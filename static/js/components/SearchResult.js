@@ -97,8 +97,8 @@ type LearningResourceProps = {
   setShowLearningResourceDrawer?: ({objectId: string,  objectType: string }) => void
 }
 
-
 const CourseSearchResult = ({ result, toggleFacet, setShowLearningResourceDrawer}: LearningResourceProps) => {
+  // $FlowFixMe: this should only be used for courses
   const course = searchResultToCourse(result)
   return (
     <CourseCard
@@ -114,6 +114,7 @@ const BootcampSearchResult = ({
   toggleFacet,
   setShowLearningResourceDrawer
 }: LearningResourceProps) => {
+  // $FlowFixMe: this should only be used for bootcamps
   const bootcamp = searchResultToBootcamp(result)
   return (
     <BootcampCard

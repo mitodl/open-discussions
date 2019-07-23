@@ -11,12 +11,12 @@ import CourseCard from "./CourseCard"
 import { makeCourse } from "../factories/courses"
 
 describe("CourseCarousel", () => {
-  let courses, sandbox, setShowCourseDrawerStub
+  let courses, sandbox, setShowLearningDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     courses = R.times(makeCourse, 10)
-    setShowCourseDrawerStub = sandbox.stub()
+    setShowLearningDrawerStub = sandbox.stub()
   })
 
   const renderCarousel = (props = {}) =>

@@ -156,6 +156,15 @@ const COURSE_QUERY_FIELDS = [
   "platform"
 ]
 
+const BOOTCAMP_QUERY_FIELDS = [
+  "title.english",
+  "short_description.english",
+  "full_description.english",
+  "instructors",
+  "prices",
+  "topics"
+]
+
 const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
@@ -167,6 +176,8 @@ const _searchFields = (type: ?string) => {
     return PROFILE_QUERY_FIELDS
   } else if (type === "course") {
     return COURSE_QUERY_FIELDS
+  } else if (type === "bootcamp") {
+    return BOOTCAMP_QUERY_FIELDS
   } else {
     return R.uniq([
       ...POST_QUERY_FIELDS,

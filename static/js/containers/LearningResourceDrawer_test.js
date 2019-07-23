@@ -11,8 +11,9 @@ import {
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
 import { setShowLearningResourceDrawer } from "../actions/ui"
-import { makeCourse } from "../factories/courses"
+import { makeBootcamp, makeCourse } from "../factories/courses"
 import { shouldIf } from "../lib/test_utils"
+import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
 
 describe("LearningResourceDrawer", () => {
   let sandbox, dispatchStub, course
@@ -69,6 +70,17 @@ describe("LearningResourceDrawer", () => {
   it("should not include an ExpandedCourseDisplay if course is null", () => {
     const wrapper = renderLearningResourceDrawer({ object: null })
     assert.isNotOk(wrapper.find(ExpandedCourseDisplay).exists())
+  })
+
+  it("should include an ExpandedBootcampDisplay", () => {
+    const bootcamp = makeBootcamp()
+    const wrapper = renderLearningResourceDrawer({
+      object:     bootcamp,
+      objectId:   bootcamp.id,
+      objectType: "bootcamp"
+    })
+    const expandedDisplay = wrapper.find(ExpandedBootcampDisplay)
+    assert.deepEqual(expandedDisplay.prop("bootcamp"), bootcamp)
   })
 
   //

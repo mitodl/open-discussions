@@ -93,12 +93,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.state = {
       text:         qs.parse(props.location.search).q,
       activeFacets: new Map([
-        [
-          "type",
-          _.union(
-            toArray(qs.parse(props.location.search).type) || []
-          )
-        ],
+        ["type", _.union(toArray(qs.parse(props.location.search).type) || [])],
         ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
         ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
         [
@@ -213,11 +208,15 @@ export class CourseSearchPage extends React.Component<Props, State> {
     // clone the facts so we can search a default of searching all resources if type isn't specified
     const queryFacets = new Map(activeFacets)
     const type = queryFacets.get("type")
-    queryFacets.set("type", R.isEmpty(type) ? SEARCH_FILTER_ALL_RESOURCES : type)
+    queryFacets.set(
+      "type",
+      emptyOrNil(type) ? SEARCH_FILTER_ALL_RESOURCES : type
+    )
     await runSearch({
       channelName: null,
       text,
       type:        queryFacets.get("type"),
+      // $FlowFixMe: type facet wont be undefined here
       facets:      queryFacets,
       from,
       size:        SETTINGS.search_page_size

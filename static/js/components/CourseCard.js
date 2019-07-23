@@ -24,12 +24,12 @@ const CourseCard = ({
   setShowLearningResourceDrawer,
   toggleFacet
 }: CardProps) => {
-  const showCourseDrawer = () => setShowLearningResourceDrawer({ objectId: course.id, objectType: "course" })
+  const showLearningResourceDrawer = () => setShowLearningResourceDrawer({ objectId: course.id, objectType: "course" })
 
   return (
     <div className="course-card">
       <div className="card-contents">
-        <div className="cover-image" onClick={showCourseDrawer}>
+        <div className="cover-image" onClick={showLearningResourceDrawer}>
           <img
             src={embedlyThumbnail(
               SETTINGS.embedlyKey,
@@ -41,7 +41,7 @@ const CourseCard = ({
             alt={`cover image for ${course.title}`}
           />
         </div>
-        <div className="row course-title" onClick={showCourseDrawer}>
+        <div className="row course-title" onClick={showLearningResourceDrawer}>
           <Dotdotdot clamp={2}>{course.title}</Dotdotdot>
         </div>
         <div className="row topics">

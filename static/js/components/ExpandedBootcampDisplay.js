@@ -7,58 +7,57 @@ import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
-import { platforms } from "../lib/constants"
 import { minPrice } from "../lib/courses"
 import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
-import type { Course } from "../flow/discussionTypes"
+import type { Bootcamp } from "../flow/discussionTypes"
 
-const COURSE_IMAGE_DISPLAY_HEIGHT = 239
-const COURSE_IMAGE_DISPLAY_WIDTH = 440
+const BOOTCAMP_IMAGE_DISPLAY_HEIGHT = 239
+const BOOTCAMP_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  course: Course
+  bootcamp: Bootcamp
 }
 
-export default class ExpandedCourseDisplay extends React.Component<Props> {
+export default class ExpandedBootcampDisplay extends React.Component<Props> {
   render() {
-    const { course } = this.props
+    const { bootcamp } = this.props
 
     return (
       <div className="expanded-course-summary">
         <div className="summary">
-          {course.image_src ? (
+          {bootcamp.image_src ? (
             <div className="course-image-div">
               <img
                 src={embedlyThumbnail(
                   SETTINGS.embedlyKey,
-                  course.image_src,
-                  COURSE_IMAGE_DISPLAY_HEIGHT,
-                  COURSE_IMAGE_DISPLAY_WIDTH
+                  bootcamp.image_src,
+                  BOOTCAMP_IMAGE_DISPLAY_HEIGHT,
+                  BOOTCAMP_IMAGE_DISPLAY_WIDTH
                 )}
               />
             </div>
           ) : null}
-          {course.url ? (
+          {bootcamp.url ? (
             <div className="course-links">
               <div>
                 <a
                   className="link-button"
-                  href={course.url}
+                  href={bootcamp.url}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Take Course on {course.platform.toUpperCase()}
+                  Take Bootcamp
                 </a>
               </div>
             </div>
           ) : null}
-          <div className="course-title">{course.title}</div>
+          <div className="course-title">{bootcamp.title}</div>
           <div className="course-description">
             <ClampLines
-              text={entities.decode(striptags(course.short_description))}
+              text={entities.decode(striptags(bootcamp.short_description))}
               lines={5}
               ellipsis="..."
               moreText="Read more"
@@ -67,7 +66,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           </div>
           <div className="course-subheader row">Topics</div>
           <div className="course-topics">
-            {course.topics.map((topic, i) => (
+            {bootcamp.topics.map((topic, i) => (
               <div className="grey-surround facet" key={i}>
                 {topic.name}
               </div>
@@ -76,32 +75,26 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           <div className="course-subheader row">Info</div>
           <div className="course-info-row">
             <i className="material-icons history">history</i>
-            <div className="course-info-label">
-              {course.platform === platforms.edX ? "As taught in" : "Semester"}:
-            </div>
-            <div className="course-info-value">
-              {_.capitalize(course.semester)} {course.year}
-            </div>
+            <div className="course-info-label">As taught in:</div>
+            <div className="course-info-value">{bootcamp.year}</div>
           </div>
           <div className="course-info-row">
             <i className="material-icons calendar_today">calendar_today</i>
             <div className="course-info-label">Start date:</div>
             <div className="course-info-value">
-              {course.platform === platforms.edX
-                ? moment(course.start_date).format("DD MMMM YYYY")
-                : "Ongoing"}
+              {moment(bootcamp.start_date).format("DD MMMM YYYY")}
             </div>
           </div>
           <div className="course-info-row">
             <i className="material-icons attach_money">attach_money</i>
             <div className="course-info-label">Cost:</div>
-            <div className="course-info-value">{minPrice(course)}</div>
+            <div className="course-info-value">{minPrice(bootcamp)}</div>
           </div>
           <div className="course-info-row">
             <i className="material-icons bar_chart">bar_chart</i>
             <div className="course-info-label">Level:</div>
             <div className="course-info-value">
-              {course.level || "Unspecified"}
+              {bootcamp.level || "Unspecified"}
             </div>
           </div>
           <div className="course-info-row">
@@ -109,7 +102,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
             <div className="course-info-label">Instructors:</div>
             <div className="course-info-value">
               {_.join(
-                course.instructors.map(
+                bootcamp.instructors.map(
                   instructor =>
                     `Prof. ${instructor.first_name} ${instructor.last_name}`
                 ),
@@ -121,7 +114,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
             <i className="material-icons language">language</i>
             <div className="course-info-label">Language:</div>
             <div className="course-info-value">
-              {languageName(course.language)}
+              {languageName(bootcamp.language)}
             </div>
           </div>
         </div>

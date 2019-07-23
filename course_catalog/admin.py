@@ -2,7 +2,14 @@
 
 from django.contrib import admin
 
-from course_catalog.models import Course, Bootcamp, Program, UserList, ProgramItem, UserListItem
+from course_catalog.models import (
+    Course,
+    Bootcamp,
+    Program,
+    UserList,
+    ProgramItem,
+    UserListItem,
+)
 
 
 class CourseAdmin(admin.ModelAdmin):

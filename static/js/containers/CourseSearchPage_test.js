@@ -162,7 +162,7 @@ describe("CourseSearchPage", () => {
           platform:     [],
           topics:       [],
           availability: [],
-          type:         SEARCH_FILTER_ALL_RESOURCES
+          type:         []
         })
       ),
       from:              5,
@@ -310,7 +310,7 @@ describe("CourseSearchPage", () => {
         ["platform", []],
         ["topics", []],
         ["availability", []],
-        ["type", SEARCH_FILTER_ALL_RESOURCES]
+        ["type", []]
       ])
     )
   })
@@ -378,9 +378,8 @@ describe("CourseSearchPage", () => {
       )
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
-      type: SEARCH_FILTER_ALL_RESOURCES,
-      q:    text,
-      t:    "Physics"
+      q: text,
+      t: "Physics"
     })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
@@ -390,7 +389,7 @@ describe("CourseSearchPage", () => {
           topics:       ["Physics"],
           platform:     [],
           availability: [],
-          type:         SEARCH_FILTER_ALL_RESOURCES
+          type:         []
         })
       ),
       from:              0,
