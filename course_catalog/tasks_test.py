@@ -217,11 +217,10 @@ def test_get_mitx_data_unexpected_error(
     assert Course.objects.count() == 0
 
 
-def test_get_mitx_data_no_settings(settings):
+def test_get_mitx_data_no_settings(get_micromasters_data):
     """
     No data should be imported if MITx settings are missing
     """
-    settings.EDX_API_URL = None
     sync_and_upload_edx_data()
     assert Course.objects.count() == 0
 
@@ -258,11 +257,10 @@ def test_get_ocw_data(settings, mock_course_index_functions):
     assert json.loads(obj.get()["Body"].read())
 
 
-def test_get_ocw_data_no_settings(settings):
+def test_get_ocw_data_no_settings():
     """
     No data should be imported if OCW settings are missing
     """
-    settings.OCW_CONTENT_ACCESS_KEY = None
     get_ocw_data()
     assert Course.objects.count() == 0
 
