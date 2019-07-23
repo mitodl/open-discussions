@@ -100,6 +100,14 @@ describe("CourseSearchPage", () => {
     })
   })
 
+  it("renders the Learning Resource facet", async() => {
+    const { inner } = await renderPage()
+    assert.equal(inner
+      .find("Connect(SearchFacet)")
+      .at(0)
+      .prop("title"), "Learning Resource")
+  })
+
   it("passes a setShowResourceDrawer to search results", async () => {
     const { inner, store } = await renderPage()
     inner
@@ -360,7 +368,7 @@ describe("CourseSearchPage", () => {
     inner.setState({ from: 7, text })
     inner
       .find("Connect(SearchFacet)")
-      .at(0)
+      .at(1)
       .props()
       .onUpdate({
         target: { name: "topics", value: "Physics", checked: true }

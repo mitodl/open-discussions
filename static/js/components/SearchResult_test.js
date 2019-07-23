@@ -5,12 +5,14 @@ import { shallow } from "enzyme"
 
 import SearchResult from "./SearchResult"
 import {
+  makeBootcampResult,
   makeCommentResult,
   makeCourseResult,
   makePostResult,
   makeProfileResult
 } from "../factories/search"
 import {
+  searchResultToBootcamp,
   searchResultToComment,
   searchResultToCourse,
   searchResultToPost,
@@ -94,5 +96,14 @@ describe("SearchResult", () => {
     course.instructors = []
     const courseDisplay = wrapper.find("CourseCard")
     assert.deepEqual(courseDisplay.prop("course"), course)
+  })
+
+  it("renders a bootcamp", () => {
+    const result = makeBootcampResult()
+    const wrapper = render(result).dive()
+    const bootcamp = searchResultToBootcamp(result)
+    bootcamp.instructors = []
+    const bootcampDisplay = wrapper.find("BootcampCard")
+    assert.deepEqual(bootcampDisplay.prop("bootcamp"), bootcamp)
   })
 })

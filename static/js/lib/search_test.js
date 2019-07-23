@@ -282,118 +282,119 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
-
-    it(`filters courses by platform, availability, type, and topics`, () => {
-      const fieldNames = ["field1", "field2", "field3"]
-      const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
-      const type = "course"
-      const text = "some text here"
-      const facets = new Map(
-        Object.entries({
-          platform:     ["mitx"],
-          topics:       ["Engineering", "Science"],
-          availability: ["Upcoming"],
-          type:         [type]
-        })
-      )
-
-      const mustQuery = [
-        {
-          term: {
-            object_type: "course"
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  platform: "mitx"
-                }
-              }
-            ]
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  topics: "Engineering"
-                }
-              },
-              {
-                term: {
-                  topics: "Science"
-                }
-              }
-            ]
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  availability: "Upcoming"
-                }
-              }
-            ]
-          }
-        }
-      ]
-
-      assert.deepEqual(buildSearchQuery({ type, text, facets }), {
-        aggs: {
-          availability: {
-            terms: {
-              field: "availability",
-              size:  10000
+    //
+    ;["course", "bootcamp"].forEach(type =>{
+      it(`filters courses by platform, availability, type, and topics`, () => {
+        const fieldNames = ["field1", "field2", "field3"]
+        const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
+        const text = "some text here"
+        const facets = new Map(
+          Object.entries({
+            platform:     ["mitx"],
+            topics:       ["Engineering", "Science"],
+            availability: ["Upcoming"],
+            type:         [type]
+          })
+        )
+  
+        const mustQuery = [
+          {
+            term: {
+              object_type: type
             }
           },
-          platform: {
-            terms: {
-              field: "platform",
-              size:  10000
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    platform: "mitx"
+                  }
+                }
+              ]
             }
           },
-          topics: {
-            terms: {
-              field: "topics",
-              size:  10000
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    topics: "Engineering"
+                  }
+                },
+                {
+                  term: {
+                    topics: "Science"
+                  }
+                }
+              ]
             }
           },
-          type: {
-            terms: {
-              field: "object_type.keyword",
-              size:  10000
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    availability: "Upcoming"
+                  }
+                }
+              ]
             }
           }
-        },
-        query: {
-          bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: mustQuery
-                    }
-                  },
-                  must: {
-                    multi_match: {
-                      query:     text,
-                      fields:    fieldNames,
-                      fuzziness: "AUTO"
+        ]
+
+        assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+          aggs: {
+            availability: {
+              terms: {
+                field: "availability",
+                size:  10000
+              }
+            },
+            platform: {
+              terms: {
+                field: "platform",
+                size:  10000
+              }
+            },
+            topics: {
+              terms: {
+                field: "topics",
+                size:  10000
+              }
+            },
+            type: {
+              terms: {
+                field: "object_type.keyword",
+                size:  10000
+              }
+            }
+          },
+          query: {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: {
+                      bool: {
+                        must: mustQuery
+                      }
+                    },
+                    must: {
+                      multi_match: {
+                        query:     text,
+                        fields:    fieldNames,
+                        fuzziness: "AUTO"
+                      }
                     }
                   }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
+        })
+        sinon.assert.calledWith(stub, type)
       })
-      sinon.assert.calledWith(stub, type)
     })
 
     //

@@ -41,7 +41,6 @@ export const SEARCH_FILTER_COMMENT = "comment"
 export const SEARCH_FILTER_PROFILE = "profile"
 export const SEARCH_FILTER_COURSE = "course"
 export const SEARCH_FILTER_BOOTCAMP = "bootcamp"
-export const SEARCH_FILTER_USERLIST = "user_list"
 export const SEARCH_FILTER_ALL_RESOURCES = [
   SEARCH_FILTER_COURSE,
   SEARCH_FILTER_BOOTCAMP

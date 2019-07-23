@@ -7,6 +7,7 @@ import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
 import { COURSE_ARCHIVED, COURSE_CURRENT, platforms } from "../lib/constants"
 
 import type {
+  BootcampResult,
   CommentResult,
   CourseResult,
   PostResult,
@@ -90,6 +91,28 @@ export const makeCourseResult = (): CourseResult => ({
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
   object_type:       "course",
+  availability:
+    casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
+})
+
+export const makeBootcampResult = (): BootcampResult => ({
+  id:                casual.number,
+  course_id:         `course_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  full_description:  casual.description,
+  language:          casual.random_element(["en-US", "fr", null]),
+  year:              casual.year,
+  start_date:        casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  instructors:       ["instuctor 1", "instructor 2"],
+  topics:            [casual.word, casual.word],
+  prices:            [{ mode: "audit", price: casual.number }],
+  object_type:       "bootcamp",
   availability:
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })

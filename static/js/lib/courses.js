@@ -8,7 +8,6 @@ import {
 } from "./constants"
 
 import type { Bootcamp, Course } from "../flow/discussionTypes"
-import { SEARCH_FILTER_USERLIST } from "./picker"
 import { capitalize } from "./util"
 
 export const availabilityLabel = (availability: ?string) => {
@@ -23,12 +22,7 @@ export const availabilityLabel = (availability: ?string) => {
 }
 
 export const resourceLabel = (resource: string) => {
-  switch (resource) {
-  case SEARCH_FILTER_USERLIST:
-    return "Learning Paths"
-  default:
-    return concat(capitalize(resource), "s")
-  }
+  return concat(capitalize(resource), "s")
 }
 
 export const maxPrice = (course: Course | Bootcamp) => {
