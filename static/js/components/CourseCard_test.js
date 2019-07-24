@@ -107,11 +107,13 @@ describe("CourseCard", () => {
         .find("img")
       assert.equal(
         platformImg.prop("src"),
-        platformLogoUrls[isCourse ? course.platform : platforms.bootcamps]
+        // $FlowFixMe: only courses will access platform
+        platformLogoUrls[isCourse ? object.platform : platforms.bootcamps]
       )
       assert.equal(
         platformImg.prop("alt"),
-        `logo for ${isCourse ? course.platform : platforms.bootcamps}`
+        // $FlowFixMe: only courses will access platform
+        `logo for ${isCourse ? object.platform : platforms.bootcamps}`
       )
     })
   })

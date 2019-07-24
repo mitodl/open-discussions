@@ -71,14 +71,14 @@ const CourseCard = ({
         <div className="row platform">
           <img
             className="course-platform"
-            // $FlowFixMe: only courses will access platform
             src={
               platformLogoUrls[
+                // $FlowFixMe: only courses will access platform
                 objectType === "course" ? object.platform : platforms.bootcamps
               ]
             }
-            // $FlowFixMe: only courses will end up here
             alt={`logo for ${
+              // $FlowFixMe: only courses will end up here
               objectType === "course" ? object.platform : platforms.bootcamps
             }`}
           />
