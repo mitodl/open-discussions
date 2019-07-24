@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.84.0
+--------------
+
+- Switch course search to use CourseCard, grid layout
+
 Version 0.83.1 (Released July 16, 2019)
 --------------
 
