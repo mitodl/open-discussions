@@ -8,7 +8,8 @@ import { embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platformLogoUrls
+  platformLogoUrls,
+  platforms
 } from "../lib/constants"
 
 import type { Bootcamp, Course } from "../flow/discussionTypes"
@@ -67,17 +68,21 @@ const CourseCard = ({
         <div className="row availability">
           {availabilityLabel(object.availability)}
         </div>
-        {objectType === "course" ? (
-          <div className="row platform">
-            <img
-              className="course-platform"
-              // $FlowFixMe: only courses will end up here
-              src={platformLogoUrls[object.platform]}
-              // $FlowFixMe: only courses will end up here
-              alt={`logo for ${object.platform}`}
-            />
-          </div>
-        ) : null}
+        <div className="row platform">
+          <img
+            className="course-platform"
+            // $FlowFixMe: only courses will access platform
+            src={
+              platformLogoUrls[
+                objectType === "course" ? object.platform : platforms.bootcamps
+              ]
+            }
+            // $FlowFixMe: only courses will end up here
+            alt={`logo for ${
+              objectType === "course" ? object.platform : platforms.bootcamps
+            }`}
+          />
+        </div>
         <div className="row price">{minPrice(object)}</div>
       </div>
       <div className="blue-bottom-border" />

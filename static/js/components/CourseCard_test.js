@@ -9,12 +9,12 @@ import sinon from "sinon"
 import CourseCard from "./CourseCard"
 
 import { availabilityLabel, minPrice } from "../lib/courses"
-import { shouldIf } from "../lib/test_utils"
 import { makeBootcamp, makeCourse } from "../factories/resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platformLogoUrls
+  platformLogoUrls,
+  platforms
 } from "../lib/constants"
 import { embedlyThumbnail } from "../lib/url"
 
@@ -97,20 +97,22 @@ describe("CourseCard", () => {
   })
   //
   ;[true, false].forEach(isCourse => {
-    it(`${shouldIf(isCourse)} render the platform`, () => {
+    it(`should render the platform image`, () => {
       const object = isCourse ? makeCourse() : makeBootcamp()
-      const wrapper = renderCourseCard({
+      const platformImg = renderCourseCard({
         object:     object,
         objectType: isCourse ? "course" : "bootcamp"
       })
-      assert.equal(wrapper.find(".platform").exists(), isCourse)
-      if (isCourse) {
-        const platformImg = wrapper.find(".platform").find("img")
-        // $FlowFixMe: only courses will end up here
-        assert.equal(platformImg.prop("src"), platformLogoUrls[object.platform])
-        // $FlowFixMe: only courses will end up here
-        assert.equal(platformImg.prop("alt"), `logo for ${object.platform}`)
-      }
+        .find(".platform")
+        .find("img")
+      assert.equal(
+        platformImg.prop("src"),
+        platformLogoUrls[isCourse ? course.platform : platforms.bootcamps]
+      )
+      assert.equal(
+        platformImg.prop("alt"),
+        `logo for ${isCourse ? course.platform : platforms.bootcamps}`
+      )
     })
   })
 
