@@ -13,7 +13,6 @@ import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 import { setShowResourceDrawer } from "../actions/ui"
 import { makeBootcamp, makeCourse } from "../factories/resources"
 import { shouldIf } from "../lib/test_utils"
-import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
 
 describe("LearningResourceDrawer", () => {
   let sandbox, dispatchStub, course
@@ -64,7 +63,7 @@ describe("LearningResourceDrawer", () => {
   it("should include an ExpandedCourseDisplay", () => {
     const wrapper = renderLearningResourceDrawer()
     const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
-    assert.deepEqual(expandedDisplay.prop("course"), course)
+    assert.deepEqual(expandedDisplay.prop("object"), course)
   })
 
   it("should not include an ExpandedCourseDisplay if course is null", () => {
@@ -72,15 +71,15 @@ describe("LearningResourceDrawer", () => {
     assert.isNotOk(wrapper.find(ExpandedCourseDisplay).exists())
   })
 
-  it("should include an ExpandedBootcampDisplay", () => {
+  it("should include an ExpandedCourseDisplay for a bootcamp", () => {
     const bootcamp = makeBootcamp()
     const wrapper = renderLearningResourceDrawer({
       object:     bootcamp,
       objectId:   bootcamp.id,
       objectType: "bootcamp"
     })
-    const expandedDisplay = wrapper.find(ExpandedBootcampDisplay)
-    assert.deepEqual(expandedDisplay.prop("bootcamp"), bootcamp)
+    const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
   })
 
   //

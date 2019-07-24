@@ -53,7 +53,8 @@ const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
       {courses.map((course, idx) => (
         <CourseCard
           key={idx}
-          course={course}
+          object={course}
+          objectType="course"
           setShowResourceDrawer={setShowResourceDrawer}
         />
       ))}

@@ -5,7 +5,6 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
 import CourseCard from "./CourseCard"
-import BootcampCard from "./BootcampCard"
 import CommentTree from "./CommentTree"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
@@ -105,7 +104,8 @@ const CourseSearchResult = ({
   const course = searchResultToCourse(result)
   return (
     <CourseCard
-      course={course}
+      object={course}
+      objectType="course"
       toggleFacet={toggleFacet}
       setShowResourceDrawer={setShowResourceDrawer}
     />
@@ -120,8 +120,9 @@ const BootcampSearchResult = ({
   // $FlowFixMe: this should only be used for bootcamps
   const bootcamp = searchResultToBootcamp(result)
   return (
-    <BootcampCard
-      bootcamp={bootcamp}
+    <CourseCard
+      object={bootcamp}
+      objectType="bootcamp"
       toggleFacet={toggleFacet}
       setShowResourceDrawer={setShowResourceDrawer}
     />

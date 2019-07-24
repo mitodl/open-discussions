@@ -14,7 +14,6 @@ import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 import { actions } from "../actions"
 import { setShowResourceDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
-import ExpandedBootcampDisplay from "../components/ExpandedBootcampDisplay"
 
 type Props = {
   showLearningDrawer: boolean,
@@ -79,20 +78,8 @@ export class LearningResourceDrawer extends React.Component<Props> {
     dispatch(setShowResourceDrawer({ objectId: null }))
   }
 
-  renderExpandedDisplay = () => {
-    const { object, objectType } = this.props
-    switch (objectType) {
-    case "course":
-      // $FlowFixMe: object won't be null here
-      return <ExpandedCourseDisplay course={object} />
-    case "bootcamp":
-      // $FlowFixMe: object won't be null here
-      return <ExpandedBootcampDisplay bootcamp={object} />
-    }
-  }
-
   render() {
-    const { object, showLearningDrawer } = this.props
+    const { object, objectType, showLearningDrawer } = this.props
     return object ? (
       <Theme>
         <Drawer
@@ -107,7 +94,7 @@ export class LearningResourceDrawer extends React.Component<Props> {
             <div className="drawer-close" onClick={this.onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>
-            {this.renderExpandedDisplay()}
+            <ExpandedCourseDisplay object={object} objectType={objectType} />
             <div className="footer" />
           </DrawerContent>
         </Drawer>

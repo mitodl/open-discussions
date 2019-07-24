@@ -46,7 +46,7 @@ describe("CourseCarousel", () => {
     const carousel = wrapper.find("Carousel")
     R.zip(carousel.find(CourseCard).map(R.identity), courses).forEach(
       ([el, course]) => {
-        assert.deepEqual(el.prop("course"), course)
+        assert.deepEqual(el.prop("object"), course)
       }
     )
   })

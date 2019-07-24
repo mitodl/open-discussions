@@ -11,21 +11,23 @@ import {
   platformLogoUrls
 } from "../lib/constants"
 
-import type { Course } from "../flow/discussionTypes"
+import type { Bootcamp, Course } from "../flow/discussionTypes"
 
 type CardProps = {|
-  course: Course,
+  object: Course | Bootcamp,
+  objectType: string,
   setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
 
 const CourseCard = ({
-  course,
+  object,
+  objectType,
   setShowResourceDrawer,
   toggleFacet
 }: CardProps) => {
   const showResourceDrawer = () =>
-    setShowResourceDrawer({ objectId: course.id, objectType: "course" })
+    setShowResourceDrawer({ objectId: object.id, objectType: objectType })
 
   return (
     <div className="course-card">
@@ -34,20 +36,20 @@ const CourseCard = ({
           <img
             src={embedlyThumbnail(
               SETTINGS.embedlyKey,
-              course.image_src || "",
+              object.image_src || "",
               CAROUSEL_IMG_HEIGHT,
               CAROUSEL_IMG_WIDTH
             )}
             height={CAROUSEL_IMG_HEIGHT}
-            alt={`cover image for ${course.title}`}
+            alt={`cover image for ${object.title}`}
           />
         </div>
         <div className="row course-title" onClick={showResourceDrawer}>
-          <Dotdotdot clamp={2}>{course.title}</Dotdotdot>
+          <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
         </div>
         <div className="row topics">
-          {course.topics.length > 0
-            ? course.topics.slice(0, 3).map(topic => (
+          {object.topics.length > 0
+            ? object.topics.slice(0, 3).map(topic => (
               <div
                 className="topic"
                 key={topic.name}
@@ -63,16 +65,20 @@ const CourseCard = ({
             : null}
         </div>
         <div className="row availability">
-          {availabilityLabel(course.availability)}
+          {availabilityLabel(object.availability)}
         </div>
-        <div className="row platform">
-          <img
-            className="course-platform"
-            src={platformLogoUrls[course.platform]}
-            alt={`logo for ${course.platform}`}
-          />
-        </div>
-        <div className="row price">{minPrice(course)}</div>
+        {objectType === "course" ? (
+          <div className="row platform">
+            <img
+              className="course-platform"
+              // $FlowFixMe: only courses will end up here
+              src={platformLogoUrls[object.platform]}
+              // $FlowFixMe: only courses will end up here
+              alt={`logo for ${object.platform}`}
+            />
+          </div>
+        ) : null}
+        <div className="row price">{minPrice(object)}</div>
       </div>
       <div className="blue-bottom-border" />
     </div>

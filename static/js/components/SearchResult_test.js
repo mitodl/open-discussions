@@ -95,7 +95,7 @@ describe("SearchResult", () => {
     const course = searchResultToCourse(result)
     course.instructors = []
     const courseDisplay = wrapper.find("CourseCard")
-    assert.deepEqual(courseDisplay.prop("course"), course)
+    assert.deepEqual(courseDisplay.prop("object"), course)
   })
 
   it("renders a bootcamp", () => {
@@ -103,7 +103,7 @@ describe("SearchResult", () => {
     const wrapper = render(result).dive()
     const bootcamp = searchResultToBootcamp(result)
     bootcamp.instructors = []
-    const bootcampDisplay = wrapper.find("BootcampCard")
-    assert.deepEqual(bootcampDisplay.prop("bootcamp"), bootcamp)
+    const bootcampDisplay = wrapper.find("CourseCard")
+    assert.deepEqual(bootcampDisplay.prop("object"), bootcamp)
   })
 })
