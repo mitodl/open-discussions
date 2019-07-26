@@ -1,5 +1,5 @@
 """
-course_catalog helper functions for tasks
+course_catalog api functions
 """
 import json
 import logging
