@@ -13,7 +13,7 @@ from ocw_data_parser import OCWParser
 from open_discussions.celery import app
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course
-from course_catalog.task_helpers import (
+from course_catalog.api import (
     get_access_token,
     parse_mitx_json_data,
     safe_load_json,

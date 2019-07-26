@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-from course_catalog.task_helpers import get_course_availability
+from course_catalog.api import get_course_availability
 
 
 def populate_availability(apps, schema_editor):

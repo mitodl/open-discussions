@@ -28,8 +28,7 @@ def get_micromasters_data(mocker):
         },
     ]
     mocker.patch(
-        "course_catalog.task_helpers.get_micromasters_data",
-        return_value=micromasters_data,
+        "course_catalog.api.get_micromasters_data", return_value=micromasters_data
     )
 
 
@@ -37,6 +36,6 @@ def get_micromasters_data(mocker):
 def mock_course_index_functions(mocker):
     """Mocks index updating functions for courses"""
     return SimpleNamespace(
-        update_course=mocker.patch("course_catalog.task_helpers.update_course"),
-        index_new_course=mocker.patch("course_catalog.task_helpers.index_new_course"),
+        update_course=mocker.patch("course_catalog.api.update_course"),
+        index_new_course=mocker.patch("course_catalog.api.index_new_course"),
     )
