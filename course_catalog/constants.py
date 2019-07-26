@@ -44,7 +44,7 @@ class AvailabilityType(Enum):
     While these are the options coming in from edX that we store as is, we
     display some values differently. Namely "Current" is displayed to the user
     as "Available Now" and "Archived" is displayed as "Prior".
-    As of 06/21/2019, the above mapping occurs in `courses.js:availabilityLabel()`.
+    As of 06/21/2019, the above mapping occurs in `learning_resources.js:availabilityLabel()`.
     All OCW courses should be set to "Current".
     """
 

@@ -3,7 +3,7 @@ import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
 
-import CourseDrawer from "./CourseDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 import { CourseIndexPage } from "./CourseIndexPage"
 import {
   BannerPageWrapper,
@@ -13,13 +13,13 @@ import {
 
 import { COURSE_BANNER_URL } from "../lib/url"
 import { configureShallowRenderer } from "../lib/test_utils"
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/learning_resources"
 
 describe("CourseIndexPage", () => {
   let featuredCourses,
     upcomingCourses,
     newCourses,
-    setShowCourseDrawerStub,
+    setShowResourceDrawerStub,
     renderCourseIndexPage,
     sandbox,
     courseLists
@@ -34,10 +34,10 @@ describe("CourseIndexPage", () => {
       newCourses
     }
     sandbox = sinon.createSandbox()
-    setShowCourseDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = sandbox.stub()
     renderCourseIndexPage = configureShallowRenderer(CourseIndexPage, {
-      setShowCourseDrawer: setShowCourseDrawerStub,
-      loaded:              true,
+      setShowResourceDrawer: setShowResourceDrawerStub,
+      loaded:                true,
       ...courseLists
     })
   })
@@ -59,14 +59,14 @@ describe("CourseIndexPage", () => {
         .at(idx)
       assert.equal(title, carousel.prop("title"))
       assert.deepEqual(courseList, carousel.prop("courses"))
-      carousel.prop("setShowCourseDrawer")()
-      sinon.assert.called(setShowCourseDrawerStub)
+      carousel.prop("setShowResourceDrawer")()
+      sinon.assert.called(setShowResourceDrawerStub)
     })
   })
 
-  it("should render a CourseDrawer", () => {
+  it("should render a LearningResourceDrawer", () => {
     const wrapper = renderCourseIndexPage()
-    assert.ok(wrapper.find(CourseDrawer).exists())
+    assert.ok(wrapper.find(LearningResourceDrawer).exists())
   })
 
   it("shouldnt render carousels if loaded === false", () => {
@@ -107,9 +107,6 @@ describe("CourseIndexPage", () => {
     assert.equal(searchBox.prop("placeholder"), "Search Learning offerings")
     assert.isTrue(searchBox.prop("noFocusOnLoad"))
     searchBox.simulate("submit", { target: { value: "search term" } })
-    sinon.assert.calledWith(
-      pushStub,
-      "/courses/search?q=search%20term&type=course"
-    )
+    sinon.assert.calledWith(pushStub, "/courses/search?q=search%20term")
   })
 })

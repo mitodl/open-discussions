@@ -8,7 +8,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 
-import CourseDrawer from "./CourseDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 
 import CanonicalLink from "../components/CanonicalLink"
 import Card from "../components/Card"
@@ -20,11 +20,11 @@ import SearchTextbox from "../components/SearchTextbox"
 import SearchResult from "../components/SearchResult"
 
 import { actions } from "../actions"
-import { setShowCourseDrawer } from "../actions/ui"
+import { setShowResourceDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
-import { availabilityLabel } from "../lib/courses"
-import { SEARCH_FILTER_COURSE } from "../lib/picker"
-import { preventDefaultAndInvoke, toArray } from "../lib/util"
+import { availabilityLabel, resourceLabel } from "../lib/learning_resources"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
+import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
 
 import type { Location, Match } from "react-router"
@@ -45,7 +45,7 @@ type OwnProps = {|
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
   clearSearch: () => void,
-  setShowCourseDrawer: ({ courseId: string }) => void
+  setShowResourceDrawer: ({ objectId: string, objectType: string }) => void
 |}
 
 type StateProps = {|
@@ -79,6 +79,7 @@ type State = {
 }
 
 const facetDisplayMap = [
+  ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
   ["availability", "Availability", availabilityLabel],
   ["platform", "Platform", _.upperCase]
@@ -92,6 +93,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.state = {
       text:         qs.parse(props.location.search).q,
       activeFacets: new Map([
+        ["type", _.union(toArray(qs.parse(props.location.search).type) || [])],
         ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
         ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
         [
@@ -124,7 +126,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       activeFacets: new Map([
         ["platform", []],
         ["availability", []],
-        ["topics", []]
+        ["topics", []],
+        ["type", []]
       ]),
       currentFacetGroup: null
     })
@@ -182,16 +185,15 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     const { activeFacets, text } = this.state
 
-    const type = SEARCH_FILTER_COURSE
     history.replace({
       pathname: pathname,
       search:   qs.stringify({
         ...qs.parse(search),
-        q: text,
-        type,
-        p: activeFacets.get("platform"),
-        t: activeFacets.get("topics"),
-        a: activeFacets.get("availability")
+        q:    text,
+        type: activeFacets.get("type"),
+        p:    activeFacets.get("platform"),
+        t:    activeFacets.get("topics"),
+        a:    activeFacets.get("availability")
       })
     })
     let from = this.state.from + SETTINGS.search_page_size
@@ -202,11 +204,20 @@ export class CourseSearchPage extends React.Component<Props, State> {
       from = 0
     }
     this.setState({ from, incremental })
+
+    // clone the facts so we can search a default of searching all resources if type isn't specified
+    const queryFacets = new Map(activeFacets)
+    const type = queryFacets.get("type")
+    queryFacets.set(
+      "type",
+      emptyOrNil(type) ? SEARCH_FILTER_ALL_RESOURCES : type
+    )
     await runSearch({
       channelName: null,
       text,
-      facets:      activeFacets,
-      type,
+      type:        queryFacets.get("type"),
+      // $FlowFixMe: type facet wont be undefined here
+      facets:      queryFacets,
       from,
       size:        SETTINGS.search_page_size
     })
@@ -254,7 +265,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       processing,
       loaded,
       total,
-      setShowCourseDrawer
+      setShowResourceDrawer
     } = this.props
     const { from, incremental } = this.state
 
@@ -281,7 +292,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               <SearchResult
                 result={result}
                 toggleFacet={this.toggleFacet}
-                setShowCourseDrawer={setShowCourseDrawer}
+                setShowResourceDrawer={setShowResourceDrawer}
               />
             </Cell>
           ))}
@@ -349,7 +360,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
           </Cell>
           <Cell width={9}>{error ? null : this.renderResults()}</Cell>
         </Grid>
-        <CourseDrawer />
+        <LearningResourceDrawer />
       </React.Fragment>
     )
   }
@@ -377,8 +388,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
   },
-  setShowCourseDrawer: ({ courseId }: { courseId: string }) => {
-    dispatch(setShowCourseDrawer({ courseId }))
+  setShowResourceDrawer: ({
+    objectId,
+    objectType
+  }: {
+    objectId: string,
+    objectType: string
+  }) => {
+    dispatch(setShowResourceDrawer({ objectId, objectType }))
   },
   dispatch
 })

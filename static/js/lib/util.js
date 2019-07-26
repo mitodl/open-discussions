@@ -148,3 +148,11 @@ export const flatZip = R.compose(
   R.flatten,
   R.zip
 )
+
+export const capitalize = R.converge(R.concat(), [
+  R.compose(
+    R.toUpper,
+    R.head
+  ),
+  R.tail
+])

@@ -57,30 +57,30 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-type RESULT_TYPE_COURSE = "course"
 
-export type CourseResult = {
-  id:                 number,
-  course_id:          string,
-  url:                string,
-  title:              string,
-  image_src:          ?string,
-  object_type:        RESULT_TYPE_COURSE,
-  short_description:  ?string,
-  full_description:   ?string,
-  platform:           string,
-  language:           ?string,
-  semester:           ?string,
-  year:               ?string,
-  level:              ?string,
-  start_date:         ?string,
-  end_date:           ?string,
-  enrollment_start:   ?string,
-  enrollment_end:     ?string,
-  availability:       ?string,
-  instructors:        Array<string>,
-  topics:             Array<string>,
-  prices:             Array<CoursePrice>
+
+export type LearningResourceResult = {
+  id:                  number,
+  course_id?:          string,
+  url?:                string,
+  title:               string,
+  image_src:           ?string,
+  object_type:         string,
+  short_description?:  ?string,
+  full_description?:   ?string,
+  platform?:           string,
+  language?:           ?string,
+  semester?:           ?string,
+  year?:               ?string,
+  level?:              ?string,
+  start_date?:         ?string,
+  end_date?:           ?string,
+  enrollment_start?:   ?string,
+  enrollment_end?:     ?string,
+  availability?:       ?string,
+  instructors?:        Array<string>,
+  topics:              Array<string>,
+  prices?:             Array<CoursePrice>
 }
 
 export type FacetBucket = {
@@ -97,7 +97,7 @@ export type CurrentFacet = {
   result: FacetResult
 }
 
-export type Result = PostResult | CommentResult | ProfileResult | CourseResult
+export type Result = PostResult | CommentResult | ProfileResult | LearningResourceResult
 
 export type SearchInputs = {
   text?:            string,
@@ -111,7 +111,7 @@ export type SortParam = {
 }
 
 export type SearchParams = {
-  type:              ?string,
+  type:              ?string|?Array<string>,
   text:              ?string,
   from:              number,
   size:              number,

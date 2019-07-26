@@ -7,7 +7,7 @@ import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
-import { SET_SHOW_COURSE_DRAWER } from "../actions/ui"
+import { SET_SHOW_RESOURCE_DRAWER } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import {
@@ -16,6 +16,7 @@ import {
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -99,15 +100,29 @@ describe("CourseSearchPage", () => {
     })
   })
 
-  it("passes a setShowCourseDrawer to search results", async () => {
+  it("renders the Learning Resource facet", async () => {
+    const { inner } = await renderPage()
+    assert.equal(
+      inner
+        .find("Connect(SearchFacet)")
+        .at(0)
+        .prop("title"),
+      "Learning Resource"
+    )
+  })
+
+  it("passes a setShowResourceDrawer to search results", async () => {
     const { inner, store } = await renderPage()
     inner
       .find("SearchResult")
       .at(0)
-      .prop("setShowCourseDrawer")({ courseId: searchCourse.course_id })
+      .prop("setShowResourceDrawer")({
+        objectId:   searchCourse.course_id,
+        objectType: "course"
+      })
     assert.deepEqual(store.getLastAction(), {
-      type:    SET_SHOW_COURSE_DRAWER,
-      payload: { courseId: searchCourse.course_id }
+      type:    SET_SHOW_RESOURCE_DRAWER,
+      payload: { objectId: searchCourse.course_id, objectType: "course" }
     })
   })
 
@@ -141,12 +156,13 @@ describe("CourseSearchPage", () => {
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
           platform:     undefined,
           topics:       undefined,
-          availability: undefined
+          availability: undefined,
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       )
     })
@@ -159,7 +175,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           platform:     [],
           topics:       [],
-          availability: []
+          availability: [],
+          type:         []
         })
       ),
       from:              5,
@@ -189,9 +206,10 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
+          type:           SEARCH_FILTER_ALL_RESOURCES,
           platforms:      ["ocw"],
           topics:         ["Science", "Engineering"],
           availabilities: ["prior"]
@@ -291,17 +309,23 @@ describe("CourseSearchPage", () => {
     const activeFacets = new Map([
       ["platform", ["ocw"]],
       ["topics", ["Science", "Law"]],
-      ["availability", ["Current"]]
+      ["availability", ["Current"]],
+      ["type", SEARCH_FILTER_ALL_RESOURCES]
     ])
     inner.setState({ text, activeFacets })
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
-    assert.equal(inner.find("SearchFilter").length, 4)
+    assert.equal(inner.find("SearchFilter").length, 6)
     inner.find(".search-filters-clear").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
       inner.state().activeFacets,
-      new Map([["platform", []], ["topics", []], ["availability", []]])
+      new Map([
+        ["platform", []],
+        ["topics", []],
+        ["availability", []],
+        ["type", []]
+      ])
     )
   })
 
@@ -329,7 +353,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           topics:       [],
           platform:     [],
-          availability: []
+          availability: [],
+          type:         ["course"]
         })
       ),
       currentFacetGroup: null,
@@ -346,7 +371,7 @@ describe("CourseSearchPage", () => {
     inner.setState({ from: 7, text })
     inner
       .find("Connect(SearchFacet)")
-      .at(0)
+      .at(1)
       .props()
       .onUpdate({
         target: { name: "topics", value: "Physics", checked: true }
@@ -356,19 +381,19 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text,
-      type:        "course",
+      type:        SEARCH_FILTER_ALL_RESOURCES,
       facets:      new Map(
         Object.entries({
           platform:     ["ocw"],
           topics:       ["Physics"],
-          availability: ["prior"]
+          availability: ["prior"],
+          type:         SEARCH_FILTER_ALL_RESOURCES
         })
       )
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
-      type: "course",
-      q:    text,
-      t:    "Physics"
+      q: text,
+      t: "Physics"
     })
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
@@ -377,7 +402,8 @@ describe("CourseSearchPage", () => {
         Object.entries({
           topics:       ["Physics"],
           platform:     [],
-          availability: []
+          availability: [],
+          type:         []
         })
       ),
       from:              0,
@@ -436,7 +462,7 @@ describe("CourseSearchPage", () => {
         from:        0,
         size:        SETTINGS.search_page_size,
         text:        "some text",
-        type:        "course",
+        type:        SEARCH_FILTER_ALL_RESOURCES,
         facets:      new Map(
           Object.entries({
             platform:     [],

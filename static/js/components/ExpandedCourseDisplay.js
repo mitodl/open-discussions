@@ -8,57 +8,62 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms } from "../lib/constants"
-import { minPrice } from "../lib/courses"
+import { minPrice } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
-import type { Course } from "../flow/discussionTypes"
+import type { Bootcamp, Course } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  course: Course
+  object: Course | Bootcamp,
+  objectType: string
 }
 
 export default class ExpandedCourseDisplay extends React.Component<Props> {
   render() {
-    const { course } = this.props
+    const { object, objectType } = this.props
+    const isCourse = objectType === "course"
 
     return (
       <div className="expanded-course-summary">
         <div className="summary">
-          {course.image_src ? (
+          {object.image_src ? (
             <div className="course-image-div">
               <img
                 src={embedlyThumbnail(
                   SETTINGS.embedlyKey,
-                  course.image_src,
+                  object.image_src,
                   COURSE_IMAGE_DISPLAY_HEIGHT,
                   COURSE_IMAGE_DISPLAY_WIDTH
                 )}
               />
             </div>
           ) : null}
-          {course.url ? (
+          {object.url ? (
             <div className="course-links">
               <div>
                 <a
                   className="link-button"
-                  href={course.url}
+                  href={object.url}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Take Course on {course.platform.toUpperCase()}
+                  {isCourse
+                    ? // $FlowFixMe: only courses will end up here
+                    `Take Course on ${object.platform.toUpperCase()}`
+                    : "Take Bootcamp"}
                 </a>
               </div>
             </div>
           ) : null}
-          <div className="course-title">{course.title}</div>
+          <div className="course-title">{object.title}</div>
           <div className="course-description">
             <ClampLines
-              text={entities.decode(striptags(course.short_description))}
+              text={entities.decode(striptags(object.short_description))}
               lines={5}
               ellipsis="..."
               moreText="Read more"
@@ -67,7 +72,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           </div>
           <div className="course-subheader row">Topics</div>
           <div className="course-topics">
-            {course.topics.map((topic, i) => (
+            {object.topics.map((topic, i) => (
               <div className="grey-surround facet" key={i}>
                 {topic.name}
               </div>
@@ -77,39 +82,49 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
           <div className="course-info-row">
             <i className="material-icons history">history</i>
             <div className="course-info-label">
-              {course.platform === platforms.edX ? "As taught in" : "Semester"}:
+              {// $FlowFixMe: only courses will access platform
+                !isCourse || object.platform === platforms.edX
+                  ? "As taught in"
+                  : "Semester"}:
             </div>
             <div className="course-info-value">
-              {_.capitalize(course.semester)} {course.year}
+              {isCourse
+                ? // $FlowFixMe: only courses will access semester
+                `${_.capitalize(object.semester)} `
+                : null}
+              {object.year}
             </div>
           </div>
           <div className="course-info-row">
             <i className="material-icons calendar_today">calendar_today</i>
             <div className="course-info-label">Start date:</div>
             <div className="course-info-value">
-              {course.platform === platforms.edX
-                ? moment(course.start_date).format("DD MMMM YYYY")
+              {!isCourse || object.platform === platforms.edX
+                ? moment(object.start_date).format("DD MMMM YYYY")
                 : "Ongoing"}
             </div>
           </div>
           <div className="course-info-row">
             <i className="material-icons attach_money">attach_money</i>
             <div className="course-info-label">Cost:</div>
-            <div className="course-info-value">{minPrice(course)}</div>
+            <div className="course-info-value">{minPrice(object)}</div>
           </div>
-          <div className="course-info-row">
-            <i className="material-icons bar_chart">bar_chart</i>
-            <div className="course-info-label">Level:</div>
-            <div className="course-info-value">
-              {course.level || "Unspecified"}
+          {isCourse ? (
+            <div className="course-info-row">
+              <i className="material-icons bar_chart">bar_chart</i>
+              <div className="course-info-label">Level:</div>
+              <div className="course-info-value">
+                {// $FlowFixMe: only courses will access level
+                  object.level || "Unspecified"}
+              </div>
             </div>
-          </div>
+          ) : null}
           <div className="course-info-row">
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
             <div className="course-info-value">
               {_.join(
-                course.instructors.map(
+                object.instructors.map(
                   instructor =>
                     `Prof. ${instructor.first_name} ${instructor.last_name}`
                 ),
@@ -121,7 +136,7 @@ export default class ExpandedCourseDisplay extends React.Component<Props> {
             <i className="material-icons language">language</i>
             <div className="course-info-label">Language:</div>
             <div className="course-info-value">
-              {languageName(course.language)}
+              {languageName(object.language)}
             </div>
           </div>
         </div>

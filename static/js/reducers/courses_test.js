@@ -4,7 +4,7 @@ import sinon from "sinon"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
-import { makeCourse } from "../factories/courses"
+import { makeCourse } from "../factories/learning_resources"
 
 describe("course reducers", () => {
   let helper, response, dispatchThen

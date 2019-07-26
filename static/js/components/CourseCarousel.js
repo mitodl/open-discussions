@@ -3,16 +3,17 @@
 import React from "react"
 import Carousel from "nuka-carousel"
 
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 
 import { CAROUSEL_PAGE_SIZE } from "../lib/constants"
 
 import type { Course } from "../flow/discussionTypes"
+import R from "ramda"
 
 type Props = {|
   title: string,
   courses: Array<Course>,
-  setShowCourseDrawer: Function
+  setShowResourceDrawer: Function
 |}
 
 const prevButton = ({ previousSlide, currentSlide }) =>
@@ -34,7 +35,7 @@ const nextButton = props => {
   )
 }
 
-const CourseCarousel = ({ title, courses, setShowCourseDrawer }: Props) => (
+const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
   <div className="course-carousel">
     <div className="title-row">
       <div className="title">{title}</div>
@@ -51,10 +52,10 @@ const CourseCarousel = ({ title, courses, setShowCourseDrawer }: Props) => (
       renderBottomCenterControls={null}
     >
       {courses.map((course, idx) => (
-        <CourseCard
+        <LearningResourceCard
           key={idx}
-          course={course}
-          setShowCourseDrawer={setShowCourseDrawer}
+          object={R.merge({ object_type: "course" }, course)}
+          setShowResourceDrawer={setShowResourceDrawer}
         />
       ))}
     </Carousel>

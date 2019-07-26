@@ -128,6 +128,7 @@ class ESCourseSerializer(ESModelSerializer):
     prices = serializers.SerializerMethodField()
     instructors = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
+    availability = serializers.SerializerMethodField()
 
     def get_prices(self, course):
         """
@@ -146,6 +147,14 @@ class ESCourseSerializer(ESModelSerializer):
         Get the topic names for a course
         """
         return [topic.name for topic in course.topics.all()]
+
+    def get_availability(self, course):
+        """
+        Get the availability for a course
+        """
+        if course.availability:
+            return course.availability.title()
+        return None
 
     class Meta:
         model = Course

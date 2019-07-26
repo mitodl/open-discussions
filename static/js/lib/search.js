@@ -5,7 +5,7 @@ import R from "ramda"
 
 import type {
   CommentInTree,
-  Course,
+  LearningResource,
   Post,
   Profile
 } from "../flow/discussionTypes"
@@ -14,8 +14,8 @@ import type {
   CommentResult,
   ProfileResult,
   SearchParams,
-  CourseResult,
-  FacetResult
+  FacetResult,
+  LearningResourceResult
 } from "../flow/searchTypes"
 
 export const searchResultToComment = (
@@ -85,27 +85,17 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
   username:             result.author_id
 })
 
-export const searchResultToCourse = (result: CourseResult): Course => ({
-  id:                result.id,
-  course_id:         result.course_id,
-  url:               result.url,
-  title:             result.title,
-  image_src:         result.image_src,
-  short_description: result.short_description,
-  full_description:  result.full_description,
-  platform:          result.platform,
-  language:          result.language,
-  semester:          result.semester,
-  year:              result.year,
-  level:             result.level,
-  start_date:        result.start_date,
-  end_date:          result.end_date,
-  enrollment_start:  result.enrollment_start,
-  enrollment_end:    result.enrollment_end,
-  availability:      result.availability,
-  instructors:       [],
-  topics:            result.topics.map(topic => ({ name: topic })),
-  prices:            result.prices
+export const searchResultToLearningResource = (
+  result: LearningResourceResult
+): LearningResource => ({
+  id:           result.id,
+  title:        result.title,
+  image_src:    result.image_src,
+  object_type:  result.object_type,
+  platform:     "platform" in result ? result.platform : null,
+  availability: "availability" in result ? result.availability : null,
+  topics:       result.topics.map(topic => ({ name: topic })),
+  prices:       "prices" in result ? result.prices || [] : []
 })
 
 const POST_QUERY_FIELDS = [
@@ -132,6 +122,17 @@ const COURSE_QUERY_FIELDS = [
   "platform"
 ]
 
+const BOOTCAMP_QUERY_FIELDS = [
+  "title.english",
+  "short_description.english",
+  "full_description.english",
+  "instructors",
+  "prices",
+  "topics"
+]
+
+const OBJECT_TYPE = "type"
+
 const _searchFields = (type: ?string) => {
   if (type === "post") {
     return POST_QUERY_FIELDS
@@ -141,6 +142,8 @@ const _searchFields = (type: ?string) => {
     return PROFILE_QUERY_FIELDS
   } else if (type === "course") {
     return COURSE_QUERY_FIELDS
+  } else if (type === "bootcamp") {
+    return BOOTCAMP_QUERY_FIELDS
   } else {
     return R.uniq([
       ...POST_QUERY_FIELDS,
@@ -170,6 +173,14 @@ const _channelField = (type: ?string) => {
 export { _channelField as channelField }
 import { channelField } from "./search"
 
+const getTypes = (type: ?(string | Array<string>)) => {
+  if (type) {
+    return Array.isArray(type) ? type : [type]
+  } else {
+    return ["comment", "post", "profile"]
+  }
+}
+
 export const buildSearchQuery = ({
   text,
   type,
@@ -192,7 +203,7 @@ export const buildSearchQuery = ({
     builder.sort(field, option)
   }
 
-  const types = type ? [type] : ["comment", "post", "profile"]
+  const types = getTypes(type)
   for (const type of types) {
     // One of the text fields must match
     const matchQuery = text
@@ -222,7 +233,7 @@ export const buildSearchQuery = ({
     const facetClauses = []
     if (facets) {
       facets.forEach((values, key) => {
-        if (values && values.length > 0) {
+        if (key !== OBJECT_TYPE && values && values.length > 0) {
           facetClauses.push({
             bool: {
               should: values.map(value => ({
@@ -233,7 +244,12 @@ export const buildSearchQuery = ({
             }
           })
         }
-        builder.agg("terms", key, { size: 10000 }, key)
+        builder.agg(
+          "terms",
+          key === OBJECT_TYPE ? "object_type.keyword" : key,
+          { size: 10000 },
+          key
+        )
       })
     }
 

@@ -4,29 +4,30 @@ import R from "ramda"
 import { assert } from "chai"
 import sinon from "sinon"
 
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 
-import { availabilityLabel, minPrice } from "../lib/courses"
-import { configureShallowRenderer } from "../lib/test_utils"
-import { makeCourse } from "../factories/courses"
+import { availabilityLabel, minPrice } from "../lib/learning_resources"
+import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platformLogoUrls
+  platformLogoUrls,
+  platforms
 } from "../lib/constants"
 import { embedlyThumbnail } from "../lib/url"
+import { configureShallowRenderer } from "../lib/test_utils"
 
-describe("CourseCard", () => {
-  let renderCarouselCard, courses, course, sandbox, setShowCourseDrawerStub
+describe("LearningResourceCard", () => {
+  let render, courses, course, sandbox, setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     courses = R.times(makeCourse, 10)
-    setShowCourseDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = sandbox.stub()
     course = courses[0]
-    renderCarouselCard = configureShallowRenderer(CourseCard, {
-      course,
-      setShowCourseDrawer: setShowCourseDrawerStub
+    render = configureShallowRenderer(LearningResourceCard, {
+      object:                course,
+      setShowResourceDrawer: setShowResourceDrawerStub
     })
   })
 
@@ -34,16 +35,16 @@ describe("CourseCard", () => {
     sandbox.restore()
   })
 
-  it("should set an onClick handler with the setShowCourseDrawer function", () => {
-    const wrapper = renderCarouselCard()
+  it("should set an onClick handler with the setShowResourceDrawer function", () => {
+    const wrapper = render()
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
-    sinon.assert.calledTwice(setShowCourseDrawerStub)
+    sinon.assert.calledTwice(setShowResourceDrawerStub)
   })
 
   it("should set a click handler on the topics, if passed a function", () => {
     const setTopicStub = sandbox.stub()
-    const wrapper = renderCarouselCard({
+    const wrapper = render({
       toggleFacet: setTopicStub
     })
     wrapper
@@ -54,7 +55,7 @@ describe("CourseCard", () => {
   })
 
   it("should render the image", () => {
-    const coverImage = renderCarouselCard()
+    const coverImage = render()
       .find(".cover-image")
       .find("img")
     assert.equal(
@@ -71,7 +72,7 @@ describe("CourseCard", () => {
 
   it("should render the title", () => {
     assert.equal(
-      renderCarouselCard()
+      render()
         .find("Dotdotdot")
         .props().children,
       course.title
@@ -80,7 +81,7 @@ describe("CourseCard", () => {
 
   it("should render the topic", () => {
     assert.equal(
-      renderCarouselCard()
+      render()
         .find(".topics")
         .find(".topic")
         .at(0)
@@ -88,18 +89,33 @@ describe("CourseCard", () => {
       course.topics[0].name
     )
   })
-
-  it("should render the platform", () => {
-    const platformImg = renderCarouselCard()
-      .find(".platform")
-      .find("img")
-    assert.equal(platformImg.prop("src"), platformLogoUrls[course.platform])
-    assert.equal(platformImg.prop("alt"), `logo for ${course.platform}`)
+  //
+  ;[true, false].forEach(isCourse => {
+    it(`should render the platform image`, () => {
+      const object = isCourse
+        ? R.merge({ object_type: "course" }, makeCourse())
+        : R.merge({ object_type: "bootcamp" }, makeBootcamp())
+      const platformImg = render({
+        object: object
+      })
+        .find(".platform")
+        .find("img")
+      assert.equal(
+        platformImg.prop("src"),
+        // $FlowFixMe: only courses will access platform
+        platformLogoUrls[isCourse ? object.platform : platforms.bootcamps]
+      )
+      assert.equal(
+        platformImg.prop("alt"),
+        // $FlowFixMe: only courses will access platform
+        `logo for ${isCourse ? object.platform : platforms.bootcamps}`
+      )
+    })
   })
 
   it("should render availability", () => {
     assert.equal(
-      renderCarouselCard()
+      render()
         .find(".availability")
         .text(),
       availabilityLabel(course.availability)
@@ -108,7 +124,7 @@ describe("CourseCard", () => {
 
   it("should render price", () => {
     assert.equal(
-      renderCarouselCard()
+      render()
         .find(".price")
         .text(),
       minPrice(course)

@@ -4,7 +4,7 @@ import { connectRequest, querySelectors } from "redux-query"
 import { connect } from "react-redux"
 import { compose } from "redux"
 
-import CourseDrawer from "./CourseDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 
 import CourseCarousel from "../components/CourseCarousel"
 import {
@@ -16,7 +16,7 @@ import {
 import { Cell, Grid } from "../components/Grid"
 import SearchTextbox from "../components/SearchTextbox"
 
-import { setShowCourseDrawer } from "../actions/ui"
+import { setShowResourceDrawer } from "../actions/ui"
 import {
   featuredCoursesRequest,
   featuredCoursesSelector,
@@ -41,7 +41,7 @@ type StateProps = {|
 |}
 
 type DispatchProps = {|
-  setShowCourseDrawer: Function
+  setShowResourceDrawer: Function
 |}
 
 type Props = {|
@@ -55,7 +55,7 @@ export const CourseIndexPage = ({
   featuredCourses,
   newCourses,
   loaded,
-  setShowCourseDrawer,
+  setShowResourceDrawer,
   history
 }: Props) => (
   <BannerPageWrapper>
@@ -72,8 +72,7 @@ export const CourseIndexPage = ({
             onSubmit={e => {
               const { value } = e.target
               const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
-                q:    value,
-                type: "course"
+                q: value
               })}`
               history.push(newLocation)
             }}
@@ -90,25 +89,25 @@ export const CourseIndexPage = ({
             <CourseCarousel
               title="Featured Courses"
               courses={featuredCourses}
-              setShowCourseDrawer={setShowCourseDrawer}
+              setShowResourceDrawer={setShowResourceDrawer}
             />
           ) : null}
           <CourseCarousel
             title="Upcoming Courses"
             courses={upcomingCourses}
-            setShowCourseDrawer={setShowCourseDrawer}
+            setShowResourceDrawer={setShowResourceDrawer}
           />
           <CourseCarousel
             title="New Courses"
             courses={newCourses}
-            setShowCourseDrawer={setShowCourseDrawer}
+            setShowResourceDrawer={setShowResourceDrawer}
           />
         </Cell>
       ) : (
         "loading"
       )}
     </Grid>
-    <CourseDrawer />
+    <LearningResourceDrawer />
   </BannerPageWrapper>
 )
 
@@ -123,7 +122,7 @@ const mapStateToProps = (state: Object): StateProps => ({
 })
 
 const mapDispatchToProps = {
-  setShowCourseDrawer
+  setShowResourceDrawer
 }
 
 const mapPropsToConfig = () => [

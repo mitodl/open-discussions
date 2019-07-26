@@ -3,6 +3,7 @@ import sinon from "sinon"
 import _ from "lodash"
 
 import {
+  makeBootcampResult,
   makeCommentResult,
   makeCourseResult,
   makePostResult,
@@ -13,7 +14,7 @@ import {
   channelField,
   searchFields,
   searchResultToComment,
-  searchResultToCourse,
+  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "./search"
@@ -107,30 +108,33 @@ describe("search functions", () => {
     })
   })
 
-  it("converts a course search result to a course", () => {
+  it("converts a course search result to a learning resource", () => {
     const result = makeCourseResult()
-    const course = searchResultToCourse(result)
+    const course = searchResultToLearningResource(result)
     assert.deepEqual(course, {
-      id:                result.id,
-      course_id:         result.course_id,
-      title:             result.title,
-      image_src:         result.image_src,
-      short_description: result.short_description,
-      full_description:  result.full_description,
-      platform:          result.platform,
-      language:          result.language,
-      semester:          result.semester,
-      year:              result.year,
-      level:             result.level,
-      start_date:        result.start_date,
-      end_date:          result.end_date,
-      enrollment_start:  result.enrollment_start,
-      enrollment_end:    result.enrollment_end,
-      instructors:       [],
-      topics:            result.topics.map(topic => ({ name: topic })),
-      prices:            result.prices,
-      url:               result.url,
-      availability:      result.availability
+      id:           result.id,
+      title:        result.title,
+      image_src:    result.image_src,
+      platform:     result.platform,
+      topics:       result.topics.map(topic => ({ name: topic })),
+      availability: result.availability,
+      prices:       result.prices,
+      object_type:  "course"
+    })
+  })
+
+  it("converts a bootcamp search result to a learning resource", () => {
+    const result = makeBootcampResult()
+    const bootcamp = searchResultToLearningResource(result)
+    assert.deepEqual(bootcamp, {
+      id:           result.id,
+      title:        result.title,
+      image_src:    result.image_src,
+      platform:     null,
+      topics:       result.topics.map(topic => ({ name: topic })),
+      availability: result.availability,
+      prices:       result.prices,
+      object_type:  "bootcamp"
     })
   })
 
@@ -282,111 +286,121 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
+    //
+    ;["course", "bootcamp"].forEach(type => {
+      it(`filters courses by platform, availability, type, and topics`, () => {
+        const fieldNames = ["field1", "field2", "field3"]
+        const stub = sandbox
+          .stub(searchFuncs, "searchFields")
+          .returns(fieldNames)
+        const text = "some text here"
+        const facets = new Map(
+          Object.entries({
+            platform:     ["mitx"],
+            topics:       ["Engineering", "Science"],
+            availability: ["Upcoming"],
+            type:         [type]
+          })
+        )
 
-    it(`filters courses by platform, availability, and topics`, () => {
-      const fieldNames = ["field1", "field2", "field3"]
-      const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
-      const type = "course"
-      const text = "some text here"
-      const facets = new Map(
-        Object.entries({
-          platform:     ["mitx"],
-          topics:       ["Engineering", "Science"],
-          availability: ["Upcoming"]
-        })
-      )
-
-      const mustQuery = [
-        {
-          term: {
-            object_type: "course"
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  platform: "mitx"
-                }
-              }
-            ]
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  topics: "Engineering"
-                }
-              },
-              {
-                term: {
-                  topics: "Science"
-                }
-              }
-            ]
-          }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  availability: "Upcoming"
-                }
-              }
-            ]
-          }
-        }
-      ]
-
-      assert.deepEqual(buildSearchQuery({ type, text, facets }), {
-        aggs: {
-          availability: {
-            terms: {
-              field: "availability",
-              size:  10000
+        const mustQuery = [
+          {
+            term: {
+              object_type: type
             }
           },
-          platform: {
-            terms: {
-              field: "platform",
-              size:  10000
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    platform: "mitx"
+                  }
+                }
+              ]
             }
           },
-          topics: {
-            terms: {
-              field: "topics",
-              size:  10000
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    topics: "Engineering"
+                  }
+                },
+                {
+                  term: {
+                    topics: "Science"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    availability: "Upcoming"
+                  }
+                }
+              ]
             }
           }
-        },
-        query: {
-          bool: {
-            should: [
-              {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: mustQuery
-                    }
-                  },
-                  must: {
-                    multi_match: {
-                      query:     text,
-                      fields:    fieldNames,
-                      fuzziness: "AUTO"
+        ]
+
+        assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+          aggs: {
+            availability: {
+              terms: {
+                field: "availability",
+                size:  10000
+              }
+            },
+            platform: {
+              terms: {
+                field: "platform",
+                size:  10000
+              }
+            },
+            topics: {
+              terms: {
+                field: "topics",
+                size:  10000
+              }
+            },
+            type: {
+              terms: {
+                field: "object_type.keyword",
+                size:  10000
+              }
+            }
+          },
+          query: {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: {
+                      bool: {
+                        must: mustQuery
+                      }
+                    },
+                    must: {
+                      multi_match: {
+                        query:     text,
+                        fields:    fieldNames,
+                        fuzziness: "AUTO"
+                      }
                     }
                   }
                 }
-              }
-            ]
+              ]
+            }
           }
-        }
+        })
+        sinon.assert.calledWith(stub, type)
       })
-      sinon.assert.calledWith(stub, type)
     })
 
     //

@@ -4,14 +4,17 @@ import { assert } from "chai"
 import { shallow } from "enzyme"
 import sinon from "sinon"
 
-import { CourseDrawer, mapStateToProps } from "./CourseDrawer"
+import {
+  LearningResourceDrawer,
+  mapStateToProps
+} from "./LearningResourceDrawer"
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
-import { setShowCourseDrawer } from "../actions/ui"
-import { makeCourse } from "../factories/courses"
+import { setShowResourceDrawer } from "../actions/ui"
+import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 
-describe("CourseDrawer", () => {
+describe("LearningResourceDrawer", () => {
   let sandbox, dispatchStub, course
 
   beforeEach(() => {
@@ -24,44 +27,59 @@ describe("CourseDrawer", () => {
     sandbox.restore()
   })
 
-  const renderCourseDrawer = (props = {}) =>
+  const renderLearningResourceDrawer = (props = {}) =>
     shallow(
-      <CourseDrawer
+      <LearningResourceDrawer
         dispatch={dispatchStub}
-        showCourseDrawer={true}
-        course={course}
-        courseId={course.id}
+        showLearningDrawer={true}
+        object={course}
+        objectId={course.id}
+        objectType="course"
         {...props}
       />
     )
 
   it("should have an onDrawerClose function to hide the course drawer", async () => {
-    const wrapper = renderCourseDrawer()
+    const wrapper = renderLearningResourceDrawer()
     await wrapper.instance().onDrawerClose()
     sinon.assert.calledWith(
       dispatchStub,
-      setShowCourseDrawer({ courseId: null })
+      setShowResourceDrawer({ objectId: null })
     )
   })
 
   it("should put an event listener on window resize", () => {
-    const onResizeStub = sandbox.stub(CourseDrawer.prototype, "onResize")
+    const onResizeStub = sandbox.stub(
+      LearningResourceDrawer.prototype,
+      "onResize"
+    )
     const addEventListenerStub = sandbox.stub(window, "addEventListener")
-    renderCourseDrawer()
+    renderLearningResourceDrawer()
     assert.ok(addEventListenerStub.calledWith("resize"))
     addEventListenerStub.args[0][1]()
     assert.ok(onResizeStub.called)
   })
 
   it("should include an ExpandedCourseDisplay", () => {
-    const wrapper = renderCourseDrawer()
+    const wrapper = renderLearningResourceDrawer()
     const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
-    assert.deepEqual(expandedDisplay.prop("course"), course)
+    assert.deepEqual(expandedDisplay.prop("object"), course)
   })
 
   it("should not include an ExpandedCourseDisplay if course is null", () => {
-    const wrapper = renderCourseDrawer({ course: null })
+    const wrapper = renderLearningResourceDrawer({ object: null })
     assert.isNotOk(wrapper.find(ExpandedCourseDisplay).exists())
+  })
+
+  it("should include an ExpandedCourseDisplay for a bootcamp", () => {
+    const bootcamp = makeBootcamp()
+    const wrapper = renderLearningResourceDrawer({
+      object:     bootcamp,
+      objectId:   bootcamp.id,
+      objectType: "bootcamp"
+    })
+    const expandedDisplay = wrapper.find(ExpandedCourseDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
   })
 
   //
@@ -77,13 +95,14 @@ describe("CourseDrawer", () => {
       prevId
     )}, next id ${String(nextId)}, same course ${String(sameCourse)}`, () => {
       course.id = prevId
-      const wrapper = renderCourseDrawer()
+      const wrapper = renderLearningResourceDrawer()
       const loadDataStub = sandbox.stub(wrapper.instance(), "loadData")
       wrapper.instance().componentDidUpdate({
-        dispatch:         wrapper.props().dispatch,
-        showCourseDrawer: true,
-        courseId:         nextId,
-        course:           sameCourse ? course : null
+        dispatch:           wrapper.props().dispatch,
+        showLearningDrawer: true,
+        objectId:           nextId,
+        object:             sameCourse ? course : null,
+        objectType:         "course"
       })
       sinon.assert.callCount(loadDataStub, needsLoad ? 1 : 0)
     })
@@ -100,13 +119,13 @@ describe("CourseDrawer", () => {
             data: new Map([[[course.id], course]])
           },
           ui: {
-            courseDetail: { courseId: courseId }
+            courseDetail: { objectId: courseId, objectType: "course" }
           }
         }
         const props = mapStateToProps(state)
-        assert.equal(props.showCourseDrawer, showDrawer)
-        assert.equal(props.courseId, state.ui.courseDetail.courseId)
-        assert.deepEqual(props.course, state.courses[course.id])
+        assert.equal(props.showLearningDrawer, showDrawer)
+        assert.equal(props.objectId, state.ui.courseDetail.objectId)
+        assert.deepEqual(props.object, state.courses[course.id])
       })
     }
   )

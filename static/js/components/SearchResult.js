@@ -4,20 +4,24 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 import CommentTree from "./CommentTree"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
 import {
   searchResultToComment,
-  searchResultToCourse,
+  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 
-import type { CourseResult, ProfileResult, Result } from "../flow/searchTypes"
+import type {
+  LearningResourceResult,
+  ProfileResult,
+  Result
+} from "../flow/searchTypes"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
 
 type PostProps = {
@@ -83,22 +87,24 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
   )
 }
 
-type CourseProps = {
-  result: CourseResult,
+type LearningResourceProps = {
+  result: LearningResourceResult,
   toggleFacet?: Function,
-  setShowCourseDrawer?: ({ courseId: string }) => void
+  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void
 }
-const CourseSearchResult = ({
+
+const LearningResourceSearchResult = ({
   result,
   toggleFacet,
-  setShowCourseDrawer
-}: CourseProps) => {
-  const course = searchResultToCourse(result)
+  setShowResourceDrawer
+}: LearningResourceProps) => {
+  // $FlowFixMe: this should only be used for courses
+
   return (
-    <CourseCard
-      course={course}
+    <LearningResourceCard
+      object={searchResultToLearningResource(result)}
       toggleFacet={toggleFacet}
-      setShowCourseDrawer={setShowCourseDrawer}
+      setShowResourceDrawer={setShowResourceDrawer}
     />
   )
 }
@@ -111,7 +117,7 @@ type Props = {
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
   toggleFacet?: Function,
-  setShowCourseDrawer?: ({ courseId: string }) => void
+  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -123,12 +129,14 @@ export default class SearchResult extends React.Component<Props> {
       commentUpvote,
       commentDownvote,
       toggleFacet,
-      setShowCourseDrawer
+      setShowResourceDrawer
     } = this.props
     if (result.object_type === "post") {
+      // $FlowFixMe: This will always be a PostResult
       const post = upvotedPost || searchResultToPost(result)
       return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
     } else if (result.object_type === "comment") {
+      // $FlowFixMe: This will always be a Comment result
       let comment = searchResultToComment(result)
       if (votedComment) {
         comment = {
@@ -143,18 +151,21 @@ export default class SearchResult extends React.Component<Props> {
           comment={comment}
           upvote={commentUpvote}
           downvote={commentDownvote}
+          // $FlowFixMe: This will always be a Comment result
           channel={result.channel_name}
+          // $FlowFixMe: This will always be a Comment result
           slug={result.post_slug}
         />
       )
     } else if (result.object_type === "profile") {
+      // $FlowFixMe: This will always be a Profile result
       return <ProfileSearchResult result={result} />
-    } else if (result.object_type === "course") {
+    } else if (["course", "bootcamp"].includes(result.object_type)) {
       return (
-        <CourseSearchResult
+        <LearningResourceSearchResult
           result={result}
           toggleFacet={toggleFacet}
-          setShowCourseDrawer={setShowCourseDrawer}
+          setShowResourceDrawer={setShowResourceDrawer}
         />
       )
     }

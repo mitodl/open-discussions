@@ -8,10 +8,11 @@ import { COURSE_ARCHIVED, COURSE_CURRENT, platforms } from "../lib/constants"
 
 import type {
   CommentResult,
-  CourseResult,
+  LearningResourceResult,
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
+import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -68,7 +69,7 @@ export const makePostResult = (): PostResult => ({
   text:                casual.text
 })
 
-export const makeCourseResult = (): CourseResult => ({
+export const makeCourseResult = (): LearningResourceResult => ({
   id:                casual.number,
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,
@@ -89,6 +90,28 @@ export const makeCourseResult = (): CourseResult => ({
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
   object_type:       "course",
+  availability:
+    casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
+})
+
+export const makeBootcampResult = (): LearningResourceResult => ({
+  id:                casual.number,
+  course_id:         `course_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  full_description:  casual.description,
+  language:          casual.random_element(["en-US", "fr", null]),
+  year:              casual.year,
+  start_date:        casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
+  instructors:       ["instuctor 1", "instructor 2"],
+  topics:            [casual.word, casual.word],
+  prices:            [{ mode: "audit", price: casual.number }],
+  object_type:       "bootcamp",
   availability:
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })
@@ -138,7 +161,8 @@ export const makeSearchFacetResult = () => {
         { key: "Archived", doc_count: 33 },
         { key: "Upcoming", doc_count: 67 }
       ]
-    }
+    },
+    type: SEARCH_FILTER_ALL_RESOURCES
   }
 }
 

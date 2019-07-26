@@ -21,9 +21,9 @@ export const setShowDrawerMobile = createAction<string, *>(
 export const SET_SHOW_DRAWER_HOVER = "SET_SHOW_DRAWER_HOVER"
 export const setShowDrawerHover = createAction<string, *>(SET_SHOW_DRAWER_HOVER)
 
-export const SET_SHOW_COURSE_DRAWER = "SET_SHOW_COURSE_DRAWER"
-export const setShowCourseDrawer = createAction<string, *>(
-  SET_SHOW_COURSE_DRAWER
+export const SET_SHOW_RESOURCE_DRAWER = "SET_SHOW_RESOURCE_DRAWER"
+export const setShowResourceDrawer = createAction<string, *>(
+  SET_SHOW_RESOURCE_DRAWER
 )
 
 export const SET_SNACKBAR_MESSAGE = "SET_SNACKBAR_MESSAGE"
