@@ -6,7 +6,7 @@ import moment from "moment"
 
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
-import { makeBootcamp, makeCourse } from "../factories/resources"
+import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 
 describe("ExpandedCourseDisplay", () => {

@@ -13,7 +13,7 @@ import {
 
 import { COURSE_BANNER_URL } from "../lib/url"
 import { configureShallowRenderer } from "../lib/test_utils"
-import { makeCourse } from "../factories/resources"
+import { makeCourse } from "../factories/learning_resources"
 
 describe("CourseIndexPage", () => {
   let featuredCourses,

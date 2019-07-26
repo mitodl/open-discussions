@@ -4,9 +4,8 @@ import bodybuilder from "bodybuilder"
 import R from "ramda"
 
 import type {
-  Bootcamp,
   CommentInTree,
-  Course,
+  LearningResource,
   Post,
   Profile
 } from "../flow/discussionTypes"
@@ -15,9 +14,8 @@ import type {
   CommentResult,
   ProfileResult,
   SearchParams,
-  CourseResult,
   FacetResult,
-  BootcampResult
+  LearningResourceResult
 } from "../flow/searchTypes"
 
 export const searchResultToComment = (
@@ -87,47 +85,17 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
   username:             result.author_id
 })
 
-export const searchResultToCourse = (result: CourseResult): Course => ({
-  id:                result.id,
-  course_id:         result.course_id,
-  url:               result.url,
-  title:             result.title,
-  image_src:         result.image_src,
-  short_description: result.short_description,
-  full_description:  result.full_description,
-  platform:          result.platform,
-  language:          result.language,
-  semester:          result.semester,
-  year:              result.year,
-  level:             result.level,
-  start_date:        result.start_date,
-  end_date:          result.end_date,
-  enrollment_start:  result.enrollment_start,
-  enrollment_end:    result.enrollment_end,
-  availability:      result.availability,
-  instructors:       [],
-  topics:            result.topics.map(topic => ({ name: topic })),
-  prices:            result.prices
-})
-
-export const searchResultToBootcamp = (result: BootcampResult): Bootcamp => ({
-  id:                result.id,
-  course_id:         result.course_id,
-  url:               result.url,
-  title:             result.title,
-  image_src:         result.image_src,
-  short_description: result.short_description,
-  full_description:  result.full_description,
-  language:          result.language,
-  year:              result.year,
-  start_date:        result.start_date,
-  end_date:          result.end_date,
-  enrollment_start:  result.enrollment_start,
-  enrollment_end:    result.enrollment_end,
-  availability:      result.availability,
-  instructors:       [],
-  topics:            result.topics.map(topic => ({ name: topic })),
-  prices:            result.prices
+export const searchResultToLearningResource = (
+  result: LearningResourceResult
+): LearningResource => ({
+  id:           result.id,
+  title:        result.title,
+  image_src:    result.image_src,
+  object_type:  result.object_type,
+  platform:     "platform" in result ? result.platform : null,
+  availability: "availability" in result ? result.availability : null,
+  topics:       result.topics.map(topic => ({ name: topic })),
+  prices:       "prices" in result ? result.prices || [] : []
 })
 
 const POST_QUERY_FIELDS = [
@@ -205,6 +173,14 @@ const _channelField = (type: ?string) => {
 export { _channelField as channelField }
 import { channelField } from "./search"
 
+const getTypes = (type: ?(string | Array<string>)) => {
+  if (type) {
+    return Array.isArray(type) ? type : [type]
+  } else {
+    return ["comment", "post", "profile"]
+  }
+}
+
 export const buildSearchQuery = ({
   text,
   type,
@@ -227,11 +203,7 @@ export const buildSearchQuery = ({
     builder.sort(field, option)
   }
 
-  const types = type
-    ? Array.isArray(type)
-      ? type
-      : [type]
-    : ["comment", "post", "profile"]
+  const types = getTypes(type)
   for (const type of types) {
     // One of the text fields must match
     const matchQuery = text

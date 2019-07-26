@@ -6,5 +6,3 @@ import type { Bootcamp } from "../../flow/discussionTypes"
 export function getBootcamp(bootcampId: number): Promise<Bootcamp> {
   return fetchJSONWithAuthFailure(`/api/v0/bootcamps/${bootcampId}/`)
 }
-
-export const nextUpdate = (prev: string, next: string) => next

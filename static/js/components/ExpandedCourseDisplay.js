@@ -8,7 +8,7 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms } from "../lib/constants"
-import { minPrice } from "../lib/courses"
+import { minPrice } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 

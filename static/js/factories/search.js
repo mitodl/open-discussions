@@ -7,9 +7,8 @@ import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
 import { COURSE_ARCHIVED, COURSE_CURRENT, platforms } from "../lib/constants"
 
 import type {
-  BootcampResult,
   CommentResult,
-  CourseResult,
+  LearningResourceResult,
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
@@ -70,7 +69,7 @@ export const makePostResult = (): PostResult => ({
   text:                casual.text
 })
 
-export const makeCourseResult = (): CourseResult => ({
+export const makeCourseResult = (): LearningResourceResult => ({
   id:                casual.number,
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,
@@ -95,7 +94,7 @@ export const makeCourseResult = (): CourseResult => ({
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })
 
-export const makeBootcampResult = (): BootcampResult => ({
+export const makeBootcampResult = (): LearningResourceResult => ({
   id:                casual.number,
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,

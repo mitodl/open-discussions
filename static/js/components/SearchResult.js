@@ -4,14 +4,13 @@ import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 import CommentTree from "./CommentTree"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
 
 import {
-  searchResultToBootcamp,
   searchResultToComment,
-  searchResultToCourse,
+  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
@@ -19,8 +18,7 @@ import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 
 import type {
-  BootcampResult,
-  CourseResult,
+  LearningResourceResult,
   ProfileResult,
   Result
 } from "../flow/searchTypes"
@@ -90,39 +88,21 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 }
 
 type LearningResourceProps = {
-  result: CourseResult | BootcampResult,
+  result: LearningResourceResult,
   toggleFacet?: Function,
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void
 }
 
-const CourseSearchResult = ({
+const LearningResourceSearchResult = ({
   result,
   toggleFacet,
   setShowResourceDrawer
 }: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for courses
-  const course = searchResultToCourse(result)
-  return (
-    <CourseCard
-      object={course}
-      objectType="course"
-      toggleFacet={toggleFacet}
-      setShowResourceDrawer={setShowResourceDrawer}
-    />
-  )
-}
 
-const BootcampSearchResult = ({
-  result,
-  toggleFacet,
-  setShowResourceDrawer
-}: LearningResourceProps) => {
-  // $FlowFixMe: this should only be used for bootcamps
-  const bootcamp = searchResultToBootcamp(result)
   return (
-    <CourseCard
-      object={bootcamp}
-      objectType="bootcamp"
+    <LearningResourceCard
+      object={searchResultToLearningResource(result)}
       toggleFacet={toggleFacet}
       setShowResourceDrawer={setShowResourceDrawer}
     />
@@ -152,9 +132,11 @@ export default class SearchResult extends React.Component<Props> {
       setShowResourceDrawer
     } = this.props
     if (result.object_type === "post") {
+      // $FlowFixMe: This will always be a PostResult
       const post = upvotedPost || searchResultToPost(result)
       return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
     } else if (result.object_type === "comment") {
+      // $FlowFixMe: This will always be a Comment result
       let comment = searchResultToComment(result)
       if (votedComment) {
         comment = {
@@ -169,23 +151,18 @@ export default class SearchResult extends React.Component<Props> {
           comment={comment}
           upvote={commentUpvote}
           downvote={commentDownvote}
+          // $FlowFixMe: This will always be a Comment result
           channel={result.channel_name}
+          // $FlowFixMe: This will always be a Comment result
           slug={result.post_slug}
         />
       )
     } else if (result.object_type === "profile") {
+      // $FlowFixMe: This will always be a Profile result
       return <ProfileSearchResult result={result} />
-    } else if (result.object_type === "course") {
+    } else if (["course", "bootcamp"].includes(result.object_type)) {
       return (
-        <CourseSearchResult
-          result={result}
-          toggleFacet={toggleFacet}
-          setShowResourceDrawer={setShowResourceDrawer}
-        />
-      )
-    } else if (result.object_type === "bootcamp") {
-      return (
-        <BootcampSearchResult
+        <LearningResourceSearchResult
           result={result}
           toggleFacet={toggleFacet}
           setShowResourceDrawer={setShowResourceDrawer}

@@ -6,9 +6,9 @@ import sinon from "sinon"
 import { shallow } from "enzyme"
 
 import CourseCarousel from "./CourseCarousel"
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 
-import { makeCourse } from "../factories/resources"
+import { makeCourse } from "../factories/learning_resources"
 
 describe("CourseCarousel", () => {
   let courses, sandbox, setShowResourceDrawerStub
@@ -44,8 +44,9 @@ describe("CourseCarousel", () => {
   it("should render a card for each course in the carousel", () => {
     const wrapper = renderCarousel()
     const carousel = wrapper.find("Carousel")
-    R.zip(carousel.find(CourseCard).map(R.identity), courses).forEach(
+    R.zip(carousel.find(LearningResourceCard).map(R.identity), courses).forEach(
       ([el, course]) => {
+        course.object_type = "course"
         assert.deepEqual(el.prop("object"), course)
       }
     )

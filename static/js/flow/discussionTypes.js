@@ -320,6 +320,18 @@ export type SocialAuth = {
   provider: string,
 }
 
+export type LearningResource = {
+  id:                 number,
+  title:              string,
+  image_src:          ?string,
+  platform:           ?string,
+  topics:             Array<CourseTopic>,
+  availability:       ?string,
+  object_type:        string,
+  prices:             Array<CoursePrice>,
+}
+
+
 export type Course = {
   id:                 number,
   course_id:          string,

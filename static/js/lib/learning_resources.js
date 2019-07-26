@@ -7,7 +7,11 @@ import {
   COURSE_PRIOR
 } from "./constants"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type {
+  Bootcamp,
+  Course,
+  LearningResource
+} from "../flow/discussionTypes"
 import { capitalize } from "./util"
 
 export const availabilityLabel = (availability: ?string) => {
@@ -30,7 +34,7 @@ export const maxPrice = (course: Course | Bootcamp) => {
   return price > 0 ? `$${price}` : "Free"
 }
 
-export const minPrice = (course: Course | Bootcamp) => {
+export const minPrice = (course: LearningResource | Course | Bootcamp) => {
   const price = Math.min(...course.prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"
 }

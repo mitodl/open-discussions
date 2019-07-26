@@ -3,6 +3,7 @@ import sinon from "sinon"
 import _ from "lodash"
 
 import {
+  makeBootcampResult,
   makeCommentResult,
   makeCourseResult,
   makePostResult,
@@ -13,7 +14,7 @@ import {
   channelField,
   searchFields,
   searchResultToComment,
-  searchResultToCourse,
+  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "./search"
@@ -107,30 +108,33 @@ describe("search functions", () => {
     })
   })
 
-  it("converts a course search result to a course", () => {
+  it("converts a course search result to a learning resource", () => {
     const result = makeCourseResult()
-    const course = searchResultToCourse(result)
+    const course = searchResultToLearningResource(result)
     assert.deepEqual(course, {
-      id:                result.id,
-      course_id:         result.course_id,
-      title:             result.title,
-      image_src:         result.image_src,
-      short_description: result.short_description,
-      full_description:  result.full_description,
-      platform:          result.platform,
-      language:          result.language,
-      semester:          result.semester,
-      year:              result.year,
-      level:             result.level,
-      start_date:        result.start_date,
-      end_date:          result.end_date,
-      enrollment_start:  result.enrollment_start,
-      enrollment_end:    result.enrollment_end,
-      instructors:       [],
-      topics:            result.topics.map(topic => ({ name: topic })),
-      prices:            result.prices,
-      url:               result.url,
-      availability:      result.availability
+      id:           result.id,
+      title:        result.title,
+      image_src:    result.image_src,
+      platform:     result.platform,
+      topics:       result.topics.map(topic => ({ name: topic })),
+      availability: result.availability,
+      prices:       result.prices,
+      object_type:  "course"
+    })
+  })
+
+  it("converts a bootcamp search result to a learning resource", () => {
+    const result = makeBootcampResult()
+    const bootcamp = searchResultToLearningResource(result)
+    assert.deepEqual(bootcamp, {
+      id:           result.id,
+      title:        result.title,
+      image_src:    result.image_src,
+      platform:     null,
+      topics:       result.topics.map(topic => ({ name: topic })),
+      availability: result.availability,
+      prices:       result.prices,
+      object_type:  "bootcamp"
     })
   })
 

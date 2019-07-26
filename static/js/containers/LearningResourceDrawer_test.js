@@ -11,7 +11,7 @@ import {
 import ExpandedCourseDisplay from "../components/ExpandedCourseDisplay"
 
 import { setShowResourceDrawer } from "../actions/ui"
-import { makeBootcamp, makeCourse } from "../factories/resources"
+import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 
 describe("LearningResourceDrawer", () => {

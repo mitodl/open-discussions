@@ -1,15 +1,13 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
 import R from "ramda"
-import { shallow } from "enzyme/build"
 import { assert } from "chai"
 import sinon from "sinon"
 
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 
-import { availabilityLabel, minPrice } from "../lib/courses"
-import { makeBootcamp, makeCourse } from "../factories/resources"
+import { availabilityLabel, minPrice } from "../lib/learning_resources"
+import { makeBootcamp, makeCourse } from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
@@ -17,24 +15,20 @@ import {
   platforms
 } from "../lib/constants"
 import { embedlyThumbnail } from "../lib/url"
+import { configureShallowRenderer } from "../lib/test_utils"
 
-describe("CourseCard", () => {
-  let renderCourseCard, courses, course, sandbox, setShowResourceDrawerStub
+describe("LearningResourceCard", () => {
+  let render, courses, course, sandbox, setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     courses = R.times(makeCourse, 10)
     setShowResourceDrawerStub = sandbox.stub()
     course = courses[0]
-    renderCourseCard = ({ ...props }) =>
-      shallow(
-        <CourseCard
-          object={course}
-          objectType="course"
-          setShowResourceDrawer={setShowResourceDrawerStub}
-          {...props}
-        />
-      )
+    render = configureShallowRenderer(LearningResourceCard, {
+      object:                course,
+      setShowResourceDrawer: setShowResourceDrawerStub
+    })
   })
 
   afterEach(() => {
@@ -42,7 +36,7 @@ describe("CourseCard", () => {
   })
 
   it("should set an onClick handler with the setShowResourceDrawer function", () => {
-    const wrapper = renderCourseCard()
+    const wrapper = render()
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
     sinon.assert.calledTwice(setShowResourceDrawerStub)
@@ -50,7 +44,7 @@ describe("CourseCard", () => {
 
   it("should set a click handler on the topics, if passed a function", () => {
     const setTopicStub = sandbox.stub()
-    const wrapper = renderCourseCard({
+    const wrapper = render({
       toggleFacet: setTopicStub
     })
     wrapper
@@ -61,7 +55,7 @@ describe("CourseCard", () => {
   })
 
   it("should render the image", () => {
-    const coverImage = renderCourseCard()
+    const coverImage = render()
       .find(".cover-image")
       .find("img")
     assert.equal(
@@ -78,7 +72,7 @@ describe("CourseCard", () => {
 
   it("should render the title", () => {
     assert.equal(
-      renderCourseCard()
+      render()
         .find("Dotdotdot")
         .props().children,
       course.title
@@ -87,7 +81,7 @@ describe("CourseCard", () => {
 
   it("should render the topic", () => {
     assert.equal(
-      renderCourseCard()
+      render()
         .find(".topics")
         .find(".topic")
         .at(0)
@@ -98,10 +92,11 @@ describe("CourseCard", () => {
   //
   ;[true, false].forEach(isCourse => {
     it(`should render the platform image`, () => {
-      const object = isCourse ? makeCourse() : makeBootcamp()
-      const platformImg = renderCourseCard({
-        object:     object,
-        objectType: isCourse ? "course" : "bootcamp"
+      const object = isCourse
+        ? R.merge({ object_type: "course" }, makeCourse())
+        : R.merge({ object_type: "bootcamp" }, makeBootcamp())
+      const platformImg = render({
+        object: object
       })
         .find(".platform")
         .find("img")
@@ -120,7 +115,7 @@ describe("CourseCard", () => {
 
   it("should render availability", () => {
     assert.equal(
-      renderCourseCard()
+      render()
         .find(".availability")
         .text(),
       availabilityLabel(course.availability)
@@ -129,7 +124,7 @@ describe("CourseCard", () => {
 
   it("should render price", () => {
     assert.equal(
-      renderCourseCard()
+      render()
         .find(".price")
         .text(),
       minPrice(course)

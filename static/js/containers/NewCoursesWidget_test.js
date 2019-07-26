@@ -6,8 +6,8 @@ import { assert } from "chai"
 import { NewCoursesWidget } from "./NewCoursesWidget"
 
 import { configureShallowRenderer } from "../lib/test_utils"
-import { makeCourse } from "../factories/resources"
-import { availabilityLabel } from "../lib/courses"
+import { makeCourse } from "../factories/learning_resources"
+import { availabilityLabel } from "../lib/learning_resources"
 import { COURSE_URL } from "../lib/url"
 
 describe("NewCoursesWidget", () => {

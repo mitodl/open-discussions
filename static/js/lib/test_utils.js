@@ -5,7 +5,7 @@ import R from "ramda"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
-import { makeCourse } from "../factories/resources"
+import { makeCourse } from "../factories/learning_resources"
 import { S } from "./sanctuary"
 const { Maybe } = S
 

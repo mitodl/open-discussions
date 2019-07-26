@@ -3,8 +3,8 @@ import { assert } from "chai"
 
 import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 
-import { getBootcamp, nextUpdate } from "./bootcamps"
-import { makeBootcamp } from "../../factories/resources"
+import { getBootcamp } from "./bootcamps"
+import { makeBootcamp } from "../../factories/learning_resources"
 
 describe("Bootcamps API", () => {
   let fetchJSONStub, sandbox
@@ -25,9 +25,5 @@ describe("Bootcamps API", () => {
     const result = await getBootcamp(bootcamp.id)
     assert.ok(fetchJSONStub.calledWith(`/api/v0/bootcamps/${bootcamp.id}/`))
     assert.deepEqual(result, bootcamp)
-  })
-
-  it("nextUpdate", () => {
-    assert.equal(nextUpdate("prev", "next"), "next")
   })
 })

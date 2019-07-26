@@ -15,7 +15,7 @@ import {
   upcomingCoursesRequest,
   upcomingCoursesSelector
 } from "../lib/api/courses"
-import { availabilityLabel } from "../lib/courses"
+import { availabilityLabel } from "../lib/learning_resources"
 import { embedlyThumbnail, COURSE_URL } from "../lib/url"
 import { flatZip } from "../lib/util"
 

@@ -4,7 +4,7 @@ import sinon from "sinon"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { actions } from "../actions"
-import { makeBootcamp } from "../factories/resources"
+import { makeBootcamp } from "../factories/learning_resources"
 
 describe("bootcamp reducers", () => {
   let helper, response, dispatchThen

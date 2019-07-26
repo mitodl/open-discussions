@@ -122,7 +122,7 @@ const mapStateToProps = (state: Object): StateProps => ({
 })
 
 const mapDispatchToProps = {
-  setShowResourceDrawer: setShowResourceDrawer
+  setShowResourceDrawer
 }
 
 const mapPropsToConfig = () => [

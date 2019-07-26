@@ -24,7 +24,13 @@ import { validateSearchQuery } from "../lib/validation"
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { Channel, CommentInTree, Post } from "../flow/discussionTypes"
-import type { SearchInputs, SearchParams, Result } from "../flow/searchTypes"
+import type {
+  SearchInputs,
+  SearchParams,
+  PostResult,
+  CommentResult,
+  ProfileResult
+} from "../flow/searchTypes"
 
 type Props = {
   dispatch: Dispatch<any>,
@@ -41,7 +47,7 @@ type Props = {
   notAuthorized: boolean,
   notFound: boolean,
   runSearch: (params: SearchParams) => Promise<*>,
-  results: Array<Result>,
+  results: Array<PostResult | CommentResult | ProfileResult>,
   searchLoaded: boolean,
   searchProcessing: boolean,
   total: number,

@@ -3,7 +3,7 @@
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
 
-import { availabilityLabel, minPrice } from "../lib/courses"
+import { availabilityLabel, minPrice } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
@@ -12,24 +12,22 @@ import {
   platforms
 } from "../lib/constants"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type { LearningResource } from "../flow/discussionTypes"
 
 type CardProps = {|
-  object: Course | Bootcamp,
-  objectType: string,
+  object: LearningResource,
   setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
 
-const CourseCard = ({
+const LearningResourceCard = ({
   object,
-  objectType,
   setShowResourceDrawer,
   toggleFacet
 }: CardProps) => {
+  const objectType = object.object_type
   const showResourceDrawer = () =>
     setShowResourceDrawer({ objectId: object.id, objectType: objectType })
-
   return (
     <div className="course-card">
       <div className="card-contents">
@@ -73,12 +71,12 @@ const CourseCard = ({
             className="course-platform"
             src={
               platformLogoUrls[
-                // $FlowFixMe: only courses will access platform
+                // $FlowFixMe: object.platform should not be null if it exists
                 objectType === "course" ? object.platform : platforms.bootcamps
               ]
             }
             alt={`logo for ${
-              // $FlowFixMe: only courses will end up here
+              // $FlowFixMe: object.platform should not be null if it exists
               objectType === "course" ? object.platform : platforms.bootcamps
             }`}
           />
@@ -90,4 +88,4 @@ const CourseCard = ({
   )
 }
 
-export default CourseCard
+export default LearningResourceCard

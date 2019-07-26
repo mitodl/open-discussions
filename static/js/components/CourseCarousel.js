@@ -3,11 +3,12 @@
 import React from "react"
 import Carousel from "nuka-carousel"
 
-import CourseCard from "./CourseCard"
+import LearningResourceCard from "./LearningResourceCard"
 
 import { CAROUSEL_PAGE_SIZE } from "../lib/constants"
 
 import type { Course } from "../flow/discussionTypes"
+import R from "ramda"
 
 type Props = {|
   title: string,
@@ -51,10 +52,9 @@ const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
       renderBottomCenterControls={null}
     >
       {courses.map((course, idx) => (
-        <CourseCard
+        <LearningResourceCard
           key={idx}
-          object={course}
-          objectType="course"
+          object={R.merge({ object_type: "course" }, course)}
           setShowResourceDrawer={setShowResourceDrawer}
         />
       ))}

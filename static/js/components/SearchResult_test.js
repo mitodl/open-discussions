@@ -12,9 +12,8 @@ import {
   makeProfileResult
 } from "../factories/search"
 import {
-  searchResultToBootcamp,
   searchResultToComment,
-  searchResultToCourse,
+  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
@@ -91,19 +90,17 @@ describe("SearchResult", () => {
 
   it("renders a course", () => {
     const result = makeCourseResult()
+    const course = searchResultToLearningResource(result)
     const wrapper = render(result).dive()
-    const course = searchResultToCourse(result)
-    course.instructors = []
-    const courseDisplay = wrapper.find("CourseCard")
+    const courseDisplay = wrapper.find("LearningResourceCard")
     assert.deepEqual(courseDisplay.prop("object"), course)
   })
 
   it("renders a bootcamp", () => {
     const result = makeBootcampResult()
+    const bootcamp = searchResultToLearningResource(result)
     const wrapper = render(result).dive()
-    const bootcamp = searchResultToBootcamp(result)
-    bootcamp.instructors = []
-    const bootcampDisplay = wrapper.find("CourseCard")
+    const bootcampDisplay = wrapper.find("LearningResourceCard")
     assert.deepEqual(bootcampDisplay.prop("object"), bootcamp)
   })
 })

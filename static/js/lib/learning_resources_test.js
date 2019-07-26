@@ -1,14 +1,14 @@
 // @flow
 import { assert } from "chai"
 
-import { makeCourse } from "../factories/resources"
+import { makeCourse } from "../factories/learning_resources"
 import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
   COURSE_CURRENT,
   COURSE_PRIOR
 } from "./constants"
-import { availabilityLabel, minPrice, maxPrice } from "./courses"
+import { availabilityLabel, minPrice, maxPrice } from "./learning_resources"
 
 describe("Course utils", () => {
   [
