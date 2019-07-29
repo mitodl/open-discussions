@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.85.0
+--------------
+
+- Renamed course_catalog.task_helpers to course_catalog.api
+- Search for bootcamps (#2102)
+
 Version 0.84.0 (Released July 24, 2019)
 --------------
 
