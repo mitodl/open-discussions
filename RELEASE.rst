@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.85.0
+Version 0.85.0 (Released July 30, 2019)
 --------------
 
 - Renamed course_catalog.task_helpers to course_catalog.api
