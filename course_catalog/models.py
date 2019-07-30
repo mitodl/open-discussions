@@ -53,64 +53,85 @@ class LearningResource(TimestampedModel):
         abstract = True
 
 
-class Course(LearningResource):
+class AbstractCourse(LearningResource):
+    """
+    Abstract data model for course models
+    """
+
+    year = models.IntegerField(null=True, blank=True)
+    full_description = models.TextField(null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    enrollment_start = models.DateTimeField(null=True, blank=True)
+    enrollment_end = models.DateTimeField(null=True, blank=True)
+    image_src = models.URLField(max_length=400, null=True, blank=True)
+    image_description = models.CharField(max_length=1024, null=True, blank=True)
+    last_modified = models.DateTimeField(null=True, blank=True)
+
+    language = models.CharField(max_length=128, null=True, blank=True)
+    featured = models.BooleanField(default=False)
+    published = models.BooleanField(default=True)
+    availability = models.CharField(max_length=128, null=True, blank=True)
+    url = models.URLField(null=True, max_length=2048)
+
+    learning_resource_type = models.CharField(
+        max_length=20, default=ResourceType.course.value
+    )
+
+    class Meta:
+        abstract = True
+
+
+class Course(AbstractCourse):
     """
     Course model for courses on all platforms
     """
 
     course_id = models.CharField(max_length=128, unique=True)
+
     level = models.CharField(max_length=128, null=True, blank=True)
     semester = models.CharField(max_length=20, null=True, blank=True)
-    language = models.CharField(max_length=128, null=True, blank=True)
     platform = models.CharField(max_length=128)
-    year = models.IntegerField(null=True, blank=True)
-    full_description = models.TextField(null=True, blank=True)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    enrollment_start = models.DateTimeField(null=True, blank=True)
-    enrollment_end = models.DateTimeField(null=True, blank=True)
-    image_src = models.URLField(max_length=400, null=True, blank=True)
-    image_description = models.CharField(max_length=1024, null=True, blank=True)
-    last_modified = models.DateTimeField(null=True, blank=True)
+
     raw_json = JSONField(null=True, blank=True)
-    featured = models.BooleanField(default=False)
-    published = models.BooleanField(default=True)
-    availability = models.CharField(max_length=128, null=True, blank=True)
-    url = models.URLField(null=True, max_length=2048)
+
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)
+
     instructors = models.ManyToManyField(
         CourseInstructor, blank=True, related_name="courses"
-    )
-    learning_resource_type = models.CharField(
-        max_length=20, default=ResourceType.course.value
     )
     prices = models.ManyToManyField(CoursePrice, blank=True)
 
 
-class Bootcamp(LearningResource):
+class CourseRun(AbstractCourse):
+    """
+    Model for course runs
+    """
+
+    course_run_id = models.CharField(max_length=128, unique=True)
+
+    level = models.CharField(max_length=128, null=True, blank=True)
+    semester = models.CharField(max_length=20, null=True, blank=True)
+
+    instructors = models.ManyToManyField(
+        CourseInstructor, blank=True, related_name="course_runs"
+    )
+    prices = models.ManyToManyField(CoursePrice, blank=True)
+    course = models.ForeignKey(
+        Course, related_name="course_runs", on_delete=models.CASCADE
+    )
+
+
+class Bootcamp(AbstractCourse):
     """
     Bootcamp model for bootcamps. Being course-like, it shares a large overlap with Course model.
     """
 
     course_id = models.CharField(max_length=128, unique=True)
-    language = models.CharField(max_length=128, null=True, blank=True)
-    year = models.IntegerField(null=True, blank=True)
-    full_description = models.TextField(null=True, blank=True)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    enrollment_start = models.DateTimeField(null=True, blank=True)
-    enrollment_end = models.DateTimeField(null=True, blank=True)
-    image_src = models.URLField(max_length=400, null=True, blank=True)
-    image_description = models.CharField(max_length=1024, null=True, blank=True)
-    last_modified = models.DateTimeField(null=True, blank=True)
-    featured = models.BooleanField(default=False)
-    published = models.BooleanField(default=True)
-    availability = models.CharField(max_length=128, null=True, blank=True)
-    url = models.URLField(null=True, max_length=2048)
-    instructors = models.ManyToManyField(CourseInstructor, blank=True)
-    learning_resource_type = models.CharField(
-        max_length=20, default=ResourceType.course.value
+
+    instructors = models.ManyToManyField(
+        CourseInstructor, blank=True, related_name="bootcamps"
     )
     prices = models.ManyToManyField(CoursePrice, blank=True)
     location = models.CharField(max_length=128, null=True, blank=True)
