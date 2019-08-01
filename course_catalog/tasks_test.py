@@ -258,6 +258,24 @@ def test_get_ocw_data(settings, mock_course_index_functions):
     assert json.loads(obj.get()["Body"].read())
 
 
+@mock_s3
+@pytest.mark.parametrize("overwrite", [True, False])
+def test_get_ocw_overwrite(mocker, settings, mock_course_index_functions, overwrite):
+    """Test that courses are overridden if force_overwrite=True"""
+    setup_s3(settings)
+
+    # run ocw sync
+    get_ocw_data()
+    assert Course.objects.count() == 1
+    assert CoursePrice.objects.count() == 1
+    assert CourseInstructor.objects.count() == 1
+    assert CourseTopic.objects.count() == 3
+
+    mock_digest = mocker.patch("course_catalog.tasks.digest_ocw_course")
+    get_ocw_data(force_overwrite=overwrite)
+    assert mock_digest.call_count == (1 if overwrite else 0)
+
+
 def test_get_ocw_data_no_settings(settings):
     """
     No data should be imported if OCW settings are missing

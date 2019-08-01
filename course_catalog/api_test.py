@@ -13,10 +13,10 @@ from course_catalog.constants import PlatformType, AvailabilityType, ResourceTyp
 from course_catalog.factories import CourseFactory, CourseRunFactory
 from course_catalog.models import (
     Course,
+    CourseRun,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    CourseRun,
 )
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
@@ -42,11 +42,11 @@ def mitx_valid_data():
 
 
 @pytest.mark.parametrize("force_overwrite", [True, False])
-def test_parse_mitx_json_data_overwrite(
+def test_parse_mitx_json_data_overwrite_course(
     mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
 ):
     """
-    Test that valid mitx json data is skipped if it doesn't need an update
+    Test that valid mitx json data for a course is skipped if it doesn't need an update
     """
     course = CourseFactory.create(
         course_id=mitx_valid_data["key"],
@@ -68,6 +68,33 @@ def test_parse_mitx_json_data_overwrite(
     assert mock_course_index_functions.update_course.call_count == (
         1 if force_overwrite else 0
     )
+
+
+@pytest.mark.parametrize("force_overwrite", [True, False])
+def test_parse_mitx_json_data_overwrite_courserun(
+    mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
+):
+    """
+    Test that valid mitx json data for a run is skipped if it doesn't need an update
+    """
+    course = CourseFactory.create(
+        course_id=mitx_valid_data["key"],
+        last_modified=datetime(year=2010, month=1, day=1).astimezone(pytz.utc),
+    )
+    CourseRunFactory.create(
+        course=course,
+        course_run_id=mitx_valid_data["course_runs"][0]["key"],
+        last_modified=datetime.now().astimezone(pytz.utc),
+    )
+    mock_save_course = mocker.patch(
+        "course_catalog.api.EDXCourseSerializer.save", return_value=course
+    )
+    mock_save_run = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
+    assert course.course_id == mitx_valid_data["key"]
+    parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
+    assert mock_save_course.call_count == 1
+    assert mock_save_run.call_count == (1 if force_overwrite else 0)
+    assert mock_course_index_functions.update_course.call_count == 1
 
 
 def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data):
@@ -103,12 +130,36 @@ def test_parse_invalid_mitx_json_data(mitx_valid_data):
     assert course_count == 0
 
 
+def test_parse_mitx_json_data_skip_course_title(mitx_valid_data):
+    """
+    Test parsing invalid mitx json data for a course
+    """
+    invalid_data = copy.copy(mitx_valid_data)
+    invalid_data["title"] = "Delete"
+    parse_mitx_json_data(invalid_data)
+    course_count = Course.objects.count()
+    assert course_count == 0
+
+
 def test_parse_invalid_mitx_run_data(mitx_valid_data):
     """
     Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
     invalid_data["course_runs"][0]["key"] = ""
+    parse_mitx_json_data(invalid_data)
+    course_count = Course.objects.count()
+    assert course_count == 1
+    run_count = CourseRun.objects.count()
+    assert run_count == 0
+
+
+def test_parse_mitx_json_data_skip_courserun_title(mitx_valid_data):
+    """
+    Test parsing invalid mitx json data for a course run
+    """
+    invalid_data = copy.copy(mitx_valid_data)
+    invalid_data["course_runs"][0]["title"] = "delete"
     parse_mitx_json_data(invalid_data)
     run_count = CourseRun.objects.count()
     assert run_count == 0

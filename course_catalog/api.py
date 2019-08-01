@@ -19,9 +19,9 @@ from course_catalog.constants import (
 from course_catalog.models import Course, Bootcamp, CourseRun
 from course_catalog.serializers import (
     BootcampSerializer,
+    EDXCourseSerializer,
     EDXCourseRunSerializer,
     OCWSerializer,
-    EDXCourseSerializer,
 )
 from search.task_helpers import update_course, index_new_course
 
@@ -99,9 +99,9 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                 edx_serializer.errors,
             )
         else:
-            course = edx_serializer.save()
             # Make changes atomically so we don't end up with partially saved/deleted data
             with transaction.atomic():
+                course = edx_serializer.save()
                 # Parse each course run individually
                 for course_run in course_data.get("course_runs"):
                     if should_skip_course(course_run.get("title")):
@@ -121,7 +121,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     # Try and get the CourseRun instance. If it exists check to see if it needs updating
                     try:
                         courserun_instance = CourseRun.objects.get(
-                            course_run_id=course_run.get("key")
+                            course_run_id=course_run.get("key"), course=course
                         )
                         compare_datetime = datetime.strptime(
                             max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -155,7 +155,6 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                         )
                         continue
                     run_serializer.save()
-
             index_func(course)
 
 

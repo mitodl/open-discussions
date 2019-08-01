@@ -247,8 +247,6 @@ class EDXCourseSerializer(CourseSerializer):
     Serializer for creating Course objects from edx data
     """
 
-    course_runs = EDXCourseRunSerializer(many=True, read_only=True)
-
     def to_internal_value(self, data):
         """
         Custom function to parse data out of the raw edx json

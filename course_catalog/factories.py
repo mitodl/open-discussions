@@ -136,16 +136,6 @@ class CourseRunFactory(DjangoModelFactory):
                 self.instructors.add(instructor)
 
     @factory.post_generation
-    def topics(self, create, extracted, **kwargs):
-        """Create topics for course"""
-        if not create:
-            return
-
-        if extracted:
-            for topic in extracted:
-                self.topics.add(topic)
-
-    @factory.post_generation
     def prices(self, create, extracted, **kwargs):
         """Create prices for course"""
         if not create:
