@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 @app.task
-def sync_and_upload_edx_data(force_overwrite=False):
+def sync_and_upload_edx_data(force_overwrite=False, upload_to_s3=True):
     """
     Task to sync mitx data with the database
     Args:
@@ -48,7 +48,6 @@ def sync_and_upload_edx_data(force_overwrite=False):
         return
     url = settings.EDX_API_URL
     access_token = get_access_token()
-    should_upload_to_s3 = True
 
     edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
 
@@ -64,15 +63,15 @@ def sync_and_upload_edx_data(force_overwrite=False):
                     log.exception(
                         "Error encountered parsing MITx json for %s", course_data["key"]
                     )
-                    should_upload_to_s3 = False
+                    upload_to_s3 = False
         else:
             log.error("Bad response status %s for %s", str(response.status_code), url)
-            should_upload_to_s3 = False
+            upload_to_s3 = False
             break
 
         url = response.json()["next"]
 
-    if should_upload_to_s3:
+    if upload_to_s3:
         log.info("Uploading edX courses data to S3")
         edx_data["count"] = len(edx_data["results"])
         raw_data_bucket = boto3.resource(
@@ -87,7 +86,9 @@ def sync_and_upload_edx_data(force_overwrite=False):
 
 
 @app.task
-def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals,too-many-branches
+def get_ocw_data(
+    force_overwrite=False, upload_to_s3=True
+):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
     """
@@ -151,7 +152,11 @@ def get_ocw_data(upload_to_s3=True):  # pylint:disable=too-many-locals,too-many-
         # if course synced before, update existing Course instance
         course_instance = Course.objects.filter(course_id=course_id).first()
         # Make sure that the data we are syncing is newer than what we already have
-        if course_instance and last_modified <= course_instance.last_modified:
+        if (
+            course_instance
+            and last_modified <= course_instance.last_modified
+            and not force_overwrite
+        ):
             log.info("Already synced. No changes found for %s", course_prefix)
             continue
         try:

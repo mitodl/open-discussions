@@ -22,6 +22,7 @@ from course_catalog.models import (
     Program,
     ProgramItem,
     FavoriteItem,
+    CourseRun,
 )
 from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
 
@@ -178,9 +179,9 @@ class CourseSerializer(BaseCourseSerializer):
         extra_kwargs = {"raw_json": {"write_only": True}}
 
 
-class EDXSerializer(CourseSerializer):
+class EDXCourseRunSerializer(serializers.ModelSerializer):
     """
-    Serializer for creating Course objects from edx data
+    Serializer for creating CourseRun objects from edx data
     """
 
     def to_internal_value(self, data):
@@ -189,7 +190,8 @@ class EDXSerializer(CourseSerializer):
         """
         year, semester = get_year_and_semester(data)
         course_fields = {
-            "course_id": data.get("key"),
+            "course": data.get("course"),
+            "course_run_id": data.get("key"),
             "title": data.get("title"),
             "short_description": data.get("short_description"),
             "full_description": data.get("full_description"),
@@ -218,10 +220,6 @@ class EDXSerializer(CourseSerializer):
             "availability": data.get("availability"),
             "offered_by": OfferedBy.mitx.value,
         }
-        self.topics = [
-            {"name": subject.get("name")}
-            for subject in data.get("raw_json").get("subjects")
-        ]
         self.instructors = [
             {
                 "first_name": person.get("given_name"),
@@ -239,6 +237,53 @@ class EDXSerializer(CourseSerializer):
         ]
         return super().to_internal_value(course_fields)
 
+    class Meta:
+        model = CourseRun
+        fields = "__all__"
+
+
+class EDXCourseSerializer(CourseSerializer):
+    """
+    Serializer for creating Course objects from edx data
+    """
+    course_runs = EDXCourseRunSerializer(many=True, read_only=True)
+
+    def to_internal_value(self, data):
+        """
+        Custom function to parse data out of the raw edx json
+        """
+        course_fields = {
+            "course_id": data.get("key"),
+            "title": data.get("title"),
+            "short_description": data.get("short_description"),
+            "full_description": data.get("full_description"),
+            "level": data.get("level_type"),
+            "platform": PlatformType.mitx.value,
+            "image_src": (
+                (data.get("image") or {}).get("src")
+                or (data.get("course_image") or {}).get("src")
+            ),
+            "image_description": (
+                (data.get("image") or {}).get("description")
+                or (data.get("course_image") or {}).get("description")
+            ),
+            "last_modified": data.get("max_modified"),
+            "raw_json": data.get("raw_json"),
+            "url": get_course_url(
+                data.get("key"), data.get("raw_json"), PlatformType.mitx.value
+            ),
+            "offered_by": OfferedBy.mitx.value,
+        }
+        self.topics = [
+            {"name": subject.get("name")}
+            for subject in data.get("raw_json").get("subjects", [])
+        ]
+        return super().to_internal_value(course_fields)
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+        
 
 class OCWSerializer(CourseSerializer):
     """

@@ -16,8 +16,13 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Course, Bootcamp
-from course_catalog.serializers import BootcampSerializer, EDXSerializer, OCWSerializer
+from course_catalog.models import Course, Bootcamp, CourseRun
+from course_catalog.serializers import (
+    BootcampSerializer,
+    EDXCourseRunSerializer,
+    OCWSerializer,
+    EDXCourseSerializer,
+)
 from search.task_helpers import update_course, index_new_course
 
 log = logging.getLogger(__name__)
@@ -52,66 +57,107 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
     if not is_mit_course(course_data):
         return
 
+    # Check if this should be skipped based on title
+    if should_skip_course(course_data.get("title")):
+        return
+
+    # Make sure there are course runs
+    if not course_data.get("course_runs"):
+        return
+
     # Get the last modified date from the course data
     course_modified = course_data.get("modified")
 
-    # Parse each course run individually
-    for course_run in course_data.get("course_runs"):
+    # Try and get the Course instance. If it exists check to see if it needs updating
+    try:
+        course = Course.objects.get(course_id=course_data.get("key"))
+        compare_datetime = datetime.strptime(
+            course_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
+        ).astimezone(pytz.utc)
+        needs_update = (
+            compare_datetime <= course.last_modified
+        ) or force_overwrite
+        index_func = update_course
+    except Course.DoesNotExist:
+        index_func = index_new_course
+        course = None
+        needs_update = True
 
-        if should_skip_course(course_run.get("title")):
-            continue
-
-        # Get the last modified date from the course run
-        course_run_modified = course_run.get("modified")
-
-        # Since we use data from both course and course_run and they use different modified timestamps,
-        # we need to find the newest changes
-        max_modified = (
-            course_modified
-            if course_modified > course_run_modified
-            else course_run_modified
-        )
-
-        # Try and get the course instance. If it exists check to see if it needs updating
-        try:
-            course_instance = Course.objects.get(course_id=course_run.get("key"))
-            compare_datetime = datetime.strptime(
-                max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
-            ).astimezone(pytz.utc)
-            if (
-                compare_datetime <= course_instance.last_modified
-                and not force_overwrite
-            ):
-                log.debug(
-                    "(%s, %s) skipped", course_data.get("key"), course_run.get("key")
-                )
-                continue
-            index_func = update_course
-        except Course.DoesNotExist:
-            course_instance = None
-            index_func = index_new_course
-
-        edx_serializer = EDXSerializer(
+    if needs_update:
+        edx_serializer = EDXCourseSerializer(
             data={
-                **course_run,
+                **course_data,
                 "course_image": course_data.get("image"),
-                "max_modified": max_modified,
+                "max_modified": course_modified,
                 "raw_json": course_data,  # This is slightly cleaner than popping the extra fields inside the serializer
             },
-            instance=course_instance,
+            instance=course,
         )
 
         if not edx_serializer.is_valid():
             log.error(
                 "Course %s is not valid: %s",
-                course_run.get("key"),
+                course_data.get("key"),
                 edx_serializer.errors,
             )
-            continue
-
-        # Make changes atomically so we don't end up with partially saved/deleted data
-        with transaction.atomic():
+        else:
             course = edx_serializer.save()
+            # Make changes atomically so we don't end up with partially saved/deleted data
+            with transaction.atomic():
+                # Parse each course run individually
+                for course_run in course_data.get("course_runs"):
+                    if should_skip_course(course_run.get("title")):
+                        continue
+
+                    # Get the last modified date from the course run
+                    course_run_modified = course_run.get("modified")
+
+                    # Since we use data from both course and course_run and they use different modified timestamps,
+                    # we need to find the newest changes
+                    max_modified = (
+                        course_modified
+                        if course_modified > course_run_modified
+                        else course_run_modified
+                    )
+
+                    # Try and get the CourseRun instance. If it exists check to see if it needs updating
+                    try:
+                        courserun_instance = CourseRun.objects.get(
+                            course_run_id=course_run.get("key"), course=course
+                        )
+                        compare_datetime = datetime.strptime(
+                            max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
+                        ).astimezone(pytz.utc)
+                        if (
+                            compare_datetime <= courserun_instance.last_modified
+                            and not force_overwrite
+                        ):
+                            log.debug(
+                                "(%s, %s) skipped",
+                                course_data.get("key"),
+                                course_run.get("key"),
+                            )
+                            continue
+                    except CourseRun.DoesNotExist:
+                        courserun_instance = None
+
+                    run_serializer = EDXCourseRunSerializer(
+                        data={
+                            **course_run,
+                            "max_modified": max_modified,
+                            "course": course.id,
+                        },
+                        instance=courserun_instance,
+                    )
+                    if not run_serializer.is_valid():
+                        log.error(
+                            "CourseRun %s is not valid: %s",
+                            course_run.get("key"),
+                            run_serializer.errors,
+                        )
+                        continue
+                    run_serializer.save()
+
             index_func(course)
 
 

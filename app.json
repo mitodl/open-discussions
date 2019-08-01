@@ -107,6 +107,10 @@
     "MAILGUN_SENDER_DOMAIN": {
       "description": "Domain used for emails sent via mailgun"
     },
+    "MAX_S3_GET_ITERATIONS": {
+      "description": "Max retry attempts to get an S3 object",
+      "required": false
+    },
     "MICROMASTERS_COURSE_URL": {
       "description": "URL for MicroMasters course info",
       "required": false

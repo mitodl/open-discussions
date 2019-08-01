@@ -10,7 +10,7 @@ import pytz
 from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import CourseFactory, CourseRunFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
@@ -42,13 +42,16 @@ def test_parse_mitx_json_data_overwrite(
     """
     Test that valid mitx json data is skipped if it doesn't need an update
     """
-    CourseFactory.create(
-        course_id=mitx_valid_data["course_runs"][0]["key"],
+    course = CourseFactory.create(
+        course_id=mitx_valid_data["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    mock_save = mocker.patch("course_catalog.api.EDXSerializer.save")
+    CourseRunFactory.create(course=course, course_run_id=mitx_valid_data["course_runs"][0]["key"])
+    mock_save_course = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
+    mock_save_run = mocker.patch("course_catalog.api.EDXCourseSerializer.save")
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
-    assert mock_save.call_count == (1 if force_overwrite else 0)
+    assert mock_save_course.call_count == (1 if force_overwrite else 0)
+    assert mock_save_run.call_count == (1 if force_overwrite else 0)
     assert mock_course_index_functions.update_course.call_count == (
         1 if force_overwrite else 0
     )

@@ -1,5 +1,6 @@
 """Factories for making test data"""
 import factory
+from factory import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 
@@ -16,7 +17,7 @@ from course_catalog.models import (
     ProgramItem,
     UserList,
     UserListItem,
-)
+    CourseRun)
 
 
 # pylint: disable=unused-argument
@@ -106,6 +107,54 @@ class CourseFactory(DjangoModelFactory):
 
     class Meta:
         model = Course
+
+
+class CourseRunFactory(DjangoModelFactory):
+    """Factory for CourseRuns"""
+    course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
+    course = SubFactory(CourseFactory)
+
+    availability = FuzzyChoice(
+        (
+            AvailabilityType.current.value,
+            AvailabilityType.upcoming.value,
+            AvailabilityType.starting_soon.value,
+            AvailabilityType.archived.value,
+        )
+    )
+
+    @factory.post_generation
+    def instructors(self, create, extracted, **kwargs):
+        """Create instructors for course"""
+        if not create:
+            return
+
+        if extracted:
+            for instructor in extracted:
+                self.instructors.add(instructor)
+
+    @factory.post_generation
+    def topics(self, create, extracted, **kwargs):
+        """Create topics for course"""
+        if not create:
+            return
+
+        if extracted:
+            for topic in extracted:
+                self.topics.add(topic)
+
+    @factory.post_generation
+    def prices(self, create, extracted, **kwargs):
+        """Create prices for course"""
+        if not create:
+            return
+
+        if extracted:
+            for price in extracted:
+                self.prices.add(price)
+
+    class Meta:
+        model = CourseRun
 
 
 class BootcampFactory(DjangoModelFactory):

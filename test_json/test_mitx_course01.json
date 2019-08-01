@@ -147,6 +147,7 @@
 			"recent_enrollment_count": 1619
 		}],
 		"entitlements": [],
+		"image_src": "",
 		"owners": [{
 			"uuid": "2a73d2ce-c34a-4e08-8223-83bca9d2f01d",
 			"key": "MITx",
@@ -159,7 +160,7 @@
 			"marketing_url": "https://www.edx.org/school/mitx"
 		}],
 		"image": {
-			"src": "image_src",
+			"src": "http://image_src.com/img.jpg",
 			"height": null,
 			"width": null,
 			"description": null
