@@ -119,6 +119,17 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     )
 
 
+def test_parse_mitx_json_data_no_runs(mitx_valid_data):
+    """
+    Test that a course without runs is skipped
+    """
+    mitx_data = copy.copy(mitx_valid_data)
+    mitx_data["course_runs"] = []
+    parse_mitx_json_data(mitx_data)
+    course_count = Course.objects.count()
+    assert course_count == 0
+
+
 def test_parse_invalid_mitx_json_data(mitx_valid_data):
     """
     Test parsing invalid mitx json data for a course
