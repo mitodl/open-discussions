@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.85.1
+Version 0.85.1 (Released August 01, 2019)
 --------------
 
 - Added CourseRun model
