@@ -11,7 +11,13 @@ from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
 from course_catalog.factories import CourseFactory, CourseRunFactory
-from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
+from course_catalog.models import (
+    Course,
+    CourseInstructor,
+    CoursePrice,
+    CourseTopic,
+    CourseRun,
+)
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
     parse_mitx_json_data,
@@ -46,9 +52,16 @@ def test_parse_mitx_json_data_overwrite(
         course_id=mitx_valid_data["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    CourseRunFactory.create(course=course, course_run_id=mitx_valid_data["course_runs"][0]["key"])
-    mock_save_course = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
-    mock_save_run = mocker.patch("course_catalog.api.EDXCourseSerializer.save")
+    CourseRunFactory.create(
+        course=course,
+        course_run_id=mitx_valid_data["course_runs"][0]["key"],
+        last_modified=datetime.now().astimezone(pytz.utc),
+    )
+    mock_save_course = mocker.patch(
+        "course_catalog.api.EDXCourseSerializer.save", return_value=course
+    )
+    mock_save_run = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
+    assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == (1 if force_overwrite else 0)
     assert mock_save_run.call_count == (1 if force_overwrite else 0)
@@ -81,13 +94,24 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
 
 def test_parse_invalid_mitx_json_data(mitx_valid_data):
     """
-    Test parsing invalid mitx json data
+    Test parsing invalid mitx json data for a course
+    """
+    invalid_data = copy.copy(mitx_valid_data)
+    invalid_data["key"] = ""
+    parse_mitx_json_data(invalid_data)
+    course_count = Course.objects.count()
+    assert course_count == 0
+
+
+def test_parse_invalid_mitx_run_data(mitx_valid_data):
+    """
+    Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
     invalid_data["course_runs"][0]["key"] = ""
     parse_mitx_json_data(invalid_data)
-    courses_count = Course.objects.count()
-    assert courses_count == 0
+    run_count = CourseRun.objects.count()
+    assert run_count == 0
 
 
 def test_parse_wrong_owner_json_data(mitx_valid_data):

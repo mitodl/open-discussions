@@ -74,9 +74,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         compare_datetime = datetime.strptime(
             course_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
         ).astimezone(pytz.utc)
-        needs_update = (
-            compare_datetime <= course.last_modified
-        ) or force_overwrite
+        needs_update = (compare_datetime >= course.last_modified) or force_overwrite
         index_func = update_course
     except Course.DoesNotExist:
         index_func = index_new_course
@@ -123,7 +121,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     # Try and get the CourseRun instance. If it exists check to see if it needs updating
                     try:
                         courserun_instance = CourseRun.objects.get(
-                            course_run_id=course_run.get("key"), course=course
+                            course_run_id=course_run.get("key")
                         )
                         compare_datetime = datetime.strptime(
                             max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"

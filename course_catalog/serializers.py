@@ -179,7 +179,7 @@ class CourseSerializer(BaseCourseSerializer):
         extra_kwargs = {"raw_json": {"write_only": True}}
 
 
-class EDXCourseRunSerializer(serializers.ModelSerializer):
+class EDXCourseRunSerializer(BaseCourseSerializer):
     """
     Serializer for creating CourseRun objects from edx data
     """
@@ -246,6 +246,7 @@ class EDXCourseSerializer(CourseSerializer):
     """
     Serializer for creating Course objects from edx data
     """
+
     course_runs = EDXCourseRunSerializer(many=True, read_only=True)
 
     def to_internal_value(self, data):
@@ -283,7 +284,7 @@ class EDXCourseSerializer(CourseSerializer):
     class Meta:
         model = Course
         fields = "__all__"
-        
+
 
 class OCWSerializer(CourseSerializer):
     """

@@ -17,7 +17,8 @@ from course_catalog.models import (
     ProgramItem,
     UserList,
     UserListItem,
-    CourseRun)
+    CourseRun,
+)
 
 
 # pylint: disable=unused-argument
@@ -111,6 +112,7 @@ class CourseFactory(DjangoModelFactory):
 
 class CourseRunFactory(DjangoModelFactory):
     """Factory for CourseRuns"""
+
     course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
     course = SubFactory(CourseFactory)
 
