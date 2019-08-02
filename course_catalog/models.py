@@ -158,7 +158,7 @@ class ListItem(TimestampedModel):
     position = models.PositiveIntegerField()
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("Course", "Bootcamp")},
+        limit_choices_to={"model__in": ("course", "bootcamp")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
@@ -220,7 +220,7 @@ class FavoriteItem(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("Course", "Bootcamp", "UserList", "Program")},
+        limit_choices_to={"model__in": ("course", "bootcamp", "userlist", "program")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
