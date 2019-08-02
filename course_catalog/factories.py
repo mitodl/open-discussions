@@ -1,8 +1,12 @@
 """Factories for making test data"""
+import random
+from datetime import timedelta
+
 import factory
 from factory import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
+import pytz
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -27,33 +31,110 @@ from course_catalog.models import (
 class CourseInstructorFactory(DjangoModelFactory):
     """Factory for course instructors"""
 
-    first_name = factory.Faker("name")
-    last_name = factory.Faker("name")
+    first_name = factory.Faker("first_name")
+    last_name = factory.Faker("last_name")
 
     class Meta:
         model = CourseInstructor
+        django_get_or_create = ("first_name", "last_name")
 
 
 class CourseTopicFactory(DjangoModelFactory):
     """Factory for course topics"""
 
-    name = factory.Sequence(lambda n: "Topic %03d" % n)
+    name = factory.Faker("word")
 
     class Meta:
         model = CourseTopic
+        django_get_or_create = ("name",)
 
 
 class CoursePriceFactory(DjangoModelFactory):
     """Factory for course prices"""
 
-    price = factory.Sequence(lambda n: 0.00 + float(n))
+    price = factory.Faker("pyfloat", right_digits=2, min_value=1, max_value=1500)
     mode = factory.Faker("word")
+    upgrade_deadline = None
 
     class Meta:
         model = CoursePrice
+        django_get_or_create = ("price", "mode", "upgrade_deadline")
 
 
-class CourseFactory(DjangoModelFactory):
+class LearningResourceFactory(DjangoModelFactory):
+    """Factory for LearningResource subclasses"""
+
+    title = factory.Faker("word")
+    short_description = factory.Faker("sentence")
+
+    @factory.post_generation
+    def topics(self, create, extracted, **kwargs):
+        """Create topics for course"""
+        if not create:
+            return
+
+        extracted = extracted or CourseTopicFactory.create_batch(random.randint(0, 5))
+
+        for topic in extracted:
+            self.topics.add(topic)
+
+    class Meta:
+        abstract = True
+
+
+class AbstractCourseFactory(LearningResourceFactory):
+    """Factory for AbstractCourse subclasses"""
+
+    year = factory.Faker("year")
+    full_description = factory.Faker("text")
+    image_src = factory.Faker("image_url")
+    image_description = factory.Faker("text", max_nb_chars=300)
+
+    enrollment_start = factory.Faker("date_time", tzinfo=pytz.utc)
+    enrollment_end = factory.LazyAttribute(
+        lambda obj: obj.enrollment_start + timedelta(days=45)
+    )
+    start_date = factory.LazyAttribute(
+        lambda obj: obj.enrollment_start + timedelta(days=15)
+    )
+    end_date = factory.LazyAttribute(lambda obj: obj.start_date + timedelta(days=90))
+
+    last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
+
+    language = factory.Faker("word")
+
+    url = factory.Faker("uri")
+
+    @factory.post_generation
+    def instructors(self, create, extracted, **kwargs):
+        """Create instructors for course"""
+        if not create:
+            return
+
+        extracted = extracted or CourseInstructorFactory.create_batch(
+            random.randint(0, 3)
+        )
+
+        if extracted:
+            for instructor in extracted:
+                self.instructors.add(instructor)
+
+    @factory.post_generation
+    def prices(self, create, extracted, **kwargs):
+        """Create prices for course"""
+        if not create:
+            return
+
+        extracted = extracted or CoursePriceFactory.create_batch(random.randint(0, 3))
+
+        for price in extracted:
+            self.prices.add(price)
+
+    class Meta:
+        abstract = True
+
+
+class CourseFactory(AbstractCourseFactory):
     """Factory for Courses"""
 
     course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
@@ -71,46 +152,36 @@ class CourseFactory(DjangoModelFactory):
             OfferedBy.mitx.value,
             OfferedBy.ocw.value,
             OfferedBy.micromasters.value,
-            OfferedBy.bootcamps.value,
             OfferedBy.xpro.value,
         )
     )
 
-    @factory.post_generation
-    def instructors(self, create, extracted, **kwargs):
-        """Create instructors for course"""
-        if not create:
-            return
-
-        if extracted:
-            for instructor in extracted:
-                self.instructors.add(instructor)
-
-    @factory.post_generation
-    def topics(self, create, extracted, **kwargs):
-        """Create topics for course"""
-        if not create:
-            return
-
-        if extracted:
-            for topic in extracted:
-                self.topics.add(topic)
-
-    @factory.post_generation
-    def prices(self, create, extracted, **kwargs):
-        """Create prices for course"""
-        if not create:
-            return
-
-        if extracted:
-            for price in extracted:
-                self.prices.add(price)
+    course_runs = factory.Maybe(
+        factory.LazyAttribute(
+            lambda o: o.offered_by
+            in [
+                OfferedBy.micromasters.value,
+                OfferedBy.mitx.value,
+                OfferedBy.xpro.value,
+            ]
+        ),
+        yes_declaration=factory.RelatedFactoryList(
+            "course_catalog.factories.CourseRunFactory", "course", size=3
+        ),
+        no_declaration=None,
+    )
 
     class Meta:
         model = Course
 
+    class Params:
+        is_mitx = factory.Trait(offered_by=OfferedBy.mitx.value)
+        is_micromasters = factory.Trait(offered_by=OfferedBy.micromasters.value)
+        is_xpro = factory.Trait(offered_by=OfferedBy.xpro.value)
+        is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
 
-class CourseRunFactory(DjangoModelFactory):
+
+class CourseRunFactory(AbstractCourseFactory):
     """Factory for CourseRuns"""
 
     course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
@@ -125,31 +196,11 @@ class CourseRunFactory(DjangoModelFactory):
         )
     )
 
-    @factory.post_generation
-    def instructors(self, create, extracted, **kwargs):
-        """Create instructors for course"""
-        if not create:
-            return
-
-        if extracted:
-            for instructor in extracted:
-                self.instructors.add(instructor)
-
-    @factory.post_generation
-    def prices(self, create, extracted, **kwargs):
-        """Create prices for course"""
-        if not create:
-            return
-
-        if extracted:
-            for price in extracted:
-                self.prices.add(price)
-
     class Meta:
         model = CourseRun
 
 
-class BootcampFactory(DjangoModelFactory):
+class BootcampFactory(AbstractCourseFactory):
     """Factory for Bootcamps"""
 
     course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
@@ -161,36 +212,7 @@ class BootcampFactory(DjangoModelFactory):
             AvailabilityType.archived.value,
         )
     )
-
-    @factory.post_generation
-    def instructors(self, create, extracted, **kwargs):
-        """Create instructors for bootcamp"""
-        if not create:
-            return
-
-        if extracted:
-            for instructor in extracted:
-                self.instructors.add(instructor)
-
-    @factory.post_generation
-    def topics(self, create, extracted, **kwargs):
-        """Create topics for bootcamp"""
-        if not create:
-            return
-
-        if extracted:
-            for topic in extracted:
-                self.topics.add(topic)
-
-    @factory.post_generation
-    def prices(self, create, extracted, **kwargs):
-        """Create prices for bootcamp"""
-        if not create:
-            return
-
-        if extracted:
-            for price in extracted:
-                self.prices.add(price)
+    offered_by = OfferedBy.bootcamps.value
 
     class Meta:
         model = Bootcamp

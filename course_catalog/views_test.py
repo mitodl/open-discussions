@@ -115,7 +115,7 @@ def test_favorites(client):
     client.login(username=username, password=password)
 
     # Test course is not favorited by default
-    course = CourseFactory()
+    course = CourseFactory.create()
     resp = client.get(reverse("courses-detail", args=[course.id]))
     assert not resp.data.get("is_favorite")
 
@@ -147,7 +147,7 @@ def test_favorites(client):
 
 def test_unautharized_favorites(client):
     """Test favoriting and unfavoriting when not logged in"""
-    course = CourseFactory()
+    course = CourseFactory.create()
     resp = client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
     assert resp.status_code == 403
 
