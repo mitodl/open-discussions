@@ -50,7 +50,7 @@ def test_serialize_bootcamp_related_models():
     """
     Verify that a serialized bootcamp contains attributes for related objects
     """
-    bootcamp = BootcampFactory(
+    bootcamp = BootcampFactory.create(
         topics=CourseTopicFactory.create_batch(3),
         prices=CoursePriceFactory.create_batch(2),
         instructors=CourseInstructorFactory.create_batch(2),
@@ -70,8 +70,8 @@ def test_generic_foreign_key_serializer():
     """
     Test that generic foreign key serializer properly rejects unexpected classes
     """
-    program = ProgramFactory()
-    course_topic = CourseTopicFactory()
+    program = ProgramFactory.create()
+    course_topic = CourseTopicFactory.create()
     program_item = ProgramItem(program=program, item=course_topic)
     serializer = ProgramItemSerializer(program_item)
     with pytest.raises(Exception):
@@ -82,12 +82,12 @@ def test_favorites_serializer():
     """
     Test that the favorite serializer generic foreign key works and also rejects unexpected classes
     """
-    user = UserFactory()
-    course = CourseFactory()
-    bootcamp = BootcampFactory()
-    user_list = UserListFactory(author=user)
-    program = ProgramFactory()
-    course_topic = CourseTopicFactory()
+    user = UserFactory.create()
+    course = CourseFactory.create()
+    bootcamp = BootcampFactory.create()
+    user_list = UserListFactory.create(author=user)
+    program = ProgramFactory.create()
+    course_topic = CourseTopicFactory.create()
 
     favorite_item = FavoriteItem(user=user, item=course)
     serializer = FavoriteItemSerializer(favorite_item)

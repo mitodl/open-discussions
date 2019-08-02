@@ -203,6 +203,9 @@ def test_serialize_bulk_comments():
     ) == len(comments)
 
 
+ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+
 @pytest.mark.django_db
 def test_es_course_serializer():
     """
@@ -223,12 +226,12 @@ def test_es_course_serializer():
         "platform": course.platform,
         "language": course.language,
         "semester": course.semester,
-        "year": course.year,
+        "year": int(course.year),
         "level": course.level,
-        "start_date": course.start_date,
-        "end_date": course.end_date,
-        "enrollment_start": course.enrollment_start,
-        "enrollment_end": course.enrollment_end,
+        "start_date": course.start_date.strftime(ISOFORMAT),
+        "end_date": course.end_date.strftime(ISOFORMAT),
+        "enrollment_start": course.enrollment_start.strftime(ISOFORMAT),
+        "enrollment_end": course.enrollment_end.strftime(ISOFORMAT),
         "title": course.title,
         "image_src": course.image_src,
         "instructors": [
