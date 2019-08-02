@@ -66,15 +66,14 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         return
 
     # Get the last modified date from the course data
-    course_modified = course_data.get("modified")
+    course_modified = datetime.strptime(
+        course_data.get("modified"), "%Y-%m-%dT%H:%M:%S.%fZ"
+    ).astimezone(pytz.utc)
 
     # Try and get the Course instance. If it exists check to see if it needs updating
     try:
         course = Course.objects.get(course_id=course_data.get("key"))
-        compare_datetime = datetime.strptime(
-            course_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).astimezone(pytz.utc)
-        needs_update = (compare_datetime >= course.last_modified) or force_overwrite
+        needs_update = (course_modified >= course.last_modified) or force_overwrite
         index_func = update_course
     except Course.DoesNotExist:
         index_func = index_new_course
@@ -108,26 +107,21 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                         continue
 
                     # Get the last modified date from the course run
-                    course_run_modified = course_run.get("modified")
+                    course_run_modified = datetime.strptime(
+                        course_run.get("modified"), "%Y-%m-%dT%H:%M:%S.%fZ"
+                    ).astimezone(pytz.utc)
 
                     # Since we use data from both course and course_run and they use different modified timestamps,
                     # we need to find the newest changes
-                    max_modified = (
-                        course_modified
-                        if course_modified > course_run_modified
-                        else course_run_modified
-                    )
+                    max_modified = max(course_modified, course_run_modified)
 
                     # Try and get the CourseRun instance. If it exists check to see if it needs updating
                     try:
                         courserun_instance = CourseRun.objects.get(
                             course_run_id=course_run.get("key"), course=course
                         )
-                        compare_datetime = datetime.strptime(
-                            max_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
-                        ).astimezone(pytz.utc)
                         if (
-                            compare_datetime <= courserun_instance.last_modified
+                            max_modified <= courserun_instance.last_modified
                             and not force_overwrite
                         ):
                             log.debug(
