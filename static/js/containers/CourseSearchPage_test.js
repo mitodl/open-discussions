@@ -295,7 +295,7 @@ describe("CourseSearchPage", () => {
   it("updates the textbox", async () => {
     const { inner } = await renderPage()
     const text = "text"
-    inner.find("SearchTextbox").prop("onChange")({
+    inner.find("CourseSearchbox").prop("onChange")({
       target: {
         value: text
       }
@@ -340,7 +340,7 @@ describe("CourseSearchPage", () => {
     )
     const text = "some other text"
     inner.setState({ text, from: 7 })
-    inner.find("SearchTextbox").prop("onSubmit")({
+    inner.find("CourseSearchbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), {
@@ -424,13 +424,6 @@ describe("CourseSearchPage", () => {
       activeFacets: inner.state().activeFacets
     })
     sinon.assert.notCalled(helper.searchStub)
-  })
-
-  it("clears the text when the onClear prop is triggered", async () => {
-    const { inner } = await renderPage()
-    inner.setState({ text: "some text" })
-    inner.find("SearchTextbox").prop("onClear")()
-    assert.equal(inner.state().text, "")
   })
 
   //

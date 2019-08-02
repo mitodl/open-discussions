@@ -19,11 +19,6 @@
   }
 }
 
-.course-search-input {
-  max-width: 600px;
-  margin: auto;
-}
-
 .row {
   flex-direction: row;
   justify-content: space-between;
@@ -40,6 +35,32 @@
     rgba(0, 0, 0, 0.1),
     rgba(0, 0, 0, 0) 25%
   );
+}
+
+.course-catalog-title {
+  display: flex;
+  justify-content: center;
+
+  .title {
+    color: white;
+    font-size: 40px;
+    padding-top: 15px;
+    font-weight: bold;
+  }
+}
+
+.course-searchbox-container {
+  display: flex;
+  flex-direction: column;
+
+  .link-button {
+    align-self: flex-end;
+    margin: 22px 0 0 0;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    padding: 9px 30px;
+  }
 }
 
 .compact-course-summary {

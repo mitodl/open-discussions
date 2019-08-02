@@ -3,6 +3,7 @@ import React from "react"
 import { connectRequest, querySelectors } from "redux-query"
 import { connect } from "react-redux"
 import { compose } from "redux"
+import { Link } from "react-router-dom"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
@@ -14,7 +15,7 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import { Cell, Grid } from "../components/Grid"
-import SearchTextbox from "../components/SearchTextbox"
+import CourseSearchbox from "../components/CourseSearchbox"
 
 import { setShowResourceDrawer } from "../actions/ui"
 import {
@@ -63,12 +64,10 @@ export const CourseIndexPage = ({
       <BannerContainer tall>
         <BannerImage src={COURSE_BANNER_URL} tall />
       </BannerContainer>
-      <Grid className="main-content two-column channel-header course-index-page">
-        <Cell width={12} className="avatar-headline-row">
-          <div className="course-search-greeting">
-            <div className="headline">MIT Online Learning</div>
-          </div>
-          <SearchTextbox
+      <Grid>
+        <Cell width={4} />
+        <Cell className="course-searchbox-container" width={4}>
+          <CourseSearchbox
             onSubmit={e => {
               const { value } = e.target
               const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
@@ -76,9 +75,10 @@ export const CourseIndexPage = ({
               })}`
               history.push(newLocation)
             }}
-            placeholder="Search Learning offerings"
-            noFocusOnLoad
           />
+          <Link className="link-button" to={COURSE_SEARCH_URL}>
+            See All Courses
+          </Link>
         </Cell>
       </Grid>
     </BannerPageHeader>

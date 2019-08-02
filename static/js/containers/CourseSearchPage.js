@@ -16,8 +16,14 @@ import { Cell, Grid } from "../components/Grid"
 import { Loading, PostLoading } from "../components/Loading"
 import SearchFacet from "../components/SearchFacet"
 import SearchFilter from "../components/SearchFilter"
-import SearchTextbox from "../components/SearchTextbox"
+import CourseSearchbox from "../components/CourseSearchbox"
 import SearchResult from "../components/SearchResult"
+import {
+  BannerPageWrapper,
+  BannerPageHeader,
+  BannerContainer,
+  BannerImage
+} from "../components/PageBanner"
 
 import { actions } from "../actions"
 import { setShowResourceDrawer } from "../actions/ui"
@@ -26,6 +32,7 @@ import { availabilityLabel, resourceLabel } from "../lib/learning_resources"
 import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
+import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -306,21 +313,34 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { text, error, activeFacets } = this.state
 
     return (
-      <React.Fragment>
-        <Grid className="main-content two-column-extrawide search-page">
-          <Cell width={12}>
-            <MetaTags>
-              <CanonicalLink match={match} />
-            </MetaTags>
-            <div className="course-search-input">
-              <SearchTextbox
+      <BannerPageWrapper>
+        <MetaTags>
+          <CanonicalLink match={match} />
+        </MetaTags>
+        <BannerPageHeader tall>
+          <BannerContainer tall>
+            <BannerImage src={COURSE_SEARCH_BANNER_URL} tall />
+          </BannerContainer>
+          <Grid>
+            <Cell width={4}>
+              <div className="course-catalog-title">
+                <div className="title">Course Catalog</div>
+              </div>
+            </Cell>
+            <Cell width={4}>
+              <CourseSearchbox
                 onChange={this.updateText}
                 value={text || ""}
                 onClear={this.updateText}
                 onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
                 validation={error}
+                autoFocus
               />
-            </div>
+            </Cell>
+          </Grid>
+        </BannerPageHeader>
+        <Grid className="main-content two-column-extrawide search-page">
+          <Cell width={12}>
             <div className="search-filters-row">
               {facetDisplayMap.map(([name, title, labelFunction]) =>
                 (activeFacets.get(name) || []).map((facet, i) => (
@@ -361,7 +381,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
           <Cell width={9}>{error ? null : this.renderResults()}</Cell>
         </Grid>
         <LearningResourceDrawer />
-      </React.Fragment>
+      </BannerPageWrapper>
     )
   }
 }

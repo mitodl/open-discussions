@@ -103,9 +103,7 @@ describe("CourseIndexPage", () => {
         push: pushStub
       }
     })
-    const searchBox = wrapper.find("SearchTextbox")
-    assert.equal(searchBox.prop("placeholder"), "Search Learning offerings")
-    assert.isTrue(searchBox.prop("noFocusOnLoad"))
+    const searchBox = wrapper.find("CourseSearchbox")
     searchBox.simulate("submit", { target: { value: "search term" } })
     sinon.assert.calledWith(pushStub, "/courses/search?q=search%20term")
   })

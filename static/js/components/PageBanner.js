@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { isMobileWidth } from "../lib/util"
 
 const bannerHeight = "200px"
-const tallBannerHeight = "400px"
+const tallBannerHeight = "252px"
 const channelBannerBg = "#20316d"
 
 const imageHeight = props =>

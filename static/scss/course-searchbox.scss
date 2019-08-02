@@ -1,0 +1,32 @@
+.course-searchbox {
+  padding-top: 78px;
+
+  label {
+    font-size: 24px;
+    color: white;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    height: 55px;
+    color: $font-grey-mid;
+
+    i.material-icons {
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      font-size: 33px;
+      cursor: pointer;
+    }
+
+    input.search-input {
+      height: 100%;
+      padding-left: 20px;
+      font-size: 20px;
+      border-radius: 7px;
+      border: none;
+    }
+  }
+}

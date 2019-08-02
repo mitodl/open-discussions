@@ -48,7 +48,7 @@ type CellWidth =
   | typeof twelve
 
 type CellProps = {
-  children: any,
+  children?: any,
   width: CellWidth,
   mobileWidth?: CellWidth,
   className?: string

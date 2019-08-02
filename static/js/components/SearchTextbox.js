@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+
 import { validationMessage } from "../lib/validation"
 
 type Props = {
