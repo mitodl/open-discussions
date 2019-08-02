@@ -150,7 +150,12 @@
             "marketing_url": "https://www.edx.org/school/mitx"
         }
     ],
-    "image": {"src": "image_src", "height": null, "width": null, "description": null},
+    "image": {
+        "src": "https://prod-discovery.edx-cdn.org/media/course/image/ff1df27b-3c97-42ee-a9b3-e031ffd41a4f-747c9c2f216e.small.jpg",
+        "height": null,
+        "width": null,
+        "description": null
+    },
     "short_description": "short_description",
     "full_description": "full description",
     "level_type": "Intermediate",
