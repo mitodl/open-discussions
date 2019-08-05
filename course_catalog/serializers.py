@@ -168,18 +168,7 @@ class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer)
             course.prices.add(course_price)
 
 
-class CourseSerializer(BaseCourseSerializer):
-    """
-    Serializer for Course model
-    """
-
-    class Meta:
-        model = Course
-        fields = "__all__"
-        extra_kwargs = {"raw_json": {"write_only": True}}
-
-
-class EDXCourseRunSerializer(BaseCourseSerializer):
+class CourseRunSerializer(BaseCourseSerializer):
     """
     Serializer for creating CourseRun objects from edx data
     """
@@ -240,6 +229,19 @@ class EDXCourseRunSerializer(BaseCourseSerializer):
     class Meta:
         model = CourseRun
         fields = "__all__"
+
+
+class CourseSerializer(BaseCourseSerializer):
+    """
+    Serializer for Course model
+    """
+
+    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+
+    class Meta:
+        model = Course
+        fields = "__all__"
+        extra_kwargs = {"raw_json": {"write_only": True}}
 
 
 class EDXCourseSerializer(CourseSerializer):

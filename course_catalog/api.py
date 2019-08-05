@@ -20,7 +20,7 @@ from course_catalog.models import Course, Bootcamp, CourseRun
 from course_catalog.serializers import (
     BootcampSerializer,
     EDXCourseSerializer,
-    EDXCourseRunSerializer,
+    CourseRunSerializer,
     OCWSerializer,
 )
 from search.task_helpers import update_course, index_new_course
@@ -133,7 +133,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     except CourseRun.DoesNotExist:
                         courserun_instance = None
 
-                    run_serializer = EDXCourseRunSerializer(
+                    run_serializer = CourseRunSerializer(
                         data={
                             **course_run,
                             "max_modified": max_modified,
