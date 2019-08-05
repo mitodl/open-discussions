@@ -176,7 +176,7 @@ class UserList(List):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     privacy_level = models.CharField(max_length=32, null=True, blank=True)
     image_src = models.ImageField(
-        null=True, max_length=2083, upload_to=user_list_image_upload_uri
+        null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
 
@@ -197,7 +197,7 @@ class Program(List):
     """
 
     image_src = models.ImageField(
-        null=True, max_length=2083, upload_to=program_image_upload_uri
+        null=True, blank=True, max_length=2083, upload_to=program_image_upload_uri
     )
 
 
