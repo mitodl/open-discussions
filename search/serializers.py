@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.models import Course, Bootcamp, Program, UserList
+from course_catalog.models import Course, CourseRun, Bootcamp, Program, UserList
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -116,73 +116,6 @@ class ESProfileSerializer(ESProxySerializer):
                 {"name": name, "joined": created_on} for name, created_on in join_data
             ],
         }
-
-
-class ESCourseSerializer(ESModelSerializer):
-    """
-    Elasticsearch serializer class for courses
-    """
-
-    object_type = COURSE_TYPE
-
-    prices = serializers.SerializerMethodField()
-    instructors = serializers.SerializerMethodField()
-    topics = serializers.SerializerMethodField()
-    availability = serializers.SerializerMethodField()
-
-    def get_prices(self, course):
-        """
-        Get the prices for a course
-        """
-        return list(course.prices.values("price", "mode"))
-
-    def get_instructors(self, course):
-        """
-        Get a list of instructor names for the course
-        """
-        return [" ".join([i.first_name, i.last_name]) for i in course.instructors.all()]
-
-    def get_topics(self, course):
-        """
-        Get the topic names for a course
-        """
-        return [topic.name for topic in course.topics.all()]
-
-    def get_availability(self, course):
-        """
-        Get the availability for a course
-        """
-        if course.availability:
-            return course.availability.title()
-        return None
-
-    class Meta:
-        model = Course
-        fields = [
-            "id",
-            "course_id",
-            "short_description",
-            "full_description",
-            "platform",
-            "language",
-            "semester",
-            "year",
-            "level",
-            "start_date",
-            "end_date",
-            "enrollment_start",
-            "enrollment_end",
-            "title",
-            "image_src",
-            "topics",
-            "prices",
-            "instructors",
-            "published",
-            "availability",
-            "offered_by",
-        ]
-
-        read_only_fields = fields
 
 
 class ESPostSerializer(ESModelSerializer):
@@ -325,6 +258,142 @@ class ESCommentSerializer(ESModelSerializer):
             "created",
         )
         read_only_fields = ("text", "score", "created", "removed", "deleted")
+
+
+class ESCourseRunSerializer(serializers.ModelSerializer):
+    """
+    Elasticsearch serializer class for course runs
+    """
+
+    prices = serializers.SerializerMethodField()
+    instructors = serializers.SerializerMethodField()
+    topics = serializers.SerializerMethodField()
+    availability = serializers.SerializerMethodField()
+
+    def get_prices(self, course_run):
+        """
+        Get the prices for a course run
+        """
+        return list(course_run.prices.values("price", "mode"))
+
+    def get_instructors(self, course_run):
+        """
+        Get a list of instructor names for the course run
+        """
+        return [
+            " ".join([i.first_name, i.last_name]) for i in course_run.instructors.all()
+        ]
+
+    def get_topics(self, course_run):
+        """
+        Get the topic names for a course run
+        """
+        return [topic.name for topic in course_run.topics.all()]
+
+    def get_availability(self, course_run):
+        """
+        Get the availability for a course run
+        """
+        if course_run.availability:
+            return course_run.availability.title()
+        return None
+
+    class Meta:
+        model = CourseRun
+        fields = [
+            "id",
+            "course_run_id",
+            "short_description",
+            "full_description",
+            "language",
+            "semester",
+            "year",
+            "level",
+            "start_date",
+            "end_date",
+            "enrollment_start",
+            "enrollment_end",
+            "title",
+            "image_src",
+            "topics",
+            "prices",
+            "instructors",
+            "published",
+            "availability",
+            "offered_by",
+        ]
+
+        read_only_fields = fields
+
+
+class ESCourseSerializer(ESModelSerializer):
+    """
+    Elasticsearch serializer class for courses
+    """
+
+    object_type = COURSE_TYPE
+
+    prices = serializers.SerializerMethodField()
+    instructors = serializers.SerializerMethodField()
+    topics = serializers.SerializerMethodField()
+    availability = serializers.SerializerMethodField()
+
+    course_runs = ESCourseRunSerializer(many=True)
+
+    def get_prices(self, course):
+        """
+        Get the prices for a course
+        """
+        return list(course.prices.values("price", "mode"))
+
+    def get_instructors(self, course):
+        """
+        Get a list of instructor names for the course
+        """
+        return [" ".join([i.first_name, i.last_name]) for i in course.instructors.all()]
+
+    def get_topics(self, course):
+        """
+        Get the topic names for a course
+        """
+        return [topic.name for topic in course.topics.all()]
+
+    def get_availability(self, course):
+        """
+        Get the availability for a course
+        """
+        if course.availability:
+            return course.availability.title()
+        return None
+
+    class Meta:
+        model = Course
+        fields = [
+            "id",
+            "course_id",
+            "short_description",
+            "full_description",
+            "platform",
+            "language",
+            "semester",
+            "year",
+            "level",
+            "start_date",
+            "end_date",
+            "enrollment_start",
+            "enrollment_end",
+            "title",
+            "image_src",
+            "topics",
+            "prices",
+            "instructors",
+            "published",
+            "availability",
+            "offered_by",
+            "course_runs",
+        ]
+
+        read_only_fields = fields
 
 
 class ESBootcampSerializer(ESCourseSerializer):

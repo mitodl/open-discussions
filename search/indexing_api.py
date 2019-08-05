@@ -115,6 +115,31 @@ COURSE_OBJECT_TYPE = {
     "published": {"type": "boolean"},
     "availability": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
+    "course_runs": {
+        "type": "nested",
+        "properties": {
+            "id": {"type": "long"},
+            "course_id": {"type": "keyword"},
+            "title": ENGLISH_TEXT_FIELD,
+            "short_description": ENGLISH_TEXT_FIELD,
+            "full_description": ENGLISH_TEXT_FIELD,
+            "language": {"type": "keyword"},
+            "level": {"type": "keyword"},
+            "semester": {"type": "keyword"},
+            "year": {"type": "keyword"},
+            "start_date": {"type": "date"},
+            "end_date": {"type": "date"},
+            "enrollment_start": {"type": "date"},
+            "enrollment_end": {"type": "date"},
+            "topics": {"type": "keyword"},
+            "instructors": {"type": "text"},
+            "price": {"type": "nested"},
+            "image_src": {"type": "keyword"},
+            "published": {"type": "boolean"},
+            "availability": {"type": "keyword"},
+            "offered_by": {"type": "keyword"},
+        },
+    },
 }
 
 BOOTCAMP_OBJECT_TYPE = {
