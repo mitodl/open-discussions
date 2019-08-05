@@ -158,7 +158,7 @@ class ListItem(TimestampedModel):
     position = models.PositiveIntegerField()
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("Course", "Bootcamp")},
+        limit_choices_to={"model__in": ("course", "bootcamp")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
@@ -176,7 +176,7 @@ class UserList(List):
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     privacy_level = models.CharField(max_length=32, null=True, blank=True)
     image_src = models.ImageField(
-        null=True, max_length=2083, upload_to=user_list_image_upload_uri
+        null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
 
@@ -197,7 +197,7 @@ class Program(List):
     """
 
     image_src = models.ImageField(
-        null=True, max_length=2083, upload_to=program_image_upload_uri
+        null=True, blank=True, max_length=2083, upload_to=program_image_upload_uri
     )
 
 
@@ -220,7 +220,7 @@ class FavoriteItem(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("Course", "Bootcamp", "UserList", "Program")},
+        limit_choices_to={"model__in": ("course", "bootcamp", "userlist", "program")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
