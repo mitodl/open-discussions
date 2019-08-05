@@ -29,7 +29,14 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    "offered_by,has_runs", [[OfferedBy.mitx.value, True], [OfferedBy.ocw.value, False]]
+    "offered_by,has_runs",
+    [
+        [OfferedBy.mitx.value, True],
+        [OfferedBy.xpro.value, True],
+        [OfferedBy.micromasters.value, True],
+        [OfferedBy.ocw.value, False],
+        [OfferedBy.bootcamps.value, False],
+    ],
 )
 def test_serialize_course_related_models(offered_by, has_runs):
     """
