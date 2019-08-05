@@ -6,12 +6,8 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
-from course_catalog.factories import (
-    CourseFactory,
-    CourseTopicFactory,
-    CoursePriceFactory,
-    CourseInstructorFactory,
-)
+from course_catalog.constants import OfferedBy
+from course_catalog.factories import CourseFactory, CourseRunFactory
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime
@@ -23,6 +19,7 @@ from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESCourseSerializer,
+    ESCourseRunSerializer,
     ESProfileSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
@@ -207,16 +204,51 @@ ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 @pytest.mark.django_db
-def test_es_course_serializer():
+def test_es_course_run_serializer():
+    """
+    Test that ESCourseRunSerializer correctly serializes a course run object
+    """
+    course_run = CourseRunFactory.create()
+    serialized = ESCourseRunSerializer(course_run).data
+    assert serialized == {
+        "id": course_run.id,
+        "course_run_id": course_run.course_run_id,
+        "short_description": course_run.short_description,
+        "full_description": course_run.full_description,
+        "language": course_run.language,
+        "semester": course_run.semester,
+        "year": int(course_run.year),
+        "level": course_run.level,
+        "start_date": course_run.start_date.strftime(ISOFORMAT),
+        "end_date": course_run.end_date.strftime(ISOFORMAT),
+        "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
+        "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
+        "title": course_run.title,
+        "image_src": course_run.image_src,
+        "instructors": [
+            " ".join([instructor.first_name, instructor.last_name])
+            for instructor in course_run.instructors.all()
+        ],
+        "topics": list(course_run.topics.values_list("name", flat=True)),
+        "prices": list(course_run.prices.values("price", "mode")),
+        "published": True,
+        "availability": course_run.availability,
+        "offered_by": course_run.offered_by,
+    }
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
+def test_es_course_serializer(offered_by):
     """
     Test that ESCourseSerializer correctly serializes a course object
     """
-    course = CourseFactory(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-        instructors=CourseInstructorFactory.create_batch(2),
-    )
+    course = CourseFactory.create(offered_by=offered_by)
     serialized = ESCourseSerializer(course).data
+    # coerce OrderDicts to dict (implementation detail of DRF)
+    serialized["course_runs"] = sorted(
+        map(dict, serialized["course_runs"]), key=lambda item: item["id"]
+    )
     assert serialized == {
         "object_type": COURSE_TYPE,
         "id": course.id,
@@ -237,6 +269,34 @@ def test_es_course_serializer():
         "instructors": [
             " ".join([instructor.first_name, instructor.last_name])
             for instructor in course.instructors.all()
+        ],
+        "course_runs": [
+            {
+                "id": course_run.id,
+                "course_run_id": course_run.course_run_id,
+                "short_description": course_run.short_description,
+                "full_description": course_run.full_description,
+                "language": course_run.language,
+                "semester": course_run.semester,
+                "year": int(course_run.year),
+                "level": course_run.level,
+                "start_date": course_run.start_date.strftime(ISOFORMAT),
+                "end_date": course_run.end_date.strftime(ISOFORMAT),
+                "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
+                "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
+                "title": course_run.title,
+                "image_src": course_run.image_src,
+                "instructors": [
+                    " ".join([instructor.first_name, instructor.last_name])
+                    for instructor in course_run.instructors.all()
+                ],
+                "topics": list(course_run.topics.values_list("name", flat=True)),
+                "prices": list(course_run.prices.values("price", "mode")),
+                "published": True,
+                "availability": course_run.availability,
+                "offered_by": course_run.offered_by,
+            }
+            for course_run in sorted(course.course_runs.all(), key=lambda item: item.id)
         ],
         "topics": list(course.topics.values_list("name", flat=True)),
         "prices": list(course.prices.values("price", "mode")),
