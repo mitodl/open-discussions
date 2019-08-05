@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.86.0
+--------------
+
+- update UI for search box in course page header
+- Add Program and UserList to Django admin (#2133)
+- Updated course_catalog factories to be generate more data out of the box
+
 Version 0.85.2 (Released August 05, 2019)
 --------------
 
