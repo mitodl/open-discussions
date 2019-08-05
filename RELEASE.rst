@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.85.2 (Released August 05, 2019)
+--------------
+
+- Import courses and course runs for MITx (#2130)
+
 Version 0.85.1 (Released August 01, 2019)
 --------------
 
