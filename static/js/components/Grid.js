@@ -71,7 +71,7 @@ export const Cell = ({
     return () => {
       window.removeEventListener("resize", setState)
     }
-  })
+  }, [])
 
   return (
     <div
