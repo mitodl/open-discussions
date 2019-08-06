@@ -60,7 +60,7 @@ def test_parse_mitx_json_data_overwrite_course(
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
+    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == (1 if force_overwrite else 0)
@@ -89,7 +89,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.EDXCourseRunSerializer.save")
+    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == 1
