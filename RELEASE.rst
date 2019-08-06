@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.86.0
+Version 0.86.0 (Released August 06, 2019)
 --------------
 
 - update UI for search box in course page header
