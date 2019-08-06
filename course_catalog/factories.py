@@ -42,7 +42,7 @@ class CourseInstructorFactory(DjangoModelFactory):
 class CourseTopicFactory(DjangoModelFactory):
     """Factory for course topics"""
 
-    name = factory.Faker("word")
+    name = factory.Sequence(lambda n: "Topic %03d" % n)
 
     class Meta:
         model = CourseTopic
@@ -52,7 +52,7 @@ class CourseTopicFactory(DjangoModelFactory):
 class CoursePriceFactory(DjangoModelFactory):
     """Factory for course prices"""
 
-    price = factory.Faker("pyfloat", right_digits=2, min_value=1, max_value=1500)
+    price = factory.Sequence(lambda n: 0.00 + float(n))
     mode = factory.Faker("word")
     upgrade_deadline = None
 
