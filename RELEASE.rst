@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.86.1
+--------------
+
+- Make topic and price sequences again in tests (#2139)
+- Include course runs in CourseSerializer (#2136)
+
 Version 0.86.0 (Released August 06, 2019)
 --------------
 
