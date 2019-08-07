@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.86.2
+--------------
+
+- Add course runs to ES index
+
 Version 0.86.1 (Released August 07, 2019)
 --------------
 
