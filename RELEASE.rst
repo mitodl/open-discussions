@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.86.1
+Version 0.86.1 (Released August 07, 2019)
 --------------
 
 - Make topic and price sequences again in tests (#2139)
