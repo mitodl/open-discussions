@@ -9,7 +9,6 @@ import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 import { connectRequest } from "redux-query"
 import { compose } from "redux"
-import { createSelector } from "reselect"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
@@ -42,7 +41,10 @@ import {
 import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
-import { favoritesRequest } from "../lib/queries/learning_resources"
+import {
+  favoritesRequest,
+  favoritesSelector
+} from "../lib/queries/learning_resources"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -414,22 +416,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 }
 
-const filterFavorite = (entities: Object) =>
-  R.filter(R.propEq("is_favorite", true), entities || {})
-
-const getFavorites = createSelector(
-  state => state.entities.courses,
-  state => state.entities.bootcamps,
-  state => state.entities.programs,
-  state => state.entities.userLists,
-  (courses, bootcamps, programs, userLists) => ({
-    courses:   filterFavorite(courses),
-    bootcamps: filterFavorite(bootcamps),
-    programs:  filterFavorite(programs),
-    userLists: filterFavorite(userLists)
-  })
-)
-
 const mapStateToProps = (state): StateProps => {
   const { search } = state
   const { results, total, initialLoad, facets } = search.data
@@ -441,7 +427,7 @@ const mapStateToProps = (state): StateProps => {
     initialLoad,
     loaded:     search.loaded,
     processing: search.processing,
-    favorites:  getFavorites(state)
+    favorites:  favoritesSelector(state)
   }
 }
 

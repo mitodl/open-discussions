@@ -4,6 +4,7 @@ import { connectRequest, querySelectors } from "redux-query"
 import { connect } from "react-redux"
 import { compose } from "redux"
 import { Link } from "react-router-dom"
+import { createSelector } from "reselect"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
@@ -26,6 +27,10 @@ import {
   newCoursesRequest,
   newCoursesSelector
 } from "../lib/queries/courses"
+import {
+  favoritesRequest,
+  favoritesSelector
+} from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 
 import type { Course } from "../flow/discussionTypes"
@@ -38,6 +43,7 @@ type StateProps = {|
   featuredCourses: Array<Course>,
   upcomingCourses: Array<Course>,
   newCourses: Array<Course>,
+  favorites: Array<Object>,
   loaded: boolean
 |}
 
@@ -57,7 +63,8 @@ export const CourseIndexPage = ({
   newCourses,
   loaded,
   setShowResourceDrawer,
-  history
+  history,
+  favorites
 }: Props) => (
   <BannerPageWrapper>
     <BannerPageHeader tall>
@@ -85,6 +92,11 @@ export const CourseIndexPage = ({
     <Grid className="main-content one-column">
       {loaded ? (
         <Cell width={12}>
+          <CourseCarousel
+            title="Favorites"
+            courses={favorites}
+            setShowResourceDrawer={setShowResourceDrawer}
+          />
           {featuredCourses.length !== 0 ? (
             <CourseCarousel
               title="Featured Courses"
@@ -111,14 +123,26 @@ export const CourseIndexPage = ({
   </BannerPageWrapper>
 )
 
+const favoritesListSelector = createSelector(
+  favoritesSelector,
+  ({ courses, bootcamps, programs, userLists }) => [
+    ...Object.values(courses),
+    ...Object.values(bootcamps),
+    ...Object.values(programs),
+    ...Object.values(userLists)
+  ]
+)
+
 const mapStateToProps = (state: Object): StateProps => ({
   featuredCourses: featuredCoursesSelector(state),
   upcomingCourses: upcomingCoursesSelector(state),
   newCourses:      newCoursesSelector(state),
+  favorites:       favoritesListSelector(state),
   loaded:
     querySelectors.isFinished(state.queries, featuredCoursesRequest()) &&
     querySelectors.isFinished(state.queries, upcomingCoursesRequest()) &&
-    querySelectors.isFinished(state.queries, newCoursesRequest())
+    querySelectors.isFinished(state.queries, newCoursesRequest()) &&
+    querySelectors.isFinished(state.queries, favoritesRequest())
 })
 
 const mapDispatchToProps = {
@@ -128,7 +152,8 @@ const mapDispatchToProps = {
 const mapPropsToConfig = () => [
   featuredCoursesRequest(),
   upcomingCoursesRequest(),
-  newCoursesRequest()
+  newCoursesRequest(),
+  favoritesRequest()
 ]
 
 export default compose(

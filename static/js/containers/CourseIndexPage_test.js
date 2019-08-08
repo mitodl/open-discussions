@@ -22,16 +22,19 @@ describe("CourseIndexPage", () => {
     setShowResourceDrawerStub,
     renderCourseIndexPage,
     sandbox,
-    courseLists
+    courseLists,
+    favorites
 
   beforeEach(() => {
     featuredCourses = R.times(makeCourse, 10)
+    favorites = R.times(makeCourse, 10)
     upcomingCourses = R.times(makeCourse, 10)
     newCourses = R.times(makeCourse, 10)
     courseLists = {
       featuredCourses,
       upcomingCourses,
-      newCourses
+      newCourses,
+      favorites
     }
     sandbox = sinon.createSandbox()
     setShowResourceDrawerStub = sandbox.stub()
@@ -48,6 +51,7 @@ describe("CourseIndexPage", () => {
 
   //
   ;[
+    ["favorites", "Favorites"],
     ["featuredCourses", "Featured Courses"],
     ["upcomingCourses", "Upcoming Courses"],
     ["newCourses", "New Courses"]
@@ -78,8 +82,9 @@ describe("CourseIndexPage", () => {
     const carousels = renderCourseIndexPage({ featuredCourses: [] }).find(
       "CourseCarousel"
     )
-    assert.lengthOf(carousels, 2)
+    assert.lengthOf(carousels, 3)
     assert.deepEqual(carousels.map(el => el.prop("title")), [
+      "Favorites",
       "Upcoming Courses",
       "New Courses"
     ])

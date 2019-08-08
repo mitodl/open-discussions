@@ -1,5 +1,6 @@
 // @flow
 import R from "ramda"
+import { createSelector } from "reselect"
 
 import { favoritesURL } from "../url"
 import { constructIdMap } from "../redux_query"
@@ -40,3 +41,19 @@ export const favoritesRequest = () => ({
     next:      (prev: string, next: string) => next
   }
 })
+
+const filterFavorite = (entities: Object) =>
+  R.filter(R.propEq("is_favorite", true), entities || {})
+
+export const favoritesSelector = createSelector(
+  state => state.entities.courses,
+  state => state.entities.bootcamps,
+  state => state.entities.programs,
+  state => state.entities.userLists,
+  (courses, bootcamps, programs, userLists) => ({
+    courses:   filterFavorite(courses),
+    bootcamps: filterFavorite(bootcamps),
+    programs:  filterFavorite(programs),
+    userLists: filterFavorite(userLists)
+  })
+)
