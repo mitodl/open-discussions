@@ -64,9 +64,13 @@ def test_ensure_notification_settings_existing(user):
 def test_get_daily_frontpage_settings_ids():
     """Tests that get_daily_frontpage_settings_ids only triggers for daily settings"""
     notification_settings = NotificationSettingsFactory.create_batch(
-        50, daily=True, frontpage_type=True
+        5, daily=True, frontpage_type=True
     )
-    NotificationSettingsFactory.create_batch(50, weekly=True, frontpage_type=True)
+    # these shouldn't show up
+    NotificationSettingsFactory.create_batch(
+        5, daily=True, frontpage_type=True, user__is_active=False
+    )
+    NotificationSettingsFactory.create_batch(5, weekly=True, frontpage_type=True)
 
     assert set(api.get_daily_frontpage_settings_ids()) == {
         ns.id for ns in notification_settings
@@ -76,9 +80,13 @@ def test_get_daily_frontpage_settings_ids():
 def test_get_weekly_frontpage_settings_ids():
     """Tests that get_weekly_frontpage_settings_ids only returns weekly settings"""
     notification_settings = NotificationSettingsFactory.create_batch(
-        50, weekly=True, frontpage_type=True
+        5, weekly=True, frontpage_type=True
     )
-    NotificationSettingsFactory.create_batch(50, daily=True, frontpage_type=True)
+    # these shouldn't show up
+    NotificationSettingsFactory.create_batch(
+        5, weekly=True, frontpage_type=True, user__is_active=False
+    )
+    NotificationSettingsFactory.create_batch(5, daily=True, frontpage_type=True)
 
     assert set(api.get_weekly_frontpage_settings_ids()) == {
         ns.id for ns in notification_settings

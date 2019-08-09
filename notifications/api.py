@@ -73,6 +73,7 @@ def get_daily_frontpage_settings_ids():
     return (
         NotificationSettings.frontpage_settings()
         .filter(trigger_frequency=FREQUENCY_DAILY)
+        .filter(user__is_active=True)
         .values_list("id", flat=True)
         .order_by("id")
         .iterator()
@@ -84,6 +85,7 @@ def get_weekly_frontpage_settings_ids():
     return (
         NotificationSettings.frontpage_settings()
         .filter(trigger_frequency=FREQUENCY_WEEKLY)
+        .filter(user__is_active=True)
         .values_list("id", flat=True)
         .order_by("id")
         .iterator()

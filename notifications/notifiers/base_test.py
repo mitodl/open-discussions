@@ -35,10 +35,13 @@ def test_invalid_notification_cls():
         BaseNotifier(_NotANotification, None)
 
 
-def test_can_notify_immediate(notifier, mocker):
+@pytest.mark.parametrize("is_active", [True, False])
+def test_can_notify_immediate(notifier, mocker, is_active):
     """Tests that if the settings are for immediate the notification triggers"""
-    notifier.notification_settings = NotificationSettingsFactory.create(immediate=True)
-    assert notifier.can_notify(mocker.Mock()) is True
+    notifier.notification_settings = NotificationSettingsFactory.create(
+        immediate=True, user__is_active=is_active
+    )
+    assert notifier.can_notify(mocker.Mock()) is is_active
 
 
 @pytest.mark.parametrize("expected", [True, False])

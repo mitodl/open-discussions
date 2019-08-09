@@ -28,6 +28,7 @@ from search.task_helpers import (
     update_channel_index,
     update_course,
     index_new_course,
+    delete_profile,
 )
 from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
 
@@ -460,4 +461,17 @@ def test_index_new_course(mock_index_functions, mocker):
     assert patched_create_task.delay.call_args[0] == (
         gen_course_id(course.course_id),
         ESCourseSerializer(course).data,
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("mock_index_functions")
+def test_delete_profile(mocker, user):
+    """Tests that deleting a user triggers a delete on a profile document"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    delete_profile(user)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (
+        gen_profile_id(user.username),
+        PROFILE_TYPE,
     )

@@ -227,6 +227,18 @@ def update_author(user_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
+def delete_profile(user_obj):
+    """
+    Run a task to delete profile document
+
+    Args:
+        user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
+    """
+    if user_obj.username != settings.INDEXING_API_USERNAME:
+        delete_document.delay(gen_profile_id(user_obj.username), PROFILE_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
 def update_author_posts_comments(profile_obj):
     """
     Run a task to update author name and avatar in all associated post and comment docs

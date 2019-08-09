@@ -10,6 +10,7 @@ from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from course_catalog.factories import CourseFactory
+from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
 from search.exceptions import ReindexException, RetryException
@@ -219,6 +220,9 @@ def test_start_recreate_index(
     """
     settings.INDEXING_API_USERNAME = user.username
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    UserFactory.create_batch(
+        4, is_active=False
+    )  # these should not show up in the indexing
     comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)
     posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
     users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
