@@ -14,13 +14,14 @@ import {
 import type { Bootcamp, Course } from "../flow/discussionTypes"
 
 const incrCourse = incrementer()
+const courseId: any = incrementer()
 
 const dateFormat = "YYYY-MM-DD[T]HH:mm:ss[Z]"
 
 export const makeCourse = (): Course => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   course_id:         `course_${incrCourse.next().value}`,
-  id:                casual.integer(1, 1000),
+  id:                courseId.next().value,
   title:             casual.title,
   url:               casual.url,
   image_src:         "http://image.medium.url",
@@ -50,11 +51,12 @@ export const makeCourse = (): Course => ({
 })
 
 const incrBootcamp = incrementer()
+const bootcampId: any = incrementer()
 
 export const makeBootcamp = (): Bootcamp => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   course_id:         `bootcamp_${incrBootcamp.next().value}`,
-  id:                casual.integer(1, 1000),
+  id:                bootcampId.next().value,
   title:             casual.title,
   url:               casual.url,
   image_src:         "http://image.medium.url",
