@@ -11,7 +11,9 @@ import {
 import type {
   Bootcamp,
   Course,
-  LearningResourceSummary
+  LearningResourceSummary,
+  Program,
+  UserList
 } from "../flow/discussionTypes"
 import { capitalize } from "./util"
 
@@ -41,8 +43,10 @@ export const maxPrice = (course: Course | Bootcamp) => {
 }
 
 export const minPrice = (
-  course: LearningResourceSummary | Course | Bootcamp
+  course: LearningResourceSummary | Course | Bootcamp | Program | UserList
 ) => {
-  const price = Math.min(...course.prices.map(price => price.price))
+  // $FlowFixMe
+  const prices = course.prices || []
+  const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"
 }

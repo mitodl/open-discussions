@@ -171,7 +171,7 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
-    # Search only published courses & bootcamps
+    # Search only published courses
     course_filter = Q("term", published=True) | ~Q("terms", object_type=[COURSE_TYPE])
 
     # Search only published bootcamps

@@ -19,7 +19,8 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_USERLIST,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  COURSE_AVAILABLE_NOW
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
@@ -48,7 +49,7 @@ const getPlatform = (object: Object): string =>
     ? object.offered_by || object.platform
     : object.object_type === LR_TYPE_BOOTCAMP
       ? platforms.bootcamps
-      : ""
+      : object.offered_by || ""
 
 export const LearningResourceCard = ({
   object,
@@ -97,11 +98,9 @@ export const LearningResourceCard = ({
             ))
             : null}
         </div>
-        {[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(object.object_type) ? (
-          <div className="row availability">
-            {availabilityLabel(object.availability)}
-          </div>
-        ) : null}
+        <div className="row availability">
+          {availabilityLabel(object.availability || COURSE_AVAILABLE_NOW)}
+        </div>
         <div className="row platform-favorite">
           <img
             className="course-platform"
@@ -117,9 +116,7 @@ export const LearningResourceCard = ({
             onClick={() => toggleFavorite(object)}
           />
         </div>
-        {[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(object.object_type) ? (
-          <div className="row price">{minPrice(object)}</div>
-        ) : null}
+        <div className="row price">{minPrice(object)}</div>
       </div>
       <div className="blue-bottom-border" />
     </div>

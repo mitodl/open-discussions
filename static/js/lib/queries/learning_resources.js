@@ -24,14 +24,13 @@ export const favoritesRequest = () => ({
   transform: (responseJson: Object) => {
     const { next, results } = responseJson
 
-    const foo = {
+    return {
       courses:   constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
       bootcamps: constructIdMap(filterFavorites(results, LR_TYPE_BOOTCAMP)),
       programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
       userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
       next:      next
     }
-    return foo
   },
   update: {
     courses:   R.merge,
