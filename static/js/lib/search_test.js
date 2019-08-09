@@ -122,7 +122,7 @@ describe("search functions", () => {
       availability: result.availability,
       prices:       result.prices,
       object_type:  LR_TYPE_COURSE,
-      offered_by:   result.offered_by,
+      offered_by:   result.offered_by
     })
   })
 
@@ -137,7 +137,8 @@ describe("search functions", () => {
       topics:       result.topics.map(topic => ({ name: topic })),
       availability: result.availability,
       prices:       result.prices,
-      object_type:  LR_TYPE_BOOTCAMP
+      object_type:  LR_TYPE_BOOTCAMP,
+      offered_by:   "bootcamps"
     })
   })
 

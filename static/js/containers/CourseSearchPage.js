@@ -32,7 +32,13 @@ import { actions } from "../actions"
 import { setShowResourceDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
 import { availabilityLabel, resourceLabel } from "../lib/learning_resources"
-import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
+import {
+  LR_TYPE_ALL,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+} from "../lib/constants"
 import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
 import { mergeFacetResults } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
@@ -45,7 +51,8 @@ import type {
   SearchParams,
   Result,
   FacetResult,
-  CurrentFacet
+  CurrentFacet,
+  LearningResourceResult
 } from "../flow/searchTypes"
 
 type OwnProps = {|
@@ -220,10 +227,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     // clone the facts so we can search a default of searching all resources if type isn't specified
     const queryFacets = new Map(activeFacets)
     const type = queryFacets.get("type")
-    queryFacets.set(
-      "type",
-      emptyOrNil(type) ? SEARCH_FILTER_ALL_RESOURCES : type
-    )
+    queryFacets.set("type", emptyOrNil(type) ? LR_TYPE_ALL : type)
     await runSearch({
       channelName: null,
       text,
@@ -271,17 +275,30 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
   }
 
+  getFavoriteObject = (result: LearningResourceResult) => {
+    const { favorites } = this.props
+    const { bootcamps, courses, programs, userLists } = favorites
+    switch (result.object_type) {
+    case LR_TYPE_COURSE:
+      return courses[result.id]
+    case LR_TYPE_BOOTCAMP:
+      return bootcamps[result.id]
+    case LR_TYPE_PROGRAM:
+      return programs[result.id]
+    case LR_TYPE_USERLIST:
+      return userLists[result.id]
+    }
+  }
+
   renderResults = () => {
     const {
       results,
       processing,
       loaded,
       total,
-      setShowResourceDrawer,
-      favorites
+      setShowResourceDrawer
     } = this.props
     const { from, incremental } = this.state
-    const { bootcamps, courses } = favorites
 
     if ((processing || !loaded) && !incremental) {
       return <PostLoading />
@@ -307,7 +324,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 result={result}
                 overrideObject={
                   // $FlowFixMe
-                  bootcamps[result.id] || courses[result.id]
+                  this.getFavoriteObject(result)
                 }
                 toggleFacet={this.toggleFacet}
                 setShowResourceDrawer={setShowResourceDrawer}
@@ -400,9 +417,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
 const getFavorites = createSelector(
   state => state.entities.courses,
   state => state.entities.bootcamps,
-  (courses, bootcamps) => ({
+  state => state.entities.programs,
+  state => state.entities.userLists,
+  (courses, bootcamps, programs, userLists) => ({
     courses:   R.filter(R.propEq("is_favorite", true), courses || {}),
-    bootcamps: R.filter(R.propEq("is_favorite", true), bootcamps || {})
+    bootcamps: R.filter(R.propEq("is_favorite", true), bootcamps || {}),
+    programs:  R.filter(R.propEq("is_favorite", true), programs || {}),
+    userLists: R.filter(R.propEq("is_favorite", true), userLists || {})
   })
 )
 

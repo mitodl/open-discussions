@@ -1,5 +1,3 @@
-import {SEARCH_FILTER_BOOTCAMP, SEARCH_FILTER_COURSE} from "./picker";
-
 export const contentLoaderSpeed = 2
 
 export const PERSONAL_SITE_TYPE = "personal"
@@ -27,7 +25,8 @@ export const platformLogoUrls = {
   [ocwPlatform]:          "/static/images/mit-ocw-logo-square.png",
   [edxPlatform]:          "/static/images/mitx-logo.png",
   [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
-  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png"
+  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
+  "":                     "/static/images/blank.png"
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"

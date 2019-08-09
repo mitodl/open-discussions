@@ -17,12 +17,16 @@ import {
   platformLogoUrls,
   platforms,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_USERLIST,
+  LR_TYPE_PROGRAM
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
+import { favoriteProgramMutation } from "../lib/queries/programs"
+import { favoriteUserListMutation } from "../lib/queries/user_lists"
 
 type OwnProps = {|
   object: LearningResourceSummary,
@@ -40,9 +44,13 @@ type Props = {|
 |}
 
 const getPlatform = (object: Object): string =>
-  object.object_type === LR_TYPE_COURSE ? object.platform : platforms.bootcamps
+  object.object_type === LR_TYPE_COURSE
+    ? object.offered_by || object.platform
+    : object.object_type === LR_TYPE_BOOTCAMP
+      ? platforms.bootcamps
+      : ""
 
-const LearningResourceCard = ({
+export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
   toggleFacet,
@@ -89,17 +97,17 @@ const LearningResourceCard = ({
             ))
             : null}
         </div>
-        <div className="row availability">
-          {availabilityLabel(object.availability)}
-        </div>
-        <div className="row platform">
-          {object.offered_by || "platform" in object ? (
-            <img
-              className="course-platform"
-              src={platformLogoUrls[object.offered_by || object.platform || ""]}
-              alt={`logo for ${object.offered_by || object.platform || ""}`}
-            />
-          ) : null}
+        {[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(object.object_type) ? (
+          <div className="row availability">
+            {availabilityLabel(object.availability)}
+          </div>
+        ) : null}
+        <div className="row platform-favorite">
+          <img
+            className="course-platform"
+            src={platformLogoUrls[getPlatform(object)]}
+            alt={`logo for ${getPlatform(object)}`}
+          />
           <img
             className="favorite"
             src={
@@ -109,7 +117,9 @@ const LearningResourceCard = ({
             onClick={() => toggleFavorite(object)}
           />
         </div>
-        <div className="row price">{minPrice(object)}</div>
+        {[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(object.object_type) ? (
+          <div className="row price">{minPrice(object)}</div>
+        ) : null}
       </div>
       <div className="blue-bottom-border" />
     </div>
@@ -123,6 +133,12 @@ const mapDispatchToProps = dispatch => ({
     }
     if (payload.object_type === LR_TYPE_BOOTCAMP) {
       dispatch(mutateAsync(favoriteBootcampMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_PROGRAM) {
+      dispatch(mutateAsync(favoriteProgramMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_USERLIST) {
+      dispatch(mutateAsync(favoriteUserListMutation(payload)))
     }
   }
 })

@@ -4,7 +4,8 @@ import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
   COURSE_CURRENT,
-  COURSE_PRIOR
+  COURSE_PRIOR,
+  LR_TYPE_USERLIST
 } from "./constants"
 
 import type {
@@ -13,7 +14,6 @@ import type {
   LearningResourceSummary
 } from "../flow/discussionTypes"
 import { capitalize } from "./util"
-import { SEARCH_FILTER_USERLIST } from "./picker"
 
 export const availabilityLabel = (availability: ?string) => {
   switch (availability) {
@@ -28,7 +28,7 @@ export const availabilityLabel = (availability: ?string) => {
 
 export const resourceLabel = (resource: string) => {
   switch (resource) {
-  case SEARCH_FILTER_USERLIST:
+  case LR_TYPE_USERLIST:
     return "Learning Paths"
   default:
     return concat(capitalize(resource), "s")

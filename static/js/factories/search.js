@@ -9,7 +9,8 @@ import {
   COURSE_CURRENT,
   platforms,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_ALL
 } from "../lib/constants"
 
 import type {
@@ -18,7 +19,6 @@ import type {
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
-import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -182,7 +182,7 @@ export const makeSearchFacetResult = () => {
         { key: "Upcoming", doc_count: 67 }
       ]
     },
-    type: SEARCH_FILTER_ALL_RESOURCES
+    type: LR_TYPE_ALL
   }
 }
 

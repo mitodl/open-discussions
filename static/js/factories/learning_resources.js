@@ -8,10 +8,17 @@ import {
   COURSE_CURRENT,
   platforms,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type {
+  Bootcamp,
+  Course,
+  Program,
+  UserList
+} from "../flow/discussionTypes"
 
 const incrCourse = incrementer()
 
@@ -84,11 +91,39 @@ export const makeBootcamp = (): Bootcamp => ({
   prices: [{ mode: "audit", price: casual.number }]
 })
 
+export const makeProgram = (): Program => ({
+  id:                casual.integer(1, 1000),
+  short_description: casual.description,
+  offered_by:        null,
+  title:             casual.title,
+  topics:            [{ name: casual.word }, { name: casual.word }],
+  image_src:         "http://image.medium.url",
+  image_description: casual.description,
+  is_favorite:       casual.boolean,
+  items:             [makeCourse(), makeCourse()]
+})
+
+export const makeUserList = (): UserList => ({
+  id:                casual.integer(1, 1000),
+  short_description: casual.description,
+  offered_by:        null,
+  title:             casual.title,
+  topics:            [{ name: casual.word }, { name: casual.word }],
+  is_favorite:       casual.boolean,
+  image_src:         "http://image.medium.url",
+  image_description: casual.description,
+  items:             [makeCourse(), makeBootcamp(), makeProgram()]
+})
+
 export const makeLearningResource = (objectType: string) => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return R.merge({ object_type: LR_TYPE_COURSE }, makeCourse())
   case LR_TYPE_BOOTCAMP:
     return R.merge({ object_type: LR_TYPE_BOOTCAMP }, makeBootcamp())
+  case LR_TYPE_PROGRAM:
+    return R.merge({ object_type: LR_TYPE_PROGRAM }, makeProgram())
+  case LR_TYPE_USERLIST:
+    return R.merge({ object_type: LR_TYPE_USERLIST }, makeUserList())
   }
 }

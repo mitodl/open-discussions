@@ -98,9 +98,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <i className="material-icons calendar_today">calendar_today</i>
           <div className="course-info-label">Start date:</div>
           <div className="course-info-value">
-            {!isCourse || object.platform === platforms.edX
-              ? moment(object.start_date).format("DD MMMM YYYY")
-              : "Ongoing"}
+            {// $FlowFixMe: only courses will access platform
+              !isCourse || object.platform === platforms.edX
+                ? moment(object.start_date).format("DD MMMM YYYY")
+                : "Ongoing"}
           </div>
         </div>
         <div className="course-info-row">

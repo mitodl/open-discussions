@@ -380,7 +380,15 @@ export type Bootcamp = LearningResource & {
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<Course>
+  items:              Array<Course>,
+  is_favorite:        boolean
+}
+
+export type UserList = LearningResource & {
+  image_src:          ?string,
+  image_description:  ?string,
+  items:              Array<Course | Bootcamp | Program | UserList>,
+  is_favorite:        boolean
 }
 
 export type CoursePrice = {
