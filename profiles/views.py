@@ -37,7 +37,7 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated, IsStaffPermission)
 
     serializer_class = UserSerializer
-    queryset = get_user_model().objects.all()
+    queryset = get_user_model().objects.filter(is_active=True)
     lookup_field = "username"
 
 
@@ -48,7 +48,9 @@ class ProfileViewSet(
 
     permission_classes = (IsAuthenticated, HasEditPermission)
     serializer_class = ProfileSerializer
-    queryset = Profile.objects.prefetch_related("userwebsite_set").all()
+    queryset = Profile.objects.prefetch_related("userwebsite_set").filter(
+        user__is_active=True
+    )
     lookup_field = "user__username"
 
     def get_serializer_context(self):
@@ -62,7 +64,7 @@ class UserWebsiteViewSet(
 
     permission_classes = (IsAuthenticated, HasSiteEditPermission)
     serializer_class = UserWebsiteSerializer
-    queryset = UserWebsite.objects.select_related("profile__user").all()
+    queryset = UserWebsite.objects.select_related("profile__user")
 
 
 @cache_page(60 * 60 * 24)

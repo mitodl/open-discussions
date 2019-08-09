@@ -110,7 +110,11 @@ class Subscription(TimestampedModel):
     Tracks user subscriptions to a post or a comment
     """
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="content_subscriptions",
+    )
     post_id = Base36IntegerField()
     comment_id = Base36IntegerField(null=True)
 
@@ -182,9 +186,10 @@ class Channel(TimestampedModel):
 
         """
         return User.objects.filter(
+            is_active=True,
             id__in=ChannelSubscription.objects.filter(channel=self)
             .order_by("created_on")
-            .values_list("user", flat=True)
+            .values_list("user", flat=True),
         ).iterator()
 
     def __str__(self):
