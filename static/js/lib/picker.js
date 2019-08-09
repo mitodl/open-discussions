@@ -39,12 +39,6 @@ export const SEARCH_FILTER_ALL = ""
 export const SEARCH_FILTER_POST = "post"
 export const SEARCH_FILTER_COMMENT = "comment"
 export const SEARCH_FILTER_PROFILE = "profile"
-export const SEARCH_FILTER_COURSE = "course"
-export const SEARCH_FILTER_BOOTCAMP = "bootcamp"
-export const SEARCH_FILTER_ALL_RESOURCES = [
-  SEARCH_FILTER_COURSE,
-  SEARCH_FILTER_BOOTCAMP
-]
 
 export const VALID_SEARCH_FILTER_TYPES = [
   SEARCH_FILTER_ALL,

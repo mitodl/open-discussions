@@ -16,7 +16,7 @@ import {
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
-import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
+import { LR_TYPE_ALL } from "../lib/constants"
 
 import type {
   LearningResourceResult,
@@ -166,7 +166,7 @@ export default class SearchResult extends React.Component<Props> {
       // $FlowFixMe: This will always be a Profile result
       return <ProfileSearchResult result={result} />
     } else if (
-      [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].includes(result.object_type)
+      LR_TYPE_ALL.includes(result.object_type)
     ) {
       return (
         <LearningResourceSearchResult

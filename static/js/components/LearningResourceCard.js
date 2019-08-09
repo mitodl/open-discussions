@@ -22,10 +22,10 @@ import {
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 
-import type { LearningResource } from "../flow/discussionTypes"
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type OwnProps = {|
-  object: LearningResource,
+  object: LearningResourceSummary,
   setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
@@ -42,7 +42,7 @@ type Props = {|
 const getPlatform = (object: Object): string =>
   object.object_type === LR_TYPE_COURSE ? object.platform : platforms.bootcamps
 
-export const LearningResourceCard = ({
+const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
   toggleFacet,
@@ -92,12 +92,14 @@ export const LearningResourceCard = ({
         <div className="row availability">
           {availabilityLabel(object.availability)}
         </div>
-        <div className="row platform-favorite">
-          <img
-            className="course-platform"
-            src={platformLogoUrls[getPlatform(object)]}
-            alt={`logo for ${getPlatform(object)}`}
-          />
+        <div className="row platform">
+          {object.offered_by || "platform" in object ? (
+            <img
+              className="course-platform"
+              src={platformLogoUrls[object.offered_by || object.platform || ""]}
+              alt={`logo for ${object.offered_by || object.platform || ""}`}
+            />
+          ) : null}
           <img
             className="favorite"
             src={

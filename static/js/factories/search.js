@@ -84,6 +84,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   short_description: casual.description,
   full_description:  casual.description,
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
+  offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
   language:          casual.random_element(["en-US", "fr", null]),
   semester:          casual.random_element(["Fall", "Spring", null]),
   year:              casual.year,
@@ -118,6 +119,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   topics:            [casual.word, casual.word],
   prices:            [{ mode: "audit", price: casual.number }],
   object_type:       LR_TYPE_BOOTCAMP,
+  offered_by:        "bootcamps",
   availability:
     casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
 })

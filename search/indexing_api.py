@@ -179,6 +179,7 @@ USER_LIST_OBJECT_TYPE = {
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
     "author": {"type": "keyword"},
+    "privacy_level": {"type": "keyword"},
     "list_type": {"type": "keyword"},
 }
 

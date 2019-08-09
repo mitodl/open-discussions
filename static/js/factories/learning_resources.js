@@ -26,6 +26,7 @@ export const makeCourse = (): Course => ({
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   full_description:  casual.description,
+  offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
   language:          casual.random_element(["en-US", "fr", null]),
   semester:          casual.random_element(["Fall", "Spring", null]),
@@ -69,6 +70,7 @@ export const makeBootcamp = (): Bootcamp => ({
   enrollment_start:  casual.date(dateFormat),
   enrollment_end:    casual.date(dateFormat),
   is_favorite:       casual.boolean,
+  offered_by:        "bootcamps",
   availability:      casual.random_element([
     COURSE_ARCHIVED,
     COURSE_CURRENT,

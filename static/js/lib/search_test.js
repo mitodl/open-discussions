@@ -121,7 +121,8 @@ describe("search functions", () => {
       topics:       result.topics.map(topic => ({ name: topic })),
       availability: result.availability,
       prices:       result.prices,
-      object_type:  LR_TYPE_COURSE
+      object_type:  LR_TYPE_COURSE,
+      offered_by:   result.offered_by,
     })
   })
 
@@ -500,7 +501,9 @@ describe("search functions", () => {
           "topics",
           "platform"
         ]
-      ]
+      ],
+      ["program", ["title.english", "short_description.english", "topics"]],
+      ["user_list", ["title.english", "short_description.english", "topics"]]
     ].forEach(([type, fields]) => {
       it(`has the right searchFields for ${type}`, () => {
         assert.deepEqual(searchFields(type), fields)

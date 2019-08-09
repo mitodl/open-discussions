@@ -483,6 +483,7 @@ class ESUserListSerializer(ESModelSerializer):
             "topics",
             "author",
             "list_type",
+            "privacy_level",
         ]
 
         read_only_fields = fields

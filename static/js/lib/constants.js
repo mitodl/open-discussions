@@ -1,3 +1,5 @@
+import {SEARCH_FILTER_BOOTCAMP, SEARCH_FILTER_COURSE} from "./picker";
+
 export const contentLoaderSpeed = 2
 
 export const PERSONAL_SITE_TYPE = "personal"
@@ -47,3 +49,11 @@ export const CAROUSEL_IMG_WIDTH = 306
 
 export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_BOOTCAMP = "bootcamp"
+export const LR_TYPE_PROGRAM = "program"
+export const LR_TYPE_USERLIST = "user_list"
+export const LR_TYPE_ALL = [
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+]

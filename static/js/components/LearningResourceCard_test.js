@@ -14,7 +14,6 @@ import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
   platformLogoUrls,
-  platforms,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP
 } from "../lib/constants"
@@ -118,12 +117,20 @@ describe("LearningResourceCard", () => {
       assert.equal(
         platformImg.prop("src"),
         // $FlowFixMe: only courses will access platform
-        platformLogoUrls[isCourse ? object.platform : platforms.bootcamps]
+        platformLogoUrls[
+          isCourse
+            ? object.offered_by || object.platform || ""
+            : object.offered_by
+        ]
       )
       assert.equal(
         platformImg.prop("alt"),
         // $FlowFixMe: only courses will access platform
-        `logo for ${isCourse ? object.platform : platforms.bootcamps}`
+        `logo for ${
+          isCourse
+            ? object.offered_by || object.platform || ""
+            : object.offered_by
+        }`
       )
     })
   })

@@ -8,7 +8,18 @@ import {
   COURSE_CURRENT,
   COURSE_PRIOR
 } from "./constants"
-import { availabilityLabel, minPrice, maxPrice } from "./learning_resources"
+import {
+  availabilityLabel,
+  minPrice,
+  maxPrice,
+  resourceLabel
+} from "./learning_resources"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+} from "./constants"
 
 describe("Course utils", () => {
   [
@@ -45,6 +56,18 @@ describe("Course utils", () => {
       })
       assert.equal(minPrice(course), expectedMin)
       assert.equal(maxPrice(course), expectedMax)
+    })
+  })
+
+  //
+  ;[
+    [LR_TYPE_COURSE, "Courses"],
+    [LR_TYPE_BOOTCAMP, "Bootcamps"],
+    [LR_TYPE_PROGRAM, "Programs"],
+    [LR_TYPE_USERLIST, "Learning Paths"]
+  ].forEach(([searchType, facetText]) => {
+    it(`facet text should be ${facetText} for resource type ${searchType}`, () => {
+      assert.equal(resourceLabel(searchType), facetText)
     })
   })
 })

@@ -69,6 +69,7 @@ export type LearningResourceResult = {
   short_description?:  ?string,
   full_description?:   ?string,
   platform?:           string,
+  offered_by?:         ?string,
   language?:           ?string,
   semester?:           ?string,
   year?:               ?string,

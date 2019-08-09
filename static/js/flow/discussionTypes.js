@@ -320,10 +320,21 @@ export type SocialAuth = {
   provider: string,
 }
 
+
 export type LearningResource = {
   id:                 number,
   title:              string,
   image_src:          ?string,
+  short_description:  ?string,
+  topics:             Array<CourseTopic>,
+  offered_by:         ?string
+}
+
+export type LearningResourceSummary = {
+  id:                 number,
+  title:              string,
+  image_src:          ?string,
+  offered_by:         ?string,
   platform:           ?string,
   topics:             Array<CourseTopic>,
   availability:       ?string,
@@ -331,14 +342,9 @@ export type LearningResource = {
   prices:             Array<CoursePrice>,
 }
 
-
-export type Course = {
-  id:                 number,
+export type Course = LearningResource & {
   course_id:          string,
   url:                ?string,
-  title:              string,
-  image_src:          ?string,
-  short_description:  ?string,
   full_description:   ?string,
   platform:           string,
   language:           ?string,
@@ -350,19 +356,14 @@ export type Course = {
   enrollment_start:   ?string,
   enrollment_end:     ?string,
   instructors:        Array<CourseInstructor>,
-  topics:             Array<CourseTopic>,
   prices:             Array<CoursePrice>,
   availability:       ?string,
   is_favorite:        boolean
 }
 
-export type Bootcamp = {
-  id:                 number,
+export type Bootcamp = LearningResource & {
   course_id:          string,
   url:                ?string,
-  title:              string,
-  image_src:          ?string,
-  short_description:  ?string,
   full_description:   ?string,
   language:           ?string,
   year:               ?string,
@@ -371,10 +372,15 @@ export type Bootcamp = {
   enrollment_start:   ?string,
   enrollment_end:     ?string,
   instructors:        Array<CourseInstructor>,
-  topics:             Array<CourseTopic>,
   prices:             Array<CoursePrice>,
   availability:       ?string,
   is_favorite:        boolean
+}
+
+export type Program = LearningResource & {
+  image_src:          ?string,
+  image_description:  ?string,
+  items:              Array<Course>
 }
 
 export type CoursePrice = {

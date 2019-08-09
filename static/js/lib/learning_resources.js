@@ -10,9 +10,10 @@ import {
 import type {
   Bootcamp,
   Course,
-  LearningResource
+  LearningResourceSummary
 } from "../flow/discussionTypes"
 import { capitalize } from "./util"
+import { SEARCH_FILTER_USERLIST } from "./picker"
 
 export const availabilityLabel = (availability: ?string) => {
   switch (availability) {
@@ -26,7 +27,12 @@ export const availabilityLabel = (availability: ?string) => {
 }
 
 export const resourceLabel = (resource: string) => {
-  return concat(capitalize(resource), "s")
+  switch (resource) {
+  case SEARCH_FILTER_USERLIST:
+    return "Learning Paths"
+  default:
+    return concat(capitalize(resource), "s")
+  }
 }
 
 export const maxPrice = (course: Course | Bootcamp) => {
@@ -34,7 +40,9 @@ export const maxPrice = (course: Course | Bootcamp) => {
   return price > 0 ? `$${price}` : "Free"
 }
 
-export const minPrice = (course: LearningResource | Course | Bootcamp) => {
+export const minPrice = (
+  course: LearningResourceSummary | Course | Bootcamp
+) => {
   const price = Math.min(...course.prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"
 }
