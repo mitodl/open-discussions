@@ -35,8 +35,8 @@ describe("Post API", () => {
     const text = "Text"
     const title = "Title"
     const url = "URL"
-    const result = await createPost("channelname", { text, title, url })
-    const body = objectToFormData({ url, text, title })
+    const result = await createPost("channelname", { text, url, title })
+    const body = objectToFormData({ text, url, title })
     sinon.assert.calledWith(fetchStub, "/api/v0/channels/channelname/posts/", {
       body,
       method: POST
@@ -54,10 +54,15 @@ describe("Post API", () => {
     const coverImage = new File([], "asdf.jpg")
     const result = await createPost("channelname", {
       title,
-      coverImage,
-      article
+      cover_image:     coverImage,
+      article_content: article
     })
-    const body = objectToFormData({ title, coverImage, article })
+    const body = objectToFormData({
+      title,
+      article_content: JSON.stringify(article),
+      cover_image:     coverImage
+    })
+
     sinon.assert.calledWith(fetchStub, "/api/v0/channels/channelname/posts/", {
       body,
       method: POST

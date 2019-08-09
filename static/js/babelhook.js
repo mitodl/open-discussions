@@ -9,7 +9,8 @@ babelSharedLoader.query.presets = [
   "@babel/preset-flow"
 ]
 
-require("@babel/polyfill")
+require("core-js/stable")
+require("regenerator-runtime/runtime")
 
 // window and global must be defined here before React is imported
 require("jsdom-global")(undefined, {

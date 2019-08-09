@@ -163,9 +163,9 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          platform:     undefined,
-          topics:       undefined,
-          availability: undefined,
+          platform:     [],
+          topics:       [],
+          availability: [],
           type:         LR_TYPE_ALL
         })
       )
@@ -213,10 +213,10 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:           LR_TYPE_ALL,
-          platforms:      ["ocw"],
-          topics:         ["Science", "Engineering"],
-          availabilities: ["prior"]
+          type:         LR_TYPE_ALL,
+          platform:     ["ocw"],
+          topics:       ["Science", "Engineering"],
+          availability: ["prior"]
         })
       )
     })
@@ -388,9 +388,9 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          platform:     ["ocw"],
+          platform:     [],
           topics:       ["Physics"],
-          availability: ["prior"],
+          availability: [],
           type:         LR_TYPE_ALL
         })
       )
@@ -464,7 +464,8 @@ describe("CourseSearchPage", () => {
           Object.entries({
             platform:     [],
             topics:       isChecked ? ["Science"] : [],
-            availability: []
+            availability: [],
+            type:         LR_TYPE_ALL
           })
         )
       })
