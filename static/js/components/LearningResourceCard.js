@@ -24,10 +24,10 @@ import {
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
-
-import type { LearningResourceSummary } from "../flow/discussionTypes"
 import { favoriteProgramMutation } from "../lib/queries/programs"
 import { favoriteUserListMutation } from "../lib/queries/user_lists"
+
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type OwnProps = {|
   object: LearningResourceSummary,
@@ -44,9 +44,10 @@ type Props = {|
   ...DispatchProps
 |}
 
-const getPlatform = (object: Object): string =>
+const getPlatform = (object: LearningResourceSummary): string =>
   object.object_type === LR_TYPE_COURSE
-    ? object.offered_by || object.platform
+    ? // $FlowFixMe: only a course will reach this line
+    object.offered_by || object.platform
     : object.object_type === LR_TYPE_BOOTCAMP
       ? platforms.bootcamps
       : object.offered_by || ""

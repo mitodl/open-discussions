@@ -320,6 +320,17 @@ export type SocialAuth = {
   provider: string,
 }
 
+export type LearningResourceSummary = {
+  id:                 number,
+  title:              string,
+  image_src:          ?string,
+  platform:           ?string,
+  topics:             Array<CourseTopic>,
+  availability:       ?string,
+  offered_by:         ?string,
+  object_type:        string,
+  prices:             Array<CoursePrice>,
+}
 
 export type LearningResource = {
   id:                 number,
@@ -328,18 +339,6 @@ export type LearningResource = {
   short_description:  ?string,
   topics:             Array<CourseTopic>,
   offered_by:         ?string
-}
-
-export type LearningResourceSummary = {
-  id:                 number,
-  title:              string,
-  image_src:          ?string,
-  offered_by:         ?string,
-  platform:           ?string,
-  topics:             Array<CourseTopic>,
-  availability:       ?string,
-  object_type:        string,
-  prices:             Array<CoursePrice>,
 }
 
 export type Course = LearningResource & {

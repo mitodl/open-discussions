@@ -110,7 +110,8 @@ describe("LearningResourceCard", () => {
         // $FlowFixMe: only courses will access platform
         platformLogoUrls[
           isCourse
-            ? object.offered_by || object.platform || ""
+            ? // $FlowFixMe: course will have platform attribute
+            object.offered_by || object.platform || ""
             : isBootcamp
               ? object.offered_by
               : ""
@@ -123,8 +124,8 @@ describe("LearningResourceCard", () => {
           isCourse
             ? object.offered_by || object.platform || ""
             : isBootcamp
-              ? object.offered_by
-              : ""
+              ? "bootcamps"
+              : object.offered_by || ""
         }`
       )
     })
