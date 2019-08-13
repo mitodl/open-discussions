@@ -44,13 +44,16 @@ type Props = {|
   ...DispatchProps
 |}
 
-const getPlatform = (object: LearningResourceSummary): string =>
-  object.object_type === LR_TYPE_COURSE
-    ? // $FlowFixMe: only a course will reach this line
-    object.offered_by || object.platform
-    : object.object_type === LR_TYPE_BOOTCAMP
-      ? platforms.bootcamps
-      : object.offered_by || ""
+const getPlatform = (object: LearningResourceSummary): string => {
+  if (object.object_type === LR_TYPE_COURSE) {
+    // $FlowFixMe: only a course will reach this line
+    return object.offered_by || object.platform
+  } else if (object.object_type === LR_TYPE_BOOTCAMP) {
+    return platforms.bootcamps
+  } else {
+    return object.offered_by || ""
+  }
+}
 
 export const LearningResourceCard = ({
   object,

@@ -6,8 +6,8 @@ import { constructIdMap } from "../redux_query"
 import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_USERLIST,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST_FAV
 } from "../constants"
 
 export const filterFavorites = (
@@ -28,7 +28,7 @@ export const favoritesRequest = () => ({
       courses:   constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
       bootcamps: constructIdMap(filterFavorites(results, LR_TYPE_BOOTCAMP)),
       programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
-      userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
+      userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST_FAV)),
       next:      next
     }
   },

@@ -8,13 +8,7 @@ import {
   LR_TYPE_USERLIST
 } from "./constants"
 
-import type {
-  Bootcamp,
-  Course,
-  LearningResourceSummary,
-  Program,
-  UserList
-} from "../flow/discussionTypes"
+import type { Bootcamp, Course } from "../flow/discussionTypes"
 import { capitalize } from "./util"
 
 export const availabilityLabel = (availability: ?string) => {
@@ -29,12 +23,9 @@ export const availabilityLabel = (availability: ?string) => {
 }
 
 export const resourceLabel = (resource: string) => {
-  switch (resource) {
-  case LR_TYPE_USERLIST:
-    return "Learning Paths"
-  default:
-    return concat(capitalize(resource), "s")
-  }
+  return resource === LR_TYPE_USERLIST
+    ? "Learning Paths"
+    : concat(capitalize(resource), "s")
 }
 
 export const maxPrice = (course: Course | Bootcamp) => {
@@ -42,10 +33,7 @@ export const maxPrice = (course: Course | Bootcamp) => {
   return price > 0 ? `$${price}` : "Free"
 }
 
-export const minPrice = (
-  course: LearningResourceSummary | Course | Bootcamp | Program | UserList
-) => {
-  // $FlowFixMe
+export const minPrice = (course: Object) => {
   const prices = course.prices || []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"

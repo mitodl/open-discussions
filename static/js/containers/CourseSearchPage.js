@@ -414,16 +414,19 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 }
 
+const filterFavorite = (entities: Object) =>
+  R.filter(R.propEq("is_favorite", true), entities || {})
+
 const getFavorites = createSelector(
   state => state.entities.courses,
   state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.userLists,
   (courses, bootcamps, programs, userLists) => ({
-    courses:   R.filter(R.propEq("is_favorite", true), courses || {}),
-    bootcamps: R.filter(R.propEq("is_favorite", true), bootcamps || {}),
-    programs:  R.filter(R.propEq("is_favorite", true), programs || {}),
-    userLists: R.filter(R.propEq("is_favorite", true), userLists || {})
+    courses:   filterFavorite(courses),
+    bootcamps: filterFavorite(bootcamps),
+    programs:  filterFavorite(programs),
+    userLists: filterFavorite(userLists)
   })
 )
 

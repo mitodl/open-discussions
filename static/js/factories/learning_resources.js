@@ -91,8 +91,11 @@ export const makeBootcamp = (): Bootcamp => ({
   prices: [{ mode: "audit", price: casual.number }]
 })
 
+const incrProgram = incrementer()
+
 export const makeProgram = (): Program => ({
-  id:                casual.integer(1, 1000),
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:                incrProgram.next().value,
   short_description: casual.description,
   offered_by:        null,
   title:             casual.title,
@@ -103,8 +106,11 @@ export const makeProgram = (): Program => ({
   items:             [makeCourse(), makeCourse()]
 })
 
+const incrUserList = incrementer()
+
 export const makeUserList = (): UserList => ({
-  id:                casual.integer(1, 1000),
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:                incrUserList.next().value,
   short_description: casual.description,
   offered_by:        null,
   title:             casual.title,
