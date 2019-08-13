@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.86.3
+Version 0.86.3 (Released August 13, 2019)
 --------------
 
 - add initial implementation of favorites
