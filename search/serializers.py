@@ -338,7 +338,7 @@ class ESCourseSerializer(ESModelSerializer):
     topics = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
 
-    course_runs = ESCourseRunSerializer(many=True)
+    course_runs = ESCourseRunSerializer(many=True, allow_null=True)
 
     def get_prices(self, course):
         """
