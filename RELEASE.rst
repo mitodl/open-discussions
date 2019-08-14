@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.86.4
+--------------
+
+- Upgrade django
+- fix a flaky test
+
 Version 0.86.3 (Released August 13, 2019)
 --------------
 
