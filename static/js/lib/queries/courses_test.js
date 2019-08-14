@@ -17,7 +17,6 @@ describe("Courses API", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     results = R.times(makeCourse, 10)
-    results.sort()
     transformTestObject = {
       results,
       next: "http://a.url"
