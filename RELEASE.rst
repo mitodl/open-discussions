@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.86.4
+Version 0.86.4 (Released August 14, 2019)
 --------------
 
 - Upgrade django
