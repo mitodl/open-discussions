@@ -21,7 +21,6 @@ from search.constants import (
     GLOBAL_DOC_TYPE,
     COURSE_TYPE,
     BOOTCAMP_TYPE,
-    PROGRAM_TYPE,
     USER_LIST_TYPE,
 )
 
@@ -180,15 +179,12 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[BOOTCAMP_TYPE]
     )
 
-    # Search programs
-    program_filter = ~Q("terms", object_type=[PROGRAM_TYPE])
-
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
         "terms", object_type=[USER_LIST_TYPE]
     )
     if not user.is_anonymous:
-        user_list_filter = user_list_filter | Q("term", author_id=user.id)
+        user_list_filter = user_list_filter | Q("term", author=user.id)
 
     # Search public channels and channels user is a contributor/moderator of
     if channel_names:
@@ -199,7 +195,6 @@ def _apply_general_query_filters(search, user):
         .filter(content_filter)
         .filter(course_filter)
         .filter(bootcamp_filter)
-        .filter(program_filter)
         .filter(user_list_filter)
     )
 

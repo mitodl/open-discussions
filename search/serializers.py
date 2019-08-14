@@ -338,7 +338,7 @@ class ESCourseSerializer(ESModelSerializer):
     topics = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
 
-    course_runs = ESCourseRunSerializer(many=True)
+    course_runs = ESCourseRunSerializer(many=True, allow_null=True)
 
     def get_prices(self, course):
         """
@@ -483,6 +483,7 @@ class ESUserListSerializer(ESModelSerializer):
             "topics",
             "author",
             "list_type",
+            "privacy_level",
         ]
 
         read_only_fields = fields

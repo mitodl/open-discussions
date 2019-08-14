@@ -25,7 +25,8 @@ export const platformLogoUrls = {
   [ocwPlatform]:          "/static/images/mit-ocw-logo-square.png",
   [edxPlatform]:          "/static/images/mitx-logo.png",
   [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
-  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png"
+  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
+  "":                     "/static/images/blank.png"
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"
@@ -47,3 +48,12 @@ export const CAROUSEL_IMG_WIDTH = 306
 
 export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_BOOTCAMP = "bootcamp"
+export const LR_TYPE_PROGRAM = "program"
+export const LR_TYPE_USERLIST = "user_list"
+export const LR_TYPE_USERLIST_FAV = "user list"
+export const LR_TYPE_ALL = [
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+]

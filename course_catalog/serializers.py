@@ -379,7 +379,7 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
         fields = "__all__"
 
 
-class ProgramItemSerializer(serializers.ModelSerializer):
+class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
     Serializer for ProgramItem model
     """

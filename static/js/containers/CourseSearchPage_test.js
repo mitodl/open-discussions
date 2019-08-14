@@ -16,8 +16,7 @@ import {
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import { SEARCH_FILTER_ALL_RESOURCES } from "../lib/picker"
-import { LR_TYPE_COURSE } from "../lib/constants"
+import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -161,13 +160,13 @@ describe("CourseSearchPage", () => {
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        SEARCH_FILTER_ALL_RESOURCES,
+      type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
           platform:     undefined,
           topics:       undefined,
           availability: undefined,
-          type:         SEARCH_FILTER_ALL_RESOURCES
+          type:         LR_TYPE_ALL
         })
       )
     })
@@ -211,10 +210,10 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        SEARCH_FILTER_ALL_RESOURCES,
+      type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:           SEARCH_FILTER_ALL_RESOURCES,
+          type:           LR_TYPE_ALL,
           platforms:      ["ocw"],
           topics:         ["Science", "Engineering"],
           availabilities: ["prior"]
@@ -315,12 +314,12 @@ describe("CourseSearchPage", () => {
       ["platform", ["ocw"]],
       ["topics", ["Science", "Law"]],
       ["availability", ["Current"]],
-      ["type", SEARCH_FILTER_ALL_RESOURCES]
+      ["type", LR_TYPE_ALL]
     ])
     inner.setState({ text, activeFacets })
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
-    assert.equal(inner.find("SearchFilter").length, 6)
+    assert.equal(inner.find("SearchFilter").length, 8)
     inner.find(".search-filters-clear").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
@@ -386,13 +385,13 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text,
-      type:        SEARCH_FILTER_ALL_RESOURCES,
+      type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
           platform:     ["ocw"],
           topics:       ["Physics"],
           availability: ["prior"],
-          type:         SEARCH_FILTER_ALL_RESOURCES
+          type:         LR_TYPE_ALL
         })
       )
     })
@@ -460,7 +459,7 @@ describe("CourseSearchPage", () => {
         from:        0,
         size:        SETTINGS.search_page_size,
         text:        "some text",
-        type:        SEARCH_FILTER_ALL_RESOURCES,
+        type:        LR_TYPE_ALL,
         facets:      new Map(
           Object.entries({
             platform:     [],

@@ -17,15 +17,20 @@ import {
   platformLogoUrls,
   platforms,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_USERLIST,
+  LR_TYPE_PROGRAM,
+  COURSE_AVAILABLE_NOW
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
+import { favoriteProgramMutation } from "../lib/queries/programs"
+import { favoriteUserListMutation } from "../lib/queries/user_lists"
 
-import type { LearningResource } from "../flow/discussionTypes"
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type OwnProps = {|
-  object: LearningResource,
+  object: LearningResourceSummary,
   setShowResourceDrawer: Function,
   toggleFacet?: Function
 |}
@@ -39,8 +44,16 @@ type Props = {|
   ...DispatchProps
 |}
 
-const getPlatform = (object: Object): string =>
-  object.object_type === LR_TYPE_COURSE ? object.platform : platforms.bootcamps
+const getPlatform = (object: LearningResourceSummary): string => {
+  if (object.object_type === LR_TYPE_COURSE) {
+    // $FlowFixMe: only a course will reach this line
+    return object.offered_by || object.platform
+  } else if (object.object_type === LR_TYPE_BOOTCAMP) {
+    return platforms.bootcamps
+  } else {
+    return object.offered_by || ""
+  }
+}
 
 export const LearningResourceCard = ({
   object,
@@ -90,7 +103,7 @@ export const LearningResourceCard = ({
             : null}
         </div>
         <div className="row availability">
-          {availabilityLabel(object.availability)}
+          {availabilityLabel(object.availability || COURSE_AVAILABLE_NOW)}
         </div>
         <div className="row platform-favorite">
           <img
@@ -121,6 +134,12 @@ const mapDispatchToProps = dispatch => ({
     }
     if (payload.object_type === LR_TYPE_BOOTCAMP) {
       dispatch(mutateAsync(favoriteBootcampMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_PROGRAM) {
+      dispatch(mutateAsync(favoriteProgramMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_USERLIST) {
+      dispatch(mutateAsync(favoriteUserListMutation(payload)))
     }
   }
 })

@@ -2,10 +2,21 @@
 /* global SETTINGS: false */
 import bodybuilder from "bodybuilder"
 import R from "ramda"
+import {
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+} from "../lib/constants"
+import {
+  SEARCH_FILTER_COMMENT,
+  SEARCH_FILTER_POST,
+  SEARCH_FILTER_PROFILE
+} from "./picker"
 
 import type {
   CommentInTree,
-  LearningResource,
+  LearningResourceSummary,
   Post,
   Profile
 } from "../flow/discussionTypes"
@@ -17,7 +28,6 @@ import type {
   FacetResult,
   LearningResourceResult
 } from "../flow/searchTypes"
-import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 
 export const searchResultToComment = (
   result: CommentResult
@@ -88,13 +98,17 @@ export const searchResultToProfile = (result: ProfileResult): Profile => ({
 
 export const searchResultToLearningResource = (
   result: LearningResourceResult,
-  overrideObject: LearningResource = {}
-): LearningResource => ({
+  overrideObject: LearningResourceSummary = {}
+): LearningResourceSummary => ({
   ...overrideObject,
-  id:           result.id,
-  title:        result.title,
-  image_src:    result.image_src,
-  object_type:  result.object_type,
+  id:          result.id,
+  title:       result.title,
+  image_src:   result.image_src,
+  object_type: result.object_type,
+  offered_by:
+    "offered_by" in result && result.offered_by
+      ? R.toLower(result.offered_by)
+      : null,
   platform:     "platform" in result ? result.platform : null,
   availability: "availability" in result ? result.availability : null,
   topics:       result.topics.map(topic => ({ name: topic })),
@@ -134,19 +148,27 @@ const BOOTCAMP_QUERY_FIELDS = [
   "topics"
 ]
 
+const LIST_QUERY_FIELDS = [
+  "title.english",
+  "short_description.english",
+  "topics"
+]
+
 const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
-  if (type === "post") {
+  if (type === SEARCH_FILTER_POST) {
     return POST_QUERY_FIELDS
-  } else if (type === "comment") {
+  } else if (type === SEARCH_FILTER_COMMENT) {
     return COMMENT_QUERY_FIELDS
-  } else if (type === "profile") {
+  } else if (type === SEARCH_FILTER_PROFILE) {
     return PROFILE_QUERY_FIELDS
   } else if (type === LR_TYPE_COURSE) {
     return COURSE_QUERY_FIELDS
   } else if (type === LR_TYPE_BOOTCAMP) {
     return BOOTCAMP_QUERY_FIELDS
+  } else if ([LR_TYPE_PROGRAM, LR_TYPE_USERLIST].includes(type)) {
+    return LIST_QUERY_FIELDS
   } else {
     return R.uniq([
       ...POST_QUERY_FIELDS,
@@ -180,7 +202,7 @@ const getTypes = (type: ?(string | Array<string>)) => {
   if (type) {
     return Array.isArray(type) ? type : [type]
   } else {
-    return ["comment", "post", "profile"]
+    return [SEARCH_FILTER_COMMENT, SEARCH_FILTER_POST, SEARCH_FILTER_PROFILE]
   }
 }
 

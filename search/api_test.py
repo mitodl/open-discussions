@@ -174,11 +174,6 @@ def test_execute_search(mocker, user):
                         },
                         {
                             "bool": {
-                                "must_not": [{"terms": {"object_type": ["program"]}}]
-                            }
-                        },
-                        {
-                            "bool": {
                                 "should": [
                                     {
                                         "bool": {
@@ -196,7 +191,7 @@ def test_execute_search(mocker, user):
                                             "privacy_level": PrivacyLevel.public.value
                                         }
                                     },
-                                    {"term": {"author_id": user.id}},
+                                    {"term": {"author": user.id}},
                                 ]
                             }
                         },
@@ -307,11 +302,6 @@ def test_execute_search_anonymous(mocker):
                                     },
                                     {"term": {"published": True}},
                                 ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "must_not": [{"terms": {"object_type": ["program"]}}]
                             }
                         },
                         {
