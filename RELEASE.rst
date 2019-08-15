@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.86.5
+--------------
+
+- add basic favorites display to the homepage
+- Show paths and programs in search results (#2131)
+
 Version 0.86.4 (Released August 14, 2019)
 --------------
 
