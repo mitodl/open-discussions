@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.86.5
+Version 0.86.5 (Released August 16, 2019)
 --------------
 
 - add basic favorites display to the homepage
