@@ -15,18 +15,27 @@ const ocwPlatform = "ocw"
 const edxPlatform = "mitx"
 const bootcampsPlatform = "bootcamps"
 const micromastersPlatform = "micromasters"
+
 export const platforms = {
   OCW:          ocwPlatform,
   edX:          edxPlatform,
   bootcamps:    bootcampsPlatform,
   micromasters: micromastersPlatform
 }
+
 export const platformLogoUrls = {
   [ocwPlatform]:          "/static/images/mit-ocw-logo-square.png",
   [edxPlatform]:          "/static/images/mitx-logo.png",
   [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
   [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
   "":                     "/static/images/blank.png"
+}
+
+export const platformReadableNames = {
+  [ocwPlatform]:          "MIT OpenCourseWare",
+  [edxPlatform]:          "edX",
+  [bootcampsPlatform]:    "MIT Bootcamp",
+  [micromastersPlatform]: "MIT MicroMasters"
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"
@@ -56,3 +65,10 @@ export const LR_TYPE_ALL = [
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST
 ]
+
+export const readableLearningResources = {
+  [LR_TYPE_COURSE]:   "Course",
+  [LR_TYPE_BOOTCAMP]: "Bootcamp",
+  [LR_TYPE_PROGRAM]:  "Program",
+  [LR_TYPE_USERLIST]: "Learning Path"
+}

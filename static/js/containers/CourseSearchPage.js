@@ -39,7 +39,11 @@ import {
   LR_TYPE_USERLIST
 } from "../lib/constants"
 import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
-import { mergeFacetResults } from "../lib/search"
+import {
+  mergeFacetResults,
+  SEARCH_GRID_UI,
+  SEARCH_LIST_UI
+} from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import {
   favoritesRequest,
@@ -96,7 +100,8 @@ type State = {
   from: number,
   error: ?string,
   currentFacetGroup: ?CurrentFacet,
-  incremental: boolean
+  incremental: boolean,
+  searchResultLayout: string
 }
 
 const facetDisplayMap = [
@@ -122,10 +127,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
           _.union(toArray(qs.parse(props.location.search).a) || [])
         ]
       ]),
-      from:              0,
-      error:             null,
-      currentFacetGroup: null,
-      incremental:       false
+      from:               0,
+      error:              null,
+      currentFacetGroup:  null,
+      incremental:        false,
+      searchResultLayout: SEARCH_GRID_UI
     }
   }
 
@@ -241,6 +247,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
     })
   }
 
+  setSearchUI = (searchResultLayout: string) => {
+    this.setState({
+      searchResultLayout
+    })
+  }
+
   toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
     const { activeFacets, currentFacetGroup } = this.state
     const { facets } = this.props
@@ -300,7 +312,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       total,
       setShowResourceDrawer
     } = this.props
-    const { from, incremental } = this.state
+    const { from, incremental, searchResultLayout } = this.state
 
     if ((processing || !loaded) && !incremental) {
       return <PostLoading />
@@ -321,7 +333,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
       >
         <Grid>
           {results.map((result, i) => (
-            <Cell width={4} key={i}>
+            <Cell
+              width={searchResultLayout === SEARCH_GRID_UI ? 4 : 12}
+              key={i}
+            >
               <SearchResult
                 result={result}
                 overrideObject={
@@ -330,6 +345,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 }
                 toggleFacet={this.toggleFacet}
                 setShowResourceDrawer={setShowResourceDrawer}
+                searchResultLayout={searchResultLayout}
               />
             </Cell>
           ))}
@@ -340,7 +356,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   render() {
     const { match } = this.props
-    const { text, error, activeFacets } = this.state
+    const { text, error, activeFacets, searchResultLayout } = this.state
 
     return (
       <BannerPageWrapper>
@@ -391,6 +407,27 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   Clear all filters
                 </div>
               ) : null}
+            </div>
+          </Cell>
+          <Cell width={3} />
+          <Cell width={9}>
+            <div className="layout-buttons">
+              <div
+                onClick={() => this.setSearchUI(SEARCH_LIST_UI)}
+                className={
+                  searchResultLayout === SEARCH_LIST_UI ? "active" : ""
+                }
+              >
+                <i className="material-icons view_list">view_list</i>
+              </div>
+              <div
+                onClick={() => this.setSearchUI(SEARCH_GRID_UI)}
+                className={
+                  searchResultLayout === SEARCH_GRID_UI ? "active" : ""
+                }
+              >
+                <i className="material-icons view_comfy">view_comfy</i>
+              </div>
             </div>
           </Cell>
           <Cell width={3}>

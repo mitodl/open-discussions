@@ -17,6 +17,7 @@ import {
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
+import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -183,10 +184,11 @@ describe("CourseSearchPage", () => {
           type:         []
         })
       ),
-      from:              5,
-      error:             null,
-      currentFacetGroup: null,
-      incremental:       true
+      from:               5,
+      error:              null,
+      currentFacetGroup:  null,
+      incremental:        true,
+      searchResultLayout: SEARCH_GRID_UI
     })
   })
 
@@ -361,10 +363,11 @@ describe("CourseSearchPage", () => {
           type:         ["course"]
         })
       ),
-      currentFacetGroup: null,
-      from:              0,
-      error:             null,
-      incremental:       false
+      currentFacetGroup:  null,
+      from:               0,
+      error:              null,
+      incremental:        false,
+      searchResultLayout: SEARCH_GRID_UI
     })
   })
 
@@ -416,7 +419,8 @@ describe("CourseSearchPage", () => {
         group:  "topics",
         result: makeSearchFacetResult().topics
       },
-      incremental: false
+      incremental:        false,
+      searchResultLayout: SEARCH_GRID_UI
     })
   })
 

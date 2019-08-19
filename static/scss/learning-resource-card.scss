@@ -1,13 +1,44 @@
 .learning-resource-card {
-  @extend %card;
-
   width: initial;
-  border: 1px solid #c2c0bf;
   margin-bottom: 0;
   font-family: roboto;
 
-  .card-contents {
-    padding: 16px;
+  &.borderless {
+    .lr-info {
+      padding: 16px;
+    }
+
+    .cover-image img {
+      border-radius: 5px 5px 0 0;
+    }
+  }
+
+  &.list-view {
+    .card-contents {
+      display: flex;
+
+      .cover-image {
+        height: 130px;
+        margin-left: 16px;
+        width: 46%;
+
+        img {
+          height: 130px;
+          border-radius: 3px;
+        }
+      }
+    }
+
+    .lr-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 100%;
+
+      .availability-price-favorite {
+        margin-top: 0;
+      }
+    }
   }
 
   .cover-image {
@@ -24,52 +55,64 @@
   .row {
     display: flex;
 
+    &.resource-type {
+      font-size: 13px;
+      color: $font-grey-mid;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
     &.course-title {
-      margin: 15px 0 10px 0;
+      margin: 10px 0;
+      margin-top: 2px;
       min-height: 40px;
-      font-size: 16px;
+      font-size: 18px;
       color: black;
       font-weight: 500;
       cursor: pointer;
     }
 
-    &.topics {
-      min-height: 108px;
-      display: inline-block;
+    &.subtitle {
+      margin-bottom: 5px;
 
-      .topic {
+      .lr-subtitle {
         font-size: 14px;
-        color: white;
-        background-color: $teal;
-        display: inline-block;
-        padding: 4px 10px;
-        height: 100%;
-        border-radius: 15px;
-        margin: 5px 8px 5px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+
+        .grey {
+          color: $font-grey-light;
+        }
       }
     }
 
-    &.availability,
-    &.price {
-      font-weight: 500;
-      font-size: 14px;
+    &.availability-price-favorite {
+      justify-content: flex-start;
+      margin-top: 25px;
+
+      .availability,
+      .price {
+        font-size: 12px;
+        padding-right: 10px;
+
+        i {
+          font-size: 12px;
+          margin-right: 4px;
+        }
+      }
+
+      .price {
+        margin-right: 5px;
+      }
+
+      .favorite {
+        margin-left: auto;
+        cursor: pointer;
+        height: 18px;
+        width: 18px;
+      }
     }
-  }
-
-  .blue-bottom-border {
-    background-color: $course-blue;
-    height: 12px;
-    border-radius: 0 0 5px 5px;
-  }
-
-  .course-platform {
-    max-height: 32px;
-    margin: 7px 0;
-  }
-
-  .favorite {
-    cursor: pointer;
-    width: 40px;
-    height: 40px;
   }
 }

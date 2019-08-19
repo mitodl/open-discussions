@@ -5,6 +5,8 @@ import Dotdotdot from "react-dotdotdot"
 import { mutateAsync } from "redux-query"
 import { connect } from "react-redux"
 
+import Card from "./Card"
+
 import { availabilityLabel, minPrice } from "../lib/learning_resources"
 import {
   embedlyThumbnail,
@@ -14,25 +16,27 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platformLogoUrls,
   platforms,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_USERLIST,
   LR_TYPE_PROGRAM,
-  COURSE_AVAILABLE_NOW
+  COURSE_AVAILABLE_NOW,
+  platformReadableNames,
+  readableLearningResources
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
 import { favoriteUserListMutation } from "../lib/queries/user_lists"
+import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type OwnProps = {|
   object: LearningResourceSummary,
   setShowResourceDrawer: Function,
-  toggleFacet?: Function
+  searchResultLayout?: string
 |}
 
 type DispatchProps = {|
@@ -55,11 +59,45 @@ const getPlatform = (object: LearningResourceSummary): string => {
   }
 }
 
+const getPlatformName = object => platformReadableNames[getPlatform(object)]
+
+const getClassName = searchResultLayout =>
+  `learning-resource-card ${
+    searchResultLayout === SEARCH_LIST_UI ? "list-view" : ""
+  }`.trim()
+
+const formatTopics = (topics: Array<{ name: string }>) =>
+  topics.map(topic => topic.name).join("\u00A0\u00A0")
+
+const Subtitle = ({ label, content }) => (
+  <div className="row subtitle">
+    <div className="lr-subtitle">
+      <span className="grey">{label}</span>
+      {content}
+    </div>
+  </div>
+)
+
+const CoverImage = ({ object, showResourceDrawer }) => (
+  <div className="cover-image" onClick={showResourceDrawer}>
+    <img
+      src={embedlyThumbnail(
+        SETTINGS.embedlyKey,
+        object.image_src || "",
+        CAROUSEL_IMG_HEIGHT,
+        CAROUSEL_IMG_WIDTH
+      )}
+      height={CAROUSEL_IMG_HEIGHT}
+      alt={`cover image for ${object.title}`}
+    />
+  </div>
+)
+
 export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
-  toggleFacet,
-  toggleFavorite
+  toggleFavorite,
+  searchResultLayout
 }: Props) => {
   const showResourceDrawer = () =>
     setShowResourceDrawer({
@@ -68,62 +106,47 @@ export const LearningResourceCard = ({
     })
 
   return (
-    <div className="learning-resource-card">
-      <div className="card-contents">
-        <div className="cover-image" onClick={showResourceDrawer}>
-          <img
-            src={embedlyThumbnail(
-              SETTINGS.embedlyKey,
-              object.image_src || "",
-              CAROUSEL_IMG_HEIGHT,
-              CAROUSEL_IMG_WIDTH
-            )}
-            height={CAROUSEL_IMG_HEIGHT}
-            alt={`cover image for ${object.title}`}
-          />
+    <Card
+      className={getClassName(searchResultLayout)}
+      borderless={searchResultLayout === SEARCH_GRID_UI}
+    >
+      {searchResultLayout === SEARCH_GRID_UI ? (
+        <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
+      ) : null}
+      <div className="lr-info">
+        <div className="row resource-type">
+          {readableLearningResources[object.object_type]}
         </div>
         <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
         </div>
-        <div className="row topics">
-          {object.topics.length > 0
-            ? object.topics.slice(0, 3).map(topic => (
-              <div
-                className="topic"
-                key={topic.name}
-                onClick={
-                  toggleFacet
-                    ? () => toggleFacet("topics", topic.name, true)
-                    : null
-                }
-              >
-                {topic.name}
-              </div>
-            ))
-            : null}
+        <Subtitle content={getPlatformName(object)} label="Offered by - " />
+        <Subtitle content={formatTopics(object.topics)} label="Subject - " />
+        <div className="row availability-price-favorite">
+          <div className="price grey-surround">
+            <i className="material-icons attach_money">attach_money</i>
+            {minPrice(object)}
+          </div>
+          <div className="availability grey-surround">
+            <i className="material-icons calendar_today">calendar_today</i>
+            {availabilityLabel(object.availability || COURSE_AVAILABLE_NOW)}
+          </div>
+          <div className="favorite grey-surround">
+            <img
+              className="favorite"
+              src={
+                // $FlowFixMe
+                object.is_favorite ? starSelectedURL : starUnselectedURL
+              }
+              onClick={() => toggleFavorite(object)}
+            />
+          </div>
         </div>
-        <div className="row availability">
-          {availabilityLabel(object.availability || COURSE_AVAILABLE_NOW)}
-        </div>
-        <div className="row platform-favorite">
-          <img
-            className="course-platform"
-            src={platformLogoUrls[getPlatform(object)]}
-            alt={`logo for ${getPlatform(object)}`}
-          />
-          <img
-            className="favorite"
-            src={
-              // $FlowFixMe
-              object.is_favorite ? starSelectedURL : starUnselectedURL
-            }
-            onClick={() => toggleFavorite(object)}
-          />
-        </div>
-        <div className="row price">{minPrice(object)}</div>
       </div>
-      <div className="blue-bottom-border" />
-    </div>
+      {searchResultLayout === SEARCH_GRID_UI ? null : (
+        <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
+      )}
+    </Card>
   )
 }
 

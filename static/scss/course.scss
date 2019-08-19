@@ -230,3 +230,19 @@
     font-family: inherit;
   }
 }
+
+.search-page {
+  .layout-buttons {
+    display: flex;
+
+    i {
+      cursor: pointer;
+      font-size: 40px;
+      color: $search-layout-inactive;
+    }
+
+    .active i {
+      color: $search-layout-active;
+    }
+  }
+}

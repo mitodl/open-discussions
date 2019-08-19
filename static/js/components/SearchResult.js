@@ -90,24 +90,24 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type LearningResourceProps = {
   result: LearningResourceResult,
-  toggleFacet?: Function,
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
-  overrideObject?: Object
+  overrideObject?: Object,
+  searchResultLayout?: string
 }
 
 const LearningResourceSearchResult = ({
   result,
-  toggleFacet,
   setShowResourceDrawer,
-  overrideObject
+  overrideObject,
+  searchResultLayout
 }: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for courses
 
   return (
     <LearningResourceCard
       object={searchResultToLearningResource(result, overrideObject)}
-      toggleFacet={toggleFacet}
       setShowResourceDrawer={setShowResourceDrawer}
+      searchResultLayout={searchResultLayout}
     />
   )
 }
@@ -121,7 +121,8 @@ type Props = {
   votedComment?: ?CommentInTree,
   toggleFacet?: Function,
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
-  overrideObject?: Object
+  overrideObject?: Object,
+  searchResultLayout?: string
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -134,7 +135,8 @@ export default class SearchResult extends React.Component<Props> {
       commentDownvote,
       toggleFacet,
       setShowResourceDrawer,
-      overrideObject
+      overrideObject,
+      searchResultLayout
     } = this.props
     if (result.object_type === "post") {
       // $FlowFixMe: This will always be a PostResult
@@ -169,9 +171,9 @@ export default class SearchResult extends React.Component<Props> {
       return (
         <LearningResourceSearchResult
           result={result}
-          toggleFacet={toggleFacet}
           setShowResourceDrawer={setShowResourceDrawer}
           overrideObject={overrideObject}
+          searchResultLayout={searchResultLayout}
         />
       )
     }

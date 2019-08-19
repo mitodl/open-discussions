@@ -303,3 +303,6 @@ export const mergeFacetResults = (...args: Array<FacetResult>) => ({
     .map(R.prop("buckets"))
     .reduce((buckets, acc) => R.unionWith(R.eqBy(R.prop("key")), buckets, acc))
 })
+
+export const SEARCH_GRID_UI = "grid"
+export const SEARCH_LIST_UI = "list"

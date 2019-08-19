@@ -5,6 +5,7 @@ import Carousel from "nuka-carousel"
 
 import LearningResourceCard from "./LearningResourceCard"
 
+import { SEARCH_GRID_UI } from "../lib/search"
 import { CAROUSEL_PAGE_SIZE } from "../lib/constants"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
@@ -55,6 +56,7 @@ const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
           key={idx}
           object={course}
           setShowResourceDrawer={setShowResourceDrawer}
+          searchResultLayout={SEARCH_GRID_UI}
         />
       ))}
     </Carousel>

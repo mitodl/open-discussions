@@ -1,6 +1,8 @@
 /* global SETTINGS:false */
+import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
+import { mount } from "enzyme"
 
 import { LearningResourceCard } from "./LearningResourceCard"
 
@@ -12,7 +14,9 @@ import {
   platformLogoUrls,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_ALL
+  LR_TYPE_ALL,
+  platformReadableNames,
+  platforms
 } from "../lib/constants"
 import {
   embedlyThumbnail,
@@ -22,19 +26,24 @@ import {
 import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("LearningResourceCard", () => {
-  let render, course, sandbox, setShowResourceDrawerStub, toggleFavoriteStub
+  let course, sandbox, setShowResourceDrawerStub, toggleFavoriteStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     setShowResourceDrawerStub = sandbox.stub()
     toggleFavoriteStub = sandbox.stub()
     course = makeLearningResource(LR_TYPE_COURSE)
-    render = configureShallowRenderer(LearningResourceCard, {
-      object:                course,
-      setShowResourceDrawer: setShowResourceDrawerStub,
-      toggleFavorite:        toggleFavoriteStub
-    })
   })
+
+  const render = (props = {}) =>
+    mount(
+      <LearningResourceCard
+        object={course}
+        setShowResourceDrawer={setShowResourceDrawerStub}
+        toggleFavorite={toggleFavoriteStub}
+        {...props}
+      />
+    )
 
   afterEach(() => {
     sandbox.restore()
@@ -45,18 +54,6 @@ describe("LearningResourceCard", () => {
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
     sinon.assert.calledTwice(setShowResourceDrawerStub)
-  })
-
-  it("should set a click handler on the topics, if passed a function", () => {
-    const setTopicStub = sandbox.stub()
-    const wrapper = render({
-      toggleFacet: setTopicStub
-    })
-    wrapper
-      .find(".topic")
-      .at(0)
-      .simulate("click")
-    sinon.assert.calledWith(setTopicStub, "topics", course.topics[0].name, true)
   })
 
   it("should render the image", () => {
@@ -85,49 +82,37 @@ describe("LearningResourceCard", () => {
   })
 
   it("should render the topic", () => {
-    assert.equal(
-      render()
-        .find(".topics")
-        .find(".topic")
-        .at(0)
-        .text(),
-      course.topics[0].name
-    )
+    const { content, label } = render()
+      .find("Subtitle")
+      .at(1)
+      .props()
+    course.topics.forEach(({ name }) => {
+      assert.include(content, name)
+    })
+    assert.equal(label, "Subject - ")
   })
 
   LR_TYPE_ALL.forEach(objectType => {
-    it(`should render the platform image`, () => {
+    it(`should render a readable platform name`, () => {
       const object = makeLearningResource(objectType)
       const isCourse = objectType === LR_TYPE_COURSE
       const isBootcamp = objectType === LR_TYPE_BOOTCAMP
-      const platformImg = render({
+      const platformName = render({
         object
       })
-        .find(".platform-favorite")
-        .find("img.course-platform")
+        .find("Subtitle")
+        .at(0)
+
+      const platform =
+        object.object_type === LR_TYPE_BOOTCAMP
+          ? platforms.bootcamps
+          : object.offered_by || object.platform
+
       assert.equal(
-        platformImg.prop("src"),
-        // $FlowFixMe: only courses will access platform
-        platformLogoUrls[
-          isCourse
-            ? // $FlowFixMe: course will have platform attribute
-            object.offered_by || object.platform || ""
-            : isBootcamp
-              ? object.offered_by
-              : ""
-        ]
+        platformName.prop("content"),
+        platformReadableNames[platform]
       )
-      assert.equal(
-        platformImg.prop("alt"),
-        // $FlowFixMe: only courses will access platform
-        `logo for ${
-          isCourse
-            ? object.offered_by || object.platform || ""
-            : isBootcamp
-              ? "bootcamps"
-              : object.offered_by || ""
-        }`
-      )
+      assert.equal(platformName.prop("label"), "Offered by - ")
     })
   })
 
@@ -144,7 +129,6 @@ describe("LearningResourceCard", () => {
         const src = render({
           object
         })
-          .find(".platform-favorite")
           .find("img.favorite")
           .prop("src")
         assert.equal(src, isFavorite ? starSelectedURL : starUnselectedURL)
@@ -156,13 +140,13 @@ describe("LearningResourceCard", () => {
     it(`should call the toggleFavorite with a ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       const wrapper = render({ object })
-      wrapper.find(".favorite").simulate("click")
+      wrapper.find(".favorite img").simulate("click")
       sinon.assert.calledWith(toggleFavoriteStub, object)
     })
   })
 
   it("should render availability", () => {
-    assert.equal(
+    assert.include(
       render()
         .find(".availability")
         .text(),
@@ -171,7 +155,7 @@ describe("LearningResourceCard", () => {
   })
 
   it("should render price", () => {
-    assert.equal(
+    assert.include(
       render()
         .find(".price")
         .text(),
