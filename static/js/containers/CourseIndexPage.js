@@ -33,16 +33,16 @@ import {
 } from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 
-import type { Course } from "../flow/discussionTypes"
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type OwnProps = {|
   history: Object
 |}
 
 type StateProps = {|
-  featuredCourses: Array<Course>,
-  upcomingCourses: Array<Course>,
-  newCourses: Array<Course>,
+  featuredCourses: Array<LearningResourceSummary>,
+  upcomingCourses: Array<LearningResourceSummary>,
+  newCourses: Array<LearningResourceSummary>,
   favorites: Array<Object>,
   loaded: boolean
 |}

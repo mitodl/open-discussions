@@ -8,7 +8,7 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST_FAV
+  LR_TYPE_USERLIST
 } from "../constants"
 
 export const filterFavorites = (
@@ -18,7 +18,11 @@ export const filterFavorites = (
   results
     .filter(result => result.content_data !== null)
     .filter(result => result.content_type === contentType)
-    .map(result => result.content_data)
+    .map(
+      (
+        { content_data, content_type } // eslint-disable-line camelcase
+      ) => R.merge({ object_type: content_type }, content_data) // eslint-disable-line camelcase
+    )
 
 export const favoritesRequest = () => ({
   url:       favoritesURL,
@@ -29,7 +33,7 @@ export const favoritesRequest = () => ({
       courses:   constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
       bootcamps: constructIdMap(filterFavorites(results, LR_TYPE_BOOTCAMP)),
       programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
-      userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST_FAV)),
+      userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
       next:      next
     }
   },

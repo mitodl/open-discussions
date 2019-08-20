@@ -180,6 +180,9 @@ class UserList(List):
     )
     list_type = models.CharField(max_length=128)
 
+    class Meta:
+        verbose_name = "user_list"
+
 
 class UserListItem(ListItem):
     """

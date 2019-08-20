@@ -10,8 +10,9 @@ import {
 import { makeCourse } from "../../factories/learning_resources"
 import { courseURL } from "../url"
 import { constructIdMap } from "../redux_query"
+import { LR_TYPE_COURSE } from "../constants"
 
-describe("Courses API", () => {
+describe("Course Queries", () => {
   let sandbox, transformTestObject, results
 
   beforeEach(() => {
@@ -77,7 +78,11 @@ describe("Courses API", () => {
 
     it("request.transform should return the right structure", () => {
       assert.deepEqual(request().transform(transformTestObject), {
-        courses:         constructIdMap(results),
+        courses: constructIdMap(
+          results.map(result =>
+            R.merge({ object_type: LR_TYPE_COURSE }, result)
+          )
+        ),
         bestCourses:     results.map(course => course.id),
         bestCoursesNext: transformTestObject.next
       })
@@ -85,7 +90,10 @@ describe("Courses API", () => {
 
     it("selector should grab the right stuff", () => {
       const testState = request().transform(transformTestObject)
-      assert.deepEqual(selector({ entities: testState }), results)
+      assert.deepEqual(
+        selector({ entities: testState }),
+        results.map(result => R.merge({ object_type: LR_TYPE_COURSE }, result))
+      )
     })
   })
 })

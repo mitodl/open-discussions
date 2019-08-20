@@ -1,18 +1,17 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import R from "ramda"
 import Carousel from "nuka-carousel"
 
 import LearningResourceCard from "./LearningResourceCard"
 
-import { CAROUSEL_PAGE_SIZE, LR_TYPE_COURSE } from "../lib/constants"
+import { CAROUSEL_PAGE_SIZE } from "../lib/constants"
 
-import type { Course } from "../flow/discussionTypes"
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type Props = {|
   title: string,
-  courses: Array<Course>,
+  courses: Array<LearningResourceSummary>,
   setShowResourceDrawer: Function
 |}
 
@@ -54,7 +53,7 @@ const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
       {courses.map((course, idx) => (
         <LearningResourceCard
           key={idx}
-          object={R.merge({ object_type: LR_TYPE_COURSE }, course)}
+          object={course}
           setShowResourceDrawer={setShowResourceDrawer}
         />
       ))}
