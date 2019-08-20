@@ -1,6 +1,7 @@
 """Serializers for elasticsearch data"""
 import logging
 
+from django.db.models import Prefetch, Subquery, OuterRef
 from prawcore import NotFound
 from rest_framework import serializers
 
@@ -326,16 +327,7 @@ class ESCourseSerializer(ESModelSerializer):
     object_type = COURSE_TYPE
 
     topics = serializers.SerializerMethodField()
-    course_runs = serializers.SerializerMethodField()
-
-    def get_course_runs(self, instance):
-        """
-        Get the course runs in reverse chronological order
-        """
-        course_runs = instance.course_runs.all().order_by(
-            "-enrollment_start", "-start_date", "-year"
-        )
-        return ESCourseRunSerializer(course_runs, many=True).data
+    course_runs = ESCourseRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_topics(self, course):
         """
@@ -559,7 +551,18 @@ def serialize_bulk_courses(ids):
         ids(list of int): List of course id's
     """
     for course in Course.objects.filter(id__in=ids).prefetch_related(
-        "topics", "course_runs"
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.filter(
+                id__in=Subquery(
+                    CourseRun.objects.filter(content_type__model="course")
+                    .filter(object_id=OuterRef("pk"))
+                    .order_by("-enrollment_start", "-start_date", "-year")
+                    .values_list("id", flat=True)
+                )
+            ),
+        ),
     ):
         yield serialize_course_for_bulk(course)
 
@@ -585,7 +588,18 @@ def serialize_bulk_bootcamps(ids):
         ids(list of int): List of bootcamp id's
     """
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
-        "course_runs", "topics"
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.filter(
+                id__in=Subquery(
+                    CourseRun.objects.filter(content_type__model="bootcamp")
+                    .filter(object_id=OuterRef("pk"))
+                    .order_by("-enrollment_start", "-start_date", "-year")
+                    .values_list("id", flat=True)
+                )
+            ),
+        ),
     ):
         yield serialize_bootcamp_for_bulk(bootcamp)
 

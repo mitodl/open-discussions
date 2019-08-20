@@ -8,9 +8,9 @@ from search.task_helpers import delete_bootcamp
 
 
 class Command(BaseCommand):
-    """Populate edx courses"""
+    """Populate bootcamp courses"""
 
-    help = "Populate edx courses"
+    help = "Populate bootcamp courses"
 
     def add_arguments(self, parser):
         parser.add_argument(

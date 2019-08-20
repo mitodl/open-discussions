@@ -4,6 +4,7 @@ course_catalog views
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
+from django.db.models import Prefetch, Subquery, OuterRef
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -11,7 +12,14 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 
 from course_catalog.constants import ResourceType, PlatformType
-from course_catalog.models import Course, UserList, Program, Bootcamp, FavoriteItem
+from course_catalog.models import (
+    Course,
+    UserList,
+    Program,
+    Bootcamp,
+    FavoriteItem,
+    CourseRun,
+)
 from course_catalog.serializers import (
     CourseSerializer,
     UserListSerializer,
@@ -99,7 +107,20 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Courses
     """
 
-    queryset = Course.objects.all().prefetch_related("topics", "course_runs")
+    queryset = Course.objects.prefetch_related(
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.filter(
+                id__in=Subquery(
+                    CourseRun.objects.filter(content_type__model="course")
+                    .filter(object_id=OuterRef("pk"))
+                    .order_by("-enrollment_start", "-start_date", "-year")
+                    .values_list("id", flat=True)
+                )
+            ),
+        ),
+    )
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
@@ -141,7 +162,20 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Bootcamps
     """
 
-    queryset = Bootcamp.objects.all().prefetch_related("topics", "course_runs")
+    queryset = Bootcamp.objects.prefetch_related(
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.filter(
+                id__in=Subquery(
+                    CourseRun.objects.filter(content_type__model="bootcamp")
+                    .filter(object_id=OuterRef("pk"))
+                    .order_by("-enrollment_start", "-start_date", "-year")
+                    .values_list("id", flat=True)
+                )
+            ),
+        ),
+    )
     serializer_class = BootcampSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)

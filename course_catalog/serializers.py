@@ -237,16 +237,7 @@ class CourseSerializer(BaseCourseSerializer):
     Serializer for Course model
     """
 
-    course_runs = serializers.SerializerMethodField()
-
-    def get_course_runs(self, instance):
-        """
-        Get the course runs sorted by date
-        """
-        course_runs = instance.course_runs.all().order_by(
-            "-enrollment_start", "-start_date", "-year"
-        )
-        return CourseRunSerializer(course_runs, many=True).data
+    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
 
     class Meta:
         model = Course
