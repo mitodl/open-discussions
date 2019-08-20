@@ -99,7 +99,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Courses
     """
 
-    queryset = Course.objects.all().prefetch_related("topics", "instructors", "prices")
+    queryset = Course.objects.all().prefetch_related("topics", "course_runs")
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
@@ -119,7 +119,9 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         Get upcoming courses
         """
         page = self.paginate_queryset(
-            self.queryset.filter(start_date__gt=timezone.now()).order_by("start_date")
+            self.queryset.filter(course_runs__start_date__gt=timezone.now()).order_by(
+                "course_runs__start_date"
+            )
         )
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -139,9 +141,7 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Bootcamps
     """
 
-    queryset = Bootcamp.objects.all().prefetch_related(
-        "topics", "instructors", "prices"
-    )
+    queryset = Bootcamp.objects.all().prefetch_related("topics", "course_runs")
     serializer_class = BootcampSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)

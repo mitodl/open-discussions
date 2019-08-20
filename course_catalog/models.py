@@ -2,7 +2,7 @@
 course_catalog models
 """
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
@@ -58,20 +58,14 @@ class AbstractCourse(LearningResource):
     Abstract data model for course models
     """
 
-    year = models.IntegerField(null=True, blank=True)
     full_description = models.TextField(null=True, blank=True)
-    start_date = models.DateTimeField(null=True, blank=True)
-    end_date = models.DateTimeField(null=True, blank=True)
-    enrollment_start = models.DateTimeField(null=True, blank=True)
-    enrollment_end = models.DateTimeField(null=True, blank=True)
     image_src = models.URLField(max_length=400, null=True, blank=True)
     image_description = models.CharField(max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
 
-    language = models.CharField(max_length=128, null=True, blank=True)
     featured = models.BooleanField(default=False)
     published = models.BooleanField(default=True)
-    availability = models.CharField(max_length=128, null=True, blank=True)
+
     url = models.URLField(null=True, max_length=2048)
 
     learning_resource_type = models.CharField(
@@ -82,28 +76,6 @@ class AbstractCourse(LearningResource):
         abstract = True
 
 
-class Course(AbstractCourse):
-    """
-    Course model for courses on all platforms
-    """
-
-    course_id = models.CharField(max_length=128, unique=True)
-
-    level = models.CharField(max_length=128, null=True, blank=True)
-    semester = models.CharField(max_length=20, null=True, blank=True)
-    platform = models.CharField(max_length=128)
-
-    raw_json = JSONField(null=True, blank=True)
-
-    program_type = models.CharField(max_length=32, null=True, blank=True)
-    program_name = models.CharField(max_length=256, null=True, blank=True)
-
-    instructors = models.ManyToManyField(
-        CourseInstructor, blank=True, related_name="courses"
-    )
-    prices = models.ManyToManyField(CoursePrice, blank=True)
-
-
 class CourseRun(AbstractCourse):
     """
     Model for course runs
@@ -111,16 +83,44 @@ class CourseRun(AbstractCourse):
 
     course_run_id = models.CharField(max_length=128, unique=True)
 
+    year = models.IntegerField(null=True, blank=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    enrollment_start = models.DateTimeField(null=True, blank=True)
+    enrollment_end = models.DateTimeField(null=True, blank=True)
     level = models.CharField(max_length=128, null=True, blank=True)
     semester = models.CharField(max_length=20, null=True, blank=True)
+    availability = models.CharField(max_length=128, null=True, blank=True)
+    language = models.CharField(max_length=128, null=True, blank=True)
 
     instructors = models.ManyToManyField(
-        CourseInstructor, blank=True, related_name="course_runs"
+        CourseInstructor, blank=True, related_name="course_instructors"
     )
     prices = models.ManyToManyField(CoursePrice, blank=True)
-    course = models.ForeignKey(
-        Course, related_name="course_runs", on_delete=models.CASCADE
+
+    content_type = models.ForeignKey(
+        ContentType,
+        limit_choices_to={"model__in": ("course", "bootcamp")},
+        on_delete=models.CASCADE,
     )
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey("content_type", "object_id")
+
+
+class Course(AbstractCourse):
+    """
+    Course model for courses on all platforms
+    """
+
+    course_id = models.CharField(max_length=128, unique=True)
+    platform = models.CharField(max_length=128)
+
+    raw_json = JSONField(null=True, blank=True)
+
+    program_type = models.CharField(max_length=32, null=True, blank=True)
+    program_name = models.CharField(max_length=256, null=True, blank=True)
+
+    course_runs = GenericRelation(CourseRun)
 
 
 class Bootcamp(AbstractCourse):
@@ -130,11 +130,8 @@ class Bootcamp(AbstractCourse):
 
     course_id = models.CharField(max_length=128, unique=True)
 
-    instructors = models.ManyToManyField(
-        CourseInstructor, blank=True, related_name="bootcamps"
-    )
-    prices = models.ManyToManyField(CoursePrice, blank=True)
     location = models.CharField(max_length=128, null=True, blank=True)
+    course_runs = GenericRelation(CourseRun)
 
 
 class List(LearningResource):

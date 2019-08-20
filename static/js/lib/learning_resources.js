@@ -1,5 +1,6 @@
 //@flow
 import { concat } from "ramda"
+
 import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
@@ -7,9 +8,7 @@ import {
   COURSE_PRIOR,
   LR_TYPE_USERLIST
 } from "./constants"
-
-import type { Bootcamp, Course } from "../flow/discussionTypes"
-import { capitalize } from "./util"
+import { capitalize, emptyOrNil } from "./util"
 
 export const availabilityLabel = (availability: ?string) => {
   switch (availability) {
@@ -28,13 +27,18 @@ export const resourceLabel = (resource: string) => {
     : concat(capitalize(resource), "s")
 }
 
-export const maxPrice = (course: Course | Bootcamp) => {
-  const price = Math.max(...course.prices.map(price => price.price))
+export const maxPrice = (resource: Object) => {
+  const prices = !emptyOrNil(resource.course_runs)
+    ? resource.course_runs[0].prices
+    : []
+  const price = Math.max(...prices.map(price => price.price))
   return price > 0 ? `$${price}` : "Free"
 }
 
-export const minPrice = (course: Object) => {
-  const prices = course.prices || []
+export const minPrice = (resource: Object) => {
+  const prices = !emptyOrNil(resource.course_runs)
+    ? resource.course_runs[0].prices
+    : []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"
 }

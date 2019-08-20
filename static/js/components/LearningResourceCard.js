@@ -32,6 +32,7 @@ import { favoriteUserListMutation } from "../lib/queries/user_lists"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
+import { emptyOrNil } from "../lib/util"
 
 type OwnProps = {|
   object: LearningResourceSummary,
@@ -129,7 +130,11 @@ export const LearningResourceCard = ({
           </div>
           <div className="availability grey-surround">
             <i className="material-icons calendar_today">calendar_today</i>
-            {availabilityLabel(object.availability || COURSE_AVAILABLE_NOW)}
+            {availabilityLabel(
+              !emptyOrNil(object.course_runs)
+                ? object.course_runs[0].availability
+                : COURSE_AVAILABLE_NOW
+            )}
           </div>
           <div className="favorite grey-surround">
             <img

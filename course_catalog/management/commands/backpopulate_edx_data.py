@@ -42,21 +42,22 @@ class Command(BaseCommand):
             for course in Course.objects.filter(platform="mitx"):
                 course.delete()
                 delete_course(course)
-        task = sync_and_upload_edx_data.delay(
-            force_overwrite=options["force_overwrite"],
-            upload_to_s3=options["upload_to_s3"],
-        )
-        self.stdout.write(
-            "Started task {task} to get edx course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(
-                task=task,
-                overwrite=options["force_overwrite"],
-                s3=options["upload_to_s3"],
+        else:
+            task = sync_and_upload_edx_data.delay(
+                force_overwrite=options["force_overwrite"],
+                upload_to_s3=options["upload_to_s3"],
             )
-        )
-        self.stdout.write("Waiting on task...")
-        start = now_in_utc()
-        task.get()
-        total_seconds = (now_in_utc() - start).total_seconds()
-        self.stdout.write(
-            "Population of edx data finished, took {} seconds".format(total_seconds)
-        )
+            self.stdout.write(
+                "Started task {task} to get edx course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(
+                    task=task,
+                    overwrite=options["force_overwrite"],
+                    s3=options["upload_to_s3"],
+                )
+            )
+            self.stdout.write("Waiting on task...")
+            start = now_in_utc()
+            task.get()
+            total_seconds = (now_in_utc() - start).total_seconds()
+            self.stdout.write(
+                "Population of edx data finished, took {} seconds".format(total_seconds)
+            )

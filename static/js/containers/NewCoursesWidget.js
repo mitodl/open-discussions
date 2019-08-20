@@ -59,7 +59,7 @@ export function NewCoursesWidget(props: Props) {
                 <Dotdotdot clamp={2}>{course.title}</Dotdotdot>
               </div>
               <div className="availability-and-platform">
-                {availabilityLabel(course.availability)} |{" "}
+                {availabilityLabel(course.course_runs[0].availability)} |{" "}
                 {course.platform.toUpperCase()}
               </div>
             </div>

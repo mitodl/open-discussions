@@ -5,12 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
-from course_catalog.constants import (
-    PlatformType,
-    AvailabilityType,
-    ResourceType,
-    OfferedBy,
-)
+from course_catalog.constants import PlatformType, ResourceType, OfferedBy
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -122,9 +117,7 @@ class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer)
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
 
-    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
 
     def create(self, validated_data):
         """
@@ -142,30 +135,15 @@ class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer)
         self.handle_many_to_many(course)
         return course
 
-    def handle_many_to_many(self, course):
+    def handle_many_to_many(self, resource):
         """
         Handle the creation and assignment of topics, instructors, and prices
         """
         topics = self.topics if hasattr(self, "topics") else []
-        instructors = self.instructors if hasattr(self, "instructors") else []
-        prices = self.prices if hasattr(self, "prices") else []
-        course.topics.clear()
+        resource.topics.clear()
         for topic in topics:
             course_topic, _ = CourseTopic.objects.get_or_create(**topic)
-            course.topics.add(course_topic)
-
-        # Clear out the instructors and re-add them
-        course.instructors.clear()
-        # In the samples it looks like instructors is never populated and staff is
-        for instructor in instructors:
-            course_instructor, _ = CourseInstructor.objects.get_or_create(**instructor)
-            course.instructors.add(course_instructor)
-
-        # Clear out the prices and re-add them
-        course.prices.clear()
-        for price in prices:
-            course_price, _ = CoursePrice.objects.get_or_create(**price)
-            course.prices.add(course_price)
+            resource.topics.add(course_topic)
 
 
 class CourseRunSerializer(BaseCourseSerializer):
@@ -173,13 +151,38 @@ class CourseRunSerializer(BaseCourseSerializer):
     Serializer for creating CourseRun objects from edx data
     """
 
+    instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
+    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
+
+    def handle_many_to_many(self, resource):
+        """
+        Handle the creation and assignment of instructors and prices
+        """
+        super().handle_many_to_many(resource)
+
+        instructors = self.instructors if hasattr(self, "instructors") else []
+        prices = self.prices if hasattr(self, "prices") else []
+        # Clear out the instructors and re-add them
+        resource.instructors.clear()
+        # In the samples it looks like instructors is never populated and staff is
+        for instructor in instructors:
+            course_instructor, _ = CourseInstructor.objects.get_or_create(**instructor)
+            resource.instructors.add(course_instructor)
+
+        # Clear out the prices and re-add them
+        resource.prices.clear()
+        for price in prices:
+            course_price, _ = CoursePrice.objects.get_or_create(**price)
+            resource.prices.add(course_price)
+
     def to_internal_value(self, data):
         """
         Custom function to parse data out of the raw edx json
         """
         year, semester = get_year_and_semester(data)
         course_fields = {
-            "course": data.get("course"),
+            "content_type": data.get("content_type"),
+            "object_id": data.get("object_id"),
             "course_run_id": data.get("key"),
             "title": data.get("title"),
             "short_description": data.get("short_description"),
@@ -203,23 +206,21 @@ class CourseRunSerializer(BaseCourseSerializer):
             ),
             "last_modified": data.get("max_modified"),
             "raw_json": data.get("raw_json"),
-            "url": get_course_url(
-                data.get("key"), data.get("raw_json"), PlatformType.mitx.value
-            ),
+            "url": data.get("url"),
             "availability": data.get("availability"),
-            "offered_by": OfferedBy.mitx.value,
+            "offered_by": data.get("offered_by"),
         }
         self.instructors = [
             {
-                "first_name": person.get("given_name"),
-                "last_name": person.get("family_name"),
+                "first_name": person.get("given_name", person.get("first_name")),
+                "last_name": person.get("family_name", person.get("last_name")),
             }
             for person in data.get("staff")
         ]
         self.prices = [
             {
                 "price": seat.get("price"),
-                "mode": seat.get("type"),
+                "mode": seat.get("type", seat.get("mode")),
                 "upgrade_deadline": seat.get("upgrade_deadline"),
             }
             for seat in data.get("seats")
@@ -236,7 +237,16 @@ class CourseSerializer(BaseCourseSerializer):
     Serializer for Course model
     """
 
-    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+    course_runs = serializers.SerializerMethodField()
+
+    def get_course_runs(self, instance):
+        """
+        Get the course runs sorted by date
+        """
+        course_runs = instance.course_runs.all().order_by(
+            "-enrollment_start", "-start_date", "-year"
+        )
+        return CourseRunSerializer(course_runs, many=True).data
 
     class Meta:
         model = Course
@@ -258,7 +268,6 @@ class EDXCourseSerializer(CourseSerializer):
             "title": data.get("title"),
             "short_description": data.get("short_description"),
             "full_description": data.get("full_description"),
-            "level": data.get("level_type"),
             "platform": PlatformType.mitx.value,
             "image_src": (
                 (data.get("image") or {}).get("src")
@@ -300,36 +309,22 @@ class OCWSerializer(CourseSerializer):
             for topic in get_ocw_topic(topic_obj):
                 topics.append({"name": topic})
         course_fields = {
-            "course_id": data.get("uid"),
+            "course_id": data.get("course_id"),
             "title": data.get("title"),
             "short_description": data.get("description"),
-            "level": data.get("course_level"),
-            "semester": data.get("from_semester"),
-            "language": data.get("language"),
-            "platform": PlatformType.ocw.value,
-            "year": data.get("from_year"),
             "image_src": data.get("image_src"),
             "image_description": data.get("image_description"),
             "last_modified": data.get("last_modified"),
             "published": data.get("is_published"),
             "raw_json": data.get("raw_json"),
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
-            "availability": AvailabilityType.current.value,
             "offered_by": OfferedBy.ocw.value,
+            "platform": PlatformType.ocw.value,
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
 
         self.topics = topics
-        self.instructors = [
-            {
-                "first_name": instructor.get("first_name"),
-                "last_name": instructor.get("last_name"),
-            }
-            for instructor in data.get("instructors")
-        ]
-        self.prices = [{"price": "0.00", "mode": "audit", "upgrade_deadline": None}]
-
         return super().to_internal_value(course_fields)
 
 
@@ -338,13 +333,22 @@ class BootcampSerializer(BaseCourseSerializer):
     Serializer for Bootcamp model
     """
 
+    course_runs = serializers.SerializerMethodField()
+
+    def get_course_runs(self, instance):
+        """
+        Get the course runs sorted by date
+        """
+        course_runs = instance.course_runs.all().order_by(
+            "-enrollment_start", "-start_date", "-year"
+        )
+        return CourseRunSerializer(course_runs, many=True).data
+
     def to_internal_value(self, data):
         """
         Custom function to parse data out of the raw bootcamp json
         """
         self.topics = data.pop("topics") if "topics" in data else []
-        self.instructors = data.pop("instructors") if "instructors" in data else []
-        self.prices = data.pop("prices") if "prices" in data else []
         data["offered_by"] = OfferedBy.bootcamps.value
         return super().to_internal_value(data)
 

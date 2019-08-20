@@ -7,8 +7,11 @@ from datetime import datetime
 
 import pytz
 import requests
+
 from django.db import transaction
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+
 from course_catalog.constants import (
     PlatformType,
     MIT_OWNER_KEYS,
@@ -23,7 +26,13 @@ from course_catalog.serializers import (
     CourseRunSerializer,
     OCWSerializer,
 )
-from search.task_helpers import update_course, index_new_course
+from course_catalog.utils import get_course_url
+from search.task_helpers import (
+    update_course,
+    index_new_course,
+    index_new_bootcamp,
+    update_bootcamp,
+)
 
 log = logging.getLogger(__name__)
 
@@ -117,8 +126,8 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
 
                     # Try and get the CourseRun instance. If it exists check to see if it needs updating
                     try:
-                        courserun_instance = CourseRun.objects.get(
-                            course_run_id=course_run.get("key"), course=course
+                        courserun_instance = course.course_runs.get(
+                            course_run_id=course_run.get("key")
                         )
                         if (
                             max_modified <= courserun_instance.last_modified
@@ -137,7 +146,14 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                         data={
                             **course_run,
                             "max_modified": max_modified,
-                            "course": course.id,
+                            "offered_by": OfferedBy.mitx.value,
+                            "content_type": ContentType.objects.get(model="course").id,
+                            "object_id": course.id,
+                            "url": get_course_url(
+                                course_run.get("key"),
+                                course.raw_json,
+                                PlatformType.mitx.value,
+                            ),
                         },
                         instance=courserun_instance,
                     )
@@ -203,6 +219,7 @@ def digest_ocw_course(
     """
 
     index_func = update_course if course_instance is not None else index_new_course
+
     ocw_serializer = OCWSerializer(
         data={
             **master_json,
@@ -225,7 +242,50 @@ def digest_ocw_course(
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
         course = ocw_serializer.save()
-        index_func(course)
+
+        # Try and get the CourseRun instance.
+        try:
+            courserun_instance = course.course_runs.get(
+                course_run_id=master_json.get("uid")
+            )
+        except CourseRun.DoesNotExist:
+            courserun_instance = None
+        run_serializer = CourseRunSerializer(
+            data={
+                **master_json,
+                "key": master_json.get("uid"),
+                "staff": master_json.get("instructors"),
+                "seats": [{"price": "0.00", "mode": "audit", "upgrade_deadline": None}],
+                "content_language": master_json.get("language"),
+                "short_description": master_json.get("description"),
+                "level_type": master_json.get("course_level"),
+                "year": master_json.get("from_year"),
+                "semester": master_json.get("from_semester"),
+                "offered_by": OfferedBy.ocw.value,
+                "availability": AvailabilityType.current.value,
+                "image": {
+                    "src": master_json.get("image_src"),
+                    "description": master_json.get("image_description"),
+                },
+                "max_modified": last_modified,
+                "content_type": ContentType.objects.get(model="course").id,
+                "object_id": course.id,
+                "url": get_course_url(
+                    master_json.get("uid"), master_json, PlatformType.ocw.value
+                ),
+            },
+            instance=courserun_instance,
+        )
+        if not run_serializer.is_valid():
+            log.error(
+                "OCW CourseRun %s is not valid: %s",
+                master_json.get("key"),
+                run_serializer.errors,
+            )
+            return
+        run_serializer.save()
+
+    index_func(course)
 
 
 def get_s3_object_and_read(obj, iteration=0):
@@ -394,7 +454,7 @@ def get_micromasters_data():
     return requests.get(settings.MICROMASTERS_COURSE_URL).json()
 
 
-def parse_bootcamp_json_data_bootcamp(bootcamp_data, force_overwrite=False):
+def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     """
     Main function to parse bootcamp json data for one bootcamp
 
@@ -420,14 +480,13 @@ def parse_bootcamp_json_data_bootcamp(bootcamp_data, force_overwrite=False):
                 bootcamp_data.get("course_id"),
             )
             return
-        index_func = update_course
+        index_func = update_bootcamp
     except Bootcamp.DoesNotExist:
         bootcamp_instance = None
-        index_func = index_new_course
+        index_func = index_new_bootcamp
 
     # Overwrite platform with our own enum value
     bootcamp_data["platform"] = PlatformType.bootcamps.value
-
     bootcamp_serializer = BootcampSerializer(
         data=bootcamp_data, instance=bootcamp_instance
     )
@@ -442,4 +501,37 @@ def parse_bootcamp_json_data_bootcamp(bootcamp_data, force_overwrite=False):
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
         bootcamp = bootcamp_serializer.save()
-        index_func(bootcamp)
+
+        # Try and get the CourseRun instance.
+        try:
+            courserun_instance = bootcamp.course_runs.get(
+                course_run_id=bootcamp.course_id
+            )
+        except CourseRun.DoesNotExist:
+            courserun_instance = None
+        run_serializer = CourseRunSerializer(
+            data={
+                **bootcamp_data,
+                "key": bootcamp_data.get("course_id"),
+                "staff": bootcamp_data.get("instructors"),
+                "seats": bootcamp_data.get("prices"),
+                "start": bootcamp_data.get("start_date"),
+                "end": bootcamp_data.get("end_date"),
+                "course_run_id": bootcamp.course_id,
+                "max_modified": bootcamp_modified,
+                "offered_by": OfferedBy.bootcamps.value,
+                "content_type": ContentType.objects.get(model="bootcamp").id,
+                "object_id": bootcamp.id,
+                "url": bootcamp.url,
+            },
+            instance=courserun_instance,
+        )
+        if not run_serializer.is_valid():
+            log.error(
+                "Bootcamp CourseRun %s is not valid: %s",
+                bootcamp_data.get("key"),
+                run_serializer.errors,
+            )
+            return
+        run_serializer.save()
+    index_func(bootcamp)

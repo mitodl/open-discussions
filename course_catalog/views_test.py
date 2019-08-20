@@ -10,8 +10,6 @@ from course_catalog.constants import PlatformType, ResourceType
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
-    CoursePriceFactory,
-    CourseInstructorFactory,
     BootcampFactory,
     ProgramFactory,
     UserListFactory,
@@ -25,11 +23,7 @@ from open_discussions.factories import UserFactory
 
 def test_course_endpoint(client):
     """Test course endpoint"""
-    course = CourseFactory(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-        instructors=CourseInstructorFactory.create_batch(2),
-    )
+    course = CourseFactory(topics=CourseTopicFactory.create_batch(3))
 
     resp = client.get(reverse("courses-list"))
     assert resp.data.get("count") == 1
@@ -49,19 +43,16 @@ def test_course_endpoint(client):
 
     resp = client.get(reverse("courses-list") + "upcoming/")
     assert resp.data.get("count") == 0
-    course.start_date = timezone.now() + timedelta(days=1)
-    course.save()
+    course_run = course.course_runs.all().order_by("-start_date")[0]
+    course_run.start_date = timezone.now() + timedelta(days=1)
+    course_run.save()
     resp = client.get(reverse("courses-list") + "upcoming/")
     assert resp.data.get("count") == 1
 
 
 def test_bootcamp_endpoint(client):
     """Test bootcamp endpoint"""
-    bootcamp = BootcampFactory(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-        instructors=CourseInstructorFactory.create_batch(2),
-    )
+    bootcamp = BootcampFactory(topics=CourseTopicFactory.create_batch(3))
 
     resp = client.get(reverse("bootcamps-list"))
     assert resp.data.get("count") == 1

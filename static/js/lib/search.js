@@ -109,10 +109,9 @@ export const searchResultToLearningResource = (
     "offered_by" in result && result.offered_by
       ? R.toLower(result.offered_by)
       : null,
-  platform:     "platform" in result ? result.platform : null,
-  availability: "availability" in result ? result.availability : null,
-  topics:       result.topics.map(topic => ({ name: topic })),
-  prices:       "prices" in result ? result.prices || [] : []
+  platform:    "platform" in result ? result.platform : null,
+  topics:      result.topics.map(topic => ({ name: topic })),
+  course_runs: "course_runs" in result ? result.course_runs : []
 })
 
 const POST_QUERY_FIELDS = [
