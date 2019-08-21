@@ -57,8 +57,6 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-
-
 export type LearningResourceResult = {
   id:                  number,
   course_id?:          string,

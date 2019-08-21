@@ -228,7 +228,7 @@ describe("EditChannelAppearancePage", () => {
         sinon.assert.calledOnce(helper.updateChannelStub)
         const channelUpdateArg = helper.updateChannelStub.firstCall.args[0]
         assert.equal(
-          channelUpdateArg.hasOwnProperty("title"),
+          channelUpdateArg.hasOwnProperty("title"), // eslint-disable-line no-prototype-builtins
           expectIncludeTitle
         )
       })

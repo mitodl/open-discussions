@@ -1,5 +1,5 @@
 // @flow
-/* global SETTINGS:false, fetch: false */
+/* global SETTINGS:false */
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"

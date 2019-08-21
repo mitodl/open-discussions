@@ -63,7 +63,7 @@ export const loadEmbedlyPlatform = () => {
     window.embedly =
       window.embedly ||
       function() {
-        (window.embedly.q = window.embedly.q || []).push(arguments)
+        (window.embedly.q = window.embedly.q || []).push(arguments) // eslint-disable-line prefer-rest-params
       }
     const el = document.createElement("script")
     el.id = id

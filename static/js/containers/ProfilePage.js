@@ -65,8 +65,9 @@ class ProfilePage extends React.Component<Props> {
   renderUserWebsiteLinks() {
     const { profile } = this.props
 
-    if (!profile.user_websites || profile.user_websites.length === 0)
+    if (!profile.user_websites || profile.user_websites.length === 0) {
       return null
+    }
 
     // $FlowFixMe: profile.user_websites cannot be undefined here
     const socialSites = profile.user_websites
