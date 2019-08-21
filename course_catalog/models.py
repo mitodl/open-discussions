@@ -97,13 +97,21 @@ class CourseRun(AbstractCourse):
         CourseInstructor, blank=True, related_name="course_instructors"
     )
     prices = models.ManyToManyField(CoursePrice, blank=True)
+    course = models.ForeignKey(
+        "Course",
+        null=True,
+        blank=True,
+        related_name="deprecated_runs",
+        on_delete=models.CASCADE,
+    )
 
     content_type = models.ForeignKey(
         ContentType,
+        null=True,
         limit_choices_to={"model__in": ("course", "bootcamp")},
         on_delete=models.CASCADE,
     )
-    object_id = models.PositiveIntegerField()
+    object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey("content_type", "object_id")
 
 
