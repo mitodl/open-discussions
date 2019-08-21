@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.87.0
+Version 0.87.0 (Released August 21, 2019)
 --------------
 
 - Added retire_users command and don't email inactive users
