@@ -4,7 +4,7 @@ course_catalog views
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch, Subquery, OuterRef
+from django.db.models import Prefetch
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -111,13 +111,8 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         "topics",
         Prefetch(
             "course_runs",
-            queryset=CourseRun.objects.filter(
-                id__in=Subquery(
-                    CourseRun.objects.filter(content_type__model="course")
-                    .filter(object_id=OuterRef("pk"))
-                    .order_by("-enrollment_start", "-start_date", "-year")
-                    .values_list("id", flat=True)
-                )
+            queryset=CourseRun.objects.order_by(
+                "-enrollment_start", "-start_date", "-year"
             ),
         ),
     )
@@ -166,13 +161,8 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         "topics",
         Prefetch(
             "course_runs",
-            queryset=CourseRun.objects.filter(
-                id__in=Subquery(
-                    CourseRun.objects.filter(content_type__model="bootcamp")
-                    .filter(object_id=OuterRef("pk"))
-                    .order_by("-enrollment_start", "-start_date", "-year")
-                    .values_list("id", flat=True)
-                )
+            queryset=CourseRun.objects.order_by(
+                "-enrollment_start", "-start_date", "-year"
             ),
         ),
     )
