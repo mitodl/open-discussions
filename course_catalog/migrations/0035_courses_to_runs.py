@@ -53,6 +53,15 @@ class Migration(migrations.Migration):
         migrations.RemoveField(model_name="course", name="semester"),
         migrations.RemoveField(model_name="course", name="start_date"),
         migrations.RemoveField(model_name="course", name="year"),
+        migrations.AlterField(
+            model_name="courserun",
+            name="instructors",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="course_instructors",
+                to="course_catalog.CourseInstructor",
+            ),
+        ),
         migrations.AddField(
             model_name="courserun",
             name="content_type",
@@ -77,15 +86,6 @@ class Migration(migrations.Migration):
                 on_delete=django.db.models.deletion.CASCADE,
                 related_name="deprecated_runs",
                 to="course_catalog.Course",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="courserun",
-            name="instructors",
-            field=models.ManyToManyField(
-                blank=True,
-                related_name="course_instructors",
-                to="course_catalog.CourseInstructor",
             ),
         ),
         migrations.RunPython(migrations.RunPython.noop, reverse_code=delete_resources),
