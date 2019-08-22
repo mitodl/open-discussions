@@ -84,9 +84,10 @@ const mapStateToProps = (state: Object): StateProps => {
     querySelectors.isFinished(state.queries, newCoursesRequest())
 
   return {
-    courses: loaded
-      ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
-      : [],
+    courses:
+      loaded && newCourses && upcomingCourses
+        ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
+        : [],
     loaded
   }
 }
