@@ -109,7 +109,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     queryset = Course.objects.prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start"))
+        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
     )
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
@@ -154,7 +154,7 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     queryset = Bootcamp.objects.prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start"))
+        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
     )
     serializer_class = BootcampSerializer
     pagination_class = DefaultPagination

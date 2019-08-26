@@ -352,11 +352,7 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     """
-<<<<<<< HEAD
     Verifies that CourseRunSerializer validation works correctly if the OCW course run serializer is invalid
-=======
-    Verifies that CourseRunSerializer validation works correctly if the OCW course run has invalid values
->>>>>>> Working availability filter based on course runs
     """
     ocw_valid_data.pop("uid")
     digest_ocw_course(ocw_valid_data, timezone.now(), None, True)

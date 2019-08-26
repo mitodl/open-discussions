@@ -57,7 +57,6 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-
 export type LearningResourceRun = {
   language?:           ?string,
   semester?:           ?string,
@@ -71,7 +70,6 @@ export type LearningResourceRun = {
   instructors:         Array<CourseInstructor>,
   prices:              Array<CoursePrice>
 }
-
 
 export type LearningResourceResult = {
   id:                  number,

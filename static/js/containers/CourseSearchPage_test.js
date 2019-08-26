@@ -215,10 +215,10 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:           LR_TYPE_ALL,
-          platforms:      ["ocw"],
-          topics:         ["Science", "Engineering"],
-          availabilities: ["availableNow"]
+          type:         LR_TYPE_ALL,
+          platform:     ["ocw"],
+          topics:       ["Science", "Engineering"],
+          availability: ["availableNow"]
         })
       )
     })
@@ -393,7 +393,7 @@ describe("CourseSearchPage", () => {
         Object.entries({
           platform:     [],
           topics:       ["Physics"],
-          availability: ["availableNow"],
+          availability: [],
           type:         LR_TYPE_ALL
         })
       )

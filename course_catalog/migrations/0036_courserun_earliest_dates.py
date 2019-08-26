@@ -30,7 +30,7 @@ def populate_earliest_dates(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("course_catalog", "0034_courses_to_runs")]
+    dependencies = [("course_catalog", "0035_courses_to_runs")]
 
     operations = [
         migrations.AddField(

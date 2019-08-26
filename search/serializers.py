@@ -554,7 +554,7 @@ def serialize_bulk_courses(ids):
     """
     for course in Course.objects.filter(id__in=ids).prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start"))
+        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
     ):
         yield serialize_course_for_bulk(course)
 
@@ -581,7 +581,7 @@ def serialize_bulk_bootcamps(ids):
     """
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start"))
+        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
     ):
         yield serialize_bootcamp_for_bulk(bootcamp)
 
