@@ -5,7 +5,10 @@ from django.conf import settings
 from django.db.models import Q
 
 from channels.models import Subscription
-from notifications.notifiers.exceptions import UnsupportedNotificationTypeError
+from notifications.notifiers.exceptions import (
+    UnsupportedNotificationTypeError,
+    CancelNotificationError,
+)
 from notifications.models import (
     EmailNotification,
     NotificationSettings,
@@ -145,6 +148,10 @@ def send_email_notification_batch(notification_ids):
         try:
             notifier = _get_notifier_for_notification(notification)
             notifier.send_notification(notification)
+        except CancelNotificationError:
+            log.debug("EmailNotification canceled: %s", notification.id)
+            notification.state = EmailNotification.STATE_CANCELED
+            notification.save()
         except:  # pylint: disable=bare-except
             log.exception("Error sending notification %s", notification)
 

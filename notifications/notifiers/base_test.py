@@ -63,6 +63,12 @@ def test_can_notify(notifier, mocker, frequency, expected, hour_of_day):
     assert notifier.can_notify(notification) is expected
 
 
+def test_can_notify_never(notifier, mocker):
+    """Tests that if the settings are for never the can_notify is False"""
+    notifier.notification_settings = NotificationSettingsFactory.create(never=True)
+    assert notifier.can_notify(mocker.Mock()) is False
+
+
 def test_can_notify_invalid_frequency(notifier, mocker):
     """Tests that this raises an error if an unsupported trigger_frequency is used"""
     notifier.notification_settings = NotificationSettingsFactory.create(

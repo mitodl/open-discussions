@@ -61,7 +61,10 @@ class BaseNotifier:
         Returns:
             bool: True if we're due to send another notification
         """
-        if not self.notification_settings.user.is_active:
+        if (
+            not self.notification_settings.user.is_active
+            or self.notification_settings.is_triggered_never
+        ):
             return False
 
         # special case if we've never sent a notification or the setting is for an immediate send
