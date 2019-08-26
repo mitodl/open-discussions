@@ -312,7 +312,7 @@ describe("search functions", () => {
           Object.entries({
             platform:     ["mitx"],
             topics:       ["Engineering", "Science"],
-            availability: ["Upcoming"],
+            availability: ["next30"],
             type:         [type]
           })
         )
@@ -354,8 +354,16 @@ describe("search functions", () => {
             bool: {
               should: [
                 {
-                  term: {
-                    availability: "Upcoming"
+                  nested: {
+                    path:  "course_runs",
+                    query: {
+                      range: {
+                        "course_runs.earliest_start": {
+                          from: "now",
+                          to:   "now+30d/d"
+                        }
+                      }
+                    }
                   }
                 }
               ]
@@ -366,9 +374,47 @@ describe("search functions", () => {
         assert.deepEqual(buildSearchQuery({ type, text, facets }), {
           aggs: {
             availability: {
-              terms: {
-                field: "availability",
-                size:  10000
+              aggs: {
+                runs: {
+                  aggs: {
+                    courses: {
+                      reverse_nested: {}
+                    }
+                  },
+                  date_range: {
+                    field:   "course_runs.earliest_start",
+                    keyed:   false,
+                    missing: "1901-01-01T00:00:00Z",
+                    ranges:  [
+                      {
+                        key: "availableNow",
+                        to:  "now"
+                      },
+                      {
+                        from: "now",
+                        key:  "next30",
+                        to:   "now+30d/d"
+                      },
+                      {
+                        from: "now+30d/d",
+                        key:  "next60",
+                        to:   "now+60d/d"
+                      },
+                      {
+                        from: "now+60d/d",
+                        key:  "next90",
+                        to:   "now+90d/d"
+                      },
+                      {
+                        from: "now+90d/d",
+                        key:  "over90"
+                      }
+                    ]
+                  }
+                }
+              },
+              nested: {
+                path: "course_runs"
               }
             },
             platform: {

@@ -30,7 +30,10 @@ import {
 import { actions } from "../actions"
 import { setShowResourceDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
-import { availabilityLabel, resourceLabel } from "../lib/learning_resources"
+import {
+  availabilityFacetLabel,
+  resourceLabel
+} from "../lib/learning_resources"
 import {
   LR_TYPE_ALL,
   LR_TYPE_BOOTCAMP,
@@ -107,7 +110,7 @@ type State = {
 const facetDisplayMap = [
   ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
-  ["availability", "Availability", availabilityLabel],
+  ["availability", "Availability", availabilityFacetLabel],
   ["platform", "Platform", _.upperCase]
 ]
 

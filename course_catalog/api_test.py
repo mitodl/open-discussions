@@ -164,14 +164,6 @@ def bootcamp_valid_data():
     }
 
 
-@pytest.fixture
-def mock_logger(mocker):
-    """
-    Mock log exception
-    """
-    return mocker.patch("course_catalog.api.log.exception")
-
-
 @pytest.mark.parametrize("force_overwrite", [True, False])
 def test_parse_mitx_json_data_overwrite_course(
     mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
@@ -360,7 +352,11 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     """
+<<<<<<< HEAD
     Verifies that CourseRunSerializer validation works correctly if the OCW course run serializer is invalid
+=======
+    Verifies that CourseRunSerializer validation works correctly if the OCW course run has invalid values
+>>>>>>> Working availability filter based on course runs
     """
     ocw_valid_data.pop("uid")
     digest_ocw_course(ocw_valid_data, timezone.now(), None, True)

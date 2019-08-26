@@ -171,12 +171,23 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
-    # Search only published courses
-    course_filter = Q("term", published=True) | ~Q("terms", object_type=[COURSE_TYPE])
+    # Search only published courses and bootcamps
+    published_filter = Q("term", published=True) | ~Q(
+        "terms", object_type=[COURSE_TYPE, BOOTCAMP_TYPE]
+    )
 
-    # Search only published bootcamps
-    bootcamp_filter = Q("term", published=True) | ~Q(
-        "terms", object_type=[BOOTCAMP_TYPE]
+    # Search only courses/bootcamps with runs that have end_date null or > now, and enrollment date null or > now
+    date_filter = ~Q("terms", object_type=[COURSE_TYPE, BOOTCAMP_TYPE]) | Q(
+        "nested",
+        path="course_runs",
+        query=(
+            (
+                ~Q("exists", field="course_runs.earliest_end")
+                | Q("term", course_runs__offered_by="OCW")
+                | Q("range", course_runs__earliest_end={"gt": "now"})
+            )
+        ),
+        ignore_unmapped=True,
     )
 
     # Search public lists (and user's own lists if logged in)
@@ -193,8 +204,8 @@ def _apply_general_query_filters(search, user):
     return (
         search.filter(channels_filter)
         .filter(content_filter)
-        .filter(course_filter)
-        .filter(bootcamp_filter)
+        .filter(published_filter)
+        .filter(date_filter)
         .filter(user_list_filter)
     )
 
@@ -214,7 +225,29 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return search.execute().to_dict()
+    return transform_aggregates(search.execute().to_dict())
+
+
+def transform_aggregates(search_result):
+    """
+    Transform the reverse nested availability aggregate counts into a format matching the other facets
+
+    Args:
+        search_result (dict): The results from ElasticSearch
+
+    Returns:
+        dict: The Elasticsearch response dict with transformed availability aggregates
+    """
+    availability_runs = (
+        search_result["aggregations"].get("availability", {}).pop("runs", {})
+    )
+    if availability_runs:
+        search_result["aggregations"]["availability"]["buckets"] = [
+            {"key": bucket["key"], "doc_count": bucket["courses"]["doc_count"]}
+            for bucket in availability_runs.pop("buckets", [])
+            if bucket["courses"]["doc_count"] > 0
+        ]
+    return search_result
 
 
 def find_related_documents(*, user, post_id):

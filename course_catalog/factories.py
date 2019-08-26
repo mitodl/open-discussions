@@ -143,12 +143,16 @@ class CourseRunFactory(DjangoModelFactory):
     )
     enrollment_start = factory.Faker("date_time", tzinfo=pytz.utc)
     enrollment_end = factory.LazyAttribute(
-        lambda obj: obj.enrollment_start + timedelta(days=45)
+        lambda obj: (obj.enrollment_start + timedelta(days=45))
+        if obj.enrollment_start
+        else None
     )
     start_date = factory.LazyAttribute(
         lambda obj: obj.enrollment_start + timedelta(days=15)
     )
-    end_date = factory.LazyAttribute(lambda obj: obj.start_date + timedelta(days=90))
+    end_date = factory.LazyAttribute(
+        lambda obj: obj.start_date + timedelta(days=90) if obj.start_date else None
+    )
     language = factory.Faker("word")
     year = factory.Faker("year")
 

@@ -19,7 +19,12 @@ from course_catalog.models import (
     FavoriteItem,
     CourseRun,
 )
-from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
+from course_catalog.utils import (
+    get_ocw_topic,
+    get_year_and_semester,
+    get_course_url,
+    best_run_date,
+)
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -153,6 +158,8 @@ class CourseRunSerializer(BaseCourseSerializer):
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
+    earliest_start = serializers.ReadOnlyField()
+    earliest_end = serializers.ReadOnlyField()
 
     def handle_many_to_many(self, resource):
         """
@@ -196,6 +203,12 @@ class CourseRunSerializer(BaseCourseSerializer):
             "end_date": data.get("end"),
             "enrollment_start": data.get("enrollment_start"),
             "enrollment_end": data.get("enrollment_end"),
+            "earliest_start": best_run_date(
+                data.get("enrollment_start"), data.get("start"), semester, year
+            ),
+            "earliest_end": best_run_date(
+                data.get("enrollment_end"), data.get("end"), semester, year, ending=True
+            ),
             "image_src": (
                 (data.get("image") or {}).get("src")
                 or (data.get("course_image") or {}).get("src")
@@ -324,16 +337,7 @@ class BootcampSerializer(BaseCourseSerializer):
     Serializer for Bootcamp model
     """
 
-    course_runs = serializers.SerializerMethodField()
-
-    def get_course_runs(self, instance):
-        """
-        Get the course runs sorted by date
-        """
-        course_runs = instance.course_runs.all().order_by(
-            "-enrollment_start", "-start_date", "-year"
-        )
-        return CourseRunSerializer(course_runs, many=True).data
+    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
 
     def to_internal_value(self, data):
         """

@@ -1,7 +1,9 @@
 """ Utils for course catalog """
 import re
+from datetime import datetime
 from urllib.parse import urljoin
 
+import pytz
 from django.conf import settings
 
 from course_catalog.constants import ocw_edx_mapping, semester_mapping, PlatformType
@@ -104,4 +106,42 @@ def get_course_url(course_id, course_json, platform):
             if preferred_urls:
                 return preferred_urls[0].split("?")[0]
         return "{}{}/course/".format(settings.MITX_ALT_URL, course_id)
+    return None
+
+
+def semester_year_to_date(semester, year, ending=False):
+    """
+    Convert semester and year to a rough date
+
+    Args:
+        semester (str): Semester ("Fall", "Spring", etc)
+        year (int): Year
+        ending (boolean): True for end of semester, False for beginning
+
+    Returns:
+        datetime: The rough date of the course
+    """
+    if semester is None or year is None:
+        return
+    if semester.lower() == "fall":
+        month_day = "12-31" if ending else "09-01"
+    elif semester.lower() == "summer":
+        month_day = "08-30" if ending else "06-01"
+    else:
+        month_day = "05-31" if ending else "01-01"
+    return datetime.strptime("{}-{}".format(year, month_day), "%Y-%m-%d").replace(
+        tzinfo=pytz.UTC
+    )
+
+
+def best_run_date(preferred_date, alternate_date, semester, year, ending=False):
+    """
+    Get the best date for a run (some have an enrollment date and no course date or vice versa)
+    """
+    if preferred_date:
+        return preferred_date
+    if alternate_date:
+        return alternate_date
+    if semester and year:
+        return semester_year_to_date(semester, year, ending=ending)
     return None

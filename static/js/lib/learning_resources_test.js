@@ -12,7 +12,8 @@ import {
   availabilityLabel,
   minPrice,
   maxPrice,
-  resourceLabel
+  resourceLabel,
+  availabilityFacetLabel
 } from "./learning_resources"
 import {
   LR_TYPE_BOOTCAMP,
@@ -20,6 +21,7 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST
 } from "./constants"
+import { AVAILABILITY_MAPPING } from "./search"
 
 describe("Course utils", () => {
   [
@@ -71,6 +73,23 @@ describe("Course utils", () => {
   ].forEach(([searchType, facetText]) => {
     it(`facet text should be ${facetText} for resource type ${searchType}`, () => {
       assert.equal(resourceLabel(searchType), facetText)
+    })
+  })
+
+  //
+  ;[
+    ["availableNow", AVAILABILITY_MAPPING["availableNow"].label],
+    ["next30", AVAILABILITY_MAPPING["next30"].label],
+    ["next60", AVAILABILITY_MAPPING["next60"].label],
+    ["next90", AVAILABILITY_MAPPING["next90"].label],
+    ["over90", AVAILABILITY_MAPPING["over90"].label],
+    ["something", "something"],
+    [null, null]
+  ].forEach(([searchType, label]) => {
+    it(`facet label should be ${String(label)} for search type ${String(
+      searchType
+    )}`, () => {
+      assert.equal(availabilityFacetLabel(searchType), label)
     })
   })
 })

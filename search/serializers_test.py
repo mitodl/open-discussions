@@ -223,6 +223,8 @@ def test_es_course_run_serializer():
         "end_date": course_run.end_date.strftime(ISOFORMAT),
         "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
         "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
+        "earliest_start": course_run.earliest_start,
+        "earliest_end": course_run.earliest_end,
         "title": course_run.title,
         "image_src": course_run.image_src,
         "instructors": [
@@ -244,10 +246,6 @@ def test_es_course_serializer(offered_by):
     """
     course = CourseFactory.create(offered_by=offered_by)
     serialized = ESCourseSerializer(course).data
-    # coerce OrderDicts to dict (implementation detail of DRF)
-    serialized["course_runs"] = sorted(
-        map(dict, serialized["course_runs"]), key=lambda item: item["id"]
-    )
     assert serialized == {
         "object_type": COURSE_TYPE,
         "id": course.id,
@@ -259,31 +257,8 @@ def test_es_course_serializer(offered_by):
         "image_src": course.image_src,
         "topics": list(course.topics.values_list("name", flat=True)),
         "course_runs": [
-            {
-                "id": course_run.id,
-                "course_run_id": course_run.course_run_id,
-                "short_description": course_run.short_description,
-                "full_description": course_run.full_description,
-                "language": course_run.language,
-                "semester": course_run.semester,
-                "year": int(course_run.year),
-                "level": course_run.level,
-                "start_date": course_run.start_date.strftime(ISOFORMAT),
-                "end_date": course_run.end_date.strftime(ISOFORMAT),
-                "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
-                "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
-                "title": course_run.title,
-                "image_src": course_run.image_src,
-                "instructors": [
-                    " ".join([instructor.first_name, instructor.last_name])
-                    for instructor in course_run.instructors.all()
-                ],
-                "prices": list(course_run.prices.values("price", "mode")),
-                "published": True,
-                "availability": course_run.availability,
-                "offered_by": course_run.offered_by,
-            }
-            for course_run in sorted(course.course_runs.all(), key=lambda item: item.id)
+            ESCourseRunSerializer(course_run).data
+            for course_run in course.course_runs.order_by("-earliest_start")
         ],
         "published": True,
         "offered_by": course.offered_by,

@@ -203,7 +203,7 @@ describe("CourseSearchPage", () => {
       },
       {
         location: {
-          search: "q=text&p=ocw&t=Science&t=Engineering&a=prior"
+          search: "q=text&p=ocw&t=Science&t=Engineering&a=availableNow"
         }
       }
     )
@@ -215,10 +215,10 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:         LR_TYPE_ALL,
-          platform:     ["ocw"],
-          topics:       ["Science", "Engineering"],
-          availability: ["prior"]
+          type:           LR_TYPE_ALL,
+          platforms:      ["ocw"],
+          topics:         ["Science", "Engineering"],
+          availabilities: ["availableNow"]
         })
       )
     })
@@ -393,7 +393,7 @@ describe("CourseSearchPage", () => {
         Object.entries({
           platform:     [],
           topics:       ["Physics"],
-          availability: [],
+          availability: ["availableNow"],
           type:         LR_TYPE_ALL
         })
       )
@@ -438,15 +438,15 @@ describe("CourseSearchPage", () => {
   ;[false, true].forEach(isChecked => {
     it(`${shouldIf(
       isChecked
-    )} include a topic facet in search after checkbox change`, async () => {
+    )} include an availability facet in search after checkbox change`, async () => {
       const { inner } = await renderPage()
       inner.setState({
         text:         "some text",
         activeFacets: new Map(
           Object.entries({
             platform:     [],
-            topics:       isChecked ? [] : ["Science"],
-            availability: []
+            topics:       [],
+            availability: isChecked ? [] : ["next30"]
           })
         )
       })
@@ -454,8 +454,8 @@ describe("CourseSearchPage", () => {
       await inner.instance().onUpdateFacets({
         target: {
           checked: isChecked,
-          name:    "topics",
-          value:   "Science"
+          name:    "availability",
+          value:   "next30"
         }
       })
       sinon.assert.calledWith(helper.searchStub, {
@@ -467,8 +467,8 @@ describe("CourseSearchPage", () => {
         facets:      new Map(
           Object.entries({
             platform:     [],
-            topics:       isChecked ? ["Science"] : [],
-            availability: [],
+            topics:       [],
+            availability: isChecked ? ["next30"] : [],
             type:         LR_TYPE_ALL
           })
         )

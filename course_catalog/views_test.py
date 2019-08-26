@@ -43,7 +43,7 @@ def test_course_endpoint(client):
 
     resp = client.get(reverse("courses-list") + "upcoming/")
     assert resp.data.get("count") == 0
-    course_run = course.course_runs.all().order_by("-start_date")[0]
+    course_run = course.course_runs.order_by("-earliest_start")[0]
     course_run.start_date = timezone.now() + timedelta(days=1)
     course_run.save()
     resp = client.get(reverse("courses-list") + "upcoming/")

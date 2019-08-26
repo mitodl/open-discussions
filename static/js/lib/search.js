@@ -153,6 +153,29 @@ const LIST_QUERY_FIELDS = [
   "topics"
 ]
 
+export const AVAILABILITY_MAPPING = {
+  availableNow: {
+    label:  "Available Now",
+    filter: { to: "now" }
+  },
+  next30: {
+    label:  "In the next 30 days",
+    filter: { from: "now", to: "now+30d/d" }
+  },
+  next60: {
+    label:  "In the next 60 days",
+    filter: { from: "now+30d/d", to: "now+60d/d" }
+  },
+  next90: {
+    label:  "In the next 90 days",
+    filter: { from: "now+60d/d", to: "now+90d/d" }
+  },
+  over90: {
+    label:  "In over 90 days",
+    filter: { from: "now+90d/d" }
+  }
+}
+
 const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
@@ -257,7 +280,11 @@ export const buildSearchQuery = ({
     const facetClauses = []
     if (facets) {
       facets.forEach((values, key) => {
-        if (key !== OBJECT_TYPE && values && values.length > 0) {
+        if (
+          ![OBJECT_TYPE, "availability"].includes(key) &&
+          values &&
+          values.length > 0
+        ) {
           facetClauses.push({
             bool: {
               should: values.map(value => ({
@@ -268,12 +295,54 @@ export const buildSearchQuery = ({
             }
           })
         }
-        builder.agg(
-          "terms",
-          key === OBJECT_TYPE ? "object_type.keyword" : key,
-          { size: 10000 },
-          key
-        )
+        if (key === "availability") {
+          if (values && values.length > 0) {
+            facetClauses.push({
+              bool: {
+                should: values.map(value => ({
+                  nested: {
+                    path:  "course_runs",
+                    query: {
+                      range: {
+                        "course_runs.earliest_start":
+                          AVAILABILITY_MAPPING[value].filter
+                      }
+                    }
+                  }
+                }))
+              }
+            })
+          }
+          builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
+            aggr.agg(
+              "date_range",
+              "course_runs.earliest_start",
+              {
+                missing: "1901-01-01T00:00:00Z",
+                keyed:   false,
+                ranges:  [
+                  {
+                    key: "availableNow",
+                    ...AVAILABILITY_MAPPING.availableNow.filter
+                  },
+                  { key: "next30", ...AVAILABILITY_MAPPING.next30.filter },
+                  { key: "next60", ...AVAILABILITY_MAPPING.next60.filter },
+                  { key: "next90", ...AVAILABILITY_MAPPING.next90.filter },
+                  { key: "over90", ...AVAILABILITY_MAPPING.over90.filter }
+                ]
+              },
+              "runs",
+              aggr => aggr.agg("reverse_nested", null, {}, "courses")
+            )
+          )
+        } else {
+          builder.agg(
+            "terms",
+            key === OBJECT_TYPE ? "object_type.keyword" : key,
+            { size: 10000 },
+            key
+          )
+        }
       })
     }
 

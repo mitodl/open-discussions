@@ -72,6 +72,7 @@ export type LearningResourceRun = {
   prices:              Array<CoursePrice>
 }
 
+
 export type LearningResourceResult = {
   id:                  number,
   course_id?:          string,
