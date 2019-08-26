@@ -10,13 +10,7 @@ from notifications.factories import (
     NotificationSettingsFactory,
     EmailNotificationFactory,
 )
-from notifications.models import (
-    EmailNotification,
-    FREQUENCY_DAILY,
-    FREQUENCY_WEEKLY,
-    FREQUENCY_NEVER,
-    FREQUENCY_IMMEDIATE,
-)
+from notifications.models import EmailNotification, FREQUENCY_DAILY, FREQUENCY_WEEKLY
 from notifications.notifiers import frontpage
 from notifications.notifiers.exceptions import InvalidTriggerFrequencyError
 from open_discussions import features
@@ -93,6 +87,7 @@ def test_can_notify(
         and can_notify
         and has_posts
         and (not has_last_notification or has_posts_after)
+        and trigger_frequency in [FREQUENCY_DAILY, FREQUENCY_WEEKLY]
     )
     assert notifier.can_notify(notification) is expected
 
@@ -100,11 +95,19 @@ def test_can_notify(
         can_notify_mock.assert_called_once_with(notification)
 
 
-@pytest.mark.parametrize("trigger_frequency", [FREQUENCY_IMMEDIATE, FREQUENCY_NEVER])
-def test_can_notify_invalid_frequency(trigger_frequency):
+def test_can_notify_never():
+    """Verify it returns False for notifications set to never"""
+    notification_settings = NotificationSettingsFactory.create(
+        never=True, via_email=True
+    )
+    notifier = frontpage.FrontpageDigestNotifier(notification_settings)
+    assert notifier.can_notify(None) is False
+
+
+def test_can_notify_invalid_frequency():
     """Verify it raises an error for an invalid frequency"""
     notification_settings = NotificationSettingsFactory.create(
-        trigger_frequency=trigger_frequency, via_email=True
+        immediate=True, via_email=True
     )
     notifier = frontpage.FrontpageDigestNotifier(notification_settings)
     with pytest.raises(InvalidTriggerFrequencyError):

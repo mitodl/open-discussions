@@ -17,6 +17,7 @@ from notifications.models import (
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
 )
+from notifications.notifiers.exceptions import CancelNotificationError
 from notifications import api
 from open_discussions.factories import UserFactory
 
@@ -142,42 +143,47 @@ def test_send_unsent_email_notifications(mocker, settings):
     ).count() == len(notifications_ids)
 
 
-def test_send_email_notification_batch(mocker):
+@pytest.mark.parametrize("should_cancel", (True, False))
+@pytest.mark.parametrize(
+    "notification_type, notifier_fqn",
+    [
+        (
+            NOTIFICATION_TYPE_COMMENTS,
+            "notifications.notifiers.comments.CommentNotifier",
+        ),
+        (
+            NOTIFICATION_TYPE_FRONTPAGE,
+            "notifications.notifiers.frontpage.FrontpageDigestNotifier",
+        ),
+    ],
+)
+def test_send_email_notification_batch(
+    mocker, should_cancel, notification_type, notifier_fqn
+):
     """Verify send_email_notification_batch calls the notifier for each of the notifications it is given"""
-    frontpage_notifications = EmailNotificationFactory.create_batch(
-        50, frontpage_type=True
+    notifications = EmailNotificationFactory.create_batch(
+        5, notification_type=notification_type
     )
-    comment_notifications = EmailNotificationFactory.create_batch(
-        50, comments_type=True
-    )
-    notifications = comment_notifications + frontpage_notifications
-    notifications_ids = [note.id for note in notifications]
     for notification in notifications:
         NotificationSettingsFactory.create(
-            user=notification.user, notification_type=notification.notification_type
+            user=notification.user, notification_type=notification_type
         )
 
-    mock_frontpage_notifier = mocker.patch(
-        "notifications.notifiers.frontpage.FrontpageDigestNotifier"
-    ).return_value
-    mock_comment_notifier = mocker.patch(
-        "notifications.notifiers.comments.CommentNotifier"
-    ).return_value
+    mock_notifier = mocker.patch(notifier_fqn).return_value
 
-    api.send_email_notification_batch(notifications_ids)
+    if should_cancel:
+        mock_notifier.send_notification.side_effect = CancelNotificationError
 
-    assert mock_comment_notifier.send_notification.call_count == len(
-        comment_notifications
-    )
-    assert mock_frontpage_notifier.send_notification.call_count == len(
-        frontpage_notifications
-    )
+    api.send_email_notification_batch([note.id for note in notifications])
 
-    for notification in frontpage_notifications:
-        mock_frontpage_notifier.send_notification.assert_any_call(notification)
+    assert mock_notifier.send_notification.call_count == len(notifications)
 
-    for notification in comment_notifications:
-        mock_comment_notifier.send_notification.assert_any_call(notification)
+    for notification in notifications:
+        notification.refresh_from_db()
+        mock_notifier.send_notification.assert_any_call(notification)
+
+        if should_cancel:
+            assert notification.state == EmailNotification.STATE_CANCELED
 
 
 @pytest.mark.parametrize("post_id,comment_id", [("1", "4"), ("1", None)])

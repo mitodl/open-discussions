@@ -110,16 +110,16 @@ class FrontpageDigestNotifier(EmailNotifier):
         Returns:
             bool: True if we're due to send another notification
         """
-        return (
-            features.is_enabled(features.FRONTPAGE_EMAIL_DIGESTS)
-            and super().can_notify(last_notification)
-            and
+        if features.is_enabled(features.FRONTPAGE_EMAIL_DIGESTS) and super().can_notify(
+            last_notification
+        ):
+
             # do this last as it's expensive if the others are False anyway
             # check if we have posts since the last notification
-            bool(
+            return bool(
                 _posts_since_notification(self.notification_settings, last_notification)
             )
-        )
+        return False
 
     def _get_notification_data(
         self, current_notification, last_notification
