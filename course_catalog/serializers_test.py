@@ -12,6 +12,7 @@ from course_catalog.factories import (
     BootcampFactory,
     ProgramFactory,
     UserListFactory,
+    CourseRunFactory,
 )
 from course_catalog.models import ProgramItem, FavoriteItem
 from course_catalog.serializers import (
@@ -29,58 +30,54 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    "offered_by,has_runs",
+    "offered_by",
     [
-        [OfferedBy.mitx.value, True],
-        [OfferedBy.xpro.value, True],
-        [OfferedBy.micromasters.value, True],
-        [OfferedBy.ocw.value, False],
-        [OfferedBy.bootcamps.value, False],
+        OfferedBy.mitx.value,
+        OfferedBy.xpro.value,
+        OfferedBy.micromasters.value,
+        OfferedBy.ocw.value,
+        OfferedBy.bootcamps.value,
     ],
 )
-def test_serialize_course_related_models(offered_by, has_runs):
+def test_serialize_course_related_models(offered_by):
     """
     Verify that a serialized course contains attributes for related objects
     """
     course = CourseFactory(
-        offered_by=offered_by,
-        topics=CourseTopicFactory.create_batch(3),
+        offered_by=offered_by, topics=CourseTopicFactory.create_batch(3)
+    )
+    serializer = CourseSerializer(course)
+    assert len(serializer.data["topics"]) == 3
+    assert "name" in serializer.data["topics"][0].keys()
+    assert len(serializer.data["course_runs"]) == 3
+
+
+def test_serialize_courserun_related_models():
+    """
+    Verify that a serialized course run contains attributes for related objects
+    """
+    courserun = CourseRunFactory(
         prices=CoursePriceFactory.create_batch(2),
         instructors=CourseInstructorFactory.create_batch(2),
     )
-    serializer = CourseSerializer(course)
+    serializer = CourseRunSerializer(courserun)
     assert len(serializer.data["prices"]) == 2
     for attr in ("mode", "price"):
         assert attr in serializer.data["prices"][0].keys()
     assert len(serializer.data["instructors"]) == 2
     for attr in ("first_name", "last_name"):
         assert attr in serializer.data["instructors"][0].keys()
-    assert len(serializer.data["topics"]) == 3
-    assert "name" in serializer.data["topics"][0].keys()
-    assert (len(serializer.data["course_runs"]) > 0) == has_runs
-    assert serializer.data["course_runs"] == [
-        CourseRunSerializer(instance=run).data for run in course.course_runs.all()
-    ]
 
 
 def test_serialize_bootcamp_related_models():
     """
     Verify that a serialized bootcamp contains attributes for related objects
     """
-    bootcamp = BootcampFactory.create(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-        instructors=CourseInstructorFactory.create_batch(2),
-    )
+    bootcamp = BootcampFactory.create(topics=CourseTopicFactory.create_batch(3))
     serializer = BootcampSerializer(bootcamp)
-    assert len(serializer.data["prices"]) == 2
-    for attr in ("mode", "price"):
-        assert attr in serializer.data["prices"][0].keys()
-    assert len(serializer.data["instructors"]) == 2
-    for attr in ("first_name", "last_name"):
-        assert attr in serializer.data["instructors"][0].keys()
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
+    assert len(serializer.data["course_runs"]) == 3
 
 
 def test_generic_foreign_key_serializer():

@@ -8,7 +8,7 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms, LR_TYPE_COURSE } from "../lib/constants"
-import { minPrice } from "../lib/learning_resources"
+import { availabilityLabel, minPrice } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
@@ -21,6 +21,18 @@ const entities = new AllHtmlEntities()
 type Props = {
   object: Course | Bootcamp,
   objectType: string
+}
+
+const getStartDate = (isCourse: boolean, object: Object) => {
+  if (!isCourse || object.platform === platforms.edX) {
+    if (object.course_runs[0].start_date) {
+      return moment(object.course_runs[0].start_date).format("DD MMMM YYYY")
+    } else {
+      return availabilityLabel(object.course_runs[0].availability)
+    }
+  } else {
+    return "Ongoing"
+  }
 }
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
@@ -89,19 +101,16 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-value">
             {isCourse
               ? // $FlowFixMe: only courses will access semester
-              `${_.capitalize(object.semester)} `
+              `${_.capitalize(object.course_runs[0].semester)} `
               : null}
-            {object.year}
+            {object.course_runs[0].year}
           </div>
         </div>
         <div className="course-info-row">
           <i className="material-icons calendar_today">calendar_today</i>
           <div className="course-info-label">Start date:</div>
           <div className="course-info-value">
-            {// $FlowFixMe: only courses will access platform
-              !isCourse || object.platform === platforms.edX
-                ? moment(object.start_date).format("DD MMMM YYYY")
-                : "Ongoing"}
+            {getStartDate(isCourse, object)}
           </div>
         </div>
         <div className="course-info-row">
@@ -115,7 +124,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <div className="course-info-label">Level:</div>
             <div className="course-info-value">
               {// $FlowFixMe: only courses will access level
-                object.level || "Unspecified"}
+                object.course_runs[0].level || "Unspecified"}
             </div>
           </div>
         ) : null}
@@ -124,7 +133,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-label">Instructors:</div>
           <div className="course-info-value">
             {_.join(
-              object.instructors.map(
+              object.course_runs[0].instructors.map(
                 instructor =>
                   `Prof. ${instructor.first_name} ${instructor.last_name}`
               ),
@@ -136,7 +145,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <i className="material-icons language">language</i>
           <div className="course-info-label">Language:</div>
           <div className="course-info-value">
-            {languageName(object.language)}
+            {languageName(
+              object.course_runs ? object.course_runs[0].language : "en"
+            )}
           </div>
         </div>
       </div>

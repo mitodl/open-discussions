@@ -12,7 +12,7 @@ from ocw_data_parser import OCWParser
 
 from open_discussions.celery import app
 from course_catalog.constants import PlatformType
-from course_catalog.models import Course
+from course_catalog.models import Course, CourseRun
 from course_catalog.api import (
     get_access_token,
     parse_mitx_json_data,
@@ -22,7 +22,7 @@ from course_catalog.api import (
     format_date,
     generate_course_prefix_list,
     tag_edx_course_program,
-    parse_bootcamp_json_data_bootcamp,
+    parse_bootcamp_json_data,
 )
 
 
@@ -115,7 +115,7 @@ def get_ocw_data(
     for course_prefix in sorted(ocw_courses):
         loaded_raw_jsons_for_course = []
         last_modified_dates = []
-        course_id = None
+        uid = None
         is_published = True
         log.info("Syncing: %s ...", course_prefix)
         # Collect last modified timestamps for all course files of the course
@@ -124,7 +124,7 @@ def get_ocw_data(
             if obj.key == course_prefix + "0/1.json":
                 try:
                     first_json = safe_load_json(get_s3_object_and_read(obj), obj.key)
-                    course_id = first_json.get("_uid")
+                    uid = first_json.get("_uid")
                     last_published_to_production = format_date(
                         first_json.get("last_published_to_production", None)
                     )
@@ -142,23 +142,13 @@ def get_ocw_data(
                     )
             # accessing last_modified from s3 object summary is fast (does not download file contents)
             last_modified_dates.append(obj.last_modified)
-        if not course_id:
+        if not uid:
             # skip if we're unable to fetch course's uid
             log.info("Skipping %s, no course_id", course_prefix)
             continue
         # get the latest modified timestamp of any file in the course
         last_modified = max(last_modified_dates)
 
-        # if course synced before, update existing Course instance
-        course_instance = Course.objects.filter(course_id=course_id).first()
-        # Make sure that the data we are syncing is newer than what we already have
-        if (
-            course_instance
-            and last_modified <= course_instance.last_modified
-            and not force_overwrite
-        ):
-            log.info("Already synced. No changes found for %s", course_prefix)
-            continue
         try:
             # fetch JSON contents for each course file in memory (slow)
             for obj in sorted(
@@ -168,8 +158,31 @@ def get_ocw_data(
                 loaded_raw_jsons_for_course.append(
                     safe_load_json(get_s3_object_and_read(obj), obj.key)
                 )
+
             # pass course contents into parser
             parser = OCWParser("", "", loaded_raw_jsons_for_course)
+            course_json = parser.get_master_json()
+            course_json["uid"] = uid
+            course_json["course_id"] = "{}.{}".format(
+                course_json.get("department_number"),
+                course_json.get("master_course_number"),
+            )
+
+            # if course run synced before, update existing Course instance
+            courserun_instance = CourseRun.objects.filter(course_run_id=uid).first()
+
+            # Make sure that the data we are syncing is newer than what we already have
+            if (
+                courserun_instance
+                and last_modified <= courserun_instance.last_modified
+                and not force_overwrite
+            ):
+                log.info("Already synced. No changes found for %s", course_prefix)
+                continue
+
+            course_instance = Course.objects.filter(
+                course_id=course_json["course_id"]
+            ).first()
             if upload_to_s3 and is_published:
                 # Upload all course media to S3 before serializing course to ensure the existence of links
                 parser.setup_s3_uploading(
@@ -224,7 +237,7 @@ def upload_ocw_master_json():
 
 
 @app.task
-def get_bootcamp_data():
+def get_bootcamp_data(force_overwrite=False):
     """
     Task to create/update courses from bootcamp.json
     """
@@ -236,4 +249,4 @@ def get_bootcamp_data():
     if response.status_code == 200:
         bootcamp_json = response.json()
         for bootcamp in bootcamp_json:
-            parse_bootcamp_json_data_bootcamp(bootcamp)
+            parse_bootcamp_json_data(bootcamp, force_overwrite=force_overwrite)

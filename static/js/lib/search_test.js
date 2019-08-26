@@ -114,15 +114,14 @@ describe("search functions", () => {
     const result = makeCourseResult()
     const course = searchResultToLearningResource(result)
     assert.deepEqual(course, {
-      id:           result.id,
-      title:        result.title,
-      image_src:    result.image_src,
-      platform:     result.platform,
-      topics:       result.topics.map(topic => ({ name: topic })),
-      availability: result.availability,
-      prices:       result.prices,
-      object_type:  LR_TYPE_COURSE,
-      offered_by:   result.offered_by
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    result.platform,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_COURSE,
+      offered_by:  result.offered_by,
+      course_runs: result.course_runs
     })
   })
 
@@ -130,15 +129,14 @@ describe("search functions", () => {
     const result = makeBootcampResult()
     const bootcamp = searchResultToLearningResource(result)
     assert.deepEqual(bootcamp, {
-      id:           result.id,
-      title:        result.title,
-      image_src:    result.image_src,
-      platform:     null,
-      topics:       result.topics.map(topic => ({ name: topic })),
-      availability: result.availability,
-      prices:       result.prices,
-      object_type:  LR_TYPE_BOOTCAMP,
-      offered_by:   "bootcamps"
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    null,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_BOOTCAMP,
+      offered_by:  "bootcamps",
+      course_runs: result.course_runs
     })
   })
 

@@ -40,21 +40,22 @@ class Command(BaseCommand):
             for course in Course.objects.filter(platform="ocw"):
                 course.delete()
                 delete_course(course)
-        task = get_ocw_data.delay(
-            force_overwrite=options["force_overwrite"],
-            upload_to_s3=options["upload_to_s3"],
-        )
-        self.stdout.write(
-            "Started task {task} to get ocw course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(
-                task=task,
-                overwrite=options["force_overwrite"],
-                s3=options["upload_to_s3"],
+        else:
+            task = get_ocw_data.delay(
+                force_overwrite=options["force_overwrite"],
+                upload_to_s3=options["upload_to_s3"],
             )
-        )
-        self.stdout.write("Waiting on task...")
-        start = now_in_utc()
-        task.get()
-        total_seconds = (now_in_utc() - start).total_seconds()
-        self.stdout.write(
-            "Population of ocw data finished, took {} seconds".format(total_seconds)
-        )
+            self.stdout.write(
+                "Started task {task} to get ocw course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(
+                    task=task,
+                    overwrite=options["force_overwrite"],
+                    s3=options["upload_to_s3"],
+                )
+            )
+            self.stdout.write("Waiting on task...")
+            start = now_in_utc()
+            task.get()
+            total_seconds = (now_in_utc() - start).total_seconds()
+            self.stdout.write(
+                "Population of ocw data finished, took {} seconds".format(total_seconds)
+            )

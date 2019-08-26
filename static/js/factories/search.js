@@ -5,8 +5,6 @@ import R from "ramda"
 
 import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
 import {
-  COURSE_ARCHIVED,
-  COURSE_CURRENT,
   platforms,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
@@ -19,6 +17,7 @@ import type {
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
+import { makeCourseRun } from "./learning_resources"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -85,20 +84,9 @@ export const makeCourseResult = (): LearningResourceResult => ({
   full_description:  casual.description,
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
   offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
-  language:          casual.random_element(["en-US", "fr", null]),
-  semester:          casual.random_element(["Fall", "Spring", null]),
-  year:              casual.year,
-  level:             casual.random_element(["Graduate", "Undergraduate", null]),
-  start_date:        casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  instructors:       ["instuctor 1", "instructor 2"],
   topics:            [casual.word, casual.word],
-  prices:            [{ mode: "audit", price: casual.number }],
   object_type:       LR_TYPE_COURSE,
-  availability:
-    casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
+  course_runs:       R.times(makeCourseRun, 3)
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
@@ -109,19 +97,10 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   full_description:  casual.description,
-  language:          casual.random_element(["en-US", "fr", null]),
-  year:              casual.year,
-  start_date:        casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  end_date:          casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  enrollment_start:  casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  enrollment_end:    casual.date("YYYY-MM-DD[T]HH:mm:ss[Z]"),
-  instructors:       ["instuctor 1", "instructor 2"],
   topics:            [casual.word, casual.word],
-  prices:            [{ mode: "audit", price: casual.number }],
   object_type:       LR_TYPE_BOOTCAMP,
   offered_by:        "bootcamps",
-  availability:
-    casual.random_element[(COURSE_ARCHIVED, COURSE_CURRENT, "Upcoming")]
+  course_runs:       [makeCourseRun()]
 })
 
 export const makeLearningResourceResult = (objectType: string) => {

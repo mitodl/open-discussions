@@ -29,8 +29,11 @@ describe("Course utils", () => {
   ].forEach(([availability, expected]) => {
     it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
-      course.availability = availability
-      assert.equal(availabilityLabel(course.availability), expected)
+      course.course_runs[0].availability = availability
+      assert.equal(
+        availabilityLabel(course.course_runs[0].availability),
+        expected
+      )
     })
   })
 
@@ -44,11 +47,11 @@ describe("Course utils", () => {
   ].forEach(([prices, expectedMax, expectedMin]) => {
     it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
       const course = makeCourse()
-      course.prices = []
+      course.course_runs[0].prices = []
       prices.forEach(price => {
         if (!isNaN(price)) {
           // $FlowFixMe: course.prices is definitely not null here
-          course.prices.push({
+          course.course_runs[0].prices.push({
             mode:  "test",
             price: price
           })

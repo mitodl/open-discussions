@@ -229,7 +229,6 @@ def test_es_course_run_serializer():
             " ".join([instructor.first_name, instructor.last_name])
             for instructor in course_run.instructors.all()
         ],
-        "topics": list(course_run.topics.values_list("name", flat=True)),
         "prices": list(course_run.prices.values("price", "mode")),
         "published": True,
         "availability": course_run.availability,
@@ -256,20 +255,9 @@ def test_es_course_serializer(offered_by):
         "short_description": course.short_description,
         "full_description": course.full_description,
         "platform": course.platform,
-        "language": course.language,
-        "semester": course.semester,
-        "year": int(course.year),
-        "level": course.level,
-        "start_date": course.start_date.strftime(ISOFORMAT),
-        "end_date": course.end_date.strftime(ISOFORMAT),
-        "enrollment_start": course.enrollment_start.strftime(ISOFORMAT),
-        "enrollment_end": course.enrollment_end.strftime(ISOFORMAT),
         "title": course.title,
         "image_src": course.image_src,
-        "instructors": [
-            " ".join([instructor.first_name, instructor.last_name])
-            for instructor in course.instructors.all()
-        ],
+        "topics": list(course.topics.values_list("name", flat=True)),
         "course_runs": [
             {
                 "id": course_run.id,
@@ -290,7 +278,6 @@ def test_es_course_serializer(offered_by):
                     " ".join([instructor.first_name, instructor.last_name])
                     for instructor in course_run.instructors.all()
                 ],
-                "topics": list(course_run.topics.values_list("name", flat=True)),
                 "prices": list(course_run.prices.values("price", "mode")),
                 "published": True,
                 "availability": course_run.availability,
@@ -298,10 +285,7 @@ def test_es_course_serializer(offered_by):
             }
             for course_run in sorted(course.course_runs.all(), key=lambda item: item.id)
         ],
-        "topics": list(course.topics.values_list("name", flat=True)),
-        "prices": list(course.prices.values("price", "mode")),
         "published": True,
-        "availability": course.availability,
         "offered_by": course.offered_by,
     }
 

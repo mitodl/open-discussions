@@ -59,7 +59,7 @@ export function NewCoursesWidget(props: Props) {
                 <Dotdotdot clamp={2}>{course.title}</Dotdotdot>
               </div>
               <div className="availability-and-platform">
-                {availabilityLabel(course.availability)} |{" "}
+                {availabilityLabel(course.course_runs[0].availability)} |{" "}
                 {course.platform.toUpperCase()}
               </div>
             </div>
@@ -84,9 +84,10 @@ const mapStateToProps = (state: Object): StateProps => {
     querySelectors.isFinished(state.queries, newCoursesRequest())
 
   return {
-    courses: loaded
-      ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
-      : [],
+    courses:
+      loaded && newCourses && upcomingCourses
+        ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
+        : [],
     loaded
   }
 }

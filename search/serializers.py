@@ -1,6 +1,7 @@
 """Serializers for elasticsearch data"""
 import logging
 
+from django.db.models import Prefetch
 from prawcore import NotFound
 from rest_framework import serializers
 
@@ -267,7 +268,6 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
 
     prices = serializers.SerializerMethodField()
     instructors = serializers.SerializerMethodField()
-    topics = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
 
     def get_prices(self, course_run):
@@ -283,12 +283,6 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
         return [
             " ".join([i.first_name, i.last_name]) for i in course_run.instructors.all()
         ]
-
-    def get_topics(self, course_run):
-        """
-        Get the topic names for a course run
-        """
-        return [topic.name for topic in course_run.topics.all()]
 
     def get_availability(self, course_run):
         """
@@ -315,7 +309,6 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
             "enrollment_end",
             "title",
             "image_src",
-            "topics",
             "prices",
             "instructors",
             "published",
@@ -333,38 +326,14 @@ class ESCourseSerializer(ESModelSerializer):
 
     object_type = COURSE_TYPE
 
-    prices = serializers.SerializerMethodField()
-    instructors = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
-    availability = serializers.SerializerMethodField()
-
-    course_runs = ESCourseRunSerializer(many=True, allow_null=True)
-
-    def get_prices(self, course):
-        """
-        Get the prices for a course
-        """
-        return list(course.prices.values("price", "mode"))
-
-    def get_instructors(self, course):
-        """
-        Get a list of instructor names for the course
-        """
-        return [" ".join([i.first_name, i.last_name]) for i in course.instructors.all()]
+    course_runs = ESCourseRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_topics(self, course):
         """
         Get the topic names for a course
         """
         return [topic.name for topic in course.topics.all()]
-
-    def get_availability(self, course):
-        """
-        Get the availability for a course
-        """
-        if course.availability:
-            return course.availability.title()
-        return None
 
     class Meta:
         model = Course
@@ -374,21 +343,10 @@ class ESCourseSerializer(ESModelSerializer):
             "short_description",
             "full_description",
             "platform",
-            "language",
-            "semester",
-            "year",
-            "level",
-            "start_date",
-            "end_date",
-            "enrollment_start",
-            "enrollment_end",
             "title",
             "image_src",
             "topics",
-            "prices",
-            "instructors",
             "published",
-            "availability",
             "offered_by",
             "course_runs",
         ]
@@ -403,6 +361,8 @@ class ESBootcampSerializer(ESCourseSerializer):
 
     object_type = BOOTCAMP_TYPE
 
+    course_runs = ESCourseRunSerializer(many=True)
+
     class Meta:
         model = Bootcamp
         fields = [
@@ -410,20 +370,12 @@ class ESBootcampSerializer(ESCourseSerializer):
             "course_id",
             "short_description",
             "full_description",
-            "language",
-            "year",
-            "start_date",
-            "end_date",
-            "enrollment_start",
-            "enrollment_end",
             "title",
             "image_src",
             "topics",
-            "prices",
-            "instructors",
             "published",
-            "availability",
             "offered_by",
+            "course_runs",
         ]
 
         read_only_fields = fields
@@ -599,7 +551,13 @@ def serialize_bulk_courses(ids):
         ids(list of int): List of course id's
     """
     for course in Course.objects.filter(id__in=ids).prefetch_related(
-        "instructors", "topics"
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.order_by(
+                "-enrollment_start", "-start_date", "-year"
+            ),
+        ),
     ):
         yield serialize_course_for_bulk(course)
 
@@ -625,7 +583,13 @@ def serialize_bulk_bootcamps(ids):
         ids(list of int): List of bootcamp id's
     """
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
-        "instructors", "topics"
+        "topics",
+        Prefetch(
+            "course_runs",
+            queryset=CourseRun.objects.order_by(
+                "-enrollment_start", "-start_date", "-year"
+            ),
+        ),
     ):
         yield serialize_bootcamp_for_bulk(bootcamp)
 

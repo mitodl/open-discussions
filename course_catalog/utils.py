@@ -59,18 +59,21 @@ def get_year_and_semester(course_run):
         tuple (str, str): year, semester
 
     """
-    match = re.search(
-        "[1|2|3]T[0-9]{4}", course_run.get("key")
-    )  # e.g. "3T2019" -> Semester "3", Year "2019"
-    if match:
-        year = int(match.group(0)[-4:])
-        semester = semester_mapping.get(match.group(0)[-6:-4])
-    else:
-        semester = None
-        if course_run.get("start"):
-            year = course_run.get("start")[:4]
+    year = course_run.get("year")
+    semester = course_run.get("semester")
+    if not semester and not year:
+        match = re.search(
+            "[1|2|3]T[0-9]{4}", course_run.get("key")
+        )  # e.g. "3T2019" -> Semester "3", Year "2019"
+        if match:
+            year = int(match.group(0)[-4:])
+            semester = semester_mapping.get(match.group(0)[-6:-4])
         else:
-            year = None
+            semester = None
+            if course_run.get("start"):
+                year = course_run.get("start")[:4]
+            else:
+                year = None
     return year, semester
 
 

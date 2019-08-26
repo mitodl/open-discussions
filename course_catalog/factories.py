@@ -3,7 +3,6 @@ import random
 from datetime import timedelta
 
 import factory
-from factory import SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 import pytz
@@ -85,11 +84,63 @@ class LearningResourceFactory(DjangoModelFactory):
 class AbstractCourseFactory(LearningResourceFactory):
     """Factory for AbstractCourse subclasses"""
 
-    year = factory.Faker("year")
     full_description = factory.Faker("text")
     image_src = factory.Faker("image_url")
     image_description = factory.Faker("text", max_nb_chars=300)
 
+    last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
+
+    url = factory.Faker("uri")
+
+    class Meta:
+        abstract = True
+
+
+class CourseFactory(AbstractCourseFactory):
+    """Factory for Courses"""
+
+    course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
+    platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
+    offered_by = FuzzyChoice(
+        (
+            OfferedBy.mitx.value,
+            OfferedBy.ocw.value,
+            OfferedBy.micromasters.value,
+            OfferedBy.xpro.value,
+        )
+    )
+    course_runs = factory.RelatedFactoryList(
+        "course_catalog.factories.CourseRunFactory", "content_object", size=3
+    )
+
+    class Meta:
+        model = Course
+
+    class Params:
+        is_mitx = factory.Trait(offered_by=OfferedBy.mitx.value)
+        is_micromasters = factory.Trait(offered_by=OfferedBy.micromasters.value)
+        is_xpro = factory.Trait(offered_by=OfferedBy.xpro.value)
+        is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
+
+
+class CourseRunFactory(DjangoModelFactory):
+    """Factory for CourseRuns"""
+
+    course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
+    content_object = factory.SubFactory(CourseFactory)
+    object_id = factory.SelfAttribute("content_object.id")
+    content_type = factory.LazyAttribute(
+        lambda o: ContentType.objects.get_for_model(o.content_object)
+    )
+
+    availability = FuzzyChoice(
+        (
+            AvailabilityType.current.value,
+            AvailabilityType.upcoming.value,
+            AvailabilityType.starting_soon.value,
+            AvailabilityType.archived.value,
+        )
+    )
     enrollment_start = factory.Faker("date_time", tzinfo=pytz.utc)
     enrollment_end = factory.LazyAttribute(
         lambda obj: obj.enrollment_start + timedelta(days=45)
@@ -98,12 +149,8 @@ class AbstractCourseFactory(LearningResourceFactory):
         lambda obj: obj.enrollment_start + timedelta(days=15)
     )
     end_date = factory.LazyAttribute(lambda obj: obj.start_date + timedelta(days=90))
-
-    last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
-
     language = factory.Faker("word")
-
-    url = factory.Faker("uri")
+    year = factory.Faker("year")
 
     @factory.post_generation
     def instructors(self, create, extracted, **kwargs):
@@ -131,72 +178,6 @@ class AbstractCourseFactory(LearningResourceFactory):
             self.prices.add(price)
 
     class Meta:
-        abstract = True
-
-
-class CourseFactory(AbstractCourseFactory):
-    """Factory for Courses"""
-
-    course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
-    platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
-    availability = FuzzyChoice(
-        (
-            AvailabilityType.current.value,
-            AvailabilityType.upcoming.value,
-            AvailabilityType.starting_soon.value,
-            AvailabilityType.archived.value,
-        )
-    )
-    offered_by = FuzzyChoice(
-        (
-            OfferedBy.mitx.value,
-            OfferedBy.ocw.value,
-            OfferedBy.micromasters.value,
-            OfferedBy.xpro.value,
-        )
-    )
-
-    course_runs = factory.Maybe(
-        factory.LazyAttribute(
-            lambda o: o.offered_by
-            in [
-                OfferedBy.micromasters.value,
-                OfferedBy.mitx.value,
-                OfferedBy.xpro.value,
-            ]
-        ),
-        yes_declaration=factory.RelatedFactoryList(
-            "course_catalog.factories.CourseRunFactory", "course", size=3
-        ),
-        no_declaration=None,
-    )
-
-    class Meta:
-        model = Course
-
-    class Params:
-        is_mitx = factory.Trait(offered_by=OfferedBy.mitx.value)
-        is_micromasters = factory.Trait(offered_by=OfferedBy.micromasters.value)
-        is_xpro = factory.Trait(offered_by=OfferedBy.xpro.value)
-        is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
-
-
-class CourseRunFactory(AbstractCourseFactory):
-    """Factory for CourseRuns"""
-
-    course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
-    course = SubFactory(CourseFactory)
-
-    availability = FuzzyChoice(
-        (
-            AvailabilityType.current.value,
-            AvailabilityType.upcoming.value,
-            AvailabilityType.starting_soon.value,
-            AvailabilityType.archived.value,
-        )
-    )
-
-    class Meta:
         model = CourseRun
 
 
@@ -204,15 +185,11 @@ class BootcampFactory(AbstractCourseFactory):
     """Factory for Bootcamps"""
 
     course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
-    availability = FuzzyChoice(
-        (
-            AvailabilityType.current.value,
-            AvailabilityType.upcoming.value,
-            AvailabilityType.starting_soon.value,
-            AvailabilityType.archived.value,
-        )
-    )
     offered_by = OfferedBy.bootcamps.value
+
+    course_runs = factory.RelatedFactoryList(
+        "course_catalog.factories.CourseRunFactory", "content_object", size=3
+    )
 
     class Meta:
         model = Bootcamp

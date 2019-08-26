@@ -16,6 +16,7 @@ import {
 import type {
   Bootcamp,
   Course,
+  CourseRun,
   Program,
   UserList
 } from "../flow/discussionTypes"
@@ -24,6 +25,37 @@ const incrCourse = incrementer()
 const courseId: any = incrementer()
 
 const dateFormat = "YYYY-MM-DD[T]HH:mm:ss[Z]"
+
+const incrCourseRun = incrementer()
+
+export const makeCourseRun = (): CourseRun => {
+  return {
+    // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+    course_run_id:     `courserun_${incrCourseRun.next().value}`,
+    id:                casual.integer,
+    url:               casual.url,
+    image_src:         "http://image.medium.url",
+    short_description: casual.description,
+    language:          casual.random_element(["en-US", "fr", null]),
+    semester:          casual.random_element(["Fall", "Spring", null]),
+    year:              casual.year,
+    level:             casual.random_element(["Graduate", "Undergraduate", null]),
+    start_date:        casual.date(dateFormat),
+    end_date:          casual.date(dateFormat),
+    enrollment_start:  casual.date(dateFormat),
+    enrollment_end:    casual.date(dateFormat),
+    availability:      casual.random_element([
+      COURSE_ARCHIVED,
+      COURSE_CURRENT,
+      "Upcoming"
+    ]),
+    instructors: [
+      { first_name: casual.name, last_name: casual.name },
+      { first_name: casual.name, last_name: casual.name }
+    ],
+    prices: [{ mode: "audit", price: casual.number }]
+  }
+}
 
 export const makeCourse = (): Course => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
@@ -36,26 +68,9 @@ export const makeCourse = (): Course => ({
   full_description:  casual.description,
   offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
-  language:          casual.random_element(["en-US", "fr", null]),
-  semester:          casual.random_element(["Fall", "Spring", null]),
-  year:              casual.year,
-  level:             casual.random_element(["Graduate", "Undergraduate", null]),
-  start_date:        casual.date(dateFormat),
-  end_date:          casual.date(dateFormat),
-  enrollment_start:  casual.date(dateFormat),
-  enrollment_end:    casual.date(dateFormat),
   is_favorite:       casual.boolean,
-  availability:      casual.random_element([
-    COURSE_ARCHIVED,
-    COURSE_CURRENT,
-    "Upcoming"
-  ]),
-  instructors: [
-    { first_name: casual.name, last_name: casual.name },
-    { first_name: casual.name, last_name: casual.name }
-  ],
-  topics: [{ name: casual.word }, { name: casual.word }],
-  prices: [{ mode: "audit", price: casual.number }]
+  topics:            [{ name: casual.word }, { name: casual.word }],
+  course_runs:       R.times(makeCourseRun, 3)
 })
 
 const incrBootcamp = incrementer()
@@ -70,27 +85,10 @@ export const makeBootcamp = (): Bootcamp => ({
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   full_description:  casual.description,
-  language:          casual.random_element(["en-US", "fr", null]),
-  semester:          casual.random_element(["Fall", "Spring", null]),
-  year:              casual.year,
-  level:             casual.random_element(["Graduate", "Undergraduate", null]),
-  start_date:        casual.date(dateFormat),
-  end_date:          casual.date(dateFormat),
-  enrollment_start:  casual.date(dateFormat),
-  enrollment_end:    casual.date(dateFormat),
   is_favorite:       casual.boolean,
   offered_by:        "bootcamps",
-  availability:      casual.random_element([
-    COURSE_ARCHIVED,
-    COURSE_CURRENT,
-    "Upcoming"
-  ]),
-  instructors: [
-    { first_name: casual.name, last_name: casual.name },
-    { first_name: casual.name, last_name: casual.name }
-  ],
-  topics: [{ name: casual.word }, { name: casual.word }],
-  prices: [{ mode: "audit", price: casual.number }]
+  topics:            [{ name: casual.word }, { name: casual.word }],
+  course_runs:       R.times(makeCourseRun, 3)
 })
 
 const incrProgram = incrementer()

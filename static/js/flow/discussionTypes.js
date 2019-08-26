@@ -326,26 +326,12 @@ export type LearningResourceSummary = {
   image_src:          ?string,
   platform:           ?string,
   topics:             Array<CourseTopic>,
-  availability:       ?string,
   offered_by:         ?string,
   object_type:        string,
-  prices:             Array<CoursePrice>,
+  course_runs:       Array<CourseRun>
 }
 
-export type LearningResource = {
-  id:                 number,
-  title:              string,
-  image_src:          ?string,
-  short_description:  ?string,
-  topics:             Array<CourseTopic>,
-  offered_by:         ?string
-}
-
-export type Course = LearningResource & {
-  course_id:          string,
-  url:                ?string,
-  full_description:   ?string,
-  platform:           string,
+export type CourseRun = {
   language:           ?string,
   semester:           ?string,
   year:               ?string,
@@ -356,38 +342,47 @@ export type Course = LearningResource & {
   enrollment_end:     ?string,
   instructors:        Array<CourseInstructor>,
   prices:             Array<CoursePrice>,
-  availability:       ?string,
+  availability:       ?string
+}
+
+
+export type LearningResource = {
+  id:                 number,
+  title:              string,
+  image_src:          ?string,
+  short_description:  ?string,
+  topics:             Array<CourseTopic>,
+  offered_by:         ?string,
   is_favorite:        boolean
 }
 
-export type Bootcamp = LearningResource & {
+
+export type Course = LearningResource & {
   course_id:          string,
   url:                ?string,
   full_description:   ?string,
-  language:           ?string,
-  year:               ?string,
-  start_date:         ?string,
-  end_date:           ?string,
-  enrollment_start:   ?string,
-  enrollment_end:     ?string,
-  instructors:        Array<CourseInstructor>,
-  prices:             Array<CoursePrice>,
-  availability:       ?string,
-  is_favorite:        boolean
+  platform:           string,
+  course_runs:        Array<CourseRun>
+}
+
+export type Bootcamp = LearningResource & {
+  id:                 number,
+  course_id:          string,
+  url:                ?string,
+  full_description:   ?string,
+  course_runs:        Array<CourseRun>
 }
 
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<Course>,
-  is_favorite:        boolean
+  items:              Array<Course>
 }
 
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<Course | Bootcamp | Program | UserList>,
-  is_favorite:        boolean
+  items:              Array<Course | Bootcamp | Program | UserList>
 }
 
 export type CoursePrice = {

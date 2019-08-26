@@ -11,19 +11,18 @@ import { makeLearningResource } from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platformLogoUrls,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   platformReadableNames,
-  platforms
+  platforms,
+  COURSE_AVAILABLE_NOW
 } from "../lib/constants"
 import {
   embedlyThumbnail,
   starSelectedURL,
   starUnselectedURL
 } from "../lib/url"
-import { configureShallowRenderer } from "../lib/test_utils"
 
 describe("LearningResourceCard", () => {
   let course, sandbox, setShowResourceDrawerStub, toggleFavoriteStub
@@ -145,13 +144,19 @@ describe("LearningResourceCard", () => {
     })
   })
 
-  it("should render availability", () => {
-    assert.include(
-      render()
-        .find(".availability")
-        .text(),
-      availabilityLabel(course.availability)
-    )
+  LR_TYPE_ALL.forEach(objectType => {
+    it(`should render availability for a ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      assert.equal(
+        render({ object })
+          .find(".availability")
+          .text()
+          .replace("calendar_today", ""),
+        [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].includes(objectType)
+          ? availabilityLabel(object.course_runs[0].availability)
+          : COURSE_AVAILABLE_NOW
+      )
+    })
   })
 
   it("should render price", () => {

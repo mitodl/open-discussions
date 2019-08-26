@@ -112,7 +112,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         dateValue,
         course.platform === "ocw"
           ? "Ongoing"
-          : moment(course.start_date).format("DD MMMM YYYY")
+          : moment(course.course_runs[0].start_date).format("DD MMMM YYYY")
       )
     })
   })
@@ -124,7 +124,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       .closest(".course-info-row")
       .find(".course-info-value")
       .text()
-    course.instructors.forEach(instructor => {
+    course.course_runs[0].instructors.forEach(instructor => {
       assert.ok(
         instructorText.includes(
           `${instructor.first_name} ${instructor.last_name}`
@@ -144,7 +144,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should display the correct language name for ${String(
       langCode
     )}`, () => {
-      course.language = langCode
+      course.course_runs[0].language = langCode
       const wrapper = render()
       assert.equal(
         wrapper
@@ -170,7 +170,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       .closest(".course-info-row")
       .find(".course-info-label")
       .text()
-    assert.equal(historyValue, bootcamp.year)
+    assert.equal(historyValue, bootcamp.course_runs[0].year)
     assert.equal(historyLabel, "As taught in:")
   })
 

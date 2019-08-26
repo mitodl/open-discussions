@@ -31,7 +31,7 @@ describe("NewCoursesWidget", () => {
           .text()
         assert.include(
           availabilityAndPlatform,
-          availabilityLabel(course.availability)
+          availabilityLabel(course.course_runs[0].availability)
         )
         assert.include(availabilityAndPlatform, course.platform.toUpperCase())
       }

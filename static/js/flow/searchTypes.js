@@ -1,5 +1,5 @@
 // @flow
-import type {CoursePrice, PostType} from './discussionTypes'
+import type {CourseInstructor, CoursePrice, PostType} from './discussionTypes'
 
 type ResultCommon = {
   author_avatar_small: string,
@@ -57,17 +57,8 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-export type LearningResourceResult = {
-  id:                  number,
-  course_id?:          string,
-  url?:                string,
-  title:               string,
-  image_src:           ?string,
-  object_type:         string,
-  short_description?:  ?string,
-  full_description?:   ?string,
-  platform?:           string,
-  offered_by?:         ?string,
+
+export type LearningResourceRun = {
   language?:           ?string,
   semester?:           ?string,
   year?:               ?string,
@@ -77,10 +68,25 @@ export type LearningResourceResult = {
   enrollment_start?:   ?string,
   enrollment_end?:     ?string,
   availability?:       ?string,
-  instructors?:        Array<string>,
-  topics:              Array<string>,
-  prices?:             Array<CoursePrice>
+  instructors:         Array<CourseInstructor>,
+  prices:              Array<CoursePrice>
 }
+
+export type LearningResourceResult = {
+  id:                  number,
+  course_id?:          string,
+  url?:                string,
+  title:               string,
+  image_src:           ?string,
+  object_type:         string,
+  offered_by?:         ?string,
+  short_description?:  ?string,
+  full_description?:   ?string,
+  platform?:           string,
+  topics:              Array<string>,
+  course_runs:         Array<LearningResourceRun>
+}
+
 
 export type FacetBucket = {
   key:       string,

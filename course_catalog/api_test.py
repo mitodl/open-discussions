@@ -17,6 +17,7 @@ from course_catalog.models import (
     CourseInstructor,
     CoursePrice,
     CourseTopic,
+    Bootcamp,
 )
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
@@ -26,6 +27,7 @@ from course_catalog.api import (
     get_course_availability,
     should_skip_course,
     tag_edx_course_program,
+    parse_bootcamp_json_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -41,6 +43,135 @@ def mitx_valid_data():
         return json.load(test_data)
 
 
+@pytest.fixture
+def ocw_valid_data():
+    """
+    Test OCW course data
+    """
+    return {
+        "uid": "e9387c256bae4ca99cce88fd8b7f8272",
+        "department_number": "2",
+        "master_course_number": "101",
+        "course_id": "2.101",
+        "title": "Undergraduate Thesis Tutorial",
+        "description": "<p>This course is a series of lectures on prospectus and thesis writing</p>",
+        "course_level": "Undergraduate",
+        "from_semester": "Fall",
+        "from_year": "2015",
+        "language": "en-US",
+        "image_src": "https://s3.us-east-2.amazonaws.com/alizagarantestbucket/test_folder/"
+        "f49d46243a5c035597e75941ffec830a_22-thtf15.jpg",
+        "image_description": "Photo of hardbound academic theses on library shelves.",
+        "platform": "OCW",
+        "creation_date": "2016-01-08 22:35:55.151996+00:00",
+        "expiration_date": None,
+        "raw_json": {"name": "ali", "whatever": "something", "llist": [1, 2, 3]},
+        "instructors": [
+            {
+                "middle_initial": "",
+                "first_name": "Michael",
+                "last_name": "Short",
+                "suffix": "",
+                "title": "",
+                "mit_id": "",
+                "department": "",
+                "directory_title": "",
+                "uid": "d9ca5631c6936252866d63683c0c452e",
+            },
+            {
+                "middle_initial": "",
+                "first_name": "Jane",
+                "last_name": "Kokernak",
+                "suffix": "",
+                "title": "",
+                "mit_id": "",
+                "department": "",
+                "directory_title": "",
+                "uid": "bb1e26b5f5c9c054ddae8a2988ad7b42",
+            },
+            {
+                "middle_initial": "",
+                "first_name": "Christine",
+                "last_name": "Sherratt",
+                "suffix": "",
+                "title": "",
+                "mit_id": "",
+                "department": "",
+                "directory_title": "",
+                "uid": "a39f692061a70a105c25b15374c02c92",
+            },
+        ],
+        "course_collections": [
+            {
+                "ocw_feature": "Engineering",
+                "ocw_subfeature": "Nuclear Engineering",
+                "ocw_feature_url": "",
+                "ocw_speciality": "Health and Exercise Science",
+                "ocw_feature_notes": "",
+            },
+            {
+                "ocw_feature": "Humanities",
+                "ocw_subfeature": "Literature",
+                "ocw_feature_url": "",
+                "ocw_speciality": "Academic Writing",
+                "ocw_feature_notes": "",
+            },
+        ],
+        "price": {"price": 0.0, "mode": "audit", "upgrade_deadline": None},
+    }
+
+
+@pytest.fixture
+def bootcamp_valid_data():
+    """
+    Return valid bootcamp data
+    """
+    return {
+        "course_id": "BootcampTest1",
+        "title": "Test Bootcamp",
+        "short_description": "The MIT Test Bootcamp",
+        "level": None,
+        "semester": None,
+        "language": None,
+        "platform": "Bootcamps",
+        "year": 2019,
+        "full_description": "<p>The Test Bootcamp is now open.</p>",
+        "start_date": "2019-06-15T00:00:01Z",
+        "end_date": "2019-06-21T23:59:59Z",
+        "enrollment_start": None,
+        "enrollment_end": "2019-04-15T23:59:59Z",
+        "image_src": "https://bootcamp.mit.edu/wp-content/uploads/2019/01/healthcare-600x231.png",
+        "image_description": None,
+        "featured": False,
+        "published": True,
+        "availability": "starting soon",
+        "url": "https://bootcamp.mit.edu/entrepreneurship/healthcare-innovation/",
+        "last_modified": "2019-05-08T13:18:17.507967Z",
+        "program_type": None,
+        "program_name": None,
+        "location": None,
+        "instructors": [],
+        "learning_resource_type": "course",
+        "topics": [
+            {"name": "Business & Management"},
+            {"name": "Entrepreneurship"},
+            {"name": "Innovation"},
+        ],
+        "prices": [
+            {"price": 8500, "mode": "Early Bird"},
+            {"price": 9500, "mode": "Standard"},
+        ],
+    }
+
+
+@pytest.fixture
+def mock_logger(mocker):
+    """
+    Mock log exception
+    """
+    return mocker.patch("course_catalog.api.log.exception")
+
+
 @pytest.mark.parametrize("force_overwrite", [True, False])
 def test_parse_mitx_json_data_overwrite_course(
     mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
@@ -53,7 +184,7 @@ def test_parse_mitx_json_data_overwrite_course(
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     CourseRunFactory.create(
-        course=course,
+        content_object=course,
         course_run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
@@ -82,7 +213,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
         last_modified=datetime(year=2010, month=1, day=1).astimezone(pytz.utc),
     )
     CourseRunFactory.create(
-        course=course,
+        content_object=course,
         course_run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
@@ -188,86 +319,18 @@ def test_parse_wrong_owner_json_data(mitx_valid_data):
 
 
 @pytest.mark.usefixtures("mock_index_functions")
-def test_deserializing_a_valid_ocw_course():
+def test_deserializing_a_valid_ocw_course(ocw_valid_data):
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """
-    valid_ocw_obj = {
-        "uid": "e9387c256bae4ca99cce88fd8b7f8272",
-        "title": "Undergraduate Thesis Tutorial",
-        "description": "<p>This course is a series of lectures on prospectus and thesis writing</p>",
-        "course_level": "Undergraduate",
-        "from_semester": "Fall",
-        "from_year": "2015",
-        "language": "en-US",
-        "image_src": "https://s3.us-east-2.amazonaws.com/alizagarantestbucket/test_folder/"
-        "f49d46243a5c035597e75941ffec830a_22-thtf15.jpg",
-        "image_description": "Photo of hardbound academic theses on library shelves.",
-        "platform": "OCW",
-        "creation_date": "2016-01-08 22:35:55.151996+00:00",
-        "expiration_date": None,
-        "raw_json": {"name": "ali", "whatever": "something", "llist": [1, 2, 3]},
-        "instructors": [
-            {
-                "middle_initial": "",
-                "first_name": "Michael",
-                "last_name": "Short",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "d9ca5631c6936252866d63683c0c452e",
-            },
-            {
-                "middle_initial": "",
-                "first_name": "Jane",
-                "last_name": "Kokernak",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "bb1e26b5f5c9c054ddae8a2988ad7b42",
-            },
-            {
-                "middle_initial": "",
-                "first_name": "Christine",
-                "last_name": "Sherratt",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "a39f692061a70a105c25b15374c02c92",
-            },
-        ],
-        "course_collections": [
-            {
-                "ocw_feature": "Engineering",
-                "ocw_subfeature": "Nuclear Engineering",
-                "ocw_feature_url": "",
-                "ocw_speciality": "Health and Exercise Science",
-                "ocw_feature_notes": "",
-            },
-            {
-                "ocw_feature": "Humanities",
-                "ocw_subfeature": "Literature",
-                "ocw_feature_url": "",
-                "ocw_speciality": "Academic Writing",
-                "ocw_feature_notes": "",
-            },
-        ],
-        "price": {"price": 0.0, "mode": "audit", "upgrade_deadline": None},
-    }
-    digest_ocw_course(valid_ocw_obj, timezone.now(), None, True)
+    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
     assert Course.objects.count() == 1
-    digest_ocw_course(valid_ocw_obj, timezone.now() - timedelta(hours=1), None, True)
+    digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), None, True)
     assert Course.objects.count() == 1
 
     course = Course.objects.last()
     digest_ocw_course(
-        valid_ocw_obj, timezone.now() + timedelta(hours=1), course, True, "PROD/RES"
+        ocw_valid_data, timezone.now() + timedelta(hours=1), course, True, "PROD/RES"
     )
     assert Course.objects.count() == 1
     assert (
@@ -275,88 +338,67 @@ def test_deserializing_a_valid_ocw_course():
     )
 
     course_instructors_count = CourseInstructor.objects.count()
-    assert course_instructors_count == len(valid_ocw_obj.get("instructors"))
+    assert course_instructors_count == len(ocw_valid_data.get("instructors"))
 
     course_prices_count = CoursePrice.objects.count()
     assert course_prices_count == 1
 
     course_topics_count = CourseTopic.objects.count()
     assert course_topics_count == sum(
-        len(get_ocw_topic(cc)) for cc in valid_ocw_obj.get("course_collections")
+        len(get_ocw_topic(cc)) for cc in ocw_valid_data.get("course_collections")
     )
 
 
-def test_deserialzing_an_invalid_ocw_course():
+def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
     """
     Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
     """
-    invalid_ocw_obj = {
-        "uid": "",
-        "title": "",
-        "description": "",
-        "course_level": "",
-        "from_semester": "Fall",
-        "from_year": "2015",
-        "language": "en-US",
-        "image_src": "",
-        "image_description": "Photo of hardbound academic theses on library shelves.",
-        "platform": "OCW",
-        "creation_date": "2016/01/08 22:35:55.151996+00:00",
-        "expiration_date": None,
-        "raw_json": {},
-        "instructors": [
-            {
-                "middle_initial": "",
-                "first_name": "Michael",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "d9ca5631c6936252866d63683c0c453e",
-            },
-            {
-                "middle_initial": "",
-                "first_name": "Jane",
-                "last_name": "Kokernak",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "bb1e26b5f5c9c054ddae8a2988ad7b48",
-            },
-            {
-                "middle_initial": "",
-                "last_name": "Sherratt",
-                "suffix": "",
-                "title": "",
-                "mit_id": "",
-                "department": "",
-                "directory_title": "",
-                "uid": "a39f692061a70a105c25b15374c02c95",
-            },
-        ],
-        "course_collections": [
-            {
-                "ocw_feature": "Engineering",
-                "ocw_subfeature": "Nuclear Engineering",
-                "ocw_feature_url": "",
-                "ocw_speciality": "",
-                "ocw_feature_notes": "",
-            },
-            {
-                "ocw_feature": "Humanities",
-                "ocw_subfeature": "Literature",
-                "ocw_feature_url": "",
-                "ocw_speciality": "Academic Writing",
-                "ocw_feature_notes": "",
-            },
-        ],
-        "price": {"price": 0.0, "upgrade_deadline": None},
-    }
-    digest_ocw_course(invalid_ocw_obj, timezone.now(), None, True)
+    ocw_valid_data.pop("course_id")
+    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
     assert not Course.objects.count()
+
+
+def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
+    """
+    Verifies that CourseRunSerializer validation works correctly if the OCW course run serializer is invalid
+    """
+    ocw_valid_data.pop("uid")
+    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
+    assert not CourseRun.objects.count()
+
+
+@pytest.mark.usefixtures("mock_index_functions")
+def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
+    """
+    Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
+    """
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert Bootcamp.objects.count() == 1
+    assert CourseRun.objects.count() == 1
+
+
+@pytest.mark.usefixtures("mock_index_functions")
+def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
+    """
+    Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
+    """
+    mocker.patch("course_catalog.api.CourseRunSerializer.is_valid", return_value=False)
+    mocker.patch(
+        "course_catalog.api.CourseRunSerializer.errors",
+        return_value={"error": "Bad data"},
+    )
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert CourseRun.objects.count() == 0
+
+
+def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
+    """
+    Verifies that parse_bootcamp_json_data does not create a new Bootcamp if the serializer is invalid
+    """
+    bootcamp_valid_data.pop("course_id")
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert Bootcamp.objects.count() == 0
+    assert CourseRun.objects.count() == 0
 
 
 def test_safe_load_bad_json(mocker):
