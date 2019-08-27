@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.87.1
+Version 0.87.1 (Released August 27, 2019)
 --------------
 
 - update course search and course carousel UI
