@@ -158,21 +158,25 @@ export const AVAILABILITY_MAPPING = {
     label:  "Available Now",
     filter: { to: "now" }
   },
-  next30: {
-    label:  "In the next 30 days",
-    filter: { from: "now", to: "now+30d/d" }
+  nextWeek: {
+    label:  "Within next week",
+    filter: { from: "now", to: "now+7d/d" }
   },
-  next60: {
-    label:  "In the next 60 days",
-    filter: { from: "now+30d/d", to: "now+60d/d" }
+  nextMonth: {
+    label:  "Within next month",
+    filter: { from: "now+7d/d", to: "now+1M/M" }
   },
-  next90: {
-    label:  "In the next 90 days",
-    filter: { from: "now+60d/d", to: "now+90d/d" }
+  next3Months: {
+    label:  "Within next 3 months",
+    filter: { from: "now+1M/M", to: "now+3M/M" }
   },
-  over90: {
-    label:  "In over 90 days",
-    filter: { from: "now+90d/d" }
+  next6Months: {
+    label:  "Within next 6 months",
+    filter: { from: "now+3M/M", to: "now+6M/M" }
+  },
+  nextYear: {
+    label:  "Within next year",
+    filter: { from: "now+6M/M", to: "now+12M/M" }
   }
 }
 
@@ -325,10 +329,20 @@ export const buildSearchQuery = ({
                     key: "availableNow",
                     ...AVAILABILITY_MAPPING.availableNow.filter
                   },
-                  { key: "next30", ...AVAILABILITY_MAPPING.next30.filter },
-                  { key: "next60", ...AVAILABILITY_MAPPING.next60.filter },
-                  { key: "next90", ...AVAILABILITY_MAPPING.next90.filter },
-                  { key: "over90", ...AVAILABILITY_MAPPING.over90.filter }
+                  { key: "nextWeek", ...AVAILABILITY_MAPPING.nextWeek.filter },
+                  {
+                    key: "nextMonth",
+                    ...AVAILABILITY_MAPPING.nextMonth.filter
+                  },
+                  {
+                    key: "next3Months",
+                    ...AVAILABILITY_MAPPING.next3Months.filter
+                  },
+                  {
+                    key: "next6Months",
+                    ...AVAILABILITY_MAPPING.next6Months.filter
+                  },
+                  { key: "nextYear", ...AVAILABILITY_MAPPING.nextYear.filter }
                 ]
               },
               "runs",

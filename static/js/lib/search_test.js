@@ -312,7 +312,7 @@ describe("search functions", () => {
           Object.entries({
             platform:     ["mitx"],
             topics:       ["Engineering", "Science"],
-            availability: ["next30"],
+            availability: ["nextWeek"],
             type:         [type]
           })
         )
@@ -360,7 +360,7 @@ describe("search functions", () => {
                       range: {
                         "course_runs.earliest_start": {
                           from: "now",
-                          to:   "now+30d/d"
+                          to:   "now+7d/d"
                         }
                       }
                     }
@@ -392,22 +392,28 @@ describe("search functions", () => {
                       },
                       {
                         from: "now",
-                        key:  "next30",
-                        to:   "now+30d/d"
+                        key:  "nextWeek",
+                        to:   "now+7d/d"
                       },
                       {
-                        from: "now+30d/d",
-                        key:  "next60",
-                        to:   "now+60d/d"
+                        from: "now+7d/d",
+                        key:  "nextMonth",
+                        to:   "now+1M/M"
                       },
                       {
-                        from: "now+60d/d",
-                        key:  "next90",
-                        to:   "now+90d/d"
+                        from: "now+1M/M",
+                        key:  "next3Months",
+                        to:   "now+3M/M"
                       },
                       {
-                        from: "now+90d/d",
-                        key:  "over90"
+                        from: "now+3M/M",
+                        key:  "next6Months",
+                        to:   "now+6M/M"
+                      },
+                      {
+                        from: "now+6M/M",
+                        key:  "nextYear",
+                        to:   "now+12M/M"
                       }
                     ]
                   }

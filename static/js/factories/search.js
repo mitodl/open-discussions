@@ -164,7 +164,7 @@ export const makeSearchFacetResult = () => {
             doc_count: 583
           },
           {
-            key:       "next30",
+            key:       "nextWeek",
             doc_count: 22
           }
         ]

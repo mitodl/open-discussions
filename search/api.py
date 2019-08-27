@@ -239,7 +239,7 @@ def transform_aggregates(search_result):
         dict: The Elasticsearch response dict with transformed availability aggregates
     """
     availability_runs = (
-        search_result["aggregations"].get("availability", {}).pop("runs", {})
+        search_result.get("aggregations", {}).get("availability", {}).pop("runs", {})
     )
     if availability_runs:
         search_result["aggregations"]["availability"]["buckets"] = [

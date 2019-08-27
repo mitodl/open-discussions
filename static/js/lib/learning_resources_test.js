@@ -79,10 +79,11 @@ describe("Course utils", () => {
   //
   ;[
     ["availableNow", AVAILABILITY_MAPPING["availableNow"].label],
-    ["next30", AVAILABILITY_MAPPING["next30"].label],
-    ["next60", AVAILABILITY_MAPPING["next60"].label],
-    ["next90", AVAILABILITY_MAPPING["next90"].label],
-    ["over90", AVAILABILITY_MAPPING["over90"].label],
+    ["nextWeek", AVAILABILITY_MAPPING["nextWeek"].label],
+    ["nextMonth", AVAILABILITY_MAPPING["nextMonth"].label],
+    ["next3Months", AVAILABILITY_MAPPING["next3Months"].label],
+    ["next6Months", AVAILABILITY_MAPPING["next6Months"].label],
+    ["nextYear", AVAILABILITY_MAPPING["nextYear"].label],
     ["something", "something"],
     [null, null]
   ].forEach(([searchType, label]) => {

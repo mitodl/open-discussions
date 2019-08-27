@@ -446,7 +446,7 @@ describe("CourseSearchPage", () => {
           Object.entries({
             platform:     [],
             topics:       [],
-            availability: isChecked ? [] : ["next30"]
+            availability: isChecked ? [] : ["nextWeek"]
           })
         )
       })
@@ -455,7 +455,7 @@ describe("CourseSearchPage", () => {
         target: {
           checked: isChecked,
           name:    "availability",
-          value:   "next30"
+          value:   "nextWeek"
         }
       })
       sinon.assert.calledWith(helper.searchStub, {
@@ -468,7 +468,7 @@ describe("CourseSearchPage", () => {
           Object.entries({
             platform:     [],
             topics:       [],
-            availability: isChecked ? ["next30"] : [],
+            availability: isChecked ? ["nextWeek"] : [],
             type:         LR_TYPE_ALL
           })
         )
