@@ -127,21 +127,10 @@ def semester_year_to_date(semester, year, ending=False):
         month_day = "12-31" if ending else "09-01"
     elif semester.lower() == "summer":
         month_day = "08-30" if ending else "06-01"
-    else:
+    elif semester.lower() == "spring":
         month_day = "05-31" if ending else "01-01"
+    else:
+        return
     return datetime.strptime("{}-{}".format(year, month_day), "%Y-%m-%d").replace(
         tzinfo=pytz.UTC
     )
-
-
-def best_run_date(preferred_date, alternate_date, semester, year, ending=False):
-    """
-    Get the best date for a run (some have an enrollment date and no course date or vice versa)
-    """
-    if preferred_date:
-        return preferred_date
-    if alternate_date:
-        return alternate_date
-    if semester and year:
-        return semester_year_to_date(semester, year, ending=ending)
-    return None

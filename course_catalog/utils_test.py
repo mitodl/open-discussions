@@ -7,7 +7,7 @@ import pytest
 import pytz
 
 from course_catalog.constants import PlatformType
-from course_catalog.utils import get_course_url, semester_year_to_date, best_run_date
+from course_catalog.utils import get_course_url, semester_year_to_date
 
 
 @pytest.mark.parametrize(
@@ -73,8 +73,8 @@ def test_get_course_url(course_id, course_json, platform, expected):
         ["summer", 2021, False, "2021-06-01"],
         ["spring", None, False, None],
         [None, 2020, False, None],
-        ["something", 2020, False, "2020-01-01"],
-        ["something", 2020, True, "2020-05-31"],
+        ["something", 2020, False, None],
+        ["something", 2020, True, None],
     ],
 )
 def test_semester_year_to_date(semester, year, ending, expected):
@@ -87,33 +87,3 @@ def test_semester_year_to_date(semester, year, ending, expected):
         assert semester_year_to_date(
             semester, year, ending=ending
         ) == datetime.strptime(expected, "%Y-%m-%d").replace(tzinfo=pytz.UTC)
-
-
-@pytest.mark.parametrize(
-    "preferred_date,alternate_date,semester,year,expected",
-    [
-        ["2020-02-01", "2020-01-01", "spring", "2020", "2020-02-01"],
-        [None, "2020-01-01", "spring", "2020", "2020-01-01"],
-        ["2020-02-01", None, "spring", "2020", "2020-02-01"],
-        [None, None, "spring", "2020", "2020-05-31"],
-        [None, None, None, "2020", None],
-        [None, None, "spring", None, None],
-    ],
-)
-def test_earliest_end(preferred_date, alternate_date, semester, year, expected):
-    """Test that the best_run_date function returns the expected value"""
-    if preferred_date is not None:
-        preferred_date = datetime.strptime(preferred_date, "%Y-%m-%d").replace(
-            tzinfo=pytz.UTC
-        )
-    if alternate_date is not None:
-        alternate_date = datetime.strptime(alternate_date, "%Y-%m-%d").replace(
-            tzinfo=pytz.UTC
-        )
-    best_date = best_run_date(
-        preferred_date, alternate_date, semester, year, ending=expected
-    )
-    if expected is None:
-        assert best_date is expected
-    else:
-        assert best_date.strftime("%Y-%m-%d") == expected

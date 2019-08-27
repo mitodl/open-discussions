@@ -194,7 +194,7 @@ def test_execute_search(mocker, user):
                                                                 "must_not": [
                                                                     {
                                                                         "exists": {
-                                                                            "field": "course_runs.earliest_end"
+                                                                            "field": "course_runs.best_end_date"
                                                                         }
                                                                     }
                                                                 ]
@@ -207,7 +207,7 @@ def test_execute_search(mocker, user):
                                                         },
                                                         {
                                                             "range": {
-                                                                "course_runs.earliest_end": {
+                                                                "course_runs.best_end_date": {
                                                                     "gt": "now"
                                                                 }
                                                             }
@@ -374,7 +374,7 @@ def test_execute_search_anonymous(mocker):
                                                                 "must_not": [
                                                                     {
                                                                         "exists": {
-                                                                            "field": "course_runs.earliest_end"
+                                                                            "field": "course_runs.best_end_date"
                                                                         }
                                                                     }
                                                                 ]
@@ -387,7 +387,7 @@ def test_execute_search_anonymous(mocker):
                                                         },
                                                         {
                                                             "range": {
-                                                                "course_runs.earliest_end": {
+                                                                "course_runs.best_end_date": {
                                                                     "gt": "now"
                                                                 }
                                                             }

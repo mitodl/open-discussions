@@ -127,8 +127,8 @@ COURSE_OBJECT_TYPE = {
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},
             "offered_by": {"type": "keyword"},
-            "earliest_start": {"type": "date"},
-            "earliest_end": {"type": "date"},
+            "best_start_date": {"type": "date"},
+            "best_end_date": {"type": "date"},
         },
     },
 }

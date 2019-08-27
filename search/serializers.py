@@ -307,8 +307,8 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
             "end_date",
             "enrollment_start",
             "enrollment_end",
-            "earliest_start",
-            "earliest_end",
+            "best_start_date",
+            "best_end_date",
             "title",
             "image_src",
             "prices",
@@ -554,7 +554,9 @@ def serialize_bulk_courses(ids):
     """
     for course in Course.objects.filter(id__in=ids).prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
+        Prefetch(
+            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
+        ),
     ):
         yield serialize_course_for_bulk(course)
 
@@ -581,7 +583,9 @@ def serialize_bulk_bootcamps(ids):
     """
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
         "topics",
-        Prefetch("course_runs", queryset=CourseRun.objects.order_by("-earliest_start")),
+        Prefetch(
+            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
+        ),
     ):
         yield serialize_bootcamp_for_bulk(bootcamp)
 

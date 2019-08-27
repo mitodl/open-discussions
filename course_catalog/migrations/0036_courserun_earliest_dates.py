@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 
-from course_catalog.utils import best_run_date
+from course_catalog.utils import semester_year_to_date
 
 
 def populate_earliest_dates(apps, schema_editor):
@@ -12,18 +12,15 @@ def populate_earliest_dates(apps, schema_editor):
     CourseRun = apps.get_model("course_catalog", "CourseRun")
 
     for course_run in CourseRun.objects.iterator():
-        course_run.earliest_start = best_run_date(
-            course_run.enrollment_start,
-            course_run.start_date,
-            course_run.semester,
-            course_run.year,
+        course_run.best_start_date = (
+            course_run.enrollment_start
+            or course_run.start_date
+            or semester_year_to_date(course_run.semester, course_run.year)
         )
-        course_run.earliest_end = best_run_date(
-            course_run.enrollment_end,
-            course_run.end_date,
-            course_run.semester,
-            course_run.year,
-            ending=True,
+        course_run.best_end_date = (
+            course_run.enrollment_end
+            or course_run.end_date
+            or semester_year_to_date(course_run.semester, course_run.year, ending=True)
         )
         course_run.save()
 
@@ -35,12 +32,12 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name="courserun",
-            name="earliest_end",
+            name="best_end_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
             model_name="courserun",
-            name="earliest_start",
+            name="best_start_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.RunPython(

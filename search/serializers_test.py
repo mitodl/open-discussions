@@ -223,8 +223,8 @@ def test_es_course_run_serializer():
         "end_date": course_run.end_date.strftime(ISOFORMAT),
         "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
         "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
-        "earliest_start": course_run.earliest_start,
-        "earliest_end": course_run.earliest_end,
+        "best_start_date": course_run.best_start_date,
+        "best_end_date": course_run.best_end_date,
         "title": course_run.title,
         "image_src": course_run.image_src,
         "instructors": [
@@ -258,7 +258,7 @@ def test_es_course_serializer(offered_by):
         "topics": list(course.topics.values_list("name", flat=True)),
         "course_runs": [
             ESCourseRunSerializer(course_run).data
-            for course_run in course.course_runs.order_by("-earliest_start")
+            for course_run in course.course_runs.order_by("-best_start_date")
         ],
         "published": True,
         "offered_by": course.offered_by,

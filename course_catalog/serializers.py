@@ -23,7 +23,7 @@ from course_catalog.utils import (
     get_ocw_topic,
     get_year_and_semester,
     get_course_url,
-    best_run_date,
+    semester_year_to_date,
 )
 
 
@@ -158,8 +158,8 @@ class CourseRunSerializer(BaseCourseSerializer):
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
-    earliest_start = serializers.ReadOnlyField()
-    earliest_end = serializers.ReadOnlyField()
+    best_start_date = serializers.ReadOnlyField()
+    best_end_date = serializers.ReadOnlyField()
 
     def handle_many_to_many(self, resource):
         """
@@ -203,12 +203,12 @@ class CourseRunSerializer(BaseCourseSerializer):
             "end_date": data.get("end"),
             "enrollment_start": data.get("enrollment_start"),
             "enrollment_end": data.get("enrollment_end"),
-            "earliest_start": best_run_date(
-                data.get("enrollment_start"), data.get("start"), semester, year
-            ),
-            "earliest_end": best_run_date(
-                data.get("enrollment_end"), data.get("end"), semester, year, ending=True
-            ),
+            "best_start_date": data.get("enrollment_start")
+            or data.get("start")
+            or semester_year_to_date(semester, year),
+            "best_end_date": data.get("enrollment_end")
+            or data.get("end")
+            or semester_year_to_date(semester, year, ending=True),
             "image_src": (
                 (data.get("image") or {}).get("src")
                 or (data.get("course_image") or {}).get("src")

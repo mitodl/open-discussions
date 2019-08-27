@@ -160,23 +160,23 @@ export const AVAILABILITY_MAPPING = {
   },
   nextWeek: {
     label:  "Within next week",
-    filter: { from: "now", to: "now+7d/d" }
+    filter: { from: "now", to: "now+7d" }
   },
   nextMonth: {
     label:  "Within next month",
-    filter: { from: "now+7d/d", to: "now+1M/M" }
+    filter: { from: "now", to: "now+1M" }
   },
   next3Months: {
     label:  "Within next 3 months",
-    filter: { from: "now+1M/M", to: "now+3M/M" }
+    filter: { from: "now", to: "now+3M" }
   },
   next6Months: {
     label:  "Within next 6 months",
-    filter: { from: "now+3M/M", to: "now+6M/M" }
+    filter: { from: "now", to: "now+6M" }
   },
   nextYear: {
     label:  "Within next year",
-    filter: { from: "now+6M/M", to: "now+12M/M" }
+    filter: { from: "now", to: "now+12M" }
   }
 }
 
@@ -308,7 +308,7 @@ export const buildSearchQuery = ({
                     path:  "course_runs",
                     query: {
                       range: {
-                        "course_runs.earliest_start":
+                        "course_runs.best_start_date":
                           AVAILABILITY_MAPPING[value].filter
                       }
                     }
@@ -320,7 +320,7 @@ export const buildSearchQuery = ({
           builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
             aggr.agg(
               "date_range",
-              "course_runs.earliest_start",
+              "course_runs.best_start_date",
               {
                 missing: "1901-01-01T00:00:00Z",
                 keyed:   false,

@@ -182,9 +182,9 @@ def _apply_general_query_filters(search, user):
         path="course_runs",
         query=(
             (
-                ~Q("exists", field="course_runs.earliest_end")
+                ~Q("exists", field="course_runs.best_end_date")
                 | Q("term", course_runs__offered_by="OCW")
-                | Q("range", course_runs__earliest_end={"gt": "now"})
+                | Q("range", course_runs__best_end_date={"gt": "now"})
             )
         ),
         ignore_unmapped=True,

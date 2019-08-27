@@ -358,9 +358,9 @@ describe("search functions", () => {
                     path:  "course_runs",
                     query: {
                       range: {
-                        "course_runs.earliest_start": {
+                        "course_runs.best_start_date": {
                           from: "now",
-                          to:   "now+7d/d"
+                          to:   "now+7d"
                         }
                       }
                     }
@@ -382,7 +382,7 @@ describe("search functions", () => {
                     }
                   },
                   date_range: {
-                    field:   "course_runs.earliest_start",
+                    field:   "course_runs.best_start_date",
                     keyed:   false,
                     missing: "1901-01-01T00:00:00Z",
                     ranges:  [
@@ -393,27 +393,27 @@ describe("search functions", () => {
                       {
                         from: "now",
                         key:  "nextWeek",
-                        to:   "now+7d/d"
+                        to:   "now+7d"
                       },
                       {
-                        from: "now+7d/d",
+                        from: "now",
                         key:  "nextMonth",
-                        to:   "now+1M/M"
+                        to:   "now+1M"
                       },
                       {
-                        from: "now+1M/M",
+                        from: "now",
                         key:  "next3Months",
-                        to:   "now+3M/M"
+                        to:   "now+3M"
                       },
                       {
-                        from: "now+3M/M",
+                        from: "now",
                         key:  "next6Months",
-                        to:   "now+6M/M"
+                        to:   "now+6M"
                       },
                       {
-                        from: "now+6M/M",
+                        from: "now",
                         key:  "nextYear",
-                        to:   "now+12M/M"
+                        to:   "now+12M"
                       }
                     ]
                   }
