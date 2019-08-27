@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.88.0
+--------------
+
+- Added trailing slash to API urls to avoid 301 redirects
+- CourseRuns for all courses and bootcamps (#2153)
+
 Version 0.87.1 (Released August 27, 2019)
 --------------
 
