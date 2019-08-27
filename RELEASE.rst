@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.87.1 (Released August 27, 2019)
+--------------
+
+- update course search and course carousel UI
+- bump a few deps
+- Pin pytest deps
+- upgrade eslint and related dependencies
+- fix an issue with unfavoriting on the favorites carousel
+- upgrade dependencies
+
 Version 0.87.0 (Released August 21, 2019)
 --------------
 
