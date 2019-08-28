@@ -174,61 +174,6 @@ def test_execute_search(mocker, user):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [
-                                                            "course",
-                                                            "bootcamp",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "nested": {
-                                            "path": "course_runs",
-                                            "query": {
-                                                "bool": {
-                                                    "should": [
-                                                        {
-                                                            "bool": {
-                                                                "must_not": [
-                                                                    {
-                                                                        "exists": {
-                                                                            "field": "course_runs.best_end_date"
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            "term": {
-                                                                "course_runs.offered_by": "OCW"
-                                                            }
-                                                        },
-                                                        {
-                                                            "range": {
-                                                                "course_runs.best_end_date": {
-                                                                    "gt": "now"
-                                                                }
-                                                            }
-                                                        },
-                                                    ]
-                                                }
-                                            },
-                                            "ignore_unmapped": True,
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
                                                         "object_type": ["user_list"]
                                                     }
                                                 }
@@ -343,61 +288,6 @@ def test_execute_search_anonymous(mocker):
                                         }
                                     },
                                     {"term": {"published": True}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "course",
-                                                            "bootcamp",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "nested": {
-                                            "path": "course_runs",
-                                            "query": {
-                                                "bool": {
-                                                    "should": [
-                                                        {
-                                                            "bool": {
-                                                                "must_not": [
-                                                                    {
-                                                                        "exists": {
-                                                                            "field": "course_runs.best_end_date"
-                                                                        }
-                                                                    }
-                                                                ]
-                                                            }
-                                                        },
-                                                        {
-                                                            "term": {
-                                                                "course_runs.offered_by": "OCW"
-                                                            }
-                                                        },
-                                                        {
-                                                            "range": {
-                                                                "course_runs.best_end_date": {
-                                                                    "gt": "now"
-                                                                }
-                                                            }
-                                                        },
-                                                    ]
-                                                }
-                                            },
-                                            "ignore_unmapped": True,
-                                        }
-                                    },
                                 ]
                             }
                         },
