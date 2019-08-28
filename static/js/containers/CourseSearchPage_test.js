@@ -7,6 +7,8 @@ import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
+import SearchFacet from "../components/SearchFacet"
+
 import { SET_SHOW_RESOURCE_DRAWER } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
@@ -110,7 +112,7 @@ describe("CourseSearchPage", () => {
     const { inner } = await renderPage()
     assert.equal(
       inner
-        .find("Connect(SearchFacet)")
+        .find(SearchFacet)
         .at(0)
         .prop("title"),
       "Learning Resource"
@@ -378,7 +380,7 @@ describe("CourseSearchPage", () => {
     const text = "new text"
     inner.setState({ from: 7, text })
     inner
-      .find("Connect(SearchFacet)")
+      .find(SearchFacet)
       .at(1)
       .props()
       .onUpdate({

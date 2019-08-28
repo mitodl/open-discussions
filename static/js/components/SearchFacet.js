@@ -1,16 +1,11 @@
 // @flow
-import React from "react"
+import React, { useState } from "react"
 import R from "ramda"
-import { connect } from "react-redux"
 import _ from "lodash"
-import Checkbox from "rmwc/Checkbox/index"
 
-import { hideSearchFacets, showSearchFacets } from "../actions/ui"
-
-import type { Dispatch } from "redux"
 import type { FacetResult } from "../flow/searchTypes"
 
-type OwnProps = {|
+type Props = {|
   results: ?FacetResult,
   name: string,
   title: string,
@@ -20,102 +15,83 @@ type OwnProps = {|
   displayCount?: number
 |}
 
-type StateProps = {|
-  showAll: boolean
-|}
+function SearchFacet(props: Props) {
+  const {
+    name,
+    title,
+    results,
+    currentlySelected,
+    labelFunction,
+    onUpdate,
+    displayCount
+  } = props
+  const maxCount = displayCount || 5
 
-type DispatchProps = {|
-  dispatch: Dispatch<*>
-|}
+  const [showFacetList, setShowFacetList] = useState(true)
+  const [showAllFacets, setShowAllFacets] = useState(false)
 
-type Props = {|
-  ...StateProps,
-  ...DispatchProps,
-  ...OwnProps
-|}
+  const titleLineIcon = showFacetList ? "arrow_drop_down" : "arrow_drop_up"
 
-export class SearchFacet extends React.Component<Props> {
-  toggleAllFacets = async (key: string) => {
-    const { dispatch, showAll } = this.props
-    await dispatch(showAll ? hideSearchFacets(key) : showSearchFacets(key))
-  }
+  return (
+    <div className="facets">
+      <div
+        className="facet-title"
+        onClick={() => setShowFacetList(!showFacetList)}
+      >
+        {title}
+        <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
+      </div>
+      {results && results.buckets && showFacetList
+        ? results.buckets.map((facet, i) => {
+          const isChecked = R.contains(facet.key, currentlySelected || [])
 
-  shouldComponentUpdate(nextProps: Props) {
-    const { results, currentlySelected, showAll } = this.props
-    const nextResults = nextProps.results
-    return (
-      _.has(nextResults, "buckets") &&
-      (results !== nextResults ||
-        currentlySelected !== nextProps.currentlySelected ||
-        showAll !== nextProps.showAll)
-    )
-  }
-
-  render() {
-    const {
-      name,
-      title,
-      results,
-      currentlySelected,
-      labelFunction,
-      onUpdate,
-      showAll,
-      displayCount
-    } = this.props
-    const maxCount = displayCount || 5
-
-    return (
-      <div className="facets">
-        <div className="facet-title">{title}</div>
-        {results && results.buckets
-          ? results.buckets.map((facet, i) => (
+          return (
             <React.Fragment key={i}>
               <div
-                className={
-                  showAll || i < maxCount ? "facet-visible" : "facet-hidden"
-                }
+                className={`${
+                  showAllFacets || i < maxCount
+                    ? "facet-visible"
+                    : "facet-hidden"
+                } ${isChecked ? "checked" : ""}`}
               >
-                <Checkbox
+                <input
+                  type="checkbox"
                   name={name}
                   value={facet.key}
-                  checked={R.contains(facet.key, currentlySelected || [])}
-                  onClick={onUpdate}
-                >
-                  <div className="facet-label-div">
-                    <div className="facet-key">
-                      {labelFunction ? labelFunction(facet.key) : facet.key}
-                    </div>
-                    <div className="facet-count">{facet.doc_count}</div>
+                  checked={isChecked}
+                  onChange={onUpdate}
+                />
+                <div className="facet-label-div">
+                  <div className="facet-key">
+                    {labelFunction ? labelFunction(facet.key) : facet.key}
                   </div>
-                </Checkbox>
+                  <div className="facet-count">{facet.doc_count}</div>
+                </div>
               </div>
-              {(!showAll &&
+              {(!showAllFacets &&
                   i === maxCount &&
                   maxCount < results.buckets.length) ||
-                (showAll && i === results.buckets.length - 1) ? (
+                (showAllFacets && i === results.buckets.length - 1) ? (
                   <div
                     className="facet-more-less"
-                    onClick={() => this.toggleAllFacets(name)}
+                    onClick={() => setShowAllFacets(!showAllFacets)}
                   >
-                    {showAll ? "View less" : "View more"}
+                    {showAllFacets ? "View less" : "View more"}
                   </div>
                 ) : null}
             </React.Fragment>
-          ))
-          : null}
-      </div>
-    )
-  }
+          )
+        })
+        : null}
+    </div>
+  )
 }
 
-const mapStateToProps = (state, ownProps): StateProps => {
-  const { ui } = state
-  const { name } = ownProps
-  return {
-    showAll: ui.facets.has(name)
-  }
+const propsAreEqual = (prevProps, nextProps) => {
+  // results.buckets is null while the search request is in-flight
+  // we want to defer rendering in that case because it will cause
+  // all the facets to briefly disappear before reappearing
+  return !_.has(nextProps.results, "buckets")
 }
 
-export default connect<Props, OwnProps, _, _, _, _>(mapStateToProps)(
-  SearchFacet
-)
+export default React.memo<Props>(SearchFacet, propsAreEqual)

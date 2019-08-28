@@ -60,10 +60,15 @@
 
 .facets {
   margin-bottom: 20px;
+  width: 90%;
 
   .facet-title {
     font-size: 18px;
-    font-weight: bold;
+    font-weight: 600;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
   }
 
   .divider {
@@ -79,21 +84,55 @@
       width: 100%;
     }
   }
-}
 
-.facet-hidden {
-  display: none;
-}
+  .facet-hidden {
+    display: none;
+  }
 
-.facet-more-less {
-  cursor: pointer;
-  color: $link-blue;
-}
+  .facet-visible {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 25px;
+    font-size: 14px;
+    margin-right: 6px;
 
-.facet-label-div {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+    input {
+      margin-right: 10px;
+    }
+
+    .facet-label-div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .facet-key {
+      color: black;
+    }
+
+    .facet-count {
+      color: $font-grey-mid;
+    }
+
+    &.checked {
+      font-size: 16px;
+      font-weight: bold;
+
+      .facet-key,
+      .facet-count {
+        color: $course-blue;
+      }
+    }
+  }
+
+  .facet-more-less {
+    cursor: pointer;
+    color: $search-view-more;
+    font-size: 14px;
+    text-align: right;
+  }
 }
 
 .search-filters-row {

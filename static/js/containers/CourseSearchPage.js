@@ -437,19 +437,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
             </div>
           </Cell>
           <Cell width={3}>
-            <Card>
-              {facetDisplayMap.map(([name, title, labelFunction], i) => (
-                <SearchFacet
-                  key={i}
-                  title={title}
-                  name={name}
-                  results={this.mergeFacetOptions(name)}
-                  onUpdate={this.onUpdateFacets}
-                  currentlySelected={activeFacets.get(name) || []}
-                  labelFunction={labelFunction}
-                />
-              ))}
-            </Card>
+            {facetDisplayMap.map(([name, title, labelFunction], i) => (
+              <SearchFacet
+                key={i}
+                title={title}
+                name={name}
+                results={this.mergeFacetOptions(name)}
+                onUpdate={this.onUpdateFacets}
+                currentlySelected={activeFacets.get(name) || []}
+                labelFunction={labelFunction}
+              />
+            ))}
           </Cell>
           <Cell width={9}>{error ? null : this.renderResults()}</Cell>
         </Grid>
