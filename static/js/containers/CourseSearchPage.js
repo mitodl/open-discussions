@@ -9,6 +9,7 @@ import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 import { connectRequest } from "redux-query"
 import { compose } from "redux"
+import debounce from "lodash/debounce"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
@@ -146,7 +147,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
     if (shouldRunSearch(prevState, this.state)) {
-      this.runSearch()
+      this.debouncedRunSearch()
     }
   }
 
@@ -249,6 +250,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       size:        SETTINGS.search_page_size
     })
   }
+
+  debouncedRunSearch = debounce(this.runSearch, 500)
 
   setSearchUI = (searchResultLayout: string) => {
     this.setState({

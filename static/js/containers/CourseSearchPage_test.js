@@ -18,6 +18,7 @@ import {
 import { makeChannel } from "../factories/channels"
 import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
+import { wait } from "../lib/util"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -383,6 +384,8 @@ describe("CourseSearchPage", () => {
       .onUpdate({
         target: { name: "topics", value: "Physics", checked: true }
       })
+    // this ensures that the debounced calls go through without having to wait
+    inner.instance().debouncedRunSearch.flush()
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        0,
@@ -458,6 +461,8 @@ describe("CourseSearchPage", () => {
           value:   "nextWeek"
         }
       })
+      // this ensures that the debounced calls go through without having to wait
+      inner.instance().debouncedRunSearch.flush()
       sinon.assert.calledWith(helper.searchStub, {
         channelName: null,
         from:        0,
@@ -507,5 +512,6 @@ describe("CourseSearchPage", () => {
       _.findIndex(mergedFacets.buckets, { doc_count: 20, key: "ocw" }) > -1
     )
     assert.isTrue(_.findIndex(mergedFacets.buckets, missingFacetGroup) > -1)
+    await wait(600)
   })
 })
