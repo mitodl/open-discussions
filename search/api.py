@@ -176,20 +176,6 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COURSE_TYPE, BOOTCAMP_TYPE]
     )
 
-    # Search only courses/bootcamps with runs that have end_date null or > now, and enrollment date null or > now
-    date_filter = ~Q("terms", object_type=[COURSE_TYPE, BOOTCAMP_TYPE]) | Q(
-        "nested",
-        path="course_runs",
-        query=(
-            (
-                ~Q("exists", field="course_runs.best_end_date")
-                | Q("term", course_runs__offered_by="OCW")
-                | Q("range", course_runs__best_end_date={"gt": "now"})
-            )
-        ),
-        ignore_unmapped=True,
-    )
-
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
         "terms", object_type=[USER_LIST_TYPE]
@@ -205,7 +191,6 @@ def _apply_general_query_filters(search, user):
         search.filter(channels_filter)
         .filter(content_filter)
         .filter(published_filter)
-        .filter(date_filter)
         .filter(user_list_filter)
     )
 
