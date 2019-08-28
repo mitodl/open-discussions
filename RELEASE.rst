@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.88.0
+Version 0.88.0 (Released August 28, 2019)
 --------------
 
 - Added trailing slash to API urls to avoid 301 redirects
