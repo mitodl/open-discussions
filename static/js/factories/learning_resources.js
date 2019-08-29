@@ -24,7 +24,7 @@ import type {
 const incrCourse = incrementer()
 const courseId: any = incrementer()
 
-const dateFormat = "YYYY-MM-DD[T]HH:mm:ss[Z]"
+export const dateFormat = "YYYY-MM-DD[T]HH:mm:ss[Z]"
 
 const incrCourseRun = incrementer()
 
