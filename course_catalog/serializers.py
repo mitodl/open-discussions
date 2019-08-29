@@ -158,8 +158,6 @@ class CourseRunSerializer(BaseCourseSerializer):
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
-    best_start_date = serializers.ReadOnlyField()
-    best_end_date = serializers.ReadOnlyField()
 
     def handle_many_to_many(self, resource):
         """
