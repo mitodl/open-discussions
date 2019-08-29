@@ -37,7 +37,8 @@ import { emptyOrNil } from "../lib/util"
 type OwnProps = {|
   object: LearningResourceSummary,
   setShowResourceDrawer: Function,
-  searchResultLayout?: string
+  searchResultLayout?: string,
+  availabilities: Array<string>
 |}
 
 type DispatchProps = {|
@@ -98,13 +99,17 @@ export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
   toggleFavorite,
-  searchResultLayout
+  searchResultLayout,
+  availabilities
 }: Props) => {
   const showResourceDrawer = () =>
     setShowResourceDrawer({
       objectId:   object.id,
       objectType: object.object_type
     })
+
+  const availableRuns = object.course_runs
+
 
   return (
     <Card

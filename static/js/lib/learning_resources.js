@@ -10,6 +10,7 @@ import {
 } from "./constants"
 import { capitalize, emptyOrNil } from "./util"
 import { AVAILABILITY_MAPPING } from "./search"
+import moment from "moment"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -26,6 +27,19 @@ export const availabilityLabel = (availability: ?string) => {
     return availability
   }
 }
+
+export const sortedAvailabilities = (availabilities: Array<string>) => (
+  availabilities.sort((a,b) => AVAILABILITY_MAPPING[a] && AVAILABILITY_MAPPING[b]
+    ? AVAILABILITY_MAPPING[a].order - AVAILABILITY_MAPPING[b].order
+    : 1))
+
+export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
+  availabilities.forEach()
+}
+
+export const filterRunsByAvailability = (runs, availabilities) => (
+  runs.filter((run) => inDateRanges(run, availabilities))
+)
 
 export const resourceLabel = (resource: string) => {
   return resource === LR_TYPE_USERLIST

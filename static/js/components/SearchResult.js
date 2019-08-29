@@ -92,14 +92,16 @@ type LearningResourceProps = {
   result: LearningResourceResult,
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
   overrideObject?: Object,
-  searchResultLayout?: string
+  searchResultLayout?: string,
+  availabilities: Array<string>
 }
 
 const LearningResourceSearchResult = ({
   result,
   setShowResourceDrawer,
   overrideObject,
-  searchResultLayout
+  searchResultLayout,
+  availabilities
 }: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for courses
 
@@ -108,6 +110,7 @@ const LearningResourceSearchResult = ({
       object={searchResultToLearningResource(result, overrideObject)}
       setShowResourceDrawer={setShowResourceDrawer}
       searchResultLayout={searchResultLayout}
+      availabilities={availabilities}
     />
   )
 }
@@ -119,10 +122,11 @@ type Props = {
   toggleUpvote?: Post => void,
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
-  toggleFacet?: Function,
+  availabilities?: Array<string>,
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
   overrideObject?: Object,
   searchResultLayout?: string
+
 }
 export default class SearchResult extends React.Component<Props> {
   render() {
@@ -133,7 +137,7 @@ export default class SearchResult extends React.Component<Props> {
       votedComment,
       commentUpvote,
       commentDownvote,
-      toggleFacet,
+      availabilities,
       setShowResourceDrawer,
       overrideObject,
       searchResultLayout
@@ -174,6 +178,7 @@ export default class SearchResult extends React.Component<Props> {
           setShowResourceDrawer={setShowResourceDrawer}
           overrideObject={overrideObject}
           searchResultLayout={searchResultLayout}
+          availabilities={availabilities}
         />
       )
     }
