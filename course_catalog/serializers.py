@@ -19,7 +19,12 @@ from course_catalog.models import (
     FavoriteItem,
     CourseRun,
 )
-from course_catalog.utils import get_ocw_topic, get_year_and_semester, get_course_url
+from course_catalog.utils import (
+    get_ocw_topic,
+    get_year_and_semester,
+    get_course_url,
+    semester_year_to_date,
+)
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -153,6 +158,8 @@ class CourseRunSerializer(BaseCourseSerializer):
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
+    best_start_date = serializers.ReadOnlyField()
+    best_end_date = serializers.ReadOnlyField()
 
     def handle_many_to_many(self, resource):
         """
@@ -196,6 +203,12 @@ class CourseRunSerializer(BaseCourseSerializer):
             "end_date": data.get("end"),
             "enrollment_start": data.get("enrollment_start"),
             "enrollment_end": data.get("enrollment_end"),
+            "best_start_date": data.get("enrollment_start")
+            or data.get("start")
+            or semester_year_to_date(semester, year),
+            "best_end_date": data.get("enrollment_end")
+            or data.get("end")
+            or semester_year_to_date(semester, year, ending=True),
             "image_src": (
                 (data.get("image") or {}).get("src")
                 or (data.get("course_image") or {}).get("src")
@@ -324,16 +337,7 @@ class BootcampSerializer(BaseCourseSerializer):
     Serializer for Bootcamp model
     """
 
-    course_runs = serializers.SerializerMethodField()
-
-    def get_course_runs(self, instance):
-        """
-        Get the course runs sorted by date
-        """
-        course_runs = instance.course_runs.all().order_by(
-            "-enrollment_start", "-start_date", "-year"
-        )
-        return CourseRunSerializer(course_runs, many=True).data
+    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
 
     def to_internal_value(self, data):
         """

@@ -110,10 +110,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     queryset = Course.objects.prefetch_related(
         "topics",
         Prefetch(
-            "course_runs",
-            queryset=CourseRun.objects.order_by(
-                "-enrollment_start", "-start_date", "-year"
-            ),
+            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
         ),
     )
     serializer_class = CourseSerializer
@@ -160,10 +157,7 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     queryset = Bootcamp.objects.prefetch_related(
         "topics",
         Prefetch(
-            "course_runs",
-            queryset=CourseRun.objects.order_by(
-                "-enrollment_start", "-start_date", "-year"
-            ),
+            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
         ),
     )
     serializer_class = BootcampSerializer

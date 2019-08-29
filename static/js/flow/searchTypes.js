@@ -57,7 +57,6 @@ export type PostResult = ResultCommon & {
   post_cover_image:    ?string
 }
 
-
 export type LearningResourceRun = {
   language?:           ?string,
   semester?:           ?string,

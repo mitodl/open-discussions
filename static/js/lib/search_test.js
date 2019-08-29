@@ -11,6 +11,8 @@ import {
   makeLearningResourceResult
 } from "../factories/search"
 import {
+  AVAILABILITY_MAPPING,
+  AVAILABLE_NOW,
   buildSearchQuery,
   channelField,
   searchFields,
@@ -299,121 +301,197 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
-
-    //
     ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(type => {
-      it(`filters courses by platform, availability, type, and topics`, () => {
-        const fieldNames = ["field1", "field2", "field3"]
-        const stub = sandbox
-          .stub(searchFuncs, "searchFields")
-          .returns(fieldNames)
-        const text = "some text here"
-        const facets = new Map(
-          Object.entries({
-            platform:     ["mitx"],
-            topics:       ["Engineering", "Science"],
-            availability: ["Upcoming"],
-            type:         [type]
-          })
-        )
+      ["availableNow", "nextWeek", null].forEach(availability => {
+        it(`filters courses by platform, availability ${availability}, type ${type}, and topics`, () => {
+          const fieldNames = ["field1", "field2", "field3"]
+          const stub = sandbox
+            .stub(searchFuncs, "searchFields")
+            .returns(fieldNames)
+          const text = "some text here"
+          const facets = new Map(
+            Object.entries({
+              platform:     ["mitx"],
+              topics:       ["Engineering", "Science"],
+              availability: availability ? [availability] : [],
+              type:         [type]
+            })
+          )
 
-        const mustQuery = [
-          {
-            term: {
-              object_type: type
-            }
-          },
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    platform: "mitx"
+          const availabilityShouldItems = availability
+            ? [
+              {
+                nested: {
+                  path:  "course_runs",
+                  query: {
+                    range: {
+                      "course_runs.best_start_date":
+                          AVAILABILITY_MAPPING[availability].filter
+                    }
                   }
                 }
-              ]
-            }
-          },
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    topics: "Engineering"
-                  }
-                },
-                {
-                  term: {
-                    topics: "Science"
-                  }
-                }
-              ]
-            }
-          },
-          {
-            bool: {
-              should: [
-                {
-                  term: {
-                    availability: "Upcoming"
-                  }
-                }
-              ]
-            }
-          }
-        ]
+              }
+            ]
+            : []
 
-        assert.deepEqual(buildSearchQuery({ type, text, facets }), {
-          aggs: {
-            availability: {
-              terms: {
-                field: "availability",
-                size:  10000
-              }
-            },
-            platform: {
-              terms: {
-                field: "platform",
-                size:  10000
-              }
-            },
-            topics: {
-              terms: {
-                field: "topics",
-                size:  10000
-              }
-            },
-            type: {
-              terms: {
-                field: "object_type.keyword",
-                size:  10000
-              }
-            }
-          },
-          query: {
-            bool: {
-              should: [
-                {
+          if (availability === "availableNow") {
+            availabilityShouldItems.push({
+              nested: {
+                path:  "course_runs",
+                query: {
                   bool: {
-                    filter: {
-                      bool: {
-                        must: mustQuery
-                      }
-                    },
-                    must: {
-                      multi_match: {
-                        query:     text,
-                        fields:    fieldNames,
-                        fuzziness: "AUTO"
+                    must_not: {
+                      exists: {
+                        field: "course_runs.best_start_date"
                       }
                     }
                   }
                 }
-              ]
+              }
+            })
+          }
+
+          const availabilityQuery = {
+            bool: {
+              should: availabilityShouldItems
             }
           }
+
+          const mustQuery = [
+            {
+              term: {
+                object_type: type
+              }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      platform: "mitx"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      topics: "Engineering"
+                    }
+                  },
+                  {
+                    term: {
+                      topics: "Science"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+
+          if (availability) {
+            mustQuery.push(availabilityQuery)
+          }
+
+          assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+            aggs: {
+              availability: {
+                aggs: {
+                  runs: {
+                    aggs: {
+                      courses: {
+                        reverse_nested: {}
+                      }
+                    },
+                    date_range: {
+                      field:   "course_runs.best_start_date",
+                      keyed:   false,
+                      missing: "1901-01-01T00:00:00Z",
+                      ranges:  [
+                        {
+                          key: "availableNow",
+                          to:  "now"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextWeek",
+                          to:   "now+7d"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextMonth",
+                          to:   "now+1M"
+                        },
+                        {
+                          from: "now",
+                          key:  "next3Months",
+                          to:   "now+3M"
+                        },
+                        {
+                          from: "now",
+                          key:  "next6Months",
+                          to:   "now+6M"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextYear",
+                          to:   "now+12M"
+                        }
+                      ]
+                    }
+                  }
+                },
+                nested: {
+                  path: "course_runs"
+                }
+              },
+              platform: {
+                terms: {
+                  field: "platform",
+                  size:  10000
+                }
+              },
+              topics: {
+                terms: {
+                  field: "topics",
+                  size:  10000
+                }
+              },
+              type: {
+                terms: {
+                  field: "object_type.keyword",
+                  size:  10000
+                }
+              }
+            },
+            query: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: mustQuery
+                        }
+                      },
+                      must: {
+                        multi_match: {
+                          query:     text,
+                          fields:    fieldNames,
+                          fuzziness: "AUTO"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          })
+          sinon.assert.calledWith(stub, type)
         })
-        sinon.assert.calledWith(stub, type)
       })
     })
 

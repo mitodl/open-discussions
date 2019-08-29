@@ -164,14 +164,6 @@ def bootcamp_valid_data():
     }
 
 
-@pytest.fixture
-def mock_logger(mocker):
-    """
-    Mock log exception
-    """
-    return mocker.patch("course_catalog.api.log.exception")
-
-
 @pytest.mark.parametrize("force_overwrite", [True, False])
 def test_parse_mitx_json_data_overwrite_course(
     mocker, mock_course_index_functions, force_overwrite, mitx_valid_data

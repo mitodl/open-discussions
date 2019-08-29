@@ -13,6 +13,7 @@ from search.api import (
     gen_post_id,
     gen_comment_id,
     find_related_documents,
+    transform_aggregates,
 )
 from search.connection import get_default_alias_name
 from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
@@ -150,21 +151,14 @@ def test_execute_search(mocker, user):
                                     {
                                         "bool": {
                                             "must_not": [
-                                                {"terms": {"object_type": ["course"]}}
-                                            ]
-                                        }
-                                    },
-                                    {"term": {"published": True}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {"terms": {"object_type": ["bootcamp"]}}
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "course",
+                                                            "bootcamp",
+                                                        ]
+                                                    }
+                                                }
                                             ]
                                         }
                                     },
@@ -282,21 +276,14 @@ def test_execute_search_anonymous(mocker):
                                     {
                                         "bool": {
                                             "must_not": [
-                                                {"terms": {"object_type": ["course"]}}
-                                            ]
-                                        }
-                                    },
-                                    {"term": {"published": True}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {"terms": {"object_type": ["bootcamp"]}}
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            "course",
+                                                            "bootcamp",
+                                                        ]
+                                                    }
+                                                }
                                             ]
                                         }
                                     },
@@ -358,3 +345,40 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     }
     assert constructed_query["body"]["from"] == 0
     assert constructed_query["body"]["size"] == posts_to_return
+
+
+def test_transform_aggregates():
+    """transform_aggregates should transform reverse nested availability results if present"""
+    raw_aggregate = {
+        "aggregations": {
+            "availability": {
+                "runs": {
+                    "buckets": [
+                        {
+                            "key": "availableNow",
+                            "doc_count": 1000,
+                            "courses": {"doc_count": 800},
+                        },
+                        {"key": "next30", "doc_count": 0, "courses": {"doc_count": 0}},
+                        {"key": "next60", "doc_count": 10, "courses": {"doc_count": 7}},
+                    ]
+                }
+            },
+            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+        }
+    }
+    assert transform_aggregates(raw_aggregate) == {
+        "aggregations": {
+            "availability": {
+                "buckets": [
+                    {"key": "availableNow", "doc_count": 800},
+                    {"key": "next60", "doc_count": 7},
+                ]
+            },
+            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+        }
+    }
+    raw_aggregate["aggregations"]["availability"].pop("runs", None)
+    assert transform_aggregates(raw_aggregate) == raw_aggregate
+    raw_aggregate["aggregations"].pop("availability", None)
+    assert transform_aggregates(raw_aggregate) == raw_aggregate

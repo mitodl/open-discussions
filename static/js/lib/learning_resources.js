@@ -9,6 +9,12 @@ import {
   LR_TYPE_USERLIST
 } from "./constants"
 import { capitalize, emptyOrNil } from "./util"
+import { AVAILABILITY_MAPPING } from "./search"
+
+export const availabilityFacetLabel = (availability: ?string) => {
+  const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
+  return facetKey ? facetKey.label : availability
+}
 
 export const availabilityLabel = (availability: ?string) => {
   switch (availability) {

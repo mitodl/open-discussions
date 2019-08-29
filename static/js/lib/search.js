@@ -153,6 +153,40 @@ const LIST_QUERY_FIELDS = [
   "topics"
 ]
 
+export const AVAILABLE_NOW = "availableNow"
+const AVAILABLE_NEXT_WEEK = "nextWeek"
+const AVAILABLE_NEXT_MONTH = "nextMonth"
+const AVAILABLE_NEXT_3MONTHS = "next3Months"
+const AVAILABLE_NEXT_6MONTHS = "next6Months"
+const AVAILABLE_NEXT_YEAR = "nextYear"
+
+export const AVAILABILITY_MAPPING = {
+  [AVAILABLE_NOW]: {
+    label:  "Available Now",
+    filter: { to: "now" }
+  },
+  [AVAILABLE_NEXT_WEEK]: {
+    label:  "Within next week",
+    filter: { from: "now", to: "now+7d" }
+  },
+  [AVAILABLE_NEXT_MONTH]: {
+    label:  "Within next month",
+    filter: { from: "now", to: "now+1M" }
+  },
+  [AVAILABLE_NEXT_3MONTHS]: {
+    label:  "Within next 3 months",
+    filter: { from: "now", to: "now+3M" }
+  },
+  [AVAILABLE_NEXT_6MONTHS]: {
+    label:  "Within next 6 months",
+    filter: { from: "now", to: "now+6M" }
+  },
+  [AVAILABLE_NEXT_YEAR]: {
+    label:  "Within next year",
+    filter: { from: "now", to: "now+12M" }
+  }
+}
+
 const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
@@ -257,7 +291,11 @@ export const buildSearchQuery = ({
     const facetClauses = []
     if (facets) {
       facets.forEach((values, key) => {
-        if (key !== OBJECT_TYPE && values && values.length > 0) {
+        if (
+          ![OBJECT_TYPE, "availability"].includes(key) &&
+          values &&
+          values.length > 0
+        ) {
           facetClauses.push({
             bool: {
               should: values.map(value => ({
@@ -268,12 +306,90 @@ export const buildSearchQuery = ({
             }
           })
         }
-        builder.agg(
-          "terms",
-          key === OBJECT_TYPE ? "object_type.keyword" : key,
-          { size: 10000 },
-          key
-        )
+        if (key === "availability") {
+          // Filter results by course run availability facet converted to date ranges
+          if (values && values.length > 0) {
+            const facetFilter = values.map(value => ({
+              nested: {
+                path:  "course_runs",
+                query: {
+                  range: {
+                    "course_runs.best_start_date":
+                      AVAILABILITY_MAPPING[value].filter
+                  }
+                }
+              }
+            }))
+            // 'availableNow' should include courses without start dates
+            if (values.includes(AVAILABLE_NOW)) {
+              facetFilter.push({
+                nested: {
+                  path:  "course_runs",
+                  query: {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "course_runs.best_start_date"
+                        }
+                      }
+                    }
+                  }
+                }
+              })
+            }
+            facetClauses.push({
+              bool: {
+                should: facetFilter
+              }
+            })
+          }
+          // Make availability aggregations based on course run date ranges
+          builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
+            aggr.agg(
+              "date_range",
+              "course_runs.best_start_date",
+              {
+                missing: "1901-01-01T00:00:00Z",
+                keyed:   false,
+                ranges:  [
+                  {
+                    key: AVAILABLE_NOW,
+                    ...AVAILABILITY_MAPPING.availableNow.filter
+                  },
+                  {
+                    key: AVAILABLE_NEXT_WEEK,
+                    ...AVAILABILITY_MAPPING.nextWeek.filter
+                  },
+                  {
+                    key: AVAILABLE_NEXT_MONTH,
+                    ...AVAILABILITY_MAPPING.nextMonth.filter
+                  },
+                  {
+                    key: AVAILABLE_NEXT_3MONTHS,
+                    ...AVAILABILITY_MAPPING.next3Months.filter
+                  },
+                  {
+                    key: AVAILABLE_NEXT_6MONTHS,
+                    ...AVAILABILITY_MAPPING.next6Months.filter
+                  },
+                  {
+                    key: AVAILABLE_NEXT_YEAR,
+                    ...AVAILABILITY_MAPPING.nextYear.filter
+                  }
+                ]
+              },
+              "runs",
+              aggr => aggr.agg("reverse_nested", null, {}, "courses")
+            )
+          )
+        } else {
+          builder.agg(
+            "terms",
+            key === OBJECT_TYPE ? "object_type.keyword" : key,
+            { size: 10000 },
+            key
+          )
+        }
       })
     }
 

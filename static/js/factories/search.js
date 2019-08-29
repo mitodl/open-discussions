@@ -156,10 +156,19 @@ export const makeSearchFacetResult = () => {
       ]
     },
     availability: {
-      buckets: [
-        { key: "Archived", doc_count: 33 },
-        { key: "Upcoming", doc_count: 67 }
-      ]
+      doc_count: 1215,
+      runs:      {
+        buckets: [
+          {
+            key:       "availableNow",
+            doc_count: 583
+          },
+          {
+            key:       "nextWeek",
+            doc_count: 22
+          }
+        ]
+      }
     },
     type: LR_TYPE_ALL
   }
