@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.88.1
+--------------
+
+- Working availability facet based on course run dates (#2158)
+- Support cancelling notifications for disabled notifications
+
 Version 0.88.0 (Released August 28, 2019)
 --------------
 
