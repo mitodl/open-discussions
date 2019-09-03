@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.89.1
+--------------
+
+- restyle the course-search facets
+- fix an issue with the responsiveness of the search facets
+
 Version 0.89.0 (Released September 03, 2019)
 --------------
 
