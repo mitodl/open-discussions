@@ -240,6 +240,16 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     mock_course_index_functions.index_new_course.assert_called_once_with(
         Course.objects.first()
     )
+    assert Course.objects.first().course_runs.first().best_start_date == datetime.strptime(
+        "2019-02-20T15:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
+    ).replace(
+        tzinfo=pytz.UTC
+    )
+    assert Course.objects.first().course_runs.first().best_end_date == datetime.strptime(
+        "2019-05-22T23:30:00Z", "%Y-%m-%dT%H:%M:%SZ"
+    ).replace(
+        tzinfo=pytz.UTC
+    )
 
 
 def test_parse_mitx_json_data_no_runs(mitx_valid_data):
