@@ -126,7 +126,6 @@ type Props = {
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
   overrideObject?: Object,
   searchResultLayout?: string
-
 }
 export default class SearchResult extends React.Component<Props> {
   render() {

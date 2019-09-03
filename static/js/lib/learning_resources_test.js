@@ -1,7 +1,11 @@
 // @flow
 import { assert } from "chai"
 
-import {dateFormat, makeCourse, makeCourseRun} from "../factories/learning_resources"
+import {
+  dateFormat,
+  makeCourse,
+  makeCourseRun
+} from "../factories/learning_resources"
 import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
@@ -13,7 +17,11 @@ import {
   minPrice,
   maxPrice,
   resourceLabel,
-  availabilityFacetLabel, parseDateFilter, inDateRanges, bestRunLabel
+  availabilityFacetLabel,
+  parseDateFilter,
+  inDateRanges,
+  bestRunLabel,
+  bestRun
 } from "./learning_resources"
 import {
   LR_TYPE_BOOTCAMP,
@@ -21,12 +29,9 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST
 } from "./constants"
-import {AVAILABILITY_MAPPING, AVAILABLE_NOW} from "./search"
-import sinon from "sinon";
-import type {CourseRun} from "../flow/discussionTypes";
-import moment from "moment";
-import {isNil} from "ramda";
-import R from "ramda";
+import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
+import sinon from "sinon"
+import R from "ramda"
 
 describe("Course utils", () => {
   [
@@ -99,13 +104,11 @@ describe("Course utils", () => {
       assert.equal(availabilityFacetLabel(searchType), label)
     })
   })
-
 })
 
 describe("Course run availability utils", () => {
-
   beforeEach(() => {
-    sinon.useFakeTimers(new Date("2019-09-01T00:00:00Z"));
+    sinon.useFakeTimers(new Date("2019-09-01T00:00:00Z"))
   })
 
   //
@@ -115,74 +118,188 @@ describe("Course run availability utils", () => {
     ["now+6M", "2020-03-01T00:00:00Z"],
     ["foo", null]
   ].forEach(([filter, expected]) => {
-    it(`parseDateFilter should return ${String(expected)} for filter ${filter}`, () => {
-        const parsedDate = parseDateFilter(filter)
-        assert.equal(parsedDate ? parsedDate.format(dateFormat) : parsedDate, expected)
-      })
+    it(`parseDateFilter should return ${String(
+      expected
+    )} for filter ${filter}`, () => {
+      const parsedDate = parseDateFilter(filter)
+      assert.equal(
+        parsedDate ? parsedDate.format(dateFormat) : parsedDate,
+        expected
+      )
+    })
   })
 
   //
   ;[
-    ["2019-08-01T00:00:00Z", "2019-08-31T00:00:00Z", ["availableNow"], true, AVAILABILITY_MAPPING.availableNow.label],
-    ["2019-08-02T00:00:00Z", "2019-08-31T00:00:00Z", ["nextWeek"], false, AVAILABILITY_MAPPING.availableNow.label],
-    ["2019-08-02T00:00:00Z", "2019-08-31T00:00:00Z", ["availableNow", "nextWeek"], true, AVAILABILITY_MAPPING.availableNow.label],
-    ["2019-09-02T00:00:00Z", "2019-10-31T00:00:00Z", ["nextWeek"], true, AVAILABILITY_MAPPING.nextWeek.label],
-    ["2019-08-01T00:00:00Z", null, ["availableNow"], true, AVAILABILITY_MAPPING.availableNow.label],
-    [null, "2019-08-31T00:00:00Z", ["availableNow"], true, AVAILABILITY_MAPPING.availableNow.label],
-    [null, "2019-08-31T00:00:00Z", ["nextWeek"], false, AVAILABILITY_MAPPING.availableNow.label],
-    [null, null, ["availableNow"], true, AVAILABILITY_MAPPING.availableNow.label],
+    [
+      "2019-08-01T00:00:00Z",
+      "2019-08-31T00:00:00Z",
+      ["availableNow"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      "2019-08-02T00:00:00Z",
+      "2019-08-31T00:00:00Z",
+      ["nextWeek"],
+      false,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      "2019-08-02T00:00:00Z",
+      "2019-08-31T00:00:00Z",
+      ["availableNow", "nextWeek"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      "2019-09-02T00:00:00Z",
+      "2019-10-31T00:00:00Z",
+      ["nextWeek"],
+      true,
+      AVAILABILITY_MAPPING.nextWeek.label
+    ],
+    [
+      "2019-08-01T00:00:00Z",
+      null,
+      ["availableNow"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      null,
+      "2019-08-31T00:00:00Z",
+      ["availableNow"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      null,
+      "2019-08-31T00:00:00Z",
+      ["nextWeek"],
+      false,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      null,
+      null,
+      ["availableNow"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
     [null, null, ["nextWeek"], false, AVAILABILITY_MAPPING.availableNow.label],
-    ["2019-09-02T00:00:00Z", "2019-09-30T00:00:00Z", ["availableNow"], false, AVAILABILITY_MAPPING.nextWeek.label],
-    ["2019-09-02T00:00:00Z", null, ["availableNow"], false, AVAILABILITY_MAPPING.nextWeek.label],
-    [null, "2019-09-31T00:00:00Z", ["availableNow"], true, AVAILABILITY_MAPPING.availableNow.label],
-    ["2019-09-02T00:00:00Z", "2019-09-30T00:00:00Z", ["availableNow", "nextWeek"], true, AVAILABILITY_MAPPING.nextWeek.label],
-    ["2019-09-02T00:00:00Z", null, ["availableNow", "nextWeek"], true, AVAILABILITY_MAPPING.nextWeek.label],
-    [null, "2019-09-30T00:00:00Z", ["availableNow", "nextWeek"], true, AVAILABILITY_MAPPING.availableNow.label],
-    ["2020-08-02T00:00:00Z", null, ["nextYear"], true, AVAILABILITY_MAPPING.nextYear.label],
-    ["2030-08-02T00:00:00Z", null, ["nextYear"], false, null],
+    [
+      "2019-09-02T00:00:00Z",
+      "2019-09-30T00:00:00Z",
+      ["availableNow"],
+      false,
+      AVAILABILITY_MAPPING.nextWeek.label
+    ],
+    [
+      "2019-09-02T00:00:00Z",
+      null,
+      ["availableNow"],
+      false,
+      AVAILABILITY_MAPPING.nextWeek.label
+    ],
+    [
+      null,
+      "2019-09-31T00:00:00Z",
+      ["availableNow"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      "2019-09-02T00:00:00Z",
+      "2019-09-30T00:00:00Z",
+      ["availableNow", "nextWeek"],
+      true,
+      AVAILABILITY_MAPPING.nextWeek.label
+    ],
+    [
+      "2019-09-02T00:00:00Z",
+      null,
+      ["availableNow", "nextWeek"],
+      true,
+      AVAILABILITY_MAPPING.nextWeek.label
+    ],
+    [
+      null,
+      "2019-09-30T00:00:00Z",
+      ["availableNow", "nextWeek"],
+      true,
+      AVAILABILITY_MAPPING.availableNow.label
+    ],
+    [
+      "2020-08-02T00:00:00Z",
+      null,
+      ["nextYear"],
+      true,
+      AVAILABILITY_MAPPING.nextYear.label
+    ],
+    ["2030-08-02T00:00:00Z", null, ["nextYear"], false, null]
   ].forEach(([start_date, end_date, availabilities, expected, label]) => {
-     const courseRun = makeCourseRun()
-     courseRun.best_start_date = start_date
-     courseRun.best_end_date = end_date
+    const courseRun = makeCourseRun()
+    courseRun.best_start_date = start_date
+    courseRun.best_end_date = end_date
 
-     it(`inDateRanges should return ${String(expected)} for start_date ${String(start_date)}, end_date ${String(end_date)}, availabilities ${String(availabilities)}`, () => {
-       assert.equal(inDateRanges(courseRun, availabilities), expected)
-     })
+    it(`inDateRanges should return ${String(expected)} for start_date ${String(
+      start_date
+    )}, end_date ${String(end_date)}, availabilities ${String(
+      availabilities
+    )}`, () => {
+      assert.equal(inDateRanges(courseRun, availabilities), expected)
+    })
 
-    it(`bestRunLabel should return ${label} for dates ${String(start_date)}-${String(end_date)}`, () => {
+    it(`bestRunLabel should return ${label} for dates ${String(
+      start_date
+    )}-${String(end_date)}`, () => {
       assert.equal(bestRunLabel(courseRun), label)
     })
   })
 
-
-  //;
-  [
+  //
+  ;[
     [
-      ["2019-09-02", "2019-08-31", "2019-10-22"], ["2019-10-02", "2019-09-31", "2019-11-22"], "2019-08-31"
+      ["2019-09-02", "2019-08-31", "2019-10-22"],
+      ["2019-10-02", "2019-09-30", "2019-11-22"],
+      "2019-08-31"
     ],
     [
-      ["2019-09-02", "2019-08-01", "2019-10-22"], ["2019-10-02", "2019-08-31", "2019-11-22"], "2019-09-02"
+      ["2019-10-22", "2019-08-01", "2019-09-02"],
+      ["2019-10-02", "2019-08-31", "2019-11-22"],
+      "2019-08-01"
     ],
     [
-      ["2019-11-02", "2019-10-01", "2019-12-22"], ["2019-12-02", "2019-11-31", "2019-12-23"],  "2019-10-01"
+      ["2019-11-02", "2019-10-01", "2019-12-22"],
+      ["2019-12-02", "2019-11-30", "2019-12-23"],
+      "2019-10-01"
     ],
     [
-      ["2019-11-02", "2019-10-01", "2019-10-22"], ["2019-12-02", null, "2019-11-22"],  "2019-10-01"
+      ["2019-11-02", "2019-10-01", "2019-10-22"],
+      ["2019-12-02", null, "2019-11-22"],
+      "2019-10-01"
     ],
     [
-      ["2019-11-02", null, "2019-10-22"], ["2019-12-02", "2019-11-31", "2019-11-22"], "2019-10-22"
+      ["2019-11-02", null, "2019-10-22"],
+      ["2019-12-02", "2019-11-31", "2019-11-22"],
+      "2019-10-22"
     ]
-    ].forEach(([start_dates, end_dates, expected]) => {
-      it(`best run of 3 should have start_date ${expected}`, () => {
-        assert(true)
-        // const runs = R.times(makeCourseRun, 3)
-        // const setDates = (iter) => {
-        //   runs[iter].start_date = start_dates[iter]
-        //   runs[iter].end_date = end_dates[iter]
-        // }
-        // R.times(setDates, 3)
-        //assert.equal(bestRun(runs).start_date.format('YYYY-MM-dd'), expected)
-      })
+  ].forEach(([start_dates, end_dates, expected]) => {
+    it(`best run of 3 should have start_date ${expected}`, () => {
+      const runs = R.times(makeCourseRun, 3)
+      const setDates = iter => {
+        runs[iter].best_start_date = start_dates[iter]
+          ? `${start_dates[iter]  }T00:00:00Z`
+          : null
+        runs[iter].best_end_date = end_dates[iter]
+          ? `${end_dates[iter]  }T00:00:00Z`
+          : null
+      }
+      R.times(setDates, 3)
+      assert.equal(runs[0].best_start_date, `${start_dates[0]  }T00:00:00Z`)
+      assert.equal(runs[0].best_end_date, `${end_dates[0]  }T00:00:00Z`)
+      assert.equal(bestRun(runs).best_start_date, `${expected  }T00:00:00Z`)
+    })
   })
-
 })

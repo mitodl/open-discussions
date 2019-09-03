@@ -7,7 +7,12 @@ import { connect } from "react-redux"
 
 import Card from "./Card"
 
-import {filterRunsByAvailability, bestRunLabel, bestRun, minPrice} from "../lib/learning_resources"
+import {
+  filterRunsByAvailability,
+  bestRunLabel,
+  bestRun,
+  minPrice
+} from "../lib/learning_resources"
 import {
   embedlyThumbnail,
   starSelectedURL,
@@ -100,11 +105,10 @@ export const LearningResourceCard = ({
   searchResultLayout,
   availabilities
 }: Props) => {
-
   // This run will be passed on to showResourceDrawer in a subsequent PR
-  const bestAvailableRun = bestRun(
-    filterRunsByAvailability(object.course_runs, availabilities)
-  ) || object.course_runs[0]
+  const bestAvailableRun =
+    bestRun(filterRunsByAvailability(object.course_runs, availabilities)) ||
+    object.course_runs[0]
 
   const showResourceDrawer = () =>
     setShowResourceDrawer({
@@ -136,9 +140,7 @@ export const LearningResourceCard = ({
           </div>
           <div className="availability grey-surround">
             <i className="material-icons calendar_today">calendar_today</i>
-            {
-              bestRunLabel(bestAvailableRun)
-            }
+            {bestRunLabel(bestAvailableRun)}
           </div>
           <div className="favorite grey-surround">
             <img

@@ -116,7 +116,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         <div className="course-info-row">
           <i className="material-icons attach_money">attach_money</i>
           <div className="course-info-label">Cost:</div>
-          <div className="course-info-value">{minPrice(object.course_runs[0])}</div>
+          <div className="course-info-value">
+            {minPrice(object.course_runs[0])}
+          </div>
         </div>
         {isCourse ? (
           <div className="course-info-row">
