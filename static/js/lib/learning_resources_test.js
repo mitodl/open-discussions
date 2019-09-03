@@ -107,8 +107,14 @@ describe("Course utils", () => {
 })
 
 describe("Course run availability utils", () => {
+  let clock
+
   beforeEach(() => {
-    sinon.useFakeTimers(new Date("2019-09-01T00:00:00Z"))
+    clock = sinon.useFakeTimers(new Date("2019-09-01T00:00:00Z"))
+  })
+
+  afterEach(() => {
+    clock.restore()
   })
 
   //
