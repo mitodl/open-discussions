@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.89.0
+--------------
+
+- Make sure best date fields are writable in serializer (#2186)
+- Working availability facet based on course run dates (#2158)
+- Support cancelling notifications for disabled notifications
+
 Version 0.88.0 (Released August 28, 2019)
 --------------
 
