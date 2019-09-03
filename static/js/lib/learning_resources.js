@@ -10,9 +10,12 @@ import {
 } from "./constants"
 import { capitalize, emptyOrNil } from "./util"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
-import moment from "moment"
+import moment, {Moment} from "moment"
 import { dateFormat } from "../factories/learning_resources"
 import type { CourseRun } from "../flow/discussionTypes"
+
+const defaultStartDate = moment("1970-01-01T00:00:00Z", dateFormat)
+const defaultEndDate = moment("2500-01-01T00:00:00Z", dateFormat)
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -30,7 +33,7 @@ export const availabilityLabel = (availability: ?string) => {
   }
 }
 
-export const parseDateFilter = filter => {
+export const parseDateFilter = (filter: string) => {
   const format = /(now)(\+)?(\d+)?([Md])?/
   const match = format.exec(filter)
   if (match) {
@@ -56,9 +59,11 @@ export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
       if (
         ((isNil(start_date) && availability === AVAILABLE_NOW) ||
           isNil(from) ||
+          // $FlowFixMe: okay to compare moments
           start_date >= from) &&
         ((isNil(start_date) && availability === AVAILABLE_NOW) ||
           isNil(to) ||
+          // $FlowFixMe: okay to compare moments
           start_date <= to)
       ) {
         inRange = true
@@ -79,12 +84,12 @@ export const bestRunLabel = (run: CourseRun) => {
   }
 }
 
-export const dateOrNull = dateString =>
-  dateString ? moment(dateString, dateFormat) : null
+export const dateOrDefault = (dateString:?string, dateDefault: Moment) =>
+  dateString ? moment(dateString, dateFormat) : dateDefault
 
-export const compareRuns = (firstRun, secondRun) =>
-  moment(firstRun.best_start_date, dateFormat) -
-  moment(secondRun.best_start_date, dateFormat)
+export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
+  (moment(firstRun.best_start_date, dateFormat) || defaultStartDate).diff(
+  (moment(secondRun.best_start_date, dateFormat) || defaultStartDate), "hours")
 
 export const bestRun = (runs: Array<CourseRun>) => {
   const now = moment()
@@ -92,35 +97,32 @@ export const bestRun = (runs: Array<CourseRun>) => {
   // Runs that are running right now
   const currentRuns = runs.filter(
     run =>
-      dateOrNull(run.best_start_date) <= now &&
-      (dateOrNull(run.best_end_date) > now || isNil(run.best_end_date))
+      dateOrDefault(run.best_start_date, defaultStartDate).diff(now) <= 0 &&
+      dateOrDefault(run.best_end_date, defaultEndDate).diff(now) > 0
   )
   if (!emptyOrNil(currentRuns)) {
-    //throw 'current ' + currentRuns[0].best_start_date
     return currentRuns[0]
   }
 
   // The next future run
   const futureRuns = runs
-    .filter(run => dateOrNull(run.best_start_date) > now)
+    .filter(run => dateOrDefault(run.best_start_date, defaultStartDate).diff(now) > 0)
     .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
-    //throw 'future ' + futureRuns[0].best_start_date
     return futureRuns[0]
   }
 
   // The most recent run that "ended"
   const mostRecentRuns = runs
-    .filter(run => dateOrNull(run.best_start_date) <= now)
+    .filter(run => dateOrDefault(run.best_start_date, defaultStartDate).diff(now) <=0)
     .sort(compareRuns)
     .reverse()
   if (!emptyOrNil(mostRecentRuns)) {
-    //throw 'past ' + mostRecentRuns[0].best_start_date
     return mostRecentRuns[0]
   }
 }
 
-export const filterRunsByAvailability = (runs, availabilities) =>
+export const filterRunsByAvailability = (runs: Array<CourseRun>, availabilities: ?Array<string>) =>
   runs.filter(
     run => (availabilities ? inDateRanges(run, availabilities) : true)
   )

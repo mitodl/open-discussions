@@ -93,7 +93,7 @@ type LearningResourceProps = {
   setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
   overrideObject?: Object,
   searchResultLayout?: string,
-  availabilities: Array<string>
+  availabilities?: Array<string>
 }
 
 const LearningResourceSearchResult = ({

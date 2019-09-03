@@ -42,6 +42,8 @@ export const makeCourseRun = (): CourseRun => {
     level:             casual.random_element(["Graduate", "Undergraduate", null]),
     start_date:        casual.date(dateFormat),
     end_date:          casual.date(dateFormat),
+    best_start_date:        casual.date(dateFormat),
+    best_end_date:          casual.date(dateFormat),
     enrollment_start:  casual.date(dateFormat),
     enrollment_end:    casual.date(dateFormat),
     availability:      casual.random_element([

@@ -41,7 +41,7 @@ type OwnProps = {|
   object: LearningResourceSummary,
   setShowResourceDrawer: Function,
   searchResultLayout?: string,
-  availabilities: Array<string>
+  availabilities?: Array<string>
 |}
 
 type DispatchProps = {|
