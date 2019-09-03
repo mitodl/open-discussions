@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.89.0
+Version 0.89.0 (Released September 03, 2019)
 --------------
 
 - Make sure best date fields are writable in serializer (#2186)
