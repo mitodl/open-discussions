@@ -1,5 +1,6 @@
 //@flow
 import { concat, isNil } from "ramda"
+import moment from "moment"
 
 import {
   COURSE_ARCHIVED,
@@ -8,10 +9,10 @@ import {
   COURSE_PRIOR,
   LR_TYPE_USERLIST
 } from "./constants"
-import { capitalize, emptyOrNil } from "./util"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
-import moment from "moment"
+import { capitalize, emptyOrNil } from "./util"
 import { dateFormat } from "../factories/learning_resources"
+
 import type { CourseRun } from "../flow/discussionTypes"
 
 const defaultStartDate = "1970-01-01T00:00:00Z"

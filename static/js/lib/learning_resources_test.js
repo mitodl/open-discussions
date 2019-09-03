@@ -1,17 +1,19 @@
 // @flow
 import { assert } from "chai"
+import sinon from "sinon"
+import { times } from "ramda"
 
-import {
-  dateFormat,
-  makeCourse,
-  makeCourseRun
-} from "../factories/learning_resources"
 import {
   COURSE_ARCHIVED,
   COURSE_AVAILABLE_NOW,
   COURSE_CURRENT,
-  COURSE_PRIOR
+  COURSE_PRIOR,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
 } from "./constants"
+import { AVAILABILITY_MAPPING } from "./search"
 import {
   availabilityLabel,
   minPrice,
@@ -24,14 +26,10 @@ import {
   bestRun
 } from "./learning_resources"
 import {
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
-} from "./constants"
-import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
-import sinon from "sinon"
-import R from "ramda"
+  dateFormat,
+  makeCourse,
+  makeCourseRun
+} from "../factories/learning_resources"
 
 describe("Course utils", () => {
   [
@@ -293,7 +291,7 @@ describe("Course run availability utils", () => {
     ]
   ].forEach(([startDates, endDates, expected]) => {
     it(`best run of 3 should have start_date ${expected}`, () => {
-      const runs = R.times(makeCourseRun, 3)
+      const runs = times(makeCourseRun, 3)
       const setDates = iter => {
         runs[iter].best_start_date = startDates[iter]
           ? `${startDates[iter]}T00:00:00Z`
@@ -302,7 +300,7 @@ describe("Course run availability utils", () => {
           ? `${endDates[iter]}T00:00:00Z`
           : null
       }
-      R.times(setDates, 3)
+      times(setDates, 3)
       // $FlowFixMe: best_start_date won't be null for these tests
       assert.equal(bestRun(runs).best_start_date, `${expected}T00:00:00Z`)
     })

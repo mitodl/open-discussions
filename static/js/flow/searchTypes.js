@@ -67,7 +67,7 @@ export type LearningResourceRun = {
   enrollment_start?:   ?string,
   enrollment_end?:     ?string,
   best_start_date?:    ?string,
-  best_end_date?:           ?string,
+  best_end_date?:      ?string,
   availability?:       ?string,
   instructors:         Array<CourseInstructor>,
   prices:              Array<CoursePrice>
