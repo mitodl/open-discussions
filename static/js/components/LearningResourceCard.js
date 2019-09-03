@@ -108,7 +108,7 @@ export const LearningResourceCard = ({
   // This run will be passed on to showResourceDrawer in a subsequent PR
   const bestAvailableRun =
     bestRun(filterRunsByAvailability(object.course_runs, availabilities)) ||
-    object.course_runs[0]
+    (object.course_runs ? object.course_runs[0] : null)
 
   const showResourceDrawer = () =>
     setShowResourceDrawer({

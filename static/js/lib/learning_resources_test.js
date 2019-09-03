@@ -238,22 +238,22 @@ describe("Course run availability utils", () => {
       AVAILABILITY_MAPPING.nextYear.label
     ],
     ["2030-08-02T00:00:00Z", null, ["nextYear"], false, null]
-  ].forEach(([start_date, end_date, availabilities, expected, label]) => {
+  ].forEach(([startDate, endDate, availabilities, expected, label]) => {
     const courseRun = makeCourseRun()
-    courseRun.best_start_date = start_date
-    courseRun.best_end_date = end_date
+    courseRun.best_start_date = startDate
+    courseRun.best_end_date = endDate
 
     it(`inDateRanges should return ${String(expected)} for start_date ${String(
-      start_date
-    )}, end_date ${String(end_date)}, availabilities ${String(
+      startDate
+    )}, end_date ${String(endDate)}, availabilities ${String(
       availabilities
     )}`, () => {
       assert.equal(inDateRanges(courseRun, availabilities), expected)
     })
 
-    it(`bestRunLabel should return ${label} for dates ${String(
-      start_date
-    )}-${String(end_date)}`, () => {
+    it(`bestRunLabel should return ${String(label)} for dates ${String(
+      startDate
+    )}-${String(endDate)}`, () => {
       assert.equal(bestRunLabel(courseRun), label)
     })
   })
@@ -266,8 +266,8 @@ describe("Course run availability utils", () => {
       "2019-08-31"
     ],
     [
-      ["2019-10-22", "2019-08-01", "2019-09-02"],
-      ["2019-10-02", "2019-08-31", "2019-11-22"],
+      ["2019-06-22", "2019-08-01", "2019-07-02"],
+      ["2019-08-02", "2019-08-31", "2019-08-22"],
       "2019-08-01"
     ],
     [
@@ -285,21 +285,20 @@ describe("Course run availability utils", () => {
       ["2019-12-02", "2019-11-31", "2019-11-22"],
       "2019-10-22"
     ]
-  ].forEach(([start_dates, end_dates, expected]) => {
+  ].forEach(([startDates, endDates, expected]) => {
     it(`best run of 3 should have start_date ${expected}`, () => {
       const runs = R.times(makeCourseRun, 3)
       const setDates = iter => {
-        runs[iter].best_start_date = start_dates[iter]
-          ? `${start_dates[iter]  }T00:00:00Z`
+        runs[iter].best_start_date = startDates[iter]
+          ? `${startDates[iter]}T00:00:00Z`
           : null
-        runs[iter].best_end_date = end_dates[iter]
-          ? `${end_dates[iter]  }T00:00:00Z`
+        runs[iter].best_end_date = endDates[iter]
+          ? `${endDates[iter]}T00:00:00Z`
           : null
       }
       R.times(setDates, 3)
-      assert.equal(runs[0].best_start_date, `${start_dates[0]  }T00:00:00Z`)
-      assert.equal(runs[0].best_end_date, `${end_dates[0]  }T00:00:00Z`)
-      assert.equal(bestRun(runs).best_start_date, `${expected  }T00:00:00Z`)
+      // $FlowFixMe: best_start_date won't be null for these tests
+      assert.equal(bestRun(runs).best_start_date, `${expected}T00:00:00Z`)
     })
   })
 })

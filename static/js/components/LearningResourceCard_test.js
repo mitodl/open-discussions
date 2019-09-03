@@ -6,7 +6,12 @@ import { mount } from "enzyme"
 
 import { LearningResourceCard } from "./LearningResourceCard"
 
-import { availabilityLabel, minPrice } from "../lib/learning_resources"
+import {
+  availabilityLabel,
+  bestRun,
+  bestRunLabel,
+  minPrice
+} from "../lib/learning_resources"
 import { makeLearningResource } from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
@@ -153,7 +158,7 @@ describe("LearningResourceCard", () => {
           .text()
           .replace("calendar_today", ""),
         [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].includes(objectType)
-          ? availabilityLabel(object.course_runs[0].availability)
+          ? bestRunLabel(bestRun(object.course_runs))
           : COURSE_AVAILABLE_NOW
       )
     })
