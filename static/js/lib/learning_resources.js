@@ -96,7 +96,8 @@ export const bestRun = (runs: Array<CourseRun>) => {
   // Runs that are running right now
   const currentRuns = runs.filter(
     run =>
-      moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <= 0 &&
+      moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <=
+        0 &&
       moment(run.best_end_date || defaultEndDate, dateFormat).diff(now) > 0
   )
   if (!emptyOrNil(currentRuns)) {
@@ -106,7 +107,9 @@ export const bestRun = (runs: Array<CourseRun>) => {
   // The next future run
   const futureRuns = runs
     .filter(
-      run => moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) > 0
+      run =>
+        moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) >
+        0
     )
     .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
@@ -116,7 +119,9 @@ export const bestRun = (runs: Array<CourseRun>) => {
   // The most recent run that "ended"
   const mostRecentRuns = runs
     .filter(
-      run => moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <= 0
+      run =>
+        moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <=
+        0
     )
     .sort(compareRuns)
     .reverse()
@@ -131,8 +136,8 @@ export const filterRunsByAvailability = (
   availabilities: ?Array<string>
 ) =>
   runs
-    // $FlowFixMe
-    ? runs.filter(
+    ? // $FlowFixMe
+    runs.filter(
       run => (availabilities ? inDateRanges(run, availabilities) : true)
     )
     : []
