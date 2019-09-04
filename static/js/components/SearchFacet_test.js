@@ -44,7 +44,7 @@ describe("SearchFacet", () => {
   it("should render facets correctly", () => {
     const wrapper = renderSearchFacet()
     const checkbox = wrapper.find("input").at(0)
-    assert.include(wrapper.find(".facet-title").text(), title)
+    assert.include(wrapper.find(".filter-section-title").text(), title)
     assert.equal(checkbox.prop("name"), name)
     assert.equal(checkbox.prop("value"), facet["key"])
   })
@@ -75,7 +75,7 @@ describe("SearchFacet", () => {
   it("should have a button to show / hide the facet list", () => {
     const wrapper = renderSearchFacet()
     assert.ok(wrapper.find(".facet-visible").exists())
-    wrapper.find(".facet-title").simulate("click")
+    wrapper.find(".filter-section-title").simulate("click")
     assert.isNotOk(wrapper.find(".facet-visible").exists())
   })
 

@@ -35,7 +35,7 @@ function SearchFacet(props: Props) {
   return (
     <div className="facets">
       <div
-        className="facet-title"
+        className="filter-section-title"
         onClick={() => setShowFacetList(!showFacetList)}
       >
         {title}

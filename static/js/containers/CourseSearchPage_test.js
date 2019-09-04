@@ -329,7 +329,7 @@ describe("CourseSearchPage", () => {
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
     assert.equal(wrapper.find("SearchFilter").length, 8)
-    wrapper.find(".search-filters-clear").simulate("click")
+    wrapper.find(".clear-all-filters").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
       inner.state().activeFacets,

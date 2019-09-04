@@ -365,6 +365,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { match } = this.props
     const { text, error, activeFacets, searchResultLayout } = this.state
 
+    const anyFiltersActive =
+      _.flatten(_.toArray(activeFacets.values())).length > 0
+
     return (
       <BannerPageWrapper>
         <MetaTags>
@@ -393,29 +396,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
           </Grid>
         </BannerPageHeader>
         <Grid className="main-content two-column-extrawide search-page">
-          <Cell width={12}>
-            <div className="search-filters-row">
-              {facetDisplayMap.map(([name, title, labelFunction]) =>
-                (activeFacets.get(name) || []).map((facet, i) => (
-                  <SearchFilter
-                    key={i}
-                    title={title}
-                    value={facet}
-                    clearFacet={() => this.toggleFacet(name, facet, false)}
-                    labelFunction={labelFunction}
-                  />
-                ))
-              )}
-              {_.flatten(_.toArray(activeFacets.values())).length > 0 ? (
-                <div
-                  className="search-filters-clear"
-                  onClick={this.clearAllFilters}
-                >
-                  Clear all filters
-                </div>
-              ) : null}
-            </div>
-          </Cell>
           <Cell width={3} />
           <Cell width={9}>
             <div className="layout-buttons">
@@ -437,7 +417,31 @@ export class CourseSearchPage extends React.Component<Props, State> {
               </div>
             </div>
           </Cell>
-          <Cell width={3}>
+          <Cell className="search-filters" width={3}>
+            <div className="active-search-filters">
+              {anyFiltersActive ? (
+                <div className="filter-section-title">
+                  Filters
+                  <span
+                    className="clear-all-filters"
+                    onClick={this.clearAllFilters}
+                  >
+                    Clear All
+                  </span>
+                </div>
+              ) : null}
+              {facetDisplayMap.map(([name, title, labelFunction]) =>
+                (activeFacets.get(name) || []).map((facet, i) => (
+                  <SearchFilter
+                    key={i}
+                    title={title}
+                    value={facet}
+                    clearFacet={() => this.toggleFacet(name, facet, false)}
+                    labelFunction={labelFunction}
+                  />
+                ))
+              )}
+            </div>
             {facetDisplayMap.map(([name, title, labelFunction], i) => (
               <SearchFacet
                 key={i}

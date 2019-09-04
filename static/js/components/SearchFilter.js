@@ -9,13 +9,13 @@ type Props = {|
 |}
 
 const SearchFilter = ({ title, value, clearFacet, labelFunction }: Props) => (
-  <div className={"search-filter-div"}>
+  <div className="active-search-filter">
+    <div className="remove-filter" onClick={clearFacet}>
+      <i className="material-icons">close</i>
+    </div>
     <div>
       {title}
       {value ? `: ${labelFunction ? labelFunction(value) : value}` : ""}
-    </div>
-    <div className="search-filter-close" onClick={clearFacet}>
-      <i className="material-icons">close</i>
     </div>
   </div>
 )
