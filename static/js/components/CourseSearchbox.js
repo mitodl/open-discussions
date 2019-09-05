@@ -11,12 +11,11 @@ type Props = {
   autoFocus?: boolean
 }
 
-function CourseSearchbox(props: Props) {
+export default function CourseSearchbox(props: Props) {
   const { onChange, value, onSubmit, validation, autoFocus } = props
 
   return (
     <div className="course-searchbox">
-      <label>Search Learning Offerings</label>
       <div className="input-wrapper">
         <input
           autoFocus={autoFocus}
@@ -25,7 +24,7 @@ function CourseSearchbox(props: Props) {
           className="search-input"
           onChange={onChange}
           onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
-          placeholder="Search"
+          placeholder="Search Learning Offerings"
           value={value}
         />
         <i className="material-icons search-icon" onClick={onSubmit}>
@@ -36,5 +35,3 @@ function CourseSearchbox(props: Props) {
     </div>
   )
 }
-
-export default CourseSearchbox

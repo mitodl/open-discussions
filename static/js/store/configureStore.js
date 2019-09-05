@@ -19,30 +19,40 @@ const persistConfig = {
   merge: R.mergeDeepRight
 }
 
-export let createStoreWithMiddleware
-if (process.env.NODE_ENV !== "production") {
-  createStoreWithMiddleware = compose(
-    persistState(null, persistConfig),
-    applyMiddleware(
-      queryMiddleware(makeRequest, getQueries, getEntities),
-      createDebounce(),
-      thunkMiddleware,
-      createLogger()
-    ),
-    window.devToolsExtension ? window.devToolsExtension() : f => f
-  )(createStore)
-} else {
-  createStoreWithMiddleware = compose(
-    persistState(null, persistConfig),
-    applyMiddleware(
-      queryMiddleware(makeRequest, getQueries, getEntities),
-      createDebounce(),
-      thunkMiddleware
-    )
-  )(createStore)
-}
-
 export default function configureStore(initialState: Object) {
+  let createStoreWithMiddleware
+  if (process.env.NODE_ENV === "production") {
+    createStoreWithMiddleware = compose(
+      persistState(null, persistConfig),
+      applyMiddleware(
+        queryMiddleware(makeRequest, getQueries, getEntities),
+        createDebounce(),
+        thunkMiddleware
+      )
+    )(createStore)
+  } else if (global._testing === true) {
+    // testing config, we want to skip the localStorage sync thing
+    createStoreWithMiddleware = compose(
+      applyMiddleware(
+        queryMiddleware(makeRequest, getQueries, getEntities),
+        createDebounce(),
+        thunkMiddleware
+      )
+    )(createStore)
+  } else {
+    // development config, we want the logger and redux devtools
+    createStoreWithMiddleware = compose(
+      persistState(null, persistConfig),
+      applyMiddleware(
+        queryMiddleware(makeRequest, getQueries, getEntities),
+        createDebounce(),
+        thunkMiddleware,
+        createLogger()
+      ),
+      window.devToolsExtension ? window.devToolsExtension() : f => f
+    )(createStore)
+  }
+
   const store = createStoreWithMiddleware(
     rootReducer,
     // calling the reducer with `undefined` and a no-op action

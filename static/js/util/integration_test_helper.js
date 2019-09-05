@@ -1,12 +1,14 @@
 /* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
-import { mount, shallow } from "enzyme"
+import { mount } from "enzyme"
 import sinon from "sinon"
 import { createMemoryHistory } from "history"
 import configureTestStore from "redux-asserts"
 import configureStore from "redux-mock-store"
 import thunk from "redux-thunk"
+import { Provider } from "react-redux"
+import { Provider as ReduxQueryProvider } from "redux-query-react"
 
 import Router, { routes } from "../Router"
 
@@ -19,13 +21,13 @@ import * as frontpageAPI from "../lib/api/frontpage"
 import * as postAPI from "../lib/api/posts"
 import * as commentAPI from "../lib/api/comments"
 import * as livestreamAPI from "../lib/api/livestream"
-import * as courseAPI from "../lib/queries/courses"
-import * as bootcampAPI from "../lib/queries/bootcamps"
 import * as widgetAPI from "../lib/api/widgets"
 import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 import * as networkInterfaceFuncs from "../store/network_interface"
 import * as embedUtil from "../lib/embed"
+import { getQueries } from "../lib/redux-query"
+import * as storeLib from "../store/configureStore"
 
 import type { Sandbox } from "../flow/sinonTypes"
 
@@ -58,8 +60,6 @@ export default class IntegrationTestHelper {
       postAPI,
       commentAPI,
       livestreamAPI,
-      courseAPI,
-      bootcampAPI,
       widgetAPI
     ].forEach(apiModule => {
       for (const methodName in apiModule) {
@@ -111,6 +111,10 @@ export default class IntegrationTestHelper {
           throw new Error("Aborts currently unhandled")
         }
       }))
+
+    // there's a good reason for this I promise
+    this.realWarn = console.warn
+    console.warn = () => {}
   }
 
   cleanup(unmount = true) {
@@ -123,6 +127,7 @@ export default class IntegrationTestHelper {
       this.wrapper.unmount()
       delete this.wrapper
     }
+    console.warn = this.realWarn
   }
 
   /**
@@ -185,6 +190,30 @@ export default class IntegrationTestHelper {
       return actions[actions.length - 1]
     }
     return store
+  }
+
+  createFullStore(initialState) {
+    return storeLib.default(initialState)
+  }
+
+  configureReduxQueryRenderer(Component, defaultProps = {}) {
+    const history = this.browserHistory
+    return async (extraProps = { history }) => {
+      const store = this.createFullStore()
+
+      const wrapper = await mount(
+        <Provider store={store}>
+          <ReduxQueryProvider queriesSelector={getQueries}>
+            <Router store={store} history={this.browserHistory}>
+              <Component {...defaultProps} {...extraProps} />
+            </Router>
+          </ReduxQueryProvider>
+        </Provider>
+      )
+      this.wrapper = wrapper
+      wrapper.update()
+      return { wrapper, store }
+    }
   }
 
   configureHOCRenderer(

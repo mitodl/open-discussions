@@ -42,6 +42,7 @@ const _createSettings = () => ({
 })
 
 global.SETTINGS = _createSettings()
+global._testing = true
 
 window.scrollTo = () => "scroll!"
 

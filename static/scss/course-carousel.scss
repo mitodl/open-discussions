@@ -11,35 +11,37 @@
 
   .title {
     font-size: $title-font-size;
-    color: $nice-red;
+    color: black;
     font-weight: bold;
   }
 
-  .title-row {
+  .title-and-controls {
+    margin: 30px 0 10px 0;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
-    margin: 30px 0;
-  }
 
-  .slider-control-centerright {
-    right: -40px !important;
-  }
+    .controls {
+      display: flex;
+      align-items: flex-end;
 
-  .slider-control-centerleft {
-    left: -42px !important;
-  }
+      button {
+        font-size: 14px;
 
-  .carousel-control {
-    height: 60px;
-    width: 60px;
-    background: #d8d8d8;
-    border-radius: 200px;
-    opacity: 0.5;
-    cursor: pointer;
+        &.next {
+          margin-right: 0;
 
-    i {
-      color: white;
-      font-size: 62px;
+          i {
+            margin-right: 0;
+            margin-left: 5px;
+          }
+        }
+
+        &.disabled {
+          color: $font-grey-light;
+          border: 1px solid $border-grey;
+        }
+      }
     }
   }
 }

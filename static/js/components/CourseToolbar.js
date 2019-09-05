@@ -52,7 +52,7 @@ export default class CourseToolbar extends React.Component<Props> {
                 </Link>
                 <div className="bar">{" | "}</div>
                 <Link className="learning-link" to={COURSE_URL}>
-                  LEARNING
+                  LEARN
                 </Link>
               </div>
             </section>

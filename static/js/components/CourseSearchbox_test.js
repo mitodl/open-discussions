@@ -24,15 +24,6 @@ describe("CourseSearchbox", () => {
     sandbox.restore()
   })
 
-  it("should say 'Search Learning Offerings'", () => {
-    assert.equal(
-      renderSearchbox()
-        .find("label")
-        .text(),
-      "Search Learning Offerings"
-    )
-  })
-
   it("should have an input", () => {
     const input = renderSearchbox({ value: "value!" }).find("input")
     const {
@@ -46,7 +37,7 @@ describe("CourseSearchbox", () => {
     assert.equal(type, "text")
     assert.equal(className, "search-input")
     assert.equal(name, "query")
-    assert.equal(placeholder, "Search")
+    assert.equal(placeholder, "Search Learning Offerings")
     assert.equal(onChange, onChangeStub)
     assert.equal(value, "value!")
   })

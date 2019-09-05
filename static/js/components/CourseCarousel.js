@@ -1,12 +1,14 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
+import React, { useState } from "react"
 import Carousel from "nuka-carousel"
+import R from "ramda"
 
 import LearningResourceCard from "./LearningResourceCard"
 
 import { SEARCH_GRID_UI } from "../lib/search"
-import { CAROUSEL_PAGE_SIZE } from "../lib/constants"
+import { CAROUSEL_PAGE_SIZE, PHONE, TABLET, DESKTOP } from "../lib/constants"
+import { useDeviceCategory } from "../hooks/util"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
 
@@ -16,50 +18,70 @@ type Props = {|
   setShowResourceDrawer: Function
 |}
 
-const prevButton = ({ previousSlide, currentSlide }) =>
-  currentSlide === 0 ? null : (
-    <div onClick={previousSlide} className="carousel-control prev">
-      <i className="material-icons">chevron_left</i>
-    </div>
-  )
+const carouselPageSizes = {
+  [PHONE]:   1,
+  [TABLET]:  2,
+  [DESKTOP]: 3
+}
 
-const nextButton = props => {
-  const { slideCount, nextSlide, currentSlide, slidesToShow } = props
-  const lastSlideIndex = slideCount - 1
+export default function CourseCarousel(props: Props) {
+  const { title, courses, setShowResourceDrawer } = props
 
-  const disabled = currentSlide + slidesToShow > lastSlideIndex
-  return disabled ? null : (
-    <div onClick={nextSlide} className="carousel-control next">
-      <i className="material-icons">chevron_right</i>
+  const [index, setIndex] = useState(0)
+  const deviceCategory = useDeviceCategory()
+  const pageSize = carouselPageSizes[deviceCategory]
+  const canPageUp = index + pageSize < courses.length
+  const canPageDown = index !== 0
+
+  return (
+    <div className="course-carousel">
+      <div className="title-and-controls">
+        <div className="title">{title}</div>
+        <div className="controls">
+          <button
+            className={`dark-outlined compact extra-compact prev ${
+              canPageDown ? "" : "disabled"
+            }`}
+            disabled={!canPageDown}
+            onClick={
+              canPageDown ? () => setIndex(R.max(index - pageSize, 0)) : null
+            }
+          >
+            <i className="material-icons">arrow_back</i>
+            Previous
+          </button>
+          <button
+            className={`dark-outlined compact extra-compact next ${
+              canPageUp ? "" : "disabled"
+            }`}
+            onClick={canPageUp ? () => setIndex(index + pageSize) : null}
+            disabled={!canPageUp}
+          >
+            Next
+            <i className="material-icons">arrow_forward</i>
+          </button>
+        </div>
+      </div>
+      <Carousel
+        slideIndex={index}
+        slidesToShow={pageSize}
+        slidesToScroll="auto"
+        withoutControls={true}
+        afterSlide={slideIndex => setIndex(slideIndex)}
+        speed={800}
+        easing="easeQuadInOut"
+        cellSpacing={22}
+        heightMode="current"
+      >
+        {courses.map((course, idx) => (
+          <LearningResourceCard
+            key={idx}
+            object={course}
+            setShowResourceDrawer={setShowResourceDrawer}
+            searchResultLayout={SEARCH_GRID_UI}
+          />
+        ))}
+      </Carousel>
     </div>
   )
 }
-
-const CourseCarousel = ({ title, courses, setShowResourceDrawer }: Props) => (
-  <div className="course-carousel">
-    <div className="title-row">
-      <div className="title">{title}</div>
-    </div>
-    <Carousel
-      slidesToShow={CAROUSEL_PAGE_SIZE}
-      slidesToScroll="auto"
-      speed={800}
-      easing="easeQuadInOut"
-      cellSpacing={22}
-      heightMode="max"
-      renderCenterLeftControls={prevButton}
-      renderCenterRightControls={nextButton}
-      renderBottomCenterControls={null}
-    >
-      {courses.map((course, idx) => (
-        <LearningResourceCard
-          key={idx}
-          object={course}
-          setShowResourceDrawer={setShowResourceDrawer}
-          searchResultLayout={SEARCH_GRID_UI}
-        />
-      ))}
-    </Carousel>
-  </div>
-)
-export default CourseCarousel

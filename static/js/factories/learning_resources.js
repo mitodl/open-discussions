@@ -18,6 +18,7 @@ import type {
   Bootcamp,
   Course,
   CourseRun,
+  LearningResource,
   Program,
   UserList
 } from "../flow/discussionTypes"
@@ -132,4 +133,23 @@ export const makeLearningResource = (objectType: string) => {
   case LR_TYPE_USERLIST:
     return R.merge({ object_type: LR_TYPE_USERLIST }, makeUserList())
   }
+}
+
+const formatFavorite = contentType => resource => ({
+  content_data: resource,
+  content_type: contentType
+})
+
+const makeFavorite = obj => ({ ...obj, is_favorite: true })
+
+export const makeFavoritesResponse = () => {
+  const courses = R.times(makeCourse, 3).map(makeFavorite)
+  const programs = R.times(makeProgram, 3).map(makeFavorite)
+  const bootcamps = R.times(makeBootcamp, 3).map(makeFavorite)
+
+  return [
+    ...courses.map(formatFavorite(LR_TYPE_COURSE)),
+    ...programs.map(formatFavorite(LR_TYPE_PROGRAM)),
+    ...bootcamps.map(formatFavorite(LR_TYPE_BOOTCAMP))
+  ]
 }

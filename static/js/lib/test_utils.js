@@ -8,6 +8,9 @@ import { shallow } from "enzyme"
 import { makeCourse } from "../factories/learning_resources"
 import { S } from "./sanctuary"
 const { Maybe } = S
+import { upcomingCoursesURL, newCoursesURL } from "../lib/url"
+
+import type { LearningResource } from "../flow/discussionTypes"
 
 export const assertMaybeEquality = (m1: Maybe, m2: Maybe) => {
   assert(S.equals(m1, m2), `expected ${m1.value} to equal ${m2.value}`)
@@ -52,8 +55,18 @@ export const makeEvent = (name: string, value: any) => ({
 })
 
 export const mockCourseAPIMethods = (helper: Object) => {
-  helper.newCoursesSelectorStub.returns(R.times(makeCourse, 10))
-  helper.newCoursesRequestStub.returns({})
-  helper.upcomingCoursesSelectorStub.returns(R.times(makeCourse, 10))
-  helper.upcomingCoursesRequestStub.returns({})
+  helper.handleRequestStub
+    .withArgs(upcomingCoursesURL)
+    .returns(courseListResponse(R.times(makeCourse, 10)))
+  helper.handleRequestStub
+    .withArgs(newCoursesURL)
+    .returns(courseListResponse(R.times(makeCourse, 10)))
 }
+
+export const courseListResponse = (list: Array<LearningResource>) => ({
+  status: 200,
+  body:   {
+    next:    null,
+    results: list
+  }
+})
