@@ -7,12 +7,11 @@ import {
   COURSE_AVAILABLE_NOW,
   COURSE_CURRENT,
   COURSE_PRIOR,
+  DATE_FORMAT,
   LR_TYPE_USERLIST
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
-import { dateFormat } from "../factories/learning_resources"
-
 import type { CourseRun } from "../flow/discussionTypes"
 
 const defaultStartDate = "1970-01-01T00:00:00Z"
@@ -34,7 +33,8 @@ export const availabilityLabel = (availability: ?string) => {
   }
 }
 
-export const parseDateFilter = (filter: string) => {
+export const availabilityFilterToMoment = (filter: string) => {
+  // Convert an Elasticsearch date_range filter string to a moment
   const format = /(now)(\+)?(\d+)?([Md])?/
   const match = format.exec(filter)
   if (match) {
@@ -50,22 +50,20 @@ export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
   let inRange = false
   availabilities.forEach(availability => {
     if (AVAILABILITY_MAPPING[availability]) {
-      const from = parseDateFilter(
+      const from = availabilityFilterToMoment(
         AVAILABILITY_MAPPING[availability].filter.from
       )
-      const to = parseDateFilter(AVAILABILITY_MAPPING[availability].filter.to)
-      const startDate = run.best_start_date
-        ? moment(run.best_start_date, dateFormat)
-        : null
+      const to = availabilityFilterToMoment(
+        AVAILABILITY_MAPPING[availability].filter.to
+      )
+      const startDate = runStartDate(run)
       if (
-        ((isNil(startDate) && availability === AVAILABLE_NOW) ||
-          isNil(from) ||
-          // $FlowFixMe: okay to compare moments
-          startDate >= from) &&
-        ((isNil(startDate) && availability === AVAILABLE_NOW) ||
-          isNil(to) ||
-          // $FlowFixMe: okay to compare moments
-          startDate <= to)
+        (isNil(from) ||
+          // $FlowFixMe: if we get this far, only moments are compared
+          startDate.isSameOrAfter(from)) &&
+        (isNil(to) ||
+          // $FlowFixMe: if we get this far, only moments are compared
+          startDate.isSameOrBefore(to))
       ) {
         inRange = true
       }
@@ -85,21 +83,20 @@ export const bestRunLabel = (run: ?CourseRun) => {
   }
 }
 
+const runStartDate = (courseRun: CourseRun) =>
+  moment(courseRun.best_start_date || defaultStartDate, DATE_FORMAT)
+const runEndDate = (courseRun: CourseRun) =>
+  moment(courseRun.best_end_date || defaultEndDate, DATE_FORMAT)
+
 export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
-  moment(firstRun.best_start_date || defaultStartDate, dateFormat).diff(
-    moment(secondRun.best_start_date || defaultStartDate, dateFormat),
-    "hours"
-  )
+  runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
 export const bestRun = (runs: Array<CourseRun>) => {
   const now = moment()
 
   // Runs that are running right now
   const currentRuns = runs.filter(
-    run =>
-      moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <=
-        0 &&
-      moment(run.best_end_date || defaultEndDate, dateFormat).diff(now) > 0
+    run => runStartDate(run).isSameOrBefore(now) && runEndDate(run).isAfter(now)
   )
   if (!emptyOrNil(currentRuns)) {
     return currentRuns[0]
@@ -107,11 +104,7 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The next future run
   const futureRuns = runs
-    .filter(
-      run =>
-        moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) >
-        0
-    )
+    .filter(run => runStartDate(run).isAfter(now))
     .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
     return futureRuns[0]
@@ -119,11 +112,7 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The most recent run that "ended"
   const mostRecentRuns = runs
-    .filter(
-      run =>
-        moment(run.best_start_date || defaultStartDate, dateFormat).diff(now) <=
-        0
-    )
+    .filter(run => runStartDate(run).isSameOrBefore(now))
     .sort(compareRuns)
     .reverse()
   if (!emptyOrNil(mostRecentRuns)) {
@@ -150,15 +139,13 @@ export const resourceLabel = (resource: string) => {
 }
 
 export const maxPrice = (courseRun: ?CourseRun) => {
-  // $FlowFixMe: prices property will exist if courseRun not emotyOrNil
-  const prices = !emptyOrNil(courseRun) ? courseRun.prices : []
+  const prices = courseRun && courseRun.prices ? courseRun.prices : []
   const price = Math.max(...prices.map(price => price.price))
   return price > 0 ? `$${price}` : "Free"
 }
 
 export const minPrice = (courseRun: ?CourseRun) => {
-  // $FlowFixMe: prices property will exist if courseRun not emotyOrNil
-  const prices = !emptyOrNil(courseRun) ? courseRun.prices || [] : []
+  const prices = courseRun && courseRun.prices ? courseRun.prices : []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price}` : "Free"
 }

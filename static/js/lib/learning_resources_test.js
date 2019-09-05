@@ -8,6 +8,7 @@ import {
   COURSE_AVAILABLE_NOW,
   COURSE_CURRENT,
   COURSE_PRIOR,
+  DATE_FORMAT,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
@@ -20,16 +21,12 @@ import {
   maxPrice,
   resourceLabel,
   availabilityFacetLabel,
-  parseDateFilter,
+  availabilityFilterToMoment,
   inDateRanges,
   bestRunLabel,
   bestRun
 } from "./learning_resources"
-import {
-  dateFormat,
-  makeCourse,
-  makeCourseRun
-} from "../factories/learning_resources"
+import { makeCourse, makeCourseRun } from "../factories/learning_resources"
 
 describe("Course utils", () => {
   [
@@ -125,9 +122,9 @@ describe("Course run availability utils", () => {
     it(`parseDateFilter should return ${String(
       expected
     )} for filter ${filter}`, () => {
-      const parsedDate = parseDateFilter(filter)
+      const parsedDate = availabilityFilterToMoment(filter)
       assert.equal(
-        parsedDate ? parsedDate.format(dateFormat) : parsedDate,
+        parsedDate ? parsedDate.format(DATE_FORMAT) : parsedDate,
         expected
       )
     })
