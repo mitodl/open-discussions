@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.89.2
+Version 0.89.2 (Released September 05, 2019)
 --------------
 
 - upgrade react-redux, react-router, redux-query
