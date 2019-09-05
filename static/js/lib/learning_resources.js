@@ -8,14 +8,13 @@ import {
   COURSE_CURRENT,
   COURSE_PRIOR,
   DATE_FORMAT,
+  DEFAULT_END_DT,
+  DEFAULT_START_DT,
   LR_TYPE_USERLIST
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
 import type { CourseRun } from "../flow/discussionTypes"
-
-const defaultStartDate = "1970-01-01T00:00:00Z"
-const defaultEndDate = "2500-01-01T00:00:00Z"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -83,20 +82,20 @@ export const bestRunLabel = (run: ?CourseRun) => {
   }
 }
 
-const runStartDate = (courseRun: CourseRun) =>
-  moment(courseRun.best_start_date || defaultStartDate, DATE_FORMAT)
-const runEndDate = (courseRun: CourseRun) =>
-  moment(courseRun.best_end_date || defaultEndDate, DATE_FORMAT)
+export const runStartDate = (courseRun: CourseRun) =>
+  moment(courseRun.best_start_date || DEFAULT_START_DT, DATE_FORMAT)
+
+export const runEndDate = (courseRun: CourseRun) =>
+  moment(courseRun.best_end_date || DEFAULT_END_DT, DATE_FORMAT)
 
 export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
   runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
 export const bestRun = (runs: Array<CourseRun>) => {
-  const now = moment()
-
   // Runs that are running right now
   const currentRuns = runs.filter(
-    run => runStartDate(run).isSameOrBefore(now) && runEndDate(run).isAfter(now)
+    // $FlowFixMe: runStartDate and runEndDate will always return a Moment
+    run => runStartDate(run).isSameOrBefore() && runEndDate(run).isAfter()
   )
   if (!emptyOrNil(currentRuns)) {
     return currentRuns[0]
@@ -104,7 +103,8 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The next future run
   const futureRuns = runs
-    .filter(run => runStartDate(run).isAfter(now))
+    // $FlowFixMe: runStartDate always returns a Moment
+    .filter(run => runStartDate(run).isAfter())
     .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
     return futureRuns[0]
@@ -112,7 +112,8 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The most recent run that "ended"
   const mostRecentRuns = runs
-    .filter(run => runStartDate(run).isSameOrBefore(now))
+    // $FlowFixMe: runStartDate always returns a Moment
+    .filter(run => runStartDate(run).isSameOrBefore())
     .sort(compareRuns)
     .reverse()
   if (!emptyOrNil(mostRecentRuns)) {

@@ -74,3 +74,5 @@ export const readableLearningResources = {
 }
 
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"
+export const DEFAULT_START_DT = "1970-01-01T00:00:00Z"
+export const DEFAULT_END_DT = "2500-01-01T00:00:00Z"

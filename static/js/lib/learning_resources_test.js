@@ -9,6 +9,8 @@ import {
   COURSE_CURRENT,
   COURSE_PRIOR,
   DATE_FORMAT,
+  DEFAULT_END_DT,
+  DEFAULT_START_DT,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
@@ -24,9 +26,12 @@ import {
   availabilityFilterToMoment,
   inDateRanges,
   bestRunLabel,
-  bestRun
+  bestRun,
+  runStartDate,
+  runEndDate
 } from "./learning_resources"
 import { makeCourse, makeCourseRun } from "../factories/learning_resources"
+import moment from "moment"
 
 describe("Course utils", () => {
   [
@@ -300,6 +305,40 @@ describe("Course run availability utils", () => {
       times(setDates, 3)
       // $FlowFixMe: best_start_date won't be null for these tests
       assert.equal(bestRun(runs).best_start_date, `${expected}T00:00:00Z`)
+    })
+  })
+
+  //
+  ;[
+    ["2019-09-01T00:00:00Z", "2019-09-01T00:00:00Z"],
+    [null, DEFAULT_START_DT]
+  ].forEach(([startDate, expectedDate]) => {
+    it(`runStartDate() should return  ${expectedDate} for run with best_start_date ${String(
+      startDate
+    )}`, () => {
+      const run = makeCourseRun()
+      run.best_start_date = startDate
+      assert.equal(
+        runStartDate(run).format(DATE_FORMAT),
+        moment(expectedDate, DATE_FORMAT).format(DATE_FORMAT)
+      )
+    })
+  })
+
+  //
+  ;[
+    ["2019-09-01T00:00:00Z", "2019-09-01T00:00:00Z"],
+    [null, DEFAULT_END_DT]
+  ].forEach(([endDate, expectedDate]) => {
+    it(`runEndDate() should return  ${expectedDate} for run with best_end_date ${String(
+      endDate
+    )}`, () => {
+      const run = makeCourseRun()
+      run.best_end_date = endDate
+      assert.equal(
+        runEndDate(run).format(DATE_FORMAT),
+        moment(expectedDate, DATE_FORMAT).format(DATE_FORMAT)
+      )
     })
   })
 })

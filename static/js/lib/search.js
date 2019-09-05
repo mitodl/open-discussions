@@ -3,11 +3,12 @@
 import bodybuilder from "bodybuilder"
 import R from "ramda"
 import {
-  LR_TYPE_COURSE,
+  DEFAULT_START_DT,
   LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST
-} from "../lib/constants"
+} from "./constants"
 import {
   SEARCH_FILTER_COMMENT,
   SEARCH_FILTER_POST,
@@ -349,7 +350,7 @@ export const buildSearchQuery = ({
               "date_range",
               "course_runs.best_start_date",
               {
-                missing: "1901-01-01T00:00:00Z",
+                missing: DEFAULT_START_DT,
                 keyed:   false,
                 ranges:  [
                   {
