@@ -119,18 +119,23 @@ describe("Course run availability utils", () => {
 
   //
   ;[
-    ["now", "2019-09-01T00:00:00Z"],
-    ["now+7d", "2019-09-08T00:00:00Z"],
-    ["now+6M", "2020-03-01T00:00:00Z"],
+    ["now", "2019-09-01T"],
+    ["now+7d", "2019-09-08T"],
+    ["now+6M", "2020-03-01T"],
     ["foo", null]
   ].forEach(([filter, expected]) => {
     it(`parseDateFilter should return ${String(
       expected
-    )} for filter ${filter}`, () => {
-      const parsedDate = availabilityFilterToMoment(filter)
+    )} for filter ${filter} and ending=false`, () => {
+      const parsedStartDate = availabilityFilterToMoment(filter, false)
       assert.equal(
-        parsedDate ? parsedDate.format(DATE_FORMAT) : parsedDate,
-        expected
+        parsedStartDate ? parsedStartDate.format(DATE_FORMAT) : parsedStartDate,
+        expected ? `${expected}00:00:00Z` : null
+      )
+      const parsedEndDate = availabilityFilterToMoment(filter, true)
+      assert.equal(
+        parsedEndDate ? parsedEndDate.format(DATE_FORMAT) : parsedEndDate,
+        expected ? `${expected}23:59:59Z` : null
       )
     })
   })

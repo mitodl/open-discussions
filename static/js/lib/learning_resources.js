@@ -32,7 +32,7 @@ export const availabilityLabel = (availability: ?string) => {
   }
 }
 
-export const availabilityFilterToMoment = (filter: string) => {
+export const availabilityFilterToMoment = (filter: string, ending: boolean) => {
   // Convert an Elasticsearch date_range filter string to a moment
   const format = /(now)(\+)?(\d+)?([Md])?/
   const match = format.exec(filter)
@@ -40,6 +40,13 @@ export const availabilityFilterToMoment = (filter: string) => {
     let dt = moment()
     if (match[3] && match[4]) {
       dt = dt.add(match[3], match[4] === "d" ? "days" : "months")
+    }
+    if (ending) {
+      // $FlowFixMe: this is fine according to moment docs, and it works
+      dt.set({ hour: 23, minute: 59, second: 59 })
+    } else {
+      // $FlowFixMe: this is fine according to moment docs, and it works
+      dt.set({ hour: 0, minute: 0, second: 0 })
     }
     return dt
   }
@@ -50,10 +57,12 @@ export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
   availabilities.forEach(availability => {
     if (AVAILABILITY_MAPPING[availability]) {
       const from = availabilityFilterToMoment(
-        AVAILABILITY_MAPPING[availability].filter.from
+        AVAILABILITY_MAPPING[availability].filter.from,
+        false
       )
       const to = availabilityFilterToMoment(
-        AVAILABILITY_MAPPING[availability].filter.to
+        AVAILABILITY_MAPPING[availability].filter.to,
+        true
       )
       const startDate = runStartDate(run)
       if (
