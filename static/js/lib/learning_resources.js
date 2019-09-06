@@ -1,5 +1,5 @@
 //@flow
-import { concat, isNil } from "ramda"
+import { concat } from "ramda"
 import moment from "moment"
 
 import {
@@ -14,6 +14,7 @@ import {
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
+
 import type { CourseRun } from "../flow/discussionTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
@@ -33,19 +34,19 @@ export const availabilityLabel = (availability: ?string) => {
 }
 
 export const availabilityFilterToMoment = (filter: string, ending: boolean) => {
-  // Convert an Elasticsearch date_range filter string to a moment
+  // Convert an Elasticsearch date_range filter string to a moment, assuming
+  // the filter is defined. For example, 'from' is undefined for 'Available Now'
+  // because any start date before today qualifies.
   const format = /(now)(\+)?(\d+)?([Md])?/
   const match = format.exec(filter)
   if (match) {
     let dt = moment()
     if (match[3] && match[4]) {
-      dt = dt.add(match[3], match[4] === "d" ? "days" : "months")
+      dt = dt.add(parseInt(match[3]), match[4] === "d" ? "days" : "months")
     }
     if (ending) {
-      // $FlowFixMe: this is fine according to moment docs, and it works
       dt.set({ hour: 23, minute: 59, second: 59 })
     } else {
-      // $FlowFixMe: this is fine according to moment docs, and it works
       dt.set({ hour: 0, minute: 0, second: 0 })
     }
     return dt
@@ -53,8 +54,10 @@ export const availabilityFilterToMoment = (filter: string, ending: boolean) => {
 }
 
 export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
-  let inRange = false
-  availabilities.forEach(availability => {
+  if (emptyOrNil(availabilities)) {
+    return true
+  }
+  for (const availability of availabilities) {
     if (AVAILABILITY_MAPPING[availability]) {
       const from = availabilityFilterToMoment(
         AVAILABILITY_MAPPING[availability].filter.from,
@@ -66,18 +69,14 @@ export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
       )
       const startDate = runStartDate(run)
       if (
-        (isNil(from) ||
-          // $FlowFixMe: if we get this far, only moments are compared
-          startDate.isSameOrAfter(from)) &&
-        (isNil(to) ||
-          // $FlowFixMe: if we get this far, only moments are compared
-          startDate.isSameOrBefore(to))
+        (!from || startDate.isSameOrAfter(from)) &&
+        (!to || startDate.isSameOrBefore(to))
       ) {
-        inRange = true
+        return true
       }
     }
-  })
-  return inRange
+  }
+  return false
 }
 
 export const bestRunLabel = (run: ?CourseRun) => {
@@ -91,10 +90,10 @@ export const bestRunLabel = (run: ?CourseRun) => {
   }
 }
 
-export const runStartDate = (courseRun: CourseRun) =>
+export const runStartDate = (courseRun: CourseRun): moment$Moment =>
   moment(courseRun.best_start_date || DEFAULT_START_DT, DATE_FORMAT)
 
-export const runEndDate = (courseRun: CourseRun) =>
+export const runEndDate = (courseRun: CourseRun): moment$Moment =>
   moment(courseRun.best_end_date || DEFAULT_END_DT, DATE_FORMAT)
 
 export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
@@ -137,9 +136,7 @@ export const filterRunsByAvailability = (
 ) =>
   runs
     ? // $FlowFixMe
-    runs.filter(
-      run => (availabilities ? inDateRanges(run, availabilities) : true)
-    )
+    runs.filter(run => inDateRanges(run, availabilities || []))
     : []
 
 export const resourceLabel = (resource: string) => {
