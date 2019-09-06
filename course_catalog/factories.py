@@ -235,6 +235,9 @@ class ProgramFactory(DjangoModelFactory):
     """Factory for Programs"""
 
     title = FuzzyText()
+    program_id = factory.Sequence(lambda n: n)
+    image_src = factory.Faker("image_url")
+    url = factory.Faker("uri")
 
     @factory.post_generation
     def topics(self, create, extracted, **kwargs):

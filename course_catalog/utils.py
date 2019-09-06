@@ -20,6 +20,7 @@ def user_list_image_upload_uri(instance, filename):
     )
 
 
+# NOTE: this is unused, but a migration references it, so we'll leave it until we decide to squash migrations or something
 def program_image_upload_uri(instance, filename):
     """
     upload_to handler for Program image

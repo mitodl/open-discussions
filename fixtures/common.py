@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 from django.utils.deprecation import RemovedInDjango30Warning
 import factory
 import pytest
+import responses
 from _pytest.deprecated import RemovedInPytest4Warning
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -157,3 +158,10 @@ def indexing_user(settings):
     user = UserFactory.create()
     settings.INDEXING_API_USERNAME = user.username
     return user
+
+
+@pytest.fixture
+def mocked_responses():
+    """Mock responses fixture"""
+    with responses.RequestsMock() as rsps:
+        yield rsps

@@ -24,6 +24,7 @@ from course_catalog.api import (
     tag_edx_course_program,
     parse_bootcamp_json_data,
 )
+from course_catalog.etl import pipelines
 
 
 log = logging.getLogger(__name__)
@@ -250,3 +251,9 @@ def get_bootcamp_data(force_overwrite=False):
         bootcamp_json = response.json()
         for bootcamp in bootcamp_json:
             parse_bootcamp_json_data(bootcamp, force_overwrite=force_overwrite)
+
+
+@app.task(acks_late=True)
+def get_micromasters_data():
+    """Execute the MicroMasters ETL pipeline"""
+    pipelines.micromasters_etl()
