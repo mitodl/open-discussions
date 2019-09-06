@@ -102,7 +102,6 @@ export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
 export const bestRun = (runs: Array<CourseRun>) => {
   // Runs that are running right now
   const currentRuns = runs.filter(
-    // $FlowFixMe: runStartDate and runEndDate will always return a Moment
     run => runStartDate(run).isSameOrBefore() && runEndDate(run).isAfter()
   )
   if (!emptyOrNil(currentRuns)) {
@@ -111,7 +110,6 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The next future run
   const futureRuns = runs
-    // $FlowFixMe: runStartDate always returns a Moment
     .filter(run => runStartDate(run).isAfter())
     .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
@@ -120,7 +118,6 @@ export const bestRun = (runs: Array<CourseRun>) => {
 
   // The most recent run that "ended"
   const mostRecentRuns = runs
-    // $FlowFixMe: runStartDate always returns a Moment
     .filter(run => runStartDate(run).isSameOrBefore())
     .sort(compareRuns)
     .reverse()
