@@ -568,6 +568,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_bootcamp_data",
         "schedule": crontab(minute=0, hour=6),  # 2am EST
     },
+    "update-micromasters-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_micromasters_data",
+        "schedule": crontab(minute=0, hour=7),  # 3am EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
@@ -804,6 +808,7 @@ BOOTCAMPS_URL = get_string(
 MICROMASTERS_COURSE_URL = get_string(
     "MICROMASTERS_COURSE_URL", "https://micromasters.mit.edu/api/v0/courseruns/"
 )
+MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)

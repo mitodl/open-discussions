@@ -12,7 +12,7 @@ from open_discussions.exceptions import DoNotUseRequestException
 @pytest.fixture(autouse=True)
 def prevent_requests(mocker, request):
     """Patch requests to error on request by default"""
-    if "betamax" in request.keywords:
+    if "betamax" in request.keywords or "mocked_responses" in request.fixturenames:
         return
     mocker.patch(
         "requests.sessions.Session.request",

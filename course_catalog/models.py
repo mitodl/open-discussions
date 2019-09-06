@@ -8,7 +8,7 @@ from django.db import models
 from django.contrib.postgres.fields import JSONField
 
 from course_catalog.constants import ResourceType
-from course_catalog.utils import program_image_upload_uri, user_list_image_upload_uri
+from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel
 
 
@@ -206,9 +206,9 @@ class Program(List):
     Program model for MIT programs. Consists of specified list of LearningResources.
     """
 
-    image_src = models.ImageField(
-        null=True, blank=True, max_length=2083, upload_to=program_image_upload_uri
-    )
+    program_id = models.CharField(max_length=80, null=True)
+    image_src = models.URLField(max_length=2048, null=True, blank=True)
+    url = models.URLField(null=True, max_length=2048)
 
 
 class ProgramItem(ListItem):

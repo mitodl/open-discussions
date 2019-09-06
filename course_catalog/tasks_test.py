@@ -26,6 +26,7 @@ from course_catalog.tasks import (
     get_ocw_data,
     upload_ocw_master_json,
     get_bootcamp_data,
+    get_micromasters_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -165,7 +166,7 @@ def test_get_mitx_data_saves_json(
     Test that mitx sync task successfully saves edx data results file in S3
     """
     setup_s3(settings)
-    sync_and_upload_edx_data()
+    sync_and_upload_edx_data.delay()
     s3 = boto3.resource(
         "s3",
         aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
@@ -190,7 +191,7 @@ def test_get_mitx_data_status_error(
     )
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)
-    sync_and_upload_edx_data()
+    sync_and_upload_edx_data.delay()
     # check that no courses were created
     assert Course.objects.count() == 0
     # check that edx API data results file was not uploaded to s3
@@ -213,7 +214,7 @@ def test_get_mitx_data_unexpected_error(
     mocker.patch("course_catalog.api.is_mit_course", side_effect=Exception)
     settings.EDX_API_URL = "fake_url"
     setup_s3(settings)
-    sync_and_upload_edx_data()
+    sync_and_upload_edx_data.delay()
     assert Course.objects.count() == 0
 
 
@@ -222,7 +223,7 @@ def test_get_mitx_data_no_settings(settings, get_micromasters_data):
     No data should be imported if MITx settings are missing
     """
     settings.EDX_API_URL = None
-    sync_and_upload_edx_data()
+    sync_and_upload_edx_data.delay()
     assert Course.objects.count() == 0
 
 
@@ -234,13 +235,13 @@ def test_get_ocw_data(settings, mock_course_index_functions):
     setup_s3(settings)
 
     # run ocw sync
-    get_ocw_data()
+    get_ocw_data.delay()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
 
-    get_ocw_data()
+    get_ocw_data.delay()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
@@ -265,14 +266,14 @@ def test_get_ocw_overwrite(mocker, settings, mock_course_index_functions, overwr
     setup_s3(settings)
 
     # run ocw sync
-    get_ocw_data()
+    get_ocw_data.delay()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
 
     mock_digest = mocker.patch("course_catalog.tasks.digest_ocw_course")
-    get_ocw_data(force_overwrite=overwrite)
+    get_ocw_data.delay(force_overwrite=overwrite)
     assert mock_digest.call_count == (1 if overwrite else 0)
 
 
@@ -281,7 +282,7 @@ def test_get_ocw_data_no_settings(settings):
     No data should be imported if OCW settings are missing
     """
     settings.OCW_CONTENT_ACCESS_KEY = None
-    get_ocw_data()
+    get_ocw_data.delay()
     assert Course.objects.count() == 0
 
 
@@ -294,7 +295,7 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
         "course_catalog.tasks.OCWParser.setup_s3_uploading", side_effect=Exception
     )
     setup_s3(settings)
-    get_ocw_data()
+    get_ocw_data.delay()
     mock_logger.assert_called_once_with(
         "Error encountered parsing OCW json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
@@ -308,7 +309,7 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
     """
     mocker.patch("course_catalog.tasks.get_s3_object_and_read", side_effect=Exception)
     setup_s3(settings)
-    get_ocw_data()
+    get_ocw_data.delay()
     mock_logger.assert_called_once_with(
         "Error encountered reading 1.json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
@@ -329,7 +330,7 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
         "course_catalog.tasks.OCWParser.upload_course_image"
     )
     setup_s3(settings)
-    get_ocw_data()
+    get_ocw_data.delay()
     assert mock_upload_image.call_count == (1 if image_only else 0)
     assert mock_upload_all.call_count == (0 if image_only else 1)
 
@@ -346,7 +347,7 @@ def test_upload_ocw_master_json(settings, mocker):
     course.raw_json = {"test": "json"}
     course.save()
 
-    upload_ocw_master_json()
+    upload_ocw_master_json.delay()
 
     s3 = boto3.resource(
         "s3",
@@ -365,7 +366,7 @@ def test_process_bootcamps(mock_get_bootcamps):
     """
     Test that bootcamp json data is properly parsed
     """
-    get_bootcamp_data()
+    get_bootcamp_data.delay()
     assert Bootcamp.objects.count() == 3
     assert Course.objects.count() == 0
 
@@ -382,3 +383,10 @@ def test_process_bootcamps(mock_get_bootcamps):
 
     assert Bootcamp.objects.count() == 3
     assert Course.objects.count() == 0
+
+
+def test_get_micromasters_data(mocker):
+    """Verify that the get_micromasters_data invokes the MicroMasters ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_micromasters_data.delay()
+    mock_pipelines.micromasters_etl.assert_called_once_with()
