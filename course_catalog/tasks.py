@@ -257,3 +257,9 @@ def get_bootcamp_data(force_overwrite=False):
 def get_micromasters_data():
     """Execute the MicroMasters ETL pipeline"""
     pipelines.micromasters_etl()
+
+
+@app.task(acks_late=True)
+def get_xpro_data():
+    """Execute the xPro ETL pipeline"""
+    pipelines.xpro_etl()

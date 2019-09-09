@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from elasticsearch.exceptions import ConflictError
+from elasticsearch.exceptions import ConflictError, NotFoundError
 
 from channels.factories.models import PostFactory, CommentFactory
 from search.connection import get_default_alias_name
@@ -512,3 +512,16 @@ def test_delete_document(mocked_es, mocker):
     )
     delete_document(1, "course")
     mocked_es.conn.delete.assert_called_with(index="a", doc_type=GLOBAL_DOC_TYPE, id=1)
+
+
+def test_delete_document_not_found(mocked_es, mocker):
+    """
+    ES should try deleting the specified document from the correct index
+    """
+    patched_logger = mocker.patch("search.indexing_api.log")
+    mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
+    )
+    mocked_es.conn.delete.side_effect = NotFoundError
+    delete_document(1, "course")
+    assert patched_logger.debug.called is True

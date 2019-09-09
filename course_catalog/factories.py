@@ -27,15 +27,38 @@ from course_catalog.models import (
 # pylint: disable=unused-argument
 
 
+def _post_gen_prices(obj, create, extracted, **kwarg):
+    """PostGeneration function for prices"""
+    if not create:
+        return
+
+    if extracted is None:
+        extracted = CoursePriceFactory.create_batch(random.randint(0, 3))
+
+    obj.prices.set(extracted)
+
+
+def _post_gen_topics(obj, create, extracted, **kwargs):
+    """PostGeneration function for topics"""
+    if not create:
+        return
+
+    if extracted is None:
+        extracted = CourseTopicFactory.create_batch(random.randint(0, 5))
+
+    obj.topics.set(extracted)
+
+
 class CourseInstructorFactory(DjangoModelFactory):
     """Factory for course instructors"""
 
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
+    full_name = factory.LazyAttribute(lambda ci: f"{ci.first_name} {ci.last_name}")
 
     class Meta:
         model = CourseInstructor
-        django_get_or_create = ("first_name", "last_name")
+        django_get_or_create = ("first_name", "last_name", "full_name")
 
 
 class CourseTopicFactory(DjangoModelFactory):
@@ -66,19 +89,13 @@ class LearningResourceFactory(DjangoModelFactory):
     title = factory.Faker("word")
     short_description = factory.Faker("sentence")
 
-    @factory.post_generation
-    def topics(self, create, extracted, **kwargs):
-        """Create topics for course"""
-        if not create:
-            return
-
-        extracted = extracted or CourseTopicFactory.create_batch(random.randint(0, 5))
-
-        for topic in extracted:
-            self.topics.add(topic)
+    topics = factory.PostGeneration(_post_gen_topics)
 
     class Meta:
         abstract = True
+
+    class Params:
+        no_topics = factory.Trait(topics=[])
 
 
 class AbstractCourseFactory(LearningResourceFactory):
@@ -123,7 +140,7 @@ class CourseFactory(AbstractCourseFactory):
         is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
 
 
-class CourseRunFactory(DjangoModelFactory):
+class CourseRunFactory(AbstractCourseFactory):
     """Factory for CourseRuns"""
 
     course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
@@ -156,33 +173,25 @@ class CourseRunFactory(DjangoModelFactory):
     language = factory.Faker("word")
     year = factory.Faker("year")
 
+    prices = factory.PostGeneration(_post_gen_prices)
+
     @factory.post_generation
     def instructors(self, create, extracted, **kwargs):
         """Create instructors for course"""
         if not create:
             return
 
-        extracted = extracted or CourseInstructorFactory.create_batch(
-            random.randint(0, 3)
-        )
+        if extracted is None:
+            extracted = CourseInstructorFactory.create_batch(random.randint(0, 3))
 
-        if extracted:
-            for instructor in extracted:
-                self.instructors.add(instructor)
-
-    @factory.post_generation
-    def prices(self, create, extracted, **kwargs):
-        """Create prices for course"""
-        if not create:
-            return
-
-        extracted = extracted or CoursePriceFactory.create_batch(random.randint(0, 3))
-
-        for price in extracted:
-            self.prices.add(price)
+        self.instructors.set(extracted)
 
     class Meta:
         model = CourseRun
+
+    class Params:
+        no_prices = factory.Trait(prices=[])
+        no_instructors = factory.Trait(instructors=[])
 
 
 class BootcampFactory(AbstractCourseFactory):
@@ -231,26 +240,20 @@ class ProgramItemBootcampFactory(ListItemFactory):
         model = ProgramItem
 
 
-class ProgramFactory(DjangoModelFactory):
+class ProgramFactory(LearningResourceFactory):
     """Factory for Programs"""
 
-    title = FuzzyText()
     program_id = factory.Sequence(lambda n: n)
     image_src = factory.Faker("image_url")
     url = factory.Faker("uri")
 
-    @factory.post_generation
-    def topics(self, create, extracted, **kwargs):
-        """Create topics for program"""
-        if not create:
-            return
-
-        if extracted:
-            for topic in extracted:
-                self.topics.add(topic)
+    prices = factory.PostGeneration(_post_gen_prices)
 
     class Meta:
         model = Program
+
+    class Params:
+        no_prices = factory.Trait(prices=[])
 
 
 class UserListCourseFactory(ListItemFactory):

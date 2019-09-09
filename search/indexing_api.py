@@ -1,11 +1,10 @@
 """
 Functions and constants for Elasticsearch indexing
 """
-from functools import partial
 import logging
 
 from elasticsearch.helpers import bulk
-from elasticsearch.exceptions import ConflictError
+from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -183,6 +182,7 @@ PROGRAM_OBJECT_TYPE = {
     "short_description": ENGLISH_TEXT_FIELD,
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
+    "prices": {"type": "nested"},
     "offered_by": {"type": "keyword"},
 }
 
@@ -283,7 +283,12 @@ def delete_document(doc_id, object_type):
     """
     conn = get_conn(verify=True)
     for alias in get_active_aliases([object_type]):
-        conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
+        try:
+            conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
+        except NotFoundError:
+            log.debug(
+                "Tried to delete an ES document that didn't exist, doc_id: '%s'", doc_id
+            )
 
 
 def update_field_values_by_query(query, field_dict, object_types=None):
@@ -331,18 +336,14 @@ def update_field_values_by_query(query, field_dict, object_types=None):
             )
 
 
-def _update_document_by_id(
-    doc_id, data, object_type, *, update_key=None, retry_on_conflict=0
-):
+def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
     """
     Makes a request to ES to update an existing document
 
     Args:
         doc_id (str): The ES document id
-        data (dict): Full ES document data
+        body (dict): ES update operation body
         object_type (str): The object type to update (post, comment, etc)
-        update_key (str): A key indicating the type of update request to Elasticsearch
-            (e.g.: 'script', 'doc')
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
     """
     conn = get_conn(verify=True)
@@ -351,7 +352,7 @@ def _update_document_by_id(
             conn.update(
                 index=alias,
                 doc_type=GLOBAL_DOC_TYPE,
-                body={update_key: data},
+                body=body,
                 id=doc_id,
                 params={"retry_on_conflict": retry_on_conflict},
             )
@@ -365,7 +366,37 @@ def _update_document_by_id(
             )
 
 
-update_document_with_partial = partial(_update_document_by_id, update_key="doc")
+def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=0):
+    """
+    Makes a request to ES to update an existing document
+
+    Args:
+        doc_id (str): The ES document id
+        doc (dict): Full or partial ES document
+        object_type (str): The object type to update (post, comment, etc)
+        retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
+    """
+    _update_document_by_id(
+        doc_id, {"doc": doc}, object_type, retry_on_conflict=retry_on_conflict
+    )
+
+
+def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0):
+    """
+    Makes a request to ES to create or update a document
+
+    Args:
+        doc_id (str): The ES document id
+        doc (dict): Full ES document
+        object_type (str): The object type to update (post, comment, etc)
+        retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
+    """
+    _update_document_by_id(
+        doc_id,
+        {"doc": doc, "doc_as_upsert": True},
+        object_type,
+        retry_on_conflict=retry_on_conflict,
+    )
 
 
 def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
@@ -381,12 +412,13 @@ def increment_document_integer_field(doc_id, field_name, incr_amount, object_typ
     _update_document_by_id(  # pylint: disable=redundant-keyword-arg
         doc_id,
         {
-            "source": "ctx._source.{} += params.incr_amount".format(field_name),
-            "lang": SCRIPTING_LANG,
-            "params": {"incr_amount": incr_amount},
+            "script": {
+                "source": "ctx._source.{} += params.incr_amount".format(field_name),
+                "lang": SCRIPTING_LANG,
+                "params": {"incr_amount": incr_amount},
+            }
         },
         object_type,
-        update_key="script",
     )
 
 

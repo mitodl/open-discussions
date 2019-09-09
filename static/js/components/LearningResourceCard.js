@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
+import R from "ramda"
 import { mutateAsync } from "redux-query"
 import { connect } from "react-redux"
 
@@ -121,7 +122,9 @@ export const LearningResourceCard = ({
         {object.offered_by ? (
           <Subtitle content={object.offered_by} label="Offered by - " />
         ) : null}
-        <Subtitle content={formatTopics(object.topics)} label="Subject - " />
+        {!R.isEmpty(object.topics) ? (
+          <Subtitle content={formatTopics(object.topics)} label="Subject - " />
+        ) : null}
         <div className="row availability-price-favorite">
           <div className="price grey-surround">
             <i className="material-icons attach_money">attach_money</i>

@@ -153,27 +153,6 @@ def test_execute_search(mocker, user):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [
-                                                            "course",
-                                                            "bootcamp",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {"term": {"published": True}},
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
                                                         "object_type": ["user_list"]
                                                     }
                                                 }
@@ -267,27 +246,6 @@ def test_execute_search_anonymous(mocker):
                                             ]
                                         }
                                     },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "course",
-                                                            "bootcamp",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {"term": {"published": True}},
                                 ]
                             }
                         },

@@ -392,6 +392,10 @@
     "CKEDITOR_UPLOAD_URL": {
       "description": "upload URL for CKEditor EasyImage",
       "required": false
+    },
+    "XPRO_CATALOG_API_URL": {
+      "description": "The catalog url for xpro products and courses",
+      "required": false
     }
   },
   "keywords": [

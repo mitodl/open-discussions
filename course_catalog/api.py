@@ -27,12 +27,7 @@ from course_catalog.serializers import (
     OCWSerializer,
 )
 from course_catalog.utils import get_course_url
-from search.task_helpers import (
-    update_course,
-    index_new_course,
-    index_new_bootcamp,
-    update_bootcamp,
-)
+from search.task_helpers import upsert_course, index_new_bootcamp, update_bootcamp
 
 log = logging.getLogger(__name__)
 
@@ -83,9 +78,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
     try:
         course = Course.objects.get(course_id=course_data.get("key"))
         needs_update = (course_modified >= course.last_modified) or force_overwrite
-        index_func = update_course
     except Course.DoesNotExist:
-        index_func = index_new_course
         course = None
         needs_update = True
 
@@ -165,7 +158,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                         )
                         continue
                     run_serializer.save()
-            index_func(course)
+            upsert_course(course)
 
 
 def is_mit_course(course_data):
@@ -217,8 +210,6 @@ def digest_ocw_course(
         is_published (bool): Flags OCW course as published or not
         course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
     """
-
-    index_func = update_course if course_instance is not None else index_new_course
 
     ocw_serializer = OCWSerializer(
         data={
@@ -285,7 +276,7 @@ def digest_ocw_course(
             return
         run_serializer.save()
 
-    index_func(course)
+    upsert_course(course)
 
 
 def get_s3_object_and_read(obj, iteration=0):

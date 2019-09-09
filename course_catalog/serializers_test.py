@@ -65,7 +65,7 @@ def test_serialize_courserun_related_models():
     for attr in ("mode", "price"):
         assert attr in serializer.data["prices"][0].keys()
     assert len(serializer.data["instructors"]) == 2
-    for attr in ("first_name", "last_name"):
+    for attr in ("first_name", "last_name", "full_name"):
         assert attr in serializer.data["instructors"][0].keys()
 
 

@@ -7,7 +7,14 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.models import Course, CourseRun, Bootcamp, Program, UserList
+from course_catalog.models import (
+    Course,
+    CourseRun,
+    CoursePrice,
+    Bootcamp,
+    Program,
+    UserList,
+)
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -261,27 +268,41 @@ class ESCommentSerializer(ESModelSerializer):
         read_only_fields = ("text", "score", "created", "removed", "deleted")
 
 
+class ESCoursePriceSerializer(serializers.ModelSerializer):
+    """ES serializer for course prices"""
+
+    class Meta:
+        model = CoursePrice
+        fields = ("price", "mode")
+
+
+class ESTopicsField(serializers.Field):
+    """Serializes the topics as a list of topic names"""
+
+    def to_representation(self, value):
+        """Serializes the topics as a list of topic names"""
+        return list(value.values_list("name", flat=True))
+
+
 class ESCourseRunSerializer(serializers.ModelSerializer):
     """
     Elasticsearch serializer class for course runs
     """
 
-    prices = serializers.SerializerMethodField()
+    prices = ESCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
-
-    def get_prices(self, course_run):
-        """
-        Get the prices for a course run
-        """
-        return list(course_run.prices.values("price", "mode"))
 
     def get_instructors(self, course_run):
         """
         Get a list of instructor names for the course run
         """
         return [
-            " ".join([i.first_name, i.last_name]) for i in course_run.instructors.all()
+            (
+                instructor.full_name
+                or " ".join([instructor.first_name, instructor.last_name])
+            )
+            for instructor in course_run.instructors.all()
         ]
 
     def get_availability(self, course_run):
@@ -328,14 +349,8 @@ class ESCourseSerializer(ESModelSerializer):
 
     object_type = COURSE_TYPE
 
-    topics = serializers.SerializerMethodField()
+    topics = ESTopicsField()
     course_runs = ESCourseRunSerializer(read_only=True, many=True, allow_null=True)
-
-    def get_topics(self, course):
-        """
-        Get the topic names for a course
-        """
-        return [topic.name for topic in course.topics.all()]
 
     class Meta:
         model = Course
@@ -364,6 +379,7 @@ class ESBootcampSerializer(ESCourseSerializer):
     object_type = BOOTCAMP_TYPE
 
     course_runs = ESCourseRunSerializer(many=True)
+    topics = ESTopicsField()
 
     class Meta:
         model = Bootcamp
@@ -390,13 +406,8 @@ class ESProgramSerializer(ESModelSerializer):
 
     object_type = PROGRAM_TYPE
 
-    topics = serializers.SerializerMethodField()
-
-    def get_topics(self, program):
-        """
-        Get the topic names for a program
-        """
-        return [topic.name for topic in program.topics.all()]
+    topics = ESTopicsField()
+    prices = ESCoursePriceSerializer(many=True)
 
     class Meta:
         model = Program
@@ -406,6 +417,7 @@ class ESProgramSerializer(ESModelSerializer):
             "title",
             "image_src",
             "topics",
+            "prices",
             "offered_by",
         ]
 
@@ -419,13 +431,7 @@ class ESUserListSerializer(ESModelSerializer):
 
     object_type = USER_LIST_TYPE
 
-    topics = serializers.SerializerMethodField()
-
-    def get_topics(self, user_list):
-        """
-        Get the topic names for a user_list
-        """
-        return [topic.name for topic in user_list.topics.all()]
+    topics = ESTopicsField()
 
     class Meta:
         model = UserList
@@ -555,7 +561,10 @@ def serialize_bulk_courses(ids):
     for course in Course.objects.filter(id__in=ids).prefetch_related(
         "topics",
         Prefetch(
-            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
+            "course_runs",
+            queryset=CourseRun.objects.filter(published=True).order_by(
+                "-best_start_date"
+            ),
         ),
     ):
         yield serialize_course_for_bulk(course)

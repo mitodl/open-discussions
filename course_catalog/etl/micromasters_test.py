@@ -53,6 +53,12 @@ def test_micromasters_extract(mock_micromasters_data):
     assert micromasters.extract() == mock_micromasters_data
 
 
+def test_micromasters_extract_disabled(settings):
+    """Verify an empty list is returned if the API URL isn't set"""
+    settings.MICROMASTERS_CATALOG_API_URL = None
+    assert micromasters.extract() == []
+
+
 def test_micromasters_transform(mock_micromasters_data):
     """Test that micromasters data is correctly transformed into our normalized structure"""
     assert micromasters.transform(mock_micromasters_data) == [

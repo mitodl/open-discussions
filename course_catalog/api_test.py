@@ -188,7 +188,7 @@ def test_parse_mitx_json_data_overwrite_course(
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == (1 if force_overwrite else 0)
     assert mock_save_run.call_count == (1 if force_overwrite else 0)
-    assert mock_course_index_functions.update_course.call_count == (
+    assert mock_course_index_functions.upsert_course.call_count == (
         1 if force_overwrite else 0
     )
 
@@ -217,7 +217,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == 1
     assert mock_save_run.call_count == (1 if force_overwrite else 0)
-    assert mock_course_index_functions.update_course.call_count == 1
+    assert mock_course_index_functions.upsert_course.call_count == 1
 
 
 def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data):
@@ -237,7 +237,7 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     course_topics_count = CourseTopic.objects.count()
     assert course_topics_count == 1
 
-    mock_course_index_functions.index_new_course.assert_called_once_with(
+    mock_course_index_functions.upsert_course.assert_called_once_with(
         Course.objects.first()
     )
     assert Course.objects.first().course_runs.first().best_start_date == datetime.strptime(

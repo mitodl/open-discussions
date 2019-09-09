@@ -15,12 +15,14 @@ const ocwPlatform = "ocw"
 const edxPlatform = "mitx"
 const bootcampsPlatform = "bootcamps"
 const micromastersPlatform = "micromasters"
+const xproPlatform = "xpro"
 
 export const platforms = {
   OCW:          ocwPlatform,
   edX:          edxPlatform,
   bootcamps:    bootcampsPlatform,
-  micromasters: micromastersPlatform
+  micromasters: micromastersPlatform,
+  xpro:         xproPlatform
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"

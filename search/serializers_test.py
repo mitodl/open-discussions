@@ -7,10 +7,10 @@ from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
 from course_catalog.constants import OfferedBy
-from course_catalog.factories import CourseFactory, CourseRunFactory
+from course_catalog.factories import CourseFactory, CourseRunFactory, CoursePriceFactory
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
-from open_discussions.test_utils import drf_datetime
+from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
 from search.api import gen_course_id
@@ -21,6 +21,7 @@ from search.serializers import (
     ESCourseSerializer,
     ESCourseRunSerializer,
     ESProfileSerializer,
+    ESCoursePriceSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
     serialize_bulk_comments,
@@ -204,38 +205,63 @@ ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 @pytest.mark.django_db
-def test_es_course_run_serializer():
+def test_es_course_price_serializer():
+    """Test that the course price serializer serializes a price"""
+    price = CoursePriceFactory.create()
+    assert_json_equal(
+        ESCoursePriceSerializer(price).data,
+        {"price": f"{price.price:.2f}", "mode": price.mode},
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("has_full_name", [True, False])
+def test_es_course_run_serializer(has_full_name):
     """
     Test that ESCourseRunSerializer correctly serializes a course run object
     """
-    course_run = CourseRunFactory.create()
+    course_run = (
+        CourseRunFactory.create()
+        if has_full_name
+        else CourseRunFactory.create(instructors__full_name=None)
+    )
     serialized = ESCourseRunSerializer(course_run).data
-    assert serialized == {
-        "id": course_run.id,
-        "course_run_id": course_run.course_run_id,
-        "short_description": course_run.short_description,
-        "full_description": course_run.full_description,
-        "language": course_run.language,
-        "semester": course_run.semester,
-        "year": int(course_run.year),
-        "level": course_run.level,
-        "start_date": course_run.start_date.strftime(ISOFORMAT),
-        "end_date": course_run.end_date.strftime(ISOFORMAT),
-        "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
-        "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
-        "best_start_date": course_run.best_start_date,
-        "best_end_date": course_run.best_end_date,
-        "title": course_run.title,
-        "image_src": course_run.image_src,
-        "instructors": [
-            " ".join([instructor.first_name, instructor.last_name])
-            for instructor in course_run.instructors.all()
-        ],
-        "prices": list(course_run.prices.values("price", "mode")),
-        "published": True,
-        "availability": course_run.availability,
-        "offered_by": course_run.offered_by,
-    }
+
+    assert_json_equal(
+        serialized,
+        {
+            "id": course_run.id,
+            "course_run_id": course_run.course_run_id,
+            "short_description": course_run.short_description,
+            "full_description": course_run.full_description,
+            "language": course_run.language,
+            "semester": course_run.semester,
+            "year": int(course_run.year),
+            "level": course_run.level,
+            "start_date": course_run.start_date.strftime(ISOFORMAT),
+            "end_date": course_run.end_date.strftime(ISOFORMAT),
+            "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
+            "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
+            "best_start_date": course_run.best_start_date,
+            "best_end_date": course_run.best_end_date,
+            "title": course_run.title,
+            "image_src": course_run.image_src,
+            "instructors": [
+                (
+                    instructor.full_name
+                    if has_full_name
+                    else " ".join([instructor.first_name, instructor.last_name])
+                )
+                for instructor in course_run.instructors.all()
+            ],
+            "prices": [
+                ESCoursePriceSerializer(price).data for price in course_run.prices.all()
+            ],
+            "published": True,
+            "availability": course_run.availability,
+            "offered_by": course_run.offered_by,
+        },
+    )
 
 
 @pytest.mark.django_db
@@ -246,23 +272,26 @@ def test_es_course_serializer(offered_by):
     """
     course = CourseFactory.create(offered_by=offered_by)
     serialized = ESCourseSerializer(course).data
-    assert serialized == {
-        "object_type": COURSE_TYPE,
-        "id": course.id,
-        "course_id": course.course_id,
-        "short_description": course.short_description,
-        "full_description": course.full_description,
-        "platform": course.platform,
-        "title": course.title,
-        "image_src": course.image_src,
-        "topics": list(course.topics.values_list("name", flat=True)),
-        "course_runs": [
-            ESCourseRunSerializer(course_run).data
-            for course_run in course.course_runs.order_by("-best_start_date")
-        ],
-        "published": True,
-        "offered_by": course.offered_by,
-    }
+    assert_json_equal(
+        serialized,
+        {
+            "object_type": COURSE_TYPE,
+            "id": course.id,
+            "course_id": course.course_id,
+            "short_description": course.short_description,
+            "full_description": course.full_description,
+            "platform": course.platform,
+            "title": course.title,
+            "image_src": course.image_src,
+            "topics": list(course.topics.values_list("name", flat=True)),
+            "course_runs": [
+                ESCourseRunSerializer(course_run).data
+                for course_run in course.course_runs.order_by("-best_start_date")
+            ],
+            "published": True,
+            "offered_by": course.offered_by,
+        },
+    )
 
 
 def test_serialize_post_for_bulk(mocker):

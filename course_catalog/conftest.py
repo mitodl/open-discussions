@@ -36,6 +36,5 @@ def get_micromasters_data(mocker):
 def mock_course_index_functions(mocker):
     """Mocks index updating functions for courses"""
     return SimpleNamespace(
-        update_course=mocker.patch("course_catalog.api.update_course"),
-        index_new_course=mocker.patch("course_catalog.api.index_new_course"),
+        upsert_course=mocker.patch("course_catalog.api.upsert_course")
     )

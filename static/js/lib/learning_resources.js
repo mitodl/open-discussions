@@ -16,7 +16,7 @@ import {
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
 
-import type { CourseRun } from "../flow/discussionTypes"
+import type { CourseRun, CourseInstructor } from "../flow/discussionTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -164,4 +164,15 @@ export const getStartDate = (object: Object, courseRun: CourseRun) => {
     return moment(courseRun.best_start_date).format("MMMM DD, YYYY")
   }
   return "Ongoing"
+}
+
+export const getInstructorName = (instructor: CourseInstructor) => {
+  if (instructor.full_name) {
+    return `Prof. ${instructor.full_name}`
+  } else if (instructor.first_name && instructor.last_name) {
+    return `Prof. ${instructor.first_name} ${instructor.last_name}`
+  } else if (instructor.last_name) {
+    return `Prof. ${instructor.last_name}`
+  }
+  return ""
 }

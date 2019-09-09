@@ -29,6 +29,7 @@ from search.tasks import (
     index_comments,
     index_courses,
     delete_document,
+    upsert_document,
 )
 
 
@@ -66,6 +67,14 @@ def test_update_document_with_partial_task(mocked_api):
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
+
+
+def test_upsert_document_task(mocked_api):
+    """Test that the upsert_document task calls the indexing API function with the right args"""
+    indexing_api_args = ("doc_id", {"test": "data"}, "TYPE")
+    upsert_document(*indexing_api_args)
+    assert mocked_api.upsert_document.call_count == 1
+    assert mocked_api.upsert_document.call_args[0] == indexing_api_args
 
 
 def test_increment_document_integer_field_task(mocked_api):

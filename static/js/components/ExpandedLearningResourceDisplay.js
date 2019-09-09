@@ -7,7 +7,12 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms, LR_TYPE_COURSE } from "../lib/constants"
-import { bestRun, minPrice, getStartDate } from "../lib/learning_resources"
+import {
+  bestRun,
+  minPrice,
+  getStartDate,
+  getInstructorName
+} from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
@@ -136,13 +141,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
             <div className="course-info-value">
-              {_.join(
-                selectedRun.instructors.map(
-                  instructor =>
-                    `Prof. ${instructor.first_name} ${instructor.last_name}`
-                ),
-                ", "
-              )}
+              {_.join(selectedRun.instructors.map(getInstructorName), ", ")}
             </div>
           </div>
         ) : null}

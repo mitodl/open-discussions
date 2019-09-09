@@ -400,6 +400,7 @@ export type CourseTopic = {
 }
 
 export type CourseInstructor = {
-  first_name: string,
-  last_name: string
+  first_name: ?string,
+  last_name: ?string,
+  full_name: ?string,
 }

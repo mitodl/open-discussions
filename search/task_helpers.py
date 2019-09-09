@@ -41,6 +41,7 @@ from search.tasks import (
     create_document,
     create_post_document,
     update_document_with_partial,
+    upsert_document,
     increment_document_integer_field,
     update_field_values_by_query,
     delete_document,
@@ -383,28 +384,16 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_course(course_obj):
+def upsert_course(course_obj):
     """
-    Serializes a course object and runs a task to create an ES document for it.
-
-    Args:
-        course_obj (course_catalog.models.Course): A Course object
-    """
-    data = ESCourseSerializer(course_obj).data
-    create_document.delay(gen_course_id(course_obj.course_id), data)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def update_course(course_obj):
-    """
-    Run a task to update all fields of a course Elasticsearch document
+    Run a task to create or update a course Elasticsearch document
 
     Args:
         course_obj(Course): the Course to update in ES
     """
 
     course_data = ESCourseSerializer(course_obj).data
-    update_document_with_partial.delay(
+    upsert_document.delay(
         gen_course_id(course_obj.course_id),
         course_data,
         COURSE_TYPE,
@@ -465,28 +454,16 @@ def delete_bootcamp(bootcamp_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_program(program_obj):
+def upsert_program(program_obj):
     """
-    Serializes a program object and runs a task to create an ES document for it.
-
-    Args:
-        program_obj (course_catalog.models.Program): A Program object
-    """
-    data = ESProgramSerializer(program_obj).data
-    create_document.delay(gen_program_id(program_obj), data)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def update_program(program_obj):
-    """
-    Run a task to update all fields of a program Elasticsearch document
+    Run a task to create or update a program Elasticsearch document
 
     Args:
         program_obj(Program): the Program to update in ES
     """
 
     program_data = ESProgramSerializer(program_obj).data
-    update_document_with_partial.delay(
+    upsert_document.delay(
         gen_program_id(program_obj),
         program_data,
         PROGRAM_TYPE,
