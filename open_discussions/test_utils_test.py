@@ -8,6 +8,7 @@ from open_discussions.test_utils import (
     assert_not_raises,
     MockResponse,
     PickleableMock,
+    assert_json_equal,
 )
 
 
@@ -57,3 +58,10 @@ def test_mock_response():
 def test_pickleable_mock():
     """Tests that a mock can be pickled"""
     pickle.dumps(PickleableMock(field_name=dict()))
+
+
+def test_assert_json_equal():
+    """Asserts that objects are equal in JSON"""
+    assert_json_equal({"a": 1}, {"a": 1})
+    assert_json_equal(2, 2)
+    assert_json_equal([2], [2])

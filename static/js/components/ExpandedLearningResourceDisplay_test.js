@@ -10,7 +10,7 @@ import {
   makeLearningResource
 } from "../factories/learning_resources"
 import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
-import { bestRun } from "../lib/learning_resources"
+import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 import { defaultResourceImageURL } from "../lib/url"
 
@@ -179,11 +179,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       .text()
     // $FlowFixMe: course run won't be null here
     bestRun(course.course_runs).instructors.forEach(instructor => {
-      assert.ok(
-        instructorText.includes(
-          `${instructor.first_name} ${instructor.last_name}`
-        )
-      )
+      assert.ok(instructorText.includes(getInstructorName(instructor)))
     })
   })
 

@@ -1,0 +1,152 @@
+[
+  {
+    "title": "SEED Systems Engineering",
+    "description": "<p>A four-course online program leading to a Professional Certificate from the Massachusetts Institute of Technology.</p>",
+    "thumbnail_url": "/static/images/mit-dome.png",
+    "readable_id": "program-v1:xPRO+SysEngx",
+    "current_price": 2499,
+    "id": 5,
+    "courses": [
+      {
+        "id": 18,
+        "title": "SEED Architecture of Complex Systems",
+        "description": "<p>Course 1 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program.</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+SysEngxB1",
+        "courseruns": [],
+        "next_run_id": null
+      },
+      {
+        "id": 20,
+        "title": "SEED Model-Based Systems Engineering: Documentation and Analysis",
+        "description": "<p>Course 3 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program. This course may be taken individually, without enrolling in the professional certificate program.</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+SysEngxB3",
+        "courseruns": [
+          {
+            "title": "SEED Model-Based Systems Engineering: Documentation and Analysis - Fall 2020",
+            "start_date": "2020-08-15T00:00:00Z",
+            "end_date": "2020-12-15T00:00:00Z",
+            "enrollment_start": null,
+            "enrollment_end": "2020-08-29T00:00:00Z",
+            "expiration_date": "2021-03-15T00:00:00Z",
+            "courseware_url": "http://172.22.0.1:18000/courses/course-v1:TestX+SysEngxB3+1T2019/course/",
+            "courseware_id": "course-v1:TestX+SysEngxB3+1T2019",
+            "current_price": 849,
+            "instructors": [],
+            "id": 49,
+            "product_id": 13
+          }
+        ],
+        "next_run_id": 49
+      },
+      {
+        "id": 19,
+        "title": "SEED Models in Engineering",
+        "description": "<p>Course 2 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program. This course may be taken individually, without enrolling in the professional certificate program.</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+SysEngxB2",
+        "courseruns": [
+          {
+            "title": "SEED Models in Engineering - Spring 2020",
+            "start_date": "2020-01-15T00:00:00Z",
+            "end_date": "2020-05-15T00:00:00Z",
+            "enrollment_start": null,
+            "enrollment_end": "2020-01-29T00:00:00Z",
+            "expiration_date": "2020-08-13T00:00:00Z",
+            "courseware_url": "http://172.22.0.1:18000/courses/course-v1:TestX+SysEngxB2+1T2019/course/",
+            "courseware_id": "course-v1:TestX+SysEngxB2+1T2019",
+            "current_price": 848,
+            "instructors": [],
+            "id": 48,
+            "product_id": 12
+          }
+        ],
+        "next_run_id": 48
+      },
+      {
+        "id": 21,
+        "title": "SEED Quantitative Methods in Systems Engineering",
+        "description": "<p>The course where the methods are quantitative and the systems are engineered.</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+SysEngxB4",
+        "courseruns": [],
+        "next_run_id": null
+      }
+    ]
+  },
+  {
+    "title": "SEED Digital Learning",
+    "description": "<p>Learn stuff about digital learning.</p>",
+    "thumbnail_url": "/static/images/mit-dome.png",
+    "readable_id": "program-v1:xPRO+DgtlLearn",
+    "current_price": null,
+    "id": 8,
+    "courses": [
+      {
+        "id": 30,
+        "title": "SEED Digital Learning 100",
+        "description": "<p>An introductory course to Digital Learning</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+DgtlLearn1",
+        "courseruns": [
+          {
+            "title": "SEED Digital Learning 100 - August 2020",
+            "start_date": "2020-08-15T00:00:00Z",
+            "end_date": "2020-12-15T00:00:00Z",
+            "enrollment_start": null,
+            "enrollment_end": "2020-08-29T00:00:00Z",
+            "expiration_date": "2021-03-15T00:00:00Z",
+            "courseware_url": null,
+            "courseware_id": "course-v1:MITx+Digital+Learning+100+Aug_2020",
+            "current_price": null,
+            "instructors": [
+              {
+                "name": "Joe Smith"
+              }
+            ],
+            "id": 73,
+            "product_id": null
+          },
+          {
+            "title": "SEED Digital Learning 100 - August 2021",
+            "start_date": "2021-08-15T00:00:00Z",
+            "end_date": "2021-12-15T00:00:00Z",
+            "enrollment_start": null,
+            "enrollment_end": "2021-08-29T00:00:00Z",
+            "expiration_date": "2022-03-15T00:00:00Z",
+            "courseware_url": null,
+            "courseware_id": "course-v1:MITx+Digital+Learning+100+Aug_2021",
+            "current_price": null,
+            "instructors": [
+              {
+                "name": "Joe Smith"
+              }
+            ],
+            "id": 72,
+            "product_id": null
+          }
+        ],
+        "next_run_id": 73
+      },
+      {
+        "id": 31,
+        "title": "SEED Digital Learning 200",
+        "description": "<p>A more advanced course in Digital Learning</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+DgtlLearn2",
+        "courseruns": [],
+        "next_run_id": null
+      },
+      {
+        "id": 32,
+        "title": "SEED Digital Learning 300",
+        "description": "<p>The most advancedest course in Digital Learning</p>",
+        "thumbnail_url": "/static/images/mit-dome.png",
+        "readable_id": "course-v1:xPRO+DgtlLearn3",
+        "courseruns": [],
+        "next_run_id": null
+      }
+    ]
+  }
+]

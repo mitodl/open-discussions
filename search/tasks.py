@@ -113,6 +113,14 @@ def update_document_with_partial(
     )
 
 
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_document(doc_id, partial_data, object_type, retry_on_conflict=0):
+    """Task that makes a request to create or update an ES document"""
+    return api.upsert_document(
+        doc_id, partial_data, object_type, retry_on_conflict=retry_on_conflict
+    )
+
+
 @app.task
 def delete_document(doc_id, object_type):
     """Task that makes a request to remove an ES document"""
@@ -311,21 +319,27 @@ def start_recreate_index(self):
             + [
                 index_courses.si(ids)
                 for ids in chunks(
-                    Course.objects.order_by("id").values_list("id", flat=True),
+                    Course.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
             + [
                 index_bootcamps.si(ids)
                 for ids in chunks(
-                    Bootcamp.objects.order_by("id").values_list("id", flat=True),
+                    Bootcamp.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
             + [
                 index_programs.si(ids)
                 for ids in chunks(
-                    Program.objects.order_by("id").values_list("id", flat=True),
+                    Program.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

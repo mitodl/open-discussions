@@ -8,7 +8,7 @@ from rest_framework import status
 from widgets.factories import WidgetInstanceFactory, WidgetListFactory
 from widgets.models import WidgetInstance
 
-pytestmark = [pytest.mark.django_db]
+pytestmark = [pytest.mark.usefixtures("mock_search_tasks"), pytest.mark.django_db]
 
 EXPECTED_AVAILABLE_WIDGETS = [
     {
@@ -109,7 +109,7 @@ EXPECTED_AVAILABLE_WIDGETS = [
 
 
 @pytest.fixture
-def widget_list(disable_search_tasks, user):  # pylint: disable=unused-argument
+def widget_list(user):
     """Creates a widget list the user can write to"""
     widget_list = WidgetListFactory.create()
     assign_perm("change_widgetlist", user, widget_list)

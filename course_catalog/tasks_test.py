@@ -27,6 +27,7 @@ from course_catalog.tasks import (
     upload_ocw_master_json,
     get_bootcamp_data,
     get_micromasters_data,
+    get_xpro_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -379,7 +380,7 @@ def test_process_bootcamps(mock_get_bootcamps):
     bootcamp = Bootcamp.objects.get(course_id="Bootcamp3")
     assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
 
-    get_bootcamp_data()
+    get_bootcamp_data.delay()
 
     assert Bootcamp.objects.count() == 3
     assert Course.objects.count() == 0
@@ -390,3 +391,10 @@ def test_get_micromasters_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_micromasters_data.delay()
     mock_pipelines.micromasters_etl.assert_called_once_with()
+
+
+def test_get_xpro_data(mocker):
+    """Verify that the get_xpro_data invokes the xPro ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_xpro_data.delay()
+    mock_pipelines.xpro_etl.assert_called_once_with()

@@ -17,8 +17,9 @@ class CourseInstructor(TimestampedModel):
     Instructors for all courses
     """
 
-    first_name = models.CharField(max_length=128)
-    last_name = models.CharField(max_length=128)
+    first_name = models.CharField(max_length=128, null=True, blank=True)
+    last_name = models.CharField(max_length=128, null=True, blank=True)
+    full_name = models.CharField(max_length=256, null=True, blank=True)
 
 
 class CourseTopic(TimestampedModel):
@@ -209,6 +210,8 @@ class Program(List):
     program_id = models.CharField(max_length=80, null=True)
     image_src = models.URLField(max_length=2048, null=True, blank=True)
     url = models.URLField(null=True, max_length=2048)
+    prices = models.ManyToManyField(CoursePrice, blank=True)
+    published = models.BooleanField(default=True)
 
 
 class ProgramItem(ListItem):

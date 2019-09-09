@@ -572,6 +572,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_micromasters_data",
         "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
     },
+    "update-xpro-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_xpro_data",
+        "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
@@ -809,6 +813,8 @@ MICROMASTERS_COURSE_URL = get_string(
     "MICROMASTERS_COURSE_URL", "https://micromasters.mit.edu/api/v0/courseruns/"
 )
 MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
+
+XPRO_CATALOG_API_URL = get_string("XPRO_CATALOG_API_URL", None)
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)

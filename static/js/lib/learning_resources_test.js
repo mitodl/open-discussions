@@ -29,7 +29,8 @@ import {
   bestRun,
   runStartDate,
   runEndDate,
-  getStartDate
+  getStartDate,
+  getInstructorName
 } from "./learning_resources"
 import { makeCourse, makeCourseRun } from "../factories/learning_resources"
 import moment from "moment"
@@ -366,6 +367,25 @@ describe("Course run availability utils", () => {
       courseRun.semester = "Fall"
       courseRun.year = "2019"
       assert.equal(getStartDate(course, courseRun), expected)
+    })
+  })
+
+  //
+  ;[
+    [{ first_name: "", last_name: "", full_name: "" }, ""],
+    [{ first_name: "Joe", last_name: "", full_name: "" }, ""],
+    [{ first_name: "", last_name: "Smith", full_name: "" }, "Prof. Smith"],
+    [
+      { first_name: "Joe", last_name: "Smith", full_name: "" },
+      "Prof. Joe Smith"
+    ],
+    [
+      { first_name: "Joe", last_name: "", full_name: "Joe Smith" },
+      "Prof. Joe Smith"
+    ]
+  ].forEach(([input, expected]) => {
+    it(`getInstructorName should return ${expected} when given ${input.toString()}`, () => {
+      assert.equal(getInstructorName(input), expected)
     })
   })
 })

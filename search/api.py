@@ -16,13 +16,7 @@ from channels.constants import (
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from search.connection import get_conn, get_default_alias_name
-from search.constants import (
-    ALIAS_ALL_INDICES,
-    GLOBAL_DOC_TYPE,
-    COURSE_TYPE,
-    BOOTCAMP_TYPE,
-    USER_LIST_TYPE,
-)
+from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, USER_LIST_TYPE
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
@@ -171,11 +165,6 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
-    # Search only published courses and bootcamps
-    published_filter = Q("term", published=True) | ~Q(
-        "terms", object_type=[COURSE_TYPE, BOOTCAMP_TYPE]
-    )
-
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
         "terms", object_type=[USER_LIST_TYPE]
@@ -188,10 +177,7 @@ def _apply_general_query_filters(search, user):
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
     return (
-        search.filter(channels_filter)
-        .filter(content_filter)
-        .filter(published_filter)
-        .filter(user_list_filter)
+        search.filter(channels_filter).filter(content_filter).filter(user_list_filter)
     )
 
 

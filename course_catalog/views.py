@@ -119,15 +119,18 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
                     CourseRun.objects.filter(
                         content_type=ContentType.objects.get_for_model(Course),
                         object_id=OuterRef("pk"),
+                        published=True,
                     )
                 )
             )
-            .filter(has_course_runs=True)
+            .filter(has_course_runs=True, published=True)
             .prefetch_related(
                 "topics",
                 Prefetch(
                     "course_runs",
-                    queryset=CourseRun.objects.order_by("-best_start_date"),
+                    queryset=CourseRun.objects.filter(published=True).order_by(
+                        "-best_start_date"
+                    ),
                 ),
             )
         )

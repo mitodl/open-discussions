@@ -8,26 +8,35 @@ from unittest.mock import Mock
 import pytest
 
 
-def any_instance_of(*cls):
+def any_instance_of(*classes):
     """
     Returns a type that evaluates __eq__ in isinstance terms
 
     Args:
-        cls (list of types): variable list of types to ensure equality against
+        classes (list of types): variable list of types to ensure equality against
 
     Returns:
         AnyInstanceOf: dynamic class type with the desired equality
     """
 
-    class AnyInstanceOf(metaclass=abc.ABCMeta):
+    class AnyInstanceOf(abc.ABC):
         """Dynamic class type for __eq__ in terms of isinstance"""
 
-        def __eq__(self, other):
-            return isinstance(other, cls)
+        def __init__(self, classes):
+            self.classes = classes
 
-    for c in cls:
+        def __eq__(self, other):
+            return isinstance(other, self.classes)
+
+        def __str__(self):  # pragma: no cover
+            return f"AnyInstanceOf({', '.join([str(c) for c in self.classes])})"
+
+        def __repr__(self):  # pragma: no cover
+            return str(self)
+
+    for c in classes:
         AnyInstanceOf.register(c)
-    return AnyInstanceOf()
+    return AnyInstanceOf(classes)
 
 
 @contextmanager
@@ -66,6 +75,20 @@ def drf_datetime(dt):
         str: ISO 8601 formatted datetime
     """
     return dt.isoformat().replace("+00:00", "Z")
+
+
+def assert_json_equal(obj1, obj2):
+    """
+    Asserts that two objects are equal after a round trip through JSON serialization/deserialization.
+    Particularly helpful when testing DRF serializers where you may get back OrderedDict and other such objects.
+
+    Args:
+        obj1 (object): the first object
+        obj2 (object): the second object
+    """
+    converted1 = json.loads(json.dumps(obj1))
+    converted2 = json.loads(json.dumps(obj2))
+    assert converted1 == converted2
 
 
 class PickleableMock(Mock):

@@ -2,13 +2,13 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import CourseFactory, ProgramFactory
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
-from search.constants import PROFILE_TYPE, COURSE_TYPE
-from search.serializers import ESCourseSerializer
+from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE
+from search.serializers import ESCourseSerializer, ESProgramSerializer
 from search.task_helpers import (
     reddit_object_persist,
     index_new_post,
@@ -26,11 +26,17 @@ from search.task_helpers import (
     update_author,
     update_author_posts_comments,
     update_channel_index,
-    update_course,
-    index_new_course,
+    upsert_course,
     delete_profile,
+    upsert_program,
 )
-from search.api import gen_post_id, gen_comment_id, gen_profile_id, gen_course_id
+from search.api import (
+    gen_post_id,
+    gen_comment_id,
+    gen_profile_id,
+    gen_course_id,
+    gen_program_id,
+)
 
 es_profile_serializer_data = {
     "object_type": PROFILE_TYPE,
@@ -433,34 +439,19 @@ def test_update_channel_index(mocker, mock_index_functions):
 
 
 @pytest.mark.django_db
-def test_update_course(mock_index_functions, mocker):
+def test_upsert_course(mock_index_functions, mocker):
     """
-    Tests that update_course calls update_field_values_by_query with the right parameters
+    Tests that upsert_course calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch("search.task_helpers.upsert_document")
     course = CourseFactory.create()
-    update_course(course)
+    upsert_course(course)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
     assert patched_task.delay.call_args[0] == (
         gen_course_id(course.course_id),
         ESCourseSerializer(course).data,
         COURSE_TYPE,
-    )
-
-
-@pytest.mark.django_db
-def test_index_new_course(mock_index_functions, mocker):
-    """
-    Test that index_new_course calls indexing tasks with the right parameters
-    """
-    patched_create_task = mocker.patch("search.task_helpers.create_document")
-    course = CourseFactory.create()
-    index_new_course(course)
-    assert patched_create_task.delay.called is True
-    assert patched_create_task.delay.call_args[0] == (
-        gen_course_id(course.course_id),
-        ESCourseSerializer(course).data,
     )
 
 
@@ -474,4 +465,21 @@ def test_delete_profile(mocker, user):
     assert patched_delete_task.delay.call_args[0] == (
         gen_profile_id(user.username),
         PROFILE_TYPE,
+    )
+
+
+@pytest.mark.django_db
+def test_upsert_program(mock_index_functions, mocker):
+    """
+    Tests that upsert_program calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    program = ProgramFactory.create()
+    upsert_program(program)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
+    assert patched_task.delay.call_args[0] == (
+        gen_program_id(program),
+        ESProgramSerializer(program).data,
+        PROGRAM_TYPE,
     )

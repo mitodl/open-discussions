@@ -50,8 +50,16 @@ export const makeCourseRun = (): CourseRun => {
       "Upcoming"
     ]),
     instructors: [
-      { first_name: casual.name, last_name: casual.name },
-      { first_name: casual.name, last_name: casual.name }
+      {
+        first_name: casual.name,
+        last_name:  casual.name,
+        full_name:  casual.name
+      },
+      {
+        first_name: casual.name,
+        last_name:  casual.name,
+        full_name:  casual.name
+      }
     ],
     prices: [{ mode: "audit", price: casual.number }]
   }
