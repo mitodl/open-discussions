@@ -318,7 +318,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       total,
       setShowResourceDrawer
     } = this.props
-    const { from, incremental, searchResultLayout } = this.state
+    const { from, incremental, searchResultLayout, activeFacets } = this.state
 
     if ((processing || !loaded) && !incremental) {
       return <PostLoading />
@@ -350,6 +350,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   this.getFavoriteObject(result)
                 }
                 toggleFacet={this.toggleFacet}
+                availabilities={activeFacets.get("availability")}
                 setShowResourceDrawer={setShowResourceDrawer}
                 searchResultLayout={searchResultLayout}
               />

@@ -10,7 +10,8 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  DATE_FORMAT
 } from "../lib/constants"
 
 import type {
@@ -23,9 +24,6 @@ import type {
 
 const incrCourse = incrementer()
 const courseId: any = incrementer()
-
-const dateFormat = "YYYY-MM-DD[T]HH:mm:ss[Z]"
-
 const incrCourseRun = incrementer()
 
 export const makeCourseRun = (): CourseRun => {
@@ -40,10 +38,12 @@ export const makeCourseRun = (): CourseRun => {
     semester:          casual.random_element(["Fall", "Spring", null]),
     year:              casual.year,
     level:             casual.random_element(["Graduate", "Undergraduate", null]),
-    start_date:        casual.date(dateFormat),
-    end_date:          casual.date(dateFormat),
-    enrollment_start:  casual.date(dateFormat),
-    enrollment_end:    casual.date(dateFormat),
+    start_date:        casual.date(DATE_FORMAT),
+    end_date:          casual.date(DATE_FORMAT),
+    best_start_date:   casual.date(DATE_FORMAT),
+    best_end_date:     casual.date(DATE_FORMAT),
+    enrollment_start:  casual.date(DATE_FORMAT),
+    enrollment_end:    casual.date(DATE_FORMAT),
     availability:      casual.random_element([
       COURSE_ARCHIVED,
       COURSE_CURRENT,

@@ -72,3 +72,7 @@ export const readableLearningResources = {
   [LR_TYPE_PROGRAM]:  "Program",
   [LR_TYPE_USERLIST]: "Learning Path"
 }
+
+export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"
+export const DEFAULT_START_DT = "1970-01-01T00:00:00Z"
+export const DEFAULT_END_DT = "2500-01-01T23:59:59Z"

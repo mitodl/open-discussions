@@ -7,7 +7,12 @@ import { connect } from "react-redux"
 
 import Card from "./Card"
 
-import { availabilityLabel, minPrice } from "../lib/learning_resources"
+import {
+  filterRunsByAvailability,
+  bestRunLabel,
+  bestRun,
+  minPrice
+} from "../lib/learning_resources"
 import {
   embedlyThumbnail,
   starSelectedURL,
@@ -21,7 +26,6 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_USERLIST,
   LR_TYPE_PROGRAM,
-  COURSE_AVAILABLE_NOW,
   platformReadableNames,
   readableLearningResources
 } from "../lib/constants"
@@ -32,12 +36,12 @@ import { favoriteUserListMutation } from "../lib/queries/user_lists"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
-import { emptyOrNil } from "../lib/util"
 
 type OwnProps = {|
   object: LearningResourceSummary,
   setShowResourceDrawer: Function,
-  searchResultLayout?: string
+  searchResultLayout?: string,
+  availabilities?: Array<string>
 |}
 
 type DispatchProps = {|
@@ -98,8 +102,14 @@ export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
   toggleFavorite,
-  searchResultLayout
+  searchResultLayout,
+  availabilities
 }: Props) => {
+  // This run will be passed on to showResourceDrawer in a subsequent PR
+  const bestAvailableRun =
+    bestRun(filterRunsByAvailability(object.course_runs, availabilities)) ||
+    (object.course_runs ? object.course_runs[0] : null)
+
   const showResourceDrawer = () =>
     setShowResourceDrawer({
       objectId:   object.id,
@@ -126,15 +136,11 @@ export const LearningResourceCard = ({
         <div className="row availability-price-favorite">
           <div className="price grey-surround">
             <i className="material-icons attach_money">attach_money</i>
-            {minPrice(object)}
+            {minPrice(bestAvailableRun)}
           </div>
           <div className="availability grey-surround">
             <i className="material-icons calendar_today">calendar_today</i>
-            {availabilityLabel(
-              !emptyOrNil(object.course_runs)
-                ? object.course_runs[0].availability
-                : COURSE_AVAILABLE_NOW
-            )}
+            {bestRunLabel(bestAvailableRun)}
           </div>
           <div className="favorite grey-surround">
             <img

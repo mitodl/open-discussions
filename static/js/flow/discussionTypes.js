@@ -340,6 +340,8 @@ export type CourseRun = {
   end_date:           ?string,
   enrollment_start:   ?string,
   enrollment_end:     ?string,
+  best_start_date:    ?string,
+  best_end_date:      ?string,
   instructors:        Array<CourseInstructor>,
   prices:             Array<CoursePrice>,
   availability:       ?string

@@ -12,7 +12,6 @@ import {
 } from "../factories/search"
 import {
   AVAILABILITY_MAPPING,
-  AVAILABLE_NOW,
   buildSearchQuery,
   channelField,
   searchFields,
@@ -22,7 +21,11 @@ import {
   searchResultToProfile
 } from "./search"
 import * as searchFuncs from "./search"
-import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  DEFAULT_START_DT
+} from "../lib/constants"
 
 describe("search functions", () => {
   let sandbox
@@ -409,7 +412,7 @@ describe("search functions", () => {
                     date_range: {
                       field:   "course_runs.best_start_date",
                       keyed:   false,
-                      missing: "1901-01-01T00:00:00Z",
+                      missing: DEFAULT_START_DT,
                       ranges:  [
                         {
                           key: "availableNow",
