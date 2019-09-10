@@ -72,11 +72,11 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   return (
     <div className="expanded-course-summary">
       <div className="summary">
-        {isCourse ? (
-          <div className="course-info-row form centered">
-            <i className="material-icons school">school</i>
-            <div className="course-info-label">As Taught In:</div>
-            <div className="select-semester-div">
+        <div className="course-info-row form centered">
+          <i className="material-icons school">school</i>
+          <div className="course-info-label">As Taught In:</div>
+          <div className="select-semester-div">
+            {object.course_runs.length > 1 ? (
               <select value={runId} onChange={updateRun}>
                 {object.course_runs.map(run => (
                   <option value={run.id} key={run.id}>
@@ -84,9 +84,12 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                   </option>
                 ))}
               </select>
-            </div>
+            ) : (
+              <div>{getRunDateLabel(object, selectedRun)}</div>
+            )}
           </div>
-        ) : null}
+        </div>
+
         {object.image_src ? (
           <div className="course-image-div">
             <img

@@ -13,6 +13,7 @@ import {
 } from "../factories/learning_resources"
 import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 import { bestRun } from "../lib/learning_resources"
+import { shouldIf } from "../lib/test_utils"
 
 describe("ExpandedLearningResourceDisplay", () => {
   let course
@@ -111,10 +112,15 @@ describe("ExpandedLearningResourceDisplay", () => {
     }
   )
 
-  it(`should not display 'As Taught In' row for bootcamps`, () => {
-    const bootcamp = makeBootcamp()
-    const wrapper = render({ object: bootcamp, objectType: LR_TYPE_BOOTCAMP })
-    assert.isNotOk(wrapper.find(".form").exists())
+  //
+  ;[[1, false], [2, true]].forEach(([runs, showDropdown]) => {
+    it(`${shouldIf(
+      showDropdown
+    )} display a course run dropdown for a course with ${runs} run(s)`, () => {
+      course.course_runs = course.course_runs.slice(0, runs)
+      const wrapper = render()
+      assert.equal(wrapper.find("option").exists(), showDropdown)
+    })
   })
 
   //
