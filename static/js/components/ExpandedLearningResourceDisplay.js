@@ -36,16 +36,13 @@ const getStartDate = (
         return moment(courseRun.start_date).format("DD MMMM YYYY")
       } else if (courseRun.best_start_date) {
         return moment(courseRun.best_start_date).format("DD MMMM YYYY")
-      } else {
-        return availabilityLabel(courseRun.availability)
       }
     }
-  } else {
-    return "Ongoing"
   }
+  return "Ongoing"
 }
 
-const getRunDateLabel = (object: Object, courseRun: CourseRun) =>
+const getTaughtInLabel = (object: Object, courseRun: CourseRun) =>
   object.platform === platforms.OCW
     ? `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
     : getStartDate(true, object, courseRun)
@@ -80,12 +77,12 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
               <select value={runId} onChange={updateRun}>
                 {object.course_runs.map(run => (
                   <option value={run.id} key={run.id}>
-                    {getRunDateLabel(object, run)}
+                    {getTaughtInLabel(object, run)}
                   </option>
                 ))}
               </select>
             ) : (
-              <div>{getRunDateLabel(object, selectedRun)}</div>
+              <div>{getTaughtInLabel(object, selectedRun)}</div>
             )}
           </div>
         </div>

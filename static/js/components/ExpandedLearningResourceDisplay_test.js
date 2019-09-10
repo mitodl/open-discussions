@@ -145,6 +145,30 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  //
+  ;[
+    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "01 september 2019"],
+    [null, "2019-08-01T00:00:00Z", "01 august 2019"],
+    [null, null, "Ongoing"]
+  ].forEach(([startDate, bestDate, expected]) => {
+    it(`mitx run date should be ${expected} for start date ${String(
+      startDate
+    )}, best date ${String(bestDate)}`, () => {
+      course.platform = "mitx"
+      course.course_runs = course.course_runs.slice(0, 1)
+      const courseRun = course.course_runs[0]
+      courseRun.start_date = startDate
+      courseRun.best_start_date = bestDate
+      const wrapper = render()
+      const dateValue = wrapper
+        .find(".calendar_today")
+        .closest(".course-info-row")
+        .find(".course-info-value")
+        .text()
+      assert.equal(dateValue, expected)
+    })
+  })
+
   it("should display all instructors for the course", () => {
     const wrapper = render()
     const instructorText = wrapper
