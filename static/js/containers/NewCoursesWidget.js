@@ -3,10 +3,8 @@
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
 import { Link } from "react-router-dom"
-import { querySelectors } from "redux-query"
-import { connectRequest } from "redux-query-react"
-import { connect } from "react-redux"
-import { compose } from "redux"
+import { useSelector } from "react-redux"
+import { useRequest } from "redux-query-react"
 
 import Card from "../components/Card"
 
@@ -24,23 +22,23 @@ import {
 } from "../lib/url"
 import { flatZip } from "../lib/util"
 
-import type { Course } from "../flow/discussionTypes"
-import type { Dispatch } from "redux"
-
 const THUMBNAIL_SIZE = 60
 
-type StateProps = {|
-  courses: Array<Course>,
-  loaded: boolean
-|}
+export default function NewCoursesWidget() {
+  const [{ isFinished: isFinishedNew }] = useRequest(newCoursesRequest())
+  const [{ isFinished: isFinishedUpcoming }] = useRequest(
+    upcomingCoursesRequest()
+  )
 
-type Props = {|
-  ...StateProps,
-  dispatch: Dispatch<*>
-|}
+  const loaded = isFinishedNew && isFinishedUpcoming
 
-export function NewCoursesWidget(props: Props) {
-  const { loaded, courses } = props
+  const newCourses = useSelector(newCoursesSelector)
+  const upcomingCourses = useSelector(upcomingCoursesSelector)
+
+  const courses =
+    loaded && newCourses && upcomingCourses
+      ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
+      : []
 
   return loaded ? (
     <Card className="new-course-widget widget">
@@ -79,27 +77,3 @@ export function NewCoursesWidget(props: Props) {
     </Card>
   ) : null
 }
-
-const mapStateToProps = (state: Object): StateProps => {
-  const newCourses = newCoursesSelector(state)
-  const upcomingCourses = upcomingCoursesSelector(state)
-
-  const loaded =
-    querySelectors.isFinished(state.queries, upcomingCoursesRequest()) &&
-    querySelectors.isFinished(state.queries, newCoursesRequest())
-
-  return {
-    courses:
-      loaded && newCourses && upcomingCourses
-        ? flatZip(newCourses.slice(0, 5), upcomingCourses.slice(0, 5))
-        : [],
-    loaded
-  }
-}
-
-const mapPropsToConfig = () => [upcomingCoursesRequest(), newCoursesRequest()]
-
-export default compose(
-  connect<Props, {||}, _, _, _, _>(mapStateToProps),
-  connectRequest(mapPropsToConfig)
-)(NewCoursesWidget)

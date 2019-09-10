@@ -3,26 +3,33 @@
 import R from "ramda"
 import { assert } from "chai"
 
-import { NewCoursesWidget } from "./NewCoursesWidget"
+import NewCoursesWidget from "./NewCoursesWidget"
 
-import { configureShallowRenderer } from "../lib/test_utils"
+import { mockCourseAPIMethods } from "../lib/test_utils"
 import { makeCourse } from "../factories/learning_resources"
 import { availabilityLabel } from "../lib/learning_resources"
 import { COURSE_URL } from "../lib/url"
+import IntegrationTestHelper from "../util/integration_test_helper"
+import { flatZip } from "../lib/util"
 
 describe("NewCoursesWidget", () => {
-  let renderNewCourseWidget, courses
+  let render, newCourses, upcomingCourses, helper, courses
 
   beforeEach(() => {
-    courses = R.times(makeCourse, 10)
-    renderNewCourseWidget = configureShallowRenderer(NewCoursesWidget, {
-      courses,
-      loaded: true
-    })
+    helper = new IntegrationTestHelper()
+    render = helper.configureReduxQueryRenderer(NewCoursesWidget)
+    newCourses = R.times(makeCourse, 5)
+    upcomingCourses = R.times(makeCourse, 5)
+    courses = flatZip(newCourses, upcomingCourses)
+    mockCourseAPIMethods(helper, upcomingCourses, newCourses)
   })
 
-  it("should render information for all courses returns", () => {
-    const wrapper = renderNewCourseWidget()
+  afterEach(() => {
+    helper.cleanup()
+  })
+
+  it("should render information for all courses returns", async () => {
+    const { wrapper } = await render()
     R.zip(wrapper.find(".course").map(R.identity), courses).forEach(
       ([el, course]) => {
         assert.equal(el.find("Dotdotdot").prop("children"), course.title)
@@ -38,13 +45,15 @@ describe("NewCoursesWidget", () => {
     )
   })
 
-  it("shouldnt display anything if loaded === false", () => {
-    const wrapper = renderNewCourseWidget({ loaded: false })
-    assert.ok(wrapper.equals(null))
+  it("shouldnt display anything if no courses are returned", async () => {
+    mockCourseAPIMethods(helper, [], [])
+    const { wrapper } = await render()
+    assert.isFalse(wrapper.find(".course").exists())
   })
 
-  it("should have a 'react more' link", () => {
-    const link = renderNewCourseWidget().find("Link")
+  it("should have a 'react more' link", async () => {
+    const { wrapper } = await render()
+    const link = wrapper.find("Link")
     assert.equal(link.props().to, COURSE_URL)
     assert.equal(link.props().children, "View More")
   })

@@ -54,13 +54,17 @@ export const makeEvent = (name: string, value: any) => ({
   preventDefault: sinon.stub()
 })
 
-export const mockCourseAPIMethods = (helper: Object) => {
+export const mockCourseAPIMethods = (
+  helper: Object,
+  upcomingCourses: ?Array<LearningResource> = null,
+  newCourses: ?Array<LearningResource> = null
+) => {
   helper.handleRequestStub
     .withArgs(upcomingCoursesURL)
-    .returns(courseListResponse(R.times(makeCourse, 10)))
+    .returns(courseListResponse(upcomingCourses || R.times(makeCourse, 10)))
   helper.handleRequestStub
     .withArgs(newCoursesURL)
-    .returns(courseListResponse(R.times(makeCourse, 10)))
+    .returns(courseListResponse(newCourses || R.times(makeCourse, 10)))
 }
 
 export const courseListResponse = (list: Array<LearningResource>) => ({
