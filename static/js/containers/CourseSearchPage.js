@@ -73,7 +73,11 @@ type OwnProps = {|
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
   clearSearch: () => void,
-  setShowResourceDrawer: ({ objectId: string, objectType: string }) => void
+  setShowResourceDrawer: ({
+    objectId: string,
+    objectType: string,
+    runId: ?number
+  }) => void
 |}
 
 type StateProps = {|
@@ -487,12 +491,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   },
   setShowResourceDrawer: ({
     objectId,
-    objectType
+    objectType,
+    runId
   }: {
     objectId: string,
-    objectType: string
+    objectType: string,
+    runId: ?number
   }) => {
-    dispatch(setShowResourceDrawer({ objectId, objectType }))
+    dispatch(setShowResourceDrawer({ objectId, objectType, runId }))
   },
   dispatch
 })

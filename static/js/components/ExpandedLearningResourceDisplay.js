@@ -8,11 +8,11 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms, LR_TYPE_COURSE } from "../lib/constants"
-import { availabilityLabel, minPrice } from "../lib/learning_resources"
+import { availabilityLabel, bestRun, minPrice } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
-import { languageName } from "../lib/util"
+import { capitalize, languageName } from "../lib/util"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type { Bootcamp, Course, CourseRun } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
@@ -20,28 +20,73 @@ const entities = new AllHtmlEntities()
 
 type Props = {
   object: Course | Bootcamp,
-  objectType: string
+  objectType: string,
+  runId: number,
+  setShowResourceDrawer: Function
 }
 
-const getStartDate = (isCourse: boolean, object: Object) => {
-  if (!isCourse || object.platform === platforms.edX) {
-    if (object.course_runs[0].start_date) {
-      return moment(object.course_runs[0].start_date).format("DD MMMM YYYY")
-    } else {
-      return availabilityLabel(object.course_runs[0].availability)
+const getStartDate = (
+  isCourse: boolean,
+  object: Object,
+  courseRun: ?CourseRun
+) => {
+  if (!isCourse || object.platform !== platforms.OCW) {
+    if (courseRun) {
+      if (courseRun.start_date) {
+        return moment(courseRun.start_date).format("DD MMMM YYYY")
+      } else if (courseRun.best_start_date) {
+        return moment(courseRun.best_start_date).format("DD MMMM YYYY")
+      } else {
+        return availabilityLabel(courseRun.availability)
+      }
     }
   } else {
     return "Ongoing"
   }
 }
 
+const getRunDateLabel = (object: Object, courseRun: CourseRun) =>
+  object.platform === platforms.OCW
+    ? `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
+    : getStartDate(true, object, courseRun)
+
 const ExpandedLearningResourceDisplay = (props: Props) => {
-  const { object, objectType } = props
+  const { object, objectType, runId, setShowResourceDrawer } = props
   const isCourse = objectType === LR_TYPE_COURSE
+
+  const updateRun = (event: Object) =>
+    setShowResourceDrawer({
+      objectId:   object.id,
+      objectType: objectType,
+      runId:      parseInt(event.target.value)
+    })
+
+  const selectedRun =
+    bestRun(
+      runId
+        ? object.course_runs.filter(run => run.id === runId)
+        : object.course_runs
+    ) || object.course_runs[0]
+  const url = selectedRun.url || object.url
 
   return (
     <div className="expanded-course-summary">
       <div className="summary">
+        {isCourse ? (
+          <div className="course-info-row form centered">
+            <i className="material-icons school">school</i>
+            <div className="course-info-label">As Taught In:</div>
+            <div className="select-semester-div">
+              <select value={runId} onChange={updateRun}>
+                {object.course_runs.map(run => (
+                  <option value={run.id} key={run.id}>
+                    {getRunDateLabel(object, run)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ) : null}
         {object.image_src ? (
           <div className="course-image-div">
             <img
@@ -54,12 +99,12 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             />
           </div>
         ) : null}
-        {object.url ? (
+        {url ? (
           <div className="course-links">
             <div>
               <a
                 className="link-button"
-                href={object.url}
+                href={url}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -91,34 +136,16 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         </div>
         <div className="course-subheader row">Info</div>
         <div className="course-info-row">
-          <i className="material-icons history">history</i>
-          <div className="course-info-label">
-            {// $FlowFixMe: only courses will access platform
-              !isCourse || object.platform === platforms.edX
-                ? "As taught in"
-                : "Semester"}:
-          </div>
-          <div className="course-info-value">
-            {isCourse
-              ? // $FlowFixMe: only courses will access semester
-              `${_.capitalize(object.course_runs[0].semester)} `
-              : null}
-            {object.course_runs[0].year}
-          </div>
-        </div>
-        <div className="course-info-row">
           <i className="material-icons calendar_today">calendar_today</i>
           <div className="course-info-label">Start date:</div>
           <div className="course-info-value">
-            {getStartDate(isCourse, object)}
+            {getStartDate(isCourse, object, selectedRun)}
           </div>
         </div>
         <div className="course-info-row">
           <i className="material-icons attach_money">attach_money</i>
           <div className="course-info-label">Cost:</div>
-          <div className="course-info-value">
-            {minPrice(object.course_runs[0])}
-          </div>
+          <div className="course-info-value">{minPrice(selectedRun)}</div>
         </div>
         {isCourse ? (
           <div className="course-info-row">
@@ -126,7 +153,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <div className="course-info-label">Level:</div>
             <div className="course-info-value">
               {// $FlowFixMe: only courses will access level
-                object.course_runs[0].level || "Unspecified"}
+                selectedRun.level || "Unspecified"}
             </div>
           </div>
         ) : null}
@@ -135,7 +162,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-label">Instructors:</div>
           <div className="course-info-value">
             {_.join(
-              object.course_runs[0].instructors.map(
+              selectedRun.instructors.map(
                 instructor =>
                   `Prof. ${instructor.first_name} ${instructor.last_name}`
               ),
@@ -147,9 +174,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <i className="material-icons language">language</i>
           <div className="course-info-label">Language:</div>
           <div className="course-info-value">
-            {languageName(
-              object.course_runs ? object.course_runs[0].language : "en"
-            )}
+            {languageName(selectedRun ? selectedRun.language : "en")}
           </div>
         </div>
       </div>

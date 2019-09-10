@@ -58,6 +58,8 @@ export type PostResult = ResultCommon & {
 }
 
 export type LearningResourceRun = {
+  id:                  number,
+  url?:                ?string,
   language?:           ?string,
   semester?:           ?string,
   year?:               ?string,

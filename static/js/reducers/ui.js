@@ -131,7 +131,8 @@ export const ui = (
       ...state,
       courseDetail: {
         objectId:   action.payload.objectId,
-        objectType: action.payload.objectType
+        objectType: action.payload.objectType,
+        runId:      action.payload.runId
       }
     }
   case SET_SNACKBAR_MESSAGE:
