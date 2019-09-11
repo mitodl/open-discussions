@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.90.0
+--------------
+
+- Added course catalog integration with micromasters
+- update display of the currently-active filters on the course search
+- Add CourseRun to admin (#2194)
+- Show most relevant availability for search result (#2190)
+
 Version 0.89.2 (Released September 05, 2019)
 --------------
 
