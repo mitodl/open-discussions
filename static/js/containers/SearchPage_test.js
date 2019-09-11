@@ -75,7 +75,7 @@ describe("SearchPage", () => {
   })
 
   it("renders search results", async () => {
-    const { wrapper, inner } = await renderPage()
+    const { inner } = await renderPage()
 
     sinon.assert.calledWith(helper.searchStub, {
       channelName: channel.name,
@@ -386,7 +386,7 @@ describe("SearchPage", () => {
   })
 
   it("calls updateVotedComments when upvote or downvote is triggered", async () => {
-    const { wrapper, inner } = await renderPage()
+    const { inner } = await renderPage()
     const comments = [makeComment(makePost()), makeComment(makePost())]
     helper.updateCommentStub.returns(Promise.resolve(comments[0]))
     await inner

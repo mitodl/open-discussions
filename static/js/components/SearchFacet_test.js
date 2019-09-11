@@ -3,7 +3,6 @@ import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import * as sinon from "sinon"
-import Checkbox from "rmwc/Checkbox/index"
 
 import SearchFacet from "./SearchFacet"
 
@@ -12,7 +11,7 @@ import { makeSearchFacetResult } from "../factories/search"
 import { shouldIf } from "../lib/test_utils"
 
 describe("SearchFacet", () => {
-  let helper, onUpdateStub, dispatchStub, results, facet
+  let helper, onUpdateStub, results, facet
   const name = "topics"
   const title = "Search Topics"
 

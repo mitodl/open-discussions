@@ -14,7 +14,6 @@ import debounce from "lodash/debounce"
 import LearningResourceDrawer from "./LearningResourceDrawer"
 
 import CanonicalLink from "../components/CanonicalLink"
-import Card from "../components/Card"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, PostLoading } from "../components/Loading"
 import SearchFacet from "../components/SearchFacet"

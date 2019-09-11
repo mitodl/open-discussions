@@ -4,7 +4,6 @@ import { assert } from "chai"
 import qs from "query-string"
 import sinon from "sinon"
 import _ from "lodash"
-import InfiniteScroll from "react-infinite-scroller"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
@@ -18,12 +17,10 @@ import {
   makeSearchFacetResult,
   makeSearchResponse
 } from "../factories/search"
-import { makeBootcamp } from "../factories/learning_resources"
 import { makeChannel } from "../factories/channels"
 import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
-import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
+import { SEARCH_GRID_UI } from "../lib/search"
 import { wait } from "../lib/util"
-import { favoritesURL } from "../lib/url"
 
 describe("CourseSearchPage", () => {
   let helper,

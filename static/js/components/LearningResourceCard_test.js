@@ -6,12 +6,7 @@ import { mount } from "enzyme"
 
 import { LearningResourceCard } from "./LearningResourceCard"
 
-import {
-  availabilityLabel,
-  bestRun,
-  bestRunLabel,
-  minPrice
-} from "../lib/learning_resources"
+import { bestRun, bestRunLabel, minPrice } from "../lib/learning_resources"
 import { makeLearningResource } from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
@@ -99,8 +94,6 @@ describe("LearningResourceCard", () => {
   LR_TYPE_ALL.forEach(objectType => {
     it(`should render a readable platform name`, () => {
       const object = makeLearningResource(objectType)
-      const isCourse = objectType === LR_TYPE_COURSE
-      const isBootcamp = objectType === LR_TYPE_BOOTCAMP
       const platformName = render({
         object
       })

@@ -1,7 +1,6 @@
 // @flow
 import { assert } from "chai"
 import R from "ramda"
-import sinon from "sinon"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 import CourseIndexPage from "./CourseIndexPage"
@@ -17,23 +16,19 @@ import {
   favoritesURL,
   featuredCoursesURL,
   upcomingCoursesURL,
-  newCoursesURL,
-  courseURL
+  newCoursesURL
 } from "../lib/url"
-import { configureShallowRenderer, courseListResponse } from "../lib/test_utils"
+import { courseListResponse } from "../lib/test_utils"
 import {
   makeCourse,
   makeFavoritesResponse
 } from "../factories/learning_resources"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { wait } from "../lib/util"
 
 describe("CourseIndexPage", () => {
   let featuredCourses,
     upcomingCourses,
     newCourses,
-    setShowResourceDrawerStub,
-    renderCourseIndexPage,
     render,
     helper,
     courseLists,
@@ -78,15 +73,7 @@ describe("CourseIndexPage", () => {
     helper.handleRequestStub
       .withArgs(newCoursesURL)
       .returns(courseListResponse(newCourses))
-
-    setShowResourceDrawerStub = helper.sandbox.stub()
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
-
-    renderCourseIndexPage = configureShallowRenderer(CourseIndexPage, {
-      setShowResourceDrawer: setShowResourceDrawerStub,
-      loaded:                true,
-      ...courseLists
-    })
   })
 
   afterEach(() => {
@@ -158,7 +145,6 @@ describe("CourseIndexPage", () => {
   })
 
   it("should have a search textbox which redirects you", async () => {
-    const pushStub = helper.sandbox.stub()
     const { wrapper } = await render()
     const searchBox = wrapper.find("CourseSearchbox")
     searchBox.prop("onSubmit")({ target: { value: "search term" } })

@@ -7,7 +7,7 @@ import R from "ramda"
 import LearningResourceCard from "./LearningResourceCard"
 
 import { SEARCH_GRID_UI } from "../lib/search"
-import { CAROUSEL_PAGE_SIZE, PHONE, TABLET, DESKTOP } from "../lib/constants"
+import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 import { useDeviceCategory } from "../hooks/util"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"

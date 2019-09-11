@@ -1,9 +1,7 @@
 // @flow
 import React, { useCallback } from "react"
-import { querySelectors } from "redux-query"
 import { useRequest } from "redux-query-react"
 import { useSelector, useDispatch } from "react-redux"
-import { compose } from "redux"
 import { Link } from "react-router-dom"
 import { createSelector } from "reselect"
 
@@ -33,8 +31,6 @@ import {
   favoritesSelector
 } from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
-
-import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type Props = {|
   history: Object

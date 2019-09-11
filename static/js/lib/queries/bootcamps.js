@@ -4,7 +4,7 @@ import R from "ramda"
 import { bootcampURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
-import type { LearningResource, Bootcamp } from "../../flow/discussionTypes"
+import type { Bootcamp } from "../../flow/discussionTypes"
 
 export const bootcampRequest = (bootcampId: string) => ({
   queryKey:  `bootcampRequest${bootcampId}`,

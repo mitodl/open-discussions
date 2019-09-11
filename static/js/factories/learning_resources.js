@@ -18,7 +18,6 @@ import type {
   Bootcamp,
   Course,
   CourseRun,
-  LearningResource,
   Program,
   UserList
 } from "../flow/discussionTypes"

@@ -2,7 +2,6 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-import { actionTypes } from "redux-query"
 
 import LiveStream from "../containers/LiveStream"
 import PostList from "../components/PostList"
@@ -14,8 +13,6 @@ import NewCoursesWidget from "../containers/NewCoursesWidget"
 
 import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
-import { actions } from "../actions"
-import { SET_CHANNEL_DATA } from "../actions/channel"
 import { SET_POST_DATA } from "../actions/post"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { REGISTER_URL, newPostURL } from "../lib/url"
@@ -88,28 +85,9 @@ describe("HomePage", () => {
   })
 
   describe("integration", () => {
-    let renderComponent
-
     beforeEach(() => {
-      renderComponent = helper.renderComponent.bind(helper)
       mockCourseAPIMethods(helper)
     })
-
-    const renderPage = async () => {
-      const [wrapper] = await renderComponent("/", [
-        actions.frontpage.get.requestType,
-        actions.frontpage.get.successType,
-        actions.subscribedChannels.get.requestType,
-        actions.subscribedChannels.get.successType,
-        actions.livestream.get.requestType,
-        actions.livestream.get.successType,
-        actionTypes.REQUEST_ASYNC,
-        actionTypes.REQUEST_ASYNC,
-        SET_POST_DATA,
-        SET_CHANNEL_DATA
-      ])
-      return wrapper.update()
-    }
 
     it("should fetch frontpage, set post data, render", async () => {
       const { wrapper } = await render()

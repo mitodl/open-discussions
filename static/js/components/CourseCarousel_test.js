@@ -1,9 +1,6 @@
 // @flow
-import React from "react"
 import R from "ramda"
 import { assert } from "chai"
-import sinon from "sinon"
-import { mount } from "enzyme"
 
 import CourseCarousel from "./CourseCarousel"
 
