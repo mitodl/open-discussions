@@ -25,27 +25,16 @@ type Props = {
   setShowResourceDrawer: Function
 }
 
-const getStartDate = (
-  isCourse: boolean,
-  object: Object,
-  courseRun: ?CourseRun
-) => {
-  if (!isCourse || object.platform !== platforms.OCW) {
-    if (courseRun) {
-      if (courseRun.start_date) {
-        return moment(courseRun.start_date).format("DD MMMM YYYY")
-      } else if (courseRun.best_start_date) {
-        return moment(courseRun.best_start_date).format("DD MMMM YYYY")
-      }
-    }
+const getStartDate = (object: Object, courseRun: CourseRun) => {
+  if (object.platform === platforms.OCW) {
+    return `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
+  } else if (courseRun.start_date) {
+    return moment(courseRun.start_date).format("MMMM DD, YYYY")
+  } else if (courseRun.best_start_date) {
+    return moment(courseRun.best_start_date).format("MMMM DD, YYYY")
   }
   return "Ongoing"
 }
-
-const getTaughtInLabel = (object: Object, courseRun: CourseRun) =>
-  object.platform === platforms.OCW
-    ? `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
-    : getStartDate(true, object, courseRun)
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
   const { object, objectType, runId, setShowResourceDrawer } = props
@@ -71,18 +60,21 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       <div className="summary">
         <div className="course-info-row form centered">
           <i className="material-icons school">school</i>
-          <div className="course-info-label">As Taught In:</div>
+          <div className="course-info-label">
+            {// $FlowFixMe: only courses will access platform
+              object.platform === platforms.OCW ? "As Taught In" : "Start Date"}:
+          </div>
           <div className="select-semester-div">
             {object.course_runs.length > 1 ? (
               <select value={runId} onChange={updateRun}>
                 {object.course_runs.map(run => (
                   <option value={run.id} key={run.id}>
-                    {getTaughtInLabel(object, run)}
+                    {getStartDate(object, run)}
                   </option>
                 ))}
               </select>
             ) : (
-              <div>{getTaughtInLabel(object, selectedRun)}</div>
+              <div>{getStartDate(object, selectedRun)}</div>
             )}
           </div>
         </div>
@@ -135,13 +127,6 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           ))}
         </div>
         <div className="course-subheader row">Info</div>
-        <div className="course-info-row">
-          <i className="material-icons calendar_today">calendar_today</i>
-          <div className="course-info-label">Start date:</div>
-          <div className="course-info-value">
-            {getStartDate(isCourse, object, selectedRun)}
-          </div>
-        </div>
         <div className="course-info-row">
           <i className="material-icons attach_money">attach_money</i>
           <div className="course-info-label">Cost:</div>

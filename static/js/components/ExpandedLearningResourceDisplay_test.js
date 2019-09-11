@@ -96,21 +96,39 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[["mitx", "01 september 2019"], ["ocw", "Fall 2019"]].forEach(
-    ([platform, expected]) => {
-      it(`should display the correct 'As Taught In' label and options for ${platform} courses`, () => {
-        course.platform = platform
-        const courseRun = course.course_runs[0]
-        courseRun.start_date = "2019-09-01T00:00:00Z"
-        courseRun.semester = "Fall"
-        courseRun.year = "2019"
-        const wrapper = render()
-        const selectOptions = wrapper.find("option")
-        assert.equal(selectOptions.length, course.course_runs.length)
-        assert.equal(selectOptions.at(0).text(), expected)
-      })
-    }
-  )
+  ;[
+    ["mitx", "september 01, 2019", "Start Date:"],
+    ["ocw", "Fall 2019", "As Taught In:"]
+  ].forEach(([platform, expectedValue, expectedLabel]) => {
+    it(`should display the correct date label and options for ${platform} courses`, () => {
+      course.platform = platform
+      const courseRun = course.course_runs[0]
+      courseRun.start_date = "2019-09-01T00:00:00Z"
+      courseRun.semester = "Fall"
+      courseRun.year = "2019"
+      const wrapper = render()
+      const selectOptions = wrapper.find("option")
+      assert.equal(selectOptions.length, course.course_runs.length)
+      assert.equal(selectOptions.at(0).text(), expectedValue)
+      const dateLabel = wrapper
+        .find(".form")
+        .at(0)
+        .find(".course-info-label")
+        .text()
+      assert.equal(dateLabel, expectedLabel)
+    })
+  })
+
+  it("should display 'Ongoing' for a course with no good dates", () => {
+    course.platform = "mitx"
+    course.course_runs = course.course_runs.splice(0, 1)
+    const courseRun = course.course_runs[0]
+    courseRun.start_date = null
+    courseRun.best_start_date = null
+    const wrapper = render()
+    const dateDiv = wrapper.find(".select-semester-div")
+    assert.equal(dateDiv.text(), "Ongoing")
+  })
 
   //
   ;[[1, false], [2, true]].forEach(([runs, showDropdown]) => {
@@ -124,46 +142,23 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;["mitx", "ocw"].forEach(platform => {
-    it(`should display the correct start date for ${platform} courses`, () => {
-      course.platform = platform
-      const wrapper = render()
-      const dateValue = wrapper
-        .find(".calendar_today")
-        .closest(".course-info-row")
-        .find(".course-info-value")
-        .text()
-      assert.equal(
-        dateValue,
-        course.platform === "ocw"
-          ? "Ongoing"
-          : // $FlowFixMe: run won't be null
-          moment(bestRun(course.course_runs).start_date).format(
-            "DD MMMM YYYY"
-          )
-      )
-    })
-  })
-
-  //
   ;[
-    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "01 september 2019"],
-    [null, "2019-08-01T00:00:00Z", "01 august 2019"],
+    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "september 01, 2019"],
+    [null, "2019-08-01T00:00:00Z", "august 01, 2019"],
     [null, null, "Ongoing"]
   ].forEach(([startDate, bestDate, expected]) => {
     it(`mitx run date should be ${expected} for start date ${String(
       startDate
     )}, best date ${String(bestDate)}`, () => {
       course.platform = "mitx"
-      course.course_runs = course.course_runs.slice(0, 1)
       const courseRun = course.course_runs[0]
       courseRun.start_date = startDate
       courseRun.best_start_date = bestDate
       const wrapper = render()
       const dateValue = wrapper
-        .find(".calendar_today")
-        .closest(".course-info-row")
-        .find(".course-info-value")
+        .find(".select-semester-div")
+        .find("option")
+        .at(0)
         .text()
       assert.equal(dateValue, expected)
     })
