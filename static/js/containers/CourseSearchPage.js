@@ -134,7 +134,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       error:              null,
       currentFacetGroup:  null,
       incremental:        false,
-      searchResultLayout: SEARCH_GRID_UI
+      searchResultLayout: SEARCH_LIST_UI
     }
   }
 
@@ -361,7 +361,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { match } = this.props
+    const { match, total, processing } = this.props
     const { text, error, activeFacets, searchResultLayout } = this.state
 
     const anyFiltersActive =
@@ -394,26 +394,37 @@ export class CourseSearchPage extends React.Component<Props, State> {
             </Cell>
           </Grid>
         </BannerPageHeader>
-        <Grid className="main-content two-column-extrawide search-page">
+        <Grid
+          className={`main-content ${
+            searchResultLayout === SEARCH_GRID_UI
+              ? "two-column-extrawide"
+              : "two-column"
+          } search-page`}
+        >
           <Cell width={3} />
           <Cell width={9}>
             <div className="layout-buttons">
               <div
                 onClick={() => this.setSearchUI(SEARCH_LIST_UI)}
-                className={
+                className={`option ${
                   searchResultLayout === SEARCH_LIST_UI ? "active" : ""
-                }
+                }`}
               >
                 <i className="material-icons view_list">view_list</i>
               </div>
               <div
                 onClick={() => this.setSearchUI(SEARCH_GRID_UI)}
-                className={
+                className={`option ${
                   searchResultLayout === SEARCH_GRID_UI ? "active" : ""
-                }
+                }`}
               >
                 <i className="material-icons view_comfy">view_comfy</i>
               </div>
+              {processing ? null : (
+                <div className="results-count">
+                  {total} {total === 1 ? "Result" : "Results"}
+                </div>
+              )}
             </div>
           </Cell>
           <Cell className="search-filters" width={3}>

@@ -234,6 +234,11 @@
 .search-page {
   .layout-buttons {
     display: flex;
+    align-items: center;
+
+    .option {
+      height: 40px;
+    }
 
     i {
       cursor: pointer;
@@ -243,6 +248,12 @@
 
     .active i {
       color: $search-layout-active;
+    }
+
+    .results-count {
+      margin-left: 50px;
+      font-size: 14px;
+      color: black;
     }
   }
 }

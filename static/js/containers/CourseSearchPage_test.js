@@ -19,7 +19,7 @@ import {
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
 import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
-import { SEARCH_GRID_UI } from "../lib/search"
+import { SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
 
 describe("CourseSearchPage", () => {
@@ -106,6 +106,10 @@ describe("CourseSearchPage", () => {
         result
       )
     })
+    assert.include(
+      inner.find(".results-count").text(),
+      searchResponse.hits.total
+    )
   })
 
   it("renders the Learning Resource facet", async () => {
@@ -192,7 +196,7 @@ describe("CourseSearchPage", () => {
       error:              null,
       currentFacetGroup:  null,
       incremental:        true,
-      searchResultLayout: SEARCH_GRID_UI
+      searchResultLayout: SEARCH_LIST_UI
     })
   })
 
@@ -246,10 +250,10 @@ describe("CourseSearchPage", () => {
     [false, true, true],
     [false, false, true],
     [true, true, true]
-  ].forEach(([loaded, processing, expected]) => {
-    it(`${expected ? "shows" : "doesn't show"} PostLoading when we are ${
-      processing ? "processing" : "not processing"
-    } search results or loaded  = ${String(loaded)}`, async () => {
+  ].forEach(([loaded, processing, shouldShowPostloading]) => {
+    it(`shows the UI we expect when processing = ${String(
+      processing
+    )} and loaded = ${String(loaded)}`, async () => {
       const { inner } = await renderPage(
         {
           search: {
@@ -263,7 +267,8 @@ describe("CourseSearchPage", () => {
           }
         }
       )
-      assert.equal(inner.find("PostLoading").length, expected ? 1 : 0)
+      assert.equal(inner.find("PostLoading").exists(), shouldShowPostloading)
+      assert.equal(inner.find(".results-count").exists(), !processing)
     })
   })
 
@@ -371,7 +376,7 @@ describe("CourseSearchPage", () => {
       from:               0,
       error:              null,
       incremental:        false,
-      searchResultLayout: SEARCH_GRID_UI
+      searchResultLayout: SEARCH_LIST_UI
     })
   })
 
@@ -426,7 +431,7 @@ describe("CourseSearchPage", () => {
         result: makeSearchFacetResult().topics
       },
       incremental:        false,
-      searchResultLayout: SEARCH_GRID_UI
+      searchResultLayout: SEARCH_LIST_UI
     })
   })
 

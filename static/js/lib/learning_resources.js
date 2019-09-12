@@ -151,5 +151,5 @@ export const maxPrice = (courseRun: ?CourseRun) => {
 export const minPrice = (courseRun: ?CourseRun) => {
   const prices = courseRun && courseRun.prices ? courseRun.prices : []
   const price = Math.min(...prices.map(price => price.price))
-  return price > 0 && price !== Infinity ? `$${price}` : "Free"
+  return price > 0 && price !== Infinity ? price : "Free"
 }

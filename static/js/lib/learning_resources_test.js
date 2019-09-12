@@ -54,7 +54,7 @@ describe("Course utils", () => {
     [[0.0, 50.0, 25.0], "$50", "Free"],
     [[null, null], "Free", "Free"],
     [[null, 0], "Free", "Free"],
-    [[20, 100, 50], "$100", "$20"],
+    [[20, 100, 50], "$100", "20"],
     [[null, 100, 75], "$100", "Free"]
   ].forEach(([prices, expectedMax, expectedMin]) => {
     it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
