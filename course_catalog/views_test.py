@@ -23,7 +23,9 @@ from open_discussions.factories import UserFactory
 
 def test_course_endpoint(client):
     """Test course endpoint"""
-    course = CourseFactory(topics=CourseTopicFactory.create_batch(3))
+    course = CourseFactory.create(topics=CourseTopicFactory.create_batch(3))
+    # this should be filtered out
+    CourseFactory.create(course_runs=None)
 
     resp = client.get(reverse("courses-list"))
     assert resp.data.get("count") == 1
@@ -52,7 +54,7 @@ def test_course_endpoint(client):
 
 def test_bootcamp_endpoint(client):
     """Test bootcamp endpoint"""
-    bootcamp = BootcampFactory(topics=CourseTopicFactory.create_batch(3))
+    bootcamp = BootcampFactory.create(topics=CourseTopicFactory.create_batch(3))
 
     resp = client.get(reverse("bootcamps-list"))
     assert resp.data.get("count") == 1
@@ -63,9 +65,9 @@ def test_bootcamp_endpoint(client):
 
 def test_program_endpoint(client):
     """Test program endpoint"""
-    program = ProgramFactory(topics=CourseTopicFactory.create_batch(3))
-    bootcamp_item = ProgramItemBootcampFactory(program=program, position=1)
-    course_item = ProgramItemCourseFactory(program=program, position=2)
+    program = ProgramFactory.create(topics=CourseTopicFactory.create_batch(3))
+    bootcamp_item = ProgramItemBootcampFactory.create(program=program, position=1)
+    course_item = ProgramItemCourseFactory.create(program=program, position=2)
 
     resp = client.get(reverse("programs-list"))
     assert resp.data.get("count") == 1
@@ -81,10 +83,12 @@ def test_program_endpoint(client):
 
 def test_user_list_endpoint(client):
     """Test learning path endpoint"""
-    user = UserFactory()
-    user_list = UserListFactory(topics=CourseTopicFactory.create_batch(3), author=user)
-    bootcamp_item = UserListBootcampFactory(user_list=user_list, position=1)
-    course_item = UserListCourseFactory(user_list=user_list, position=2)
+    user = UserFactory.create()
+    user_list = UserListFactory.create(
+        topics=CourseTopicFactory.create_batch(3), author=user
+    )
+    bootcamp_item = UserListBootcampFactory.create(user_list=user_list, position=1)
+    course_item = UserListCourseFactory.create(user_list=user_list, position=2)
 
     resp = client.get(reverse("userlists-list"))
     assert resp.data.get("count") == 1
@@ -108,18 +112,18 @@ def test_favorites(client):
     # Test course is not favorited by default
     course = CourseFactory.create()
     resp = client.get(reverse("courses-detail", args=[course.id]))
-    assert not resp.data.get("is_favorite")
+    assert resp.data.get("is_favorite") is False
 
     # Favorite course and test that it is favorited
     client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
     resp = client.get(reverse("courses-detail", args=[course.id]))
-    assert resp.data.get("is_favorite")
+    assert resp.data.get("is_favorite") is True
 
     # Test that viewset gracefully handles favoriting an already favorited object
     with transaction.atomic():
         client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
     resp = client.get(reverse("courses-detail", args=[course.id]))
-    assert resp.data.get("is_favorite")
+    assert resp.data.get("is_favorite") is True
 
     # Test that course shows up in favorites endpoint
     resp = client.get(reverse("favorites-list"))
@@ -128,12 +132,12 @@ def test_favorites(client):
     # Unfavorite course and test that it is no longer favorited
     client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
     resp = client.get(reverse("courses-detail", args=[course.id]))
-    assert not resp.data.get("is_favorite")
+    assert resp.data.get("is_favorite") is False
 
     # Test that viewset gracefully handles unfavoriting an already unfavorited object
     client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
     resp = client.get(reverse("courses-detail", args=[course.id]))
-    assert not resp.data.get("is_favorite")
+    assert resp.data.get("is_favorite") is False
 
 
 def test_unautharized_favorites(client):
@@ -148,24 +152,24 @@ def test_unautharized_favorites(client):
 
 def test_course_report(client):
     """Test ocw course report"""
-    CourseFactory(
+    CourseFactory.create(
         platform=PlatformType.ocw.value,
         learning_resource_type=ResourceType.course.value,
         published=False,
     )
-    CourseFactory(
+    CourseFactory.create(
         platform=PlatformType.ocw.value,
         learning_resource_type=ResourceType.course.value,
         published=True,
         image_src="",
     )
-    CourseFactory(
+    CourseFactory.create(
         platform=PlatformType.ocw.value,
         learning_resource_type=ResourceType.course.value,
         published=True,
         image_src="abc123",
     )
-    CourseFactory(
+    CourseFactory.create(
         platform=PlatformType.ocw.value,
         learning_resource_type=ResourceType.ocw_resource.value,
         published=False,
