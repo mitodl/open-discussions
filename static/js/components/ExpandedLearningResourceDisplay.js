@@ -2,17 +2,16 @@
 /* global SETTINGS: false */
 import React from "react"
 import _ from "lodash"
-import moment from "moment"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import { platforms, LR_TYPE_COURSE } from "../lib/constants"
-import { availabilityLabel, bestRun, minPrice } from "../lib/learning_resources"
+import { bestRun, minPrice, getStartDate } from "../lib/learning_resources"
 import { embedlyThumbnail } from "../lib/url"
-import { capitalize, languageName } from "../lib/util"
+import { languageName } from "../lib/util"
 
-import type { Bootcamp, Course, CourseRun } from "../flow/discussionTypes"
+import type { Bootcamp, Course } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
@@ -23,17 +22,6 @@ type Props = {
   objectType: string,
   runId: number,
   setShowResourceDrawer: Function
-}
-
-const getStartDate = (object: Object, courseRun: CourseRun) => {
-  if (object.platform === platforms.OCW) {
-    return `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
-  } else if (courseRun.start_date) {
-    return moment(courseRun.start_date).format("MMMM DD, YYYY")
-  } else if (courseRun.best_start_date) {
-    return moment(courseRun.best_start_date).format("MMMM DD, YYYY")
-  }
-  return "Ongoing"
 }
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
@@ -53,32 +41,35 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         ? object.course_runs.filter(run => run.id === runId)
         : object.course_runs
     ) || object.course_runs[0]
-  const url = selectedRun.url || object.url
+  const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
 
   return (
     <div className="expanded-course-summary">
       <div className="summary">
-        <div className="course-info-row form centered">
-          <i className="material-icons school">school</i>
-          <div className="course-info-label">
-            {// $FlowFixMe: only courses will access platform
-              object.platform === platforms.OCW ? "As Taught In" : "Start Date"}:
+        {selectedRun ? (
+          <div className="course-info-row form centered">
+            <i className="material-icons school">school</i>
+            <div className="course-info-label">
+              {// $FlowFixMe: only courses will access platform
+                object.platform === platforms.OCW
+                  ? "As Taught In"
+                  : "Start Date"}:
+            </div>
+            <div className="select-semester-div">
+              {object.course_runs.length > 1 ? (
+                <select value={runId} onChange={updateRun}>
+                  {object.course_runs.map(run => (
+                    <option value={run.id} key={run.id}>
+                      {getStartDate(object, run)}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div>{getStartDate(object, selectedRun)}</div>
+              )}
+            </div>
           </div>
-          <div className="select-semester-div">
-            {object.course_runs.length > 1 ? (
-              <select value={runId} onChange={updateRun}>
-                {object.course_runs.map(run => (
-                  <option value={run.id} key={run.id}>
-                    {getStartDate(object, run)}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div>{getStartDate(object, selectedRun)}</div>
-            )}
-          </div>
-        </div>
-
+        ) : null}
         {object.image_src ? (
           <div className="course-image-div">
             <img
@@ -132,7 +123,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-label">Cost:</div>
           <div className="course-info-value">{minPrice(selectedRun)}</div>
         </div>
-        {isCourse ? (
+        {isCourse && selectedRun ? (
           <div className="course-info-row">
             <i className="material-icons bar_chart">bar_chart</i>
             <div className="course-info-label">Level:</div>
@@ -142,19 +133,21 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        <div className="course-info-row">
-          <i className="material-icons school">school</i>
-          <div className="course-info-label">Instructors:</div>
-          <div className="course-info-value">
-            {_.join(
-              selectedRun.instructors.map(
-                instructor =>
-                  `Prof. ${instructor.first_name} ${instructor.last_name}`
-              ),
-              ", "
-            )}
+        {selectedRun ? (
+          <div className="course-info-row">
+            <i className="material-icons school">school</i>
+            <div className="course-info-label">Instructors:</div>
+            <div className="course-info-value">
+              {_.join(
+                selectedRun.instructors.map(
+                  instructor =>
+                    `Prof. ${instructor.first_name} ${instructor.last_name}`
+                ),
+                ", "
+              )}
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="course-info-row">
           <i className="material-icons language">language</i>
           <div className="course-info-label">Language:</div>

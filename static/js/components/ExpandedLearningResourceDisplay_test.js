@@ -2,12 +2,10 @@
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
-import moment from "moment"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
 import {
-  makeBootcamp,
   makeCourse,
   makeLearningResource
 } from "../factories/learning_resources"
@@ -27,7 +25,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       <ExpandedLearningResourceDisplay
         object={course}
         objectType={LR_TYPE_COURSE}
-        runId={course.course_runs[0].id}
+        runId={course.course_runs[0] ? course.course_runs[0].id : 0}
         setShowResourceDrawer={null}
         {...props}
       />
@@ -224,5 +222,30 @@ describe("ExpandedLearningResourceDisplay", () => {
           : "Take Bootcamp"
       )
     })
+  })
+
+  it(`should still display without errors in case of a bad course with no runs`, () => {
+    course.course_runs = []
+    const wrapper = render()
+    assert.isNotOk(
+      wrapper
+        .find(".bar_chart")
+        .at(0)
+        .exists()
+    )
+    assert.isNotOk(
+      wrapper
+        .find(".school")
+        .at(1)
+        .exists()
+    )
+    assert.equal(
+      wrapper
+        .find(".language")
+        .closest(".course-info-row")
+        .find(".course-info-value")
+        .text(),
+      "English"
+    )
   })
 })

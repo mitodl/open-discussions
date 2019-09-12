@@ -28,7 +28,8 @@ import {
   bestRunLabel,
   bestRun,
   runStartDate,
-  runEndDate
+  runEndDate,
+  getStartDate
 } from "./learning_resources"
 import { makeCourse, makeCourseRun } from "../factories/learning_resources"
 import moment from "moment"
@@ -344,6 +345,27 @@ describe("Course run availability utils", () => {
         runEndDate(run).format(DATE_FORMAT),
         moment(expectedDate, DATE_FORMAT).format(DATE_FORMAT)
       )
+    })
+  })
+
+  //
+  ;[
+    ["ocw", "2019-09-01", "2019-08-01", "Fall 2019"],
+    ["mitx", "2019-09-01", "2019-08-01", "september 01, 2019"],
+    ["mitx", null, "2019-08-01", "august 01, 2019"],
+    ["mitx", null, null, "Ongoing"]
+  ].forEach(([platform, startDt, bestDt, expected]) => {
+    it(`getStartDate should return ${expected} for ${platform} run with start_dt ${String(
+      startDt
+    )}, best_dt ${String(bestDt)}`, () => {
+      const course = makeCourse()
+      course.platform = platform
+      const courseRun = makeCourseRun()
+      courseRun.start_date = startDt
+      courseRun.best_start_date = bestDt
+      courseRun.semester = "Fall"
+      courseRun.year = "2019"
+      assert.equal(getStartDate(course, courseRun), expected)
     })
   })
 })
