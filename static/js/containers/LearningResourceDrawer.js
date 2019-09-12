@@ -13,7 +13,7 @@ import { createSelector } from "reselect"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
 import { setShowResourceDrawer } from "../actions/ui"
-import { capitalize, getViewportWidth } from "../lib/util"
+import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
