@@ -4,7 +4,7 @@ course_catalog views
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch
+from django.db.models import Prefetch, OuterRef, Exists
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -107,22 +107,37 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Courses
     """
 
-    queryset = Course.objects.prefetch_related(
-        "topics",
-        Prefetch(
-            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
-        ),
-    )
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+    def get_queryset(self):
+        """Generate a QuerySet for fetching valid courses"""
+        return (
+            Course.objects.annotate(
+                has_course_runs=Exists(
+                    CourseRun.objects.filter(
+                        content_type=ContentType.objects.get_for_model(Course),
+                        object_id=OuterRef("pk"),
+                    )
+                )
+            )
+            .filter(has_course_runs=True)
+            .prefetch_related(
+                "topics",
+                Prefetch(
+                    "course_runs",
+                    queryset=CourseRun.objects.order_by("-best_start_date"),
+                ),
+            )
+        )
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
         """
         Get new courses
         """
-        page = self.paginate_queryset(self.queryset.order_by("-created_on"))
+        page = self.paginate_queryset(self.get_queryset().order_by("-created_on"))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
@@ -132,9 +147,9 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         Get upcoming courses
         """
         page = self.paginate_queryset(
-            self.queryset.filter(course_runs__start_date__gt=timezone.now()).order_by(
-                "course_runs__start_date"
-            )
+            self.get_queryset()
+            .filter(course_runs__start_date__gt=timezone.now())
+            .order_by("course_runs__start_date")
         )
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -144,7 +159,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """
         Get featured courses
         """
-        page = self.paginate_queryset(self.queryset.filter(featured=True))
+        page = self.paginate_queryset(self.get_queryset().filter(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
