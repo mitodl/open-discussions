@@ -558,19 +558,19 @@ CELERY_BEAT_SCHEDULE = {
     },
     "update_edx-courses-every-1-days": {
         "task": "course_catalog.tasks.sync_and_upload_edx_data",
-        "schedule": crontab(minute=0, hour=4),  # 12am EST
+        "schedule": crontab(minute=30, hour=13),  # 9:30am EST
     },
     "update_ocw-courses-every-1-days": {
         "task": "course_catalog.tasks.get_ocw_data",
-        "schedule": crontab(minute=0, hour=5),  # 1am EST
+        "schedule": crontab(minute=30, hour=14),  # 10:30am EST
     },
     "update_bootcamp-courses-every-1-days": {
         "task": "course_catalog.tasks.get_bootcamp_data",
-        "schedule": crontab(minute=0, hour=6),  # 2am EST
+        "schedule": crontab(minute=30, hour=15),  # 11:30am EST
     },
     "update-micromasters-courses-every-1-days": {
         "task": "course_catalog.tasks.get_micromasters_data",
-        "schedule": crontab(minute=0, hour=7),  # 3am EST
+        "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
     },
 }
 
