@@ -146,8 +146,8 @@ export const makeSearchResult = (type: ?string) => {
 
 export const makeSearchFacetResult = () => {
   return {
-    platform: {
-      buckets: [{ key: "mitx", doc_count: 88 }, { key: "ocw", doc_count: 102 }]
+    offered_by: {
+      buckets: [{ key: "MITx", doc_count: 88 }, { key: "OCW", doc_count: 102 }]
     },
     topics: {
       buckets: [
@@ -155,20 +155,20 @@ export const makeSearchFacetResult = () => {
         { key: "Physics", doc_count: 32 }
       ]
     },
+    cost: {
+      buckets: [{ key: "free", doc_count: 102 }, { key: "paid", doc_count: 88 }]
+    },
     availability: {
-      doc_count: 1215,
-      runs:      {
-        buckets: [
-          {
-            key:       "availableNow",
-            doc_count: 583
-          },
-          {
-            key:       "nextWeek",
-            doc_count: 22
-          }
-        ]
-      }
+      buckets: [
+        {
+          key:       "availableNow",
+          doc_count: 583
+        },
+        {
+          key:       "nextWeek",
+          doc_count: 22
+        }
+      ]
     },
     type: LR_TYPE_ALL
   }

@@ -171,9 +171,10 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          platform:     [],
+          offered_by:   [],
           topics:       [],
           availability: [],
+          cost:         [],
           type:         LR_TYPE_ALL
         })
       )
@@ -186,9 +187,10 @@ describe("CourseSearchPage", () => {
       text:         "text",
       activeFacets: new Map(
         Object.entries({
-          platform:     [],
+          offered_by:   [],
           topics:       [],
           availability: [],
+          cost:         [],
           type:         []
         })
       ),
@@ -211,7 +213,7 @@ describe("CourseSearchPage", () => {
       },
       {
         location: {
-          search: "q=text&p=ocw&t=Science&t=Engineering&a=availableNow"
+          search: "q=text&o=OCW&t=Science&t=Engineering&a=availableNow&c=free"
         }
       }
     )
@@ -224,9 +226,10 @@ describe("CourseSearchPage", () => {
       facets:      new Map(
         Object.entries({
           type:         LR_TYPE_ALL,
-          platform:     ["ocw"],
+          offered_by:   ["OCW"],
           topics:       ["Science", "Engineering"],
-          availability: ["availableNow"]
+          availability: ["availableNow"],
+          cost:         ["free"]
         })
       )
     })
@@ -322,23 +325,25 @@ describe("CourseSearchPage", () => {
     const { wrapper, inner } = await renderPage()
     const text = "text"
     const activeFacets = new Map([
-      ["platform", ["ocw"]],
+      ["offered_by", ["OCW"]],
       ["topics", ["Science", "Law"]],
       ["availability", ["Current"]],
+      ["cost", ["paid"]],
       ["type", LR_TYPE_ALL]
     ])
     inner.setState({ text, activeFacets })
     assert.equal(inner.state().text, text)
     assert.deepEqual(inner.state().activeFacets, activeFacets)
-    assert.equal(wrapper.find("SearchFilter").length, 8)
+    assert.equal(wrapper.find("SearchFilter").length, 9)
     wrapper.find(".clear-all-filters").simulate("click")
     assert.equal(inner.state().text, null)
     assert.deepEqual(
       inner.state().activeFacets,
       new Map([
-        ["platform", []],
+        ["offered_by", []],
         ["topics", []],
         ["availability", []],
+        ["cost", []],
         ["type", []]
       ])
     )
@@ -367,8 +372,9 @@ describe("CourseSearchPage", () => {
       activeFacets: new Map(
         Object.entries({
           topics:       [],
-          platform:     [],
+          offered_by:   [],
           availability: [],
+          cost:         [],
           type:         ["course"]
         })
       ),
@@ -402,9 +408,10 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          platform:     [],
+          offered_by:   [],
           topics:       ["Physics"],
           availability: [],
+          cost:         [],
           type:         LR_TYPE_ALL
         })
       )
@@ -419,8 +426,9 @@ describe("CourseSearchPage", () => {
       activeFacets: new Map(
         Object.entries({
           topics:       ["Physics"],
-          platform:     [],
+          offered_by:   [],
           availability: [],
+          cost:         [],
           type:         []
         })
       ),
@@ -455,8 +463,9 @@ describe("CourseSearchPage", () => {
         text:         "some text",
         activeFacets: new Map(
           Object.entries({
-            platform:     [],
+            offered_by:   [],
             topics:       [],
+            cost:         [],
             availability: isChecked ? [] : ["nextWeek"]
           })
         )
@@ -479,7 +488,8 @@ describe("CourseSearchPage", () => {
         type:        LR_TYPE_ALL,
         facets:      new Map(
           Object.entries({
-            platform:     [],
+            offered_by:   [],
+            cost:         [],
             topics:       [],
             availability: isChecked ? ["nextWeek"] : [],
             type:         LR_TYPE_ALL
@@ -492,7 +502,8 @@ describe("CourseSearchPage", () => {
   it("mergeFacetOptions adds any selected facets not in results to the group", async () => {
     const { inner } = await renderPage()
     const activeFacets = new Map([
-      ["platform", []],
+      ["offered_by", []],
+      ["cost", []],
       ["topics", ["NewTopic"]],
       ["availability", []]
     ])
@@ -506,18 +517,18 @@ describe("CourseSearchPage", () => {
   it("mergeFacetOptions adds any search facets not in current facet group", async () => {
     const { inner } = await renderPage()
     const currentFacetGroup = {
-      group:  "platform",
-      result: { buckets: [{ key: "ocw", doc_count: 20 }] }
+      group:  "offered_by",
+      result: { buckets: [{ key: "OCW", doc_count: 20 }] }
     }
     const missingFacetGroup = _.find(
       // $FlowFixMe: platform exists in aggregation result
-      searchResponse.aggregations.platform.buckets,
-      { key: "mitx" }
+      searchResponse.aggregations.offered_by.buckets,
+      { key: "MITx" }
     )
     inner.setState({ currentFacetGroup })
-    const mergedFacets = inner.instance().mergeFacetOptions("platform")
+    const mergedFacets = inner.instance().mergeFacetOptions("offered_by")
     assert.isTrue(
-      _.findIndex(mergedFacets.buckets, { doc_count: 20, key: "ocw" }) > -1
+      _.findIndex(mergedFacets.buckets, { doc_count: 20, key: "OCW" }) > -1
     )
     assert.isTrue(_.findIndex(mergedFacets.buckets, missingFacetGroup) > -1)
     await wait(600)
