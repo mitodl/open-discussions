@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.90.1
+--------------
+
+- Adjust cron job times
+- Display the most relevant course run, with dropdown, in course drawer (#2196)
+
 Version 0.90.0 (Released September 12, 2019)
 --------------
 
