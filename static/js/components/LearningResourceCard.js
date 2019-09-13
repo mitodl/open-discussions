@@ -113,7 +113,8 @@ export const LearningResourceCard = ({
   const showResourceDrawer = () =>
     setShowResourceDrawer({
       objectId:   object.id,
-      objectType: object.object_type
+      objectType: object.object_type,
+      runId:      bestAvailableRun ? bestAvailableRun.id : null
     })
 
   return (

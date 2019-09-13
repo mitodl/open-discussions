@@ -10,7 +10,8 @@ import {
   DATE_FORMAT,
   DEFAULT_END_DT,
   DEFAULT_START_DT,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
@@ -152,4 +153,15 @@ export const minPrice = (courseRun: ?CourseRun) => {
   const prices = courseRun && courseRun.prices ? courseRun.prices : []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? price : "Free"
+}
+
+export const getStartDate = (object: Object, courseRun: CourseRun) => {
+  if (object.platform === platforms.OCW) {
+    return `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
+  } else if (courseRun.start_date) {
+    return moment(courseRun.start_date).format("MMMM DD, YYYY")
+  } else if (courseRun.best_start_date) {
+    return moment(courseRun.best_start_date).format("MMMM DD, YYYY")
+  }
+  return "Ongoing"
 }

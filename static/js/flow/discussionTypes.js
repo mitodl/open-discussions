@@ -332,6 +332,7 @@ export type LearningResourceSummary = {
 }
 
 export type CourseRun = {
+  id:                 number,
   language:           ?string,
   semester:           ?string,
   year:               ?string,
@@ -344,7 +345,8 @@ export type CourseRun = {
   best_end_date:      ?string,
   instructors:        Array<CourseInstructor>,
   prices:             Array<CoursePrice>,
-  availability:       ?string
+  availability:       ?string,
+  url:                ?string
 }
 
 

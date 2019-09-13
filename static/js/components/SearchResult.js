@@ -90,7 +90,11 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type LearningResourceProps = {
   result: LearningResourceResult,
-  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
+  setShowResourceDrawer?: ({
+    objectId: string,
+    objectType: string,
+    runId: ?number
+  }) => void,
   overrideObject?: Object,
   searchResultLayout?: string,
   availabilities?: Array<string>
@@ -123,7 +127,11 @@ type Props = {
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
   availabilities?: Array<string>,
-  setShowResourceDrawer?: ({ objectId: string, objectType: string }) => void,
+  setShowResourceDrawer?: ({
+    objectId: string,
+    objectType: string,
+    runId: ?number
+  }) => void,
   overrideObject?: Object,
   searchResultLayout?: string
 }

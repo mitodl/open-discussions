@@ -27,6 +27,7 @@ type Props = {
   object: Course | Bootcamp | null,
   objectId: number,
   objectType: string,
+  runId: number,
   setShowResourceDrawer: Function
 }
 
@@ -52,6 +53,7 @@ export class LearningResourceDrawer extends React.Component<Props> {
     const {
       object,
       objectType,
+      runId,
       showLearningDrawer,
       setShowResourceDrawer
     } = this.props
@@ -75,6 +77,8 @@ export class LearningResourceDrawer extends React.Component<Props> {
             <ExpandedLearningResourceDisplay
               object={object}
               objectType={objectType}
+              runId={runId}
+              setShowResourceDrawer={setShowResourceDrawer}
             />
             <div className="footer" />
           </DrawerContent>
@@ -110,11 +114,13 @@ export const mapStateToProps = (state: Object) => {
 
   const objectId = ui.courseDetail.objectId
   const objectType = ui.courseDetail.objectType
+  const runId = ui.courseDetail.runId
 
   return {
     showLearningDrawer: _.isFinite(state.ui.courseDetail.objectId),
     objectId,
     objectType,
+    runId,
     object:             getObject(state)
   }
 }

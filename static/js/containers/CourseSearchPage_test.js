@@ -130,11 +130,16 @@ describe("CourseSearchPage", () => {
       .at(0)
       .prop("setShowResourceDrawer")({
         objectId:   searchCourse.course_id,
-        objectType: LR_TYPE_COURSE
+        objectType: LR_TYPE_COURSE,
+        runId:      23
       })
     assert.deepEqual(store.getLastAction(), {
       type:    SET_SHOW_RESOURCE_DRAWER,
-      payload: { objectId: searchCourse.course_id, objectType: LR_TYPE_COURSE }
+      payload: {
+        objectId:   searchCourse.course_id,
+        objectType: LR_TYPE_COURSE,
+        runId:      23
+      }
     })
   })
 
