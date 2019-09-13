@@ -116,7 +116,7 @@ const facetDisplayMap = [
   ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
   ["availability", "Availability", availabilityFacetLabel],
-  ["cost", "Price", capitalize],
+  ["cost", "Cost", capitalize],
   ["offered_by", "Offered By", null]
 ]
 
