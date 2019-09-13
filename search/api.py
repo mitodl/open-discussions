@@ -232,11 +232,11 @@ def transform_aggregates(search_result):
             for bucket in availability_runs.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
-    costs = search_result.get("aggregations", {}).get("cost", {}).pop("prices", {})
-    if costs:
+    prices = search_result.get("aggregations", {}).get("cost", {}).pop("prices", {})
+    if prices:
         search_result["aggregations"]["cost"]["buckets"] = [
             {"key": bucket["key"], "doc_count": bucket["courses"]["doc_count"]}
-            for bucket in costs.pop("buckets", [])
+            for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
     return search_result
