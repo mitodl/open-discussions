@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.90.1
+Version 0.90.1 (Released September 16, 2019)
 --------------
 
 - Adjust cron job times
