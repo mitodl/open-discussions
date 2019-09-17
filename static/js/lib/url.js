@@ -52,6 +52,12 @@ export const channelSearchURL = (channelName: string) =>
 export const blankThumbnailUrl = () =>
   new URL("/static/images/blank.png", window.location.origin).toString()
 
+export const defaultResourceImageURL = () =>
+  new URL(
+    "/static/images/default_resource_thumb.jpg",
+    window.location.origin
+  ).toString()
+
 export const embedlyThumbnail = (
   key: string,
   url: string,

@@ -14,6 +14,7 @@ import {
   minPrice
 } from "../lib/learning_resources"
 import {
+  defaultResourceImageURL,
   embedlyThumbnail,
   starSelectedURL,
   starUnselectedURL
@@ -88,7 +89,7 @@ const CoverImage = ({ object, showResourceDrawer }) => (
     <img
       src={embedlyThumbnail(
         SETTINGS.embedlyKey,
-        object.image_src || "",
+        object.image_src || defaultResourceImageURL(),
         CAROUSEL_IMG_HEIGHT,
         CAROUSEL_IMG_WIDTH
       )}

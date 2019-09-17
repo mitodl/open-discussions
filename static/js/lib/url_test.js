@@ -21,6 +21,7 @@ import {
   postPermalink,
   embedlyThumbnail,
   blankThumbnailUrl,
+  defaultResourceImageURL,
   embedlyResizeImage,
   absolutizeURL,
   getNextParam,
@@ -256,6 +257,15 @@ describe("url helper functions", () => {
       assert.equal(
         blankThumbnailUrl(),
         `${window.location.origin}/static/images/blank.png`
+      )
+    })
+  })
+
+  describe("defaultResourceImageURL", () => {
+    it("should return a default course image url", () => {
+      assert.equal(
+        defaultResourceImageURL(),
+        `${window.location.origin}/static/images/default_resource_thumb.jpg`
       )
     })
   })

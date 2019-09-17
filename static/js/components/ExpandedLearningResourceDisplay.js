@@ -8,7 +8,7 @@ import ClampLines from "react-clamp-lines"
 
 import { platforms, LR_TYPE_COURSE } from "../lib/constants"
 import { bestRun, minPrice, getStartDate } from "../lib/learning_resources"
-import { embedlyThumbnail } from "../lib/url"
+import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { languageName } from "../lib/util"
 
 import type { Bootcamp, Course } from "../flow/discussionTypes"
@@ -70,18 +70,16 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        {object.image_src ? (
-          <div className="course-image-div">
-            <img
-              src={embedlyThumbnail(
-                SETTINGS.embedlyKey,
-                object.image_src,
-                COURSE_IMAGE_DISPLAY_HEIGHT,
-                COURSE_IMAGE_DISPLAY_WIDTH
-              )}
-            />
-          </div>
-        ) : null}
+        <div className="course-image-div">
+          <img
+            src={embedlyThumbnail(
+              SETTINGS.embedlyKey,
+              object.image_src || defaultResourceImageURL(),
+              COURSE_IMAGE_DISPLAY_HEIGHT,
+              COURSE_IMAGE_DISPLAY_WIDTH
+            )}
+          />
+        </div>
         {url ? (
           <div className="course-links">
             <div>

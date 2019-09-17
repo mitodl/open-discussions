@@ -12,6 +12,7 @@ import {
 import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 import { bestRun } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
+import { defaultResourceImageURL } from "../lib/url"
 
 describe("ExpandedLearningResourceDisplay", () => {
   let course
@@ -50,10 +51,16 @@ describe("ExpandedLearningResourceDisplay", () => {
     )
   })
 
-  it(`should not render a course image if none exists`, () => {
+  it(`should render a default course image if none exists`, () => {
     course.image_src = null
     const wrapper = render()
-    assert.isNotOk(wrapper.find(".course-image-div").exists())
+    assert.ok(
+      wrapper
+        .find(".course-image-div")
+        .find("img")
+        .prop("src")
+        .includes(encodeURIComponent(defaultResourceImageURL()))
+    )
   })
 
   //

@@ -17,7 +17,11 @@ import {
   upcomingCoursesSelector
 } from "../lib/queries/courses"
 import { availabilityLabel } from "../lib/learning_resources"
-import { embedlyThumbnail, COURSE_URL } from "../lib/url"
+import {
+  embedlyThumbnail,
+  COURSE_URL,
+  defaultResourceImageURL
+} from "../lib/url"
 import { flatZip } from "../lib/util"
 
 import type { Course } from "../flow/discussionTypes"
@@ -48,7 +52,7 @@ export function NewCoursesWidget(props: Props) {
           <img
             src={embedlyThumbnail(
               SETTINGS.embedlyKey,
-              course.image_src || "",
+              course.image_src || defaultResourceImageURL(),
               THUMBNAIL_SIZE,
               THUMBNAIL_SIZE
             )}
