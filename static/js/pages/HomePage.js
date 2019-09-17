@@ -7,9 +7,8 @@ import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 
-import LiveStream from "../containers/LiveStream"
-import NewCoursesWidget from "../containers/NewCoursesWidget"
-
+import NewCoursesWidget from "../components/NewCoursesWidget"
+import LiveStream from "../components/LiveStream"
 import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
 import { withPostLoading } from "../components/Loading"

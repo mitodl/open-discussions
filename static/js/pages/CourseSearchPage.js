@@ -11,8 +11,7 @@ import { connectRequest } from "redux-query-react"
 import { compose } from "redux"
 import debounce from "lodash/debounce"
 
-import LearningResourceDrawer from "./LearningResourceDrawer"
-
+import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CanonicalLink from "../components/CanonicalLink"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"

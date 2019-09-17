@@ -2,7 +2,7 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 
-import ProfileImage from "./ProfileImage"
+import ProfileImage from "../components/ProfileImage"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { profileURL } from "../lib/url"

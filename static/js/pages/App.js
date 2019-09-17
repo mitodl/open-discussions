@@ -35,7 +35,7 @@ import CourseIndexPage from "./CourseIndexPage"
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
-import Drawer from "../containers/Drawer"
+import Drawer from "../components/Drawer"
 import Toolbar from "../components/Toolbar"
 import CourseToolbar from "../components/CourseToolbar"
 

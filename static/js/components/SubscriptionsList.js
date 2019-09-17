@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import ChannelAvatar from "../containers/ChannelAvatar"
+import ChannelAvatar from "./ChannelAvatar"
 import NavigationItem from "./NavigationItem"
 
 import { channelURL } from "../lib/url"

@@ -4,7 +4,7 @@ import { Provider } from "react-redux"
 import { Route, Router as ReactRouter } from "react-router-dom"
 import { Provider as ReduxQueryProvider } from "redux-query-react"
 
-import App from "./containers/App"
+import App from "./pages/App"
 import withTracker from "./util/withTracker"
 import ScrollToTop from "./components/ScrollToTop"
 

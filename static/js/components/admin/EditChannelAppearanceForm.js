@@ -3,8 +3,8 @@
 import React from "react"
 
 import Card from "../Card"
-import ChannelAvatar from "../../containers/ChannelAvatar"
-import ChannelBanner from "../../containers/ChannelBanner"
+import ChannelAvatar from "../ChannelAvatar"
+import ChannelBanner from "../ChannelBanner"
 
 import { channelURL } from "../../lib/url"
 import { validationMessage } from "../../lib/validation"

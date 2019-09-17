@@ -3,14 +3,12 @@
 import * as React from "react"
 import { Link } from "react-router-dom"
 
-import ChannelBanner from "../containers/ChannelBanner"
+import ChannelBanner from "./ChannelBanner"
 import { Cell, Grid } from "./Grid"
-import ChannelAvatar, {
-  CHANNEL_AVATAR_MEDIUM
-} from "../containers/ChannelAvatar"
-import ChannelSettingsLink from "../containers/ChannelSettingsLink"
-import ChannelFollowControls from "../containers/ChannelFollowControls"
-import { BannerPageHeader } from "../components/PageBanner"
+import ChannelAvatar, { CHANNEL_AVATAR_MEDIUM } from "./ChannelAvatar"
+import ChannelSettingsLink from "./ChannelSettingsLink"
+import ChannelFollowControls from "./ChannelFollowControls"
+import { BannerPageHeader } from "./PageBanner"
 
 import { channelURL } from "../lib/url"
 

@@ -3,7 +3,7 @@ import React from "react"
 import R from "ramda"
 
 import ChannelSidebar from "../components/ChannelSidebar"
-import PostDetailSidebar from "../containers/PostDetailSidebar"
+import PostDetailSidebar from "../pages/PostDetailSidebar"
 import Sidebar from "../components/Sidebar"
 import { Cell, Grid } from "../components/Grid"
 

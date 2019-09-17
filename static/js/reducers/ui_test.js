@@ -27,7 +27,7 @@ import {
   setBannerMessage,
   hideBanner
 } from "../actions/ui"
-import { USER_MENU_DROPDOWN } from "../containers/App"
+import { USER_MENU_DROPDOWN } from "../pages/App"
 
 describe("ui reducer", () => {
   let helper, store, dispatchThen

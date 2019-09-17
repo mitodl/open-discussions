@@ -5,8 +5,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { createSelector } from "reselect"
 
-import LearningResourceDrawer from "./LearningResourceDrawer"
-
+import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseCarousel from "../components/CourseCarousel"
 import {
   BannerPageWrapper,

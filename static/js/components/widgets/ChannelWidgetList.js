@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 
-import WidgetListContainer from "../../containers/widgets/WidgetListContainer"
+import WidgetListContainer from "./WidgetListContainer"
 
 import type { Channel } from "../../flow/discussionTypes"
 

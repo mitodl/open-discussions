@@ -18,7 +18,7 @@ import {
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
-import { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
+import { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { profileURL } from "../lib/url"
 import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
 

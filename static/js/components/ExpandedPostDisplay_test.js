@@ -12,7 +12,7 @@ import ExpandedPostDisplay from "./ExpandedPostDisplay"
 import Router from "../Router"
 import Embedly from "./Embedly"
 import FollowButton from "./FollowButton"
-import ProfileImage from "../containers/ProfileImage"
+import ProfileImage from "./ProfileImage"
 import SharePopup from "./SharePopup"
 
 import { wait } from "../lib/util"

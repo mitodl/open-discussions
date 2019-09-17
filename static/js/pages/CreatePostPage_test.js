@@ -7,7 +7,7 @@ import * as fetchFuncs from "redux-hammock/django_csrf_fetch"
 import {
   CreatePostPage as InnerCreatePostPage,
   CREATE_POST_KEY
-} from "../containers/CreatePostPage"
+} from "../pages/CreatePostPage"
 import Dialog from "../components/Dialog"
 
 import { makeChannelList } from "../factories/channels"

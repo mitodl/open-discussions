@@ -3,10 +3,10 @@
 import React from "react"
 import R from "ramda"
 
-import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
-import Card from "../components/Card"
-import LocationPicker from "../components/LocationPicker"
+import Card from "./Card"
+import LocationPicker from "./LocationPicker"
 
 import { validationMessage } from "../lib/validation"
 import { goBackAndHandleEvent } from "../lib/util"

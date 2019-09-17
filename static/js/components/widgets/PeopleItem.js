@@ -3,9 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { SortableElement } from "react-sortable-hoc"
 
-import ProfileImage, {
-  PROFILE_IMAGE_MICRO
-} from "../../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MICRO } from "../ProfileImage"
 
 import DragHandle from "./DragHandle"
 

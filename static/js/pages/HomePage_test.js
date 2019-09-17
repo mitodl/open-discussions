@@ -3,13 +3,13 @@
 import { assert } from "chai"
 import sinon from "sinon"
 
-import LiveStream from "../containers/LiveStream"
+import LiveStream from "../components/LiveStream"
 import PostList from "../components/PostList"
 import HomePage, {
   HomePage as InnerHomePage,
   mapStateToProps
 } from "./HomePage"
-import NewCoursesWidget from "../containers/NewCoursesWidget"
+import NewCoursesWidget from "../components/NewCoursesWidget"
 
 import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"

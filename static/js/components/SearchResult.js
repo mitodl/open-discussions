@@ -6,7 +6,7 @@ import Card from "./Card"
 import CompactPostDisplay from "./CompactPostDisplay"
 import LearningResourceCard from "./LearningResourceCard"
 import CommentTree from "./CommentTree"
-import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 
 import {
   searchResultToComment,

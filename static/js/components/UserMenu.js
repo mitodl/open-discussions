@@ -4,7 +4,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 
 import DropdownMenu from "./DropdownMenu"
-import ProfileImage, { PROFILE_IMAGE_SMALL } from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { DropUpArrow, DropDownArrow } from "./Arrow"
 
 import { isProfileComplete } from "../lib/util"

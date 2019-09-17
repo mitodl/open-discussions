@@ -6,7 +6,7 @@ import { assert } from "chai"
 
 import ProfileForm from "./ProfileForm"
 import { makeProfile, makeUserWebsite } from "../factories/profiles"
-import ProfileImage from "../containers/ProfileImage"
+import ProfileImage from "./ProfileImage"
 import { Provider } from "react-redux"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { PERSONAL_SITE_TYPE } from "../lib/constants"

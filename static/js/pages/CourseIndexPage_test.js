@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import LearningResourceDrawer from "./LearningResourceDrawer"
+import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseIndexPage from "./CourseIndexPage"
 import {
   BannerPageWrapper,

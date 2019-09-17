@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import { Formik, Form, Field } from "formik"
 
 import LoginPopup from "./LoginPopup"
-import ProfileImage, { PROFILE_IMAGE_MICRO } from "../containers/ProfileImage"
+import ProfileImage, { PROFILE_IMAGE_MICRO } from "./ProfileImage"
 
 import {
   isEmptyText,
