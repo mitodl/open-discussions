@@ -124,10 +124,7 @@ COURSE_OBJECT_TYPE = {
             "instructors": {"type": "text"},
             "prices": {
                 "type": "nested",
-                "properties": {
-                    "mode": {"type": "text"},
-                    "price": {"type": "float"}
-                }
+                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
             },
             "image_src": {"type": "keyword"},
             "published": {"type": "boolean"},
@@ -170,10 +167,7 @@ BOOTCAMP_OBJECT_TYPE = {
             "instructors": {"type": "text"},
             "prices": {
                 "type": "nested",
-                "properties": {
-                    "mode": {"type": "text"},
-                    "price": {"type": "float"}
-                }
+                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
             },
             "image_src": {"type": "keyword"},
             "published": {"type": "boolean"},
