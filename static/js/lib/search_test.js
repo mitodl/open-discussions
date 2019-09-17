@@ -383,7 +383,7 @@ describe("search functions", () => {
                 should: [
                   {
                     nested: {
-                      path:  "course_runs",
+                      path:  "course_runs.prices",
                       query: {
                         range: {
                           "course_runs.prices.price": {
@@ -496,7 +496,7 @@ describe("search functions", () => {
                   }
                 },
                 nested: {
-                  path: "course_runs"
+                  path: "course_runs.prices"
                 }
               },
               offered_by: {

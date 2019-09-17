@@ -348,7 +348,7 @@ const buildCostQuery = (
   if (values && values.length > 0) {
     const facetFilter = values.map(value => ({
       nested: {
-        path:  "course_runs",
+        path:  "course_runs.prices",
         query: {
           range: {
             "course_runs.prices.price": COST_MAPPING[value].filter
@@ -363,7 +363,7 @@ const buildCostQuery = (
     })
   }
   // Make cost aggregations based on course run prices
-  builder.agg("nested", { path: "course_runs" }, "cost", aggr =>
+  builder.agg("nested", { path: "course_runs.prices" }, "cost", aggr =>
     aggr.agg(
       "range",
       "course_runs.prices.price",
