@@ -314,7 +314,8 @@ describe("search functions", () => {
           const text = "some text here"
           const facets = new Map(
             Object.entries({
-              platform:     ["mitx"],
+              offered_by:   ["MITx"],
+              cost:         ["free"],
               topics:       ["Engineering", "Science"],
               availability: availability ? [availability] : [],
               type:         [type]
@@ -371,7 +372,25 @@ describe("search functions", () => {
                 should: [
                   {
                     term: {
-                      platform: "mitx"
+                      offered_by: "MITx"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    nested: {
+                      path:  "course_runs.prices",
+                      query: {
+                        range: {
+                          "course_runs.prices.price": {
+                            to: 0.01
+                          }
+                        }
+                      }
                     }
                   }
                 ]
@@ -451,9 +470,38 @@ describe("search functions", () => {
                   path: "course_runs"
                 }
               },
-              platform: {
+              cost: {
+                aggs: {
+                  prices: {
+                    aggs: {
+                      courses: {
+                        reverse_nested: {}
+                      }
+                    },
+                    range: {
+                      field:   "course_runs.prices.price",
+                      keyed:   false,
+                      missing: 0,
+                      ranges:  [
+                        {
+                          key: "free",
+                          to:  0.01
+                        },
+                        {
+                          from: 0.01,
+                          key:  "paid"
+                        }
+                      ]
+                    }
+                  }
+                },
+                nested: {
+                  path: "course_runs.prices"
+                }
+              },
+              offered_by: {
                 terms: {
-                  field: "platform",
+                  field: "offered_by",
                   size:  10000
                 }
               },
@@ -579,7 +627,9 @@ describe("search functions", () => {
           "instructors",
           "prices",
           "topics",
-          "platform"
+          "platform",
+          "course_id",
+          "offered_by"
         ]
       ],
       ["program", ["title.english", "short_description.english", "topics"]],

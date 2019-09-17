@@ -122,7 +122,10 @@ COURSE_OBJECT_TYPE = {
             "enrollment_end": {"type": "date"},
             "topics": {"type": "keyword"},
             "instructors": {"type": "text"},
-            "price": {"type": "nested"},
+            "prices": {
+                "type": "nested",
+                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
+            },
             "image_src": {"type": "keyword"},
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},
@@ -162,7 +165,10 @@ BOOTCAMP_OBJECT_TYPE = {
             "enrollment_end": {"type": "date"},
             "topics": {"type": "keyword"},
             "instructors": {"type": "text"},
-            "price": {"type": "nested"},
+            "prices": {
+                "type": "nested",
+                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
+            },
             "image_src": {"type": "keyword"},
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},

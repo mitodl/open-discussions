@@ -364,6 +364,24 @@ def test_transform_aggregates():
                     ]
                 }
             },
+            "cost": {
+                "prices": {
+                    "buckets": [
+                        {
+                            "key": "free",
+                            "to": 0.01,
+                            "doc_count": 3290,
+                            "courses": {"doc_count": 1937},
+                        },
+                        {
+                            "key": "paid",
+                            "from": 0.01,
+                            "doc_count": 545,
+                            "courses": {"doc_count": 267},
+                        },
+                    ]
+                }
+            },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
         }
     }
@@ -375,10 +393,18 @@ def test_transform_aggregates():
                     {"key": "next60", "doc_count": 7},
                 ]
             },
+            "cost": {
+                "buckets": [
+                    {"key": "free", "doc_count": 1937},
+                    {"key": "paid", "doc_count": 267},
+                ]
+            },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
         }
     }
     raw_aggregate["aggregations"]["availability"].pop("runs", None)
+    raw_aggregate["aggregations"]["cost"].pop("prices", None)
     assert transform_aggregates(raw_aggregate) == raw_aggregate
     raw_aggregate["aggregations"].pop("availability", None)
+    raw_aggregate["aggregations"].pop("cost", None)
     assert transform_aggregates(raw_aggregate) == raw_aggregate

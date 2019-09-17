@@ -41,7 +41,12 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST
 } from "../lib/constants"
-import { emptyOrNil, preventDefaultAndInvoke, toArray } from "../lib/util"
+import {
+  emptyOrNil,
+  preventDefaultAndInvoke,
+  toArray,
+  capitalize
+} from "../lib/util"
 import {
   mergeFacetResults,
   SEARCH_GRID_UI,
@@ -115,7 +120,8 @@ const facetDisplayMap = [
   ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
   ["availability", "Availability", availabilityFacetLabel],
-  ["platform", "Platform", _.upperCase]
+  ["cost", "Cost", capitalize],
+  ["offered_by", "Offered By", null]
 ]
 
 const shouldRunSearch = R.complement(R.eqProps("activeFacets"))
@@ -127,8 +133,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
       text:         qs.parse(props.location.search).q,
       activeFacets: new Map([
         ["type", _.union(toArray(qs.parse(props.location.search).type) || [])],
-        ["platform", _.union(toArray(qs.parse(props.location.search).p) || [])],
+        [
+          "offered_by",
+          _.union(toArray(qs.parse(props.location.search).o) || [])
+        ],
         ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
+        ["cost", _.union(toArray(qs.parse(props.location.search).c) || [])],
         [
           "availability",
           _.union(toArray(qs.parse(props.location.search).a) || [])
@@ -158,9 +168,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.setState({
       text:         null,
       activeFacets: new Map([
-        ["platform", []],
+        ["offered_by", []],
         ["availability", []],
         ["topics", []],
+        ["cost", []],
         ["type", []]
       ]),
       currentFacetGroup: null
@@ -225,9 +236,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
         ...qs.parse(search),
         q:    text,
         type: activeFacets.get("type"),
-        p:    activeFacets.get("platform"),
+        o:    activeFacets.get("offered_by"),
         t:    activeFacets.get("topics"),
-        a:    activeFacets.get("availability")
+        a:    activeFacets.get("availability"),
+        c:    activeFacets.get("cost")
       })
     })
     let from = this.state.from + SETTINGS.search_page_size

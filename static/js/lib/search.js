@@ -136,7 +136,9 @@ const COURSE_QUERY_FIELDS = [
   "instructors",
   "prices",
   "topics",
-  "platform"
+  "platform",
+  "course_id",
+  "offered_by"
 ]
 
 const BOOTCAMP_QUERY_FIELDS = [
@@ -145,7 +147,9 @@ const BOOTCAMP_QUERY_FIELDS = [
   "full_description.english",
   "instructors",
   "prices",
-  "topics"
+  "topics",
+  "course_id",
+  "offered_by"
 ]
 
 const LIST_QUERY_FIELDS = [
@@ -160,6 +164,9 @@ const AVAILABLE_NEXT_MONTH = "nextMonth"
 const AVAILABLE_NEXT_3MONTHS = "next3Months"
 const AVAILABLE_NEXT_6MONTHS = "next6Months"
 const AVAILABLE_NEXT_YEAR = "nextYear"
+
+const COST_FREE = "free"
+const COST_PAID = "paid"
 
 export const AVAILABILITY_MAPPING = {
   [AVAILABLE_NOW]: {
@@ -185,6 +192,17 @@ export const AVAILABILITY_MAPPING = {
   [AVAILABLE_NEXT_YEAR]: {
     label:  "Within next year",
     filter: { from: "now", to: "now+12M" }
+  }
+}
+
+export const COST_MAPPING = {
+  [COST_FREE]: {
+    label:  "Free",
+    filter: { to: 0.01 }
+  },
+  [COST_PAID]: {
+    label:  "Paid",
+    filter: { from: 0.01 }
   }
 }
 
@@ -240,6 +258,135 @@ const getTypes = (type: ?(string | Array<string>)) => {
   }
 }
 
+const buildAvailabilityQuery = (
+  builder: Object,
+  values: Array<string>,
+  facetClauses: Array<Object>
+) => {
+  // Filter results by course run availability facet converted to date ranges
+  if (values && values.length > 0) {
+    const facetFilter = values.map(value => ({
+      nested: {
+        path:  "course_runs",
+        query: {
+          range: {
+            "course_runs.best_start_date": AVAILABILITY_MAPPING[value].filter
+          }
+        }
+      }
+    }))
+    // 'availableNow' should include courses without start dates
+    if (values.includes(AVAILABLE_NOW)) {
+      facetFilter.push({
+        nested: {
+          path:  "course_runs",
+          query: {
+            bool: {
+              must_not: {
+                exists: {
+                  field: "course_runs.best_start_date"
+                }
+              }
+            }
+          }
+        }
+      })
+    }
+    facetClauses.push({
+      bool: {
+        should: facetFilter
+      }
+    })
+  }
+  // Make availability aggregations based on course run date ranges
+  builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
+    aggr.agg(
+      "date_range",
+      "course_runs.best_start_date",
+      {
+        missing: DEFAULT_START_DT,
+        keyed:   false,
+        ranges:  [
+          {
+            key: AVAILABLE_NOW,
+            ...AVAILABILITY_MAPPING.availableNow.filter
+          },
+          {
+            key: AVAILABLE_NEXT_WEEK,
+            ...AVAILABILITY_MAPPING.nextWeek.filter
+          },
+          {
+            key: AVAILABLE_NEXT_MONTH,
+            ...AVAILABILITY_MAPPING.nextMonth.filter
+          },
+          {
+            key: AVAILABLE_NEXT_3MONTHS,
+            ...AVAILABILITY_MAPPING.next3Months.filter
+          },
+          {
+            key: AVAILABLE_NEXT_6MONTHS,
+            ...AVAILABILITY_MAPPING.next6Months.filter
+          },
+          {
+            key: AVAILABLE_NEXT_YEAR,
+            ...AVAILABILITY_MAPPING.nextYear.filter
+          }
+        ]
+      },
+      "runs",
+      aggr => aggr.agg("reverse_nested", null, {}, "courses")
+    )
+  )
+}
+
+const buildCostQuery = (
+  builder: Object,
+  values: Array<string>,
+  facetClauses: Array<Object>
+) => {
+  // Filter results by course run price (free or paid)
+  if (values && values.length > 0) {
+    const facetFilter = values.map(value => ({
+      nested: {
+        path:  "course_runs.prices",
+        query: {
+          range: {
+            "course_runs.prices.price": COST_MAPPING[value].filter
+          }
+        }
+      }
+    }))
+    facetClauses.push({
+      bool: {
+        should: facetFilter
+      }
+    })
+  }
+  // Make cost aggregations based on course run prices
+  builder.agg("nested", { path: "course_runs.prices" }, "cost", aggr =>
+    aggr.agg(
+      "range",
+      "course_runs.prices.price",
+      {
+        missing: 0,
+        keyed:   false,
+        ranges:  [
+          {
+            key: COST_FREE,
+            ...COST_MAPPING.free.filter
+          },
+          {
+            key: COST_PAID,
+            ...COST_MAPPING.paid.filter
+          }
+        ]
+      },
+      "prices",
+      aggr => aggr.agg("reverse_nested", null, {}, "courses")
+    )
+  )
+}
+
 export const buildSearchQuery = ({
   text,
   type,
@@ -293,7 +440,7 @@ export const buildSearchQuery = ({
     if (facets) {
       facets.forEach((values, key) => {
         if (
-          ![OBJECT_TYPE, "availability"].includes(key) &&
+          ![OBJECT_TYPE, "availability", "cost"].includes(key) &&
           values &&
           values.length > 0
         ) {
@@ -308,81 +455,9 @@ export const buildSearchQuery = ({
           })
         }
         if (key === "availability") {
-          // Filter results by course run availability facet converted to date ranges
-          if (values && values.length > 0) {
-            const facetFilter = values.map(value => ({
-              nested: {
-                path:  "course_runs",
-                query: {
-                  range: {
-                    "course_runs.best_start_date":
-                      AVAILABILITY_MAPPING[value].filter
-                  }
-                }
-              }
-            }))
-            // 'availableNow' should include courses without start dates
-            if (values.includes(AVAILABLE_NOW)) {
-              facetFilter.push({
-                nested: {
-                  path:  "course_runs",
-                  query: {
-                    bool: {
-                      must_not: {
-                        exists: {
-                          field: "course_runs.best_start_date"
-                        }
-                      }
-                    }
-                  }
-                }
-              })
-            }
-            facetClauses.push({
-              bool: {
-                should: facetFilter
-              }
-            })
-          }
-          // Make availability aggregations based on course run date ranges
-          builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
-            aggr.agg(
-              "date_range",
-              "course_runs.best_start_date",
-              {
-                missing: DEFAULT_START_DT,
-                keyed:   false,
-                ranges:  [
-                  {
-                    key: AVAILABLE_NOW,
-                    ...AVAILABILITY_MAPPING.availableNow.filter
-                  },
-                  {
-                    key: AVAILABLE_NEXT_WEEK,
-                    ...AVAILABILITY_MAPPING.nextWeek.filter
-                  },
-                  {
-                    key: AVAILABLE_NEXT_MONTH,
-                    ...AVAILABILITY_MAPPING.nextMonth.filter
-                  },
-                  {
-                    key: AVAILABLE_NEXT_3MONTHS,
-                    ...AVAILABILITY_MAPPING.next3Months.filter
-                  },
-                  {
-                    key: AVAILABLE_NEXT_6MONTHS,
-                    ...AVAILABILITY_MAPPING.next6Months.filter
-                  },
-                  {
-                    key: AVAILABLE_NEXT_YEAR,
-                    ...AVAILABILITY_MAPPING.nextYear.filter
-                  }
-                ]
-              },
-              "runs",
-              aggr => aggr.agg("reverse_nested", null, {}, "courses")
-            )
-          )
+          buildAvailabilityQuery(builder, values, facetClauses)
+        } else if (key === "cost") {
+          buildCostQuery(builder, values, facetClauses)
         } else {
           builder.agg(
             "terms",
