@@ -15,7 +15,7 @@ import LearningResourceDrawer from "./LearningResourceDrawer"
 
 import CanonicalLink from "../components/CanonicalLink"
 import { Cell, Grid } from "../components/Grid"
-import { Loading, PostLoading } from "../components/Loading"
+import { Loading, CourseSearchLoading } from "../components/Loading"
 import SearchFacet from "../components/SearchFacet"
 import SearchFilter from "../components/SearchFilter"
 import CourseSearchbox from "../components/CourseSearchbox"
@@ -336,7 +336,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { from, incremental, searchResultLayout, activeFacets } = this.state
 
     if ((processing || !loaded) && !incremental) {
-      return <PostLoading />
+      return <CourseSearchLoading />
     }
 
     if (total === 0 && !processing && loaded) {

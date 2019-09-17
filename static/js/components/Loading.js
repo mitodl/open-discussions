@@ -32,7 +32,7 @@ export const Loading = (props: SpinnerProps) => (
   </div>
 )
 
-const AnimatedEmptyPost = (i: number) => {
+const AnimatedEmptyCard = (i: number) => {
   return (
     <div className="post-content-loader" key={`loader-${i}`}>
       <Card className="compact-post-summary">
@@ -62,7 +62,7 @@ const AnimatedEmptyPost = (i: number) => {
 }
 
 export const PostLoading = () => (
-  <div className="post-loader">
+  <div className="card-list-loader">
     <div className="post-list-title">
       <ContentLoader
         speed={contentLoaderSpeed}
@@ -74,7 +74,13 @@ export const PostLoading = () => (
         <rect x="0" y="0" rx="5" ry="5" width="100%" height="100%" />
       </ContentLoader>
     </div>
-    {R.times(AnimatedEmptyPost, emptyPostsToRender)}
+    {R.times(AnimatedEmptyCard, emptyPostsToRender)}
+  </div>
+)
+
+export const CourseSearchLoading = () => (
+  <div className="card-list-loader">
+    {R.times(AnimatedEmptyCard, emptyPostsToRender)}
   </div>
 )
 

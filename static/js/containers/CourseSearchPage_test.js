@@ -275,7 +275,10 @@ describe("CourseSearchPage", () => {
           }
         }
       )
-      assert.equal(inner.find("PostLoading").exists(), shouldShowPostloading)
+      assert.equal(
+        inner.find("CourseSearchLoading").exists(),
+        shouldShowPostloading
+      )
       assert.equal(inner.find(".results-count").exists(), !processing)
     })
   })
