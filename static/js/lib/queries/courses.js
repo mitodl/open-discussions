@@ -10,7 +10,6 @@ import {
 } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 import { constructIdMap } from "../redux_query"
-import { LR_TYPE_COURSE } from "../constants"
 
 import type { Course } from "../../flow/discussionTypes"
 
@@ -43,11 +42,7 @@ export const courseListRequestFactory = (
       const { next, results } = responseJson
 
       return {
-        courses: constructIdMap(
-          results.map(result =>
-            R.merge({ object_type: LR_TYPE_COURSE }, result)
-          )
-        ),
+        courses:                  constructIdMap(results),
         [courseListKey]:          results.map(result => result.id),
         [`${courseListKey}Next`]: next
       }

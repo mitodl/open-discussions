@@ -10,11 +10,11 @@ import { SEARCH_GRID_UI } from "../lib/search"
 import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 import { useDeviceCategory } from "../hooks/util"
 
-import type { LearningResourceSummary } from "../flow/discussionTypes"
+import type { LearningResource } from "../flow/discussionTypes"
 
 type Props = {|
   title: string,
-  courses: Array<LearningResourceSummary>,
+  courses: Array<LearningResource>,
   setShowResourceDrawer: Function
 |}
 
