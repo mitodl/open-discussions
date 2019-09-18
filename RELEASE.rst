@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.91.0
+--------------
+
+- refactor course sidebar component to use hooks
+- fix the search loader for the course search
+- Default image for learning resource (#2222)
+- Facets for price and offered by (#2212)
+
 Version 0.90.1 (Released September 16, 2019)
 --------------
 
