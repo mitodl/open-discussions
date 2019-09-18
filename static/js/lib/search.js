@@ -134,6 +134,7 @@ const COURSE_QUERY_FIELDS = [
   "topics",
   "platform",
   "course_id",
+  "coursenum^5",
   "offered_by"
 ]
 
@@ -142,6 +143,7 @@ const BOOTCAMP_QUERY_FIELDS = [
   "short_description.english",
   "full_description.english",
   "course_id",
+  "coursenum^5",
   "offered_by"
 ]
 
