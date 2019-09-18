@@ -130,11 +130,6 @@ const COURSE_QUERY_FIELDS = [
   "title.english",
   "short_description.english",
   "full_description.english",
-  "year",
-  "semester",
-  "level",
-  "instructors",
-  "prices",
   "topics",
   "platform",
   "course_id",
@@ -145,11 +140,15 @@ const BOOTCAMP_QUERY_FIELDS = [
   "title.english",
   "short_description.english",
   "full_description.english",
-  "instructors",
-  "prices",
-  "topics",
   "course_id",
   "offered_by"
+]
+
+export const RESOURCE_QUERY_NESTED_FIELDS = [
+  "course_runs.year",
+  "course_runs.semester",
+  "course_runs.level",
+  "course_runs.instructors"
 ]
 
 const LIST_QUERY_FIELDS = [
@@ -414,15 +413,32 @@ export const buildSearchQuery = ({
     // One of the text fields must match
     const matchQuery = text
       ? {
-        must: {
-          multi_match: {
-            query:     text,
-            fields:    searchFields(type),
-            fuzziness: "AUTO"
+        should: [
+          {
+            multi_match: {
+              query:     text,
+              fields:    searchFields(type),
+              fuzziness: "AUTO"
+            }
           }
-        }
+        ]
       }
       : {}
+
+    if (text && [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(type)) {
+      matchQuery.should.push({
+        nested: {
+          path:  "course_runs",
+          query: {
+            multi_match: {
+              query:     text,
+              fields:    RESOURCE_QUERY_NESTED_FIELDS,
+              fuzziness: "AUTO"
+            }
+          }
+        }
+      })
+    }
 
     // If channelName is present add a filter for the type
     const channelClauses = channelName

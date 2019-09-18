@@ -14,6 +14,7 @@ import {
   AVAILABILITY_MAPPING,
   buildSearchQuery,
   channelField,
+  RESOURCE_QUERY_NESTED_FIELDS,
   searchFields,
   searchResultToComment,
   searchResultToLearningResource,
@@ -289,13 +290,15 @@ describe("search functions", () => {
                       ]
                     }
                   },
-                  must: {
-                    multi_match: {
-                      fields:    fieldNames,
-                      query:     text,
-                      fuzziness: "AUTO"
+                  should: [
+                    {
+                      multi_match: {
+                        query:     text,
+                        fields:    fieldNames,
+                        fuzziness: "AUTO"
+                      }
                     }
-                  }
+                  ]
                 }
               }
             ]
@@ -528,13 +531,27 @@ describe("search functions", () => {
                           must: mustQuery
                         }
                       },
-                      must: {
-                        multi_match: {
-                          query:     text,
-                          fields:    fieldNames,
-                          fuzziness: "AUTO"
+                      should: [
+                        {
+                          multi_match: {
+                            query:     text,
+                            fields:    fieldNames,
+                            fuzziness: "AUTO"
+                          }
+                        },
+                        {
+                          nested: {
+                            path:  "course_runs",
+                            query: {
+                              multi_match: {
+                                query:     text,
+                                fields:    RESOURCE_QUERY_NESTED_FIELDS,
+                                fuzziness: "AUTO"
+                              }
+                            }
+                          }
                         }
-                      }
+                      ]
                     }
                   }
                 ]
@@ -621,11 +638,6 @@ describe("search functions", () => {
           "title.english",
           "short_description.english",
           "full_description.english",
-          "year",
-          "semester",
-          "level",
-          "instructors",
-          "prices",
           "topics",
           "platform",
           "course_id",
