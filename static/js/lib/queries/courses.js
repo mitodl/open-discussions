@@ -10,7 +10,6 @@ import {
 } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 import { constructIdMap } from "../redux_query"
-import { LR_TYPE_COURSE } from "../constants"
 
 import type { Course } from "../../flow/discussionTypes"
 
