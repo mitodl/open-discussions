@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.91.0
+Version 0.91.0 (Released September 18, 2019)
 --------------
 
 - refactor course sidebar component to use hooks
