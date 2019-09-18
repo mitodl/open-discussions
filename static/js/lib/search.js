@@ -7,7 +7,10 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  PHONE,
+  TABLET,
+  DESKTOP
 } from "./constants"
 import {
   SEARCH_FILTER_COMMENT,
@@ -495,3 +498,9 @@ export const mergeFacetResults = (...args: Array<FacetResult>) => ({
 
 export const SEARCH_GRID_UI = "grid"
 export const SEARCH_LIST_UI = "list"
+
+export const SEARCH_UI_GRID_WIDTHS = {
+  [PHONE]:   1,
+  [TABLET]:  2,
+  [DESKTOP]: 3
+}

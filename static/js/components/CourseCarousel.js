@@ -6,8 +6,7 @@ import R from "ramda"
 
 import LearningResourceCard from "./LearningResourceCard"
 
-import { SEARCH_GRID_UI } from "../lib/search"
-import { PHONE, TABLET, DESKTOP } from "../lib/constants"
+import { SEARCH_GRID_UI, SEARCH_UI_GRID_WIDTHS } from "../lib/search"
 import { useDeviceCategory } from "../hooks/util"
 
 import type { LearningResource } from "../flow/discussionTypes"
@@ -18,18 +17,12 @@ type Props = {|
   setShowResourceDrawer: Function
 |}
 
-const carouselPageSizes = {
-  [PHONE]:   1,
-  [TABLET]:  2,
-  [DESKTOP]: 3
-}
-
 export default function CourseCarousel(props: Props) {
   const { title, courses, setShowResourceDrawer } = props
 
   const [index, setIndex] = useState(0)
   const deviceCategory = useDeviceCategory()
-  const pageSize = carouselPageSizes[deviceCategory]
+  const pageSize = SEARCH_UI_GRID_WIDTHS[deviceCategory]
   const canPageUp = index + pageSize < courses.length
   const canPageDown = index !== 0
 

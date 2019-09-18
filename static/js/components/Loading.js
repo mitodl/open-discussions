@@ -3,11 +3,18 @@ import React from "react"
 import R from "ramda"
 import ContentLoader from "react-content-loader"
 
-import { NotFound, NotAuthorized } from "../components/ErrorPages"
+import { NotFound, NotAuthorized } from "./ErrorPages"
 import Card from "./Card"
 import { Cell, Grid } from "./Grid"
+
 import { contentLoaderSpeed } from "../lib/constants"
 import { EMBEDLY_THUMB_HEIGHT } from "../lib/posts"
+import {
+  SEARCH_GRID_UI,
+  SEARCH_LIST_UI,
+  SEARCH_UI_GRID_WIDTHS
+} from "../lib/search"
+import { useDeviceCategory } from "../hooks/util"
 
 type LoadingProps = {
   loaded: boolean,
@@ -32,34 +39,55 @@ export const Loading = (props: SpinnerProps) => (
   </div>
 )
 
-const AnimatedEmptyCard = (i: number) => {
-  return (
-    <div className="post-content-loader" key={`loader-${i}`}>
-      <Card className="compact-post-summary">
-        <ContentLoader
-          speed={contentLoaderSpeed}
-          style={{ width: "100%", height: "137px" }}
-          width={1000}
-          height={137}
-          preserveAspectRatio="none"
-        >
-          <rect x="0" y="0" rx="5" ry="5" width="60%" height="20" />
-          <rect x="0" y="40" rx="5" ry="5" width="60%" height="16" />
-          <rect x="0" y="58" rx="5" ry="5" width="60%" height="16" />
-          <rect x="0" y="113" rx="5" ry="5" width="170" height="24" />
-          <rect
-            x="66%"
-            y="0"
-            rx="5"
-            ry="5"
-            width="34%"
-            height={EMBEDLY_THUMB_HEIGHT}
-          />
-        </ContentLoader>
-      </Card>
-    </div>
-  )
-}
+const AnimatedEmptyCard = () => (
+  <div className="post-content-loader">
+    <Card className="compact-post-summary">
+      <ContentLoader
+        speed={contentLoaderSpeed}
+        style={{ width: "100%", height: "137px" }}
+        width={1000}
+        height={137}
+        preserveAspectRatio="none"
+      >
+        <rect x="0" y="0" rx="5" ry="5" width="60%" height="20" />
+        <rect x="0" y="40" rx="5" ry="5" width="60%" height="16" />
+        <rect x="0" y="58" rx="5" ry="5" width="60%" height="16" />
+        <rect x="0" y="113" rx="5" ry="5" width="170" height="24" />
+        <rect
+          x="66%"
+          y="0"
+          rx="5"
+          ry="5"
+          width="34%"
+          height={EMBEDLY_THUMB_HEIGHT}
+        />
+      </ContentLoader>
+    </Card>
+  </div>
+)
+
+const AnimatedEmptyLRPortrait = () => (
+  <Card className="borderless lr-portrait-loader">
+    <ContentLoader
+      speed={contentLoaderSpeed}
+      style={{ width: "100%", height: "354px" }}
+      width={1000}
+      height={354}
+      preserveAspectRatio="none"
+    >
+      <rect x="0" y="0" rx="5" ry="5" width="100%" height="171" />
+      <rect x="60" y="190" rx="5" ry="5" width="250" height="13" />
+      <rect x="60" y="210" rx="5" ry="5" width="60%" height="24" />
+
+      <rect x="60" y="250" rx="5" ry="5" width="75%" height="15" />
+      <rect x="60" y="270" rx="5" ry="5" width="85%" height="15" />
+
+      <rect x="60" y="315" rx="25" ry="25" width="180" height="20" />
+      <rect x="280" y="315" rx="25" ry="25" width="250" height="20" />
+      <rect x="85%" y="315" rx="25" ry="25" width="10%" height="20" />
+    </ContentLoader>
+  </Card>
+)
 
 export const PostLoading = () => (
   <div className="card-list-loader">
@@ -74,15 +102,54 @@ export const PostLoading = () => (
         <rect x="0" y="0" rx="5" ry="5" width="100%" height="100%" />
       </ContentLoader>
     </div>
-    {R.times(AnimatedEmptyCard, emptyPostsToRender)}
+    {R.times(i => <AnimatedEmptyCard key={i} />, emptyPostsToRender)}
   </div>
 )
 
-export const CourseSearchLoading = () => (
-  <div className="card-list-loader">
-    {R.times(AnimatedEmptyCard, emptyPostsToRender)}
-  </div>
+type CSLProps = {
+  layout: string
+}
+
+export const CourseSearchLoading = ({ layout }: CSLProps) => (
+  <Grid className="card-list-loader">
+    {R.times(
+      i => (
+        <Cell width={layout === SEARCH_GRID_UI ? 4 : 12} key={i}>
+          {layout === SEARCH_LIST_UI ? (
+            <AnimatedEmptyCard />
+          ) : (
+            <AnimatedEmptyLRPortrait />
+          )}
+        </Cell>
+      ),
+      10
+    )}
+  </Grid>
 )
+
+export const CarouselLoading = () => {
+  const deviceCategory = useDeviceCategory()
+  const width = SEARCH_UI_GRID_WIDTHS[deviceCategory]
+
+  return (
+    <div className="course-carousel-loader">
+      <ContentLoader
+        speed={contentLoaderSpeed}
+        style={{ width: "100%", height: "30px" }}
+        width={1000}
+        height={30}
+        preserveAspectRatio="none"
+      >
+        <rect x="0" y="0" rx="5" ry="5" width="15%" height="22" />
+        <rect x="83%" y="0" rx="5" ry="5" width="8%" height="22" />
+        <rect x="92%" y="0" rx="5" ry="5" width="8%" height="22" />
+      </ContentLoader>
+      <div className="loader-row">
+        {R.times(i => <AnimatedEmptyLRPortrait key={i} />, width)}
+      </div>
+    </div>
+  )
+}
 
 export const SearchLoading = () => (
   <Grid className="main-content two-column search-page">

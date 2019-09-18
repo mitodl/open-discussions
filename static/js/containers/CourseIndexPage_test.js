@@ -152,4 +152,10 @@ describe("CourseIndexPage", () => {
     assert.equal(pathname, "/courses/search")
     assert.equal(search, "?q=search%20term")
   })
+
+  it("should have a loading state", async () => {
+    helper.handleRequestStub.withArgs(favoritesURL).returns({})
+    const { wrapper } = await render()
+    assert.equal(wrapper.find("CarouselLoading").length, 3)
+  })
 })

@@ -336,7 +336,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { from, incremental, searchResultLayout, activeFacets } = this.state
 
     if ((processing || !loaded) && !incremental) {
-      return <CourseSearchLoading />
+      return <CourseSearchLoading layout={searchResultLayout} />
     }
 
     if (total === 0 && !processing && loaded) {

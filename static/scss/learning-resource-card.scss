@@ -33,7 +33,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      width: 100%;
+      min-width: 64%;
+      width: 64%;
 
       .availability-price-favorite {
         margin-top: 0;
@@ -125,4 +126,8 @@
       }
     }
   }
+}
+
+.lr-portrait-loader {
+  height: 354px;
 }

@@ -107,9 +107,7 @@ export default class IntegrationTestHelper {
 
           callback(err, resStatus, resBody, resText, resHeaders)
         },
-        abort: () => {
-          throw new Error("Aborts currently unhandled")
-        }
+        abort: () => {}
       }))
 
     // there's a good reason for this I promise

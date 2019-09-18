@@ -16,6 +16,7 @@ import {
 } from "../components/PageBanner"
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
+import { CarouselLoading } from "../components/Loading"
 
 import { setShowResourceDrawer } from "../actions/ui"
 import {
@@ -126,7 +127,11 @@ export default function CourseIndexPage({ history }: Props) {
             />
           </Cell>
         ) : (
-          "loading"
+          <Cell width={12}>
+            <CarouselLoading />
+            <CarouselLoading />
+            <CarouselLoading />
+          </Cell>
         )}
       </Grid>
       <LearningResourceDrawer />

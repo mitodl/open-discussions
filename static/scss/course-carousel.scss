@@ -45,3 +45,18 @@
     }
   }
 }
+
+.course-carousel-loader {
+  margin-top: 30px;
+
+  .loader-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .lr-portrait-loader {
+    &:not(:last-child) {
+      margin-right: 20px;
+    }
+  }
+}
