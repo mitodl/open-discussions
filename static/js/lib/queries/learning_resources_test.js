@@ -15,11 +15,10 @@ describe("learning resource queries", () => {
 
   //
   ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(resourceType => {
-    it("filterFavorites should separate by content type and include object_type", () => {
+    it("filterFavorites should separate by content type", () => {
       const filtered = filterFavorites(favorites, resourceType)
       filtered.forEach(object => {
         assert.equal(resourceType, object.content_type)
-        assert.equal(resourceType, object.object_type)
       })
     })
   })

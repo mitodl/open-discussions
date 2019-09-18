@@ -357,7 +357,8 @@ export type LearningResource = {
   short_description:  ?string,
   topics:             Array<CourseTopic>,
   offered_by:         ?string,
-  is_favorite:        boolean
+  is_favorite:        boolean,
+  object_type:        string
 }
 
 

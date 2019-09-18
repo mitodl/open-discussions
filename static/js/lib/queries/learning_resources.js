@@ -46,11 +46,8 @@ export const favoritesRequest = () => ({
   }
 })
 
-const filterFavorite = (entities: Object, objectType: string) =>
-  R.map(
-    object => R.merge({ object_type: objectType }, object),
-    R.filter(R.propEq("is_favorite", true), entities || {})
-  )
+const filterFavorite = (entities: Object) =>
+  R.filter(R.propEq("is_favorite", true), entities || {})
 
 export const favoritesSelector = createSelector(
   state => state.entities.courses,
@@ -58,9 +55,9 @@ export const favoritesSelector = createSelector(
   state => state.entities.programs,
   state => state.entities.userLists,
   (courses, bootcamps, programs, userLists) => ({
-    courses:   filterFavorite(courses, LR_TYPE_COURSE),
-    bootcamps: filterFavorite(bootcamps, LR_TYPE_BOOTCAMP),
-    programs:  filterFavorite(programs, LR_TYPE_PROGRAM),
-    userLists: filterFavorite(userLists, LR_TYPE_USERLIST)
+    courses:   filterFavorite(courses),
+    bootcamps: filterFavorite(bootcamps),
+    programs:  filterFavorite(programs),
+    userLists: filterFavorite(userLists)
   })
 )

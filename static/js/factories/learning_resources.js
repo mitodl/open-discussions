@@ -70,7 +70,8 @@ export const makeCourse = (): Course => ({
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
   is_favorite:       casual.boolean,
   topics:            [{ name: casual.word }, { name: casual.word }],
-  course_runs:       R.times(makeCourseRun, 3)
+  course_runs:       R.times(makeCourseRun, 3),
+  object_type:       "course"
 })
 
 const incrBootcamp = incrementer()
@@ -88,7 +89,8 @@ export const makeBootcamp = (): Bootcamp => ({
   is_favorite:       casual.boolean,
   offered_by:        "bootcamps",
   topics:            [{ name: casual.word }, { name: casual.word }],
-  course_runs:       R.times(makeCourseRun, 3)
+  course_runs:       R.times(makeCourseRun, 3),
+  object_type:       "bootcamp"
 })
 
 const incrProgram = incrementer()
@@ -103,7 +105,8 @@ export const makeProgram = (): Program => ({
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   is_favorite:       casual.boolean,
-  items:             [makeCourse(), makeCourse()]
+  items:             [makeCourse(), makeCourse()],
+  object_type:       "program"
 })
 
 const incrUserList = incrementer()
@@ -118,7 +121,8 @@ export const makeUserList = (): UserList => ({
   is_favorite:       casual.boolean,
   image_src:         "http://image.medium.url",
   image_description: casual.description,
-  items:             [makeCourse(), makeBootcamp(), makeProgram()]
+  items:             [makeCourse(), makeBootcamp(), makeProgram()],
+  object_type:       "user_list"
 })
 
 export const makeLearningResource = (objectType: string) => {

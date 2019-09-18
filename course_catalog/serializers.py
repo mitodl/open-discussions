@@ -249,6 +249,7 @@ class CourseSerializer(BaseCourseSerializer):
     """
 
     course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="course")
 
     class Meta:
         model = Course
@@ -336,6 +337,7 @@ class BootcampSerializer(BaseCourseSerializer):
     """
 
     course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="bootcamp")
 
     def to_internal_value(self, data):
         """
@@ -370,6 +372,7 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
 
     items = UserListItemSerializer(many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="user_list")
 
     class Meta:
         model = UserList
@@ -396,6 +399,7 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
 
     items = ProgramItemSerializer(many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="program")
 
     class Meta:
         model = Program

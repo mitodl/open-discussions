@@ -30,11 +30,7 @@ const courseListSelector = listName =>
     state => state.entities.courses,
     state => state.entities[listName],
     (courseMap, list) =>
-      list && courseMap
-        ? list.map(id =>
-          R.merge({ object_type: LR_TYPE_COURSE }, courseMap[id])
-        )
-        : null
+      list && courseMap ? list.map(id => courseMap[id]) : null
   )
 
 export const courseListRequestFactory = (
@@ -47,11 +43,7 @@ export const courseListRequestFactory = (
       const { next, results } = responseJson
 
       return {
-        courses: constructIdMap(
-          results.map(result =>
-            R.merge({ object_type: LR_TYPE_COURSE }, result)
-          )
-        ),
+        courses:                  constructIdMap(results),
         [courseListKey]:          results.map(result => result.id),
         [`${courseListKey}Next`]: next
       }
@@ -92,8 +84,7 @@ export const favoriteCourseMutation = (course: Course) => ({
   transform: () => {
     const updatedCourse = {
       ...course,
-      is_favorite: !course.is_favorite,
-      object_type: LR_TYPE_COURSE
+      is_favorite: !course.is_favorite
     }
 
     return {
