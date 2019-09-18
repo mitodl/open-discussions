@@ -55,7 +55,8 @@ describe("Course Queries", () => {
         courses: {
           [course.id]: {
             ...course,
-            is_favorite: !isFavorite
+            is_favorite: !isFavorite,
+            object_type: LR_TYPE_COURSE
           }
         }
       })
