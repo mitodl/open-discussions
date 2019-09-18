@@ -12,9 +12,9 @@ import {
 } from "../factories/search"
 import {
   AVAILABILITY_MAPPING,
+  RESOURCE_QUERY_NESTED_FIELDS,
   buildSearchQuery,
   channelField,
-  RESOURCE_QUERY_NESTED_FIELDS,
   searchFields,
   searchResultToComment,
   searchResultToLearningResource,
