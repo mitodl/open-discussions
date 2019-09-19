@@ -22,12 +22,10 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  platforms,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_USERLIST,
   LR_TYPE_PROGRAM,
-  platformReadableNames,
   readableLearningResources
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
@@ -53,19 +51,6 @@ type Props = {|
   ...OwnProps,
   ...DispatchProps
 |}
-
-const getPlatform = (object: LearningResourceSummary): string => {
-  if (object.object_type === LR_TYPE_COURSE) {
-    // $FlowFixMe: only a course will reach this line
-    return object.offered_by || object.platform
-  } else if (object.object_type === LR_TYPE_BOOTCAMP) {
-    return platforms.bootcamps
-  } else {
-    return object.offered_by || ""
-  }
-}
-
-const getPlatformName = object => platformReadableNames[getPlatform(object)]
 
 const getClassName = searchResultLayout =>
   `learning-resource-card ${
@@ -133,7 +118,9 @@ export const LearningResourceCard = ({
         <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
         </div>
-        <Subtitle content={getPlatformName(object)} label="Offered by - " />
+        {object.offered_by ? (
+          <Subtitle content={object.offered_by} label="Offered by - " />
+        ) : null}
         <Subtitle content={formatTopics(object.topics)} label="Subject - " />
         <div className="row availability-price-favorite">
           <div className="price grey-surround">
