@@ -32,22 +32,22 @@
     .lr-info {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       min-width: 64%;
       width: 64%;
 
       .availability-price-favorite {
-        margin-top: 0;
+        margin-top: 12px;
       }
 
       .course-title {
         min-height: 0;
         margin: 0;
-        margin-bottom: 5px;
+        margin-top: 6px;
+        margin-bottom: 10px;
       }
 
       .subtitle {
-        margin-bottom: 0;
+        margin-bottom: 6px;
       }
     }
   }

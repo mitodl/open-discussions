@@ -383,6 +383,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const anyFiltersActive =
       _.flatten(_.toArray(activeFacets.values())).length > 0
 
+    const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4
+    const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
+
     return (
       <BannerPageWrapper>
         <MetaTags>
@@ -393,11 +396,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
             <BannerImage src={COURSE_SEARCH_BANNER_URL} tall />
           </BannerContainer>
           <Grid>
-            <Cell width={4}>
-              <div className="course-catalog-title">
-                <div className="title">Course Catalog</div>
-              </div>
-            </Cell>
+            <Cell width={4} />
             <Cell width={4}>
               <CourseSearchbox
                 onChange={this.updateText}
@@ -417,8 +416,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
               : "two-column"
           } search-page`}
         >
-          <Cell width={3} />
-          <Cell width={9}>
+          <Cell width={facetColumnWidth} />
+          <Cell width={resultsColumnWidth}>
             <div className="layout-buttons">
               <div
                 onClick={() => this.setSearchUI(SEARCH_LIST_UI)}
@@ -443,7 +442,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               )}
             </div>
           </Cell>
-          <Cell className="search-filters" width={3}>
+          <Cell className="search-filters" width={facetColumnWidth}>
             <div className="active-search-filters">
               {anyFiltersActive ? (
                 <div className="filter-section-title">
@@ -480,7 +479,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
               />
             ))}
           </Cell>
-          <Cell width={9}>{error ? null : this.renderResults()}</Cell>
+          <Cell width={resultsColumnWidth}>
+            {error ? null : this.renderResults()}
+          </Cell>
         </Grid>
         <LearningResourceDrawer />
       </BannerPageWrapper>
