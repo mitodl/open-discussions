@@ -6,7 +6,6 @@ import logging
 from datetime import datetime
 
 import pytz
-import requests
 
 from django.db import transaction
 from django.conf import settings
@@ -14,15 +13,13 @@ from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import (
     PlatformType,
-    MIT_OWNER_KEYS,
     NON_COURSE_DIRECTORIES,
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Course, Bootcamp, CourseRun
+from course_catalog.models import Bootcamp, CourseRun
 from course_catalog.serializers import (
     BootcampSerializer,
-    EDXCourseSerializer,
     CourseRunSerializer,
     OCWSerializer,
 )
@@ -30,151 +27,6 @@ from course_catalog.utils import get_course_url
 from search.task_helpers import upsert_course, index_new_bootcamp, update_bootcamp
 
 log = logging.getLogger(__name__)
-
-
-def get_access_token():
-    """
-    Get an access token for edx
-    """
-    post_data = {
-        "grant_type": "client_credentials",
-        "client_id": settings.EDX_API_CLIENT_ID,
-        "client_secret": settings.EDX_API_CLIENT_SECRET,
-        "token_type": "jwt",
-    }
-    response = requests.post(
-        "https://api.edx.org/oauth2/v1/access_token", data=post_data
-    )
-    return response.json()["access_token"]
-
-
-def parse_mitx_json_data(course_data, force_overwrite=False):
-    """
-    Main function to parse edx json data for one course
-
-    Args:
-        course_data (dict): The JSON object representing the course with all its course runs
-        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
-    """
-
-    # Make sure this is an MIT course
-    if not is_mit_course(course_data):
-        return
-
-    # Check if this should be skipped based on title
-    if should_skip_course(course_data.get("title")):
-        return
-
-    # Make sure there are course runs
-    if not course_data.get("course_runs"):
-        return
-
-    # Get the last modified date from the course data
-    course_modified = datetime.strptime(
-        course_data.get("modified"), "%Y-%m-%dT%H:%M:%S.%fZ"
-    ).astimezone(pytz.utc)
-
-    # Try and get the Course instance. If it exists check to see if it needs updating
-    try:
-        course = Course.objects.get(course_id=course_data.get("key"))
-        needs_update = (course_modified >= course.last_modified) or force_overwrite
-    except Course.DoesNotExist:
-        course = None
-        needs_update = True
-
-    if needs_update:
-        edx_serializer = EDXCourseSerializer(
-            data={
-                **course_data,
-                "course_image": course_data.get("image"),
-                "max_modified": course_modified,
-                "raw_json": course_data,  # This is slightly cleaner than popping the extra fields inside the serializer
-            },
-            instance=course,
-        )
-
-        if not edx_serializer.is_valid():
-            log.error(
-                "Course %s is not valid: %s",
-                course_data.get("key"),
-                edx_serializer.errors,
-            )
-        else:
-            # Make changes atomically so we don't end up with partially saved/deleted data
-            with transaction.atomic():
-                course = edx_serializer.save()
-                # Parse each course run individually
-                for course_run in course_data.get("course_runs"):
-                    if should_skip_course(course_run.get("title")):
-                        continue
-
-                    # Get the last modified date from the course run
-                    course_run_modified = datetime.strptime(
-                        course_run.get("modified"), "%Y-%m-%dT%H:%M:%S.%fZ"
-                    ).astimezone(pytz.utc)
-
-                    # Since we use data from both course and course_run and they use different modified timestamps,
-                    # we need to find the newest changes
-                    max_modified = max(course_modified, course_run_modified)
-
-                    # Try and get the CourseRun instance. If it exists check to see if it needs updating
-                    try:
-                        courserun_instance = course.course_runs.get(
-                            course_run_id=course_run.get("key")
-                        )
-                        if (
-                            max_modified <= courserun_instance.last_modified
-                            and not force_overwrite
-                        ):
-                            log.debug(
-                                "(%s, %s) skipped",
-                                course_data.get("key"),
-                                course_run.get("key"),
-                            )
-                            continue
-                    except CourseRun.DoesNotExist:
-                        courserun_instance = None
-
-                    run_serializer = CourseRunSerializer(
-                        data={
-                            **course_run,
-                            "max_modified": max_modified,
-                            "offered_by": OfferedBy.mitx.value,
-                            "content_type": ContentType.objects.get(model="course").id,
-                            "object_id": course.id,
-                            "url": get_course_url(
-                                course_run.get("key"),
-                                course.raw_json,
-                                PlatformType.mitx.value,
-                            ),
-                        },
-                        instance=courserun_instance,
-                    )
-                    if not run_serializer.is_valid():
-                        log.error(
-                            "CourseRun %s is not valid: %s",
-                            course_run.get("key"),
-                            run_serializer.errors,
-                        )
-                        continue
-                    run_serializer.save()
-            upsert_course(course)
-
-
-def is_mit_course(course_data):
-    """
-    Helper function to determine if a course is an MIT course
-
-    Args:
-        course_data (dict): The JSON object representing the course with all its course runs
-
-    Returns:
-        bool: indicates whether the course is owned by MIT
-    """
-    for owner in course_data.get("owners"):
-        if owner["key"] in MIT_OWNER_KEYS:
-            return True
-    return False
 
 
 def safe_load_json(json_string, json_file_key):
@@ -371,78 +223,6 @@ def get_course_availability(course):
         for run in course_runs:
             if run.get("key") == course.course_id:
                 return run.get("availability")
-
-
-def should_skip_course(course_title):
-    """
-    Returns True if '[delete]', 'delete ' (note the ending space character)
-    exists in a course's title or if the course title equals 'delete' for the
-    purpose of skipping the course
-
-    Args:
-        course_title (str): The course.title of the course
-
-    Returns:
-        bool
-
-    """
-    title = course_title.strip().lower()
-    if (
-        "[delete]" in title
-        or "(delete)" in title
-        or "delete " in title
-        or title == "delete"
-    ):
-        return True
-    return False
-
-
-def tag_edx_course_program():
-    """
-    Mark courses that are part of professional education or MicroMasters programs
-    """
-    micromasters_courses = {
-        micro_course["edx_course_key"]: micro_course["program_title"]
-        for micro_course in get_micromasters_data()
-    }
-
-    with open("course_catalog/data/professional_programs.json", "r") as json_file:
-        prof_ed_json = json.load(json_file)
-    prof_ed_courses = {
-        prof_ed_course["edx_course_key"]: prof_ed_course["program_title"]
-        for prof_ed_course in prof_ed_json
-    }
-
-    with transaction.atomic():
-        courses = Course.objects.filter(platform=PlatformType.mitx.value)
-        # Clear program information to handle situations where a course is removed from a program
-        courses.update(program_type=None, program_name=None)
-        for course in courses:
-            # Check Professional Education
-            if "ProfessionalX" in course.course_id or "MITxPRO" in course.course_id:
-                course.program_type = "Professional"
-                prof_ed_program = prof_ed_courses.get(course.course_id)
-                if prof_ed_program:
-                    course.program_name = prof_ed_program
-                course.offered_by = OfferedBy.xpro.value
-                course.save()
-                continue
-
-            # Check MicroMasters
-            micromasters_program = micromasters_courses.get(course.course_id)
-            if micromasters_program:
-                course.program_type = "MicroMasters"
-                course.program_name = micromasters_program
-                course.offered_by = OfferedBy.micromasters.value
-                course.save()
-                continue
-
-
-def get_micromasters_data():
-    """
-    Get json course data from micromasters
-    """
-    return requests.get(settings.MICROMASTERS_COURSE_URL).json()
 
 
 def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):

@@ -6,6 +6,7 @@ import requests
 import pytz
 
 from course_catalog.constants import OfferedBy
+from course_catalog.etl.utils import log_exceptions
 
 
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -28,6 +29,7 @@ def _parse_datetime(value):
     )
 
 
+@log_exceptions("Error extracting xPro catalog", exc_return_value=[])
 def extract():
     """Loads the xPro catalog data"""
     if settings.XPRO_CATALOG_API_URL:
@@ -35,6 +37,7 @@ def extract():
     return []
 
 
+@log_exceptions("Error transforming MicroMasters catalog", exc_return_value=[])
 def transform(programs):
     """Transform the xPro catalog data"""
     # normalize the xPro data into the course_catalog/models.py data structures

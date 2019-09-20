@@ -1,16 +1,14 @@
 """
 Test course_catalog.api
 """
-import copy
 import json
-from datetime import timedelta, datetime
+from datetime import timedelta
 
 import pytest
-import pytz
 from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
-from course_catalog.factories import CourseFactory, CourseRunFactory
+from course_catalog.factories import CourseFactory
 from course_catalog.models import (
     Course,
     CourseRun,
@@ -21,12 +19,9 @@ from course_catalog.models import (
 )
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
-    parse_mitx_json_data,
     digest_ocw_course,
     safe_load_json,
     get_course_availability,
-    should_skip_course,
-    tag_edx_course_program,
     parse_bootcamp_json_data,
 )
 
@@ -39,8 +34,8 @@ def mitx_valid_data():
     """
     Test MITx course data
     """
-    with open("./test_json/test_mitx_course02.json", "r") as test_data:
-        return json.load(test_data)
+    with open("./test_json/test_mitx_course.json", "r") as test_data:
+        return json.load(test_data)["results"][0]
 
 
 @pytest.fixture
@@ -164,162 +159,6 @@ def bootcamp_valid_data():
     }
 
 
-@pytest.mark.parametrize("force_overwrite", [True, False])
-def test_parse_mitx_json_data_overwrite_course(
-    mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
-):
-    """
-    Test that valid mitx json data for a course is skipped if it doesn't need an update
-    """
-    course = CourseFactory.create(
-        course_id=mitx_valid_data["key"],
-        last_modified=datetime.now().astimezone(pytz.utc),
-    )
-    CourseRunFactory.create(
-        content_object=course,
-        course_run_id=mitx_valid_data["course_runs"][0]["key"],
-        last_modified=datetime.now().astimezone(pytz.utc),
-    )
-    mock_save_course = mocker.patch(
-        "course_catalog.api.EDXCourseSerializer.save", return_value=course
-    )
-    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
-    assert course.course_id == mitx_valid_data["key"]
-    parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
-    assert mock_save_course.call_count == (1 if force_overwrite else 0)
-    assert mock_save_run.call_count == (1 if force_overwrite else 0)
-    assert mock_course_index_functions.upsert_course.call_count == (
-        1 if force_overwrite else 0
-    )
-
-
-@pytest.mark.parametrize("force_overwrite", [True, False])
-def test_parse_mitx_json_data_overwrite_courserun(
-    mocker, mock_course_index_functions, force_overwrite, mitx_valid_data
-):
-    """
-    Test that valid mitx json data for a run is skipped if it doesn't need an update
-    """
-    course = CourseFactory.create(
-        course_id=mitx_valid_data["key"],
-        last_modified=datetime(year=2010, month=1, day=1).astimezone(pytz.utc),
-    )
-    CourseRunFactory.create(
-        content_object=course,
-        course_run_id=mitx_valid_data["course_runs"][0]["key"],
-        last_modified=datetime.now().astimezone(pytz.utc),
-    )
-    mock_save_course = mocker.patch(
-        "course_catalog.api.EDXCourseSerializer.save", return_value=course
-    )
-    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
-    assert course.course_id == mitx_valid_data["key"]
-    parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
-    assert mock_save_course.call_count == 1
-    assert mock_save_run.call_count == (1 if force_overwrite else 0)
-    assert mock_course_index_functions.upsert_course.call_count == 1
-
-
-def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data):
-    """
-    Test parsing valid mitx json data
-    """
-    parse_mitx_json_data(mitx_valid_data)
-    courses_count = Course.objects.count()
-    assert courses_count == 1
-
-    course_instructors_count = CourseInstructor.objects.count()
-    assert course_instructors_count == 2
-
-    course_prices_count = CoursePrice.objects.count()
-    assert course_prices_count == 2
-
-    course_topics_count = CourseTopic.objects.count()
-    assert course_topics_count == 1
-
-    mock_course_index_functions.upsert_course.assert_called_once_with(
-        Course.objects.first()
-    )
-    assert Course.objects.first().course_runs.first().best_start_date == datetime.strptime(
-        "2019-02-20T15:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
-    ).replace(
-        tzinfo=pytz.UTC
-    )
-    assert Course.objects.first().course_runs.first().best_end_date == datetime.strptime(
-        "2019-05-22T23:30:00Z", "%Y-%m-%dT%H:%M:%SZ"
-    ).replace(
-        tzinfo=pytz.UTC
-    )
-
-
-def test_parse_mitx_json_data_no_runs(mitx_valid_data):
-    """
-    Test that a course without runs is skipped
-    """
-    mitx_data = copy.copy(mitx_valid_data)
-    mitx_data["course_runs"] = []
-    parse_mitx_json_data(mitx_data)
-    course_count = Course.objects.count()
-    assert course_count == 0
-
-
-def test_parse_invalid_mitx_json_data(mitx_valid_data):
-    """
-    Test parsing invalid mitx json data for a course
-    """
-    invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["key"] = ""
-    parse_mitx_json_data(invalid_data)
-    course_count = Course.objects.count()
-    assert course_count == 0
-
-
-def test_parse_mitx_json_data_skip_course_title(mitx_valid_data):
-    """
-    Test parsing invalid mitx json data for a course
-    """
-    invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["title"] = "Delete"
-    parse_mitx_json_data(invalid_data)
-    course_count = Course.objects.count()
-    assert course_count == 0
-
-
-def test_parse_invalid_mitx_run_data(mitx_valid_data):
-    """
-    Test parsing invalid mitx json data for a course run
-    """
-    invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["course_runs"][0]["key"] = ""
-    parse_mitx_json_data(invalid_data)
-    course_count = Course.objects.count()
-    assert course_count == 1
-    run_count = CourseRun.objects.count()
-    assert run_count == 0
-
-
-def test_parse_mitx_json_data_skip_courserun_title(mitx_valid_data):
-    """
-    Test parsing invalid mitx json data for a course run
-    """
-    invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["course_runs"][0]["title"] = "delete"
-    parse_mitx_json_data(invalid_data)
-    run_count = CourseRun.objects.count()
-    assert run_count == 0
-
-
-def test_parse_wrong_owner_json_data(mitx_valid_data):
-    """
-    Test parsing valid edx data from a different owner.
-    """
-    invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["owners"][0]["key"] = "FakeUniversity"
-    parse_mitx_json_data(invalid_data)
-    courses_count = Course.objects.count()
-    assert courses_count == 0
-
-
 @pytest.mark.usefixtures("mock_index_functions")
 def test_deserializing_a_valid_ocw_course(ocw_valid_data):
     """
@@ -435,58 +274,3 @@ def test_get_course_availability(mitx_valid_data):
         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
     )
     assert get_course_availability(mitx_course_no_runs_json) is None
-
-
-def test_should_skip_course():
-    """ Tests should_skip_course returns as expected """
-    assert should_skip_course("DELETE")
-    assert should_skip_course("Delete")
-    assert should_skip_course("Delete ")
-    assert should_skip_course("Delete wrong institution")
-    assert should_skip_course("[DELETE]Management in Engineering II]")
-    assert should_skip_course("Introduction to Syntax") is False
-
-
-def test_tag_edx_course_program(get_micromasters_data):
-    """ Tests that edx courses are tagged with programs """
-    course_pro = CourseFactory.create(
-        platform=PlatformType.mitx.value,
-        course_id="course-v1:MITProfessionalX+SysEngx4+1T2017",
-    )
-    course_micro = CourseFactory.create(
-        platform=PlatformType.mitx.value, course_id="course-v1:MITx+ESD.SCM1x+3T2014"
-    )
-    course_blank_pro = CourseFactory.create(
-        platform=PlatformType.mitx.value,
-        course_id="course-v1:MITProfessionalX+Something+1T2017",
-    )
-    course_none = CourseFactory.create(
-        platform=PlatformType.mitx.value, course_id="MyTestCourse"
-    )
-    course_ocw = CourseFactory.create(
-        platform=PlatformType.ocw.value, course_id="abc123"
-    )
-    tag_edx_course_program()
-
-    course_pro.refresh_from_db()
-    assert course_pro.program_type == "Professional"
-    assert (
-        course_pro.program_name
-        == "Architecture and Systems Engineering: Models and Methods to Manage Complex Systems"
-    )
-
-    course_micro.refresh_from_db()
-    assert course_micro.program_type == "MicroMasters"
-    assert course_micro.program_name == "Supply Chain Management"
-
-    course_blank_pro.refresh_from_db()
-    assert course_blank_pro.program_type == "Professional"
-    assert course_blank_pro.program_name is None
-
-    course_none.refresh_from_db()
-    assert course_none.program_type is None
-    assert course_none.program_name is None
-
-    course_ocw.refresh_from_db()
-    assert course_ocw.program_type is None
-    assert course_ocw.program_name is None

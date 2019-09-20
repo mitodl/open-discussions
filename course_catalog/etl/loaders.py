@@ -10,6 +10,7 @@ from course_catalog.models import (
     Program,
     ProgramItem,
 )
+from course_catalog.etl.utils import log_exceptions
 
 from search import task_helpers as search_task_helpers
 
@@ -57,6 +58,7 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
+@log_exceptions("Error loading course run")
 def load_course_run(course_or_bootcamp, course_run_data):
     """Load the course run into the database"""
     course_run_id = course_run_data.pop("course_run_id")
@@ -66,9 +68,11 @@ def load_course_run(course_or_bootcamp, course_run_data):
 
     course_run, _ = CourseRun.objects.update_or_create(
         course_run_id=course_run_id,
-        object_id=course_or_bootcamp.id,
-        content_type=ContentType.objects.get_for_model(course_or_bootcamp),
-        defaults=course_run_data,
+        defaults={
+            **course_run_data,
+            "object_id": course_or_bootcamp.id,
+            "content_type": ContentType.objects.get_for_model(course_or_bootcamp),
+        },
     )
 
     load_topics(course_run, topics_data)
@@ -78,6 +82,7 @@ def load_course_run(course_or_bootcamp, course_run_data):
     return course_run
 
 
+@log_exceptions("Error loading course")
 def load_course(course_data):
     """Load the course into the database"""
     course_id = course_data.pop("course_id")
@@ -101,6 +106,12 @@ def load_course(course_data):
     return course
 
 
+def load_courses(courses_data):
+    """Load a list of programs"""
+    return [load_course(course_data) for course_data in courses_data]
+
+
+@log_exceptions("Error loading program")
 def load_program(program_data):
     """Load the program into the database"""
     program_id = program_data.pop("program_id")
@@ -148,5 +159,5 @@ def load_program(program_data):
 
 
 def load_programs(programs_data):
-    """Load programs into the database"""
+    """Load a list of programs"""
     return [load_program(program_data) for program_data in programs_data]

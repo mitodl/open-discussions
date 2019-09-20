@@ -14,14 +14,11 @@ from open_discussions.celery import app
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course, CourseRun
 from course_catalog.api import (
-    get_access_token,
-    parse_mitx_json_data,
     safe_load_json,
     digest_ocw_course,
     get_s3_object_and_read,
     format_date,
     generate_course_prefix_list,
-    tag_edx_course_program,
     parse_bootcamp_json_data,
 )
 from course_catalog.etl import pipelines
@@ -31,59 +28,9 @@ log = logging.getLogger(__name__)
 
 
 @app.task
-def sync_and_upload_edx_data(force_overwrite=False, upload_to_s3=True):
-    """
-    Task to sync mitx data with the database
-    Args:
-        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
-    """
-    if not (
-        settings.EDX_API_URL
-        and settings.EDX_API_CLIENT_ID
-        and settings.EDX_API_CLIENT_SECRET
-        and settings.OCW_LEARNING_COURSE_BUCKET_NAME
-        and settings.OCW_LEARNING_COURSE_ACCESS_KEY
-        and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
-    ):
-        log.warning("Required settings missing for sync_and_upload_edx_data")
-        return
-    url = settings.EDX_API_URL
-    access_token = get_access_token()
-
-    edx_data = {"count": 0, "catalog_url": settings.EDX_API_URL, "results": []}
-
-    log.info("Syncing edX data...")
-    while url:
-        response = requests.get(url, headers={"Authorization": "JWT " + access_token})
-        if response.status_code == 200:
-            for course_data in response.json()["results"]:
-                edx_data["results"].append(course_data)
-                try:
-                    parse_mitx_json_data(course_data, force_overwrite)
-                except:  # pylint: disable=bare-except
-                    log.exception(
-                        "Error encountered parsing MITx json for %s", course_data["key"]
-                    )
-                    upload_to_s3 = False
-        else:
-            log.error("Bad response status %s for %s", str(response.status_code), url)
-            upload_to_s3 = False
-            break
-
-        url = response.json()["next"]
-
-    if upload_to_s3:
-        log.info("Uploading edX courses data to S3")
-        edx_data["count"] = len(edx_data["results"])
-        raw_data_bucket = boto3.resource(
-            "s3",
-            aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-            aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
-        ).Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
-        # saves edx API response results in S3 as one file
-        raw_data_bucket.put_object(Key="edx_courses.json", Body=json.dumps(edx_data))
-
-    tag_edx_course_program()
+def get_mitx_data():
+    """Task to sync mitx data with the database"""
+    pipelines.mitx_etl()
 
 
 @app.task

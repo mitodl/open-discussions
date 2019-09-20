@@ -149,8 +149,8 @@
 		"entitlements": [],
 		"owners": [{
 			"uuid": "2a73d2ce-c34a-4e08-8223-83bca9d2f01d",
-			"key": "MITx",
-			"name": "Massachusetts Institute of Technology",
+			"key": "NOTMITx",
+			"name": "NOT Massachusetts Institute of Technology",
 			"certificate_logo_image_url": "https://edxuploads.s3.amazonaws.com/organization_logos/logo-mitx.png",
 			"description": "description",
 			"homepage_url": "",
