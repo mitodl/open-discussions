@@ -82,7 +82,7 @@ export default class IntegrationTestHelper {
     })
     this.getViewportWidthStub = this.sandbox
       .stub(utilFuncs, "getViewportWidth")
-      .returns(700)
+      .returns(1000)
     this.embedlyPlatformStub = this.sandbox.stub(
       embedUtil,
       "loadEmbedlyPlatform"

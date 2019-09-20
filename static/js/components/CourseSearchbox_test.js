@@ -1,4 +1,5 @@
 // @flow
+import React from "react"
 import sinon from "sinon"
 import { assert } from "chai"
 
@@ -72,5 +73,12 @@ describe("CourseSearchbox", () => {
     const validationStub = sandbox.stub(validationFuncs, "validationMessage")
     renderSearchbox({ validation: "NO!!!!!" })
     sinon.assert.calledWith(validationStub, "NO!!!!!")
+  })
+
+  it("should render children if they are passed", () => {
+    const wrapper = renderSearchbox({
+      children: <div className="child">hey!</div>
+    })
+    assert.ok(wrapper.find(".child").exists())
   })
 })

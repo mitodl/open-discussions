@@ -25,6 +25,7 @@ import {
   BannerContainer,
   BannerImage
 } from "../components/PageBanner"
+import CourseFilterDrawer from "../components/CourseFilterDrawer"
 
 import { actions } from "../actions"
 import { setShowResourceDrawer } from "../actions/ui"
@@ -44,7 +45,9 @@ import {
   emptyOrNil,
   preventDefaultAndInvoke,
   toArray,
-  capitalize
+  capitalize,
+  getViewportWidth,
+  GRID_MOBILE_BREAKPOINT
 } from "../lib/util"
 import {
   mergeFacetResults,
@@ -125,6 +128,8 @@ const facetDisplayMap = [
 
 const shouldRunSearch = R.complement(R.eqProps("activeFacets"))
 
+const THREE_CARD_BREAKPOINT = 1100
+
 export class CourseSearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -155,6 +160,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { clearSearch } = this.props
     clearSearch()
     this.runSearch()
+    window.addEventListener("resize", () => this.setState({}))
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -324,6 +330,21 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
   }
 
+  getSearchResultCellWidth = () => {
+    const { searchResultLayout } = this.state
+
+    if (searchResultLayout === SEARCH_LIST_UI) {
+      return 12
+    }
+
+    const width = getViewportWidth()
+    if (width < THREE_CARD_BREAKPOINT && width >= GRID_MOBILE_BREAKPOINT) {
+      return 6
+    } else {
+      return 4
+    }
+  }
+
   renderResults = () => {
     const {
       results,
@@ -353,10 +374,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       >
         <Grid>
           {results.map((result, i) => (
-            <Cell
-              width={searchResultLayout === SEARCH_GRID_UI ? 4 : 12}
-              key={i}
-            >
+            <Cell width={this.getSearchResultCellWidth()} key={i}>
               <SearchResult
                 result={result}
                 overrideObject={
@@ -390,23 +408,18 @@ export class CourseSearchPage extends React.Component<Props, State> {
         <MetaTags>
           <CanonicalLink match={match} />
         </MetaTags>
-        <BannerPageHeader tall>
-          <BannerContainer tall>
-            <BannerImage src={COURSE_SEARCH_BANNER_URL} tall />
+        <BannerPageHeader tall compactOnMobile>
+          <BannerContainer tall compactOnMobile>
+            <BannerImage src={COURSE_SEARCH_BANNER_URL} tall compactOnMobile />
           </BannerContainer>
-          <Grid>
-            <Cell width={4} />
-            <Cell width={4}>
-              <CourseSearchbox
-                onChange={this.updateText}
-                value={text || ""}
-                onClear={this.updateText}
-                onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
-                validation={error}
-                autoFocus
-              />
-            </Cell>
-          </Grid>
+          <CourseSearchbox
+            onChange={this.updateText}
+            value={text || ""}
+            onClear={this.updateText}
+            onSubmit={preventDefaultAndInvoke(() => this.runSearch())}
+            validation={error}
+            autoFocus
+          />
         </BannerPageHeader>
         <Grid
           className={`main-content ${
@@ -442,41 +455,43 @@ export class CourseSearchPage extends React.Component<Props, State> {
             </div>
           </Cell>
           <Cell className="search-filters" width={facetColumnWidth}>
-            <div className="active-search-filters">
-              {anyFiltersActive ? (
-                <div className="filter-section-title">
-                  Filters
-                  <span
-                    className="clear-all-filters"
-                    onClick={this.clearAllFilters}
-                  >
-                    Clear All
-                  </span>
-                </div>
-              ) : null}
-              {facetDisplayMap.map(([name, title, labelFunction]) =>
-                (activeFacets.get(name) || []).map((facet, i) => (
-                  <SearchFilter
-                    key={i}
-                    title={title}
-                    value={facet}
-                    clearFacet={() => this.toggleFacet(name, facet, false)}
-                    labelFunction={labelFunction}
-                  />
-                ))
-              )}
-            </div>
-            {facetDisplayMap.map(([name, title, labelFunction], i) => (
-              <SearchFacet
-                key={i}
-                title={title}
-                name={name}
-                results={this.mergeFacetOptions(name)}
-                onUpdate={this.onUpdateFacets}
-                currentlySelected={activeFacets.get(name) || []}
-                labelFunction={labelFunction}
-              />
-            ))}
+            <CourseFilterDrawer>
+              <div className="active-search-filters">
+                {anyFiltersActive ? (
+                  <div className="filter-section-title">
+                    Filters
+                    <span
+                      className="clear-all-filters"
+                      onClick={this.clearAllFilters}
+                    >
+                      Clear All
+                    </span>
+                  </div>
+                ) : null}
+                {facetDisplayMap.map(([name, title, labelFunction]) =>
+                  (activeFacets.get(name) || []).map((facet, i) => (
+                    <SearchFilter
+                      key={i}
+                      title={title}
+                      value={facet}
+                      clearFacet={() => this.toggleFacet(name, facet, false)}
+                      labelFunction={labelFunction}
+                    />
+                  ))
+                )}
+              </div>
+              {facetDisplayMap.map(([name, title, labelFunction], i) => (
+                <SearchFacet
+                  key={i}
+                  title={title}
+                  name={name}
+                  results={this.mergeFacetOptions(name)}
+                  onUpdate={this.onUpdateFacets}
+                  currentlySelected={activeFacets.get(name) || []}
+                  labelFunction={labelFunction}
+                />
+              ))}
+            </CourseFilterDrawer>
           </Cell>
           <Cell width={resultsColumnWidth}>
             {error ? null : this.renderResults()}

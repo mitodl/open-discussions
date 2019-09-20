@@ -1,15 +1,23 @@
 // @flow
 import React from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 
-import { isMobileWidth } from "../lib/util"
+import { PHONE_WIDTH } from "../lib/constants"
 
 const bannerHeight = "200px"
 const tallBannerHeight = "252px"
+const shortMobileBannerHeight = "115px"
 const channelBannerBg = "#20316d"
 
-const imageHeight = props =>
-  props.tall && !isMobileWidth() ? tallBannerHeight : bannerHeight
+const imageHeight = css`
+  @media (max-width: ${PHONE_WIDTH}px) {
+    height: ${props =>
+    props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
+  }
+  @media (min-width: ${PHONE_WIDTH + 1}px) {
+    height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
+  }
+`
 
 export const BannerContainer = styled.div`
   position: absolute;
@@ -24,24 +32,30 @@ const imageStylesheet = `
 
 const StyledImage = styled.img`
   ${imageStylesheet} object-fit: cover;
-  height: ${imageHeight};
+  ${imageHeight};
 `
 
 const PlaceholderDiv = styled.div`
   ${imageStylesheet}
   background-color: ${channelBannerBg};
-  height: ${imageHeight}
+  ${imageHeight}
 `
 
 type ImgProps = {
   src: ?string,
   alt?: string,
-  tall?: boolean
+  tall?: boolean,
+  compactOnMobile?: boolean
 }
 
-export const BannerImage = ({ src, alt, tall }: ImgProps) =>
+export const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
   src ? (
-    <StyledImage src={src} tall={tall} alt={alt || ""} />
+    <StyledImage
+      src={src}
+      tall={tall}
+      alt={alt || ""}
+      compactOnMobile={compactOnMobile}
+    />
   ) : (
     <PlaceholderDiv />
   )
@@ -53,7 +67,7 @@ export const BannerPageWrapper = styled.div`
 
 export const BannerPageHeader = styled.div`
   margin-bottom: 20px;
-  min-height: ${imageHeight};
+  ${imageHeight};
 `
 
 export const Gradient = styled.div`
@@ -63,8 +77,8 @@ export const Gradient = styled.div`
     rgba(0, 0, 0, 0.5)
   );
   position: absolute;
-  height: ${imageHeight}
   width: 100%;
   display: block;
   top: 0;
+  ${imageHeight};
 `

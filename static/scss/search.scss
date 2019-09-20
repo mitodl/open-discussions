@@ -59,6 +59,12 @@
 }
 
 .search-filters {
+  .filter-controls {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
   .filter-section-title {
     font-size: 18px;
     font-weight: 600;
@@ -70,7 +76,9 @@
 
   .facets,
   .active-search-filters {
-    width: 90%;
+    @include breakpoint(desktop) {
+      width: 90%;
+    }
   }
 
   .active-search-filters {
@@ -132,9 +140,11 @@
       height: 25px;
       font-size: 14px;
       margin-right: 6px;
+      cursor: pointer;
 
       input {
         margin-right: 10px;
+        cursor: pointer;
       }
 
       .facet-label-div {

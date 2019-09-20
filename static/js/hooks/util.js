@@ -2,7 +2,13 @@
 import { useState, useEffect } from "react"
 
 import { getViewportWidth } from "../lib/util"
-import { PHONE, TABLET, DESKTOP } from "../lib/constants"
+import {
+  PHONE,
+  PHONE_WIDTH,
+  TABLET,
+  TABLET_WIDTH,
+  DESKTOP
+} from "../lib/constants"
 
 export const useDeviceCategory = () => {
   const [width, setWidth] = useState(getViewportWidth())
@@ -17,10 +23,10 @@ export const useDeviceCategory = () => {
     }
   }, [])
 
-  if (width <= 580) {
+  if (width <= PHONE_WIDTH) {
     return PHONE
   }
-  if (width <= 800) {
+  if (width <= TABLET_WIDTH) {
     return TABLET
   }
   return DESKTOP

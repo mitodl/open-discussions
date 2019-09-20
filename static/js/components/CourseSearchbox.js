@@ -8,11 +8,12 @@ type Props = {
   value?: string,
   onSubmit: Function,
   validation?: ?string,
-  autoFocus?: boolean
+  autoFocus?: boolean,
+  children?: React$Node
 }
 
 export default function CourseSearchbox(props: Props) {
-  const { onChange, value, onSubmit, validation, autoFocus } = props
+  const { onChange, value, onSubmit, validation, autoFocus, children } = props
 
   return (
     <div className="course-searchbox">
@@ -30,6 +31,7 @@ export default function CourseSearchbox(props: Props) {
         <i className="material-icons search-icon" onClick={onSubmit}>
           search
         </i>
+        {children}
       </div>
       {validationMessage(validation)}
     </div>

@@ -53,6 +53,15 @@ function SearchFacet(props: Props) {
                     ? "facet-visible"
                     : "facet-hidden"
                 } ${isChecked ? "checked" : ""}`}
+                onClick={() => {
+                  onUpdate({
+                    target: {
+                      name,
+                      value:   facet.key,
+                      checked: !isChecked
+                    }
+                  })
+                }}
               >
                 <input
                   type="checkbox"

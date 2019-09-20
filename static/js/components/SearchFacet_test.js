@@ -58,6 +58,16 @@ describe("SearchFacet", () => {
     sinon.assert.calledWith(onUpdateStub, event)
   })
 
+  it("whole thing should call onUpdate when clicked", () => {
+    renderSearchFacet()
+      .find(".facet-visible")
+      .at(0)
+      .simulate("click")
+    sinon.assert.calledWith(onUpdateStub, {
+      target: { checked: true, name: name, value: facet["key"] }
+    })
+  })
+
   it("checkbox should call the label function if assigned", () => {
     const labelStub = helper.sandbox.stub()
     renderSearchFacet({ labelFunction: labelStub })

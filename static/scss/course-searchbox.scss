@@ -1,5 +1,9 @@
 .course-searchbox {
-  padding-top: 78px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 
   label {
     font-size: 24px;
@@ -12,6 +16,9 @@
     position: relative;
     height: 55px;
     color: $font-grey-mid;
+    margin: 0 20px;
+    max-width: 500px;
+    width: calc(100% - 40px);
 
     i.material-icons {
       position: absolute;
@@ -27,6 +34,16 @@
       font-size: 20px;
       border-radius: 7px;
       border: none;
+    }
+
+    .link-wrapper {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 22px;
+
+      a.link-button {
+        margin-right: 0;
+      }
     }
   }
 }

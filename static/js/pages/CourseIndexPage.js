@@ -16,6 +16,7 @@ import {
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"
+import ResponsiveWrapper from "../components/ResponsiveWrapper"
 
 import { setShowResourceDrawer } from "../actions/ui"
 import {
@@ -31,6 +32,7 @@ import {
   favoritesSelector
 } from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
+import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 
 type Props = {|
   history: Object
@@ -75,28 +77,35 @@ export default function CourseIndexPage({ history }: Props) {
 
   return (
     <BannerPageWrapper>
-      <BannerPageHeader tall>
-        <BannerContainer tall>
-          <BannerImage src={COURSE_BANNER_URL} tall />
+      <BannerPageHeader tall compactOnMobile>
+        <BannerContainer tall compactOnMobile>
+          <BannerImage src={COURSE_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
-        <Grid>
-          <Cell width={4} />
-          <Cell className="course-searchbox-container" width={4}>
-            <CourseSearchbox
-              onSubmit={e => {
-                const { value } = e.target
-                const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
-                  q: value
-                })}`
-                history.push(newLocation)
-              }}
-            />
-            <Link className="link-button" to={COURSE_SEARCH_URL}>
-              View All
-            </Link>
-          </Cell>
-        </Grid>
+        <CourseSearchbox
+          onSubmit={e => {
+            const { value } = e.target
+            const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
+              q: value
+            })}`
+            history.push(newLocation)
+          }}
+        >
+          <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
+            <div className="link-wrapper">
+              <Link className="link-button" to={COURSE_SEARCH_URL}>
+                View All
+              </Link>
+            </div>
+          </ResponsiveWrapper>
+        </CourseSearchbox>
       </BannerPageHeader>
+      <ResponsiveWrapper onlyOn={[PHONE]}>
+        <div className="wide-view-more">
+          <Link className="link-button" to={COURSE_SEARCH_URL}>
+            View All
+          </Link>
+        </div>
+      </ResponsiveWrapper>
       <Grid className="main-content one-column">
         {loaded ? (
           <Cell width={12}>

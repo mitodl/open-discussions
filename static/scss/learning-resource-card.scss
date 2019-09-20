@@ -22,6 +22,10 @@
         margin-left: 16px;
         width: 46%;
 
+        @include breakpoint(phone) {
+          display: none;
+        }
+
         img {
           height: 130px;
           border-radius: 3px;
@@ -34,6 +38,10 @@
       flex-direction: column;
       min-width: 64%;
       width: 64%;
+
+      @include breakpoint(phone) {
+        width: 100%;
+      }
 
       .availability-price-favorite {
         margin-top: 12px;

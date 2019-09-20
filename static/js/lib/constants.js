@@ -66,3 +66,5 @@ export const DEFAULT_END_DT = "2500-01-01T23:59:59Z"
 export const PHONE = "PHONE"
 export const TABLET = "TABLET"
 export const DESKTOP = "DESKTOP"
+export const PHONE_WIDTH = 580
+export const TABLET_WIDTH = 839

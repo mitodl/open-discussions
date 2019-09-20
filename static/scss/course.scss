@@ -238,6 +238,10 @@
 
     .option {
       height: 40px;
+
+      &:first-child {
+        padding-right: 20px;
+      }
     }
 
     i {
@@ -254,6 +258,10 @@
       margin-left: 50px;
       font-size: 14px;
       color: black;
+
+      @include breakpoint(phone) {
+        margin-left: auto;
+      }
     }
   }
 }
@@ -271,4 +279,15 @@
 .bordered {
   padding-bottom: 5px;
   border-bottom: 1px solid black;
+}
+
+.wide-view-more {
+  display: flex;
+  justify-content: center;
+
+  a {
+    max-width: 424px;
+    margin: 0 20px;
+    width: 100%;
+  }
 }
