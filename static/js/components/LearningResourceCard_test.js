@@ -104,6 +104,7 @@ describe("LearningResourceCard", () => {
       assert.equal(offeredBySubtitle.prop("label"), "Offered by - ")
     })
   })
+
   //
   ;["", null].forEach(offeredBy => {
     it(`should not render offered_by subtitle if null`, () => {
