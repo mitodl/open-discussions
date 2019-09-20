@@ -7,7 +7,6 @@ from django.forms.models import model_to_dict
 import pytest
 
 from course_catalog.etl.loaders import (
-    load_programs,
     load_program,
     load_course,
     load_course_run,
@@ -37,38 +36,6 @@ def mock_upsert_tasks(mocker):
         upsert_program=mocker.patch("search.task_helpers.upsert_program"),
         delete_program=mocker.patch("search.task_helpers.delete_program"),
     )
-
-
-def test_load_programs():
-    """Test that load_programs loads each program"""
-    programs = ProgramFactory.build_batch(2)
-
-    assert Program.objects.count() == 0
-    assert Course.objects.count() == 0
-
-    results = load_programs(
-        [
-            {
-                "program_id": program.program_id,
-                "title": program.title,
-                "url": program.url,
-                "image_src": program.image_src,
-                "courses": [],
-            }
-            for program in programs
-        ]
-    )
-
-    assert len(results) == len(programs)
-
-    assert Program.objects.count() == len(programs)
-    assert Course.objects.count() == 0
-
-    for program, data in zip(results, programs):
-        # assert we got programs back and that each course is in a program
-        assert isinstance(program, Program)
-        assert program.items.count() == 0
-        assert program.program_id == data.program_id
 
 
 @pytest.mark.parametrize("program_exists", [True, False])
@@ -224,6 +191,8 @@ def test_load_course_run(course_run_exists):
     result = load_course_run(course, props)
 
     assert CourseRun.objects.count() == 1
+
+    assert result.content_object == course
 
     # assert we got a course run back
     assert isinstance(result, CourseRun)

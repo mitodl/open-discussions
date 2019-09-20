@@ -51,6 +51,10 @@
       "description": "Cloudfront distribution",
       "required": false
     },
+    "EDX_API_ACCESS_TOKEN_URL": {
+      "description": "URL to retrieve a MITx access token",
+      "required": false
+    },
     "EDX_API_URL": {
       "description": "URL to retrieve MITx course data from",
       "required": false
@@ -109,10 +113,6 @@
     },
     "MAX_S3_GET_ITERATIONS": {
       "description": "Max retry attempts to get an S3 object",
-      "required": false
-    },
-    "MICROMASTERS_COURSE_URL": {
-      "description": "URL for MicroMasters course info",
       "required": false
     },
     "MICROMASTERS_CATALOG_API_URL": {

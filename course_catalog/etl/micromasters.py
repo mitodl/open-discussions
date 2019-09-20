@@ -3,15 +3,21 @@ from django.conf import settings
 import requests
 
 from course_catalog.constants import OfferedBy
+from course_catalog.etl.constants import COMMON_HEADERS
+from course_catalog.etl.utils import log_exceptions
 
 
+@log_exceptions("Error extracting MicroMasters catalog", exc_return_value=[])
 def extract():
     """Loads the MicroMasters catalog data"""
     if settings.MICROMASTERS_CATALOG_API_URL:
-        return requests.get(settings.MICROMASTERS_CATALOG_API_URL).json()
+        return requests.get(
+            settings.MICROMASTERS_CATALOG_API_URL, headers={**COMMON_HEADERS}
+        ).json()
     return []
 
 
+@log_exceptions("Error extracting MicroMasters catalog", exc_return_value=[])
 def transform(programs):
     """Transform the micromasters catalog data"""
     # normalize the micromasters data into the course_catalog/models.py data structures
@@ -26,6 +32,7 @@ def transform(programs):
             "courses": [
                 {
                     "course_id": course["edx_key"],
+                    "offered_by": OfferedBy.micromasters.value
                     # TBD: how to handle merging `offered_by` for courses and course runs
                 }
                 for course in sorted(

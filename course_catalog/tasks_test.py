@@ -8,7 +8,6 @@ from os.path import isfile, join
 from unittest.mock import Mock
 
 import boto3
-import botocore
 import pytest
 from moto import mock_s3
 
@@ -22,7 +21,7 @@ from course_catalog.models import (
     Bootcamp,
 )
 from course_catalog.tasks import (
-    sync_and_upload_edx_data,
+    get_mitx_data,
     get_ocw_data,
     upload_ocw_master_json,
     get_bootcamp_data,
@@ -40,42 +39,6 @@ TEST_JSON_PATH = (
 TEST_JSON_FILES = [
     f for f in listdir(TEST_JSON_PATH) if isfile(join(TEST_JSON_PATH, f))
 ]
-
-
-@pytest.fixture
-def mitx_data(settings):
-    """
-    Test MITx course data
-    """
-    settings.EDX_API_URL = "fake_url"
-    settings.EDX_API_CLIENT_ID = "fake_id"
-    settings.EDX_API_CLIENT_SECRET = "fake_secret"
-    with open("./test_json/test_mitx_course01.json", "r") as test_data:
-        return json.load(test_data)
-
-
-@pytest.fixture
-def access_token(mocker):
-    """
-    Mock requests.post to retrieve a fake access token
-    """
-    mocker.patch(
-        "requests.post",
-        return_value=Mock(
-            json=Mock(return_value={"access_token": "fake_access_token"})
-        ),
-    )
-
-
-@pytest.fixture
-def get_test_data(mocker, mitx_data):
-    """
-    Mock requests.get to retrieve fake course data
-    """
-    mocker.patch(
-        "requests.get",
-        return_value=Mock(status_code=200, json=Mock(return_value=mitx_data)),
-    )
 
 
 @pytest.fixture
@@ -135,97 +98,11 @@ def setup_s3(settings):
     conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
-@mock_s3
-def test_get_mitx_data_valid(
-    settings,
-    access_token,
-    get_test_data,
-    mock_course_index_functions,
-    get_micromasters_data,
-):
-    """
-    Test that mitx sync task successfully creates database objects
-    """
-    setup_s3(settings)
-    sync_and_upload_edx_data()
-    assert Course.objects.count() == 1
-    assert CoursePrice.objects.count() == 2
-    assert CourseInstructor.objects.count() == 2
-    assert CourseTopic.objects.count() == 1
-
-
-@mock_s3
-def test_get_mitx_data_saves_json(
-    settings,
-    mocker,
-    access_token,
-    get_test_data,
-    mock_course_index_functions,
-    get_micromasters_data,
-):
-    """
-    Test that mitx sync task successfully saves edx data results file in S3
-    """
-    setup_s3(settings)
-    sync_and_upload_edx_data.delay()
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-    )
-    obj = s3.Object(settings.OCW_LEARNING_COURSE_BUCKET_NAME, "edx_courses.json")
-    # check that pub_object call to create edx_courses.json succeeded
-    contents = json.loads(obj.get()["Body"].read())
-    assert "results" in contents
-
-
-@mock_s3
-def test_get_mitx_data_status_error(
-    settings, mocker, access_token, mitx_data, get_micromasters_data
-):
-    """
-    Test that mitx sync task properly stops when it gets an error status code
-    """
-    mocker.patch(
-        "requests.get",
-        return_value=Mock(status_code=500, json=Mock(return_value=mitx_data)),
-    )
-    settings.EDX_API_URL = "fake_url"
-    setup_s3(settings)
-    sync_and_upload_edx_data.delay()
-    # check that no courses were created
-    assert Course.objects.count() == 0
-    # check that edx API data results file was not uploaded to s3
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-    )
-    with pytest.raises(botocore.exceptions.ClientError):
-        s3.Object(settings.OCW_LEARNING_COURSE_BUCKET_NAME, "edx_courses.json").load()
-
-
-@mock_s3
-def test_get_mitx_data_unexpected_error(
-    settings, mocker, access_token, get_test_data, get_micromasters_data
-):
-    """
-    Test that mitx sync task properly stops when it gets an error status code
-    """
-    mocker.patch("course_catalog.api.is_mit_course", side_effect=Exception)
-    settings.EDX_API_URL = "fake_url"
-    setup_s3(settings)
-    sync_and_upload_edx_data.delay()
-    assert Course.objects.count() == 0
-
-
-def test_get_mitx_data_no_settings(settings, get_micromasters_data):
-    """
-    No data should be imported if MITx settings are missing
-    """
-    settings.EDX_API_URL = None
-    sync_and_upload_edx_data.delay()
-    assert Course.objects.count() == 0
+def test_get_mitx_data_valid(mocker):
+    """Verify that the get_mitx_data invokes the MITx ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_mitx_data.delay()
+    mock_pipelines.mitx_etl.assert_called_once_with()
 
 
 @mock_s3
