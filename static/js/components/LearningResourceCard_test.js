@@ -14,8 +14,6 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
-  platformReadableNames,
-  platforms,
   COURSE_AVAILABLE_NOW
 } from "../lib/constants"
 import {
@@ -91,25 +89,33 @@ describe("LearningResourceCard", () => {
     assert.equal(label, "Subject - ")
   })
 
-  LR_TYPE_ALL.forEach(objectType => {
-    it(`should render a readable platform name`, () => {
-      const object = makeLearningResource(objectType)
-      const platformName = render({
+  //
+  ;["OCW", "MITx", "foo"].forEach(offeredBy => {
+    it(`should render offered_by`, () => {
+      const object = makeLearningResource(LR_TYPE_COURSE)
+      object.offered_by = offeredBy
+      const offeredBySubtitle = render({
         object
       })
         .find("Subtitle")
         .at(0)
 
-      const platform =
-        object.object_type === LR_TYPE_BOOTCAMP
-          ? platforms.bootcamps
-          : object.offered_by || object.platform
+      assert.equal(offeredBySubtitle.prop("content"), object.offered_by)
+      assert.equal(offeredBySubtitle.prop("label"), "Offered by - ")
+    })
+  })
 
-      assert.equal(
-        platformName.prop("content"),
-        platformReadableNames[platform]
-      )
-      assert.equal(platformName.prop("label"), "Offered by - ")
+  //
+  ;["", null].forEach(offeredBy => {
+    it(`should not render offered_by subtitle if null`, () => {
+      const object = makeLearningResource(LR_TYPE_COURSE)
+      object.offered_by = offeredBy
+      const offeredBySubtitle = render({
+        object
+      })
+        .find("Subtitle")
+        .at(0)
+      assert.notEqual(offeredBySubtitle.prop("label"), "Offered by - ")
     })
   })
 

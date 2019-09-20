@@ -23,21 +23,6 @@ export const platforms = {
   micromasters: micromastersPlatform
 }
 
-export const platformLogoUrls = {
-  [ocwPlatform]:          "/static/images/mit-ocw-logo-square.png",
-  [edxPlatform]:          "/static/images/mitx-logo.png",
-  [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
-  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
-  "":                     "/static/images/blank.png"
-}
-
-export const platformReadableNames = {
-  [ocwPlatform]:          "MIT OpenCourseWare",
-  [edxPlatform]:          "edX",
-  [bootcampsPlatform]:    "MIT Bootcamp",
-  [micromastersPlatform]: "MIT MicroMasters"
-}
-
 export const WIDGET_TYPE_MARKDOWN = "Markdown"
 export const WIDGET_TYPE_RSS = "RSS Feed"
 export const WIDGET_TYPE_URL = "URL"
@@ -51,7 +36,6 @@ export const WIDGET_FIELD_TYPE_MARKDOWN = "markdown_wysiwyg"
 export const WIDGET_FIELD_TYPE_PEOPLE = "people"
 export const WIDGET_FIELD_TYPE_CHECKBOX = "checkbox"
 
-export const CAROUSEL_PAGE_SIZE = 3
 export const CAROUSEL_IMG_HEIGHT = 130
 export const CAROUSEL_IMG_WIDTH = 306
 
