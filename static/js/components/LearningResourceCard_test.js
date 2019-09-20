@@ -79,6 +79,7 @@ describe("LearningResourceCard", () => {
   })
 
   it("should render the topic", () => {
+    course.offered_by = "MITx"
     const { content, label } = render()
       .find("Subtitle")
       .at(1)
