@@ -78,7 +78,7 @@ describe("LearningResourceCard", () => {
     )
   })
 
-  it("should render the topic", () => {
+  it("should render topics", () => {
     course.offered_by = "MITx"
     const { content, label } = render()
       .find("Subtitle")
@@ -87,7 +87,29 @@ describe("LearningResourceCard", () => {
     course.topics.forEach(({ name }) => {
       assert.include(content, name)
     })
+    assert.equal(label, "Subjects - ")
+  })
+
+  it("should render a single topic", () => {
+    course.offered_by = "MITx"
+    course.topics = [course.topics[0]]
+    const { content, label } = render()
+      .find("Subtitle")
+      .at(1)
+      .props()
+    assert.include(content, course.topics[0].name)
     assert.equal(label, "Subject - ")
+  })
+
+  it("should not render topics if they aren't present", () => {
+    course.offered_by = "MITx"
+    course.topics = []
+    assert.notOk(
+      render()
+        .find("Subtitle")
+        .at(1)
+        .exists()
+    )
   })
 
   //
