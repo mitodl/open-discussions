@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.92.0
+Version 0.92.0 (Released September 23, 2019)
 --------------
 
 - a few styling tweaks for the course search page
