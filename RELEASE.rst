@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.92.0
+--------------
+
+- a few styling tweaks for the course search page
+- Fix occasionally failing test for LearningResourceCard (#2241)
+- add 'grid' style loader to the course search page
+- Fix 'Offered By' display (#2238)
+- Make sure object_type is always merged in when retrieving entities from state (#2230)
+
 Version 0.91.0 (Released September 18, 2019)
 --------------
 
