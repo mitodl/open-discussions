@@ -25,6 +25,8 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
 )
+from profiles.models import Profile
+from profiles.utils import image_uri, IMAGE_MEDIUM
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -373,6 +375,16 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     items = UserListItemSerializer(many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="user_list")
+    profile_name = serializers.SerializerMethodField(read_only=True)
+    profile_img = serializers.SerializerMethodField(read_only=True)
+
+    def get_profile_name(self, instance):
+        if instance.author.profile:
+            return instance.author.profile.name
+
+    def get_profile_img(self, instance):
+        if instance.author.profile:
+            image_uri(instance.author.profile, IMAGE_MEDIUM)
 
     class Meta:
         model = UserList
@@ -399,6 +411,7 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
 
     items = ProgramItemSerializer(many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
 
     class Meta:

@@ -6,7 +6,13 @@ import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
-import { platforms, LR_TYPE_COURSE } from "../lib/constants"
+import {
+  platforms,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST,
+  LR_TYPE_COURSE
+} from "../lib/constants"
 import {
   bestRun,
   minPrice,
@@ -14,16 +20,26 @@ import {
   getInstructorName
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
-import { languageName } from "../lib/util"
+import {
+  capitalize,
+  defaultProfileImageUrl,
+  emptyOrNil,
+  languageName
+} from "../lib/util"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type {
+  Bootcamp,
+  Course,
+  Program,
+  UserList
+} from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  object: Course | Bootcamp,
+  object: Course | Bootcamp | Program | UserList,
   objectType: string,
   runId: number,
   setShowResourceDrawer: Function
@@ -31,7 +47,11 @@ type Props = {
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
   const { object, objectType, runId, setShowResourceDrawer } = props
+  const isProgram = objectType === LR_TYPE_PROGRAM
+  const isBootcamp = objectType === LR_TYPE_BOOTCAMP
   const isCourse = objectType === LR_TYPE_COURSE
+  const isLearningPath = objectType === LR_TYPE_USERLIST
+  const hasRuns = isBootcamp || isCourse
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -40,13 +60,17 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       runId:      parseInt(event.target.value)
     })
 
-  const selectedRun =
-    bestRun(
+  const selectedRun = hasRuns
+    ? bestRun(
       runId
         ? object.course_runs.filter(run => run.id === runId)
         : object.course_runs
     ) || object.course_runs[0]
+    : null
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
+  const listItems = isLearningPath
+    ? object.items.filter(item => item.content_data)
+    : null
 
   return (
     <div className="expanded-course-summary">
@@ -94,10 +118,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {isCourse
-                  ? // $FlowFixMe: only courses will end up here
-                  `Take Course on ${object.platform.toUpperCase()}`
-                  : "Take Bootcamp"}
+                {isBootcamp
+                  ? "Take Bootcamp"
+                  : `Take ${capitalize(objectType)} on ${object.offered_by}`}
               </a>
             </div>
           </div>
@@ -112,31 +135,72 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             lessText="Read less"
           />
         </div>
-        <div className="course-subheader row">Topics</div>
-        <div className="course-topics">
-          {object.topics.map((topic, i) => (
-            <div className="grey-surround facet" key={i}>
-              {topic.name}
+        {listItems ? (
+          <div>
+            <div className="course-info-row">
+              <div>
+                <img
+                  src={object.profile_img || defaultProfileImageUrl}
+                  alt="profile image"
+                  className="profile-image medium"
+                />
+              </div>
+              <div className="course-info-value">{object.profile_name}</div>
             </div>
-          ))}
-        </div>
-        <div className="course-subheader row">Info</div>
-        <div className="course-info-row">
-          <i className="material-icons attach_money">attach_money</i>
-          <div className="course-info-label">Cost:</div>
-          <div className="course-info-value">{minPrice(selectedRun)}</div>
-        </div>
-        {isCourse && selectedRun ? (
-          <div className="course-info-row">
-            <i className="material-icons bar_chart">bar_chart</i>
-            <div className="course-info-label">Level:</div>
-            <div className="course-info-value">
-              {// $FlowFixMe: only courses will access level
-                selectedRun.level || "Unspecified"}
+            <div className="course-subheader row">{`List of Items (${
+              listItems.length
+            })`}</div>
+            {listItems.map((item, key) => (
+              <div className="course-info-row" key={key}>
+                <div>{key + 1}.</div>
+                <div>
+                  <img
+                    alt="item thumbnail"
+                    src={embedlyThumbnail(
+                      SETTINGS.embedlyKey,
+                      item.content_data.image_src,
+                      50,
+                      50
+                    )}
+                  />
+                </div>
+                <div>{item.content_data.title}</div>
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {!emptyOrNil(object.topics) ? (
+          <div>
+            <div className="course-subheader row">Topics</div>
+            <div className="course-topics">
+              {object.topics.map((topic, i) => (
+                <div className="grey-surround facet" key={i}>
+                  {topic.name}
+                </div>
+              ))}
             </div>
           </div>
         ) : null}
-        {selectedRun ? (
+        {!isLearningPath ? (
+          <div>
+            <div className="course-subheader row">Info</div>
+            <div className="course-info-row">
+              <i className="material-icons attach_money">attach_money</i>
+              <div className="course-info-label">Cost:</div>
+              <div className="course-info-value">
+                {minPrice(isProgram ? object : selectedRun)}
+              </div>
+            </div>
+          </div>
+        ) : null}
+        {selectedRun && selectedRun.level ? (
+          <div className="course-info-row">
+            <i className="material-icons bar_chart">bar_chart</i>
+            <div className="course-info-label">Level:</div>
+            <div className="course-info-value">{selectedRun.level}</div>
+          </div>
+        ) : null}
+        {selectedRun && selectedRun.instructors ? (
           <div className="course-info-row">
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
@@ -145,13 +209,24 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        <div className="course-info-row">
-          <i className="material-icons language">language</i>
-          <div className="course-info-label">Language:</div>
-          <div className="course-info-value">
-            {languageName(selectedRun ? selectedRun.language : "en")}
+        {isProgram ? (
+          <div className="course-info-row">
+            <i className="material-icons menu_book">menu_book</i>
+            <div className="course-info-label">Number of Courses:</div>
+            <div className="course-info-value">
+              {`${object.items.length} Courses in Program`}
+            </div>
           </div>
-        </div>
+        ) : null}
+        {isLearningPath ? null : (
+          <div className="course-info-row">
+            <i className="material-icons language">language</i>
+            <div className="course-info-label">Language:</div>
+            <div className="course-info-value">
+              {languageName(selectedRun ? selectedRun.language : "en")}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

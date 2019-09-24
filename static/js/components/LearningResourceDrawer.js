@@ -16,10 +16,17 @@ import { setShowResourceDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
-import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
+import { programRequest } from "../lib/queries/programs"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
+} from "../lib/constants"
 
 import type { Dispatch } from "redux"
 import type { Bootcamp, Course } from "../flow/discussionTypes"
+import { userListRequest } from "../lib/queries/user_lists"
 
 type Props = {
   showLearningDrawer: boolean,
@@ -92,8 +99,10 @@ const getObject = createSelector(
   state => state.ui,
   state => state.entities.courses,
   state => state.entities.bootcamps,
+  state => state.entities.programs,
+  state => state.entities.userLists,
   state => state.queries,
-  (ui, courses, bootcamps, queries) => {
+  (ui, courses, bootcamps, programs, userlists, queries) => {
     const { objectId, objectType } = ui.courseDetail
 
     switch (objectType) {
@@ -104,6 +113,14 @@ const getObject = createSelector(
     case LR_TYPE_BOOTCAMP:
       return querySelectors.isFinished(queries, bootcampRequest(objectId))
         ? bootcamps[objectId]
+        : null
+    case LR_TYPE_PROGRAM:
+      return querySelectors.isFinished(queries, programRequest(objectId))
+        ? programs[objectId]
+        : null
+    case LR_TYPE_USERLIST:
+      return querySelectors.isFinished(queries, userListRequest(objectId))
+        ? userlists[objectId]
         : null
     }
   }
@@ -137,6 +154,10 @@ const mapPropsToConfig = props => {
     return [courseRequest(objectId)]
   case LR_TYPE_BOOTCAMP:
     return [bootcampRequest(objectId)]
+  case LR_TYPE_PROGRAM:
+    return [programRequest(objectId)]
+  case LR_TYPE_USERLIST:
+    return [userListRequest(objectId)]
   }
   return []
 }

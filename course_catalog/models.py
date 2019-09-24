@@ -36,7 +36,7 @@ class CoursePrice(TimestampedModel):
     """
 
     price = models.DecimalField(decimal_places=2, max_digits=6)
-    mode = models.CharField(max_length=128)
+    mode = models.CharField(max_length=128, null=True, blank=True)
     upgrade_deadline = models.DateTimeField(null=True)
 
 

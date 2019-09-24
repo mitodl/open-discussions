@@ -109,6 +109,7 @@ export const makeProgram = (): Program => ({
   short_description: casual.description,
   offered_by:        null,
   title:             casual.title,
+  url:               casual.url,
   topics:            [{ name: casual.word }, { name: casual.word }],
   image_src:         "http://image.medium.url",
   image_description: casual.description,

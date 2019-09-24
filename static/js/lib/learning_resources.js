@@ -16,7 +16,11 @@ import {
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil } from "./util"
 
-import type { CourseRun, CourseInstructor } from "../flow/discussionTypes"
+import type {
+  CourseRun,
+  CourseInstructor,
+  Program
+} from "../flow/discussionTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -143,14 +147,14 @@ export const resourceLabel = (resource: string) => {
     : concat(capitalize(resource), "s")
 }
 
-export const maxPrice = (courseRun: ?CourseRun) => {
-  const prices = courseRun && courseRun.prices ? courseRun.prices : []
+export const maxPrice = (object: ?CourseRun | Program) => {
+  const prices = object && object.prices ? object.prices : []
   const price = Math.max(...prices.map(price => price.price))
   return price > 0 ? `$${price}` : "Free"
 }
 
-export const minPrice = (courseRun: ?CourseRun) => {
-  const prices = courseRun && courseRun.prices ? courseRun.prices : []
+export const minPrice = (object: ?CourseRun | Program) => {
+  const prices = object && object.prices ? object.prices : []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? price : "Free"
 }

@@ -9,10 +9,15 @@ import {
   makeCourse,
   makeLearningResource
 } from "../factories/learning_resources"
-import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
+import {
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM
+} from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 import { defaultResourceImageURL } from "../lib/url"
+import { capitalize } from "../lib/util"
 
 describe("ExpandedLearningResourceDisplay", () => {
   let course
@@ -209,9 +214,11 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
     it(`should display the platform in the link button text for ${objectType}`, () => {
       const object = makeLearningResource(objectType)
+      // $FlowFixMe
+      object.offered_by = "xPro"
       const wrapper = render({
         object,
         objectType
@@ -221,7 +228,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         linkText,
         objectType === LR_TYPE_COURSE
           ? // $FlowFixMe: only courses will access platform
-          `Take Course on ${object.platform.toUpperCase()}`
+          `Take ${capitalize(objectType)} on ${object.offered_by}`
           : "Take Bootcamp"
       )
     })
