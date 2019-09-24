@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.92.1
+Version 0.92.1 (Released September 24, 2019)
 --------------
 
 - Added xpro integration for catalog
