@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.92.1 (Released September 24, 2019)
+--------------
+
+- Added xpro integration for catalog
+- rename 'containers' dir to 'pages'
+
 Version 0.92.0 (Released September 23, 2019)
 --------------
 
