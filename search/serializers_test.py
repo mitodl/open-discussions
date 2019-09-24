@@ -278,6 +278,7 @@ def test_es_course_serializer(offered_by):
             "object_type": COURSE_TYPE,
             "id": course.id,
             "course_id": course.course_id,
+            "coursenum": course.course_id.split("+")[-1],
             "short_description": course.short_description,
             "full_description": course.full_description,
             "platform": course.platform,

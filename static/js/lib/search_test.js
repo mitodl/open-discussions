@@ -629,6 +629,7 @@ describe("search functions", () => {
           "topics",
           "platform",
           "course_id",
+          "coursenum^5",
           "offered_by"
         ]
       ],

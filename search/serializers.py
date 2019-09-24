@@ -351,12 +351,20 @@ class ESCourseSerializer(ESModelSerializer):
 
     topics = ESTopicsField()
     course_runs = ESCourseRunSerializer(read_only=True, many=True, allow_null=True)
+    coursenum = serializers.SerializerMethodField()
+
+    def get_coursenum(self, course):
+        """
+        Extract the course number from the course id
+        """
+        return course.course_id.split("+")[-1]
 
     class Meta:
         model = Course
         fields = [
             "id",
             "course_id",
+            "coursenum",
             "short_description",
             "full_description",
             "platform",
@@ -386,6 +394,7 @@ class ESBootcampSerializer(ESCourseSerializer):
         fields = [
             "id",
             "course_id",
+            "coursenum",
             "short_description",
             "full_description",
             "title",
