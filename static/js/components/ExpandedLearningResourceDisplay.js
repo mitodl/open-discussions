@@ -71,10 +71,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-row form centered">
             <i className="material-icons school">school</i>
             <div className="course-info-label">
-              {// $FlowFixMe: only courses will access platform
-                object.platform === platforms.OCW
-                  ? "As Taught In"
-                  : "Start Date"}:
+              {object.platform === platforms.OCW
+                ? "As Taught In"
+                : "Start Date"}:
             </div>
             <div className="select-semester-div">
               {object.course_runs.length > 1 ? (
@@ -128,22 +127,22 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           />
         </div>
         {listItems ? (
-          <div>
-            <div className="course-info-row">
+          <React.Fragment>
+            <div className="course-info-row centered">
               <div>
                 <img
                   src={object.profile_img || defaultProfileImageUrl}
                   alt="profile image"
-                  className="profile-image medium"
+                  className="profile-image medium-small"
                 />
               </div>
               <div className="course-info-value">{object.profile_name}</div>
             </div>
-            <div className="course-subheader row">{`List of Items (${
+            <div className="course-subheader row bordered">{`List of Items (${
               listItems.length
             })`}</div>
             {listItems.map((item, key) => (
-              <div className="course-info-row" key={key}>
+              <div className="course-info-row centered bordered" key={key}>
                 <div>{key + 1}.</div>
                 <div>
                   <img
@@ -159,10 +158,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 <div>{item.content_data.title}</div>
               </div>
             ))}
-          </div>
+          </React.Fragment>
         ) : null}
         {!emptyOrNil(object.topics) ? (
-          <div>
+          <React.Fragment>
             <div className="course-subheader row">Topics</div>
             <div className="course-topics">
               {object.topics.map((topic, i) => (
@@ -171,10 +170,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 </div>
               ))}
             </div>
-          </div>
+          </React.Fragment>
         ) : null}
         {!isLearningPath ? (
-          <div>
+          <React.Fragment>
             <div className="course-subheader row">Info</div>
             <div className="course-info-row">
               <i className="material-icons attach_money">attach_money</i>
@@ -183,7 +182,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 {minPrice(isProgram ? object : selectedRun)}
               </div>
             </div>
-          </div>
+          </React.Fragment>
         ) : null}
         {selectedRun && selectedRun.level ? (
           <div className="course-info-row">
@@ -210,7 +209,14 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        {isLearningPath ? null : (
+        {isLearningPath ? (
+          <React.Fragment>
+            <div className="course-subheader row">Privacy</div>
+            <div className="course-info-value privacy">
+              {capitalize(object.privacy_level)}
+            </div>
+          </React.Fragment>
+        ) : (
           <div className="course-info-row">
             <i className="material-icons language">language</i>
             <div className="course-info-label">Language:</div>

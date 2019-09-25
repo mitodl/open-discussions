@@ -12,7 +12,8 @@ import {
 import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
@@ -231,6 +232,57 @@ describe("ExpandedLearningResourceDisplay", () => {
           : `Take ${capitalize(objectType)} on xPro`
       )
     })
+  })
+
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+    it(`should display the cost for ${objectType}`, () => {
+      const prices = [{ price: 25.5, mode: "" }]
+      const object = makeLearningResource(objectType)
+      if (objectType === LR_TYPE_PROGRAM) {
+        object.prices = prices
+      } else {
+        // $FlowFixMe: bestRun result won't be null
+        bestRun(object.course_runs).prices = prices
+      }
+
+      const wrapper = render({
+        object,
+        objectType
+      })
+      assert.equal(
+        wrapper
+          .find(".attach_money")
+          .closest(".course-info-row")
+          .find(".course-info-value")
+          .text(),
+        "$25.50"
+      )
+    })
+  })
+
+  it(`should display an item list, profile image & privacy but not language, cost or link button for Learning Paths`, () => {
+    const objectType = LR_TYPE_USERLIST
+    const object = makeLearningResource(objectType)
+    const wrapper = render({ object, objectType })
+    assert.equal(
+      wrapper
+        .find(".course-info-value")
+        .last()
+        .text(),
+      capitalize(object.privacy_level)
+    )
+    assert.isOk(
+      wrapper
+        .find(".course-info-row.centered.bordered")
+        .at(0)
+        .text()
+        .includes(object.items[0].content_data.title)
+    )
+    assert.isOk(wrapper.find(".profile-image").exists())
+    assert.isNotOk(wrapper.find(".link-button").exists())
+    assert.isNotOk(wrapper.find(".language").exists())
+    assert.isNotOk(wrapper.find(".attach_money").exists())
   })
 
   it(`should still display without errors in case of a bad course with no runs`, () => {

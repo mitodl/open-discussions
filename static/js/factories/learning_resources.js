@@ -119,6 +119,18 @@ export const makeProgram = (): Program => ({
   prices:            [{ mode: "", price: casual.number }]
 })
 
+const incrUserListItem = incrementer()
+export const makeUserListItem = (objectType: string) => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:           incrUserListItem.next().value,
+  is_favorite:  casual.boolean,
+  object_id:    casual.number,
+  position:     incrUserListItem.next().value,
+  program:      casual.number,
+  content_type: objectType,
+  content_data: makeLearningResource(objectType)
+})
+
 const incrUserList = incrementer()
 
 export const makeUserList = (): UserList => ({
@@ -131,13 +143,18 @@ export const makeUserList = (): UserList => ({
   is_favorite:       casual.boolean,
   image_src:         "http://image.medium.url",
   image_description: casual.description,
-  items:             [makeCourse(), makeBootcamp(), makeProgram()],
-  object_type:       "user_list",
-  profile_img:       casual.url,
-  profile_name:      casual.name
+  items:             [
+    makeUserListItem(LR_TYPE_COURSE),
+    makeUserListItem(LR_TYPE_BOOTCAMP),
+    makeUserListItem(LR_TYPE_PROGRAM)
+  ],
+  object_type:   "user_list",
+  profile_img:   casual.url,
+  profile_name:  casual.name,
+  privacy_level: casual.random_element(["public", "private"])
 })
 
-export const makeLearningResource = (objectType: string) => {
+export const makeLearningResource = (objectType: string): Object => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return R.merge({ object_type: LR_TYPE_COURSE }, makeCourse())

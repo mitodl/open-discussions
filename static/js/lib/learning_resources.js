@@ -150,13 +150,13 @@ export const resourceLabel = (resource: string) => {
 export const maxPrice = (object: ?CourseRun | Program) => {
   const prices = object && object.prices ? object.prices : []
   const price = Math.max(...prices.map(price => price.price))
-  return price > 0 ? `$${price}` : "Free"
+  return price > 0 ? `$${price.toFixed(2)}` : "Free"
 }
 
 export const minPrice = (object: ?CourseRun | Program) => {
   const prices = object && object.prices ? object.prices : []
   const price = Math.min(...prices.map(price => price.price))
-  return price > 0 && price !== Infinity ? price : "Free"
+  return price > 0 && price !== Infinity ? `$${price.toFixed(2)}` : "Free"
 }
 
 export const getStartDate = (object: Object, courseRun: CourseRun) => {

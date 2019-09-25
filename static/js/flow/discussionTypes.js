@@ -390,7 +390,8 @@ export type UserList = LearningResource & {
   image_description:  ?string,
   items:              Array<Object>,
   profile_img:        ?string,
-  profile_name:       ?string
+  profile_name:       ?string,
+  privacy_level:      ?string
 }
 
 export type CoursePrice = {
