@@ -17,6 +17,7 @@ import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
+import { userListRequest } from "../lib/queries/user_lists"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
@@ -25,13 +26,17 @@ import {
 } from "../lib/constants"
 
 import type { Dispatch } from "redux"
-import type { Bootcamp, Course } from "../flow/discussionTypes"
-import { userListRequest } from "../lib/queries/user_lists"
+import type {
+  Bootcamp,
+  Course,
+  Program,
+  UserList
+} from "../flow/discussionTypes"
 
 type Props = {
   showLearningDrawer: boolean,
   dispatch: Dispatch<*>,
-  object: Course | Bootcamp | null,
+  object: Course | Bootcamp | Program | UserList | null,
   objectId: number,
   objectType: string,
   runId: number,

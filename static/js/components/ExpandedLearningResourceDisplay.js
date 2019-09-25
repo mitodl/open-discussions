@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import _ from "lodash"
+import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
@@ -10,8 +10,7 @@ import {
   platforms,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST,
-  LR_TYPE_COURSE
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 import {
   bestRun,
@@ -27,19 +26,12 @@ import {
   languageName
 } from "../lib/util"
 
-import type {
-  Bootcamp,
-  Course,
-  Program,
-  UserList
-} from "../flow/discussionTypes"
-
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  object: Course | Bootcamp | Program | UserList,
+  object: Object,
   objectType: string,
   runId: number,
   setShowResourceDrawer: Function
@@ -49,9 +41,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const { object, objectType, runId, setShowResourceDrawer } = props
   const isProgram = objectType === LR_TYPE_PROGRAM
   const isBootcamp = objectType === LR_TYPE_BOOTCAMP
-  const isCourse = objectType === LR_TYPE_COURSE
   const isLearningPath = objectType === LR_TYPE_USERLIST
-  const hasRuns = isBootcamp || isCourse
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -60,17 +50,19 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       runId:      parseInt(event.target.value)
     })
 
-  const selectedRun = hasRuns
+  const selectedRun = R.has("course_runs", object)
     ? bestRun(
       runId
-        ? object.course_runs.filter(run => run.id === runId)
+        ? // $FlowFixMe: already verified it has course_runs
+        object.course_runs.filter(run => run.id === runId)
         : object.course_runs
     ) || object.course_runs[0]
     : null
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
-  const listItems = isLearningPath
-    ? object.items.filter(item => item.content_data)
-    : null
+  const listItems =
+    R.has("items", object) && objectType === LR_TYPE_USERLIST
+      ? object.items.filter(item => item.content_data)
+      : null
 
   return (
     <div className="expanded-course-summary">
@@ -205,7 +197,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
             <div className="course-info-value">
-              {_.join(selectedRun.instructors.map(getInstructorName), ", ")}
+              {R.join(", ", selectedRun.instructors.map(getInstructorName))}
             </div>
           </div>
         ) : null}

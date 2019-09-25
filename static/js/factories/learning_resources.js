@@ -115,7 +115,8 @@ export const makeProgram = (): Program => ({
   image_description: casual.description,
   is_favorite:       casual.boolean,
   items:             [makeCourse(), makeCourse()],
-  object_type:       "program"
+  object_type:       "program",
+  prices:            [{ mode: "", price: casual.number }]
 })
 
 const incrUserList = incrementer()
@@ -131,7 +132,9 @@ export const makeUserList = (): UserList => ({
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   items:             [makeCourse(), makeBootcamp(), makeProgram()],
-  object_type:       "user_list"
+  object_type:       "user_list",
+  profile_img:       casual.url,
+  profile_name:      casual.name
 })
 
 export const makeLearningResource = (objectType: string) => {

@@ -25,7 +25,6 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
 )
-from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
 
 
@@ -379,10 +378,12 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     profile_img = serializers.SerializerMethodField(read_only=True)
 
     def get_profile_name(self, instance):
+        """Get the user profile name"""
         if instance.author.profile:
             return instance.author.profile.name
 
     def get_profile_img(self, instance):
+        """Get the user profile image"""
         if instance.author.profile:
             image_uri(instance.author.profile, IMAGE_MEDIUM)
 

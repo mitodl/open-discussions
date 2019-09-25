@@ -5,14 +5,12 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('course_catalog', '0040_add_program_published'),
-    ]
+    dependencies = [("course_catalog", "0040_add_program_published")]
 
     operations = [
         migrations.AlterField(
-            model_name='courseprice',
-            name='mode',
+            model_name="courseprice",
+            name="mode",
             field=models.CharField(blank=True, max_length=128, null=True),
-        ),
+        )
     ]

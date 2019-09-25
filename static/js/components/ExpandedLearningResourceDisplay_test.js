@@ -226,10 +226,9 @@ describe("ExpandedLearningResourceDisplay", () => {
       const linkText = wrapper.find(".link-button").text()
       assert.equal(
         linkText,
-        objectType === LR_TYPE_COURSE
-          ? // $FlowFixMe: only courses will access platform
-          `Take ${capitalize(objectType)} on ${object.offered_by}`
-          : "Take Bootcamp"
+        objectType === LR_TYPE_BOOTCAMP
+          ? "Take Bootcamp"
+          : `Take ${capitalize(objectType)} on xPro`
       )
     })
   })

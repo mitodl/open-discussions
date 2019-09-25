@@ -388,7 +388,7 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<Course | Bootcamp | Program | UserList>,
+  items:              Array<Object>,
   profile_img:        ?string,
   profile_name:       ?string
 }

@@ -9,7 +9,7 @@ import type { Program } from "../../flow/discussionTypes"
 export const programRequest = (programId: string) => ({
   queryKey:  `programRequest${programId}`,
   url:       `${programURL}/${programId}/`,
-  transform: (program: Program) => ({
+  transform: (program: any) => ({
     programs: { [program.id]: program }
   }),
   update: {
