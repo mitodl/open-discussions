@@ -12,8 +12,7 @@ import {
 import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_PROGRAM
 } from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
@@ -83,6 +82,26 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  //
+  ;[true, false].forEach(hasProgramUrl => {
+    it(`${shouldIf(hasProgramUrl)} render program link`, () => {
+      const program = makeLearningResource(LR_TYPE_PROGRAM)
+      if (!hasProgramUrl) {
+        program.url = null
+      }
+      const wrapper = render({
+        object:     program,
+        objectType: LR_TYPE_PROGRAM
+      })
+      const link = wrapper.find(".course-links").find("a")
+      assert.equal(link.exists(), hasProgramUrl)
+      // $FlowFixMe: run won't be null
+      if (hasProgramUrl) {
+        assert.equal(link.prop("href"), program.url)
+      }
+    })
+  })
+
   it("should render course description as a ClampLines tag", () => {
     const wrapper = render()
     const clampLines = wrapper.find("ClampLines")
@@ -96,14 +115,23 @@ describe("ExpandedLearningResourceDisplay", () => {
     assert.isNotOk(wrapper.find(".course-links").exists())
   })
 
-  it("should display all topics for the course", () => {
-    const wrapper = render()
-    const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
-    assert.equal(topicDivs.length, course.topics.length)
-    assert.deepEqual(
-      topicDivs.map(topicDiv => ({ name: topicDiv.text() })),
-      course.topics
-    )
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+    it(`should display all topics for the ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      // $FlowFixMe
+      object.offered_by = "xPro"
+      const wrapper = render({
+        object,
+        objectType
+      })
+      const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
+      assert.equal(topicDivs.length, object.topics.length)
+      assert.deepEqual(
+        topicDivs.map(topicDiv => topicDiv.text()).sort(),
+        object.topics.map(topic => topic.name).sort()
+      )
+    })
   })
 
   //
@@ -259,30 +287,6 @@ describe("ExpandedLearningResourceDisplay", () => {
         "$25.50"
       )
     })
-  })
-
-  it(`should display an item list, profile image & privacy but not language, cost or link button for Learning Paths`, () => {
-    const objectType = LR_TYPE_USERLIST
-    const object = makeLearningResource(objectType)
-    const wrapper = render({ object, objectType })
-    assert.equal(
-      wrapper
-        .find(".course-info-value")
-        .last()
-        .text(),
-      capitalize(object.privacy_level)
-    )
-    assert.isOk(
-      wrapper
-        .find(".course-info-row.centered.bordered")
-        .at(0)
-        .text()
-        .includes(object.items[0].content_data.title)
-    )
-    assert.isOk(wrapper.find(".profile-image").exists())
-    assert.isNotOk(wrapper.find(".link-button").exists())
-    assert.isNotOk(wrapper.find(".language").exists())
-    assert.isNotOk(wrapper.find(".attach_money").exists())
   })
 
   it(`should still display without errors in case of a bad course with no runs`, () => {

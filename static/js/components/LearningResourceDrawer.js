@@ -17,16 +17,13 @@ import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
-import { userListRequest } from "../lib/queries/user_lists"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_PROGRAM
 } from "../lib/constants"
 
 import type { Dispatch } from "redux"
-import ExpandedLearningPathDisplay from "./ExpandedLearningPathDisplay";
 
 type Props = {
   showLearningDrawer: boolean,
@@ -59,7 +56,6 @@ export class LearningResourceDrawer extends React.Component<Props> {
   render() {
     const {
       object,
-      objectType,
       runId,
       showLearningDrawer,
       setShowResourceDrawer
@@ -81,19 +77,11 @@ export class LearningResourceDrawer extends React.Component<Props> {
             <div className="drawer-close" onClick={onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>
-            {object.object_type === LR_TYPE_USERLIST ? (
-              <ExpandedLearningPathDisplay
-                object={object}
-                objectType={objectType}
-              />
-              ) : (
-              <ExpandedLearningResourceDisplay
-                object={object}
-                objectType={objectType}
-                runId={runId}
-                setShowResourceDrawer={setShowResourceDrawer}
-              />
-            )}
+            <ExpandedLearningResourceDisplay
+              object={object}
+              runId={runId}
+              setShowResourceDrawer={setShowResourceDrawer}
+            />
             <div className="footer" />
           </DrawerContent>
         </Drawer>
@@ -107,9 +95,8 @@ const getObject = createSelector(
   state => state.entities.courses,
   state => state.entities.bootcamps,
   state => state.entities.programs,
-  state => state.entities.userLists,
   state => state.queries,
-  (ui, courses, bootcamps, programs, userlists, queries) => {
+  (ui, courses, bootcamps, programs, queries) => {
     const { objectId, objectType } = ui.courseDetail
 
     switch (objectType) {
@@ -124,10 +111,6 @@ const getObject = createSelector(
     case LR_TYPE_PROGRAM:
       return querySelectors.isFinished(queries, programRequest(objectId))
         ? programs[objectId]
-        : null
-    case LR_TYPE_USERLIST:
-      return querySelectors.isFinished(queries, userListRequest(objectId))
-        ? userlists[objectId]
         : null
     }
   }
@@ -163,8 +146,6 @@ const mapPropsToConfig = props => {
     return [bootcampRequest(objectId)]
   case LR_TYPE_PROGRAM:
     return [programRequest(objectId)]
-  case LR_TYPE_USERLIST:
-    return [userListRequest(objectId)]
   }
   return []
 }
