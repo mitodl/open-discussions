@@ -56,9 +56,15 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     ) || courseRuns[0]
     : null
 
-  const url =
-    // $FlowFixMe: url will be set to null if object.url is undefined
-    selectedRun && selectedRun.url ? selectedRun.url : object.url || null
+  let url = object.url
+  let cost = null
+  if (selectedRun && selectedRun.url) {
+    url = selectedRun.url
+    cost = minPrice(selectedRun.prices)
+  } else if (object.object_type === LR_TYPE_PROGRAM) {
+    // $FlowFixMe: programs do have prices
+    cost = minPrice(object.prices)
+  }
 
   return (
     <div className="expanded-course-summary">
@@ -137,16 +143,13 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           </React.Fragment>
         ) : null}
         <div className="course-subheader row">Info</div>
-        <div className="course-info-row">
-          <i className="material-icons attach_money">attach_money</i>
-          <div className="course-info-label">Cost:</div>
-          <div className="course-info-value">
-            {minPrice(
-              // $FlowFixMe: either the object or the run will have a prices attribute
-              object.object_type === LR_TYPE_PROGRAM ? object : selectedRun
-            )}
+        {cost ? (
+          <div className="course-info-row">
+            <i className="material-icons attach_money">attach_money</i>
+            <div className="course-info-label">Cost:</div>
+            <div className="course-info-value">{cost}</div>
           </div>
-        </div>
+        ) : null}
         {selectedRun && selectedRun.level ? (
           <div className="course-info-row">
             <i className="material-icons bar_chart">bar_chart</i>

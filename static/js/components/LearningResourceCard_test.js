@@ -169,7 +169,7 @@ describe("LearningResourceCard", () => {
       render()
         .find(".price")
         .text(),
-      minPrice(course)
+      minPrice(bestRun(course.course_runs).prices)
     )
   })
 })

@@ -388,6 +388,7 @@ export type Bootcamp = LearningResource & {
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
+  url:                ?string,
   items:              Array<Course>,
   prices:             Array<CoursePrice>,
   object_type:        LR_TYPE_PROGRAM

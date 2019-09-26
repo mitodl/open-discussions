@@ -72,8 +72,8 @@ describe("Course utils", () => {
           })
         }
       })
-      assert.equal(minPrice(courseRun), expectedMin)
-      assert.equal(maxPrice(courseRun), expectedMax)
+      assert.equal(minPrice(courseRun.prices), expectedMin)
+      assert.equal(maxPrice(courseRun.prices), expectedMax)
     })
   })
 

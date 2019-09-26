@@ -70,9 +70,10 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[true, false].forEach(hasCourseRunUrl => {
-    it(`should render course ${hasCourseRunUrl ? "run" : ""} link`, () => {
+    it(`should render ${hasCourseRunUrl ? "run" : "course"} link`, () => {
       const run = bestRun(course.course_runs)
-      if (run && !hasCourseRunUrl) {
+      if (!hasCourseRunUrl) {
+        // $FlowFixMe: run is not null here
         run.url = null
       }
       const wrapper = render()

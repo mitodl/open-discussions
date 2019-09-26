@@ -19,7 +19,7 @@ import { capitalize, emptyOrNil } from "./util"
 import type {
   CourseRun,
   CourseInstructor,
-  Program
+  CoursePrice
 } from "../flow/discussionTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
@@ -147,14 +147,18 @@ export const resourceLabel = (resource: string) => {
     : concat(capitalize(resource), "s")
 }
 
-export const maxPrice = (object: ?CourseRun | ?Program) => {
-  const prices = object && object.prices ? object.prices : []
+export const maxPrice = (prices: Array<CoursePrice>) => {
+  if (emptyOrNil(prices)) {
+    return null
+  }
   const price = Math.max(...prices.map(price => price.price))
   return price > 0 ? `$${price.toFixed(2)}` : "Free"
 }
 
-export const minPrice = (object: ?CourseRun | ?Program) => {
-  const prices = object && object.prices ? object.prices : []
+export const minPrice = (prices: Array<CoursePrice>) => {
+  if (emptyOrNil(prices)) {
+    return null
+  }
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price.toFixed(2)}` : "Free"
 }
