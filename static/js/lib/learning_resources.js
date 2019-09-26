@@ -147,13 +147,13 @@ export const resourceLabel = (resource: string) => {
     : concat(capitalize(resource), "s")
 }
 
-export const maxPrice = (object: ?CourseRun | Program) => {
+export const maxPrice = (object: ?CourseRun | ?Program) => {
   const prices = object && object.prices ? object.prices : []
   const price = Math.max(...prices.map(price => price.price))
   return price > 0 ? `$${price.toFixed(2)}` : "Free"
 }
 
-export const minPrice = (object: ?CourseRun | Program) => {
+export const minPrice = (object: ?CourseRun | ?Program) => {
   const prices = object && object.prices ? object.prices : []
   const price = Math.min(...prices.map(price => price.price))
   return price > 0 && price !== Infinity ? `$${price.toFixed(2)}` : "Free"

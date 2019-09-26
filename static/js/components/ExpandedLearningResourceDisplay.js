@@ -7,7 +7,7 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import {
-  LR_TYPE_BOOTCAMP,
+  LR_TYPE_BOOTCAMP, LR_TYPE_COURSE,
   LR_TYPE_PROGRAM
 } from "../lib/constants"
 import {
@@ -49,7 +49,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     })
 
   // $FlowFixMe: courseRuns will be set to [] if a program
-  const courseRuns = object.course_runs || []
+  const courseRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(object.object_type) ? object.course_runs : []
   const selectedRun = courseRuns
     ? bestRun(
       runId
@@ -58,7 +58,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     ) || courseRuns[0]
     : null
 
-  // $FLowFixMe: url will be set to null if object.url is undefined
+  // $FlowFixMe: url will be set to null if object.url is undefined
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url || null
 
   return (
@@ -106,9 +106,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {isBootcamp
-                  ? "Take Bootcamp"
-                  : `Take ${capitalize(objectType)} on ${object.offered_by}`}
+                {`Take ${capitalize(objectType)}`}{object.offered_by ? ` on ${object.offered_by}` : null}
               </a>
             </div>
           </div>
@@ -140,7 +138,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <i className="material-icons attach_money">attach_money</i>
           <div className="course-info-label">Cost:</div>
           <div className="course-info-value">
-            {minPrice(isProgram ? object : selectedRun)}
+            {
+              // $FlowFixMe: either the object or the run will have a prices attribute
+              minPrice(object.object_type === LR_TYPE_PROGRAM ? object : selectedRun)
+            }
           </div>
         </div>
         {selectedRun && selectedRun.level ? (
@@ -159,12 +160,15 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        {isProgram && object.items ? (
+        {object.object_type === LR_TYPE_PROGRAM ? (
           <div className="course-info-row">
             <i className="material-icons menu_book">menu_book</i>
             <div className="course-info-label">Number of Courses:</div>
             <div className="course-info-value">
-              {`${object.items.length} Courses in Program`}
+              {
+                // $FlowFixMe: only programs will get to this code
+                `${object.items.length} Courses in Program`
+              }
             </div>
           </div>
         ) : null}
