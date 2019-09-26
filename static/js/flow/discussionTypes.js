@@ -11,7 +11,8 @@ import {
   COMMENTS_OBJECT_TYPE,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM, LR_TYPE_USERLIST
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 
 export type FormImage = {
@@ -398,9 +399,6 @@ export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
   items:              Array<Object>,
-  profile_img:        ?string,
-  profile_name:       ?string,
-  privacy_level:      ?string,
   object_type:        LR_TYPE_USERLIST
 }
 
