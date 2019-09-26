@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.92.2
+Version 0.92.2 (Released September 26, 2019)
 --------------
 
 - Search nested fields including instructors (#2232)
