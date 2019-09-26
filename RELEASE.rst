@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.92.2
+--------------
+
+- Search nested fields including instructors (#2232)
+- Add course number to the search index and boost it in queries (#2233)
+
 Version 0.92.1 (Released September 24, 2019)
 --------------
 
