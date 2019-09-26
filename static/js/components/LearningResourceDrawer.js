@@ -26,17 +26,12 @@ import {
 } from "../lib/constants"
 
 import type { Dispatch } from "redux"
-import type {
-  Bootcamp,
-  Course,
-  Program,
-  UserList
-} from "../flow/discussionTypes"
+import ExpandedLearningPathDisplay from "./ExpandedLearningPathDisplay";
 
 type Props = {
   showLearningDrawer: boolean,
   dispatch: Dispatch<*>,
-  object: Course | Bootcamp | Program | UserList | null,
+  object: Object | null,
   objectId: number,
   objectType: string,
   runId: number,
@@ -86,12 +81,19 @@ export class LearningResourceDrawer extends React.Component<Props> {
             <div className="drawer-close" onClick={onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>
-            <ExpandedLearningResourceDisplay
-              object={object}
-              objectType={objectType}
-              runId={runId}
-              setShowResourceDrawer={setShowResourceDrawer}
-            />
+            {object.object_type === LR_TYPE_USERLIST ? (
+              <ExpandedLearningPathDisplay
+                object={object}
+                objectType={objectType}
+              />
+              ) : (
+              <ExpandedLearningResourceDisplay
+                object={object}
+                objectType={objectType}
+                runId={runId}
+                setShowResourceDrawer={setShowResourceDrawer}
+              />
+            )}
             <div className="footer" />
           </DrawerContent>
         </Drawer>

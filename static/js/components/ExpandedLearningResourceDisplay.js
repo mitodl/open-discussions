@@ -7,10 +7,8 @@ import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
 import {
-  platforms,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_PROGRAM
 } from "../lib/constants"
 import {
   bestRun,
@@ -21,17 +19,18 @@ import {
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import {
   capitalize,
-  defaultProfileImageUrl,
   emptyOrNil,
   languageName
 } from "../lib/util"
+
+import type {Bootcamp, Course, Program} from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  object: Object,
+  object: Course | Bootcamp | Program,
   objectType: string,
   runId: number,
   setShowResourceDrawer: Function
@@ -41,7 +40,6 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const { object, objectType, runId, setShowResourceDrawer } = props
   const isProgram = objectType === LR_TYPE_PROGRAM
   const isBootcamp = objectType === LR_TYPE_BOOTCAMP
-  const isLearningPath = objectType === LR_TYPE_USERLIST
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -50,19 +48,18 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       runId:      parseInt(event.target.value)
     })
 
-  const selectedRun = R.has("course_runs", object)
+  // $FlowFixMe: courseRuns will be set to [] if a program
+  const courseRuns = object.course_runs || []
+  const selectedRun = courseRuns
     ? bestRun(
       runId
-        ? // $FlowFixMe: already verified it has course_runs
-        object.course_runs.filter(run => run.id === runId)
-        : object.course_runs
-    ) || object.course_runs[0]
+        ? courseRuns.filter(run => run.id === runId)
+        : courseRuns
+    ) || courseRuns[0]
     : null
-  const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
-  const listItems =
-    R.has("items", object) && objectType === LR_TYPE_USERLIST
-      ? object.items.filter(item => item.content_data)
-      : null
+
+  // $FLowFixMe: url will be set to null if object.url is undefined
+  const url = selectedRun && selectedRun.url ? selectedRun.url : object.url || null
 
   return (
     <div className="expanded-course-summary">
@@ -71,14 +68,14 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           <div className="course-info-row form centered">
             <i className="material-icons school">school</i>
             <div className="course-info-label">
-              {object.platform === platforms.OCW
+              {object.offered_by === "OCW"
                 ? "As Taught In"
                 : "Start Date"}:
             </div>
             <div className="select-semester-div">
-              {object.course_runs.length > 1 ? (
+              {courseRuns.length > 1 ? (
                 <select value={runId} onChange={updateRun}>
-                  {object.course_runs.map(run => (
+                  {courseRuns.map(run => (
                     <option value={run.id} key={run.id}>
                       {getStartDate(object, run)}
                     </option>
@@ -126,40 +123,6 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             lessText="Read less"
           />
         </div>
-        {listItems ? (
-          <React.Fragment>
-            <div className="course-info-row centered">
-              <div>
-                <img
-                  src={object.profile_img || defaultProfileImageUrl}
-                  alt="profile image"
-                  className="profile-image medium-small"
-                />
-              </div>
-              <div className="course-info-value">{object.profile_name}</div>
-            </div>
-            <div className="course-subheader row bordered">{`List of Items (${
-              listItems.length
-            })`}</div>
-            {listItems.map((item, key) => (
-              <div className="course-info-row centered bordered" key={key}>
-                <div>{key + 1}.</div>
-                <div>
-                  <img
-                    alt="item thumbnail"
-                    src={embedlyThumbnail(
-                      SETTINGS.embedlyKey,
-                      item.content_data.image_src,
-                      50,
-                      50
-                    )}
-                  />
-                </div>
-                <div>{item.content_data.title}</div>
-              </div>
-            ))}
-          </React.Fragment>
-        ) : null}
         {!emptyOrNil(object.topics) ? (
           <React.Fragment>
             <div className="course-subheader row">Topics</div>
@@ -172,18 +135,14 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </React.Fragment>
         ) : null}
-        {!isLearningPath ? (
-          <React.Fragment>
-            <div className="course-subheader row">Info</div>
-            <div className="course-info-row">
-              <i className="material-icons attach_money">attach_money</i>
-              <div className="course-info-label">Cost:</div>
-              <div className="course-info-value">
-                {minPrice(isProgram ? object : selectedRun)}
-              </div>
-            </div>
-          </React.Fragment>
-        ) : null}
+        <div className="course-subheader row">Info</div>
+        <div className="course-info-row">
+          <i className="material-icons attach_money">attach_money</i>
+          <div className="course-info-label">Cost:</div>
+          <div className="course-info-value">
+            {minPrice(isProgram ? object : selectedRun)}
+          </div>
+        </div>
         {selectedRun && selectedRun.level ? (
           <div className="course-info-row">
             <i className="material-icons bar_chart">bar_chart</i>
@@ -200,7 +159,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        {isProgram ? (
+        {isProgram && object.items ? (
           <div className="course-info-row">
             <i className="material-icons menu_book">menu_book</i>
             <div className="course-info-label">Number of Courses:</div>
@@ -209,22 +168,13 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        {isLearningPath ? (
-          <React.Fragment>
-            <div className="course-subheader row">Privacy</div>
-            <div className="course-info-value privacy">
-              {capitalize(object.privacy_level)}
-            </div>
-          </React.Fragment>
-        ) : (
-          <div className="course-info-row">
-            <i className="material-icons language">language</i>
-            <div className="course-info-label">Language:</div>
-            <div className="course-info-value">
-              {languageName(selectedRun ? selectedRun.language : "en")}
-            </div>
+        <div className="course-info-row">
+          <i className="material-icons language">language</i>
+          <div className="course-info-label">Language:</div>
+          <div className="course-info-value">
+            {languageName(selectedRun ? selectedRun.language : "en")}
           </div>
-        )}
+        </div>
       </div>
     </div>
   )

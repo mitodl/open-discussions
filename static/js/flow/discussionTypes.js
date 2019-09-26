@@ -6,7 +6,13 @@ import {
 } from "../lib/channels"
 
 import type { LinkType, ChannelType } from "../lib/channels"
-import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
+import {
+  POSTS_OBJECT_TYPE,
+  COMMENTS_OBJECT_TYPE,
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM, LR_TYPE_USERLIST
+} from "../lib/constants"
 
 export type FormImage = {
   edit:  Blob,
@@ -357,8 +363,7 @@ export type LearningResource = {
   short_description:  ?string,
   topics:             Array<CourseTopic>,
   offered_by:         ?string,
-  is_favorite:        boolean,
-  object_type:        string
+  is_favorite:        boolean
 }
 
 
@@ -367,7 +372,8 @@ export type Course = LearningResource & {
   url:                ?string,
   full_description:   ?string,
   platform:           string,
-  course_runs:        Array<CourseRun>
+  course_runs:        Array<CourseRun>,
+  object_type:        LR_TYPE_COURSE
 }
 
 export type Bootcamp = LearningResource & {
@@ -375,14 +381,16 @@ export type Bootcamp = LearningResource & {
   course_id:          string,
   url:                ?string,
   full_description:   ?string,
-  course_runs:        Array<CourseRun>
+  course_runs:        Array<CourseRun>,
+  object_type:        LR_TYPE_BOOTCAMP
 }
 
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
   items:              Array<Course>,
-  prices:             Array<CoursePrice>
+  prices:             Array<CoursePrice>,
+  object_type:        LR_TYPE_PROGRAM
 }
 
 export type UserList = LearningResource & {
@@ -391,7 +399,8 @@ export type UserList = LearningResource & {
   items:              Array<Object>,
   profile_img:        ?string,
   profile_name:       ?string,
-  privacy_level:      ?string
+  privacy_level:      ?string,
+  object_type:        LR_TYPE_USERLIST
 }
 
 export type CoursePrice = {
