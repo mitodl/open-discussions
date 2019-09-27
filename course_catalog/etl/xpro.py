@@ -75,6 +75,14 @@ def transform(programs):
                             "enrollment_end": _parse_datetime(
                                 course_run["enrollment_end"]
                             ),
+                            "best_start_date": _parse_datetime(
+                                course_run["enrollment_start"]
+                            )
+                            or _parse_datetime(course_run["start_date"]),
+                            "best_end_date": _parse_datetime(
+                                course_run["enrollment_end"]
+                            )
+                            or _parse_datetime(course_run["end_date"]),
                             "offered_by": OfferedBy.xpro.value,
                             "published": bool(course_run["current_price"]),
                             "prices": [{"price": course_run["current_price"]}]

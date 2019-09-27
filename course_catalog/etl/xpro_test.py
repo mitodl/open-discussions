@@ -7,6 +7,7 @@ import pytest
 
 from course_catalog.constants import OfferedBy
 from course_catalog.etl import xpro
+from course_catalog.etl.xpro import _parse_datetime
 from open_discussions.test_utils import any_instance_of
 
 
@@ -73,6 +74,14 @@ def test_xpro_transform(mock_xpro_data):
                             "end_date": any_instance_of(datetime, type(None)),
                             "enrollment_start": any_instance_of(datetime, type(None)),
                             "enrollment_end": any_instance_of(datetime, type(None)),
+                            "best_start_date": _parse_datetime(
+                                course_run_data["enrollment_start"]
+                                or course_run_data["start_date"]
+                            ),
+                            "best_end_date": _parse_datetime(
+                                course_run_data["enrollment_end"]
+                                or course_run_data["end_date"]
+                            ),
                             "offered_by": OfferedBy.xpro.value,
                             "published": bool(course_run_data["current_price"]),
                             "prices": [{"price": course_run_data["current_price"]}]
@@ -91,6 +100,4 @@ def test_xpro_transform(mock_xpro_data):
         }
         for program_data in mock_xpro_data
     ]
-    print(result)
-    print(expected)
     assert expected == result
