@@ -14,7 +14,7 @@ import {
   platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
-import { capitalize, emptyOrNil } from "./util"
+import { capitalize, emptyOrNil, formatPrice } from "./util"
 
 import type {
   CourseRun,
@@ -152,7 +152,7 @@ export const maxPrice = (prices: Array<CoursePrice>) => {
     return null
   }
   const price = Math.max(...prices.map(price => price.price))
-  return price > 0 ? `$${price.toFixed(2)}` : "Free"
+  return price > 0 ? `${formatPrice(price)}` : "Free"
 }
 
 export const minPrice = (prices: Array<CoursePrice>) => {
@@ -160,7 +160,7 @@ export const minPrice = (prices: Array<CoursePrice>) => {
     return null
   }
   const price = Math.min(...prices.map(price => price.price))
-  return price > 0 && price !== Infinity ? `$${price.toFixed(2)}` : "Free"
+  return price > 0 && price !== Infinity ? `${formatPrice(price)}` : "Free"
 }
 
 export const getStartDate = (object: Object, courseRun: CourseRun) => {

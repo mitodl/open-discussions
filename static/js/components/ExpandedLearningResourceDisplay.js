@@ -191,8 +191,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <i className="material-icons menu_book">menu_book</i>
             <div className="course-info-label">Number of Courses:</div>
             <div className="course-info-value">
-              {// $FlowFixMe: only programs will get to this code
-                `${object.items.length} Courses in Program`}
+              {
+                // $FlowFixMe: only programs will get to this code
+                object.items.length
+              }
             </div>
           </div>
         ) : null}

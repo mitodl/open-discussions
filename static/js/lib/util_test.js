@@ -17,7 +17,8 @@ import {
   makeUUID,
   spaceSeparated,
   isValidUrl,
-  flatZip
+  flatZip,
+  formatPrice
 } from "./util"
 
 describe("utility functions", () => {
@@ -202,5 +203,21 @@ describe("utility functions", () => {
 
   it("flattens and zips", () => {
     assert.deepEqual([1, 2, 3, 4, 5, 6], flatZip([1, 3, 5], [2, 4, 6]))
+  })
+
+  describe("formatPrice", () => {
+    it("format price", () => {
+      assert.equal(formatPrice(20), "$20")
+      assert.equal(formatPrice(20.005), "$20.01")
+      assert.equal(formatPrice(20.1), "$20.10")
+      assert.equal(formatPrice(20.6059), "$20.61")
+      assert.equal(formatPrice(20.6959), "$20.70")
+      assert.equal(formatPrice(20.1234567), "$20.12")
+    })
+
+    it("returns an empty string if null or undefined", () => {
+      assert.equal(formatPrice(null), "")
+      assert.equal(formatPrice(undefined), "")
+    })
   })
 })
