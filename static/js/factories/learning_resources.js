@@ -101,6 +101,19 @@ export const makeBootcamp = (): Bootcamp => ({
   object_type:       "bootcamp"
 })
 
+const incrUserListItem = incrementer()
+
+export const makeUserListItem = (objectType: string) => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:           incrUserListItem.next().value,
+  is_favorite:  casual.boolean,
+  object_id:    casual.number,
+  position:     casual.number,
+  program:      casual.number,
+  content_type: objectType,
+  content_data: makeLearningResource(objectType)
+})
+
 const incrProgram = incrementer()
 
 export const makeProgram = (): Program => ({
@@ -114,21 +127,13 @@ export const makeProgram = (): Program => ({
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   is_favorite:       casual.boolean,
-  items:             [makeCourse(), makeCourse()],
-  object_type:       "program",
-  prices:            [{ mode: "", price: casual.number }]
-})
-
-const incrUserListItem = incrementer()
-export const makeUserListItem = (objectType: string) => ({
-  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-  id:           incrUserListItem.next().value,
-  is_favorite:  casual.boolean,
-  object_id:    casual.number,
-  position:     incrUserListItem.next().value,
-  program:      casual.number,
-  content_type: objectType,
-  content_data: makeLearningResource(objectType)
+  items:             [
+    // $FlowFixMe: flow seems confused here
+    makeUserListItem(LR_TYPE_COURSE),
+    makeUserListItem(LR_TYPE_COURSE)
+  ],
+  object_type: "program",
+  prices:      [{ mode: "", price: casual.number }]
 })
 
 const incrUserList = incrementer()

@@ -386,11 +386,21 @@ export type Bootcamp = LearningResource & {
   object_type:        LR_TYPE_BOOTCAMP
 }
 
+export type UserListItem = {
+  id:           number,
+  is_favorite:  boolean,
+  object_id:    number,
+  position:     number,
+  program:      number,
+  content_type: string,
+  content_data: Object
+}
+
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
   url:                ?string,
-  items:              Array<Course>,
+  items:              Array<UserListItem>,
   prices:             Array<CoursePrice>,
   object_type:        LR_TYPE_PROGRAM
 }
@@ -398,7 +408,7 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<Object>,
+  items:              Array<UserListItem>,
   object_type:        LR_TYPE_USERLIST
 }
 

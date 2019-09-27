@@ -66,6 +66,28 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     cost = minPrice(object.prices)
   }
 
+  let instructors = []
+  if (selectedRun && selectedRun.instructors) {
+    instructors = selectedRun.instructors.map(instructor =>
+      getInstructorName(instructor)
+    )
+  } else if (object.object_type === LR_TYPE_PROGRAM) {
+    instructors = Array.from(
+      new Set(
+        R.flatten(
+          // $FlowFixMe: programs have items
+          object.items.map(item =>
+            item.content_data.course_runs.map(courseRun =>
+              courseRun.instructors.map(instructor =>
+                getInstructorName(instructor)
+              )
+            )
+          )
+        )
+      )
+    )
+  }
+
   return (
     <div className="expanded-course-summary">
       <div className="summary">
@@ -157,13 +179,11 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             <div className="course-info-value">{selectedRun.level}</div>
           </div>
         ) : null}
-        {selectedRun && selectedRun.instructors ? (
+        {!emptyOrNil(instructors) ? (
           <div className="course-info-row">
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
-            <div className="course-info-value">
-              {R.join(", ", selectedRun.instructors.map(getInstructorName))}
-            </div>
+            <div className="course-info-value">{R.join(", ", instructors)}</div>
           </div>
         ) : null}
         {object.object_type === LR_TYPE_PROGRAM ? (

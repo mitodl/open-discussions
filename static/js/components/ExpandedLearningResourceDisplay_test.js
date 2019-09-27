@@ -30,7 +30,6 @@ describe("ExpandedLearningResourceDisplay", () => {
     shallow(
       <ExpandedLearningResourceDisplay
         object={course}
-        objectType={LR_TYPE_COURSE}
         runId={course.course_runs[0] ? course.course_runs[0].id : 0}
         setShowResourceDrawer={null}
         {...props}
@@ -91,8 +90,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         program.url = null
       }
       const wrapper = render({
-        object:     program,
-        objectType: LR_TYPE_PROGRAM
+        object: program
       })
       const link = wrapper.find(".course-links").find("a")
       assert.equal(link.exists(), hasProgramUrl)
@@ -123,8 +121,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       // $FlowFixMe
       object.offered_by = "xPro"
       const wrapper = render({
-        object,
-        objectType
+        object
       })
       const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
       assert.equal(topicDivs.length, object.topics.length)
@@ -218,6 +215,27 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  it("should display all instructors for the program", () => {
+    const object = makeLearningResource(LR_TYPE_PROGRAM)
+    // $FlowFixMe
+    const wrapper = render({
+      object
+    })
+    const instructorText = wrapper
+      .find(".school")
+      .at(0)
+      .closest(".course-info-row")
+      .find(".course-info-value")
+      .text()
+    object.items.forEach(item => {
+      item.content_data.course_runs.forEach(courseRun => {
+        courseRun.instructors.forEach(instructor => {
+          assert.ok(instructorText.includes(getInstructorName(instructor)))
+        })
+      })
+    })
+  })
+
   //
   ;[
     ["en-us", "English"],
@@ -250,8 +268,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       // $FlowFixMe
       object.offered_by = "xPro"
       const wrapper = render({
-        object,
-        objectType
+        object
       })
       const linkText = wrapper.find(".link-button").text()
       assert.equal(
@@ -276,8 +293,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       }
 
       const wrapper = render({
-        object,
-        objectType
+        object
       })
       assert.equal(
         wrapper
