@@ -98,6 +98,17 @@ describe("LearningResourceDrawer", () => {
     assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
   })
 
+  it("should include an ExpandedLearningResourceDisplay for a program", () => {
+    const program = makeProgram()
+    const wrapper = renderLearningResourceDrawer({
+      object:     program,
+      objectId:   program.id,
+      objectType: LR_TYPE_PROGRAM
+    })
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), program)
+  })
+
   describe("mapStateToProps", () => {
     let state
 
