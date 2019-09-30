@@ -5,24 +5,22 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('course_catalog', '0040_add_program_published'),
-    ]
+    dependencies = [("course_catalog", "0040_add_program_published")]
 
     operations = [
         migrations.AddField(
-            model_name='program',
-            name='end_date',
+            model_name="program",
+            name="end_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='program',
-            name='enrollment_start',
+            model_name="program",
+            name="enrollment_start",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='program',
-            name='start_date',
+            model_name="program",
+            name="start_date",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]
