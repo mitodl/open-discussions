@@ -54,6 +54,10 @@ def test_xpro_transform(mock_xpro_data):
             "prices": [{"price": program_data["current_price"]}]
             if program_data["current_price"]
             else [],
+            "url": program_data["url"],
+            "enrollment_start": _parse_datetime(program_data["enrollment_start"]),
+            "start_date": _parse_datetime(program_data["start_date"]),
+            "end_date": _parse_datetime(program_data["end_date"]),
             "courses": [
                 {
                     "course_id": course_data["readable_id"],

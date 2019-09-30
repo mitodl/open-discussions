@@ -51,6 +51,10 @@ def transform(programs):
             "prices": [{"price": program["current_price"]}]
             if program.get("current_price", None)
             else [],
+            "enrollment_start": _parse_datetime(program["enrollment_start"]),
+            "start_date": _parse_datetime(program["start_date"]),
+            "end_date": _parse_datetime(program["end_date"]),
+            "url": program["url"],
             "courses": [
                 {
                     "course_id": course["readable_id"],

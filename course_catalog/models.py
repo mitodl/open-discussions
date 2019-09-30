@@ -212,6 +212,9 @@ class Program(List):
     url = models.URLField(null=True, max_length=2048)
     prices = models.ManyToManyField(CoursePrice, blank=True)
     published = models.BooleanField(default=True)
+    start_date = models.DateTimeField(null=True, blank=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+    enrollment_start = models.DateTimeField(null=True, blank=True)
 
 
 class ProgramItem(ListItem):
