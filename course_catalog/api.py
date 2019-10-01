@@ -5,11 +5,12 @@ import json
 import logging
 from datetime import datetime
 
-import pytz
-
+import boto3
 from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from ocw_data_parser import OCWParser
+import pytz
 
 from course_catalog.constants import (
     PlatformType,
@@ -17,14 +18,19 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Bootcamp, CourseRun
+from course_catalog.models import Bootcamp, Course, CourseRun
 from course_catalog.serializers import (
     BootcampSerializer,
     CourseRunSerializer,
     OCWSerializer,
 )
 from course_catalog.utils import get_course_url
-from search.task_helpers import upsert_course, index_new_bootcamp, update_bootcamp
+from search.task_helpers import (
+    delete_course,
+    upsert_course,
+    index_new_bootcamp,
+    update_bootcamp,
+)
 
 log = logging.getLogger(__name__)
 
@@ -62,12 +68,11 @@ def digest_ocw_course(
         is_published (bool): Flags OCW course as published or not
         course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
     """
-
     ocw_serializer = OCWSerializer(
         data={
             **master_json,
             "last_modified": last_modified,
-            "is_published": is_published,
+            "is_published": True,  # This will be updated after all course runs are serialized
             "course_prefix": course_prefix,
             "raw_json": master_json,  # This is slightly cleaner than popping the extra fields inside the serializer
         },
@@ -97,6 +102,7 @@ def digest_ocw_course(
             data={
                 **master_json,
                 "key": master_json.get("uid"),
+                "is_published": is_published,
                 "staff": master_json.get("instructors"),
                 "seats": [{"price": "0.00", "mode": "audit", "upgrade_deadline": None}],
                 "content_language": master_json.get("language"),
@@ -127,8 +133,6 @@ def digest_ocw_course(
             )
             return
         run_serializer.save()
-
-    upsert_course(course)
 
 
 def get_s3_object_and_read(obj, iteration=0):
@@ -306,3 +310,192 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
             return
         run_serializer.save()
     index_func(bootcamp)
+
+
+# pylint: disable=too-many-locals
+def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3):
+    """
+    Sync an OCW course run
+
+    Args:
+        course_prefix (str): The course prefix
+        raw_data_bucket (boto3.resource): The S3 bucket containing the OCW information
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+        upload_to_s3 (bool): If True, upload course media to S3
+
+    Returns:
+        tuple[str, bool]:
+            First item is the UID, or None if the course_run_id is not found in the data
+            Second item is whether or not the course run is published
+    """
+    loaded_raw_jsons_for_course = []
+    last_modified_dates = []
+    uid = None
+    is_published = True
+    log.info("Syncing: %s ...", course_prefix)
+    # Collect last modified timestamps for all course files of the course
+    for obj in raw_data_bucket.objects.filter(Prefix=course_prefix):
+        # the "1.json" metadata file contains a course's uid
+        if obj.key == course_prefix + "0/1.json":
+            try:
+                first_json = safe_load_json(get_s3_object_and_read(obj), obj.key)
+                uid = first_json.get("_uid")
+                last_published_to_production = format_date(
+                    first_json.get("last_published_to_production", None)
+                )
+                last_unpublishing_date = format_date(
+                    first_json.get("last_unpublishing_date", None)
+                )
+                if last_published_to_production is None or (
+                    last_unpublishing_date
+                    and (last_unpublishing_date > last_published_to_production)
+                ):
+                    is_published = False
+            except:  # pylint: disable=bare-except
+                log.exception("Error encountered reading 1.json for %s", course_prefix)
+        # accessing last_modified from s3 object summary is fast (does not download file contents)
+        last_modified_dates.append(obj.last_modified)
+    if not uid:
+        # skip if we're unable to fetch course's uid
+        log.info("Skipping %s, no course_id", course_prefix)
+        return uid, is_published
+    # get the latest modified timestamp of any file in the course
+    last_modified = max(last_modified_dates)
+
+    # fetch JSON contents for each course file in memory (slow)
+    log.info("Loading JSON for %s...", course_prefix)
+    for obj in sorted(
+        raw_data_bucket.objects.filter(Prefix=course_prefix),
+        key=lambda x: int(x.key.split("/")[-1].split(".")[0]),
+    ):
+        loaded_raw_jsons_for_course.append(
+            safe_load_json(get_s3_object_and_read(obj), obj.key)
+        )
+
+    log.info("Parsing for %s...", course_prefix)
+    # pass course contents into parser
+    parser = OCWParser("", "", loaded_raw_jsons_for_course)
+    course_json = parser.get_master_json()
+    course_json["uid"] = uid
+    course_json["course_id"] = "{}.{}".format(
+        course_json.get("department_number"), course_json.get("master_course_number")
+    )
+
+    # if course run synced before, update existing Course instance
+    courserun_instance = CourseRun.objects.filter(course_run_id=uid).first()
+
+    # Make sure that the data we are syncing is newer than what we already have
+    if (
+        courserun_instance
+        and last_modified <= courserun_instance.last_modified
+        and not force_overwrite
+    ):
+        log.info("Already synced. No changes found for %s", course_prefix)
+        return uid, is_published
+
+    course_instance = Course.objects.filter(course_id=course_json["course_id"]).first()
+    if upload_to_s3 and is_published:
+        # Upload all course media to S3 before serializing course to ensure the existence of links
+        parser.setup_s3_uploading(
+            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+            settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+            settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+            # course_prefix now has trailing slash so [-2] below is the last
+            # actual element and [-1] is an empty string
+            course_prefix.split("/")[-2],
+        )
+        if settings.OCW_UPLOAD_IMAGE_ONLY:
+            parser.upload_course_image()
+        else:
+            parser.upload_all_media_to_s3(upload_master_json=True)
+
+    log.info("Digesting %s...", course_prefix)
+    digest_ocw_course(
+        parser.get_master_json(),
+        last_modified,
+        course_instance,
+        is_published,
+        course_prefix,
+    )
+    return uid, is_published
+
+
+def sync_ocw_courses(*, force_overwrite, upload_to_s3):
+    """
+    Sync OCW courses to the database
+
+    Args:
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+        upload_to_s3 (bool): If True, upload course media to S3
+
+    Returns:
+        dict: A mapping of CourseRun.course_run_id to its is_published value
+    """
+    raw_data_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+
+    # get all the courses prefixes we care about
+    ocw_courses = generate_course_prefix_list(raw_data_bucket)
+
+    # loop over each course
+    uids = {}
+    for course_prefix in sorted(ocw_courses):
+        try:
+            uid, is_published = sync_ocw_course(
+                course_prefix=course_prefix,
+                raw_data_bucket=raw_data_bucket,
+                force_overwrite=force_overwrite,
+                upload_to_s3=upload_to_s3,
+            )
+
+            if uid:
+                uids[uid] = is_published
+        except:  # pylint: disable=bare-except
+            log.exception("Error encountered parsing OCW json for %s", course_prefix)
+
+    return uids
+
+
+def update_course_published(runs):
+    """
+    Fix the is_published value for each course
+
+    Args:
+        runs (iterable of CourseRun): An iterable of CourseRun
+
+    Returns:
+        set[int]: A set of Course ids
+    """
+    log.info("Fixing is_published values for each course...")
+    done_courses = set()
+    for run in runs:
+        course = run.content_object
+        if course.id not in done_courses:
+            runs_published = course.course_runs.values_list("published", flat=True)
+            course.published = any(runs_published)
+            course.save()
+            done_courses.add(course.id)
+    return done_courses
+
+
+def sync_ocw_data(*, force_overwrite, upload_to_s3):
+    """
+    Sync OCW data to database
+
+    Args:
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+        upload_to_s3 (bool): If True, upload course media to S3
+    """
+    uids = sync_ocw_courses(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
+    course_ids = update_course_published(
+        CourseRun.objects.filter(course_run_id__in=uids.keys())
+    )
+    for course in Course.objects.filter(id__in=course_ids):
+        # Probably quicker to do this as a bulk operation
+        if course.published:
+            upsert_course(course)
+        else:
+            delete_course(course)

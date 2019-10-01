@@ -46,7 +46,7 @@ def mock_logger(mocker):
     """
     Mock log exception
     """
-    return mocker.patch("course_catalog.tasks.log.exception")
+    return mocker.patch("course_catalog.api.log.exception")
 
 
 @pytest.fixture
@@ -150,7 +150,7 @@ def test_get_ocw_overwrite(mocker, settings, mock_course_index_functions, overwr
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
 
-    mock_digest = mocker.patch("course_catalog.tasks.digest_ocw_course")
+    mock_digest = mocker.patch("course_catalog.api.digest_ocw_course")
     get_ocw_data.delay(force_overwrite=overwrite)
     assert mock_digest.call_count == (1 if overwrite else 0)
 
@@ -170,7 +170,7 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
     Test that an error parsing ocw data is correctly logged
     """
     mocker.patch(
-        "course_catalog.tasks.OCWParser.setup_s3_uploading", side_effect=Exception
+        "course_catalog.api.OCWParser.setup_s3_uploading", side_effect=Exception
     )
     setup_s3(settings)
     get_ocw_data.delay()
@@ -185,7 +185,7 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
     """
     Test that an error reading from S3 is correctly logged
     """
-    mocker.patch("course_catalog.tasks.get_s3_object_and_read", side_effect=Exception)
+    mocker.patch("course_catalog.api.get_s3_object_and_read", side_effect=Exception)
     setup_s3(settings)
     get_ocw_data.delay()
     mock_logger.assert_called_once_with(
@@ -202,11 +202,9 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
     """
     settings.OCW_UPLOAD_IMAGE_ONLY = image_only
     mock_upload_all = mocker.patch(
-        "course_catalog.tasks.OCWParser.upload_all_media_to_s3"
+        "course_catalog.api.OCWParser.upload_all_media_to_s3"
     )
-    mock_upload_image = mocker.patch(
-        "course_catalog.tasks.OCWParser.upload_course_image"
-    )
+    mock_upload_image = mocker.patch("course_catalog.api.OCWParser.upload_course_image")
     setup_s3(settings)
     get_ocw_data.delay()
     assert mock_upload_image.call_count == (1 if image_only else 0)

@@ -159,19 +159,27 @@ def bootcamp_valid_data():
     }
 
 
-@pytest.mark.usefixtures("mock_index_functions")
-def test_deserializing_a_valid_ocw_course(ocw_valid_data):
+@pytest.mark.parametrize("published", [True, False])
+def test_deserializing_a_valid_ocw_course(
+    mock_course_index_functions, ocw_valid_data, published
+):
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """
-    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
+    digest_ocw_course(ocw_valid_data, timezone.now(), None, published)
     assert Course.objects.count() == 1
-    digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), None, True)
+    digest_ocw_course(
+        ocw_valid_data, timezone.now() - timedelta(hours=1), None, published
+    )
     assert Course.objects.count() == 1
 
     course = Course.objects.last()
     digest_ocw_course(
-        ocw_valid_data, timezone.now() + timedelta(hours=1), course, True, "PROD/RES"
+        ocw_valid_data,
+        timezone.now() + timedelta(hours=1),
+        course,
+        published,
+        "PROD/RES",
     )
     assert Course.objects.count() == 1
     assert (
