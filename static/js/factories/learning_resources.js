@@ -101,6 +101,19 @@ export const makeBootcamp = (): Bootcamp => ({
   object_type:       "bootcamp"
 })
 
+const incrUserListItem = incrementer()
+
+export const makeUserListItem = (objectType: string) => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:           incrUserListItem.next().value,
+  is_favorite:  casual.boolean,
+  object_id:    casual.number,
+  position:     casual.number,
+  program:      casual.number,
+  content_type: objectType,
+  content_data: makeLearningResource(objectType)
+})
+
 const incrProgram = incrementer()
 
 export const makeProgram = (): Program => ({
@@ -109,12 +122,18 @@ export const makeProgram = (): Program => ({
   short_description: casual.description,
   offered_by:        null,
   title:             casual.title,
+  url:               casual.url,
   topics:            [{ name: casual.word }, { name: casual.word }],
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   is_favorite:       casual.boolean,
-  items:             [makeCourse(), makeCourse()],
-  object_type:       "program"
+  items:             [
+    // $FlowFixMe: flow seems confused here
+    makeUserListItem(LR_TYPE_COURSE),
+    makeUserListItem(LR_TYPE_COURSE)
+  ],
+  object_type: "program",
+  prices:      [{ mode: "", price: casual.number }]
 })
 
 const incrUserList = incrementer()
@@ -129,11 +148,18 @@ export const makeUserList = (): UserList => ({
   is_favorite:       casual.boolean,
   image_src:         "http://image.medium.url",
   image_description: casual.description,
-  items:             [makeCourse(), makeBootcamp(), makeProgram()],
-  object_type:       "user_list"
+  items:             [
+    makeUserListItem(LR_TYPE_COURSE),
+    makeUserListItem(LR_TYPE_BOOTCAMP),
+    makeUserListItem(LR_TYPE_PROGRAM)
+  ],
+  object_type:   "user_list",
+  profile_img:   casual.url,
+  profile_name:  casual.name,
+  privacy_level: casual.random_element(["public", "private"])
 })
 
-export const makeLearningResource = (objectType: string) => {
+export const makeLearningResource = (objectType: string): Object => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return R.merge({ object_type: LR_TYPE_COURSE }, makeCourse())

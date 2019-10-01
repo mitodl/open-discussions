@@ -16,15 +16,19 @@ import { setShowResourceDrawer } from "../actions/ui"
 import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
-import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
+import { programRequest } from "../lib/queries/programs"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM
+} from "../lib/constants"
 
 import type { Dispatch } from "redux"
-import type { Bootcamp, Course } from "../flow/discussionTypes"
 
 type Props = {
   showLearningDrawer: boolean,
   dispatch: Dispatch<*>,
-  object: Course | Bootcamp | null,
+  object: Object | null,
   objectId: number,
   objectType: string,
   runId: number,
@@ -52,7 +56,6 @@ export class LearningResourceDrawer extends React.Component<Props> {
   render() {
     const {
       object,
-      objectType,
       runId,
       showLearningDrawer,
       setShowResourceDrawer
@@ -76,7 +79,6 @@ export class LearningResourceDrawer extends React.Component<Props> {
             </div>
             <ExpandedLearningResourceDisplay
               object={object}
-              objectType={objectType}
               runId={runId}
               setShowResourceDrawer={setShowResourceDrawer}
             />
@@ -92,8 +94,9 @@ const getObject = createSelector(
   state => state.ui,
   state => state.entities.courses,
   state => state.entities.bootcamps,
+  state => state.entities.programs,
   state => state.queries,
-  (ui, courses, bootcamps, queries) => {
+  (ui, courses, bootcamps, programs, queries) => {
     const { objectId, objectType } = ui.courseDetail
 
     switch (objectType) {
@@ -104,6 +107,10 @@ const getObject = createSelector(
     case LR_TYPE_BOOTCAMP:
       return querySelectors.isFinished(queries, bootcampRequest(objectId))
         ? bootcamps[objectId]
+        : null
+    case LR_TYPE_PROGRAM:
+      return querySelectors.isFinished(queries, programRequest(objectId))
+        ? programs[objectId]
         : null
     }
   }
@@ -137,6 +144,8 @@ const mapPropsToConfig = props => {
     return [courseRequest(objectId)]
   case LR_TYPE_BOOTCAMP:
     return [bootcampRequest(objectId)]
+  case LR_TYPE_PROGRAM:
+    return [programRequest(objectId)]
   }
   return []
 }

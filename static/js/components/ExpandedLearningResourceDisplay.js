@@ -1,12 +1,17 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import _ from "lodash"
+import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
-import { platforms, LR_TYPE_COURSE } from "../lib/constants"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  platforms
+} from "../lib/constants"
 import {
   bestRun,
   minPrice,
@@ -14,39 +19,74 @@ import {
   getInstructorName
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
-import { languageName } from "../lib/util"
+import { capitalize, emptyOrNil, languageName } from "../lib/util"
 
-import type { Bootcamp, Course } from "../flow/discussionTypes"
+import type { Bootcamp, Course, Program } from "../flow/discussionTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 const entities = new AllHtmlEntities()
 
 type Props = {
-  object: Course | Bootcamp,
-  objectType: string,
+  object: Course | Bootcamp | Program,
   runId: number,
   setShowResourceDrawer: Function
 }
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
-  const { object, objectType, runId, setShowResourceDrawer } = props
-  const isCourse = objectType === LR_TYPE_COURSE
+  const { object, runId, setShowResourceDrawer } = props
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
       objectId:   object.id,
-      objectType: objectType,
+      objectType: object.object_type,
       runId:      parseInt(event.target.value)
     })
 
-  const selectedRun =
-    bestRun(
-      runId
-        ? object.course_runs.filter(run => run.id === runId)
-        : object.course_runs
-    ) || object.course_runs[0]
-  const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
+  const courseRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(
+    object.object_type
+  )
+    ? // $FlowFixMe: if object is bootcamp or course it will have course_runs property
+    object.course_runs
+    : []
+
+  const selectedRun = courseRuns
+    ? bestRun(
+      runId ? courseRuns.filter(run => run.id === runId) : courseRuns
+    ) || courseRuns[0]
+    : null
+
+  let url = object.url
+  let cost = null
+  if (selectedRun && selectedRun.url) {
+    url = selectedRun.url
+    cost = minPrice(selectedRun.prices)
+  } else if (object.object_type === LR_TYPE_PROGRAM) {
+    // $FlowFixMe: programs do have prices
+    cost = minPrice(object.prices)
+  }
+
+  let instructors = []
+  if (selectedRun && selectedRun.instructors) {
+    instructors = selectedRun.instructors.map(instructor =>
+      getInstructorName(instructor)
+    )
+  } else if (object.object_type === LR_TYPE_PROGRAM) {
+    instructors = Array.from(
+      new Set(
+        R.flatten(
+          // $FlowFixMe: programs have items
+          object.items.map(item =>
+            item.content_data.course_runs.map(courseRun =>
+              courseRun.instructors.map(instructor =>
+                getInstructorName(instructor)
+              )
+            )
+          )
+        )
+      )
+    )
+  }
 
   return (
     <div className="expanded-course-summary">
@@ -61,9 +101,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                   : "Start Date"}:
             </div>
             <div className="select-semester-div">
-              {object.course_runs.length > 1 ? (
+              {courseRuns.length > 1 ? (
                 <select value={runId} onChange={updateRun}>
-                  {object.course_runs.map(run => (
+                  {courseRuns.map(run => (
                     <option value={run.id} key={run.id}>
                       {getStartDate(object, run)}
                     </option>
@@ -94,10 +134,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {isCourse
-                  ? // $FlowFixMe: only courses will end up here
-                  `Take Course on ${object.platform.toUpperCase()}`
-                  : "Take Bootcamp"}
+                {`Take ${capitalize(object.object_type)}`}
+                {object.offered_by && object.object_type !== LR_TYPE_BOOTCAMP
+                  ? ` on ${object.offered_by}`
+                  : null}
               </a>
             </div>
           </div>
@@ -112,36 +152,49 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             lessText="Read less"
           />
         </div>
-        <div className="course-subheader row">Topics</div>
-        <div className="course-topics">
-          {object.topics.map((topic, i) => (
-            <div className="grey-surround facet" key={i}>
-              {topic.name}
+        {!emptyOrNil(object.topics) ? (
+          <React.Fragment>
+            <div className="course-subheader row">Topics</div>
+            <div className="course-topics">
+              {object.topics.map((topic, i) => (
+                <div className="grey-surround facet" key={i}>
+                  {topic.name}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </React.Fragment>
+        ) : null}
         <div className="course-subheader row">Info</div>
-        <div className="course-info-row">
-          <i className="material-icons attach_money">attach_money</i>
-          <div className="course-info-label">Cost:</div>
-          <div className="course-info-value">{minPrice(selectedRun)}</div>
-        </div>
-        {isCourse && selectedRun ? (
+        {cost ? (
+          <div className="course-info-row">
+            <i className="material-icons attach_money">attach_money</i>
+            <div className="course-info-label">Cost:</div>
+            <div className="course-info-value">{cost}</div>
+          </div>
+        ) : null}
+        {selectedRun && selectedRun.level ? (
           <div className="course-info-row">
             <i className="material-icons bar_chart">bar_chart</i>
             <div className="course-info-label">Level:</div>
-            <div className="course-info-value">
-              {// $FlowFixMe: only courses will access level
-                selectedRun.level || "Unspecified"}
-            </div>
+            <div className="course-info-value">{selectedRun.level}</div>
           </div>
         ) : null}
-        {selectedRun ? (
+        {!emptyOrNil(instructors) ? (
           <div className="course-info-row">
             <i className="material-icons school">school</i>
             <div className="course-info-label">Instructors:</div>
+            <div className="course-info-value">{R.join(", ", instructors)}</div>
+          </div>
+        ) : null}
+        {object.object_type === LR_TYPE_PROGRAM ? (
+          <div className="course-info-row">
+            <i className="material-icons menu_book">menu_book</i>
+            <div className="course-info-label">Number of Courses:</div>
             <div className="course-info-value">
-              {_.join(selectedRun.instructors.map(getInstructorName), ", ")}
+              {
+                // $FlowFixMe: only programs will get to this code
+                object.items.length
+              }
             </div>
           </div>
         ) : null}

@@ -45,6 +45,7 @@
     "codecov": "^3.5.0",
     "core-js": "^3.2.0",
     "css-loader": "^2.1.0",
+    "decimal.js-light": "^2.5.0",
     "detect-browser": "^2.5.1",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",

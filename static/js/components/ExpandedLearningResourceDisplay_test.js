@@ -9,10 +9,15 @@ import {
   makeCourse,
   makeLearningResource
 } from "../factories/learning_resources"
-import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
+import {
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM
+} from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 import { defaultResourceImageURL } from "../lib/url"
+import { capitalize } from "../lib/util"
 
 describe("ExpandedLearningResourceDisplay", () => {
   let course
@@ -25,7 +30,6 @@ describe("ExpandedLearningResourceDisplay", () => {
     shallow(
       <ExpandedLearningResourceDisplay
         object={course}
-        objectType={LR_TYPE_COURSE}
         runId={course.course_runs[0] ? course.course_runs[0].id : 0}
         setShowResourceDrawer={null}
         {...props}
@@ -65,15 +69,35 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[true, false].forEach(hasCourseRunUrl => {
-    it(`should render course ${hasCourseRunUrl ? "run" : ""} link`, () => {
+    it(`should render ${hasCourseRunUrl ? "run" : "course"} link`, () => {
       const run = bestRun(course.course_runs)
-      if (run && !hasCourseRunUrl) {
+      if (!hasCourseRunUrl) {
+        // $FlowFixMe: run is not null here
         run.url = null
       }
       const wrapper = render()
       const link = wrapper.find(".course-links").find("a")
       // $FlowFixMe: run won't be null
       assert.equal(link.prop("href"), hasCourseRunUrl ? run.url : course.url)
+    })
+  })
+
+  //
+  ;[true, false].forEach(hasProgramUrl => {
+    it(`${shouldIf(hasProgramUrl)} render program link`, () => {
+      const program = makeLearningResource(LR_TYPE_PROGRAM)
+      if (!hasProgramUrl) {
+        program.url = null
+      }
+      const wrapper = render({
+        object: program
+      })
+      const link = wrapper.find(".course-links").find("a")
+      assert.equal(link.exists(), hasProgramUrl)
+      // $FlowFixMe: run won't be null
+      if (hasProgramUrl) {
+        assert.equal(link.prop("href"), program.url)
+      }
     })
   })
 
@@ -90,14 +114,22 @@ describe("ExpandedLearningResourceDisplay", () => {
     assert.isNotOk(wrapper.find(".course-links").exists())
   })
 
-  it("should display all topics for the course", () => {
-    const wrapper = render()
-    const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
-    assert.equal(topicDivs.length, course.topics.length)
-    assert.deepEqual(
-      topicDivs.map(topicDiv => ({ name: topicDiv.text() })),
-      course.topics
-    )
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+    it(`should display all topics for the ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      // $FlowFixMe
+      object.offered_by = "xPro"
+      const wrapper = render({
+        object
+      })
+      const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
+      assert.equal(topicDivs.length, object.topics.length)
+      assert.deepEqual(
+        topicDivs.map(topicDiv => topicDiv.text()).sort(),
+        object.topics.map(topic => topic.name).sort()
+      )
+    })
   })
 
   //
@@ -183,6 +215,27 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  it("should display all instructors for the program", () => {
+    const object = makeLearningResource(LR_TYPE_PROGRAM)
+    // $FlowFixMe
+    const wrapper = render({
+      object
+    })
+    const instructorText = wrapper
+      .find(".school")
+      .at(0)
+      .closest(".course-info-row")
+      .find(".course-info-value")
+      .text()
+    object.items.forEach(item => {
+      item.content_data.course_runs.forEach(courseRun => {
+        courseRun.instructors.forEach(instructor => {
+          assert.ok(instructorText.includes(getInstructorName(instructor)))
+        })
+      })
+    })
+  })
+
   //
   ;[
     ["en-us", "English"],
@@ -209,20 +262,46 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
     it(`should display the platform in the link button text for ${objectType}`, () => {
       const object = makeLearningResource(objectType)
+      // $FlowFixMe
+      object.offered_by = "xPro"
       const wrapper = render({
-        object,
-        objectType
+        object
       })
       const linkText = wrapper.find(".link-button").text()
       assert.equal(
         linkText,
-        objectType === LR_TYPE_COURSE
-          ? // $FlowFixMe: only courses will access platform
-          `Take Course on ${object.platform.toUpperCase()}`
-          : "Take Bootcamp"
+        objectType === LR_TYPE_BOOTCAMP
+          ? "Take Bootcamp"
+          : `Take ${capitalize(objectType)} on xPro`
+      )
+    })
+  })
+
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+    it(`should display the cost for ${objectType}`, () => {
+      const prices = [{ price: 25.5, mode: "" }]
+      const object = makeLearningResource(objectType)
+      if (objectType === LR_TYPE_PROGRAM) {
+        object.prices = prices
+      } else {
+        // $FlowFixMe: bestRun result won't be null
+        bestRun(object.course_runs).prices = prices
+      }
+
+      const wrapper = render({
+        object
+      })
+      assert.equal(
+        wrapper
+          .find(".attach_money")
+          .closest(".course-info-row")
+          .find(".course-info-value")
+          .text(),
+        "$25.50"
       )
     })
   })

@@ -5,6 +5,7 @@ import _ from "lodash"
 import qs from "query-string"
 import LocaleCode from "locale-code"
 import isURL from "validator/lib/isURL"
+import Decimal from "decimal.js-light"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
@@ -156,3 +157,18 @@ export const capitalize = R.converge(R.concat(), [
   ),
   R.tail
 ])
+
+export const formatPrice = (price: ?string | number | Decimal): string => {
+  if (price === null || price === undefined) {
+    return ""
+  } else {
+    let formattedPrice: Decimal = Decimal(price)
+
+    if (formattedPrice.isInteger()) {
+      formattedPrice = formattedPrice.toFixed(0)
+    } else {
+      formattedPrice = formattedPrice.toFixed(2, Decimal.ROUND_HALF_UP)
+    }
+    return `$${formattedPrice}`
+  }
+}

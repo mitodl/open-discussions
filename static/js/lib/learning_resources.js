@@ -14,9 +14,13 @@ import {
   platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
-import { capitalize, emptyOrNil } from "./util"
+import { capitalize, emptyOrNil, formatPrice } from "./util"
 
-import type { CourseRun, CourseInstructor } from "../flow/discussionTypes"
+import type {
+  CourseRun,
+  CourseInstructor,
+  CoursePrice
+} from "../flow/discussionTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -143,16 +147,20 @@ export const resourceLabel = (resource: string) => {
     : concat(capitalize(resource), "s")
 }
 
-export const maxPrice = (courseRun: ?CourseRun) => {
-  const prices = courseRun && courseRun.prices ? courseRun.prices : []
+export const maxPrice = (prices: Array<CoursePrice>) => {
+  if (emptyOrNil(prices)) {
+    return null
+  }
   const price = Math.max(...prices.map(price => price.price))
-  return price > 0 ? `$${price}` : "Free"
+  return price > 0 ? `${formatPrice(price)}` : "Free"
 }
 
-export const minPrice = (courseRun: ?CourseRun) => {
-  const prices = courseRun && courseRun.prices ? courseRun.prices : []
+export const minPrice = (prices: Array<CoursePrice>) => {
+  if (emptyOrNil(prices)) {
+    return null
+  }
   const price = Math.min(...prices.map(price => price.price))
-  return price > 0 && price !== Infinity ? price : "Free"
+  return price > 0 && price !== Infinity ? `${formatPrice(price)}` : "Free"
 }
 
 export const getStartDate = (object: Object, courseRun: CourseRun) => {

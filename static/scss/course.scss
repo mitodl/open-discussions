@@ -174,7 +174,7 @@
     font-weight: bold;
     line-height: 1.5em;
     height: 32px;
-    margin-top: 10px;
+    margin: 10px 0 10px 0;
   }
 
   .course-description {
@@ -266,4 +266,9 @@
 
 .centered {
   align-items: center;
+}
+
+.bordered {
+  padding-bottom: 5px;
+  border-bottom: 1px solid black;
 }

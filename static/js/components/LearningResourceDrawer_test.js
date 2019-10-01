@@ -9,20 +9,35 @@ import {
 } from "./LearningResourceDrawer"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
-import { makeBootcamp, makeCourse } from "../factories/learning_resources"
+import {
+  makeBootcamp,
+  makeCourse,
+  makeProgram
+} from "../factories/learning_resources"
 import { shouldIf } from "../lib/test_utils"
-import { LR_TYPE_BOOTCAMP, LR_TYPE_COURSE } from "../lib/constants"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM
+} from "../lib/constants"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
+import { programRequest } from "../lib/queries/programs"
 
 describe("LearningResourceDrawer", () => {
-  let sandbox, dispatchStub, course, bootcamp, setShowResourceDrawerStub
+  let sandbox,
+    dispatchStub,
+    course,
+    bootcamp,
+    program,
+    setShowResourceDrawerStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     dispatchStub = sandbox.stub()
     course = makeCourse()
     bootcamp = makeBootcamp()
+    program = makeProgram()
     setShowResourceDrawerStub = sandbox.stub()
   })
 
@@ -83,6 +98,17 @@ describe("LearningResourceDrawer", () => {
     assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
   })
 
+  it("should include an ExpandedLearningResourceDisplay for a program", () => {
+    const program = makeProgram()
+    const wrapper = renderLearningResourceDrawer({
+      object:     program,
+      objectId:   program.id,
+      objectType: LR_TYPE_PROGRAM
+    })
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), program)
+  })
+
   describe("mapStateToProps", () => {
     let state
 
@@ -94,6 +120,9 @@ describe("LearningResourceDrawer", () => {
           },
           bootcamps: {
             [bootcamp.id]: bootcamp
+          },
+          programs: {
+            [program.id]: program
           }
         },
         queries: {
@@ -101,6 +130,9 @@ describe("LearningResourceDrawer", () => {
             isFinished: true
           },
           [bootcampRequest(bootcamp.id).queryKey]: {
+            isFinished: true
+          },
+          [programRequest(program.id).queryKey]: {
             isFinished: true
           }
         },
@@ -125,25 +157,31 @@ describe("LearningResourceDrawer", () => {
     )
 
     //
-    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].forEach(testObjectType => {
-      it(`mapStateToProps should grab the right ${testObjectType}`, () => {
-        state.ui.courseDetail.objectType = testObjectType
-        let expectedObject
-        switch (testObjectType) {
-        case LR_TYPE_COURSE:
-          expectedObject = course
-          state.ui.courseDetail.objectId = course.id
-          break
-        case LR_TYPE_BOOTCAMP:
-          expectedObject = bootcamp
-          state.ui.courseDetail.objectId = bootcamp.id
-          break
-        }
-        const { object, objectType, objectId } = mapStateToProps(state)
-        assert.deepEqual(object, expectedObject)
-        assert.equal(objectType, testObjectType)
-        assert.equal(objectId, expectedObject.id)
-      })
-    })
+    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(
+      testObjectType => {
+        it(`mapStateToProps should grab the right ${testObjectType}`, () => {
+          state.ui.courseDetail.objectType = testObjectType
+          let expectedObject
+          switch (testObjectType) {
+          case LR_TYPE_COURSE:
+            expectedObject = course
+            state.ui.courseDetail.objectId = course.id
+            break
+          case LR_TYPE_BOOTCAMP:
+            expectedObject = bootcamp
+            state.ui.courseDetail.objectId = bootcamp.id
+            break
+          case LR_TYPE_PROGRAM:
+            expectedObject = program
+            state.ui.courseDetail.objectId = program.id
+            break
+          }
+          const { object, objectType, objectId } = mapStateToProps(state)
+          assert.deepEqual(object, expectedObject)
+          assert.equal(objectType, testObjectType)
+          assert.equal(objectId, expectedObject.id)
+        })
+      }
+    )
   })
 })

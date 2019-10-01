@@ -56,8 +56,8 @@ describe("Course utils", () => {
     [[0.0, 50.0, 25.0], "$50", "Free"],
     [[null, null], "Free", "Free"],
     [[null, 0], "Free", "Free"],
-    [[20, 100, 50], "$100", "20"],
-    [[null, 100, 75], "$100", "Free"]
+    [[20.9, 100, 50], "$100", "$20.90"],
+    [[null, 100.23, 75], "$100.23", "Free"]
   ].forEach(([prices, expectedMax, expectedMin]) => {
     it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
       const course = makeCourse()
@@ -72,8 +72,8 @@ describe("Course utils", () => {
           })
         }
       })
-      assert.equal(minPrice(courseRun), expectedMin)
-      assert.equal(maxPrice(courseRun), expectedMax)
+      assert.equal(minPrice(courseRun.prices), expectedMin)
+      assert.equal(maxPrice(courseRun.prices), expectedMax)
     })
   })
 

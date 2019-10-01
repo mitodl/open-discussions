@@ -91,7 +91,6 @@ export const LearningResourceCard = ({
   searchResultLayout,
   availabilities
 }: Props) => {
-  // This run will be passed on to showResourceDrawer in a subsequent PR
   const bestAvailableRun =
     bestRun(filterRunsByAvailability(object.course_runs, availabilities)) ||
     (object.course_runs ? object.course_runs[0] : null)
@@ -102,6 +101,8 @@ export const LearningResourceCard = ({
       objectType: object.object_type,
       runId:      bestAvailableRun ? bestAvailableRun.id : null
     })
+
+  const cost = bestAvailableRun ? minPrice(bestAvailableRun.prices) : null
 
   return (
     <Card
@@ -128,10 +129,12 @@ export const LearningResourceCard = ({
           />
         ) : null}
         <div className="row availability-price-favorite">
-          <div className="price grey-surround">
-            <i className="material-icons attach_money">attach_money</i>
-            {minPrice(bestAvailableRun)}
-          </div>
+          {cost ? (
+            <div className="price grey-surround">
+              <i className="material-icons attach_money">attach_money</i>
+              {cost}
+            </div>
+          ) : null}
           <div className="availability grey-surround">
             <i className="material-icons calendar_today">calendar_today</i>
             {bestRunLabel(bestAvailableRun)}

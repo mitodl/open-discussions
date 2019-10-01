@@ -9,7 +9,7 @@ import type { UserList } from "../../flow/discussionTypes"
 export const userListRequest = (userListId: string) => ({
   queryKey:  `userListRequest${userListId}`,
   url:       `${userListURL}/${userListId}/`,
-  transform: (userList: UserList) => ({
+  transform: (userList: any) => ({
     userLists: { [userList.id]: userList }
   }),
   update: {
