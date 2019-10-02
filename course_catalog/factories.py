@@ -248,7 +248,7 @@ class ProgramFactory(LearningResourceFactory):
     url = factory.Faker("uri")
 
     runs = factory.RelatedFactoryList(
-        "course_catalog.factories.RunFactory", "content_object", size=3
+        "course_catalog.factories.RunFactory", "content_object", size=1
     )
 
     class Meta:

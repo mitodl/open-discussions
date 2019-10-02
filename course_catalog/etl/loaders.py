@@ -38,7 +38,6 @@ def load_prices(resource, prices_data):
             upgrade_deadline=price_data.get("upgrade_deadline", None),
         )
         prices.append(price)
-
     resource.prices.set(prices)
     resource.save()
     return prices
