@@ -236,9 +236,7 @@ def digest_ocw_course(
 
         # Try and get the LearningResourceRun instance.
         try:
-            courserun_instance = course.runs.get(
-                run_id=master_json.get("uid")
-            )
+            courserun_instance = course.runs.get(run_id=master_json.get("uid"))
         except LearningResourceRun.DoesNotExist:
             courserun_instance = None
         run_serializer = RunSerializer(
@@ -495,9 +493,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
 
         # Try and get the LearningResourceRun instance.
         try:
-            run_instance = bootcamp.runs.get(
-                run_id=bootcamp.course_id
-            )
+            run_instance = bootcamp.runs.get(run_id=bootcamp.course_id)
         except LearningResourceRun.DoesNotExist:
             run_instance = None
         run_serializer = RunSerializer(

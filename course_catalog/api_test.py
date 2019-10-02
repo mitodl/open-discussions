@@ -10,7 +10,7 @@ import pytz
 from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
-from course_catalog.factories import CourseFactory, CourseRunFactory
+from course_catalog.factories import CourseFactory, RunFactory
 from course_catalog.models import (
     Course,
     LearningResourceRun,
@@ -175,7 +175,7 @@ def test_parse_mitx_json_data_overwrite_course(
         course_id=mitx_valid_data["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    CourseRunFactory.create(
+    RunFactory.create(
         content_object=course,
         run_id=mitx_valid_data["runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
@@ -204,7 +204,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
         course_id=mitx_valid_data["key"],
         last_modified=datetime(year=2010, month=1, day=1).astimezone(pytz.utc),
     )
-    CourseRunFactory.create(
+    RunFactory.create(
         content_object=course,
         run_id=mitx_valid_data["runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
@@ -242,14 +242,10 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     )
     assert Course.objects.first().runs.first().best_start_date == datetime.strptime(
         "2019-02-20T15:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
-    ).replace(
-        tzinfo=pytz.UTC
-    )
+    ).replace(tzinfo=pytz.UTC)
     assert Course.objects.first().runs.first().best_end_date == datetime.strptime(
         "2019-05-22T23:30:00Z", "%Y-%m-%dT%H:%M:%SZ"
-    ).replace(
-        tzinfo=pytz.UTC
-    )
+    ).replace(tzinfo=pytz.UTC)
 
 
 def test_parse_mitx_json_data_no_runs(mitx_valid_data):
@@ -386,8 +382,7 @@ def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
     mocker.patch("course_catalog.api.RunSerializer.is_valid", return_value=False)
     mocker.patch(
-        "course_catalog.api.RunSerializer.errors",
-        return_value={"error": "Bad data"},
+        "course_catalog.api.RunSerializer.errors", return_value={"error": "Bad data"}
     )
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert LearningResourceRun.objects.count() == 0

@@ -111,9 +111,9 @@ export const searchResultToLearningResource = (
   object_type: result.object_type,
   offered_by:
     "offered_by" in result && result.offered_by ? result.offered_by : null,
-  platform:    "platform" in result ? result.platform : null,
-  topics:      result.topics.map(topic => ({ name: topic })),
-  runs: "runs" in result ? result.runs : []
+  platform: "platform" in result ? result.platform : null,
+  topics:   result.topics.map(topic => ({ name: topic })),
+  runs:     "runs" in result ? result.runs : []
 })
 
 const POST_QUERY_FIELDS = [

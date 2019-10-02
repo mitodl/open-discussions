@@ -128,9 +128,9 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
                 "topics",
                 Prefetch(
                     "runs",
-                    queryset=LearningResourceRun.objects.filter(published=True).order_by(
-                        "-best_start_date"
-                    ),
+                    queryset=LearningResourceRun.objects.filter(
+                        published=True
+                    ).order_by("-best_start_date"),
                 ),
             )
         )

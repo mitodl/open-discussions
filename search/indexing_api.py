@@ -124,8 +124,8 @@ LEARNING_RESOURCE_TYPE = {
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},
             "offered_by": {"type": "keyword"},
-        }
-    }
+        },
+    },
 }
 
 COURSE_OBJECT_TYPE = {
@@ -146,11 +146,7 @@ BOOTCAMP_OBJECT_TYPE = {
     "location": {"type": "keyword"},
 }
 
-PROGRAM_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    "id": {"type": "long"},
-
-}
+PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
     "id": {"type": "long"},

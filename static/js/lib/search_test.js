@@ -127,7 +127,7 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_COURSE,
       offered_by:  result.offered_by,
-      runs: result.runs
+      runs:        result.runs
     })
   })
 
@@ -142,7 +142,7 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_BOOTCAMP,
       offered_by:  "bootcamps",
-      runs: result.runs
+      runs:        result.runs
     })
   })
 

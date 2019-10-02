@@ -6,18 +6,18 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('course_catalog', '0040_add_program_published'),
-    ]
+    dependencies = [("course_catalog", "0040_add_program_published")]
 
     operations = [
-        migrations.RemoveField(
-            model_name='program',
-            name='prices',
-        ),
+        migrations.RemoveField(model_name="program", name="prices"),
         migrations.AlterField(
-            model_name='courserun',
-            name='content_type',
-            field=models.ForeignKey(limit_choices_to={'model__in': ('course', 'bootcamp', 'program')}, null=True, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType'),
+            model_name="courserun",
+            name="content_type",
+            field=models.ForeignKey(
+                limit_choices_to={"model__in": ("course", "bootcamp", "program")},
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.ContentType",
+            ),
         ),
     ]

@@ -78,7 +78,7 @@ export const makeCourse = (): Course => ({
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
   is_favorite:       casual.boolean,
   topics:            [{ name: casual.word }, { name: casual.word }],
-  runs:       R.times(makeCourseRun, 3),
+  runs:              R.times(makeCourseRun, 3),
   object_type:       "course"
 })
 
@@ -97,7 +97,7 @@ export const makeBootcamp = (): Bootcamp => ({
   is_favorite:       casual.boolean,
   offered_by:        "bootcamps",
   topics:            [{ name: casual.word }, { name: casual.word }],
-  runs:       R.times(makeCourseRun, 3),
+  runs:              R.times(makeCourseRun, 3),
   object_type:       "bootcamp"
 })
 

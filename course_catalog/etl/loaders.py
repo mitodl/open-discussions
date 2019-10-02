@@ -124,7 +124,6 @@ def load_program(program_data):
         if not course_data.get("course_id", None):
             continue
 
-
         course = load_course(course_data)
         courses.append(course)
 

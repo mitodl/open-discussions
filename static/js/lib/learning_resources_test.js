@@ -44,10 +44,7 @@ describe("Course utils", () => {
     it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
       course.runs[0].availability = availability
-      assert.equal(
-        availabilityLabel(course.runs[0].availability),
-        expected
-      )
+      assert.equal(availabilityLabel(course.runs[0].availability), expected)
     })
   })
 

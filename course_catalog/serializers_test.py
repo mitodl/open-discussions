@@ -12,7 +12,7 @@ from course_catalog.factories import (
     BootcampFactory,
     ProgramFactory,
     UserListFactory,
-    CourseRunFactory,
+    RunFactory,
     ProgramItemCourseFactory,
 )
 from course_catalog.models import ProgramItem, FavoriteItem
@@ -57,7 +57,7 @@ def test_serialize_courserun_related_models():
     """
     Verify that a serialized course run contains attributes for related objects
     """
-    courserun = CourseRunFactory(
+    courserun = RunFactory(
         prices=CoursePriceFactory.create_batch(2),
         instructors=CourseInstructorFactory.create_batch(2),
     )
@@ -85,14 +85,11 @@ def test_serialize_program_related_models():
     """
     Verify that a serialized program contains attributes for related objects
     """
-    program = ProgramFactory.create(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-    )
+    program = ProgramFactory.create(topics=CourseTopicFactory.create_batch(3))
     ProgramItemCourseFactory.create_batch(4, program=program)
     serializer = ProgramSerializer(program)
     assert len(serializer.data["topics"]) == 3
-    assert len(serializer.data["prices"]) == 2
+    assert len(serializer.data["runs"]) == 3
     assert len(serializer.data["items"]) == 4
     assert "content_data" in serializer.data["items"][0].keys()
 

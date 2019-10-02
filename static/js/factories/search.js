@@ -86,7 +86,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_COURSE,
-  runs:       R.times(makeCourseRun, 3)
+  runs:              R.times(makeCourseRun, 3)
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
@@ -100,7 +100,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_BOOTCAMP,
   offered_by:        "bootcamps",
-  runs:       [makeCourseRun()]
+  runs:              [makeCourseRun()]
 })
 
 export const makeLearningResourceResult = (objectType: string) => {
