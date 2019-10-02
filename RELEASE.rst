@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.93.0 (Released October 02, 2019)
+--------------
+
+- fix pluralization of "subject" line on learning resource card
+- Populate best date fields during xpro import (#2252)
+
 Version 0.92.2 (Released September 26, 2019)
 --------------
 
