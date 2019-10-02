@@ -100,7 +100,7 @@ def get_course_url(course_id, course_json, platform):
     elif platform == PlatformType.mitx.value:
         if course_json is not None:
             preferred_urls = []
-            for run in course_json.get("course_runs", []):
+            for run in course_json.get("runs", []):
                 url = run.get("marketing_url", "")
                 if url and settings.MITX_BASE_URL in url:
                     preferred_urls.append(url)

@@ -43,9 +43,9 @@ describe("Course utils", () => {
   ].forEach(([availability, expected]) => {
     it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
-      course.course_runs[0].availability = availability
+      course.runs[0].availability = availability
       assert.equal(
-        availabilityLabel(course.course_runs[0].availability),
+        availabilityLabel(course.runs[0].availability),
         expected
       )
     })
@@ -61,7 +61,7 @@ describe("Course utils", () => {
   ].forEach(([prices, expectedMax, expectedMin]) => {
     it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
       const course = makeCourse()
-      const courseRun = course.course_runs[0]
+      const courseRun = course.runs[0]
       courseRun.prices = []
       prices.forEach(price => {
         if (!isNaN(price)) {

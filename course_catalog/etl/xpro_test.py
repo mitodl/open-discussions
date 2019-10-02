@@ -67,9 +67,9 @@ def test_xpro_transform(mock_xpro_data):
                             course_data["courseruns"],
                         )
                     ),
-                    "course_runs": [
+                    "runs": [
                         {
-                            "course_run_id": course_run_data["courseware_id"],
+                            "run_id": course_run_data["courseware_id"],
                             "start_date": any_instance_of(datetime, type(None)),
                             "end_date": any_instance_of(datetime, type(None)),
                             "enrollment_start": any_instance_of(datetime, type(None)),

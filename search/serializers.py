@@ -9,7 +9,7 @@ from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
 from course_catalog.models import (
     Course,
-    CourseRun,
+    LearningResourceRun,
     CoursePrice,
     Bootcamp,
     Program,
@@ -284,7 +284,7 @@ class ESTopicsField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
-class ESCourseRunSerializer(serializers.ModelSerializer):
+class ESRunSerializer(serializers.ModelSerializer):
     """
     Elasticsearch serializer class for course runs
     """
@@ -293,7 +293,7 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
 
-    def get_instructors(self, course_run):
+    def get_instructors(self, instance):
         """
         Get a list of instructor names for the course run
         """
@@ -302,22 +302,22 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
                 instructor.full_name
                 or " ".join([instructor.first_name, instructor.last_name])
             )
-            for instructor in course_run.instructors.all()
+            for instructor in instance.instructors.all()
         ]
 
-    def get_availability(self, course_run):
+    def get_availability(self, instance):
         """
         Get the availability for a course run
         """
-        if course_run.availability:
-            return course_run.availability.title()
+        if instance.availability:
+            return instance.availability.title()
         return None
 
     class Meta:
-        model = CourseRun
+        model = LearningResourceRun
         fields = [
             "id",
-            "course_run_id",
+            "run_id",
             "short_description",
             "full_description",
             "language",
@@ -350,7 +350,7 @@ class ESCourseSerializer(ESModelSerializer):
     object_type = COURSE_TYPE
 
     topics = ESTopicsField()
-    course_runs = ESCourseRunSerializer(read_only=True, many=True, allow_null=True)
+    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
 
     def get_coursenum(self, course):
@@ -373,7 +373,7 @@ class ESCourseSerializer(ESModelSerializer):
             "topics",
             "published",
             "offered_by",
-            "course_runs",
+            "runs",
         ]
 
         read_only_fields = fields
@@ -386,7 +386,7 @@ class ESBootcampSerializer(ESCourseSerializer):
 
     object_type = BOOTCAMP_TYPE
 
-    course_runs = ESCourseRunSerializer(many=True)
+    runs = ESRunSerializer(many=True)
     topics = ESTopicsField()
 
     class Meta:
@@ -402,7 +402,7 @@ class ESBootcampSerializer(ESCourseSerializer):
             "topics",
             "published",
             "offered_by",
-            "course_runs",
+            "runs",
         ]
 
         read_only_fields = fields
@@ -416,7 +416,7 @@ class ESProgramSerializer(ESModelSerializer):
     object_type = PROGRAM_TYPE
 
     topics = ESTopicsField()
-    prices = ESCoursePriceSerializer(many=True)
+    runs = ESRunSerializer(many=True)
 
     class Meta:
         model = Program
@@ -426,7 +426,7 @@ class ESProgramSerializer(ESModelSerializer):
             "title",
             "image_src",
             "topics",
-            "prices",
+            "runs",
             "offered_by",
         ]
 
@@ -570,8 +570,8 @@ def serialize_bulk_courses(ids):
     for course in Course.objects.filter(id__in=ids).prefetch_related(
         "topics",
         Prefetch(
-            "course_runs",
-            queryset=CourseRun.objects.filter(published=True).order_by(
+            "runs",
+            queryset=LearningResourceRun.objects.filter(published=True).order_by(
                 "-best_start_date"
             ),
         ),
@@ -602,7 +602,7 @@ def serialize_bulk_bootcamps(ids):
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
         "topics",
         Prefetch(
-            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
+            "runs", queryset=LearningResourceRun.objects.order_by("-best_start_date")
         ),
     ):
         yield serialize_bootcamp_for_bulk(bootcamp)

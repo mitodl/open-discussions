@@ -6,7 +6,7 @@ from course_catalog.models import (
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    CourseRun,
+    LearningResourceRun,
     Program,
     ProgramItem,
 )
@@ -57,17 +57,17 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
-def load_course_run(course_or_bootcamp, course_run_data):
+def load_run(learning_resource, course_run_data):
     """Load the course run into the database"""
-    course_run_id = course_run_data.pop("course_run_id")
+    run_id = course_run_data.pop("run_id")
     instructors_data = course_run_data.pop("instructors", [])
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
 
-    course_run, _ = CourseRun.objects.update_or_create(
-        course_run_id=course_run_id,
-        object_id=course_or_bootcamp.id,
-        content_type=ContentType.objects.get_for_model(course_or_bootcamp),
+    course_run, _ = LearningResourceRun.objects.update_or_create(
+        run_id=run_id,
+        object_id=learning_resource.id,
+        content_type=ContentType.objects.get_for_model(learning_resource),
         defaults=course_run_data,
     )
 
@@ -81,7 +81,7 @@ def load_course_run(course_or_bootcamp, course_run_data):
 def load_course(course_data):
     """Load the course into the database"""
     course_id = course_data.pop("course_id")
-    course_runs_data = course_data.pop("course_runs", [])
+    runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
 
     course, created = Course.objects.update_or_create(
@@ -90,8 +90,8 @@ def load_course(course_data):
 
     load_topics(course, topics_data)
 
-    for course_run_data in course_runs_data:
-        load_course_run(course, course_run_data)
+    for course_run_data in runs_data:
+        load_run(course, course_run_data)
 
     if not created and not course.published:
         search_task_helpers.delete_course(course)
@@ -106,14 +106,15 @@ def load_program(program_data):
     program_id = program_data.pop("program_id")
     courses_data = program_data.pop("courses")
     topics_data = program_data.pop("topics", [])
-    prices_data = program_data.pop("prices", [])
+    runs_data = program_data.pop("runs")
 
     program, created = Program.objects.update_or_create(
         program_id=program_id, defaults=program_data
     )
 
     load_topics(program, topics_data)
-    load_prices(program, prices_data)
+    for run_data in runs_data:
+        load_run(program, run_data)
 
     courses = []
     course_content_type = ContentType.objects.get(model="course")
@@ -122,6 +123,7 @@ def load_program(program_data):
         # skip courses that don't define a course_id
         if not course_data.get("course_id", None):
             continue
+
 
         course = load_course(course_data)
         courses.append(course)

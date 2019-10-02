@@ -22,6 +22,11 @@ def transform(programs):
             "url": program["programpage_url"],
             "image_src": program["thumbnail_url"],
             "offered_by": OfferedBy.micromasters.value,
+            "runs": [
+                {
+                    "run_id": program["id"]
+                }
+            ],
             # all we need for course data is the relative positioning of courses by course_id
             "courses": [
                 {

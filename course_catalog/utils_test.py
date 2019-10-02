@@ -15,25 +15,25 @@ from course_catalog.utils import get_course_url, semester_year_to_date
     [
         [
             "MITX-01",
-            {"course_runs": [{"marketing_url": "https://www.edx.org/course/someurl"}]},
+            {"runs": [{"marketing_url": "https://www.edx.org/course/someurl"}]},
             PlatformType.mitx.value,
             "https://www.edx.org/course/someurl",
         ],
         [
             "MITX-01",
-            {"course_runs": [{"marketing_url": "https://www.edx.org/"}]},
+            {"runs": [{"marketing_url": "https://www.edx.org/"}]},
             PlatformType.mitx.value,
             "https://courses.edx.org/courses/MITX-01/course/",
         ],
         [
             "MITX-01",
-            {"course_runs": [{"marketing_url": ""}]},
+            {"runs": [{"marketing_url": ""}]},
             PlatformType.mitx.value,
             "https://courses.edx.org/courses/MITX-01/course/",
         ],
         [
             "MITX-01",
-            {"course_runs": [{}]},
+            {"runs": [{}]},
             PlatformType.mitx.value,
             "https://courses.edx.org/courses/MITX-01/course/",
         ],

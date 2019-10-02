@@ -127,7 +127,7 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_COURSE,
       offered_by:  result.offered_by,
-      course_runs: result.course_runs
+      runs: result.runs
     })
   })
 
@@ -142,7 +142,7 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_BOOTCAMP,
       offered_by:  "bootcamps",
-      course_runs: result.course_runs
+      runs: result.runs
     })
   })
 
@@ -329,10 +329,10 @@ describe("search functions", () => {
             ? [
               {
                 nested: {
-                  path:  "course_runs",
+                  path:  "runs",
                   query: {
                     range: {
-                      "course_runs.best_start_date":
+                      "runs.best_start_date":
                           AVAILABILITY_MAPPING[availability].filter
                     }
                   }
@@ -344,12 +344,12 @@ describe("search functions", () => {
           if (availability === "availableNow") {
             availabilityShouldItems.push({
               nested: {
-                path:  "course_runs",
+                path:  "runs",
                 query: {
                   bool: {
                     must_not: {
                       exists: {
-                        field: "course_runs.best_start_date"
+                        field: "runs.best_start_date"
                       }
                     }
                   }
@@ -386,10 +386,10 @@ describe("search functions", () => {
                 should: [
                   {
                     nested: {
-                      path:  "course_runs.prices",
+                      path:  "runs.prices",
                       query: {
                         range: {
-                          "course_runs.prices.price": {
+                          "runs.prices.price": {
                             to: 0.01
                           }
                         }
@@ -432,7 +432,7 @@ describe("search functions", () => {
                       }
                     },
                     date_range: {
-                      field:   "course_runs.best_start_date",
+                      field:   "runs.best_start_date",
                       keyed:   false,
                       missing: DEFAULT_START_DT,
                       ranges:  [
@@ -470,7 +470,7 @@ describe("search functions", () => {
                   }
                 },
                 nested: {
-                  path: "course_runs"
+                  path: "runs"
                 }
               },
               cost: {
@@ -482,7 +482,7 @@ describe("search functions", () => {
                       }
                     },
                     range: {
-                      field:   "course_runs.prices.price",
+                      field:   "runs.prices.price",
                       keyed:   false,
                       missing: 0,
                       ranges:  [
@@ -499,7 +499,7 @@ describe("search functions", () => {
                   }
                 },
                 nested: {
-                  path: "course_runs.prices"
+                  path: "runs.prices"
                 }
               },
               offered_by: {
@@ -541,7 +541,7 @@ describe("search functions", () => {
                         },
                         {
                           nested: {
-                            path:  "course_runs",
+                            path:  "runs",
                             query: {
                               multi_match: {
                                 query:     text,

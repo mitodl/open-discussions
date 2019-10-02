@@ -19,7 +19,7 @@ from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESCourseSerializer,
-    ESCourseRunSerializer,
+    ESRunSerializer,
     ESProfileSerializer,
     ESCoursePriceSerializer,
     serialize_post_for_bulk,
@@ -218,20 +218,20 @@ def test_es_course_price_serializer():
 @pytest.mark.parametrize("has_full_name", [True, False])
 def test_es_course_run_serializer(has_full_name):
     """
-    Test that ESCourseRunSerializer correctly serializes a course run object
+    Test that ESRunSerializer correctly serializes a course run object
     """
     course_run = (
         CourseRunFactory.create()
         if has_full_name
         else CourseRunFactory.create(instructors__full_name=None)
     )
-    serialized = ESCourseRunSerializer(course_run).data
+    serialized = ESRunSerializer(course_run).data
 
     assert_json_equal(
         serialized,
         {
             "id": course_run.id,
-            "course_run_id": course_run.course_run_id,
+            "run_id": course_run.run_id,
             "short_description": course_run.short_description,
             "full_description": course_run.full_description,
             "language": course_run.language,
@@ -285,9 +285,9 @@ def test_es_course_serializer(offered_by):
             "title": course.title,
             "image_src": course.image_src,
             "topics": list(course.topics.values_list("name", flat=True)),
-            "course_runs": [
-                ESCourseRunSerializer(course_run).data
-                for course_run in course.course_runs.order_by("-best_start_date")
+            "runs": [
+                ESRunSerializer(course_run).data
+                for course_run in course.runs.order_by("-best_start_date")
             ],
             "published": True,
             "offered_by": course.offered_by,

@@ -92,8 +92,8 @@ export const LearningResourceCard = ({
   availabilities
 }: Props) => {
   const bestAvailableRun =
-    bestRun(filterRunsByAvailability(object.course_runs, availabilities)) ||
-    (object.course_runs ? object.course_runs[0] : null)
+    bestRun(filterRunsByAvailability(object.runs, availabilities)) ||
+    (object.runs ? object.runs[0] : null)
 
   const showResourceDrawer = () =>
     setShowResourceDrawer({

@@ -17,7 +17,7 @@ from course_catalog.models import (
     Program,
     ProgramItem,
     FavoriteItem,
-    CourseRun,
+    LearningResourceRun,
 )
 from course_catalog.utils import (
     get_ocw_topic,
@@ -151,9 +151,9 @@ class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer)
             resource.topics.add(course_topic)
 
 
-class CourseRunSerializer(BaseCourseSerializer):
+class RunSerializer(BaseCourseSerializer):
     """
-    Serializer for creating CourseRun objects from edx data
+    Serializer for creating LearningResourceRun objects from edx data
     """
 
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
@@ -188,7 +188,7 @@ class CourseRunSerializer(BaseCourseSerializer):
         course_fields = {
             "content_type": data.get("content_type"),
             "object_id": data.get("object_id"),
-            "course_run_id": data.get("key"),
+            "run_id": data.get("key"),
             "title": data.get("title"),
             "short_description": data.get("short_description"),
             "full_description": data.get("full_description"),
@@ -239,7 +239,7 @@ class CourseRunSerializer(BaseCourseSerializer):
         return super().to_internal_value(course_fields)
 
     class Meta:
-        model = CourseRun
+        model = LearningResourceRun
         fields = "__all__"
 
 
@@ -248,7 +248,7 @@ class CourseSerializer(BaseCourseSerializer):
     Serializer for Course model
     """
 
-    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+    runs = RunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="course")
 
     class Meta:
@@ -336,7 +336,7 @@ class BootcampSerializer(BaseCourseSerializer):
     Serializer for Bootcamp model
     """
 
-    course_runs = CourseRunSerializer(read_only=True, many=True, allow_null=True)
+    runs = RunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="bootcamp")
 
     def to_internal_value(self, data):
@@ -398,8 +398,8 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
 
     items = ProgramItemSerializer(many=True, allow_null=True)
+    runs = RunSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
 
     class Meta:

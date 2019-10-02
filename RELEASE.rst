@@ -45,7 +45,7 @@ Version 0.90.0 (Released September 12, 2019)
 - update course home page
 - Added course catalog integration with micromasters
 - update display of the currently-active filters on the course search
-- Add CourseRun to admin (#2194)
+- Add LearningResourceRun to admin (#2194)
 - Show most relevant availability for search result (#2190)
 
 Version 0.89.2 (Released September 05, 2019)
@@ -130,7 +130,7 @@ Version 0.85.2 (Released August 05, 2019)
 Version 0.85.1 (Released August 01, 2019)
 --------------
 
-- Added CourseRun model
+- Added LearningResourceRun model
 
 Version 0.85.0 (Released July 30, 2019)
 --------------

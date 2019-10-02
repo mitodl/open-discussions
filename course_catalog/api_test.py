@@ -13,7 +13,7 @@ from course_catalog.constants import PlatformType, AvailabilityType, ResourceTyp
 from course_catalog.factories import CourseFactory, CourseRunFactory
 from course_catalog.models import (
     Course,
-    CourseRun,
+    LearningResourceRun,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
@@ -177,13 +177,13 @@ def test_parse_mitx_json_data_overwrite_course(
     )
     CourseRunFactory.create(
         content_object=course,
-        course_run_id=mitx_valid_data["course_runs"][0]["key"],
+        run_id=mitx_valid_data["runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
+    mock_save_run = mocker.patch("course_catalog.api.RunSerializer.save")
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == (1 if force_overwrite else 0)
@@ -206,13 +206,13 @@ def test_parse_mitx_json_data_overwrite_courserun(
     )
     CourseRunFactory.create(
         content_object=course,
-        course_run_id=mitx_valid_data["course_runs"][0]["key"],
+        run_id=mitx_valid_data["runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.CourseRunSerializer.save")
+    mock_save_run = mocker.patch("course_catalog.api.RunSerializer.save")
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == 1
@@ -240,12 +240,12 @@ def test_parse_valid_mitx_json_data(mock_course_index_functions, mitx_valid_data
     mock_course_index_functions.upsert_course.assert_called_once_with(
         Course.objects.first()
     )
-    assert Course.objects.first().course_runs.first().best_start_date == datetime.strptime(
+    assert Course.objects.first().runs.first().best_start_date == datetime.strptime(
         "2019-02-20T15:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
     ).replace(
         tzinfo=pytz.UTC
     )
-    assert Course.objects.first().course_runs.first().best_end_date == datetime.strptime(
+    assert Course.objects.first().runs.first().best_end_date == datetime.strptime(
         "2019-05-22T23:30:00Z", "%Y-%m-%dT%H:%M:%SZ"
     ).replace(
         tzinfo=pytz.UTC
@@ -257,7 +257,7 @@ def test_parse_mitx_json_data_no_runs(mitx_valid_data):
     Test that a course without runs is skipped
     """
     mitx_data = copy.copy(mitx_valid_data)
-    mitx_data["course_runs"] = []
+    mitx_data["runs"] = []
     parse_mitx_json_data(mitx_data)
     course_count = Course.objects.count()
     assert course_count == 0
@@ -290,11 +290,11 @@ def test_parse_invalid_mitx_run_data(mitx_valid_data):
     Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["course_runs"][0]["key"] = ""
+    invalid_data["runs"][0]["key"] = ""
     parse_mitx_json_data(invalid_data)
     course_count = Course.objects.count()
     assert course_count == 1
-    run_count = CourseRun.objects.count()
+    run_count = LearningResourceRun.objects.count()
     assert run_count == 0
 
 
@@ -303,9 +303,9 @@ def test_parse_mitx_json_data_skip_courserun_title(mitx_valid_data):
     Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["course_runs"][0]["title"] = "delete"
+    invalid_data["runs"][0]["title"] = "delete"
     parse_mitx_json_data(invalid_data)
-    run_count = CourseRun.objects.count()
+    run_count = LearningResourceRun.objects.count()
     assert run_count == 0
 
 
@@ -362,11 +362,11 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     """
-    Verifies that CourseRunSerializer validation works correctly if the OCW course run serializer is invalid
+    Verifies that RunSerializer validation works correctly if the OCW course run serializer is invalid
     """
     ocw_valid_data.pop("uid")
     digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
-    assert not CourseRun.objects.count()
+    assert not LearningResourceRun.objects.count()
 
 
 @pytest.mark.usefixtures("mock_index_functions")
@@ -376,7 +376,7 @@ def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     """
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert Bootcamp.objects.count() == 1
-    assert CourseRun.objects.count() == 1
+    assert LearningResourceRun.objects.count() == 1
 
 
 @pytest.mark.usefixtures("mock_index_functions")
@@ -384,13 +384,13 @@ def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
     Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
     """
-    mocker.patch("course_catalog.api.CourseRunSerializer.is_valid", return_value=False)
+    mocker.patch("course_catalog.api.RunSerializer.is_valid", return_value=False)
     mocker.patch(
-        "course_catalog.api.CourseRunSerializer.errors",
+        "course_catalog.api.RunSerializer.errors",
         return_value={"error": "Bad data"},
     )
     parse_bootcamp_json_data(bootcamp_valid_data)
-    assert CourseRun.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
 
 
 def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
@@ -400,7 +400,7 @@ def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
     bootcamp_valid_data.pop("course_id")
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert Bootcamp.objects.count() == 0
-    assert CourseRun.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
 
 
 def test_safe_load_bad_json(mocker):
@@ -416,21 +416,21 @@ def test_get_course_availability(mitx_valid_data):
     # test mitx course with raw_json
     assert get_course_availability(ocw_course) == AvailabilityType.current.value
     mitx_course_with_json = CourseFactory.create(
-        course_id=mitx_valid_data["course_runs"][0]["key"],
+        course_id=mitx_valid_data["runs"][0]["key"],
         raw_json=mitx_valid_data,
         platform=PlatformType.mitx.value,
     )
     # test mitx course without raw_json
     assert (
         get_course_availability(mitx_course_with_json)
-        == mitx_valid_data["course_runs"][0]["availability"]
+        == mitx_valid_data["runs"][0]["availability"]
     )
     mitx_course_no_json = CourseFactory.create(
         raw_json=None, platform=PlatformType.mitx.value
     )
     assert get_course_availability(mitx_course_no_json) is None
     # test mitx course without course_runs
-    mitx_valid_data["course_runs"] = None  # pop course_runs json
+    mitx_valid_data["runs"] = None  # pop course_runs json
     mitx_course_no_runs_json = CourseFactory.create(
         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
     )

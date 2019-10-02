@@ -23,7 +23,7 @@ from course_catalog.serializers import (
     FavoriteItemSerializer,
     UserListSerializer,
     ProgramSerializer,
-    CourseRunSerializer,
+    RunSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -50,7 +50,7 @@ def test_serialize_course_related_models(offered_by):
     serializer = CourseSerializer(course)
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
-    assert len(serializer.data["course_runs"]) == 3
+    assert len(serializer.data["runs"]) == 3
 
 
 def test_serialize_courserun_related_models():
@@ -61,7 +61,7 @@ def test_serialize_courserun_related_models():
         prices=CoursePriceFactory.create_batch(2),
         instructors=CourseInstructorFactory.create_batch(2),
     )
-    serializer = CourseRunSerializer(courserun)
+    serializer = RunSerializer(courserun)
     assert len(serializer.data["prices"]) == 2
     for attr in ("mode", "price"):
         assert attr in serializer.data["prices"][0].keys()
@@ -78,7 +78,7 @@ def test_serialize_bootcamp_related_models():
     serializer = BootcampSerializer(bootcamp)
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
-    assert len(serializer.data["course_runs"]) == 3
+    assert len(serializer.data["runs"]) == 3
 
 
 def test_serialize_program_related_models():

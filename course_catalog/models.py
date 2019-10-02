@@ -77,12 +77,12 @@ class AbstractCourse(LearningResource):
         abstract = True
 
 
-class CourseRun(AbstractCourse):
+class LearningResourceRun(AbstractCourse):
     """
     Model for course runs
     """
 
-    course_run_id = models.CharField(max_length=128, unique=True)
+    run_id = models.CharField(max_length=128, unique=True)
 
     year = models.IntegerField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
@@ -111,7 +111,7 @@ class CourseRun(AbstractCourse):
     content_type = models.ForeignKey(
         ContentType,
         null=True,
-        limit_choices_to={"model__in": ("course", "bootcamp")},
+        limit_choices_to={"model__in": ("course", "bootcamp", "program")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField(null=True)
@@ -131,7 +131,7 @@ class Course(AbstractCourse):
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)
 
-    course_runs = GenericRelation(CourseRun)
+    runs = GenericRelation(LearningResourceRun)
 
 
 class Bootcamp(AbstractCourse):
@@ -142,7 +142,7 @@ class Bootcamp(AbstractCourse):
     course_id = models.CharField(max_length=128, unique=True)
 
     location = models.CharField(max_length=128, null=True, blank=True)
-    course_runs = GenericRelation(CourseRun)
+    runs = GenericRelation(LearningResourceRun)
 
 
 class List(LearningResource):
@@ -210,8 +210,8 @@ class Program(List):
     program_id = models.CharField(max_length=80, null=True)
     image_src = models.URLField(max_length=2048, null=True, blank=True)
     url = models.URLField(null=True, max_length=2048)
-    prices = models.ManyToManyField(CoursePrice, blank=True)
     published = models.BooleanField(default=True)
+    runs = GenericRelation(LearningResourceRun)
 
 
 class ProgramItem(ListItem):

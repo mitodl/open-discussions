@@ -12,7 +12,7 @@ from ocw_data_parser import OCWParser
 
 from open_discussions.celery import app
 from course_catalog.constants import PlatformType
-from course_catalog.models import Course, CourseRun
+from course_catalog.models import Course, LearningResourceRun
 from course_catalog.api import (
     get_access_token,
     parse_mitx_json_data,
@@ -170,7 +170,7 @@ def get_ocw_data(
             )
 
             # if course run synced before, update existing Course instance
-            courserun_instance = CourseRun.objects.filter(course_run_id=uid).first()
+            courserun_instance = LearningResourceRun.objects.filter(run_id=uid).first()
 
             # Make sure that the data we are syncing is newer than what we already have
             if (

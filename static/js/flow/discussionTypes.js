@@ -335,7 +335,7 @@ export type LearningResourceSummary = {
   topics:             Array<CourseTopic>,
   offered_by:         ?string,
   object_type:        string,
-  course_runs:       Array<CourseRun>
+  runs:       Array<CourseRun>
 }
 
 export type CourseRun = {
@@ -373,7 +373,7 @@ export type Course = LearningResource & {
   url:                ?string,
   full_description:   ?string,
   platform:           string,
-  course_runs:        Array<CourseRun>,
+  runs:        Array<CourseRun>,
   object_type:        LR_TYPE_COURSE
 }
 
@@ -382,7 +382,7 @@ export type Bootcamp = LearningResource & {
   course_id:          string,
   url:                ?string,
   full_description:   ?string,
-  course_runs:        Array<CourseRun>,
+  runs:        Array<CourseRun>,
   object_type:        LR_TYPE_BOOTCAMP
 }
 

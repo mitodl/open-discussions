@@ -46,8 +46,8 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const courseRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(
     object.object_type
   )
-    ? // $FlowFixMe: if object is bootcamp or course it will have course_runs property
-    object.course_runs
+    ? // $FlowFixMe: if object is bootcamp or course it will have runs property
+    object.runs
     : []
 
   const selectedRun = courseRuns
@@ -77,7 +77,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         R.flatten(
           // $FlowFixMe: programs have items
           object.items.map(item =>
-            item.content_data.course_runs.map(courseRun =>
+            item.content_data.runs.map(courseRun =>
               courseRun.instructors.map(instructor =>
                 getInstructorName(instructor)
               )

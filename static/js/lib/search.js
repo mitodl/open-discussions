@@ -113,7 +113,7 @@ export const searchResultToLearningResource = (
     "offered_by" in result && result.offered_by ? result.offered_by : null,
   platform:    "platform" in result ? result.platform : null,
   topics:      result.topics.map(topic => ({ name: topic })),
-  course_runs: "course_runs" in result ? result.course_runs : []
+  runs: "runs" in result ? result.runs : []
 })
 
 const POST_QUERY_FIELDS = [
@@ -148,10 +148,10 @@ const BOOTCAMP_QUERY_FIELDS = [
 ]
 
 export const RESOURCE_QUERY_NESTED_FIELDS = [
-  "course_runs.year",
-  "course_runs.semester",
-  "course_runs.level",
-  "course_runs.instructors"
+  "runs.year",
+  "runs.semester",
+  "runs.level",
+  "runs.instructors"
 ]
 
 const LIST_QUERY_FIELDS = [
@@ -269,10 +269,10 @@ const buildAvailabilityQuery = (
   if (values && values.length > 0) {
     const facetFilter = values.map(value => ({
       nested: {
-        path:  "course_runs",
+        path:  "runs",
         query: {
           range: {
-            "course_runs.best_start_date": AVAILABILITY_MAPPING[value].filter
+            "runs.best_start_date": AVAILABILITY_MAPPING[value].filter
           }
         }
       }
@@ -281,12 +281,12 @@ const buildAvailabilityQuery = (
     if (values.includes(AVAILABLE_NOW)) {
       facetFilter.push({
         nested: {
-          path:  "course_runs",
+          path:  "runs",
           query: {
             bool: {
               must_not: {
                 exists: {
-                  field: "course_runs.best_start_date"
+                  field: "runs.best_start_date"
                 }
               }
             }
@@ -301,10 +301,10 @@ const buildAvailabilityQuery = (
     })
   }
   // Make availability aggregations based on course run date ranges
-  builder.agg("nested", { path: "course_runs" }, "availability", aggr =>
+  builder.agg("nested", { path: "runs" }, "availability", aggr =>
     aggr.agg(
       "date_range",
-      "course_runs.best_start_date",
+      "runs.best_start_date",
       {
         missing: DEFAULT_START_DT,
         keyed:   false,
@@ -350,10 +350,10 @@ const buildCostQuery = (
   if (values && values.length > 0) {
     const facetFilter = values.map(value => ({
       nested: {
-        path:  "course_runs.prices",
+        path:  "runs.prices",
         query: {
           range: {
-            "course_runs.prices.price": COST_MAPPING[value].filter
+            "runs.prices.price": COST_MAPPING[value].filter
           }
         }
       }
@@ -365,10 +365,10 @@ const buildCostQuery = (
     })
   }
   // Make cost aggregations based on course run prices
-  builder.agg("nested", { path: "course_runs.prices" }, "cost", aggr =>
+  builder.agg("nested", { path: "runs.prices" }, "cost", aggr =>
     aggr.agg(
       "range",
-      "course_runs.prices.price",
+      "runs.prices.price",
       {
         missing: 0,
         keyed:   false,
@@ -431,7 +431,7 @@ export const buildSearchQuery = ({
     if (text && [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(type)) {
       matchQuery.should.push({
         nested: {
-          path:  "course_runs",
+          path:  "runs",
           query: {
             multi_match: {
               query:     text,

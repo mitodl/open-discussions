@@ -19,11 +19,11 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Course, Bootcamp, CourseRun
+from course_catalog.models import Course, Bootcamp, LearningResourceRun
 from course_catalog.serializers import (
     BootcampSerializer,
     EDXCourseSerializer,
-    CourseRunSerializer,
+    RunSerializer,
     OCWSerializer,
 )
 from course_catalog.utils import get_course_url
@@ -66,7 +66,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         return
 
     # Make sure there are course runs
-    if not course_data.get("course_runs"):
+    if not course_data.get("runs"):
         return
 
     # Get the last modified date from the course data
@@ -104,7 +104,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             with transaction.atomic():
                 course = edx_serializer.save()
                 # Parse each course run individually
-                for course_run in course_data.get("course_runs"):
+                for course_run in course_data.get("runs"):
                     if should_skip_course(course_run.get("title")):
                         continue
 
@@ -117,10 +117,10 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     # we need to find the newest changes
                     max_modified = max(course_modified, course_run_modified)
 
-                    # Try and get the CourseRun instance. If it exists check to see if it needs updating
+                    # Try and get the LearningResourceRun instance. If it exists check to see if it needs updating
                     try:
-                        courserun_instance = course.course_runs.get(
-                            course_run_id=course_run.get("key")
+                        courserun_instance = course.runs.get(
+                            run_id=course_run.get("key")
                         )
                         if (
                             max_modified <= courserun_instance.last_modified
@@ -132,10 +132,10 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                                 course_run.get("key"),
                             )
                             continue
-                    except CourseRun.DoesNotExist:
+                    except LearningResourceRun.DoesNotExist:
                         courserun_instance = None
 
-                    run_serializer = CourseRunSerializer(
+                    run_serializer = RunSerializer(
                         data={
                             **course_run,
                             "max_modified": max_modified,
@@ -152,7 +152,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     )
                     if not run_serializer.is_valid():
                         log.error(
-                            "CourseRun %s is not valid: %s",
+                            "LearningResourceRun %s is not valid: %s",
                             course_run.get("key"),
                             run_serializer.errors,
                         )
@@ -234,14 +234,14 @@ def digest_ocw_course(
     with transaction.atomic():
         course = ocw_serializer.save()
 
-        # Try and get the CourseRun instance.
+        # Try and get the LearningResourceRun instance.
         try:
-            courserun_instance = course.course_runs.get(
-                course_run_id=master_json.get("uid")
+            courserun_instance = course.runs.get(
+                run_id=master_json.get("uid")
             )
-        except CourseRun.DoesNotExist:
+        except LearningResourceRun.DoesNotExist:
             courserun_instance = None
-        run_serializer = CourseRunSerializer(
+        run_serializer = RunSerializer(
             data={
                 **master_json,
                 "key": master_json.get("uid"),
@@ -269,7 +269,7 @@ def digest_ocw_course(
         )
         if not run_serializer.is_valid():
             log.error(
-                "OCW CourseRun %s is not valid: %s",
+                "OCW LearningResourceRun %s is not valid: %s",
                 master_json.get("key"),
                 run_serializer.errors,
             )
@@ -364,11 +364,11 @@ def get_course_availability(course):
         course_json = course.raw_json
         if course_json is None:
             return
-        course_runs = course_json.get("course_runs")
-        if course_runs is None:
+        runs = course_json.get("runs")
+        if runs is None:
             return
         # get appropriate course_run
-        for run in course_runs:
+        for run in runs:
             if run.get("key") == course.course_id:
                 return run.get("availability")
 
@@ -493,14 +493,14 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     with transaction.atomic():
         bootcamp = bootcamp_serializer.save()
 
-        # Try and get the CourseRun instance.
+        # Try and get the LearningResourceRun instance.
         try:
-            courserun_instance = bootcamp.course_runs.get(
-                course_run_id=bootcamp.course_id
+            run_instance = bootcamp.runs.get(
+                run_id=bootcamp.course_id
             )
-        except CourseRun.DoesNotExist:
-            courserun_instance = None
-        run_serializer = CourseRunSerializer(
+        except LearningResourceRun.DoesNotExist:
+            run_instance = None
+        run_serializer = RunSerializer(
             data={
                 **bootcamp_data,
                 "key": bootcamp_data.get("course_id"),
@@ -508,18 +508,18 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 "seats": bootcamp_data.get("prices"),
                 "start": bootcamp_data.get("start_date"),
                 "end": bootcamp_data.get("end_date"),
-                "course_run_id": bootcamp.course_id,
+                "run_id": bootcamp.course_id,
                 "max_modified": bootcamp_modified,
                 "offered_by": OfferedBy.bootcamps.value,
                 "content_type": ContentType.objects.get(model="bootcamp").id,
                 "object_id": bootcamp.id,
                 "url": bootcamp.url,
             },
-            instance=courserun_instance,
+            instance=run_instance,
         )
         if not run_serializer.is_valid():
             log.error(
-                "Bootcamp CourseRun %s is not valid: %s",
+                "Bootcamp LearningResourceRun %s is not valid: %s",
                 bootcamp_data.get("key"),
                 run_serializer.errors,
             )

@@ -20,7 +20,7 @@ from course_catalog.models import (
     ProgramItem,
     UserList,
     UserListItem,
-    CourseRun,
+    LearningResourceRun,
 )
 
 
@@ -126,7 +126,7 @@ class CourseFactory(AbstractCourseFactory):
             OfferedBy.xpro.value,
         )
     )
-    course_runs = factory.RelatedFactoryList(
+    runs = factory.RelatedFactoryList(
         "course_catalog.factories.CourseRunFactory", "content_object", size=3
     )
 
@@ -143,7 +143,7 @@ class CourseFactory(AbstractCourseFactory):
 class CourseRunFactory(AbstractCourseFactory):
     """Factory for CourseRuns"""
 
-    course_run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
+    run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
     content_object = factory.SubFactory(CourseFactory)
     object_id = factory.SelfAttribute("content_object.id")
     content_type = factory.LazyAttribute(
@@ -187,7 +187,7 @@ class CourseRunFactory(AbstractCourseFactory):
         self.instructors.set(extracted)
 
     class Meta:
-        model = CourseRun
+        model = LearningResourceRun
 
     class Params:
         no_prices = factory.Trait(prices=[])
@@ -200,7 +200,7 @@ class BootcampFactory(AbstractCourseFactory):
     course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
     offered_by = OfferedBy.bootcamps.value
 
-    course_runs = factory.RelatedFactoryList(
+    runs = factory.RelatedFactoryList(
         "course_catalog.factories.CourseRunFactory", "content_object", size=3
     )
 
