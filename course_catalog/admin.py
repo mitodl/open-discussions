@@ -14,7 +14,7 @@ from course_catalog.models import (
 )
 
 
-class CourseRunAdmin(admin.ModelAdmin):
+class LearningResourceRunAdmin(admin.ModelAdmin):
     """LearningResourceRun Admin"""
 
     model = LearningResourceRun
@@ -24,7 +24,7 @@ class CourseRunAdmin(admin.ModelAdmin):
     list_filter = ("semester", "year")
 
 
-class CourseRunInline(GenericTabularInline):
+class LearningResourceRunInline(GenericTabularInline):
     """Inline list items for course runs"""
 
     model = LearningResourceRun
@@ -59,7 +59,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ("course_id", "title")
     list_display = ("course_id", "title", "platform")
     list_filter = ("platform",)
-    inlines = [CourseRunInline]
+    inlines = [LearningResourceRunInline]
 
 
 class BootcampAdmin(admin.ModelAdmin):
@@ -68,7 +68,7 @@ class BootcampAdmin(admin.ModelAdmin):
     model = Bootcamp
     search_fields = ("course_id", "title")
     list_display = ("course_id", "title")
-    inlines = [CourseRunInline]
+    inlines = [LearningResourceRunInline]
 
 
 class UserListItemInline(admin.StackedInline):
@@ -112,7 +112,7 @@ class UserListAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Course, CourseAdmin)
-admin.site.register(LearningResourceRun, CourseRunAdmin)
+admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
 admin.site.register(Bootcamp, BootcampAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(UserList, UserListAdmin)
