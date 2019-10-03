@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.93.1
+Version 0.93.1 (Released October 03, 2019)
 --------------
 
 - Open drawer for programs (#2251)
