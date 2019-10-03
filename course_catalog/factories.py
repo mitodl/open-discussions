@@ -127,7 +127,7 @@ class CourseFactory(AbstractCourseFactory):
         )
     )
     runs = factory.RelatedFactoryList(
-        "course_catalog.factories.RunFactory", "content_object", size=3
+        "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )
 
     class Meta:
@@ -140,7 +140,7 @@ class CourseFactory(AbstractCourseFactory):
         is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
 
 
-class RunFactory(AbstractCourseFactory):
+class LearningResourceRunFactory(AbstractCourseFactory):
     """Factory for CourseRuns"""
 
     run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
@@ -201,7 +201,7 @@ class BootcampFactory(AbstractCourseFactory):
     offered_by = OfferedBy.bootcamps.value
 
     runs = factory.RelatedFactoryList(
-        "course_catalog.factories.RunFactory", "content_object", size=3
+        "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )
 
     class Meta:
@@ -248,7 +248,7 @@ class ProgramFactory(LearningResourceFactory):
     url = factory.Faker("uri")
 
     runs = factory.RelatedFactoryList(
-        "course_catalog.factories.RunFactory", "content_object", size=1
+        "course_catalog.factories.LearningResourceRunFactory", "content_object", size=1
     )
 
     class Meta:

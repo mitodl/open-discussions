@@ -7,7 +7,11 @@ from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
 from course_catalog.constants import OfferedBy
-from course_catalog.factories import CourseFactory, RunFactory, CoursePriceFactory
+from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceRunFactory,
+    CoursePriceFactory,
+)
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
@@ -221,9 +225,9 @@ def test_es_course_run_serializer(has_full_name):
     Test that ESRunSerializer correctly serializes a course run object
     """
     course_run = (
-        RunFactory.create()
+        LearningResourceRunFactory.create()
         if has_full_name
-        else RunFactory.create(instructors__full_name=None)
+        else LearningResourceRunFactory.create(instructors__full_name=None)
     )
     serialized = ESRunSerializer(course_run).data
 

@@ -64,6 +64,9 @@ def test_xpro_transform(mock_xpro_data):
                     "prices": [{"price": program_data["current_price"], "mode": ""}]
                     if program_data["current_price"]
                     else [],
+                    "title": program_data["title"],
+                    "short_description": program_data["description"],
+                    "offered_by": OfferedBy.xpro.value,
                 }
             ],
             "courses": [

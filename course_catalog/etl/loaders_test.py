@@ -19,7 +19,7 @@ from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
     ProgramFactory,
     CourseFactory,
-    RunFactory,
+    LearningResourceRunFactory,
     CoursePriceFactory,
     CourseTopicFactory,
     CourseInstructorFactory,
@@ -212,7 +212,7 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
     props = model_to_dict(CourseFactory.build(published=is_published))
     props["course_id"] = course.course_id
     del props["id"]
-    run = model_to_dict(RunFactory.build())
+    run = model_to_dict(LearningResourceRunFactory.build())
     del run["content_type"]
     del run["object_id"]
     del run["id"]
@@ -243,12 +243,12 @@ def test_load_course_run(course_run_exists):
     """Test that load_run loads the course run"""
     course = CourseFactory.create(runs=None)
     course_run = (
-        RunFactory.create(content_object=course)
+        LearningResourceRunFactory.create(content_object=course)
         if course_run_exists
-        else RunFactory.build()
+        else LearningResourceRunFactory.build()
     )
 
-    props = model_to_dict(RunFactory.build())
+    props = model_to_dict(LearningResourceRunFactory.build())
     props["run_id"] = course_run.run_id
     del props["content_type"]
     del props["object_id"]
@@ -267,7 +267,9 @@ def test_load_course_run(course_run_exists):
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
 
 
-@pytest.mark.parametrize("parent_factory", [CourseFactory, ProgramFactory, RunFactory])
+@pytest.mark.parametrize(
+    "parent_factory", [CourseFactory, ProgramFactory, LearningResourceRunFactory]
+)
 @pytest.mark.parametrize("topics_exist", [True, False])
 def test_load_topics(parent_factory, topics_exist):
     """Test that load_topics creates and/or assigns topics to the parent object"""
@@ -293,7 +295,7 @@ def test_load_prices(prices_exist):
         if prices_exist
         else CoursePriceFactory.build_batch(3)
     )
-    course_run = RunFactory.create(no_prices=True)
+    course_run = LearningResourceRunFactory.create(no_prices=True)
 
     assert course_run.prices.count() == 0
 
@@ -320,7 +322,7 @@ def test_load_instructors(instructor_exists):
         if instructor_exists
         else CourseInstructorFactory.build_batch(3)
     )
-    run = RunFactory.create(no_instructors=True)
+    run = LearningResourceRunFactory.create(no_instructors=True)
 
     assert run.instructors.count() == 0
 

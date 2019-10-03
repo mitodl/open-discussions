@@ -10,7 +10,7 @@ import pytz
 from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
-from course_catalog.factories import CourseFactory, RunFactory
+from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import (
     Course,
     LearningResourceRun,
@@ -175,7 +175,7 @@ def test_parse_mitx_json_data_overwrite_course(
         course_id=mitx_valid_data["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
-    RunFactory.create(
+    LearningResourceRunFactory.create(
         content_object=course,
         run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
@@ -183,7 +183,9 @@ def test_parse_mitx_json_data_overwrite_course(
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.RunSerializer.save")
+    mock_save_run = mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.save"
+    )
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == (1 if force_overwrite else 0)
@@ -204,7 +206,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
         course_id=mitx_valid_data["key"],
         last_modified=datetime(year=2010, month=1, day=1).astimezone(pytz.utc),
     )
-    RunFactory.create(
+    LearningResourceRunFactory.create(
         content_object=course,
         run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
@@ -212,7 +214,9 @@ def test_parse_mitx_json_data_overwrite_courserun(
     mock_save_course = mocker.patch(
         "course_catalog.api.EDXCourseSerializer.save", return_value=course
     )
-    mock_save_run = mocker.patch("course_catalog.api.RunSerializer.save")
+    mock_save_run = mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.save"
+    )
     assert course.course_id == mitx_valid_data["key"]
     parse_mitx_json_data(mitx_valid_data, force_overwrite=force_overwrite)
     assert mock_save_course.call_count == 1
@@ -358,7 +362,7 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     """
-    Verifies that RunSerializer validation works correctly if the OCW course run serializer is invalid
+    Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
     """
     ocw_valid_data.pop("uid")
     digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
@@ -380,9 +384,12 @@ def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
     Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
     """
-    mocker.patch("course_catalog.api.RunSerializer.is_valid", return_value=False)
     mocker.patch(
-        "course_catalog.api.RunSerializer.errors", return_value={"error": "Bad data"}
+        "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
+    )
+    mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.errors",
+        return_value={"error": "Bad data"},
     )
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert LearningResourceRun.objects.count() == 0

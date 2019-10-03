@@ -151,7 +151,7 @@ class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer)
             resource.topics.add(course_topic)
 
 
-class RunSerializer(BaseCourseSerializer):
+class LearningResourceRunSerializer(BaseCourseSerializer):
     """
     Serializer for creating LearningResourceRun objects from edx data
     """
@@ -248,7 +248,7 @@ class CourseSerializer(BaseCourseSerializer):
     Serializer for Course model
     """
 
-    runs = RunSerializer(read_only=True, many=True, allow_null=True)
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="course")
 
     class Meta:
@@ -336,7 +336,7 @@ class BootcampSerializer(BaseCourseSerializer):
     Serializer for Bootcamp model
     """
 
-    runs = RunSerializer(read_only=True, many=True, allow_null=True)
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="bootcamp")
 
     def to_internal_value(self, data):
@@ -398,7 +398,7 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
 
     items = ProgramItemSerializer(many=True, allow_null=True)
-    runs = RunSerializer(read_only=True, many=True, allow_null=True)
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
 

@@ -60,6 +60,9 @@ def transform(programs):
                     "best_start_date": _parse_datetime(program["enrollment_start"])
                     or _parse_datetime(program["start_date"]),
                     "best_end_date": _parse_datetime(program["end_date"]),
+                    "offered_by": OfferedBy.xpro.value,
+                    "title": program["title"],
+                    "short_description": program["description"],
                 }
             ],
             "courses": [

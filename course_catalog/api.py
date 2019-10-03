@@ -23,7 +23,7 @@ from course_catalog.models import Course, Bootcamp, LearningResourceRun
 from course_catalog.serializers import (
     BootcampSerializer,
     EDXCourseSerializer,
-    RunSerializer,
+    LearningResourceRunSerializer,
     OCWSerializer,
 )
 from course_catalog.utils import get_course_url
@@ -135,7 +135,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
                     except LearningResourceRun.DoesNotExist:
                         courserun_instance = None
 
-                    run_serializer = RunSerializer(
+                    run_serializer = LearningResourceRunSerializer(
                         data={
                             **course_run,
                             "max_modified": max_modified,
@@ -239,7 +239,7 @@ def digest_ocw_course(
             courserun_instance = course.runs.get(run_id=master_json.get("uid"))
         except LearningResourceRun.DoesNotExist:
             courserun_instance = None
-        run_serializer = RunSerializer(
+        run_serializer = LearningResourceRunSerializer(
             data={
                 **master_json,
                 "key": master_json.get("uid"),
@@ -496,7 +496,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
             run_instance = bootcamp.runs.get(run_id=bootcamp.course_id)
         except LearningResourceRun.DoesNotExist:
             run_instance = None
-        run_serializer = RunSerializer(
+        run_serializer = LearningResourceRunSerializer(
             data={
                 **bootcamp_data,
                 "key": bootcamp_data.get("course_id"),
