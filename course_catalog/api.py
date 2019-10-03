@@ -66,7 +66,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
         return
 
     # Make sure there are course runs
-    if not course_data.get("runs"):
+    if not course_data.get("course_runs"):
         return
 
     # Get the last modified date from the course data
@@ -104,7 +104,7 @@ def parse_mitx_json_data(course_data, force_overwrite=False):
             with transaction.atomic():
                 course = edx_serializer.save()
                 # Parse each course run individually
-                for course_run in course_data.get("runs"):
+                for course_run in course_data.get("course_runs"):
                     if should_skip_course(course_run.get("title")):
                         continue
 
@@ -362,7 +362,7 @@ def get_course_availability(course):
         course_json = course.raw_json
         if course_json is None:
             return
-        runs = course_json.get("runs")
+        runs = course_json.get("course_runs")
         if runs is None:
             return
         # get appropriate course_run

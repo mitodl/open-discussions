@@ -177,7 +177,7 @@ def test_parse_mitx_json_data_overwrite_course(
     )
     RunFactory.create(
         content_object=course,
-        run_id=mitx_valid_data["runs"][0]["key"],
+        run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     mock_save_course = mocker.patch(
@@ -206,7 +206,7 @@ def test_parse_mitx_json_data_overwrite_courserun(
     )
     RunFactory.create(
         content_object=course,
-        run_id=mitx_valid_data["runs"][0]["key"],
+        run_id=mitx_valid_data["course_runs"][0]["key"],
         last_modified=datetime.now().astimezone(pytz.utc),
     )
     mock_save_course = mocker.patch(
@@ -253,7 +253,7 @@ def test_parse_mitx_json_data_no_runs(mitx_valid_data):
     Test that a course without runs is skipped
     """
     mitx_data = copy.copy(mitx_valid_data)
-    mitx_data["runs"] = []
+    mitx_data["course_runs"] = []
     parse_mitx_json_data(mitx_data)
     course_count = Course.objects.count()
     assert course_count == 0
@@ -286,7 +286,7 @@ def test_parse_invalid_mitx_run_data(mitx_valid_data):
     Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["runs"][0]["key"] = ""
+    invalid_data["course_runs"][0]["key"] = ""
     parse_mitx_json_data(invalid_data)
     course_count = Course.objects.count()
     assert course_count == 1
@@ -299,7 +299,7 @@ def test_parse_mitx_json_data_skip_courserun_title(mitx_valid_data):
     Test parsing invalid mitx json data for a course run
     """
     invalid_data = copy.copy(mitx_valid_data)
-    invalid_data["runs"][0]["title"] = "delete"
+    invalid_data["course_runs"][0]["title"] = "delete"
     parse_mitx_json_data(invalid_data)
     run_count = LearningResourceRun.objects.count()
     assert run_count == 0
@@ -411,21 +411,21 @@ def test_get_course_availability(mitx_valid_data):
     # test mitx course with raw_json
     assert get_course_availability(ocw_course) == AvailabilityType.current.value
     mitx_course_with_json = CourseFactory.create(
-        course_id=mitx_valid_data["runs"][0]["key"],
+        course_id=mitx_valid_data["course_runs"][0]["key"],
         raw_json=mitx_valid_data,
         platform=PlatformType.mitx.value,
     )
     # test mitx course without raw_json
     assert (
         get_course_availability(mitx_course_with_json)
-        == mitx_valid_data["runs"][0]["availability"]
+        == mitx_valid_data["course_runs"][0]["availability"]
     )
     mitx_course_no_json = CourseFactory.create(
         raw_json=None, platform=PlatformType.mitx.value
     )
     assert get_course_availability(mitx_course_no_json) is None
     # test mitx course without course_runs
-    mitx_valid_data["runs"] = None  # pop course_runs json
+    mitx_valid_data["course_runs"] = None  # pop course_runs json
     mitx_course_no_runs_json = CourseFactory.create(
         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
     )
