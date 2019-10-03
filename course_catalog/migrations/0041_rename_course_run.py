@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("course_catalog", "0041_runs_for_programs"),
+        ("course_catalog", "0040_add_program_published"),
     ]
 
     operations = [

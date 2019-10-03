@@ -6,12 +6,12 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [("course_catalog", "0040_add_program_published")]
+    dependencies = [("course_catalog", "0042_rename_run_id")]
 
     operations = [
         migrations.RemoveField(model_name="program", name="prices"),
         migrations.AlterField(
-            model_name="courserun",
+            model_name="learningresourcerun",
             name="content_type",
             field=models.ForeignKey(
                 limit_choices_to={"model__in": ("course", "bootcamp", "program")},
