@@ -19,6 +19,16 @@ const imageHeight = css`
   }
 `
 
+const imageWrapperHeight = css`
+  @media (max-width: ${PHONE_WIDTH}px) {
+    min-height: ${props =>
+    props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
+  }
+  @media (min-width: ${PHONE_WIDTH + 1}px) {
+    min-height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
+  }
+`
+
 export const BannerContainer = styled.div`
   position: absolute;
   width: 100%;
@@ -38,7 +48,7 @@ const StyledImage = styled.img`
 const PlaceholderDiv = styled.div`
   ${imageStylesheet}
   background-color: ${channelBannerBg};
-  ${imageHeight}
+  ${imageWrapperHeight}
 `
 
 type ImgProps = {
@@ -67,7 +77,7 @@ export const BannerPageWrapper = styled.div`
 
 export const BannerPageHeader = styled.div`
   margin-bottom: 20px;
-  ${imageHeight};
+  ${imageWrapperHeight};
 `
 
 export const Gradient = styled.div`
