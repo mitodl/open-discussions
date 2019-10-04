@@ -338,7 +338,7 @@ class ESCourseRunSerializer(serializers.ModelSerializer):
             "availability",
             "offered_by",
         ]
-
+        ordering = "-best_start_date"
         read_only_fields = fields
 
 
