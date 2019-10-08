@@ -1,10 +1,10 @@
 // @flow
 /* global SETTINGS:false */
-import React, { useState } from "react"
+import React from "react"
 import { connect } from "react-redux"
 import { Formik, Form, Field } from "formik"
 
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "./ProfileImage"
 
 import {
@@ -59,106 +59,101 @@ function CommentFormInner(props: Props) {
     autoFocus
   } = props
 
-  const [popupVisible, setPopupVisible] = useState(false)
-
   return (
-    <div className={comment ? "reply-form" : "reply-post-form"}>
-      {userIsAnonymous() ? (
-        <LoginPopup
-          visible={popupVisible}
-          closePopup={setPopupVisible}
-          className="post-reply-popup"
-        />
-      ) : null}
-      <Formik
-        onSubmit={async (values, actions) => {
-          const { commentText } = values
+    <LoginTooltip>
+      <div className={comment ? "reply-form" : "reply-post-form"}>
+        <Formik
+          onSubmit={async (values, actions) => {
+            const { commentText } = values
 
-          if (editing && comment) {
-            const { id } = comment
-            const updatedComment = {
-              id,
-              text: commentText
+            if (editing && comment) {
+              const { id } = comment
+              const updatedComment = {
+                id,
+                text: commentText
+              }
+              await patchComment(updatedComment)
+            } else {
+              await onSubmit(
+                commentText,
+                comment ? comment.id : undefined,
+                post
+              )
             }
-            await patchComment(updatedComment)
-          } else {
-            await onSubmit(commentText, comment ? comment.id : undefined, post)
-          }
-          actions.setSubmitting(false)
-          if (closeReply) {
-            closeReply()
-          } else {
-            actions.resetForm({ commentText: "" })
-          }
-        }}
-        initialValues={{
-          commentText: editing && comment ? comment.text : ""
-        }}
-      >
-        {({ isSubmitting, values, handleSubmit }) => (
-          <Form
-            onKeyDown={e => {
-              if (
-                e.key === "Enter" &&
-                e.ctrlKey &&
-                !isSubmitting &&
-                !isEmptyText(values.commentText)
-              ) {
-                handleSubmit(e)
-              }
-            }}
-          >
-            <div className="form-item">
-              {profile ? (
-                <React.Fragment>
-                  <ProfileImage
-                    profile={profile}
-                    imageSize={PROFILE_IMAGE_MICRO}
-                  />
-                  <div className="triangle" />
-                </React.Fragment>
-              ) : null}
-              <Field
-                type="text"
-                name="commentText"
-                className="input"
-                placeholder="Write a reply here..."
-                autoFocus={autoFocus}
-                render={({ field }) => (
-                  <textarea
-                    type="text"
-                    {...field}
-                    onChange={userOrAnonymousFunction(field.onChange, () =>
-                      setPopupVisible(true)
-                    )}
-                    onFocus={userOrAnonymousFunction(null, () =>
-                      setPopupVisible(true)
-                    )}
-                  />
-                )}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={
-                isSubmitting || userIsAnonymous() || !values.commentText
-              }
+            actions.setSubmitting(false)
+            if (closeReply) {
+              closeReply()
+            } else {
+              actions.resetForm({ commentText: "" })
+            }
+          }}
+          initialValues={{
+            commentText: editing && comment ? comment.text : ""
+          }}
+        >
+          {({ isSubmitting, values, handleSubmit }) => (
+            <Form
+              onKeyDown={e => {
+                if (
+                  e.key === "Enter" &&
+                  e.ctrlKey &&
+                  !isSubmitting &&
+                  !isEmptyText(values.commentText) &&
+                  !userIsAnonymous()
+                ) {
+                  handleSubmit(e)
+                }
+              }}
             >
-              Submit
-            </button>
-            {closeReply ? (
+              <div className="form-item">
+                {profile ? (
+                  <React.Fragment>
+                    <ProfileImage
+                      profile={profile}
+                      imageSize={PROFILE_IMAGE_MICRO}
+                    />
+                    <div className="triangle" />
+                  </React.Fragment>
+                ) : null}
+                <Field
+                  type="text"
+                  name="commentText"
+                  className="input"
+                  placeholder="Write a reply here..."
+                  autoFocus={autoFocus}
+                  render={({ field }) => (
+                    <textarea
+                      type="text"
+                      {...field}
+                      onChange={userOrAnonymousFunction(field.onChange, null)}
+                    />
+                  )}
+                />
+              </div>
               <button
-                onClick={preventDefaultAndInvoke(closeReply)}
-                className="cancel"
-                disabled={isSubmitting}
+                type="submit"
+                disabled={
+                  userIsAnonymous()
+                    ? false
+                    : isSubmitting || !values.commentText
+                }
               >
-                Cancel
+                Submit
               </button>
-            ) : null}
-          </Form>
-        )}
-      </Formik>
-    </div>
+              {closeReply ? (
+                <button
+                  onClick={preventDefaultAndInvoke(closeReply)}
+                  className="cancel"
+                  disabled={isSubmitting}
+                >
+                  Cancel
+                </button>
+              ) : null}
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </LoginTooltip>
   )
 }
 

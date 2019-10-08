@@ -41,3 +41,14 @@ export const findComment = (
 
   return null
 }
+
+const stripReplies = R.evolve({
+  replies: () => []
+})
+
+export const flattenCommentTree = (comments: any) =>
+  comments.reduce(
+    (acc, comment) =>
+      acc.concat(stripReplies(comment), flattenCommentTree(comment.replies)),
+    []
+  )

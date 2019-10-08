@@ -130,16 +130,16 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
 
     const channelName = getChannelNameFromPathname(pathname)
     const currentChannel = channels.get(channelName)
-    let showComposeLink, composeHref, useLoginPopup
+
+    const composeHref = userIsAnonymous() ? null : newPostURL(channelName)
+
+    let showComposeLink
     if (userIsAnonymous()) {
       showComposeLink = true
-      useLoginPopup = true
     } else {
       showComposeLink = currentChannel
         ? userCanPost(currentChannel)
         : R.any(userCanPost, [...channels.values()])
-      composeHref = newPostURL(channelName)
-      useLoginPopup = false
     }
 
     const expanded = isMobile ? true : showDrawerDesktop || showDrawerHover
@@ -171,7 +171,6 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                       pathname={pathname}
                       showComposeLink={showComposeLink}
                       composeHref={composeHref}
-                      useLoginPopup={useLoginPopup}
                     />
                   </div>
                   <NavigationItem fading whenExpanded={() => <Footer />} />

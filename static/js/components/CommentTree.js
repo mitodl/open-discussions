@@ -15,7 +15,7 @@ import { renderTextContent } from "./Markdown"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "./ProfileImage"
 import DropdownMenu from "../components/DropdownMenu"
 import ReplyButton from "./ReplyButton"
-import SharePopup from "./SharePopup"
+import ShareTooltip from "./ShareTooltip"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 import { makeProfile } from "../lib/profile"
@@ -66,9 +66,6 @@ type State = {
 
 export const commentDropdownKey = (c: CommentInTree) =>
   `COMMENT_DROPDOWN_${c.id}`
-
-export const commentShareKey = (c: CommentInTree) =>
-  `COMMENT_SHARE_MENU_${c.id}`
 
 export const EDITING: "editing" = "editing"
 export const REPLYING: "replying" = "replying"
@@ -137,12 +134,7 @@ export default class CommentTree extends React.Component<Props, State> {
     const { showDropdown, hideDropdown } = curriedDropdownMenufunc(
       commentDropdownKey(comment)
     )
-    const {
-      showDropdown: showShareMenu,
-      hideDropdown: hideShareMenu
-    } = curriedDropdownMenufunc(commentShareKey(comment))
     const commentMenuOpen = dropdownMenus.has(commentDropdownKey(comment))
-    const commentShareOpen = dropdownMenus.has(commentShareKey(comment))
 
     return (
       <div className="row comment-actions">
@@ -166,19 +158,12 @@ export default class CommentTree extends React.Component<Props, State> {
           )}
         {useSearchPageUI ? null : (
           <div className="share-button-wrapper">
-            <div
-              className="comment-action-button share-button"
-              onClick={showShareMenu}
+            <ShareTooltip
+              hideSocialButtons={isPrivateChannel}
+              url={absolutizeURL(commentPermalink(comment.id))}
             >
-              share
-            </div>
-            {commentShareOpen ? (
-              <SharePopup
-                url={absolutizeURL(commentPermalink(comment.id))}
-                closePopup={hideShareMenu}
-                hideSocialButtons={isPrivateChannel}
-              />
-            ) : null}
+              <div className="comment-action-button share-button">share</div>
+            </ShareTooltip>
           </div>
         )}
         {!userIsAnonymous() && !useSearchPageUI ? (

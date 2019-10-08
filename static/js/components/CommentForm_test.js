@@ -5,26 +5,17 @@ import { assert } from "chai"
 import { mount } from "enzyme"
 import sinon from "sinon"
 import { Field } from "formik"
-import { Router } from "react-router"
 
 import CommentForm from "./CommentForm"
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import * as utils from "../lib/util"
-import { shouldIf } from "../lib/test_utils"
 import { makePost } from "../factories/posts"
 import { makeComment } from "../factories/comments"
 import { makeProfile } from "../factories/profiles"
 
 describe("CommentForm", () => {
-  let helper,
-    post,
-    comment,
-    userIsAnonymousStub,
-    profile,
-    onSubmitActions,
-    closeReplyStub
+  let helper, post, comment, profile, onSubmitActions, closeReplyStub
 
   const renderCommentForm = (props = {}) =>
     mount(
@@ -38,9 +29,6 @@ describe("CommentForm", () => {
     post = makePost()
     comment = makeComment(post)
     profile = makeProfile()
-    userIsAnonymousStub = helper.sandbox
-      .stub(utils, "userIsAnonymous")
-      .returns(false)
     onSubmitActions = {
       setSubmitting: helper.sandbox.stub(),
       resetForm:     helper.sandbox.stub()
@@ -54,17 +42,9 @@ describe("CommentForm", () => {
     helper.cleanup()
   })
 
-  //
-  ;[true, false].forEach(userIsAnonymous => {
-    it(`${shouldIf(
-      userIsAnonymous
-    )} include a LoginPopup if the userIsAnonymous=${String(
-      userIsAnonymous
-    )}`, () => {
-      userIsAnonymousStub.returns(userIsAnonymous)
-      const wrapper = renderCommentForm()
-      assert.equal(userIsAnonymous, wrapper.find(LoginPopup).exists())
-    })
+  it("should include a LoginTooltip", () => {
+    const wrapper = renderCommentForm()
+    assert.isOk(wrapper.find(LoginTooltip).exists())
   })
 
   it("should pass the initial text to formik if passed the editing flag", () => {
@@ -143,18 +123,5 @@ describe("CommentForm", () => {
         .find(".cancel")
         .exists()
     )
-  })
-
-  it("should open popup onFocus, if anonymous", () => {
-    userIsAnonymousStub.returns(true)
-    const wrapper = mount(
-      <Router history={helper.browserHistory}>
-        <Provider store={helper.store}>
-          <CommentForm post={post} comment={comment} />
-        </Provider>
-      </Router>
-    )
-    wrapper.find("textarea").simulate("focus")
-    assert.isTrue(wrapper.find(LoginPopup).prop("visible"))
   })
 })

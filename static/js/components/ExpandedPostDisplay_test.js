@@ -13,7 +13,7 @@ import Router from "../Router"
 import Embedly from "./Embedly"
 import FollowButton from "./FollowButton"
 import ProfileImage from "./ProfileImage"
-import SharePopup from "./SharePopup"
+import ShareTooltip from "./ShareTooltip"
 
 import { wait } from "../lib/util"
 import {
@@ -415,16 +415,16 @@ describe("ExpandedPostDisplay", () => {
 
   it("should render a sharepopup", () => {
     const wrapper = renderPostDisplay({ postShareMenuOpen: true }).find(
-      SharePopup
+      ShareTooltip
     )
     assert.ok(wrapper.exists())
     assert.equal(wrapper.props().url, postPermalink(post))
   })
 
-  it("should pass down hideSocialButtons to SharePopup if private channel", () => {
+  it("should pass down hideSocialButtons to ShareTooltip if private channel", () => {
     channel.channel_type = "private"
     const popup = renderPostDisplay({ postShareMenuOpen: true }).find(
-      SharePopup
+      ShareTooltip
     )
     assert.isTrue(popup.props().hideSocialButtons)
   })

@@ -380,11 +380,6 @@
           i {
             transform: scaleX(-1);
           }
-
-          > div:not(.share-popup) {
-            display: flex;
-            align-items: center;
-          }
         }
 
         @include breakpoint(phone) {

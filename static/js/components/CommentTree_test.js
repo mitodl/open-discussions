@@ -7,11 +7,11 @@ import { mount } from "enzyme"
 import ReactMarkdown from "react-markdown"
 
 import Card from "../components/Card"
-import CommentTree, { commentDropdownKey, commentShareKey } from "./CommentTree"
+import CommentTree, { commentDropdownKey } from "./CommentTree"
 import CommentForm from "./CommentForm"
 import { commentPermalink, profileURL, absolutizeURL } from "../lib/url"
 import Router from "../Router"
-import SharePopup from "./SharePopup"
+import ShareTooltip from "./ShareTooltip"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCommentsResponse, makeMoreComments } from "../factories/comments"
@@ -21,6 +21,7 @@ import { makeCommentReport } from "../factories/reports"
 import * as utilFuncs from "../lib/util"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { shouldIf } from "../lib/test_utils"
+import { flattenCommentTree } from "../lib/comments"
 
 describe("CommentTree", () => {
   let comments,
@@ -91,18 +92,26 @@ describe("CommentTree", () => {
 
   const openDropdownMenu = openMenu(commentDropdownKey)
 
-  const openShareMenu = openMenu(commentShareKey)
-
   it("should wrap all top-level comments in a div", () => {
     const wrapper = renderCommentTree()
     assert.equal(wrapper.find("div.top-level-comment").length, comments.length)
   })
 
-  it("should render a share menu if it's open", () => {
-    const wrapper = renderCommentTree(openShareMenu(comments[0]))
-    assert.ok(wrapper.find(SharePopup).exists())
-    const { url } = wrapper.find(SharePopup).props()
-    assert.equal(url, absolutizeURL(permalinkFunc(comments[0].id)))
+  //
+  ;[true, false].forEach(isPrivateChannel => {
+    it(`should render a ShareTooltip for each comment on a ${
+      isPrivateChannel ? "private" : "public"
+    } channel`, () => {
+      const wrapper = renderCommentTree({ isPrivateChannel })
+      R.zip(
+        wrapper.find(ShareTooltip).map(R.identity),
+        flattenCommentTree(comments)
+      ).forEach(([toolTip, comment]) => {
+        const { url, hideSocialButtons } = toolTip.props()
+        assert.equal(url, absolutizeURL(permalinkFunc(comment.id)))
+        assert.equal(hideSocialButtons, isPrivateChannel)
+      })
+    })
   })
 
   //

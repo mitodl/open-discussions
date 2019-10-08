@@ -2,34 +2,28 @@
 import { connect } from "react-redux"
 import React from "react"
 import R from "ramda"
-import onClickOutside from "react-onclickoutside"
 import {
   FacebookShareButton,
   LinkedinShareButton,
   TwitterShareButton
 } from "react-share"
 import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
+import Tooltip from "rc-tooltip"
 
 import { setSnackbarMessage } from "../actions/ui"
 
-type Props = {
+type HelperProps = {
   url: string,
-  closePopup: Function,
   hideSocialButtons?: boolean,
   setSnackbarMessage: Function
 }
 
-export class SharePopupHelper extends React.Component<Props> {
+export class ShareTooltipHelper extends React.Component<HelperProps> {
   input: { current: null | React$ElementRef<typeof HTMLInputElement> }
 
-  constructor(props: Props) {
+  constructor(props: HelperProps) {
     super(props)
     this.input = React.createRef()
-  }
-
-  handleClickOutside = () => {
-    const { closePopup } = this.props
-    closePopup()
   }
 
   selectAndCopyLinkText = (e: Event) => {
@@ -46,13 +40,12 @@ export class SharePopupHelper extends React.Component<Props> {
     const { url, hideSocialButtons } = this.props
 
     return (
-      <div className="popup share-popup">
-        <div className="triangle" />
-        <div className="popup-text">Share a link to this post:</div>
+      <div className="tooltip">
+        <div className="tooltip-text">Share a link to this post:</div>
         <input ref={this.input} readOnly value={url} />
         <div className="bottom-row">
           {hideSocialButtons ? null : (
-            <div className="popup-buttons">
+            <div className="tooltip-buttons">
               <FacebookShareButton url={url}>
                 <FacebookIcon round size={28} />
               </FacebookShareButton>
@@ -73,10 +66,25 @@ export class SharePopupHelper extends React.Component<Props> {
   }
 }
 
-export default R.compose(
-  connect(
-    R.always({}), // mapStateToProps is not needed - just return an object
-    { setSnackbarMessage }
-  ),
-  onClickOutside
-)(SharePopupHelper)
+const ConnectedShareTooltipHelper = connect(
+  R.always({}), // mapStateToProps is not needed - just return an object
+  { setSnackbarMessage }
+)(ShareTooltipHelper)
+
+type Props = {
+  url: string,
+  hideSocialButtons?: boolean,
+  children: Array<React$Element<any>> | React$Element<any>
+}
+
+export default function ShareTooltip({ children, ...props }: Props) {
+  return (
+    <Tooltip
+      placement="top"
+      trigger={["click"]}
+      overlay={() => <ConnectedShareTooltipHelper {...props} />}
+    >
+      {children}
+    </Tooltip>
+  )
+}

@@ -93,6 +93,7 @@
     "raf": "^3.4.0",
     "ramda": "^0.24.1",
     "raven-js": "^3.26.4",
+    "rc-tooltip": "^3.7.3",
     "react": "^16.8.6",
     "react-addons-shallow-compare": "^15.6.2",
     "react-autosuggest": "^9.4.3",

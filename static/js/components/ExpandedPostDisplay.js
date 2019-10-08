@@ -11,7 +11,7 @@ import { renderTextContent } from "./Markdown"
 import Embedly from "./Embedly"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "./ProfileImage"
 import DropdownMenu from "./DropdownMenu"
-import SharePopup from "./SharePopup"
+import ShareTooltip from "./ShareTooltip"
 import FollowButton from "./FollowButton"
 import PostUpvoteButton from "./PostUpvoteButton"
 import ArticleEditor from "./ArticleEditor"
@@ -49,9 +49,6 @@ type Props = {|
   showPostMenu: Function,
   hidePostMenu: Function,
   postDropdownMenuOpen: boolean,
-  showPostShareMenu: Function,
-  hidePostShareMenu: Function,
-  postShareMenuOpen: boolean,
   channel: Channel
 |}
 
@@ -120,9 +117,6 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
       postDropdownMenuOpen,
       showPostMenu,
       hidePostMenu,
-      showPostShareMenu,
-      hidePostShareMenu,
-      postShareMenuOpen,
       channel
     } = this.props
 
@@ -142,20 +136,15 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
               <span>Edit</span>
             </div>
           ) : null}
-          <div
-            className="post-action share-action grey-surround"
-            onClick={showPostShareMenu}
+          <ShareTooltip
+            url={postPermalink(post)}
+            hideSocialButtons={isPrivate(channel)}
           >
-            <i className="material-icons reply">reply</i>
-            <span>Share</span>
-            {postShareMenuOpen ? (
-              <SharePopup
-                url={postPermalink(post)}
-                closePopup={hidePostShareMenu}
-                hideSocialButtons={isPrivate(channel)}
-              />
-            ) : null}
-          </div>
+            <div className="post-action share-action grey-surround">
+              <i className="material-icons reply">reply</i>
+              <span>Share</span>
+            </div>
+          </ShareTooltip>
           <FollowButton post={post} toggleFollowPost={toggleFollowPost} />
           {userIsAnonymous() ? null : (
             <i

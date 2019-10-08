@@ -1,8 +1,10 @@
 // @flow
 import React from "react"
 
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
+
 import { userIsAnonymous } from "../lib/util"
+
 import type { CommentInTree } from "../flow/discussionTypes"
 
 export type CommentVoteFunc = (comment: CommentInTree) => Promise<*>
@@ -15,8 +17,7 @@ type Props = {
 
 type State = {
   downvoting: boolean,
-  upvoting: boolean,
-  popupVisible: boolean
+  upvoting: boolean
 }
 
 export default class CommentVoteForm extends React.Component<Props, State> {
@@ -24,9 +25,8 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     super()
 
     this.state = {
-      downvoting:   false,
-      upvoting:     false,
-      popupVisible: false
+      downvoting: false,
+      upvoting:   false
     }
   }
 
@@ -54,16 +54,9 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     })
   }
 
-  onTogglePopup = async () => {
-    const { popupVisible } = this.state
-    this.setState({
-      popupVisible: !popupVisible
-    })
-  }
-
   render() {
     const { comment } = this.props
-    const { upvoting, downvoting, popupVisible } = this.state
+    const { upvoting, downvoting } = this.state
 
     const disabled = upvoting || downvoting
 
@@ -75,40 +68,41 @@ export default class CommentVoteForm extends React.Component<Props, State> {
     return (
       <div className="votes-form">
         <div className="score">{comment.score}</div>
-        <button
-          className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
-          onClick={userIsAnonymous() ? this.onTogglePopup : this.upvote}
-          disabled={disabled}
-        >
-          <img
-            className="vote-arrow"
-            src={
-              upvoted
-                ? "/static/images/upvote_arrow_on.png"
-                : "/static/images/upvote_arrow.png"
-            }
-            width="13"
-          />
-        </button>
+        <LoginTooltip>
+          <button
+            className={`vote upvote-button ${upvoted ? "upvoted" : ""}`}
+            onClick={userIsAnonymous() ? null : this.upvote}
+            disabled={disabled}
+          >
+            <img
+              className="vote-arrow"
+              src={
+                upvoted
+                  ? "/static/images/upvote_arrow_on.png"
+                  : "/static/images/upvote_arrow.png"
+              }
+              width="13"
+            />
+          </button>
+        </LoginTooltip>
         <span className="pipe">|</span>
-        <button
-          className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
-          onClick={userIsAnonymous() ? this.onTogglePopup : this.downvote}
-          disabled={disabled}
-        >
-          <img
-            className="vote-arrow"
-            src={
-              downvoted
-                ? "/static/images/downvote_arrow_on.png"
-                : "/static/images/downvote_arrow.png"
-            }
-            width="13"
-          />
-        </button>
-        {userIsAnonymous() ? (
-          <LoginPopup visible={popupVisible} closePopup={this.onTogglePopup} />
-        ) : null}
+        <LoginTooltip>
+          <button
+            className={`vote downvote-button ${downvoted ? "downvoted" : ""}`}
+            onClick={userIsAnonymous() ? null : this.downvote}
+            disabled={disabled}
+          >
+            <img
+              className="vote-arrow"
+              src={
+                downvoted
+                  ? "/static/images/downvote_arrow_on.png"
+                  : "/static/images/downvote_arrow.png"
+              }
+              width="13"
+            />
+          </button>
+        </LoginTooltip>
       </div>
     )
   }

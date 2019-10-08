@@ -155,20 +155,18 @@ describe("Drawer", () => {
 
     it("should include props that will link to post compose page if the user is not anonymous", () => {
       userIsAnonymousStub.returns(false)
-      const { composeHref, useLoginPopup } = renderDrawer()
+      const { composeHref } = renderDrawer()
         .find(Navigation)
         .props()
       assert.equal(composeHref, newPostURL())
-      assert.isFalse(useLoginPopup)
     })
 
     it("should include props that will show a tooltip if the user is anonymous", () => {
       userIsAnonymousStub.returns(true)
-      const { showComposeLink, useLoginPopup } = renderDrawer()
+      const { showComposeLink } = renderDrawer()
         .find(Navigation)
         .props()
       assert.isTrue(showComposeLink)
-      assert.isTrue(useLoginPopup)
     })
 
     describe("on a non-channel page", () => {

@@ -1,15 +1,21 @@
 // @flow
+import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
+import { Router } from "react-router"
+import { mount } from "enzyme"
+import { Provider } from "react-redux"
 
 import Navigation from "./Navigation"
 import SubscriptionsList from "./SubscriptionsList"
+import LoginTooltip from "./LoginTooltip"
 
 import * as channels from "../lib/channels"
 import * as util from "../lib/util"
 import { channelURL } from "../lib/url"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 import { makeChannelList } from "../factories/channels"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("Navigation", () => {
   let sandbox,
@@ -39,6 +45,16 @@ describe("Navigation", () => {
   describe("compose link", () => {
     const postLinkSel = ".new-post-link"
 
+    let helper
+
+    beforeEach(() => {
+      helper = new IntegrationTestHelper()
+    })
+
+    afterEach(() => {
+      helper.cleanup()
+    })
+
     it("should not be shown if the showComposeLink=false", () => {
       const wrapper = renderComponent({
         showComposeLink: false
@@ -46,24 +62,25 @@ describe("Navigation", () => {
       assert.isFalse(wrapper.find(postLinkSel).exists())
     })
 
-    it("should show a tooltip when clicked if useLoginPopup=true", async () => {
+    it("should be wrapped with <LoginTooltip />", () => {
       userIsAnonymousStub.returns(true)
-      const wrapper = renderComponent({
-        showComposeLink: true,
-        useLoginPopup:   true
-      })
-      const newPostLink = wrapper.find(postLinkSel)
-      assert.equal(newPostLink.prop("href"), "#")
-      assert.isFalse(wrapper.state("popupVisible"))
-      await newPostLink.simulate("click", null)
-      assert.isTrue(wrapper.state("popupVisible"))
+      const wrapper = mount(
+        <Provider store={helper.store}>
+          <Router history={helper.browserHistory}>
+            <Navigation showComposeLink={true} {...defaultProps} />
+          </Router>
+        </Provider>
+      )
+      const tooltip = wrapper.find(LoginTooltip)
+      assert.ok(tooltip.exists())
+      const newPostLink = tooltip.find(postLinkSel).at(0)
+      assert.equal(newPostLink.prop("to"), "#")
     })
 
     it("should link to a page indicated by the composeHref prop", () => {
       const composeHref = "/path/to/compose"
       const wrapper = renderComponent({
         showComposeLink: true,
-        useLoginPopup:   false,
         composeHref:     composeHref
       })
       const newPostLink = wrapper.find(postLinkSel)

@@ -2,8 +2,9 @@
 import { assert } from "chai"
 
 import ReplyButton from "./ReplyButton"
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 import IntegrationTestHelper from "../util/integration_test_helper"
+
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 import * as utilFuncs from "../lib/util"
 
@@ -22,19 +23,9 @@ describe("ReplyButton", () => {
     helper.cleanup()
   })
 
-  it("should have a LoginPopup, if the user is anonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+  it("should wrap with LoginTooltip", () => {
     const wrapper = renderButton()
-    wrapper.find(LoginPopup).exists()
-  })
-
-  it("should not have a LoginPopup, if the user is not anonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-    assert.isNotOk(
-      renderButton()
-        .find(LoginPopup)
-        .exists()
-    )
+    wrapper.find(LoginTooltip).exists()
   })
 
   //
@@ -47,9 +38,6 @@ describe("ReplyButton", () => {
       helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
       const wrapper = renderButton()
       wrapper.find(".reply-button").simulate("click")
-      if (isAnonymous) {
-        assert.equal(wrapper.find(LoginPopup).props().visible, isAnonymous)
-      }
       assert.equal(beginEditingStub.calledOnce, !isAnonymous)
     })
   })

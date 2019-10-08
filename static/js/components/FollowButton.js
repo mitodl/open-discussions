@@ -1,73 +1,41 @@
 // @flow
 import React from "react"
 
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 
 import { preventDefaultAndInvoke, userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
 
-type FollowProps = {
+type Props = {
   post: Post,
   toggleFollowPost: Post => void
 }
 
-type FollowState = {
-  popupVisible: boolean
-}
+const FollowButton = ({ toggleFollowPost, post }: Props) => (
+  <LoginTooltip>
+    {post.subscribed ? (
+      <div
+        className="post-action subscribed grey-surround"
+        onClick={preventDefaultAndInvoke(() => {
+          toggleFollowPost(post)
+        })}
+      >
+        <i className="material-icons rss_feed">rss_feed</i>
+        <span>Unfollow</span>
+      </div>
+    ) : (
+      <div
+        className="post-action unsubscribed grey-surround"
+        onClick={preventDefaultAndInvoke(() => {
+          userIsAnonymous() ? null : toggleFollowPost(post)
+        })}
+      >
+        <i className="material-icons rss_feed">rss_feed</i>
+        <span>Follow</span>
+      </div>
+    )}
+  </LoginTooltip>
+)
 
-export default class FollowButton extends React.Component<
-  FollowProps,
-  FollowState
-> {
-  constructor() {
-    super()
-    this.state = {
-      popupVisible: false
-    }
-  }
-
-  onTogglePopup = async () => {
-    const { popupVisible } = this.state
-    this.setState({
-      popupVisible: !popupVisible
-    })
-  }
-
-  render() {
-    const { toggleFollowPost, post } = this.props
-    const { popupVisible } = this.state
-    return (
-      <React.Fragment>
-        {post.subscribed ? (
-          <div
-            className="post-action subscribed grey-surround"
-            onClick={preventDefaultAndInvoke(() => {
-              toggleFollowPost(post)
-            })}
-          >
-            <i className="material-icons rss_feed">rss_feed</i>
-            <span>Unfollow</span>
-          </div>
-        ) : (
-          <div
-            className="post-action unsubscribed grey-surround"
-            onClick={preventDefaultAndInvoke(() => {
-              userIsAnonymous() ? this.onTogglePopup() : toggleFollowPost(post)
-            })}
-          >
-            <i className="material-icons rss_feed">rss_feed</i>
-            <span>Follow</span>
-          </div>
-        )}
-        {userIsAnonymous() ? (
-          <LoginPopup
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-            className="reversed follow-btn-popup"
-          />
-        ) : null}
-      </React.Fragment>
-    )
-  }
-}
+export default FollowButton

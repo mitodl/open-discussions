@@ -6,6 +6,7 @@ import { mutateAsync } from "redux-query"
 import { connect } from "react-redux"
 
 import Card from "./Card"
+import LoginTooltip from "./LoginTooltip"
 
 import {
   filterRunsByAvailability,
@@ -139,16 +140,18 @@ export const LearningResourceCard = ({
             <i className="material-icons calendar_today">calendar_today</i>
             {bestRunLabel(bestAvailableRun)}
           </div>
-          <div className="favorite grey-surround">
-            <img
-              className="favorite"
-              src={
-                // $FlowFixMe
-                object.is_favorite ? starSelectedURL : starUnselectedURL
-              }
-              onClick={() => toggleFavorite(object)}
-            />
-          </div>
+          <LoginTooltip>
+            <div className="favorite grey-surround">
+              <img
+                className="favorite"
+                src={
+                  // $FlowFixMe
+                  object.is_favorite ? starSelectedURL : starUnselectedURL
+                }
+                onClick={() => toggleFavorite(object)}
+              />
+            </div>
+          </LoginTooltip>
         </div>
       </div>
       {searchResultLayout === SEARCH_GRID_UI ? null : (

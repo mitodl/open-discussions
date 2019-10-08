@@ -1,28 +1,25 @@
 // @flow
 import React from "react"
 
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 import { userIsAnonymous } from "../lib/util"
 
 import type { Post } from "../flow/discussionTypes"
 
 type Props = {
   post: Post,
-  toggleUpvote?: Function,
-  showLoginMenu?: Function
+  toggleUpvote?: Function
 }
 
 type State = {
-  upvoting: boolean,
-  popupVisible: boolean
+  upvoting: boolean
 }
 
 export default class PostUpvoteButton extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      upvoting:     false,
-      popupVisible: false
+      upvoting: false
     }
   }
 
@@ -39,42 +36,22 @@ export default class PostUpvoteButton extends React.Component<Props, State> {
     }
   }
 
-  onTogglePopup = () => {
-    const { popupVisible } = this.state
-    this.setState({
-      popupVisible: !popupVisible
-    })
-  }
-
   render() {
     const { post } = this.props
-    const { upvoting, popupVisible } = this.state
+    const { upvoting } = this.state
     const upvoted = post.upvoted !== upvoting
     const upvoteClass = upvoted ? "upvoted" : ""
 
     return (
-      <React.Fragment>
+      <LoginTooltip>
         <div
           className={`post-upvote-button ${upvoteClass} grey-surround`}
-          onClick={
-            upvoting
-              ? null
-              : userIsAnonymous()
-                ? this.onTogglePopup
-                : this.onToggleUpvote
-          }
+          onClick={upvoting || userIsAnonymous() ? null : this.onToggleUpvote}
         >
           <i className="material-icons arrow_upward">arrow_upward</i>
           <span className="votes">{post.score}</span>
         </div>
-        {userIsAnonymous() ? (
-          <LoginPopup
-            visible={popupVisible}
-            closePopup={this.onTogglePopup}
-            className="post-upvote-popup"
-          />
-        ) : null}
-      </React.Fragment>
+      </LoginTooltip>
     )
   }
 }

@@ -1,0 +1,81 @@
+.rc-tooltip {
+  opacity: 1;
+  box-shadow: 0 0 20px $card-shadow;
+
+  .rc-tooltip-inner {
+    border: none;
+    padding: 0;
+  }
+
+  .rc-tooltip-arrow {
+    border-top-color: white;
+  }
+}
+
+.tooltip {
+  background: white;
+  padding: 12px;
+  min-width: 250px;
+  max-width: 250px;
+  font-size: $tooltip-font-size;
+  opacity: 1 !important;
+
+  .tooltip-text,
+  h4 {
+    width: 90%;
+    color: $font-black;
+  }
+
+  h4 {
+    padding: 0 0 10px 0;
+    margin: 0;
+    font-size: inherit;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 15px;
+
+    .tooltip-buttons {
+      display: flex;
+
+      > div {
+        margin-right: 3px;
+      }
+    }
+
+    .copy-url {
+      font-size: 12px;
+    }
+  }
+}
+
+.login-tooltip {
+  top: unset;
+  right: unset;
+  min-width: 255px;
+  max-width: 290px;
+
+  .link-button {
+    background-color: #fff;
+    display: block;
+    border-radius: $std-border-radius;
+    padding: 5px 15px;
+    margin: 0 0 0 10px;
+    border: 1px solid $brand-bg;
+    color: $brand-bg;
+    text-align: center;
+  }
+
+  .red {
+    background-color: $brand-bg;
+    color: #fff;
+  }
+}

@@ -4,12 +4,11 @@ import { mount } from "enzyme"
 import { assert } from "chai"
 
 import FollowButton from "./FollowButton"
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
+import Router from "../Router"
 
 import { makePost } from "../factories/posts"
-import { shouldIf } from "../lib/test_utils"
 import * as utilFuncs from "../lib/util"
-import Router from "../Router"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("FollowButton", () => {
@@ -32,19 +31,9 @@ describe("FollowButton", () => {
       </Router>
     )
 
-  it("should have a LoginPopup, if the user is anonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+  it("should have a LoginTooltip", () => {
     const wrapper = renderButton()
-    wrapper.find(LoginPopup).exists()
-  })
-
-  it("should not have a LoginPopup, if the user is not anonymous", () => {
-    helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-    assert.isNotOk(
-      renderButton()
-        .find(LoginPopup)
-        .exists()
-    )
+    wrapper.find(LoginTooltip).exists()
   })
 
   //
@@ -63,22 +52,4 @@ describe("FollowButton", () => {
       })
     }
   )
-
-  //
-  ;[true, false].forEach(isAnonymous => {
-    it(`clicking the follow button ${shouldIf(
-      isAnonymous
-    )} set visible state to true and ${shouldIf(
-      !isAnonymous
-    )} trigger follow function`, () => {
-      helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(isAnonymous)
-      post.subscribed = false
-      const wrapper = renderButton()
-      wrapper.find(".unsubscribed").simulate("click")
-      if (isAnonymous) {
-        assert.equal(wrapper.find(LoginPopup).props().visible, isAnonymous)
-      }
-      assert.equal(toggleFollowPostStub.notCalled, isAnonymous)
-    })
-  })
 })

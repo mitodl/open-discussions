@@ -65,7 +65,6 @@ import {
   REPORT_CONTENT_PAYLOAD
 } from "../lib/reports"
 import { ensureTwitterEmbedJS, handleTwitterWidgets } from "../lib/embed"
-import { showDropdown, hideDropdownDebounced } from "../actions/ui"
 import { withChannelTracker } from "../hoc/withChannelTracker"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { getOwnProfile } from "../lib/redux_selectors"
@@ -121,8 +120,6 @@ const DELETE_COMMENT_DIALOG = "DELETE_COMMENT_DIALOG"
 
 const REPORT_POST_DIALOG = "REPORT_POST_DIALOG"
 const REPORT_COMMENT_DIALOG = "REPORT_COMMENT_DIALOG"
-
-const POST_SHARE_MENU_KEY = "POST_SHARE_MENU_KEY"
 
 // if postId, channelName, or commentID don't match
 const shouldLoadData = R.complement(
@@ -305,16 +302,6 @@ export class PostPage extends React.Component<PostPageProps> {
     }
   }
 
-  showPostShareMenu = () => {
-    const { dispatch } = this.props
-    dispatch(showDropdown(POST_SHARE_MENU_KEY))
-  }
-
-  hidePostShareMenu = () => {
-    const { dispatch } = this.props
-    dispatch(hideDropdownDebounced(POST_SHARE_MENU_KEY))
-  }
-
   renderCommentSectionHeader = () => {
     const {
       post,
@@ -367,7 +354,6 @@ export class PostPage extends React.Component<PostPageProps> {
       embedly,
       reportPost,
       postDropdownMenuOpen,
-      postShareMenuOpen,
       dropdownMenus,
       profile
     } = this.props
@@ -415,9 +401,6 @@ export class PostPage extends React.Component<PostPageProps> {
               postDropdownMenuOpen={postDropdownMenuOpen}
               showPostMenu={showPostMenu}
               hidePostMenu={hidePostMenu}
-              showPostShareMenu={this.showPostShareMenu}
-              hidePostShareMenu={this.hidePostShareMenu}
-              postShareMenuOpen={postShareMenuOpen}
               channel={channel}
             />
           </div>
@@ -523,8 +506,6 @@ const mapStateToProps = (state, ownProps) => {
 
   const { dropdownMenus } = ui
 
-  const postShareMenuOpen = ui.dropdownMenus.has(POST_SHARE_MENU_KEY)
-
   return {
     ...postModerationSelector(state, ownProps),
     ...commentModerationSelector(state, ownProps),
@@ -539,7 +520,6 @@ const mapStateToProps = (state, ownProps) => {
     notFound,
     notAuthorized,
     postDropdownMenuOpen,
-    postShareMenuOpen,
     dropdownMenus,
     profile:     getOwnProfile(state),
     isModerator: channel && channel.user_is_moderator,

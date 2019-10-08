@@ -10,16 +10,15 @@ import {
 } from "react-share"
 import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
 
-import { SharePopupHelper } from "./SharePopup"
+import { ShareTooltipHelper } from "./ShareTooltip"
 
-describe("SharePopup", () => {
-  let closePopupStub, execCommandStub, setSnackbarMessageStub, url, sandbox
+describe("ShareTooltip", () => {
+  let execCommandStub, setSnackbarMessageStub, url, sandbox
 
   // unfortunately have to use mount to get the ref to work
-  const renderSharePopupHelper = (props = {}) =>
+  const renderShareTooltipHelper = (props = {}) =>
     mount(
-      <SharePopupHelper
-        closePopup={closePopupStub}
+      <ShareTooltipHelper
         url={url}
         setSnackbarMessage={setSnackbarMessageStub}
         {...props}
@@ -28,7 +27,6 @@ describe("SharePopup", () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
-    closePopupStub = sandbox.stub()
     execCommandStub = sandbox.stub()
     setSnackbarMessageStub = sandbox.stub()
     // $FlowFixMe: flow thinks this isn't writable (normally that's true!)
@@ -40,29 +38,22 @@ describe("SharePopup", () => {
     sandbox.restore()
   })
 
-  it("should have a handleClickOutside handler", () => {
-    const wrapper = renderSharePopupHelper()
-    assert.isFunction(wrapper.instance().handleClickOutside)
-    wrapper.instance().handleClickOutside()
-    assert.ok(closePopupStub.called)
-  })
-
   it("should set a ref to the input", () => {
-    const wrapper = renderSharePopupHelper()
+    const wrapper = renderShareTooltipHelper()
     assert.isTrue(wrapper.instance().input.current instanceof HTMLInputElement)
   })
 
   it("should populate the input field with the value of the url prop", () => {
     assert.equal(
       url,
-      renderSharePopupHelper()
+      renderShareTooltipHelper()
         .find("input")
         .props().value
     )
   })
 
   it("should select text in the input field", () => {
-    const wrapperInstance = renderSharePopupHelper().instance()
+    const wrapperInstance = renderShareTooltipHelper().instance()
     const selectStub = sandbox.stub(wrapperInstance.input.current, "select")
     const fakeEvent = { preventDefault: sandbox.stub() }
     wrapperInstance.selectAndCopyLinkText(fakeEvent)
@@ -75,7 +66,7 @@ describe("SharePopup", () => {
   })
 
   it("should include the share buttons we expect", () => {
-    const wrapper = renderSharePopupHelper()
+    const wrapper = renderShareTooltipHelper()
     ;[
       [FacebookShareButton, FacebookIcon],
       [LinkedinShareButton, LinkedinIcon],
@@ -88,7 +79,7 @@ describe("SharePopup", () => {
   })
 
   it("should hide buttons, if hideSocialButtons === true", () => {
-    const wrapper = renderSharePopupHelper({ hideSocialButtons: true })
+    const wrapper = renderShareTooltipHelper({ hideSocialButtons: true })
     ;[FacebookShareButton, LinkedinShareButton, TwitterShareButton].forEach(
       button => assert.isNotOk(wrapper.find(button).exists())
     )

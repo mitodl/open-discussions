@@ -3,7 +3,7 @@ import sinon from "sinon"
 import { assert } from "chai"
 
 import CommentVoteForm from "./CommentVoteForm"
-import LoginPopup from "./LoginPopup"
+import LoginTooltip from "./LoginTooltip"
 
 import * as utilFuncs from "../lib/util"
 import { wait } from "../lib/util"
@@ -92,33 +92,17 @@ describe("CommentVoteForm", () => {
     )
   }
 
-  it("should have a LoginPopup, if the user is anonymous", () => {
-    sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
+  it("should have a LoginTooltip", () => {
     const wrapper = renderForm()
-    wrapper.find(LoginPopup).exists()
+    wrapper.find(LoginTooltip).exists()
   })
 
-  it("should not have a LoginPopup, if the user is not anonymous", () => {
-    sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-    assert.isNotOk(
-      renderForm()
-        .find(LoginPopup)
-        .exists()
-    )
-  })
-
-  it("clicking a vote button should set visible state to true and not trigger vote function", () => {
+  it("clicking a vote button should not trigger vote function", () => {
     sandbox.stub(utilFuncs, "userIsAnonymous").returns(true)
     const wrapper = renderForm()
     const voteStub = upvoteStub
     wrapper.find(".upvote-button").simulate("click")
     sinon.assert.notCalled(voteStub)
-    assert.deepEqual(wrapper.state(), {
-      downvoting:   false,
-      upvoting:     false,
-      popupVisible: true
-    })
-    assert.ok(wrapper.find(LoginPopup).props().visible)
   })
 
   //
@@ -133,9 +117,8 @@ describe("CommentVoteForm", () => {
           .simulate("click")
         sinon.assert.calledWith(voteStub, comment)
         assert.deepEqual(wrapper.state(), {
-          downvoting:   !isUpvote,
-          upvoting:     isUpvote,
-          popupVisible: false
+          downvoting: !isUpvote,
+          upvoting:   isUpvote
         })
         assertButtons(wrapper, isUpvote, false, true)
 
