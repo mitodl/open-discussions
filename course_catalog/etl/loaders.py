@@ -6,7 +6,7 @@ from course_catalog.models import (
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    CourseRun,
+    LearningResourceRun,
     Program,
     ProgramItem,
 )
@@ -59,34 +59,34 @@ def load_instructors(resource, instructors_data):
 
 
 @log_exceptions("Error loading course run")
-def load_course_run(course_or_bootcamp, course_run_data):
+def load_run(learning_resource, course_run_data):
     """Load the course run into the database"""
-    course_run_id = course_run_data.pop("course_run_id")
+    run_id = course_run_data.pop("run_id")
     instructors_data = course_run_data.pop("instructors", [])
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
 
-    course_run, _ = CourseRun.objects.update_or_create(
-        course_run_id=course_run_id,
+    learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
+        course_run_id=run_id,
         defaults={
             **course_run_data,
-            "object_id": course_or_bootcamp.id,
-            "content_type": ContentType.objects.get_for_model(course_or_bootcamp),
+            "object_id": learning_resource.id,
+            "content_type": ContentType.objects.get_for_model(learning_resource),
         },
     )
 
-    load_topics(course_run, topics_data)
-    load_prices(course_run, prices_data)
-    load_instructors(course_run, instructors_data)
+    load_topics(learning_resource_run, topics_data)
+    load_prices(learning_resource_run, prices_data)
+    load_instructors(learning_resource_run, instructors_data)
 
-    return course_run
+    return learning_resource_run
 
 
 @log_exceptions("Error loading course")
 def load_course(course_data):
     """Load the course into the database"""
     course_id = course_data.pop("course_id")
-    course_runs_data = course_data.pop("course_runs", [])
+    runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
 
     course, created = Course.objects.update_or_create(
@@ -95,8 +95,8 @@ def load_course(course_data):
 
     load_topics(course, topics_data)
 
-    for course_run_data in course_runs_data:
-        load_course_run(course, course_run_data)
+    for course_run_data in runs_data:
+        load_run(course, course_run_data)
 
     if not created and not course.published:
         search_task_helpers.delete_course(course)

@@ -1,5 +1,5 @@
 """Tests for ETL loaders"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,too-many-locals
 from types import SimpleNamespace
 
 from django.contrib.contenttypes.models import ContentType
@@ -9,7 +9,7 @@ import pytest
 from course_catalog.etl.loaders import (
     load_program,
     load_course,
-    load_course_run,
+    load_run,
     load_topics,
     load_prices,
     load_instructors,
@@ -17,12 +17,12 @@ from course_catalog.etl.loaders import (
 from course_catalog.factories import (
     ProgramFactory,
     CourseFactory,
-    CourseRunFactory,
+    LearningResourceRunFactory,
     CoursePriceFactory,
     CourseTopicFactory,
     CourseInstructorFactory,
 )
-from course_catalog.models import Program, Course, CourseRun, ProgramItem
+from course_catalog.models import Program, Course, LearningResourceRun, ProgramItem
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
 
@@ -134,21 +134,21 @@ def test_load_program(
 def test_load_course(mock_upsert_tasks, course_exists, is_published):
     """Test that load_course loads the course"""
     course = (
-        CourseFactory.create(course_runs=None, published=is_published)
+        CourseFactory.create(runs=None, published=is_published)
         if course_exists
         else CourseFactory.build()
     )
     assert Course.objects.count() == (1 if course_exists else 0)
-    assert CourseRun.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
 
     props = model_to_dict(CourseFactory.build(published=is_published))
     props["course_id"] = course.course_id
     del props["id"]
-    run = model_to_dict(CourseRunFactory.build())
+    run = model_to_dict(LearningResourceRunFactory.build())
     del run["content_type"]
     del run["object_id"]
     del run["id"]
-    props["course_runs"] = [run]
+    props["runs"] = [run]
 
     result = load_course(props)
 
@@ -161,7 +161,7 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
         mock_upsert_tasks.upsert_course.assert_not_called()
 
     assert Course.objects.count() == 1
-    assert CourseRun.objects.count() == 1
+    assert LearningResourceRun.objects.count() == 1
 
     # assert we got a course back
     assert isinstance(result, Course)
@@ -170,39 +170,39 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
 
 
-@pytest.mark.parametrize("course_run_exists", [True, False])
-def test_load_course_run(course_run_exists):
-    """Test that load_course_run loads the course run"""
-    course = CourseFactory.create(course_runs=None)
-    course_run = (
-        CourseRunFactory.create(content_object=course)
-        if course_run_exists
-        else CourseRunFactory.build()
+@pytest.mark.parametrize("run_exists", [True, False])
+def test_load_run(run_exists):
+    """Test that load_run loads the course run"""
+    course = CourseFactory.create(runs=None)
+    learning_resource_run = (
+        LearningResourceRunFactory.create(content_object=course)
+        if run_exists
+        else LearningResourceRunFactory.build()
     )
 
-    props = model_to_dict(CourseRunFactory.build())
-    props["course_run_id"] = course_run.course_run_id
+    props = model_to_dict(LearningResourceRunFactory.build())
+    props["run_id"] = learning_resource_run.run_id
     del props["content_type"]
     del props["object_id"]
     del props["id"]
 
-    assert CourseRun.objects.count() == (1 if course_run_exists else 0)
+    assert LearningResourceRun.objects.count() == (1 if run_exists else 0)
 
-    result = load_course_run(course, props)
+    result = load_run(course, props)
 
-    assert CourseRun.objects.count() == 1
+    assert LearningResourceRun.objects.count() == 1
 
     assert result.content_object == course
 
     # assert we got a course run back
-    assert isinstance(result, CourseRun)
+    assert isinstance(result, LearningResourceRun)
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
 
 
 @pytest.mark.parametrize(
-    "parent_factory", [CourseFactory, ProgramFactory, CourseRunFactory]
+    "parent_factory", [CourseFactory, ProgramFactory, LearningResourceRunFactory]
 )
 @pytest.mark.parametrize("topics_exist", [True, False])
 def test_load_topics(parent_factory, topics_exist):
@@ -221,7 +221,7 @@ def test_load_topics(parent_factory, topics_exist):
     assert parent.topics.count() == len(topics)
 
 
-@pytest.mark.parametrize("parent_factory", [ProgramFactory, CourseRunFactory])
+@pytest.mark.parametrize("parent_factory", [ProgramFactory, LearningResourceRunFactory])
 @pytest.mark.parametrize("prices_exist", [True, False])
 def test_load_prices(parent_factory, prices_exist):
     """Test that load_prices creates and/or assigns prices to the parent object"""
@@ -257,7 +257,7 @@ def test_load_instructors(instructor_exists):
         if instructor_exists
         else CourseInstructorFactory.build_batch(3)
     )
-    run = CourseRunFactory.create(no_instructors=True)
+    run = LearningResourceRunFactory.create(no_instructors=True)
 
     assert run.instructors.count() == 0
 

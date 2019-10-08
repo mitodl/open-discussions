@@ -17,7 +17,7 @@ import type {
   PostResult,
   ProfileResult
 } from "../flow/searchTypes"
-import { makeCourseRun } from "./learning_resources"
+import { makeRun } from "./learning_resources"
 
 export const makeProfileResult = (): ProfileResult => ({
   author_avatar_medium: casual.url,
@@ -86,7 +86,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_COURSE,
-  course_runs:       R.times(makeCourseRun, 3)
+  runs:              R.times(makeRun, 3)
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
@@ -100,7 +100,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_BOOTCAMP,
   offered_by:        "bootcamps",
-  course_runs:       [makeCourseRun()]
+  runs:              [makeRun()]
 })
 
 export const makeLearningResourceResult = (objectType: string) => {

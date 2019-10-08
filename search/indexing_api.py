@@ -103,7 +103,7 @@ COURSE_OBJECT_TYPE = {
     "image_src": {"type": "keyword"},
     "published": {"type": "boolean"},
     "offered_by": {"type": "keyword"},
-    "course_runs": {
+    "runs": {
         "type": "nested",
         "properties": {
             "id": {"type": "long"},
@@ -146,7 +146,7 @@ BOOTCAMP_OBJECT_TYPE = {
     "published": {"type": "boolean"},
     "location": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
-    "course_runs": {
+    "runs": {
         "type": "nested",
         "properties": {
             "id": {"type": "long"},

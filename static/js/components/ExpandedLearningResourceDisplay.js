@@ -43,17 +43,17 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       runId:      parseInt(event.target.value)
     })
 
-  const courseRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(
+  const objectRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(
     object.object_type
   )
-    ? // $FlowFixMe: if object is bootcamp or course it will have course_runs property
-    object.course_runs
+    ? // $FlowFixMe: if object is bootcamp or course it will have runs property
+    object.runs
     : []
 
-  const selectedRun = courseRuns
+  const selectedRun = objectRuns
     ? bestRun(
-      runId ? courseRuns.filter(run => run.id === runId) : courseRuns
-    ) || courseRuns[0]
+      runId ? objectRuns.filter(run => run.id === runId) : objectRuns
+    ) || objectRuns[0]
     : null
 
   let url = object.url
@@ -77,8 +77,8 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         R.flatten(
           // $FlowFixMe: programs have items
           object.items.map(item =>
-            item.content_data.course_runs.map(courseRun =>
-              courseRun.instructors.map(instructor =>
+            item.content_data.runs.map(objectRun =>
+              objectRun.instructors.map(instructor =>
                 getInstructorName(instructor)
               )
             )
@@ -101,9 +101,9 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                   : "Start Date"}:
             </div>
             <div className="select-semester-div">
-              {courseRuns.length > 1 ? (
+              {objectRuns.length > 1 ? (
                 <select value={runId} onChange={updateRun}>
-                  {courseRuns.map(run => (
+                  {objectRuns.map(run => (
                     <option value={run.id} key={run.id}>
                       {getStartDate(object, run)}
                     </option>

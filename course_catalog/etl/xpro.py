@@ -67,9 +67,9 @@ def transform(programs):
                             course["courseruns"],
                         )
                     ),
-                    "course_runs": [
+                    "runs": [
                         {
-                            "course_run_id": course_run["courseware_id"],
+                            "run_id": course_run["courseware_id"],
                             "start_date": _parse_datetime(course_run["start_date"]),
                             "end_date": _parse_datetime(course_run["end_date"]),
                             "enrollment_start": _parse_datetime(

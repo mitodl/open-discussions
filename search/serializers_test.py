@@ -7,7 +7,11 @@ from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
 from course_catalog.constants import OfferedBy
-from course_catalog.factories import CourseFactory, CourseRunFactory, CoursePriceFactory
+from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceRunFactory,
+    CoursePriceFactory,
+)
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
@@ -19,7 +23,7 @@ from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESCourseSerializer,
-    ESCourseRunSerializer,
+    ESRunSerializer,
     ESProfileSerializer,
     ESCoursePriceSerializer,
     serialize_post_for_bulk,
@@ -216,50 +220,53 @@ def test_es_course_price_serializer():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("has_full_name", [True, False])
-def test_es_course_run_serializer(has_full_name):
+def test_es_run_serializer(has_full_name):
     """
-    Test that ESCourseRunSerializer correctly serializes a course run object
+    Test that ESRunSerializer correctly serializes a run object
     """
-    course_run = (
-        CourseRunFactory.create()
+    learning_resource_run = (
+        LearningResourceRunFactory.create()
         if has_full_name
-        else CourseRunFactory.create(instructors__full_name=None)
+        else LearningResourceRunFactory.create(instructors__full_name=None)
     )
-    serialized = ESCourseRunSerializer(course_run).data
+    serialized = ESRunSerializer(learning_resource_run).data
 
     assert_json_equal(
         serialized,
         {
-            "id": course_run.id,
-            "course_run_id": course_run.course_run_id,
-            "short_description": course_run.short_description,
-            "full_description": course_run.full_description,
-            "language": course_run.language,
-            "semester": course_run.semester,
-            "year": int(course_run.year),
-            "level": course_run.level,
-            "start_date": course_run.start_date.strftime(ISOFORMAT),
-            "end_date": course_run.end_date.strftime(ISOFORMAT),
-            "enrollment_start": course_run.enrollment_start.strftime(ISOFORMAT),
-            "enrollment_end": course_run.enrollment_end.strftime(ISOFORMAT),
-            "best_start_date": course_run.best_start_date,
-            "best_end_date": course_run.best_end_date,
-            "title": course_run.title,
-            "image_src": course_run.image_src,
+            "id": learning_resource_run.id,
+            "run_id": learning_resource_run.run_id,
+            "short_description": learning_resource_run.short_description,
+            "full_description": learning_resource_run.full_description,
+            "language": learning_resource_run.language,
+            "semester": learning_resource_run.semester,
+            "year": int(learning_resource_run.year),
+            "level": learning_resource_run.level,
+            "start_date": learning_resource_run.start_date.strftime(ISOFORMAT),
+            "end_date": learning_resource_run.end_date.strftime(ISOFORMAT),
+            "enrollment_start": learning_resource_run.enrollment_start.strftime(
+                ISOFORMAT
+            ),
+            "enrollment_end": learning_resource_run.enrollment_end.strftime(ISOFORMAT),
+            "best_start_date": learning_resource_run.best_start_date,
+            "best_end_date": learning_resource_run.best_end_date,
+            "title": learning_resource_run.title,
+            "image_src": learning_resource_run.image_src,
             "instructors": [
                 (
                     instructor.full_name
                     if has_full_name
                     else " ".join([instructor.first_name, instructor.last_name])
                 )
-                for instructor in course_run.instructors.all()
+                for instructor in learning_resource_run.instructors.all()
             ],
             "prices": [
-                ESCoursePriceSerializer(price).data for price in course_run.prices.all()
+                ESCoursePriceSerializer(price).data
+                for price in learning_resource_run.prices.all()
             ],
             "published": True,
-            "availability": course_run.availability,
-            "offered_by": course_run.offered_by,
+            "availability": learning_resource_run.availability,
+            "offered_by": learning_resource_run.offered_by,
         },
     )
 
@@ -285,9 +292,9 @@ def test_es_course_serializer(offered_by):
             "title": course.title,
             "image_src": course.image_src,
             "topics": list(course.topics.values_list("name", flat=True)),
-            "course_runs": [
-                ESCourseRunSerializer(course_run).data
-                for course_run in course.course_runs.order_by("-best_start_date")
+            "runs": [
+                ESRunSerializer(course_run).data
+                for course_run in course.runs.order_by("-best_start_date")
             ],
             "published": True,
             "offered_by": course.offered_by,

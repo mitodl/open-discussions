@@ -17,7 +17,7 @@ import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
 
 import type {
-  CourseRun,
+  LearningResourceRun,
   CourseInstructor,
   CoursePrice
 } from "../flow/discussionTypes"
@@ -58,7 +58,10 @@ export const availabilityFilterToMoment = (filter: string, ending: boolean) => {
   }
 }
 
-export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
+export const inDateRanges = (
+  run: LearningResourceRun,
+  availabilities: Array<string>
+) => {
   if (emptyOrNil(availabilities)) {
     return true
   }
@@ -84,7 +87,7 @@ export const inDateRanges = (run: CourseRun, availabilities: Array<string>) => {
   return false
 }
 
-export const bestRunLabel = (run: ?CourseRun) => {
+export const bestRunLabel = (run: ?LearningResourceRun) => {
   if (!run) {
     return AVAILABILITY_MAPPING[AVAILABLE_NOW].label
   }
@@ -95,16 +98,18 @@ export const bestRunLabel = (run: ?CourseRun) => {
   }
 }
 
-export const runStartDate = (courseRun: CourseRun): moment$Moment =>
-  moment(courseRun.best_start_date || DEFAULT_START_DT, DATE_FORMAT)
+export const runStartDate = (objectRun: LearningResourceRun): moment$Moment =>
+  moment(objectRun.best_start_date || DEFAULT_START_DT, DATE_FORMAT)
 
-export const runEndDate = (courseRun: CourseRun): moment$Moment =>
-  moment(courseRun.best_end_date || DEFAULT_END_DT, DATE_FORMAT)
+export const runEndDate = (objectRun: LearningResourceRun): moment$Moment =>
+  moment(objectRun.best_end_date || DEFAULT_END_DT, DATE_FORMAT)
 
-export const compareRuns = (firstRun: CourseRun, secondRun: CourseRun) =>
-  runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
+export const compareRuns = (
+  firstRun: LearningResourceRun,
+  secondRun: LearningResourceRun
+) => runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
-export const bestRun = (runs: Array<CourseRun>) => {
+export const bestRun = (runs: Array<LearningResourceRun>) => {
   // Runs that are running right now
   const currentRuns = runs.filter(
     run => runStartDate(run).isSameOrBefore() && runEndDate(run).isAfter()
@@ -133,7 +138,7 @@ export const bestRun = (runs: Array<CourseRun>) => {
 }
 
 export const filterRunsByAvailability = (
-  runs: ?Array<CourseRun>,
+  runs: ?Array<LearningResourceRun>,
   availabilities: ?Array<string>
 ) =>
   runs
@@ -163,13 +168,16 @@ export const minPrice = (prices: Array<CoursePrice>) => {
   return price > 0 && price !== Infinity ? `${formatPrice(price)}` : "Free"
 }
 
-export const getStartDate = (object: Object, courseRun: CourseRun) => {
+export const getStartDate = (
+  object: Object,
+  objectRun: LearningResourceRun
+) => {
   if (object.platform === platforms.OCW) {
-    return `${capitalize(courseRun.semester || "")} ${courseRun.year || ""}`
-  } else if (courseRun.start_date) {
-    return moment(courseRun.start_date).format("MMMM DD, YYYY")
-  } else if (courseRun.best_start_date) {
-    return moment(courseRun.best_start_date).format("MMMM DD, YYYY")
+    return `${capitalize(objectRun.semester || "")} ${objectRun.year || ""}`
+  } else if (objectRun.start_date) {
+    return moment(objectRun.start_date).format("MMMM DD, YYYY")
+  } else if (objectRun.best_start_date) {
+    return moment(objectRun.best_start_date).format("MMMM DD, YYYY")
   }
   return "Ongoing"
 }

@@ -17,19 +17,19 @@ import {
 import type {
   Bootcamp,
   Course,
-  CourseRun,
+  LearningResourceRun,
   Program,
   UserList
 } from "../flow/discussionTypes"
 
 const incrCourse = incrementer()
 const courseId: any = incrementer()
-const incrCourseRun = incrementer()
+const incrRun = incrementer()
 
-export const makeCourseRun = (): CourseRun => {
+export const makeRun = (): LearningResourceRun => {
   return {
     // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-    course_run_id:     `courserun_${incrCourseRun.next().value}`,
+    run_id:            `courserun_${incrRun.next().value}`,
     id:                casual.integer,
     url:               casual.url,
     image_src:         "http://image.medium.url",
@@ -78,7 +78,7 @@ export const makeCourse = (): Course => ({
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
   is_favorite:       casual.boolean,
   topics:            [{ name: casual.word }, { name: casual.word }],
-  course_runs:       R.times(makeCourseRun, 3),
+  runs:              R.times(makeRun, 3),
   object_type:       "course"
 })
 
@@ -97,7 +97,7 @@ export const makeBootcamp = (): Bootcamp => ({
   is_favorite:       casual.boolean,
   offered_by:        "bootcamps",
   topics:            [{ name: casual.word }, { name: casual.word }],
-  course_runs:       R.times(makeCourseRun, 3),
+  runs:              R.times(makeRun, 3),
   object_type:       "bootcamp"
 })
 

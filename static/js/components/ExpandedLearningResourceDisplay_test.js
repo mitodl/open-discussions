@@ -30,7 +30,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     shallow(
       <ExpandedLearningResourceDisplay
         object={course}
-        runId={course.course_runs[0] ? course.course_runs[0].id : 0}
+        runId={course.runs[0] ? course.runs[0].id : 0}
         setShowResourceDrawer={null}
         {...props}
       />
@@ -70,7 +70,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   //
   ;[true, false].forEach(hasCourseRunUrl => {
     it(`should render ${hasCourseRunUrl ? "run" : "course"} link`, () => {
-      const run = bestRun(course.course_runs)
+      const run = bestRun(course.runs)
       if (!hasCourseRunUrl) {
         // $FlowFixMe: run is not null here
         run.url = null
@@ -109,7 +109,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("should not render course links if urls are all null", () => {
     course.url = null
-    course.course_runs.forEach(run => (run.url = null))
+    course.runs.forEach(run => (run.url = null))
     const wrapper = render()
     assert.isNotOk(wrapper.find(".course-links").exists())
   })
@@ -139,13 +139,13 @@ describe("ExpandedLearningResourceDisplay", () => {
   ].forEach(([platform, expectedValue, expectedLabel]) => {
     it(`should display the correct date label and options for ${platform} courses`, () => {
       course.platform = platform
-      const courseRun = course.course_runs[0]
+      const courseRun = course.runs[0]
       courseRun.start_date = "2019-09-01T00:00:00Z"
       courseRun.semester = "Fall"
       courseRun.year = "2019"
       const wrapper = render()
       const selectOptions = wrapper.find("option")
-      assert.equal(selectOptions.length, course.course_runs.length)
+      assert.equal(selectOptions.length, course.runs.length)
       assert.equal(selectOptions.at(0).text(), expectedValue)
       const dateLabel = wrapper
         .find(".form")
@@ -158,8 +158,8 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("should display 'Ongoing' for a course with no good dates", () => {
     course.platform = "mitx"
-    course.course_runs = course.course_runs.splice(0, 1)
-    const courseRun = course.course_runs[0]
+    course.runs = course.runs.splice(0, 1)
+    const courseRun = course.runs[0]
     courseRun.start_date = null
     courseRun.best_start_date = null
     const wrapper = render()
@@ -172,7 +172,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`${shouldIf(
       showDropdown
     )} display a course run dropdown for a course with ${runs} run(s)`, () => {
-      course.course_runs = course.course_runs.slice(0, runs)
+      course.runs = course.runs.slice(0, runs)
       const wrapper = render()
       assert.equal(wrapper.find("option").exists(), showDropdown)
     })
@@ -188,7 +188,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       startDate
     )}, best date ${String(bestDate)}`, () => {
       course.platform = "mitx"
-      const courseRun = course.course_runs[0]
+      const courseRun = course.runs[0]
       courseRun.start_date = startDate
       courseRun.best_start_date = bestDate
       const wrapper = render()
@@ -210,7 +210,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       .find(".course-info-value")
       .text()
     // $FlowFixMe: course run won't be null here
-    bestRun(course.course_runs).instructors.forEach(instructor => {
+    bestRun(course.runs).instructors.forEach(instructor => {
       assert.ok(instructorText.includes(getInstructorName(instructor)))
     })
   })
@@ -228,7 +228,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       .find(".course-info-value")
       .text()
     object.items.forEach(item => {
-      item.content_data.course_runs.forEach(courseRun => {
+      item.content_data.runs.forEach(courseRun => {
         courseRun.instructors.forEach(instructor => {
           assert.ok(instructorText.includes(getInstructorName(instructor)))
         })
@@ -248,7 +248,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       langCode
     )}`, () => {
       // $FlowFixMe: course run won't be null here
-      bestRun(course.course_runs).language = langCode
+      bestRun(course.runs).language = langCode
       const wrapper = render()
       assert.equal(
         wrapper
@@ -289,7 +289,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         object.prices = prices
       } else {
         // $FlowFixMe: bestRun result won't be null
-        bestRun(object.course_runs).prices = prices
+        bestRun(object.runs).prices = prices
       }
 
       const wrapper = render({
@@ -307,7 +307,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   it(`should still display without errors in case of a bad course with no runs`, () => {
-    course.course_runs = []
+    course.runs = []
     const wrapper = render()
     assert.isNotOk(
       wrapper
