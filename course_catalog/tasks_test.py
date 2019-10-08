@@ -273,7 +273,8 @@ def test_get_xpro_data(mocker):
     """Verify that the get_xpro_data invokes the xPro ETL pipeline"""
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_xpro_data.delay()
-    mock_pipelines.xpro_etl.assert_called_once_with()
+    mock_pipelines.xpro_programs_etl.assert_called_once_with()
+    mock_pipelines.xpro_courses_etl.assert_called_once_with()
 
 
 def test_get_oll_data(mocker):

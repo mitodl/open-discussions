@@ -418,7 +418,11 @@
       "required": false
     },
     "XPRO_CATALOG_API_URL": {
-      "description": "The catalog url for xpro products and courses",
+      "description": "The catalog url for xpro programs",
+      "required": false
+    },
+    "XPRO_COURSES_API_URL": {
+      "description": "The api url for xpro courses",
       "required": false
     }
   },

@@ -30,15 +30,97 @@ def _parse_datetime(value):
 
 
 @log_exceptions("Error extracting xPro catalog", exc_return_value=[])
-def extract():
+def extract_programs():
     """Loads the xPro catalog data"""
     if settings.XPRO_CATALOG_API_URL:
         return requests.get(settings.XPRO_CATALOG_API_URL).json()
     return []
 
 
-@log_exceptions("Error transforming MicroMasters catalog", exc_return_value=[])
-def transform(programs):
+def extract_courses():
+    """Loads the xPro catalog data"""
+    if settings.XPRO_COURSES_API_URL:
+        return requests.get(settings.XPRO_COURSES_API_URL).json()
+    return []
+
+
+def _transform_run(course_run):
+    """
+    Transforms a course run into our normalized data structure
+
+    Args:
+        course_run (dict): course run data
+
+    Returns:
+        dict: normalized course run data
+    """
+    return {
+        "run_id": course_run["courseware_id"],
+        "platform": PlatformType.xpro.value,
+        "start_date": _parse_datetime(course_run["start_date"]),
+        "end_date": _parse_datetime(course_run["end_date"]),
+        "enrollment_start": _parse_datetime(course_run["enrollment_start"]),
+        "enrollment_end": _parse_datetime(course_run["enrollment_end"]),
+        "best_start_date": _parse_datetime(course_run["enrollment_start"])
+        or _parse_datetime(course_run["start_date"]),
+        "best_end_date": _parse_datetime(course_run["enrollment_end"])
+        or _parse_datetime(course_run["end_date"]),
+        "offered_by": OfferedBy.xpro.value,
+        "published": bool(course_run["current_price"]),
+        "prices": [{"price": course_run["current_price"]}]
+        if course_run.get("current_price", None)
+        else [],
+        "instructors": [
+            {"full_name": instructor["name"]}
+            for instructor in course_run["instructors"]
+        ],
+    }
+
+
+def _transform_course(course):
+    """
+    Transforms a course into our normalized data structure
+
+    Args:
+        course (dict): course data
+
+    Returns:
+        dict: normalized course data
+    """
+    return {
+        "course_id": course["readable_id"],
+        "platform": PlatformType.xpro.value,
+        "title": course["title"],
+        "image_src": course["thumbnail_url"],
+        "offered_by": OfferedBy.xpro.value,
+        "short_description": course["description"],
+        "published": any(
+            map(
+                lambda course_run: course_run.get("current_price", None),
+                course["courseruns"],
+            )
+        ),
+        "runs": [_transform_run(course_run) for course_run in course["courseruns"]],
+    }
+
+
+@log_exceptions("Error transforming xPro courses", exc_return_value=[])
+def transform_courses(courses):
+    """
+    Transforms a list of courses into our normalized data structure
+
+    Args:
+        courses (list of dict): courses data
+
+    Returns:
+        list of dict: normalized courses data
+    """
+    # NOTE: don't use this in `transform_programs`, because this is wrapped in `log_exceptions`
+    return [_transform_course(course) for course in courses]
+
+
+@log_exceptions("Error transforming xPro programs", exc_return_value=[])
+def transform_programs(programs):
     """Transform the xPro catalog data"""
     # normalize the xPro data into the course_catalog/models.py data structures
     return [
@@ -70,55 +152,7 @@ def transform(programs):
                     "short_description": program["description"],
                 }
             ],
-            "courses": [
-                {
-                    "course_id": course["readable_id"],
-                    "platform": PlatformType.xpro.value,
-                    "title": course["title"],
-                    "image_src": course["thumbnail_url"],
-                    "offered_by": OfferedBy.xpro.value,
-                    "short_description": course["description"],
-                    "published": any(
-                        map(
-                            lambda course_run: course_run.get("current_price", None),
-                            course["courseruns"],
-                        )
-                    ),
-                    "runs": [
-                        {
-                            "run_id": course_run["courseware_id"],
-                            "platform": PlatformType.xpro.value,
-                            "start_date": _parse_datetime(course_run["start_date"]),
-                            "end_date": _parse_datetime(course_run["end_date"]),
-                            "enrollment_start": _parse_datetime(
-                                course_run["enrollment_start"]
-                            ),
-                            "enrollment_end": _parse_datetime(
-                                course_run["enrollment_end"]
-                            ),
-                            "best_start_date": _parse_datetime(
-                                course_run["enrollment_start"]
-                            )
-                            or _parse_datetime(course_run["start_date"]),
-                            "best_end_date": _parse_datetime(
-                                course_run["enrollment_end"]
-                            )
-                            or _parse_datetime(course_run["end_date"]),
-                            "offered_by": OfferedBy.xpro.value,
-                            "published": bool(course_run["current_price"]),
-                            "prices": [{"price": course_run["current_price"]}]
-                            if course_run.get("current_price", None)
-                            else [],
-                            "instructors": [
-                                {"full_name": instructor["name"]}
-                                for instructor in course_run["instructors"]
-                            ],
-                        }
-                        for course_run in course["courseruns"]
-                    ],
-                }
-                for course in program["courses"]
-            ],
+            "courses": [_transform_course(course) for course in program["courses"]],
         }
         for program in programs
     ]
