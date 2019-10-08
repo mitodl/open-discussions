@@ -8,7 +8,7 @@ import pytest
 from django.utils import timezone
 
 from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
-from course_catalog.factories import CourseFactory, LearningResourceRunFactory
+from course_catalog.factories import CourseFactory
 from course_catalog.models import (
     Course,
     LearningResourceRun,
