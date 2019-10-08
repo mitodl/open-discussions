@@ -67,7 +67,7 @@ def load_run(learning_resource, course_run_data):
     topics_data = course_run_data.pop("topics", [])
 
     learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
-        course_run_id=run_id,
+        run_id=run_id,
         defaults={
             **course_run_data,
             "object_id": learning_resource.id,
