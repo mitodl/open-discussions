@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.94.0
+--------------
+
+- fix small layout bug
+- Refactor MITx integration to new etl pipeline
+- refactor tooltips
+- implement mobile view for the course search page
+- Set default ordering of CourseRun (#2262)
+
 Version 0.93.1 (Released October 03, 2019)
 --------------
 
