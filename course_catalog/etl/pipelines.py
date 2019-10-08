@@ -18,7 +18,12 @@ micromasters_etl = compose(
     loaders.load_programs, micromasters.transform, micromasters.extract
 )
 
-xpro_etl = compose(loaders.load_programs, xpro.transform, xpro.extract)
+xpro_programs_etl = compose(
+    loaders.load_programs, xpro.transform_programs, xpro.extract_programs
+)
+xpro_courses_etl = compose(
+    loaders.load_courses, xpro.transform_courses, xpro.extract_courses
+)
 
 mitx_etl = compose(
     loaders.load_courses,

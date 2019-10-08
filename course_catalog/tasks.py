@@ -96,7 +96,8 @@ def get_micromasters_data():
 @app.task(acks_late=True)
 def get_xpro_data():
     """Execute the xPro ETL pipeline"""
-    pipelines.xpro_etl()
+    pipelines.xpro_programs_etl()
+    pipelines.xpro_courses_etl()
 
 
 @app.task(acks_late=True)

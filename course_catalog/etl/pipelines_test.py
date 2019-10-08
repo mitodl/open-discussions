@@ -37,20 +37,36 @@ def test_micromasters_etl(mocker):
     assert result == mock_load_programs.return_value
 
 
-def test_xpro_etl(mocker):
-    """Verify that xpro etl pipeline executes correctly"""
-    mock_extract = mocker.patch("course_catalog.etl.xpro.extract")
-    mock_transform = mocker.patch("course_catalog.etl.xpro.transform")
+def test_xpro_programs_etl(mocker):
+    """Verify that xpro programs etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.xpro.extract_programs")
+    mock_transform = mocker.patch("course_catalog.etl.xpro.transform_programs")
     mock_load_programs = mocker.patch("course_catalog.etl.loaders.load_programs")
 
     with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_programs):
-        result = pipelines.xpro_etl()
+        result = pipelines.xpro_programs_etl()
 
     mock_extract.assert_called_once_with()
     mock_transform.assert_called_once_with(mock_extract.return_value)
     mock_load_programs.assert_called_once_with(mock_transform.return_value)
 
     assert result == mock_load_programs.return_value
+
+
+def test_xpro_courses_etl(mocker):
+    """Verify that xpro courses etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.xpro.extract_courses")
+    mock_transform = mocker.patch("course_catalog.etl.xpro.transform_courses")
+    mock_load_courses = mocker.patch("course_catalog.etl.loaders.load_courses")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_courses):
+        result = pipelines.xpro_courses_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_courses.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_courses.return_value
 
 
 def test_mitx_etl(mocker):
