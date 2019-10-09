@@ -18,11 +18,12 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Bootcamp, LearningResourceRun
+from course_catalog.models import Bootcamp, LearningResourceRun, Course
 from course_catalog.serializers import (
     BootcampSerializer,
     OCWSerializer,
-    LearningResourceRunSerializer)
+    LearningResourceRunSerializer,
+)
 from course_catalog.utils import get_course_url
 from search.task_helpers import (
     delete_course,
