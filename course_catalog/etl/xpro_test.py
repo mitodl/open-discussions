@@ -51,9 +51,25 @@ def test_xpro_transform(mock_xpro_data):
             "short_description": program_data["description"],
             "offered_by": OfferedBy.xpro.value,
             "published": bool(program_data["current_price"]),
-            "prices": [{"price": program_data["current_price"]}]
-            if program_data["current_price"]
-            else [],
+            "url": program_data["url"],
+            "runs": [
+                {
+                    "run_id": program_data["readable_id"],
+                    "start_date": any_instance_of(datetime, type(None)),
+                    "end_date": any_instance_of(datetime, type(None)),
+                    "enrollment_start": any_instance_of(datetime, type(None)),
+                    "best_start_date": _parse_datetime(
+                        program_data["enrollment_start"] or program_data["start_date"]
+                    ),
+                    "best_end_date": _parse_datetime(program_data["end_date"]),
+                    "prices": [{"price": program_data["current_price"], "mode": ""}]
+                    if program_data["current_price"]
+                    else [],
+                    "title": program_data["title"],
+                    "short_description": program_data["description"],
+                    "offered_by": OfferedBy.xpro.value,
+                }
+            ],
             "courses": [
                 {
                     "course_id": course_data["readable_id"],

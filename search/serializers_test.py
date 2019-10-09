@@ -11,6 +11,7 @@ from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
     CoursePriceFactory,
+    ProgramFactory,
 )
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
@@ -18,10 +19,11 @@ from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
 from search.api import gen_course_id
-from search.constants import PROFILE_TYPE, COURSE_TYPE
+from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
+    ESProgramSerializer,
     ESCourseSerializer,
     ESRunSerializer,
     ESProfileSerializer,
@@ -298,6 +300,32 @@ def test_es_course_serializer(offered_by):
             ],
             "published": True,
             "offered_by": course.offered_by,
+        },
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
+def test_es_program_serializer(offered_by):
+    """
+    Test that ESProgramSerializer correctly serializes a course object
+    """
+    program = ProgramFactory.create(offered_by=offered_by)
+    serialized = ESProgramSerializer(program).data
+    assert_json_equal(
+        serialized,
+        {
+            "object_type": PROGRAM_TYPE,
+            "id": program.id,
+            "short_description": program.short_description,
+            "title": program.title,
+            "image_src": program.image_src,
+            "topics": list(program.topics.values_list("name", flat=True)),
+            "runs": [
+                ESRunSerializer(program_run).data
+                for program_run in program.runs.order_by("-best_start_date")
+            ],
+            "offered_by": program.offered_by,
         },
     )
 

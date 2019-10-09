@@ -416,7 +416,7 @@ class ESProgramSerializer(ESModelSerializer):
     object_type = PROGRAM_TYPE
 
     topics = ESTopicsField()
-    prices = ESCoursePriceSerializer(many=True)
+    runs = ESRunSerializer(many=True)
 
     class Meta:
         model = Program
@@ -426,7 +426,7 @@ class ESProgramSerializer(ESModelSerializer):
             "title",
             "image_src",
             "topics",
-            "prices",
+            "runs",
             "offered_by",
         ]
 

@@ -72,6 +72,13 @@ def test_micromasters_transform(mock_micromasters_data):
                 {"course_id": "1", "offered_by": OfferedBy.micromasters.value},
                 {"course_id": "2", "offered_by": OfferedBy.micromasters.value},
             ],
+            "runs": [
+                {
+                    "run_id": 1,
+                    "title": "program title 1",
+                    "offered_by": OfferedBy.micromasters.value,
+                }
+            ],
         },
         {
             "program_id": 2,
@@ -82,6 +89,13 @@ def test_micromasters_transform(mock_micromasters_data):
             "courses": [
                 {"course_id": "3", "offered_by": OfferedBy.micromasters.value},
                 {"course_id": "4", "offered_by": OfferedBy.micromasters.value},
+            ],
+            "runs": [
+                {
+                    "run_id": 2,
+                    "title": "program title 2",
+                    "offered_by": OfferedBy.micromasters.value,
+                }
             ],
         },
     ]

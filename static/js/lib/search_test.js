@@ -8,7 +8,8 @@ import {
   makeCourseResult,
   makePostResult,
   makeProfileResult,
-  makeLearningResourceResult
+  makeLearningResourceResult,
+  makeProgramResult
 } from "../factories/search"
 import {
   AVAILABILITY_MAPPING,
@@ -27,6 +28,7 @@ import {
   LR_TYPE_COURSE,
   DEFAULT_START_DT
 } from "../lib/constants"
+import { LR_TYPE_PROGRAM } from "./constants"
 
 describe("search functions", () => {
   let sandbox
@@ -142,6 +144,21 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_BOOTCAMP,
       offered_by:  "bootcamps",
+      runs:        result.runs
+    })
+  })
+
+  it("converts a program search result to a learning resource", () => {
+    const result = makeProgramResult()
+    const program = searchResultToLearningResource(result)
+    assert.deepEqual(program, {
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    null,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_PROGRAM,
+      offered_by:  result.offered_by,
       runs:        result.runs
     })
   })

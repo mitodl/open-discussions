@@ -14,6 +14,7 @@ from course_catalog.etl.loaders import (
     load_prices,
     load_instructors,
 )
+from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
     ProgramFactory,
     CourseFactory,
@@ -53,9 +54,9 @@ def test_load_program(
 ):  # pylint: disable=too-many-arguments
     """Test that load_program loads the program"""
     program = (
-        ProgramFactory.create(published=is_published)
+        ProgramFactory.create(published=is_published, runs=[])
         if program_exists
-        else ProgramFactory.build(published=is_published)
+        else ProgramFactory.build(published=is_published, runs=[])
     )
     courses = (
         CourseFactory.create_batch(2) if courses_exist else CourseFactory.build_batch(2)
@@ -82,6 +83,23 @@ def test_load_program(
     assert Program.objects.count() == (1 if program_exists else 0)
     assert Course.objects.count() == before_course_count
 
+    run_data = {
+        "prices": [
+            {
+                "price": price.price,
+                "mode": price.mode,
+                "upgrade_deadline": price.upgrade_deadline,
+            }
+            for price in prices
+        ],
+        "run_id": program.program_id,
+        "enrollment_start": "2017-01-01T00:00:00Z",
+        "start_date": "2017-01-20T00:00:00Z",
+        "end_date": "2017-06-20T00:00:00Z",
+        "best_start_date": "2017-06-20T00:00:00Z",
+        "best_end_date": "2017-06-20T00:00:00Z",
+    }
+
     result = load_program(
         {
             "program_id": program.program_id,
@@ -89,14 +107,7 @@ def test_load_program(
             "url": program.url,
             "image_src": program.image_src,
             "published": is_published,
-            "prices": [
-                {
-                    "price": price.price,
-                    "mode": price.mode,
-                    "upgrade_deadline": price.upgrade_deadline,
-                }
-                for price in prices
-            ],
+            "runs": [run_data],
             "courses": [{"course_id": course.course_id} for course in courses],
         }
     )
@@ -115,13 +126,18 @@ def test_load_program(
     # assert we got a program back and that each course is in a program
     assert isinstance(result, Program)
     assert result.items.count() == len(courses)
-    assert result.prices.count() == len(prices)
+    assert result.runs.count() == 1
+    assert result.runs.first().prices.count() == len(prices)
     assert sorted(
         [
             (price.price, price.mode, price.upgrade_deadline)
-            for price in result.prices.all()
+            for price in result.runs.first().prices.all()
         ]
     ) == sorted([(price.price, price.mode, price.upgrade_deadline) for price in prices])
+
+    assert result.runs.first().best_start_date == _parse_datetime(
+        run_data["best_start_date"]
+    )
 
     for item, data in zip(result.items.all(), courses):
         course = item.item
@@ -221,21 +237,20 @@ def test_load_topics(parent_factory, topics_exist):
     assert parent.topics.count() == len(topics)
 
 
-@pytest.mark.parametrize("parent_factory", [ProgramFactory, LearningResourceRunFactory])
 @pytest.mark.parametrize("prices_exist", [True, False])
-def test_load_prices(parent_factory, prices_exist):
+def test_load_prices(prices_exist):
     """Test that load_prices creates and/or assigns prices to the parent object"""
     prices = (
         CoursePriceFactory.create_batch(3)
         if prices_exist
         else CoursePriceFactory.build_batch(3)
     )
-    parent = parent_factory.create(no_prices=True)
+    course_run = LearningResourceRunFactory.create(no_prices=True)
 
-    assert parent.prices.count() == 0
+    assert course_run.prices.count() == 0
 
     load_prices(
-        parent,
+        course_run,
         [
             {
                 "price": price.price,
@@ -246,7 +261,7 @@ def test_load_prices(parent_factory, prices_exist):
         ],
     )
 
-    assert parent.prices.count() == len(prices)
+    assert course_run.prices.count() == len(prices)
 
 
 @pytest.mark.parametrize("instructor_exists", [True, False])

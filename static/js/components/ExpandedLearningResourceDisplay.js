@@ -6,12 +6,7 @@ import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
 import ClampLines from "react-clamp-lines"
 
-import {
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM,
-  platforms
-} from "../lib/constants"
+import { LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM, platforms } from "../lib/constants"
 import {
   bestRun,
   minPrice,
@@ -43,35 +38,17 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
       runId:      parseInt(event.target.value)
     })
 
-  const objectRuns = [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(
-    object.object_type
-  )
-    ? // $FlowFixMe: if object is bootcamp or course it will have runs property
-    object.runs
-    : []
+  const objectRuns = object.runs || []
 
-  const selectedRun = objectRuns
-    ? bestRun(
-      runId ? objectRuns.filter(run => run.id === runId) : objectRuns
-    ) || objectRuns[0]
-    : null
+  const selectedRun =
+    bestRun(runId ? objectRuns.filter(run => run.id === runId) : objectRuns) ||
+    objectRuns[0]
 
-  let url = object.url
-  let cost = null
-  if (selectedRun && selectedRun.url) {
-    url = selectedRun.url
-    cost = minPrice(selectedRun.prices)
-  } else if (object.object_type === LR_TYPE_PROGRAM) {
-    // $FlowFixMe: programs do have prices
-    cost = minPrice(object.prices)
-  }
+  const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
+  const cost = selectedRun ? minPrice(selectedRun.prices) : null
 
   let instructors = []
-  if (selectedRun && selectedRun.instructors) {
-    instructors = selectedRun.instructors.map(instructor =>
-      getInstructorName(instructor)
-    )
-  } else if (object.object_type === LR_TYPE_PROGRAM) {
+  if (object.object_type === LR_TYPE_PROGRAM) {
     instructors = Array.from(
       new Set(
         R.flatten(
@@ -85,6 +62,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           )
         )
       )
+    )
+  } else if (selectedRun && selectedRun.instructors) {
+    instructors = selectedRun.instructors.map(instructor =>
+      getInstructorName(instructor)
     )
   }
 

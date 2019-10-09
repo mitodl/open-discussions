@@ -68,17 +68,22 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[true, false].forEach(hasCourseRunUrl => {
-    it(`should render ${hasCourseRunUrl ? "run" : "course"} link`, () => {
-      const run = bestRun(course.runs)
-      if (!hasCourseRunUrl) {
-        // $FlowFixMe: run is not null here
-        run.url = null
-      }
-      const wrapper = render()
-      const link = wrapper.find(".course-links").find("a")
-      // $FlowFixMe: run won't be null
-      assert.equal(link.prop("href"), hasCourseRunUrl ? run.url : course.url)
+  ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(objectType => {
+    [true, false].forEach(hasRunUrl => {
+      it(`should render ${hasRunUrl ? "run" : objectType} link`, () => {
+        const object = makeLearningResource(objectType)
+        const run = bestRun(object.runs)
+        if (!hasRunUrl) {
+          // $FlowFixMe: run is not null here
+          run.url = null
+        }
+        const wrapper = render({
+          object
+        })
+        const link = wrapper.find(".course-links").find("a")
+        // $FlowFixMe: run won't be null
+        assert.equal(link.prop("href"), hasRunUrl ? run.url : object.url)
+      })
     })
   })
 
@@ -86,6 +91,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   ;[true, false].forEach(hasProgramUrl => {
     it(`${shouldIf(hasProgramUrl)} render program link`, () => {
       const program = makeLearningResource(LR_TYPE_PROGRAM)
+      program.runs[0].url = null
       if (!hasProgramUrl) {
         program.url = null
       }
@@ -94,7 +100,6 @@ describe("ExpandedLearningResourceDisplay", () => {
       })
       const link = wrapper.find(".course-links").find("a")
       assert.equal(link.exists(), hasProgramUrl)
-      // $FlowFixMe: run won't be null
       if (hasProgramUrl) {
         assert.equal(link.prop("href"), program.url)
       }
@@ -223,7 +228,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
     const instructorText = wrapper
       .find(".school")
-      .at(0)
+      .at(1)
       .closest(".course-info-row")
       .find(".course-info-value")
       .text()
@@ -286,7 +291,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const prices = [{ price: 25.5, mode: "" }]
       const object = makeLearningResource(objectType)
       if (objectType === LR_TYPE_PROGRAM) {
-        object.prices = prices
+        object.runs[0].prices = prices
       } else {
         // $FlowFixMe: bestRun result won't be null
         bestRun(object.runs).prices = prices

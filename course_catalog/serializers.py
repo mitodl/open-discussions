@@ -361,8 +361,8 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
 
     items = ProgramItemSerializer(many=True, allow_null=True)
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
 
     class Meta:

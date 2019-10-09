@@ -133,7 +133,7 @@ export const makeProgram = (): Program => ({
     makeUserListItem(LR_TYPE_COURSE)
   ],
   object_type: "program",
-  prices:      [{ mode: "", price: casual.number }]
+  runs:        [makeRun()]
 })
 
 const incrUserList = incrementer()
