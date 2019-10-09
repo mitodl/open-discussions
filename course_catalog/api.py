@@ -1,9 +1,10 @@
 """
 course_catalog api functions
 """
+from collections import namedtuple
+from datetime import datetime
 import json
 import logging
-from datetime import datetime
 
 import boto3
 from django.db import transaction
@@ -324,9 +325,8 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
         upload_to_s3 (bool): If True, upload course media to S3
 
     Returns:
-        tuple[str, bool]:
-            First item is the UID, or None if the course_run_id is not found in the data
-            Second item is whether or not the course run is published
+        str:
+            The UID, or None if the course_run_id is not found, or if it was found but not synced
     """
     loaded_raw_jsons_for_course = []
     last_modified_dates = []
@@ -358,7 +358,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
     if not uid:
         # skip if we're unable to fetch course's uid
         log.info("Skipping %s, no course_id", course_prefix)
-        return uid, is_published
+        return None
     # get the latest modified timestamp of any file in the course
     last_modified = max(last_modified_dates)
 
@@ -391,7 +391,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
         and not force_overwrite
     ):
         log.info("Already synced. No changes found for %s", course_prefix)
-        return uid, is_published
+        return None
 
     course_instance = Course.objects.filter(course_id=course_json["course_id"]).first()
     if upload_to_s3 and is_published:
@@ -417,7 +417,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
         is_published,
         course_prefix,
     )
-    return uid, is_published
+    return uid
 
 
 def sync_ocw_courses(*, force_overwrite, upload_to_s3):
@@ -429,7 +429,7 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
         upload_to_s3 (bool): If True, upload course media to S3
 
     Returns:
-        dict: A mapping of CourseRun.course_run_id to its is_published value
+        set[str]: All CourseRun.course_run_id values for course runs which were synced
     """
     raw_data_bucket = boto3.resource(
         "s3",
@@ -441,10 +441,10 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
     ocw_courses = generate_course_prefix_list(raw_data_bucket)
 
     # loop over each course
-    uids = {}
+    uids = set()
     for course_prefix in sorted(ocw_courses):
         try:
-            uid, is_published = sync_ocw_course(
+            uid = sync_ocw_course(
                 course_prefix=course_prefix,
                 raw_data_bucket=raw_data_bucket,
                 force_overwrite=force_overwrite,
@@ -452,10 +452,9 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
             )
 
             if uid:
-                uids[uid] = is_published
+                uids.add(uid)
         except:  # pylint: disable=bare-except
             log.exception("Error encountered parsing OCW json for %s", course_prefix)
-
     return uids
 
 
@@ -491,7 +490,7 @@ def sync_ocw_data(*, force_overwrite, upload_to_s3):
     """
     uids = sync_ocw_courses(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
     course_ids = update_course_published(
-        CourseRun.objects.filter(course_run_id__in=uids.keys())
+        CourseRun.objects.filter(course_run_id__in=uids)
     )
     for course in Course.objects.filter(id__in=course_ids):
         # Probably quicker to do this as a bulk operation
