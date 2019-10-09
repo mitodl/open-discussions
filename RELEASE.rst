@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.94.1
+--------------
+
+- Rename CourseRun to LearningResourceRun (#2265)
+- Remove OCW courses from search if they are unpublished (#2260)
+
 Version 0.94.0 (Released October 09, 2019)
 --------------
 
