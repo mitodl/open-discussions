@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.94.0
+Version 0.94.0 (Released October 09, 2019)
 --------------
 
 - fix small layout bug
