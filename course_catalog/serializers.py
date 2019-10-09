@@ -221,6 +221,10 @@ class CourseRunSerializer(BaseCourseSerializer):
             "availability": data.get("availability"),
             "offered_by": data.get("offered_by"),
         }
+        is_published = data.get("is_published")
+        if is_published is not None:
+            course_fields["published"] = is_published
+
         self.instructors = [
             {
                 "first_name": person.get("given_name", person.get("first_name")),
