@@ -18,11 +18,11 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.models import Bootcamp, Course, CourseRun
+from course_catalog.models import Bootcamp, LearningResourceRun, Course
 from course_catalog.serializers import (
     BootcampSerializer,
-    CourseRunSerializer,
     OCWSerializer,
+    LearningResourceRunSerializer,
 )
 from course_catalog.utils import get_course_url
 from search.task_helpers import (
@@ -91,14 +91,12 @@ def digest_ocw_course(
     with transaction.atomic():
         course = ocw_serializer.save()
 
-        # Try and get the CourseRun instance.
+        # Try and get the LearningResourceRun instance.
         try:
-            courserun_instance = course.course_runs.get(
-                course_run_id=master_json.get("uid")
-            )
-        except CourseRun.DoesNotExist:
+            courserun_instance = course.runs.get(run_id=master_json.get("uid"))
+        except LearningResourceRun.DoesNotExist:
             courserun_instance = None
-        run_serializer = CourseRunSerializer(
+        run_serializer = LearningResourceRunSerializer(
             data={
                 **master_json,
                 "key": master_json.get("uid"),
@@ -127,7 +125,7 @@ def digest_ocw_course(
         )
         if not run_serializer.is_valid():
             log.error(
-                "OCW CourseRun %s is not valid: %s",
+                "OCW LearningResourceRun %s is not valid: %s",
                 master_json.get("key"),
                 run_serializer.errors,
             )
@@ -220,11 +218,11 @@ def get_course_availability(course):
         course_json = course.raw_json
         if course_json is None:
             return
-        course_runs = course_json.get("course_runs")
-        if course_runs is None:
+        runs = course_json.get("course_runs")
+        if runs is None:
             return
         # get appropriate course_run
-        for run in course_runs:
+        for run in runs:
             if run.get("key") == course.course_id:
                 return run.get("availability")
 
@@ -277,14 +275,12 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     with transaction.atomic():
         bootcamp = bootcamp_serializer.save()
 
-        # Try and get the CourseRun instance.
+        # Try and get the LearningResourceRun instance.
         try:
-            courserun_instance = bootcamp.course_runs.get(
-                course_run_id=bootcamp.course_id
-            )
-        except CourseRun.DoesNotExist:
-            courserun_instance = None
-        run_serializer = CourseRunSerializer(
+            run_instance = bootcamp.runs.get(run_id=bootcamp.course_id)
+        except LearningResourceRun.DoesNotExist:
+            run_instance = None
+        run_serializer = LearningResourceRunSerializer(
             data={
                 **bootcamp_data,
                 "key": bootcamp_data.get("course_id"),
@@ -292,18 +288,18 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 "seats": bootcamp_data.get("prices"),
                 "start": bootcamp_data.get("start_date"),
                 "end": bootcamp_data.get("end_date"),
-                "course_run_id": bootcamp.course_id,
+                "run_id": bootcamp.course_id,
                 "max_modified": bootcamp_modified,
                 "offered_by": OfferedBy.bootcamps.value,
                 "content_type": ContentType.objects.get(model="bootcamp").id,
                 "object_id": bootcamp.id,
                 "url": bootcamp.url,
             },
-            instance=courserun_instance,
+            instance=run_instance,
         )
         if not run_serializer.is_valid():
             log.error(
-                "Bootcamp CourseRun %s is not valid: %s",
+                "Bootcamp LearningResourceRun %s is not valid: %s",
                 bootcamp_data.get("key"),
                 run_serializer.errors,
             )
@@ -325,7 +321,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
 
     Returns:
         str:
-            The UID, or None if the course_run_id is not found, or if it was found but not synced
+            The UID, or None if the run_id is not found, or if it was found but not synced
     """
     loaded_raw_jsons_for_course = []
     last_modified_dates = []
@@ -381,7 +377,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
     )
 
     # if course run synced before, update existing Course instance
-    courserun_instance = CourseRun.objects.filter(course_run_id=uid).first()
+    courserun_instance = LearningResourceRun.objects.filter(run_id=uid).first()
 
     # Make sure that the data we are syncing is newer than what we already have
     if (
@@ -428,7 +424,7 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
         upload_to_s3 (bool): If True, upload course media to S3
 
     Returns:
-        set[str]: All CourseRun.course_run_id values for course runs which were synced
+        set[str]: All LearningResourceRun.run_id values for course runs which were synced
     """
     raw_data_bucket = boto3.resource(
         "s3",
@@ -462,7 +458,7 @@ def update_course_published(runs):
     Fix the is_published value for each course
 
     Args:
-        runs (iterable of CourseRun): An iterable of CourseRun
+        runs (iterable of LearningResourceRun): An iterable of LearningResourceRun
 
     Returns:
         set[int]: A set of Course ids
@@ -472,7 +468,7 @@ def update_course_published(runs):
     for run in runs:
         course = run.content_object
         if course.id not in done_courses:
-            runs_published = course.course_runs.values_list("published", flat=True)
+            runs_published = course.runs.values_list("published", flat=True)
             course.published = any(runs_published)
             course.save()
             done_courses.add(course.id)
@@ -489,7 +485,7 @@ def sync_ocw_data(*, force_overwrite, upload_to_s3):
     """
     uids = sync_ocw_courses(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
     course_ids = update_course_published(
-        CourseRun.objects.filter(course_run_id__in=uids)
+        LearningResourceRun.objects.filter(run_id__in=uids)
     )
     for course in Course.objects.filter(id__in=course_ids):
         # Probably quicker to do this as a bulk operation

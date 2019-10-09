@@ -18,7 +18,7 @@ from course_catalog.models import (
     Program,
     Bootcamp,
     FavoriteItem,
-    CourseRun,
+    LearningResourceRun,
 )
 from course_catalog.serializers import (
     CourseSerializer,
@@ -115,22 +115,22 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """Generate a QuerySet for fetching valid courses"""
         return (
             Course.objects.annotate(
-                has_course_runs=Exists(
-                    CourseRun.objects.filter(
+                has_runs=Exists(
+                    LearningResourceRun.objects.filter(
                         content_type=ContentType.objects.get_for_model(Course),
                         object_id=OuterRef("pk"),
                         published=True,
                     )
                 )
             )
-            .filter(has_course_runs=True, published=True)
+            .filter(has_runs=True, published=True)
             .prefetch_related(
                 "topics",
                 Prefetch(
-                    "course_runs",
-                    queryset=CourseRun.objects.filter(published=True).order_by(
-                        "-best_start_date"
-                    ),
+                    "runs",
+                    queryset=LearningResourceRun.objects.filter(
+                        published=True
+                    ).order_by("-best_start_date"),
                 ),
             )
         )
@@ -151,8 +151,8 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """
         page = self.paginate_queryset(
             self.get_queryset()
-            .filter(course_runs__start_date__gt=timezone.now())
-            .order_by("course_runs__start_date")
+            .filter(runs__start_date__gt=timezone.now())
+            .order_by("runs__start_date")
         )
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -175,7 +175,7 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     queryset = Bootcamp.objects.prefetch_related(
         "topics",
         Prefetch(
-            "course_runs", queryset=CourseRun.objects.order_by("-best_start_date")
+            "runs", queryset=LearningResourceRun.objects.order_by("-best_start_date")
         ),
     )
     serializer_class = BootcampSerializer

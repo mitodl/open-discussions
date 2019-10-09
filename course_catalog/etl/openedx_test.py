@@ -128,14 +128,14 @@ def test_transform_course(
             "last_modified": any_instance_of(datetime),
             "topics": [{"name": "Data Analysis & Statistics"}],
             "url": f"{openedx_config.alt_url}MITx+15.071x/course/",
-            "course_runs": []
+            "runs": []
             if is_course_run_deleted
             else [
                 {
                     "availability": "Starting Soon",
                     "best_end_date": "2019-05-22T23:30:00Z",
                     "best_start_date": "2019-02-20T15:00:00Z",
-                    "course_run_id": "course-v1:MITx+15.071x+1T2019",
+                    "run_id": "course-v1:MITx+15.071x+1T2019",
                     "end_date": "2019-05-22T23:30:00Z",
                     "enrollment_end": None,
                     "enrollment_start": None,

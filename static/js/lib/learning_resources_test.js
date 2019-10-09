@@ -32,7 +32,7 @@ import {
   getStartDate,
   getInstructorName
 } from "./learning_resources"
-import { makeCourse, makeCourseRun } from "../factories/learning_resources"
+import { makeCourse, makeRun } from "../factories/learning_resources"
 import moment from "moment"
 
 describe("Course utils", () => {
@@ -43,11 +43,8 @@ describe("Course utils", () => {
   ].forEach(([availability, expected]) => {
     it(`availabilityLabel should return ${expected} for course.availability of ${availability}`, () => {
       const course = makeCourse()
-      course.course_runs[0].availability = availability
-      assert.equal(
-        availabilityLabel(course.course_runs[0].availability),
-        expected
-      )
+      course.runs[0].availability = availability
+      assert.equal(availabilityLabel(course.runs[0].availability), expected)
     })
   })
 
@@ -61,7 +58,7 @@ describe("Course utils", () => {
   ].forEach(([prices, expectedMax, expectedMin]) => {
     it(`minPrice, maxPrice should return ${expectedMin}, ${expectedMax} for price range ${prices.toString()}`, () => {
       const course = makeCourse()
-      const courseRun = course.course_runs[0]
+      const courseRun = course.runs[0]
       courseRun.prices = []
       prices.forEach(price => {
         if (!isNaN(price)) {
@@ -252,7 +249,7 @@ describe("Course run availability utils", () => {
     ],
     ["2030-08-02T00:00:00Z", null, ["nextYear"], false, null]
   ].forEach(([startDate, endDate, availabilities, expected, label]) => {
-    const courseRun = makeCourseRun()
+    const courseRun = makeRun()
     courseRun.best_start_date = startDate
     courseRun.best_end_date = endDate
 
@@ -300,7 +297,7 @@ describe("Course run availability utils", () => {
     ]
   ].forEach(([startDates, endDates, expected]) => {
     it(`best run of 3 should have start_date ${expected}`, () => {
-      const runs = times(makeCourseRun, 3)
+      const runs = times(makeRun, 3)
       const setDates = iter => {
         runs[iter].best_start_date = startDates[iter]
           ? `${startDates[iter]}T00:00:00Z`
@@ -323,7 +320,7 @@ describe("Course run availability utils", () => {
     it(`runStartDate() should return  ${expectedDate} for run with best_start_date ${String(
       startDate
     )}`, () => {
-      const run = makeCourseRun()
+      const run = makeRun()
       run.best_start_date = startDate
       assert.equal(
         runStartDate(run).format(DATE_FORMAT),
@@ -340,7 +337,7 @@ describe("Course run availability utils", () => {
     it(`runEndDate() should return  ${expectedDate} for run with best_end_date ${String(
       endDate
     )}`, () => {
-      const run = makeCourseRun()
+      const run = makeRun()
       run.best_end_date = endDate
       assert.equal(
         runEndDate(run).format(DATE_FORMAT),
@@ -361,7 +358,7 @@ describe("Course run availability utils", () => {
     )}, best_dt ${String(bestDt)}`, () => {
       const course = makeCourse()
       course.platform = platform
-      const courseRun = makeCourseRun()
+      const courseRun = makeRun()
       courseRun.start_date = startDt
       courseRun.best_start_date = bestDt
       courseRun.semester = "Fall"

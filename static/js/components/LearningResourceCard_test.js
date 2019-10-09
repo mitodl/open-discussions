@@ -180,7 +180,7 @@ describe("LearningResourceCard", () => {
           .text()
           .replace("calendar_today", ""),
         [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].includes(objectType)
-          ? bestRunLabel(bestRun(object.course_runs))
+          ? bestRunLabel(bestRun(object.runs))
           : COURSE_AVAILABLE_NOW
       )
     })
@@ -191,7 +191,7 @@ describe("LearningResourceCard", () => {
       render()
         .find(".price")
         .text(),
-      minPrice(bestRun(course.course_runs).prices)
+      minPrice(bestRun(course.runs).prices)
     )
   })
 })

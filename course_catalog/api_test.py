@@ -11,7 +11,7 @@ from course_catalog.constants import PlatformType, AvailabilityType, ResourceTyp
 from course_catalog.factories import CourseFactory
 from course_catalog.models import (
     Course,
-    CourseRun,
+    LearningResourceRun,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
@@ -209,11 +209,11 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
 
 def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     """
-    Verifies that CourseRunSerializer validation works correctly if the OCW course run serializer is invalid
+    Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
     """
     ocw_valid_data.pop("uid")
     digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
-    assert not CourseRun.objects.count()
+    assert not LearningResourceRun.objects.count()
 
 
 @pytest.mark.usefixtures("mock_index_functions")
@@ -223,7 +223,7 @@ def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     """
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert Bootcamp.objects.count() == 1
-    assert CourseRun.objects.count() == 1
+    assert LearningResourceRun.objects.count() == 1
 
 
 @pytest.mark.usefixtures("mock_index_functions")
@@ -231,13 +231,15 @@ def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
     Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
     """
-    mocker.patch("course_catalog.api.CourseRunSerializer.is_valid", return_value=False)
     mocker.patch(
-        "course_catalog.api.CourseRunSerializer.errors",
+        "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
+    )
+    mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.errors",
         return_value={"error": "Bad data"},
     )
     parse_bootcamp_json_data(bootcamp_valid_data)
-    assert CourseRun.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
 
 
 def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
@@ -247,7 +249,7 @@ def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
     bootcamp_valid_data.pop("course_id")
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert Bootcamp.objects.count() == 0
-    assert CourseRun.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
 
 
 def test_safe_load_bad_json(mocker):

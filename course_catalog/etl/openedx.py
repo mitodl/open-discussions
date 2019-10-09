@@ -174,7 +174,7 @@ def _transform_course_run(config, course_run, course_last_modified, marketing_ur
     course_run_last_modified = _parse_openedx_datetime(course_run.get("modified"))
     last_modified = max(course_last_modified, course_run_last_modified)
     return {
-        "course_run_id": course_run.get("key"),
+        "run_id": course_run.get("key"),
         "title": course_run.get("title"),
         "short_description": course_run.get("short_description"),
         "full_description": course_run.get("full_description"),
@@ -245,7 +245,7 @@ def _transform_course(config, course):
         "topics": [
             {"name": subject.get("name")} for subject in course.get("subjects", [])
         ],
-        "course_runs": [
+        "runs": [
             _transform_course_run(config, course_run, last_modified, marketing_url)
             for course_run in course.get("course_runs", [])
             if _filter_course_run(course_run)

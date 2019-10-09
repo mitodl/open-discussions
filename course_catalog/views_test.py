@@ -25,7 +25,7 @@ def test_course_endpoint(client):
     """Test course endpoint"""
     course = CourseFactory.create(topics=CourseTopicFactory.create_batch(3))
     # this should be filtered out
-    CourseFactory.create(course_runs=None)
+    CourseFactory.create(runs=None)
 
     resp = client.get(reverse("courses-list"))
     assert resp.data.get("count") == 1
@@ -45,7 +45,7 @@ def test_course_endpoint(client):
 
     resp = client.get(reverse("courses-list") + "upcoming/")
     assert resp.data.get("count") == 0
-    course_run = course.course_runs.order_by("-best_start_date")[0]
+    course_run = course.runs.order_by("-best_start_date")[0]
     course_run.start_date = timezone.now() + timedelta(days=1)
     course_run.save()
     resp = client.get(reverse("courses-list") + "upcoming/")

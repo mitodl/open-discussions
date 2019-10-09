@@ -10,28 +10,28 @@ from course_catalog.models import (
     UserList,
     ProgramItem,
     UserListItem,
-    CourseRun,
+    LearningResourceRun,
 )
 
 
-class CourseRunAdmin(admin.ModelAdmin):
-    """CourseRun Admin"""
+class LearningResourceRunAdmin(admin.ModelAdmin):
+    """LearningResourceRun Admin"""
 
-    model = CourseRun
+    model = LearningResourceRun
 
-    search_fields = ("course_run_id", "title", "course__course_id")
-    list_display = ("course_run_id", "title", "best_start_date", "best_end_date")
+    search_fields = ("run_id", "title", "course__course_id")
+    list_display = ("run_id", "title", "best_start_date", "best_end_date")
     list_filter = ("semester", "year")
 
 
-class CourseRunInline(GenericTabularInline):
+class LearningResourceRunInline(GenericTabularInline):
     """Inline list items for course runs"""
 
-    model = CourseRun
+    model = LearningResourceRun
     extra = 0
     show_change_link = True
     fields = (
-        "course_run_id",
+        "run_id",
         "best_start_date",
         "best_end_date",
         "enrollment_start",
@@ -59,7 +59,7 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ("course_id", "title")
     list_display = ("course_id", "title", "platform")
     list_filter = ("platform",)
-    inlines = [CourseRunInline]
+    inlines = [LearningResourceRunInline]
 
 
 class BootcampAdmin(admin.ModelAdmin):
@@ -68,7 +68,7 @@ class BootcampAdmin(admin.ModelAdmin):
     model = Bootcamp
     search_fields = ("course_id", "title")
     list_display = ("course_id", "title")
-    inlines = [CourseRunInline]
+    inlines = [LearningResourceRunInline]
 
 
 class UserListItemInline(admin.StackedInline):
@@ -112,7 +112,7 @@ class UserListAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Course, CourseAdmin)
-admin.site.register(CourseRun, CourseRunAdmin)
+admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
 admin.site.register(Bootcamp, BootcampAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(UserList, UserListAdmin)
