@@ -4,7 +4,7 @@ import R from "ramda"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import { Radio } from "@mitodl/mdl-react-components"
-import Checkbox from "rmwc/Checkbox"
+import { Checkbox } from "@rmwc/checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"

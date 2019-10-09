@@ -106,10 +106,10 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
-  it("should render course description as a ClampLines tag", () => {
+  it("should render course description using the TruncatedText", () => {
     const wrapper = render()
-    const clampLines = wrapper.find("ClampLines")
-    assert.equal(clampLines.props().text, course.short_description)
+    const truncated = wrapper.find("TruncatedText")
+    assert.equal(truncated.props().text, course.short_description)
   })
 
   it("should not render course links if urls are all null", () => {

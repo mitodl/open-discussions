@@ -3,7 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 import sinon from "sinon"
-import { Drawer } from "rmwc/Drawer"
+import { Drawer } from "@rmwc/drawer"
 
 import { ResponsiveDrawer, mapStateToProps } from "./Drawer"
 
@@ -57,8 +57,8 @@ describe("Drawer", () => {
       assert.equal(
         wrapper.props().className,
         showDrawerDesktop
-          ? "persistent-drawer-open"
-          : "persistent-drawer-closed"
+          ? "persistent-drawer open"
+          : "persistent-drawer closed"
       )
     })
   })

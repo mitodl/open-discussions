@@ -1,13 +1,13 @@
 // @flow
 import React from "react"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 import { assert } from "chai"
 import _ from "lodash"
 
 import TruncatedText from "./TruncatedText"
 
 describe("TruncatedText", () => {
-  const render = (props = {}) => shallow(<TruncatedText {...props} />)
+  const render = (props = {}) => mount(<TruncatedText {...props} />)
 
   it("displays text", () => {
     const props = {

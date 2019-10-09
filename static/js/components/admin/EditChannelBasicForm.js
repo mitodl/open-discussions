@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import Checkbox from "rmwc/Checkbox"
+import { Checkbox } from "@rmwc/checkbox"
 import R from "ramda"
 
 import Card from "../Card"
@@ -49,84 +49,76 @@ type Props = {
   processing: boolean
 }
 
-export default class EditChannelBasicForm extends React.Component<Props> {
-  render() {
-    const {
-      onSubmit,
-      onUpdate,
-      form,
-      processing,
-      validation,
-      history
-    } = this.props
-    return (
-      <form onSubmit={onSubmit} className="form channel-form">
-        <Card title="Type">
-          {makeChannelTypeOption(
-            CHANNEL_TYPE_PUBLIC,
-            "Public (everybody can see & create posts)",
-            form,
-            onUpdate
-          )}
-          {makeChannelTypeOption(
-            CHANNEL_TYPE_RESTRICTED,
-            "Restricted (everybody can see & only you can create posts)",
-            form,
-            onUpdate
-          )}
-          {makeChannelTypeOption(
-            CHANNEL_TYPE_PRIVATE,
-            "Private (only invited members can see & create posts)",
-            form,
-            onUpdate
-          )}
-        </Card>
-        <Card title="Allowed post types">
-          <div className="post-types">
-            <Checkbox
-              name="allowed_post_types"
-              value={LINK_TYPE_TEXT}
-              checked={R.contains(LINK_TYPE_TEXT, form.allowed_post_types)}
-              onChange={onUpdate}
-            >
-              Short text posts
-            </Checkbox>
-            <Checkbox
-              name="allowed_post_types"
-              value={LINK_TYPE_LINK}
-              checked={R.contains(LINK_TYPE_LINK, form.allowed_post_types)}
-              onChange={onUpdate}
-            >
-              Links to external sites
-            </Checkbox>
-            {SETTINGS.article_ui_enabled ? (
-              <Checkbox
-                name="allowed_post_types"
-                value={LINK_TYPE_ARTICLE}
-                checked={R.contains(LINK_TYPE_ARTICLE, form.allowed_post_types)}
-                onChange={onUpdate}
-              >
-                Article posts
-              </Checkbox>
-            ) : null}
-          </div>
-          <div className="row">
-            {validationMessage(validation.allowed_post_types)}
-          </div>
-        </Card>
-        <div className="row actions">
-          <button
-            className="cancel"
-            onClick={() => history.push(channelURL(form.name))}
-            disabled={processing}
+export default function EditChannelBasicForm(props: Props) {
+  const { onSubmit, onUpdate, form, processing, validation, history } = props
+
+  return (
+    <form onSubmit={onSubmit} className="form channel-form">
+      <Card title="Type">
+        {makeChannelTypeOption(
+          CHANNEL_TYPE_PUBLIC,
+          "Public (everybody can see & create posts)",
+          form,
+          onUpdate
+        )}
+        {makeChannelTypeOption(
+          CHANNEL_TYPE_RESTRICTED,
+          "Restricted (everybody can see & only you can create posts)",
+          form,
+          onUpdate
+        )}
+        {makeChannelTypeOption(
+          CHANNEL_TYPE_PRIVATE,
+          "Private (only invited members can see & create posts)",
+          form,
+          onUpdate
+        )}
+      </Card>
+      <Card title="Allowed post types">
+        <div className="post-types">
+          <Checkbox
+            name="allowed_post_types"
+            value={LINK_TYPE_TEXT}
+            checked={R.contains(LINK_TYPE_TEXT, form.allowed_post_types)}
+            onChange={onUpdate}
           >
-            Cancel
-          </button>
-          <button type="submit" className="save-changes" disabled={processing}>
-            Save
-          </button>
+            Short text posts
+          </Checkbox>
+          <Checkbox
+            name="allowed_post_types"
+            value={LINK_TYPE_LINK}
+            checked={R.contains(LINK_TYPE_LINK, form.allowed_post_types)}
+            onChange={onUpdate}
+          >
+            Links to external sites
+          </Checkbox>
+          {SETTINGS.article_ui_enabled ? (
+            <Checkbox
+              name="allowed_post_types"
+              value={LINK_TYPE_ARTICLE}
+              checked={R.contains(LINK_TYPE_ARTICLE, form.allowed_post_types)}
+              onChange={onUpdate}
+            >
+              Article posts
+            </Checkbox>
+          ) : null}
         </div>
-      </form>
-    )
-  }
+        <div className="row">
+          {validationMessage(validation.allowed_post_types)}
+        </div>
+      </Card>
+      <div className="row actions">
+        <button
+          className="cancel"
+          onClick={() => history.push(channelURL(form.name))}
+          disabled={processing}
+        >
+          Cancel
+        </button>
+        <button type="submit" className="save-changes" disabled={processing}>
+          Save
+        </button>
+      </div>
+    </form>
+  )
 }

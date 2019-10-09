@@ -8,34 +8,7 @@ $drawer-trans: width 500ms;
   font-family: inherit;
 }
 
-.mdc-drawer.mdc-drawer--temporary {
-  z-index: 45;
-}
-
-.persistent-drawer-open,
-.persistent-drawer-hover {
-  .mdc-drawer.mdc-drawer--persistent {
-    width: $drawer-width;
-
-    .mdc-drawer__drawer {
-      width: $drawer-width;
-    }
-  }
-}
-
-.persistent-drawer-hover,
-.persistent-drawer-closed {
-  z-index: 1;
-  position: relative;
-}
-
-.persistent-drawer-hover {
-  .mdc-drawer.mdc-drawer--persistent {
-    transition: $drawer-trans 300ms;
-  }
-}
-
-.mdc-drawer.mdc-drawer--persistent {
+.persistent-drawer {
   position: fixed;
   left: 0;
   height: calc(100vh - #{$toolbar-height-desktop});
@@ -44,30 +17,25 @@ $drawer-trans: width 500ms;
   transition: $drawer-trans;
   overflow: hidden;
   box-shadow: 1px -1px 3px -3px rgba(0, 0, 0, 0.75);
+  z-index: 35;
 
-  .mdc-drawer__drawer {
-    position: absolute;
-    top: 0px;
-    left: 0px;
+  &.open,
+  &.hover {
     width: $drawer-width;
+  }
 
-    .scrollbar-container {
-      display: none;
-    }
-
-    &:hover .scrollbar-container {
-      display: block;
-    }
+  .mdc-drawer__content {
+    width: $drawer-width;
   }
 }
 
 .align-right {
   &.mdc-drawer--open {
-    left: initial;
-    right: 0px;
+    width: 100%;
+    max-width: 486px;
     top: $banner-height;
 
-    nav {
+    .mdc-drawer__content {
       right: 0px;
       max-width: 486px;
     }

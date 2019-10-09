@@ -4,8 +4,8 @@ import R from "ramda"
 import _ from "lodash"
 import { connect } from "react-redux"
 import { withRouter } from "react-router"
-import { Drawer, DrawerContent } from "rmwc/Drawer"
-import { Theme } from "rmwc/Theme"
+import { Drawer, DrawerContent } from "@rmwc/drawer"
+import { Theme } from "@rmwc/theme"
 import { querySelectors } from "redux-query"
 import { connectRequest } from "redux-query-react"
 import { createSelector } from "reselect"
@@ -66,14 +66,13 @@ export class LearningResourceDrawer extends React.Component<Props> {
     return object ? (
       <Theme>
         <Drawer
-          persistent={false}
-          temporary={true}
           open={showLearningDrawer}
           onClose={onDrawerClose}
           dir="rtl"
           className="align-right"
+          modal
         >
-          <DrawerContent dir="ltr" className="alignRight">
+          <DrawerContent dir="ltr">
             <div className="drawer-close" onClick={onDrawerClose}>
               <i className="material-icons clear">clear</i>
             </div>

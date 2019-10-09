@@ -4,7 +4,8 @@ import React from "react"
 import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
-import ClampLines from "react-clamp-lines"
+
+import TruncatedText from "./TruncatedText"
 
 import { LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM, platforms } from "../lib/constants"
 import {
@@ -108,12 +109,11 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
         ) : null}
         <div className="course-title">{object.title}</div>
         <div className="course-description">
-          <ClampLines
+          <TruncatedText
             text={entities.decode(striptags(object.short_description))}
             lines={5}
-            ellipsis="..."
-            moreText="Read more"
-            lessText="Read less"
+            estCharsPerLine={100}
+            showExpansionControls
           />
         </div>
         {!emptyOrNil(object.topics) ? (

@@ -4,8 +4,8 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 import { withRouter } from "react-router"
-import { Drawer, DrawerContent } from "rmwc/Drawer"
-import { Theme } from "rmwc/Theme"
+import { Drawer, DrawerContent } from "@rmwc/drawer"
+import { Theme } from "@rmwc/theme"
 import ScrollArea from "react-scrollbar"
 
 import Navigation from "../components/Navigation"
@@ -109,12 +109,12 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
       return ""
     }
     if (showDrawerDesktop) {
-      return "persistent-drawer-open"
+      return "persistent-drawer open"
     }
     if (showDrawerHover) {
-      return "persistent-drawer-hover"
+      return "persistent-drawer hover"
     }
-    return "persistent-drawer-closed"
+    return "persistent-drawer closed"
   }
 
   render() {
@@ -148,12 +148,12 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
       <div className={this.wrappingClass}>
         <Theme>
           <Drawer
-            persistent={!isMobile}
-            temporary={isMobile}
+            modal={isMobile}
             open={isMobile ? showDrawerMobile : true}
             onClose={this.onDrawerClose}
             onPointerEnter={this.onMouseEnter}
             onPointerLeave={this.onMouseExit}
+            className={this.wrappingClass}
           >
             <ScrollArea horizontal={false}>
               <DrawerContent>

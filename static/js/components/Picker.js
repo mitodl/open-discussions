@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 import R from "ramda"
-import { Menu, MenuItem, MenuAnchor } from "rmwc/Menu"
+import { Menu, MenuItem, MenuSurfaceAnchor } from "@rmwc/menu"
 
 import { DropDownArrow, DropUpArrow } from "./Arrow"
 
@@ -39,7 +39,7 @@ const Picker = (labels, className) => {
       const { menuOpen } = this.state
 
       return (
-        <MenuAnchor className={`picker ${className}`}>
+        <MenuSurfaceAnchor className={`picker ${className}`}>
           <Menu open={menuOpen} onClose={this.toggleMenuOpen}>
             {labels.map(([type, label]) => (
               <MenuItem key={label} onClick={updatePickerParam(type)}>
@@ -51,7 +51,7 @@ const Picker = (labels, className) => {
             {R.fromPairs(labels)[value]}
             {menuOpen ? <DropUpArrow /> : <DropDownArrow />}
           </div>
-        </MenuAnchor>
+        </MenuSurfaceAnchor>
       )
     }
   }

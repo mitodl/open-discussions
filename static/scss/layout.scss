@@ -68,6 +68,7 @@
 @import "channel-member-page";
 @import "course-searchbox";
 @import "course-filter-drawer";
+@import "truncated-text";
 
 body {
   font-family: $body-font;
@@ -85,12 +86,12 @@ body {
     padding: 0;
   }
 
-  .persistent-drawer-open ~ .content {
+  .persistent-drawer.open ~ .content {
     padding-left: $drawer-width;
   }
 
-  .persistent-drawer-closed ~ .content,
-  .persistent-drawer-hover ~ .content {
+  .persistent-drawer.closed ~ .content,
+  .persistent-drawer.hover ~ .content {
     padding-left: $collapse-drawer-width;
   }
 

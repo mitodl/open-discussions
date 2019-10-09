@@ -62,30 +62,30 @@ describe("Dialog", () => {
     assert.equal(props.open, open)
   })
 
-  it("passes the title to DialogHeaderTitle", () => {
+  it("passes the title to DialogTitle", () => {
     assert.equal(
       render()
-        .find("DialogHeaderTitle")
+        .find("DialogTitle")
         .dive()
         .text(),
       title
     )
   })
 
-  it("passes a className to the DialogSurface", () => {
+  it("passes a className to the Dialog", () => {
     assert.equal(
       render()
-        .find("DialogSurface")
+        .find("Dialog")
         .prop("className"),
       className
     )
   })
 
-  it("passes children to the DialogBody", () => {
+  it("passes children to the DialogContent", () => {
     const children = "Some text here"
     assert.equal(
       render({ children })
-        .find("DialogBody")
+        .find("DialogContent")
         .dive()
         .text(),
       children

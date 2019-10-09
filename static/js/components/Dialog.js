@@ -1,14 +1,6 @@
 // @flow
 import React from "react"
-import {
-  Dialog,
-  DialogSurface,
-  DialogHeader,
-  DialogHeaderTitle,
-  DialogBody,
-  DialogFooter,
-  DialogBackdrop
-} from "rmwc/Dialog"
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@rmwc/dialog"
 
 type Props = {
   open: boolean,
@@ -22,24 +14,23 @@ type Props = {
   children?: any
 }
 
-const OurDialog = ({
-  open,
-  hideDialog,
-  onCancel,
-  onAccept,
-  title,
-  submitText,
-  id,
-  className,
-  children
-}: Props) => (
-  <Dialog open={open} onClose={hideDialog} id={id}>
-    <DialogSurface className={className}>
-      <DialogHeader>
-        <DialogHeaderTitle>{title}</DialogHeaderTitle>
-      </DialogHeader>
-      <DialogBody>{children}</DialogBody>
-      <DialogFooter>
+export default function OurDialog(props: Props) {
+  const {
+    open,
+    hideDialog,
+    onCancel,
+    onAccept,
+    title,
+    submitText,
+    id,
+    className,
+    children
+  } = props
+  return (
+    <Dialog open={open} onClose={hideDialog} id={id} className={className}>
+      <DialogTitle>{title}</DialogTitle>
+      <DialogContent>{children}</DialogContent>
+      <DialogActions>
         <button
           className="cancel"
           onClick={onCancel || hideDialog}
@@ -50,10 +41,7 @@ const OurDialog = ({
         <button className="submit" onClick={onAccept} type="button">
           {submitText || "Accept"}
         </button>
-      </DialogFooter>
-    </DialogSurface>
-    <DialogBackdrop />
-  </Dialog>
-)
-
-export default OurDialog
+      </DialogActions>
+    </Dialog>
+  )
+}

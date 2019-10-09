@@ -91,10 +91,7 @@ describe("ProfileImage", () => {
 
     it("should have a description in the upload dialog", () => {
       const image = renderProfileImage({ editable: true })
-      assert.equal(
-        image.find(".mdc-dialog__header__title").text(),
-        "Upload a Profile Image"
-      )
+      assert.equal(image.find("DialogTitle").text(), "Upload a Profile Image")
     })
 
     describe("save button", () => {
@@ -258,7 +255,7 @@ describe("ProfileImage", () => {
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
         const cancelButton = dialog.find(".cancel").at(0)
         await listenForActions(
-          [actions.forms.FORM_BEGIN_EDIT, HIDE_DIALOG],
+          [actions.forms.FORM_BEGIN_EDIT, HIDE_DIALOG, HIDE_DIALOG],
           () => {
             cancelButton.simulate("click")
           }
@@ -285,7 +282,7 @@ describe("ProfileImage", () => {
           .at(0)
           .simulate("click")
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
-        await listenForActions([HIDE_DIALOG], () => {
+        await listenForActions([HIDE_DIALOG, HIDE_DIALOG], () => {
           dialog.props().hideDialog()
         })
       })

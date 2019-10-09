@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 import { Radio } from "@mitodl/mdl-react-components"
-import Checkbox from "rmwc/Checkbox"
+import { Checkbox } from "@rmwc/checkbox"
 
 import { actions } from "../actions"
 import IntegrationTestHelper from "../util/integration_test_helper"

@@ -34,26 +34,18 @@ $dialog-max-width: 400px;
 $person-z-index: 10;
 
 .widget-dialog {
-  min-width: auto;
-  max-width: $dialog-max-width;
-  max-height: 80%;
-  overflow: scroll;
-
-  .mdc-dialog__header {
-    padding: 40px $body-x-padding 20px $body-x-padding;
-
-    .mdc-dialog__header__title {
-      font-size: 24px;
-      font-weight: 700;
-    }
+  .mdc-dialog__container {
+    width: 100%;
   }
 
-  .mdc-dialog__body {
-    padding: 0 $body-x-padding 20px $body-x-padding;
+  .mdc-dialog__surface {
+    max-width: 530px;
+    width: 100%;
   }
 
-  .mdc-dialog__footer {
-    padding: 0 $body-x-padding 30px $body-x-padding;
+  .mdc-dialog__title,
+  .mdc-dialog__content {
+    width: 100%;
   }
 
   .under-text {
