@@ -1,7 +1,6 @@
 """
 course_catalog api functions
 """
-from collections import namedtuple
 from datetime import datetime
 import json
 import logging
