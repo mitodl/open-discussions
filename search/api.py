@@ -60,18 +60,19 @@ def gen_profile_id(profile_id):
     return "u_{}".format(profile_id)
 
 
-def gen_course_id(course_id):
+def gen_course_id(platform, course_id):
     """
     Generates the Elasticsearch document id for a course
 
     Args:
+        platform (str): The platform of a Course object
         course_id (str): The course_id of a Course object
 
     Returns:
         str: The Elasticsearch document id for this object
     """
     safe_id = urlsafe_b64encode(course_id.encode("utf-8")).decode("utf-8").rstrip("=")
-    return "co_{}".format(safe_id)
+    return "co_{}_{}".format(platform, safe_id)
 
 
 def gen_bootcamp_id(bootcamp_id):

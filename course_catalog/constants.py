@@ -17,6 +17,7 @@ class OfferedBy(Enum):
     micromasters = "MicroMasters"
     bootcamps = "Bootcamps"
     xpro = "xPro"
+    oll = "Open Learning Library"
 
 
 class PlatformType(Enum):
@@ -26,7 +27,10 @@ class PlatformType(Enum):
 
     ocw = "ocw"
     mitx = "mitx"
+    micromasters = "micromasters"
     bootcamps = "bootcamps"
+    xpro = "xpro"
+    oll = "oll"
 
 
 class ResourceType(Enum):
@@ -88,6 +92,14 @@ NON_COURSE_DIRECTORIES = [
     "QA",
 ]
 
+OFFERED_BY_MAPPINGS = {
+    OfferedBy.micromasters.value: PlatformType.mitx.value,
+    OfferedBy.mitx.value: PlatformType.mitx.value,
+    OfferedBy.ocw.value: PlatformType.ocw.value,
+    OfferedBy.oll.value: PlatformType.oll.value,
+    OfferedBy.xpro.value: PlatformType.xpro.value,
+    OfferedBy.bootcamps.value: PlatformType.bootcamps.value,
+}
 
 semester_mapping = {"1T": "spring", "2T": "summer", "3T": "fall"}
 

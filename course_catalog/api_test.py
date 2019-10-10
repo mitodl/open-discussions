@@ -166,20 +166,13 @@ def test_deserializing_a_valid_ocw_course(
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """
-    digest_ocw_course(ocw_valid_data, timezone.now(), None, published)
+    digest_ocw_course(ocw_valid_data, timezone.now(), published)
     assert Course.objects.count() == 1
-    digest_ocw_course(
-        ocw_valid_data, timezone.now() - timedelta(hours=1), None, published
-    )
+    digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), published)
     assert Course.objects.count() == 1
 
-    course = Course.objects.last()
     digest_ocw_course(
-        ocw_valid_data,
-        timezone.now() + timedelta(hours=1),
-        course,
-        published,
-        "PROD/RES",
+        ocw_valid_data, timezone.now() + timedelta(hours=1), published, "PROD/RES"
     )
     assert Course.objects.count() == 1
     assert (
@@ -203,7 +196,7 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
     Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
     """
     ocw_valid_data.pop("course_id")
-    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
+    digest_ocw_course(ocw_valid_data, timezone.now(), True)
     assert not Course.objects.count()
 
 
@@ -212,7 +205,7 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
     """
     ocw_valid_data.pop("uid")
-    digest_ocw_course(ocw_valid_data, timezone.now(), None, True)
+    digest_ocw_course(ocw_valid_data, timezone.now(), True)
     assert not LearningResourceRun.objects.count()
 
 

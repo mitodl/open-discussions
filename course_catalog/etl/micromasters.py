@@ -2,7 +2,7 @@
 from django.conf import settings
 import requests
 
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.constants import COMMON_HEADERS
 from course_catalog.etl.utils import log_exceptions
 
@@ -31,6 +31,7 @@ def transform(programs):
             "runs": [
                 {
                     "run_id": program["id"],
+                    "platform": PlatformType.micromasters.value,
                     "title": program["title"],
                     "offered_by": OfferedBy.micromasters.value,
                 }
@@ -38,7 +39,11 @@ def transform(programs):
             # all we need for course data is the relative positioning of courses by course_id
             "courses": [
                 {
+                    # `platform` is specified as mitx here because that allows this data to merge with data sourced from MITx
+                    # we want this because all the course data is populated from MITx and we just want to
+                    # indicate that each of these courses are also offered by MicroMasters
                     "course_id": course["edx_key"],
+                    "platform": PlatformType.mitx.value,
                     "offered_by": OfferedBy.micromasters.value
                     # TBD: how to handle merging `offered_by` for courses and course runs
                 }

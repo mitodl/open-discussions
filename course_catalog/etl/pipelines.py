@@ -1,7 +1,7 @@
 """ETL pipelines"""
 from toolz import compose, first, juxt
 
-from course_catalog.etl import micromasters, loaders, mitx, xpro, ocw
+from course_catalog.etl import micromasters, loaders, mitx, xpro, ocw, oll
 from course_catalog.etl.utils import log_exceptions
 
 # A few notes on how this module works:
@@ -38,3 +38,5 @@ mitx_etl = compose(
     ),
     log_exceptions("Error extracting MITx catalog", exc_return_value=[])(mitx.extract),
 )
+
+oll_etl = compose(loaders.load_courses, oll.transform, oll.extract)

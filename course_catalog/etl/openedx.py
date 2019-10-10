@@ -175,6 +175,7 @@ def _transform_course_run(config, course_run, course_last_modified, marketing_ur
     last_modified = max(course_last_modified, course_run_last_modified)
     return {
         "run_id": course_run.get("key"),
+        "platform": config.platform,
         "title": course_run.get("title"),
         "short_description": course_run.get("short_description"),
         "full_description": course_run.get("full_description"),
@@ -254,12 +255,12 @@ def _transform_course(config, course):
     }
 
 
-def openedx_extract_transform_factory(config):
+def openedx_extract_transform_factory(get_config):
     """
     Factory for generating OpenEdx extract and transform functions based on the configuration
 
     Args:
-        config (OpenEdxConfiguration): configuration for the openedx backend
+        get_config (callable): callable to get configuration for the openedx backend
 
     Returns:
         OpenEdxExtractTransform: the generated extract and transform functions
@@ -272,6 +273,8 @@ def openedx_extract_transform_factory(config):
         Yields:
             dict: an object representing each course
         """
+        config = get_config()
+
         if not all(
             [
                 config.client_id,
@@ -303,6 +306,8 @@ def openedx_extract_transform_factory(config):
             list of dict: the tranformed courses data
 
         """
+        config = get_config()
+
         return [
             _transform_course(config, course)
             for course in courses

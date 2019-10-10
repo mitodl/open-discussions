@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl import xpro
 from course_catalog.etl.xpro import _parse_datetime
 from open_discussions.test_utils import any_instance_of
@@ -55,6 +55,7 @@ def test_xpro_transform(mock_xpro_data):
             "runs": [
                 {
                     "run_id": program_data["readable_id"],
+                    "platform": PlatformType.xpro.value,
                     "start_date": any_instance_of(datetime, type(None)),
                     "end_date": any_instance_of(datetime, type(None)),
                     "enrollment_start": any_instance_of(datetime, type(None)),
@@ -73,6 +74,7 @@ def test_xpro_transform(mock_xpro_data):
             "courses": [
                 {
                     "course_id": course_data["readable_id"],
+                    "platform": PlatformType.xpro.value,
                     "title": course_data["title"],
                     "image_src": course_data["thumbnail_url"],
                     "short_description": course_data["description"],
@@ -86,6 +88,7 @@ def test_xpro_transform(mock_xpro_data):
                     "runs": [
                         {
                             "run_id": course_run_data["courseware_id"],
+                            "platform": PlatformType.xpro.value,
                             "start_date": any_instance_of(datetime, type(None)),
                             "end_date": any_instance_of(datetime, type(None)),
                             "enrollment_start": any_instance_of(datetime, type(None)),

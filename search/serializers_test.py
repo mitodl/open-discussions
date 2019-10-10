@@ -401,6 +401,6 @@ def test_serialize_course_for_bulk():
     """
     course = CourseFactory.create()
     assert serialize_course_for_bulk(course) == {
-        "_id": gen_course_id(course.course_id),
+        "_id": gen_course_id(course.platform, course.course_id),
         **ESCourseSerializer(course).data,
     }

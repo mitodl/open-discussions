@@ -55,19 +55,24 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
-def digest_ocw_course(
-    master_json, last_modified, course_instance, is_published, course_prefix=""
-):
+def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""):
     """
     Takes in OCW course master json to store it in DB
 
     Args:
         master_json (dict): course master JSON object as an output from ocw-data-parser
         last_modified (datetime): timestamp of latest modification of all course files
-        course_instance (Course): Course instance if exists, otherwise None
         is_published (bool): Flags OCW course as published or not
         course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
     """
+    if "course_id" not in master_json:
+        log.error("Course %s is missing 'course_id'", master_json.get("uid"))
+        return
+
+    course_instance = Course.objects.filter(
+        platform=PlatformType.ocw.value, course_id=master_json["course_id"]
+    ).first()
+
     ocw_serializer = OCWSerializer(
         data={
             **master_json,
@@ -91,14 +96,14 @@ def digest_ocw_course(
     with transaction.atomic():
         course = ocw_serializer.save()
 
-        # Try and get the LearningResourceRun instance.
-        try:
-            courserun_instance = course.runs.get(run_id=master_json.get("uid"))
-        except LearningResourceRun.DoesNotExist:
-            courserun_instance = None
+        # Try and get the run instance.
+        courserun_instance = course.runs.filter(
+            platform=PlatformType.ocw.value, run_id=master_json.get("uid")
+        ).first()
         run_serializer = LearningResourceRunSerializer(
             data={
                 **master_json,
+                "platform": PlatformType.ocw.value,
                 "key": master_json.get("uid"),
                 "is_published": is_published,
                 "staff": master_json.get("instructors"),
@@ -377,7 +382,9 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
     )
 
     # if course run synced before, update existing Course instance
-    courserun_instance = LearningResourceRun.objects.filter(run_id=uid).first()
+    courserun_instance = LearningResourceRun.objects.filter(
+        platform=PlatformType.ocw.value, run_id=uid
+    ).first()
 
     # Make sure that the data we are syncing is newer than what we already have
     if (
@@ -388,7 +395,6 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
         log.info("Already synced. No changes found for %s", course_prefix)
         return None
 
-    course_instance = Course.objects.filter(course_id=course_json["course_id"]).first()
     if upload_to_s3 and is_published:
         # Upload all course media to S3 before serializing course to ensure the existence of links
         parser.setup_s3_uploading(
@@ -405,13 +411,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
             parser.upload_all_media_to_s3(upload_master_json=True)
 
     log.info("Digesting %s...", course_prefix)
-    digest_ocw_course(
-        parser.get_master_json(),
-        last_modified,
-        course_instance,
-        is_published,
-        course_prefix,
-    )
+    digest_ocw_course(course_json, last_modified, is_published, course_prefix)
     return uid
 
 

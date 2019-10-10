@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 import pytest
 
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl import micromasters
 
 
@@ -69,12 +69,21 @@ def test_micromasters_transform(mock_micromasters_data):
             "image_src": "http://example.com/program/1/image/url",
             "offered_by": OfferedBy.micromasters.value,
             "courses": [
-                {"course_id": "1", "offered_by": OfferedBy.micromasters.value},
-                {"course_id": "2", "offered_by": OfferedBy.micromasters.value},
+                {
+                    "course_id": "1",
+                    "platform": PlatformType.mitx.value,
+                    "offered_by": OfferedBy.micromasters.value,
+                },
+                {
+                    "course_id": "2",
+                    "platform": PlatformType.mitx.value,
+                    "offered_by": OfferedBy.micromasters.value,
+                },
             ],
             "runs": [
                 {
                     "run_id": 1,
+                    "platform": PlatformType.micromasters.value,
                     "title": "program title 1",
                     "offered_by": OfferedBy.micromasters.value,
                 }
@@ -87,12 +96,21 @@ def test_micromasters_transform(mock_micromasters_data):
             "image_src": "http://example.com/program/2/image/url",
             "offered_by": OfferedBy.micromasters.value,
             "courses": [
-                {"course_id": "3", "offered_by": OfferedBy.micromasters.value},
-                {"course_id": "4", "offered_by": OfferedBy.micromasters.value},
+                {
+                    "course_id": "3",
+                    "platform": PlatformType.mitx.value,
+                    "offered_by": OfferedBy.micromasters.value,
+                },
+                {
+                    "course_id": "4",
+                    "platform": PlatformType.mitx.value,
+                    "offered_by": OfferedBy.micromasters.value,
+                },
             ],
             "runs": [
                 {
                     "run_id": 2,
+                    "platform": PlatformType.micromasters.value,
                     "title": "program title 2",
                     "offered_by": OfferedBy.micromasters.value,
                 }

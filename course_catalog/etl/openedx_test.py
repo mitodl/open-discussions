@@ -32,7 +32,7 @@ def openedx_config():
 @pytest.fixture
 def openedx_extract_transform(openedx_config):
     """Fixture for generationg an extract/transform pair for the given config"""
-    return openedx_extract_transform_factory(openedx_config)
+    return openedx_extract_transform_factory(lambda: openedx_config)
 
 
 def test_extract(mocked_responses, openedx_config, openedx_extract_transform):
@@ -88,7 +88,7 @@ def test_extract_disabled(openedx_config, config_arg_idx):
 
     config = OpenEdxConfiguration(*args)
 
-    extract, _ = openedx_extract_transform_factory(config)
+    extract, _ = openedx_extract_transform_factory(lambda: config)
 
     assert extract() == []
 
@@ -137,6 +137,7 @@ def test_transform_course(
                     "best_start_date": "2019-02-20T15:00:00Z",
                     "run_id": "course-v1:MITx+15.071x+1T2019",
                     "end_date": "2019-05-22T23:30:00Z",
+                    "platform": openedx_config.platform,
                     "enrollment_end": None,
                     "enrollment_start": None,
                     "full_description": "<p>Full Description</p>",
@@ -149,7 +150,7 @@ def test_transform_course(
                     "language": "en-us",
                     "last_modified": any_instance_of(datetime),
                     "level": "Intermediate",
-                    "offered_by": "fake-offered-by",
+                    "offered_by": openedx_config.offered_by,
                     "prices": [
                         {
                             "mode": "verified",

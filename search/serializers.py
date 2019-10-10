@@ -587,7 +587,7 @@ def serialize_course_for_bulk(course_obj):
         course_obj (Course): A course
     """
     return {
-        "_id": gen_course_id(course_obj.course_id),
+        "_id": gen_course_id(course_obj.platform, course_obj.course_id),
         **ESCourseSerializer(course_obj).data,
     }
 

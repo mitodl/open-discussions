@@ -5,7 +5,7 @@ from django.conf import settings
 import requests
 import pytz
 
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.utils import log_exceptions
 
 
@@ -58,6 +58,7 @@ def transform(programs):
                     if program.get("current_price", None)
                     else [],
                     "run_id": program["readable_id"],
+                    "platform": PlatformType.xpro.value,
                     "enrollment_start": _parse_datetime(program["enrollment_start"]),
                     "start_date": _parse_datetime(program["start_date"]),
                     "end_date": _parse_datetime(program["end_date"]),
@@ -72,6 +73,7 @@ def transform(programs):
             "courses": [
                 {
                     "course_id": course["readable_id"],
+                    "platform": PlatformType.xpro.value,
                     "title": course["title"],
                     "image_src": course["thumbnail_url"],
                     "offered_by": OfferedBy.xpro.value,
@@ -85,6 +87,7 @@ def transform(programs):
                     "runs": [
                         {
                             "run_id": course_run["courseware_id"],
+                            "platform": PlatformType.xpro.value,
                             "start_date": _parse_datetime(course_run["start_date"]),
                             "end_date": _parse_datetime(course_run["end_date"]),
                             "enrollment_start": _parse_datetime(
