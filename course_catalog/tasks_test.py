@@ -27,6 +27,7 @@ from course_catalog.tasks import (
     get_bootcamp_data,
     get_micromasters_data,
     get_xpro_data,
+    get_oll_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -273,3 +274,10 @@ def test_get_xpro_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_xpro_data.delay()
     mock_pipelines.xpro_etl.assert_called_once_with()
+
+
+def test_get_oll_data(mocker):
+    """Verify that the get_oll_data invokes the OLL ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_oll_data.delay()
+    mock_pipelines.oll_etl.assert_called_once_with()

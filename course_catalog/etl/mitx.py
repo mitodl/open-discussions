@@ -27,7 +27,7 @@ def _is_mit_course(course):
 
 # use the OpenEdx factory to create our extract and transform funcs
 extract, _transform = openedx_extract_transform_factory(
-    OpenEdxConfiguration(
+    lambda: OpenEdxConfiguration(
         settings.EDX_API_CLIENT_ID,
         settings.EDX_API_CLIENT_SECRET,
         settings.EDX_API_ACCESS_TOKEN_URL,

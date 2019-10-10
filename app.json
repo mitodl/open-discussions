@@ -163,6 +163,30 @@
       "description": "Upload course image only instead of all OCW files",
       "required": false
     },
+    "OLL_ALT_URL": {
+      "description": "Base alternate URL for OLL courses",
+      "required": false
+    },
+    "OLL_API_ACCESS_TOKEN_URL": {
+      "description": "URL to retrieve a OLL access token",
+      "required": false
+    },
+    "OLL_API_URL": {
+      "description": "URL to retrieve OLL course data from",
+      "required": false
+    },
+    "OLL_API_CLIENT_ID": {
+      "description": "Openedx client id to access the OLL course catalog API",
+      "required": false
+    },
+    "OLL_API_CLIENT_SECRET": {
+      "description": "Openedx secret key to access the OLL course catalog API",
+      "required": false
+    },
+    "OLL_BASE_URL": {
+      "description": "Base default URL for OLL courses",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_ADMIN_EMAIL": {
       "description": "E-mail to send 500 reports to."
     },

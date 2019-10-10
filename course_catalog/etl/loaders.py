@@ -58,16 +58,17 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
-@log_exceptions("Error loading course run")
 def load_run(learning_resource, course_run_data):
     """Load the course run into the database"""
     run_id = course_run_data.pop("run_id")
+    platform = course_run_data.get("platform")
     instructors_data = course_run_data.pop("instructors", [])
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
 
     learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
         run_id=run_id,
+        platform=platform,
         defaults={
             **course_run_data,
             "object_id": learning_resource.id,
@@ -82,15 +83,15 @@ def load_run(learning_resource, course_run_data):
     return learning_resource_run
 
 
-@log_exceptions("Error loading course")
 def load_course(course_data):
     """Load the course into the database"""
     course_id = course_data.pop("course_id")
+    platform = course_data.get("platform")
     runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
 
     course, created = Course.objects.update_or_create(
-        course_id=course_id, defaults=course_data
+        platform=platform, course_id=course_id, defaults=course_data
     )
 
     load_topics(course, topics_data)
@@ -106,6 +107,7 @@ def load_course(course_data):
     return course
 
 
+@log_exceptions("Error loading courses")
 def load_courses(courses_data):
     """Load a list of programs"""
     return [load_course(course_data) for course_data in courses_data]

@@ -82,7 +82,8 @@ class LearningResourceRun(AbstractCourse):
     Model for course runs
     """
 
-    run_id = models.CharField(max_length=128, unique=True)
+    run_id = models.CharField(max_length=128)
+    platform = models.CharField(max_length=128, null=True)
 
     year = models.IntegerField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
@@ -117,13 +118,16 @@ class LearningResourceRun(AbstractCourse):
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey("content_type", "object_id")
 
+    def __str__(self):
+        return f"LearningResourceRun platform={self.platform} run_id={self.run_id}"
+
 
 class Course(AbstractCourse):
     """
     Course model for courses on all platforms
     """
 
-    course_id = models.CharField(max_length=128, unique=True)
+    course_id = models.CharField(max_length=128)
     platform = models.CharField(max_length=128)
 
     raw_json = JSONField(null=True, blank=True)

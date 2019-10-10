@@ -159,6 +159,21 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
     instructors = CourseInstructorSerializer(read_only=True, many=True, allow_null=True)
     prices = CoursePriceSerializer(read_only=True, many=True, allow_null=True)
 
+    def validate(self, attrs):
+        """
+        Verify the run doesn't exist if we're creating a new one
+        """
+        run_id = attrs["run_id"]
+        platform = attrs["platform"]
+        if (
+            self.instance is None
+            and LearningResourceRun.objects.filter(
+                platform=platform, run_id=run_id
+            ).exists()
+        ):
+            raise serializers.ValidationError("LearningResourceRun already exists")
+        return attrs
+
     def handle_many_to_many(self, resource):
         """
         Handle the creation and assignment of instructors and prices
@@ -195,7 +210,6 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             "level": data.get("level_type"),
             "semester": semester,
             "language": data.get("content_language"),
-            "platform": PlatformType.mitx.value,
             "year": year,
             "start_date": data.get("start"),
             "end_date": data.get("end"),
@@ -220,6 +234,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             "url": data.get("url"),
             "availability": data.get("availability"),
             "offered_by": data.get("offered_by"),
+            "platform": data.get("platform"),
         }
         is_published = data.get("is_published")
         if is_published is not None:
@@ -254,6 +269,19 @@ class CourseSerializer(BaseCourseSerializer):
 
     runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="course")
+
+    def validate(self, attrs):
+        """
+        Verify the Course doesn't exist if we're creating a new one
+        """
+        course_id = attrs["course_id"]
+        platform = attrs["platform"]
+        if (
+            self.instance is None
+            and Course.objects.filter(platform=platform, course_id=course_id).exists()
+        ):
+            raise serializers.ValidationError("Course already exists")
+        return attrs
 
     class Meta:
         model = Course

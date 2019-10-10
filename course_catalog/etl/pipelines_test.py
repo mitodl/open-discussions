@@ -77,3 +77,19 @@ def test_mitx_etl(mocker):
     mock_load_courses.assert_called_once_with(mock_transform.return_value)
 
     assert result == mock_load_courses.return_value
+
+
+def test_oll_etl(mocker):
+    """Verify that OLL etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.oll.extract")
+    mock_transform = mocker.patch("course_catalog.etl.oll.transform")
+    mock_load_courses = mocker.patch("course_catalog.etl.loaders.load_courses")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_courses):
+        result = pipelines.oll_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_courses.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_courses.return_value

@@ -394,7 +394,7 @@ def upsert_course(course_obj):
 
     course_data = ESCourseSerializer(course_obj).data
     upsert_document.delay(
-        gen_course_id(course_obj.course_id),
+        gen_course_id(course_obj.platform, course_obj.course_id),
         course_data,
         COURSE_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
@@ -409,7 +409,9 @@ def delete_course(course_obj):
     Args:
         course_obj (course_catalog.models.Course): A Course object
     """
-    delete_document.delay(gen_course_id(course_obj.course_id), COURSE_TYPE)
+    delete_document.delay(
+        gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
+    )
 
 
 @if_feature_enabled(INDEX_UPDATES)

@@ -59,7 +59,9 @@ def test_load_program(
         else ProgramFactory.build(published=is_published, runs=[])
     )
     courses = (
-        CourseFactory.create_batch(2) if courses_exist else CourseFactory.build_batch(2)
+        CourseFactory.create_batch(2, platform="fake-platform")
+        if courses_exist
+        else CourseFactory.build_batch(2, platform="fake-platform")
     )
     prices = CoursePriceFactory.build_batch(2) if has_prices else []
 
@@ -67,7 +69,7 @@ def test_load_program(
     after_course_count = len(courses)
 
     if program_exists and has_retired_course:
-        course = CourseFactory.create()
+        course = CourseFactory.create(platform="fake-platform")
         before_course_count += 1
         after_course_count += 1
         ProgramItem.objects.create(
@@ -108,7 +110,10 @@ def test_load_program(
             "image_src": program.image_src,
             "published": is_published,
             "runs": [run_data],
-            "courses": [{"course_id": course.course_id} for course in courses],
+            "courses": [
+                {"course_id": course.course_id, "platform": course.platform}
+                for course in courses
+            ],
         }
     )
 
@@ -157,10 +162,13 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
     assert Course.objects.count() == (1 if course_exists else 0)
     assert LearningResourceRun.objects.count() == 0
 
-    props = model_to_dict(CourseFactory.build(published=is_published))
-    props["course_id"] = course.course_id
+    props = model_to_dict(
+        CourseFactory.build(
+            course_id=course.course_id, platform=course.platform, published=is_published
+        )
+    )
     del props["id"]
-    run = model_to_dict(LearningResourceRunFactory.build())
+    run = model_to_dict(LearningResourceRunFactory.build(platform=course.platform))
     del run["content_type"]
     del run["object_id"]
     del run["id"]
@@ -196,8 +204,11 @@ def test_load_run(run_exists):
         else LearningResourceRunFactory.build()
     )
 
-    props = model_to_dict(LearningResourceRunFactory.build())
-    props["run_id"] = learning_resource_run.run_id
+    props = model_to_dict(
+        LearningResourceRunFactory.build(
+            run_id=learning_resource_run.run_id, platform=learning_resource_run.platform
+        )
+    )
     del props["content_type"]
     del props["object_id"]
     del props["id"]

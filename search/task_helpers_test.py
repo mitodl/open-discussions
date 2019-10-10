@@ -449,7 +449,7 @@ def test_upsert_course(mock_index_functions, mocker):
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
     assert patched_task.delay.call_args[0] == (
-        gen_course_id(course.course_id),
+        gen_course_id(course.platform, course.course_id),
         ESCourseSerializer(course).data,
         COURSE_TYPE,
     )

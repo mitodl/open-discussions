@@ -576,6 +576,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_xpro_data",
         "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
     },
+    "update-oll-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_oll_data",
+        "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
@@ -811,6 +815,13 @@ BOOTCAMPS_URL = get_string(
 MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
 
 XPRO_CATALOG_API_URL = get_string("XPRO_CATALOG_API_URL", None)
+
+OLL_API_URL = get_string("OLL_API_URL", None)
+OLL_API_ACCESS_TOKEN_URL = get_string("OLL_API_ACCESS_TOKEN_URL", None)
+OLL_API_CLIENT_ID = get_string("OLL_API_CLIENT_ID", None)
+OLL_API_CLIENT_SECRET = get_string("OLL_API_CLIENT_SECRET", None)
+OLL_BASE_URL = get_string("OLL_BASE_URL", None)
+OLL_ALT_URL = get_string("OLL_ALT_URL", None)
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)

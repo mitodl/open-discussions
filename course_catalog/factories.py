@@ -9,7 +9,12 @@ import pytz
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import PlatformType, AvailabilityType, ListType, OfferedBy
+from course_catalog.constants import (
+    AvailabilityType,
+    ListType,
+    OfferedBy,
+    OFFERED_BY_MAPPINGS,
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -90,6 +95,15 @@ class LearningResourceFactory(DjangoModelFactory):
     short_description = factory.Faker("sentence")
 
     topics = factory.PostGeneration(_post_gen_topics)
+    offered_by = FuzzyChoice(
+        (
+            OfferedBy.mitx.value,
+            OfferedBy.ocw.value,
+            OfferedBy.micromasters.value,
+            OfferedBy.xpro.value,
+            OfferedBy.oll.value,
+        )
+    )
 
     class Meta:
         abstract = True
@@ -117,15 +131,7 @@ class CourseFactory(AbstractCourseFactory):
     """Factory for Courses"""
 
     course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
-    platform = FuzzyChoice((PlatformType.mitx.value, PlatformType.ocw.value))
-    offered_by = FuzzyChoice(
-        (
-            OfferedBy.mitx.value,
-            OfferedBy.ocw.value,
-            OfferedBy.micromasters.value,
-            OfferedBy.xpro.value,
-        )
-    )
+    platform = factory.LazyAttribute(lambda o: OFFERED_BY_MAPPINGS[o.offered_by])
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )
@@ -144,6 +150,7 @@ class LearningResourceRunFactory(AbstractCourseFactory):
     """Factory for LearningResourceRuns"""
 
     run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
+    platform = factory.LazyAttribute(lambda o: OFFERED_BY_MAPPINGS[o.offered_by])
     content_object = factory.SubFactory(CourseFactory)
     object_id = factory.SelfAttribute("content_object.id")
     content_type = factory.LazyAttribute(
@@ -194,6 +201,12 @@ class LearningResourceRunFactory(AbstractCourseFactory):
         no_instructors = factory.Trait(instructors=[])
 
 
+class BootcampRunFactory(LearningResourceRunFactory):
+    """LearningResourceRun factory specific to Bootcamps"""
+
+    offered_by = OfferedBy.bootcamps.value
+
+
 class BootcampFactory(AbstractCourseFactory):
     """Factory for Bootcamps"""
 
@@ -201,7 +214,7 @@ class BootcampFactory(AbstractCourseFactory):
     offered_by = OfferedBy.bootcamps.value
 
     runs = factory.RelatedFactoryList(
-        "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
+        "course_catalog.factories.BootcampRunFactory", "content_object", size=3
     )
 
     class Meta:
