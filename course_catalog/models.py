@@ -111,7 +111,7 @@ class LearningResourceRun(AbstractCourse):
     content_type = models.ForeignKey(
         ContentType,
         null=True,
-        limit_choices_to={"model__in": ("course", "bootcamp")},
+        limit_choices_to={"model__in": ("course", "bootcamp", "program")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField(null=True)
@@ -210,8 +210,8 @@ class Program(List):
     program_id = models.CharField(max_length=80, null=True)
     image_src = models.URLField(max_length=2048, null=True, blank=True)
     url = models.URLField(null=True, max_length=2048)
-    prices = models.ManyToManyField(CoursePrice, blank=True)
     published = models.BooleanField(default=True)
+    runs = GenericRelation(LearningResourceRun)
 
 
 class ProgramItem(ListItem):

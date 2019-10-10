@@ -51,9 +51,24 @@ def transform(programs):
             "published": bool(
                 program["current_price"]
             ),  # a program is only considered published if it has a product/price
-            "prices": [{"price": program["current_price"]}]
-            if program.get("current_price", None)
-            else [],
+            "url": program["url"],
+            "runs": [
+                {
+                    "prices": [{"price": program["current_price"], "mode": ""}]
+                    if program.get("current_price", None)
+                    else [],
+                    "run_id": program["readable_id"],
+                    "enrollment_start": _parse_datetime(program["enrollment_start"]),
+                    "start_date": _parse_datetime(program["start_date"]),
+                    "end_date": _parse_datetime(program["end_date"]),
+                    "best_start_date": _parse_datetime(program["enrollment_start"])
+                    or _parse_datetime(program["start_date"]),
+                    "best_end_date": _parse_datetime(program["end_date"]),
+                    "offered_by": OfferedBy.xpro.value,
+                    "title": program["title"],
+                    "short_description": program["description"],
+                }
+            ],
             "courses": [
                 {
                     "course_id": course["readable_id"],

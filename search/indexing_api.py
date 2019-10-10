@@ -92,16 +92,11 @@ CONTENT_OBJECT_TYPE = {
     "removed": {"type": "boolean"},
 }
 
-COURSE_OBJECT_TYPE = {
-    "id": {"type": "long"},
-    "course_id": {"type": "keyword"},
+LEARNING_RESOURCE_TYPE = {
     "title": ENGLISH_TEXT_FIELD,
     "short_description": ENGLISH_TEXT_FIELD,
-    "full_description": ENGLISH_TEXT_FIELD,
-    "platform": {"type": "keyword"},
-    "topics": {"type": "keyword"},
     "image_src": {"type": "keyword"},
-    "published": {"type": "boolean"},
+    "topics": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
     "runs": {
         "type": "nested",
@@ -129,62 +124,29 @@ COURSE_OBJECT_TYPE = {
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},
             "offered_by": {"type": "keyword"},
-            "best_start_date": {"type": "date"},
-            "best_end_date": {"type": "date"},
         },
     },
+}
+
+COURSE_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "course_id": {"type": "keyword"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "platform": {"type": "keyword"},
+    "published": {"type": "boolean"},
 }
 
 BOOTCAMP_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
     "id": {"type": "long"},
     "course_id": {"type": "keyword"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
     "full_description": ENGLISH_TEXT_FIELD,
-    "topics": {"type": "keyword"},
-    "image_src": {"type": "keyword"},
-    "published": {"type": "boolean"},
     "location": {"type": "keyword"},
-    "offered_by": {"type": "keyword"},
-    "runs": {
-        "type": "nested",
-        "properties": {
-            "id": {"type": "long"},
-            "course_id": {"type": "keyword"},
-            "title": ENGLISH_TEXT_FIELD,
-            "short_description": ENGLISH_TEXT_FIELD,
-            "full_description": ENGLISH_TEXT_FIELD,
-            "language": {"type": "keyword"},
-            "level": {"type": "keyword"},
-            "semester": {"type": "keyword"},
-            "year": {"type": "keyword"},
-            "start_date": {"type": "date"},
-            "end_date": {"type": "date"},
-            "enrollment_start": {"type": "date"},
-            "enrollment_end": {"type": "date"},
-            "topics": {"type": "keyword"},
-            "instructors": {"type": "text"},
-            "prices": {
-                "type": "nested",
-                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
-            },
-            "image_src": {"type": "keyword"},
-            "published": {"type": "boolean"},
-            "availability": {"type": "keyword"},
-            "offered_by": {"type": "keyword"},
-        },
-    },
+    "published": {"type": "boolean"},
 }
 
-PROGRAM_OBJECT_TYPE = {
-    "id": {"type": "long"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
-    "image_src": {"type": "keyword"},
-    "topics": {"type": "keyword"},
-    "prices": {"type": "nested"},
-    "offered_by": {"type": "keyword"},
-}
+PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
     "id": {"type": "long"},

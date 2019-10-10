@@ -20,7 +20,11 @@ import {
 } from "../lib/search"
 import { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { profileURL } from "../lib/url"
-import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../lib/constants"
+import {
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM
+} from "../lib/constants"
 
 describe("SearchResult", () => {
   const render = (result, props = {}) =>
@@ -91,7 +95,7 @@ describe("SearchResult", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
     it(`renders a ${objectType}`, () => {
       const result = makeLearningResourceResult(objectType)
       const object = searchResultToLearningResource(result)

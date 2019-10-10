@@ -401,7 +401,7 @@ export type Program = LearningResource & {
   image_description:  ?string,
   url:                ?string,
   items:              Array<UserListItem>,
-  prices:             Array<CoursePrice>,
+  runs:               Array<LearningResourceRun>,
   object_type:        LR_TYPE_PROGRAM
 }
 

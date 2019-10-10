@@ -85,14 +85,11 @@ def test_serialize_program_related_models():
     """
     Verify that a serialized program contains attributes for related objects
     """
-    program = ProgramFactory.create(
-        topics=CourseTopicFactory.create_batch(3),
-        prices=CoursePriceFactory.create_batch(2),
-    )
+    program = ProgramFactory.create(topics=CourseTopicFactory.create_batch(3))
     ProgramItemCourseFactory.create_batch(4, program=program)
     serializer = ProgramSerializer(program)
     assert len(serializer.data["topics"]) == 3
-    assert len(serializer.data["prices"]) == 2
+    assert len(serializer.data["runs"]) == 1
     assert len(serializer.data["items"]) == 4
     assert "content_data" in serializer.data["items"][0].keys()
 

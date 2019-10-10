@@ -117,14 +117,15 @@ def load_program(program_data):
     program_id = program_data.pop("program_id")
     courses_data = program_data.pop("courses")
     topics_data = program_data.pop("topics", [])
-    prices_data = program_data.pop("prices", [])
+    runs_data = program_data.pop("runs")
 
     program, created = Program.objects.update_or_create(
         program_id=program_id, defaults=program_data
     )
 
     load_topics(program, topics_data)
-    load_prices(program, prices_data)
+    for run_data in runs_data:
+        load_run(program, run_data)
 
     courses = []
     course_content_type = ContentType.objects.get(model="course")

@@ -247,13 +247,12 @@ class ProgramFactory(LearningResourceFactory):
     image_src = factory.Faker("image_url")
     url = factory.Faker("uri")
 
-    prices = factory.PostGeneration(_post_gen_prices)
+    runs = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceRunFactory", "content_object", size=1
+    )
 
     class Meta:
         model = Program
-
-    class Params:
-        no_prices = factory.Trait(prices=[])
 
 
 class UserListCourseFactory(ListItemFactory):

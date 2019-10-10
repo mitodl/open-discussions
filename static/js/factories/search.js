@@ -8,7 +8,8 @@ import {
   platforms,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_ALL
+  LR_TYPE_ALL,
+  LR_TYPE_PROGRAM
 } from "../lib/constants"
 
 import type {
@@ -103,12 +104,27 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   runs:              [makeRun()]
 })
 
+export const makeProgramResult = (): LearningResourceResult => ({
+  id:                casual.number,
+  program_id:        `program_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  topics:            [casual.word, casual.word],
+  object_type:       LR_TYPE_PROGRAM,
+  offered_by:        casual.random_element([platforms.xpro, platforms.micromasters]),
+  runs:              [makeRun()]
+})
+
 export const makeLearningResourceResult = (objectType: string) => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return makeCourseResult()
   case LR_TYPE_BOOTCAMP:
     return makeBootcampResult()
+  case LR_TYPE_PROGRAM:
+    return makeProgramResult()
   }
 }
 
