@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.94.2
+--------------
+
+- Added Open Learning Library implementation
+- Create program runs (#2267)
+
 Version 0.94.1 (Released October 11, 2019)
 --------------
 
