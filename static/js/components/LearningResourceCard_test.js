@@ -3,6 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
 import { mount } from "enzyme"
+import R from "ramda"
 
 import { LearningResourceCard } from "./LearningResourceCard"
 
@@ -14,7 +15,8 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
-  COURSE_AVAILABLE_NOW
+  COURSE_AVAILABLE_NOW,
+  offeredBys
 } from "../lib/constants"
 import {
   embedlyThumbnail,
@@ -79,7 +81,6 @@ describe("LearningResourceCard", () => {
   })
 
   it("should render topics", () => {
-    course.offered_by = "MITx"
     const { content, label } = render()
       .find("Subtitle")
       .at(1)
@@ -91,7 +92,6 @@ describe("LearningResourceCard", () => {
   })
 
   it("should render a single topic", () => {
-    course.offered_by = "MITx"
     course.topics = [course.topics[0]]
     const { content, label } = render()
       .find("Subtitle")
@@ -102,7 +102,6 @@ describe("LearningResourceCard", () => {
   })
 
   it("should not render topics if they aren't present", () => {
-    course.offered_by = "MITx"
     course.topics = []
     assert.notOk(
       render()
@@ -113,10 +112,10 @@ describe("LearningResourceCard", () => {
   })
 
   //
-  ;["OCW", "MITx", "foo"].forEach(offeredBy => {
+  R.values(offeredBys).forEach(offeredBy => {
     it(`should render offered_by`, () => {
       const object = makeLearningResource(LR_TYPE_COURSE)
-      object.offered_by = offeredBy
+      object.offered_by = [offeredBy]
       const offeredBySubtitle = render({
         object
       })
@@ -129,17 +128,15 @@ describe("LearningResourceCard", () => {
   })
 
   //
-  ;["", null].forEach(offeredBy => {
-    it(`should not render offered_by subtitle if null`, () => {
-      const object = makeLearningResource(LR_TYPE_COURSE)
-      object.offered_by = offeredBy
-      const offeredBySubtitle = render({
-        object
-      })
-        .find("Subtitle")
-        .at(0)
-      assert.notEqual(offeredBySubtitle.prop("label"), "Offered by - ")
+  it(`should not render offered_by subtitle if empty`, () => {
+    const object = makeLearningResource(LR_TYPE_COURSE)
+    object.offered_by = []
+    const offeredBySubtitle = render({
+      object
     })
+      .find("Subtitle")
+      .at(0)
+    assert.notEqual(offeredBySubtitle.prop("label"), "Offered by - ")
   })
 
   //

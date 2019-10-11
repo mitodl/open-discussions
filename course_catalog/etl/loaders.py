@@ -7,6 +7,7 @@ from course_catalog.models import (
     CoursePrice,
     CourseTopic,
     LearningResourceRun,
+    LearningResourceOfferor,
     Program,
     ProgramItem,
 )
@@ -58,6 +59,20 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
+def load_offered_bys(resource, offered_bys_data):
+    """Loads a list of offered_by into the resource. This operation is additive-only."""
+    offered_bys = []
+
+    for offered_by_data in offered_bys_data:
+        offered_by, _ = LearningResourceOfferor.objects.get_or_create(
+            name=offered_by_data["name"]
+        )
+        resource.offered_by.add(offered_by)
+
+    resource.save()
+    return offered_bys
+
+
 def load_run(learning_resource, course_run_data):
     """Load the course run into the database"""
     run_id = course_run_data.pop("run_id")
@@ -65,6 +80,7 @@ def load_run(learning_resource, course_run_data):
     instructors_data = course_run_data.pop("instructors", [])
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
+    offered_bys_data = course_run_data.pop("offered_by", [])
 
     learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
         run_id=run_id,
@@ -79,6 +95,7 @@ def load_run(learning_resource, course_run_data):
     load_topics(learning_resource_run, topics_data)
     load_prices(learning_resource_run, prices_data)
     load_instructors(learning_resource_run, instructors_data)
+    load_offered_bys(learning_resource_run, offered_bys_data)
 
     return learning_resource_run
 
@@ -89,12 +106,14 @@ def load_course(course_data):
     platform = course_data.get("platform")
     runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
+    offered_bys_data = course_data.pop("offered_by", [])
 
     course, created = Course.objects.update_or_create(
         platform=platform, course_id=course_id, defaults=course_data
     )
 
     load_topics(course, topics_data)
+    load_offered_bys(course, offered_bys_data)
 
     for course_run_data in runs_data:
         load_run(course, course_run_data)
@@ -120,12 +139,15 @@ def load_program(program_data):
     courses_data = program_data.pop("courses")
     topics_data = program_data.pop("topics", [])
     runs_data = program_data.pop("runs")
+    offered_bys_data = program_data.pop("offered_by", [])
 
     program, created = Program.objects.update_or_create(
         program_id=program_id, defaults=program_data
     )
 
     load_topics(program, topics_data)
+    load_offered_bys(program, offered_bys_data)
+
     for run_data in runs_data:
         load_run(program, run_data)
 

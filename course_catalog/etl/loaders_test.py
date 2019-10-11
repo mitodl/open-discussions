@@ -13,12 +13,14 @@ from course_catalog.etl.loaders import (
     load_topics,
     load_prices,
     load_instructors,
+    load_offered_bys,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
     ProgramFactory,
     CourseFactory,
     LearningResourceRunFactory,
+    LearningResourceOfferorFactory,
     CoursePriceFactory,
     CourseTopicFactory,
     CourseInstructorFactory,
@@ -292,3 +294,29 @@ def test_load_instructors(instructor_exists):
     )
 
     assert run.instructors.count() == len(instructors)
+
+
+@pytest.mark.parametrize(
+    "parent_factory", [CourseFactory, ProgramFactory, LearningResourceRunFactory]
+)
+@pytest.mark.parametrize("offeror_exists", [True, False])
+@pytest.mark.parametrize("has_other_offered_by", [True, False])
+def test_load_offered_bys(parent_factory, offeror_exists, has_other_offered_by):
+    """Test that load_offered_bys creates and/or assigns offeror to the parent object"""
+    offeror = (
+        LearningResourceOfferorFactory.create(is_xpro=True)
+        if offeror_exists
+        else LearningResourceOfferorFactory.build(is_xpro=True)
+    )
+
+    parent = parent_factory.create(no_topics=True)
+
+    if has_other_offered_by:
+        parent.offered_by.add(LearningResourceOfferorFactory.create(is_mitx=True))
+        parent.save()
+
+    assert parent.offered_by.count() == (1 if has_other_offered_by else 0)
+
+    load_offered_bys(parent, [{"name": offeror.name}])
+
+    assert parent.offered_by.count() == (2 if has_other_offered_by else 1)

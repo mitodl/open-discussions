@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 
-from course_catalog.constants import PlatformType, ResourceType, OfferedBy
+from course_catalog.constants import PlatformType, ResourceType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -117,12 +117,21 @@ class CourseTopicSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class LearningResourceOfferorField(serializers.Field):
+    """Serializer for LearningResourceOfferor"""
+
+    def to_representation(self, value):
+        """Serializes offered_by as a list of OfferedBy names"""
+        return list(value.values_list("name", flat=True))
+
+
 class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer):
     """
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
 
     def create(self, validated_data):
         """
@@ -233,7 +242,6 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             "raw_json": data.get("raw_json"),
             "url": data.get("url"),
             "availability": data.get("availability"),
-            "offered_by": data.get("offered_by"),
             "platform": data.get("platform"),
         }
         is_published = data.get("is_published")
@@ -312,7 +320,6 @@ class OCWSerializer(CourseSerializer):
             "published": data.get("is_published"),
             "raw_json": data.get("raw_json"),
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
-            "offered_by": OfferedBy.ocw.value,
             "platform": PlatformType.ocw.value,
         }
         if "PROD/RES" in data.get("course_prefix"):
@@ -335,7 +342,6 @@ class BootcampSerializer(BaseCourseSerializer):
         Custom function to parse data out of the raw bootcamp json
         """
         self.topics = data.pop("topics") if "topics" in data else []
-        data["offered_by"] = OfferedBy.bootcamps.value
         return super().to_internal_value(data)
 
     class Meta:
@@ -391,6 +397,7 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     items = ProgramItemSerializer(many=True, allow_null=True)
     runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
 
     class Meta:

@@ -7,7 +7,12 @@ from datetime import timedelta
 import pytest
 from django.utils import timezone
 
-from course_catalog.constants import PlatformType, AvailabilityType, ResourceType
+from course_catalog.constants import (
+    PlatformType,
+    AvailabilityType,
+    ResourceType,
+    OfferedBy,
+)
 from course_catalog.factories import CourseFactory
 from course_catalog.models import (
     Course,
@@ -175,9 +180,12 @@ def test_deserializing_a_valid_ocw_course(
         ocw_valid_data, timezone.now() + timedelta(hours=1), published, "PROD/RES"
     )
     assert Course.objects.count() == 1
-    assert (
-        Course.objects.last().learning_resource_type == ResourceType.ocw_resource.value
-    )
+    course = Course.objects.last()
+    assert course.learning_resource_type == ResourceType.ocw_resource.value
+    assert course.offered_by.count() == 1
+    assert course.offered_by.first().name == OfferedBy.ocw.value
+    assert course.runs.first().offered_by.count() == 1
+    assert course.runs.first().offered_by.first().name == OfferedBy.ocw.value
 
     course_instructors_count = CourseInstructor.objects.count()
     assert course_instructors_count == len(ocw_valid_data.get("instructors"))
@@ -217,6 +225,11 @@ def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     parse_bootcamp_json_data(bootcamp_valid_data)
     assert Bootcamp.objects.count() == 1
     assert LearningResourceRun.objects.count() == 1
+    bootcamp = Bootcamp.objects.first()
+    assert bootcamp.offered_by.count() == 1
+    assert bootcamp.offered_by.first().name == OfferedBy.bootcamps.value
+    assert bootcamp.runs.first().offered_by.count() == 1
+    assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
 
 
 @pytest.mark.usefixtures("mock_index_functions")

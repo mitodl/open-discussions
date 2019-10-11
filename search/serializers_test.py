@@ -268,7 +268,9 @@ def test_es_run_serializer(has_full_name):
             ],
             "published": True,
             "availability": learning_resource_run.availability,
-            "offered_by": learning_resource_run.offered_by,
+            "offered_by": list(
+                learning_resource_run.offered_by.values_list("name", flat=True)
+            ),
         },
     )
 
@@ -299,7 +301,7 @@ def test_es_course_serializer(offered_by):
                 for course_run in course.runs.order_by("-best_start_date")
             ],
             "published": True,
-            "offered_by": course.offered_by,
+            "offered_by": list(course.offered_by.values_list("name", flat=True)),
         },
     )
 
@@ -325,7 +327,7 @@ def test_es_program_serializer(offered_by):
                 ESRunSerializer(program_run).data
                 for program_run in program.runs.order_by("-best_start_date")
             ],
-            "offered_by": program.offered_by,
+            "offered_by": list(program.offered_by.values_list("name", flat=True)),
         },
     )
 

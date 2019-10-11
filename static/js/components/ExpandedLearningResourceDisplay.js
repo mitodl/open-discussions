@@ -12,7 +12,8 @@ import {
   bestRun,
   minPrice,
   getStartDate,
-  getInstructorName
+  getInstructorName,
+  getPreferredOfferedBy
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
@@ -48,6 +49,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
   const cost = selectedRun ? minPrice(selectedRun.prices) : null
 
+  const offeredBy = getPreferredOfferedBy(object.offered_by)
   const instructors =
     selectedRun && selectedRun.instructors
       ? selectedRun.instructors.map(instructor => getInstructorName(instructor))
@@ -100,8 +102,8 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
                 rel="noopener noreferrer"
               >
                 {`Take ${capitalize(object.object_type)}`}
-                {object.offered_by && object.object_type !== LR_TYPE_BOOTCAMP
-                  ? ` on ${object.offered_by}`
+                {offeredBy && object.object_type !== LR_TYPE_BOOTCAMP
+                  ? ` on ${offeredBy}`
                   : null}
               </a>
             </div>

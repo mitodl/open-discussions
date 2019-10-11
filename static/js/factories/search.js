@@ -6,6 +6,7 @@ import R from "ramda"
 import { LINK_TYPE_LINK, LINK_TYPE_TEXT } from "../lib/channels"
 import {
   platforms,
+  offeredBys,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
@@ -84,7 +85,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   short_description: casual.description,
   full_description:  casual.description,
   platform:          casual.random_element([platforms.edX, platforms.OCW]),
-  offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
+  offered_by:        [casual.random_element(offeredBys)],
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_COURSE,
   runs:              R.times(makeRun, 3)
@@ -100,7 +101,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   full_description:  casual.description,
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_BOOTCAMP,
-  offered_by:        "bootcamps",
+  offered_by:        [offeredBys.bootcamps],
   runs:              [makeRun()]
 })
 
@@ -113,8 +114,10 @@ export const makeProgramResult = (): LearningResourceResult => ({
   short_description: casual.description,
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_PROGRAM,
-  offered_by:        casual.random_element([platforms.xpro, platforms.micromasters]),
-  runs:              [makeRun()]
+  offered_by:        [
+    casual.random_element([offeredBys.xpro, offeredBys.micromasters])
+  ],
+  runs: [makeRun()]
 })
 
 export const makeLearningResourceResult = (objectType: string) => {

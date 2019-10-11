@@ -143,7 +143,7 @@ describe("search functions", () => {
       platform:    null,
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_BOOTCAMP,
-      offered_by:  "bootcamps",
+      offered_by:  result.offered_by,
       runs:        result.runs
     })
   })

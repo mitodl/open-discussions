@@ -9,12 +9,7 @@ import pytz
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import (
-    AvailabilityType,
-    ListType,
-    OfferedBy,
-    OFFERED_BY_MAPPINGS,
-)
+from course_catalog.constants import AvailabilityType, ListType, OfferedBy, PlatformType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -26,6 +21,7 @@ from course_catalog.models import (
     UserList,
     UserListItem,
     LearningResourceRun,
+    LearningResourceOfferor,
 )
 
 
@@ -88,6 +84,33 @@ class CoursePriceFactory(DjangoModelFactory):
         django_get_or_create = ("price", "mode", "upgrade_deadline")
 
 
+class LearningResourceOfferorFactory(DjangoModelFactory):
+    """Factory for LearningResourceOfferor"""
+
+    name = FuzzyChoice(
+        (
+            OfferedBy.mitx.value,
+            OfferedBy.ocw.value,
+            OfferedBy.micromasters.value,
+            OfferedBy.xpro.value,
+            OfferedBy.oll.value,
+            OfferedBy.bootcamps.value,
+        )
+    )
+
+    class Meta:
+        model = LearningResourceOfferor
+        django_get_or_create = ("name",)
+
+    class Params:
+        is_xpro = factory.Trait(name=OfferedBy.xpro.value)
+        is_bootcamps = factory.Trait(name=OfferedBy.bootcamps.value)
+        is_mitx = factory.Trait(name=OfferedBy.mitx.value)
+        is_oll = factory.Trait(name=OfferedBy.oll.value)
+        is_micromasters = factory.Trait(name=OfferedBy.micromasters.value)
+        is_ocw = factory.Trait(name=OfferedBy.ocw.value)
+
+
 class LearningResourceFactory(DjangoModelFactory):
     """Factory for LearningResource subclasses"""
 
@@ -95,14 +118,8 @@ class LearningResourceFactory(DjangoModelFactory):
     short_description = factory.Faker("sentence")
 
     topics = factory.PostGeneration(_post_gen_topics)
-    offered_by = FuzzyChoice(
-        (
-            OfferedBy.mitx.value,
-            OfferedBy.ocw.value,
-            OfferedBy.micromasters.value,
-            OfferedBy.xpro.value,
-            OfferedBy.oll.value,
-        )
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory", size=1
     )
 
     class Meta:
@@ -131,7 +148,16 @@ class CourseFactory(AbstractCourseFactory):
     """Factory for Courses"""
 
     course_id = factory.Sequence(lambda n: "COURSE%03d.MIT" % n)
-    platform = factory.LazyAttribute(lambda o: OFFERED_BY_MAPPINGS[o.offered_by])
+    platform = FuzzyChoice(
+        (
+            PlatformType.mitx.value,
+            PlatformType.ocw.value,
+            PlatformType.micromasters.value,
+            PlatformType.xpro.value,
+            PlatformType.oll.value,
+            PlatformType.bootcamps.value,
+        )
+    )
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )
@@ -139,18 +165,21 @@ class CourseFactory(AbstractCourseFactory):
     class Meta:
         model = Course
 
-    class Params:
-        is_mitx = factory.Trait(offered_by=OfferedBy.mitx.value)
-        is_micromasters = factory.Trait(offered_by=OfferedBy.micromasters.value)
-        is_xpro = factory.Trait(offered_by=OfferedBy.xpro.value)
-        is_ocw = factory.Trait(offered_by=OfferedBy.ocw.value)
-
 
 class LearningResourceRunFactory(AbstractCourseFactory):
     """Factory for LearningResourceRuns"""
 
     run_id = factory.Sequence(lambda n: "COURSEN%03d.MIT_run" % n)
-    platform = factory.LazyAttribute(lambda o: OFFERED_BY_MAPPINGS[o.offered_by])
+    platform = FuzzyChoice(
+        (
+            PlatformType.mitx.value,
+            PlatformType.ocw.value,
+            PlatformType.micromasters.value,
+            PlatformType.xpro.value,
+            PlatformType.oll.value,
+            PlatformType.bootcamps.value,
+        )
+    )
     content_object = factory.SubFactory(CourseFactory)
     object_id = factory.SelfAttribute("content_object.id")
     content_type = factory.LazyAttribute(
@@ -204,14 +233,22 @@ class LearningResourceRunFactory(AbstractCourseFactory):
 class BootcampRunFactory(LearningResourceRunFactory):
     """LearningResourceRun factory specific to Bootcamps"""
 
-    offered_by = OfferedBy.bootcamps.value
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory",
+        size=1,
+        name=OfferedBy.bootcamps.value,
+    )
 
 
 class BootcampFactory(AbstractCourseFactory):
     """Factory for Bootcamps"""
 
     course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
-    offered_by = OfferedBy.bootcamps.value
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory",
+        size=1,
+        name=OfferedBy.bootcamps.value,
+    )
 
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.BootcampRunFactory", "content_object", size=3

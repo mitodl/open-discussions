@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name
 import pytest
 
-from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.constants import PlatformType
 from course_catalog.etl import micromasters
 
 
@@ -17,8 +17,18 @@ def mock_micromasters_data():
             "thumbnail_url": "http://example.com/program/1/image/url",
             "extra_field": "value",
             "courses": [
-                {"edx_key": "2", "position_in_program": 2, "extra_field": "value"},
-                {"edx_key": "1", "position_in_program": 1, "extra_field": "value"},
+                {
+                    "edx_key": "2",
+                    "position_in_program": 2,
+                    "extra_field": "value",
+                    "course_runs": [{"edx_course_key": None}, {"edx_course_key": ""}],
+                },
+                {
+                    "edx_key": "1",
+                    "position_in_program": 1,
+                    "extra_field": "value",
+                    "course_runs": [{"edx_course_key": "course_key_1"}],
+                },
             ],
             "instructors": [
                 {"name": "Dr. Doofenshmirtz"},
@@ -37,8 +47,18 @@ def mock_micromasters_data():
             "thumbnail_url": "http://example.com/program/2/image/url",
             "extra_field": "value",
             "courses": [
-                {"edx_key": "3", "position_in_program": 1, "extra_field": "value"},
-                {"edx_key": "4", "position_in_program": 2, "extra_field": "value"},
+                {
+                    "edx_key": "3",
+                    "position_in_program": 1,
+                    "extra_field": "value",
+                    "course_runs": [],
+                },
+                {
+                    "edx_key": "4",
+                    "position_in_program": 2,
+                    "extra_field": "value",
+                    "course_runs": [{"edx_course_key": "course_key_4"}],
+                },
             ],
             "instructors": [{"name": "Mia"}, {"name": "Leah"}],
             "topics": [{"name": "program"}, {"name": "second"}],
@@ -82,17 +102,25 @@ def test_micromasters_transform(mock_micromasters_data):
             "title": "program title 1",
             "url": "http://example.com/program/1/url",
             "image_src": "http://example.com/program/1/image/url",
-            "offered_by": OfferedBy.micromasters.value,
+            "offered_by": micromasters.OFFERED_BY,
             "courses": [
                 {
                     "course_id": "1",
                     "platform": PlatformType.mitx.value,
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
+                    "runs": [
+                        {
+                            "run_id": "course_key_1",
+                            "platform": PlatformType.mitx.value,
+                            "offered_by": micromasters.OFFERED_BY,
+                        }
+                    ],
                 },
                 {
                     "course_id": "2",
                     "platform": PlatformType.mitx.value,
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
+                    "runs": [],
                 },
             ],
             "runs": [
@@ -100,7 +128,7 @@ def test_micromasters_transform(mock_micromasters_data):
                     "run_id": 1,
                     "platform": PlatformType.micromasters.value,
                     "title": "program title 1",
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
                     "instructors": [
                         {"full_name": "Dr. Doofenshmirtz"},
                         {"full_name": "Joey Jo Jo Shabadoo"},
@@ -120,17 +148,25 @@ def test_micromasters_transform(mock_micromasters_data):
             "title": "program title 2",
             "url": "http://example.com/program/2/url",
             "image_src": "http://example.com/program/2/image/url",
-            "offered_by": OfferedBy.micromasters.value,
+            "offered_by": micromasters.OFFERED_BY,
             "courses": [
                 {
                     "course_id": "3",
                     "platform": PlatformType.mitx.value,
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
+                    "runs": [],
                 },
                 {
                     "course_id": "4",
                     "platform": PlatformType.mitx.value,
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
+                    "runs": [
+                        {
+                            "run_id": "course_key_4",
+                            "platform": PlatformType.mitx.value,
+                            "offered_by": micromasters.OFFERED_BY,
+                        }
+                    ],
                 },
             ],
             "runs": [
@@ -138,7 +174,7 @@ def test_micromasters_transform(mock_micromasters_data):
                     "run_id": 2,
                     "platform": PlatformType.micromasters.value,
                     "title": "program title 2",
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": micromasters.OFFERED_BY,
                     "instructors": [{"full_name": "Mia"}, {"full_name": "Leah"}],
                     "prices": [{"price": "87.65"}],
                     "start_date": None,

@@ -284,6 +284,14 @@ class ESTopicsField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
+class ESOfferedByField(serializers.Field):
+    """Serializes offered_by as a list of OfferedBy names"""
+
+    def to_representation(self, value):
+        """Serializes offered_by as a list of OfferedBy names"""
+        return list(value.values_list("name", flat=True))
+
+
 class ESRunSerializer(serializers.ModelSerializer):
     """
     Elasticsearch serializer class for course runs
@@ -292,6 +300,7 @@ class ESRunSerializer(serializers.ModelSerializer):
     prices = ESCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
+    offered_by = ESOfferedByField()
 
     def get_instructors(self, instance):
         """
@@ -352,6 +361,7 @@ class ESCourseSerializer(ESModelSerializer):
     topics = ESTopicsField()
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
+    offered_by = ESOfferedByField()
 
     def get_coursenum(self, course):
         """
@@ -388,6 +398,7 @@ class ESBootcampSerializer(ESCourseSerializer):
 
     runs = ESRunSerializer(many=True)
     topics = ESTopicsField()
+    offered_by = ESOfferedByField()
 
     class Meta:
         model = Bootcamp
@@ -417,6 +428,7 @@ class ESProgramSerializer(ESModelSerializer):
 
     topics = ESTopicsField()
     runs = ESRunSerializer(many=True)
+    offered_by = ESOfferedByField()
 
     class Meta:
         model = Program

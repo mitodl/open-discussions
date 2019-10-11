@@ -124,7 +124,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should display all topics for the ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       // $FlowFixMe
-      object.offered_by = "xPro"
+      object.offered_by = ["xPro"]
       const wrapper = render({
         object
       })
@@ -256,7 +256,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should display the platform in the link button text for ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       // $FlowFixMe
-      object.offered_by = "xPro"
+      object.offered_by = ["xPro"]
       const wrapper = render({
         object
       })

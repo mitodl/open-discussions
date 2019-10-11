@@ -7,6 +7,7 @@ import {
   COURSE_ARCHIVED,
   COURSE_CURRENT,
   platforms,
+  offeredBys,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
@@ -25,6 +26,8 @@ import type {
 const incrCourse = incrementer()
 const courseId: any = incrementer()
 const incrRun = incrementer()
+
+const OFFERORS = R.values(offeredBys)
 
 export const makeRun = (): LearningResourceRun => {
   return {
@@ -74,8 +77,8 @@ export const makeCourse = (): Course => ({
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   full_description:  casual.description,
-  offered_by:        casual.random_element([platforms.edX, platforms.OCW, null]),
-  platform:          casual.random_element([platforms.edX, platforms.OCW]),
+  offered_by:        [casual.random_element(OFFERORS)],
+  platform:          casual.random_element(R.values(platforms)),
   is_favorite:       casual.boolean,
   topics:            [{ name: casual.word }, { name: casual.word }],
   runs:              R.times(makeRun, 3),
@@ -95,7 +98,7 @@ export const makeBootcamp = (): Bootcamp => ({
   short_description: casual.description,
   full_description:  casual.description,
   is_favorite:       casual.boolean,
-  offered_by:        "bootcamps",
+  offered_by:        [offeredBys.bootcamps],
   topics:            [{ name: casual.word }, { name: casual.word }],
   runs:              R.times(makeRun, 3),
   object_type:       "bootcamp"
@@ -120,7 +123,7 @@ export const makeProgram = (): Program => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   id:                incrProgram.next().value,
   short_description: casual.description,
-  offered_by:        null,
+  offered_by:        [casual.random_element(OFFERORS)],
   title:             casual.title,
   url:               casual.url,
   topics:            [{ name: casual.word }, { name: casual.word }],
@@ -142,7 +145,7 @@ export const makeUserList = (): UserList => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   id:                incrUserList.next().value,
   short_description: casual.description,
-  offered_by:        null,
+  offered_by:        [],
   title:             casual.title,
   topics:            [{ name: casual.word }, { name: casual.word }],
   is_favorite:       casual.boolean,

@@ -333,7 +333,7 @@ export type LearningResourceSummary = {
   image_src:          ?string,
   platform:           ?string,
   topics:             Array<CourseTopic>,
-  offered_by:         ?string,
+  offered_by:         Array<string>,
   object_type:        string,
   runs:               Array<LearningResourceRun>
 }
@@ -363,7 +363,7 @@ export type LearningResource = {
   image_src:          ?string,
   short_description:  ?string,
   topics:             Array<CourseTopic>,
-  offered_by:         ?string,
+  offered_by:         Array<string>,
   is_favorite:        boolean
 }
 
