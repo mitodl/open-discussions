@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.94.1
+Version 0.94.1 (Released October 11, 2019)
 --------------
 
 - Rename CourseRun to LearningResourceRun (#2265)
