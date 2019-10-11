@@ -34,8 +34,17 @@ def transform(programs):
                     "platform": PlatformType.micromasters.value,
                     "title": program["title"],
                     "offered_by": OfferedBy.micromasters.value,
+                    "instructors": [
+                        {"full_name": instructor["name"]}
+                        for instructor in program["instructors"]
+                    ],
+                    "prices": [{"price": program["total_price"]}],
+                    "start_date": program["start_date"],
+                    "end_date": program["end_date"],
+                    "enrollment_start": program["enrollment_start"],
                 }
             ],
+            "topics": program["topics"],
             # all we need for course data is the relative positioning of courses by course_id
             "courses": [
                 {
