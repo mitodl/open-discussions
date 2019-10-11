@@ -18,6 +18,7 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
+from course_catalog.etl.loaders import load_offered_bys
 from course_catalog.models import Bootcamp, LearningResourceRun, Course
 from course_catalog.serializers import (
     BootcampSerializer,
@@ -95,6 +96,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
         course = ocw_serializer.save()
+        load_offered_bys(course, [{"name": OfferedBy.ocw.value}])
 
         # Try and get the run instance.
         courserun_instance = course.runs.filter(
@@ -113,7 +115,6 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
                 "level_type": master_json.get("course_level"),
                 "year": master_json.get("from_year"),
                 "semester": master_json.get("from_semester"),
-                "offered_by": OfferedBy.ocw.value,
                 "availability": AvailabilityType.current.value,
                 "image": {
                     "src": master_json.get("image_src"),
@@ -135,7 +136,8 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
                 run_serializer.errors,
             )
             return
-        run_serializer.save()
+        run = run_serializer.save()
+        load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
 
 
 def get_s3_object_and_read(obj, iteration=0):
@@ -279,6 +281,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
         bootcamp = bootcamp_serializer.save()
+        load_offered_bys(bootcamp, [{"name": OfferedBy.bootcamps.value}])
 
         # Try and get the LearningResourceRun instance.
         try:
@@ -295,7 +298,6 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 "end": bootcamp_data.get("end_date"),
                 "run_id": bootcamp.course_id,
                 "max_modified": bootcamp_modified,
-                "offered_by": OfferedBy.bootcamps.value,
                 "content_type": ContentType.objects.get(model="bootcamp").id,
                 "object_id": bootcamp.id,
                 "url": bootcamp.url,
@@ -309,7 +311,10 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 run_serializer.errors,
             )
             return
-        run_serializer.save()
+        run = run_serializer.save()
+
+        load_offered_bys(run, [{"name": OfferedBy.bootcamps.value}])
+
     index_func(bootcamp)
 
 

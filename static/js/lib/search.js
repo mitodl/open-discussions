@@ -110,7 +110,7 @@ export const searchResultToLearningResource = (
   image_src:   result.image_src,
   object_type: result.object_type,
   offered_by:
-    "offered_by" in result && result.offered_by ? result.offered_by : null,
+    "offered_by" in result && result.offered_by ? result.offered_by : [],
   platform: "platform" in result ? result.platform : null,
   topics:   result.topics.map(topic => ({ name: topic })),
   runs:     "runs" in result ? result.runs : []

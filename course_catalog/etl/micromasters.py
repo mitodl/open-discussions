@@ -1,10 +1,14 @@
 """MicroMasters course catalog ETL"""
+import copy
+
 from django.conf import settings
 import requests
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.constants import COMMON_HEADERS
 from course_catalog.etl.utils import log_exceptions
+
+OFFERED_BY = [{"name": OfferedBy.micromasters.value}]
 
 
 @log_exceptions("Error extracting MicroMasters catalog", exc_return_value=[])
@@ -27,13 +31,13 @@ def transform(programs):
             "title": program["title"],
             "url": program["programpage_url"],
             "image_src": program["thumbnail_url"],
-            "offered_by": OfferedBy.micromasters.value,
+            "offered_by": copy.deepcopy(OFFERED_BY),
             "runs": [
                 {
                     "run_id": program["id"],
                     "platform": PlatformType.micromasters.value,
                     "title": program["title"],
-                    "offered_by": OfferedBy.micromasters.value,
+                    "offered_by": copy.deepcopy(OFFERED_BY),
                     "instructors": [
                         {"full_name": instructor["name"]}
                         for instructor in program["instructors"]
@@ -56,8 +60,16 @@ def transform(programs):
                     # indicate that each of these courses are also offered by MicroMasters
                     "course_id": course["edx_key"],
                     "platform": PlatformType.mitx.value,
-                    "offered_by": OfferedBy.micromasters.value
-                    # TBD: how to handle merging `offered_by` for courses and course runs
+                    "offered_by": copy.deepcopy(OFFERED_BY),
+                    "runs": [
+                        {
+                            "run_id": run["edx_course_key"],
+                            "platform": PlatformType.mitx.value,
+                            "offered_by": copy.deepcopy(OFFERED_BY),
+                        }
+                        for run in course["course_runs"]
+                        if run.get("edx_course_key", None)
+                    ],
                 }
                 for course in sorted(
                     program["courses"], key=lambda course: course["position_in_program"]

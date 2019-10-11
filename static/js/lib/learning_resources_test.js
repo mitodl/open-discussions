@@ -14,7 +14,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  offeredBys
 } from "./constants"
 import { AVAILABILITY_MAPPING } from "./search"
 import {
@@ -30,7 +31,8 @@ import {
   runStartDate,
   runEndDate,
   getStartDate,
-  getInstructorName
+  getInstructorName,
+  getPreferredOfferedBy
 } from "./learning_resources"
 import { makeCourse, makeRun } from "../factories/learning_resources"
 import moment from "moment"
@@ -380,6 +382,19 @@ describe("Course run availability utils", () => {
   ].forEach(([input, expected]) => {
     it(`getInstructorName should return ${expected} when given ${input.toString()}`, () => {
       assert.equal(getInstructorName(input), expected)
+    })
+  })
+
+  //
+  ;[
+    [[offeredBys.micromasters, offeredBys.mitx], offeredBys.micromasters],
+    [[offeredBys.mitx, offeredBys.micromasters], offeredBys.micromasters],
+    [[offeredBys.micromasters], offeredBys.micromasters],
+    [[offeredBys.mitx], offeredBys.mitx],
+    [[offeredBys.mitx, offeredBys.xpro], offeredBys.mitx]
+  ].forEach(([input, expected]) => {
+    it(`getPreferredOfferedBy should return ${expected} when given ${input.toString()}`, () => {
+      assert.equal(getPreferredOfferedBy(input), expected)
     })
   })
 })

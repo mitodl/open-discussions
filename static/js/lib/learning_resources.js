@@ -1,5 +1,5 @@
 //@flow
-import { concat } from "ramda"
+import { concat, find, equals, head } from "ramda"
 import moment from "moment"
 
 import {
@@ -11,7 +11,8 @@ import {
   DEFAULT_END_DT,
   DEFAULT_START_DT,
   LR_TYPE_USERLIST,
-  platforms
+  platforms,
+  offeredBys
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
@@ -192,3 +193,9 @@ export const getInstructorName = (instructor: CourseInstructor) => {
   }
   return ""
 }
+
+// prefer MicroMasters over MITx
+const findMicroMasters = find(equals(offeredBys.micromasters))
+
+export const getPreferredOfferedBy = (offeredBy: Array<string>): string =>
+  findMicroMasters(offeredBy) || head(offeredBy)

@@ -49,6 +49,12 @@ class CoursePrice(TimestampedModel):
         return "${:,.2f}".format(self.price)
 
 
+class LearningResourceOfferor(TimestampedModel):
+    """Data model for who is offering a learning resource"""
+
+    name = models.CharField(max_length=32, unique=True)
+
+
 class LearningResource(TimestampedModel):
     """
     Base class for all learning resource models under course_catalog app.
@@ -57,7 +63,13 @@ class LearningResource(TimestampedModel):
     title = models.CharField(max_length=256)
     short_description = models.TextField(null=True, blank=True)
     topics = models.ManyToManyField(CourseTopic, blank=True)
-    offered_by = models.CharField(max_length=128, null=True, blank=True)
+
+    # deprecated, moved aside to _offered_by, but still mapped to the old column so we don't drop it immediately
+    _deprecated_offered_by = models.CharField(
+        db_column="offered_by", max_length=128, null=True, blank=True
+    )
+
+    offered_by = models.ManyToManyField(LearningResourceOfferor, blank=True)
 
     class Meta:
         abstract = True

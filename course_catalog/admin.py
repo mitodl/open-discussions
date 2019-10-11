@@ -124,8 +124,7 @@ class ProgramAdmin(admin.ModelAdmin):
     """Program Admin"""
 
     model = Program
-    list_filter = ("offered_by",)
-    list_display = ("title", "short_description", "offered_by")
+    list_display = ("title", "short_description")
     search_fields = ("title", "short_description")
     autocomplete_fields = ("topics",)
     inlines = [ProgramItemInline, LearningResourceRunInline]

@@ -196,7 +196,7 @@ def _transform_course_run(config, course_run, course_last_modified, marketing_ur
         or semester_year_to_date(semester, year, ending=True),
         "image_src": (course_run.get("image") or {}).get("src", None),
         "image_description": (course_run.get("image") or {}).get("description", None),
-        "offered_by": config.offered_by,
+        "offered_by": [{"name": config.offered_by}],
         "availability": course_run.get("availability"),
         "url": marketing_url
         or "{}{}/course/".format(config.alt_url, course_run.get("key")),
@@ -237,7 +237,7 @@ def _transform_course(config, course):
         "short_description": course.get("short_description"),
         "full_description": course.get("full_description"),
         "platform": config.platform,
-        "offered_by": config.offered_by,
+        "offered_by": [{"name": config.offered_by}],
         "last_modified": last_modified,
         "image_src": (course.get("image") or {}).get("src", None),
         "image_description": (course.get("image") or {}).get("description", None),

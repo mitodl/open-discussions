@@ -1,4 +1,5 @@
 """xPro course catalog ETL"""
+import copy
 from datetime import datetime
 
 from django.conf import settings
@@ -10,6 +11,8 @@ from course_catalog.etl.utils import log_exceptions
 
 
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+
+OFFERED_BY = [{"name": OfferedBy.xpro.value}]
 
 
 def _parse_datetime(value):
@@ -65,7 +68,7 @@ def _transform_run(course_run):
         or _parse_datetime(course_run["start_date"]),
         "best_end_date": _parse_datetime(course_run["enrollment_end"])
         or _parse_datetime(course_run["end_date"]),
-        "offered_by": OfferedBy.xpro.value,
+        "offered_by": copy.deepcopy(OFFERED_BY),
         "published": bool(course_run["current_price"]),
         "prices": [{"price": course_run["current_price"]}]
         if course_run.get("current_price", None)
@@ -92,7 +95,7 @@ def _transform_course(course):
         "platform": PlatformType.xpro.value,
         "title": course["title"],
         "image_src": course["thumbnail_url"],
-        "offered_by": OfferedBy.xpro.value,
+        "offered_by": copy.deepcopy(OFFERED_BY),
         "short_description": course["description"],
         "published": any(
             map(
@@ -130,7 +133,7 @@ def transform_programs(programs):
             "title": program["title"],
             "image_src": program["thumbnail_url"],
             "short_description": program["description"],
-            "offered_by": OfferedBy.xpro.value,
+            "offered_by": copy.deepcopy(OFFERED_BY),
             "published": bool(
                 program["current_price"]
             ),  # a program is only considered published if it has a product/price
@@ -149,7 +152,7 @@ def transform_programs(programs):
                     "best_start_date": _parse_datetime(program["enrollment_start"])
                     or _parse_datetime(program["start_date"]),
                     "best_end_date": _parse_datetime(program["end_date"]),
-                    "offered_by": OfferedBy.xpro.value,
+                    "offered_by": copy.deepcopy(OFFERED_BY),
                     "title": program["title"],
                     "short_description": program["description"],
                     "instructors": [

@@ -122,7 +122,7 @@ def test_transform_course(
             "short_description": "short_description",
             "full_description": "full description",
             "platform": openedx_config.platform,
-            "offered_by": openedx_config.offered_by,
+            "offered_by": [{"name": openedx_config.offered_by}],
             "image_src": "https://prod-discovery.edx-cdn.org/media/course/image/ff1df27b-3c97-42ee-a9b3-e031ffd41a4f-747c9c2f216e.small.jpg",
             "image_description": "Image description",
             "last_modified": any_instance_of(datetime),
@@ -150,7 +150,7 @@ def test_transform_course(
                     "language": "en-us",
                     "last_modified": any_instance_of(datetime),
                     "level": "Intermediate",
-                    "offered_by": openedx_config.offered_by,
+                    "offered_by": [{"name": openedx_config.offered_by}],
                     "prices": [
                         {
                             "mode": "verified",

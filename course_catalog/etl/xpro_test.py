@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.constants import PlatformType
 from course_catalog.etl import xpro
 from course_catalog.etl.xpro import _parse_datetime
 from open_discussions.test_utils import any_instance_of
@@ -80,7 +80,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
             "title": program_data["title"],
             "image_src": program_data["thumbnail_url"],
             "short_description": program_data["description"],
-            "offered_by": OfferedBy.xpro.value,
+            "offered_by": xpro.OFFERED_BY,
             "published": bool(program_data["current_price"]),
             "url": program_data["url"],
             "topics": program_data.get("topics", []),
@@ -104,7 +104,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     ],
                     "title": program_data["title"],
                     "short_description": program_data["description"],
-                    "offered_by": OfferedBy.xpro.value,
+                    "offered_by": xpro.OFFERED_BY,
                 }
             ],
             "courses": [
@@ -114,7 +114,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "title": course_data["title"],
                     "image_src": course_data["thumbnail_url"],
                     "short_description": course_data["description"],
-                    "offered_by": OfferedBy.xpro.value,
+                    "offered_by": xpro.OFFERED_BY,
                     "published": any(
                         map(
                             lambda course_run: course_run.get("current_price", None),
@@ -138,7 +138,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                                 course_run_data["enrollment_end"]
                                 or course_run_data["end_date"]
                             ),
-                            "offered_by": OfferedBy.xpro.value,
+                            "offered_by": xpro.OFFERED_BY,
                             "published": bool(course_run_data["current_price"]),
                             "prices": [{"price": course_run_data["current_price"]}]
                             if course_run_data["current_price"]
@@ -169,7 +169,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
             "title": course_data["title"],
             "image_src": course_data["thumbnail_url"],
             "short_description": course_data["description"],
-            "offered_by": OfferedBy.xpro.value,
+            "offered_by": xpro.OFFERED_BY,
             "published": any(
                 map(
                     lambda course_run: course_run.get("current_price", None),
@@ -192,7 +192,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
                     "best_end_date": _parse_datetime(
                         course_run_data["enrollment_end"] or course_run_data["end_date"]
                     ),
-                    "offered_by": OfferedBy.xpro.value,
+                    "offered_by": xpro.OFFERED_BY,
                     "published": bool(course_run_data["current_price"]),
                     "prices": [{"price": course_run_data["current_price"]}]
                     if course_run_data["current_price"]

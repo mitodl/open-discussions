@@ -12,7 +12,8 @@ import {
   filterRunsByAvailability,
   bestRunLabel,
   bestRun,
-  minPrice
+  minPrice,
+  getPreferredOfferedBy
 } from "../lib/learning_resources"
 import {
   defaultResourceImageURL,
@@ -120,8 +121,11 @@ export const LearningResourceCard = ({
         <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
         </div>
-        {object.offered_by ? (
-          <Subtitle content={object.offered_by} label="Offered by - " />
+        {object.offered_by.length ? (
+          <Subtitle
+            content={getPreferredOfferedBy(object.offered_by)}
+            label="Offered by - "
+          />
         ) : null}
         {object.topics.length > 0 ? (
           <Subtitle

@@ -25,6 +25,14 @@ export const platforms = {
   xpro:         xproPlatform
 }
 
+export const offeredBys = {
+  ocw:          "OCW",
+  micromasters: "MicroMasters",
+  bootcamps:    "Bootcamps",
+  mitx:         "MITx",
+  xpro:         "xPro"
+}
+
 export const WIDGET_TYPE_MARKDOWN = "Markdown"
 export const WIDGET_TYPE_RSS = "RSS Feed"
 export const WIDGET_TYPE_URL = "URL"

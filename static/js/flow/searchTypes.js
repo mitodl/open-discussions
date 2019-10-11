@@ -82,7 +82,7 @@ export type LearningResourceResult = {
   title:               string,
   image_src:           ?string,
   object_type:         string,
-  offered_by?:         ?string,
+  offered_by?:         Array<string>,
   short_description?:  ?string,
   full_description?:   ?string,
   platform?:           string,
