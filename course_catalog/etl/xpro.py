@@ -134,6 +134,7 @@ def transform_programs(programs):
                 program["current_price"]
             ),  # a program is only considered published if it has a product/price
             "url": program["url"],
+            "topics": program.get("topics", []),
             "runs": [
                 {
                     "prices": [{"price": program["current_price"], "mode": ""}]
@@ -150,6 +151,10 @@ def transform_programs(programs):
                     "offered_by": OfferedBy.xpro.value,
                     "title": program["title"],
                     "short_description": program["description"],
+                    "instructors": [
+                        {"full_name": instructor["name"]}
+                        for instructor in program.get("instructors", [])
+                    ],
                 }
             ],
             "courses": [_transform_course(course) for course in program["courses"]],

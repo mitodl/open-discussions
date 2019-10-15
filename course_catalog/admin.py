@@ -11,7 +11,32 @@ from course_catalog.models import (
     ProgramItem,
     UserListItem,
     LearningResourceRun,
+    CoursePrice,
+    CourseInstructor,
+    CourseTopic,
 )
+
+
+class CourseInstructorAdmin(admin.ModelAdmin):
+    """Instructor Admin"""
+
+    model = CourseInstructor
+    search_fields = ("full_name", "first_name", "last_name")
+
+
+class CoursePriceAdmin(admin.ModelAdmin):
+    """Price Admin"""
+
+    model = CoursePrice
+    search_fields = ("price",)
+    list_filter = ("mode",)
+
+
+class CourseTopicAdmin(admin.ModelAdmin):
+    """Topic Admin"""
+
+    model = CourseTopic
+    search_fields = ("name",)
 
 
 class LearningResourceRunAdmin(admin.ModelAdmin):
@@ -22,6 +47,8 @@ class LearningResourceRunAdmin(admin.ModelAdmin):
     search_fields = ("run_id", "title", "course__course_id")
     list_display = ("run_id", "title", "best_start_date", "best_end_date")
     list_filter = ("semester", "year")
+    exclude = ("course",)
+    autocomplete_fields = ("prices", "instructors", "topics")
 
 
 class LearningResourceRunInline(GenericTabularInline):
@@ -60,6 +87,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ("course_id", "title", "platform")
     list_filter = ("platform",)
     inlines = [LearningResourceRunInline]
+    autocomplete_fields = ("topics",)
 
 
 class BootcampAdmin(admin.ModelAdmin):
@@ -68,6 +96,7 @@ class BootcampAdmin(admin.ModelAdmin):
     model = Bootcamp
     search_fields = ("course_id", "title")
     list_display = ("course_id", "title")
+    autocomplete_fields = ("topics",)
     inlines = [LearningResourceRunInline]
 
 
@@ -98,7 +127,8 @@ class ProgramAdmin(admin.ModelAdmin):
     list_filter = ("offered_by",)
     list_display = ("title", "short_description", "offered_by")
     search_fields = ("title", "short_description")
-    inlines = [ProgramItemInline]
+    autocomplete_fields = ("topics",)
+    inlines = [ProgramItemInline, LearningResourceRunInline]
 
 
 class UserListAdmin(admin.ModelAdmin):
@@ -111,6 +141,9 @@ class UserListAdmin(admin.ModelAdmin):
     inlines = [UserListItemInline]
 
 
+admin.site.register(CourseTopic, CourseTopicAdmin)
+admin.site.register(CoursePrice, CoursePriceAdmin)
+admin.site.register(CourseInstructor, CourseInstructorAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
 admin.site.register(Bootcamp, BootcampAdmin)

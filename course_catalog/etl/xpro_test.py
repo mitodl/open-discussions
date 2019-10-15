@@ -83,6 +83,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
             "offered_by": OfferedBy.xpro.value,
             "published": bool(program_data["current_price"]),
             "url": program_data["url"],
+            "topics": program_data.get("topics", []),
             "runs": [
                 {
                     "run_id": program_data["readable_id"],
@@ -97,6 +98,10 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "prices": [{"price": program_data["current_price"], "mode": ""}]
                     if program_data["current_price"]
                     else [],
+                    "instructors": [
+                        {"full_name": instructor["name"]}
+                        for instructor in program_data.get("instructors", [])
+                    ],
                     "title": program_data["title"],
                     "short_description": program_data["description"],
                     "offered_by": OfferedBy.xpro.value,
@@ -116,6 +121,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                             course_data["courseruns"],
                         )
                     ),
+                    "topics": course_data.get("topics", []),
                     "runs": [
                         {
                             "run_id": course_run_data["courseware_id"],
