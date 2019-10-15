@@ -428,7 +428,10 @@ export const buildSearchQuery = ({
       }
       : {}
 
-    if (text && [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE].includes(type)) {
+    if (
+      text &&
+      [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+    ) {
       matchQuery.should.push({
         nested: {
           path:  "runs",

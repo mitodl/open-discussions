@@ -47,27 +47,10 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
   const cost = selectedRun ? minPrice(selectedRun.prices) : null
 
-  let instructors = []
-  if (object.object_type === LR_TYPE_PROGRAM) {
-    instructors = Array.from(
-      new Set(
-        R.flatten(
-          // $FlowFixMe: programs have items
-          object.items.map(item =>
-            item.content_data.runs.map(objectRun =>
-              objectRun.instructors.map(instructor =>
-                getInstructorName(instructor)
-              )
-            )
-          )
-        )
-      )
-    )
-  } else if (selectedRun && selectedRun.instructors) {
-    instructors = selectedRun.instructors.map(instructor =>
-      getInstructorName(instructor)
-    )
-  }
+  const instructors =
+    selectedRun && selectedRun.instructors
+      ? selectedRun.instructors.map(instructor => getInstructorName(instructor))
+      : []
 
   return (
     <div className="expanded-course-summary">

@@ -184,7 +184,7 @@ export const getStartDate = (
 
 export const getInstructorName = (instructor: CourseInstructor) => {
   if (instructor.full_name) {
-    return `Prof. ${instructor.full_name}`
+    return instructor.full_name // Assume full name contains title if any
   } else if (instructor.first_name && instructor.last_name) {
     return `Prof. ${instructor.first_name} ${instructor.last_name}`
   } else if (instructor.last_name) {

@@ -10,6 +10,7 @@
     "start_date": "2019-09-01T00:00:00Z",
     "end_date": "2019-12-01T00:00:00Z",
     "enrollment_start": "2019-08-01T00:00:00Z",
+    "topics": ["Engineering", "Planning"],
     "courses": [
       {
         "id": 18,
@@ -18,7 +19,8 @@
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+SysEngxB1",
         "courseruns": [],
-        "next_run_id": null
+        "next_run_id": null,
+        "topics": ["Engineering"]
       },
       {
         "id": 20,
@@ -26,6 +28,7 @@
         "description": "<p>Course 3 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program. This course may be taken individually, without enrolling in the professional certificate program.</p>",
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+SysEngxB3",
+        "topics": [],
         "courseruns": [
           {
             "title": "SEED Model-Based Systems Engineering: Documentation and Analysis - Fall 2020",
@@ -50,6 +53,7 @@
         "description": "<p>Course 2 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program. This course may be taken individually, without enrolling in the professional certificate program.</p>",
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+SysEngxB2",
+        "topics": ["Planning"],
         "courseruns": [
           {
             "title": "SEED Models in Engineering - Spring 2020",
@@ -75,7 +79,8 @@
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+SysEngxB4",
         "courseruns": [],
-        "next_run_id": null
+        "next_run_id": null,
+        "topics": []
       }
     ]
   },
@@ -90,6 +95,7 @@
     "start_date": "2019-09-10T00:00:00Z",
     "end_date": "2019-12-10T00:00:00Z",
     "enrollment_start": null,
+    "topics": ["Education", "Computer Science"],
     "courses": [
       {
         "id": 30,
@@ -97,6 +103,7 @@
         "description": "<p>An introductory course to Digital Learning</p>",
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+DgtlLearn1",
+        "topics": ["Education", "Computer Science"],
         "courseruns": [
           {
             "title": "SEED Digital Learning 100 - August 2020",
@@ -144,7 +151,8 @@
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+DgtlLearn2",
         "courseruns": [],
-        "next_run_id": null
+        "next_run_id": null,
+        "topics": ["Education", "Computer Science"]
       },
       {
         "id": 32,
@@ -153,7 +161,8 @@
         "thumbnail_url": "/static/images/mit-dome.png",
         "readable_id": "course-v1:xPRO+DgtlLearn3",
         "courseruns": [],
-        "next_run_id": null
+        "next_run_id": null,
+        "topics": []
       }
     ]
   }

@@ -21,6 +21,9 @@ class CourseInstructor(TimestampedModel):
     last_name = models.CharField(max_length=128, null=True, blank=True)
     full_name = models.CharField(max_length=256, null=True, blank=True)
 
+    def __str__(self):
+        return self.full_name or " ".join((self.first_name, self.last_name))
+
 
 class CourseTopic(TimestampedModel):
     """
@@ -28,6 +31,9 @@ class CourseTopic(TimestampedModel):
     """
 
     name = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CoursePrice(TimestampedModel):
@@ -38,6 +44,9 @@ class CoursePrice(TimestampedModel):
     price = models.DecimalField(decimal_places=2, max_digits=6)
     mode = models.CharField(max_length=128)
     upgrade_deadline = models.DateTimeField(null=True)
+
+    def __str__(self):
+        return "${:,.2f}".format(self.price)
 
 
 class LearningResource(TimestampedModel):

@@ -206,37 +206,22 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
-  it("should display all instructors for the course", () => {
-    const wrapper = render()
-    const instructorText = wrapper
-      .find(".school")
-      .at(1)
-      .closest(".course-info-row")
-      .find(".course-info-value")
-      .text()
-    // $FlowFixMe: course run won't be null here
-    bestRun(course.runs).instructors.forEach(instructor => {
-      assert.ok(instructorText.includes(getInstructorName(instructor)))
-    })
-  })
-
-  it("should display all instructors for the program", () => {
-    const object = makeLearningResource(LR_TYPE_PROGRAM)
-    // $FlowFixMe
-    const wrapper = render({
-      object
-    })
-    const instructorText = wrapper
-      .find(".school")
-      .at(1)
-      .closest(".course-info-row")
-      .find(".course-info-value")
-      .text()
-    object.items.forEach(item => {
-      item.content_data.runs.forEach(courseRun => {
-        courseRun.instructors.forEach(instructor => {
-          assert.ok(instructorText.includes(getInstructorName(instructor)))
-        })
+  //
+  ;[LR_TYPE_PROGRAM, LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`should display all instructors for the ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({
+        object
+      })
+      const instructorText = wrapper
+        .find(".school")
+        .at(1)
+        .closest(".course-info-row")
+        .find(".course-info-value")
+        .text()
+      // $FlowFixMe: course run won't be null here
+      bestRun(object.runs).instructors.forEach(instructor => {
+        assert.ok(instructorText.includes(getInstructorName(instructor)))
       })
     })
   })

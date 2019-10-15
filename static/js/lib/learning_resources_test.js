@@ -376,10 +376,7 @@ describe("Course run availability utils", () => {
       { first_name: "Joe", last_name: "Smith", full_name: "" },
       "Prof. Joe Smith"
     ],
-    [
-      { first_name: "Joe", last_name: "", full_name: "Joe Smith" },
-      "Prof. Joe Smith"
-    ]
+    [{ first_name: "Joe", last_name: "", full_name: "Joe Smith" }, "Joe Smith"]
   ].forEach(([input, expected]) => {
     it(`getInstructorName should return ${expected} when given ${input.toString()}`, () => {
       assert.equal(getInstructorName(input), expected)
