@@ -109,6 +109,8 @@ def test_micromasters_transform(mock_micromasters_data):
                     "start_date": "2019-10-04T20:13:26.367297Z",
                     "end_date": None,
                     "enrollment_start": "2019-09-29T20:13:26.367297Z",
+                    "best_start_date": "2019-09-29T20:13:26.367297Z",
+                    "best_end_date": None,
                 }
             ],
             "topics": [{"name": "program"}, {"name": "first"}],
@@ -142,6 +144,8 @@ def test_micromasters_transform(mock_micromasters_data):
                     "start_date": None,
                     "end_date": "2019-10-04T20:14:50.271027Z",
                     "enrollment_start": None,
+                    "best_start_date": None,
+                    "best_end_date": "2019-10-04T20:14:50.271027Z",
                 }
             ],
             "topics": [{"name": "program"}, {"name": "second"}],

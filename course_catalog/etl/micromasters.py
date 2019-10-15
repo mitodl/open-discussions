@@ -42,6 +42,9 @@ def transform(programs):
                     "start_date": program["start_date"],
                     "end_date": program["end_date"],
                     "enrollment_start": program["enrollment_start"],
+                    "best_start_date": program["enrollment_start"]
+                    or program["start_date"],
+                    "best_end_date": program["end_date"],
                 }
             ],
             "topics": program["topics"],
