@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.95.0
+--------------
+
+- fix UI issue with showing/hiding options on SearchFacet
+- Import xPro program topics and instructors (#2279)
+- Add instructors, topics, and program prices to micromasters ETL transform (#2282)
+- Added import for xpro courses
+
 Version 0.94.2 (Released October 15, 2019)
 --------------
 
