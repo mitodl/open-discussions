@@ -20,6 +20,15 @@ def mock_micromasters_data():
                 {"edx_key": "2", "position_in_program": 2, "extra_field": "value"},
                 {"edx_key": "1", "position_in_program": 1, "extra_field": "value"},
             ],
+            "instructors": [
+                {"name": "Dr. Doofenshmirtz"},
+                {"name": "Joey Jo Jo Shabadoo"},
+            ],
+            "topics": [{"name": "program"}, {"name": "first"}],
+            "total_price": "123.45",
+            "start_date": "2019-10-04T20:13:26.367297Z",
+            "end_date": None,
+            "enrollment_start": "2019-09-29T20:13:26.367297Z",
         },
         {
             "id": 2,
@@ -31,6 +40,12 @@ def mock_micromasters_data():
                 {"edx_key": "3", "position_in_program": 1, "extra_field": "value"},
                 {"edx_key": "4", "position_in_program": 2, "extra_field": "value"},
             ],
+            "instructors": [{"name": "Mia"}, {"name": "Leah"}],
+            "topics": [{"name": "program"}, {"name": "second"}],
+            "start_date": None,
+            "end_date": "2019-10-04T20:14:50.271027Z",
+            "enrollment_start": None,
+            "total_price": "87.65",
         },
     ]
 
@@ -86,8 +101,19 @@ def test_micromasters_transform(mock_micromasters_data):
                     "platform": PlatformType.micromasters.value,
                     "title": "program title 1",
                     "offered_by": OfferedBy.micromasters.value,
+                    "instructors": [
+                        {"full_name": "Dr. Doofenshmirtz"},
+                        {"full_name": "Joey Jo Jo Shabadoo"},
+                    ],
+                    "prices": [{"price": "123.45"}],
+                    "start_date": "2019-10-04T20:13:26.367297Z",
+                    "end_date": None,
+                    "enrollment_start": "2019-09-29T20:13:26.367297Z",
+                    "best_start_date": "2019-09-29T20:13:26.367297Z",
+                    "best_end_date": None,
                 }
             ],
+            "topics": [{"name": "program"}, {"name": "first"}],
         },
         {
             "program_id": 2,
@@ -113,7 +139,15 @@ def test_micromasters_transform(mock_micromasters_data):
                     "platform": PlatformType.micromasters.value,
                     "title": "program title 2",
                     "offered_by": OfferedBy.micromasters.value,
+                    "instructors": [{"full_name": "Mia"}, {"full_name": "Leah"}],
+                    "prices": [{"price": "87.65"}],
+                    "start_date": None,
+                    "end_date": "2019-10-04T20:14:50.271027Z",
+                    "enrollment_start": None,
+                    "best_start_date": None,
+                    "best_end_date": "2019-10-04T20:14:50.271027Z",
                 }
             ],
+            "topics": [{"name": "program"}, {"name": "second"}],
         },
     ]
