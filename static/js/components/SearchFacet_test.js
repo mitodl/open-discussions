@@ -3,6 +3,7 @@ import React from "react"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import * as sinon from "sinon"
+import R from "ramda"
 
 import SearchFacet from "./SearchFacet"
 
@@ -74,11 +75,26 @@ describe("SearchFacet", () => {
     sinon.assert.calledWith(labelStub, facet["key"])
   })
 
-  it("should have a button to show / hide all facets", () => {
-    const wrapper = renderSearchFacet({ displayCount: 1 })
-    assert.equal(wrapper.find(".facet-more-less").text(), "View more")
-    wrapper.find(".facet-more-less").simulate("click")
-    assert.equal(wrapper.find(".facet-more-less").text(), "View less")
+  //
+  ;[[2, false], [20, true]].forEach(([numBuckets, shouldShowExpansionUI]) => {
+    it(`${shouldIf(shouldShowExpansionUI)} show hide/show button when ${String(
+      numBuckets
+    )} buckets`, () => {
+      // $FlowFixMe: who cares it's a test
+      results.buckets = R.times(
+        () => ({ key: "Physics", doc_count: 32 }),
+        numBuckets
+      )
+
+      const wrapper = renderSearchFacet()
+      if (shouldShowExpansionUI) {
+        assert.equal(wrapper.find(".facet-more-less").text(), "View more")
+        wrapper.find(".facet-more-less").simulate("click")
+        assert.equal(wrapper.find(".facet-more-less").text(), "View less")
+      } else {
+        assert.isNotOk(wrapper.find(".facet-more-less").exists())
+      }
+    })
   })
 
   it("should have a button to show / hide the facet list", () => {
