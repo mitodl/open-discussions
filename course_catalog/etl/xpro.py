@@ -100,6 +100,7 @@ def _transform_course(course):
                 course["courseruns"],
             )
         ),
+        "topics": course.get("topics", []),
         "runs": [_transform_run(course_run) for course_run in course["courseruns"]],
     }
 

@@ -176,6 +176,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
                     course_data["courseruns"],
                 )
             ),
+            "topics": course_data.get("topics", []),
             "runs": [
                 {
                     "run_id": course_run_data["courseware_id"],
