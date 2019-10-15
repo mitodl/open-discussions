@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.94.2
+Version 0.94.2 (Released October 15, 2019)
 --------------
 
 - Added Open Learning Library implementation
