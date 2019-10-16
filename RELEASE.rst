@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.95.0
+Version 0.95.0 (Released October 16, 2019)
 --------------
 
 - fix UI issue with showing/hiding options on SearchFacet
