@@ -66,12 +66,12 @@ export const embedlyThumbnail = (
 ) =>
   `https://i.embed.ly/1/display/crop/?key=${key}&url=${encodeURIComponent(
     url
-  )}&height=${height}&width=${width}&grow=true&errorurl=${blankThumbnailUrl()}`
+  )}&height=${height}&width=${width}&grow=true&animate=false&errorurl=${blankThumbnailUrl()}`
 
 export const embedlyResizeImage = (key: string, url: string, height: number) =>
   `https://i.embed.ly/1/display/resize/?key=${key}&url=${encodeURIComponent(
     url
-  )}&height=${height}&grow=false&errorurl=${blankThumbnailUrl()}`
+  )}&height=${height}&grow=false&animate=false&errorurl=${blankThumbnailUrl()}`
 
 export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()
