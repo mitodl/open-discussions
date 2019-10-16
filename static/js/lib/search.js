@@ -151,7 +151,7 @@ export const RESOURCE_QUERY_NESTED_FIELDS = [
   "runs.year",
   "runs.semester",
   "runs.level",
-  "runs.instructors"
+  "runs.instructors^5"
 ]
 
 const LIST_QUERY_FIELDS = [
