@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.95.1
+--------------
+
+- small style tweak to course facets
+- fix the learning resources drawer right-to-left behavior
+- Prevent embedly from creating animated thumbnails (#2291)
+
 Version 0.95.0 (Released October 16, 2019)
 --------------
 
