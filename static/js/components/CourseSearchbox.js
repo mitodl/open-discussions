@@ -1,5 +1,5 @@
 // @flow
-import React from "react"
+import React, { useState } from "react"
 
 import { validationMessage } from "../lib/validation"
 
@@ -15,6 +15,8 @@ type Props = {
 export default function CourseSearchbox(props: Props) {
   const { onChange, value, onSubmit, validation, autoFocus, children } = props
 
+  const [text, setText] = useState("")
+
   return (
     <div className="course-searchbox">
       <div className="input-wrapper">
@@ -23,12 +25,23 @@ export default function CourseSearchbox(props: Props) {
           type="text"
           name="query"
           className="search-input"
-          onChange={onChange}
+          onChange={
+            onChange ||
+            (e => {
+              const { value } = e.target
+              setText(value)
+            })
+          }
           onKeyDown={event => (event.key === "Enter" ? onSubmit(event) : null)}
           placeholder="Search Learning Offerings"
           value={value}
         />
-        <i className="material-icons search-icon" onClick={onSubmit}>
+        <i
+          className="material-icons search-icon"
+          onClick={
+            onChange ? onSubmit : () => onSubmit({ target: { value: text } })
+          }
+        >
           search
         </i>
         {children}

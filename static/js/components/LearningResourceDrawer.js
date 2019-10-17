@@ -13,7 +13,6 @@ import { createSelector } from "reselect"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
 import { setShowResourceDrawer } from "../actions/ui"
-import { getViewportWidth } from "../lib/util"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
@@ -22,6 +21,7 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM
 } from "../lib/constants"
+import { useResponsive } from "../hooks/util"
 
 import type { Dispatch } from "redux"
 
@@ -35,58 +35,36 @@ type Props = {
   setShowResourceDrawer: Function
 }
 
-export class LearningResourceDrawer extends React.Component<Props> {
-  width: number
+export function LearningResourceDrawer(props: Props) {
+  const { object, runId, showLearningDrawer, setShowResourceDrawer } = props
 
-  constructor(props: Props) {
-    super(props)
-    this.width = getViewportWidth()
-  }
+  useResponsive()
 
-  componentDidMount() {
-    window.addEventListener("resize", () => this.onResize())
-  }
+  const onDrawerClose = () => setShowResourceDrawer({ objectId: null })
 
-  onResize() {
-    // this setState call forces a re-render of the component
-    // to ensure that the drawer is responsive
-    this.setState({})
-  }
-
-  render() {
-    const {
-      object,
-      runId,
-      showLearningDrawer,
-      setShowResourceDrawer
-    } = this.props
-
-    const onDrawerClose = () => setShowResourceDrawer({ objectId: null })
-
-    return object ? (
-      <Theme>
-        <Drawer
-          open={showLearningDrawer}
-          onClose={onDrawerClose}
-          dir="rtl"
-          className="align-right"
-          modal
-        >
-          <DrawerContent dir="ltr">
-            <div className="drawer-close" onClick={onDrawerClose}>
-              <i className="material-icons clear">clear</i>
-            </div>
-            <ExpandedLearningResourceDisplay
-              object={object}
-              runId={runId}
-              setShowResourceDrawer={setShowResourceDrawer}
-            />
-            <div className="footer" />
-          </DrawerContent>
-        </Drawer>
-      </Theme>
-    ) : null
-  }
+  return object ? (
+    <Theme>
+      <Drawer
+        open={showLearningDrawer}
+        onClose={onDrawerClose}
+        dir="rtl"
+        className="align-right"
+        modal
+      >
+        <DrawerContent dir="ltr">
+          <div className="drawer-close" onClick={onDrawerClose}>
+            <i className="material-icons clear">clear</i>
+          </div>
+          <ExpandedLearningResourceDisplay
+            object={object}
+            runId={runId}
+            setShowResourceDrawer={setShowResourceDrawer}
+          />
+          <div className="footer" />
+        </DrawerContent>
+      </Drawer>
+    </Theme>
+  ) : null
 }
 
 const getObject = createSelector(

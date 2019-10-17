@@ -1,7 +1,8 @@
 // @flow
-import React, { useState, useEffect } from "react"
+import React from "react"
 
 import { isMobileGridWidth } from "../lib/util"
+import { useResponsive } from "../hooks/util"
 
 type GridProps = {
   children: any,
@@ -63,15 +64,7 @@ export const Cell = ({
   mobileWidth,
   className
 }: CellProps) => {
-  const [, setState] = useState(null)
-
-  useEffect(() => {
-    window.addEventListener("resize", setState)
-
-    return () => {
-      window.removeEventListener("resize", setState)
-    }
-  }, [])
+  useResponsive()
 
   return (
     <div

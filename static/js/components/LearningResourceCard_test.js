@@ -21,7 +21,9 @@ import {
 import {
   embedlyThumbnail,
   starSelectedURL,
-  starUnselectedURL
+  starUnselectedURL,
+  toQueryString,
+  COURSE_SEARCH_URL
 } from "../lib/url"
 
 describe("LearningResourceCard", () => {
@@ -80,24 +82,30 @@ describe("LearningResourceCard", () => {
     )
   })
 
-  it("should render topics", () => {
-    const { content, label } = render()
+  it("should render topics as links", () => {
+    const subtitle = render()
       .find("Subtitle")
       .at(1)
-      .props()
-    course.topics.forEach(({ name }) => {
-      assert.include(content, name)
+    const links = subtitle.find("a")
+    course.topics.forEach(({ name }, i) => {
+      const link = links.at(i)
+      assert.equal(link.text(), name)
+      assert.equal(
+        link.prop("href"),
+        `${COURSE_SEARCH_URL}${toQueryString({
+          t: name
+        })}`
+      )
     })
-    assert.equal(label, "Subjects - ")
+    assert.equal(subtitle.prop("label"), "Subjects - ")
   })
 
   it("should render a single topic", () => {
     course.topics = [course.topics[0]]
-    const { content, label } = render()
+    const { label } = render()
       .find("Subtitle")
       .at(1)
       .props()
-    assert.include(content, course.topics[0].name)
     assert.equal(label, "Subject - ")
   })
 
@@ -121,9 +129,15 @@ describe("LearningResourceCard", () => {
       })
         .find("Subtitle")
         .at(0)
-
-      assert.equal(offeredBySubtitle.prop("content"), object.offered_by)
       assert.equal(offeredBySubtitle.prop("label"), "Offered by - ")
+      const link = offeredBySubtitle.find("a")
+      assert.equal(link.text(), object.offered_by)
+      assert.equal(
+        link.prop("href"),
+        `${COURSE_SEARCH_URL}${toQueryString({
+          o: object.offered_by
+        })}`
+      )
     })
   })
 

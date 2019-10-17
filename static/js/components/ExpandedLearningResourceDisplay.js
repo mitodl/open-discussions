@@ -47,7 +47,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     objectRuns[0]
 
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
-  const cost = selectedRun ? minPrice(selectedRun.prices) : null
+  const cost = selectedRun ? minPrice(selectedRun.prices, true) : null
 
   const offeredBy = getPreferredOfferedBy(object.offered_by)
   const instructors =

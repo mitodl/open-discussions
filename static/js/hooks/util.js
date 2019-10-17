@@ -31,3 +31,15 @@ export const useDeviceCategory = () => {
   }
   return DESKTOP
 }
+
+export const useResponsive = () => {
+  const [, setState] = useState(null)
+
+  useEffect(() => {
+    window.addEventListener("resize", setState)
+
+    return () => {
+      window.removeEventListener("resize", setState)
+    }
+  }, [])
+}

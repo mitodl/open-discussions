@@ -1,6 +1,6 @@
 import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
+import { mount } from "enzyme"
 import sinon from "sinon"
 
 import {
@@ -46,12 +46,13 @@ describe("LearningResourceDrawer", () => {
   })
 
   const renderLearningResourceDrawer = (props = {}) =>
-    shallow(
+    mount(
       <LearningResourceDrawer
         dispatch={dispatchStub}
         showLearningDrawer={true}
         object={course}
         objectId={course.id}
+        runId={course.runs[0].run_id}
         objectType={LR_TYPE_COURSE}
         setShowResourceDrawer={setShowResourceDrawerStub}
         {...props}
@@ -65,15 +66,9 @@ describe("LearningResourceDrawer", () => {
   })
 
   it("should put an event listener on window resize", () => {
-    const onResizeStub = sandbox.stub(
-      LearningResourceDrawer.prototype,
-      "onResize"
-    )
     const addEventListenerStub = sandbox.stub(window, "addEventListener")
     renderLearningResourceDrawer()
-    assert.ok(addEventListenerStub.calledWith("resize"))
-    addEventListenerStub.args[0][1]()
-    assert.ok(onResizeStub.called)
+    assert.ok(addEventListenerStub.called)
   })
 
   it("should include an ExpandedLearningResourceDisplay", () => {

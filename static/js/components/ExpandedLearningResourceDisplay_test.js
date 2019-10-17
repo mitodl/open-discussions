@@ -78,7 +78,9 @@ describe("ExpandedLearningResourceDisplay", () => {
           run.url = null
         }
         const wrapper = render({
-          object
+          object,
+          // $FlowFixMe: course run won't be null here
+          runId: run.id
         })
         const link = wrapper.find(".course-links").find("a")
         // $FlowFixMe: run won't be null
@@ -211,7 +213,9 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should display all instructors for the ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       const wrapper = render({
-        object
+        object,
+        // $FlowFixMe: course run won't be null here
+        runId: bestRun(object.runs).id
       })
       const instructorText = wrapper
         .find(".school")
@@ -239,7 +243,8 @@ describe("ExpandedLearningResourceDisplay", () => {
     )}`, () => {
       // $FlowFixMe: course run won't be null here
       bestRun(course.runs).language = langCode
-      const wrapper = render()
+      // $FlowFixMe: course run won't be null here
+      const wrapper = render({ runId: bestRun(course.runs).id })
       assert.equal(
         wrapper
           .find(".language")
@@ -275,15 +280,20 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should display the cost for ${objectType}`, () => {
       const prices = [{ price: 25.5, mode: "" }]
       const object = makeLearningResource(objectType)
+      let run
       if (objectType === LR_TYPE_PROGRAM) {
         object.runs[0].prices = prices
+        run = object.runs[0]
       } else {
         // $FlowFixMe: bestRun result won't be null
         bestRun(object.runs).prices = prices
+        run = bestRun(object.runs)
       }
 
       const wrapper = render({
-        object
+        object,
+        // $FlowFixMe
+        runId: run.id
       })
       assert.equal(
         wrapper

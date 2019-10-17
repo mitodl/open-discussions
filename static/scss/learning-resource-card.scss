@@ -2,6 +2,7 @@
   width: initial;
   margin-bottom: 0;
   font-family: roboto;
+  cursor: initial;
 
   &.borderless {
     .lr-info {
@@ -101,6 +102,16 @@
         text-overflow: ellipsis;
         width: 100%;
 
+        a {
+          color: black;
+          margin-right: 10px;
+
+          &:hover {
+            color: black;
+            text-decoration: underline;
+          }
+        }
+
         .grey {
           color: $font-grey-light;
         }
@@ -115,6 +126,7 @@
       .price {
         font-size: 12px;
         padding-right: 10px;
+        cursor: default;
 
         i {
           font-size: 12px;

@@ -2,23 +2,28 @@
 import React from "react"
 import sinon from "sinon"
 import { assert } from "chai"
+import { mount } from "enzyme"
 
 import CourseSearchbox from "./CourseSearchbox"
 
-import { configureShallowRenderer } from "../lib/test_utils"
 import * as validationFuncs from "../lib/validation"
 
 describe("CourseSearchbox", () => {
-  let sandbox, renderSearchbox, onChangeStub, onSubmitStub
+  let sandbox, onChangeStub, onSubmitStub
+
+  const renderSearchbox = (props = {}) =>
+    mount(
+      <CourseSearchbox
+        onChange={onChangeStub}
+        onSubmit={onSubmitStub}
+        {...props}
+      />
+    )
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     onChangeStub = sandbox.stub()
     onSubmitStub = sandbox.stub()
-    renderSearchbox = configureShallowRenderer(CourseSearchbox, {
-      onChange: onChangeStub,
-      onSubmit: onSubmitStub
-    })
   })
 
   afterEach(() => {

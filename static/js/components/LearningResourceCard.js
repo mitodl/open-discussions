@@ -37,6 +37,7 @@ import { favoriteProgramMutation } from "../lib/queries/programs"
 import { favoriteUserListMutation } from "../lib/queries/user_lists"
 import { favoriteVideoMutation } from "../lib/queries/videos"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
+import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
 
@@ -62,7 +63,26 @@ const getClassName = searchResultLayout =>
   }`.trim()
 
 const formatTopics = (topics: Array<{ name: string }>) =>
-  topics.map(topic => topic.name).join("\u00A0\u00A0")
+  topics.map((topic, i) => (
+    <a
+      href={`${COURSE_SEARCH_URL}${toQueryString({
+        t: topic.name
+      })}`}
+      key={i}
+    >
+      {topic.name}
+    </a>
+  ))
+
+const offeredBySearchLink = offeredBy => (
+  <a
+    href={`${COURSE_SEARCH_URL}${toQueryString({
+      o: offeredBy
+    })}`}
+  >
+    {offeredBy}
+  </a>
+)
 
 const Subtitle = ({ label, content }) => (
   <div className="row subtitle">
@@ -125,7 +145,9 @@ export const LearningResourceCard = ({
         </div>
         {object.offered_by.length ? (
           <Subtitle
-            content={getPreferredOfferedBy(object.offered_by)}
+            content={offeredBySearchLink(
+              getPreferredOfferedBy(object.offered_by)
+            )}
             label="Offered by - "
           />
         ) : null}

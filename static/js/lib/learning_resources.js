@@ -167,12 +167,20 @@ export const maxPrice = (prices: Array<CoursePrice>) => {
   return price > 0 ? `${formatPrice(price)}` : "Free"
 }
 
-export const minPrice = (prices: Array<CoursePrice>) => {
+export const minPrice = (
+  prices: Array<CoursePrice>,
+  includeDollarSign: boolean = false
+) => {
   if (emptyOrNil(prices)) {
     return null
   }
   const price = Math.min(...prices.map(price => price.price))
-  return price > 0 && price !== Infinity ? `${formatPrice(price)}` : "Free"
+
+  if (price > 0 && price !== Infinity) {
+    return includeDollarSign ? `${formatPrice(price)}` : price
+  } else {
+    return "Free"
+  }
 }
 
 export const getStartDate = (

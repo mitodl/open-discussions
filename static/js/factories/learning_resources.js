@@ -28,15 +28,14 @@ import type {
 
 const incrCourse = incrementer()
 const courseId: any = incrementer()
-const incrRun = incrementer()
+const incrRun: any = incrementer()
 
 const OFFERORS = R.values(offeredBys)
 
 export const makeRun = (): LearningResourceRun => {
   return {
-    // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
     run_id:            `courserun_${incrRun.next().value}`,
-    id:                casual.integer,
+    id:                incrRun.next().value,
     url:               casual.url,
     image_src:         "http://image.medium.url",
     short_description: casual.description,

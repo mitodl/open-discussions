@@ -94,7 +94,7 @@ export default function CourseIndexPage({ history }: Props) {
           <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
             <div className="link-wrapper">
               <Link className="link-button" to={COURSE_SEARCH_URL}>
-                View All
+                Explore
               </Link>
             </div>
           </ResponsiveWrapper>
@@ -103,7 +103,7 @@ export default function CourseIndexPage({ history }: Props) {
       <ResponsiveWrapper onlyOn={[PHONE]}>
         <div className="wide-view-more">
           <Link className="link-button" to={COURSE_SEARCH_URL}>
-            View All
+            Explore
           </Link>
         </div>
       </ResponsiveWrapper>
