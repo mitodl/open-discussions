@@ -128,8 +128,8 @@ const PROFILE_QUERY_FIELDS = [
   "author_name.english"
 ]
 const COURSE_QUERY_FIELDS = [
-  "title.english",
-  "short_description.english",
+  "title.english^3",
+  "short_description.english^2",
   "full_description.english",
   "topics",
   "platform",
@@ -139,8 +139,8 @@ const COURSE_QUERY_FIELDS = [
 ]
 
 const BOOTCAMP_QUERY_FIELDS = [
-  "title.english",
-  "short_description.english",
+  "title.english^3",
+  "short_description.english^2",
   "full_description.english",
   "course_id",
   "coursenum^5",
@@ -151,7 +151,7 @@ export const RESOURCE_QUERY_NESTED_FIELDS = [
   "runs.year",
   "runs.semester",
   "runs.level",
-  "runs.instructors"
+  "runs.instructors^5"
 ]
 
 const LIST_QUERY_FIELDS = [
@@ -251,6 +251,7 @@ const _channelField = (type: ?string) => {
 }
 export { _channelField as channelField }
 import { channelField } from "./search"
+import { emptyOrNil } from "./util"
 
 const getTypes = (type: ?(string | Array<string>)) => {
   if (type) {
@@ -413,9 +414,9 @@ export const buildSearchQuery = ({
 
   const types = getTypes(type)
   for (const type of types) {
-    // One of the text fields must match
-    const matchQuery = text
-      ? {
+    const textQuery = emptyOrNil(text)
+      ? {}
+      : {
         should: [
           {
             multi_match: {
@@ -423,28 +424,25 @@ export const buildSearchQuery = ({
               fields:    searchFields(type),
               fuzziness: "AUTO"
             }
-          }
-        ]
-      }
-      : {}
-
-    if (
-      text &&
-      [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
-    ) {
-      matchQuery.should.push({
-        nested: {
-          path:  "runs",
-          query: {
-            multi_match: {
-              query:     text,
-              fields:    RESOURCE_QUERY_NESTED_FIELDS,
-              fuzziness: "AUTO"
+          },
+          [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+            ? {
+              nested: {
+                path:  "runs",
+                query: {
+                  multi_match: {
+                    query:     text,
+                    fields:    RESOURCE_QUERY_NESTED_FIELDS,
+                    fuzziness: "AUTO"
+                  }
+                }
+              }
             }
-          }
-        }
-      })
-    }
+            : null
+        ].filter(clause => clause !== null)
+      }
+
+    const textFilter = emptyOrNil(text) ? [] : [{ bool: textQuery }]
 
     // If channelName is present add a filter for the type
     const channelClauses = channelName
@@ -501,11 +499,14 @@ export const buildSearchQuery = ({
               }
             },
             ...channelClauses,
-            ...facetClauses
+            ...facetClauses,
+            // Add multimatch text query here to filter out non-matching results
+            ...textFilter
           ]
         }
       },
-      ...matchQuery
+      // Add multimatch text query here again to score results based on match
+      ...textQuery
     })
   }
   return builder.build()

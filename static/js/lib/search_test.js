@@ -290,6 +290,17 @@ describe("search functions", () => {
       const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
       const type = "a_type"
       const text = "some text here"
+      const textQuery = {
+        should: [
+          {
+            multi_match: {
+              query:     text,
+              fields:    fieldNames,
+              fuzziness: "AUTO"
+            }
+          }
+        ]
+      }
       assert.deepEqual(buildSearchQuery({ type, text }), {
         query: {
           bool: {
@@ -303,19 +314,14 @@ describe("search functions", () => {
                           term: {
                             object_type: type
                           }
+                        },
+                        {
+                          bool: textQuery
                         }
                       ]
                     }
                   },
-                  should: [
-                    {
-                      multi_match: {
-                        query:     text,
-                        fields:    fieldNames,
-                        fuzziness: "AUTO"
-                      }
-                    }
-                  ]
+                  ...textQuery
                 }
               }
             ]
@@ -381,6 +387,28 @@ describe("search functions", () => {
             }
           }
 
+          const textQuery = [
+            {
+              multi_match: {
+                query:     text,
+                fields:    fieldNames,
+                fuzziness: "AUTO"
+              }
+            },
+            {
+              nested: {
+                path:  "runs",
+                query: {
+                  multi_match: {
+                    query:     text,
+                    fields:    RESOURCE_QUERY_NESTED_FIELDS,
+                    fuzziness: "AUTO"
+                  }
+                }
+              }
+            }
+          ]
+
           const mustQuery = [
             {
               term: {
@@ -437,6 +465,12 @@ describe("search functions", () => {
           if (availability) {
             mustQuery.push(availabilityQuery)
           }
+
+          mustQuery.push({
+            bool: {
+              should: textQuery
+            }
+          })
 
           assert.deepEqual(buildSearchQuery({ type, text, facets }), {
             aggs: {
@@ -548,27 +582,7 @@ describe("search functions", () => {
                           must: mustQuery
                         }
                       },
-                      should: [
-                        {
-                          multi_match: {
-                            query:     text,
-                            fields:    fieldNames,
-                            fuzziness: "AUTO"
-                          }
-                        },
-                        {
-                          nested: {
-                            path:  "runs",
-                            query: {
-                              multi_match: {
-                                query:     text,
-                                fields:    RESOURCE_QUERY_NESTED_FIELDS,
-                                fuzziness: "AUTO"
-                              }
-                            }
-                          }
-                        }
-                      ]
+                      should: textQuery
                     }
                   }
                 ]
@@ -652,8 +666,8 @@ describe("search functions", () => {
       [
         "course",
         [
-          "title.english",
-          "short_description.english",
+          "title.english^3",
+          "short_description.english^2",
           "full_description.english",
           "topics",
           "platform",
