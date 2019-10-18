@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.95.1
+Version 0.95.1 (Released October 18, 2019)
 --------------
 
 - small style tweak to course facets
