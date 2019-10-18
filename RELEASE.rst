@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.95.2
+--------------
+
+- fix bug with the Cell component
+- Add support for multiple offered_by
+- Don't show any results if no text matches are found (#2295)
+
 Version 0.95.1 (Released October 18, 2019)
 --------------
 
