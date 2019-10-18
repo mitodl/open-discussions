@@ -414,34 +414,35 @@ export const buildSearchQuery = ({
 
   const types = getTypes(type)
   for (const type of types) {
-    let textQuery = {}
-    const textClauses = []
-    let textFilter = []
-    if (!emptyOrNil(text)) {
-      textClauses.push({
-        multi_match: {
-          query:     text,
-          fields:    searchFields(type),
-          fuzziness: "AUTO"
-        }
-      })
-      if ([LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)) {
-        textClauses.push({
-          nested: {
-            path:  "runs",
-            query: {
-              multi_match: {
-                query:     text,
-                fields:    RESOURCE_QUERY_NESTED_FIELDS,
-                fuzziness: "AUTO"
+    const textQuery = emptyOrNil(text)
+      ? {}
+      : {
+        should: [
+          {
+            multi_match: {
+              query:     text,
+              fields:    searchFields(type),
+              fuzziness: "AUTO"
+            }
+          },
+          [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+            ? {
+              nested: {
+                path:  "runs",
+                query: {
+                  multi_match: {
+                    query:     text,
+                    fields:    RESOURCE_QUERY_NESTED_FIELDS,
+                    fuzziness: "AUTO"
+                  }
+                }
               }
             }
-          }
-        })
+            : null
+        ].filter(clause => clause !== null)
       }
-      textQuery = { should: textClauses }
-      textFilter = [{ bool: textQuery }]
-    }
+
+    const textFilter = emptyOrNil(text) ? [] : [{ bool: textQuery }]
 
     // If channelName is present add a filter for the type
     const channelClauses = channelName
