@@ -31,6 +31,7 @@ class PlatformType(Enum):
     bootcamps = "bootcamps"
     xpro = "xpro"
     oll = "oll"
+    youtube = "youtube"
 
 
 class ResourceType(Enum):

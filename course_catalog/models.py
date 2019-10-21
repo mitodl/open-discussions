@@ -266,3 +266,25 @@ class FavoriteItem(TimestampedModel):
 
     class Meta:
         unique_together = ("user", "content_type", "object_id")
+
+
+class VideoResource(LearningResource):
+    """Data model for video resources"""
+
+    video_id = models.CharField(max_length=80)
+    platform = models.CharField(max_length=128)
+
+    full_description = models.TextField(null=True, blank=True)
+    image_src = models.URLField(max_length=400, null=True, blank=True)
+    last_modified = models.DateTimeField(null=True, blank=True)
+
+    published = models.BooleanField(default=True)
+
+    url = models.URLField(null=True, max_length=2048)
+
+    transcript = models.TextField(blank=True, default="")
+
+    raw_data = models.TextField(blank=True, default="")
+
+    class Meta:
+        unique_together = ("platform", "video_id")
