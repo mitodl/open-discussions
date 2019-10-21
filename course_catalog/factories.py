@@ -22,6 +22,7 @@ from course_catalog.models import (
     UserListItem,
     LearningResourceRun,
     LearningResourceOfferor,
+    VideoResource,
 )
 
 
@@ -341,3 +342,29 @@ class UserListFactory(DjangoModelFactory):
 
     class Meta:
         model = UserList
+
+
+class VideoResourceFactory(LearningResourceFactory):
+    """Factory for VideoResource"""
+
+    video_id = factory.Sequence(lambda n: "VIDEO-%03d.MIT" % n)
+    platform = FuzzyChoice([PlatformType.youtube.value])
+
+    full_description = factory.Faker("text")
+    image_src = factory.Faker("image_url")
+    image_description = factory.Faker("text", max_nb_chars=300)
+
+    last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
+
+    url = factory.Faker("uri")
+
+    transcript = factory.Faker("text")
+
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory",
+        size=1,
+        name=OfferedBy.ocw.value,
+    )
+
+    class Meta:
+        model = VideoResource
