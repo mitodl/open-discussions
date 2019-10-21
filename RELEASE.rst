@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.95.2
+Version 0.95.2 (Released October 21, 2019)
 --------------
 
 - fix bug with the Cell component
