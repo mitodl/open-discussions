@@ -31,7 +31,7 @@ function SearchFacet(props: Props) {
 
   const titleLineIcon = showFacetList ? "arrow_drop_down" : "arrow_drop_up"
 
-  return (
+  return results && results.buckets && results.buckets.length === 0 ? null : (
     <div className="facets">
       <div
         className="filter-section-title"
@@ -40,54 +40,58 @@ function SearchFacet(props: Props) {
         {title}
         <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
       </div>
-      {results && results.buckets && showFacetList
-        ? results.buckets.map((facet, i) => {
-          const isChecked = R.contains(facet.key, currentlySelected || [])
+      {showFacetList ? (
+        <React.Fragment>
+          {results && results.buckets
+            ? results.buckets.map((facet, i) => {
+              const isChecked = R.contains(facet.key, currentlySelected || [])
 
-          return (
-            <div
-              key={i}
-              className={`${
-                showAllFacets ||
-                  i < MAX_DISPLAY_COUNT ||
-                  results.buckets.length < FACET_COLLAPSE_THRESHOLD
-                  ? "facet-visible"
-                  : "facet-hidden"
-              } ${isChecked ? "checked" : ""}`}
-              onClick={() => {
-                onUpdate({
-                  target: {
-                    name,
-                    value:   facet.key,
-                    checked: !isChecked
-                  }
-                })
-              }}
-            >
-              <input
-                type="checkbox"
-                name={name}
-                value={facet.key}
-                checked={isChecked}
-                onChange={onUpdate}
-              />
-              <div className="facet-label-div">
-                <div className="facet-key">
-                  {labelFunction ? labelFunction(facet.key) : facet.key}
+              return (
+                <div
+                  key={i}
+                  className={`${
+                    showAllFacets ||
+                      i < MAX_DISPLAY_COUNT ||
+                      results.buckets.length < FACET_COLLAPSE_THRESHOLD
+                      ? "facet-visible"
+                      : "facet-hidden"
+                  } ${isChecked ? "checked" : ""}`}
+                  onClick={() => {
+                    onUpdate({
+                      target: {
+                        name,
+                        value:   facet.key,
+                        checked: !isChecked
+                      }
+                    })
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    name={name}
+                    value={facet.key}
+                    checked={isChecked}
+                    onChange={onUpdate}
+                  />
+                  <div className="facet-label-div">
+                    <div className="facet-key">
+                      {labelFunction ? labelFunction(facet.key) : facet.key}
+                    </div>
+                    <div className="facet-count">{facet.doc_count}</div>
+                  </div>
                 </div>
-                <div className="facet-count">{facet.doc_count}</div>
-              </div>
+              )
+            })
+            : null}
+          {results && results.buckets.length >= FACET_COLLAPSE_THRESHOLD ? (
+            <div
+              className="facet-more-less"
+              onClick={() => setShowAllFacets(!showAllFacets)}
+            >
+              {showAllFacets ? "View less" : "View more"}
             </div>
-          )
-        })
-        : null}
-      {results && results.buckets.length >= FACET_COLLAPSE_THRESHOLD ? (
-        <div
-          className="facet-more-less"
-          onClick={() => setShowAllFacets(!showAllFacets)}
-        >
-          {showAllFacets ? "View less" : "View more"}
-        </div>
+          ) : null}
+        </React.Fragment>
       ) : null}
     </div>
   )

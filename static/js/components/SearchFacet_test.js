@@ -49,6 +49,13 @@ describe("SearchFacet", () => {
     assert.equal(checkbox.prop("value"), facet["key"])
   })
 
+  it("should return null when the buckets are empty", () => {
+    // $FlowFixMe
+    results.buckets = []
+    const wrapper = renderSearchFacet()
+    assert.isFalse(wrapper.isEmpty())
+  })
+
   it("checkbox should call onUpdate when clicked", () => {
     const wrapper = renderSearchFacet()
     const event = { target: { checked: true, name: name, value: facet["key"] } }
@@ -102,6 +109,15 @@ describe("SearchFacet", () => {
     assert.ok(wrapper.find(".facet-visible").exists())
     wrapper.find(".filter-section-title").simulate("click")
     assert.isNotOk(wrapper.find(".facet-visible").exists())
+  })
+
+  it("should hide the expansion UI when the facet is closed", () => {
+    // $FlowFixMe: who cares it's a test
+    results.buckets = R.times(() => ({ key: "Physics", doc_count: 32 }), 20)
+    const wrapper = renderSearchFacet()
+    assert.isOk(wrapper.find(".facet-more-less").exists())
+    wrapper.find(".filter-section-title").simulate("click")
+    assert.isNotOk(wrapper.find(".facet-more-less").exists())
   })
 
   //
