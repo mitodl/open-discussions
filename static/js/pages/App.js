@@ -31,6 +31,7 @@ import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import ChannelRouter from "./ChannelRouter"
 import CourseIndexPage from "./CourseIndexPage"
+import UserListPage from "./UserListPage"
 
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
@@ -322,6 +323,11 @@ class App extends React.Component<Props> {
                 exact
                 path={`${match.url}courses/search`}
                 component={CourseSearchPage}
+              />
+              <Route
+                exact
+                path={`${match.url}courses/lists`}
+                component={UserListPage}
               />
             </Switch>
           ) : null}

@@ -61,13 +61,13 @@ export const mockCourseAPIMethods = (
 ) => {
   helper.handleRequestStub
     .withArgs(upcomingCoursesURL)
-    .returns(courseListResponse(upcomingCourses || R.times(makeCourse, 10)))
+    .returns(queryListResponse(upcomingCourses || R.times(makeCourse, 10)))
   helper.handleRequestStub
     .withArgs(newCoursesURL)
-    .returns(courseListResponse(newCourses || R.times(makeCourse, 10)))
+    .returns(queryListResponse(newCourses || R.times(makeCourse, 10)))
 }
 
-export const courseListResponse = (list: Array<LearningResource>) => ({
+export const queryListResponse = (list: Array<LearningResource>) => ({
   status: 200,
   body:   {
     next:    null,

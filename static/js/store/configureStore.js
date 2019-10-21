@@ -9,7 +9,7 @@ import R from "ramda"
 import rootReducer from "../reducers"
 import { makeRequest } from "./network_interface"
 
-import { getQueries, getEntities } from "../lib/redux-query"
+import { getQueries, getEntities } from "../lib/redux_query"
 
 const persistConfig = {
   slicer: () => state => {

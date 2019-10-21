@@ -142,4 +142,6 @@ export const favoritesURL = "/api/v0/favorites"
 export const courseURL = "/api/v0/courses"
 export const bootcampURL = "/api/v0/bootcamps"
 export const programURL = "/api/v0/programs"
-export const userListURL = "/api/v0/userlists"
+export const userListApiURL = "/api/v0/userlists"
+
+export const userListIndexURL = "/courses/lists/"

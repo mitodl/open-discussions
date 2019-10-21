@@ -6,7 +6,10 @@ import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import MITLogoLink from "./MITLogoLink"
 import UserMenu from "./UserMenu"
-import { COURSE_URL } from "../lib/url"
+import ResponsiveWrapper from "./ResponsiveWrapper"
+
+import { TABLET, DESKTOP } from "../lib/constants"
+import { COURSE_URL, userListIndexURL } from "../lib/url"
 
 import type { Profile } from "../flow/discussionTypes"
 
@@ -57,6 +60,12 @@ export default class CourseToolbar extends React.Component<Props> {
               </div>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
+              <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
+                <Link className="user-list-link" to={userListIndexURL}>
+                  <i className="material-icons">bookmark</i>
+                  My Lists
+                </Link>
+              </ResponsiveWrapper>
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
                 showUserMenu={showUserMenu}

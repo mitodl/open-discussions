@@ -26,7 +26,7 @@ import rootReducer from "../reducers"
 import * as utilFuncs from "../lib/util"
 import * as networkInterfaceFuncs from "../store/network_interface"
 import * as embedUtil from "../lib/embed"
-import { getQueries } from "../lib/redux-query"
+import { getQueries } from "../lib/redux_query"
 import * as storeLib from "../store/configureStore"
 
 import type { Sandbox } from "../flow/sinonTypes"

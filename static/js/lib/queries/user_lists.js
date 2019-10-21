@@ -1,14 +1,15 @@
 // @flow
 import R from "ramda"
+import { createSelector } from "reselect"
 
-import { userListURL } from "../url"
-import { DEFAULT_POST_OPTIONS } from "../redux_query"
+import { userListApiURL } from "../url"
+import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { UserList } from "../../flow/discussionTypes"
 
 export const userListRequest = (userListId: string) => ({
   queryKey:  `userListRequest${userListId}`,
-  url:       `${userListURL}/${userListId}/`,
+  url:       `${userListApiURL}/${userListId}/`,
   transform: (userList: any) => ({
     userLists: { [userList.id]: userList }
   }),
@@ -17,10 +18,26 @@ export const userListRequest = (userListId: string) => ({
   }
 })
 
+export const userListsRequest = () => ({
+  queryKey:  "userListsRequest",
+  url:       userListApiURL,
+  transform: (body: ?{ results: Array<UserList> }) => ({
+    userLists: body ? constructIdMap(body.results) : {}
+  }),
+  update: {
+    userLists: R.merge
+  }
+})
+
+export const userListsSelector = createSelector(
+  state => state.entities.userLists,
+  userLists => userLists
+)
+
 export const favoriteUserListMutation = (userList: UserList) => ({
   queryKey: "userListMutation",
   body:     userList,
-  url:      `${userListURL}/${userList.id}/${
+  url:      `${userListApiURL}/${userList.id}/${
     userList.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {

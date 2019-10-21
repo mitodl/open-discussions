@@ -18,7 +18,7 @@ import {
   upcomingCoursesURL,
   newCoursesURL
 } from "../lib/url"
-import { courseListResponse } from "../lib/test_utils"
+import { queryListResponse } from "../lib/test_utils"
 import {
   makeCourse,
   makeFavoritesResponse
@@ -63,16 +63,16 @@ describe("CourseIndexPage", () => {
     }
     helper.handleRequestStub
       .withArgs(favoritesURL)
-      .returns(courseListResponse(favorites))
+      .returns(queryListResponse(favorites))
     helper.handleRequestStub
       .withArgs(featuredCoursesURL)
-      .returns(courseListResponse(featuredCourses))
+      .returns(queryListResponse(featuredCourses))
     helper.handleRequestStub
       .withArgs(upcomingCoursesURL)
-      .returns(courseListResponse(upcomingCourses))
+      .returns(queryListResponse(upcomingCourses))
     helper.handleRequestStub
       .withArgs(newCoursesURL)
-      .returns(courseListResponse(newCourses))
+      .returns(queryListResponse(newCourses))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
   })
 
@@ -108,7 +108,7 @@ describe("CourseIndexPage", () => {
   it("shouldnt render a featured carousel if featuredCourses is empty", async () => {
     helper.handleRequestStub
       .withArgs(featuredCoursesURL)
-      .returns(courseListResponse([]))
+      .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
     assert.lengthOf(carousels, 3)
@@ -122,7 +122,7 @@ describe("CourseIndexPage", () => {
   it("should hide the favorites carousel when empty", async () => {
     helper.handleRequestStub
       .withArgs(favoritesURL)
-      .returns(courseListResponse([]))
+      .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
     assert.lengthOf(carousels, 3)

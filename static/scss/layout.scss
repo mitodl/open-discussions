@@ -69,6 +69,7 @@
 @import "course-searchbox";
 @import "course-filter-drawer";
 @import "truncated-text";
+@import "user-list-card";
 
 body {
   font-family: $body-font;
@@ -122,6 +123,10 @@ body {
       &.one-column {
         width: 80%;
         max-width: 950px;
+
+        &.narrow {
+          max-width: 560px;
+        }
 
         @include breakpoint(mobile) {
           width: 90%;

@@ -1,14 +1,22 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import { Link } from "react-router-dom"
+import { Link, Route } from "react-router-dom"
 
 import DropdownMenu from "./DropdownMenu"
 import ProfileImage, { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { DropUpArrow, DropDownArrow } from "./Arrow"
+import ResponsiveWrapper from "./ResponsiveWrapper"
 
 import { isProfileComplete } from "../lib/util"
-import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
+import {
+  profileURL,
+  userListIndexURL,
+  SETTINGS_URL,
+  LOGIN_URL,
+  REGISTER_URL
+} from "../lib/url"
+import { PHONE } from "../lib/constants"
 
 import type { Profile } from "../flow/discussionTypes"
 
@@ -33,6 +41,16 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
         <Link to={profileURL(SETTINGS.username)}>Profile</Link>
       </li>
     ) : null}
+    <ResponsiveWrapper onlyOn={[PHONE]}>
+      <Route
+        path="/courses"
+        render={() => (
+          <Link className="user-list-link" to={userListIndexURL}>
+            My Lists
+          </Link>
+        )}
+      />
+    </ResponsiveWrapper>
     <li>
       <a href="/logout">Sign Out</a>
     </li>

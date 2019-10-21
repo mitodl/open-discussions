@@ -2,7 +2,7 @@ import { assert } from "chai"
 
 import { userListRequest, favoriteUserListMutation } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
-import { userListURL } from "../url"
+import { userListApiURL } from "../url"
 
 describe("UserLists API", () => {
   let userList
@@ -13,7 +13,7 @@ describe("UserLists API", () => {
 
   it("userList request allows fetching a userList", () => {
     const request = userListRequest("fake-id")
-    assert.equal(request.url, `${userListURL}/fake-id/`)
+    assert.equal(request.url, `${userListApiURL}/fake-id/`)
     assert.deepEqual(request.transform({ id: "foobar" }), {
       userLists: {
         foobar: { id: "foobar" }
@@ -30,7 +30,7 @@ describe("UserLists API", () => {
       const mutation = favoriteUserListMutation(userList)
       assert.equal(
         mutation.url,
-        `${userListURL}/${userList.id}/${
+        `${userListApiURL}/${userList.id}/${
           isFavorite ? "unfavorite" : "favorite"
         }/`
       )

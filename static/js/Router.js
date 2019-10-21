@@ -8,7 +8,7 @@ import App from "./pages/App"
 import withTracker from "./util/withTracker"
 import ScrollToTop from "./components/ScrollToTop"
 
-import { getQueries } from "./lib/redux-query"
+import { getQueries } from "./lib/redux_query"
 
 import type { Store } from "redux"
 

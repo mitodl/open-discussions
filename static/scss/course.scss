@@ -17,6 +17,22 @@
       margin-left: 8px;
     }
   }
+
+  .user-menu-section {
+    max-width: 200px;
+    justify-content: space-between;
+    flex-grow: 1;
+
+    @include breakpoint(phone) {
+      justify-content: flex-end;
+      flex-grow: unset;
+    }
+
+    .user-list-link {
+      color: black;
+      display: flex;
+    }
+  }
 }
 
 .row {
@@ -256,6 +272,7 @@
 
     .results-count {
       margin-left: 50px;
+      margin-right: 20px;
       font-size: 14px;
       color: black;
 
