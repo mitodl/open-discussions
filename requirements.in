@@ -29,6 +29,7 @@ elasticsearch==6.3.0
 factory_boy
 faker
 feedparser
+google-api-python-client==1.7.11
 html5lib==0.999999999
 ipython
 markdown2

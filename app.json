@@ -424,6 +424,14 @@
     "XPRO_COURSES_API_URL": {
       "description": "The api url for xpro courses",
       "required": false
+    },
+     "YOUTUBE_CONFIG_FILE_LOCATION": {
+      "description": "The url for the yml file with indexed video channels",
+      "required": false
+    },
+    "YOUTUBE_DEVELOPER_KEY": {
+      "description": "The key to the google youtube api",
+      "required": false
     }
   },
   "keywords": [
