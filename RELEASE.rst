@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.96.0
+--------------
+
+- Added VideoResource model
+- Fix caniuse-lite breaking build by upgrading it
+
 Version 0.95.2 (Released October 21, 2019)
 --------------
 
