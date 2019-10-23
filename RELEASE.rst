@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.96.0
+Version 0.96.0 (Released October 23, 2019)
 --------------
 
 - Added VideoResource model
