@@ -28,6 +28,7 @@ from search.constants import (
     PROGRAM_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    VIDEO_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -39,6 +40,7 @@ from search.serializers import (
     serialize_bulk_bootcamps,
     serialize_bulk_programs,
     serialize_bulk_user_lists,
+    serialize_bulk_videos,
 )
 
 
@@ -160,6 +162,16 @@ USER_LIST_OBJECT_TYPE = {
     "list_type": {"type": "keyword"},
 }
 
+VIDEO_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "video_id": {"type": "keyword"},
+    "platform": {"type": "keyword"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "transcript": ENGLISH_TEXT_FIELD,
+    "published": {"type": "boolean"},
+}
+
 MAPPING = {
     POST_TYPE: {
         **CONTENT_OBJECT_TYPE,
@@ -181,6 +193,7 @@ MAPPING = {
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
     USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
     LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE,
+    VIDEO_TYPE: VIDEO_OBJECT_TYPE,
 }
 
 
@@ -399,167 +412,107 @@ def update_post(doc_id, post):
     )
 
 
-def index_posts(post_ids):
+def index_items(serialize_bulk_items, object_type, ids):
     """
-    Index a list of posts
+    Index items based on list of item ids
 
     Args:
-        post_ids (list of int): list of Post.id to index
+        serialize_bulk_items (callable): the function to serializer a list of objects by id
+        object_type (str): the ES object type
+        ids(list of int): List of item id's
     """
     conn = get_conn()
-
-    for alias in get_active_aliases([POST_TYPE]):
+    for alias in get_active_aliases([object_type]):
         _, errors = bulk(
             conn,
-            serialize_bulk_posts(post_ids),
+            serialize_bulk_items(ids),
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )
         if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk post insert: {errors}".format(errors=errors)
-            )
+            raise ReindexException(f"Error during bulk {object_type} insert: {errors}")
 
 
-def index_comments(comment_ids):
+def index_posts(ids):
     """
-    Index a list of comments
+    Index a list of posts by id
 
     Args:
-        comment_ids (list of int): list of Post.id to index
+        ids(list of int): List of Post id's
     """
-    conn = get_conn()
+    index_items(serialize_bulk_posts, POST_TYPE, ids)
 
-    for alias in get_active_aliases([COMMENT_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_comments(comment_ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk comment insert: {errors}".format(errors=errors)
-            )
+
+def index_comments(ids):
+    """
+    Index a list of comments by id
+
+    Args:
+        ids(list of int): List of Comment id's
+    """
+    index_items(serialize_bulk_comments, COMMENT_TYPE, ids)
 
 
 def index_profiles(ids):
     """
-    Index user profiles based on list of profile ids
+    Index a list of profiles by id
 
     Args:
-        ids(list of int): List of profile id's
+        ids(list of int): List of Profile id's
     """
-    conn = get_conn()
-    for alias in get_active_aliases([PROFILE_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_profiles(ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk profile insert: {errors}".format(errors=errors)
-            )
+    index_items(serialize_bulk_profiles, PROFILE_TYPE, ids)
 
 
 def index_courses(ids):
     """
-    Index courses based on list of course ids
+    Index a list of courses by id
 
     Args:
-        ids(list of int): List of course id's
+        ids(list of int): List of Course id's
     """
-    conn = get_conn()
-    for alias in get_active_aliases([COURSE_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_courses(ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk course insert: {errors}".format(errors=errors)
-            )
+    index_items(serialize_bulk_courses, COURSE_TYPE, ids)
 
 
 def index_bootcamps(ids):
     """
-    Index bootcamps based on list of bootcamp ids
+    Index a list of bootcamps by id
 
     Args:
-        ids(list of int): List of bootcamp id's
+        ids(list of int): List of Bootcamp id's
     """
-    conn = get_conn()
-    for alias in get_active_aliases([BOOTCAMP_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_bootcamps(ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk bootcamp insert: {errors}".format(errors=errors)
-            )
+    index_items(serialize_bulk_bootcamps, BOOTCAMP_TYPE, ids)
 
 
 def index_programs(ids):
     """
-    Index programs based on list of program ids
+    Index a list of programs by id
 
     Args:
-        ids(list of int): List of program id's
+        ids(list of int): List of Program id's
     """
-    conn = get_conn()
-    for alias in get_active_aliases([PROGRAM_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_programs(ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk program insert: {errors}".format(errors=errors)
-            )
+    index_items(serialize_bulk_programs, PROGRAM_TYPE, ids)
 
 
 def index_user_lists(ids):
     """
-    Index user_lists based on list of user_list ids
+    Index a list of user lists by id
 
     Args:
-        ids(list of int): List of user_list id's
+        ids(list of int): List of UserList id's
     """
-    conn = get_conn()
-    for alias in get_active_aliases([USER_LIST_TYPE]):
-        _, errors = bulk(
-            conn,
-            serialize_bulk_user_lists(ids),
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(
-                "Error during bulk user_list insert: {errors}".format(errors=errors)
-            )
+    index_items(serialize_bulk_user_lists, USER_LIST_TYPE, ids)
+
+
+def index_videos(ids):
+    """
+    Index a list of videos by id
+
+    Args:
+        ids(list of int): List of VideoResource id's
+    """
+    index_items(serialize_bulk_videos, VIDEO_TYPE, ids)
 
 
 def create_backing_index(object_type):

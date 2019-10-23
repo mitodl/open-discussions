@@ -8,6 +8,7 @@ BOOTCAMP_TYPE = "bootcamp"
 PROGRAM_TYPE = "program"
 USER_LIST_TYPE = "user_list"
 LEARNING_PATH_TYPE = "learning_path"
+VIDEO_TYPE = "video"
 
 VALID_OBJECT_TYPES = (
     POST_TYPE,
@@ -17,5 +18,6 @@ VALID_OBJECT_TYPES = (
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
+    VIDEO_TYPE,
 )
 GLOBAL_DOC_TYPE = "_doc"

@@ -120,6 +120,19 @@ def gen_user_list_id(user_list_obj):
     return "user_list_{}".format(user_list_obj.id)
 
 
+def gen_video_id(video_obj):
+    """
+    Generates the Elasticsearch document id for a VideoResource
+
+    Args:
+        video_obj (VideoResource): The VideoResource object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
+
+
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators

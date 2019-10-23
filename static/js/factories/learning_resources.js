@@ -13,6 +13,7 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
+  LR_TYPE_VIDEO,
   DATE_FORMAT
 } from "../lib/constants"
 
@@ -21,7 +22,8 @@ import type {
   Course,
   LearningResourceRun,
   Program,
-  UserList
+  UserList,
+  Video
 } from "../flow/discussionTypes"
 
 const incrCourse = incrementer()
@@ -164,6 +166,21 @@ export const makeUserList = (): UserList => ({
   privacy_level: casual.random_element(["public", "private"])
 })
 
+export const makeVideo = (): Video => ({
+  id:                casual.number,
+  video_id:          `video_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  is_favorite:       casual.boolean,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  transcript:        casual.description,
+  topics:            [casual.word, casual.word],
+  object_type:       LR_TYPE_VIDEO,
+  offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
+  runs:              []
+})
+
 export const makeLearningResource = (objectType: string): Object => {
   switch (objectType) {
   case LR_TYPE_COURSE:
@@ -182,6 +199,8 @@ export const makeLearningResource = (objectType: string): Object => {
       { object_type: LR_TYPE_LEARNINGPATH, list_type: LR_TYPE_LEARNINGPATH },
       makeUserList()
     )
+  case LR_TYPE_VIDEO:
+    return R.merge({ object_type: LR_TYPE_VIDEO }, makeVideo())
   }
 }
 

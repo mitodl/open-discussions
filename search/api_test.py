@@ -12,6 +12,7 @@ from search.api import (
     is_reddit_object_removed,
     gen_post_id,
     gen_comment_id,
+    gen_video_id,
     find_related_documents,
     transform_aggregates,
 )
@@ -40,12 +41,20 @@ def gen_query_filters_mock(mocker):
 
 def test_gen_post_id():
     """Test that gen_post_id returns an expected id"""
-    return gen_post_id("1") == "p_1"
+    assert gen_post_id("1") == "p_1"
 
 
 def test_gen_comment_id():
     """Test that gen_comment_id returns an expected id"""
-    return gen_comment_id("1") == "c_1"
+    assert gen_comment_id("1") == "c_1"
+
+
+def test_gen_video_id(mocker):
+    """Test that gen_video_id returns an expected id"""
+    assert (
+        gen_video_id(mocker.Mock(platform="youtube", video_id="8gjuY2"))
+        == "video_youtube_8gjuY2"
+    )
 
 
 @pytest.mark.parametrize(

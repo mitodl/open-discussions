@@ -9,7 +9,7 @@ import pytest
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import CourseFactory, VideoResourceFactory
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
@@ -25,9 +25,9 @@ from search.tasks import (
     index_posts,
     start_recreate_index,
     wrap_retry_exception,
-    index_profiles,
     index_comments,
     index_courses,
+    index_videos,
     delete_document,
     upsert_document,
 )
@@ -210,15 +210,15 @@ def test_index_comments(
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_profiles(mocker, with_error):  # pylint: disable=unused-argument
-    """index_profiles should call the api function of the same name"""
-    index_profile_mock = mocker.patch("search.indexing_api.index_profiles")
+def test_index_videos(mocker, with_error):  # pylint: disable=unused-argument
+    """index_videos should call the api function of the same name"""
+    index_videos_mock = mocker.patch("search.indexing_api.index_videos")
     if with_error:
-        index_profile_mock.side_effect = TabError
-    result = index_profiles.delay([1, 2, 3]).get()
-    assert result == ("index_profiles threw an error" if with_error else None)
+        index_videos_mock.side_effect = TabError
+    result = index_videos.delay([1, 2, 3]).get()
+    assert result == ("index_videos threw an error" if with_error else None)
 
-    index_profile_mock.assert_called_once_with([1, 2, 3])
+    index_videos_mock.assert_called_once_with([1, 2, 3])
 
 
 def test_start_recreate_index(
@@ -236,10 +236,12 @@ def test_start_recreate_index(
     posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
     users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
     courses = sorted(CourseFactory.create_batch(4), key=lambda course: course.id)
+    videos = sorted(VideoResourceFactory.create_batch(4), key=lambda video: video.id)
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
+    index_videos_mock = mocker.patch("search.tasks.index_videos", autospec=True)
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
         "search.indexing_api.create_backing_index",
@@ -263,6 +265,7 @@ def test_start_recreate_index(
             "bootcamp": backing_index,
             "program": backing_index,
             "user_list": backing_index,
+            "video": backing_index,
         }
     )
     assert mocked_celery.group.call_count == 1
@@ -288,6 +291,10 @@ def test_start_recreate_index(
     assert index_courses_mock.si.call_count == 2
     index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
     index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
+
+    assert index_videos_mock.si.call_count == 2
+    index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id])
+    index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id])
 
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value
