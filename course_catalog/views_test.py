@@ -175,12 +175,7 @@ def test_listitem_endpoint_create(client, user, is_author):
     userlist = UserListFactory.create(author=author)
     course = CourseFactory.create()
 
-    data = {
-        "content_type": "course",
-        "object_id": course.id,
-        "position": 3,
-        "user_list": userlist.id,
-    }
+    data = {"content_type": "course", "object_id": course.id, "user_list": userlist.id}
 
     resp = client.post(reverse("userlistitems-list"), data=data, format="json")
     assert resp.status_code == (201 if is_author else 403)
@@ -188,7 +183,7 @@ def test_listitem_endpoint_create(client, user, is_author):
         assert resp.data.get("user_list") == userlist.id
         userlist.refresh_from_db()
         item = userlist.items.first()
-        assert item.position == 3
+        assert item.position == 1
         assert item.object_id == course.id
 
 

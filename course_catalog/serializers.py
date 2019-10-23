@@ -3,6 +3,8 @@ course_catalog serializers
 """
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -359,9 +361,13 @@ class UserListItemSerializer(serializers.ModelSerializer):
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
 
+    def _max_position(self, items):
+        return (items.aggregate(Max("position"))["position__max"] or items.count()) + 1
+
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
         object_id = attrs.get("object_id")
+
         if content_type:
             if content_type not in [
                 "course",
@@ -399,24 +405,36 @@ class UserListItemSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
+        user_list = validated_data["user_list"]
+        position = self._max_position(UserListItem.objects.filter(user_list=user_list))
         item, _ = UserListItem.objects.get_or_create(
             user_list=validated_data["user_list"],
             content_type=ContentType.objects.get(
                 model=validated_data["content_type"]["name"]
             ),
             object_id=validated_data["object_id"],
-            defaults={"position": validated_data.get("position", None)},
+            position=position,
         )
         return item
 
     def update(self, instance, validated_data):
-        position = validated_data.get("position", None)
-        instance.position = position
-        instance.save()
+        with transaction.atomic():
+            instance.position = validated_data.get("position", None)
+            if not instance.position or instance.position == 0:
+                instance.position = self._max_position(instance.user_list.items)
+            else:
+                later_items = UserListItem.objects.filter(
+                    user_list=instance.user_list
+                ).filter(position__gte=instance.position)
+                for item in later_items:
+                    item.position += 1
+                    item.save()
+            instance.save()
         return instance
 
     class Meta:
         model = UserListItem
+        extra_kwargs = {"position": {"required": False}}
         fields = "__all__"
 
 

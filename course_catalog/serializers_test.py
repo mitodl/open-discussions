@@ -15,6 +15,7 @@ from course_catalog.factories import (
     UserListFactory,
     LearningResourceRunFactory,
     ProgramItemCourseFactory,
+    UserListCourseFactory,
 )
 from course_catalog.models import ProgramItem, FavoriteItem
 from course_catalog.serializers import (
@@ -162,6 +163,35 @@ def test_userlistitem_serializer_validation(
     }
     serializer = UserListItemSerializer(data=data)
     assert serializer.is_valid() == (valid_type and object_exists)
+
+
+def test_userlistitem_serializer_positioning():
+    """Verify that item ordering is updated correctly"""
+    userlist = UserListFactory.create()
+    items = sorted(
+        UserListCourseFactory.create_batch(10, user_list=userlist),
+        key=lambda item: item.position,
+    )
+    serializer = UserListItemSerializer(
+        instance=items[5],
+        data={
+            "position": 3,
+            "content_type": "course",
+            "object_id": items[5].object_id,
+            "user_list": userlist.id,
+        },
+    )
+    assert serializer.is_valid()
+    serializer.save()
+    for idx, item in enumerate(items):
+        old_position = item.position
+        item.refresh_from_db()
+        if item.id == items[5].id:
+            assert item.position == 3
+        elif idx >= 2:
+            assert item.position == old_position + 1
+        else:
+            assert item.position == old_position
 
 
 def test_favorites_serializer():
