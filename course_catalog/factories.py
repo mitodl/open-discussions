@@ -9,7 +9,13 @@ import pytz
 
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import AvailabilityType, ListType, OfferedBy, PlatformType
+from course_catalog.constants import (
+    AvailabilityType,
+    ListType,
+    OfferedBy,
+    PlatformType,
+    PrivacyLevel,
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -27,6 +33,7 @@ from course_catalog.models import (
 
 
 # pylint: disable=unused-argument
+from open_discussions.factories import UserFactory
 
 
 def _post_gen_prices(obj, create, extracted, **kwarg):
@@ -329,6 +336,9 @@ class UserListFactory(DjangoModelFactory):
 
     title = FuzzyText()
     list_type = FuzzyChoice((ListType.LEARNING_PATH.value, ListType.LIST.value))
+    privacy_level = FuzzyChoice((PrivacyLevel.public.value, PrivacyLevel.private.value))
+
+    author = factory.SubFactory(UserFactory)
 
     @factory.post_generation
     def topics(self, create, extracted, **kwargs):

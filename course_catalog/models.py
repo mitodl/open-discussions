@@ -6,8 +6,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.db.models import Manager
 
-from course_catalog.constants import ResourceType
+from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel
 
@@ -201,17 +202,41 @@ class ListItem(TimestampedModel):
         abstract = True
 
 
+class UserListManager(Manager):
+    """
+    Custom manager for the UserList model
+    """
+
+    def viewable(self, user):
+        """
+        Return all UserLists that a user has view permissions for.
+
+        Args:
+            user (django.contrib.auth.User): the Django user.
+
+        Returns:
+            A list of UserLists the user has view access to.
+        """
+        if user.is_anonymous:
+            return self.filter(privacy_level=PrivacyLevel.public.value)
+        return self.filter(
+            (models.Q(author=user) | models.Q(privacy_level=PrivacyLevel.public.value))
+        ).distinct()
+
+
 class UserList(List):
     """
     UserList is a user-created model tracking a restricted list of LearningResources.
     """
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
-    privacy_level = models.CharField(max_length=32, null=True, blank=True)
+    privacy_level = models.CharField(max_length=32, default=PrivacyLevel.private.value)
     image_src = models.ImageField(
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
+
+    objects = UserListManager()
 
     class Meta:
         verbose_name = "user_list"

@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, OuterRef, Exists
 from django.utils import timezone
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -19,6 +19,11 @@ from course_catalog.models import (
     Bootcamp,
     FavoriteItem,
     LearningResourceRun,
+    UserListItem,
+)
+from course_catalog.permissions import (
+    HasUserListPermissions,
+    HasUserListItemPermissions,
 )
 from course_catalog.serializers import (
     CourseSerializer,
@@ -26,6 +31,7 @@ from course_catalog.serializers import (
     ProgramSerializer,
     BootcampSerializer,
     FavoriteItemSerializer,
+    UserListItemSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -183,15 +189,35 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class UserListViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
+class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     """
-    Viewset for Learning Paths
+    Viewset for User Lists & Learning Paths
     """
 
     queryset = UserList.objects.all().prefetch_related("items")
     serializer_class = UserListSerializer
     pagination_class = DefaultPagination
-    permission_classes = (AnonymousAccessReadonlyPermission,)
+    permission_classes = (HasUserListPermissions,)
+
+    def get_queryset(self):
+        return UserList.objects.viewable(self.request.user).prefetch_related("items")
+
+
+class UserListItemViewSet(
+    viewsets.GenericViewSet,
+    mixins.RetrieveModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+):
+    """
+    Viewset for User List Items
+    """
+
+    queryset = UserListItem.objects.all().prefetch_related("user_list")
+    serializer_class = UserListItemSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (HasUserListItemPermissions,)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):

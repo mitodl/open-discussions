@@ -4,8 +4,9 @@ course_catalog serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import PlatformType, ResourceType
+from course_catalog.constants import PlatformType, ResourceType, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -18,6 +19,7 @@ from course_catalog.models import (
     ProgramItem,
     FavoriteItem,
     LearningResourceRun,
+    VideoResource,
 )
 from course_catalog.utils import (
     get_ocw_topic,
@@ -354,8 +356,64 @@ class UserListItemSerializer(serializers.ModelSerializer):
     Serializer for UserListItem model
     """
 
-    content_data = GenericForeignKeyFieldSerializer(source="item")
+    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
+
+    def validate(self, attrs):
+        content_type = attrs.get("content_type", {}).get("name", None)
+        object_id = attrs.get("object_id")
+        if content_type:
+            if content_type not in [
+                "course",
+                "bootcamp",
+                "program",
+                "user_list",
+                "video resource",
+            ]:
+                raise ValidationError("Incorrect object type {}".format(content_type))
+            if (
+                content_type == "course"
+                and not Course.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Course does not exist")
+            if (
+                content_type == "bootcamp"
+                and not Bootcamp.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Bootcamp does not exist")
+            if (
+                content_type == "program"
+                and not Program.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Program does not exist")
+            if (
+                content_type == "user_list"
+                and not UserList.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("UserList does not exist")
+            if (
+                content_type == "video_resource"
+                and not VideoResource.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("VideoResource does not exist")
+        return attrs
+
+    def create(self, validated_data):
+        item, _ = UserListItem.objects.get_or_create(
+            user_list=validated_data["user_list"],
+            content_type=ContentType.objects.get(
+                model=validated_data["content_type"]["name"]
+            ),
+            object_id=validated_data["object_id"],
+            defaults={"position": validated_data.get("position", None)},
+        )
+        return item
+
+    def update(self, instance, validated_data):
+        position = validated_data.get("position", None)
+        instance.position = position
+        instance.save()
+        return instance
 
     class Meta:
         model = UserListItem
@@ -367,13 +425,29 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     Serializer for UserList model
     """
 
-    items = UserListItemSerializer(many=True, allow_null=True)
+    items = UserListItemSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="user_list")
+
+    def validate_list_type(self, list_type):
+        """
+        Validator for list_type.
+        """
+        if not list_type or list_type not in [listtype.value for listtype in ListType]:
+            raise ValidationError("Missing/incorrect list type information")
+        return list_type
+
+    def create(self, validated_data):
+        """Ensure that the list is created by the requesting user"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            validated_data["author"] = request.user
+            return super().create(validated_data)
 
     class Meta:
         model = UserList
         fields = "__all__"
+        read_only_fields = ["author"]
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
