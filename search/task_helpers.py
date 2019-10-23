@@ -20,6 +20,7 @@ from search.api import (
     gen_bootcamp_id,
     gen_program_id,
     gen_user_list_id,
+    gen_video_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -27,6 +28,7 @@ from search.constants import (
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
+    VIDEO_TYPE,
 )
 from search.serializers import (
     ESPostSerializer,
@@ -36,6 +38,7 @@ from search.serializers import (
     ESBootcampSerializer,
     ESUserListSerializer,
     ESProgramSerializer,
+    ESVideoSerializer,
 )
 from search.tasks import (
     create_document,
@@ -404,7 +407,7 @@ def upsert_course(course_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def delete_course(course_obj):
     """
-    Serializes a course object and runs a task to create an ES document for it.
+    Runs a task to delete an ES Course document
 
     Args:
         course_obj (course_catalog.models.Course): A Course object
@@ -447,7 +450,7 @@ def update_bootcamp(bootcamp_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def delete_bootcamp(bootcamp_obj):
     """
-    Serializes a bootcamp object and runs a task to create an ES document for it.
+    Runs a task to delete an ES Bootcamp document
 
     Args:
         bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
@@ -476,7 +479,7 @@ def upsert_program(program_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def delete_program(program_obj):
     """
-    Serializes a program object and runs a task to create an ES document for it.
+    Runs a task to delete an ES Program document
 
     Args:
         program_obj (course_catalog.models.Program): A Program object
@@ -517,9 +520,38 @@ def update_user_list(user_list_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def delete_user_list(user_list_obj):
     """
-    Serializes a UserList object and runs a task to create an ES document for it.
+    Runs a task to delete an ES UserList document
 
     Args:
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
     delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def upsert_video(video_obj):
+    """
+    Run a task to create or update a video Elasticsearch document
+
+    Args:
+        video_obj(VideoResource): the VideoResource to update in ES
+    """
+
+    video_data = ESVideoSerializer(video_obj).data
+    upsert_document.delay(
+        gen_video_id(video_obj),
+        video_data,
+        VIDEO_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_video(video_obj):
+    """
+    Runs a task to delete an ES VideoResource document
+
+    Args:
+        video_obj (course_catalog.models.VideoResource): A VideoResource object
+    """
+    delete_document.delay(gen_video_id(video_obj), VIDEO_TYPE)

@@ -363,7 +363,6 @@ class VideoResourceFactory(LearningResourceFactory):
 
     full_description = factory.Faker("text")
     image_src = factory.Faker("image_url")
-    image_description = factory.Faker("text", max_nb_chars=300)
 
     last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
 

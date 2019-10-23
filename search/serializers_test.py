@@ -18,13 +18,14 @@ from course_catalog.factories import (
     CoursePriceFactory,
     ProgramFactory,
     UserListFactory,
+    VideoResourceFactory,
 )
-from course_catalog.models import Course
+from course_catalog.models import Course, VideoResource
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
-from search.api import gen_course_id
+from search.api import gen_course_id, gen_video_id
 from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE
 from search.serializers import (
     ESPostSerializer,
@@ -34,6 +35,7 @@ from search.serializers import (
     ESRunSerializer,
     ESProfileSerializer,
     ESCoursePriceSerializer,
+    ESVideoSerializer,
     serialize_post_for_bulk,
     serialize_comment_for_bulk,
     serialize_bulk_comments,
@@ -42,6 +44,8 @@ from search.serializers import (
     serialize_bulk_courses,
     serialize_course_for_bulk,
     ESUserListSerializer,
+    serialize_bulk_videos,
+    serialize_video_for_bulk,
 )
 
 
@@ -439,4 +443,28 @@ def test_serialize_course_for_bulk():
     assert serialize_course_for_bulk(course) == {
         "_id": gen_course_id(course.platform, course.course_id),
         **ESCourseSerializer(course).data,
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_video(mocker):
+    """
+    Test that serialize_bulk_video calls serialize_video_for_bulk for every existing video
+    """
+    mock_serialize_video = mocker.patch("search.serializers.serialize_video_for_bulk")
+    videos = VideoResourceFactory.create_batch(5)
+    list(serialize_bulk_videos(VideoResource.objects.values_list("id", flat=True)))
+    for video in videos:
+        mock_serialize_video.assert_any_call(video)
+
+
+@pytest.mark.django_db
+def test_serialize_video_for_bulk():
+    """
+    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    """
+    video = VideoResourceFactory.create()
+    assert serialize_video_for_bulk(video) == {
+        "_id": gen_video_id(video),
+        **ESVideoSerializer(video).data,
     }

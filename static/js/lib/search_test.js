@@ -26,6 +26,7 @@ import * as searchFuncs from "./search"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
+  LR_TYPE_VIDEO,
   DEFAULT_START_DT
 } from "../lib/constants"
 import { LR_TYPE_PROGRAM } from "./constants"
@@ -164,7 +165,7 @@ describe("search functions", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_VIDEO].forEach(objectType => {
     it(`takes an overrideObject with ${objectType}`, () => {
       const result = makeLearningResourceResult(objectType)
       const object = searchResultToLearningResource(result, {

@@ -12,7 +12,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 
 from channels.constants import LINK_TYPE_LINK
 from channels.models import Comment, Post
-from course_catalog.models import Course, Bootcamp, Program, UserList
+from course_catalog.models import Course, Bootcamp, Program, UserList, VideoResource
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
@@ -274,6 +274,25 @@ def index_user_lists(ids):
         return error
 
 
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_videos(ids):
+    """
+    Index VideoResources
+
+    Args:
+        ids(list of int): List of VideoResource id's
+
+    """
+    try:
+        api.index_videos(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_videos threw an error"
+        log.exception(error)
+        return error
+
+
 @app.task(bind=True)
 def start_recreate_index(self):
     """
@@ -347,6 +366,15 @@ def start_recreate_index(self):
                 index_user_lists.si(ids)
                 for ids in chunks(
                     UserList.objects.order_by("id").values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_videos.si(ids)
+                for ids in chunks(
+                    VideoResource.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

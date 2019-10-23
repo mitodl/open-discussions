@@ -15,6 +15,7 @@ from course_catalog.models import (
     Bootcamp,
     Program,
     UserList,
+    VideoResource,
 )
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
@@ -27,6 +28,7 @@ from search.api import (
     gen_bootcamp_id,
     gen_user_list_id,
     gen_program_id,
+    gen_video_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -34,6 +36,7 @@ from search.constants import (
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
+    VIDEO_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -293,7 +296,14 @@ class ESOfferedByField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
-class ESRunSerializer(serializers.ModelSerializer):
+class LearningResourceSerializer(serializers.ModelSerializer):
+    """Abstract serializer for LearningResource subclasses"""
+
+    offered_by = ESOfferedByField()
+    topics = ESTopicsField()
+
+
+class ESRunSerializer(LearningResourceSerializer):
     """
     Elasticsearch serializer class for course runs
     """
@@ -301,7 +311,6 @@ class ESRunSerializer(serializers.ModelSerializer):
     prices = ESCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
-    offered_by = ESOfferedByField()
 
     def get_instructors(self, instance):
         """
@@ -352,17 +361,15 @@ class ESRunSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
-class ESCourseSerializer(ESModelSerializer):
+class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for courses
     """
 
     object_type = COURSE_TYPE
 
-    topics = ESTopicsField()
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
-    offered_by = ESOfferedByField()
 
     def get_coursenum(self, course):
         """
@@ -398,8 +405,6 @@ class ESBootcampSerializer(ESCourseSerializer):
     object_type = BOOTCAMP_TYPE
 
     runs = ESRunSerializer(many=True)
-    topics = ESTopicsField()
-    offered_by = ESOfferedByField()
 
     class Meta:
         model = Bootcamp
@@ -420,16 +425,14 @@ class ESBootcampSerializer(ESCourseSerializer):
         read_only_fields = fields
 
 
-class ESProgramSerializer(ESModelSerializer):
+class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for programs
     """
 
     object_type = PROGRAM_TYPE
 
-    topics = ESTopicsField()
     runs = ESRunSerializer(many=True)
-    offered_by = ESOfferedByField()
 
     class Meta:
         model = Program
@@ -446,12 +449,10 @@ class ESProgramSerializer(ESModelSerializer):
         read_only_fields = fields
 
 
-class ESUserListSerializer(ESModelSerializer):
+class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for user_lists
     """
-
-    topics = ESTopicsField()
 
     def to_representation(self, instance):
         """Serializes the instance"""
@@ -470,6 +471,29 @@ class ESUserListSerializer(ESModelSerializer):
             "author",
             "list_type",
             "privacy_level",
+        ]
+
+        read_only_fields = fields
+
+
+class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
+    """ElasticSearch serializer for VideoResources"""
+
+    object_type = VIDEO_TYPE
+
+    class Meta:
+        model = VideoResource
+        fields = [
+            "id",
+            "video_id",
+            "short_description",
+            "full_description",
+            "platform",
+            "title",
+            "image_src",
+            "topics",
+            "published",
+            "offered_by",
         ]
 
         read_only_fields = fields
@@ -586,6 +610,7 @@ def serialize_bulk_courses(ids):
     """
     for course in Course.objects.filter(id__in=ids).prefetch_related(
         "topics",
+        "offered_by",
         Prefetch(
             "runs",
             queryset=LearningResourceRun.objects.filter(published=True).order_by(
@@ -618,6 +643,7 @@ def serialize_bulk_bootcamps(ids):
     """
     for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
         "topics",
+        "offered_by",
         Prefetch(
             "runs", queryset=LearningResourceRun.objects.order_by("-best_start_date")
         ),
@@ -645,7 +671,9 @@ def serialize_bulk_programs(ids):
     Args:
         ids(list of int): List of program id's
     """
-    for program in Program.objects.filter(id__in=ids).prefetch_related("topics"):
+    for program in Program.objects.filter(id__in=ids).prefetch_related(
+        "topics", "offered_by"
+    ):
         yield serialize_program_for_bulk(program)
 
 
@@ -681,3 +709,26 @@ def serialize_user_list_for_bulk(user_list_obj):
         "_id": gen_user_list_id(user_list_obj),
         **ESUserListSerializer(user_list_obj).data,
     }
+
+
+def serialize_bulk_videos(ids):
+    """
+    Serialize VideoResources for bulk indexing
+
+    Args:
+        ids(list of int): List of VideoResource id's
+    """
+    for video in VideoResource.objects.filter(id__in=ids).prefetch_related(
+        "topics", "offered_by"
+    ):
+        yield serialize_video_for_bulk(video)
+
+
+def serialize_video_for_bulk(video_obj):
+    """
+    Serialize a VideoResource for bulk API request
+
+    Args:
+        video_obj (VideoResource): A video instance
+    """
+    return {"_id": gen_video_id(video_obj), **ESVideoSerializer(video_obj).data}

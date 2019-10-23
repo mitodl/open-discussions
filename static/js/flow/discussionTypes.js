@@ -11,7 +11,8 @@ import {
   COMMENTS_OBJECT_TYPE,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 
 export type FormImage = {
@@ -410,6 +411,13 @@ export type UserList = LearningResource & {
   items:              Array<UserListItem>,
   list_type:          string,
   object_type:        string
+}
+
+export type Video = LearningResource & {
+  image_src:          ?string,
+  object_type:        LR_TYPE_VIDEO,
+  transcript:         ?string,
+  url:                ?string,
 }
 
 export type CoursePrice = {

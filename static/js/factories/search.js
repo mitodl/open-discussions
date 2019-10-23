@@ -10,7 +10,8 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 
 import type {
@@ -120,6 +121,19 @@ export const makeProgramResult = (): LearningResourceResult => ({
   runs: [makeRun()]
 })
 
+export const makeVideoResult = (): LearningResourceResult => ({
+  id:                casual.number,
+  video_id:          `video_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  topics:            [casual.word, casual.word],
+  object_type:       LR_TYPE_VIDEO,
+  offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
+  runs:              []
+})
+
 export const makeLearningResourceResult = (objectType: string) => {
   switch (objectType) {
   case LR_TYPE_COURSE:
@@ -128,6 +142,8 @@ export const makeLearningResourceResult = (objectType: string) => {
     return makeBootcampResult()
   case LR_TYPE_PROGRAM:
     return makeProgramResult()
+  case LR_TYPE_VIDEO:
+    return makeVideoResult()
   }
 }
 

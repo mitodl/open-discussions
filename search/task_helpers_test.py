@@ -2,13 +2,17 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from course_catalog.factories import CourseFactory, ProgramFactory
+from course_catalog.factories import CourseFactory, ProgramFactory, VideoResourceFactory
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
-from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE
-from search.serializers import ESCourseSerializer, ESProgramSerializer
+from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE, VIDEO_TYPE
+from search.serializers import (
+    ESCourseSerializer,
+    ESProgramSerializer,
+    ESVideoSerializer,
+)
 from search.task_helpers import (
     reddit_object_persist,
     index_new_post,
@@ -29,6 +33,8 @@ from search.task_helpers import (
     upsert_course,
     delete_profile,
     upsert_program,
+    upsert_video,
+    delete_video,
 )
 from search.api import (
     gen_post_id,
@@ -36,6 +42,7 @@ from search.api import (
     gen_profile_id,
     gen_course_id,
     gen_program_id,
+    gen_video_id,
 )
 
 es_profile_serializer_data = {
@@ -483,3 +490,32 @@ def test_upsert_program(mock_index_functions, mocker):
         ESProgramSerializer(program).data,
         PROGRAM_TYPE,
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("mock_index_functions")
+def test_upsert_video(mocker):
+    """
+    Tests that upsert_video calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    video = VideoResourceFactory.create()
+    upsert_video(video)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
+    assert patched_task.delay.call_args[0] == (
+        gen_video_id(video),
+        ESVideoSerializer(video).data,
+        VIDEO_TYPE,
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("mock_index_functions")
+def test_delete_video(mocker):
+    """Tests that deleting a video triggers a delete on a video document"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    video = VideoResourceFactory.create()
+    delete_video(video)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (gen_video_id(video), VIDEO_TYPE)
