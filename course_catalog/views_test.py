@@ -132,23 +132,7 @@ def test_user_list_endpoint_create(client, is_anonymous):
     assert resp.status_code == (403 if is_anonymous else 201)
     if resp.status_code == 201:
         assert resp.data.get("title") == resp.data.get("title")
-        userlist = UserList.objects.get(id=resp.data.get("id"))
-        assert userlist.author == user
-
-
-@pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_delete(client, user, is_author):
-    """Test userlist endpoint for deleting a UserList"""
-    author = UserFactory.create()
-    userlist = UserListFactory.create(
-        author=author, privacy_level=PrivacyLevel.public.value
-    )
-
-    client.force_login(author if is_author else user)
-
-    resp = client.delete(reverse("userlists-detail", args=[userlist.id]))
-    assert resp.status_code == (204 if is_author else 403)
-    assert UserList.objects.filter(id=userlist.id).exists() is not is_author
+        assert resp.data.get("author") == user.id
 
 
 def test_user_list_endpoint_patch(client, user):
@@ -167,55 +151,106 @@ def test_user_list_endpoint_patch(client, user):
 
 
 @pytest.mark.parametrize("is_author", [True, False])
-def test_listitem_endpoint_create(client, user, is_author):
+def test_user_list_endpoint_create_item(client, user, is_author):
     """Test userlist endpoint for creating a UserListItem"""
-    author = UserFactory.create()
-    client.force_login(author if is_author else user)
-
-    userlist = UserListFactory.create(author=author)
-    course = CourseFactory.create()
-
-    data = {"content_type": "course", "object_id": course.id, "user_list": userlist.id}
-
-    resp = client.post(reverse("userlistitems-list"), data=data, format="json")
-    assert resp.status_code == (201 if is_author else 403)
-    if resp.status_code == 201:
-        assert resp.data.get("user_list") == userlist.id
-        userlist.refresh_from_db()
-        item = userlist.items.first()
-        assert item.position == 1
-        assert item.object_id == course.id
-
-
-@pytest.mark.parametrize("is_author", [True, False])
-def test_listitem_endpoint_delete(client, is_author):
-    """Test userlist endpoint for deleting a UserListItem"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
         author=author, privacy_level=PrivacyLevel.public.value
     )
-    item = UserListBootcampFactory.create(user_list=userlist)
+    course = CourseFactory.create()
 
-    client.force_login(author if is_author else UserFactory.create())
+    client.force_login(author if is_author else user)
 
-    resp = client.delete(reverse("userlistitems-detail", args=[item.id]))
-    assert resp.status_code == (204 if is_author else 403)
-    assert UserListItem.objects.filter(id=item.id).exists() is not is_author
+    data = {"items": [{"content_type": "course", "object_id": course.id}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        assert len(resp.data.get("items")) == 1
+        assert resp.data.get("items")[0]["object_id"] == course.id
 
 
-def test_listitem_endpoint_patch(client):
-    """Test userlist endpoint for updating a UserList"""
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_update_items(client, user, is_author):
+    """Test userlist endpoint for updating UserListItem positions"""
     author = UserFactory.create()
-    userlist = UserListFactory.create(author=author)
-    item = UserListCourseFactory.create(user_list=userlist)
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+    list_items = sorted(
+        UserListCourseFactory.create_batch(2, user_list=userlist),
+        key=lambda item: item.position,
+    )
 
-    client.force_login(author)
+    client.force_login(author if is_author else user)
 
-    data = {"position": 99}
+    data = {
+        "items": [
+            {"id": list_items[0].id, "position": 44},
+            {"id": list_items[1].id, "position": 33},
+        ]
+    }
 
-    resp = client.patch(reverse("userlistitems-detail", args=[item.id]), data=data)
-    assert resp.status_code == 200
-    assert UserListItem.objects.get(id=item.id).position == 99
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        updated_items = sorted(
+            resp.data.get("items"), key=lambda item: item["position"]
+        )
+        assert (
+            updated_items[0]["position"] == 33
+            and updated_items[0]["id"] == list_items[1].id
+        )
+        assert (
+            updated_items[1]["position"] == 44
+            and updated_items[1]["id"] == list_items[0].id
+        )
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_delete_items(client, user, is_author):
+    """Test userlist endpoint for deleting UserListItems"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+    list_items = sorted(
+        UserListCourseFactory.create_batch(2, user_list=userlist),
+        key=lambda item: item.id,
+    )
+
+    client.force_login(author if is_author else user)
+
+    data = {"items": [{"id": list_items[0].id, "delete": True}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        updated_items = resp.data.get("items")
+        assert len(updated_items) == 1
+        assert updated_items[0]["id"] == list_items[1].id
+        assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_delete(client, user, is_author):
+    """Test userlist endpoint for deleting a UserList"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+
+    client.force_login(author if is_author else user)
+
+    resp = client.delete(reverse("userlists-detail", args=[userlist.id]))
+    assert resp.status_code == (204 if is_author else 403)
+    assert UserList.objects.filter(id=userlist.id).exists() is not is_author
 
 
 def test_favorites(client):

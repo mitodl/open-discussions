@@ -24,7 +24,6 @@ router.register(r"courses", views.CourseViewSet, basename="courses")
 router.register(r"bootcamps", views.BootcampViewSet, basename="bootcamps")
 router.register(r"programs", views.ProgramViewSet, basename="programs")
 router.register(r"userlists", views.UserListViewSet, basename="userlists")
-router.register(r"userlistitems", views.UserListItemViewSet, basename="userlistitems")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
 
 urlpatterns = [

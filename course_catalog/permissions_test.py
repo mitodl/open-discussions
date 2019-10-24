@@ -7,10 +7,7 @@ from django.contrib.auth.models import AnonymousUser
 
 from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import UserListFactory, UserListCourseFactory
-from course_catalog.permissions import (
-    HasUserListPermissions,
-    HasUserListItemPermissions,
-)
+from course_catalog.permissions import HasUserListPermissions
 from open_discussions.factories import UserFactory
 
 
@@ -45,45 +42,14 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
         else PrivacyLevel.private.value,
     )
 
+    userlist_item = UserListCourseFactory.create(user_list=userlist)
+
     request = mocker.MagicMock(
         method="GET", user=(user if is_author else UserFactory.create())
     )
     assert HasUserListPermissions().has_object_permission(
         request, mocker.MagicMock(), userlist
     ) is (is_public or is_author)
-
-
-@pytest.mark.parametrize("has_list", [True, False])
-@pytest.mark.parametrize("is_author", [True, False])
-def test_userlistitem_permissions(mocker, user, has_list, is_author):
-    """
-    HasUserListItemPermissions.has_permission should return True if userlist is None or belongs to user
-    """
-    userlist = UserListFactory.create(author=user)
-    data = {"user_list": userlist.id} if has_list else {}
-
-    request = mocker.MagicMock(
-        method="POST", user=(user if is_author else UserFactory.create()), data=data
-    )
-    assert HasUserListItemPermissions().has_permission(request, mocker.MagicMock()) is (
-        is_author or not has_list
-    )
-
-
-@pytest.mark.parametrize("is_author", [True, False])
-def test_userlistitem_object_permissions(mocker, user, is_author):
-    """
-    HasUserListItemPermissions.has_object_permission should return True only if the item belongs to user
-    """
-    user_list = UserListFactory.create(author=user)
-    item = UserListCourseFactory.create(user_list=user_list, position=1)
-
-    request = mocker.MagicMock(
-        method="PATCH", user=(user if is_author else UserFactory.create())
-    )
-    assert (
-        HasUserListItemPermissions().has_object_permission(
-            request, mocker.MagicMock(), item
-        )
-        is is_author
-    )
+    assert HasUserListPermissions().has_object_permission(
+        request, mocker.MagicMock(), userlist_item
+    ) is (is_public or is_author)

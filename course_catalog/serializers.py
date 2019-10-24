@@ -8,7 +8,11 @@ from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import PlatformType, ResourceType, ListType
+from course_catalog.constants import (
+    PlatformType,
+    ResourceType,
+    ListType
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -29,6 +33,7 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
 )
+from open_discussions.serializers import WriteableSerializerMethodField
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -360,9 +365,7 @@ class UserListItemSerializer(serializers.ModelSerializer):
 
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
-
-    def _max_position(self, items):
-        return (items.aggregate(Max("position"))["position__max"] or items.count()) + 1
+    delete = serializers.BooleanField(write_only=True, default=False, required=False)
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
@@ -406,29 +409,23 @@ class UserListItemSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user_list = validated_data["user_list"]
-        position = self._max_position(UserListItem.objects.filter(user_list=user_list))
+        items = UserListItem.objects.filter(user_list=user_list)
+        position = (
+            items.aggregate(Max("position"))["position__max"] or items.count()
+        ) + 1
         item, _ = UserListItem.objects.get_or_create(
             user_list=validated_data["user_list"],
             content_type=ContentType.objects.get(
                 model=validated_data["content_type"]["name"]
             ),
             object_id=validated_data["object_id"],
-            position=position,
+            defaults={"position": position},
         )
         return item
 
     def update(self, instance, validated_data):
         with transaction.atomic():
-            instance.position = validated_data.get("position", None)
-            if not instance.position or instance.position == 0:
-                instance.position = self._max_position(instance.user_list.items)
-            else:
-                later_items = UserListItem.objects.filter(
-                    user_list=instance.user_list
-                ).filter(position__gte=instance.position)
-                for item in later_items:
-                    item.position += 1
-                    item.save()
+            instance.position = validated_data["position"]
             instance.save()
         return instance
 
@@ -443,9 +440,20 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     Serializer for UserList model
     """
 
-    items = UserListItemSerializer(read_only=True, many=True, allow_null=True)
+    items = WriteableSerializerMethodField()
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="user_list")
+    modified_items = serializers.JSONField(
+        write_only=True, allow_null=True, required=False
+    )
+
+    def validate_items(self, value):
+        """Dummy validation for items"""
+        return {"items": value}
+
+    def get_items(self, instance):
+        """Returns the list of items"""
+        return [UserListItemSerializer(item).data for item in instance.items.all()]
 
     def validate_list_type(self, list_type):
         """
@@ -461,6 +469,34 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
             return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """Ensure that the list is authored by the requesting user before modifying"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            validated_data["author"] = request.user
+            items_data = validated_data.pop("items", [])
+            # iterate through any UserListItem objects that should be created/modified/deleted:
+            for data in items_data:
+                delete = data.get("delete", False)
+                position = data.get("position")
+                if data.get("id") is not None:
+                    if delete is True:
+                        # Delete an existing UserListItem
+                        UserListItem.objects.get(id=data["id"]).delete()
+                    else:
+                        # Update the position of an existing UserListItem
+                        item = UserListItem.objects.get(id=data["id"])
+                        if item.position != position:
+                            item.position = position
+                            item.save()
+                else:
+                    # Create a new UserListItem
+                    data.setdefault("user_list", instance.id)
+                    item = UserListItemSerializer(data=data)
+                    item.is_valid(raise_exception=True)
+                    item.save()
+            return super().update(instance, validated_data)
 
     class Meta:
         model = UserList
