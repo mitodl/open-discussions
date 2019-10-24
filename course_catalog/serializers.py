@@ -473,26 +473,32 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
             validated_data["author"] = request.user
             items_data = validated_data.pop("items", [])
             # iterate through any UserListItem objects that should be created/modified/deleted:
-            for data in items_data:
-                delete = data.get("delete", False)
-                position = data.get("position")
-                if data.get("id") is not None:
-                    if delete is True:
-                        # Delete an existing UserListItem
-                        UserListItem.objects.get(id=data["id"]).delete()
-                    else:
-                        # Update the position of an existing UserListItem
-                        item = UserListItem.objects.get(id=data["id"])
-                        if item.position != position:
-                            item.position = position
+            with transaction.atomic():
+                for data in items_data:
+                    if data.get("id") is not None:
+                        try:
+                            item_obj = UserListItem.objects.get(
+                                id=data["id"], user_list=instance
+                            )
+                        except UserListItem.DoesNotExist:
+                            raise ValidationError(
+                                "Item {} not in list".format(data["id"])
+                            )
+                        item = UserListItemSerializer(
+                            instance=item_obj, data=data, partial=True
+                        )
+                        item.is_valid(raise_exception=True)
+                        if data.get("delete", False) is True:
+                            item_obj.delete()
+                        else:
                             item.save()
-                else:
-                    # Create a new UserListItem
-                    data.setdefault("user_list", instance.id)
-                    item = UserListItemSerializer(data=data)
-                    item.is_valid(raise_exception=True)
-                    item.save()
-            return super().update(instance, validated_data)
+                    else:
+                        # Create a new UserListItem
+                        data.setdefault("user_list", instance.id)
+                        item = UserListItemSerializer(data=data)
+                        item.is_valid(raise_exception=True)
+                        item.save()
+                return super().update(instance, validated_data)
 
     class Meta:
         model = UserList

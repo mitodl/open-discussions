@@ -172,6 +172,27 @@ def test_user_list_endpoint_create_item(client, user, is_author):
         assert resp.data.get("items")[0]["object_id"] == course.id
 
 
+def test_user_list_endpoint_create_item_bad_data(client, user):
+    """Test userlist endpoint for creating a UserListItem"""
+    userlist = UserListFactory.create(
+        author=user, privacy_level=PrivacyLevel.public.value
+    )
+    course = CourseFactory.create()
+
+    client.force_login(user)
+
+    data = {"items": [{"content_type": "bad_content", "object_id": course.id}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == 400
+    assert resp.json() == {
+        "non_field_errors": ["Incorrect object type bad_content"],
+        "error_type": "ValidationError",
+    }
+
+
 @pytest.mark.parametrize("is_author", [True, False])
 def test_user_list_endpoint_update_items(client, user, is_author):
     """Test userlist endpoint for updating UserListItem positions"""
@@ -209,6 +230,22 @@ def test_user_list_endpoint_update_items(client, user, is_author):
             updated_items[1]["position"] == 44
             and updated_items[1]["id"] == list_items[0].id
         )
+
+
+def test_user_list_endpoint_update_items_wrong_list(client, user):
+    """Verify that trying an update on UserListItem in wrong list fails"""
+    userlist = UserListFactory.create(author=user, privacy_level=PrivacyLevel.public.value)
+    list_item_incorrect = UserListCourseFactory.create(user_list=UserListFactory.create())
+
+    client.force_login(user)
+
+    data = {"items": [{"id": list_item_incorrect.id, "position": 44}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == 400
+    assert resp.json() == [f"Item {list_item_incorrect.id} not in list"]
 
 
 @pytest.mark.parametrize("is_author", [True, False])
