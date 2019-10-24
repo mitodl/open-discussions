@@ -8,11 +8,7 @@ from django.db.models import Max
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import (
-    PlatformType,
-    ResourceType,
-    ListType
-)
+from course_catalog.constants import PlatformType, ResourceType, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
