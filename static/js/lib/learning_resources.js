@@ -12,7 +12,7 @@ import {
   DEFAULT_START_DT,
   LR_TYPE_USERLIST,
   platforms,
-  offeredBys
+  offeredBys, LR_TYPE_LEARNINGPATH
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
@@ -148,9 +148,14 @@ export const filterRunsByAvailability = (
     : []
 
 export const resourceLabel = (resource: string) => {
-  return resource === LR_TYPE_USERLIST
-    ? "Learning Paths"
-    : concat(capitalize(resource), "s")
+  switch(resource) {
+    case LR_TYPE_USERLIST:
+      return "User Lists"
+    case LR_TYPE_LEARNINGPATH:
+      return "Learning Paths"
+    default:
+      return  concat(capitalize(resource), "s")
+  }
 }
 
 export const maxPrice = (prices: Array<CoursePrice>) => {

@@ -12,7 +12,7 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
-  DATE_FORMAT
+  DATE_FORMAT, LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
 
 import type {
@@ -172,6 +172,8 @@ export const makeLearningResource = (objectType: string): Object => {
     return R.merge({ object_type: LR_TYPE_PROGRAM }, makeProgram())
   case LR_TYPE_USERLIST:
     return R.merge({ object_type: LR_TYPE_USERLIST }, makeUserList())
+  case LR_TYPE_LEARNINGPATH:
+    return R.merge({ object_type: LR_TYPE_LEARNINGPATH }, makeUserList())
   }
 }
 

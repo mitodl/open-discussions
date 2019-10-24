@@ -16,7 +16,7 @@ from channels.constants import (
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from search.connection import get_conn, get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, USER_LIST_TYPE
+from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, USER_LIST_TYPE, LEARNING_PATH_TYPE
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
@@ -168,7 +168,7 @@ def _apply_general_query_filters(search, user):
 
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
-        "terms", object_type=[USER_LIST_TYPE]
+        "terms", object_type=[USER_LIST_TYPE, LEARNING_PATH_TYPE]
     )
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author=user.id)
