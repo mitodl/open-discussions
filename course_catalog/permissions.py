@@ -5,7 +5,6 @@ course_catalog permissions
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from course_catalog.constants import PrivacyLevel
-from course_catalog.models import UserListItem
 
 
 class HasUserListPermissions(BasePermission):
@@ -17,8 +16,6 @@ class HasUserListPermissions(BasePermission):
         return not request.user.is_anonymous
 
     def has_object_permission(self, request, view, obj):
-        if isinstance(obj, UserListItem):
-            obj = obj.user_list
         if request.method in SAFE_METHODS:
             return (
                 obj.privacy_level == PrivacyLevel.public.value

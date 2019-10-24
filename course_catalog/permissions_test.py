@@ -6,7 +6,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 
 from course_catalog.constants import PrivacyLevel
-from course_catalog.factories import UserListFactory, UserListCourseFactory
+from course_catalog.factories import UserListFactory
 from course_catalog.permissions import HasUserListPermissions
 from open_discussions.factories import UserFactory
 
@@ -42,14 +42,9 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
         else PrivacyLevel.private.value,
     )
 
-    userlist_item = UserListCourseFactory.create(user_list=userlist)
-
     request = mocker.MagicMock(
         method="GET", user=(user if is_author else UserFactory.create())
     )
     assert HasUserListPermissions().has_object_permission(
         request, mocker.MagicMock(), userlist
-    ) is (is_public or is_author)
-    assert HasUserListPermissions().has_object_permission(
-        request, mocker.MagicMock(), userlist_item
     ) is (is_public or is_author)

@@ -234,8 +234,12 @@ def test_user_list_endpoint_update_items(client, user, is_author):
 
 def test_user_list_endpoint_update_items_wrong_list(client, user):
     """Verify that trying an update on UserListItem in wrong list fails"""
-    userlist = UserListFactory.create(author=user, privacy_level=PrivacyLevel.public.value)
-    list_item_incorrect = UserListCourseFactory.create(user_list=UserListFactory.create())
+    userlist = UserListFactory.create(
+        author=user, privacy_level=PrivacyLevel.public.value
+    )
+    list_item_incorrect = UserListCourseFactory.create(
+        user_list=UserListFactory.create()
+    )
 
     client.force_login(user)
 
