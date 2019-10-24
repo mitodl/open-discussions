@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.96.1
+--------------
+
+- add an index page for showing userlists
+- Bump pillow from 3.4.2 to 6.2.0
+- two tweaks to course search facet
+
 Version 0.96.0 (Released October 23, 2019)
 --------------
 
