@@ -12,8 +12,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
-  DATE_FORMAT,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_LEARNINGPATH,
+  DATE_FORMAT
 } from "../lib/constants"
 
 import type {

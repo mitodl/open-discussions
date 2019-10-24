@@ -13,9 +13,9 @@ import {
   DEFAULT_START_DT,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
-  LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH,
   offeredBys
 } from "./constants"
 import { AVAILABILITY_MAPPING } from "./search"

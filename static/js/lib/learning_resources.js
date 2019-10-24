@@ -11,9 +11,9 @@ import {
   DEFAULT_END_DT,
   DEFAULT_START_DT,
   LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH,
   platforms,
-  offeredBys,
-  LR_TYPE_LEARNINGPATH
+  offeredBys
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
