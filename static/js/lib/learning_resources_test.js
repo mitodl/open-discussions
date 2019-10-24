@@ -12,7 +12,8 @@ import {
   DEFAULT_END_DT,
   DEFAULT_START_DT,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE, LR_TYPE_LEARNINGPATH,
+  LR_TYPE_COURSE,
+  LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   offeredBys
@@ -82,7 +83,7 @@ describe("Course utils", () => {
     [LR_TYPE_BOOTCAMP, "Bootcamps"],
     [LR_TYPE_PROGRAM, "Programs"],
     [LR_TYPE_USERLIST, "User Lists"],
-    [LR_TYPE_LEARNINGPATH, "Learning Paths"],
+    [LR_TYPE_LEARNINGPATH, "Learning Paths"]
   ].forEach(([searchType, facetText]) => {
     it(`facet text should be ${facetText} for resource type ${searchType}`, () => {
       assert.equal(resourceLabel(searchType), facetText)

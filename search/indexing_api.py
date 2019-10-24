@@ -27,7 +27,8 @@ from search.constants import (
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
-    LEARNING_PATH_TYPE)
+    LEARNING_PATH_TYPE,
+)
 from search.exceptions import ReindexException
 from search.serializers import (
     serialize_bulk_posts,
@@ -179,7 +180,7 @@ MAPPING = {
     BOOTCAMP_TYPE: BOOTCAMP_OBJECT_TYPE,
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
     USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
-    LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE
+    LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE,
 }
 
 

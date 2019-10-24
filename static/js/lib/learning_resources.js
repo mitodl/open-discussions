@@ -12,7 +12,8 @@ import {
   DEFAULT_START_DT,
   LR_TYPE_USERLIST,
   platforms,
-  offeredBys, LR_TYPE_LEARNINGPATH
+  offeredBys,
+  LR_TYPE_LEARNINGPATH
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
@@ -148,13 +149,13 @@ export const filterRunsByAvailability = (
     : []
 
 export const resourceLabel = (resource: string) => {
-  switch(resource) {
-    case LR_TYPE_USERLIST:
-      return "User Lists"
-    case LR_TYPE_LEARNINGPATH:
-      return "Learning Paths"
-    default:
-      return  concat(capitalize(resource), "s")
+  switch (resource) {
+  case LR_TYPE_USERLIST:
+    return "User Lists"
+  case LR_TYPE_LEARNINGPATH:
+    return "Learning Paths"
+  default:
+    return concat(capitalize(resource), "s")
   }
 }
 

@@ -16,7 +16,12 @@ from channels.constants import (
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from search.connection import get_conn, get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE, USER_LIST_TYPE, LEARNING_PATH_TYPE
+from search.constants import (
+    ALIAS_ALL_INDICES,
+    GLOBAL_DOC_TYPE,
+    USER_LIST_TYPE,
+    LEARNING_PATH_TYPE,
+)
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 
