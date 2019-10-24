@@ -493,11 +493,25 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
                         else:
                             item.save()
                     else:
-                        # Create a new UserListItem
                         data.setdefault("user_list", instance.id)
-                        item = UserListItemSerializer(data=data)
-                        item.is_valid(raise_exception=True)
-                        item.save()
+                        if data.get("delete") is True:
+                            # Find and delete an existing item by type/object_id
+                            try:
+                                item_obj = UserListItem.objects.get(
+                                    object_id=data.get("object_id"),
+                                    content_type__model=data.get("content_type"),
+                                    user_list=instance,
+                                )
+                                item_obj.delete()
+                            except UserListItem.DoesNotExist:
+                                raise ValidationError(
+                                    "Item {} not in list".format(data["id"])
+                                )
+                        else:
+                            # Create a new UserListItem
+                            item = UserListItemSerializer(data=data)
+                            item.is_valid(raise_exception=True)
+                            item.save()
                 return super().update(instance, validated_data)
 
     class Meta:

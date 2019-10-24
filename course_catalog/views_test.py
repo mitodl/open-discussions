@@ -278,6 +278,24 @@ def test_user_list_endpoint_delete_items(client, user, is_author):
         assert updated_items[0]["id"] == list_items[1].id
         assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
 
+        data = {
+            "items": [
+                {
+                    "object_id": list_items[1].object_id,
+                    "content_type": "course",
+                    "delete": True,
+                }
+            ]
+        }
+
+        resp = client.patch(
+            reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+        )
+        assert resp.status_code == 200
+        updated_items = resp.data.get("items")
+        assert len(updated_items) == 0
+        assert UserListItem.objects.filter(id=list_items[1].id).exists() is False
+
 
 @pytest.mark.parametrize("is_author", [True, False])
 def test_user_list_endpoint_delete(client, user, is_author):
