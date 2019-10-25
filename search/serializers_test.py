@@ -6,12 +6,18 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
-from course_catalog.constants import OfferedBy
+from course_catalog.constants import (
+    OfferedBy,
+    ListType,
+    PrivacyLevel,
+    LIST_TYPE_MAPPINGS,
+)
 from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
     CoursePriceFactory,
     ProgramFactory,
+    UserListFactory,
 )
 from course_catalog.models import Course
 from open_discussions.factories import UserFactory
@@ -35,6 +41,7 @@ from search.serializers import (
     serialize_profile_for_bulk,
     serialize_bulk_courses,
     serialize_course_for_bulk,
+    ESUserListSerializer,
 )
 
 
@@ -310,7 +317,7 @@ def test_es_course_serializer(offered_by):
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
 def test_es_program_serializer(offered_by):
     """
-    Test that ESProgramSerializer correctly serializes a course object
+    Test that ESProgramSerializer correctly serializes a program object
     """
     program = ProgramFactory.create(offered_by=offered_by)
     serialized = ESProgramSerializer(program).data
@@ -328,6 +335,33 @@ def test_es_program_serializer(offered_by):
                 for program_run in program.runs.order_by("-best_start_date")
             ],
             "offered_by": list(program.offered_by.values_list("name", flat=True)),
+        },
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("list_type", [list_type.value for list_type in ListType])
+@pytest.mark.parametrize("privacy_level", [privacy.value for privacy in PrivacyLevel])
+def test_es_userlist_serializer(list_type, privacy_level, user):
+    """
+    Test that ESUserListSerializer correctly serializes a UserList object
+    """
+    user_list = UserListFactory.create(
+        list_type=list_type, privacy_level=privacy_level, author=user
+    )
+    serialized = ESUserListSerializer(user_list).data
+    assert_json_equal(
+        serialized,
+        {
+            "author": user.id,
+            "object_type": LIST_TYPE_MAPPINGS[list_type],
+            "list_type": list_type,
+            "privacy_level": privacy_level,
+            "id": user_list.id,
+            "short_description": user_list.short_description,
+            "title": user_list.title,
+            "image_src": user_list.image_src.url,
+            "topics": list(user_list.topics.values_list("name", flat=True)),
         },
     )
 
