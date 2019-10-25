@@ -10,6 +10,7 @@ from course_catalog.models import (
     LearningResourceOfferor,
     Program,
     ProgramItem,
+    VideoResource,
 )
 from course_catalog.etl.utils import log_exceptions
 
@@ -186,3 +187,30 @@ def load_program(program_data):
 def load_programs(programs_data):
     """Load a list of programs"""
     return [load_program(program_data) for program_data in programs_data]
+
+
+def load_video(video_data):
+    """Load a video into the database"""
+    video_id = video_data.pop("video_id")
+    platform = video_data.pop("platform")
+    topics_data = video_data.pop("topics", [])
+    offered_bys_data = video_data.pop("offered_by", [])
+
+    video, created = VideoResource.objects.update_or_create(
+        video_id=video_id, platform=platform, defaults=video_data
+    )
+
+    load_topics(video, topics_data)
+    load_offered_bys(video, offered_bys_data)
+
+    if not created and not video.published:
+        search_task_helpers.delete_video(video)
+    elif video.published:
+        search_task_helpers.upsert_video(video)
+
+    return video
+
+
+def load_videos(videos_data):
+    """Load a list of videos"""
+    return [load_video(video_data) for video_data in videos_data]
