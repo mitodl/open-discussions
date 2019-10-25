@@ -143,5 +143,6 @@ export const courseURL = "/api/v0/courses"
 export const bootcampURL = "/api/v0/bootcamps"
 export const programURL = "/api/v0/programs"
 export const userListApiURL = "/api/v0/userlists"
+export const videoApiURL = "/api/v0/videos"
 
 export const userListIndexURL = "/courses/lists/"

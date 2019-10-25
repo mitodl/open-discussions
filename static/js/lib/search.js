@@ -8,6 +8,7 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO,
   PHONE,
   TABLET,
   DESKTOP
@@ -137,7 +138,15 @@ const COURSE_QUERY_FIELDS = [
   "coursenum^5",
   "offered_by"
 ]
-
+const VIDEO_QUERY_FIELDS = [
+  "title.english^3",
+  "short_description.english^2",
+  "full_description.english",
+  "topics",
+  "platform",
+  "video_id",
+  "offered_by"
+]
 const BOOTCAMP_QUERY_FIELDS = [
   "title.english^3",
   "short_description.english^2",
@@ -221,6 +230,8 @@ const _searchFields = (type: ?string) => {
     return COURSE_QUERY_FIELDS
   } else if (type === LR_TYPE_BOOTCAMP) {
     return BOOTCAMP_QUERY_FIELDS
+  } else if (type === LR_TYPE_VIDEO) {
+    return VIDEO_QUERY_FIELDS
   } else if ([LR_TYPE_PROGRAM, LR_TYPE_USERLIST].includes(type)) {
     return LIST_QUERY_FIELDS
   } else {

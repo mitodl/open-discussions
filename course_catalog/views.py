@@ -19,6 +19,7 @@ from course_catalog.models import (
     Bootcamp,
     FavoriteItem,
     LearningResourceRun,
+    Video,
 )
 from course_catalog.permissions import HasUserListPermissions
 from course_catalog.serializers import (
@@ -27,6 +28,7 @@ from course_catalog.serializers import (
     ProgramSerializer,
     BootcampSerializer,
     FavoriteItemSerializer,
+    VideoSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -219,6 +221,17 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
     queryset = Program.objects.all().prefetch_related("items")
     serializer_class = ProgramSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
+    """
+    Viewset for Videos
+    """
+
+    queryset = Video.objects.all().prefetch_related("topics", "offered_by")
+    serializer_class = VideoSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
 

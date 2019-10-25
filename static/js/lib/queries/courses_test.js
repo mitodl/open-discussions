@@ -50,7 +50,6 @@ describe("Course Queries", () => {
         mutation.url,
         `${courseURL}/${course.id}/${isFavorite ? "unfavorite" : "favorite"}/`
       )
-      assert.deepEqual(mutation.body, course)
       assert.deepEqual(mutation.transform(), {
         courses: {
           [course.id]: {

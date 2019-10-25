@@ -39,7 +39,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 import {
   emptyOrNil,
@@ -317,7 +318,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   getFavoriteObject = (result: LearningResourceResult) => {
     const { favorites } = this.props
-    const { bootcamps, courses, programs, userLists } = favorites
+    const { bootcamps, courses, programs, userLists, videos } = favorites
     switch (result.object_type) {
     case LR_TYPE_COURSE:
       return courses[result.id]
@@ -327,6 +328,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       return programs[result.id]
     case LR_TYPE_USERLIST:
       return userLists[result.id]
+    case LR_TYPE_VIDEO:
+      return videos[result.id]
     }
   }
 

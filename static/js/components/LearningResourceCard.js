@@ -28,12 +28,14 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_USERLIST,
   LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO,
   readableLearningResources
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
 import { favoriteUserListMutation } from "../lib/queries/user_lists"
+import { favoriteVideoMutation } from "../lib/queries/videos"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
@@ -178,6 +180,9 @@ const mapDispatchToProps = dispatch => ({
     }
     if (payload.object_type === LR_TYPE_USERLIST) {
       dispatch(mutateAsync(favoriteUserListMutation(payload)))
+    }
+    if (payload.object_type === LR_TYPE_VIDEO) {
+      dispatch(mutateAsync(favoriteVideoMutation(payload)))
     }
   }
 })

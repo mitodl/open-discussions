@@ -21,7 +21,7 @@ from course_catalog.models import (
     ProgramItem,
     FavoriteItem,
     LearningResourceRun,
-    VideoResource,
+    Video,
 )
 from course_catalog.utils import (
     get_ocw_topic,
@@ -64,6 +64,8 @@ class FavoriteItemContentSerializer(serializers.ModelSerializer):
             serializer = UserListSerializer(instance, context=context)
         elif isinstance(instance, Program):
             serializer = ProgramSerializer(instance, context=context)
+        elif isinstance(instance, Video):
+            serializer = VideoSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
 
@@ -398,9 +400,9 @@ class UserListItemSerializer(serializers.ModelSerializer):
                 raise ValidationError("UserList does not exist")
             if (
                 content_type == "video_resource"
-                and not VideoResource.objects.filter(id=object_id).exists()
+                and not Video.objects.filter(id=object_id).exists()
             ):
-                raise ValidationError("VideoResource does not exist")
+                raise ValidationError("Video does not exist")
         return attrs
 
     def create(self, validated_data):
@@ -546,6 +548,20 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
 
     class Meta:
         model = Program
+        fields = "__all__"
+
+
+class VideoSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+    """
+    Serializer for Video model
+    """
+
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="video")
+
+    class Meta:
+        model = Video
         fields = "__all__"
 
 

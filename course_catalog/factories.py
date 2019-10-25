@@ -28,7 +28,7 @@ from course_catalog.models import (
     UserListItem,
     LearningResourceRun,
     LearningResourceOfferor,
-    VideoResource,
+    Video,
 )
 
 
@@ -355,8 +355,8 @@ class UserListFactory(DjangoModelFactory):
         model = UserList
 
 
-class VideoResourceFactory(LearningResourceFactory):
-    """Factory for VideoResource"""
+class VideoFactory(LearningResourceFactory):
+    """Factory for Video"""
 
     video_id = factory.Sequence(lambda n: "VIDEO-%03d.MIT" % n)
     platform = FuzzyChoice([PlatformType.youtube.value])
@@ -377,4 +377,4 @@ class VideoResourceFactory(LearningResourceFactory):
     )
 
     class Meta:
-        model = VideoResource
+        model = Video

@@ -34,7 +34,6 @@ describe("Bootcamps API", () => {
           isFavorite ? "unfavorite" : "favorite"
         }/`
       )
-      assert.deepEqual(mutation.body, bootcamp)
       assert.deepEqual(mutation.transform(), {
         bootcamps: {
           [bootcamp.id]: {

@@ -9,7 +9,7 @@ import pytest
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
-from course_catalog.factories import CourseFactory, VideoResourceFactory
+from course_catalog.factories import CourseFactory, VideoFactory
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
@@ -236,7 +236,7 @@ def test_start_recreate_index(
     posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
     users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
     courses = sorted(CourseFactory.create_batch(4), key=lambda course: course.id)
-    videos = sorted(VideoResourceFactory.create_batch(4), key=lambda video: video.id)
+    videos = sorted(VideoFactory.create_batch(4), key=lambda video: video.id)
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)

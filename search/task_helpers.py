@@ -534,7 +534,7 @@ def upsert_video(video_obj):
     Run a task to create or update a video Elasticsearch document
 
     Args:
-        video_obj(VideoResource): the VideoResource to update in ES
+        video_obj(Video): the Video to update in ES
     """
 
     video_data = ESVideoSerializer(video_obj).data
@@ -549,9 +549,9 @@ def upsert_video(video_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def delete_video(video_obj):
     """
-    Runs a task to delete an ES VideoResource document
+    Runs a task to delete an ES Video document
 
     Args:
-        video_obj (course_catalog.models.VideoResource): A VideoResource object
+        video_obj (course_catalog.models.Video): A Video object
     """
     delete_document.delay(gen_video_id(video_obj), VIDEO_TYPE)
