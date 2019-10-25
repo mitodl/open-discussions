@@ -6,7 +6,6 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
-from django.db.models import Manager
 
 from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
