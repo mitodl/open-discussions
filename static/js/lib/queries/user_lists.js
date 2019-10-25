@@ -59,3 +59,25 @@ export const favoriteUserListMutation = (userList: UserList) => ({
     ...DEFAULT_POST_OPTIONS
   }
 })
+
+export const createUserListMutation = (params: Object) => ({
+  queryKey:  "createUserListMutation",
+  body:      params,
+  url:       `${userListApiURL}/`,
+  transform: (newUserList: ?UserList) => {
+    return newUserList
+      ? {
+        userLists: {
+          [newUserList.id]: newUserList
+        }
+      }
+      : {}
+  },
+  update: {
+    userLists: R.mergeDeepRight
+  },
+  options: {
+    method: "POST",
+    ...DEFAULT_POST_OPTIONS
+  }
+})

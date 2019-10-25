@@ -22,7 +22,8 @@ import {
   PASSWORD_LENGTH_MINIMUM,
   validNotMIT,
   validateSearchQuery,
-  validateWidgetDialog
+  validateWidgetDialog,
+  validateCreateUserListForm
 } from "./validation"
 import {
   WIDGET_CREATE,
@@ -30,7 +31,13 @@ import {
   WIDGET_TYPE_SELECT
 } from "../components/widgets/WidgetEditDialog"
 import { makeWidgetInstance } from "../factories/widgets"
-import { WIDGET_TYPE_RSS, WIDGET_TYPE_URL } from "./constants"
+import {
+  WIDGET_TYPE_RSS,
+  WIDGET_TYPE_URL,
+  LR_TYPE_USERLIST,
+  LR_PUBLIC
+} from "../lib/constants"
+
 import * as htmlLib from "./html"
 
 describe("validation library", () => {
@@ -460,6 +467,29 @@ describe("validation library", () => {
       it(`a query of '${String(query)}' ${shouldIf(isValid)} be valid`, () => {
         assert.equal(validateSearchQuery(query) === null, isValid)
       })
+    })
+  })
+
+  describe("validateCreateUserListForm", () => {
+    it("should complain about all required fields", () => {
+      assert.deepEqual(validateCreateUserListForm({}), {
+        list_type:         "You need to select a list type",
+        privacy_level:     "You need to select a privacy level",
+        short_description: "Description is required",
+        title:             "Title is required"
+      })
+    })
+
+    it("shouldn't compalin when they're filled out", () => {
+      assert.deepEqual(
+        validateCreateUserListForm({
+          list_type:         LR_TYPE_USERLIST,
+          privacy_level:     LR_PUBLIC,
+          short_description: "My list is gonna be GREAT!",
+          title:             "The Best List"
+        }),
+        {}
+      )
     })
   })
 

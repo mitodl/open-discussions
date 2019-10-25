@@ -1,8 +1,14 @@
 import { assert } from "chai"
 
-import { userListRequest, favoriteUserListMutation } from "./user_lists"
+import {
+  userListRequest,
+  favoriteUserListMutation,
+  createUserListMutation
+} from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
+import { LR_TYPE_USERLIST, LR_PUBLIC } from "../constants"
+import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
 describe("UserLists API", () => {
   let userList
@@ -42,6 +48,29 @@ describe("UserLists API", () => {
           }
         }
       })
+    })
+  })
+
+  it("createUserListMutation should return a good query", () => {
+    const params = {
+      title:             "My TITLE!",
+      short_description: "Well and truly described",
+      list_type:         LR_TYPE_USERLIST,
+      privacy:           LR_PUBLIC
+    }
+    const query = createUserListMutation(params)
+    assert.deepEqual(query.body, params)
+    assert.equal(query.queryKey, "createUserListMutation")
+    assert.equal(query.url, `${userListApiURL}/`)
+    assert.deepEqual(query.options, {
+      method: "POST",
+      ...DEFAULT_POST_OPTIONS
+    })
+    assert.deepEqual(query.transform(), {})
+    assert.deepEqual(query.transform(userList), {
+      userLists: {
+        [userList.id]: userList
+      }
     })
   })
 })

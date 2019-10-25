@@ -74,3 +74,17 @@ export const queryListResponse = (list: Array<LearningResource>) => ({
     results: list
   }
 })
+
+export const changeFormikInput = (
+  wrapper: Object,
+  name: string,
+  value: any
+) => {
+  wrapper.simulate("change", {
+    persist: () => {},
+    target:  {
+      name,
+      value
+    }
+  })
+}

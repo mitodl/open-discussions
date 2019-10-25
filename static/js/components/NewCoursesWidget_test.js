@@ -1,5 +1,4 @@
 // @flow
-
 import R from "ramda"
 import { assert } from "chai"
 

@@ -35,7 +35,7 @@ export default function UserListCard(props: Props) {
     <Card className="user-list-card">
       <div className="userlist-info">
         <div className="platform">
-          {readableLearningResources[userList.object_type]}
+          {readableLearningResources[userList.list_type]}
         </div>
         <div className="ul-title">{userList.title}</div>
         <div className="actions-and-count">

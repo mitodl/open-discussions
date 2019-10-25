@@ -82,3 +82,6 @@ export const TABLET = "TABLET"
 export const DESKTOP = "DESKTOP"
 export const PHONE_WIDTH = 580
 export const TABLET_WIDTH = 839
+
+export const LR_PUBLIC = "public"
+export const LR_PRIVATE = "private"

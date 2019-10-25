@@ -1,0 +1,66 @@
+.create-user-list-dialog {
+  display: block;
+
+  .user-list-create-form {
+    color: black;
+    border-top: 2px solid $border-grey;
+    border-bottom: 2px solid $border-grey;
+    padding-top: 20px;
+
+    .radio {
+      display: flex;
+      align-items: center;
+      margin: 20px 0;
+
+      &.type {
+        label {
+          height: 70px;
+        }
+      }
+
+      &.privacy {
+        label {
+          text-align: center;
+        }
+      }
+
+      input {
+        margin: 0;
+      }
+
+      label {
+        color: black;
+        font-size: 14px;
+        border: 1px solid $border-grey;
+        border-radius: 5px;
+        width: 130px;
+        padding: 15px 10px;
+        line-height: 1.1rem;
+        margin: 0 60px 0 20px;
+
+        .header {
+          display: block;
+          font-size: 16px;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .input-name {
+      font-size: 16px;
+      display: block;
+    }
+
+    input.title {
+      width: calc(100% - 25px);
+      padding: 10px;
+    }
+
+    input.title,
+    textarea {
+      border-radius: 5px;
+      border: 1px solid $border-grey;
+      margin: 10px 0;
+    }
+  }
+}

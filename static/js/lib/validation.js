@@ -392,3 +392,22 @@ export const validateWidgetDialog = (data: WidgetDialogData) => {
 
   return validate(validationList)(data.instance)
 }
+
+export const validateCreateUserListForm = validate([
+  validation(
+    emptyOrNil,
+    R.lensProp("privacy_level"),
+    "You need to select a privacy level"
+  ),
+  validation(
+    emptyOrNil,
+    R.lensProp("list_type"),
+    "You need to select a list type"
+  ),
+  validation(emptyOrNil, R.lensProp("title"), "Title is required"),
+  validation(
+    emptyOrNil,
+    R.lensProp("short_description"),
+    "Description is required"
+  )
+])

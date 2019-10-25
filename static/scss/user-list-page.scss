@@ -1,0 +1,11 @@
+.user-list-page {
+  .first-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    button {
+      max-height: 36px;
+    }
+  }
+}

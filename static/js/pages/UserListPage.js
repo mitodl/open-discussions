@@ -1,5 +1,5 @@
 // @flow
-import React from "react"
+import React, { useState } from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 import { createSelector } from "reselect"
@@ -12,9 +12,12 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import UserListCard from "../components/UserListCard"
+import CreateUserListDialog from "../components/CreateUserListDialog"
+import LoginTooltip from "../components/LoginTooltip"
 
 import { userListsRequest, userListsSelector } from "../lib/queries/user_lists"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 
 const userListsPageSelector = createSelector(
   userListsSelector,
@@ -23,6 +26,7 @@ const userListsPageSelector = createSelector(
 )
 
 export default function UserListPage() {
+  const [showCreateListDialog, setShowCreateListDialog] = useState(false)
   const [{ isFinished }] = useRequest(userListsRequest())
 
   const userLists = useSelector(userListsPageSelector)
@@ -34,9 +38,25 @@ export default function UserListPage() {
           <BannerImage src={COURSE_SEARCH_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
       </BannerPageHeader>
+      {showCreateListDialog ? (
+        <CreateUserListDialog hide={() => setShowCreateListDialog(false)} />
+      ) : null}
       <Grid className="main-content one-column narrow user-list-page">
-        <Cell width={12}>
+        <Cell width={12} className="first-row">
           <h1 className="my-lists">My Lists</h1>
+          <LoginTooltip>
+            <button
+              className="blue-btn"
+              onClick={e => {
+                e.preventDefault()
+                if (!userIsAnonymous()) {
+                  setShowCreateListDialog(!showCreateListDialog)
+                }
+              }}
+            >
+              Create New List
+            </button>
+          </LoginTooltip>
         </Cell>
         {isFinished
           ? userLists.map((list, i) => (
