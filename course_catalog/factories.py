@@ -337,6 +337,7 @@ class UserListFactory(DjangoModelFactory):
     title = FuzzyText()
     list_type = FuzzyChoice((ListType.LEARNING_PATH.value, ListType.LIST.value))
     privacy_level = FuzzyChoice((PrivacyLevel.public.value, PrivacyLevel.private.value))
+    image_src = factory.Faker("file_path", extension="jpg")
 
     author = factory.SubFactory(UserFactory)
 

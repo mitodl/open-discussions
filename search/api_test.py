@@ -16,7 +16,12 @@ from search.api import (
     transform_aggregates,
 )
 from search.connection import get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
+from search.constants import (
+    ALIAS_ALL_INDICES,
+    GLOBAL_DOC_TYPE,
+    USER_LIST_TYPE,
+    LEARNING_PATH_TYPE,
+)
 
 
 @pytest.fixture()
@@ -153,7 +158,10 @@ def test_execute_search(mocker, user):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": ["user_list"]
+                                                        "object_type": [
+                                                            USER_LIST_TYPE,
+                                                            LEARNING_PATH_TYPE,
+                                                        ]
                                                     }
                                                 }
                                             ]
@@ -257,7 +265,10 @@ def test_execute_search_anonymous(mocker):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": ["user_list"]
+                                                        "object_type": [
+                                                            USER_LIST_TYPE,
+                                                            LEARNING_PATH_TYPE,
+                                                        ]
                                                     }
                                                 }
                                             ]

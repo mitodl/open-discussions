@@ -7,6 +7,7 @@ COURSE_TYPE = "course"
 BOOTCAMP_TYPE = "bootcamp"
 PROGRAM_TYPE = "program"
 USER_LIST_TYPE = "user_list"
+LEARNING_PATH_TYPE = "learning_path"
 
 VALID_OBJECT_TYPES = (
     POST_TYPE,

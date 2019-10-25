@@ -7,6 +7,7 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
+from course_catalog.constants import LIST_TYPE_MAPPINGS
 from course_catalog.models import (
     Course,
     LearningResourceRun,
@@ -450,9 +451,13 @@ class ESUserListSerializer(ESModelSerializer):
     Elasticsearch serializer class for user_lists
     """
 
-    object_type = USER_LIST_TYPE
-
     topics = ESTopicsField()
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+        ret["object_type"] = LIST_TYPE_MAPPINGS.get(instance.list_type, USER_LIST_TYPE)
+        return ret
 
     class Meta:
         model = UserList

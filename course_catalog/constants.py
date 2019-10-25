@@ -3,6 +3,8 @@ course_catalog constants
 """
 from enum import Enum
 
+from search.constants import LEARNING_PATH_TYPE, USER_LIST_TYPE
+
 
 class OfferedBy(Enum):
     """
@@ -92,6 +94,11 @@ NON_COURSE_DIRECTORIES = [
     "PROD/physics",
     "QA",
 ]
+
+LIST_TYPE_MAPPINGS = {
+    ListType.LEARNING_PATH.value: LEARNING_PATH_TYPE,
+    ListType.LIST.value: USER_LIST_TYPE,
+}
 
 OFFERED_BY_MAPPINGS = {
     OfferedBy.micromasters.value: PlatformType.mitx.value,

@@ -53,18 +53,21 @@ export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_BOOTCAMP = "bootcamp"
 export const LR_TYPE_PROGRAM = "program"
 export const LR_TYPE_USERLIST = "user_list"
+export const LR_TYPE_LEARNINGPATH = "learning_path"
 export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH
 ]
 
 export const readableLearningResources = {
-  [LR_TYPE_COURSE]:   "Course",
-  [LR_TYPE_BOOTCAMP]: "Bootcamp",
-  [LR_TYPE_PROGRAM]:  "Program",
-  [LR_TYPE_USERLIST]: "Learning Path"
+  [LR_TYPE_COURSE]:       "Course",
+  [LR_TYPE_BOOTCAMP]:     "Bootcamp",
+  [LR_TYPE_PROGRAM]:      "Program",
+  [LR_TYPE_USERLIST]:     "User List",
+  [LR_TYPE_LEARNINGPATH]: "Learning Path"
 }
 
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"

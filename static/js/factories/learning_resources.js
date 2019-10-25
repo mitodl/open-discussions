@@ -12,6 +12,7 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH,
   DATE_FORMAT
 } from "../lib/constants"
 
@@ -157,6 +158,7 @@ export const makeUserList = (): UserList => ({
     makeUserListItem(LR_TYPE_PROGRAM)
   ],
   object_type:   "user_list",
+  list_type:     "user_list",
   profile_img:   casual.url,
   profile_name:  casual.name,
   privacy_level: casual.random_element(["public", "private"])
@@ -171,7 +173,15 @@ export const makeLearningResource = (objectType: string): Object => {
   case LR_TYPE_PROGRAM:
     return R.merge({ object_type: LR_TYPE_PROGRAM }, makeProgram())
   case LR_TYPE_USERLIST:
-    return R.merge({ object_type: LR_TYPE_USERLIST }, makeUserList())
+    return R.merge(
+      { object_type: LR_TYPE_USERLIST, list_type: LR_TYPE_USERLIST },
+      makeUserList()
+    )
+  case LR_TYPE_LEARNINGPATH:
+    return R.merge(
+      { object_type: LR_TYPE_LEARNINGPATH, list_type: LR_TYPE_LEARNINGPATH },
+      makeUserList()
+    )
   }
 }
 
