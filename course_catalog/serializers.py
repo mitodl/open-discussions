@@ -3,9 +3,12 @@ course_catalog serializers
 """
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import Max
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import PlatformType, ResourceType
+from course_catalog.constants import PlatformType, ResourceType, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -18,6 +21,7 @@ from course_catalog.models import (
     ProgramItem,
     FavoriteItem,
     LearningResourceRun,
+    VideoResource,
 )
 from course_catalog.utils import (
     get_ocw_topic,
@@ -25,6 +29,7 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
 )
+from open_discussions.serializers import WriteableSerializerMethodField
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -354,11 +359,75 @@ class UserListItemSerializer(serializers.ModelSerializer):
     Serializer for UserListItem model
     """
 
-    content_data = GenericForeignKeyFieldSerializer(source="item")
+    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
+    delete = serializers.BooleanField(write_only=True, default=False, required=False)
+
+    def validate(self, attrs):
+        content_type = attrs.get("content_type", {}).get("name", None)
+        object_id = attrs.get("object_id")
+
+        if content_type:
+            if content_type not in [
+                "course",
+                "bootcamp",
+                "program",
+                "user_list",
+                "video resource",
+            ]:
+                raise ValidationError("Incorrect object type {}".format(content_type))
+            if (
+                content_type == "course"
+                and not Course.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Course does not exist")
+            if (
+                content_type == "bootcamp"
+                and not Bootcamp.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Bootcamp does not exist")
+            if (
+                content_type == "program"
+                and not Program.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Program does not exist")
+            if (
+                content_type == "user_list"
+                and not UserList.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("UserList does not exist")
+            if (
+                content_type == "video_resource"
+                and not VideoResource.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("VideoResource does not exist")
+        return attrs
+
+    def create(self, validated_data):
+        user_list = validated_data["user_list"]
+        items = UserListItem.objects.filter(user_list=user_list)
+        position = (
+            items.aggregate(Max("position"))["position__max"] or items.count()
+        ) + 1
+        item, _ = UserListItem.objects.get_or_create(
+            user_list=validated_data["user_list"],
+            content_type=ContentType.objects.get(
+                model=validated_data["content_type"]["name"]
+            ),
+            object_id=validated_data["object_id"],
+            defaults={"position": position},
+        )
+        return item
+
+    def update(self, instance, validated_data):
+        with transaction.atomic():
+            instance.position = validated_data["position"]
+            instance.save()
+        return instance
 
     class Meta:
         model = UserListItem
+        extra_kwargs = {"position": {"required": False}}
         fields = "__all__"
 
 
@@ -367,13 +436,88 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     Serializer for UserList model
     """
 
-    items = UserListItemSerializer(many=True, allow_null=True)
+    items = WriteableSerializerMethodField()
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="user_list")
+    modified_items = serializers.JSONField(
+        write_only=True, allow_null=True, required=False
+    )
+
+    def validate_items(self, value):
+        """Dummy validation for items"""
+        return {"items": value}
+
+    def get_items(self, instance):
+        """Returns the list of items"""
+        return [UserListItemSerializer(item).data for item in instance.items.all()]
+
+    def validate_list_type(self, list_type):
+        """
+        Validator for list_type.
+        """
+        if not list_type or list_type not in [listtype.value for listtype in ListType]:
+            raise ValidationError("Missing/incorrect list type information")
+        return list_type
+
+    def create(self, validated_data):
+        """Ensure that the list is created by the requesting user"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            validated_data["author"] = request.user
+            return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        """Ensure that the list is authored by the requesting user before modifying"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            validated_data["author"] = request.user
+            items_data = validated_data.pop("items", [])
+            # iterate through any UserListItem objects that should be created/modified/deleted:
+            with transaction.atomic():
+                for data in items_data:
+                    if data.get("id") is not None:
+                        try:
+                            item_obj = UserListItem.objects.get(
+                                id=data["id"], user_list=instance
+                            )
+                        except UserListItem.DoesNotExist:
+                            raise ValidationError(
+                                "Item {} not in list".format(data["id"])
+                            )
+                        item = UserListItemSerializer(
+                            instance=item_obj, data=data, partial=True
+                        )
+                        item.is_valid(raise_exception=True)
+                        if data.get("delete", False) is True:
+                            item_obj.delete()
+                        else:
+                            item.save()
+                    else:
+                        data.setdefault("user_list", instance.id)
+                        if data.get("delete") is True:
+                            # Find and delete an existing item by type/object_id
+                            try:
+                                item_obj = UserListItem.objects.get(
+                                    object_id=data.get("object_id"),
+                                    content_type__model=data.get("content_type"),
+                                    user_list=instance,
+                                )
+                                item_obj.delete()
+                            except UserListItem.DoesNotExist:
+                                raise ValidationError(
+                                    "Item {} not in list".format(data["id"])
+                                )
+                        else:
+                            # Create a new UserListItem
+                            item = UserListItemSerializer(data=data)
+                            item.is_valid(raise_exception=True)
+                            item.save()
+                return super().update(instance, validated_data)
 
     class Meta:
         model = UserList
         fields = "__all__"
+        read_only_fields = ["author"]
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):

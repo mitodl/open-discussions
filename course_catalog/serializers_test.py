@@ -3,7 +3,8 @@ Test course_catalog serializers
 """
 import pytest
 
-from course_catalog.constants import OfferedBy
+from course_catalog import factories
+from course_catalog.constants import OfferedBy, ListType
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -24,6 +25,7 @@ from course_catalog.serializers import (
     UserListSerializer,
     ProgramSerializer,
     LearningResourceRunSerializer,
+    UserListItemSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -104,6 +106,61 @@ def test_generic_foreign_key_serializer():
     serializer = ProgramItemSerializer(program_item)
     with pytest.raises(Exception):
         assert serializer.data.get("item").get("id") == course_topic.id
+
+
+@pytest.mark.parametrize(
+    "list_type,valid",
+    [
+        [ListType.LIST.value, True],
+        [ListType.LEARNING_PATH.value, True],
+        ["bad_type", False],
+        [None, False],
+    ],
+)
+def test_userlist_serializer_validation(list_type, valid):
+    """
+    Test that the UserListSerializer validates list_type correctly
+    """
+    data = {"title": "My List", "list_type": list_type}
+    serializer = UserListSerializer(data=data)
+    assert serializer.is_valid() == valid
+
+
+@pytest.mark.parametrize("object_exists", [True, False])
+@pytest.mark.parametrize(
+    "content_type,factory,valid_type",
+    [
+        ["course", "CourseFactory", True],
+        ["program", "ProgramFactory", True],
+        ["bootcamp", "BootcampFactory", True],
+        ["user_list", "UserListFactory", True],
+        ["user list item", "UserListCourseFactory", False],
+        [None, "CourseFactory", False],
+    ],
+)
+def test_userlistitem_serializer_validation(
+    content_type, factory, valid_type, object_exists
+):
+    """
+    Test that the UserListItemSerializer validates content_type and object correctly
+    """
+    userlist = UserListFactory.create()
+    kwargs = (
+        {"user_list": UserListFactory.create()}
+        if factory == "UserListCourseFactory"
+        else {}
+    )
+    # pylint:disable=redefined-builtin
+    object_id = (
+        getattr(factories, factory).create(**kwargs).id if object_exists else 1_001_001
+    )
+    data = {
+        "content_type": content_type,
+        "object_id": object_id,
+        "user_list": userlist.id,
+    }
+    serializer = UserListItemSerializer(data=data)
+    assert serializer.is_valid() == (valid_type and object_exists)
 
 
 def test_favorites_serializer():

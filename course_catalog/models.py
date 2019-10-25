@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
-from course_catalog.constants import ResourceType
+from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel
 
@@ -207,7 +207,7 @@ class UserList(List):
     """
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
-    privacy_level = models.CharField(max_length=32, null=True, blank=True)
+    privacy_level = models.CharField(max_length=32, default=PrivacyLevel.private.value)
     image_src = models.ImageField(
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )

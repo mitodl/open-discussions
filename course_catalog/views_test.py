@@ -1,12 +1,13 @@
 """Tests for course_catalog views"""
 from datetime import timedelta
 
+import pytest
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 
-from course_catalog.constants import PlatformType, ResourceType
+from course_catalog.constants import PlatformType, ResourceType, PrivacyLevel, ListType
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -18,6 +19,7 @@ from course_catalog.factories import (
     ProgramItemCourseFactory,
     ProgramItemBootcampFactory,
 )
+from course_catalog.models import UserList, UserListItem
 from open_discussions.factories import UserFactory
 
 
@@ -81,25 +83,250 @@ def test_program_endpoint(client):
             assert item.get("id") == course_item.id
 
 
-def test_user_list_endpoint(client):
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_get(client, is_public, is_author, user):
     """Test learning path endpoint"""
-    user = UserFactory.create()
+    author = UserFactory.create()
     user_list = UserListFactory.create(
-        topics=CourseTopicFactory.create_batch(3), author=user
+        topics=CourseTopicFactory.create_batch(3),
+        author=author,
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
     )
+
+    another_user_list = UserListFactory.create(
+        author=UserFactory.create(),
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    )
+
     bootcamp_item = UserListBootcampFactory.create(user_list=user_list, position=1)
     course_item = UserListCourseFactory.create(user_list=user_list, position=2)
 
+    # Anonymous users should get no results
     resp = client.get(reverse("userlists-list"))
-    assert resp.data.get("count") == 1
+    assert resp.data.get("count") == 0
+
+    # Logged in user should get own lists
+    client.force_login(author if is_author else user)
+    resp = client.get(reverse("userlists-list"))
+    assert resp.data.get("count") == (1 if is_author else 0)
 
     resp = client.get(reverse("userlists-detail", args=[user_list.id]))
-    assert resp.data.get("title") == user_list.title
-    for item in resp.data.get("items"):
-        if item.get("position") == 1:
-            assert item.get("id") == bootcamp_item.id
-        else:
-            assert item.get("id") == course_item.id
+    assert resp.status_code == (403 if not (is_public or is_author) else 200)
+    if resp.status_code == 200:
+        assert resp.data.get("title") == user_list.title
+        for item in resp.data.get("items"):
+            if item.get("position") == 1:
+                assert item.get("id") == bootcamp_item.id
+            else:
+                assert item.get("id") == course_item.id
+
+    # Logged in user should see other person's public list
+    resp = client.get(reverse("userlists-detail", args=[another_user_list.id]))
+    assert resp.status_code == (403 if not is_public else 200)
+    if resp.status_code == 200:
+        assert resp.data.get("title") == another_user_list.title
+
+
+@pytest.mark.parametrize("is_anonymous", [True, False])
+def test_user_list_endpoint_create(client, is_anonymous):
+    """Test userlist endpoint for creating a UserList"""
+    user = UserFactory.create()
+    if not is_anonymous:
+        client.force_login(user)
+
+    data = {
+        "title": "My List",
+        "privacy_level": PrivacyLevel.public.value,
+        "list_type": ListType.LEARNING_PATH.value,
+    }
+
+    resp = client.post(reverse("userlists-list"), data=data, format="json")
+    assert resp.status_code == (403 if is_anonymous else 201)
+    if resp.status_code == 201:
+        assert resp.data.get("title") == resp.data.get("title")
+        assert resp.data.get("author") == user.id
+
+
+def test_user_list_endpoint_patch(client, user):
+    """Test userlist endpoint for updating a UserList"""
+    userlist = UserListFactory.create(author=user, title="Title 1")
+
+    client.force_login(user)
+
+    data = {"title": "Title 2"}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == 200
+    assert UserList.objects.get(id=userlist.id).title == "Title 2"
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_create_item(client, user, is_author):
+    """Test userlist endpoint for creating a UserListItem"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+    course = CourseFactory.create()
+
+    client.force_login(author if is_author else user)
+
+    data = {"items": [{"content_type": "course", "object_id": course.id}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        assert len(resp.data.get("items")) == 1
+        assert resp.data.get("items")[0]["object_id"] == course.id
+
+
+def test_user_list_endpoint_create_item_bad_data(client, user):
+    """Test userlist endpoint for creating a UserListItem"""
+    userlist = UserListFactory.create(
+        author=user, privacy_level=PrivacyLevel.public.value
+    )
+    course = CourseFactory.create()
+
+    client.force_login(user)
+
+    data = {"items": [{"content_type": "bad_content", "object_id": course.id}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == 400
+    assert resp.json() == {
+        "non_field_errors": ["Incorrect object type bad_content"],
+        "error_type": "ValidationError",
+    }
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_update_items(client, user, is_author):
+    """Test userlist endpoint for updating UserListItem positions"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+    list_items = sorted(
+        UserListCourseFactory.create_batch(2, user_list=userlist),
+        key=lambda item: item.position,
+    )
+
+    client.force_login(author if is_author else user)
+
+    data = {
+        "items": [
+            {"id": list_items[0].id, "position": 44},
+            {"id": list_items[1].id, "position": 33},
+        ]
+    }
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        updated_items = sorted(
+            resp.data.get("items"), key=lambda item: item["position"]
+        )
+        assert (
+            updated_items[0]["position"] == 33
+            and updated_items[0]["id"] == list_items[1].id
+        )
+        assert (
+            updated_items[1]["position"] == 44
+            and updated_items[1]["id"] == list_items[0].id
+        )
+
+
+def test_user_list_endpoint_update_items_wrong_list(client, user):
+    """Verify that trying an update on UserListItem in wrong list fails"""
+    userlist = UserListFactory.create(
+        author=user, privacy_level=PrivacyLevel.public.value
+    )
+    list_item_incorrect = UserListCourseFactory.create(
+        user_list=UserListFactory.create()
+    )
+
+    client.force_login(user)
+
+    data = {"items": [{"id": list_item_incorrect.id, "position": 44}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == 400
+    assert resp.json() == [f"Item {list_item_incorrect.id} not in list"]
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_delete_items(client, user, is_author):
+    """Test userlist endpoint for deleting UserListItems"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+    list_items = sorted(
+        UserListCourseFactory.create_batch(2, user_list=userlist),
+        key=lambda item: item.id,
+    )
+
+    client.force_login(author if is_author else user)
+
+    data = {"items": [{"id": list_items[0].id, "delete": True}]}
+
+    resp = client.patch(
+        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+    )
+    assert resp.status_code == (200 if is_author else 403)
+    if resp.status_code == 200:
+        updated_items = resp.data.get("items")
+        assert len(updated_items) == 1
+        assert updated_items[0]["id"] == list_items[1].id
+        assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
+
+        data = {
+            "items": [
+                {
+                    "object_id": list_items[1].object_id,
+                    "content_type": "course",
+                    "delete": True,
+                }
+            ]
+        }
+
+        resp = client.patch(
+            reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
+        )
+        assert resp.status_code == 200
+        updated_items = resp.data.get("items")
+        assert len(updated_items) == 0
+        assert UserListItem.objects.filter(id=list_items[1].id).exists() is False
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+def test_user_list_endpoint_delete(client, user, is_author):
+    """Test userlist endpoint for deleting a UserList"""
+    author = UserFactory.create()
+    userlist = UserListFactory.create(
+        author=author, privacy_level=PrivacyLevel.public.value
+    )
+
+    client.force_login(author if is_author else user)
+
+    resp = client.delete(reverse("userlists-detail", args=[userlist.id]))
+    assert resp.status_code == (204 if is_author else 403)
+    assert UserList.objects.filter(id=userlist.id).exists() is not is_author
 
 
 def test_favorites(client):

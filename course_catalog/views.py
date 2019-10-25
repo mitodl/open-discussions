@@ -20,6 +20,7 @@ from course_catalog.models import (
     FavoriteItem,
     LearningResourceRun,
 )
+from course_catalog.permissions import HasUserListPermissions
 from course_catalog.serializers import (
     CourseSerializer,
     UserListSerializer,
@@ -183,15 +184,32 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class UserListViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
+class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     """
-    Viewset for Learning Paths
+    Viewset for User Lists & Learning Paths
     """
 
     queryset = UserList.objects.all().prefetch_related("items")
     serializer_class = UserListSerializer
     pagination_class = DefaultPagination
-    permission_classes = (AnonymousAccessReadonlyPermission,)
+    permission_classes = (HasUserListPermissions,)
+
+    def list(self, request, *args, **kwargs):
+        """Override default list to only get lists authored by user"""
+        if request.user and not request.user.is_anonymous:
+            queryset = UserList.objects.filter(author=request.user).prefetch_related(
+                "items"
+            )
+        else:
+            queryset = UserList.objects.none()
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
