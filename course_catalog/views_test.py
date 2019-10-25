@@ -85,27 +85,38 @@ def test_program_endpoint(client):
 
 @pytest.mark.parametrize("is_public", [True, False])
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_get(client, is_public, is_author):
+def test_user_list_endpoint_get(client, is_public, is_author, user):
     """Test learning path endpoint"""
-    user = UserFactory.create()
-    if is_author:
-        client.force_login(user)
-
+    author = UserFactory.create()
     user_list = UserListFactory.create(
         topics=CourseTopicFactory.create_batch(3),
-        author=user,
+        author=author,
         privacy_level=PrivacyLevel.public.value
         if is_public
         else PrivacyLevel.private.value,
     )
+
+    another_user_list = UserListFactory.create(
+        author=UserFactory.create(),
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    )
+
     bootcamp_item = UserListBootcampFactory.create(user_list=user_list, position=1)
     course_item = UserListCourseFactory.create(user_list=user_list, position=2)
 
+    # Anonymous users should get no results
     resp = client.get(reverse("userlists-list"))
-    assert resp.data.get("count") == (1 if (is_public or is_author) else 0)
+    assert resp.data.get("count") == 0
+
+    # Logged in user should get own lists
+    client.force_login(author if is_author else user)
+    resp = client.get(reverse("userlists-list"))
+    assert resp.data.get("count") == (1 if is_author else 0)
 
     resp = client.get(reverse("userlists-detail", args=[user_list.id]))
-    assert resp.status_code == (404 if not (is_public or is_author) else 200)
+    assert resp.status_code == (403 if not (is_public or is_author) else 200)
     if resp.status_code == 200:
         assert resp.data.get("title") == user_list.title
         for item in resp.data.get("items"):
@@ -113,6 +124,12 @@ def test_user_list_endpoint_get(client, is_public, is_author):
                 assert item.get("id") == bootcamp_item.id
             else:
                 assert item.get("id") == course_item.id
+
+    # Logged in user should see other person's public list
+    resp = client.get(reverse("userlists-detail", args=[another_user_list.id]))
+    assert resp.status_code == (403 if not is_public else 200)
+    if resp.status_code == 200:
+        assert resp.data.get("title") == another_user_list.title
 
 
 @pytest.mark.parametrize("is_anonymous", [True, False])

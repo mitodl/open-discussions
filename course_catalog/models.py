@@ -202,28 +202,6 @@ class ListItem(TimestampedModel):
         abstract = True
 
 
-class UserListManager(Manager):
-    """
-    Custom manager for the UserList model
-    """
-
-    def viewable(self, user):
-        """
-        Return all UserLists that a user has view permissions for.
-
-        Args:
-            user (django.contrib.auth.User): the Django user.
-
-        Returns:
-            A list of UserLists the user has view access to.
-        """
-        if user.is_anonymous:
-            return self.filter(privacy_level=PrivacyLevel.public.value)
-        return self.filter(
-            (models.Q(author=user) | models.Q(privacy_level=PrivacyLevel.public.value))
-        ).distinct()
-
-
 class UserList(List):
     """
     UserList is a user-created model tracking a restricted list of LearningResources.
@@ -235,8 +213,6 @@ class UserList(List):
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
-
-    objects = UserListManager()
 
     class Meta:
         verbose_name = "user_list"
