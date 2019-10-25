@@ -122,10 +122,10 @@ def gen_user_list_id(user_list_obj):
 
 def gen_video_id(video_obj):
     """
-    Generates the Elasticsearch document id for a VideoResource
+    Generates the Elasticsearch document id for a Video
 
     Args:
-        video_obj (VideoResource): The VideoResource object
+        video_obj (Video): The Video object
 
     Returns:
         str: The Elasticsearch document id for this object

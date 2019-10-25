@@ -34,7 +34,6 @@ describe("UserLists API", () => {
           isFavorite ? "unfavorite" : "favorite"
         }/`
       )
-      assert.deepEqual(mutation.body, userList)
       assert.deepEqual(mutation.transform(), {
         userLists: {
           [userList.id]: {

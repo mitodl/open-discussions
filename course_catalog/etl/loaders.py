@@ -10,7 +10,7 @@ from course_catalog.models import (
     LearningResourceOfferor,
     Program,
     ProgramItem,
-    VideoResource,
+    Video,
 )
 from course_catalog.etl.utils import log_exceptions
 
@@ -196,7 +196,7 @@ def load_video(video_data):
     topics_data = video_data.pop("topics", [])
     offered_bys_data = video_data.pop("offered_by", [])
 
-    video, created = VideoResource.objects.update_or_create(
+    video, created = Video.objects.update_or_create(
         video_id=video_id, platform=platform, defaults=video_data
     )
 

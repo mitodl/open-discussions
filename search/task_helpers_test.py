@@ -2,7 +2,7 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from course_catalog.factories import CourseFactory, ProgramFactory, VideoResourceFactory
+from course_catalog.factories import CourseFactory, ProgramFactory, VideoFactory
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
@@ -499,7 +499,7 @@ def test_upsert_video(mocker):
     Tests that upsert_video calls update_field_values_by_query with the right parameters
     """
     patched_task = mocker.patch("search.task_helpers.upsert_document")
-    video = VideoResourceFactory.create()
+    video = VideoFactory.create()
     upsert_video(video)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
@@ -515,7 +515,7 @@ def test_upsert_video(mocker):
 def test_delete_video(mocker):
     """Tests that deleting a video triggers a delete on a video document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")
-    video = VideoResourceFactory.create()
+    video = VideoFactory.create()
     delete_video(video)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (gen_video_id(video), VIDEO_TYPE)

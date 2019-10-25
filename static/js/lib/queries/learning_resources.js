@@ -8,7 +8,8 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO
 } from "../constants"
 
 export const filterFavorites = (
@@ -34,6 +35,7 @@ export const favoritesRequest = () => ({
       bootcamps: constructIdMap(filterFavorites(results, LR_TYPE_BOOTCAMP)),
       programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
       userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
+      videos:    constructIdMap(filterFavorites(results, LR_TYPE_VIDEO)),
       next:      next
     }
   },
@@ -42,6 +44,7 @@ export const favoritesRequest = () => ({
     bootcamps: R.merge,
     programs:  R.merge,
     userLists: R.merge,
+    videos:    R.merge,
     next:      (prev: string, next: string) => next
   }
 })
@@ -54,10 +57,12 @@ export const favoritesSelector = createSelector(
   state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.userLists,
-  (courses, bootcamps, programs, userLists) => ({
+  state => state.entities.videos,
+  (courses, bootcamps, programs, userLists, videos) => ({
     courses:   filterFavorite(courses),
     bootcamps: filterFavorite(bootcamps),
     programs:  filterFavorite(programs),
-    userLists: filterFavorite(userLists)
+    userLists: filterFavorite(userLists),
+    videos:    filterFavorite(videos)
   })
 )

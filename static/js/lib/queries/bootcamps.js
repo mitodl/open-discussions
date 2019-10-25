@@ -19,7 +19,6 @@ export const bootcampRequest = (bootcampId: string) => ({
 
 export const favoriteBootcampMutation = (bootcamp: Bootcamp) => ({
   queryKey: "bootcampMutation",
-  body:     bootcamp,
   url:      `${bootcampURL}/${bootcamp.id}/${
     bootcamp.is_favorite ? "unfavorite" : "favorite"
   }/`,

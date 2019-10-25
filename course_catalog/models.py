@@ -268,7 +268,7 @@ class FavoriteItem(TimestampedModel):
         unique_together = ("user", "content_type", "object_id")
 
 
-class VideoResource(LearningResource):
+class Video(LearningResource):
     """Data model for video resources"""
 
     video_id = models.CharField(max_length=80)

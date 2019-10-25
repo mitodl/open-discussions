@@ -76,7 +76,6 @@ export const [newCoursesRequest, newCoursesSelector] = courseListRequestFactory(
 
 export const favoriteCourseMutation = (course: Course) => ({
   queryKey: "courseMutation",
-  body:     course,
   url:      `${courseURL}/${course.id}/${
     course.is_favorite ? "unfavorite" : "favorite"
   }/`,

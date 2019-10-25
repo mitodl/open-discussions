@@ -15,7 +15,7 @@ from course_catalog.models import (
     Bootcamp,
     Program,
     UserList,
-    VideoResource,
+    Video,
 )
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
@@ -477,12 +477,12 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
 
 
 class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
-    """ElasticSearch serializer for VideoResources"""
+    """ElasticSearch serializer for Videos"""
 
     object_type = VIDEO_TYPE
 
     class Meta:
-        model = VideoResource
+        model = Video
         fields = [
             "id",
             "video_id",
@@ -713,12 +713,12 @@ def serialize_user_list_for_bulk(user_list_obj):
 
 def serialize_bulk_videos(ids):
     """
-    Serialize VideoResources for bulk indexing
+    Serialize Videos for bulk indexing
 
     Args:
-        ids(list of int): List of VideoResource id's
+        ids(list of int): List of Video id's
     """
-    for video in VideoResource.objects.filter(id__in=ids).prefetch_related(
+    for video in Video.objects.filter(id__in=ids).prefetch_related(
         "topics", "offered_by"
     ):
         yield serialize_video_for_bulk(video)
@@ -726,9 +726,9 @@ def serialize_bulk_videos(ids):
 
 def serialize_video_for_bulk(video_obj):
     """
-    Serialize a VideoResource for bulk API request
+    Serialize a Video for bulk API request
 
     Args:
-        video_obj (VideoResource): A video instance
+        video_obj (Video): A video instance
     """
     return {"_id": gen_video_id(video_obj), **ESVideoSerializer(video_obj).data}

@@ -510,7 +510,7 @@ def index_videos(ids):
     Index a list of videos by id
 
     Args:
-        ids(list of int): List of VideoResource id's
+        ids(list of int): List of Video id's
     """
     index_items(serialize_bulk_videos, VIDEO_TYPE, ids)
 

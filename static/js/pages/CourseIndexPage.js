@@ -40,11 +40,12 @@ type Props = {|
 
 const favoritesListSelector = createSelector(
   favoritesSelector,
-  ({ courses, bootcamps, programs, userLists }) => [
+  ({ courses, bootcamps, programs, userLists, videos }) => [
     ...Object.values(courses),
     ...Object.values(bootcamps),
     ...Object.values(programs),
-    ...Object.values(userLists)
+    ...Object.values(userLists),
+    ...Object.values(videos)
   ]
 )
 

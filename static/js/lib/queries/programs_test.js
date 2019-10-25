@@ -32,7 +32,6 @@ describe("Programs API", () => {
         mutation.url,
         `${programURL}/${program.id}/${isFavorite ? "unfavorite" : "favorite"}/`
       )
-      assert.deepEqual(mutation.body, program)
       assert.deepEqual(mutation.transform(), {
         programs: {
           [program.id]: {

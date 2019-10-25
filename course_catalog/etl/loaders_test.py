@@ -26,14 +26,14 @@ from course_catalog.factories import (
     CoursePriceFactory,
     CourseTopicFactory,
     CourseInstructorFactory,
-    VideoResourceFactory,
+    VideoFactory,
 )
 from course_catalog.models import (
     Program,
     Course,
     LearningResourceRun,
     ProgramItem,
-    VideoResource,
+    Video,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
@@ -338,14 +338,14 @@ def test_load_offered_bys(parent_factory, offeror_exists, has_other_offered_by):
 def test_load_video(mock_upsert_tasks, video_exists, is_published):
     """Test that load_video loads the video"""
     video = (
-        VideoResourceFactory.create(published=is_published)
+        VideoFactory.create(published=is_published)
         if video_exists
-        else VideoResourceFactory.build()
+        else VideoFactory.build()
     )
-    assert VideoResource.objects.count() == (1 if video_exists else 0)
+    assert Video.objects.count() == (1 if video_exists else 0)
 
     props = model_to_dict(
-        VideoResourceFactory.build(
+        VideoFactory.build(
             video_id=video.video_id, platform=video.platform, published=is_published
         )
     )
@@ -360,10 +360,10 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
         mock_upsert_tasks.delete_video.assert_not_called()
         mock_upsert_tasks.upsert_video.assert_not_called()
 
-    assert VideoResource.objects.count() == 1
+    assert Video.objects.count() == 1
 
     # assert we got a course back
-    assert isinstance(result, VideoResource)
+    assert isinstance(result, Video)
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
@@ -371,13 +371,12 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
 
 def test_load_videos():
     """Verify that load_videos loads a list of videos"""
-    assert VideoResource.objects.count() == 0
+    assert Video.objects.count() == 0
 
     videos_data = [
-        model_to_dict(video)
-        for video in VideoResourceFactory.build_batch(5, published=True)
+        model_to_dict(video) for video in VideoFactory.build_batch(5, published=True)
     ]
 
     load_videos(videos_data)
 
-    assert VideoResource.objects.count() == len(videos_data)
+    assert Video.objects.count() == len(videos_data)

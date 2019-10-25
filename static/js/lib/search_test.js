@@ -678,7 +678,19 @@ describe("search functions", () => {
         ]
       ],
       ["program", ["title.english", "short_description.english", "topics"]],
-      ["user_list", ["title.english", "short_description.english", "topics"]]
+      ["user_list", ["title.english", "short_description.english", "topics"]],
+      [
+        "video",
+        [
+          "title.english^3",
+          "short_description.english^2",
+          "full_description.english",
+          "topics",
+          "platform",
+          "video_id",
+          "offered_by"
+        ]
+      ]
     ].forEach(([type, fields]) => {
       it(`has the right searchFields for ${type}`, () => {
         assert.deepEqual(searchFields(type), fields)

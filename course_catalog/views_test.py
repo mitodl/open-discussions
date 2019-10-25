@@ -3,7 +3,6 @@ from datetime import timedelta
 
 import pytest
 from django.contrib.auth.models import User
-from django.db import transaction
 from django.urls import reverse
 from django.utils import timezone
 
@@ -18,6 +17,7 @@ from course_catalog.factories import (
     UserListCourseFactory,
     ProgramItemCourseFactory,
     ProgramItemBootcampFactory,
+    VideoFactory,
 )
 from course_catalog.models import UserList, UserListItem
 from open_discussions.factories import UserFactory
@@ -329,51 +329,66 @@ def test_user_list_endpoint_delete(client, user, is_author):
     assert UserList.objects.filter(id=userlist.id).exists() is not is_author
 
 
-def test_favorites(client):
+@pytest.mark.usefixtures("transactional_db")
+@pytest.mark.parametrize(
+    "factory, route_name",
+    [
+        (CourseFactory, "courses-detail"),
+        (ProgramFactory, "programs-detail"),
+        (BootcampFactory, "bootcamps-detail"),
+        (VideoFactory, "videos-detail"),
+    ],
+)
+def test_favorites(user_client, factory, route_name):
     """Test favoriting and unfavoriting"""
-    username = "test_user"
-    password = "test_password"
-    User.objects.create_user(username=username, password=password)
-    client.login(username=username, password=password)
-
-    # Test course is not favorited by default
-    course = CourseFactory.create()
-    resp = client.get(reverse("courses-detail", args=[course.id]))
+    # Test item is not favorited by default
+    item = factory.create()
+    path = reverse(route_name, args=[item.id])
+    resp = user_client.get(path)
     assert resp.data.get("is_favorite") is False
 
     # Favorite course and test that it is favorited
-    client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
-    resp = client.get(reverse("courses-detail", args=[course.id]))
+    user_client.post(f"{path}favorite/")
+    resp = user_client.get(path)
     assert resp.data.get("is_favorite") is True
 
     # Test that viewset gracefully handles favoriting an already favorited object
-    with transaction.atomic():
-        client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
-    resp = client.get(reverse("courses-detail", args=[course.id]))
+    user_client.post(f"{path}favorite/")
+    resp = user_client.get(path)
     assert resp.data.get("is_favorite") is True
 
     # Test that course shows up in favorites endpoint
-    resp = client.get(reverse("favorites-list"))
-    assert resp.data.get("results")[0].get("content_data").get("id") == course.id
+    resp = user_client.get(reverse("favorites-list"))
+    assert resp.data.get("results")[0].get("content_data").get("id") == item.id
 
     # Unfavorite course and test that it is no longer favorited
-    client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
-    resp = client.get(reverse("courses-detail", args=[course.id]))
+    user_client.post(f"{path}unfavorite/")
+    resp = user_client.get(path)
     assert resp.data.get("is_favorite") is False
 
     # Test that viewset gracefully handles unfavoriting an already unfavorited object
-    client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
-    resp = client.get(reverse("courses-detail", args=[course.id]))
+    user_client.post(f"{path}unfavorite/")
+    resp = user_client.get(path)
     assert resp.data.get("is_favorite") is False
 
 
-def test_unautharized_favorites(client):
+@pytest.mark.parametrize(
+    "factory, route_name",
+    [
+        (CourseFactory, "courses-detail"),
+        (ProgramFactory, "programs-detail"),
+        (BootcampFactory, "bootcamps-detail"),
+        (VideoFactory, "videos-detail"),
+    ],
+)
+def test_unautharized_favorites(client, factory, route_name):
     """Test favoriting and unfavoriting when not logged in"""
-    course = CourseFactory.create()
-    resp = client.post(reverse("courses-detail", args=[course.id]) + "favorite/")
+    item = factory.create()
+    path = reverse(route_name, args=[item.id])
+    resp = client.post(f"{path}favorite/")
     assert resp.status_code == 403
 
-    resp = client.post(reverse("courses-detail", args=[course.id]) + "unfavorite/")
+    resp = client.post(f"{path}unfavorite/")
     assert resp.status_code == 403
 
 

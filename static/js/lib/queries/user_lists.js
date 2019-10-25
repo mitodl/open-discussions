@@ -36,7 +36,6 @@ export const userListsSelector = createSelector(
 
 export const favoriteUserListMutation = (userList: UserList) => ({
   queryKey: "userListMutation",
-  body:     userList,
   url:      `${userListApiURL}/${userList.id}/${
     userList.is_favorite ? "unfavorite" : "favorite"
   }/`,

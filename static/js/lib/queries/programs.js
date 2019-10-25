@@ -19,7 +19,6 @@ export const programRequest = (programId: string) => ({
 
 export const favoriteProgramMutation = (program: Program) => ({
   queryKey: "programMutation",
-  body:     program,
   url:      `${programURL}/${program.id}/${
     program.is_favorite ? "unfavorite" : "favorite"
   }/`,

@@ -18,9 +18,9 @@ from course_catalog.factories import (
     CoursePriceFactory,
     ProgramFactory,
     UserListFactory,
-    VideoResourceFactory,
+    VideoFactory,
 )
-from course_catalog.models import Course, VideoResource
+from course_catalog.models import Course, Video
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
@@ -452,8 +452,8 @@ def test_serialize_bulk_video(mocker):
     Test that serialize_bulk_video calls serialize_video_for_bulk for every existing video
     """
     mock_serialize_video = mocker.patch("search.serializers.serialize_video_for_bulk")
-    videos = VideoResourceFactory.create_batch(5)
-    list(serialize_bulk_videos(VideoResource.objects.values_list("id", flat=True)))
+    videos = VideoFactory.create_batch(5)
+    list(serialize_bulk_videos(Video.objects.values_list("id", flat=True)))
     for video in videos:
         mock_serialize_video.assert_any_call(video)
 
@@ -463,7 +463,7 @@ def test_serialize_video_for_bulk():
     """
     Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
     """
-    video = VideoResourceFactory.create()
+    video = VideoFactory.create()
     assert serialize_video_for_bulk(video) == {
         "_id": gen_video_id(video),
         **ESVideoSerializer(video).data,
