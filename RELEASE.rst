@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.96.1
+Version 0.96.1 (Released October 25, 2019)
 --------------
 
 - add an index page for showing userlists
