@@ -14,6 +14,8 @@ from course_catalog.etl.loaders import (
     load_prices,
     load_instructors,
     load_offered_bys,
+    load_video,
+    load_videos,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -24,8 +26,15 @@ from course_catalog.factories import (
     CoursePriceFactory,
     CourseTopicFactory,
     CourseInstructorFactory,
+    VideoResourceFactory,
 )
-from course_catalog.models import Program, Course, LearningResourceRun, ProgramItem
+from course_catalog.models import (
+    Program,
+    Course,
+    LearningResourceRun,
+    ProgramItem,
+    VideoResource,
+)
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
 
@@ -38,6 +47,8 @@ def mock_upsert_tasks(mocker):
         delete_course=mocker.patch("search.task_helpers.delete_course"),
         upsert_program=mocker.patch("search.task_helpers.upsert_program"),
         delete_program=mocker.patch("search.task_helpers.delete_program"),
+        upsert_video=mocker.patch("search.task_helpers.upsert_video"),
+        delete_video=mocker.patch("search.task_helpers.delete_video"),
     )
 
 
@@ -320,3 +331,53 @@ def test_load_offered_bys(parent_factory, offeror_exists, has_other_offered_by):
     load_offered_bys(parent, [{"name": offeror.name}])
 
     assert parent.offered_by.count() == (2 if has_other_offered_by else 1)
+
+
+@pytest.mark.parametrize("video_exists", [True, False])
+@pytest.mark.parametrize("is_published", [True, False])
+def test_load_video(mock_upsert_tasks, video_exists, is_published):
+    """Test that load_video loads the video"""
+    video = (
+        VideoResourceFactory.create(published=is_published)
+        if video_exists
+        else VideoResourceFactory.build()
+    )
+    assert VideoResource.objects.count() == (1 if video_exists else 0)
+
+    props = model_to_dict(
+        VideoResourceFactory.build(
+            video_id=video.video_id, platform=video.platform, published=is_published
+        )
+    )
+    del props["id"]
+    result = load_video(props)
+
+    if video_exists and not is_published:
+        mock_upsert_tasks.delete_video.assert_called_with(result)
+    elif is_published:
+        mock_upsert_tasks.upsert_video.assert_called_with(result)
+    else:
+        mock_upsert_tasks.delete_video.assert_not_called()
+        mock_upsert_tasks.upsert_video.assert_not_called()
+
+    assert VideoResource.objects.count() == 1
+
+    # assert we got a course back
+    assert isinstance(result, VideoResource)
+
+    for key, value in props.items():
+        assert getattr(result, key) == value, f"Property {key} should equal {value}"
+
+
+def test_load_videos():
+    """Verify that load_videos loads a list of videos"""
+    assert VideoResource.objects.count() == 0
+
+    videos_data = [
+        model_to_dict(video)
+        for video in VideoResourceFactory.build_batch(5, published=True)
+    ]
+
+    load_videos(videos_data)
+
+    assert VideoResource.objects.count() == len(videos_data)
