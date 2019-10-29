@@ -102,6 +102,7 @@ def test_serialize_program_related_models():
         ["ProgramFactory", True],
         ["BootcampFactory", True],
         ["UserListFactory", True],
+        ["VideoFactory", True],
         ["CourseTopicFactory", False],
     ],
 )
@@ -150,6 +151,7 @@ def test_userlist_serializer_validation(list_type, valid):
         ["course", "CourseFactory", True],
         ["program", "ProgramFactory", True],
         ["bootcamp", "BootcampFactory", True],
+        ["video", "VideoFactory", True],
         ["userlist", "UserListFactory", True],
         ["user list item", "UserListCourseFactory", False],
         [None, "CourseFactory", False],
