@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.97.0
+--------------
+
+- Added loader code for videos
+- Added VideoResource indexing
+- Differentiate between user lists and learning paths in the search index (#2329)
+- Allow CRUD operations for UserLists via API (#2326)
+
 Version 0.96.1 (Released October 25, 2019)
 --------------
 
