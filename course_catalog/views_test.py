@@ -337,12 +337,18 @@ def test_user_list_endpoint_delete(client, user, is_author):
         (ProgramFactory, "programs-detail"),
         (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
+        (UserListFactory, "userlists-detail"),
     ],
 )
 def test_favorites(user_client, factory, route_name):
     """Test favoriting and unfavoriting"""
     # Test item is not favorited by default
-    item = factory.create()
+    kwargs = (
+        {"privacy_level": PrivacyLevel.public.value}
+        if route_name == "userlists-detail"
+        else {}
+    )
+    item = factory.create(**kwargs)
     path = reverse(route_name, args=[item.id])
     resp = user_client.get(path)
     assert resp.data.get("is_favorite") is False
@@ -379,11 +385,17 @@ def test_favorites(user_client, factory, route_name):
         (ProgramFactory, "programs-detail"),
         (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
+        (UserListFactory, "userlists-detail"),
     ],
 )
 def test_unautharized_favorites(client, factory, route_name):
     """Test favoriting and unfavoriting when not logged in"""
-    item = factory.create()
+    kwargs = (
+        {"privacy_level": PrivacyLevel.public.value}
+        if route_name == "userlists-detail"
+        else {}
+    )
+    item = factory.create(**kwargs)
     path = reverse(route_name, args=[item.id])
     resp = client.post(f"{path}favorite/")
     assert resp.status_code == 403
