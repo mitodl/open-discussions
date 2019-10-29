@@ -95,13 +95,15 @@ def test_serialize_program_related_models():
     assert "content_data" in serializer.data["items"][0].keys()
 
 
-@pytest.mark.parametrize("factory,valid_type", [
-    ["CourseFactory", True],
-    ["ProgramFactory", True],
-    ["BootcampFactory", True],
-    ["UserListFactory", True],
-    ["CourseTopicFactory", False],
-],
+@pytest.mark.parametrize(
+    "factory,valid_type",
+    [
+        ["CourseFactory", True],
+        ["ProgramFactory", True],
+        ["BootcampFactory", True],
+        ["UserListFactory", True],
+        ["CourseTopicFactory", False],
+    ],
 )
 def test_generic_foreign_key_serializer_classes(factory, valid_type):
     """
@@ -148,7 +150,7 @@ def test_userlist_serializer_validation(list_type, valid):
         ["course", "CourseFactory", True],
         ["program", "ProgramFactory", True],
         ["bootcamp", "BootcampFactory", True],
-        ["user_list", "UserListFactory", True],
+        ["userlist", "UserListFactory", True],
         ["user list item", "UserListCourseFactory", False],
         [None, "CourseFactory", False],
     ],

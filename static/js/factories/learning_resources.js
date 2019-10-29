@@ -159,8 +159,8 @@ export const makeUserList = (): UserList => ({
     makeUserListItem(LR_TYPE_BOOTCAMP),
     makeUserListItem(LR_TYPE_PROGRAM)
   ],
-  object_type:   "user_list",
-  list_type:     "user_list",
+  object_type:   "userlist",
+  list_type:     "userlist",
   profile_img:   casual.url,
   profile_name:  casual.name,
   privacy_level: casual.random_element(["public", "private"])

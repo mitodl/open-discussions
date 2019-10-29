@@ -52,8 +52,8 @@ export const CAROUSEL_IMG_WIDTH = 306
 export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_BOOTCAMP = "bootcamp"
 export const LR_TYPE_PROGRAM = "program"
-export const LR_TYPE_USERLIST = "user_list"
-export const LR_TYPE_LEARNINGPATH = "learning_path"
+export const LR_TYPE_USERLIST = "userlist"
+export const LR_TYPE_LEARNINGPATH = "learningpath"
 export const LR_TYPE_VIDEO = "video"
 export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
