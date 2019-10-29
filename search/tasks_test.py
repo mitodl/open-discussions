@@ -264,7 +264,7 @@ def test_start_recreate_index(
             "course": backing_index,
             "bootcamp": backing_index,
             "program": backing_index,
-            "user_list": backing_index,
+            "userlist": backing_index,
             "video": backing_index,
         }
     )
