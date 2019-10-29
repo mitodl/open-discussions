@@ -392,6 +392,24 @@ def test_unautharized_favorites(client, factory, route_name):
     assert resp.status_code == 403
 
 
+@pytest.mark.parametrize(
+    "privacy_level", [PrivacyLevel.public.value, PrivacyLevel.private.value]
+)
+def test_favorite_lists_other_user(user_client, privacy_level):
+    """Test favoriting and unfavoriting someone else's list"""
+    is_public = privacy_level == PrivacyLevel.public.value
+    userlist = UserListFactory.create(privacy_level=privacy_level)
+    resp = user_client.post(
+        reverse("userlists-detail", args=[userlist.id]) + "favorite/"
+    )
+    assert resp.status_code == 200 if is_public else 403
+
+    resp = user_client.post(
+        reverse("userlists-detail", args=[userlist.id]) + "unfavorite/"
+    )
+    assert resp.status_code == 200 if is_public else 403
+
+
 def test_course_report(client):
     """Test ocw course report"""
     CourseFactory.create(

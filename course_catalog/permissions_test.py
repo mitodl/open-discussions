@@ -48,3 +48,26 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
     assert HasUserListPermissions().has_object_permission(
         request, mocker.MagicMock(), userlist
     ) is (is_public or is_author)
+
+
+@pytest.mark.parametrize("action", ["favorite", "unfavorite", ""])
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_author", [True, False])
+def test_userlist_favorite_permissions(mocker, user, is_public, is_author, action):
+    """
+    HasUserListPermissions.has_object_permission should return correct permission depending
+    on privacy level and author when favoriting or unfavoriting.
+    """
+    userlist = UserListFactory.create(
+        author=user,
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    )
+
+    request = mocker.MagicMock(
+        method="POST", user=(user if is_author else UserFactory.create())
+    )
+    assert HasUserListPermissions().has_object_permission(
+        request, mocker.MagicMock(action=action), userlist
+    ) is ((is_public and "favorite" in action) or is_author)

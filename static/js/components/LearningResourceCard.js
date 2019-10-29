@@ -26,9 +26,10 @@ import {
   CAROUSEL_IMG_HEIGHT,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_USERLIST,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH,
   readableLearningResources
 } from "../lib/constants"
 import { favoriteCourseMutation } from "../lib/queries/courses"
@@ -178,7 +179,9 @@ const mapDispatchToProps = dispatch => ({
     if (payload.object_type === LR_TYPE_PROGRAM) {
       dispatch(mutateAsync(favoriteProgramMutation(payload)))
     }
-    if (payload.object_type === LR_TYPE_USERLIST) {
+    if (
+      [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(payload.object_type)
+    ) {
       dispatch(mutateAsync(favoriteUserListMutation(payload)))
     }
     if (payload.object_type === LR_TYPE_VIDEO) {
