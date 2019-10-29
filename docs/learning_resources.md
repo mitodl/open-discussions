@@ -40,17 +40,24 @@ and in tests for that code:
 - flow/discussionTypes
   - Add your new type
   
-- lib/constants.js
+- lib/constants
   - add a `LR_TYPE_<typename>` const
   - add the above to `LR_TYPE_ALL`  and `readableLearningResources`
   
-- lib/search.js
+- lib/search
   - Add query fields for the type
   - Include the type in `_searchFields`
  
- - components/LearningResourceCard.js
+ - components/LearningResourceCard
    - update `mapDispatchToProps` so that `toggleFavorite` will work with the new type
    
- - components/LearningResourceDrawer.js
+ - components/LearningResourceDrawer
    - at some point it needs to be able to display details for objects of the new type
    
+- pages/CourseIndexPage
+  - add the type to `favoritesListSelector`
+  
+- pages/CourseSearchPage
+  - add the type to `getFavoriteObject`
+  
+ 
