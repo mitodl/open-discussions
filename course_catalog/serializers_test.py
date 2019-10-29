@@ -16,11 +16,10 @@ from course_catalog.factories import (
     LearningResourceRunFactory,
     ProgramItemCourseFactory,
 )
-from course_catalog.models import ProgramItem, FavoriteItem
+from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
     CourseSerializer,
     BootcampSerializer,
-    ProgramItemSerializer,
     FavoriteItemSerializer,
     UserListSerializer,
     ProgramSerializer,
@@ -96,16 +95,32 @@ def test_serialize_program_related_models():
     assert "content_data" in serializer.data["items"][0].keys()
 
 
-def test_generic_foreign_key_serializer():
+@pytest.mark.parametrize("factory,valid_type", [
+    ["CourseFactory", True],
+    ["ProgramFactory", True],
+    ["BootcampFactory", True],
+    ["UserListFactory", True],
+    ["CourseTopicFactory", False],
+],
+)
+def test_generic_foreign_key_serializer_classes(factory, valid_type):
     """
-    Test that generic foreign key serializer properly rejects unexpected classes
+    Test that generic foreign key serializer properly accepts expected classes and rejects others
     """
-    program = ProgramFactory.create()
-    course_topic = CourseTopicFactory.create()
-    program_item = ProgramItem(program=program, item=course_topic)
-    serializer = ProgramItemSerializer(program_item)
-    with pytest.raises(Exception):
-        assert serializer.data.get("item").get("id") == course_topic.id
+    userlist = UserListFactory.create()
+    kwargs = (
+        {"user_list": UserListFactory.create()}
+        if factory == "UserListCourseFactory"
+        else {}
+    )
+    obj = getattr(factories, factory).create(**kwargs)
+    list_item = UserListItem(user_list=userlist, item=obj)
+    serializer = UserListItemSerializer(list_item)
+    if valid_type:
+        assert serializer.data.get("content_data").get("id") == obj.id
+    else:
+        with pytest.raises(Exception):
+            assert serializer.data.get("content_data").get("id") == obj.id
 
 
 @pytest.mark.parametrize(

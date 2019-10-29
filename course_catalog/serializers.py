@@ -34,23 +34,7 @@ from open_discussions.serializers import WriteableSerializerMethodField
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     """
-    Special field to handle the generic foreign key in ListItem
-    """
-
-    def to_representation(self, instance):
-        if isinstance(instance, Bootcamp):
-            serializer = BootcampSerializer(instance)
-        elif isinstance(instance, Course):
-            serializer = CourseSerializer(instance)
-        else:
-            raise Exception("Unexpected type of tagged object")
-
-        return serializer.data
-
-
-class FavoriteItemContentSerializer(serializers.ModelSerializer):
-    """
-    Special field to handle the generic foreign key in FavoriteItem
+    Special field to handle the generic foreign key in FavoriteItem and ListItem
     """
 
     def to_representation(self, instance):
@@ -570,7 +554,7 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
     Serializer for Favorite Item
     """
 
-    content_data = FavoriteItemContentSerializer(source="item")
+    content_data = GenericForeignKeyFieldSerializer(source="item")
     content_type = serializers.CharField(source="content_type.name")
 
     class Meta:
