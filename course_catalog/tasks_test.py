@@ -4,7 +4,6 @@ Test tasks
 import json
 from os import listdir
 from os.path import isfile, join
-
 from unittest.mock import Mock
 
 import boto3
@@ -28,6 +27,7 @@ from course_catalog.tasks import (
     get_micromasters_data,
     get_xpro_data,
     get_oll_data,
+    get_youtube_data,
 )
 
 pytestmark = pytest.mark.django_db
@@ -282,3 +282,11 @@ def test_get_oll_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_oll_data.delay()
     mock_pipelines.oll_etl.assert_called_once_with()
+
+
+@pytest.mark.parametrize("channel_ids", [["abc", "123"], None])
+def test_get_youtube_data(mocker, settings, channel_ids):
+    """Verify that the get_youtube_data invokes the YouTube ETL pipeline with expected params"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_youtube_data.delay(channel_ids=channel_ids)
+    mock_pipelines.youtube_etl.assert_called_once_with(channel_ids=channel_ids)

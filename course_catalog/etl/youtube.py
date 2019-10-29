@@ -43,7 +43,6 @@ def get_videos_for_playlist(youtube_client, playlist_id, offered_by):
 
     Returns:
         A generator that yields tuples with offered_by and video data
-
     """
 
     page_token = ""
@@ -64,10 +63,10 @@ def get_videos_for_playlist(youtube_client, playlist_id, offered_by):
                 lambda video: video["contentDetails"]["videoId"],
                 playlist_items_response["items"],
             )
-            video_ids_paramenter = ", ".join(video_ids)
+            video_ids_parameter = ", ".join(video_ids)
 
             full_request = youtube_client.videos().list(
-                part="snippet,contentDetails", id=video_ids_paramenter
+                part="snippet,contentDetails", id=video_ids_parameter
             )
             full_response = full_request.execute()
 
@@ -135,14 +134,15 @@ def parse_video_captions(xml_captions):
     return "\n".join(captions_list)
 
 
-def extract():
+def extract(*, channel_ids=None):
     """
     Function which returns video data for all videos in our watched playlists
 
+    Args:
+        channel_ids (list of str or None): if a list the extraction is limited to those channels
 
     Returns:
         A generator that yields tuples with offered_by and video data
-
     """
     if not (settings.YOUTUBE_CONFIG_FILE_LOCATION and settings.YOUTUBE_DEVELOPER_KEY):
         return
@@ -153,13 +153,19 @@ def extract():
 
     channels_yml = yaml.safe_load(response.content)
 
-    if channels_yml and ("channels" in channels_yml):
-        for channel in channels_yml["channels"]:
-            if "playlists" in channel:
-                for playlist_id in channel["playlists"]:
-                    yield from get_videos_for_playlist(
-                        youtube_client, playlist_id, channel["offered_by"]
-                    )
+    if not channels_yml:
+        return
+
+    channels = channels_yml.get("channels", [])
+
+    if channel_ids:
+        channels = filter(lambda c: c.channel_id in channel_ids, channels)
+
+    for channel in channels:
+        for playlist_id in channel.get("playlists", []):
+            yield from get_videos_for_playlist(
+                youtube_client, playlist_id, channel["offered_by"]
+            )
 
 
 def transform_single_video(offered_by, raw_video_data):
@@ -167,8 +173,8 @@ def transform_single_video(offered_by, raw_video_data):
     Transforms raw video data into normalized data structure for single video
 
     Args:
-        offered_by (string)
-        raw_video_data (dict)
+        offered_by (string): the OfferedBy value for this video
+        raw_video_data (dict): the raw data from the Youtube API
 
     Returns:
         dict: normalized video data
@@ -195,7 +201,7 @@ def transform(raw_videos_data):
     Transforms raw video data into normalized data structure
 
     Args:
-        raw_videos_data (iterable of tuples) tuple has the structure (offered_by, data)
+        raw_videos_data (iterable of tuples): tuple has the structure (offered_by, data)
 
     Returns:
         generator that yields normalized video data

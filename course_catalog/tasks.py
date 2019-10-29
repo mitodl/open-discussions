@@ -102,5 +102,23 @@ def get_xpro_data():
 
 @app.task(acks_late=True)
 def get_oll_data():
-    """Execute the oLL ETL pipeline"""
+    """Execute the OLL ETL pipeline"""
     pipelines.oll_etl()
+
+
+@app.task(acks_late=True)
+def get_youtube_data(*, channel_ids=None):
+    """
+    Execute the YouTube ETL pipeline
+
+    Args:
+        channel_ids (list of str or None):
+            if a list the extraction is limited to those channels
+
+    Returns:
+        int:
+            The number of results that were fetched
+    """
+    results = pipelines.youtube_etl(channel_ids=channel_ids)
+
+    return len(list(results))

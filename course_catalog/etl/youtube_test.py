@@ -205,21 +205,55 @@ def test_parse_video_captions(mock_raw_caption_data, mock_parsed_transcript_data
 def test_extract(mocker, mock_video_data, mock_video_batch_data):
     """Test youtube video ETL extract"""
     mock_video_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
-    mock_video_client.return_value.playlistItems.return_value.list.return_value.execute.side_effect = [
-        mock_list_items_data("token"),
-        mock_list_items_data(),
-        mock_list_items_data(),
-    ]
+    mock_list_api = mock_video_client.return_value.playlistItems.return_value.list
+    # the first-level keys are the channelId param, the second level are the pageToken param
+    list_items_results = {
+        "playlist1": {
+            "": mock_list_items_data(next_token="token"),
+            "token": mock_list_items_data(),
+        },
+        "playlist2": {"": mock_list_items_data()},
+    }
 
+    def _playlist_items_list_side_effect(
+        *args, **kwargs
+    ):  # pylint: disable=unused-argument
+        """side_effect for playlistItems().list()"""
+        playlist_id = kwargs["playlistId"]
+        page_token = kwargs["pageToken"]
+
+        # we return a mocked responses with the particular mocked response the request was looking for
+        mocked_request = mocker.Mock()
+        mocked_request.execute.return_value = list_items_results[playlist_id][
+            page_token
+        ]
+        return mocked_request
+
+    mock_list_api.side_effect = _playlist_items_list_side_effect
     mock_video_client.return_value.videos.return_value.list.return_value.execute.return_value = (
         mock_video_batch_data
     )
 
-    assert list(youtube.extract()) == [
+    result = list(youtube.extract())
+
+    assert result == [
         ("MIT", mock_video_data),
         ("MIT", mock_video_data),
         ("OCW", mock_video_data),
     ]
+
+    assert mock_list_api.call_count == sum(
+        [len(list_calls) for list_calls in list_items_results.values()]
+    )
+
+    for playlist_id, list_calls in list_items_results.items():
+        for page_token in list_calls:
+            mock_list_api.assert_any_call(
+                playlistId=playlist_id,
+                maxResults=50,
+                pageToken=page_token,
+                part="contentDetails",
+            )
 
 
 @pytest.mark.usefixtures("mocked_channel_response")
@@ -250,7 +284,7 @@ def test_extract_with_unset_keys(settings):
 
 @pytest.mark.usefixtures("video_settings")
 @pytest.mark.usefixtures("mocked_channel_response")
-@pytest.mark.parametrize("yaml_parser_response", [None, []])
+@pytest.mark.parametrize("yaml_parser_response", [None, {}, {"channels": []}])
 def test_extract_with_no_channels(mocker, yaml_parser_response):
     """Test youtube video ETL extract with no channels in data"""
     mocker.patch("course_catalog.etl.youtube.get_youtube_client")

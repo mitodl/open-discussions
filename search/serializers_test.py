@@ -16,6 +16,7 @@ from course_catalog.factories import (
     VideoFactory,
 )
 from course_catalog.models import Course, Video
+from open_discussions.constants import ISOFORMAT
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
@@ -211,9 +212,6 @@ def test_serialize_bulk_comments():
     assert len(
         list(serialize_bulk_comments([comment.id for comment in comments]))
     ) == len(comments)
-
-
-ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 
 @pytest.mark.django_db
