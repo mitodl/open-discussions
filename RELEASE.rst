@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.97.0
+Version 0.97.0 (Released October 29, 2019)
 --------------
 
 - Added loader code for videos
