@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 delete_course(course)
         else:
             task = get_oll_data.delay()
-            self.stdout.write("Started task {task} to get oll course data")
+            self.stdout.write(f"Started task {task} to get oll course data")
             self.stdout.write("Waiting on task...")
             start = now_in_utc()
             task.get()

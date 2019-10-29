@@ -7,14 +7,13 @@ from django.conf import settings
 import feedparser
 from rest_framework.serializers import ValidationError
 
+from open_discussions.constants import ISOFORMAT
 from widgets.serializers.widget_instance import (
     WidgetConfigSerializer,
     WidgetInstanceSerializer,
 )
 from widgets.serializers.react_fields import ReactURLField, ReactIntegerField
 
-
-ISOFORMAT = "%Y-%m-%dT%H:%M:%SZ"
 MAX_FEED_ITEMS = 10
 
 log = logging.getLogger()

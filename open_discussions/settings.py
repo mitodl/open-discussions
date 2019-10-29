@@ -580,6 +580,12 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_oll_data",
         "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
     },
+    "update-youtube-videos": {
+        "task": "course_catalog.tasks.get_youtube_data",
+        "schedule": get_int(
+            "YOUTUBE_FETCH_SCHEDULE_SECONDS", 60 * 30
+        ),  # default is every 30 minutes
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
