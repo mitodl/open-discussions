@@ -3,7 +3,8 @@ import { assert } from "chai"
 import {
   userListRequest,
   favoriteUserListMutation,
-  createUserListMutation
+  createUserListMutation,
+  deleteUserListMutation
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
@@ -72,5 +73,22 @@ describe("UserLists API", () => {
         [userList.id]: userList
       }
     })
+  })
+
+  it("deleteUserListMutation should return what we expect", () => {
+    const query = deleteUserListMutation(userList)
+    assert.isUndefined(query.body)
+    assert.equal(query.queryKey, "deleteUserListMutation")
+    assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
+    assert.deepEqual(query.options, {
+      method: "DELETE",
+      ...DEFAULT_POST_OPTIONS
+    })
+    assert.deepEqual(
+      query.update.userLists({
+        [userList.id]: userList
+      }),
+      {}
+    )
   })
 })

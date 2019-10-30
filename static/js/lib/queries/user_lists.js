@@ -81,3 +81,15 @@ export const createUserListMutation = (params: Object) => ({
     ...DEFAULT_POST_OPTIONS
   }
 })
+
+export const deleteUserListMutation = (userList: UserList) => ({
+  queryKey: "deleteUserListMutation",
+  url:      `${userListApiURL}/${userList.id}/`,
+  update:   {
+    userLists: R.dissoc(userList.id)
+  },
+  options: {
+    method: "DELETE",
+    ...DEFAULT_POST_OPTIONS
+  }
+})

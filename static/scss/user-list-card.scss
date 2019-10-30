@@ -30,10 +30,15 @@
       display: flex;
       margin-top: auto;
       justify-content: space-between;
+      position: relative;
 
       .count {
         font-size: 14px;
         font-weight: 500;
+      }
+
+      i {
+        font-size: 20px;
       }
     }
   }
