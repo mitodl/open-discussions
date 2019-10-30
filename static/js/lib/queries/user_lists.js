@@ -93,3 +93,19 @@ export const deleteUserListMutation = (userList: UserList) => ({
     ...DEFAULT_POST_OPTIONS
   }
 })
+
+export const userListItemsMutation = (userList: UserList) => ({
+  queryKey:  "userListItemsMutation",
+  body:      userList,
+  url:       `${userListApiURL}/${userList.id}/`,
+  transform: (userList: any) => ({
+    userLists: { [userList.id]: userList }
+  }),
+  update: {
+    userLists: R.merge
+  },
+  options: {
+    method: "PATCH",
+    ...DEFAULT_POST_OPTIONS
+  }
+})

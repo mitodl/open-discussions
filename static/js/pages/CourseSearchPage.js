@@ -72,6 +72,7 @@ import type {
   CurrentFacet,
   LearningResourceResult
 } from "../flow/searchTypes"
+import ListItemDialog from "../components/AddToListDialog"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,
@@ -504,6 +505,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
           </Cell>
         </Grid>
         <LearningResourceDrawer />
+        <ListItemDialog />
       </BannerPageWrapper>
     )
   }
