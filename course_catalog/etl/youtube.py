@@ -5,6 +5,8 @@ from googleapiclient.discovery import build
 import googleapiclient.errors
 import yaml
 import requests
+from course_catalog.etl.utils import log_exceptions
+from course_catalog.constants import PlatformType
 
 
 YOUTUBE_API_SERVICE_NAME = "youtube"
@@ -101,3 +103,43 @@ def extract():
             yield from get_videos_for_channel(
                 youtube_client, channel["channel_id"], channel["offered_by"]
             )
+
+
+def transform_single_video(offered_by, raw_video_data):
+    """
+    Transforms raw video data into normalized data structure for single video
+
+    Args:
+        offered_by (string)
+        raw_video_data (dict)
+
+    Returns:
+        dict: normalized video data
+    """
+    return {
+        "video_id": raw_video_data["id"],
+        "platform": PlatformType.youtube.value,
+        "full_description": raw_video_data["snippet"]["description"],
+        "image_src": raw_video_data["snippet"]["thumbnails"]["high"]["url"],
+        "last_modified": raw_video_data["snippet"]["publishedAt"],
+        "published": True,
+        "url": "https://www.youtube.com/watch?v=%s" % raw_video_data["id"],
+        "offered_by": [{"name": offered_by}],
+        "title": raw_video_data["snippet"]["localized"]["title"],
+        "raw_data": raw_video_data,
+    }
+
+
+@log_exceptions("Error transforming youtube data", exc_return_value=[])
+def transform(raw_videos_data):
+    """
+    Transforms raw video data into normalized data structure
+
+    Args:
+        raw_videos_data (iterable of tuples) tuple has the structure (offered_by, data)
+
+    Returns:
+        generator that yields normalized video data
+    """
+    for offered_by, raw_video_data in raw_videos_data:
+        yield transform_single_video(offered_by, raw_video_data)
