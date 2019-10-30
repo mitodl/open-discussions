@@ -10,6 +10,7 @@ import ResponsiveWrapper from "./ResponsiveWrapper"
 
 import { TABLET, DESKTOP } from "../lib/constants"
 import { COURSE_URL, userListIndexURL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 
 import type { Profile } from "../flow/discussionTypes"
 
@@ -61,10 +62,14 @@ export default class CourseToolbar extends React.Component<Props> {
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
               <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
-                <Link className="user-list-link" to={userListIndexURL}>
-                  <i className="material-icons">bookmark</i>
-                  My Lists
-                </Link>
+                {userIsAnonymous() ? (
+                  <div />
+                ) : (
+                  <Link className="user-list-link" to={userListIndexURL}>
+                    <i className="material-icons">bookmark</i>
+                    My Lists
+                  </Link>
+                )}
               </ResponsiveWrapper>
               <UserMenu
                 toggleShowUserMenu={toggleShowUserMenu}
