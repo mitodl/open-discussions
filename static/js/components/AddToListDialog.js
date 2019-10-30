@@ -8,11 +8,10 @@ import { withRouter } from "react-router"
 import R from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
 
-import Card from "./Card"
 import Dialog from "./Dialog"
 
 import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
-import { capitalize, emptyOrNil } from "../lib/util"
+import { capitalize, emptyOrNil, privacyIcon } from "../lib/util"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
@@ -86,23 +85,31 @@ export function AddToListDialog(props: Props) {
       open={!emptyOrNil(resource)}
       hideDialog={hideDialog}
       title="Add to List"
-      onAccept={hideDialog}
-      submitText="Close"
-      hideCancel={true}
+      onAccept={() => {}}
+      submitText="New List"
+      cancelText="Exit"
+      className="user-listitem-dialog"
     >
-      <Card className="column3">
-        <div>
-          <div className="flex-row" key="99">
+      <form className="user-listitem-form">
+        <div className="flex-row">
+          <div>
             <Checkbox
               checked={resource.is_favorite}
               onChange={() => toggleFavorite(resource)}
             >
               Favorites
             </Checkbox>
-            <div className="privacy-level">Private</div>
           </div>
-          {userLists.map((list, i) => (
-            <div className="flex-row" key={i}>
+          <div>
+            <div className="grey-surround privacy">
+              <i className="material-icons lock">lock</i>
+              Private
+            </div>
+          </div>
+        </div>
+        {userLists.map((list, i) => (
+          <div className="flex-row" key={i}>
+            <div>
               <Checkbox
                 checked={inLists.includes(list.id)}
                 onChange={() =>
@@ -111,13 +118,22 @@ export function AddToListDialog(props: Props) {
               >
                 {`${list.title}`}
               </Checkbox>
-              <div className="privacy-level">
+            </div>
+            <div>
+              <div className="grey-surround privacy">
+                <i
+                  className={`material-icons ${privacyIcon(
+                    list.privacy_level
+                  )}`}
+                >
+                  {privacyIcon(list.privacy_level)}
+                </i>
                 {capitalize(list.privacy_level)}
               </div>
             </div>
-          ))}
-        </div>
-      </Card>
+          </div>
+        ))}
+      </form>
     </Dialog>
   ) : null
 }

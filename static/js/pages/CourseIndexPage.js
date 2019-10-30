@@ -7,6 +7,7 @@ import { createSelector } from "reselect"
 
 import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseCarousel from "../components/CourseCarousel"
+
 import {
   BannerPageWrapper,
   BannerPageHeader,
@@ -16,6 +17,7 @@ import {
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"
+import AddToListDialog from "../components/AddToListDialog"
 import ResponsiveWrapper from "../components/ResponsiveWrapper"
 
 import { setShowResourceDrawer } from "../actions/ui"
@@ -144,6 +146,7 @@ export default function CourseIndexPage({ history }: Props) {
         )}
       </Grid>
       <LearningResourceDrawer />
+      <AddToListDialog />
     </BannerPageWrapper>
   )
 }

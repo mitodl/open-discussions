@@ -28,6 +28,7 @@ import {
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
 import { DIALOG_ADD_TO_LIST } from "../actions/ui"
@@ -182,7 +183,9 @@ export const LearningResourceCard = ({
 
 const mapDispatchToProps = dispatch => ({
   showListDialog: payload => {
-    dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
+    if (!userIsAnonymous()) {
+      dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
+    }
   }
 })
 

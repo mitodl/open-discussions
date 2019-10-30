@@ -72,6 +72,7 @@
 @import "user-list-card";
 @import "create-user-list-dialog";
 @import "user-list-page";
+@import "user-listitem-dialog";
 
 body {
   font-family: $body-font;
@@ -169,5 +170,6 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
   }
 }
