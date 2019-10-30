@@ -16,7 +16,8 @@ import {
   favoritesURL,
   featuredCoursesURL,
   upcomingCoursesURL,
-  newCoursesURL
+  newCoursesURL,
+  userListApiURL
 } from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 import {
@@ -32,7 +33,8 @@ describe("CourseIndexPage", () => {
     render,
     helper,
     courseLists,
-    favorites
+    favorites,
+    myLists
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -42,6 +44,7 @@ describe("CourseIndexPage", () => {
     })
 
     favorites = makeFavoritesResponse()
+    myLists = []
     upcomingCourses = R.times(makeCourse, 10).map(course => {
       course.is_favorite = false
       return course
@@ -73,6 +76,9 @@ describe("CourseIndexPage", () => {
     helper.handleRequestStub
       .withArgs(newCoursesURL)
       .returns(queryListResponse(newCourses))
+    helper.handleRequestStub
+      .withArgs(userListApiURL)
+      .returns(queryListResponse(myLists))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
   })
 

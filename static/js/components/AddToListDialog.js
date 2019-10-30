@@ -11,7 +11,7 @@ import { Checkbox } from "@rmwc/checkbox"
 import Dialog from "./Dialog"
 
 import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
-import { capitalize, emptyOrNil, privacyIcon } from "../lib/util"
+import {capitalize, emptyOrNil, privacyIcon} from "../lib/util"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
@@ -67,7 +67,6 @@ const userListsFormSelector = createSelector(
 
 export function AddToListDialog(props: Props) {
   const { resource, toggleFavorite, toggleListItem, hideDialog } = props
-
   const userLists = useSelector(userListsFormSelector)
   const [{ isFinished }] = useRequest(userListsRequest())
 
@@ -85,12 +84,12 @@ export function AddToListDialog(props: Props) {
       open={!emptyOrNil(resource)}
       hideDialog={hideDialog}
       title="Add to List"
-      onAccept={() => {}}
-      submitText="New List"
-      cancelText="Exit"
+      onAccept={hideDialog}
+      hideCancel={true}
+      submitText="OK"
       className="user-listitem-dialog"
     >
-      <form className="user-listitem-form">
+      <div className="user-listitem-form">
         <div className="flex-row">
           <div>
             <Checkbox
@@ -133,7 +132,7 @@ export function AddToListDialog(props: Props) {
             </div>
           </div>
         ))}
-      </form>
+      </div>
     </Dialog>
   ) : null
 }
