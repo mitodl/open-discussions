@@ -40,7 +40,7 @@ def mock_video_search_data(token=""):
 @pytest.fixture
 def mock_video_data():
     """Mock data for a single video"""
-    data = {
+    return {
         "contentDetails": {
             "caption": "true",
             "definition": "hd",
@@ -64,11 +64,26 @@ def mock_video_data():
                 "title": "Faraday Cage",
             },
             "publishedAt": "2018-10-09T18:18:09.000Z",
-            "thumbnails": {},
+            "thumbnails": {"high": {"url": "thumbnailurl.com"}},
         },
     }
 
-    return data
+
+def mock_normalized_video_data(offered_by, video_data):
+    """Mock normalized data for a single video"""
+
+    return {
+        "video_id": video_data["id"],
+        "platform": "youtube",
+        "full_description": video_data["snippet"]["description"],
+        "image_src": video_data["snippet"]["thumbnails"]["high"]["url"],
+        "last_modified": video_data["snippet"]["publishedAt"],
+        "published": True,
+        "url": "https://www.youtube.com/watch?v=%s" % video_data["id"],
+        "offered_by": [{"name": offered_by}],
+        "title": video_data["snippet"]["localized"]["title"],
+        "raw_data": video_data,
+    }
 
 
 @pytest.fixture(autouse=True)
@@ -174,3 +189,26 @@ def test_extract_with_no_channels(mocker, yaml_parser_response):
     mocker.patch("yaml.safe_load", return_value=yaml_parser_response)
 
     assert list(youtube.extract()) == []
+
+
+def test_transform_single_video(mock_video_data):
+    """test youtube transform for singe video"""
+    assert youtube.transform_single_video(
+        "OCW", mock_video_data
+    ) == mock_normalized_video_data("OCW", mock_video_data)
+
+
+def test_transform(mock_video_data):
+    """test youtube transform"""
+
+    raw_data = [
+        ("MIT", mock_video_data),
+        ("MIT", mock_video_data),
+        ("OCW", mock_video_data),
+    ]
+
+    assert list(youtube.transform(raw_data)) == [
+        mock_normalized_video_data("MIT", mock_video_data),
+        mock_normalized_video_data("MIT", mock_video_data),
+        mock_normalized_video_data("OCW", mock_video_data),
+    ]
