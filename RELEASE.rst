@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.97.1
+--------------
+
+- add ability to create new UserLists
+- Extract function for course catalog youtube video etl
+- Added video favoriting functionality
+
 Version 0.97.0 (Released October 29, 2019)
 --------------
 
