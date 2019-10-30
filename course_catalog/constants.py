@@ -67,8 +67,8 @@ class ListType(Enum):
     to the user as "Your Lists"
     """
 
-    LEARNING_PATH = "learning_path"
-    LIST = "user_list"
+    LEARNING_PATH = "learningpath"
+    LIST = "userlist"
 
 
 class PrivacyLevel(Enum):

@@ -457,7 +457,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     def to_representation(self, instance):
         """Serializes the instance"""
         ret = super().to_representation(instance)
-        ret["object_type"] = LIST_TYPE_MAPPINGS.get(instance.list_type, USER_LIST_TYPE)
+        ret["object_type"] = instance.list_type
         return ret
 
     class Meta:
