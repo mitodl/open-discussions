@@ -17,7 +17,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST, LR_TYPE_VIDEO
+  LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 import { filterItems } from "../lib/learning_resources"
 import { courseRequest, favoriteCourseMutation } from "../lib/queries/courses"
@@ -36,11 +37,10 @@ import {
   userListsRequest,
   userListsSelector
 } from "../lib/queries/user_lists"
-import {favoriteVideoMutation, videoRequest} from "../lib/queries/videos"
+import { favoriteVideoMutation, videoRequest } from "../lib/queries/videos"
 
 import type { Dispatch } from "redux"
 import type { LearningResource, UserList } from "../flow/discussionTypes"
-
 
 type StateProps = {|
   objectId: ?number,
