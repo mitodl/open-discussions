@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.97.1
+Version 0.97.1 (Released October 31, 2019)
 --------------
 
 - add ability to create new UserLists
