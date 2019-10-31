@@ -4,12 +4,16 @@ import { times } from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeCourse, makeUserList } from "../factories/learning_resources"
+import {
+  makeCourse,
+  makeLearningResource,
+  makeUserList
+} from "../factories/learning_resources"
 import { courseURL, userListApiURL } from "../lib/url"
 import { AddToListDialog } from "./AddToListDialog"
 import { queryListResponse } from "../lib/test_utils"
 import sinon from "sinon"
-import { LR_TYPE_COURSE } from "../lib/constants"
+import { LR_TYPE_ALL, LR_TYPE_COURSE } from "../lib/constants"
 
 describe("AddToListDialog", () => {
   let render,
@@ -63,14 +67,19 @@ describe("AddToListDialog", () => {
     assert.equal(userListCheck.find("label").text(), userLists[0].title)
   })
 
-  it("should call toggleFavorite when Favorite checkbox checked", async () => {
-    const { wrapper } = await render()
-    const event = { target: { checked: true, name: "foo", value: "bar" } }
-    wrapper
-      .find("input")
-      .at(0)
-      .prop("onChange")(event)
-    sinon.assert.calledWith(toggleFavoriteStub, course)
+  LR_TYPE_ALL.forEach(objectType => {
+    it(`should call toggleFavorite when Favorite checkbox checked for ${objectType}`, async () => {
+      const object = makeLearningResource(objectType)
+      const { wrapper } = await render({
+        resource: object
+      })
+      const event = { target: { checked: true, name: "foo", value: "bar" } }
+      wrapper
+        .find("input")
+        .at(0)
+        .prop("onChange")(event)
+      sinon.assert.calledWith(toggleFavoriteStub, object)
+    })
   })
 
   //
