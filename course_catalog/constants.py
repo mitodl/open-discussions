@@ -3,8 +3,6 @@ course_catalog constants
 """
 from enum import Enum
 
-from search.constants import LEARNING_PATH_TYPE, USER_LIST_TYPE
-
 
 class OfferedBy(Enum):
     """
