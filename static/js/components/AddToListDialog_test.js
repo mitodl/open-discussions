@@ -1,18 +1,18 @@
 // @flow
+import sinon from "sinon"
 import { assert } from "chai"
 import { times } from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { AddToListDialog } from "./AddToListDialog"
 import {
   makeCourse,
   makeLearningResource,
   makeUserList
 } from "../factories/learning_resources"
 import { courseURL, userListApiURL } from "../lib/url"
-import { AddToListDialog } from "./AddToListDialog"
-import { queryListResponse } from "../lib/test_utils"
-import sinon from "sinon"
+import { queryListResponse, shouldIf } from "../lib/test_utils"
 import { LR_TYPE_ALL, LR_TYPE_COURSE } from "../lib/constants"
 
 describe("AddToListDialog", () => {
@@ -25,7 +25,7 @@ describe("AddToListDialog", () => {
     toggleListItemStub
 
   beforeEach(() => {
-    userLists = times(makeUserList, 1)
+    userLists = times(makeUserList, 5)
     course = makeCourse()
     helper = new IntegrationTestHelper()
     hideStub = helper.sandbox.stub()
@@ -62,6 +62,23 @@ describe("AddToListDialog", () => {
 
     const userListCheck = checkboxes.at(1)
     assert.equal(userListCheck.find("label").text(), userLists[0].title)
+  })
+
+  //
+  ;[true, false].forEach(inList => {
+    it(`${shouldIf(inList)} precheck a userlist if the resource is ${
+      inList ? "" : "not"
+    } in it`, async () => {
+      course.id = inList ? userLists[0].items[0].object_id : course.id
+      const { wrapper } = await render()
+      assert.equal(
+        wrapper
+          .find(Checkbox)
+          .at(1)
+          .prop("checked"),
+        inList
+      )
+    })
   })
 
   LR_TYPE_ALL.forEach(objectType => {
