@@ -95,11 +95,6 @@ NON_COURSE_DIRECTORIES = [
     "QA",
 ]
 
-LIST_TYPE_MAPPINGS = {
-    ListType.LEARNING_PATH.value: LEARNING_PATH_TYPE,
-    ListType.LIST.value: USER_LIST_TYPE,
-}
-
 OFFERED_BY_MAPPINGS = {
     OfferedBy.micromasters.value: PlatformType.mitx.value,
     OfferedBy.mitx.value: PlatformType.mitx.value,

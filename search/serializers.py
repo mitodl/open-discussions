@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import LIST_TYPE_MAPPINGS
 from course_catalog.models import (
     Course,
     LearningResourceRun,
