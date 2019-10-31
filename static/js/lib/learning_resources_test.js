@@ -33,9 +33,15 @@ import {
   runEndDate,
   getStartDate,
   getInstructorName,
-  getPreferredOfferedBy
+  getPreferredOfferedBy,
+  privacyIcon,
+  filterItems
 } from "./learning_resources"
-import { makeCourse, makeRun } from "../factories/learning_resources"
+import {
+  makeCourse,
+  makeRun,
+  makeUserList
+} from "../factories/learning_resources"
 import moment from "moment"
 
 describe("Course utils", () => {
@@ -409,5 +415,16 @@ describe("Course run availability utils", () => {
     it(`getPreferredOfferedBy should return ${expected} when given ${input.toString()}`, () => {
       assert.equal(getPreferredOfferedBy(input), expected)
     })
+  })
+
+  //
+  ;[["public", "lock_open"], ["private", "lock"]].forEach(([privacy, icon]) => {
+    assert.equal(privacyIcon(privacy), icon)
+  })
+
+  it("filterItems returns a list of userlists to those including a resource item", () => {
+    const userLists = times(makeUserList, 5)
+    const resource = userLists[3].items[1]
+    assert.deepEqual(filterItems(userLists, "items", resource), [userLists[3]])
   })
 })

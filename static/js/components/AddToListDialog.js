@@ -11,15 +11,16 @@ import { Checkbox } from "@rmwc/checkbox"
 import Dialog from "./Dialog"
 
 import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
-import { capitalize, emptyOrNil, privacyIcon } from "../lib/util"
+import { capitalize, emptyOrNil } from "../lib/util"
 import {
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE, LR_TYPE_LEARNINGPATH,
+  LR_TYPE_COURSE,
+  LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
 } from "../lib/constants"
-import { filterItems } from "../lib/learning_resources"
+import { filterItems, privacyIcon } from "../lib/learning_resources"
 import { courseRequest, favoriteCourseMutation } from "../lib/queries/courses"
 import {
   bootcampRequest,
@@ -73,7 +74,7 @@ export function AddToListDialog(props: Props) {
       ? filterItems(userLists, "items", {
         content_type: resource.object_type,
         object_id:    resource.id
-      }).map(item => item.id)
+      }).map(userList => userList.id)
       : []
 
   return isFinished && resource ? (
@@ -104,28 +105,28 @@ export function AddToListDialog(props: Props) {
             </div>
           </div>
         </div>
-        {userLists.map((list, i) => (
+        {userLists.map((userList, i) => (
           <div className="flex-row" key={i}>
             <div>
               <Checkbox
-                checked={inLists.includes(list.id)}
+                checked={inLists.includes(userList.id)}
                 onChange={(e: any) => {
-                  toggleListItem(resource, list, !e.target.checked)
+                  toggleListItem(resource, userList, !e.target.checked)
                 }}
               >
-                {`${list.title}`}
+                {`${userList.title}`}
               </Checkbox>
             </div>
             <div>
               <div className="grey-surround privacy">
                 <i
                   className={`material-icons ${privacyIcon(
-                    list.privacy_level
+                    userList.privacy_level
                   )}`}
                 >
-                  {privacyIcon(list.privacy_level)}
+                  {privacyIcon(userList.privacy_level)}
                 </i>
-                {capitalize(list.privacy_level)}
+                {capitalize(userList.privacy_level)}
               </div>
             </div>
           </div>
@@ -195,7 +196,9 @@ const mapDispatchToProps = dispatch => ({
     if (resource.object_type === LR_TYPE_PROGRAM) {
       dispatch(mutateAsync(favoriteProgramMutation(resource)))
     }
-    if ([LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(resource.object_type)) {
+    if (
+      [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(resource.object_type)
+    ) {
       dispatch(mutateAsync(favoriteUserListMutation(resource)))
     }
     if (resource.object_type === LR_TYPE_VIDEO) {

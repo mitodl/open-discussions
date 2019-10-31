@@ -21,24 +21,21 @@ describe("AddToListDialog", () => {
     helper,
     course,
     hideStub,
-    dispatchStub,
     toggleFavoriteStub,
     toggleListItemStub
 
   beforeEach(() => {
-    userLists = times(makeUserList, 5)
+    userLists = times(makeUserList, 1)
     course = makeCourse()
     helper = new IntegrationTestHelper()
     hideStub = helper.sandbox.stub()
     toggleFavoriteStub = helper.sandbox.stub()
     toggleListItemStub = helper.sandbox.stub()
-    dispatchStub = helper.sandbox.stub()
     render = helper.configureReduxQueryRenderer(AddToListDialog, {
       hide:           hideStub,
       toggleFavorite: toggleFavoriteStub,
       toggleListItem: toggleListItemStub,
-      resource:       course,
-      dispatch:       dispatchStub
+      resource:       course
     })
     helper.handleRequestStub
       .withArgs(userListApiURL)

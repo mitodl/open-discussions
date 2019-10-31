@@ -225,3 +225,6 @@ export const filterItems = (
       R.prop(property)
     )
   )(results)
+
+export const privacyIcon = (privacyLevel: string) =>
+  privacyLevel === "public" ? "lock_open" : "lock"
