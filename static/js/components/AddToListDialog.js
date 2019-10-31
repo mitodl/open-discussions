@@ -14,7 +14,7 @@ import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
 import { capitalize, emptyOrNil, privacyIcon } from "../lib/util"
 import {
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE,
+  LR_TYPE_COURSE, LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
@@ -195,13 +195,12 @@ const mapDispatchToProps = dispatch => ({
     if (resource.object_type === LR_TYPE_PROGRAM) {
       dispatch(mutateAsync(favoriteProgramMutation(resource)))
     }
-    if (resource.object_type === LR_TYPE_USERLIST) {
+    if ([LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(resource.object_type)) {
       dispatch(mutateAsync(favoriteUserListMutation(resource)))
     }
     if (resource.object_type === LR_TYPE_VIDEO) {
       dispatch(mutateAsync(favoriteVideoMutation(resource)))
     }
-    //
   },
   toggleListItem: (
     resource: LearningResource,
