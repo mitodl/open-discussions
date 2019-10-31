@@ -33,7 +33,8 @@ describe("AddToListDialog", () => {
       hide:           hideStub,
       toggleFavorite: toggleFavoriteStub,
       toggleListItem: toggleListItemStub,
-      resource:       course
+      resource:       course,
+      dispatch:       dispatchStub
     })
     helper.handleRequestStub
       .withArgs(userListApiURL)
