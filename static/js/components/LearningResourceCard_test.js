@@ -174,7 +174,7 @@ describe("LearningResourceCard", () => {
   })
 
   LR_TYPE_ALL.forEach(objectType => {
-    it(`should call the toggleFavorite with a ${objectType}`, () => {
+    it(`should call showListDialog with a ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       const wrapper = render({ object })
       wrapper.find(".favorite img").simulate("click")

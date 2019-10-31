@@ -168,7 +168,12 @@ export const LearningResourceCard = ({
                   // $FlowFixMe
                   object.is_favorite ? starSelectedURL : starUnselectedURL
                 }
-                onClick={() => showListDialog(object)}
+                onClick={e => {
+                  e.preventDefault()
+                  if (!userIsAnonymous()) {
+                    showListDialog(object)
+                  }
+                }}
               />
             </div>
           </LoginTooltip>
@@ -183,9 +188,7 @@ export const LearningResourceCard = ({
 
 const mapDispatchToProps = dispatch => ({
   showListDialog: payload => {
-    if (!userIsAnonymous()) {
-      dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
-    }
+    dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
   }
 })
 
