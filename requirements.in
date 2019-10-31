@@ -38,6 +38,7 @@ ocw-data-parser==0.2.7
 Pillow==6.2.0
 psycopg2==2.8.3
 praw==4.5.1
+pyyaml==5.1.2
 python-dateutil
 python3-saml==1.4.1
 raven==6.9.0
