@@ -42,8 +42,6 @@ import type { Dispatch } from "redux"
 import type { LearningResource, UserList } from "../flow/discussionTypes"
 
 type StateProps = {|
-  objectId: ?number,
-  objectType: ?string,
   resource: ?LearningResource
 |}
 
@@ -62,7 +60,7 @@ type Props = {|
 const userListsFormSelector = createSelector(
   userListsSelector,
   userLists =>
-    userLists ? Object.keys(userLists).map(key => userLists[key]) : null
+    userLists ? Object.keys(userLists).map(key => userLists[key]) : []
 )
 
 export function AddToListDialog(props: Props) {
@@ -111,9 +109,9 @@ export function AddToListDialog(props: Props) {
             <div>
               <Checkbox
                 checked={inLists.includes(list.id)}
-                onChange={() =>
-                  toggleListItem(resource, list, inLists.includes(list.id))
-                }
+                onChange={(e: any) => {
+                  toggleListItem(resource, list, !e.target.checked)
+                }}
               >
                 {`${list.title}`}
               </Checkbox>
