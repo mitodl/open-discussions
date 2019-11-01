@@ -96,32 +96,37 @@ export function AddToListDialog(props: Props) {
           </div>
         </div>
       </div>
-      {userLists.map((userList, i) => (
-        <div className="flex-row" key={i}>
-          <div>
-            <Checkbox
-              checked={inLists.includes(userList.id)}
-              onChange={(e: any) => {
-                toggleListItem(resource, userList, !e.target.checked)
-              }}
-            >
-              {`${userList.title}`}
-            </Checkbox>
-          </div>
-          <div>
-            <div className="grey-surround privacy">
-              <i
-                className={`material-icons ${privacyIcon(
-                  userList.privacy_level
-                )}`}
-              >
-                {privacyIcon(userList.privacy_level)}
-              </i>
-              {capitalize(userList.privacy_level)}
-            </div>
-          </div>
-        </div>
-      ))}
+      {userLists.map(
+        (userList, i) =>
+          ![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
+            resource.object_type
+          ) || resource.id !== userList.id ? (
+              <div className="flex-row" key={i}>
+                <div>
+                  <Checkbox
+                    checked={inLists.includes(userList.id)}
+                    onChange={(e: any) => {
+                      toggleListItem(resource, userList, !e.target.checked)
+                    }}
+                  >
+                    {`${userList.title}`}
+                  </Checkbox>
+                </div>
+                <div>
+                  <div className="grey-surround privacy">
+                    <i
+                      className={`material-icons ${privacyIcon(
+                        userList.privacy_level
+                      )}`}
+                    >
+                      {privacyIcon(userList.privacy_level)}
+                    </i>
+                    {capitalize(userList.privacy_level)}
+                  </div>
+                </div>
+              </div>
+            ) : null
+      )}
     </div>
   )
   return resource && isFinished ? (

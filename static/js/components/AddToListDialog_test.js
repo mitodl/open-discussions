@@ -64,6 +64,20 @@ describe("AddToListDialog", () => {
     assert.equal(userListCheck.find("label").text(), userLists[0].title)
   })
 
+  it("if resource is a list, dont let user add that list to itself", async () => {
+    const resource = userLists[0]
+    const { wrapper } = await render({
+      resource
+    })
+    const checkboxes = wrapper.find(Checkbox)
+
+    // Should be 1 checkbox for each list, plus 1 for favorites, -1 for excluded list
+    assert.equal(checkboxes.length, userLists.length)
+
+    const userListCheck = checkboxes.at(1)
+    assert.equal(userListCheck.find("label").text(), userLists[1].title)
+  })
+
   //
   ;[true, false].forEach(inList => {
     it(`${shouldIf(inList)} precheck a userlist if the resource is ${
