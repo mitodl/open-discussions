@@ -16,7 +16,7 @@ class HasUserListPermissions(BasePermission):
         return not request.user.is_anonymous
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
+        if request.method in SAFE_METHODS or view.action in ("favorite", "unfavorite"):
             return (
                 obj.privacy_level == PrivacyLevel.public.value
                 or request.user == obj.author

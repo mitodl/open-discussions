@@ -40,6 +40,7 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH,
   LR_TYPE_VIDEO
 } from "../lib/constants"
 import {
@@ -330,6 +331,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
       return userLists[result.id]
     case LR_TYPE_VIDEO:
       return videos[result.id]
+    case LR_TYPE_LEARNINGPATH:
+      return userLists[result.id]
     }
   }
 

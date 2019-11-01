@@ -337,12 +337,18 @@ def test_user_list_endpoint_delete(client, user, is_author):
         (ProgramFactory, "programs-detail"),
         (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
+        (UserListFactory, "userlists-detail"),
     ],
 )
 def test_favorites(user_client, factory, route_name):
     """Test favoriting and unfavoriting"""
     # Test item is not favorited by default
-    item = factory.create()
+    kwargs = (
+        {"privacy_level": PrivacyLevel.public.value}
+        if route_name == "userlists-detail"
+        else {}
+    )
+    item = factory.create(**kwargs)
     path = reverse(route_name, args=[item.id])
     resp = user_client.get(path)
     assert resp.data.get("is_favorite") is False
@@ -379,17 +385,41 @@ def test_favorites(user_client, factory, route_name):
         (ProgramFactory, "programs-detail"),
         (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
+        (UserListFactory, "userlists-detail"),
     ],
 )
 def test_unautharized_favorites(client, factory, route_name):
     """Test favoriting and unfavoriting when not logged in"""
-    item = factory.create()
+    kwargs = (
+        {"privacy_level": PrivacyLevel.public.value}
+        if route_name == "userlists-detail"
+        else {}
+    )
+    item = factory.create(**kwargs)
     path = reverse(route_name, args=[item.id])
     resp = client.post(f"{path}favorite/")
     assert resp.status_code == 403
 
     resp = client.post(f"{path}unfavorite/")
     assert resp.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "privacy_level", [PrivacyLevel.public.value, PrivacyLevel.private.value]
+)
+def test_favorite_lists_other_user(user_client, privacy_level):
+    """Test favoriting and unfavoriting someone else's list"""
+    is_public = privacy_level == PrivacyLevel.public.value
+    userlist = UserListFactory.create(privacy_level=privacy_level)
+    resp = user_client.post(
+        reverse("userlists-detail", args=[userlist.id]) + "favorite/"
+    )
+    assert resp.status_code == 200 if is_public else 403
+
+    resp = user_client.post(
+        reverse("userlists-detail", args=[userlist.id]) + "unfavorite/"
+    )
+    assert resp.status_code == 200 if is_public else 403
 
 
 def test_course_report(client):
