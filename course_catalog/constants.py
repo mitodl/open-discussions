@@ -3,8 +3,6 @@ course_catalog constants
 """
 from enum import Enum
 
-from search.constants import LEARNING_PATH_TYPE, USER_LIST_TYPE
-
 
 class OfferedBy(Enum):
     """
@@ -67,8 +65,8 @@ class ListType(Enum):
     to the user as "Your Lists"
     """
 
-    LEARNING_PATH = "learning_path"
-    LIST = "user_list"
+    LEARNING_PATH = "learningpath"
+    LIST = "userlist"
 
 
 class PrivacyLevel(Enum):
@@ -94,11 +92,6 @@ NON_COURSE_DIRECTORIES = [
     "PROD/physics",
     "QA",
 ]
-
-LIST_TYPE_MAPPINGS = {
-    ListType.LEARNING_PATH.value: LEARNING_PATH_TYPE,
-    ListType.LIST.value: USER_LIST_TYPE,
-}
 
 OFFERED_BY_MAPPINGS = {
     OfferedBy.micromasters.value: PlatformType.mitx.value,

@@ -6,12 +6,7 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
-from course_catalog.constants import (
-    OfferedBy,
-    ListType,
-    PrivacyLevel,
-    LIST_TYPE_MAPPINGS,
-)
+from course_catalog.constants import OfferedBy, ListType, PrivacyLevel
 from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
@@ -358,7 +353,7 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
         serialized,
         {
             "author": user.id,
-            "object_type": LIST_TYPE_MAPPINGS[list_type],
+            "object_type": list_type,
             "list_type": list_type,
             "privacy_level": privacy_level,
             "id": user_list.id,

@@ -7,7 +7,6 @@ from rest_framework import serializers
 
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import LIST_TYPE_MAPPINGS
 from course_catalog.models import (
     Course,
     LearningResourceRun,
@@ -35,7 +34,6 @@ from search.constants import (
     COURSE_TYPE,
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
-    USER_LIST_TYPE,
     VIDEO_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
@@ -457,7 +455,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     def to_representation(self, instance):
         """Serializes the instance"""
         ret = super().to_representation(instance)
-        ret["object_type"] = LIST_TYPE_MAPPINGS.get(instance.list_type, USER_LIST_TYPE)
+        ret["object_type"] = instance.list_type
         return ret
 
     class Meta:

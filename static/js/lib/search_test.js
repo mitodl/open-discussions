@@ -678,7 +678,7 @@ describe("search functions", () => {
         ]
       ],
       ["program", ["title.english", "short_description.english", "topics"]],
-      ["user_list", ["title.english", "short_description.english", "topics"]],
+      ["userlist", ["title.english", "short_description.english", "topics"]],
       [
         "video",
         [

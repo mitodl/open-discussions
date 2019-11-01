@@ -34,23 +34,7 @@ from open_discussions.serializers import WriteableSerializerMethodField
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     """
-    Special field to handle the generic foreign key in ListItem
-    """
-
-    def to_representation(self, instance):
-        if isinstance(instance, Bootcamp):
-            serializer = BootcampSerializer(instance)
-        elif isinstance(instance, Course):
-            serializer = CourseSerializer(instance)
-        else:
-            raise Exception("Unexpected type of tagged object")
-
-        return serializer.data
-
-
-class FavoriteItemContentSerializer(serializers.ModelSerializer):
-    """
-    Special field to handle the generic foreign key in FavoriteItem
+    Special field to handle the generic foreign key in FavoriteItem and ListItem
     """
 
     def to_representation(self, instance):
@@ -374,8 +358,8 @@ class UserListItemSerializer(serializers.ModelSerializer):
                 "course",
                 "bootcamp",
                 "program",
-                "user_list",
-                "video resource",
+                "userlist",
+                "video",
             ]:
                 raise ValidationError("Incorrect object type {}".format(content_type))
             if (
@@ -394,12 +378,12 @@ class UserListItemSerializer(serializers.ModelSerializer):
             ):
                 raise ValidationError("Program does not exist")
             if (
-                content_type == "user_list"
+                content_type == "userlist"
                 and not UserList.objects.filter(id=object_id).exists()
             ):
                 raise ValidationError("UserList does not exist")
             if (
-                content_type == "video_resource"
+                content_type == "video"
                 and not Video.objects.filter(id=object_id).exists()
             ):
                 raise ValidationError("Video does not exist")
@@ -440,7 +424,7 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
 
     items = WriteableSerializerMethodField()
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
-    object_type = serializers.CharField(read_only=True, default="user_list")
+    object_type = serializers.CharField(read_only=True, default="userlist")
     modified_items = serializers.JSONField(
         write_only=True, allow_null=True, required=False
     )
@@ -570,7 +554,7 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
     Serializer for Favorite Item
     """
 
-    content_data = FavoriteItemContentSerializer(source="item")
+    content_data = GenericForeignKeyFieldSerializer(source="item")
     content_type = serializers.CharField(source="content_type.name")
 
     class Meta:
