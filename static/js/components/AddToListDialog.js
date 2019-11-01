@@ -82,8 +82,7 @@ export function AddToListDialog(props: Props) {
       <div className="flex-row">
         <div>
           <Checkbox
-            // $FlowFixMe: this should only be called when resource isn't null
-            checked={resource.is_favorite}
+            checked={resource ? resource.is_favorite : false}
             onChange={() => toggleFavorite(resource)}
           >
             Favorites
@@ -98,9 +97,11 @@ export function AddToListDialog(props: Props) {
       </div>
       {userLists.map(
         (userList, i) =>
-          ![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
+          resource &&
+          (![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
             resource.object_type
-          ) || resource.id !== userList.id ? (
+          ) ||
+            resource.id !== userList.id) ? (
               <div className="flex-row" key={i}>
                 <div>
                   <Checkbox
