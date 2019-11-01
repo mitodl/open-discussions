@@ -96,26 +96,34 @@ describe("AddToListDialog", () => {
     })
   })
 
-  //
-  ;[true, false].forEach(checked => {
-    it(`should call toggleListItem ${
-      checked ? "" : "w/remove=true"
-    } when a List checkbox is ${checked ? "" : "un"}checked`, async () => {
-      const { wrapper } = await render()
-      const event = { target: { checked: checked, name: "foo", value: "bar" } }
-      const userList = userLists[0]
-      userList.items = [
-        {
-          content_type: LR_TYPE_COURSE,
-          object_id:    course.id,
-          remove:       !checked
+  LR_TYPE_ALL.forEach(objectType => {
+    [true, false].forEach(checked => {
+      it(`should call toggleListItem ${
+        checked ? "" : "w/remove=true"
+      } when a List checkbox is ${
+        checked ? "" : "un"
+      }checked for a ${objectType}`, async () => {
+        const object = makeLearningResource(objectType)
+        const { wrapper } = await render({
+          resource: object
+        })
+        const event = {
+          target: { checked: checked, name: "foo", value: "bar" }
         }
-      ]
-      wrapper
-        .find("input")
-        .at(1)
-        .prop("onChange")(event)
-      sinon.assert.calledWith(toggleListItemStub, course, userList, !checked)
+        const userList = userLists[0]
+        userList.items = [
+          {
+            content_type: LR_TYPE_COURSE,
+            object_id:    object.id,
+            remove:       !checked
+          }
+        ]
+        wrapper
+          .find("input")
+          .at(1)
+          .prop("onChange")(event)
+        sinon.assert.calledWith(toggleListItemStub, object, userList, !checked)
+      })
     })
   })
 })

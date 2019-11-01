@@ -124,7 +124,6 @@ export function AddToListDialog(props: Props) {
       ))}
     </div>
   )
-
   return resource && isFinished ? (
     <Dialog
       id="list-add-dialog"
@@ -147,9 +146,11 @@ const getObject = createSelector(
   state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.userLists,
+  state => state.entities.videos,
   state => state.queries,
-  (ui, courses, bootcamps, programs, userLists, queries) => {
+  (ui, courses, bootcamps, programs, userLists, videos, queries) => {
     const object = ui.dialogs.get(DIALOG_ADD_TO_LIST)
+
     if (object && object.object_type) {
       switch (object.object_type) {
       case LR_TYPE_COURSE:
@@ -164,7 +165,15 @@ const getObject = createSelector(
         return querySelectors.isFinished(queries, programRequest(object.id))
           ? programs[object.id]
           : null
+      case LR_TYPE_VIDEO:
+        return querySelectors.isFinished(queries, videoRequest(object.id))
+          ? videos[object.id]
+          : null
       case LR_TYPE_USERLIST:
+        return querySelectors.isFinished(queries, userListRequest(object.id))
+          ? userLists[object.id]
+          : null
+      case LR_TYPE_LEARNINGPATH:
         return querySelectors.isFinished(queries, userListRequest(object.id))
           ? userLists[object.id]
           : null
@@ -237,6 +246,8 @@ const mapPropsToConfig = props => {
   case LR_TYPE_PROGRAM:
     return [programRequest(objectId)]
   case LR_TYPE_USERLIST:
+    return [userListRequest(objectId)]
+  case LR_TYPE_LEARNINGPATH:
     return [userListRequest(objectId)]
   case LR_TYPE_VIDEO:
     return [videoRequest(objectId)]
