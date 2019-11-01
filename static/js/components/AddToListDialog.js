@@ -32,7 +32,7 @@ import {
 } from "../lib/queries/programs"
 import {
   favoriteUserListMutation,
-  userListItemsMutation,
+  userListMutation,
   userListRequest,
   userListsRequest,
   userListsSelector
@@ -70,14 +70,62 @@ export function AddToListDialog(props: Props) {
   const [{ isFinished }] = useRequest(userListsRequest())
 
   const inLists =
-    isFinished && resource
+    resource && isFinished
       ? filterItems(userLists, "items", {
         content_type: resource.object_type,
         object_id:    resource.id
       }).map(userList => userList.id)
       : []
 
-  return isFinished && resource ? (
+  const renderAddToListForm = () => (
+    <div className="user-listitem-form">
+      <div className="flex-row">
+        <div>
+          <Checkbox
+            // $FlowFixMe: this should only be called when resource isn't null
+            checked={resource.is_favorite}
+            onChange={() => toggleFavorite(resource)}
+          >
+            Favorites
+          </Checkbox>
+        </div>
+        <div>
+          <div className="grey-surround privacy">
+            <i className="material-icons lock">lock</i>
+            Private
+          </div>
+        </div>
+      </div>
+      {userLists.map((userList, i) => (
+        <div className="flex-row" key={i}>
+          <div>
+            <Checkbox
+              checked={inLists.includes(userList.id)}
+              onChange={(e: any) => {
+                toggleListItem(resource, userList, !e.target.checked)
+              }}
+            >
+              {`${userList.title}`}
+            </Checkbox>
+          </div>
+          <div>
+            <div className="grey-surround privacy">
+              <i
+                className={`material-icons ${privacyIcon(
+                  userList.privacy_level
+                )}`}
+              >
+                {privacyIcon(userList.privacy_level)}
+              </i>
+              {capitalize(userList.privacy_level)}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  return resource && isFinished ? (
     <Dialog
       id="list-add-dialog"
       open={!emptyOrNil(resource)}
@@ -88,50 +136,7 @@ export function AddToListDialog(props: Props) {
       submitText="OK"
       className="user-listitem-dialog"
     >
-      <div className="user-listitem-form">
-        <div className="flex-row">
-          <div>
-            <Checkbox
-              checked={resource.is_favorite}
-              onChange={() => toggleFavorite(resource)}
-            >
-              Favorites
-            </Checkbox>
-          </div>
-          <div>
-            <div className="grey-surround privacy">
-              <i className="material-icons lock">lock</i>
-              Private
-            </div>
-          </div>
-        </div>
-        {userLists.map((userList, i) => (
-          <div className="flex-row" key={i}>
-            <div>
-              <Checkbox
-                checked={inLists.includes(userList.id)}
-                onChange={(e: any) => {
-                  toggleListItem(resource, userList, !e.target.checked)
-                }}
-              >
-                {`${userList.title}`}
-              </Checkbox>
-            </div>
-            <div>
-              <div className="grey-surround privacy">
-                <i
-                  className={`material-icons ${privacyIcon(
-                    userList.privacy_level
-                  )}`}
-                >
-                  {privacyIcon(userList.privacy_level)}
-                </i>
-                {capitalize(userList.privacy_level)}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {renderAddToListForm()}
     </Dialog>
   ) : null
 }
@@ -217,7 +222,7 @@ const mapDispatchToProps = dispatch => ({
         delete:       remove
       }
     ]
-    dispatch(mutateAsync(userListItemsMutation(list)))
+    dispatch(mutateAsync(userListMutation(list)))
   }
 })
 

@@ -4,7 +4,8 @@ import {
   userListRequest,
   favoriteUserListMutation,
   createUserListMutation,
-  deleteUserListMutation
+  deleteUserListMutation,
+  userListMutation
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
@@ -87,8 +88,24 @@ describe("UserLists API", () => {
     assert.deepEqual(
       query.update.userLists({
         [userList.id]: userList
-      }),
-      {}
+      })
     )
+  })
+
+  it("userListMutation should return a correct query", () => {
+    const userList = makeUserList()
+    const query = userListMutation(userList)
+    assert.deepEqual(query.body, userList)
+    assert.equal(query.queryKey, "userListMutation")
+    assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
+    assert.deepEqual(query.options, {
+      method: "PATCH",
+      ...DEFAULT_POST_OPTIONS
+    })
+    assert.deepEqual(query.transform(userList), {
+      userLists: {
+        [userList.id]: userList
+      }
+    })
   })
 })

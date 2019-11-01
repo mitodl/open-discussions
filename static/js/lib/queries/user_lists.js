@@ -94,8 +94,8 @@ export const deleteUserListMutation = (userList: UserList) => ({
   }
 })
 
-export const userListItemsMutation = (userList: UserList) => ({
-  queryKey:  "userListItemsMutation",
+export const userListMutation = (userList: UserList) => ({
+  queryKey:  "userListMutation",
   body:      userList,
   url:       `${userListApiURL}/${userList.id}/`,
   transform: (userList: any) => ({
