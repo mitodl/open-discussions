@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.97.2 (Released November 04, 2019)
+--------------
+
+- some tweaks to the course search page
+- transform function for youtube etl
+- add pyyaml to requirements
+
 Version 0.97.1 (Released October 31, 2019)
 --------------
 
