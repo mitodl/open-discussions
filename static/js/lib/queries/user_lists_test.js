@@ -88,7 +88,8 @@ describe("UserLists API", () => {
     assert.deepEqual(
       query.update.userLists({
         [userList.id]: userList
-      })
+      }),
+      {}
     )
   })
 
