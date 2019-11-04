@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.97.2
+Version 0.97.2 (Released November 04, 2019)
 --------------
 
 - some tweaks to the course search page
