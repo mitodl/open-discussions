@@ -9,7 +9,6 @@ import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
 import SearchFacet from "../components/SearchFacet"
 
-import { SET_SHOW_RESOURCE_DRAWER } from "../actions/ui"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import {
@@ -18,7 +17,7 @@ import {
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import { LR_TYPE_COURSE, LR_TYPE_ALL } from "../lib/constants"
+import { LR_TYPE_ALL } from "../lib/constants"
 import { SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
 
@@ -121,26 +120,6 @@ describe("CourseSearchPage", () => {
         .prop("title"),
       "Learning Resource"
     )
-  })
-
-  it("passes a setShowResourceDrawer to search results", async () => {
-    const { inner, store } = await renderPage()
-    inner
-      .find("SearchResult")
-      .at(0)
-      .prop("setShowResourceDrawer")({
-        objectId:   searchCourse.course_id,
-        objectType: LR_TYPE_COURSE,
-        runId:      23
-      })
-    assert.deepEqual(store.getLastAction(), {
-      type:    SET_SHOW_RESOURCE_DRAWER,
-      payload: {
-        objectId:   searchCourse.course_id,
-        objectType: LR_TYPE_COURSE,
-        runId:      23
-      }
-    })
   })
 
   //

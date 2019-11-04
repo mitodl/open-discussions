@@ -146,3 +146,4 @@ export const userListApiURL = "/api/v0/userlists"
 export const videoApiURL = "/api/v0/videos"
 
 export const userListIndexURL = "/courses/lists/"
+export const userListDetailURL = (id: number) => `/courses/lists/${id}`

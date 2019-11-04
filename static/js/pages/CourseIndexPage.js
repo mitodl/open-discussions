@@ -1,7 +1,7 @@
 // @flow
-import React, { useCallback } from "react"
+import React from "react"
 import { useRequest } from "redux-query-react"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { createSelector } from "reselect"
 
@@ -20,7 +20,6 @@ import { CarouselLoading } from "../components/Loading"
 import AddToListDialog from "../components/AddToListDialog"
 import ResponsiveWrapper from "../components/ResponsiveWrapper"
 
-import { setShowResourceDrawer } from "../actions/ui"
 import {
   featuredCoursesRequest,
   featuredCoursesSelector,
@@ -72,12 +71,6 @@ export default function CourseIndexPage({ history }: Props) {
     isFinishedNew &&
     isFinishedFavorites
 
-  const dispatch = useDispatch()
-  const setShowResourceDrawerFunc = useCallback(
-    args => dispatch(setShowResourceDrawer(args)),
-    [dispatch]
-  )
-
   return (
     <BannerPageWrapper>
       <BannerPageHeader tall compactOnMobile>
@@ -113,29 +106,19 @@ export default function CourseIndexPage({ history }: Props) {
         {loaded ? (
           <Cell width={12}>
             {favorites.length !== 0 ? (
-              <CourseCarousel
-                title="Your Favorites"
-                courses={favorites}
-                setShowResourceDrawer={setShowResourceDrawerFunc}
-              />
+              <CourseCarousel title="Your Favorites" courses={favorites} />
             ) : null}
             {featuredCourses.length !== 0 ? (
               <CourseCarousel
                 title="Featured Courses"
                 courses={featuredCourses}
-                setShowResourceDrawer={setShowResourceDrawerFunc}
               />
             ) : null}
             <CourseCarousel
               title="Upcoming Courses"
               courses={upcomingCourses}
-              setShowResourceDrawer={setShowResourceDrawerFunc}
             />
-            <CourseCarousel
-              title="New Courses"
-              courses={newCourses}
-              setShowResourceDrawer={setShowResourceDrawerFunc}
-            />
+            <CourseCarousel title="New Courses" courses={newCourses} />
           </Cell>
         ) : (
           <Cell width={12}>

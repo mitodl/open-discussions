@@ -3,12 +3,17 @@
 import React, { useState } from "react"
 import R from "ramda"
 import { useMutation } from "redux-query-react"
+import { Link } from "react-router-dom"
 
 import Card from "./Card"
 import Dialog from "./Dialog"
 import DropdownMenu from "./DropdownMenu"
 
-import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
+import {
+  defaultResourceImageURL,
+  embedlyThumbnail,
+  userListDetailURL
+} from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
@@ -72,7 +77,9 @@ export default function UserListCard(props: Props) {
         <div className="platform">
           {readableLearningResources[userList.list_type]}
         </div>
-        <div className="ul-title">{userList.title}</div>
+        <Link to={userListDetailURL(userList.id)} className="ul-title">
+          {userList.title}
+        </Link>
         <div className="actions-and-count">
           <div className="count">{readableLength(userList.items.length)}</div>
           <i

@@ -1,8 +1,8 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
+import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
-import { connect } from "react-redux"
+import { useDispatch } from "react-redux"
 
 import Card from "./Card"
 import LoginTooltip from "./LoginTooltip"
@@ -29,24 +29,14 @@ import {
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
+import { setShowResourceDrawer, DIALOG_ADD_TO_LIST } from "../actions/ui"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
-import { DIALOG_ADD_TO_LIST } from "../actions/ui"
-
-type OwnProps = {|
-  object: LearningResourceSummary,
-  setShowResourceDrawer: Function,
-  searchResultLayout?: string,
-  availabilities?: Array<string>
-|}
-
-type DispatchProps = {|
-  showListDialog: Function
-|}
 
 type Props = {|
-  ...OwnProps,
-  ...DispatchProps
+  object: LearningResourceSummary,
+  searchResultLayout?: string,
+  availabilities?: Array<string>
 |}
 
 const getClassName = searchResultLayout =>
@@ -100,23 +90,32 @@ const CoverImage = ({ object, showResourceDrawer }) => (
   </div>
 )
 
-export const LearningResourceCard = ({
-  object,
-  setShowResourceDrawer,
-  showListDialog,
-  searchResultLayout,
-  availabilities
-}: Props) => {
+export default function LearningResourceCard(props: Props) {
+  const { object, searchResultLayout, availabilities } = props
+
   const bestAvailableRun =
     bestRun(filterRunsByAvailability(object.runs, availabilities)) ||
     (object.runs ? object.runs[0] : null)
 
-  const showResourceDrawer = () =>
-    setShowResourceDrawer({
-      objectId:   object.id,
-      objectType: object.object_type,
-      runId:      bestAvailableRun ? bestAvailableRun.id : null
-    })
+  const dispatch = useDispatch()
+  const showResourceDrawer = useCallback(
+    () =>
+      dispatch(
+        setShowResourceDrawer({
+          objectId:   object.id,
+          objectType: object.object_type,
+          runId:      bestAvailableRun ? bestAvailableRun.id : null
+        })
+      ),
+    [dispatch, object]
+  )
+
+  const showListDialog = useCallback(
+    payload => {
+      dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
+    },
+    [dispatch]
+  )
 
   const cost = bestAvailableRun ? minPrice(bestAvailableRun.prices) : null
 
@@ -185,14 +184,3 @@ export const LearningResourceCard = ({
     </Card>
   )
 }
-
-const mapDispatchToProps = dispatch => ({
-  showListDialog: payload => {
-    dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
-  }
-})
-
-export default connect<Props, OwnProps, _, _, _, _>(
-  null,
-  mapDispatchToProps
-)(LearningResourceCard)

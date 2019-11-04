@@ -25,7 +25,7 @@ const userListsPageSelector = createSelector(
     userLists ? Object.keys(userLists).map(key => userLists[key]) : null
 )
 
-export default function UserListPage() {
+export default function UserListsPage() {
   const [showCreateListDialog, setShowCreateListDialog] = useState(false)
   const [{ isFinished }] = useRequest(userListsRequest())
 

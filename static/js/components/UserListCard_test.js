@@ -48,7 +48,13 @@ describe("UserListCard tests", () => {
 
   it("should put the title", async () => {
     const { wrapper } = await renderUserListCard()
-    assert.equal(wrapper.find(".ul-title").text(), userList.title)
+    assert.equal(
+      wrapper
+        .find(".ul-title")
+        .at(0)
+        .text(),
+      userList.title
+    )
   })
 
   //

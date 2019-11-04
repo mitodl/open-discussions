@@ -1,7 +1,7 @@
 // @flow
 import { assert } from "chai"
 
-import UserListPage from "./UserListPage"
+import UserListsPage from "./UserListsPage"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeUserList } from "../factories/learning_resources"
@@ -9,7 +9,7 @@ import { queryListResponse } from "../lib/test_utils"
 import { userListApiURL } from "../lib/url"
 import * as util from "../lib/util"
 
-describe("UserListPage tests", () => {
+describe("UserListsPage tests", () => {
   let helper, userLists, render
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe("UserListPage tests", () => {
     helper.handleRequestStub
       .withArgs(userListApiURL)
       .returns(queryListResponse(userLists))
-    render = helper.configureReduxQueryRenderer(UserListPage)
+    render = helper.configureReduxQueryRenderer(UserListsPage)
   })
 
   afterEach(() => {

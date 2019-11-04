@@ -90,11 +90,6 @@ const ProfileSearchResult = ({ result }: ProfileProps) => {
 
 type LearningResourceProps = {
   result: LearningResourceResult,
-  setShowResourceDrawer?: ({
-    objectId: string,
-    objectType: string,
-    runId: ?number
-  }) => void,
   overrideObject?: Object,
   searchResultLayout?: string,
   availabilities?: Array<string>
@@ -102,7 +97,6 @@ type LearningResourceProps = {
 
 const LearningResourceSearchResult = ({
   result,
-  setShowResourceDrawer,
   overrideObject,
   searchResultLayout,
   availabilities
@@ -112,7 +106,6 @@ const LearningResourceSearchResult = ({
   return (
     <LearningResourceCard
       object={searchResultToLearningResource(result, overrideObject)}
-      setShowResourceDrawer={setShowResourceDrawer}
       searchResultLayout={searchResultLayout}
       availabilities={availabilities}
     />

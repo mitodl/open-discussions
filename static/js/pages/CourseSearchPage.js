@@ -29,7 +29,6 @@ import {
 import CourseFilterDrawer from "../components/CourseFilterDrawer"
 
 import { actions } from "../actions"
-import { setShowResourceDrawer } from "../actions/ui"
 import { clearSearch } from "../actions/search"
 import {
   availabilityFacetLabel,
@@ -81,12 +80,7 @@ type OwnProps = {|
   isModerator: boolean,
   match: Match,
   runSearch: (params: SearchParams) => Promise<*>,
-  clearSearch: () => void,
-  setShowResourceDrawer: ({
-    objectId: string,
-    objectType: string,
-    runId: ?number
-  }) => void
+  clearSearch: () => void
 |}
 
 type StateProps = {|
@@ -353,13 +347,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const {
-      results,
-      processing,
-      loaded,
-      total,
-      setShowResourceDrawer
-    } = this.props
+    const { results, processing, loaded, total } = this.props
     const { from, incremental, searchResultLayout, activeFacets } = this.state
 
     if ((processing || !loaded) && !incremental) {
@@ -390,7 +378,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 }
                 toggleFacet={this.toggleFacet}
                 availabilities={activeFacets.get("availability")}
-                setShowResourceDrawer={setShowResourceDrawer}
                 searchResultLayout={searchResultLayout}
               />
             </Cell>
@@ -533,17 +520,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   clearSearch: async () => {
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
-  },
-  setShowResourceDrawer: ({
-    objectId,
-    objectType,
-    runId
-  }: {
-    objectId: string,
-    objectType: string,
-    runId: ?number
-  }) => {
-    dispatch(setShowResourceDrawer({ objectId, objectType, runId }))
   },
   dispatch
 })

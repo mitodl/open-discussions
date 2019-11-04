@@ -9,16 +9,15 @@ import LearningResourceCard from "./LearningResourceCard"
 import { SEARCH_GRID_UI, SEARCH_UI_GRID_WIDTHS } from "../lib/search"
 import { useDeviceCategory } from "../hooks/util"
 
-import type { LearningResource } from "../flow/discussionTypes"
+import type { LearningResourceSummary } from "../flow/discussionTypes"
 
 type Props = {|
   title: string,
-  courses: Array<LearningResource>,
-  setShowResourceDrawer: Function
+  courses: Array<LearningResourceSummary>
 |}
 
 export default function CourseCarousel(props: Props) {
-  const { title, courses, setShowResourceDrawer } = props
+  const { title, courses } = props
 
   const [index, setIndex] = useState(0)
   const deviceCategory = useDeviceCategory()
@@ -70,7 +69,6 @@ export default function CourseCarousel(props: Props) {
           <LearningResourceCard
             key={idx}
             object={course}
-            setShowResourceDrawer={setShowResourceDrawer}
             searchResultLayout={SEARCH_GRID_UI}
           />
         ))}
