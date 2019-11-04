@@ -29,15 +29,15 @@ def get_youtube_client():
     )
 
 
-def get_videos_for_channel(youtube_client, channel_id, offered_by):
+def get_videos_for_playlist(youtube_client, playlist_id, offered_by):
     """
-    Function which returns a generator that loops through a youtube channel and
+    Function which returns a generator that loops through a youtube playlist and
     returns video data
 
     Args:
-        youtube_client: Youtube api client
-        channel_id: Youtube's id for a channel
-        offered_by: Our offered by tag for the youtube channel
+        youtube_client (object): Youtube api client
+        playlist_id (str): Youtube's id for a playlist
+        offered_by (str): Our offered by tag for the youtube playlist
 
     Returns:
         A generator that yields tuples with offered_by and video data
@@ -49,17 +49,18 @@ def get_videos_for_channel(youtube_client, channel_id, offered_by):
     while True:
 
         try:
-            search_request = youtube_client.search().list(
-                channelId=channel_id,
+            playlist_items_request = youtube_client.playlistItems().list(
+                part="contentDetails",
                 maxResults=50,
+                playlistId=playlist_id,
                 pageToken=page_token,
-                part="snippet",
-                type="video",
             )
-            search_response = search_request.execute()
+
+            playlist_items_response = playlist_items_request.execute()
 
             video_ids = map(
-                lambda video: video["id"]["videoId"], search_response["items"]
+                lambda video: video["contentDetails"]["videoId"],
+                playlist_items_response["items"],
             )
             video_ids_paramenter = ", ".join(video_ids)
 
@@ -71,19 +72,19 @@ def get_videos_for_channel(youtube_client, channel_id, offered_by):
             for video_data in full_response["items"]:
                 yield (offered_by, video_data)
 
-            if "nextPageToken" in search_response:
-                page_token = search_response["nextPageToken"]
+            if "nextPageToken" in playlist_items_response:
+                page_token = playlist_items_response["nextPageToken"]
             else:
                 break
 
         except googleapiclient.errors.HttpError:
-            log.exception("Unable to fetch videos for channel id=%s", channel_id)
+            log.exception("Unable to fetch videos for playlist id=%s", playlist_id)
             break
 
 
 def extract():
     """
-    Function which returns video data for all videos in our watched channels
+    Function which returns video data for all videos in our watched playlists
 
 
     Returns:
@@ -98,11 +99,14 @@ def extract():
     response.raise_for_status()
 
     channels_yml = yaml.safe_load(response.content)
+
     if channels_yml and ("channels" in channels_yml):
         for channel in channels_yml["channels"]:
-            yield from get_videos_for_channel(
-                youtube_client, channel["channel_id"], channel["offered_by"]
-            )
+            if "playlists" in channel:
+                for playlist_id in channel["playlists"]:
+                    yield from get_videos_for_playlist(
+                        youtube_client, playlist_id, channel["offered_by"]
+                    )
 
 
 def transform_single_video(offered_by, raw_video_data):

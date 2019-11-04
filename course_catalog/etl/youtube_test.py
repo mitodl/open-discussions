@@ -6,33 +6,27 @@ import googleapiclient.errors
 from course_catalog.etl import youtube
 
 
-def mock_video_search_data(token=""):
-    """Mock video search data"""
+def mock_list_items_data(next_token=None):
+    """Mock video playlist list data"""
     data = {
-        "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/BcXH3l8f_4E3Blh2YR0v6NuPxAQ"',
+        "kind": "youtube#playlistItemListResponse",
+        "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/xusLJ2FRC1XScoMyK2-1FU9fnzA"',
+        "pageInfo": {"totalResults": 53, "resultsPerPage": 1},
         "items": [
             {
-                "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/AE0DGFijV8YKFde-0lAnu1RjIGY"',
-                "id": {"kind": "youtube#video", "videoId": "CKwCYr41J-4"},
-                "kind": "youtube#searchResult",
-                "snippet": {
-                    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
-                    "channelTitle": "MITx Videos",
-                    "description": "Gordon Fullterton, NASA astronaut and research pilot, talks about how a visit from HRH Charles, Prince of Wales pointed out a serious flaw when testing the ...",
-                    "liveBroadcastContent": "none",
-                    "publishedAt": "2019-08-30T04:00:05.000Z",
-                    "thumbnails": {},
-                    "title": "Pitch and Roll and Prince Charles",
+                "kind": "youtube#playlistItem",
+                "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/ZMYt2whVvQV7UzaXyfd2eP40S9Q"',
+                "id": "VVVUQk1XdTh5c2huQW1welIzTW9KRnR3LmZ0TFdOWUJUZjJz",
+                "contentDetails": {
+                    "videoId": "QU0fLnucE6A",
+                    "videoPublishedAt": "2019-10-25T04:00:09.000Z",
                 },
             }
         ],
-        "kind": "youtube#searchListResponse",
-        "pageInfo": {"resultsPerPage": 50, "totalResults": 51},
-        "regionCode": "US",
     }
 
-    if token != "":
-        data["nextPageToken"] = token
+    if next_token is not None:
+        data["nextPageToken"] = next_token
 
     return data
 
@@ -110,16 +104,18 @@ def mock_video_batch_data(mock_video_data):
 @pytest.fixture
 def mock_channel_data():
     """Mock video channel yml"""
-    data = """
+    return """
 ---
 channels:
   - offered_by: MIT
     channel_id: channel1
+    playlists:
+      - playlist1
   - offered_by: OCW
     channel_id: channel2
+    playlists:
+      - playlist2
 """
-
-    return data
 
 
 @pytest.fixture
@@ -137,10 +133,10 @@ def mocked_channel_response(mocked_responses, mock_channel_data, video_settings)
 def test_extract(mocker, mock_video_data, mock_video_batch_data):
     """Test youtube video ETL extract"""
     mock_video_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
-    mock_video_client.return_value.search.return_value.list.return_value.execute.side_effect = [
-        mock_video_search_data("token"),
-        mock_video_search_data(""),
-        mock_video_search_data(""),
+    mock_video_client.return_value.playlistItems.return_value.list.return_value.execute.side_effect = [
+        mock_list_items_data("token"),
+        mock_list_items_data(),
+        mock_list_items_data(),
     ]
 
     mock_video_client.return_value.videos.return_value.list.return_value.execute.return_value = (
@@ -157,11 +153,11 @@ def test_extract(mocker, mock_video_data, mock_video_batch_data):
 @pytest.mark.usefixtures("mocked_channel_response")
 @pytest.mark.usefixtures("video_settings")
 def test_extract_with_bad_channel_id(mocker, mock_video_data, mock_video_batch_data):
-    """Test youtube video ETL extract with a channel for which the google api throws an error"""
+    """Test youtube video ETL extract with a playlist for which the google api throws an error"""
     mock_video_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
-    mock_video_client.return_value.search.return_value.list.return_value.execute.side_effect = [
+    mock_video_client.return_value.playlistItems.return_value.list.return_value.execute.side_effect = [
         googleapiclient.errors.HttpError(MagicMock(), bytes()),
-        mock_video_search_data(""),
+        mock_list_items_data(),
     ]
 
     mock_video_client.return_value.videos.return_value.list.return_value.execute.return_value = (
