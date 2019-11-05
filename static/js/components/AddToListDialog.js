@@ -2,7 +2,7 @@
 import React from "react"
 import { connect, useSelector } from "react-redux"
 import { connectRequest, useRequest } from "redux-query-react"
-import { mutateAsync, querySelectors } from "redux-query"
+import { mutateAsync } from "redux-query"
 import { createSelector } from "reselect"
 import { withRouter } from "react-router"
 import R from "ramda"
@@ -41,6 +41,7 @@ import { favoriteVideoMutation, videoRequest } from "../lib/queries/videos"
 
 import type { Dispatch } from "redux"
 import type { LearningResource, UserList } from "../flow/discussionTypes"
+import { getQuerySelector } from "../lib/queries/learning_resources"
 
 type StateProps = {|
   resource: ?LearningResource
@@ -146,59 +147,17 @@ export function AddToListDialog(props: Props) {
   ) : null
 }
 
-const getObject = createSelector(
-  state => state.ui,
-  state => state.entities.courses,
-  state => state.entities.bootcamps,
-  state => state.entities.programs,
-  state => state.entities.userLists,
-  state => state.entities.videos,
-  state => state.queries,
-  (ui, courses, bootcamps, programs, userLists, videos, queries) => {
-    const object = ui.dialogs.get(DIALOG_ADD_TO_LIST)
-
-    if (object && object.object_type) {
-      switch (object.object_type) {
-      case LR_TYPE_COURSE:
-        return querySelectors.isFinished(queries, courseRequest(object.id))
-          ? courses[object.id]
-          : null
-      case LR_TYPE_BOOTCAMP:
-        return querySelectors.isFinished(queries, bootcampRequest(object.id))
-          ? bootcamps[object.id]
-          : null
-      case LR_TYPE_PROGRAM:
-        return querySelectors.isFinished(queries, programRequest(object.id))
-          ? programs[object.id]
-          : null
-      case LR_TYPE_VIDEO:
-        return querySelectors.isFinished(queries, videoRequest(object.id))
-          ? videos[object.id]
-          : null
-      case LR_TYPE_USERLIST:
-        return querySelectors.isFinished(queries, userListRequest(object.id))
-          ? userLists[object.id]
-          : null
-      case LR_TYPE_LEARNINGPATH:
-        return querySelectors.isFinished(queries, userListRequest(object.id))
-          ? userLists[object.id]
-          : null
-      }
-    }
-    return null
-  }
-)
-
 export const mapStateToProps = (state: Object) => {
   const { ui } = state
   const object = ui.dialogs.get(DIALOG_ADD_TO_LIST)
   const objectId = object ? object.id : null
   const objectType = object ? object.object_type : null
+  const resourceFilter = getQuerySelector(state, object)
 
   return {
     objectId,
     objectType,
-    resource: getObject(state)
+    resource: resourceFilter(state)
   }
 }
 

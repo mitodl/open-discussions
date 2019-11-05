@@ -165,8 +165,10 @@ export const makeUserList = (): UserList => ({
   privacy_level: casual.random_element(["public", "private"])
 })
 
+const incrVideo = incrementer()
 export const makeVideo = (): Video => ({
-  id:                casual.number,
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:                incrVideo.next().value,
   video_id:          `video_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,

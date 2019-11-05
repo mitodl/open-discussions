@@ -6,9 +6,7 @@ import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "@rmwc/drawer"
 import { Theme } from "@rmwc/theme"
-import { querySelectors } from "redux-query"
 import { connectRequest } from "redux-query-react"
-import { createSelector } from "reselect"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
@@ -24,6 +22,7 @@ import {
 import { useResponsive } from "../hooks/util"
 
 import type { Dispatch } from "redux"
+import { getQuerySelector } from "../lib/queries/learning_resources"
 
 type Props = {
   showLearningDrawer: boolean,
@@ -67,45 +66,23 @@ export function LearningResourceDrawer(props: Props) {
   ) : null
 }
 
-const getObject = createSelector(
-  state => state.ui,
-  state => state.entities.courses,
-  state => state.entities.bootcamps,
-  state => state.entities.programs,
-  state => state.queries,
-  (ui, courses, bootcamps, programs, queries) => {
-    const { objectId, objectType } = ui.courseDetail
-
-    switch (objectType) {
-    case LR_TYPE_COURSE:
-      return querySelectors.isFinished(queries, courseRequest(objectId))
-        ? courses[objectId]
-        : null
-    case LR_TYPE_BOOTCAMP:
-      return querySelectors.isFinished(queries, bootcampRequest(objectId))
-        ? bootcamps[objectId]
-        : null
-    case LR_TYPE_PROGRAM:
-      return querySelectors.isFinished(queries, programRequest(objectId))
-        ? programs[objectId]
-        : null
-    }
-  }
-)
-
 export const mapStateToProps = (state: Object) => {
   const { ui } = state
 
   const objectId = ui.courseDetail.objectId
   const objectType = ui.courseDetail.objectType
   const runId = ui.courseDetail.runId
+  const resourceFilter = getQuerySelector(state, {
+    id:          objectId,
+    object_type: objectType
+  })
 
   return {
     showLearningDrawer: _.isFinite(state.ui.courseDetail.objectId),
     objectId,
     objectType,
     runId,
-    object:             getObject(state)
+    object:             resourceFilter(state)
   }
 }
 
