@@ -1,13 +1,15 @@
 """video catalog ETL"""
 import logging
+from html import unescape
+from xml.etree import ElementTree
 from django.conf import settings
 from googleapiclient.discovery import build
 import googleapiclient.errors
 import yaml
 import requests
+import pytube
 from course_catalog.etl.utils import log_exceptions
 from course_catalog.constants import PlatformType
-
 
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
@@ -80,6 +82,57 @@ def get_videos_for_playlist(youtube_client, playlist_id, offered_by):
         except googleapiclient.errors.HttpError:
             log.exception("Unable to fetch videos for playlist id=%s", playlist_id)
             break
+
+
+def get_captions_for_video(video):
+    """
+    Function which fetches and returns xml captions for a video object
+
+    Args:
+        video (course_catalog.models.Video)
+
+    Returns:
+        str: transcript in xml format
+
+    """
+    pytube_client = pytube.YouTube(video.url)
+    all_captions = pytube_client.captions.all()
+
+    english_captions = [caption for caption in all_captions if caption.code == "en"]
+    # sort auto-generated captions to the bottom of the list
+    sorted_captions = sorted(
+        english_captions, key=lambda caption: "auto-generated" in caption.name
+    )
+
+    return sorted_captions[0].xml_captions if sorted_captions else None
+
+
+def parse_video_captions(xml_captions):
+    """
+    Function which parses xml captions and returns a string with just the transcript
+
+    Args:
+        xml_captions (str): Caption as xml with text and timestamps
+
+    Returns:
+        str: transcript with timestamps removed
+
+    """
+
+    if not xml_captions:
+        return ""
+
+    captions_list = []
+    root = ElementTree.fromstring(xml_captions)
+
+    for child in root.iter():
+        text = child.text or ""
+        text = unescape(text.replace("\n", " ").replace("  ", " "))
+
+        if text:
+            captions_list.append(text)
+
+    return "\n".join(captions_list)
 
 
 def extract():

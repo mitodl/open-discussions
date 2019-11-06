@@ -86,6 +86,7 @@ pyjwt==1.5.2              # via djangorestframework-jwt, social-auth-core
 python-dateutil==2.6.0
 python3-openid==3.1.0     # via social-auth-core
 python3-saml==1.4.1
+pytube==9.5.2
 pytz==2018.9              # via celery, django
 pyyaml==5.1.2
 raven==6.9.0
