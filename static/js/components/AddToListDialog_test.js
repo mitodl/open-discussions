@@ -5,21 +5,12 @@ import { Checkbox } from "@rmwc/checkbox"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { AddToListDialog } from "./AddToListDialog"
-import {
-  makeCourse,
-  makeUserList
-} from "../factories/learning_resources"
-import {
-  courseURL,
-  userListApiURL,
-} from "../lib/url"
+import { makeCourse, makeUserList } from "../factories/learning_resources"
+import { courseURL, userListApiURL } from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
 
 describe("AddToListDialog", () => {
-  let render,
-    userLists,
-    helper,
-    course
+  let render, userLists, helper, course
 
   beforeEach(() => {
     userLists = times(makeUserList, 5)
