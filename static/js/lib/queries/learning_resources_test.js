@@ -6,7 +6,7 @@ import { filterFavorites } from "./learning_resources"
 import { makeCourse, makeBootcamp } from "../../factories/learning_resources"
 import { LR_TYPE_COURSE, LR_TYPE_BOOTCAMP } from "../constants"
 
-describe("learning resource queries", () => {
+describe("learning resource favorite queries", () => {
   let favorites
 
   beforeEach(() => {

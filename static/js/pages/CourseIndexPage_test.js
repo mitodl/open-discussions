@@ -16,7 +16,8 @@ import {
   favoritesURL,
   featuredCoursesURL,
   upcomingCoursesURL,
-  newCoursesURL
+  newCoursesURL,
+  userListApiURL
 } from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 import {
@@ -73,6 +74,9 @@ describe("CourseIndexPage", () => {
     helper.handleRequestStub
       .withArgs(newCoursesURL)
       .returns(queryListResponse(newCourses))
+    helper.handleRequestStub
+      .withArgs(userListApiURL)
+      .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
   })
 

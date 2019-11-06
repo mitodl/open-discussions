@@ -364,7 +364,8 @@ export type LearningResource = {
   short_description:  ?string,
   topics:             Array<CourseTopic>,
   offered_by:         Array<string>,
-  is_favorite:        boolean
+  is_favorite:        boolean,
+  object_type:        string
 }
 
 
@@ -396,6 +397,16 @@ export type UserListItem = {
   content_data: Object
 }
 
+
+export type UserListItemEdit = {
+  id?:           number,
+  object_id?:    number,
+  position?:     number,
+  content_type?: string,
+  delete?:       boolean
+}
+
+
 export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
@@ -408,7 +419,7 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<UserListItem>,
+  items:              Array<UserListItem | UserListItemEdit>,
   list_type:          string,
   object_type:        string
 }

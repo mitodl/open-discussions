@@ -27,12 +27,12 @@ import {
 } from "../lib/url"
 
 describe("LearningResourceCard", () => {
-  let course, sandbox, setShowResourceDrawerStub, toggleFavoriteStub
+  let course, sandbox, setShowResourceDrawerStub, showListDialogStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     setShowResourceDrawerStub = sandbox.stub()
-    toggleFavoriteStub = sandbox.stub()
+    showListDialogStub = sandbox.stub()
     course = makeLearningResource(LR_TYPE_COURSE)
   })
 
@@ -41,7 +41,7 @@ describe("LearningResourceCard", () => {
       <LearningResourceCard
         object={course}
         setShowResourceDrawer={setShowResourceDrawerStub}
-        toggleFavorite={toggleFavoriteStub}
+        showListDialog={showListDialogStub}
         {...props}
       />
     )
@@ -174,11 +174,11 @@ describe("LearningResourceCard", () => {
   })
 
   LR_TYPE_ALL.forEach(objectType => {
-    it(`should call the toggleFavorite with a ${objectType}`, () => {
+    it(`should call showListDialog with a ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       const wrapper = render({ object })
       wrapper.find(".favorite img").simulate("click")
-      sinon.assert.calledWith(toggleFavoriteStub, object)
+      sinon.assert.calledWith(showListDialogStub, object)
     })
   })
 

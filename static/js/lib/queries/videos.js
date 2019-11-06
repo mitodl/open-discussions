@@ -7,7 +7,7 @@ import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { Video } from "../../flow/discussionTypes"
 
-export const videoRequest = (videoId: string) => ({
+export const videoRequest = (videoId: number) => ({
   queryKey:  `videoRequest${videoId}`,
   url:       `${videoApiURL}/${videoId}/`,
   transform: (video: any) => ({

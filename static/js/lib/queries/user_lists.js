@@ -7,7 +7,7 @@ import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { UserList } from "../../flow/discussionTypes"
 
-export const userListRequest = (userListId: string) => ({
+export const userListRequest = (userListId: number) => ({
   queryKey:  `userListRequest${userListId}`,
   url:       `${userListApiURL}/${userListId}/`,
   transform: (userList: any) => ({
@@ -90,6 +90,22 @@ export const deleteUserListMutation = (userList: UserList) => ({
   },
   options: {
     method: "DELETE",
+    ...DEFAULT_POST_OPTIONS
+  }
+})
+
+export const userListMutation = (userList: UserList) => ({
+  queryKey:  "userListMutation",
+  body:      userList,
+  url:       `${userListApiURL}/${userList.id}/`,
+  transform: (userList: any) => ({
+    userLists: { [userList.id]: userList }
+  }),
+  update: {
+    userLists: R.merge
+  },
+  options: {
+    method: "PATCH",
     ...DEFAULT_POST_OPTIONS
   }
 })

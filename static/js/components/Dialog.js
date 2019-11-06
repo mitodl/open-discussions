@@ -6,9 +6,12 @@ type Props = {
   open: boolean,
   hideDialog: Function,
   onCancel?: Function,
-  onAccept: ?Function,
+  onAccept?: ?Function,
+  submitText?: string,
+  cancelText?: string,
+  hideAccept?: boolean,
+  hideCancel?: boolean,
   title: string,
-  submitText: string,
   id?: string,
   className?: string,
   children?: any
@@ -19,9 +22,12 @@ export default function OurDialog(props: Props) {
     open,
     hideDialog,
     onCancel,
+    hideCancel,
     onAccept,
+    hideAccept,
     title,
     submitText,
+    cancelText,
     id,
     className,
     children
@@ -31,16 +37,20 @@ export default function OurDialog(props: Props) {
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <button
-          className="cancel"
-          onClick={onCancel || hideDialog}
-          type="button"
-        >
-          Cancel
-        </button>
-        <button className="submit" onClick={onAccept} type="button">
-          {submitText || "Accept"}
-        </button>
+        {!hideCancel ? (
+          <button
+            className="cancel"
+            onClick={onCancel || hideDialog}
+            type="button"
+          >
+            {cancelText || "Cancel"}
+          </button>
+        ) : null}
+        {!hideAccept ? (
+          <button className="submit" onClick={onAccept} type="button">
+            {submitText || "Accept"}
+          </button>
+        ) : null}
       </DialogActions>
     </Dialog>
   )

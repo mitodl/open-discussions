@@ -12,6 +12,9 @@ describe("Dialog", () => {
     onCancel,
     onAccept,
     submitText,
+    cancelText,
+    hideAccept,
+    hideCancel,
     title,
     id,
     className,
@@ -22,8 +25,11 @@ describe("Dialog", () => {
     hideDialog = sandbox.stub()
     onCancel = sandbox.stub()
     onAccept = sandbox.stub()
+    hideAccept = false
+    hideCancel = false
     title = "Dialog title"
     submitText = "Submit"
+    cancelText = null
     className = "class"
     open = true
   })
@@ -38,12 +44,16 @@ describe("Dialog", () => {
       <Dialog
         open={open}
         hideDialog={hideDialog}
+        hideAccept={hideAccept}
+        hideCancel={hideCancel}
         // $FlowFixMe
         onCancel={onCancel}
         onAccept={onAccept}
         title={title}
         // $FlowFixMe
         submitText={submitText}
+        // $FlowFixMe
+        cancelText={cancelText}
         id={id}
         className={className}
         {...props}
@@ -133,6 +143,44 @@ describe("Dialog", () => {
           .find(".submit")
           .text(),
         "Accept"
+      )
+    })
+
+    it("shows the specified cancel text", () => {
+      cancelText = "Exit"
+      assert.equal(
+        render()
+          .find(".cancel")
+          .text(),
+        cancelText
+      )
+    })
+
+    it("shows default cancel text if no cancel text is provided", () => {
+      cancelText = null
+      assert.equal(
+        render()
+          .find(".cancel")
+          .text(),
+        "Cancel"
+      )
+    })
+
+    it("hides the Accept button if hideAccept is true", () => {
+      hideAccept = true
+      assert.isNotOk(
+        render()
+          .find(".submit")
+          .exists()
+      )
+    })
+
+    it("hides the Cancel button if hideCancel is true", () => {
+      hideCancel = true
+      assert.isNotOk(
+        render()
+          .find(".cancel")
+          .exists()
       )
     })
   })

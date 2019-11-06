@@ -1,0 +1,17 @@
+.user-listitem-dialog {
+  .mdc-dialog__content {
+    padding: 5px !important;
+  }
+
+  .user-listitem-form {
+    color: black;
+    border-top: 2px solid $border-grey;
+    border-bottom: 2px solid $border-grey;
+    padding-top: 20px;
+    overflow: scroll;
+  }
+
+  .privacy {
+    width: 65px;
+  }
+}

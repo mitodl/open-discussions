@@ -2,12 +2,12 @@
 /* global SETTINGS:false */
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
-import { mutateAsync } from "redux-query"
 import { connect } from "react-redux"
 
 import Card from "./Card"
 import LoginTooltip from "./LoginTooltip"
 
+import { setDialogData } from "../actions/ui"
 import {
   filterRunsByAvailability,
   bestRunLabel,
@@ -24,23 +24,14 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO,
-  LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH,
   readableLearningResources
 } from "../lib/constants"
-import { favoriteCourseMutation } from "../lib/queries/courses"
-import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
-import { favoriteProgramMutation } from "../lib/queries/programs"
-import { favoriteUserListMutation } from "../lib/queries/user_lists"
-import { favoriteVideoMutation } from "../lib/queries/videos"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
+import { userIsAnonymous } from "../lib/util"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
+import { DIALOG_ADD_TO_LIST } from "../actions/ui"
 
 type OwnProps = {|
   object: LearningResourceSummary,
@@ -50,7 +41,7 @@ type OwnProps = {|
 |}
 
 type DispatchProps = {|
-  toggleFavorite: Function
+  showListDialog: Function
 |}
 
 type Props = {|
@@ -112,7 +103,7 @@ const CoverImage = ({ object, showResourceDrawer }) => (
 export const LearningResourceCard = ({
   object,
   setShowResourceDrawer,
-  toggleFavorite,
+  showListDialog,
   searchResultLayout,
   availabilities
 }: Props) => {
@@ -177,7 +168,12 @@ export const LearningResourceCard = ({
                   // $FlowFixMe
                   object.is_favorite ? starSelectedURL : starUnselectedURL
                 }
-                onClick={() => toggleFavorite(object)}
+                onClick={e => {
+                  e.preventDefault()
+                  if (!userIsAnonymous()) {
+                    showListDialog(object)
+                  }
+                }}
               />
             </div>
           </LoginTooltip>
@@ -191,24 +187,8 @@ export const LearningResourceCard = ({
 }
 
 const mapDispatchToProps = dispatch => ({
-  toggleFavorite: payload => {
-    if (payload.object_type === LR_TYPE_COURSE) {
-      dispatch(mutateAsync(favoriteCourseMutation(payload)))
-    }
-    if (payload.object_type === LR_TYPE_BOOTCAMP) {
-      dispatch(mutateAsync(favoriteBootcampMutation(payload)))
-    }
-    if (payload.object_type === LR_TYPE_PROGRAM) {
-      dispatch(mutateAsync(favoriteProgramMutation(payload)))
-    }
-    if (
-      [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(payload.object_type)
-    ) {
-      dispatch(mutateAsync(favoriteUserListMutation(payload)))
-    }
-    if (payload.object_type === LR_TYPE_VIDEO) {
-      dispatch(mutateAsync(favoriteVideoMutation(payload)))
-    }
+  showListDialog: payload => {
+    dispatch(setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: payload }))
   }
 })
 

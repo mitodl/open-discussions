@@ -5,8 +5,14 @@ import { programURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
 import type { Program } from "../../flow/discussionTypes"
+import { createSelector } from "reselect"
 
-export const programRequest = (programId: string) => ({
+export const programsSelector = createSelector(
+  state => state.entities.programs,
+  programs => programs
+)
+
+export const programRequest = (programId: number) => ({
   queryKey:  `programRequest${programId}`,
   url:       `${programURL}/${programId}/`,
   transform: (program: any) => ({

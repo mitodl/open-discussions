@@ -13,7 +13,7 @@ import { constructIdMap } from "../redux_query"
 
 import type { Course } from "../../flow/discussionTypes"
 
-export const courseRequest = (courseId: string) => ({
+export const courseRequest = (courseId: number) => ({
   queryKey:  `courseRequest${courseId}`,
   url:       `${courseURL}/${courseId}/`,
   transform: (course: any) => ({
@@ -23,6 +23,11 @@ export const courseRequest = (courseId: string) => ({
     courses: R.merge
   }
 })
+
+export const coursesSelector = createSelector(
+  state => state.entities.courses,
+  courses => courses
+)
 
 const courseListSelector = listName =>
   createSelector(

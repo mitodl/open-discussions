@@ -1,5 +1,5 @@
 //@flow
-import { concat, find, equals, head } from "ramda"
+import R from "ramda"
 import moment from "moment"
 
 import {
@@ -155,7 +155,7 @@ export const resourceLabel = (resource: string) => {
   case LR_TYPE_LEARNINGPATH:
     return "Learning Paths"
   default:
-    return concat(capitalize(resource), "s")
+    return R.concat(capitalize(resource), "s")
   }
 }
 
@@ -209,7 +209,22 @@ export const getInstructorName = (instructor: CourseInstructor) => {
 }
 
 // prefer MicroMasters over MITx
-const findMicroMasters = find(equals(offeredBys.micromasters))
+const findMicroMasters = R.find(R.equals(offeredBys.micromasters))
 
 export const getPreferredOfferedBy = (offeredBy: Array<string>): string =>
-  findMicroMasters(offeredBy) || head(offeredBy)
+  findMicroMasters(offeredBy) || R.head(offeredBy)
+
+export const filterItems = (
+  results: Array<Object>,
+  property: string,
+  object: Object
+) =>
+  R.filter(
+    R.compose(
+      R.any(R.whereEq(object)),
+      R.prop(property)
+    )
+  )(results)
+
+export const privacyIcon = (privacyLevel: string) =>
+  privacyLevel === "public" ? "lock_open" : "lock"

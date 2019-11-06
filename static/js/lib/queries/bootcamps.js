@@ -5,8 +5,14 @@ import { bootcampURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
 import type { Bootcamp } from "../../flow/discussionTypes"
+import { createSelector } from "reselect"
 
-export const bootcampRequest = (bootcampId: string) => ({
+export const bootcampsSelector = createSelector(
+  state => state.entities.bootcamps,
+  bootcamps => bootcamps
+)
+
+export const bootcampRequest = (bootcampId: number) => ({
   queryKey:  `bootcampRequest${bootcampId}`,
   url:       `${bootcampURL}/${bootcampId}/`,
   transform: (bootcamp: any) => ({
