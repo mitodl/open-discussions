@@ -1,6 +1,7 @@
 // @flow
 import R from "ramda"
 import { createSelector } from "reselect"
+import { memoize } from "lodash"
 
 import {
   featuredCoursesURL,
@@ -13,7 +14,7 @@ import { constructIdMap } from "../redux_query"
 
 import type { Course } from "../../flow/discussionTypes"
 
-export const courseRequest = (courseId: string) => ({
+export const courseRequest = (courseId: number) => ({
   queryKey:  `courseRequest${courseId}`,
   url:       `${courseURL}/${courseId}/`,
   transform: (course: any) => ({
@@ -23,6 +24,15 @@ export const courseRequest = (courseId: string) => ({
     courses: R.merge
   }
 })
+
+export const coursesSelector = createSelector(
+  state => state.entities.courses,
+  courses => courses
+)
+
+export const courseSelector = createSelector(coursesSelector, courses =>
+  memoize(courseID => (courses ? courses[courseID] : null))
+)
 
 const courseListSelector = listName =>
   createSelector(

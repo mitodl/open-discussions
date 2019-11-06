@@ -9,15 +9,13 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
-  LR_TYPE_VIDEO,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_VIDEO
 } from "../constants"
-import { querySelectors } from "redux-query"
-import { courseRequest } from "./courses"
-import { bootcampRequest } from "./bootcamps"
-import { programRequest } from "./programs"
-import { videoRequest } from "./videos"
-import { userListRequest } from "./user_lists"
+import { courseRequest, courseSelector } from "./courses"
+import { bootcampRequest, bootcampSelector } from "./bootcamps"
+import { programRequest, programSelector } from "./programs"
+import { videoRequest, videoSelector } from "./videos"
+import { userListRequest, userListSelector } from "./user_lists"
 
 export const filterFavorites = (
   results: Array<Object>,
@@ -74,54 +72,17 @@ export const favoritesSelector = createSelector(
   })
 )
 
-export const getQuerySelector = (state: Object, object: Object) => {
-  return createSelector(
-    state => state.ui,
-    state => state.entities.courses,
-    state => state.entities.bootcamps,
-    state => state.entities.programs,
-    state => state.entities.userLists,
-    state => state.entities.videos,
-    state => state.queries,
-    (ui, courses, bootcamps, programs, userLists, videos, queries) => {
-      if (object && object.object_type) {
-        switch (object.object_type) {
-        case LR_TYPE_COURSE:
-          return querySelectors.isFinished(queries, courseRequest(object.id))
-            ? courses[object.id]
-            : null
-        case LR_TYPE_BOOTCAMP:
-          return querySelectors.isFinished(
-            queries,
-            bootcampRequest(object.id)
-          )
-            ? bootcamps[object.id]
-            : null
-        case LR_TYPE_PROGRAM:
-          return querySelectors.isFinished(queries, programRequest(object.id))
-            ? programs[object.id]
-            : null
-        case LR_TYPE_VIDEO:
-          return querySelectors.isFinished(queries, videoRequest(object.id))
-            ? videos[object.id]
-            : null
-        case LR_TYPE_USERLIST:
-          return querySelectors.isFinished(
-            queries,
-            userListRequest(object.id)
-          )
-            ? userLists[object.id]
-            : null
-        case LR_TYPE_LEARNINGPATH:
-          return querySelectors.isFinished(
-            queries,
-            userListRequest(object.id)
-          )
-            ? userLists[object.id]
-            : null
-        }
-      }
-      return null
-    }
-  )
+export const getResourceSelectorAndRequest = (object: Object) => {
+  switch (object.object_type) {
+  case LR_TYPE_COURSE:
+    return [courseSelector, courseRequest]
+  case LR_TYPE_BOOTCAMP:
+    return [bootcampSelector, bootcampRequest]
+  case LR_TYPE_PROGRAM:
+    return [programSelector, programRequest]
+  case LR_TYPE_VIDEO:
+    return [videoSelector, videoRequest]
+  default:
+    return [userListSelector, userListRequest]
+  }
 }

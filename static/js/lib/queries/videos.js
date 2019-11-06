@@ -1,13 +1,14 @@
 // @flow
 import R from "ramda"
 import { createSelector } from "reselect"
+import { memoize } from "lodash"
 
 import { videoApiURL } from "../url"
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { Video } from "../../flow/discussionTypes"
 
-export const videoRequest = (videoId: string) => ({
+export const videoRequest = (videoId: number) => ({
   queryKey:  `videoRequest${videoId}`,
   url:       `${videoApiURL}/${videoId}/`,
   transform: (video: any) => ({
@@ -32,6 +33,10 @@ export const videosRequest = () => ({
 export const videosSelector = createSelector(
   state => state.entities.videos,
   videos => videos
+)
+
+export const videoSelector = createSelector(videosSelector, videos =>
+  memoize(videoID => (videos ? videos[videoID] : null))
 )
 
 export const favoriteVideoMutation = (video: Video) => ({
