@@ -1,8 +1,7 @@
 // @flow
-import React from "react"
-import { connect, useDispatch, useSelector } from "react-redux"
-import { useRequest } from "redux-query-react"
-import { mutateAsync } from "redux-query"
+import React, { useCallback } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { useRequest, useMutation } from "redux-query-react"
 import { createSelector } from "reselect"
 import { Checkbox } from "@rmwc/checkbox"
 
@@ -29,13 +28,10 @@ import {
   userListsSelector
 } from "../lib/queries/user_lists"
 import { favoriteVideoMutation } from "../lib/queries/videos"
-
-import type { LearningResource, UserList } from "../flow/discussionTypes"
-import { getResourceSelectorAndRequest } from "../lib/queries/learning_resources"
-
-type Props = {
-  object: ?LearningResource
-}
+import {
+  learningResourceSelector,
+  getResourceRequest
+} from "../lib/queries/learning_resources"
 
 const userListsFormSelector = createSelector(
   userListsSelector,
@@ -43,19 +39,22 @@ const userListsFormSelector = createSelector(
     userLists ? Object.keys(userLists).map(key => userLists[key]) : []
 )
 
-export function AddToListDialog(props: Props) {
-  const { object } = props
-  const dispatch = useDispatch()
+const uiDialogSelector = createSelector(
+  state => state.ui,
+  ui => ui.dialogs.get(DIALOG_ADD_TO_LIST) || {}
+)
 
-  if (!object) {
-    return null
-  }
-
-  const [objectSelector, objectRequest] = getResourceSelectorAndRequest(object)
-  const [{ isFinished: isFinishedResource }] = useRequest(
-    objectRequest(object.id)
+export default function AddToListDialog() {
+  const { id: objectId, object_type: objectType } = useSelector(
+    uiDialogSelector
   )
-  const resource = useSelector(objectSelector)(object.id)
+
+  const [{ isFinished: isFinishedResource }] = useRequest(
+    getResourceRequest(objectId, objectType)
+  )
+
+  const resource = useSelector(learningResourceSelector)(objectId, objectType)
+
   const userLists = useSelector(userListsFormSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
 
@@ -67,35 +66,30 @@ export function AddToListDialog(props: Props) {
       }).map(userList => userList.id)
       : []
 
-  const hide = () => {
-    dispatch(hideDialog(DIALOG_ADD_TO_LIST))
-  }
+  const dispatch = useDispatch()
+  const hide = useCallback(
+    () => {
+      dispatch(hideDialog(DIALOG_ADD_TO_LIST))
+    },
+    [dispatch]
+  )
 
-  const toggleFavorite = resource => {
-    if (resource.object_type === LR_TYPE_COURSE) {
-      dispatch(mutateAsync(favoriteCourseMutation(resource)))
+  const [, toggleFavorite] = useMutation(resource => {
+    switch (resource.object_type) {
+    case LR_TYPE_COURSE:
+      return favoriteCourseMutation(resource)
+    case LR_TYPE_BOOTCAMP:
+      return favoriteBootcampMutation(resource)
+    case LR_TYPE_PROGRAM:
+      return favoriteProgramMutation(resource)
+    case LR_TYPE_VIDEO:
+      return favoriteVideoMutation(resource)
+    default:
+      return favoriteUserListMutation(resource)
     }
-    if (resource.object_type === LR_TYPE_BOOTCAMP) {
-      dispatch(mutateAsync(favoriteBootcampMutation(resource)))
-    }
-    if (resource.object_type === LR_TYPE_PROGRAM) {
-      dispatch(mutateAsync(favoriteProgramMutation(resource)))
-    }
-    if (
-      [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(resource.object_type)
-    ) {
-      dispatch(mutateAsync(favoriteUserListMutation(resource)))
-    }
-    if (resource.object_type === LR_TYPE_VIDEO) {
-      dispatch(mutateAsync(favoriteVideoMutation(resource)))
-    }
-  }
+  })
 
-  const toggleListItem = (
-    resource: LearningResource,
-    list: UserList,
-    remove: boolean
-  ) => {
+  const [, toggleListItem] = useMutation((resource, list, remove) => {
     list.items = [
       {
         content_type: resource.object_type,
@@ -103,8 +97,8 @@ export function AddToListDialog(props: Props) {
         delete:       remove
       }
     ]
-    dispatch(mutateAsync(userListMutation(list)))
-  }
+    return userListMutation(list)
+  })
 
   const renderAddToListForm = () => (
     <div className="user-listitem-form">
@@ -159,6 +153,7 @@ export function AddToListDialog(props: Props) {
       )}
     </div>
   )
+
   return resource && isFinishedList && isFinishedResource ? (
     <Dialog
       id="list-add-dialog"
@@ -174,12 +169,3 @@ export function AddToListDialog(props: Props) {
     </Dialog>
   ) : null
 }
-
-export const mapStateToProps = (state: Object) => {
-  const { ui } = state
-  return {
-    object: ui.dialogs.get(DIALOG_ADD_TO_LIST)
-  }
-}
-
-export default connect<Props, _, _, _, _, _>(mapStateToProps)(AddToListDialog)

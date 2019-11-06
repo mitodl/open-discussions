@@ -1,6 +1,5 @@
 // @flow
 import R from "ramda"
-import { memoize } from "lodash"
 
 import { bootcampURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
@@ -11,10 +10,6 @@ import { createSelector } from "reselect"
 export const bootcampsSelector = createSelector(
   state => state.entities.bootcamps,
   bootcamps => bootcamps
-)
-
-export const bootcampSelector = createSelector(bootcampsSelector, bootcamps =>
-  memoize(bootcampID => (bootcamps ? bootcamps[bootcampID] : null))
 )
 
 export const bootcampRequest = (bootcampId: number) => ({

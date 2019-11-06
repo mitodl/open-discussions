@@ -1,7 +1,6 @@
 // @flow
 import R from "ramda"
 import { createSelector } from "reselect"
-import { memoize } from "lodash"
 
 import { userListApiURL } from "../url"
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
@@ -33,10 +32,6 @@ export const userListsRequest = () => ({
 export const userListsSelector = createSelector(
   state => state.entities.userLists,
   userLists => userLists
-)
-
-export const userListSelector = createSelector(userListsSelector, userLists =>
-  memoize(userListID => (userLists ? userLists[userListID] : null))
 )
 
 export const favoriteUserListMutation = (userList: UserList) => ({

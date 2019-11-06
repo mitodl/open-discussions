@@ -1,6 +1,5 @@
 // @flow
 import R from "ramda"
-import { memoize } from "lodash"
 
 import { programURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
@@ -11,10 +10,6 @@ import { createSelector } from "reselect"
 export const programsSelector = createSelector(
   state => state.entities.programs,
   programs => programs
-)
-
-export const programSelector = createSelector(programsSelector, programs =>
-  memoize(programID => (programs ? programs[programID] : null))
 )
 
 export const programRequest = (programId: number) => ({

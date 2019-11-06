@@ -4,19 +4,20 @@ import { times } from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { AddToListDialog } from "./AddToListDialog"
+import AddToListDialog from "./AddToListDialog"
 import { makeCourse, makeUserList } from "../factories/learning_resources"
 import { courseURL, userListApiURL } from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
+import { DIALOG_ADD_TO_LIST, setDialogData } from "../actions/ui"
 
 describe("AddToListDialog", () => {
-  let render, userLists, helper, course
+  let renderDialog, userLists, helper, course
 
   beforeEach(() => {
     userLists = times(makeUserList, 5)
     course = makeCourse()
     helper = new IntegrationTestHelper()
-    render = helper.configureReduxQueryRenderer(AddToListDialog, {
+    renderDialog = helper.configureReduxQueryRenderer(AddToListDialog, {
       object: course
     })
     helper.handleRequestStub
@@ -31,6 +32,13 @@ describe("AddToListDialog", () => {
   afterEach(() => {
     helper.cleanup()
   })
+
+  const render = async (object = course) => {
+    const { wrapper, store } = await renderDialog({ object }, [
+      setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: object })
+    ])
+    return { wrapper, store }
+  }
 
   it("should render a dialog with all the right checkboxes", async () => {
     const { wrapper } = await render()
@@ -55,9 +63,7 @@ describe("AddToListDialog", () => {
         status: 200,
         body:   object
       })
-    const { wrapper } = await render({
-      object
-    })
+    const { wrapper } = await render(object)
     const checkboxes = wrapper.find(Checkbox)
 
     // Should be 1 checkbox for each list, plus 1 for favorites, -1 for excluded list
@@ -72,12 +78,10 @@ describe("AddToListDialog", () => {
     it(`${shouldIf(inList)} precheck a userlist if the resource is ${
       inList ? "" : "not"
     } in it`, async () => {
-      course.id = inList ? userLists[0].items[0].object_id : course.id
-      helper.handleRequestStub.withArgs(`${courseURL}/${course.id}/`).returns({
-        status: 200,
-        body:   course
-      })
-      const { wrapper } = await render()
+      if (inList) {
+        userLists[0].items[0].object_id = course.id
+      }
+      const { wrapper } = await render(course)
       assert.equal(
         wrapper
           .find(Checkbox)

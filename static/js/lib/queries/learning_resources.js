@@ -1,6 +1,7 @@
 // @flow
 import R from "ramda"
 import { createSelector } from "reselect"
+import { memoize } from "lodash"
 
 import { favoritesURL } from "../url"
 import { constructIdMap } from "../redux_query"
@@ -11,11 +12,11 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
 } from "../constants"
-import { courseRequest, courseSelector } from "./courses"
-import { bootcampRequest, bootcampSelector } from "./bootcamps"
-import { programRequest, programSelector } from "./programs"
-import { videoRequest, videoSelector } from "./videos"
-import { userListRequest, userListSelector } from "./user_lists"
+import { courseRequest } from "./courses"
+import { bootcampRequest } from "./bootcamps"
+import { programRequest } from "./programs"
+import { videoRequest } from "./videos"
+import { userListRequest } from "./user_lists"
 
 export const filterFavorites = (
   results: Array<Object>,
@@ -72,17 +73,44 @@ export const favoritesSelector = createSelector(
   })
 )
 
-export const getResourceSelectorAndRequest = (object: Object) => {
-  switch (object.object_type) {
+export const getResourceRequest = (objectId: ?number, objectType: ?string) => {
+  if (!objectId) {
+    return null
+  }
+
+  switch (objectType) {
   case LR_TYPE_COURSE:
-    return [courseSelector, courseRequest]
+    return courseRequest(objectId)
   case LR_TYPE_BOOTCAMP:
-    return [bootcampSelector, bootcampRequest]
+    return bootcampRequest(objectId)
   case LR_TYPE_PROGRAM:
-    return [programSelector, programRequest]
+    return programRequest(objectId)
   case LR_TYPE_VIDEO:
-    return [videoSelector, videoRequest]
+    return videoRequest(objectId)
   default:
-    return [userListSelector, userListRequest]
+    return userListRequest(objectId)
   }
 }
+
+export const learningResourceSelector = createSelector(
+  state => state.entities.courses,
+  state => state.entities.bootcamps,
+  state => state.entities.programs,
+  state => state.entities.userLists,
+  state => state.entities.videos,
+  (courses, bootcamps, programs, userLists, videos) =>
+    memoize((objectId, objectType) => {
+      switch (objectType) {
+      case LR_TYPE_COURSE:
+        return courses ? courses[objectId] : null
+      case LR_TYPE_BOOTCAMP:
+        return bootcamps ? bootcamps[objectId] : null
+      case LR_TYPE_PROGRAM:
+        return programs ? programs[objectId] : null
+      case LR_TYPE_VIDEO:
+        return videos ? videos[objectId] : null
+      default:
+        return userLists ? userLists[objectId] : null
+      }
+    })
+)

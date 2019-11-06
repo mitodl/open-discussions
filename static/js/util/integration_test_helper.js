@@ -196,8 +196,9 @@ export default class IntegrationTestHelper {
 
   configureReduxQueryRenderer(Component, defaultProps = {}) {
     const history = this.browserHistory
-    return async (extraProps = { history }) => {
+    return async (extraProps = { history }, beforeRenderActions = []) => {
       const store = this.createFullStore()
+      beforeRenderActions.forEach(action => store.dispatch(action))
 
       const wrapper = await mount(
         <Provider store={store}>

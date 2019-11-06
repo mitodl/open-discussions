@@ -1,7 +1,6 @@
 // @flow
 import R from "ramda"
 import { createSelector } from "reselect"
-import { memoize } from "lodash"
 
 import {
   featuredCoursesURL,
@@ -28,10 +27,6 @@ export const courseRequest = (courseId: number) => ({
 export const coursesSelector = createSelector(
   state => state.entities.courses,
   courses => courses
-)
-
-export const courseSelector = createSelector(coursesSelector, courses =>
-  memoize(courseID => (courses ? courses[courseID] : null))
 )
 
 const courseListSelector = listName =>
