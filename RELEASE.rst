@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.98.0 (Released November 07, 2019)
+--------------
+
+- use youtube playlist item call to get around search limit
+- add the ability to delete user lists
+- Allow programs, videos, and user lists to be added as UserList items (#2346)
+- Fix favoriting of lists and paths (#2341)
+- fix display of the "My Lists" link
+
 Version 0.97.2 (Released November 04, 2019)
 --------------
 
