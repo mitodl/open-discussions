@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.98.0
+Version 0.98.0 (Released November 07, 2019)
 --------------
 
 - use youtube playlist item call to get around search limit
