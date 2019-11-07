@@ -12,7 +12,7 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import UserListCard from "../components/UserListCard"
-import CreateUserListDialog from "../components/CreateUserListDialog"
+import UserListFormDialog from "../components/UserListFormDialog"
 import LoginTooltip from "../components/LoginTooltip"
 
 import { userListsRequest, userListsSelector } from "../lib/queries/user_lists"
@@ -39,7 +39,7 @@ export default function UserListsPage() {
         </BannerContainer>
       </BannerPageHeader>
       {showCreateListDialog ? (
-        <CreateUserListDialog hide={() => setShowCreateListDialog(false)} />
+        <UserListFormDialog hide={() => setShowCreateListDialog(false)} />
       ) : null}
       <Grid className="main-content one-column narrow user-list-page">
         <Cell width={12} className="first-row">

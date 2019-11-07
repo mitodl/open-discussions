@@ -41,19 +41,19 @@ describe("UserListsPage tests", () => {
 
   it("should hide and show the create list dialog", async () => {
     const { wrapper } = await render()
-    assert.isNotOk(wrapper.find("CreateUserListDialog").exists())
+    assert.isNotOk(wrapper.find("UserListFormDialog").exists())
     wrapper.find(".blue-btn").simulate("click")
-    assert.ok(wrapper.find("CreateUserListDialog").exists())
-    wrapper.find("CreateUserListDialog").prop("hide")()
+    assert.ok(wrapper.find("UserListFormDialog").exists())
+    wrapper.find("UserListFormDialog").prop("hide")()
     wrapper.update()
-    assert.isNotOk(wrapper.find("CreateUserListDialog").exists())
+    assert.isNotOk(wrapper.find("UserListFormDialog").exists())
   })
 
   it("should not open create list dialog for anonymous users", async () => {
     helper.sandbox.stub(util, "userIsAnonymous").returns(true)
     const { wrapper } = await render()
-    assert.isNotOk(wrapper.find("CreateUserListDialog").exists())
+    assert.isNotOk(wrapper.find("UserListFormDialog").exists())
     wrapper.find(".blue-btn").simulate("click")
-    assert.isNotOk(wrapper.find("CreateUserListDialog").exists())
+    assert.isNotOk(wrapper.find("UserListFormDialog").exists())
   })
 })

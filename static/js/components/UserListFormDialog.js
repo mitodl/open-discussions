@@ -5,7 +5,10 @@ import { Formik, Form, Field } from "formik"
 
 import Dialog from "./Dialog"
 
-import { createUserListMutation } from "../lib/queries/user_lists"
+import {
+  createUserListMutation,
+  userListMutation
+} from "../lib/queries/user_lists"
 import {
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
@@ -17,32 +20,54 @@ import {
   validationMessage
 } from "../lib/validation"
 
+import type { UserList } from "../flow/discussionTypes"
+
 type Props = {
-  hide: Function
+  hide: Function,
+  userList?: UserList
 }
 
-export default function CreateUserListDialog(props: Props) {
-  const { hide } = props
+export default function UserListFormDialog(props: Props) {
+  // if a userList is provided we're editing it,
+  // if not we're creating a new userList
+  const { hide, userList } = props
 
   const [, createUserList] = useMutation(createUserListMutation)
+  const [, updateUserList] = useMutation(userListMutation)
 
   return (
     <Formik
       onSubmit={async params => {
-        await createUserList(params)
+        if (userList) {
+          await updateUserList({
+            ...params,
+            id: userList.id
+          })
+        } else {
+          await createUserList(params)
+        }
         hide()
       }}
-      initialValues={{
-        title:             "",
-        short_description: ""
-      }}
+      initialValues={
+        userList
+          ? {
+            title:             userList.title,
+            short_description: userList.short_description,
+            privacy_level:     userList.privacy_level,
+            list_type:         userList.list_type
+          }
+          : {
+            title:             "",
+            short_description: ""
+          }
+      }
       validate={validateCreateUserListForm}
       validateOnBlur={false}
       validateOnChange={false}
     >
       {({ handleSubmit, errors }) => (
         <Dialog
-          title="Create new list"
+          title={userList ? `Edit ${userList.title}` : "Create new list"}
           open={true}
           hideDialog={hide}
           onAccept={handleSubmit}

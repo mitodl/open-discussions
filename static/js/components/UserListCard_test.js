@@ -6,6 +6,7 @@ import sinon from "sinon"
 import UserListCard from "./UserListCard"
 import DropdownMenu from "./DropdownMenu"
 import Dialog from "./Dialog"
+import UserListFormDialog from "./UserListFormDialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeUserList, makeUserListItem } from "../factories/learning_resources"
@@ -28,15 +29,19 @@ describe("UserListCard tests", () => {
     helper.cleanup()
   })
 
-  const getDeleteDialog = wrapper => {
+  const getDialog = R.curry((index, Component, wrapper) => {
     wrapper.find(".more_vert").simulate("click")
     wrapper.update()
     wrapper
       .find(DropdownMenu)
       .find("div")
+      .at(index)
       .simulate("click")
-    return wrapper.find(Dialog)
-  }
+    return wrapper.find(Component)
+  })
+
+  const getDeleteDialog = getDialog(0, Dialog)
+  const getEditDialog = getDialog(1, UserListFormDialog)
 
   it("should print the list type (learning path || list)", async () => {
     const { wrapper } = await renderUserListCard()
@@ -92,7 +97,7 @@ describe("UserListCard tests", () => {
     )
     hideDialog()
     wrapper.update()
-    assert.isNotOk(wrapper.find("Dialog").exists())
+    assert.isNotOk(wrapper.find(Dialog).exists())
   })
 
   it("should issue a DELETE request if the user confirms", async () => {
@@ -105,5 +110,14 @@ describe("UserListCard tests", () => {
       `${userListApiURL}/${userList.id}/`,
       "DELETE"
     )
+  })
+
+  it("should let you open a dialog to edit the UserList", async () => {
+    const { wrapper } = await renderUserListCard()
+    const dialog = getEditDialog(wrapper)
+    assert.deepEqual(dialog.prop("userList"), userList)
+    dialog.prop("hide")()
+    wrapper.update()
+    assert.isNotOk(wrapper.find(Dialog).exists())
   })
 })

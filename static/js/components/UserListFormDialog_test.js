@@ -1,7 +1,8 @@
 // @flow
 import { assert } from "chai"
 
-import CreateUserListDialog from "./CreateUserListDialog"
+import UserListFormDialog from "./UserListFormDialog"
+import Dialog from "./Dialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeUserList } from "../factories/learning_resources"
@@ -15,13 +16,13 @@ import { wait } from "../lib/util"
 import { userListApiURL } from "../lib/url"
 import { changeFormikInput } from "../lib/test_utils"
 
-describe("CreateUserListDialog", () => {
+describe("UserListFormDialog", () => {
   let render, userList, helper, hideStub
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     hideStub = helper.sandbox.stub()
-    render = helper.configureReduxQueryRenderer(CreateUserListDialog, {
+    render = helper.configureReduxQueryRenderer(UserListFormDialog, {
       hide: hideStub
     })
     userList = makeUserList()
@@ -90,6 +91,48 @@ describe("CreateUserListDialog", () => {
       short_description: "My Great Description",
       list_type:         LR_TYPE_USERLIST,
       privacy_level:     LR_PUBLIC
+    })
+  })
+
+  it("should pre-populate fields when you pass a list", async () => {
+    const { wrapper } = await render({ userList })
+    assert.equal(wrapper.find(Dialog).prop("title"), `Edit ${userList.title}`)
+    assert.isTrue(
+      wrapper.find(`input[value="${userList.list_type}"]`).prop("checked")
+    )
+    assert.isTrue(
+      wrapper.find(`input[value="${userList.privacy_level}"]`).prop("checked")
+    )
+    assert.equal(
+      wrapper.find('input[name="title"]').prop("value"),
+      userList.title
+    )
+    assert.equal(
+      wrapper.find("textarea").prop("value"),
+      userList.short_description
+    )
+  })
+
+  it("should let you edit and then patch a list", async () => {
+    const { wrapper } = await render({ userList })
+    changeFormikInput(
+      wrapper.find('input[name="title"]'),
+      "title",
+      "My Brand New Title"
+    )
+    wrapper.update()
+    wrapper.find("form").simulate("submit")
+    await wait(50)
+    assert.ok(hideStub.called)
+    const [url, method, { body }] = helper.handleRequestStub.args[0]
+    assert.equal(url, `${userListApiURL}/${userList.id}/`)
+    assert.equal(method, "PATCH")
+    assert.deepEqual(body, {
+      title:             "My Brand New Title",
+      short_description: userList.short_description,
+      privacy_level:     userList.privacy_level,
+      list_type:         userList.list_type,
+      id:                userList.id
     })
   })
 })

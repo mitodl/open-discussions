@@ -8,6 +8,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 import Dialog from "./Dialog"
 import DropdownMenu from "./DropdownMenu"
+import UserListFormDialog from "./UserListFormDialog"
 
 import {
   defaultResourceImageURL,
@@ -38,7 +39,7 @@ type Props = {
 }
 
 function ConfirmDeleteDialog(props) {
-  const { userList, close } = props
+  const { userList, hide } = props
 
   const [, deleteUserList] = useMutation(deleteUserListMutation)
 
@@ -46,11 +47,11 @@ function ConfirmDeleteDialog(props) {
     <Dialog
       title={`Delete this ${readableLearningResources[userList.list_type]}?`}
       open={true}
-      hideDialog={close}
+      hideDialog={hide}
       submitText="Delete"
       onAccept={() => {
         deleteUserList(userList)
-        close()
+        hide()
       }}
     >
       Are you sure you want to delete this{" "}
@@ -63,6 +64,7 @@ export default function UserListCard(props: Props) {
   const { userList } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [showEditDialog, setShowEditDialog] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
 
   return (
@@ -70,7 +72,13 @@ export default function UserListCard(props: Props) {
       {showDeleteDialog ? (
         <ConfirmDeleteDialog
           userList={userList}
-          close={() => setShowDeleteDialog(false)}
+          hide={() => setShowDeleteDialog(false)}
+        />
+      ) : null}
+      {showEditDialog ? (
+        <UserListFormDialog
+          userList={userList}
+          hide={() => setShowEditDialog(false)}
         />
       ) : null}
       <div className="userlist-info">
@@ -92,6 +100,9 @@ export default function UserListCard(props: Props) {
             <DropdownMenu closeMenu={() => setShowMenu(false)}>
               <li>
                 <div onClick={() => setShowDeleteDialog(true)}>Delete</div>
+              </li>
+              <li>
+                <div onClick={() => setShowEditDialog(true)}>Edit</div>
               </li>
             </DropdownMenu>
           ) : null}
