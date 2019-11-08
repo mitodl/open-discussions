@@ -1,0 +1,2920 @@
+{
+ "kind": "youtube#videoListResponse",
+ "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/_4yGWuQqFNOY9m1W9Brq4N9Nho0\"",
+ "pageInfo": {
+  "totalResults": 50,
+  "resultsPerPage": 50
+ },
+ "items": [
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/uaaPwjRrItR132b5JR8JQcIdKOw\"",
+   "id": "hNDFwVVKVk0",
+   "snippet": {
+    "publishedAt": "2012-08-09T18:56:41.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Course Introduction | MIT 18.06SC Linear Algebra",
+    "description": "Course Introduction\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06SCF11\n\nProfessor Gil Strang describes the key concepts of undergraduate course Linear Algebra, who should take it, and how it is taught. He provides examples of applications of linear algebra and how it is useful in physics, economics and social sciences, natural sciences, and engineering.\n\nLicense: Creative Commons BY-NC-SA\nMore information at http://ocw.mit.edu/terms\nMore courses at http://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/hNDFwVVKVk0/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/hNDFwVVKVk0/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/hNDFwVVKVk0/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "Linear Algebra",
+     "Matrices",
+     "Data Arrays",
+     "Data Networks",
+     "Systems of Linear Equations",
+     "Matrix Operations"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Course Introduction | MIT 18.06SC Linear Algebra",
+     "description": "Course Introduction\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06SCF11\n\nProfessor Gil Strang describes the key concepts of undergraduate course Linear Algebra, who should take it, and how it is taught. He provides examples of applications of linear algebra and how it is useful in physics, economics and social sciences, natural sciences, and engineering.\n\nLicense: Creative Commons BY-NC-SA\nMore information at http://ocw.mit.edu/terms\nMore courses at http://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT7M13S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/LyWvVBChokCFp5vwmSxcbqKgvhQ\"",
+   "id": "7UJ4CFRGd-U",
+   "snippet": {
+    "publishedAt": "2019-08-19T11:25:37.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "An Interview with Gilbert Strang on Teaching Linear Algebra",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nInstructor: Gilbert Strang, Sarah Hansen\nView the complete course: https://ocw.mit.edu/18-06SCF11\nYouTube Playlist: https://www.youtube.com/playlist?list=PLUl4u3cNGP63uMA4q8GaU6Eg5nzeOc8tx\n\nIn this video, Professor Gilbert Strang shares how he infuses linear algebra with a sense of humanity as a way to engage students in learning mathematics.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "In this video"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "An Interview with Gilbert Strang on Teaching Linear Algebra",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nInstructor: Gilbert Strang, Sarah Hansen\nView the complete course: https://ocw.mit.edu/18-06SCF11\nYouTube Playlist: https://www.youtube.com/playlist?list=PLUl4u3cNGP63uMA4q8GaU6Eg5nzeOc8tx\n\nIn this video, Professor Gilbert Strang shares how he infuses linear algebra with a sense of humanity as a way to engage students in learning mathematics.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en-US"
+   },
+   "contentDetails": {
+    "duration": "PT7M34S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/sf5SfokEmKNY_RMArzW6ZQrzlYo\"",
+   "id": "J7DzL2_Na80",
+   "snippet": {
+    "publishedAt": "2019-09-24T20:20:31.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "1. The Geometry of Linear Equations",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n1. The Geometry of Linear Equations\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/J7DzL2_Na80/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/J7DzL2_Na80/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/J7DzL2_Na80/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/J7DzL2_Na80/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "Geometry",
+     "Linear Equations",
+     "Linear Algebra"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "1. The Geometry of Linear Equations",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n1. The Geometry of Linear Equations\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en-US"
+   },
+   "contentDetails": {
+    "duration": "PT39M49S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/taOpMY1hIb6RrQzy8MRtHUluI_s\"",
+   "id": "My5w4MXWBew",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:03.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Geometry of Linear Algebra",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on the geometry of linear algebra.\n\nWatch this in Chinese: https://youtu.be/mgbjhzDndOY\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/My5w4MXWBew/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/My5w4MXWBew/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/My5w4MXWBew/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/My5w4MXWBew/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/My5w4MXWBew/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "geometry"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Geometry of Linear Algebra",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on the geometry of linear algebra.\n\nWatch this in Chinese: https://youtu.be/mgbjhzDndOY\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT16M36S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/hxefW-YlX4K_T_V0m1oWaGGzKUU\"",
+   "id": "0oBJN8F616U",
+   "snippet": {
+    "publishedAt": "2009-02-25T18:30:37.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Rec 1 | MIT 18.085 Computational Science and Engineering I, Fall 2008",
+    "description": "Recitation 1: Key ideas of linear algebra\r\n\r\nLicense: Creative Commons BY-NC-SA\r\nMore information at http://ocw.mit.edu/terms\r\nMore courses at http://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/0oBJN8F616U/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/0oBJN8F616U/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/0oBJN8F616U/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear",
+     "algebra",
+     "networks",
+     "Lagrange",
+     "multipliers",
+     "differential",
+     "equations",
+     "of",
+     "equilibrium",
+     "Laplace's",
+     "equation",
+     "potential",
+     "flow",
+     "boundary-value",
+     "problems",
+     "Fourier",
+     "series",
+     "discrete",
+     "transform",
+     "convolution"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Rec 1 | MIT 18.085 Computational Science and Engineering I, Fall 2008",
+     "description": "Recitation 1: Key ideas of linear algebra\r\n\r\nLicense: Creative Commons BY-NC-SA\r\nMore information at http://ocw.mit.edu/terms\r\nMore courses at http://ocw.mit.edu"
+    }
+   },
+   "contentDetails": {
+    "duration": "PT49M32S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/OOEOwApPe7YQfLhcwPRjIiLmFrk\"",
+   "id": "OZxzHcW663g",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:43.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "An Overview of Key Ideas",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant introduces key ideas found in the course 18.085. \n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/OZxzHcW663g/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/OZxzHcW663g/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/OZxzHcW663g/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/OZxzHcW663g/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/OZxzHcW663g/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "18.085"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "An Overview of Key Ideas",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant introduces key ideas found in the course 18.085. \n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT7M44S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/RTljC9W4DwA7_SmJXUetyEDKzqM\"",
+   "id": "QVKj3LADCnA",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:00:50.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "2. Elimination with Matrices.",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list...\n\n2. Elimination with Matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/QVKj3LADCnA/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/QVKj3LADCnA/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/QVKj3LADCnA/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "2. Elimination with Matrices.",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list...\n\n2. Elimination with Matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT47M42S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/SGGEIAsFUPoyXyOSroohQXSH2bw\"",
+   "id": "GLFg2UBMAxc",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:43.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Elimination with Matrices",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on elimination with matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/GLFg2UBMAxc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/GLFg2UBMAxc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/GLFg2UBMAxc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/GLFg2UBMAxc/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/GLFg2UBMAxc/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "elimination",
+     "matrices"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Elimination with Matrices",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on elimination with matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M18S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/84lX4b1cOoO3IrMwEA8uFk1ajGU\"",
+   "id": "FX4C-JpTFgY",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:09:45.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "3. Multiplication and Inverse Matrices",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n3. Multiplication and Inverse Matrices\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/FX4C-JpTFgY/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/FX4C-JpTFgY/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/FX4C-JpTFgY/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "3. Multiplication and Inverse Matrices",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n3. Multiplication and Inverse Matrices\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT46M49S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/hyHtYg5RGacl-CrpWhTR9KhrBIs\"",
+   "id": "zWxhmBCdvFs",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:43.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Inverse Matrices",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on inverse matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/zWxhmBCdvFs/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/zWxhmBCdvFs/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/zWxhmBCdvFs/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/zWxhmBCdvFs/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/zWxhmBCdvFs/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "inverse matrices"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Inverse Matrices",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on inverse matrices.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT8M25S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/THUwFS8x8eLevbj9FPm91BW89Y4\"",
+   "id": "MsIvs_6vC38",
+   "snippet": {
+    "publishedAt": "2017-04-24T18:01:31.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "4. Factorization into A = LU",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n4. Factorization into A = LU\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/MsIvs_6vC38/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/MsIvs_6vC38/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/MsIvs_6vC38/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/MsIvs_6vC38/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "Factorization",
+     "A = LU",
+     "product",
+     "inverse matrices",
+     "elimination matrices",
+     "gaussian elimination",
+     "linear algebra"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "4. Factorization into A = LU",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n4. Factorization into A = LU\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT48M5S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/jhnFCmpLwhHd5JqsgNhUAmxTc0s\"",
+   "id": "-eA2D_rIcNA",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "LU Decomposition",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on LU decomposition.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/-eA2D_rIcNA/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/-eA2D_rIcNA/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/-eA2D_rIcNA/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/-eA2D_rIcNA/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/-eA2D_rIcNA/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "LU decomposition"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "LU Decomposition",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on LU decomposition.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M35S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/7PExxuQ_ZTi0OpcdeYG9J_zZJ3E\"",
+   "id": "JibVXBElKL0",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:38:13.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "5. Transposes, Permutations, Spaces R^n",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n5. Transposes, Permutations, Spaces R^n\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/JibVXBElKL0/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/JibVXBElKL0/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/JibVXBElKL0/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "5. Transposes, Permutations, Spaces R^n",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n5. Transposes, Permutations, Spaces R^n\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT47M42S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/p7HaGgddzbxmMR_L09-qPZREXi8\"",
+   "id": "QQpvGlF_1Qo",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Subspaces of Three Dimensional Space",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on subspaces of three dimensional space.\n\nWatch this video in Chinese: https://youtu.be/VyPIQ_8QqEk\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/QQpvGlF_1Qo/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/QQpvGlF_1Qo/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/QQpvGlF_1Qo/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/QQpvGlF_1Qo/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/QQpvGlF_1Qo/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "three-dimensional space",
+     "subspaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Subspaces of Three Dimensional Space",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on subspaces of three dimensional space.\n\nWatch this video in Chinese: https://youtu.be/VyPIQ_8QqEk\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT14M45S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/8Hv8fYpTJ_QdDDGPU0eFq6DOFUE\"",
+   "id": "8o5Cmfpeo6g",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:18:37.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "6. Column Space and Nullspace",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n6. Column Space and Nullspace\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/8o5Cmfpeo6g/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/8o5Cmfpeo6g/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/8o5Cmfpeo6g/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "6. Column Space and Nullspace",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n6. Column Space and Nullspace\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT46M1S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/1Z5YNDnnqc3xIF9fP5i0w0LLde0\"",
+   "id": "S8DQZjE4V8U",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Vector Subspaces",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on vector subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/S8DQZjE4V8U/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/S8DQZjE4V8U/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/S8DQZjE4V8U/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/S8DQZjE4V8U/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/S8DQZjE4V8U/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "vector subspaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Vector Subspaces",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on vector subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT8M46S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/KE8SwIRv-ff4RhkQuqd3cNNsdJM\"",
+   "id": "VqP2tREMvt0",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:54:12.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "7. Solving Ax = 0: Pivot Variables, Special Solutions",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n7. Solving Ax = 0: Pivot Variables, Special Solutions\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/VqP2tREMvt0/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/VqP2tREMvt0/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/VqP2tREMvt0/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "7. Solving Ax = 0: Pivot Variables, Special Solutions",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n7. Solving Ax = 0: Pivot Variables, Special Solutions\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT43M20S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Nm2xUVZplXDtD69VoQTygqv2je8\"",
+   "id": "3cMyj8EKFGo",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:45.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Solving Ax=0",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on solving Ax=0.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/3cMyj8EKFGo/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/3cMyj8EKFGo/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/3cMyj8EKFGo/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/3cMyj8EKFGo/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/3cMyj8EKFGo/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "Ax=0"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Solving Ax=0",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on solving Ax=0.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M4S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/fR7BJuge3ZkDXEbDTdOQoDrEcXE\"",
+   "id": "9Q1q7s1jTzU",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:07:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "8. Solving Ax = b: Row Reduced Form R",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n8. Solving Ax = b: Row Reduced Form R\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/9Q1q7s1jTzU/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/9Q1q7s1jTzU/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/9Q1q7s1jTzU/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "8. Solving Ax = b: Row Reduced Form R",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n8. Solving Ax = b: Row Reduced Form R\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT47M20S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/lDkRlo_Q-kv5zU7A7I_ingdyacw\"",
+   "id": "fjsPjh0B2tU",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:03.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Solving Ax=b",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on solving Ax=b.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/fjsPjh0B2tU/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/fjsPjh0B2tU/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/fjsPjh0B2tU/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/fjsPjh0B2tU/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/fjsPjh0B2tU/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "Ax=b"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Solving Ax=b",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Martina Balagovic\n\nA teaching assistant works through a problem on solving Ax=b.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M4S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/vCWSQvMmqBWACJVwwRpq99JZxxE\"",
+   "id": "yjBerM5jWsc",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:10:37.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "9. Independence, Basis, and Dimension",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n9. Independence, Basis, and Dimension\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/yjBerM5jWsc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/yjBerM5jWsc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/yjBerM5jWsc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "9. Independence, Basis, and Dimension",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n9. Independence, Basis, and Dimension\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT50M14S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/LpPaNBizFNy-vEgS0YPRxZvdomA\"",
+   "id": "MMWqGD4Urso",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Basis and Dimension",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on basis and dimension.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/MMWqGD4Urso/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/MMWqGD4Urso/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/MMWqGD4Urso/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/MMWqGD4Urso/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/MMWqGD4Urso/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "basis and dimension"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Basis and Dimension",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on basis and dimension.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT8M10S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/WZlDVJS1cAdupzTxTS3HuLshEhQ\"",
+   "id": "nHlE7EgJFds",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:41:23.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "10. The Four Fundamental Subspaces",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n10. The Four Fundamental Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/nHlE7EgJFds/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/nHlE7EgJFds/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/nHlE7EgJFds/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "10. The Four Fundamental Subspaces",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n10. The Four Fundamental Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT49M20S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/CVDtZDzc4erDx9wnfNUtvVgcDC0\"",
+   "id": "D8u1LV9CnCk",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Computing the Four Fundamental Subspaces",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on the four fundamental subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/D8u1LV9CnCk/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/D8u1LV9CnCk/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/D8u1LV9CnCk/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/D8u1LV9CnCk/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/D8u1LV9CnCk/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "fundamental subspaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Computing the Four Fundamental Subspaces",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on the four fundamental subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M45S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/g21bu4JLC8OhUnzRcG57RtyimVY\"",
+   "id": "2IdtqGM6KWU",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:17:50.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "11. Matrix Spaces; Rank 1; Small World Graphs",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n11. Matrix Spaces; Rank 1; Small World Graphs\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/2IdtqGM6KWU/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/2IdtqGM6KWU/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/2IdtqGM6KWU/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "11. Matrix Spaces; Rank 1; Small World Graphs",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n11. Matrix Spaces; Rank 1; Small World Graphs\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT45M56S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/LXqhTdO--s36YnWTqubFM-Mwa_8\"",
+   "id": "BaBoztM9Q1w",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:43.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Matrix Spaces",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\n A teaching assistant works through a problem on matrix spaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/BaBoztM9Q1w/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/BaBoztM9Q1w/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/BaBoztM9Q1w/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/BaBoztM9Q1w/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/BaBoztM9Q1w/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "matrix spaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Matrix Spaces",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\n A teaching assistant works through a problem on matrix spaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT8M56S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/eh0FQlIDWjWWDNg1dEWh6FbnU30\"",
+   "id": "6-wh6yvk6uc",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:19:59.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "12. Graphs, Networks, Incidence Matrices",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n12. Graphs, Networks, Incidence Matrices\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/6-wh6yvk6uc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/6-wh6yvk6uc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/6-wh6yvk6uc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "12. Graphs, Networks, Incidence Matrices",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n12. Graphs, Networks, Incidence Matrices\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT47M57S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/RkUQ1B9wsxzFSvGvZSv_3MOlMTA\"",
+   "id": "h0m2tsmSPTI",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Graphs and Networks",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on graphs and networks.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/h0m2tsmSPTI/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/h0m2tsmSPTI/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/h0m2tsmSPTI/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/h0m2tsmSPTI/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/h0m2tsmSPTI/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "graphs",
+     "networks"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Graphs and Networks",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on graphs and networks.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT12M31S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/MwV5lOV4BGcEOqN4K8--l7APtGc\"",
+   "id": "l88D4r74gtM",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:12:50.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "13. Quiz 1 Review",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n13. Quiz 1 Review\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/l88D4r74gtM/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/l88D4r74gtM/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/l88D4r74gtM/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "13. Quiz 1 Review",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n13. Quiz 1 Review\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT47M40S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/sh7oQgAov8Y-YV6kxJX42nDfmGI\"",
+   "id": "AMLekTJR5_U",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Exam #1 Problem Solving",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant introduces problems found in the first exam.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/AMLekTJR5_U/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/AMLekTJR5_U/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/AMLekTJR5_U/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/AMLekTJR5_U/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/AMLekTJR5_U/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "exam review"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Exam #1 Problem Solving",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant introduces problems found in the first exam.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT14M53S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/KpW3tH7oppeIjNcOSRyfmtWUUXs\"",
+   "id": "YzZUIYRCE38",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:41:34.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "14. Orthogonal Vectors and Subspaces",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n14. Orthogonal Vectors and Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/YzZUIYRCE38/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/YzZUIYRCE38/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/YzZUIYRCE38/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "14. Orthogonal Vectors and Subspaces",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n14. Orthogonal Vectors and Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT49M48S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/2mwu314_r2E8fLHeSdWjNW7gVuU\"",
+   "id": "h9aDgvW59TU",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Orthogonal Vectors and Subspaces",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: David Shirokoff\n\nA teaching assistant works through a problem on orthogonal vectors and subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/h9aDgvW59TU/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/h9aDgvW59TU/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/h9aDgvW59TU/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/h9aDgvW59TU/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/h9aDgvW59TU/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "orthogonal vectors",
+     "subspaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Orthogonal Vectors and Subspaces",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: David Shirokoff\n\nA teaching assistant works through a problem on orthogonal vectors and subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M20S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/sXAFKTnM5Qy8dZKbI4mONWbn-b0\"",
+   "id": "Y_Ac6KiQ1t0",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:23:22.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "15. Projections onto Subspaces",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n15. Projections onto Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/Y_Ac6KiQ1t0/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/Y_Ac6KiQ1t0/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/Y_Ac6KiQ1t0/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "15. Projections onto Subspaces",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n15. Projections onto Subspaces\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT48M51S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/IzWztE5t6qIjs2NFLQ0hERbsD3U\"",
+   "id": "t-n4a18AW08",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Projection into Subspaces",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on projection into subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/t-n4a18AW08/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/t-n4a18AW08/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/t-n4a18AW08/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/t-n4a18AW08/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/t-n4a18AW08/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "projection",
+     "subspaces"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Projection into Subspaces",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on projection into subspaces.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M51S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/R-tqhmwptCfOpNuGDeyAFIyA1J8\"",
+   "id": "osh80YCg_GM",
+   "snippet": {
+    "publishedAt": "2009-05-07T03:28:47.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "16. Projection Matrices and Least Squares",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n16. Projection Matrices and Least Squares\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/osh80YCg_GM/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/osh80YCg_GM/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/osh80YCg_GM/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "16. Projection Matrices and Least Squares",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n16. Projection Matrices and Least Squares\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT48M5S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/YO3EAQXuLC3Nx3gYiUN-zmlSRXM\"",
+   "id": "AmQcoopBUTk",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Least Squares Approximation",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on least squares approximation.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/AmQcoopBUTk/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/AmQcoopBUTk/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/AmQcoopBUTk/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/AmQcoopBUTk/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/AmQcoopBUTk/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "approximation"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Least Squares Approximation",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\nA teaching assistant works through a problem on least squares approximation.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT8M4S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/qHN-LCDrQL6Jfv_KT8xq3ac1PxM\"",
+   "id": "0MtwqhIwdrI",
+   "snippet": {
+    "publishedAt": "2019-09-24T20:20:31.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "17. Orthogonal Matrices and Gram-Schmidt",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n17. Orthogonal Matrices and Gram-Schmidt\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/0MtwqhIwdrI/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/0MtwqhIwdrI/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/0MtwqhIwdrI/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/0MtwqhIwdrI/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "Orthogonal Matrices",
+     "Gram-Schmidt",
+     "Linear Algebra"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "17. Orthogonal Matrices and Gram-Schmidt",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n17. Orthogonal Matrices and Gram-Schmidt\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en-US"
+   },
+   "contentDetails": {
+    "duration": "PT49M10S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/xU3VSDNs85Ii_I89RXZxBUKO4iA\"",
+   "id": "HEQuN0QELSQ",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Gram-Schmidt Orthogonalization",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on Gram-Schmidt orthogonalization.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/HEQuN0QELSQ/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/HEQuN0QELSQ/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/HEQuN0QELSQ/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/HEQuN0QELSQ/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/HEQuN0QELSQ/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "Gram-Schmidt orthogonalization"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Gram-Schmidt Orthogonalization",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\nA teaching assistant works through a problem on Gram-Schmidt orthogonalization.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/cxySJVHW-2Z16Kjm1cnOS3U0ykU\"",
+   "id": "srxexLishgY",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:26:24.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "18. Properties of Determinants",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n18. Properties of Determinants\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/srxexLishgY/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/srxexLishgY/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/srxexLishgY/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "18. Properties of Determinants",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n18. Properties of Determinants\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT49M12S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/KnIRG03SGD4VEu4R1WMf7_CG7QA\"",
+   "id": "55AoWKZZtww",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:59:04.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Properties of Determinants",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\n A teaching assistant works through a problem on properties of determinants.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/55AoWKZZtww/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/55AoWKZZtww/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/55AoWKZZtww/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/55AoWKZZtww/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/55AoWKZZtww/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "properties of determinants"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Properties of Determinants",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ana Rita Pires\n\n A teaching assistant works through a problem on properties of determinants.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M56S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Clys_pqVrEI8SZRJbofEJfstW6s\"",
+   "id": "23LLB9mNJvc",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:03:28.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "19. Determinant Formulas and Cofactors",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n19. Determinant Formulas and Cofactors\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/23LLB9mNJvc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/23LLB9mNJvc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/23LLB9mNJvc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "19. Determinant Formulas and Cofactors",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n19. Determinant Formulas and Cofactors\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT53M17S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/pQD_6GMf50w1f37CYdGHYD7ZU0s\"",
+   "id": "B17h10EF59g",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Determinants",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on determinants.\n\nWatch this video in Chinese: https://youtu.be/ZyYGJc9jNno\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/B17h10EF59g/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/B17h10EF59g/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/B17h10EF59g/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/B17h10EF59g/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/B17h10EF59g/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "determinants"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Determinants",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on determinants.\n\nWatch this video in Chinese: https://youtu.be/ZyYGJc9jNno\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT12M49S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/eYgLoaATTAzxukmQjkjP-GNm0bM\"",
+   "id": "QNpj-gOXW9M",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:42:39.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "20. Cramer's Rule, Inverse Matrix, and Volume",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n20. Cramer's Rule, Inverse Matrix, and Volume\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/QNpj-gOXW9M/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/QNpj-gOXW9M/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/QNpj-gOXW9M/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "20. Cramer's Rule, Inverse Matrix, and Volume",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n20. Cramer's Rule, Inverse Matrix, and Volume\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT51M1S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/E52w7R-RqCI9jo0QLFcjycGOgmw\"",
+   "id": "qEBi0K5wfOs",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Determinants and Volume",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on determinants and volume.\n\nWatch this video in Chinese: https://youtu.be/ZuWAwCEMeWE\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/qEBi0K5wfOs/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/qEBi0K5wfOs/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/qEBi0K5wfOs/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/qEBi0K5wfOs/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/qEBi0K5wfOs/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "determinants",
+     "volume"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Determinants and Volume",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on determinants and volume.\n\nWatch this video in Chinese: https://youtu.be/ZuWAwCEMeWE\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT13M50S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Go_P8yUFzXYBFEGJL2e7xeNaDgw\"",
+   "id": "cdZnhQjJu4I",
+   "snippet": {
+    "publishedAt": "2019-09-24T20:20:31.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "21. Eigenvalues and Eigenvectors",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n21. Eigenvalues and Eigenvectors\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/cdZnhQjJu4I/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/cdZnhQjJu4I/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/cdZnhQjJu4I/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/cdZnhQjJu4I/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "Eigenvalues",
+     "Eigenvectors",
+     "Linear Algebra"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "21. Eigenvalues and Eigenvectors",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n21. Eigenvalues and Eigenvectors\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en-US"
+   },
+   "contentDetails": {
+    "duration": "PT51M23S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Yb8ByRkphogcE1VineXORcU-MaQ\"",
+   "id": "mVeuZzJdd1w",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:44.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Eigenvalues and Eigenvectors",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on eigenvalues and eigenvectors.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/mVeuZzJdd1w/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/mVeuZzJdd1w/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/mVeuZzJdd1w/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/mVeuZzJdd1w/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/mVeuZzJdd1w/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "eigenvalues",
+     "eigenvectors"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Eigenvalues and Eigenvectors",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Nikola Kamburov\n\nA teaching assistant works through a problem on eigenvalues and eigenvectors.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M22S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/quJo9LYFISmoXf5nPix1PdTXXE4\"",
+   "id": "13r9QY6cmjc",
+   "snippet": {
+    "publishedAt": "2009-05-07T04:28:01.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "22. Diagonalization and Powers of A",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n22. Diagonalization and Powers of A\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/13r9QY6cmjc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/13r9QY6cmjc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/13r9QY6cmjc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "22. Diagonalization and Powers of A",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n22. Diagonalization and Powers of A\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT51M50S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Eom58OFQ0HufIUEvmDSfChKk7K8\"",
+   "id": "5IGTFgPqlkw",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:45.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Powers of a Matrix",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\n A teaching assistant worksthrough a problem on powers of a matrix.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/5IGTFgPqlkw/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/5IGTFgPqlkw/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/5IGTFgPqlkw/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/5IGTFgPqlkw/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/5IGTFgPqlkw/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "powers of a matrix"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Powers of a Matrix",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Ben Harris\n\n A teaching assistant worksthrough a problem on powers of a matrix.\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M7S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/YKHuiT4PIU-ZEpOzo70svK5ne0g\"",
+   "id": "IZqwi0wJovM",
+   "snippet": {
+    "publishedAt": "2009-05-07T05:24:37.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "23. Differential Equations and exp(At)",
+    "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n23. Differential Equations and exp(At)\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/IZqwi0wJovM/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/IZqwi0wJovM/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/IZqwi0wJovM/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "matrix theory",
+     "linear algebra",
+     "systems of equations",
+     "vector spaces",
+     "determinants",
+     "eigenvalues",
+     "similarity",
+     "positive definite matrices",
+     "least-squares approximations",
+     "networks",
+     "Fourier transforms",
+     "Markov processes"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "23. Differential Equations and exp(At)",
+     "description": "MIT 18.06 Linear Algebra, Spring 2005\nInstructor: Gilbert Strang\nView the complete course: http://ocw.mit.edu/18-06S05\nYouTube Playlist: https://www.youtube.com/playlist?list=PLE7DDD91010BC51F8\n\n23. Differential Equations and exp(At)\n\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT51M3S",
+    "dimension": "2d",
+    "definition": "sd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/A1GD9zaHxwS3xLWw7DuI-HSV2v0\"",
+   "id": "FzncDO1eSNI",
+   "snippet": {
+    "publishedAt": "2018-07-25T17:56:43.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "Differential Equations and exp (At)",
+    "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on differential equations.\n\nWatch this video in Chinese: https://www.youtube.com/watch?v=fiSp3Ss-Yo8\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/FzncDO1eSNI/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/FzncDO1eSNI/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/FzncDO1eSNI/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/FzncDO1eSNI/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/FzncDO1eSNI/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "tags": [
+     "linear algebra",
+     "differential equations"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Differential Equations and exp (At)",
+     "description": "MIT 18.06SC Linear Algebra, Fall 2011\nView the complete course: https://ocw.mit.edu/18-06SCF11\nInstructor: Linan Chen\n\nA teaching assistant works through a problem on differential equations.\n\nWatch this video in Chinese: https://www.youtube.com/watch?v=fiSp3Ss-Yo8\nLicense: Creative Commons BY-NC-SA\nMore information at https://ocw.mit.edu/terms\nMore courses at https://ocw.mit.edu"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT18M41S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": true,
+    "projection": "rectangular"
+   }
+  }
+ ]
+}

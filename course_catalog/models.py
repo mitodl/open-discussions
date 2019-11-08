@@ -281,6 +281,17 @@ class FavoriteItem(TimestampedModel):
         unique_together = ("user", "content_type", "object_id")
 
 
+class VideoChannel(LearningResource):
+    """Data model for video channels"""
+
+    platform = models.CharField(max_length=40)
+    channel_id = models.CharField(max_length=80)
+
+    full_description = models.TextField(null=True, blank=True)
+
+    published = models.BooleanField(default=True)
+
+
 class Video(LearningResource):
     """Data model for video resources"""
 
@@ -303,3 +314,42 @@ class Video(LearningResource):
 
     class Meta:
         unique_together = ("platform", "video_id")
+
+
+class Playlist(List):
+    """
+    Video playlist model, contains videos
+    """
+
+    platform = models.CharField(max_length=40)
+    playlist_id = models.CharField(max_length=80)
+
+    channel = models.ForeignKey(
+        VideoChannel, on_delete=models.CASCADE, related_name="playlists"
+    )
+
+    image_src = models.URLField(max_length=400, null=True, blank=True)
+    url = models.URLField(null=True, max_length=2048)
+    published = models.BooleanField(default=True)
+
+    has_user_list = models.BooleanField(default=True)
+
+    videos = models.ManyToManyField(
+        Video, through="PlaylistVideo", through_fields=("playlist", "video")
+    )
+
+
+class PlaylistVideo(models.Model):
+    """Join table for Playlist -> Video"""
+
+    video = models.ForeignKey(
+        Video, on_delete=models.CASCADE, related_name="playlist_videos"
+    )
+    playlist = models.ForeignKey(
+        Playlist, on_delete=models.CASCADE, related_name="playlist_videos"
+    )
+
+    position = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("playlist", "video")

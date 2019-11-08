@@ -115,13 +115,15 @@ def test_youtube_etl(mocker):
     """Verify that youtube etl pipeline executes correctly"""
     mock_extract = mocker.patch("course_catalog.etl.youtube.extract")
     mock_transform = mocker.patch("course_catalog.etl.youtube.transform")
-    mock_load_videos = mocker.patch("course_catalog.etl.loaders.load_videos")
+    mock_load_video_channels = mocker.patch(
+        "course_catalog.etl.loaders.load_video_channels"
+    )
 
-    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_videos):
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_video_channels):
         result = pipelines.youtube_etl()
 
     mock_extract.assert_called_once_with()
     mock_transform.assert_called_once_with(mock_extract.return_value)
-    mock_load_videos.assert_called_once_with(mock_transform.return_value)
+    mock_load_video_channels.assert_called_once_with(mock_transform.return_value)
 
-    assert result == mock_load_videos.return_value
+    assert result == mock_load_video_channels.return_value

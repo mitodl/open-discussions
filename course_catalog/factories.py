@@ -29,6 +29,8 @@ from course_catalog.models import (
     LearningResourceRun,
     LearningResourceOfferor,
     Video,
+    Playlist,
+    VideoChannel,
 )
 
 
@@ -405,3 +407,48 @@ class UserListUserListFactory(ListItemFactory):
 
     class Meta:
         model = UserListItem
+
+
+class VideoChannelFactory(LearningResourceFactory):
+    """Factory for VideoChannel"""
+
+    channel_id = factory.Sequence(lambda n: "VIDEO-CHANNEL-%03d.MIT" % n)
+    platform = FuzzyChoice([PlatformType.youtube.value])
+
+    full_description = factory.Faker("text")
+    published = True
+
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory",
+        size=1,
+        name=OfferedBy.ocw.value,
+    )
+
+    playlists = factory.RelatedFactoryList(
+        "course_catalog.factories.PlaylistFactory", "channel", size=1
+    )
+
+    class Meta:
+        model = VideoChannel
+
+
+class PlaylistFactory(LearningResourceFactory):
+    """Factory for Playlist"""
+
+    playlist_id = factory.Sequence(lambda n: "VIDEO-PLAYLIST-%03d.MIT" % n)
+    platform = FuzzyChoice([PlatformType.youtube.value])
+
+    image_src = factory.Faker("image_url")
+    url = factory.Faker("image_url")
+    published = True
+
+    offered_by = factory.RelatedFactoryList(
+        "course_catalog.factories.LearningResourceOfferorFactory",
+        size=1,
+        name=OfferedBy.ocw.value,
+    )
+
+    channel = factory.SubFactory("course_catalog.factories.VideoChannelFactory")
+
+    class Meta:
+        model = Playlist

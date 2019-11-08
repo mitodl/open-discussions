@@ -1,0 +1,48 @@
+{
+ "kind": "youtube#playlistListResponse",
+ "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/sTRKtQ4KihIHlQBEjWk5aGKdSs4\"",
+ "pageInfo": {
+  "totalResults": 1,
+  "resultsPerPage": 5
+ },
+ "items": [
+  {
+   "kind": "youtube#playlist",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/6C1ecOQttGaaRXvVLOhsBzWfgGs\"",
+   "id": "PLTz-v-F773kXwTSKsX_E9t8ZnP_3LYaGy",
+   "snippet": {
+    "publishedAt": "2019-07-02T17:03:18.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Humanities & Social Sciences",
+    "description": "",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "localized": {
+     "title": "Humanities & Social Sciences",
+     "description": ""
+    }
+   }
+  }
+ ]
+}
