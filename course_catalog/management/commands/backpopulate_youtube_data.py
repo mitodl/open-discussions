@@ -55,5 +55,5 @@ class Command(BaseCommand):
             result = task.get()
             total_seconds = (now_in_utc() - start).total_seconds()
             self.stdout.write(
-                f"Fetched {result} YouTube videos in {total_seconds} seconds"
+                f"Fetched {result} YouTube channel in {total_seconds} seconds"
             )

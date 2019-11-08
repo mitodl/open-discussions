@@ -16,6 +16,9 @@ from course_catalog.etl.loaders import (
     load_offered_bys,
     load_video,
     load_videos,
+    load_playlist,
+    load_playlists,
+    load_video_channels,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -27,6 +30,8 @@ from course_catalog.factories import (
     CourseTopicFactory,
     CourseInstructorFactory,
     VideoFactory,
+    PlaylistFactory,
+    VideoChannelFactory,
 )
 from course_catalog.models import (
     Program,
@@ -34,12 +39,15 @@ from course_catalog.models import (
     LearningResourceRun,
     ProgramItem,
     Video,
+    Playlist,
+    VideoChannel,
+    PlaylistVideo,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def mock_upsert_tasks(mocker):
     """Mock out the upsert task helpers"""
     return SimpleNamespace(
@@ -373,10 +381,108 @@ def test_load_videos():
     """Verify that load_videos loads a list of videos"""
     assert Video.objects.count() == 0
 
-    videos_data = [
-        model_to_dict(video) for video in VideoFactory.build_batch(5, published=True)
+    videos_records = VideoFactory.build_batch(5, published=True)
+    videos_data = [model_to_dict(video) for video in videos_records]
+
+    results = load_videos(videos_data)
+
+    assert len(results) == len(videos_records)
+
+    assert Video.objects.count() == len(videos_records)
+
+
+def test_load_playlist():
+    """Test load_playlist"""
+    channel = VideoChannelFactory.create(playlists=None)
+    playlist = PlaylistFactory.build()
+    assert Playlist.objects.count() == 0
+    assert Video.objects.count() == 0
+
+    videos_records = VideoFactory.build_batch(5, published=True)
+    videos_data = [model_to_dict(video) for video in videos_records]
+
+    props = model_to_dict(playlist)
+
+    del props["id"]
+    del props["channel"]
+    props["videos"] = videos_data
+
+    result = load_playlist(channel, props)
+
+    assert isinstance(result, Playlist)
+
+    assert result.videos.count() == len(videos_records)
+    assert result.channel == channel
+
+
+def test_load_playlists_unpublish():
+    """Test load_playlists when a video/playlist gets unpublished"""
+    channel = VideoChannelFactory.create()
+    playlist1 = PlaylistFactory.create(channel=channel, published=True)
+    playlist2 = PlaylistFactory.create(channel=channel, published=True)
+
+    playlists_data = [
+        {
+            "playlist_id": playlist1.playlist_id,
+            "platform": playlist1.platform,
+            "videos": [],
+        }
     ]
 
-    load_videos(videos_data)
+    load_playlists(channel, playlists_data)
 
-    assert Video.objects.count() == len(videos_data)
+    playlist1.refresh_from_db()
+    playlist2.refresh_from_db()
+    assert playlist1.published is True
+    assert playlist2.published is False
+
+
+def test_load_video_channels():
+    """Test load_video_channels"""
+    assert VideoChannel.objects.count() == 0
+    assert Playlist.objects.count() == 0
+
+    channels_data = []
+    for channel in VideoChannelFactory.build_batch(3):
+        channel_data = model_to_dict(channel)
+        del channel_data["id"]
+
+        playlist = PlaylistFactory.build()
+        playlist_data = model_to_dict(playlist)
+        del playlist_data["id"]
+        del playlist_data["channel"]
+
+        channel_data["playlists"] = [playlist_data]
+        channels_data.append(channel_data)
+
+    results = load_video_channels(channels_data)
+
+    assert len(results) == len(channels_data)
+
+    for result in results:
+        assert isinstance(result, VideoChannel)
+
+        assert result.playlists.count() == 1
+
+
+def test_load_video_channels_unpublish(mock_upsert_tasks):
+    """Test load_video_channels when a video/playlist gets unpublished"""
+    channel = VideoChannelFactory.create()
+    playlist = PlaylistFactory.create(channel=channel, published=True)
+    video = VideoFactory.create()
+    PlaylistVideo.objects.create(playlist=playlist, video=video, position=0)
+    unpublished_playlist = PlaylistFactory.create(channel=channel, published=False)
+    unpublished_video = VideoFactory.create()
+    PlaylistVideo.objects.create(
+        playlist=unpublished_playlist, video=unpublished_video, position=0
+    )
+
+    # inputs don't matter here
+    load_video_channels([])
+
+    video.refresh_from_db()
+    unpublished_video.refresh_from_db()
+    assert video.published is True
+    assert unpublished_video.published is False
+
+    mock_upsert_tasks.delete_video.assert_called_once_with(unpublished_video)

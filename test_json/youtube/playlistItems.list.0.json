@@ -1,0 +1,71 @@
+{
+ "kind": "youtube#playlistItemListResponse",
+ "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/sB7SGN-yT77XokepQCZHX51RzR8\"",
+ "pageInfo": {
+  "totalResults": 7,
+  "resultsPerPage": 50
+ },
+ "items": [
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/I7jxxs1g3KyTJDetV-OrWI4_Ghg\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS41NkI0NEY2RDEwNTU3Q0M2",
+   "contentDetails": {
+    "videoId": "WYzg4QQ3REQ"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/fiBEHEr7nvOedfE4eCC2SduYhuA\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS4yODlGNEE0NkRGMEEzMEQy",
+   "contentDetails": {
+    "videoId": "a9bGhWnvS1k",
+    "videoPublishedAt": "2019-06-21T04:00:01.000Z"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/C15S-i_dIsqOcYyC4UBP34rMCaY\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS4wMTcyMDhGQUE4NTIzM0Y5",
+   "contentDetails": {
+    "videoId": "ukucq80_gHE",
+    "videoPublishedAt": "2019-05-24T04:00:04.000Z"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/4Ewn7IPSIMYCelDyJy6STCNHHfA\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS41MjE1MkI0OTQ2QzJGNzNG",
+   "contentDetails": {
+    "videoId": "YjFE2OxIg6I",
+    "videoPublishedAt": "2018-08-14T18:32:31.000Z"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/MZb3XAetMb7rQd_gceleOrcczzo\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS4wOTA3OTZBNzVEMTUzOTMy",
+   "contentDetails": {
+    "videoId": "kWPClqksISc",
+    "videoPublishedAt": "2019-07-05T04:00:05.000Z"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Rxujk31L2qKiPvwkm_tfkUGjtjw\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS4xMkVGQjNCMUM1N0RFNEUx",
+   "contentDetails": {
+    "videoId": "ftLWNYBTf2s",
+    "videoPublishedAt": "2019-10-25T04:00:09.000Z"
+   }
+  },
+  {
+   "kind": "youtube#playlistItem",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/CpsvfY9j8C2KFDiyioJgY6NJ8_g\"",
+   "id": "UExUei12LUY3NzNrWHdUU0tzWF9FOXQ4Wm5QXzNMWWFHeS41MzJCQjBCNDIyRkJDN0VD",
+   "contentDetails": {
+    "videoId": "g_FEWB76-7o"
+   }
+  }
+ ]
+}

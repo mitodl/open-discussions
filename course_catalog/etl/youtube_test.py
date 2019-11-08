@@ -1,85 +1,40 @@
 """Tests for Video ETL functions"""
 # pylint: disable=redefined-outer-name
+from collections import defaultdict
 from unittest.mock import Mock, MagicMock
+from glob import glob
+from os.path import basename
+import json
 import pytest
 import googleapiclient.errors
+
+from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.etl.exceptions import (
+    ExtractVideoException,
+    ExtractPlaylistException,
+    ExtractPlaylistItemException,
+)
 from course_catalog.etl import youtube
 
 
-def mock_list_items_data(next_token=None):
-    """Mock video playlist list data"""
-    data = {
-        "kind": "youtube#playlistItemListResponse",
-        "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/xusLJ2FRC1XScoMyK2-1FU9fnzA"',
-        "pageInfo": {"totalResults": 53, "resultsPerPage": 1},
-        "items": [
-            {
-                "kind": "youtube#playlistItem",
-                "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/ZMYt2whVvQV7UzaXyfd2eP40S9Q"',
-                "id": "VVVUQk1XdTh5c2huQW1welIzTW9KRnR3LmZ0TFdOWUJUZjJz",
-                "contentDetails": {
-                    "videoId": "QU0fLnucE6A",
-                    "videoPublishedAt": "2019-10-25T04:00:09.000Z",
-                },
-            }
-        ],
-    }
-
-    if next_token is not None:
-        data["nextPageToken"] = next_token
-
-    return data
-
-
 @pytest.fixture
-def mock_video_data():
-    """Mock data for a single video"""
-    return {
-        "contentDetails": {
-            "caption": "true",
-            "definition": "hd",
-            "dimension": "2d",
-            "duration": "PT3M14S",
-            "licensedContent": False,
-            "projection": "rectangular",
-        },
-        "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/Bh4Z5YJX4kTKyCsVio3xqVS9nx0"',
-        "id": "QU0fLnucE6A",
-        "kind": "youtube#video",
-        "snippet": {
-            "categoryId": "27",
-            "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
-            "channelTitle": "MITx Videos",
-            "defaultAudioLanguage": "en",
-            "description": "Professor Krishna Rajagopal explains Faraday Cages and why it's not such a bad thing if you're in a lightning storm as long as you're inside a car. Learn more and enroll now at https://www.edx.org/course/electricity-and-magnetism-electrostatics?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-8.01.1x-faraday",
-            "liveBroadcastContent": "none",
-            "localized": {
-                "description": "Professor Krishna Rajagopal explains Faraday Cages and why it's not such a bad thing if you're in a lightning storm as long as you're inside a car. Learn more and enroll now at https://www.edx.org/course/electricity-and-magnetism-electrostatics?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-8.01.1x-faraday",
-                "title": "Faraday Cage",
-            },
-            "publishedAt": "2018-10-09T18:18:09.000Z",
-            "thumbnails": {"high": {"url": "thumbnailurl.com"}},
-        },
-    }
+def youtube_api_responses():
+    """Load the api responses"""
+    mock_responses = defaultdict(list)
 
+    # these need to be sorted() so that *.N.json files get appended in the proper order
+    for pathname in sorted(glob("test_json/youtube/*.json")):
+        mod_name, func_name, _, _ = basename(pathname).split(".")
 
-def mock_normalized_video_data(offered_by, video_data):
-    """Mock normalized data for a single video"""
+        with open(pathname, "r") as f:
+            mock_responses[(mod_name, func_name)].append(json.load(f))
 
-    return {
-        "video_id": video_data["id"],
-        "platform": "youtube",
-        "full_description": video_data["snippet"]["description"],
-        "short_description": video_data["snippet"]["description"],
-        "image_src": video_data["snippet"]["thumbnails"]["high"]["url"],
-        "last_modified": video_data["snippet"]["publishedAt"],
-        "duration": video_data["contentDetails"]["duration"],
-        "published": True,
-        "url": "https://www.youtube.com/watch?v=%s" % video_data["id"],
-        "offered_by": [{"name": offered_by}],
-        "title": video_data["snippet"]["localized"]["title"],
-        "raw_data": video_data,
-    }
+    for (mod_name, func_name), side_effects in mock_responses.items():
+        if func_name == "list_next":
+            # list_next() operations return None when there's no additional pages to fetch
+            side_effects.append(None)
+
+    return mock_responses
 
 
 @pytest.fixture(autouse=True)
@@ -89,25 +44,37 @@ def video_settings(settings):
     return settings
 
 
-@pytest.fixture
-def mock_video_batch_data(mock_video_data):
-    """Mock video request data for a batch"""
-    data = {
-        "kind": "youtube#videoListResponse",
-        "etag": '"j6xRRd8dTPVVptg711_CSPADRfg/j0RF7LBD1f8ViAQN-D94fJ40WZ8"',
-        "pageInfo": {"totalResults": 1, "resultsPerPage": 1},
-        "items": [mock_video_data],
-    }
+@pytest.fixture(autouse=True)
+def mock_youtube_client(mocker, youtube_api_responses):
+    """Mocks out the youtube client with static json data"""
+    # each side effect should default to an empty list
+    config = defaultdict(list)
+    # build up a config based on filenames of the loaded responses, as an example
+    # the original filename "videos.list.0.json" will create this key:
+    #   "videos.return_value.list.return_value.execute.side_effect"
+    config.update(
+        {
+            f"{'.return_value.'.join(key)}.return_value.execute.side_effect": value
+            for key, value in youtube_api_responses.items()
+        }
+    )
+    # append None to each of the list_next funcs so pagination terminates
+    for mod in ["channels", "playlistItems", "playlists", "video"]:
+        config[f"{mod}.return_value.list_next.return_value.execute.side_effect"].append(
+            None
+        )
 
-    return data
+    mock_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
+    mock_client.return_value.configure_mock(**config)
+    return mock_client
 
 
-def mock_channel_file(offered_by, playlist_id):
+def mock_channel_file(offered_by, channel_id, playlist_id):
     """Mock video channel github file"""
 
     content = f"""---
 offered_by: {offered_by}
-channel_id: channel
+channel_id: {channel_id}
 playlists:
   - id: {playlist_id}
 
@@ -120,13 +87,113 @@ playlists:
 def mocked_github_channel_response(mocker):
     """Mock response from github api requst to open-video-data"""
     channel_list = [
-        mock_channel_file("MIT", "playlist1"),
-        mock_channel_file("OCW", "playlist2"),
+        mock_channel_file(
+            OfferedBy.mitx.value, "UCTBMWu8yshnAmpzR3MoJFtw", "UUTBMWu8yshnAmpzR3MoJFtw"
+        ),
+        mock_channel_file(
+            OfferedBy.ocw.value, "UCEBb1b_L6zDS3xTUrIALZOw", "UUEBb1b_L6zDS3xTUrIALZOw"
+        ),
     ]
     mock_github_client = mocker.patch("github.Github")
     mock_github_client.return_value.get_repo.return_value.get_contents.return_value = (
         channel_list
     )
+
+
+@pytest.fixture
+def extracted_and_transformed_values(youtube_api_responses):
+    """Mock data for the API responses and how they are transformed"""
+    channels_list = youtube_api_responses[("channels", "list")]
+    playlists_list = youtube_api_responses[("playlists", "list")]
+    playlist_items_list = youtube_api_responses[("playlistItems", "list")]
+    playlist_items_list_next = youtube_api_responses[("playlistItems", "list_next")]
+    videos_list = youtube_api_responses[("videos", "list")]
+
+    ocw_items = playlist_items_list[0]["items"] + playlist_items_list_next[0]["items"]
+    ocw_items_order = [item["contentDetails"]["videoId"] for item in ocw_items]
+
+    mitx_items = playlist_items_list[1]["items"]
+    mitx_items_order = [item["contentDetails"]["videoId"] for item in mitx_items]
+
+    # sort the videos by the order they appeared in playlistItems responses
+    ocw_videos = sorted(
+        videos_list[0]["items"] + videos_list[1]["items"],
+        key=lambda item: ocw_items_order.index(item["id"]),
+    )
+    mitx_videos = sorted(
+        videos_list[2]["items"], key=lambda item: mitx_items_order.index(item["id"])
+    )
+
+    extracted = [
+        (
+            OfferedBy.ocw.value,
+            channels_list[0]["items"][0],
+            [(playlists_list[0]["items"][0], ocw_videos)],
+        ),
+        (
+            OfferedBy.mitx.value,
+            channels_list[0]["items"][1],
+            [(playlists_list[1]["items"][0], mitx_videos)],
+        ),
+    ]
+
+    transformed = [
+        {
+            "platform": PlatformType.youtube.value,
+            "channel_id": channel["id"],
+            "title": channel["snippet"]["title"],
+            "offered_by": [{"name": offered_by}] if offered_by else [],
+            "playlists": [
+                {
+                    "platform": PlatformType.youtube.value,
+                    "playlist_id": playlist["id"],
+                    "offered_by": [{"name": offered_by}] if offered_by else [],
+                    "title": playlist["snippet"]["title"],
+                    "videos": [
+                        {
+                            "video_id": video["id"],
+                            "platform": PlatformType.youtube.value,
+                            "full_description": video["snippet"]["description"],
+                            "short_description": video["snippet"]["description"],
+                            "duration": video["contentDetails"]["duration"],
+                            "image_src": video["snippet"]["thumbnails"]["high"]["url"],
+                            "last_modified": video["snippet"]["publishedAt"],
+                            "published": True,
+                            "url": f"https://www.youtube.com/watch?v={video['id']}",
+                            "offered_by": [{"name": offered_by}] if offered_by else [],
+                            "title": video["snippet"]["localized"]["title"],
+                            "raw_data": video,
+                        }
+                        for video in videos
+                    ],
+                }
+                for playlist, videos in playlists
+            ],
+        }
+        for offered_by, channel, playlists in extracted
+    ]
+
+    return extracted, transformed
+
+
+def _resolve_extracted_channels(channels):
+    """Resolve the nested generator data"""
+    return list(
+        [
+            (
+                offered_by,
+                channel_data,
+                list(map(_resolve_extracted_playlist, playlists)),
+            )
+            for offered_by, channel_data, playlists in channels
+        ]
+    )
+
+
+def _resolve_extracted_playlist(playlist):
+    """Resolve a playlist and its nested generators"""
+    playlist_data, videos = playlist
+    return (playlist_data, list(videos))
 
 
 @pytest.fixture
@@ -199,115 +266,161 @@ def test_parse_video_captions(mock_raw_caption_data, mock_parsed_transcript_data
     )
 
 
+@pytest.mark.usefixtures("mock_youtube_client", "mocked_github_channel_response")
+def test_extract(extracted_and_transformed_values):
+    """Test that extract returns expected responses"""
+    extracted, _ = extracted_and_transformed_values
+
+    assert _resolve_extracted_channels(youtube.extract()) == extracted
+
+
 @pytest.mark.usefixtures("mocked_github_channel_response")
-def test_extract(mocker, mock_video_data, mock_video_batch_data):
-    """Test youtube video ETL extract"""
-    mock_video_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
-    mock_list_api = mock_video_client.return_value.playlistItems.return_value.list
-    # the first-level keys are the channelId param, the second level are the pageToken param
-    list_items_results = {
-        "playlist1": {
-            "": mock_list_items_data(next_token="token"),
-            "token": mock_list_items_data(),
-        },
-        "playlist2": {"": mock_list_items_data()},
+@pytest.mark.parametrize(
+    "operation_key, exception_cls",
+    [
+        [("playlists", "list"), ExtractPlaylistException],
+        [("playlistItems", "list"), ExtractPlaylistItemException],
+        [("videos", "list"), ExtractVideoException],
+    ],
+)
+def test_extract_with_exception(
+    mock_youtube_client, youtube_api_responses, operation_key, exception_cls
+):  # pylint: disable=too-many-locals
+    """Test youtube video ETL"""
+    # error on the first call, this will consistently be the first channel
+    side_effect = youtube_api_responses[operation_key][:]
+    side_effect[0] = googleapiclient.errors.HttpError(MagicMock(), bytes())
+
+    channels_list = youtube_api_responses[("channels", "list")]
+    playlists_list = youtube_api_responses[("playlists", "list")]
+    playlist_items_list = youtube_api_responses[("playlistItems", "list")]
+    videos_list = youtube_api_responses[("videos", "list")]
+
+    modified_config = {
+        f"{'.return_value.'.join(operation_key)}.return_value.execute.side_effect": side_effect
     }
 
-    def _playlist_items_list_side_effect(
-        *args, **kwargs
-    ):  # pylint: disable=unused-argument
-        """side_effect for playlistItems().list()"""
-        playlist_id = kwargs["playlistId"]
-        page_token = kwargs["pageToken"]
+    if operation_key[0] in ["playlists", "playlistItems"]:
+        # if the error was on playlists.list or playlistItems.list
+        # then videos.list needs to return the second channel's data on the first call
+        modified_config[
+            "videos.return_value.list.return_value.execute.side_effect"
+        ] = videos_list[2:]
+    if operation_key[0] == "playlists":
+        # if the error was on playlists.list
+        # then playlistItems.list needs to return the second channel's data on the first call
+        modified_config[
+            "playlistItems.return_value.list.return_value.execute.side_effect"
+        ] = playlist_items_list[1:]
+    if operation_key[0] == "videos":
+        # if the error is on the video, the 2nd call to videos needs to be what was originally the 3rd
+        # so we delete the second side_effect as the first is an HttpError now
+        del side_effect[1]
 
-        # we return a mocked responses with the particular mocked response the request was looking for
-        mocked_request = mocker.Mock()
-        mocked_request.execute.return_value = list_items_results[playlist_id][
-            page_token
-        ]
-        return mocked_request
+    mock_youtube_client.return_value.configure_mock(**modified_config)
 
-    mock_list_api.side_effect = _playlist_items_list_side_effect
-    mock_video_client.return_value.videos.return_value.list.return_value.execute.return_value = (
-        mock_video_batch_data
-    )
+    results = list(youtube.extract())
 
-    result = list(youtube.extract())
+    offered_by, channel_data, playlists = results[0]
 
-    assert result == [
-        ("MIT", mock_video_data),
-        ("MIT", mock_video_data),
-        ("OCW", mock_video_data),
-    ]
+    assert offered_by == OfferedBy.ocw.value
+    assert channel_data == channels_list[0]["items"][0]
 
-    assert mock_list_api.call_count == sum(
-        [len(list_calls) for list_calls in list_items_results.values()]
-    )
+    with pytest.raises(exception_cls):
+        # exercise the generator tree to trigger the exception
+        for _, videos in playlists:
+            list(videos)
 
-    for playlist_id, list_calls in list_items_results.items():
-        for page_token in list_calls:
-            mock_list_api.assert_any_call(
-                playlistId=playlist_id,
-                maxResults=50,
-                pageToken=page_token,
-                part="contentDetails",
-            )
+    offered_by, channel_data, playlists = results[1]
+    playlists = list(playlists)
+    assert len(playlists) == 1
 
+    playlist_data, videos = playlists[0]
 
-@pytest.mark.usefixtures("mocked_github_channel_response")
-@pytest.mark.usefixtures("video_settings")
-def test_extract_with_bad_channel_id(mocker, mock_video_data, mock_video_batch_data):
-    """Test youtube video ETL extract with a playlist for which the google api throws an error"""
-    mock_video_client = mocker.patch("course_catalog.etl.youtube.get_youtube_client")
-    mock_video_client.return_value.playlistItems.return_value.list.return_value.execute.side_effect = [
-        googleapiclient.errors.HttpError(MagicMock(), bytes()),
-        mock_list_items_data(),
-    ]
-
-    mock_video_client.return_value.videos.return_value.list.return_value.execute.return_value = (
-        mock_video_batch_data
-    )
-
-    assert list(youtube.extract()) == [("OCW", mock_video_data)]
+    assert offered_by == OfferedBy.mitx.value
+    assert channel_data == channels_list[0]["items"][1]
+    assert playlist_data == playlists_list[1]["items"][0]
+    assert list(videos) == videos_list[2]["items"]
 
 
 def test_extract_with_unset_keys(settings):
     """Test youtube video ETL extract with no keys set"""
-
     settings.YOUTUBE_DEVELOPER_KEY = None
 
-    assert list(youtube.extract()) == []
+    assert _resolve_extracted_channels(youtube.extract()) == []
 
 
-@pytest.mark.usefixtures("video_settings")
-@pytest.mark.usefixtures("mocked_github_channel_response")
-@pytest.mark.parametrize("yaml_parser_response", [None, []])
+@pytest.mark.usefixtures("video_settings", "mocked_github_channel_response")
+@pytest.mark.parametrize("yaml_parser_response", [None, {}, {"channels": []}])
 def test_extract_with_no_channels(mocker, yaml_parser_response):
     """Test youtube video ETL extract with no channels in data"""
-    mocker.patch("course_catalog.etl.youtube.get_youtube_client")
     mocker.patch("yaml.safe_load", return_value=yaml_parser_response)
 
-    assert list(youtube.extract()) == []
+    assert _resolve_extracted_channels(youtube.extract()) == []
 
 
-def test_transform_single_video(mock_video_data):
-    """test youtube transform for singe video"""
-    assert youtube.transform_single_video(
-        "OCW", mock_video_data
-    ) == mock_normalized_video_data("OCW", mock_video_data)
+def test_transform_video(extracted_and_transformed_values):
+    """test youtube transform for a video"""
+    extracted, transformed = extracted_and_transformed_values
+    result = youtube.transform_video(extracted[0][2][0][1][0], OfferedBy.ocw.value)
+    assert result == transformed[0]["playlists"][0]["videos"][0]
 
 
-def test_transform(mock_video_data):
+def test_transform_playlist(extracted_and_transformed_values):
+    """test youtube transform for a playlist"""
+    extracted, transformed = extracted_and_transformed_values
+    result = youtube.transform_playlist(
+        extracted[0][2][0][0], extracted[0][2][0][1], OfferedBy.ocw.value
+    )
+    assert {**result, "videos": list(result["videos"])} == transformed[0]["playlists"][
+        0
+    ]
+
+
+def test_transform(extracted_and_transformed_values):
     """test youtube transform"""
+    extracted, transformed = extracted_and_transformed_values
+    channels = youtube.transform(extracted)
+    assert (
+        list(
+            [
+                {
+                    **channel,
+                    "playlists": list(
+                        [
+                            {**playlist, "videos": list(playlist["videos"])}
+                            for playlist in channel["playlists"]
+                        ]
+                    ),
+                }
+                for channel in channels
+            ]
+        )
+        == transformed
+    )
 
-    raw_data = [
-        ("MIT", mock_video_data),
-        ("MIT", mock_video_data),
-        ("OCW", mock_video_data),
-    ]
 
-    assert list(youtube.transform(raw_data)) == [
-        mock_normalized_video_data("MIT", mock_video_data),
-        mock_normalized_video_data("MIT", mock_video_data),
-        mock_normalized_video_data("OCW", mock_video_data),
-    ]
+@pytest.mark.parametrize(
+    "config, expected",
+    [
+        (None, ["Channel config data is empty"]),
+        ({}, ["Channel config data is empty"]),
+        ("a string", ["Channel data should be a dict"]),
+        ({"channel_id": "abc", "offered_by": "org", "playlists": [{"id": "def"}]}, []),
+        ({"channel_id": "abc", "playlists": [{"id": "def"}]}, []),
+        (
+            {"offered_by": "org"},
+            [
+                "Required key 'playlists' is not present",
+                "Required key 'channel_id' is not present",
+            ],
+        ),
+        (
+            {"channel_id": "abc", "playlists": [{}]},
+            ["Required key 'id' not present in playlists[0]"],
+        ),
+    ],
+)
+def test_validate_channel_config(config, expected):
+    """Test that validate_channel_config returns expected errors"""
+    assert youtube.validate_channel_config(config) == expected

@@ -1,0 +1,53 @@
+{
+ "kind": "youtube#playlistListResponse",
+ "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/HEARtWRdnqj1B6zWDh7xnYqTgjk\"",
+ "pageInfo": {
+  "totalResults": 1,
+  "resultsPerPage": 5
+ },
+ "items": [
+  {
+   "kind": "youtube#playlist",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/5CcmzsKqjxufbaVoRj7Sl9uHRFE\"",
+   "id": "PL221E2BBF13BECF6C",
+   "snippet": {
+    "publishedAt": "2012-01-25T13:31:12.000Z",
+    "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+    "title": "MIT 18.06SC Linear Algebra, Fall 2011",
+    "description": "Instructor: Gilbert Strang\n\nThe Help Session Videos were developed by: Martina Balagovic, Linan Chen, Benjamin Harris, Ana Rita Pires, David Shirokoff, Nikola Kamburov\n\nView the complete course: http://ocw.mit.edu/18-06SCF11\n\nLicense: Creative Commons BY-NC-SA\nMore information at http://ocw.mit.edu/terms\nMore courses at http://ocw.mit.edu",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/7UJ4CFRGd-U/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MIT OpenCourseWare",
+    "localized": {
+     "title": "MIT 18.06SC Linear Algebra, Fall 2011",
+     "description": "Instructor: Gilbert Strang\n\nThe Help Session Videos were developed by: Martina Balagovic, Linan Chen, Benjamin Harris, Ana Rita Pires, David Shirokoff, Nikola Kamburov\n\nView the complete course: http://ocw.mit.edu/18-06SCF11\n\nLicense: Creative Commons BY-NC-SA\nMore information at http://ocw.mit.edu/terms\nMore courses at http://ocw.mit.edu"
+    }
+   }
+  }
+ ]
+}

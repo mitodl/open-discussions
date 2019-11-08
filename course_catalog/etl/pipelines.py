@@ -46,4 +46,4 @@ mitx_etl = compose(
 
 oll_etl = compose(loaders.load_courses, oll.transform, oll.extract)
 
-youtube_etl = compose(loaders.load_videos, youtube.transform, youtube.extract)
+youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)

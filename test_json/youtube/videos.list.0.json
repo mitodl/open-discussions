@@ -1,0 +1,357 @@
+{
+ "kind": "youtube#videoListResponse",
+ "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/3p6qeq0kHQXfO5OS18W7myhK2VA\"",
+ "pageInfo": {
+  "totalResults": 5,
+  "resultsPerPage": 5
+ },
+ "items": [
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/2wT6UQnzdtph7vzgisHkYpLBAq4\"",
+   "id": "a9bGhWnvS1k",
+   "snippet": {
+    "publishedAt": "2019-06-21T04:00:01.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Cayley Graphs and the Globe",
+    "description": "Agustin Rayo, MIT professor and associate dean, explains how a Cayley graph works when wrapped around a ball. https://www.edx.org/course/paradox-and-infinity?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-24.118x-cayley",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/a9bGhWnvS1k/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "tags": [
+     "MIT",
+     "MITx",
+     "Massachusetts Institute of Technology",
+     "MOOCs",
+     "free online courses",
+     "free college courses",
+     "online courses up down left right steps",
+     "Cayley Graph",
+     "rotation"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Cayley Graphs and the Globe",
+     "description": "Agustin Rayo, MIT professor and associate dean, explains how a Cayley graph works when wrapped around a ball. https://www.edx.org/course/paradox-and-infinity?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-24.118x-cayley"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M41S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/uFcJMkEPB2CQn-y9S9xwJ11m3so\"",
+   "id": "ukucq80_gHE",
+   "snippet": {
+    "publishedAt": "2019-05-24T04:00:04.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Lean Research Principles",
+    "description": "Elizabeth Hoffecker, research scientist at MIT D-Lab, explains the 4Rs of Lean Research: rigor, relevance, respect, right size. Learn more and enroll at https://www.edx.org/course/lean-research-skills-for-conducting-interviews-0?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-ec.745x-4rs",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/ukucq80_gHE/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/ukucq80_gHE/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/ukucq80_gHE/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/ukucq80_gHE/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/ukucq80_gHE/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "tags": [
+     "MIT",
+     "MITx",
+     "Massachusetts Institute of Technology",
+     "MOOCs",
+     "free online courses",
+     "free college courses",
+     "online courses field research",
+     "research interviews",
+     "rigor",
+     "relevance",
+     "respect",
+     "right size",
+     "4Rs",
+     "lean research",
+     "qualtitative research",
+     "research principles",
+     "data collection"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Lean Research Principles",
+     "description": "Elizabeth Hoffecker, research scientist at MIT D-Lab, explains the 4Rs of Lean Research: rigor, relevance, respect, right size. Learn more and enroll at https://www.edx.org/course/lean-research-skills-for-conducting-interviews-0?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-ec.745x-4rs"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT9M54S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Sth6-xPAmNkGTy5jJmR2PRD4gcc\"",
+   "id": "YjFE2OxIg6I",
+   "snippet": {
+    "publishedAt": "2018-08-14T18:32:31.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Historical Evolution of Work",
+    "description": "To really understand the world of work today, it's important to take a closer look at history. MIT Professor Tom Kochan discusses the evolution of work. Learn more and enroll at https://www.edx.org/course/shaping-the-future-of-work?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=15.662x-history-youtube",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/YjFE2OxIg6I/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/YjFE2OxIg6I/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/YjFE2OxIg6I/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/YjFE2OxIg6I/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/YjFE2OxIg6I/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "tags": [
+     "MITx",
+     "Massachusetts Institute of Technology",
+     "MOOCs",
+     "free online courses",
+     "free college courses",
+     "online courses",
+     "MIT\nevolution of work",
+     "history of work",
+     "work trends",
+     "agricultural revolution",
+     "industrial revolution",
+     "future of work",
+     "knowledge economy",
+     "Tom Kochan"
+    ],
+    "categoryId": "22",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Historical Evolution of Work",
+     "description": "To really understand the world of work today, it's important to take a closer look at history. MIT Professor Tom Kochan discusses the evolution of work. Learn more and enroll at https://www.edx.org/course/shaping-the-future-of-work?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=15.662x-history-youtube"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT3M23S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/X5bJVw64s1l6YJDTXfGmMZi-zPA\"",
+   "id": "kWPClqksISc",
+   "snippet": {
+    "publishedAt": "2019-07-05T04:00:05.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Ensuring Descriptive Validity",
+    "description": "MIT Professor, Susan Silbey, speak on the importance of descriptive validity in qualtative resarch and challenges it can present. Learn more and enroll at https://www.edx.org/course/qualitative-research-methods-interview-process?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-21a.819.1x-descripvalidity",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/kWPClqksISc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/kWPClqksISc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/kWPClqksISc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/kWPClqksISc/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "tags": [
+     "MIT",
+     "MITx",
+     "Massachusetts Institute of Technology",
+     "MOOCs",
+     "free online courses",
+     "free college courses",
+     "online courses descriptive validity",
+     "qualtative research",
+     "research methods",
+     "observational research",
+     "Susan Silbey",
+     "robust data gathering",
+     "conversational interviewing",
+     "interviewing techniques",
+     "interviewing research",
+     "humanities",
+     "social sciences"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Ensuring Descriptive Validity",
+     "description": "MIT Professor, Susan Silbey, speak on the importance of descriptive validity in qualtative resarch and challenges it can present. Learn more and enroll at https://www.edx.org/course/qualitative-research-methods-interview-process?utm_campaign=mitx&utm_medium=partner-marketing&utm_source=social&utm_content=youtube-21a.819.1x-descripvalidity"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT4M38S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/dLKuTZ27usq61wi0OrgjJ16wYiw\"",
+   "id": "ftLWNYBTf2s",
+   "snippet": {
+    "publishedAt": "2019-10-25T04:00:09.000Z",
+    "channelId": "UCTBMWu8yshnAmpzR3MoJFtw",
+    "title": "Deconstructing Dialogue from A Merchant in Venice",
+    "description": "MIT Professor, Diana Henderson examines dialogue between Lorenzo and Jessica in the Shakespearean comedy, A Merchant in Venice.",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/ftLWNYBTf2s/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/ftLWNYBTf2s/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/ftLWNYBTf2s/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/ftLWNYBTf2s/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     }
+    },
+    "channelTitle": "MITx Videos",
+    "tags": [
+     "MIT",
+     "MITx",
+     "Massachusetts Institute of Technology",
+     "MOOCs",
+     "free online courses",
+     "free college courses",
+     "online courses Lorenzo",
+     "A Merchant of Venice",
+     "William Shakespeare",
+     "Diana Henderson",
+     "Act 5 Scene 1",
+     "Jessica",
+     "Shakesperean plays",
+     "pastoral scene",
+     "lyrical writing",
+     "literary theory",
+     "literary criticism",
+     "literary structure",
+     "literary allusions",
+     "intertextual allusions",
+     "epic traditions",
+     "contextual",
+     "interpretive choice"
+    ],
+    "categoryId": "27",
+    "liveBroadcastContent": "none",
+    "defaultLanguage": "en",
+    "localized": {
+     "title": "Deconstructing Dialogue from A Merchant in Venice",
+     "description": "MIT Professor, Diana Henderson examines dialogue between Lorenzo and Jessica in the Shakespearean comedy, A Merchant in Venice."
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT10M27S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  }
+ ]
+}

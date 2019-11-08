@@ -1,4 +1,8 @@
 """Course catalog data loaders"""
+import logging
+
+from django.db import transaction
+from django.db.models import OuterRef, Exists
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.models import (
@@ -11,10 +15,16 @@ from course_catalog.models import (
     Program,
     ProgramItem,
     Video,
+    VideoChannel,
+    Playlist,
+    PlaylistVideo,
 )
+from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.utils import log_exceptions
 
 from search import task_helpers as search_task_helpers
+
+log = logging.getLogger()
 
 
 def load_topics(resource, topics_data):
@@ -204,6 +214,8 @@ def load_video(video_data):
     load_offered_bys(video, offered_bys_data)
 
     if not created and not video.published:
+        # NOTE: if we didn't see a video in a playlist, it is likely NOT being removed here
+        #       this gets addressed in load_channels after everything has been synced
         search_task_helpers.delete_video(video)
     elif video.published:
         search_task_helpers.upsert_video(video)
@@ -212,5 +224,163 @@ def load_video(video_data):
 
 
 def load_videos(videos_data):
-    """Load a list of videos"""
+    """
+    Loads a list of videos data
+
+    Args:
+        videos_data (iter of dict): iterable of the video data
+
+    Returns:
+        list of Video:
+            the list of loaded videos
+    """
     return [load_video(video_data) for video_data in videos_data]
+
+
+def load_playlist(video_channel, playlist_data):
+    """
+    Load a playlist
+
+    Args:
+        video_channel (VideoChannel): the video channel instance this playlist is under
+        playlists_data (iter of dict): iterable of the video playlists
+
+    Returns:
+        Playlist:
+            the created or updated playlist
+    """
+    platform = playlist_data.pop("platform")
+    playlist_id = playlist_data.pop("playlist_id")
+    videos_data = playlist_data.pop("videos", [])
+    topics_data = playlist_data.pop("topics", [])
+    offered_by_data = playlist_data.pop("offered_by", [])
+
+    playlist, _ = Playlist.objects.update_or_create(
+        platform=platform,
+        playlist_id=playlist_id,
+        defaults={"channel": video_channel, **playlist_data},
+    )
+
+    load_topics(playlist, topics_data)
+    load_offered_bys(playlist, offered_by_data)
+
+    videos = load_videos(videos_data)
+
+    # atomically remove existing videos in the playlist and add the current ones in bulk
+    with transaction.atomic():
+        for position, video in enumerate(videos):
+            PlaylistVideo.objects.update_or_create(
+                playlist=playlist, video=video, defaults={"position": position}
+            )
+        PlaylistVideo.objects.filter(playlist=playlist).exclude(
+            video_id__in=[video.id for video in videos]
+        ).delete()
+
+    return playlist
+
+
+def load_playlists(video_channel, playlists_data):
+    """
+    Load a list of channel playlists
+
+    Args:
+        video_channel (VideoChannel): the video channel instance this playlist is under
+        playlists_data (iter of dict): iterable of the video playlists
+
+
+    Returns:
+        list of Playlist:
+            the created or updated playlists
+    """
+    playlists = [
+        load_playlist(video_channel, playlist_data) for playlist_data in playlists_data
+    ]
+    playlist_ids = [playlist.id for playlist in playlists]
+
+    # remove playlists that no longer exist
+    Playlist.objects.filter(channel=video_channel).exclude(id__in=playlist_ids).update(
+        published=False
+    )
+
+    return playlists
+
+
+def load_video_channel(video_channel_data):
+    """
+    Load a single video channel
+
+    Arg:
+        video_channel_data (dict):
+            the normalized video channel data
+    Returns:
+        VideoChannel:
+            the updated or created video channel
+    """
+    platform = video_channel_data.pop("platform")
+    channel_id = video_channel_data.pop("channel_id")
+    playlists_data = video_channel_data.pop("playlists", [])
+    topics_data = video_channel_data.pop("topics", [])
+    offered_by_data = video_channel_data.pop("offered_by", [])
+
+    video_channel, _ = VideoChannel.objects.update_or_create(
+        platform=platform, channel_id=channel_id, defaults=video_channel_data
+    )
+
+    load_topics(video_channel, topics_data)
+    load_offered_bys(video_channel, offered_by_data)
+    load_playlists(video_channel, playlists_data)
+
+    return video_channel
+
+
+def load_video_channels(video_channels_data):
+    """
+    Load a list of video channels
+
+    Args:
+        video_channels_data (iter of dict): iterable of the video channels data
+
+    Returns:
+        list of VideoChannel:
+            list of the loaded videos
+    """
+    video_channels = []
+
+    # video_channels_data is a generator
+    for video_channel_data in video_channels_data:
+        try:
+            video_channel = load_video_channel(video_channel_data)
+        except ExtractException:
+            # video_channel_data has lazily evaluated generators, one of them could raise an extraction error
+            # this is a small pollution of separation of concerns
+            # but this allows us to stream the extracted data w/ generators
+            # as opposed to having to load everything into memory, which will eventually fail
+            log.exception(
+                "Error with extracted video channel: channel_id=%s",
+                video_channel_data["channel_id"],
+            )
+        else:
+            video_channels.append(video_channel)
+
+    # unpublish the channels we're no longer tracking
+    channel_ids = [channel for channel in video_channels_data]
+    VideoChannel.objects.exclude(channel_id__in=channel_ids).update(published=False)
+
+    # finally, unpublish any published videos that aren't in at least one published playlist
+    for video in (
+        Video.objects.annotate(
+            in_published_playlist=Exists(
+                PlaylistVideo.objects.filter(
+                    video_id=OuterRef("pk"), playlist__published=True
+                )
+            )
+        )
+        .filter(published=True)
+        .exclude(in_published_playlist=True)
+    ):
+        # remove it from the index first
+        search_task_helpers.delete_video(video)
+        video.published = False
+        video.save()
+
+    return video_channels

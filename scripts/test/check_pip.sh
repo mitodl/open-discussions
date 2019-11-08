@@ -12,6 +12,7 @@ if ! cmp -s $PIP_OLD $PIP_NEW
 then
   echo "requirements files differ from docker image pip environment. Running diff image-pip tox-pip:"
   diff $PIP_OLD $PIP_NEW
+  echo "fixing this may require deleting the .tox/ directory in the project folder"
   exit 1
 fi
 
