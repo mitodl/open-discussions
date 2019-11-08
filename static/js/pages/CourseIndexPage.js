@@ -3,7 +3,6 @@ import React from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
-import { createSelector } from "reselect"
 
 import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseCarousel from "../components/CourseCarousel"
@@ -30,7 +29,7 @@ import {
 } from "../lib/queries/courses"
 import {
   favoritesRequest,
-  favoritesSelector
+  favoritesListSelector
 } from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 import { PHONE, TABLET, DESKTOP } from "../lib/constants"
@@ -38,17 +37,6 @@ import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 type Props = {|
   history: Object
 |}
-
-const favoritesListSelector = createSelector(
-  favoritesSelector,
-  ({ courses, bootcamps, programs, userLists, videos }) => [
-    ...Object.values(courses),
-    ...Object.values(bootcamps),
-    ...Object.values(programs),
-    ...Object.values(userLists),
-    ...Object.values(videos)
-  ]
-)
 
 export default function CourseIndexPage({ history }: Props) {
   const [{ isFinished: isFinishedFeatured }] = useRequest(

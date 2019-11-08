@@ -34,10 +34,6 @@ const userListCoverImage = R.pathOr(null, [
   "image_src"
 ])
 
-type Props = {
-  userList: UserList
-}
-
 function ConfirmDeleteDialog(props) {
   const { userList, hide } = props
 
@@ -60,8 +56,13 @@ function ConfirmDeleteDialog(props) {
   )
 }
 
+type Props = {
+  userList: UserList,
+  hideUserListOptions?: boolean
+}
+
 export default function UserListCard(props: Props) {
-  const { userList } = props
+  const { userList, hideUserListOptions } = props
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -90,12 +91,14 @@ export default function UserListCard(props: Props) {
         </Link>
         <div className="actions-and-count">
           <div className="count">{readableLength(userList.items.length)}</div>
-          <i
-            className="material-icons grey-surround more_vert"
-            onClick={() => setShowMenu(true)}
-          >
-            more_vert
-          </i>
+          {hideUserListOptions ? null : (
+            <i
+              className="material-icons grey-surround more_vert"
+              onClick={() => setShowMenu(true)}
+            >
+              more_vert
+            </i>
+          )}
           {showMenu ? (
             <DropdownMenu closeMenu={() => setShowMenu(false)}>
               <li>

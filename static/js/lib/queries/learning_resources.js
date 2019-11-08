@@ -73,6 +73,17 @@ export const favoritesSelector = createSelector(
   })
 )
 
+export const favoritesListSelector = createSelector(
+  favoritesSelector,
+  ({ courses, bootcamps, programs, userLists, videos }) => [
+    ...Object.values(courses),
+    ...Object.values(bootcamps),
+    ...Object.values(programs),
+    ...Object.values(userLists),
+    ...Object.values(videos)
+  ]
+)
+
 export const getResourceRequest = (objectId: ?number, objectType: ?string) => {
   if (!objectId) {
     return null

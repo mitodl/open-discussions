@@ -4,13 +4,17 @@ import { assert } from "chai"
 import UserListsPage from "./UserListsPage"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeUserList } from "../factories/learning_resources"
+import {
+  makeUserList,
+  makeFavoritesResponse
+} from "../factories/learning_resources"
 import { queryListResponse } from "../lib/test_utils"
-import { userListApiURL } from "../lib/url"
+import { userListApiURL, favoritesURL } from "../lib/url"
 import * as util from "../lib/util"
+import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
 
 describe("UserListsPage tests", () => {
-  let helper, userLists, render
+  let helper, userLists, render, favorites
 
   beforeEach(() => {
     userLists = [makeUserList(), makeUserList(), makeUserList()]
@@ -19,6 +23,10 @@ describe("UserListsPage tests", () => {
     helper.handleRequestStub
       .withArgs(userListApiURL)
       .returns(queryListResponse(userLists))
+    favorites = makeFavoritesResponse()
+    helper.handleRequestStub
+      .withArgs(favoritesURL)
+      .returns(queryListResponse(favorites))
     render = helper.configureReduxQueryRenderer(UserListsPage)
   })
 
@@ -33,10 +41,26 @@ describe("UserListsPage tests", () => {
         list,
         wrapper
           .find("UserListCard")
-          .at(i)
+          .at(i + 1)
           .prop("userList")
       )
     })
+  })
+
+  it("should pass favorites down to user list card", async () => {
+    helper.handleRequestStub
+      .withArgs(userListApiURL)
+      .returns(queryListResponse([]))
+    const { wrapper } = await render()
+    const card = wrapper.find("UserListCard").at(0)
+    assert.isTrue(card.prop("hideUserListOptions"))
+    const { title, list_type, items } = card.prop("userList") // eslint-disable-line camelcase
+    assert.equal(title, "My Favorites")
+    assert.equal(list_type, FAVORITES_PSEUDO_LIST)
+    assert.deepEqual(
+      items.map(item => item.id).sort(),
+      favorites.map(item => item.content_data.id).sort()
+    )
   })
 
   it("should hide and show the create list dialog", async () => {

@@ -86,6 +86,11 @@ describe("UserListCard tests", () => {
     assert.equal(src, "南瓜")
   })
 
+  it("should hide the dropdown menu if you pass the flag", async () => {
+    const { wrapper } = await renderUserListCard({ hideUserListOptions: true })
+    assert.isNotOk(wrapper.find(".more_vert").exists())
+  })
+
   it("should have a button to open a delete menu, which should confirm", async () => {
     const { wrapper } = await renderUserListCard()
     const dialog = getDeleteDialog(wrapper)

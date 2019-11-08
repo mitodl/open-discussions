@@ -33,6 +33,7 @@ import ChannelRouter from "./ChannelRouter"
 import CourseIndexPage from "./CourseIndexPage"
 import UserListsPage from "./UserListsPage"
 import UserListDetailPage from "./UserListDetailPage"
+import FavoritesDetailPage from "./FavoritesDetailPage"
 
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
@@ -324,6 +325,10 @@ class App extends React.Component<Props> {
                 exact
                 path={`${match.url}courses/search`}
                 component={CourseSearchPage}
+              />
+              <Route
+                path={`${match.url}courses/lists/favorites`}
+                component={FavoritesDetailPage}
               />
               <Route
                 path={`${match.url}courses/lists/:id`}
