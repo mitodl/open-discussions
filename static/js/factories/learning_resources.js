@@ -1,5 +1,6 @@
 //@flow
 import casual from "casual-browserify"
+import moment from "moment"
 import R from "ramda"
 
 import { incrementer } from "../lib/util"
@@ -173,9 +174,11 @@ export const makeVideo = (): Video => ({
   title:             casual.title,
   url:               casual.url,
   is_favorite:       casual.boolean,
+  last_updated:      casual.date(DATE_FORMAT),
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   transcript:        casual.description,
+  duration:          moment.duration(casual.integer(30, 60 * 90) * 1000).toISOString(),
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_VIDEO,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],

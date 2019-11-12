@@ -16,13 +16,15 @@ const edxPlatform = "mitx"
 const bootcampsPlatform = "bootcamps"
 const micromastersPlatform = "micromasters"
 const xproPlatform = "xpro"
+const youtubePlatform = "youtube"
 
 export const platforms = {
   OCW:          ocwPlatform,
   edX:          edxPlatform,
   bootcamps:    bootcampsPlatform,
   micromasters: micromastersPlatform,
-  xpro:         xproPlatform
+  xpro:         xproPlatform,
+  youtube:      youtubePlatform
 }
 
 export const offeredBys = {

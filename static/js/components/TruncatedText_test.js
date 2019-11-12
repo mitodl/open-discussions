@@ -22,7 +22,29 @@ describe("TruncatedText", () => {
     assert.isTrue(dotdotdot.exists())
     assert.equal(dotdotdot.prop("clamp"), props.lines)
     assert.equal(dotdotdot.prop("className"), props.className)
-    assert.equal(dotdotdot.prop("children"), props.text)
+    assert.equal(dotdotdot.text(), props.text)
+  })
+
+  it("converts newlines to <br>", () => {
+    const props = {
+      text:            "normal\ntext",
+      lines:           2,
+      estCharsPerLine: 200,
+      className:       "some-class"
+    }
+    const wrapper = render(props)
+    const dotdotdot = wrapper.find("Dotdotdot")
+
+    assert.isTrue(dotdotdot.exists())
+    assert.equal(dotdotdot.prop("clamp"), props.lines)
+    assert.equal(dotdotdot.prop("className"), props.className)
+    assert.equal(
+      dotdotdot
+        .children()
+        .children()
+        .html(),
+      "normal<br>text"
+    )
   })
 
   it("limits text that is passed into Dotdotdot if necessary", () => {
@@ -31,7 +53,7 @@ describe("TruncatedText", () => {
       estCharsPerLine = 5
     const props = { text, lines, estCharsPerLine }
     const wrapper = render(props)
-    const dotdotdotText = wrapper.find("Dotdotdot").prop("children")
+    const dotdotdotText = wrapper.find("Dotdotdot").text()
 
     assert.isBelow(dotdotdotText.length, text.length)
     assert.equal(

@@ -4,16 +4,25 @@ import React from "react"
 import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
+import moment from "moment"
 
 import TruncatedText from "./TruncatedText"
+import Embedly from "./Embedly"
 
-import { LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM, platforms } from "../lib/constants"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO,
+  platforms
+} from "../lib/constants"
 import {
   bestRun,
   minPrice,
   getStartDate,
   getInstructorName,
-  getPreferredOfferedBy
+  getPreferredOfferedBy,
+  isCoursewareResource,
+  formatDurationClockTime
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
@@ -27,11 +36,12 @@ const entities = new AllHtmlEntities()
 type Props = {
   object: Course | Bootcamp | Program,
   runId: number,
-  setShowResourceDrawer: Function
+  setShowResourceDrawer: Function,
+  embedly: ?Object
 }
 
 const ExpandedLearningResourceDisplay = (props: Props) => {
-  const { object, runId, setShowResourceDrawer } = props
+  const { object, runId, setShowResourceDrawer, embedly } = props
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -83,16 +93,20 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
           </div>
         ) : null}
         <div className="course-image-div">
-          <img
-            src={embedlyThumbnail(
-              SETTINGS.embedlyKey,
-              object.image_src || defaultResourceImageURL(),
-              COURSE_IMAGE_DISPLAY_HEIGHT,
-              COURSE_IMAGE_DISPLAY_WIDTH
-            )}
-          />
+          {object.object_type === LR_TYPE_VIDEO ? (
+            <Embedly embedly={embedly} />
+          ) : (
+            <img
+              src={embedlyThumbnail(
+                SETTINGS.embedlyKey,
+                object.image_src || defaultResourceImageURL(),
+                COURSE_IMAGE_DISPLAY_HEIGHT,
+                COURSE_IMAGE_DISPLAY_WIDTH
+              )}
+            />
+          )}
         </div>
-        {url ? (
+        {isCoursewareResource(object.object_type) && url ? (
           <div className="course-links">
             <div>
               <a
@@ -164,13 +178,45 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             </div>
           </div>
         ) : null}
-        <div className="course-info-row">
-          <i className="material-icons language">language</i>
-          <div className="course-info-label">Language:</div>
-          <div className="course-info-value">
-            {languageName(selectedRun ? selectedRun.language : "en")}
+        {isCoursewareResource(object.object_type) ? (
+          <div className="course-info-row">
+            <i className="material-icons language">language</i>
+            <div className="course-info-label">Language:</div>
+            <div className="course-info-value">
+              {languageName(selectedRun ? selectedRun.language : "en")}
+            </div>
           </div>
-        </div>
+        ) : null}
+        {object.object_type === LR_TYPE_VIDEO ? (
+          <React.Fragment>
+            {// $FlowFixMe: only videos will get to this code
+              object.duration ? (
+                <div className="course-info-row">
+                  <i className="material-icons restore">restore</i>
+                  <div className="course-info-label">Duration:</div>
+                  <div className="course-info-value">
+                    {// $FlowFixMe: only videos will get to this code
+                      formatDurationClockTime(object.duration)}
+                  </div>
+                </div>
+              ) : null}
+            {offeredBy ? (
+              <div className="course-info-row">
+                <i className="material-icons local_offer">local_offer</i>
+                <div className="course-info-label">Offered By:</div>
+                <div className="course-info-value">{offeredBy}</div>
+              </div>
+            ) : null}
+            <div className="course-info-row">
+              <i className="material-icons calendar_today">calendar_today</i>
+              <div className="course-info-label">Date Posted:</div>
+              <div className="course-info-value">
+                {// $FlowFixMe: only videos will get to this code
+                  moment(object.last_modified).format("MMM D, YYYY")}
+              </div>
+            </div>
+          </React.Fragment>
+        ) : null}
       </div>
     </div>
   )

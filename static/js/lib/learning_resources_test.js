@@ -16,6 +16,7 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
+  LR_TYPE_VIDEO,
   offeredBys
 } from "./constants"
 import { AVAILABILITY_MAPPING } from "./search"
@@ -35,7 +36,9 @@ import {
   getInstructorName,
   getPreferredOfferedBy,
   privacyIcon,
-  filterItems
+  filterItems,
+  isCoursewareResource,
+  formatDurationClockTime
 } from "./learning_resources"
 import {
   makeCourse,
@@ -426,5 +429,28 @@ describe("Course run availability utils", () => {
     const userLists = times(makeUserList, 5)
     const resource = userLists[3].items[1]
     assert.deepEqual(filterItems(userLists, "items", resource), [userLists[3]])
+  })
+
+  //
+  ;[
+    [LR_TYPE_COURSE, true],
+    [LR_TYPE_PROGRAM, true],
+    [LR_TYPE_BOOTCAMP, true],
+    [LR_TYPE_USERLIST, false],
+    [LR_TYPE_VIDEO, false],
+    [LR_TYPE_LEARNINGPATH, false]
+  ].forEach(([objectType, expected]) => {
+    it(`isCoursewareResource should return ${expected.toString()} for object_type=${objectType}`, () => {
+      assert.equal(isCoursewareResource(objectType), expected)
+    })
+  })
+
+  //
+  ;[
+    ["PT2H30M27S", "2:30:27"],
+    ["PT30M27S", "30:27"],
+    ["PT27S", "0:27"]
+  ].forEach(([value, expected]) => {
+    assert.equal(formatDurationClockTime(value), expected)
   })
 })

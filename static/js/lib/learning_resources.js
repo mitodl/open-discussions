@@ -12,6 +12,9 @@ import {
   DEFAULT_START_DT,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_COURSE,
+  LR_TYPE_BOOTCAMP,
   platforms,
   offeredBys
 } from "./constants"
@@ -228,3 +231,44 @@ export const filterItems = (
 
 export const privacyIcon = (privacyLevel: string) =>
   privacyLevel === "public" ? "lock_open" : "lock"
+
+export const isCoursewareResource = R.contains(R.__, [
+  LR_TYPE_COURSE,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_BOOTCAMP
+])
+
+export const formatDurationClockTime = (value: string) => {
+  // Format an ISO-8601 duration string so to a readable format
+  // The logic here ensures that if there is a colon (:) to the left
+  // of a time component (minutes, seconds) it is zero-padded
+  // hours are not included if they are zero
+  // this follows what most humans would consider a reasonable "clock display" format
+  // Examples of output of this function:
+  //
+  //  3:00:01
+  //  43:07
+  //  3:09
+  //  0:47
+
+  const duration = moment.duration(value)
+  const values = []
+
+  if (duration.asHours() >= 1) {
+    // never zero-pad this as it will always be the first component, if it present
+    values.push(duration.hours().toString())
+  }
+
+  if (values.length) {
+    // zero-pad the minutes if they're not the first time component
+    values.push(`0${duration.minutes().toString()}`.slice(-2))
+  } else {
+    // otherwise it's not padded
+    values.push(duration.minutes().toString())
+  }
+
+  // always zero-pad the seconds, because there's always at least a minutes component ahead of it
+  values.push(`0${duration.seconds().toString()}`.slice(-2))
+
+  return values.join(":")
+}

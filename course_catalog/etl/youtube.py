@@ -123,6 +123,8 @@ def transform_single_video(offered_by, raw_video_data):
     return {
         "video_id": raw_video_data["id"],
         "platform": PlatformType.youtube.value,
+        "duration": raw_video_data["contentDetails"]["duration"],
+        "short_description": raw_video_data["snippet"]["description"],
         "full_description": raw_video_data["snippet"]["description"],
         "image_src": raw_video_data["snippet"]["thumbnails"]["high"]["url"],
         "last_modified": raw_video_data["snippet"]["publishedAt"],
