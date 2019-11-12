@@ -500,19 +500,18 @@ def index_new_user_list(user_list_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_user_list(user_list_obj):
+def upsert_user_list(user_list_obj):
     """
     Run a task to update all fields of a UserList Elasticsearch document
 
     Args:
         user_list_obj(UserList): the UserList to update in ES
     """
-
     user_list_data = ESUserListSerializer(user_list_obj).data
-    update_document_with_partial.delay(
+    upsert_document.delay(
         gen_user_list_id(user_list_obj),
         user_list_data,
-        USER_LIST_TYPE,
+        user_list_obj.list_type,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
@@ -525,7 +524,7 @@ def delete_user_list(user_list_obj):
     Args:
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+    delete_document.delay(gen_user_list_id(user_list_obj), user_list_obj.list_type)
 
 
 @if_feature_enabled(INDEX_UPDATES)
