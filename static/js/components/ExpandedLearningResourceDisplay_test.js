@@ -9,10 +9,13 @@ import {
   makeCourse,
   makeLearningResource
 } from "../factories/learning_resources"
+import { makeYoutubeVideo } from "../factories/embedly"
 import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
@@ -20,10 +23,11 @@ import { defaultResourceImageURL } from "../lib/url"
 import { capitalize } from "../lib/util"
 
 describe("ExpandedLearningResourceDisplay", () => {
-  let course
+  let course, embedly
 
   beforeEach(() => {
     course = makeCourse()
+    embedly = makeYoutubeVideo()
   })
 
   const render = ({ ...props }) =>
@@ -32,6 +36,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         object={course}
         runId={course.runs[0] ? course.runs[0].id : 0}
         setShowResourceDrawer={null}
+        embedly={embedly}
         {...props}
       />
     )
@@ -329,5 +334,31 @@ describe("ExpandedLearningResourceDisplay", () => {
         .text(),
       "English"
     )
+  })
+
+  //
+  ;[
+    [LR_TYPE_COURSE, false],
+    [LR_TYPE_PROGRAM, false],
+    [LR_TYPE_BOOTCAMP, false],
+    [LR_TYPE_USERLIST, false],
+    [LR_TYPE_VIDEO, true]
+  ].forEach(([objectType, hasEmbedly]) => {
+    it(`should ${
+      hasEmbedly ? "" : "not "
+    }display an embedly component for object_type=${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({ object })
+      assert.equal(wrapper.find("Embedly").exists(), hasEmbedly)
+      if (hasEmbedly) {
+        assert.equal(
+          wrapper
+            .find("Embedly")
+            .at(0)
+            .prop("embedly"),
+          embedly
+        )
+      }
+    })
   })
 })

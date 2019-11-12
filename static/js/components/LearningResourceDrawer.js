@@ -16,10 +16,13 @@ import { setShowResourceDrawer } from "../actions/ui"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
+import { videoRequest } from "../lib/queries/videos"
+import { embedlyRequest, getEmbedlys } from "../lib/queries/embedly"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 import { useResponsive } from "../hooks/util"
 
@@ -32,11 +35,18 @@ type Props = {
   objectId: number,
   objectType: string,
   runId: number,
-  setShowResourceDrawer: Function
+  setShowResourceDrawer: Function,
+  embedly: ?Object
 }
 
 export function LearningResourceDrawer(props: Props) {
-  const { object, runId, showLearningDrawer, setShowResourceDrawer } = props
+  const {
+    object,
+    runId,
+    showLearningDrawer,
+    setShowResourceDrawer,
+    embedly
+  } = props
 
   useResponsive()
 
@@ -59,6 +69,7 @@ export function LearningResourceDrawer(props: Props) {
             object={object}
             runId={runId}
             setShowResourceDrawer={setShowResourceDrawer}
+            embedly={embedly}
           />
           <div className="footer" />
         </DrawerContent>
@@ -72,8 +83,9 @@ const getObject = createSelector(
   state => state.entities.courses,
   state => state.entities.bootcamps,
   state => state.entities.programs,
+  state => state.entities.videos,
   state => state.queries,
-  (ui, courses, bootcamps, programs, queries) => {
+  (ui, courses, bootcamps, programs, videos, queries) => {
     const { objectId, objectType } = ui.courseDetail
 
     switch (objectType) {
@@ -89,7 +101,26 @@ const getObject = createSelector(
       return querySelectors.isFinished(queries, programRequest(objectId))
         ? programs[objectId]
         : null
+    case LR_TYPE_VIDEO:
+      return querySelectors.isFinished(queries, videoRequest(objectId))
+        ? videos[objectId]
+        : null
     }
+  }
+)
+
+const getEmbedlyForObject = createSelector(
+  getObject,
+  getEmbedlys,
+  state => state.queries,
+  (object, embedlys, queries) => {
+    if (!object || object.object_type !== LR_TYPE_VIDEO || !object.url) {
+      return null
+    }
+
+    return querySelectors.isFinished(queries, embedlyRequest(object.url))
+      ? embedlys[object.url]
+      : null
   }
 )
 
@@ -105,7 +136,8 @@ export const mapStateToProps = (state: Object) => {
     objectId,
     objectType,
     runId,
-    object:             getObject(state)
+    object:             getObject(state),
+    embedly:            getEmbedlyForObject(state)
   }
 }
 
@@ -114,7 +146,7 @@ const mapDispatchToProps = {
 }
 
 const mapPropsToConfig = props => {
-  const { objectType, objectId } = props
+  const { objectType, objectId, object } = props
 
   switch (objectType) {
   case LR_TYPE_COURSE:
@@ -123,6 +155,11 @@ const mapPropsToConfig = props => {
     return [bootcampRequest(objectId)]
   case LR_TYPE_PROGRAM:
     return [programRequest(objectId)]
+  case LR_TYPE_VIDEO:
+    return [
+      videoRequest(objectId),
+      ...(object && object.url ? [embedlyRequest(object.url)] : [])
+    ]
   }
   return []
 }

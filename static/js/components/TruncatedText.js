@@ -11,6 +11,15 @@ type Props = {
   className: ?string
 }
 
+const RenderedNewlines = React.memo(({ text }) =>
+  text.split(/\n/g).map((item, key) => (
+    <React.Fragment key={key}>
+      {key === 0 ? null : <br />}
+      {item}
+    </React.Fragment>
+  ))
+)
+
 export default function TruncatedText(props: Props) {
   const {
     text,
@@ -24,13 +33,17 @@ export default function TruncatedText(props: Props) {
   return (
     <React.Fragment>
       {expanded ? (
-        <div>{text}</div>
+        <div>
+          <RenderedNewlines text={text} />
+        </div>
       ) : (
         <Dotdotdot clamp={lines} className={className}>
-          {// Dotdotdot seems to trip on long, unbroken strings. As a fail-safe, we're limiting
-          // the input string to a number of characters that is greater than the characters that
-          // will be shown, but not so long that it will cause issues with Dotdotdot.
-            text.substring(0, estCharsPerLine * (lines + 2))}
+          {/* Dotdotdot seems to trip on long, unbroken strings. As a fail-safe, we're limiting
+              the input string to a number of characters that is greater than the characters that
+              will be shown, but not so long that it will cause issues with Dotdotdot.*/}
+          <RenderedNewlines
+            text={text.substring(0, estCharsPerLine * (lines + 2))}
+          />
         </Dotdotdot>
       )}
       {showExpansionControls ? (

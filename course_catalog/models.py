@@ -277,6 +277,7 @@ class Video(LearningResource):
     full_description = models.TextField(null=True, blank=True)
     image_src = models.URLField(max_length=400, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
+    duration = models.CharField(null=True, blank=True, max_length=10)
 
     published = models.BooleanField(default=True)
 

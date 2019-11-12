@@ -430,6 +430,8 @@ export type Video = LearningResource & {
   object_type:        LR_TYPE_VIDEO,
   transcript:         ?string,
   url:                ?string,
+  duration:           ?string,
+  last_updated:       ?string
 }
 
 export type CoursePrice = {

@@ -12,17 +12,21 @@ import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResou
 import {
   makeBootcamp,
   makeCourse,
-  makeProgram
+  makeProgram,
+  makeVideo
 } from "../factories/learning_resources"
+import { makeYoutubeVideo } from "../factories/embedly"
 import { shouldIf } from "../lib/test_utils"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
+import { videoRequest } from "../lib/queries/videos"
 
 describe("LearningResourceDrawer", () => {
   let sandbox,
@@ -30,6 +34,7 @@ describe("LearningResourceDrawer", () => {
     course,
     bootcamp,
     program,
+    video,
     setShowResourceDrawerStub
 
   beforeEach(() => {
@@ -38,6 +43,7 @@ describe("LearningResourceDrawer", () => {
     course = makeCourse()
     bootcamp = makeBootcamp()
     program = makeProgram()
+    video = makeVideo()
     setShowResourceDrawerStub = sandbox.stub()
   })
 
@@ -104,6 +110,19 @@ describe("LearningResourceDrawer", () => {
     assert.deepEqual(expandedDisplay.prop("object"), program)
   })
 
+  it("should include an ExpandedLearningResourceDisplay for a video", () => {
+    const embedly = makeYoutubeVideo()
+    const wrapper = renderLearningResourceDrawer({
+      object:     video,
+      objectId:   video.id,
+      objectType: LR_TYPE_VIDEO,
+      embedly
+    })
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), video)
+    assert.deepEqual(expandedDisplay.prop("embedly"), embedly)
+  })
+
   describe("mapStateToProps", () => {
     let state
 
@@ -118,6 +137,9 @@ describe("LearningResourceDrawer", () => {
           },
           programs: {
             [program.id]: program
+          },
+          videos: {
+            [video.id]: video
           }
         },
         queries: {
@@ -128,6 +150,9 @@ describe("LearningResourceDrawer", () => {
             isFinished: true
           },
           [programRequest(program.id).queryKey]: {
+            isFinished: true
+          },
+          [videoRequest(video.id).queryKey]: {
             isFinished: true
           }
         },
@@ -152,7 +177,7 @@ describe("LearningResourceDrawer", () => {
     )
 
     //
-    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(
+    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM, LR_TYPE_VIDEO].forEach(
       testObjectType => {
         it(`mapStateToProps should grab the right ${testObjectType}`, () => {
           state.ui.courseDetail.objectType = testObjectType
@@ -169,6 +194,10 @@ describe("LearningResourceDrawer", () => {
           case LR_TYPE_PROGRAM:
             expectedObject = program
             state.ui.courseDetail.objectId = program.id
+            break
+          case LR_TYPE_VIDEO:
+            expectedObject = video
+            state.ui.courseDetail.objectId = video.id
             break
           }
           const { object, objectType, objectId } = mapStateToProps(state)
