@@ -511,7 +511,7 @@ def upsert_user_list(user_list_obj):
     upsert_document.delay(
         gen_user_list_id(user_list_obj),
         user_list_data,
-        user_list_obj.list_type,
+        USER_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
@@ -524,7 +524,7 @@ def delete_user_list(user_list_obj):
     Args:
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    delete_document.delay(gen_user_list_id(user_list_obj), user_list_obj.list_type)
+    delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)

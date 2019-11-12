@@ -552,7 +552,7 @@ def test_upsert_user_list(mocker, list_type):
     assert patched_task.delay.call_args[0] == (
         gen_user_list_id(user_list),
         ESUserListSerializer(user_list).data,
-        list_type,
+        USER_LIST_TYPE,
     )
 
 
@@ -567,5 +567,5 @@ def test_delete_user_list(mocker, list_type):
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (
         gen_user_list_id(user_list),
-        list_type,
+        USER_LIST_TYPE,
     )

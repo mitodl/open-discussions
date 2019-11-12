@@ -1,8 +1,6 @@
 """
 Test course_catalog serializers
 """
-from types import SimpleNamespace
-
 import pytest
 
 from course_catalog import factories
