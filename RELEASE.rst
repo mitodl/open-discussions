@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.99.0
+--------------
+
+- add user list detail page
+- UI for adding/removing a list item (#2339)
+
 Version 0.98.0 (Released November 07, 2019)
 --------------
 
