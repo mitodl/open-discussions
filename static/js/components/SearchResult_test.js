@@ -2,7 +2,7 @@ import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
-import LearningResourceCard from "./LearningResourceCard"
+import { LearningResourceCard } from "./LearningResourceCard"
 import SearchResult from "./SearchResult"
 
 import {

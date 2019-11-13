@@ -8,12 +8,14 @@ import {
   mapStateToProps
 } from "./LearningResourceDrawer"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
+import * as LRCardMod from "../components/LearningResourceCard"
 
 import {
   makeBootcamp,
   makeCourse,
   makeProgram,
-  makeVideo
+  makeVideo,
+  makeUserList
 } from "../factories/learning_resources"
 import { makeYoutubeVideo } from "../factories/embedly"
 import { shouldIf } from "../lib/test_utils"
@@ -21,34 +23,41 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
 import { videoRequest } from "../lib/queries/videos"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("LearningResourceDrawer", () => {
-  let sandbox,
-    dispatchStub,
+  let dispatchStub,
     course,
     bootcamp,
     program,
     video,
-    setShowResourceDrawerStub
+    setShowResourceDrawerStub,
+    helper
 
   beforeEach(() => {
-    sandbox = sinon.createSandbox()
-    dispatchStub = sandbox.stub()
+    helper = new IntegrationTestHelper()
+    dispatchStub = helper.sandbox.stub()
     course = makeCourse()
     bootcamp = makeBootcamp()
     program = makeProgram()
     video = makeVideo()
-    setShowResourceDrawerStub = sandbox.stub()
+    setShowResourceDrawerStub = helper.sandbox.stub()
+    helper.stubComponent(
+      LRCardMod,
+      "LearningResourceRow",
+      "LearningResourceRow"
+    )
   })
 
   afterEach(() => {
-    sandbox.restore()
+    helper.cleanup()
   })
 
   const renderLearningResourceDrawer = (props = {}) =>
@@ -72,7 +81,7 @@ describe("LearningResourceDrawer", () => {
   })
 
   it("should put an event listener on window resize", () => {
-    const addEventListenerStub = sandbox.stub(window, "addEventListener")
+    const addEventListenerStub = helper.sandbox.stub(window, "addEventListener")
     renderLearningResourceDrawer()
     assert.ok(addEventListenerStub.called)
   })
@@ -121,6 +130,17 @@ describe("LearningResourceDrawer", () => {
     const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), video)
     assert.deepEqual(expandedDisplay.prop("embedly"), embedly)
+  })
+
+  it("should include an ExpandedLearningResourceDisplay for a userList", () => {
+    const userList = makeUserList()
+    const wrapper = renderLearningResourceDrawer({
+      object:     userList,
+      objectId:   userList.id,
+      objectType: LR_TYPE_USERLIST
+    })
+    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
+    assert.deepEqual(expandedDisplay.prop("object"), userList)
   })
 
   describe("mapStateToProps", () => {

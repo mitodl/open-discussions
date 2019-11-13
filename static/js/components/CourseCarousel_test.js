@@ -16,7 +16,11 @@ describe("CourseCarousel", () => {
     helper = new IntegrationTestHelper()
     courses = R.times(makeCourse, 10)
     setShowResourceDrawerStub = helper.sandbox.stub()
-    helper.stubComponent(LRCardModule, "LearningResourceCard")
+    helper.stubComponent(
+      LRCardModule,
+      "LearningResourceCard",
+      "LearningResourceCard"
+    )
     render = helper.configureHOCRenderer(
       CourseCarousel,
       CourseCarousel,
@@ -45,7 +49,7 @@ describe("CourseCarousel", () => {
     const { wrapper } = await render()
     const carousel = wrapper.find("Carousel")
     R.zip(
-      carousel.find("LearningResourceCard").map(R.identity),
+      carousel.find("LearningResourceDisplay").map(R.identity),
       courses
     ).forEach(([el, course]) => {
       course.object_type = LR_TYPE_COURSE

@@ -219,6 +219,19 @@
   }
 }
 
+.expanded-learning-resource-userlist {
+  .learning-resource-card {
+    margin: 20px;
+  }
+
+  .user-list-header {
+    background-color: $bg-light-grey;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px 20px;
+  }
+}
+
 .facet {
   display: inline-flex;
   cursor: default;

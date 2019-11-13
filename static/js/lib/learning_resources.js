@@ -288,3 +288,10 @@ export const filterListsByResource = (
     object_id: resource.id
   }).map(userList => userList.id)
 }
+
+export const userListCoverImage = R.pathOr(null, [
+  "items",
+  0,
+  "content_data",
+  "image_src"
+])

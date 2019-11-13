@@ -473,6 +473,11 @@ class SimpleUserListSerializer(
     items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
     topics = WriteableSerializerMethodField()
     object_type = serializers.CharField(read_only=True, default="userlist")
+    author_name = serializers.SerializerMethodField()
+
+    def get_author_name(self, instance):
+        """get author name for userlist"""
+        return instance.author.profile.name
 
     def validate_topics(self, topics):
         """Validator for topics"""
@@ -515,7 +520,7 @@ class SimpleUserListSerializer(
     class Meta:
         model = UserList
         fields = "__all__"
-        read_only_fields = ["author", "items"]
+        read_only_fields = ["author", "items", "author_name"]
 
 
 class UserListSerializer(SimpleUserListSerializer):

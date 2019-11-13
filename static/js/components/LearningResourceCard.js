@@ -90,7 +90,30 @@ const CoverImage = ({ object, showResourceDrawer }) => (
   </div>
 )
 
-export default function LearningResourceCard(props: Props) {
+export function LearningResourceCard(props: Props) {
+  const { searchResultLayout } = props
+
+  return (
+    <Card
+      className={getClassName(searchResultLayout)}
+      borderless={searchResultLayout === SEARCH_GRID_UI}
+    >
+      <LearningResourceDisplay {...props} />
+    </Card>
+  )
+}
+
+export function LearningResourceRow(props: Props) {
+  return (
+    <div className="learning-resource-card list-view">
+      <div className="card-contents">
+        <LearningResourceDisplay {...props} />
+      </div>
+    </div>
+  )
+}
+
+export function LearningResourceDisplay(props: Props) {
   const { object, searchResultLayout, availabilities } = props
 
   const bestAvailableRun =
@@ -121,10 +144,7 @@ export default function LearningResourceCard(props: Props) {
   const inLists = object ? object.lists : []
 
   return (
-    <Card
-      className={getClassName(searchResultLayout)}
-      borderless={searchResultLayout === SEARCH_GRID_UI}
-    >
+    <React.Fragment>
       {searchResultLayout === SEARCH_GRID_UI ? (
         <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
       ) : null}
@@ -184,6 +204,6 @@ export default function LearningResourceCard(props: Props) {
       {searchResultLayout === SEARCH_GRID_UI ? null : (
         <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
       )}
-    </Card>
+    </React.Fragment>
   )
 }

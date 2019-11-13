@@ -3,7 +3,7 @@ import { assert } from "chai"
 import R from "ramda"
 
 import UserListDetailPage from "./UserListDetailPage"
-import LearningResourceCard from "../components/LearningResourceCard"
+import { LearningResourceCard } from "../components/LearningResourceCard"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeUserList } from "../factories/learning_resources"

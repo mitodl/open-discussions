@@ -12,7 +12,9 @@ import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
 
 export type FormImage = {
@@ -421,11 +423,12 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<UserListItem | UserListItemEdit>,
+  items:              Array<UserListItem>,
   list_type:          string,
-  object_type:        string,
+  object_type:        LR_TYPE_USERLIST | LR_TYPE_LEARNINGPATH,
   privacy_level:      string,
-  author:             number
+  author:             number,
+  author_name:        string
 }
 
 export type Video = LearningResource & {

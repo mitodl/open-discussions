@@ -13,7 +13,7 @@ import {
   BannerContainer,
   BannerImage
 } from "../components/PageBanner"
-import LearningResourceCard from "../components/LearningResourceCard"
+import { LearningResourceCard } from "../components/LearningResourceCard"
 import AddToListDialog from "../components/AddToListDialog"
 
 import { SEARCH_LIST_UI } from "../lib/search"

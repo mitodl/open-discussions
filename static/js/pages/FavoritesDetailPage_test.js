@@ -2,7 +2,7 @@
 import { assert } from "chai"
 
 import FavoritesDetailPage from "./FavoritesDetailPage"
-import LearningResourceCard from "../components/LearningResourceCard"
+import { LearningResourceCard } from "../components/LearningResourceCard"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeFavoritesResponse } from "../factories/learning_resources"

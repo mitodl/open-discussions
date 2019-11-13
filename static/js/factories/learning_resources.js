@@ -168,7 +168,8 @@ export const makeUserList = (): UserList => ({
   profile_name:  casual.name,
   privacy_level: casual.random_element(["public", "private"]),
   author:        casual.integer(1, 1000),
-  lists:         []
+  lists:         [],
+  author_name:   casual.name
 })
 
 const incrVideo = incrementer()

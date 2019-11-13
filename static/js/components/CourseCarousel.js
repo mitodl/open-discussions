@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import Carousel from "nuka-carousel"
 import R from "ramda"
 
-import LearningResourceCard from "./LearningResourceCard"
+import { LearningResourceCard } from "./LearningResourceCard"
 
 import { SEARCH_GRID_UI, SEARCH_UI_GRID_WIDTHS } from "../lib/search"
 import { useDeviceCategory } from "../hooks/util"

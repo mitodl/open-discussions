@@ -2,6 +2,7 @@
 import React from "react"
 import { assert } from "chai"
 import { shallow } from "enzyme"
+import R from "ramda"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
@@ -15,7 +16,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
@@ -113,10 +115,26 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
-  it("should render course description using the TruncatedText", () => {
-    const wrapper = render()
-    const truncated = wrapper.find("TruncatedText")
-    assert.equal(truncated.props().text, course.short_description)
+  //
+  ;[
+    LR_TYPE_COURSE,
+    LR_TYPE_BOOTCAMP,
+    LR_TYPE_PROGRAM,
+    LR_TYPE_USERLIST,
+    LR_TYPE_LEARNINGPATH
+  ].forEach(objectType => {
+    it(`should render description using the TruncatedText for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({ object })
+      const truncated = wrapper.find("TruncatedText")
+      assert.equal(truncated.props().text, object.short_description)
+    })
+
+    it(`should render a title for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({ object })
+      assert.equal(wrapper.find(".course-title").text(), object.title)
+    })
   })
 
   it("should not render course links if urls are all null", () => {
@@ -308,6 +326,66 @@ describe("ExpandedLearningResourceDisplay", () => {
           .text(),
         "$25.50"
       )
+    })
+  })
+
+  //
+  ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].forEach(objectType => {
+    it(`should display the authors name for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({
+        object
+      })
+      assert.equal(
+        wrapper
+          .find(".local_offer")
+          .closest(".course-info-row")
+          .find(".course-info-value")
+          .text(),
+        object.author_name
+      )
+    })
+
+    it(`should display the privacy for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({
+        object
+      })
+      assert.equal(
+        wrapper
+          .find(".lock")
+          .closest(".course-info-row")
+          .find(".course-info-value")
+          .text(),
+        capitalize(object.privacy_level)
+      )
+    })
+
+    it(`should display the length for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({
+        object
+      })
+      assert.equal(
+        wrapper
+          .find(".view_list")
+          .closest(".course-info-row")
+          .find(".course-info-value")
+          .text(),
+        object.items.length
+      )
+    })
+
+    it(`should include a display of list items for ${objectType}`, () => {
+      const object = makeLearningResource(objectType)
+      const wrapper = render({
+        object
+      })
+      assert.ok(wrapper.find(".expanded-learning-resource-userlist").exists())
+      R.zip(
+        object.items.map(item => item.content_data),
+        wrapper.find("LearningResourceRow").map(el => el.prop("object"))
+      ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
     })
   })
 

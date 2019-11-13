@@ -1,7 +1,6 @@
 // @flow
 /* global SETTINGS:false */
 import React, { useState } from "react"
-import R from "ramda"
 import { useMutation } from "redux-query-react"
 import { Link } from "react-router-dom"
 
@@ -21,18 +20,12 @@ import {
   readableLearningResources
 } from "../lib/constants"
 import { deleteUserListMutation } from "../lib/queries/user_lists"
+import { userListCoverImage } from "../lib/learning_resources"
 
 import type { UserList } from "../flow/discussionTypes"
 
 const readableLength = (length: number) =>
   length === 1 ? "1 Item" : `${String(length)} Items`
-
-const userListCoverImage = R.pathOr(null, [
-  "items",
-  0,
-  "content_data",
-  "image_src"
-])
 
 function ConfirmDeleteDialog(props) {
   const { userList, hide } = props

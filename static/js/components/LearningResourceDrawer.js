@@ -17,12 +17,15 @@ import { courseRequest } from "../lib/queries/courses"
 import { bootcampRequest } from "../lib/queries/bootcamps"
 import { programRequest } from "../lib/queries/programs"
 import { videoRequest } from "../lib/queries/videos"
+import { userListRequest } from "../lib/queries/user_lists"
 import { embedlyRequest, getEmbedlys } from "../lib/queries/embedly"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
 import { useResponsive } from "../hooks/util"
 
@@ -84,8 +87,9 @@ const getObject = createSelector(
   state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.videos,
+  state => state.entities.userLists,
   state => state.queries,
-  (ui, courses, bootcamps, programs, videos, queries) => {
+  (ui, courses, bootcamps, programs, videos, userLists, queries) => {
     const { objectId, objectType } = ui.courseDetail
 
     switch (objectType) {
@@ -104,6 +108,12 @@ const getObject = createSelector(
     case LR_TYPE_VIDEO:
       return querySelectors.isFinished(queries, videoRequest(objectId))
         ? videos[objectId]
+        : null
+    }
+
+    if ([LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(objectType)) {
+      return querySelectors.isFinished(queries, userListRequest(objectId))
+        ? userLists[objectId]
         : null
     }
   }
@@ -160,6 +170,10 @@ const mapPropsToConfig = props => {
       videoRequest(objectId),
       ...(object && object.url ? [embedlyRequest(object.url)] : [])
     ]
+  case LR_TYPE_LEARNINGPATH:
+    return [userListRequest(objectId)]
+  case LR_TYPE_USERLIST:
+    return [userListRequest(objectId)]
   }
   return []
 }

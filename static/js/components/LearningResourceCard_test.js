@@ -2,7 +2,11 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import LearningResourceCard from "./LearningResourceCard"
+import {
+  LearningResourceCard,
+  LearningResourceRow
+} from "./LearningResourceCard"
+import Card from "./Card"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 
@@ -33,7 +37,7 @@ import { DIALOG_ADD_TO_LIST } from "../actions/ui"
 import { queryListResponse } from "../lib/test_utils"
 
 describe("LearningResourceCard", () => {
-  let course, userList, helper, render
+  let course, userList, helper, render, renderRow
 
   beforeEach(() => {
     course = makeLearningResource(LR_TYPE_COURSE)
@@ -43,6 +47,9 @@ describe("LearningResourceCard", () => {
       .withArgs(userListApiURL)
       .returns(queryListResponse([userList]))
     render = helper.configureReduxQueryRenderer(LearningResourceCard, {
+      object: course
+    })
+    renderRow = helper.configureReduxQueryRenderer(LearningResourceRow, {
       object: course
     })
   })
@@ -211,5 +218,15 @@ describe("LearningResourceCard", () => {
       wrapper.find(".price").text(),
       minPrice(bestRun(course.runs).prices)
     )
+  })
+
+  it("should render a LearningResourceRow", async () => {
+    const { wrapper } = await renderRow()
+    assert.ok(wrapper.find("LearningResourceDisplay").exists())
+    assert.deepEqual(
+      wrapper.find("LearningResourceDisplay").prop("object"),
+      course
+    )
+    assert.isNotOk(wrapper.find(Card).exists())
   })
 })
