@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.99.0
+Version 0.99.0 (Released November 13, 2019)
 --------------
 
 - add user list detail page
