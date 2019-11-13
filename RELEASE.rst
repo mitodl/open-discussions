@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.99.1
+Version 0.99.1 (Released November 13, 2019)
 --------------
 
 - add the ability to edit userlist metadata
