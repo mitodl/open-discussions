@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.99.1
+--------------
+
+- add the ability to edit userlist metadata
+- add functions to download and process youtube transcripts
+
 Version 0.99.0 (Released November 13, 2019)
 --------------
 
