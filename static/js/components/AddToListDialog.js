@@ -25,19 +25,13 @@ import {
   favoriteUserListMutation,
   userListMutation,
   userListsRequest,
-  userListsSelector
+  myUserListsSelector
 } from "../lib/queries/user_lists"
 import { favoriteVideoMutation } from "../lib/queries/videos"
 import {
   learningResourceSelector,
   getResourceRequest
 } from "../lib/queries/learning_resources"
-
-const userListsFormSelector = createSelector(
-  userListsSelector,
-  userLists =>
-    userLists ? Object.keys(userLists).map(key => userLists[key]) : []
-)
 
 const uiDialogSelector = createSelector(
   state => state.ui,
@@ -55,7 +49,7 @@ export default function AddToListDialog() {
 
   const resource = useSelector(learningResourceSelector)(objectId, objectType)
 
-  const userLists = useSelector(userListsFormSelector)
+  const userLists = useSelector(myUserListsSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
 
   const inLists =

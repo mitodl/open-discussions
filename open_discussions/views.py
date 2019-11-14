@@ -33,6 +33,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     user_full_name = None
     user_email = None
     user_is_superuser = False
+    user_id = None
 
     if request.user.is_authenticated:
         user = request.user
@@ -40,6 +41,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         user_full_name = user.profile.name
         user_email = user.email
         user_is_superuser = user.is_superuser
+        user_id = user.id
 
     site = get_default_site()
 
@@ -68,6 +70,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "username": username,
         "user_full_name": user_full_name,
         "user_email": user_email,
+        "user_id": user_id,
         "is_admin": user_is_superuser,
         "authenticated_site": {
             "title": site.title,

@@ -11,6 +11,7 @@ declare var SETTINGS: {
   },
   username: ?string,
   user_full_name: ?string,
+  user_id: ?number,
   profile_ui_enabled: boolean,
   authenticated_site: {
     title: string,

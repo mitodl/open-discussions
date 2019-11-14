@@ -1,22 +1,32 @@
 import { assert } from "chai"
+import { mergeAll, times } from "ramda"
 
 import {
   userListRequest,
   favoriteUserListMutation,
   createUserListMutation,
   deleteUserListMutation,
-  userListMutation
+  userListMutation,
+  userListsSelector,
+  myUserListsMapSelector
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
 import { LR_TYPE_USERLIST, LR_PUBLIC } from "../constants"
-import { DEFAULT_POST_OPTIONS } from "../redux_query"
+import {constructIdMap, DEFAULT_POST_OPTIONS} from "../redux_query"
 
 describe("UserLists API", () => {
-  let userList
+  let userList, results, testState, author
 
   beforeEach(() => {
-    userList = makeUserList()
+    results = times(makeUserList, 5)
+    author = results[0].author
+    userList = results[0]
+    testState = {
+      entities: {
+        userLists: mergeAll(constructIdMap(results))
+      }
+    }
   })
 
   it("userList request allows fetching a userList", () => {
@@ -108,5 +118,18 @@ describe("UserLists API", () => {
         [userList.id]: userList
       }
     })
+  })
+
+  it("userListsSelector should grab the right stuff", () => {
+    assert.deepEqual(userListsSelector(testState), testState.entities.userLists)
+  })
+
+  it("myUserListsMapSelector should grab the right stuff", () => {
+    assert.deepEqual(
+      myUserListsMapSelector(testState),
+      Object.keys(results)
+        .map(key => results[key])
+        .filter(result => result.author === author)
+    )
   })
 })

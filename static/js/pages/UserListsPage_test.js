@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import { assert } from "chai"
 
 import UserListsPage from "./UserListsPage"
@@ -14,10 +15,15 @@ import * as util from "../lib/util"
 import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
 
 describe("UserListsPage tests", () => {
+
   let helper, userLists, render, favorites
+  const userId = 92932
 
   beforeEach(() => {
     userLists = [makeUserList(), makeUserList(), makeUserList()]
+    userLists[0].author = userId
+    userLists[1].author = userId
+    userLists[2].author = userId + 1
     helper = new IntegrationTestHelper()
 
     helper.handleRequestStub
@@ -34,16 +40,23 @@ describe("UserListsPage tests", () => {
     helper.cleanup()
   })
 
-  it("should pass user lists down to user list card", async () => {
-    const { wrapper } = await render()
-    userLists.forEach((list, i) => {
-      assert.equal(
-        list,
-        wrapper
-          .find("UserListCard")
-          .at(i + 1)
-          .prop("userList")
-      )
+
+  //
+  ;[[userId, 2], [null, 0]].forEach(([authorId, numLists]) => {
+    it(`should pass ${numLists} user lists down to user list card`, async () => {
+      SETTINGS.user_id = authorId
+      const { wrapper } = await render()
+      const cards = wrapper.find("UserListCard")
+      assert.equal(cards.length, numLists)
+      userLists.slice(0, numLists).forEach((list, i) => {
+        assert.equal(
+          list,
+          wrapper
+            .find("UserListCard")
+            .at(i)
+            .prop("userList")
+        )
+      })
     })
   })
 

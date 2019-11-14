@@ -23,6 +23,7 @@ const _createSettings = () => ({
   is_admin:               false,
   username:               "greatusername",
   user_full_name:         "Great User",
+  user_id:                0,
   profile_ui_enabled:     false,
   course_ui_enabled:      false,
   support_email:          "support@fake.url",
