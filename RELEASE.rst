@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.99.2
+--------------
+
+- Search index updates for user lists (#2374)
+- Added tasks to fetch youtube videos
+- Added drawer for video resources
+
 Version 0.99.1 (Released November 13, 2019)
 --------------
 
