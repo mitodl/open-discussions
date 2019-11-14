@@ -2,16 +2,29 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from course_catalog.factories import CourseFactory, ProgramFactory, VideoFactory
+from course_catalog.factories import (
+    CourseFactory,
+    ProgramFactory,
+    VideoFactory,
+    UserListFactory,
+)
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
-from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE, VIDEO_TYPE
+from search.constants import (
+    PROFILE_TYPE,
+    COURSE_TYPE,
+    PROGRAM_TYPE,
+    VIDEO_TYPE,
+    USER_LIST_TYPE,
+    LEARNING_PATH_TYPE,
+)
 from search.serializers import (
     ESCourseSerializer,
     ESProgramSerializer,
     ESVideoSerializer,
+    ESUserListSerializer,
 )
 from search.task_helpers import (
     reddit_object_persist,
@@ -35,6 +48,8 @@ from search.task_helpers import (
     upsert_program,
     upsert_video,
     delete_video,
+    upsert_user_list,
+    delete_user_list,
 )
 from search.api import (
     gen_post_id,
@@ -43,6 +58,7 @@ from search.api import (
     gen_course_id,
     gen_program_id,
     gen_video_id,
+    gen_user_list_id,
 )
 
 es_profile_serializer_data = {
@@ -519,3 +535,37 @@ def test_delete_video(mocker):
     delete_video(video)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (gen_video_id(video), VIDEO_TYPE)
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("mock_index_functions")
+@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
+def test_upsert_user_list(mocker, list_type):
+    """
+    Tests that upsert_user_list calls update_field_values_by_query with the right parameters
+    """
+    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    user_list = UserListFactory.create(list_type=list_type)
+    upsert_user_list(user_list)
+    assert patched_task.delay.called is True
+    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
+    assert patched_task.delay.call_args[0] == (
+        gen_user_list_id(user_list),
+        ESUserListSerializer(user_list).data,
+        USER_LIST_TYPE,
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.usefixtures("mock_index_functions")
+@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
+def test_delete_user_list(mocker, list_type):
+    """Tests that deleting a UserList triggers a delete on a UserList document"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    user_list = UserListFactory.create(list_type=list_type)
+    delete_user_list(user_list)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (
+        gen_user_list_id(user_list),
+        USER_LIST_TYPE,
+    )

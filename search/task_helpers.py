@@ -500,16 +500,15 @@ def index_new_user_list(user_list_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_user_list(user_list_obj):
+def upsert_user_list(user_list_obj):
     """
     Run a task to update all fields of a UserList Elasticsearch document
 
     Args:
         user_list_obj(UserList): the UserList to update in ES
     """
-
     user_list_data = ESUserListSerializer(user_list_obj).data
-    update_document_with_partial.delay(
+    upsert_document.delay(
         gen_user_list_id(user_list_obj),
         user_list_data,
         USER_LIST_TYPE,

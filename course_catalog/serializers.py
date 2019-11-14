@@ -30,6 +30,7 @@ from course_catalog.utils import (
     semester_year_to_date,
 )
 from open_discussions.serializers import WriteableSerializerMethodField
+from search.task_helpers import upsert_user_list
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -450,7 +451,9 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
-            return super().create(validated_data)
+            userlist = super().create(validated_data)
+            upsert_user_list(userlist)
+            return userlist
 
     def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
@@ -498,7 +501,9 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
                             item = UserListItemSerializer(data=data)
                             item.is_valid(raise_exception=True)
                             item.save()
-                return super().update(instance, validated_data)
+                userlist = super().update(instance, validated_data)
+                upsert_user_list(userlist)
+                return userlist
 
     class Meta:
         model = UserList

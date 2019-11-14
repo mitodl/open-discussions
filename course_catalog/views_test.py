@@ -1,5 +1,6 @@
 """Tests for course_catalog views"""
 from datetime import timedelta
+from types import SimpleNamespace
 
 import pytest
 from django.contrib.auth.models import User
@@ -21,6 +22,17 @@ from course_catalog.factories import (
 )
 from course_catalog.models import UserList, UserListItem
 from open_discussions.factories import UserFactory
+
+# pylint:disable=redefined-outer-name
+
+
+@pytest.fixture()
+def mock_user_list_index(mocker):
+    """Mocks index updating functions for user lists"""
+    return SimpleNamespace(
+        upsert_user_list=mocker.patch("course_catalog.serializers.upsert_user_list"),
+        delete_user_list=mocker.patch("course_catalog.views.delete_user_list"),
+    )
 
 
 def test_course_endpoint(client):
@@ -133,7 +145,7 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
 
 
 @pytest.mark.parametrize("is_anonymous", [True, False])
-def test_user_list_endpoint_create(client, is_anonymous):
+def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
     """Test userlist endpoint for creating a UserList"""
     user = UserFactory.create()
     if not is_anonymous:
@@ -150,9 +162,12 @@ def test_user_list_endpoint_create(client, is_anonymous):
     if resp.status_code == 201:
         assert resp.data.get("title") == resp.data.get("title")
         assert resp.data.get("author") == user.id
+        mock_user_list_index.upsert_user_list.assert_called_once_with(
+            UserList.objects.first()
+        )
 
 
-def test_user_list_endpoint_patch(client, user):
+def test_user_list_endpoint_patch(client, user, mock_user_list_index):
     """Test userlist endpoint for updating a UserList"""
     userlist = UserListFactory.create(author=user, title="Title 1")
 
@@ -165,10 +180,11 @@ def test_user_list_endpoint_patch(client, user):
     )
     assert resp.status_code == 200
     assert UserList.objects.get(id=userlist.id).title == "Title 2"
+    mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_create_item(client, user, is_author):
+def test_user_list_endpoint_create_item(client, user, is_author, mock_user_list_index):
     """Test userlist endpoint for creating a UserListItem"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
@@ -187,6 +203,7 @@ def test_user_list_endpoint_create_item(client, user, is_author):
     if resp.status_code == 200:
         assert len(resp.data.get("items")) == 1
         assert resp.data.get("items")[0]["object_id"] == course.id
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
 def test_user_list_endpoint_create_item_bad_data(client, user):
@@ -211,7 +228,7 @@ def test_user_list_endpoint_create_item_bad_data(client, user):
 
 
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_update_items(client, user, is_author):
+def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list_index):
     """Test userlist endpoint for updating UserListItem positions"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
@@ -247,6 +264,7 @@ def test_user_list_endpoint_update_items(client, user, is_author):
             updated_items[1]["position"] == 44
             and updated_items[1]["id"] == list_items[0].id
         )
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
 def test_user_list_endpoint_update_items_wrong_list(client, user):
@@ -270,7 +288,7 @@ def test_user_list_endpoint_update_items_wrong_list(client, user):
 
 
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_delete_items(client, user, is_author):
+def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list_index):
     """Test userlist endpoint for deleting UserListItems"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
@@ -312,10 +330,11 @@ def test_user_list_endpoint_delete_items(client, user, is_author):
         updated_items = resp.data.get("items")
         assert len(updated_items) == 0
         assert UserListItem.objects.filter(id=list_items[1].id).exists() is False
+        mock_user_list_index.upsert_user_list.assert_called_with(userlist)
 
 
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_delete(client, user, is_author):
+def test_user_list_endpoint_delete(client, user, is_author, mock_user_list_index):
     """Test userlist endpoint for deleting a UserList"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
@@ -327,6 +346,7 @@ def test_user_list_endpoint_delete(client, user, is_author):
     resp = client.delete(reverse("userlists-detail", args=[userlist.id]))
     assert resp.status_code == (204 if is_author else 403)
     assert UserList.objects.filter(id=userlist.id).exists() is not is_author
+    assert mock_user_list_index.delete_user_list.call_count == (1 if is_author else 0)
 
 
 @pytest.mark.usefixtures("transactional_db")

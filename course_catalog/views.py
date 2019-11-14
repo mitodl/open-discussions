@@ -33,6 +33,7 @@ from course_catalog.serializers import (
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
+from search.task_helpers import delete_user_list
 
 
 @api_view(["GET"])
@@ -212,6 +213,10 @@ class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def perform_destroy(self, instance):
+        delete_user_list(instance)
+        instance.delete()
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
