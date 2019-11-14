@@ -13,7 +13,7 @@ import {
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
 import { LR_TYPE_USERLIST, LR_PUBLIC } from "../constants"
-import {constructIdMap, DEFAULT_POST_OPTIONS} from "../redux_query"
+import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
 
 describe("UserLists API", () => {
   let userList, results, testState, author

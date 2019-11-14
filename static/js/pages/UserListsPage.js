@@ -16,7 +16,7 @@ import LoginTooltip from "../components/LoginTooltip"
 
 import {
   myUserListsSelector,
-  userListsRequest,
+  userListsRequest
 } from "../lib/queries/user_lists"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
