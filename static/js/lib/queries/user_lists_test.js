@@ -8,7 +8,7 @@ import {
   deleteUserListMutation,
   userListMutation,
   userListsSelector,
-  myUserListsMapSelector
+  myUserListsSelector
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
@@ -126,7 +126,7 @@ describe("UserLists API", () => {
 
   it("myUserListsMapSelector should grab the right stuff", () => {
     assert.deepEqual(
-      myUserListsMapSelector(testState),
+      myUserListsSelector(testState),
       Object.keys(results)
         .map(key => results[key])
         .filter(result => result.author === author)
