@@ -6,11 +6,14 @@ from django.conf import settings
 from googleapiclient.discovery import build
 import googleapiclient.errors
 import yaml
-import requests
 import pytube
+import github
 from course_catalog.etl.utils import log_exceptions
 from course_catalog.constants import PlatformType
 
+
+CONFIG_FILE_REPO = "mitodl/open-video-data"
+CONFIG_FILE_FOLDER = "youtube"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
 
@@ -134,6 +137,20 @@ def parse_video_captions(xml_captions):
     return "\n".join(captions_list)
 
 
+def github_youtube_config_files():
+    """
+    Function that returns a list of pyGithub files with youtube config channel data
+
+    Returns:
+        A list of pyGithub contentFile objects
+    """
+    github_client = github.Github()
+    repo = github_client.get_repo(CONFIG_FILE_REPO)
+
+    return repo.get_contents(CONFIG_FILE_FOLDER, ref=settings.OPEN_VIDEO_DATA_BRANCH)
+
+
+@log_exceptions("Error extracting youtube data", exc_return_value=[])
 def extract(*, channel_ids=None):
     """
     Function which returns video data for all videos in our watched playlists
@@ -144,28 +161,32 @@ def extract(*, channel_ids=None):
     Returns:
         A generator that yields tuples with offered_by and video data
     """
-    if not (settings.YOUTUBE_CONFIG_FILE_LOCATION and settings.YOUTUBE_DEVELOPER_KEY):
+    if not settings.YOUTUBE_DEVELOPER_KEY:
         return
 
     youtube_client = get_youtube_client()
-    response = requests.get(settings.YOUTUBE_CONFIG_FILE_LOCATION)
-    response.raise_for_status()
 
-    channels_yml = yaml.safe_load(response.content)
+    for file in github_youtube_config_files():
+        try:
+            channel_data = yaml.safe_load(file.decoded_content)
+        except yaml.scanner.ScannerError:
+            continue
 
-    if not channels_yml:
-        return
+        if (
+            channel_data
+            and isinstance(channel_data, dict)
+            and ("playlists" in channel_data)
+            and ("offered_by" in channel_data)
+            and ("channel_id" in channel_data)
+        ):
+            if channel_ids and not channel_data["channel_id"] in channel_ids:
+                continue
 
-    channels = channels_yml.get("channels", [])
-
-    if channel_ids:
-        channels = filter(lambda c: c.channel_id in channel_ids, channels)
-
-    for channel in channels:
-        for playlist_id in channel.get("playlists", []):
-            yield from get_videos_for_playlist(
-                youtube_client, playlist_id, channel["offered_by"]
-            )
+            for playlist in channel_data["playlists"]:
+                if isinstance(playlist, dict) and "id" in playlist:
+                    yield from get_videos_for_playlist(
+                        youtube_client, playlist["id"], channel_data["offered_by"]
+                    )
 
 
 def transform_single_video(offered_by, raw_video_data):

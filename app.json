@@ -310,6 +310,10 @@
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "False"
     },
+    "OPEN_VIDEO_DATA_BRANCH": {
+      "description": "Branch in the open video data repository to use for video downloads",
+      "required": false
+    },
     "NEW_RELIC_APP_NAME": {
       "description": "Application identifier in New Relic."
     },
@@ -423,10 +427,6 @@
     },
     "XPRO_COURSES_API_URL": {
       "description": "The api url for xpro courses",
-      "required": false
-    },
-    "YOUTUBE_CONFIG_FILE_LOCATION": {
-      "description": "The url for the yml file with indexed video channels",
       "required": false
     },
     "YOUTUBE_DEVELOPER_KEY": {
