@@ -25,6 +25,7 @@ chardet==3.0.4            # via requests
 cssselect2==0.2.1         # via cairosvg
 decorator==4.0.11         # via ipython, traitlets
 defusedxml==0.5.0         # via cairosvg, python3-openid, python3-saml, social-auth-core
+deprecated==1.2.7         # via pygithub
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.0
@@ -81,8 +82,9 @@ ptyprocess==0.5.1         # via pexpect
 pyasn1-modules==0.2.7     # via google-auth
 pyasn1==0.4.7             # via pyasn1-modules, rsa
 pycparser==2.18           # via cffi
+pygithub==1.44.1
 pygments==2.2.0           # via ipython
-pyjwt==1.5.2              # via djangorestframework-jwt, social-auth-core
+pyjwt==1.5.2              # via djangorestframework-jwt, pygithub, social-auth-core
 python-dateutil==2.6.0
 python3-openid==3.1.0     # via social-auth-core
 python3-saml==1.4.1
@@ -97,7 +99,7 @@ requests==2.21.0
 rsa==4.0                  # via google-auth
 s3transfer==0.1.13        # via boto3
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-bitfield, django-compat, django-guardian, django-server-status, elasticsearch-dsl, faker, google-api-python-client, google-auth, html5lib, isodate, prompt-toolkit, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
+six==1.10.0               # via django-anymail, django-bitfield, django-compat, django-guardian, django-server-status, elasticsearch-dsl, faker, google-api-python-client, google-auth, html5lib, isodate, prompt-toolkit, pygithub, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
 smart-open==1.8.0         # via ocw-data-parser
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
