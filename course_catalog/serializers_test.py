@@ -25,6 +25,7 @@ from course_catalog.serializers import (
     ProgramSerializer,
     LearningResourceRunSerializer,
     UserListItemSerializer,
+    SimpleUserListSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -141,6 +142,24 @@ def test_userlist_serializer_validation(list_type, valid):
     """
     data = {"title": "My List", "list_type": list_type}
     serializer = UserListSerializer(data=data)
+    assert serializer.is_valid() == valid
+
+
+@pytest.mark.parametrize(
+    "list_type,valid",
+    [
+        [ListType.LIST.value, True],
+        [ListType.LEARNING_PATH.value, True],
+        ["bad_type", False],
+        [None, False],
+    ],
+)
+def test_simple_userlist_serializer_validation(list_type, valid):
+    """
+    Test that the SimpleUserListSerializer validates list_type correctly
+    """
+    data = {"title": "My List", "list_type": list_type}
+    serializer = SimpleUserListSerializer(data=data)
     assert serializer.is_valid() == valid
 
 

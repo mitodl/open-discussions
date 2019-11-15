@@ -29,6 +29,7 @@ from course_catalog.serializers import (
     BootcampSerializer,
     FavoriteItemSerializer,
     VideoSerializer,
+    SimpleUserListSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -187,15 +188,29 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
+class UserListViewPagination(LimitOffsetPagination):
+    """
+    Pagination class for the UserList list view
+    on the frontend we have to fetch all the results,
+    for the same reason as favorites :/
+    """
+
+    default_limit = 1000
+    max_limit = 1000
+
+
 class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     """
     Viewset for User Lists & Learning Paths
     """
 
     queryset = UserList.objects.all().prefetch_related("items")
-    serializer_class = UserListSerializer
-    pagination_class = DefaultPagination
+    serializer_classes = {"list": SimpleUserListSerializer}
+    pagination_class = UserListViewPagination
     permission_classes = (HasUserListPermissions,)
+
+    def get_serializer_class(self):
+        return self.serializer_classes.get(self.action, UserListSerializer)
 
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""

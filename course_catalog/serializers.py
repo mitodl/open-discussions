@@ -79,6 +79,28 @@ class FavoriteSerializerMixin(serializers.Serializer):
             return False
 
 
+class ListsSerializerMixin(serializers.Serializer):
+    """
+    Mixin to serialize lists for various models
+    """
+
+    lists = serializers.SerializerMethodField()
+
+    def get_lists(self, obj):
+        """
+        Return a list of user's lists/path id's that a resource is in.
+        """
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            return UserListItem.objects.filter(
+                author=request.user,
+                object_id=obj.id,
+                content_type=ContentType.objects.get_for_model(obj),
+            ).values_list("user_list", flat=True)
+        else:
+            return []
+
+
 class CourseInstructorSerializer(serializers.ModelSerializer):
     """
     Serializer for CourseInstructor model
@@ -117,7 +139,7 @@ class LearningResourceOfferorField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
-class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer):
+class BaseCourseSerializer(FavoriteSerializerMixin, ListsSerializerMixin, serializers.ModelSerializer):
     """
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
@@ -341,14 +363,14 @@ class BootcampSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
-class UserListItemSerializer(serializers.ModelSerializer):
+class SimpleUserListItemSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin
+):
     """
-    Serializer for UserListItem model
+    Simplified serializer for UserListItem model
     """
 
-    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
-    delete = serializers.BooleanField(write_only=True, default=False, required=False)
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
@@ -390,6 +412,19 @@ class UserListItemSerializer(serializers.ModelSerializer):
                 raise ValidationError("Video does not exist")
         return attrs
 
+    class Meta:
+        model = UserListItem
+        fields = ("id", "object_id", "content_type", "is_favorite")
+
+
+class UserListItemSerializer(SimpleUserListItemSerializer):
+    """
+    Serializer for UserListItem model
+    """
+
+    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
+    delete = serializers.BooleanField(write_only=True, default=False, required=False)
+
     def create(self, validated_data):
         user_list = validated_data["user_list"]
         items = UserListItem.objects.filter(user_list=user_list)
@@ -418,25 +453,14 @@ class UserListItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class SimpleUserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin):
     """
-    Serializer for UserList model
+    Simplified serializer for UserList model
     """
 
-    items = WriteableSerializerMethodField()
+    items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="userlist")
-    modified_items = serializers.JSONField(
-        write_only=True, allow_null=True, required=False
-    )
-
-    def validate_items(self, value):
-        """Dummy validation for items"""
-        return {"items": value}
-
-    def get_items(self, instance):
-        """Returns the list of items"""
-        return [UserListItemSerializer(item).data for item in instance.items.all()]
 
     def validate_list_type(self, list_type):
         """
@@ -454,6 +478,27 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
             userlist = super().create(validated_data)
             upsert_user_list(userlist)
             return userlist
+
+    class Meta:
+        model = UserList
+        fields = "__all__"
+        read_only_fields = ["author", "items"]
+
+
+class UserListSerializer(SimpleUserListSerializer):
+    """
+    Serializer for UserList model
+    """
+
+    items = WriteableSerializerMethodField()
+
+    def validate_items(self, value):
+        """Dummy validation for items"""
+        return {"items": value}
+
+    def get_items(self, instance):
+        """Returns the list of items"""
+        return [UserListItemSerializer(item).data for item in instance.items.all()]
 
     def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
@@ -505,11 +550,6 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
                 upsert_user_list(userlist)
                 return userlist
 
-    class Meta:
-        model = UserList
-        fields = "__all__"
-        read_only_fields = ["author"]
-
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
@@ -524,7 +564,7 @@ class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin
         fields = "__all__"
 
 
-class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin):
     """
     Serializer for Program model
     """
@@ -540,7 +580,7 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
         fields = "__all__"
 
 
-class VideoSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class VideoSerializer(serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin):
     """
     Serializer for Video model
     """
