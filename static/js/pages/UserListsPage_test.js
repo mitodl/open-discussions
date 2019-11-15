@@ -47,13 +47,14 @@ describe("UserListsPage tests", () => {
       SETTINGS.user_id = authorId
       const { wrapper } = await render()
       const cards = wrapper.find("UserListCard")
-      assert.equal(cards.length, numLists)
+      // Expect <numLists> cards, plus 1 for favorites
+      assert.equal(cards.length, numLists + 1)
       userLists.slice(0, numLists).forEach((list, i) => {
         assert.equal(
           list,
           wrapper
             .find("UserListCard")
-            .at(i)
+            .at(i+1)
             .prop("userList")
         )
       })
