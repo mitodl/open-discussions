@@ -67,7 +67,7 @@ export const makeRun = (): LearningResourceRun => {
         full_name:  casual.name
       }
     ],
-    prices: [{ mode: "audit", price: casual.number }]
+    prices: [{ mode: "audit", price: casual.integer(1, 1000) }]
   }
 }
 
@@ -113,9 +113,9 @@ export const makeUserListItem = (objectType: string) => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   id:           incrUserListItem.next().value,
   is_favorite:  casual.boolean,
-  object_id:    casual.number,
-  position:     casual.number,
-  program:      casual.number,
+  object_id:    casual.integer(1, 1000),
+  position:     casual.integer(1, 1000),
+  program:      casual.integer(1, 1000),
   content_type: objectType,
   content_data: makeLearningResource(objectType)
 })
@@ -164,7 +164,7 @@ export const makeUserList = (): UserList => ({
   profile_img:   casual.url,
   profile_name:  casual.name,
   privacy_level: casual.random_element(["public", "private"]),
-  author:        casual.number
+  author:        casual.integer(1, 1000)
 })
 
 const incrVideo = incrementer()
