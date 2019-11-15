@@ -42,7 +42,6 @@ export default function UserListsPage() {
   const [{ isFinished }] = useRequest(userListsRequest())
   const [{ isFinished: isFinishedFavorites }] = useRequest(favoritesRequest())
 
-
   const userLists = useSelector(myUserListsSelector)
   const favoritesUserList = useSelector(favoritesPseudoListSelector)
 

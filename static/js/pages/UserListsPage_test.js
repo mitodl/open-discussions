@@ -15,7 +15,6 @@ import * as util from "../lib/util"
 import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
 
 describe("UserListsPage tests", () => {
-
   let helper, userLists, render, favorites
   const userId = 92932
 
@@ -40,7 +39,6 @@ describe("UserListsPage tests", () => {
     helper.cleanup()
   })
 
-
   //
   ;[[userId, 2], [null, 0]].forEach(([authorId, numLists]) => {
     it(`should pass ${numLists} user lists down to user list card`, async () => {
@@ -54,7 +52,7 @@ describe("UserListsPage tests", () => {
           list,
           wrapper
             .find("UserListCard")
-            .at(i+1)
+            .at(i + 1)
             .prop("userList")
         )
       })
