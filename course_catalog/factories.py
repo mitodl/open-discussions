@@ -313,24 +313,6 @@ class ProgramFactory(LearningResourceFactory):
         model = Program
 
 
-class UserListCourseFactory(ListItemFactory):
-    """Factory for Learning Path Item Courses"""
-
-    content_object = factory.SubFactory(CourseFactory)
-
-    class Meta:
-        model = UserListItem
-
-
-class UserListBootcampFactory(ListItemFactory):
-    """Factory for Learning Path Item Bootcamps"""
-
-    content_object = factory.SubFactory(BootcampFactory)
-
-    class Meta:
-        model = UserListItem
-
-
 class UserListFactory(DjangoModelFactory):
     """Factory for Learning Paths"""
 
@@ -378,3 +360,48 @@ class VideoFactory(LearningResourceFactory):
 
     class Meta:
         model = Video
+
+
+class UserListCourseFactory(ListItemFactory):
+    """Factory for Course UserListItems"""
+
+    content_object = factory.SubFactory(CourseFactory)
+
+    class Meta:
+        model = UserListItem
+
+
+class UserListBootcampFactory(ListItemFactory):
+    """Factory for Bootcamp UserListItems"""
+
+    content_object = factory.SubFactory(BootcampFactory)
+
+    class Meta:
+        model = UserListItem
+
+
+class UserListProgramFactory(ListItemFactory):
+    """Factory for Program UserListItems"""
+
+    content_object = factory.SubFactory(ProgramFactory)
+
+    class Meta:
+        model = UserListItem
+
+
+class UserListVideoFactory(ListItemFactory):
+    """Factory for Video UserListItems"""
+
+    content_object = factory.SubFactory(VideoFactory)
+
+    class Meta:
+        model = UserListItem
+
+
+class UserListUserListFactory(ListItemFactory):
+    """Factory for UserList UserListItems"""
+
+    content_object = factory.SubFactory(VideoFactory)
+
+    class Meta:
+        model = UserListItem
