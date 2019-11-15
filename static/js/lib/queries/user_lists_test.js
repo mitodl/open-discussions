@@ -20,7 +20,6 @@ describe("UserLists API", () => {
 
   beforeEach(() => {
     results = times(makeUserList, 5)
-    author = results[0].author
     userList = results[0]
     testState = {
       entities: {
@@ -125,6 +124,8 @@ describe("UserLists API", () => {
   })
 
   it("myUserListsMapSelector should grab the right stuff", () => {
+    author = results[0].author
+    SETTINGS.user_id = author
     assert.deepEqual(
       myUserListsSelector(testState),
       Object.keys(results)
