@@ -1,3 +1,5 @@
+// @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
 import { mergeAll, times } from "ramda"
 
@@ -29,8 +31,8 @@ describe("UserLists API", () => {
   })
 
   it("userList request allows fetching a userList", () => {
-    const request = userListRequest("fake-id")
-    assert.equal(request.url, `${userListApiURL}/fake-id/`)
+    const request = userListRequest(45)
+    assert.equal(request.url, `${userListApiURL}/45/`)
     assert.deepEqual(request.transform({ id: "foobar" }), {
       userLists: {
         foobar: { id: "foobar" }
@@ -87,7 +89,6 @@ describe("UserLists API", () => {
 
   it("deleteUserListMutation should return what we expect", () => {
     const query = deleteUserListMutation(userList)
-    assert.isUndefined(query.body)
     assert.equal(query.queryKey, "deleteUserListMutation")
     assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
     assert.deepEqual(query.options, {
@@ -119,11 +120,11 @@ describe("UserLists API", () => {
     })
   })
 
-  it("userListsSelector should grab the right stuff", () => {
+  it("userListsSelector should grab all userList entities from state", () => {
     assert.deepEqual(userListsSelector(testState), testState.entities.userLists)
   })
 
-  it("myUserListsMapSelector should grab the right stuff", () => {
+  it("myUserListsMapSelector should grab only user's userList entities", () => {
     author = results[0].author
     SETTINGS.user_id = author
     assert.deepEqual(
