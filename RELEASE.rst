@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.99.2
+Version 0.99.2 (Released November 15, 2019)
 --------------
 
 - Search index updates for user lists (#2374)
