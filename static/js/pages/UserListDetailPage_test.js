@@ -43,6 +43,20 @@ describe("UserListDetailPage tests", () => {
     assert.equal(wrapper.find(".list-header").text(), userList.title)
   })
 
+  it("should should show the description", async () => {
+    const { wrapper } = await render()
+    assert.equal(
+      wrapper.find(".list-description").text(),
+      userList.short_description
+    )
+  })
+
+  it("should not show the description if not there", async () => {
+    userList.short_description = undefined
+    const { wrapper } = await render()
+    assert.isNotOk(wrapper.find(".list-description").exists())
+  })
+
   it("should render the list items", async () => {
     const { wrapper } = await render()
     R.zip([...wrapper.find(LearningResourceCard)], userList.items).forEach(

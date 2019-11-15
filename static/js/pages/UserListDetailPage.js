@@ -46,6 +46,9 @@ export default function UserListDetailPage(props: Props) {
         <Grid className="main-content one-column narrow user-list-page">
           <Cell width={12}>
             <h1 className="list-header">{userList.title}</h1>
+            {userList.short_description ? (
+              <p className="list-description">{userList.short_description}</p>
+            ) : null}
           </Cell>
           {userList.items.map((item, i) => (
             <Cell width={12} key={i}>
