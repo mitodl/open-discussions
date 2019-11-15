@@ -1,27 +1,38 @@
+// @flow
+/* global SETTINGS: false */
 import { assert } from "chai"
+import { mergeAll, times } from "ramda"
 
 import {
   userListRequest,
   favoriteUserListMutation,
   createUserListMutation,
   deleteUserListMutation,
-  userListMutation
+  userListMutation,
+  userListsSelector,
+  myUserListsSelector
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
 import { userListApiURL } from "../url"
 import { LR_TYPE_USERLIST, LR_PUBLIC } from "../constants"
-import { DEFAULT_POST_OPTIONS } from "../redux_query"
+import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
 
 describe("UserLists API", () => {
-  let userList
+  let userList, results, testState, author
 
   beforeEach(() => {
-    userList = makeUserList()
+    results = times(makeUserList, 5)
+    userList = results[0]
+    testState = {
+      entities: {
+        userLists: mergeAll(constructIdMap(results))
+      }
+    }
   })
 
   it("userList request allows fetching a userList", () => {
-    const request = userListRequest("fake-id")
-    assert.equal(request.url, `${userListApiURL}/fake-id/`)
+    const request = userListRequest(45)
+    assert.equal(request.url, `${userListApiURL}/45/`)
     assert.deepEqual(request.transform({ id: "foobar" }), {
       userLists: {
         foobar: { id: "foobar" }
@@ -78,7 +89,6 @@ describe("UserLists API", () => {
 
   it("deleteUserListMutation should return what we expect", () => {
     const query = deleteUserListMutation(userList)
-    assert.isUndefined(query.body)
     assert.equal(query.queryKey, "deleteUserListMutation")
     assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
     assert.deepEqual(query.options, {
@@ -108,5 +118,20 @@ describe("UserLists API", () => {
         [userList.id]: userList
       }
     })
+  })
+
+  it("userListsSelector should grab all userList entities from state", () => {
+    assert.deepEqual(userListsSelector(testState), testState.entities.userLists)
+  })
+
+  it("myUserListsMapSelector should grab only user's userList entities", () => {
+    author = results[0].author
+    SETTINGS.user_id = author
+    assert.deepEqual(
+      myUserListsSelector(testState),
+      Object.keys(results)
+        .map(key => results[key])
+        .filter(result => result.author === author)
+    )
   })
 })

@@ -6,7 +6,7 @@ import type { LiveStreamEvent } from "../flow/livestreamTypes"
 export const makeLivestreamEvent = (
   isLive: boolean = false
 ): LiveStreamEvent => ({
-  ownerAccountId: casual.number,
-  id:             casual.number,
+  ownerAccountId: casual.integer(1, 1000),
+  id:             casual.integer(1, 1000),
   isLive
 })

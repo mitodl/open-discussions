@@ -78,7 +78,7 @@ export const makePostResult = (): PostResult => ({
 })
 
 export const makeCourseResult = (): LearningResourceResult => ({
-  id:                casual.number,
+  id:                casual.integer(1, 1000),
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,
@@ -93,7 +93,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
-  id:                casual.number,
+  id:                casual.integer(1, 1000),
   course_id:         `course_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,
@@ -107,7 +107,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
 })
 
 export const makeProgramResult = (): LearningResourceResult => ({
-  id:                casual.number,
+  id:                casual.integer(1, 1000),
   program_id:        `program_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,
@@ -122,7 +122,7 @@ export const makeProgramResult = (): LearningResourceResult => ({
 })
 
 export const makeVideoResult = (): LearningResourceResult => ({
-  id:                casual.number,
+  id:                casual.integer(1, 1000),
   video_id:          `video_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,

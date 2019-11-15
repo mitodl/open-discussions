@@ -42,6 +42,7 @@ def test_webpack_url(
         expected_user_values = {
             "user_email": test_user.email,
             "username": test_user.username,
+            "user_id": test_user.id,
             "user_full_name": test_user.profile.name,
             "is_admin": test_user.is_superuser,
         }
@@ -50,6 +51,7 @@ def test_webpack_url(
             "user_email": None,
             "username": None,
             "user_full_name": None,
+            "user_id": None,
             "is_admin": False,
         }
 

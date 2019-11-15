@@ -422,7 +422,8 @@ export type UserList = LearningResource & {
   items:              Array<UserListItem | UserListItemEdit>,
   list_type:          string,
   object_type:        string,
-  privacy_level:      string
+  privacy_level:      string,
+  author:             number
 }
 
 export type Video = LearningResource & {

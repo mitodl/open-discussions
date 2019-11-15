@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import { assert } from "chai"
 import { times } from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
@@ -12,9 +13,13 @@ import { DIALOG_ADD_TO_LIST, setDialogData } from "../actions/ui"
 
 describe("AddToListDialog", () => {
   let renderDialog, userLists, helper, course
+  SETTINGS.user_id = 92932
 
   beforeEach(() => {
-    userLists = times(makeUserList, 5)
+    userLists = times(makeUserList, 7)
+    userLists.forEach((userList, idx) => {
+      userList.author = idx < 5 ? SETTINGS.user_id : 121212
+    })
     course = makeCourse()
     helper = new IntegrationTestHelper()
     renderDialog = helper.configureReduxQueryRenderer(AddToListDialog, {
@@ -44,8 +49,8 @@ describe("AddToListDialog", () => {
     const { wrapper } = await render()
     const checkboxes = wrapper.find(Checkbox)
 
-    // Should be 1 checkbox for each list, plus 1 for favorites
-    assert.equal(checkboxes.length, userLists.length + 1)
+    // Should be 1 checkbox for each list, plus 1 for favorites, minus 2 for non-authored lists
+    assert.equal(checkboxes.length, userLists.length - 1)
 
     // 1st checkbox for Favorites
     const favoriteCheck = checkboxes.at(0)
@@ -66,8 +71,8 @@ describe("AddToListDialog", () => {
     const { wrapper } = await render(object)
     const checkboxes = wrapper.find(Checkbox)
 
-    // Should be 1 checkbox for each list, plus 1 for favorites, -1 for excluded list
-    assert.equal(checkboxes.length, userLists.length)
+    // Should be 1 checkbox for each list, plus 1 for favorites, -2 for non-authored lists, -1 for excluded list
+    assert.equal(checkboxes.length, userLists.length - 2)
 
     const userListCheck = checkboxes.at(1)
     assert.equal(userListCheck.find("label").text(), userLists[1].title)

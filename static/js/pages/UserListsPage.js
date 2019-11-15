@@ -15,7 +15,10 @@ import UserListCard from "../components/UserListCard"
 import UserListFormDialog from "../components/UserListFormDialog"
 import LoginTooltip from "../components/LoginTooltip"
 
-import { userListsRequest, userListsSelector } from "../lib/queries/user_lists"
+import {
+  myUserListsSelector,
+  userListsRequest
+} from "../lib/queries/user_lists"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
 import {
@@ -23,12 +26,6 @@ import {
   favoritesListSelector
 } from "../lib/queries/learning_resources"
 import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
-
-const userListsPageSelector = createSelector(
-  userListsSelector,
-  userLists =>
-    userLists ? Object.keys(userLists).map(key => userLists[key]) : null
-)
 
 const favoritesPseudoListSelector = createSelector(
   favoritesListSelector,
@@ -45,7 +42,7 @@ export default function UserListsPage() {
   const [{ isFinished }] = useRequest(userListsRequest())
   const [{ isFinished: isFinishedFavorites }] = useRequest(favoritesRequest())
 
-  const userLists = useSelector(userListsPageSelector)
+  const userLists = useSelector(myUserListsSelector)
   const favoritesUserList = useSelector(favoritesPseudoListSelector)
 
   return (

@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import R from "ramda"
 import { createSelector } from "reselect"
 
@@ -32,6 +33,16 @@ export const userListsRequest = () => ({
 export const userListsSelector = createSelector(
   state => state.entities.userLists,
   userLists => userLists
+)
+
+export const myUserListsSelector = createSelector(
+  userListsSelector,
+  userLists =>
+    userLists
+      ? Object.keys(userLists)
+        .map(key => userLists[key])
+        .filter(userList => userList.author === SETTINGS.user_id)
+      : []
 )
 
 export const favoriteUserListMutation = (userList: UserList) => ({
