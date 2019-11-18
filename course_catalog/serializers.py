@@ -349,6 +349,13 @@ class SimpleUserListItemSerializer(
     """
 
     content_type = serializers.CharField(source="content_type.name")
+    content_data = serializers.SerializerMethodField()
+
+    def get_content_data(self, instance):
+        """Get the item content_data with image_src only"""
+        if instance.item and instance.item.image_src:
+            return {"image_src": instance.item.image_src}
+        return {}
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
@@ -392,7 +399,7 @@ class SimpleUserListItemSerializer(
 
     class Meta:
         model = UserListItem
-        fields = ("id", "object_id", "content_type", "is_favorite")
+        fields = ("id", "object_id", "content_type", "is_favorite", "content_data")
 
 
 class UserListItemSerializer(SimpleUserListItemSerializer):

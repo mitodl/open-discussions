@@ -15,6 +15,7 @@ from course_catalog.factories import (
     UserListFactory,
     LearningResourceRunFactory,
     ProgramItemCourseFactory,
+    UserListCourseFactory,
 )
 from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
@@ -26,6 +27,7 @@ from course_catalog.serializers import (
     LearningResourceRunSerializer,
     UserListItemSerializer,
     SimpleUserListSerializer,
+    SimpleUserListItemSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -199,6 +201,21 @@ def test_userlistitem_serializer_validation(
     }
     serializer = UserListItemSerializer(data=data)
     assert serializer.is_valid() == (valid_type and object_exists)
+
+
+def test_simpleuserlistitem_serializer_content_data():
+    """
+    Test that the SimpleUserListItemSerializer includes content_data with an image_src
+    """
+    course = CourseFactory.create()
+    userlistitem = UserListCourseFactory.create(
+        content_object=course, user_list=UserListFactory.create()
+    )
+    expected_content_data = {"image_src": course.image_src}
+    item_serializer = SimpleUserListItemSerializer(instance=userlistitem)
+    assert item_serializer.data["content_data"] == expected_content_data
+    list_serializer = SimpleUserListSerializer(instance=userlistitem.user_list)
+    assert list_serializer.data["items"][0]["content_data"] == expected_content_data
 
 
 def test_favorites_serializer():
