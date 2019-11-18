@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.100.0
+Version 0.100.0 (Released November 18, 2019)
 ---------------
 
 - Filter out unauthored lists on UserListsPage and AddToListDialog (#2383)
