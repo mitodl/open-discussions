@@ -353,9 +353,10 @@ class SimpleUserListItemSerializer(
 
     def get_content_data(self, instance):
         """Get the item content_data with image_src only"""
+        image_src = None
         if instance.item and instance.item.image_src:
-            return {"image_src": instance.item.image_src}
-        return {}
+            image_src = instance.item.image_src
+        return {"image_src": image_src}
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)

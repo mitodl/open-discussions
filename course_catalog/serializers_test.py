@@ -203,7 +203,8 @@ def test_userlistitem_serializer_validation(
     assert serializer.is_valid() == (valid_type and object_exists)
 
 
-def test_simpleuserlistitem_serializer_content_data():
+@pytest.mark.parametrize("is_null", [True, False])
+def test_simpleuserlistitem_serializer_content_data(is_null):
     """
     Test that the SimpleUserListItemSerializer includes content_data with an image_src
     """
@@ -212,6 +213,9 @@ def test_simpleuserlistitem_serializer_content_data():
         content_object=course, user_list=UserListFactory.create()
     )
     expected_content_data = {"image_src": course.image_src}
+    if is_null:
+        course.delete()
+        expected_content_data = {"image_src": None}
     item_serializer = SimpleUserListItemSerializer(instance=userlistitem)
     assert item_serializer.data["content_data"] == expected_content_data
     list_serializer = SimpleUserListSerializer(instance=userlistitem.user_list)
