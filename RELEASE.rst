@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.100.0
+---------------
+
+- Filter out unauthored lists on UserListsPage and AddToListDialog (#2383)
+- new config file format
+- add the favorites as a userlist in the UI
+
 Version 0.99.2 (Released November 15, 2019)
 --------------
 
