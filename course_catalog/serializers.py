@@ -463,7 +463,9 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
         fields = "__all__"
 
 
-class SimpleUserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin):
+class SimpleUserListSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Simplified serializer for UserList model
     """
