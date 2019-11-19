@@ -74,7 +74,7 @@ import type {
   LearningResourceResult
 } from "../flow/searchTypes"
 import {
-  userListsMapSelector,
+  myUserListsSelector,
   userListsRequest
 } from "../lib/queries/user_lists"
 import type { UserList } from "../flow/discussionTypes"
@@ -520,7 +520,7 @@ const mapStateToProps = (state): StateProps => {
     loaded:     search.loaded,
     processing: search.processing,
     favorites:  favoritesSelector(state),
-    lists:      userListsMapSelector(state)
+    lists:      myUserListsSelector(state)
   }
 }
 

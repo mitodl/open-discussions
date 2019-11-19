@@ -124,7 +124,7 @@ describe("UserLists API", () => {
     assert.deepEqual(userListsSelector(testState), testState.entities.userLists)
   })
 
-  it("myUserListsMapSelector should grab only user's userList entities", () => {
+  it("myUserListsSelector should grab only user's userList entities", () => {
     author = results[0].author
     SETTINGS.user_id = author
     assert.deepEqual(
