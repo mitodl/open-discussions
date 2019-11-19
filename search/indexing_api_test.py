@@ -62,7 +62,7 @@ def test_create_document(mocked_es, mocker, object_type):
         "search.indexing_api.get_active_aliases", return_value=[object_type]
     )
     create_document(doc_id, data)
-    mock_get_aliases.assert_called_once_with([object_type])
+    mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.create.assert_any_call(
         index=object_type, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id
@@ -117,7 +117,7 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     )
     doc_id, data = ("doc_id", {"key1": "value1"})
     update_document_with_partial(doc_id, data, object_type)
-    mock_get_aliases.assert_called_once_with([object_type])
+    mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
     mocked_es.get_conn.assert_called_once_with(verify=True)
     mocked_es.conn.update.assert_called_once_with(
         index=object_type,
