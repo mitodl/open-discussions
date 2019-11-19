@@ -104,7 +104,7 @@ def extract_playlist_items(youtube_client, playlist_id):
         return
     except googleapiclient.errors.HttpError as exc:
         raise ExtractPlaylistItemException(
-            "Error fetching playlist items: playlist_id={playlist_id}"
+            f"Error fetching playlist items: playlist_id={playlist_id}"
         ) from exc
 
 
@@ -119,7 +119,11 @@ def extract_playlists(youtube_client, playlist_configs):
     Returns:
         A generator that yields playlist data
     """
-    playlist_ids = [playlist_config["id"] for playlist_config in playlist_configs]
+
+    playlist_configs_by_id = {
+        playlist_config["id"]: playlist_config for playlist_config in playlist_configs
+    }
+    playlist_ids = playlist_configs_by_id.keys()
 
     try:
         request = youtube_client.playlists().list(
@@ -134,10 +138,12 @@ def extract_playlists(youtube_client, playlist_configs):
 
             for playlist_data in response["items"]:
                 playlist_id = playlist_data["id"]
+                playlist_config = playlist_configs_by_id[playlist_id]
 
                 yield (
                     playlist_data,
                     extract_playlist_items(youtube_client, playlist_id),
+                    playlist_config.get("create_user_list", True),
                 )
 
             request = youtube_client.playlists().list_next(request, response)
@@ -145,7 +151,7 @@ def extract_playlists(youtube_client, playlist_configs):
         return
     except googleapiclient.errors.HttpError as exc:
         raise ExtractPlaylistException(
-            "Error fetching channel playlists: playlist_ids={playlist_ids}"
+            f"Error fetching channel playlists: playlist_ids={playlist_ids}"
         ) from exc
 
 
@@ -181,10 +187,10 @@ def extract_channels(youtube_client, channels_config):
                 channel_id = channel_data["id"]
                 channel_config = channel_configs_by_ids[channel_id]
                 offered_by = channel_config.get("offered_by", None)
-                playlist_ids = channel_config.get("playlists", [])
+                playlist_configs = channel_config.get("playlists", [])
 
                 # if we hit any error on a playlist, we simply abort
-                playlists = extract_playlists(youtube_client, playlist_ids)
+                playlists = extract_playlists(youtube_client, playlist_configs)
                 yield (offered_by, channel_data, playlists)
 
             request = youtube_client.channels().list_next(request, response)
@@ -373,7 +379,7 @@ def transform_video(video_data, offered_by):
     }
 
 
-def transform_playlist(playlist_data, videos, offered_by):
+def transform_playlist(playlist_data, videos, offered_by, has_user_list):
     """
     Transform a playlist into our normalized data
 
@@ -390,6 +396,7 @@ def transform_playlist(playlist_data, videos, offered_by):
         "playlist_id": playlist_data["id"],
         "title": playlist_data["snippet"]["title"],
         "offered_by": [{"name": offered_by}] if offered_by else [],
+        "has_user_list": has_user_list,
         # intentional generator expression
         "videos": (
             transform_video(extracted_video, offered_by) for extracted_video in videos
@@ -420,7 +427,7 @@ def transform(extracted_channels):
             "offered_by": [{"name": offered_by}] if offered_by else [],
             # intentional generator expression
             "playlists": (
-                transform_playlist(playlist, videos, offered_by)
-                for playlist, videos in playlists
+                transform_playlist(playlist, videos, offered_by, has_user_list)
+                for playlist, videos, has_user_list in playlists
             ),
         }

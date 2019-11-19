@@ -333,6 +333,9 @@ class Playlist(List):
     published = models.BooleanField(default=True)
 
     has_user_list = models.BooleanField(default=True)
+    user_list = models.OneToOneField(
+        UserList, on_delete=models.SET_NULL, null=True, related_name="playlist"
+    )
 
     videos = models.ManyToManyField(
         Video, through="PlaylistVideo", through_fields=("playlist", "video")

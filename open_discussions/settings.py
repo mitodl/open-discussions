@@ -839,4 +839,5 @@ LIVESTREAM_ACCOUNT_ID = get_string("LIVESTREAM_ACCOUNT_ID", None)
 
 # course catalog video etl settings
 OPEN_VIDEO_DATA_BRANCH = get_string("OPEN_VIDEO_DATA_BRANCH", "master")
+OPEN_VIDEO_USER_LIST_OWNER = get_string("OPEN_VIDEO_USER_LIST_OWNER", None)
 YOUTUBE_DEVELOPER_KEY = get_string("YOUTUBE_DEVELOPER_KEY", None)

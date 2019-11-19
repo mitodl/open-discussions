@@ -338,6 +338,12 @@ class UserListFactory(DjangoModelFactory):
     class Meta:
         model = UserList
 
+    class Params:
+        is_learning_path = factory.Trait(list_type=ListType.LEARNING_PATH.value)
+        is_list = factory.Trait(list_type=ListType.LIST.value)
+        is_public = factory.Trait(privacy_level=PrivacyLevel.public.value)
+        is_private = factory.Trait(privacy_level=PrivacyLevel.private.value)
+
 
 class VideoFactory(LearningResourceFactory):
     """Factory for Video"""

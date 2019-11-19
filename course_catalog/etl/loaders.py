@@ -1,10 +1,13 @@
 """Course catalog data loaders"""
 import logging
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import OuterRef, Exists
+from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
+from course_catalog.constants import PrivacyLevel, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -18,6 +21,8 @@ from course_catalog.models import (
     VideoChannel,
     Playlist,
     PlaylistVideo,
+    UserList,
+    UserListItem,
 )
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.utils import log_exceptions
@@ -25,6 +30,8 @@ from course_catalog.etl.utils import log_exceptions
 from search import task_helpers as search_task_helpers
 
 log = logging.getLogger()
+
+User = get_user_model()
 
 
 def load_topics(resource, topics_data):
@@ -237,13 +244,82 @@ def load_videos(videos_data):
     return [load_video(video_data) for video_data in videos_data]
 
 
+def load_playlist_user_list(playlist):
+    """
+    Load a playlist into a user list
+
+    Args:
+        playlist (Playlist): the playlist to generate a user list from
+
+    Returns:
+        UserList or None:
+            the created/updated user list or None
+    """
+    owner_username = settings.OPEN_VIDEO_USER_LIST_OWNER
+    if not owner_username:
+        log.debug("OPEN_VIDEO_USER_LIST_OWNER is not set, skipping")
+        return None
+
+    owner = User.objects.filter(username=owner_username).first()
+    if owner is None:
+        log.error(
+            "OPEN_VIDEO_USER_LIST_OWNER is set to '%s', but that user doesn't exist",
+            owner_username,
+        )
+        return None
+
+    if not playlist.has_user_list:
+        # if the playlist shouldn't have a user list, but it does, delete it
+        if playlist.user_list:
+            user_list = playlist.user_list
+            search_task_helpers.delete_user_list(user_list)
+            user_list.delete()
+        return None
+
+    # atomically ensure we create one and only one user list for this playlist
+    with transaction.atomic():
+        playlist = Playlist.objects.select_for_update().get(id=playlist.id)
+        if not playlist.user_list:
+            playlist.user_list = UserList.objects.create(
+                author=owner,
+                privacy_level=PrivacyLevel.public.value,
+                list_type=ListType.LIST.value,
+            )
+            playlist.save()
+
+    user_list = playlist.user_list
+    user_list.title = playlist.title
+    user_list.save()
+
+    video_content_type = ContentType.objects.get_for_model(Video)
+
+    items = []
+    for playlist_video in playlist.playlist_videos.order_by("position"):
+        item, _ = UserListItem.objects.update_or_create(
+            user_list=user_list,
+            content_type=video_content_type,
+            object_id=playlist_video.video_id,
+            defaults={"position": playlist_video.position},
+        )
+        items.append(item)
+
+    # prune any items from the previous state
+    UserListItem.objects.filter(user_list=user_list).exclude(
+        id__in=[item.id for item in items]
+    ).delete()
+
+    search_task_helpers.upsert_user_list(user_list)
+
+    return user_list
+
+
 def load_playlist(video_channel, playlist_data):
     """
     Load a playlist
 
     Args:
         video_channel (VideoChannel): the video channel instance this playlist is under
-        playlists_data (iter of dict): iterable of the video playlists
+        playlist_data (dict): the video playlist
 
     Returns:
         Playlist:
@@ -275,6 +351,8 @@ def load_playlist(video_channel, playlist_data):
         PlaylistVideo.objects.filter(playlist=playlist).exclude(
             video_id__in=[video.id for video in videos]
         ).delete()
+
+    load_playlist_user_list(playlist)
 
     return playlist
 
