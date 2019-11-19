@@ -17,7 +17,7 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
 } from "../lib/constants"
-import { filterItems, privacyIcon } from "../lib/learning_resources"
+import { privacyIcon } from "../lib/learning_resources"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
@@ -52,13 +52,7 @@ export default function AddToListDialog() {
   const userLists = useSelector(myUserListsSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
 
-  const inLists =
-    resource && isFinishedList && isFinishedResource
-      ? filterItems(userLists, "items", {
-        content_type: resource.object_type,
-        object_id:    resource.id
-      }).map(userList => userList.id)
-      : []
+  const inLists = resource && isFinishedResource ? resource.lists : []
 
   const dispatch = useDispatch()
   const hide = useCallback(
@@ -94,6 +88,14 @@ export default function AddToListDialog() {
     return userListMutation(list)
   })
 
+  const updateResource = (checked: boolean, userListId) => {
+    if (checked && !resource.lists.includes(userListId)) {
+      resource.lists.push(userListId)
+    } else {
+      resource.lists.pop(userListId)
+    }
+  }
+
   const renderAddToListForm = () => (
     <div className="user-listitem-form">
       <div className="flex-row">
@@ -125,6 +127,7 @@ export default function AddToListDialog() {
                     checked={inLists.includes(userList.id)}
                     onChange={(e: any) => {
                       toggleListItem(resource, userList, !e.target.checked)
+                      updateResource(e.target.checked, userList.id)
                     }}
                   >
                     {`${userList.title}`}

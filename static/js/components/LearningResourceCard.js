@@ -28,7 +28,7 @@ import {
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
-import { userIsAnonymous } from "../lib/util"
+import { emptyOrNil, userIsAnonymous } from "../lib/util"
 import { setShowResourceDrawer, DIALOG_ADD_TO_LIST } from "../actions/ui"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
@@ -118,6 +118,7 @@ export default function LearningResourceCard(props: Props) {
   )
 
   const cost = bestAvailableRun ? minPrice(bestAvailableRun.prices) : null
+  const inLists = object ? object.lists : []
 
   return (
     <Card
@@ -165,7 +166,9 @@ export default function LearningResourceCard(props: Props) {
                 className="favorite"
                 src={
                   // $FlowFixMe
-                  object.is_favorite ? starSelectedURL : starUnselectedURL
+                  object.is_favorite || !emptyOrNil(inLists)
+                    ? starSelectedURL
+                    : starUnselectedURL
                 }
                 onClick={e => {
                   e.preventDefault()

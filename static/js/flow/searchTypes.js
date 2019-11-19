@@ -87,7 +87,8 @@ export type LearningResourceResult = {
   full_description?:   ?string,
   platform?:           string,
   topics:              Array<string>,
-  runs:         Array<LearningResourceRun>
+  runs:                Array<LearningResourceRun>,
+  lists?:               Array<number>
 }
 
 

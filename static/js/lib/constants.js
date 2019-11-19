@@ -77,6 +77,15 @@ export const readableLearningResources = {
   [FAVORITES_PSEUDO_LIST]: "Favorites"
 }
 
+export const resourceEntities = {
+  [LR_TYPE_COURSE]:       "courses",
+  [LR_TYPE_BOOTCAMP]:     "bootcamps",
+  [LR_TYPE_PROGRAM]:      "programs",
+  [LR_TYPE_USERLIST]:     "userLists",
+  [LR_TYPE_LEARNINGPATH]: "userLists",
+  [LR_TYPE_VIDEO]:        "videos"
+}
+
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"
 export const DEFAULT_START_DT = "1970-01-01T00:00:00Z"
 export const DEFAULT_END_DT = "2500-01-01T23:59:59Z"

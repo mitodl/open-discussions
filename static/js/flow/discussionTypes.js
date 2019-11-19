@@ -335,7 +335,8 @@ export type LearningResourceSummary = {
   topics:             Array<CourseTopic>,
   offered_by:         Array<string>,
   object_type:        string,
-  runs:               Array<LearningResourceRun>
+  runs:               Array<LearningResourceRun>,
+  lists:              Array<number>
 }
 
 export type LearningResourceRun = {
@@ -365,7 +366,8 @@ export type LearningResource = {
   topics:             Array<CourseTopic>,
   offered_by:         Array<string>,
   is_favorite:        boolean,
-  object_type:        string
+  object_type:        string,
+  lists:              Array<number>
 }
 
 

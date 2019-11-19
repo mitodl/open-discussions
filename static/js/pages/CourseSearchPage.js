@@ -32,6 +32,7 @@ import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
   availabilityFacetLabel,
+  filterListsByResource,
   resourceLabel
 } from "../lib/learning_resources"
 import {
@@ -72,6 +73,11 @@ import type {
   CurrentFacet,
   LearningResourceResult
 } from "../flow/searchTypes"
+import {
+  userListsMapSelector,
+  userListsRequest
+} from "../lib/queries/user_lists"
+import type { UserList } from "../flow/discussionTypes"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,
@@ -90,7 +96,8 @@ type StateProps = {|
   loaded: boolean,
   processing: boolean,
   total: number,
-  favorites: Object
+  favorites: Object,
+  lists: Array<UserList>
 |}
 
 type DispatchProps = {|
@@ -312,22 +319,25 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
   }
 
-  getFavoriteObject = (result: LearningResourceResult) => {
+  getFavoriteOrListedObject = (result: LearningResourceResult) => {
     const { favorites } = this.props
+    const { lists } = this.props
+    // $FlowFixMe: this is a pseudo-result
+    result.lists = filterListsByResource(result, lists)
     const { bootcamps, courses, programs, userLists, videos } = favorites
     switch (result.object_type) {
     case LR_TYPE_COURSE:
-      return courses[result.id]
+      return courses[result.id] || result
     case LR_TYPE_BOOTCAMP:
-      return bootcamps[result.id]
+      return bootcamps[result.id] || result
     case LR_TYPE_PROGRAM:
-      return programs[result.id]
+      return programs[result.id] || result
     case LR_TYPE_USERLIST:
-      return userLists[result.id]
+      return userLists[result.id] || result
     case LR_TYPE_VIDEO:
-      return videos[result.id]
+      return videos[result.id] || result
     case LR_TYPE_LEARNINGPATH:
-      return userLists[result.id]
+      return userLists[result.id] || result
     }
   }
 
@@ -374,7 +384,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                 result={result}
                 overrideObject={
                   // $FlowFixMe
-                  this.getFavoriteObject(result)
+                  this.getFavoriteOrListedObject(result)
                 }
                 toggleFacet={this.toggleFacet}
                 availabilities={activeFacets.get("availability")}
@@ -509,7 +519,8 @@ const mapStateToProps = (state): StateProps => {
     initialLoad,
     loaded:     search.loaded,
     processing: search.processing,
-    favorites:  favoritesSelector(state)
+    favorites:  favoritesSelector(state),
+    lists:      userListsMapSelector(state)
   }
 }
 
@@ -524,7 +535,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
-const mapPropsToConfig = () => [favoritesRequest()]
+const mapPropsToConfig = () => [favoritesRequest(), userListsRequest()]
 
 export default compose(
   connect<Props, OwnProps, _, _, _, _>(

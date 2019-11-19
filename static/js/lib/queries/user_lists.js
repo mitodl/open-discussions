@@ -113,7 +113,7 @@ export const userListMutation = (userList: UserList) => ({
     userLists: { [userList.id]: userList }
   }),
   update: {
-    userLists: R.merge
+    userLists: R.mergeDeepRight
   },
   options: {
     method: "PATCH",
