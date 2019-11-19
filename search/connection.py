@@ -53,7 +53,7 @@ def get_conn(*, verify=True):
             _CONN_VERIFIED = False
         return _CONN
 
-    if len(get_active_aliases(VALID_OBJECT_TYPES)) == 0:
+    if len(get_active_aliases(_CONN, VALID_OBJECT_TYPES)) == 0:
         raise Exception("Unable to find any active indices to update")
 
     _CONN_VERIFIED = True
@@ -99,11 +99,12 @@ get_default_alias_name = partial(make_alias_name, False)
 get_reindexing_alias_name = partial(make_alias_name, True)
 
 
-def get_active_aliases(object_types):
+def get_active_aliases(conn, object_types):
     """
     Returns aliases which exist for specified object types
 
     Args:
+        conn(elasticsearch.client.Elasticsearch): An Elasticsearch client
         object_types(list of str): list of object types (post, comment, etc)
 
     Returns:
@@ -111,7 +112,6 @@ def get_active_aliases(object_types):
     """
     if not object_types:
         object_types = VALID_OBJECT_TYPES
-    conn = get_conn(verify=False)
     return [
         alias
         for alias_tuple in [

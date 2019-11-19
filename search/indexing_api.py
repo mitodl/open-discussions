@@ -246,7 +246,7 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases([data["object_type"]]):
+    for alias in get_active_aliases(conn, [data["object_type"]]):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
@@ -259,7 +259,7 @@ def delete_document(doc_id, object_type):
         object_type (str): The object type
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases([object_type]):
+    for alias in get_active_aliases(conn, [object_type]):
         try:
             conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
         except NotFoundError:
@@ -287,7 +287,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
     if not object_types:
         object_types = VALID_OBJECT_TYPES
     conn = get_conn(verify=True)
-    for alias in get_active_aliases(object_types):
+    for alias in get_active_aliases(conn, object_types):
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -324,7 +324,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
     """
     conn = get_conn(verify=True)
-    for alias in get_active_aliases([object_type]):
+    for alias in get_active_aliases(conn, [object_type]):
         try:
             conn.update(
                 index=alias,
@@ -422,7 +422,7 @@ def index_items(serialize_bulk_items, object_type, ids):
         ids(list of int): List of item id's
     """
     conn = get_conn()
-    for alias in get_active_aliases([object_type]):
+    for alias in get_active_aliases(conn, [object_type]):
         _, errors = bulk(
             conn,
             serialize_bulk_items(ids),
