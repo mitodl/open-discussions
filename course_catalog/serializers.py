@@ -510,7 +510,10 @@ class UserListSerializer(SimpleUserListSerializer):
 
     def get_items(self, instance):
         """Returns the list of items"""
-        return [UserListItemSerializer(item).data for item in instance.items.all()]
+        return [
+            UserListItemSerializer(item, context=self.context).data
+            for item in instance.items.all()
+        ]
 
     def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
