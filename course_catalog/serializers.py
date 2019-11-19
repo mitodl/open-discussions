@@ -476,11 +476,11 @@ class SimpleUserListSerializer(
 
     def validate_topics(self, topics):
         """Validator for topics"""
-        topic_ids = set([topic["id"] for topic in topics])
+        topic_ids = {topic["id"] for topic in topics}
         valid_topic_ids = set(
             CourseTopic.objects.filter(id__in=topic_ids).values_list("id", flat=True)
         )
-        missing = set(topic_ids).difference(valid_topic_ids)
+        missing = topic_ids.difference(valid_topic_ids)
         if missing:
             raise ValidationError(f"Invalid topic ids: {missing}")
         return {"topics": topics}
@@ -582,8 +582,10 @@ class UserListSerializer(SimpleUserListSerializer):
                             item.save()
                 userlist = super().update(instance, validated_data)
                 if topics_data is not None:
-                    userlist.topics.set(CourseTopic.objects.filter(
-                        id__in=[topic["id"] for topic in topics_data])
+                    userlist.topics.set(
+                        CourseTopic.objects.filter(
+                            id__in=[topic["id"] for topic in topics_data]
+                        )
                     )
                 upsert_user_list(userlist)
                 return userlist
