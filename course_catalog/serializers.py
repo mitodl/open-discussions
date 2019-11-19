@@ -32,6 +32,10 @@ from course_catalog.utils import (
 from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list
 
+import logging
+
+log = logging.getLogger()
+
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     """
@@ -471,8 +475,21 @@ class SimpleUserListSerializer(
     """
 
     items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
-    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    topics = WriteableSerializerMethodField()
     object_type = serializers.CharField(read_only=True, default="userlist")
+
+    def validate_topics(self, topics):
+        """Validator for topics"""
+        log.error(f"VALIDATING {topics}")
+        if CourseTopic.objects.filter(
+            id__in=[topic["id"] for topic in topics]
+        ).count() != len(topics):
+            raise ValidationError("One of your topics is not valid")
+        return {"topics": topics}
+
+    def get_topics(self, instance):
+        """Returns the list of topics"""
+        return [CourseTopicSerializer(topic).data for topic in instance.topics.all()]
 
     def validate_list_type(self, list_type):
         """
@@ -487,8 +504,11 @@ class SimpleUserListSerializer(
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
-            userlist = super().create(validated_data)
-            upsert_user_list(userlist)
+            topics = [topic["id"] for topic in validated_data.pop("topics", [])]
+            with transaction.atomic():
+                userlist = super().create(validated_data)
+                userlist.topics.set(CourseTopic.objects.filter(id__in=topics))
+                upsert_user_list(userlist)
             return userlist
 
     class Meta:
@@ -520,6 +540,8 @@ class UserListSerializer(SimpleUserListSerializer):
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
+            topics_data = [topic["id"] for topic in validated_data.pop("topics", [])]
+            log.error(f"TOPICS: {topics_data}")
             items_data = validated_data.pop("items", [])
             # iterate through any UserListItem objects that should be created/modified/deleted:
             with transaction.atomic():
@@ -562,6 +584,7 @@ class UserListSerializer(SimpleUserListSerializer):
                             item.is_valid(raise_exception=True)
                             item.save()
                 userlist = super().update(instance, validated_data)
+                userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
                 upsert_user_list(userlist)
                 return userlist
 
