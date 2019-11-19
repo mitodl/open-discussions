@@ -5,8 +5,11 @@ from unittest.mock import Mock, MagicMock
 from glob import glob
 from os.path import basename
 import json
+from datetime import datetime
 import pytest
+import pytz
 import googleapiclient.errors
+import pytube
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.exceptions import (
@@ -15,6 +18,7 @@ from course_catalog.etl.exceptions import (
     ExtractPlaylistItemException,
 )
 from course_catalog.etl import youtube
+from course_catalog.factories import VideoFactory
 
 
 @pytest.fixture
@@ -424,3 +428,133 @@ def test_transform(extracted_and_transformed_values):
 def test_validate_channel_config(config, expected):
     """Test that validate_channel_config returns expected errors"""
     assert youtube.validate_channel_config(config) == expected
+
+
+def test_get_youtube_transcripts(mocker):
+    """Verify that get_youtube_transcript downloads, saves and upserts video data"""
+    mock_caption = Mock()
+    mock_video = Mock()
+
+    mock_caption_call = mocker.patch(
+        "course_catalog.etl.youtube.get_captions_for_video"
+    )
+    mock_caption_call.return_value = mock_caption
+
+    mock_parse_call = mocker.patch("course_catalog.etl.youtube.parse_video_captions")
+    mock_parse_call.return_value = "parsed"
+
+    mock_upsert_video = mocker.patch("course_catalog.etl.youtube.upsert_video")
+
+    youtube.get_youtube_transcripts([mock_video])
+
+    mock_caption_call.assert_called_once_with(mock_video)
+    mock_parse_call.assert_called_once_with(mock_caption)
+    mock_video.save.assert_called_once()
+
+    mock_upsert_video.assert_called_once_with(mock_video)
+
+
+def test_get_youtube_transcripts_with_a_retry(mocker):
+    """Verify that get_youtube_transcript downloads retries once if a transcript download fails"""
+    mock_caption = Mock()
+    mock_video = Mock(id=1)
+
+    mock_caption_call = mocker.patch(
+        "course_catalog.etl.youtube.get_captions_for_video"
+    )
+    mock_caption_call.side_effect = [KeyError, mock_caption]
+
+    mock_parse_call = mocker.patch("course_catalog.etl.youtube.parse_video_captions")
+    mock_parse_call.return_value = "parsed"
+
+    mock_upsert_video = mocker.patch("course_catalog.etl.youtube.upsert_video")
+
+    youtube.get_youtube_transcripts([mock_video])
+
+    assert mock_caption_call.call_count == 2
+
+    mock_parse_call.assert_called_once_with(mock_caption)
+    mock_video.save.assert_called_once()
+
+    mock_upsert_video.assert_called_once_with(mock_video)
+
+
+def test_get_youtube_transcripts_with_multiple_consecutive_failures(mocker):
+    """
+    Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error
+    """
+
+    mock_video = Mock(id=1)
+    video_list = [mock_video for _ in range(20)]
+
+    mock_caption_call = mocker.patch(
+        "course_catalog.etl.youtube.get_captions_for_video"
+    )
+    mock_caption_call.side_effect = pytube.exceptions.VideoUnavailable
+
+    mock_parse_call = mocker.patch("course_catalog.etl.youtube.parse_video_captions")
+    mock_upsert_video = mocker.patch("course_catalog.etl.youtube.upsert_video")
+
+    youtube.get_youtube_transcripts(video_list)
+
+    # Fails after 2 attempts each for the first 15 videos.
+    assert mock_caption_call.call_count == 30
+
+    mock_parse_call.assert_not_called()
+    mock_video.save.assert_not_called()
+    mock_upsert_video.assert_not_called()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("overwrite", [True, False])
+@pytest.mark.parametrize(
+    "created_after", [datetime(2019, 10, 4, tzinfo=pytz.utc), None]
+)
+@pytest.mark.parametrize("created_minutes", [2000, None])
+def test_get_youtube_videos_for_transcripts_job(
+    overwrite, created_after, created_minutes
+):
+    """Verify that get_youtube_videos_for_transcripts_job applies filters correctly"""
+
+    video1 = VideoFactory.create(transcript="saved already")
+    video2 = VideoFactory.create(transcript="")
+    video3 = VideoFactory.create(transcript="saved already")
+    video3.created_on = datetime(2019, 10, 1, tzinfo=pytz.utc)
+    video3.save()
+    video4 = VideoFactory.create(transcript="")
+    video4.created_on = datetime(2019, 10, 1, tzinfo=pytz.utc)
+    video4.save()
+    video5 = VideoFactory.create(transcript="saved already")
+    video5.created_on = datetime(2019, 10, 5, tzinfo=pytz.utc)
+    video5.save()
+    video6 = VideoFactory.create(transcript="")
+    video6.created_on = datetime(2019, 10, 5, tzinfo=pytz.utc)
+    video6.save()
+
+    result = youtube.get_youtube_videos_for_transcripts_job(
+        created_after=created_after,
+        created_minutes=created_minutes,
+        overwrite=overwrite,
+    )
+
+    if overwrite:
+        if created_after:
+            assert list(result.order_by("id")) == [video1, video2, video5, video6]
+        elif created_minutes:
+            assert list(result.order_by("id")) == [video1, video2]
+        else:
+            assert list(result.order_by("id")) == [
+                video1,
+                video2,
+                video3,
+                video4,
+                video5,
+                video6,
+            ]
+    else:
+        if created_after:
+            assert list(result.order_by("id")) == [video2, video6]
+        elif created_minutes:
+            assert list(result.order_by("id")) == [video2]
+        else:
+            assert list(result.order_by("id")) == [video2, video4, video6]

@@ -586,6 +586,12 @@ CELERY_BEAT_SCHEDULE = {
             "YOUTUBE_FETCH_SCHEDULE_SECONDS", 60 * 30
         ),  # default is every 30 minutes
     },
+    "update-youtube-transcripts": {
+        "task": "course_catalog.tasks.get_youtube_transcripts",
+        "schedule": get_int(
+            "YOUTUBE_FETCH_TRANSCRIPT_SCHEDULE_SECONDS", 60 * 60 * 12
+        ),  # default is 12 hours
+    },
 }
 
 CELERY_TASK_SERIALIZER = "json"
