@@ -3,7 +3,6 @@ course_catalog tasks
 """
 import logging
 import json
-
 import requests
 import boto3
 from django.conf import settings
@@ -12,8 +11,7 @@ from open_discussions.celery import app
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.api import sync_ocw_data, parse_bootcamp_json_data
-from course_catalog.etl import pipelines
-
+from course_catalog.etl import pipelines, youtube
 
 log = logging.getLogger(__name__)
 
@@ -122,3 +120,29 @@ def get_youtube_data(*, channel_ids=None):
     results = pipelines.youtube_etl(channel_ids=channel_ids)
 
     return len(list(results))
+
+
+@app.task
+def get_youtube_transcripts(
+    *, created_after=None, created_minutes=None, overwrite=False
+):
+    """
+    Fetch transcripts for Youtube videos
+
+    Args:
+        created_after (date or None):
+            if a string transcripts are pulled only for videos added to the course catalog after that date
+        created_minutes (int or None):
+            if a string transcripts are pulled only from videos added created_minutes ago and after
+        overwrite (bool):
+            if true youtube transcriptsipts are updated for videos that already have transcripts
+    """
+
+    videos = youtube.get_youtube_videos_for_transcripts_job(
+        created_after=created_after,
+        created_minutes=created_minutes,
+        overwrite=overwrite,
+    )
+
+    log.info("Updating transcripts for %i videos", videos.count())
+    youtube.get_youtube_transcripts(videos)

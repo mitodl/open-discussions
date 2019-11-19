@@ -440,6 +440,10 @@
     "YOUTUBE_FETCH_SCHEDULE_SECONDS": {
       "description": "The time in seconds between periodic syncs of youtube videos",
       "required": false
+    },
+    "YOUTUBE_FETCH_TRANSCRIPT_SCHEDULE_SECONDS": {
+      "description": "The time in seconds between periodic syncs of youtube video transcripts",
+      "required": false
     }
   },
   "keywords": [

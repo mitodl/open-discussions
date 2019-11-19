@@ -28,7 +28,9 @@ from course_catalog.tasks import (
     get_xpro_data,
     get_oll_data,
     get_youtube_data,
+    get_youtube_transcripts,
 )
+
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument,too-many-arguments
@@ -290,3 +292,19 @@ def test_get_youtube_data(mocker, settings, channel_ids):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_youtube_data.delay(channel_ids=channel_ids)
     mock_pipelines.youtube_etl.assert_called_once_with(channel_ids=channel_ids)
+
+
+def test_get_youtube_transcripts(mocker):
+    """Verify that get_youtube_transcripts invokes correct course_catalog.etl.youtube functions"""
+
+    mock_course_catalog_youtube = mocker.patch("course_catalog.tasks.youtube")
+
+    get_youtube_transcripts(created_after=None, created_minutes=2000, overwrite=True)
+
+    mock_course_catalog_youtube.get_youtube_videos_for_transcripts_job.assert_called_once_with(
+        created_after=None, created_minutes=2000, overwrite=True
+    )
+
+    mock_course_catalog_youtube.get_youtube_transcripts.assert_called_once_with(
+        mock_course_catalog_youtube.get_youtube_videos_for_transcripts_job.return_value
+    )

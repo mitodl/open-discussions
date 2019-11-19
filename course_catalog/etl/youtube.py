@@ -2,6 +2,7 @@
 import logging
 from html import unescape
 from xml.etree import ElementTree
+from datetime import timedelta
 from django.conf import settings
 
 from googleapiclient.discovery import build
@@ -17,6 +18,9 @@ from course_catalog.etl.exceptions import (
     ExtractPlaylistItemException,
 )
 from course_catalog.etl.utils import log_exceptions
+from course_catalog.models import Video
+from open_discussions.utils import now_in_utc
+from search.task_helpers import upsert_video
 
 
 CONFIG_FILE_REPO = "mitodl/open-video-data"
@@ -438,3 +442,77 @@ def transform(extracted_channels):
                 for playlist, videos, has_user_list in playlists
             ),
         }
+
+
+def get_youtube_videos_for_transcripts_job(
+    *, created_after=None, created_minutes=None, overwrite=False
+):
+    """
+    course_catalog.Video object filtered to tasks.get_youtube_transcripts job params
+
+    Args:
+        created_after (date or None):
+            if a date inclued only videos with a created_on after that date
+        created_minutes (int or None):
+            if an int include only videos with created_on in the last created_minutes minutes
+        overwrite (bool):
+            if true include videos that already have transcripts
+
+    Returns
+        Django filtered course_catalog.videos object
+    """
+
+    videos = Video.objects.filter(published=True)
+
+    if not overwrite:
+        videos = videos.filter(transcript="")
+
+    if created_after:
+        videos = videos.filter(created_on__gte=created_after)
+    elif created_minutes:
+        date = now_in_utc() - timedelta(minutes=created_minutes)
+        videos = videos.filter(created_on__gte=date)
+    return videos
+
+
+def get_youtube_transcripts(videos):
+    """
+    Fetch transcripts for Youtube videos
+
+    Args:
+        vidoes - collection of course_catalog.Video objects
+    """
+
+    # The call to download the transcript occasionally fails. We'll retry once after the first failure.
+    # If 15 consecutive  videos fail to load with pytube.exceptions.VideoUnavailable error
+    # we will assume we are being rate limited and stop the job early
+
+    consecutive_video_unavailable_failures = 0
+    max_consecutive_video_unavailable_failures = 15
+    for video in videos:
+        if (
+            consecutive_video_unavailable_failures
+            >= max_consecutive_video_unavailable_failures
+        ):
+            log.error(
+                "%i consecutive faliures for transcript downloads. Ending transcript download job early. ",
+                max_consecutive_video_unavailable_failures,
+            )
+            break
+
+        tries = 2
+        for attempt in range(tries):
+            try:
+                caption = get_captions_for_video(video)
+            except (pytube.exceptions.PytubeError, KeyError) as error:
+                if attempt == tries - 1:
+                    log.error("Unable to fetch transcript for video id=%i", video.id)
+                    if isinstance(error, pytube.exceptions.VideoUnavailable):
+                        consecutive_video_unavailable_failures += 1
+                continue
+            else:
+                video.transcript = parse_video_captions(caption)
+                video.save()
+                upsert_video(video)
+                consecutive_video_unavailable_failures = 0
+                break
