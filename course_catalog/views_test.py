@@ -198,19 +198,24 @@ def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
         )
 
 
-def test_user_list_endpoint_patch(client, user, mock_user_list_index):
+@pytest.mark.parametrize("update_topics", [True, False])
+def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_topics):
     """Test userlist endpoint for updating a UserList"""
-    userlist = UserListFactory.create(author=user, title="Title 1")
+    [original_topic, new_topic] = CourseTopicFactory.create_batch(2)
+    userlist = UserListFactory.create(author=user, title="Title 1", topics=[original_topic])
 
     client.force_login(user)
 
     data = {"title": "Title 2"}
+    if update_topics:
+        data["topics"] = [{"id": new_topic.id}]
 
     resp = client.patch(
         reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
     )
     assert resp.status_code == 200
     assert UserList.objects.get(id=userlist.id).title == "Title 2"
+    assert resp.data["topics"][0]["id"] == (new_topic.id if update_topics else original_topic.id)
     mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
