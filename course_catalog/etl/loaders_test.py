@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 import pytest
 
+from course_catalog.constants import ListType, PrivacyLevel
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.loaders import (
     load_program,
@@ -20,6 +21,7 @@ from course_catalog.etl.loaders import (
     load_playlist,
     load_playlists,
     load_video_channels,
+    load_playlist_user_list,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -33,6 +35,7 @@ from course_catalog.factories import (
     VideoFactory,
     PlaylistFactory,
     VideoChannelFactory,
+    UserListFactory,
 )
 from course_catalog.models import (
     Program,
@@ -43,6 +46,7 @@ from course_catalog.models import (
     Playlist,
     VideoChannel,
     PlaylistVideo,
+    UserListItem,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
@@ -58,6 +62,8 @@ def mock_upsert_tasks(mocker):
         delete_program=mocker.patch("search.task_helpers.delete_program"),
         upsert_video=mocker.patch("search.task_helpers.upsert_video"),
         delete_video=mocker.patch("search.task_helpers.delete_video"),
+        delete_user_list=mocker.patch("search.task_helpers.delete_user_list"),
+        upsert_user_list=mocker.patch("search.task_helpers.upsert_user_list"),
     )
 
 
@@ -507,3 +513,101 @@ def test_load_video_channels_unpublish(mock_upsert_tasks):
     assert unpublished_video.published is False
 
     mock_upsert_tasks.delete_video.assert_called_once_with(unpublished_video)
+
+
+def test_load_playlist_user_list_invalid_settings(mocker, settings):
+    """Verify load_playlist_user_list aborts if the settings are invalid"""
+    mock_log = mocker.patch("course_catalog.etl.loaders.log")
+
+    settings.OPEN_VIDEO_USER_LIST_OWNER = None
+
+    assert load_playlist_user_list(mocker.Mock()) is None
+
+    mock_log.debug.assert_called_once_with(
+        "OPEN_VIDEO_USER_LIST_OWNER is not set, skipping"
+    )
+
+    settings.OPEN_VIDEO_USER_LIST_OWNER = "missing"
+
+    assert load_playlist_user_list(mocker.Mock()) is None
+
+    mock_log.error.assert_called_once_with(
+        "OPEN_VIDEO_USER_LIST_OWNER is set to '%s', but that user doesn't exist",
+        settings.OPEN_VIDEO_USER_LIST_OWNER,
+    )
+
+
+@pytest.mark.parametrize("exists", [True, False])
+@pytest.mark.parametrize("has_user_list", [True, False])
+def test_load_playlist_user_list(
+    mock_upsert_tasks, settings, user, exists, has_user_list
+):
+    """Test that load_playlist_user_list updates or create the user list"""
+    settings.OPEN_VIDEO_USER_LIST_OWNER = user.username
+
+    playlist = PlaylistFactory.create(has_user_list=has_user_list)
+    videos = VideoFactory.create_batch(3)
+    for idx, video in enumerate(videos):
+        PlaylistVideo.objects.create(playlist=playlist, video=video, position=idx)
+
+    prune_video = VideoFactory.create()
+    video_content_type = ContentType.objects.get_for_model(Video)
+    user_list = None
+    if exists:
+        user_list = UserListFactory.create(is_list=True, is_public=True, author=user)
+        UserListItem.objects.create(
+            user_list=user_list,
+            content_type=video_content_type,
+            object_id=prune_video.id,
+            position=0,
+        )
+
+        playlist.user_list = user_list
+        playlist.save()
+    else:
+        assert playlist.user_list is None
+
+    load_playlist_user_list(playlist)
+
+    playlist.refresh_from_db()
+
+    if has_user_list:
+        if exists:
+            assert playlist.user_list == user_list
+        else:
+            assert playlist.user_list is not None
+    else:
+        assert playlist.user_list is None
+
+    if has_user_list:
+        user_list = playlist.user_list
+
+        assert user_list.author == user
+        assert user_list.title == playlist.title
+        assert user_list.privacy_level == PrivacyLevel.public.value
+        assert user_list.list_type == ListType.LIST.value
+
+        assert (
+            UserListItem.objects.filter(
+                user_list=user_list,
+                content_type=video_content_type,
+                object_id=prune_video.id,
+            ).exists()
+            is False
+        )
+
+        for video in videos:
+            assert (
+                UserListItem.objects.filter(
+                    user_list=user_list,
+                    content_type=video_content_type,
+                    object_id=video.id,
+                ).exists()
+                is True
+            )
+        mock_upsert_tasks.upsert_user_list.assert_called_once_with(user_list)
+    else:
+        if exists:
+            mock_upsert_tasks.delete_user_list.assert_called_once_with(user_list)
+        else:
+            mock_upsert_tasks.delete_user_list.assert_not_called()

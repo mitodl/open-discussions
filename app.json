@@ -314,6 +314,10 @@
       "description": "Branch in the open video data repository to use for video downloads",
       "required": false
     },
+    "OPEN_VIDEO_USER_LIST_OWNER": {
+      "description": "User who will own user lists generated from playlists",
+      "required": false
+    },
     "NEW_RELIC_APP_NAME": {
       "description": "Application identifier in New Relic."
     },

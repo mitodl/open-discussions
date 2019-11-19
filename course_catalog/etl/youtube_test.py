@@ -88,10 +88,12 @@ def mocked_github_channel_response(mocker):
     """Mock response from github api requst to open-video-data"""
     channel_list = [
         mock_channel_file(
-            OfferedBy.mitx.value, "UCTBMWu8yshnAmpzR3MoJFtw", "UUTBMWu8yshnAmpzR3MoJFtw"
+            OfferedBy.mitx.value, "UCTBMWu8yshnAmpzR3MoJFtw", "PL221E2BBF13BECF6C"
         ),
         mock_channel_file(
-            OfferedBy.ocw.value, "UCEBb1b_L6zDS3xTUrIALZOw", "UUEBb1b_L6zDS3xTUrIALZOw"
+            OfferedBy.ocw.value,
+            "UCEBb1b_L6zDS3xTUrIALZOw",
+            "PLTz-v-F773kXwTSKsX_E9t8ZnP_3LYaGy",
         ),
     ]
     mock_github_client = mocker.patch("github.Github")
@@ -128,12 +130,12 @@ def extracted_and_transformed_values(youtube_api_responses):
         (
             OfferedBy.ocw.value,
             channels_list[0]["items"][0],
-            [(playlists_list[0]["items"][0], ocw_videos)],
+            [(playlists_list[0]["items"][0], ocw_videos, True)],
         ),
         (
             OfferedBy.mitx.value,
             channels_list[0]["items"][1],
-            [(playlists_list[1]["items"][0], mitx_videos)],
+            [(playlists_list[1]["items"][0], mitx_videos, True)],
         ),
     ]
 
@@ -149,6 +151,7 @@ def extracted_and_transformed_values(youtube_api_responses):
                     "playlist_id": playlist["id"],
                     "offered_by": [{"name": offered_by}] if offered_by else [],
                     "title": playlist["snippet"]["title"],
+                    "has_user_list": has_user_list,
                     "videos": [
                         {
                             "video_id": video["id"],
@@ -167,7 +170,7 @@ def extracted_and_transformed_values(youtube_api_responses):
                         for video in videos
                     ],
                 }
-                for playlist, videos in playlists
+                for playlist, videos, has_user_list in playlists
             ],
         }
         for offered_by, channel, playlists in extracted
@@ -192,8 +195,8 @@ def _resolve_extracted_channels(channels):
 
 def _resolve_extracted_playlist(playlist):
     """Resolve a playlist and its nested generators"""
-    playlist_data, videos = playlist
-    return (playlist_data, list(videos))
+    playlist_data, videos, has_user_list = playlist
+    return (playlist_data, list(videos), has_user_list)
 
 
 @pytest.fixture
@@ -328,14 +331,14 @@ def test_extract_with_exception(
 
     with pytest.raises(exception_cls):
         # exercise the generator tree to trigger the exception
-        for _, videos in playlists:
+        for _, videos, _ in playlists:
             list(videos)
 
     offered_by, channel_data, playlists = results[1]
     playlists = list(playlists)
     assert len(playlists) == 1
 
-    playlist_data, videos = playlists[0]
+    playlist_data, videos, _ = playlists[0]
 
     assert offered_by == OfferedBy.mitx.value
     assert channel_data == channels_list[0]["items"][1]
@@ -366,15 +369,17 @@ def test_transform_video(extracted_and_transformed_values):
     assert result == transformed[0]["playlists"][0]["videos"][0]
 
 
-def test_transform_playlist(extracted_and_transformed_values):
+@pytest.mark.parametrize("has_user_list", [True, False])
+def test_transform_playlist(extracted_and_transformed_values, has_user_list):
     """test youtube transform for a playlist"""
     extracted, transformed = extracted_and_transformed_values
     result = youtube.transform_playlist(
-        extracted[0][2][0][0], extracted[0][2][0][1], OfferedBy.ocw.value
+        extracted[0][2][0][0], extracted[0][2][0][1], OfferedBy.ocw.value, has_user_list
     )
-    assert {**result, "videos": list(result["videos"])} == transformed[0]["playlists"][
-        0
-    ]
+    assert {**result, "videos": list(result["videos"])} == {
+        **transformed[0]["playlists"][0],
+        "has_user_list": has_user_list,
+    }
 
 
 def test_transform(extracted_and_transformed_values):
