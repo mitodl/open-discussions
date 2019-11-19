@@ -341,14 +341,22 @@ class BootcampSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
-class UserListItemSerializer(serializers.ModelSerializer):
+class SimpleUserListItemSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin
+):
     """
-    Serializer for UserListItem model
+    Simplified serializer for UserListItem model
     """
 
-    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
-    delete = serializers.BooleanField(write_only=True, default=False, required=False)
+    content_data = serializers.SerializerMethodField()
+
+    def get_content_data(self, instance):
+        """Get the item content_data with image_src only"""
+        image_src = None
+        if instance.item and instance.item.image_src:
+            image_src = instance.item.image_src
+        return {"image_src": image_src}
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
@@ -390,6 +398,19 @@ class UserListItemSerializer(serializers.ModelSerializer):
                 raise ValidationError("Video does not exist")
         return attrs
 
+    class Meta:
+        model = UserListItem
+        fields = ("id", "object_id", "content_type", "is_favorite", "content_data")
+
+
+class UserListItemSerializer(SimpleUserListItemSerializer):
+    """
+    Serializer for UserListItem model
+    """
+
+    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
+    delete = serializers.BooleanField(write_only=True, default=False, required=False)
+
     def create(self, validated_data):
         user_list = validated_data["user_list"]
         items = UserListItem.objects.filter(user_list=user_list)
@@ -418,25 +439,14 @@ class UserListItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class SimpleUserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
     """
-    Serializer for UserList model
+    Simplified serializer for UserList model
     """
 
-    items = WriteableSerializerMethodField()
+    items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="userlist")
-    modified_items = serializers.JSONField(
-        write_only=True, allow_null=True, required=False
-    )
-
-    def validate_items(self, value):
-        """Dummy validation for items"""
-        return {"items": value}
-
-    def get_items(self, instance):
-        """Returns the list of items"""
-        return [UserListItemSerializer(item).data for item in instance.items.all()]
 
     def validate_list_type(self, list_type):
         """
@@ -454,6 +464,27 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
             userlist = super().create(validated_data)
             upsert_user_list(userlist)
             return userlist
+
+    class Meta:
+        model = UserList
+        fields = "__all__"
+        read_only_fields = ["author", "items"]
+
+
+class UserListSerializer(SimpleUserListSerializer):
+    """
+    Serializer for UserList model
+    """
+
+    items = WriteableSerializerMethodField()
+
+    def validate_items(self, value):
+        """Dummy validation for items"""
+        return {"items": value}
+
+    def get_items(self, instance):
+        """Returns the list of items"""
+        return [UserListItemSerializer(item).data for item in instance.items.all()]
 
     def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
@@ -504,11 +535,6 @@ class UserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
                 userlist = super().update(instance, validated_data)
                 upsert_user_list(userlist)
                 return userlist
-
-    class Meta:
-        model = UserList
-        fields = "__all__"
-        read_only_fields = ["author"]
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):

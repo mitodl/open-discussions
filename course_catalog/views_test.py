@@ -126,12 +126,15 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
     client.force_login(author if is_author else user)
     resp = client.get(reverse("userlists-list"))
     assert resp.data.get("count") == (1 if is_author else 0)
+    if is_author:
+        assert "content_data" not in resp.data.get("results")[0]
 
     resp = client.get(reverse("userlists-detail", args=[user_list.id]))
     assert resp.status_code == (403 if not (is_public or is_author) else 200)
     if resp.status_code == 200:
         assert resp.data.get("title") == user_list.title
         for item in resp.data.get("items"):
+            assert "content_data" in item
             if item.get("position") == 1:
                 assert item.get("id") == bootcamp_item.id
             else:
