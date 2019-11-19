@@ -32,10 +32,6 @@ from course_catalog.utils import (
 from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list
 
-import logging
-
-log = logging.getLogger()
-
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     """
@@ -480,7 +476,6 @@ class SimpleUserListSerializer(
 
     def validate_topics(self, topics):
         """Validator for topics"""
-        log.error(f"VALIDATING {topics}")
         if CourseTopic.objects.filter(
             id__in=[topic["id"] for topic in topics]
         ).count() != len(topics):
@@ -541,7 +536,6 @@ class UserListSerializer(SimpleUserListSerializer):
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
             topics_data = [topic["id"] for topic in validated_data.pop("topics", [])]
-            log.error(f"TOPICS: {topics_data}")
             items_data = validated_data.pop("items", [])
             # iterate through any UserListItem objects that should be created/modified/deleted:
             with transaction.atomic():
