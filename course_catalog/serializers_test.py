@@ -163,10 +163,11 @@ def test_userlist_serializer_validation_bad_topic(data, error):
     data = {
         "title": "My List",
         "list_type": ListType.LEARNING_PATH.value,
-        "topics": [{"id": 9999}],
+        "topics": [data],
     }
     serializer = UserListSerializer(data=data)
     assert serializer.is_valid() is False
+    assert serializer.errors["topics"][0] == error
 
 
 @pytest.mark.parametrize(
