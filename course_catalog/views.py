@@ -20,6 +20,7 @@ from course_catalog.models import (
     FavoriteItem,
     LearningResourceRun,
     Video,
+    CourseTopic,
 )
 from course_catalog.permissions import HasUserListPermissions
 from course_catalog.serializers import (
@@ -30,6 +31,7 @@ from course_catalog.serializers import (
     FavoriteItemSerializer,
     VideoSerializer,
     SimpleUserListSerializer,
+    CourseTopicSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
@@ -188,11 +190,10 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class UserListViewPagination(LimitOffsetPagination):
+class LargePagination(LimitOffsetPagination):
     """
-    Pagination class for the UserList list view
-    on the frontend we have to fetch all the results,
-    for the same reason as favorites :/
+    Pagination class for list views for when we have to
+    fetch all the results on the frontend :/
     """
 
     default_limit = 1000
@@ -206,7 +207,7 @@ class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
 
     queryset = UserList.objects.all().prefetch_related("items")
     serializer_classes = {"list": SimpleUserListSerializer}
-    pagination_class = UserListViewPagination
+    pagination_class = LargePagination
     permission_classes = (HasUserListPermissions,)
 
     def get_serializer_class(self):
@@ -256,23 +257,24 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
-class FavoriteViewPagination(LimitOffsetPagination):
-    """
-    Pagination class for the favorites list view
-    on the frontend we have to fetch all the results :/
-    """
-
-    default_limit = 1000
-    max_limit = 1000
-
-
 class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
     Viewset for favorites
     """
 
     serializer_class = FavoriteItemSerializer
-    pagination_class = FavoriteViewPagination
+    pagination_class = LargePagination
 
     def get_queryset(self):
         return FavoriteItem.objects.filter(user=self.request.user)
+
+
+class TopicViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for topics
+    """
+
+    queryset = CourseTopic.objects.all()
+    serializer_class = CourseTopicSerializer
+    pagination_class = LargePagination
+    permission_classes = (AnonymousAccessReadonlyPermission,)
