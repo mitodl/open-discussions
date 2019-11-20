@@ -202,7 +202,9 @@ def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
 def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_topics):
     """Test userlist endpoint for updating a UserList"""
     [original_topic, new_topic] = CourseTopicFactory.create_batch(2)
-    userlist = UserListFactory.create(author=user, title="Title 1", topics=[original_topic])
+    userlist = UserListFactory.create(
+        author=user, title="Title 1", topics=[original_topic]
+    )
 
     client.force_login(user)
 
@@ -215,7 +217,9 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
     )
     assert resp.status_code == 200
     assert UserList.objects.get(id=userlist.id).title == "Title 2"
-    assert resp.data["topics"][0]["id"] == (new_topic.id if update_topics else original_topic.id)
+    assert resp.data["topics"][0]["id"] == (
+        new_topic.id if update_topics else original_topic.id
+    )
     mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
