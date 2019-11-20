@@ -157,6 +157,7 @@ class Course(AbstractCourse):
     program_name = models.CharField(max_length=256, null=True, blank=True)
 
     runs = GenericRelation(LearningResourceRun)
+    list_items = GenericRelation("course_catalog.UserListItem")
 
 
 class Bootcamp(AbstractCourse):
@@ -168,6 +169,7 @@ class Bootcamp(AbstractCourse):
 
     location = models.CharField(max_length=128, null=True, blank=True)
     runs = GenericRelation(LearningResourceRun)
+    list_items = GenericRelation("course_catalog.UserListItem")
 
 
 class List(LearningResource):
@@ -212,6 +214,7 @@ class UserList(List):
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
+    list_items = GenericRelation("course_catalog.UserListItem")
 
     class Meta:
         verbose_name = "userlist"
@@ -222,6 +225,13 @@ class UserListItem(ListItem):
     ListItem model for UserLists
     """
 
+    content_type = models.ForeignKey(
+        ContentType,
+        limit_choices_to={
+            "model__in": ("course", "bootcamp", "program", "video", "userlist")
+        },
+        on_delete=models.CASCADE,
+    )
     user_list = models.ForeignKey(
         UserList, related_name="items", on_delete=models.CASCADE
     )
@@ -237,6 +247,7 @@ class Program(List):
     url = models.URLField(null=True, max_length=2048)
     published = models.BooleanField(default=True)
     runs = GenericRelation(LearningResourceRun)
+    list_items = GenericRelation(UserListItem)
 
 
 class ProgramItem(ListItem):
@@ -258,7 +269,9 @@ class FavoriteItem(TimestampedModel):
     user = models.ForeignKey(User, on_delete=models.PROTECT)
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("course", "bootcamp", "userlist", "program")},
+        limit_choices_to={
+            "model__in": ("course", "bootcamp", "userlist", "program", "video")
+        },
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
@@ -286,6 +299,7 @@ class Video(LearningResource):
     transcript = models.TextField(blank=True, default="")
 
     raw_data = models.TextField(blank=True, default="")
+    list_items = GenericRelation(UserListItem)
 
     class Meta:
         unique_together = ("platform", "video_id")
