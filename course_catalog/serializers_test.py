@@ -214,7 +214,8 @@ def test_simpleuserlistitem_serializer_content_data(is_null):
     )
     expected_content_data = {"image_src": course.image_src}
     if is_null:
-        course.delete()
+        course.image_src = None
+        course.save()
         expected_content_data = {"image_src": None}
     item_serializer = SimpleUserListItemSerializer(instance=userlistitem)
     assert item_serializer.data["content_data"] == expected_content_data
