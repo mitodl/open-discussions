@@ -476,7 +476,10 @@ class SimpleUserListSerializer(
 
     def validate_topics(self, topics):
         """Validator for topics"""
-        topic_ids = {topic["id"] for topic in topics}
+        try:
+            topic_ids = {topic["id"] for topic in topics}
+        except KeyError:
+            raise ValidationError("Topics must have id's")
         valid_topic_ids = set(
             CourseTopic.objects.filter(id__in=topic_ids).values_list("id", flat=True)
         )

@@ -152,17 +152,22 @@ def test_userlist_serializer_validation(list_type, valid):
     assert serializer.is_valid() is valid
 
 
-def test_userlist_serializer_validation_bad_topic():
+@pytest.mark.parametrize(
+    "data, error",
+    [[{"id": 9999}, "Invalid topic ids: {9999}"], [{}, "Topics must have id's"]],
+)
+def test_userlist_serializer_validation_bad_topic(data, error):
     """
     Test that the UserListSerializer invalidates a non-existent topic
     """
     data = {
         "title": "My List",
         "list_type": ListType.LEARNING_PATH.value,
-        "topics": [{"id": 9999}],
+        "topics": [data],
     }
     serializer = UserListSerializer(data=data)
     assert serializer.is_valid() is False
+    assert serializer.errors["topics"][0] == error
 
 
 @pytest.mark.parametrize(
