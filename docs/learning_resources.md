@@ -58,6 +58,6 @@ and in tests for that code:
   - add the type to `favoritesListSelector`
   
 - pages/CourseSearchPage
-  - add the type to `getFavoriteObject`
+  - add the type to `getFavoriteOrListedObject`
   
  

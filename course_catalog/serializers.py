@@ -79,6 +79,28 @@ class FavoriteSerializerMixin(serializers.Serializer):
             return False
 
 
+class ListsSerializerMixin(serializers.Serializer):
+    """
+    Mixin to serialize lists for various models
+    """
+
+    lists = serializers.SerializerMethodField()
+
+    def get_lists(self, obj):
+        """
+        Return a list of user's lists/path id's that a resource is in.
+        """
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            return UserListItem.objects.filter(
+                user_list__author=request.user,
+                object_id=obj.id,
+                content_type=ContentType.objects.get_for_model(obj),
+            ).values_list("user_list", flat=True)
+        else:
+            return []
+
+
 class CourseInstructorSerializer(serializers.ModelSerializer):
     """
     Serializer for CourseInstructor model
@@ -117,7 +139,9 @@ class LearningResourceOfferorField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
-class BaseCourseSerializer(FavoriteSerializerMixin, serializers.ModelSerializer):
+class BaseCourseSerializer(
+    FavoriteSerializerMixin, ListsSerializerMixin, serializers.ModelSerializer
+):
     """
     Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
     """
@@ -439,7 +463,9 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
         fields = "__all__"
 
 
-class SimpleUserListSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class SimpleUserListSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Simplified serializer for UserList model
     """
@@ -484,7 +510,10 @@ class UserListSerializer(SimpleUserListSerializer):
 
     def get_items(self, instance):
         """Returns the list of items"""
-        return [UserListItemSerializer(item).data for item in instance.items.all()]
+        return [
+            UserListItemSerializer(item, context=self.context).data
+            for item in instance.items.all()
+        ]
 
     def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
@@ -550,7 +579,9 @@ class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin
         fields = "__all__"
 
 
-class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class ProgramSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Serializer for Program model
     """
@@ -566,7 +597,9 @@ class ProgramSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
         fields = "__all__"
 
 
-class VideoSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class VideoSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Serializer for Video model
     """

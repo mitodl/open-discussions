@@ -85,7 +85,8 @@ export const makeCourse = (): Course => ({
   is_favorite:       casual.boolean,
   topics:            [{ name: casual.word }, { name: casual.word }],
   runs:              R.times(makeRun, 3),
-  object_type:       "course"
+  object_type:       "course",
+  lists:             []
 })
 
 const incrBootcamp = incrementer()
@@ -104,7 +105,8 @@ export const makeBootcamp = (): Bootcamp => ({
   offered_by:        [offeredBys.bootcamps],
   topics:            [{ name: casual.word }, { name: casual.word }],
   runs:              R.times(makeRun, 3),
-  object_type:       "bootcamp"
+  object_type:       "bootcamp",
+  lists:             []
 })
 
 const incrUserListItem = incrementer()
@@ -139,7 +141,8 @@ export const makeProgram = (): Program => ({
     makeUserListItem(LR_TYPE_COURSE)
   ],
   object_type: "program",
-  runs:        [makeRun()]
+  runs:        [makeRun()],
+  lists:       []
 })
 
 const incrUserList = incrementer()
@@ -164,7 +167,8 @@ export const makeUserList = (): UserList => ({
   profile_img:   casual.url,
   profile_name:  casual.name,
   privacy_level: casual.random_element(["public", "private"]),
-  author:        casual.integer(1, 1000)
+  author:        casual.integer(1, 1000),
+  lists:         []
 })
 
 const incrVideo = incrementer()
@@ -183,7 +187,8 @@ export const makeVideo = (): Video => ({
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_VIDEO,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
-  runs:              []
+  runs:              [],
+  lists:             []
 })
 
 export const makeLearningResource = (objectType: string): Object => {

@@ -46,6 +46,7 @@ def test_course_endpoint(client):
 
     resp = client.get(reverse("courses-detail", args=[course.id]))
     assert resp.data.get("course_id") == course.course_id
+    assert len(resp.data.get("lists")) == 0
 
     resp = client.get(reverse("courses-list") + "new/")
     assert resp.data.get("count") == 1
@@ -66,6 +67,18 @@ def test_course_endpoint(client):
     assert resp.data.get("count") == 1
 
 
+def test_course_detail_endpoint_lists(user_client, user):
+    """Test that author's list ids are included"""
+    course = CourseFactory.create()
+    user_lists = UserListFactory.create_batch(3, author=user)
+    for user_list in user_lists:
+        UserListCourseFactory.create(content_object=course, user_list=user_list)
+    resp = user_client.get(reverse("courses-detail", args=[course.id]))
+    assert sorted(resp.data.get("lists")) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
+
+
 def test_bootcamp_endpoint(client):
     """Test bootcamp endpoint"""
     bootcamp = BootcampFactory.create(topics=CourseTopicFactory.create_batch(3))
@@ -75,6 +88,18 @@ def test_bootcamp_endpoint(client):
 
     resp = client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
     assert resp.data.get("course_id") == bootcamp.course_id
+
+
+def test_bootcamp_detail_endpoint_lists(user_client, user):
+    """Test that author's list ids are included"""
+    bootcamp = BootcampFactory.create()
+    user_lists = UserListFactory.create_batch(2, author=user)
+    for user_list in user_lists:
+        UserListBootcampFactory.create(content_object=bootcamp, user_list=user_list)
+    resp = user_client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
+    assert sorted(resp.data.get("lists")) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
 
 
 def test_program_endpoint(client):
@@ -88,6 +113,7 @@ def test_program_endpoint(client):
 
     resp = client.get(reverse("programs-detail", args=[program.id]))
     assert resp.data.get("title") == program.title
+    assert len(resp.data.get("lists")) == 0
     for item in resp.data.get("items"):
         if item.get("position") == 1:
             assert item.get("id") == bootcamp_item.id
@@ -133,6 +159,7 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
     assert resp.status_code == (403 if not (is_public or is_author) else 200)
     if resp.status_code == 200:
         assert resp.data.get("title") == user_list.title
+        assert len(resp.data.get("lists")) == 0
         for item in resp.data.get("items"):
             assert "content_data" in item
             if item.get("position") == 1:

@@ -7,7 +7,11 @@ import LearningResourceCard from "./LearningResourceCard"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { bestRun, bestRunLabel, minPrice } from "../lib/learning_resources"
-import { makeLearningResource } from "../factories/learning_resources"
+import {
+  makeCourse,
+  makeLearningResource,
+  makeUserList
+} from "../factories/learning_resources"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
@@ -22,16 +26,22 @@ import {
   starSelectedURL,
   starUnselectedURL,
   toQueryString,
-  COURSE_SEARCH_URL
+  COURSE_SEARCH_URL,
+  userListApiURL
 } from "../lib/url"
 import { DIALOG_ADD_TO_LIST } from "../actions/ui"
+import { queryListResponse } from "../lib/test_utils"
 
 describe("LearningResourceCard", () => {
-  let course, helper, render
+  let course, userList, helper, render
 
   beforeEach(() => {
-    helper = new IntegrationTestHelper()
     course = makeLearningResource(LR_TYPE_COURSE)
+    userList = makeUserList()
+    helper = new IntegrationTestHelper()
+    helper.handleRequestStub
+      .withArgs(userListApiURL)
+      .returns(queryListResponse([userList]))
     render = helper.configureReduxQueryRenderer(LearningResourceCard, {
       object: course
     })
@@ -150,6 +160,20 @@ describe("LearningResourceCard", () => {
         const src = wrapper.find("img.favorite").prop("src")
         assert.equal(src, isFavorite ? starSelectedURL : starUnselectedURL)
       })
+    })
+  })
+
+  //
+  ;[true, false].forEach(inList => {
+    it(`should render ${inList ? "filled-in" : "empty"} star when course is ${
+      inList ? "" : "not"
+    } in the user's lists`, async () => {
+      const object = makeCourse()
+      object.is_favorite = false
+      object.lists = inList ? [userList.items[0].id] : []
+      const { wrapper } = await render({ object })
+      const src = wrapper.find("img.favorite").prop("src")
+      assert.equal(src, inList ? starSelectedURL : starUnselectedURL)
     })
   })
 
