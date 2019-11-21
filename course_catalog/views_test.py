@@ -21,6 +21,7 @@ from course_catalog.factories import (
     VideoFactory,
 )
 from course_catalog.models import UserList, UserListItem
+from course_catalog.serializers import CourseTopicSerializer
 from open_discussions.factories import UserFactory
 
 # pylint:disable=redefined-outer-name
@@ -197,24 +198,36 @@ def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
         )
 
 
-def test_user_list_endpoint_patch(client, user, mock_user_list_index):
+@pytest.mark.parametrize("update_topics", [True, False])
+def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_topics):
     """Test userlist endpoint for updating a UserList"""
-    userlist = UserListFactory.create(author=user, title="Title 1")
+    [original_topic, new_topic] = CourseTopicFactory.create_batch(2)
+    userlist = UserListFactory.create(
+        author=user, title="Title 1", topics=[original_topic]
+    )
 
     client.force_login(user)
 
     data = {"title": "Title 2"}
+    if update_topics:
+        data["topics"] = [{"id": new_topic.id}]
 
     resp = client.patch(
         reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
     )
     assert resp.status_code == 200
     assert UserList.objects.get(id=userlist.id).title == "Title 2"
+    assert resp.data["topics"][0]["id"] == (
+        new_topic.id if update_topics else original_topic.id
+    )
     mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
+@pytest.mark.parametrize("num_topics", [0, 2])
 @pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_create_item(client, user, is_author, mock_user_list_index):
+def test_user_list_endpoint_create_item(
+    client, user, is_author, mock_user_list_index, num_topics
+):
     """Test userlist endpoint for creating a UserListItem"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
@@ -222,9 +235,20 @@ def test_user_list_endpoint_create_item(client, user, is_author, mock_user_list_
     )
     course = CourseFactory.create()
 
+    topics = sorted(
+        [
+            CourseTopicSerializer(instance=topic).data
+            for topic in CourseTopicFactory.create_batch(num_topics)
+        ],
+        key=lambda topic: topic["id"],
+    )
+
     client.force_login(author if is_author else user)
 
-    data = {"items": [{"content_type": "course", "object_id": course.id}]}
+    data = {
+        "items": [{"content_type": "course", "object_id": course.id}],
+        "topics": topics,
+    }
 
     resp = client.patch(
         reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
@@ -233,6 +257,9 @@ def test_user_list_endpoint_create_item(client, user, is_author, mock_user_list_
     if resp.status_code == 200:
         assert len(resp.data.get("items")) == 1
         assert resp.data.get("items")[0]["object_id"] == course.id
+        assert (
+            sorted(resp.data.get("topics", []), key=lambda topic: topic["id"]) == topics
+        )
         mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
 
@@ -261,8 +288,9 @@ def test_user_list_endpoint_create_item_bad_data(client, user):
 def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list_index):
     """Test userlist endpoint for updating UserListItem positions"""
     author = UserFactory.create()
+    topics = CourseTopicFactory.create_batch(3)
     userlist = UserListFactory.create(
-        author=author, privacy_level=PrivacyLevel.public.value
+        author=author, privacy_level=PrivacyLevel.public.value, topics=topics
     )
     list_items = sorted(
         UserListCourseFactory.create_batch(2, user_list=userlist),
@@ -275,7 +303,8 @@ def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list
         "items": [
             {"id": list_items[0].id, "position": 44},
             {"id": list_items[1].id, "position": 33},
-        ]
+        ],
+        "topics": [{"id": topics[0].id}],
     }
 
     resp = client.patch(
@@ -283,6 +312,9 @@ def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list
     )
     assert resp.status_code == (200 if is_author else 403)
     if resp.status_code == 200:
+        assert resp.data.get("topics") == [
+            CourseTopicSerializer(instance=topics[0]).data
+        ]
         updated_items = sorted(
             resp.data.get("items"), key=lambda item: item["position"]
         )
