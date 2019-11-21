@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.100.1 (Released November 21, 2019)
+---------------
+
+- show the description for a user list on the detail page
+- Simplified serializers for UserListView list response (#2385)
+
 Version 0.100.0 (Released November 18, 2019)
 ---------------
 
