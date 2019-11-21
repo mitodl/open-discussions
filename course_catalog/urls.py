@@ -26,6 +26,7 @@ router.register(r"programs", views.ProgramViewSet, basename="programs")
 router.register(r"userlists", views.UserListViewSet, basename="userlists")
 router.register(r"videos", views.VideoViewSet, basename="videos")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
+router.register(r"topics", views.TopicViewSet, basename="topics")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),

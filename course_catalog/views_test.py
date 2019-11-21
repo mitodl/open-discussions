@@ -541,3 +541,15 @@ def test_course_report(client):
         "ocw_courses_without_image": 1,
         "ocw_resources": 1,
     }
+
+
+def test_topic_endpoint(client):
+    """Test topic endpoint"""
+    topics = CourseTopicFactory.create_batch(5)
+
+    resp = client.get(reverse("topics-list"))
+    assert resp.data.get("count") == 5
+
+    topic = topics[0]
+    resp = client.get(reverse("topics-detail", args=[topic.id]))
+    assert resp.data == CourseTopicSerializer(topic).data

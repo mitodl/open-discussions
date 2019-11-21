@@ -128,7 +128,7 @@ class CourseTopicSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CourseTopic
-        fields = "__all__"
+        fields = ["id", "name"]
 
 
 class LearningResourceOfferorField(serializers.Field):
