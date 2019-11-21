@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.100.1
+Version 0.100.1 (Released November 21, 2019)
 ---------------
 
 - show the description for a user list on the detail page
