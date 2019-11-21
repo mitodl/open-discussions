@@ -3,15 +3,23 @@
     padding: 5px !important;
   }
 
+  .mdc-dialog__surface {
+    width: 100%;
+  }
+
   .user-listitem-form {
     color: black;
     border-top: 2px solid $border-grey;
-    border-bottom: 2px solid $border-grey;
     padding-top: 20px;
     overflow: scroll;
+    min-width: 300px;
   }
 
   .privacy {
     width: 65px;
+  }
+
+  .create-new-list {
+    margin-top: 10px;
   }
 }

@@ -1,11 +1,12 @@
 // @flow
-import React, { useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { useRequest, useMutation } from "redux-query-react"
 import { createSelector } from "reselect"
 import { Checkbox } from "@rmwc/checkbox"
 
 import Dialog from "./Dialog"
+import UserListFormDialog from "./UserListFormDialog"
 
 import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
 import { capitalize, emptyOrNil } from "../lib/util"
@@ -48,6 +49,7 @@ export default function AddToListDialog() {
   )
 
   const resource = useSelector(learningResourceSelector)(objectId, objectType)
+  const [showUserListFormDialog, setShowUserListFormDialog] = useState(false)
 
   const userLists = useSelector(myUserListsSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
@@ -148,21 +150,32 @@ export default function AddToListDialog() {
               </div>
             ) : null
       )}
+      <button
+        className="create-new-list blue-btn"
+        onClick={() => setShowUserListFormDialog(true)}
+      >
+        Create New List
+      </button>
     </div>
   )
 
   return resource && isFinishedList && isFinishedResource ? (
-    <Dialog
-      id="list-add-dialog"
-      open={!emptyOrNil(resource)}
-      hideDialog={hide}
-      title="Add to List"
-      onAccept={hide}
-      hideCancel={true}
-      submitText="OK"
-      className="user-listitem-dialog"
-    >
-      {renderAddToListForm()}
-    </Dialog>
+    <React.Fragment>
+      <Dialog
+        id="list-add-dialog"
+        open={!emptyOrNil(resource)}
+        hideDialog={showUserListFormDialog ? null : hide}
+        title="Add to List"
+        onAccept={hide}
+        noButtons
+        submitText="OK"
+        className="user-listitem-dialog"
+      >
+        {renderAddToListForm()}
+      </Dialog>
+      {showUserListFormDialog ? (
+        <UserListFormDialog hide={() => setShowUserListFormDialog(false)} />
+      ) : null}
+    </React.Fragment>
   ) : null
 }

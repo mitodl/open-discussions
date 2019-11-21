@@ -91,7 +91,7 @@ describe("ProfileImage", () => {
 
     it("should have a description in the upload dialog", () => {
       const image = renderProfileImage({ editable: true })
-      assert.equal(image.find("DialogTitle").text(), "Upload a Profile Image")
+      assert.include(image.find("DialogTitle").text(), "Upload a Profile Image")
     })
 
     describe("save button", () => {

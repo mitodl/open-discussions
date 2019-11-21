@@ -13,8 +13,6 @@ describe("Dialog", () => {
     onAccept,
     submitText,
     cancelText,
-    hideAccept,
-    hideCancel,
     title,
     id,
     className,
@@ -25,8 +23,6 @@ describe("Dialog", () => {
     hideDialog = sandbox.stub()
     onCancel = sandbox.stub()
     onAccept = sandbox.stub()
-    hideAccept = false
-    hideCancel = false
     title = "Dialog title"
     submitText = "Submit"
     cancelText = null
@@ -38,14 +34,11 @@ describe("Dialog", () => {
     sandbox.restore()
   })
 
-  const render = (props = {}) => {
-    const { children } = props
-    return shallow(
+  const render = (props = {}) =>
+    shallow(
       <Dialog
         open={open}
         hideDialog={hideDialog}
-        hideAccept={hideAccept}
-        hideCancel={hideCancel}
         // $FlowFixMe
         onCancel={onCancel}
         onAccept={onAccept}
@@ -58,10 +51,9 @@ describe("Dialog", () => {
         className={className}
         {...props}
       >
-        {children}
+        Some Text Here
       </Dialog>
     )
-  }
 
   it("passes some props to the inner Dialog component", () => {
     const props = render()
@@ -73,7 +65,7 @@ describe("Dialog", () => {
   })
 
   it("passes the title to DialogTitle", () => {
-    assert.equal(
+    assert.include(
       render()
         .find("DialogTitle")
         .dive()
@@ -92,13 +84,12 @@ describe("Dialog", () => {
   })
 
   it("passes children to the DialogContent", () => {
-    const children = "Some text here"
     assert.equal(
-      render({ children })
+      render()
         .find("DialogContent")
         .dive()
         .text(),
-      children
+      "Some Text Here"
     )
   })
 
@@ -166,20 +157,10 @@ describe("Dialog", () => {
       )
     })
 
-    it("hides the Accept button if hideAccept is true", () => {
-      hideAccept = true
+    it("hides the buttons if noButtons is true", () => {
       assert.isNotOk(
-        render()
-          .find(".submit")
-          .exists()
-      )
-    })
-
-    it("hides the Cancel button if hideCancel is true", () => {
-      hideCancel = true
-      assert.isNotOk(
-        render()
-          .find(".cancel")
+        render({ noButtons: true })
+          .find("DialogActions")
           .exists()
       )
     })

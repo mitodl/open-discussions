@@ -4,8 +4,10 @@ import { assert } from "chai"
 import { times } from "ramda"
 import { Checkbox } from "@rmwc/checkbox"
 
-import IntegrationTestHelper from "../util/integration_test_helper"
+import UserListFormDialog from "./UserListFormDialog"
 import AddToListDialog from "./AddToListDialog"
+
+import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCourse, makeUserList } from "../factories/learning_resources"
 import { courseURL, userListApiURL } from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
@@ -22,9 +24,7 @@ describe("AddToListDialog", () => {
     })
     course = makeCourse()
     helper = new IntegrationTestHelper()
-    renderDialog = helper.configureReduxQueryRenderer(AddToListDialog, {
-      object: course
-    })
+    renderDialog = helper.configureReduxQueryRenderer(AddToListDialog)
     helper.handleRequestStub
       .withArgs(userListApiURL)
       .returns(queryListResponse(userLists))
@@ -39,7 +39,7 @@ describe("AddToListDialog", () => {
   })
 
   const render = async (object = course) => {
-    const { wrapper, store } = await renderDialog({ object }, [
+    const { wrapper, store } = await renderDialog({}, [
       setDialogData({ dialogKey: DIALOG_ADD_TO_LIST, data: object })
     ])
     return { wrapper, store }
@@ -95,5 +95,11 @@ describe("AddToListDialog", () => {
         inList
       )
     })
+  })
+
+  it("should have a button for making a new list", async () => {
+    const { wrapper } = await render(course)
+    wrapper.find(".create-new-list").simulate("click")
+    assert.ok(wrapper.find(UserListFormDialog).exists())
   })
 })
