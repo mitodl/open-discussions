@@ -482,13 +482,12 @@ class SimpleUserListSerializer(
     def validate_topics(self, topics):
         """Validator for topics"""
         try:
-            topic_ids = {topic["id"] for topic in topics}
-        except KeyError:
-            raise ValidationError("Topics must have id's")
-        valid_topic_ids = set(
-            CourseTopic.objects.filter(id__in=topic_ids).values_list("id", flat=True)
-        )
-        missing = topic_ids.difference(valid_topic_ids)
+            valid_topic_ids = set(
+                CourseTopic.objects.filter(id__in=topics).values_list("id", flat=True)
+            )
+        except ValueError:
+            raise ValidationError(f"Topic ids must be integers")
+        missing = set(topics).difference(valid_topic_ids)
         if missing:
             raise ValidationError(f"Invalid topic ids: {missing}")
         return {"topics": topics}
@@ -510,7 +509,7 @@ class SimpleUserListSerializer(
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
-            topics_data = [topic["id"] for topic in validated_data.pop("topics", [])]
+            topics_data = validated_data.pop("topics", [])
             with transaction.atomic():
                 userlist = super().create(validated_data)
                 userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
@@ -590,11 +589,7 @@ class UserListSerializer(SimpleUserListSerializer):
                             item.save()
                 userlist = super().update(instance, validated_data)
                 if topics_data is not None:
-                    userlist.topics.set(
-                        CourseTopic.objects.filter(
-                            id__in=topics_data
-                        )
-                    )
+                    userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
                 upsert_user_list(userlist)
                 return userlist
 

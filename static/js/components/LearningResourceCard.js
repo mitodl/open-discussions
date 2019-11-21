@@ -31,7 +31,10 @@ import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
 import { emptyOrNil, userIsAnonymous } from "../lib/util"
 import { setShowResourceDrawer, DIALOG_ADD_TO_LIST } from "../actions/ui"
 
-import type { LearningResourceSummary } from "../flow/discussionTypes"
+import type {
+  CourseTopic,
+  LearningResourceSummary
+} from "../flow/discussionTypes"
 
 type Props = {|
   object: LearningResourceSummary,
@@ -44,7 +47,7 @@ const getClassName = searchResultLayout =>
     searchResultLayout === SEARCH_LIST_UI ? "list-view" : ""
   }`.trim()
 
-const formatTopics = (topics: Array<{ name: string }>) =>
+const formatTopics = (topics: Array<CourseTopic>) =>
   topics.map((topic, i) => (
     <a
       href={`${COURSE_SEARCH_URL}${toQueryString({

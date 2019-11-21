@@ -21,6 +21,7 @@ import {
 import type {
   Bootcamp,
   Course,
+  CourseTopic,
   LearningResourceRun,
   Program,
   UserList,
@@ -30,8 +31,15 @@ import type {
 const incrCourse = incrementer()
 const courseId: any = incrementer()
 const incrRun: any = incrementer()
+const topicId: any = incrementer()
 
 const OFFERORS = R.values(offeredBys)
+
+export const makeTopic = (): CourseTopic => ({
+  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+  id:   topicId.next().value,
+  name: casual.title
+})
 
 export const makeRun = (): LearningResourceRun => {
   return {
@@ -83,7 +91,7 @@ export const makeCourse = (): Course => ({
   offered_by:        [casual.random_element(OFFERORS)],
   platform:          casual.random_element(R.values(platforms)),
   is_favorite:       casual.boolean,
-  topics:            [{ name: casual.word }, { name: casual.word }],
+  topics:            R.times(makeTopic, 2),
   runs:              R.times(makeRun, 3),
   object_type:       "course",
   lists:             []
@@ -103,7 +111,7 @@ export const makeBootcamp = (): Bootcamp => ({
   full_description:  casual.description,
   is_favorite:       casual.boolean,
   offered_by:        [offeredBys.bootcamps],
-  topics:            [{ name: casual.word }, { name: casual.word }],
+  topics:            R.times(makeTopic, 2),
   runs:              R.times(makeRun, 3),
   object_type:       "bootcamp",
   lists:             []
@@ -131,7 +139,7 @@ export const makeProgram = (): Program => ({
   offered_by:        [casual.random_element(OFFERORS)],
   title:             casual.title,
   url:               casual.url,
-  topics:            [{ name: casual.word }, { name: casual.word }],
+  topics:            R.times(makeTopic, 2),
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   is_favorite:       casual.boolean,
@@ -153,7 +161,7 @@ export const makeUserList = (): UserList => ({
   short_description: casual.description,
   offered_by:        [],
   title:             casual.title,
-  topics:            [{ name: casual.word }, { name: casual.word }],
+  topics:            R.times(makeTopic, 2),
   is_favorite:       casual.boolean,
   image_src:         "http://image.medium.url",
   image_description: casual.description,
@@ -185,7 +193,7 @@ export const makeVideo = (): Video => ({
   short_description: casual.description,
   transcript:        casual.description,
   duration:          moment.duration(casual.integer(30, 60 * 90) * 1000).toISOString(),
-  topics:            [casual.word, casual.word],
+  topics:            R.times(makeTopic, 2),
   object_type:       LR_TYPE_VIDEO,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],

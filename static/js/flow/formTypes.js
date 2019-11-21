@@ -53,5 +53,10 @@ export type FormProps<T> = {
   onRecaptcha?: Object => void
 }
 
+export type FormOption = {
+  label: string,
+  value: string
+}
+
 export type FormComponentCls<T> = React$ComponentType<$Subtype<FormProps<T>>>
 export type WrappedComponentCls<T> = React$ComponentType<WithFormProps<T>>

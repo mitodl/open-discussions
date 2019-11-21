@@ -145,6 +145,7 @@ export const programURL = "/api/v0/programs"
 export const userListApiURL = "/api/v0/userlists"
 export const videoApiURL = "/api/v0/videos"
 export const embedlyApiURL = "/api/v0/embedly"
+export const topicApiURL = "/api/v0/topics"
 
 export const userListIndexURL = "/courses/lists/"
 export const userListDetailURL = (id: number) => `/courses/lists/${id}`

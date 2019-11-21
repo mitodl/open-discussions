@@ -146,7 +146,7 @@ def test_userlist_serializer_validation(list_type, valid):
     data = {
         "title": "My List",
         "list_type": list_type,
-        "topics": [{"id": topic.id} for topic in topics],
+        "topics": [topic.id for topic in topics],
     }
     serializer = UserListSerializer(data=data)
     assert serializer.is_valid() is valid
@@ -154,7 +154,11 @@ def test_userlist_serializer_validation(list_type, valid):
 
 @pytest.mark.parametrize(
     "data, error",
-    [[{"id": 9999}, "Invalid topic ids: {9999}"], [{}, "Topics must have id's"]],
+    [
+        [9999, "Invalid topic ids: {9999}"],
+        [None, "Invalid topic ids: {None}"],
+        ["a", "Topic ids must be integers"],
+    ],
 )
 def test_userlist_serializer_validation_bad_topic(data, error):
     """
