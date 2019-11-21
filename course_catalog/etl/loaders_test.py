@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 import pytest
 
+from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.loaders import (
     load_program,
     load_course,
@@ -463,6 +464,26 @@ def test_load_video_channels():
         assert isinstance(result, VideoChannel)
 
         assert result.playlists.count() == 1
+
+
+def test_load_video_channels_error(mocker):
+    """Test that an error doesn't fail the entire operation"""
+
+    def pop_channel_id_with_exception(data):
+        """Pop channel_id off data and raise an exception"""
+        data.pop("channel_id")
+        raise ExtractException()
+
+    mock_load_channel = mocker.patch("course_catalog.etl.loaders.load_video_channel")
+    mock_load_channel.side_effect = pop_channel_id_with_exception
+    mock_log = mocker.patch("course_catalog.etl.loaders.log")
+    channel_id = "abc"
+
+    load_video_channels([{"channel_id": channel_id}])
+
+    mock_log.exception.assert_called_once_with(
+        "Error with extracted video channel: channel_id=%s", channel_id
+    )
 
 
 def test_load_video_channels_unpublish(mock_upsert_tasks):
