@@ -28,6 +28,9 @@ describe("Topics API", () => {
   })
 
   it("topicsSelector should grab all topic entities from state", () => {
-    assert.deepEqual(topicsArraySelector(testState), testState.entities.topics)
+    assert.deepEqual(
+      topicsArraySelector(testState),
+      Object.keys(topics).map(key => topics[key])
+    )
   })
 })
