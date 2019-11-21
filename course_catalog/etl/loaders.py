@@ -348,6 +348,7 @@ def load_video_channels(video_channels_data):
 
     # video_channels_data is a generator
     for video_channel_data in video_channels_data:
+        channel_id = video_channel_data["channel_id"]
         try:
             video_channel = load_video_channel(video_channel_data)
         except ExtractException:
@@ -356,8 +357,7 @@ def load_video_channels(video_channels_data):
             # but this allows us to stream the extracted data w/ generators
             # as opposed to having to load everything into memory, which will eventually fail
             log.exception(
-                "Error with extracted video channel: channel_id=%s",
-                video_channel_data["channel_id"],
+                "Error with extracted video channel: channel_id=%s", channel_id
             )
         else:
             video_channels.append(video_channel)
