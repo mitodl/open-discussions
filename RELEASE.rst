@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.100.2
+---------------
+
+- Fixed KeyError in etl loaders
+- Topics endpoint API (#2401)
+- Support topics CRUD in UserList API (#2397)
+- Added video unpublish support
+- Fix test (#2400)
+- When a resource is deleted, delete any UserListItems for that resource (#2389)
+- Show a filled-in star when a resource is in a user's list (#2379)
+
 Version 0.100.1 (Released November 21, 2019)
 ---------------
 
