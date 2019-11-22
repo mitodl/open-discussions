@@ -28,6 +28,8 @@ import * as networkInterfaceFuncs from "../store/network_interface"
 import * as embedUtil from "../lib/embed"
 import { getQueries } from "../lib/redux_query"
 import * as storeLib from "../store/configureStore"
+import { topicApiURL, userListApiURL } from "../lib/url"
+import { queryListResponse } from "../lib/test_utils"
 
 import type { Sandbox } from "../flow/sinonTypes"
 
@@ -109,6 +111,11 @@ export default class IntegrationTestHelper {
         },
         abort: () => {}
       }))
+
+    this.handleRequestStub
+      .withArgs(userListApiURL)
+      .returns(queryListResponse([]))
+    this.handleRequestStub.withArgs(topicApiURL).returns(queryListResponse([]))
 
     // there's a good reason for this I promise
     this.realWarn = console.warn

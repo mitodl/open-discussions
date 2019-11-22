@@ -229,4 +229,20 @@ describe("LearningResourceCard", () => {
     )
     assert.isNotOk(wrapper.find(Card).exists())
   })
+
+  //
+  ;[true, false].forEach(reordering => {
+    it(`should set a classname and show UI when reordering=${String(
+      reordering
+    )}`, async () => {
+      const { wrapper } = await render({ reordering })
+      assert.equal(
+        wrapper.find(Card).prop("className"),
+        reordering
+          ? "learning-resource-card  reordering"
+          : "learning-resource-card"
+      )
+      assert.equal(wrapper.find(".drag-handle").exists(), reordering)
+    })
+  })
 })

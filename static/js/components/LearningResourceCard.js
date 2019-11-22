@@ -39,13 +39,14 @@ import type {
 type Props = {|
   object: LearningResourceSummary,
   searchResultLayout?: string,
-  availabilities?: Array<string>
+  availabilities?: Array<string>,
+  reordering?: boolean
 |}
 
-const getClassName = searchResultLayout =>
+const getClassName = (searchResultLayout, reordering) =>
   `learning-resource-card ${
     searchResultLayout === SEARCH_LIST_UI ? "list-view" : ""
-  }`.trim()
+  } ${reordering ? "reordering" : ""}`.trim()
 
 const formatTopics = (topics: Array<CourseTopic>) =>
   topics.map((topic, i) => (
@@ -94,11 +95,11 @@ const CoverImage = ({ object, showResourceDrawer }) => (
 )
 
 export function LearningResourceCard(props: Props) {
-  const { searchResultLayout } = props
+  const { searchResultLayout, reordering } = props
 
   return (
     <Card
-      className={getClassName(searchResultLayout)}
+      className={getClassName(searchResultLayout, reordering)}
       borderless={searchResultLayout === SEARCH_GRID_UI}
     >
       <LearningResourceDisplay {...props} />
@@ -117,7 +118,7 @@ export function LearningResourceRow(props: Props) {
 }
 
 export function LearningResourceDisplay(props: Props) {
-  const { object, searchResultLayout, availabilities } = props
+  const { object, searchResultLayout, availabilities, reordering } = props
 
   const bestAvailableRun =
     bestRun(filterRunsByAvailability(object.runs, availabilities)) ||
@@ -150,6 +151,11 @@ export function LearningResourceDisplay(props: Props) {
     <React.Fragment>
       {searchResultLayout === SEARCH_GRID_UI ? (
         <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
+      ) : null}
+      {reordering ? (
+        <div className="drag-handle">
+          <i className="material-icons">drag_indicator</i>
+        </div>
       ) : null}
       <div className="lr-info">
         <div className="row resource-type">

@@ -96,6 +96,8 @@ describe("WidgetList", () => {
       assert.equal(props.startEditInstance, startEditInstanceStub)
     })
   })
+
+  //
   ;[
     [true, true, true],
     [true, false, false],
@@ -136,6 +138,8 @@ describe("WidgetList", () => {
       sinon.assert.calledWith(setExpandedStub, [key], !expanded[key])
     })
   })
+
+  //
   ;[true, false].forEach(editing => {
     it(`${shouldIf(
       editing
@@ -151,6 +155,8 @@ describe("WidgetList", () => {
       wrapper.find(".add-widget").prop("onClick")()
       sinon.assert.calledWith(startAddInstanceStub)
     })
+
+    //
     ;[true, false].forEach(allExpanded => {
       it(`has a link to ${allExpanded ? "expand" : "collapse"} widgets`, () => {
         const widgetKeys = listResponse.widgets.map(getWidgetKey)
