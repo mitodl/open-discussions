@@ -11,8 +11,9 @@ import UserListFormDialog from "./UserListFormDialog"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeUserList, makeUserListItem } from "../factories/learning_resources"
 import { LR_TYPE_COURSE, readableLearningResources } from "../lib/constants"
-import { userListApiURL } from "../lib/url"
+import { topicApiURL, userListApiURL } from "../lib/url"
 import * as urlLib from "../lib/url"
+import { queryListResponse } from "../lib/test_utils"
 
 describe("UserListCard tests", () => {
   let userList, helper, renderUserListCard
@@ -20,6 +21,9 @@ describe("UserListCard tests", () => {
   beforeEach(() => {
     userList = makeUserList()
     helper = new IntegrationTestHelper()
+    helper.handleRequestStub
+      .withArgs(topicApiURL)
+      .returns(queryListResponse([]))
     renderUserListCard = helper.configureReduxQueryRenderer(UserListCard, {
       userList
     })

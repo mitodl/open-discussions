@@ -10,7 +10,7 @@ import {
   makeFavoritesResponse
 } from "../factories/learning_resources"
 import { queryListResponse } from "../lib/test_utils"
-import { userListApiURL, favoritesURL } from "../lib/url"
+import { userListApiURL, favoritesURL, topicApiURL } from "../lib/url"
 import * as util from "../lib/util"
 import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
 
@@ -32,6 +32,9 @@ describe("UserListsPage tests", () => {
     helper.handleRequestStub
       .withArgs(favoritesURL)
       .returns(queryListResponse(favorites))
+    helper.handleRequestStub
+      .withArgs(topicApiURL)
+      .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(UserListsPage)
   })
 
