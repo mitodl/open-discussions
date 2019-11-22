@@ -1,11 +1,9 @@
 """Tests for course_catalog views"""
-from datetime import timedelta
 from types import SimpleNamespace
 
 import pytest
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.utils import timezone
 
 from course_catalog.constants import PlatformType, ResourceType, PrivacyLevel, ListType
 from course_catalog.factories import (
@@ -19,6 +17,7 @@ from course_catalog.factories import (
     ProgramItemCourseFactory,
     ProgramItemBootcampFactory,
     VideoFactory,
+    LearningResourceRunFactory,
 )
 from course_catalog.models import UserList, UserListItem
 from course_catalog.serializers import CourseTopicSerializer
@@ -36,36 +35,67 @@ def mock_user_list_index(mocker):
     )
 
 
-def test_course_endpoint(client):
+def test_list_course_endpoint(client):
     """Test course endpoint"""
-    course = CourseFactory.create(topics=CourseTopicFactory.create_batch(3))
+    course = CourseFactory.create()
     # this should be filtered out
     CourseFactory.create(runs=None)
 
     resp = client.get(reverse("courses-list"))
     assert resp.data.get("count") == 1
+    assert resp.data.get("results")[0]["id"] == course.id
+
+
+def test_get_course_endpoint(client):
+    """Test course detail endpoint"""
+    course = CourseFactory.create()
 
     resp = client.get(reverse("courses-detail", args=[course.id]))
+
     assert resp.data.get("course_id") == course.course_id
-    assert len(resp.data.get("lists")) == 0
+
+
+def test_new_courses_endpoint(client):
+    """Test new courses endpoint"""
+    course = CourseFactory.create()
+    # this should be filtered out
+    CourseFactory.create(runs=None)
 
     resp = client.get(reverse("courses-list") + "new/")
+
     assert resp.data.get("count") == 1
+    assert resp.data.get("results")[0]["id"] == course.id
+
+
+@pytest.mark.parametrize("featured", [True, False])
+def test_featured_courses_endpoint(client, featured):
+    """Test featured courses endpoint"""
+    course = CourseFactory.create(featured=featured)
+    # this should be filtered out
+    CourseFactory.create(runs=None)
 
     resp = client.get(reverse("courses-list") + "featured/")
-    assert resp.data.get("count") == 0
-    course.featured = True
-    course.save()
-    resp = client.get(reverse("courses-list") + "featured/")
-    assert resp.data.get("count") == 1
+
+    assert resp.data.get("count") == (1 if featured else 0)
+    if featured:
+        assert resp.data.get("results")[0]["id"] == course.id
+
+
+@pytest.mark.parametrize(
+    "kwargs, is_upcoming", [({"in_future": True}, True), ({"in_past": True}, False)]
+)
+def test_upcoming_courses_endpoint(client, kwargs, is_upcoming):
+    """Test upcoming courses endpoint"""
+    course = CourseFactory.create(runs=None)
+    LearningResourceRunFactory.create(content_object=course, **kwargs)
+    # this should be filtered out
+    CourseFactory.create(runs=None)
 
     resp = client.get(reverse("courses-list") + "upcoming/")
-    assert resp.data.get("count") == 0
-    course_run = course.runs.order_by("-best_start_date")[0]
-    course_run.start_date = timezone.now() + timedelta(days=1)
-    course_run.save()
-    resp = client.get(reverse("courses-list") + "upcoming/")
-    assert resp.data.get("count") == 1
+
+    assert resp.data.get("count") == (1 if is_upcoming else 0)
+    if is_upcoming:
+        assert resp.data.get("results")[0]["id"] == course.id
 
 
 def test_course_detail_endpoint_lists(user_client, user):
@@ -82,7 +112,7 @@ def test_course_detail_endpoint_lists(user_client, user):
 
 def test_bootcamp_endpoint(client):
     """Test bootcamp endpoint"""
-    bootcamp = BootcampFactory.create(topics=CourseTopicFactory.create_batch(3))
+    bootcamp = BootcampFactory.create()
 
     resp = client.get(reverse("bootcamps-list"))
     assert resp.data.get("count") == 1
@@ -105,7 +135,7 @@ def test_bootcamp_detail_endpoint_lists(user_client, user):
 
 def test_program_endpoint(client):
     """Test program endpoint"""
-    program = ProgramFactory.create(topics=CourseTopicFactory.create_batch(3))
+    program = ProgramFactory.create()
     bootcamp_item = ProgramItemBootcampFactory.create(program=program, position=1)
     course_item = ProgramItemCourseFactory.create(program=program, position=2)
 
@@ -128,7 +158,6 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
     """Test learning path endpoint"""
     author = UserFactory.create()
     user_list = UserListFactory.create(
-        topics=CourseTopicFactory.create_batch(3),
         author=author,
         privacy_level=PrivacyLevel.public.value
         if is_public

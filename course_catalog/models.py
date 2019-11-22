@@ -133,7 +133,7 @@ class LearningResourceRun(AbstractCourse):
     content_type = models.ForeignKey(
         ContentType,
         null=True,
-        limit_choices_to={"model__in": ("course", "bootcamp", "program")},
+        limit_choices_to={"model__in": ("course", "bootcamp", "program", "video")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField(null=True)
@@ -311,6 +311,8 @@ class Video(LearningResource):
 
     raw_data = models.TextField(blank=True, default="")
     list_items = GenericRelation(UserListItem)
+
+    runs = GenericRelation(LearningResourceRun)
 
     class Meta:
         unique_together = ("platform", "video_id")

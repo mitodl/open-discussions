@@ -239,6 +239,17 @@ class LearningResourceRunFactory(AbstractCourseFactory):
         no_prices = factory.Trait(prices=[])
         no_instructors = factory.Trait(instructors=[])
 
+        in_past = factory.Trait(
+            enrollment_start=factory.Faker(
+                "date_time_between", end_date="-270d", tzinfo=pytz.utc
+            )
+        )
+        in_future = factory.Trait(
+            enrollment_start=factory.Faker(
+                "date_time_between", start_date="+15d", tzinfo=pytz.utc
+            )
+        )
+
 
 class BootcampRunFactory(LearningResourceRunFactory):
     """LearningResourceRun factory specific to Bootcamps"""

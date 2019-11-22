@@ -212,6 +212,7 @@ def load_video(video_data):
     platform = video_data.pop("platform")
     topics_data = video_data.pop("topics", [])
     offered_bys_data = video_data.pop("offered_by", [])
+    runs_data = video_data.pop("runs")
 
     video, created = Video.objects.update_or_create(
         video_id=video_id, platform=platform, defaults=video_data
@@ -219,6 +220,9 @@ def load_video(video_data):
 
     load_topics(video, topics_data)
     load_offered_bys(video, offered_bys_data)
+
+    for run_data in runs_data:
+        load_run(video, run_data)
 
     if not created and not video.published:
         # NOTE: if we didn't see a video in a playlist, it is likely NOT being removed here

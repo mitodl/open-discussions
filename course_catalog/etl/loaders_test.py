@@ -365,6 +365,11 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
         )
     )
     del props["id"]
+
+    props["runs"] = [
+        {"run_id": video.video_id, "platform": video.platform, "prices": [{"price": 0}]}
+    ]
+
     result = load_video(props)
 
     if video_exists and not is_published:
@@ -380,6 +385,11 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
     # assert we got a course back
     assert isinstance(result, Video)
 
+    # verify a free price
+    assert result.runs.count() == 1
+    assert result.runs.first().prices.count() == 1
+    assert result.runs.first().prices.first().price == 0
+
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
 
@@ -390,6 +400,15 @@ def test_load_videos():
 
     videos_records = VideoFactory.build_batch(5, published=True)
     videos_data = [model_to_dict(video) for video in videos_records]
+
+    for video_data in videos_data:
+        video_data["runs"] = [
+            {
+                "run_id": video_data["video_id"],
+                "platform": video_data["platform"],
+                "prices": [{"price": 0}],
+            }
+        ]
 
     results = load_videos(videos_data)
 
@@ -407,6 +426,15 @@ def test_load_playlist():
 
     videos_records = VideoFactory.build_batch(5, published=True)
     videos_data = [model_to_dict(video) for video in videos_records]
+
+    for video_data in videos_data:
+        video_data["runs"] = [
+            {
+                "run_id": video_data["video_id"],
+                "platform": video_data["platform"],
+                "prices": [{"price": 0}],
+            }
+        ]
 
     props = model_to_dict(playlist)
 
