@@ -479,6 +479,8 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
 
     object_type = VIDEO_TYPE
 
+    runs = ESRunSerializer(many=True)
+
     class Meta:
         model = Video
         fields = [
@@ -491,6 +493,7 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "image_src",
             "topics",
             "published",
+            "runs",
             "offered_by",
         ]
 

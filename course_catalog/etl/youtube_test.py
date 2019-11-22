@@ -166,6 +166,13 @@ def extracted_and_transformed_values(youtube_api_responses):
                             "offered_by": [{"name": offered_by}] if offered_by else [],
                             "title": video["snippet"]["localized"]["title"],
                             "raw_data": video,
+                            "runs": [
+                                {
+                                    "run_id": video["id"],
+                                    "platform": PlatformType.youtube.value,
+                                    "prices": [{"price": 0}],
+                                }
+                            ],
                         }
                         for video in videos
                     ],
