@@ -62,5 +62,13 @@
       border: 1px solid $border-grey;
       margin: 10px 0;
     }
+
+    .topics-select {
+      padding-bottom: 15px;
+
+      input {
+        width: 100% !important;
+      }
+    }
   }
 }

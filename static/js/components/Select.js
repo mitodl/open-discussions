@@ -1,8 +1,7 @@
 // @flow
 // Adapted from https://codesandbox.io/s/6ll36y9qjw
 import React from "react"
-import ReactSelect from "react-select"
-import { OptionsType, ValueType } from "react-select/lib/types"
+import ReactSelect, { OptionsType, ValueType } from "react-select"
 import { FieldProps } from "formik"
 
 import type { FormOption } from "../flow/formTypes"

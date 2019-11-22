@@ -140,10 +140,10 @@ export default function UserListFormDialog(props: Props) {
             <span className="input-name">Description</span>
             <Field name="short_description" as="textarea" />
             {validationMessage(errors.short_description)}
-            <span className="input-name">List Subjects</span>
+            <span className="input-name">Subjects</span>
             <Field
               name="topics"
-              className="basic-multi-select"
+              className="basic-multi-select topics-select"
               options={sortBy("label")(
                 topics.map(topic => ({ value: topic.id, label: topic.name }))
               )}
