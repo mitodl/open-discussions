@@ -394,7 +394,10 @@ export const validateWidgetDialog = (data: WidgetDialogData) => {
   return validate(validationList)(data.instance)
 }
 
-const topicsExceeded = R.compose(R.lt(TOPICS_LENGTH_MAXIMUM), R.length)
+const topicsExceeded = R.compose(
+  R.lt(TOPICS_LENGTH_MAXIMUM),
+  R.length
+)
 
 export const validateCreateUserListForm = validate([
   validation(

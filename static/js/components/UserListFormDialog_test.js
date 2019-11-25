@@ -16,6 +16,7 @@ import {
 import { wait } from "../lib/util"
 import { topicApiURL, userListApiURL } from "../lib/url"
 import { changeFormikInput, queryListResponse } from "../lib/test_utils"
+import { TOPICS_LENGTH_MAXIMUM } from "../lib/validation"
 
 describe("UserListFormDialog", () => {
   let render, userList, helper, hideStub, topics
@@ -23,7 +24,7 @@ describe("UserListFormDialog", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     hideStub = helper.sandbox.stub()
-    topics = times(makeTopic, 3)
+    topics = times(makeTopic, 5)
     helper.handleRequestStub
       .withArgs(topicApiURL)
       .returns(queryListResponse(topics))
@@ -52,6 +53,16 @@ describe("UserListFormDialog", () => {
 
   it("should call validator, show the results", async () => {
     const { wrapper } = await render()
+    // Select all 5 topics (only 3 allowed)
+    topics.forEach(topic => {
+      wrapper
+        .find("Select")
+        .at(1)
+        .instance()
+        .selectOption({ label: topic.name, value: topic.id })
+      wrapper.update()
+    })
+
     wrapper.find("form").simulate("submit")
     await wait(50)
     wrapper.update()
@@ -60,7 +71,8 @@ describe("UserListFormDialog", () => {
         "You need to select a list type",
         "You need to select a privacy level",
         "Title is required",
-        "Description is required"
+        "Description is required",
+        `Only ${TOPICS_LENGTH_MAXIMUM} topics allowed`
       ],
       wrapper.find(".validation-message").map(el => el.text())
     )
