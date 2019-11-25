@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.101.0 (Released November 25, 2019)
+---------------
+
+- display user lists and learning paths in the learning resource drawer
+- add ability to create a new list from the "add to list" dialog
+
 Version 0.100.2 (Released November 25, 2019)
 ---------------
 
