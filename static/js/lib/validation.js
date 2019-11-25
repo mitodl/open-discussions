@@ -15,6 +15,7 @@ import type { PostForm, PostFormType } from "../flow/discussionTypes"
 import type { WidgetDialogData } from "../flow/widgetTypes"
 
 export const PASSWORD_LENGTH_MINIMUM = 8
+export const TOPICS_LENGTH_MAXIMUM = 3
 
 // this function checks that a given object fails validation (validator function returns true)
 // if it fails, it returns a setter (R.set) which which set the appropirate
@@ -393,6 +394,8 @@ export const validateWidgetDialog = (data: WidgetDialogData) => {
   return validate(validationList)(data.instance)
 }
 
+const topicsExceeded = R.compose(R.lt(TOPICS_LENGTH_MAXIMUM), R.length)
+
 export const validateCreateUserListForm = validate([
   validation(
     emptyOrNil,
@@ -409,5 +412,10 @@ export const validateCreateUserListForm = validate([
     emptyOrNil,
     R.lensProp("short_description"),
     "Description is required"
+  ),
+  validation(
+    topicsExceeded,
+    R.lensProp("topics"),
+    `Only ${TOPICS_LENGTH_MAXIMUM} topics allowed`
   )
 ])
