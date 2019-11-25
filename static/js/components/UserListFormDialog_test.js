@@ -72,7 +72,7 @@ describe("UserListFormDialog", () => {
         "You need to select a privacy level",
         "Title is required",
         "Description is required",
-        `Only ${TOPICS_LENGTH_MAXIMUM} topics allowed`
+        `Select ${TOPICS_LENGTH_MAXIMUM} or fewer subjects`
       ],
       wrapper.find(".validation-message").map(el => el.text())
     )

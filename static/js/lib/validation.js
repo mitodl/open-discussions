@@ -419,6 +419,6 @@ export const validateCreateUserListForm = validate([
   validation(
     topicsExceeded,
     R.lensProp("topics"),
-    `Only ${TOPICS_LENGTH_MAXIMUM} topics allowed`
+    `Select ${TOPICS_LENGTH_MAXIMUM} or fewer subjects`
   )
 ])

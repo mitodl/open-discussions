@@ -148,7 +148,7 @@ export default function UserListFormDialog(props: Props) {
                 topics.map(topic => ({ value: topic.id, label: topic.name }))
               )}
               component={Select}
-              placeholder="Select subjects...."
+              placeholder="Select up to 3 subjects...."
               isMulti={true}
               closeMenuOnSelect={false}
               openMenuOnClick={false}
