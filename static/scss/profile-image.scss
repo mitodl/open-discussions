@@ -87,6 +87,10 @@ $profile-image-small-size: 45px;
   h3 {
     border-bottom: none !important;
   }
+
+  .mdc-dialog__surface {
+    width: 100%;
+  }
 }
 
 .photo-dropzone {

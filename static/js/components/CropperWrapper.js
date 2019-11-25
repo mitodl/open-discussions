@@ -36,7 +36,7 @@ export default class CropperWrapper extends React.Component<Props> {
     return (
       <Cropper
         ref={cropper => (this.cropper = cropper)}
-        style={{ height: uploaderBodyHeight() }}
+        style={{ height: uploaderBodyHeight(), width: uploaderBodyHeight() }}
         className="photo-upload-dialog photo-active-item cropper"
         src={photo.preview}
         aspectRatio={width / height}

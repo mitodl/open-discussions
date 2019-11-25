@@ -97,7 +97,7 @@ export default class ImageUploaderForm extends React.Component<
   spinner = () => (
     <div
       className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-      style={{ height: uploaderBodyHeight() }}
+      style={{ height: uploaderBodyHeight(), width: uploaderBodyHeight() }}
     >
       <div className="sk-fading-circle">
         <div className="sk-circle1 sk-circle" />
@@ -123,7 +123,7 @@ export default class ImageUploaderForm extends React.Component<
       <Dropzone
         onDrop={onDrop(this.startPhotoEdit)}
         className="photo-upload-dialog photo-active-item photo-dropzone dashed-border"
-        style={{ height: uploaderBodyHeight() }}
+        style={{ height: uploaderBodyHeight(), width: uploaderBodyHeight() }}
         accept="image/*"
         onDropRejected={() => this.setPhotoError("Please select a valid photo")}
       >
@@ -152,8 +152,8 @@ export default class ImageUploaderForm extends React.Component<
     return (
       <Dialog
         title={`Upload a ${description}`}
+        className="photo-upload-dialog"
         autoScrollBodyContent={true}
-        contentStyle={{ maxWidth: "620px" }}
         open={dialogOpen}
         onAccept={image && !processing ? onSubmit : null}
         onCancel={() => {
