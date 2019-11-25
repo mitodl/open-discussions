@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.101.0
+Version 0.101.0 (Released November 25, 2019)
 ---------------
 
 - display user lists and learning paths in the learning resource drawer
