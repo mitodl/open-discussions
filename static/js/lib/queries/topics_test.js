@@ -1,11 +1,11 @@
 // @flow
-
+import { assert } from "chai"
 import { mergeAll, times } from "ramda"
+
+import { getTopicsRequest, topicsArraySelector } from "./topics"
 import { makeTopic } from "../../factories/learning_resources"
 import { constructIdMap } from "../redux_query"
-import { assert } from "chai"
 import { topicApiURL } from "../url"
-import { getTopicsRequest, topicsArraySelector } from "./topics"
 
 describe("Topics API", () => {
   let topics, testState

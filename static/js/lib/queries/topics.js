@@ -1,10 +1,10 @@
 // @flow
-
 import { topicApiURL } from "../url"
 import { merge } from "ramda"
-import type { CourseTopic } from "../../flow/discussionTypes"
 import { constructIdMap } from "../redux_query"
 import { createSelector } from "reselect"
+
+import type { CourseTopic } from "../../flow/discussionTypes"
 
 export const getTopicsRequest = () => ({
   queryKey:  "topicsRequest",

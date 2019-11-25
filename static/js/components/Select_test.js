@@ -27,10 +27,10 @@ describe("Select", function() {
     menuPlacement = "bottom"
     className = "class"
     field = { name: "TestName" }
-    ;(form = {}),
-    (options = [
+    form = {}
+    options = [
       [{ value: 1, label: "Option A" }, { value: 2, label: "Option B" }]
-    ])
+    ]
   })
 
   afterEach(() => {

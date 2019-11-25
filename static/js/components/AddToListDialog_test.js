@@ -9,7 +9,7 @@ import AddToListDialog from "./AddToListDialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCourse, makeUserList } from "../factories/learning_resources"
-import { courseURL, userListApiURL } from "../lib/url"
+import { courseURL, topicApiURL, userListApiURL } from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
 import { DIALOG_ADD_TO_LIST, setDialogData } from "../actions/ui"
 
@@ -28,6 +28,9 @@ describe("AddToListDialog", () => {
     helper.handleRequestStub
       .withArgs(userListApiURL)
       .returns(queryListResponse(userLists))
+    helper.handleRequestStub
+      .withArgs(topicApiURL)
+      .returns(queryListResponse([]))
     helper.handleRequestStub.withArgs(`${courseURL}/${course.id}/`).returns({
       status: 200,
       body:   course
