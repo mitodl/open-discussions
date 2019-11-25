@@ -122,7 +122,16 @@ export default function AddToListDialog() {
           (![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
             resource.object_type
           ) ||
-            resource.id !== userList.id) ? (
+            (resource.id !== userList.id &&
+              emptyOrNil(
+                resource.items.filter(
+                  item =>
+                    item.object_id === userList.id &&
+                    [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
+                      item.content_type
+                    )
+                )
+              ))) ? (
               <div className="flex-row" key={i}>
                 <div>
                   <Checkbox
