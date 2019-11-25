@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.100.2
+Version 0.100.2 (Released November 25, 2019)
 ---------------
 
 - Fixed KeyError in etl loaders
