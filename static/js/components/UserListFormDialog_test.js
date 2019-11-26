@@ -1,11 +1,12 @@
 // @flow
 import { assert } from "chai"
+import { times } from "ramda"
 
 import UserListFormDialog from "./UserListFormDialog"
 import Dialog from "./Dialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeUserList } from "../factories/learning_resources"
+import { makeTopic, makeUserList } from "../factories/learning_resources"
 import {
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
@@ -13,20 +14,25 @@ import {
   LR_PRIVATE
 } from "../lib/constants"
 import { wait } from "../lib/util"
-import { userListApiURL } from "../lib/url"
-import { changeFormikInput } from "../lib/test_utils"
+import { topicApiURL, userListApiURL } from "../lib/url"
+import { changeFormikInput, queryListResponse } from "../lib/test_utils"
+import { TOPICS_LENGTH_MAXIMUM } from "../lib/validation"
 
 describe("UserListFormDialog", () => {
-  let render, userList, helper, hideStub
+  let render, userList, helper, hideStub, topics
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     hideStub = helper.sandbox.stub()
+    topics = times(makeTopic, 5)
+    helper.handleRequestStub
+      .withArgs(topicApiURL)
+      .returns(queryListResponse(topics))
+    userList = makeUserList()
+    helper.handleRequestStub.withArgs(userListApiURL).returns(userList)
     render = helper.configureReduxQueryRenderer(UserListFormDialog, {
       hide: hideStub
     })
-    userList = makeUserList()
-    helper.handleRequestStub.withArgs(userListApiURL).returns(userList)
   })
 
   afterEach(() => {
@@ -47,6 +53,16 @@ describe("UserListFormDialog", () => {
 
   it("should call validator, show the results", async () => {
     const { wrapper } = await render()
+    // Select all 5 topics (only 3 allowed)
+    topics.forEach(topic => {
+      wrapper
+        .find("Select")
+        .at(1)
+        .instance()
+        .selectOption({ label: topic.name, value: topic.id })
+      wrapper.update()
+    })
+
     wrapper.find("form").simulate("submit")
     await wait(50)
     wrapper.update()
@@ -55,7 +71,8 @@ describe("UserListFormDialog", () => {
         "You need to select a list type",
         "You need to select a privacy level",
         "Title is required",
-        "Description is required"
+        "Description is required",
+        `Select ${TOPICS_LENGTH_MAXIMUM} or fewer subjects`
       ],
       wrapper.find(".validation-message").map(el => el.text())
     )
@@ -74,6 +91,11 @@ describe("UserListFormDialog", () => {
       LR_PUBLIC
     )
     changeFormikInput(wrapper.find('input[name="title"]'), "title", "Title")
+    wrapper
+      .find("Select")
+      .at(1)
+      .instance()
+      .selectOption({ label: topics[0].name, value: topics[0].id })
     changeFormikInput(
       wrapper.find("textarea"),
       "short_description",
@@ -83,14 +105,15 @@ describe("UserListFormDialog", () => {
     wrapper.find("form").simulate("submit")
     await wait(50)
     assert.ok(hideStub.called)
-    const [url, method, { body }] = helper.handleRequestStub.args[0]
+    const [url, method, { body }] = helper.handleRequestStub.args[1]
     assert.equal(url, `${userListApiURL}/`)
     assert.equal(method, "POST")
     assert.deepEqual(body, {
       title:             "Title",
       short_description: "My Great Description",
       list_type:         LR_TYPE_USERLIST,
-      privacy_level:     LR_PUBLIC
+      privacy_level:     LR_PUBLIC,
+      topics:            [topics[0].id]
     })
   })
 
@@ -120,11 +143,21 @@ describe("UserListFormDialog", () => {
       "title",
       "My Brand New Title"
     )
+    wrapper
+      .find("Select")
+      .at(1)
+      .instance()
+      .selectOption({ label: topics[0].name, value: topics[0].id })
+    wrapper
+      .find("Select")
+      .at(1)
+      .instance()
+      .selectOption({ label: topics[1].name, value: topics[1].id })
     wrapper.update()
     wrapper.find("form").simulate("submit")
     await wait(50)
     assert.ok(hideStub.called)
-    const [url, method, { body }] = helper.handleRequestStub.args[0]
+    const [url, method, { body }] = helper.handleRequestStub.args[1]
     assert.equal(url, `${userListApiURL}/${userList.id}/`)
     assert.equal(method, "PATCH")
     assert.deepEqual(body, {
@@ -132,7 +165,8 @@ describe("UserListFormDialog", () => {
       short_description: userList.short_description,
       privacy_level:     userList.privacy_level,
       list_type:         userList.list_type,
-      id:                userList.id
+      id:                userList.id,
+      topics:            [topics[0].id, topics[1].id]
     })
   })
 })

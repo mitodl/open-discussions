@@ -172,3 +172,6 @@ export const formatPrice = (price: ?string | number | Decimal): string => {
     return `$${formattedPrice}`
   }
 }
+
+export const sortBy = (property: string) =>
+  R.sortWith([R.ascend(R.prop(property))])

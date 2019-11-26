@@ -1,9 +1,11 @@
 // @flow
 import React from "react"
-import { useMutation } from "redux-query-react"
+import { useMutation, useRequest } from "redux-query-react"
+import { useSelector } from "react-redux"
 import { Formik, Form, Field } from "formik"
 
 import Dialog from "./Dialog"
+import { Select } from "./Select"
 
 import {
   createUserListMutation,
@@ -22,6 +24,9 @@ import {
 
 import type { UserList } from "../flow/discussionTypes"
 
+import { getTopicsRequest, topicsArraySelector } from "../lib/queries/topics"
+import { sortBy } from "../lib/util"
+
 type Props = {
   hide: Function,
   userList?: UserList
@@ -32,10 +37,14 @@ export default function UserListFormDialog(props: Props) {
   // if not we're creating a new userList
   const { hide, userList } = props
 
+  const [{ isFinished }] = useRequest(getTopicsRequest())
+
+  const topics = useSelector(topicsArraySelector)
+
   const [, createUserList] = useMutation(createUserListMutation)
   const [, updateUserList] = useMutation(userListMutation)
 
-  return (
+  return isFinished ? (
     <Formik
       onSubmit={async params => {
         if (userList) {
@@ -54,11 +63,15 @@ export default function UserListFormDialog(props: Props) {
             title:             userList.title,
             short_description: userList.short_description,
             privacy_level:     userList.privacy_level,
-            list_type:         userList.list_type
+            list_type:         userList.list_type,
+            topics:            sortBy("name")(
+              userList.topics.map(topic => topic.id) || []
+            )
           }
           : {
             title:             "",
-            short_description: ""
+            short_description: "",
+            topics:            []
           }
       }
       validate={validateCreateUserListForm}
@@ -127,9 +140,24 @@ export default function UserListFormDialog(props: Props) {
             <span className="input-name">Description</span>
             <Field name="short_description" as="textarea" />
             {validationMessage(errors.short_description)}
+            <span className="input-name">Subjects</span>
+            <Field
+              name="topics"
+              className="basic-multi-select topics-select"
+              options={sortBy("label")(
+                topics.map(topic => ({ value: topic.id, label: topic.name }))
+              )}
+              component={Select}
+              placeholder="Select up to 3 subjects...."
+              isMulti={true}
+              closeMenuOnSelect={false}
+              openMenuOnClick={false}
+              menuPlacement="top"
+            />
+            {validationMessage(errors.topics)}
           </Form>
         </Dialog>
       )}
     </Formik>
-  )
+  ) : null
 }

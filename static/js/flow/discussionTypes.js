@@ -423,7 +423,8 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<UserListItem>,
+  items:              Array<UserListItem | UserListItemEdit>,
+  topics:             Array<CourseTopic>,
   list_type:          string,
   object_type:        LR_TYPE_USERLIST | LR_TYPE_LEARNINGPATH,
   privacy_level:      string,
@@ -446,6 +447,7 @@ export type CoursePrice = {
 }
 
 export type CourseTopic = {
+  id?:   number,
   name: string
 }
 

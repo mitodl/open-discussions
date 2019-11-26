@@ -210,7 +210,7 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
 
     data = {"title": "Title 2"}
     if update_topics:
-        data["topics"] = [{"id": new_topic.id}]
+        data["topics"] = [new_topic.id]
 
     resp = client.patch(
         reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
@@ -235,19 +235,15 @@ def test_user_list_endpoint_create_item(
     )
     course = CourseFactory.create()
 
-    topics = sorted(
-        [
-            CourseTopicSerializer(instance=topic).data
-            for topic in CourseTopicFactory.create_batch(num_topics)
-        ],
-        key=lambda topic: topic["id"],
+    topic_ids = sorted(
+        [topic.id for topic in CourseTopicFactory.create_batch(num_topics)]
     )
 
     client.force_login(author if is_author else user)
 
     data = {
         "items": [{"content_type": "course", "object_id": course.id}],
-        "topics": topics,
+        "topics": topic_ids,
     }
 
     resp = client.patch(
@@ -258,7 +254,7 @@ def test_user_list_endpoint_create_item(
         assert len(resp.data.get("items")) == 1
         assert resp.data.get("items")[0]["object_id"] == course.id
         assert (
-            sorted(resp.data.get("topics", []), key=lambda topic: topic["id"]) == topics
+            sorted([topic["id"] for topic in resp.data.get("topics", [])]) == topic_ids
         )
         mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
 
@@ -304,7 +300,7 @@ def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list
             {"id": list_items[0].id, "position": 44},
             {"id": list_items[1].id, "position": 33},
         ],
-        "topics": [{"id": topics[0].id}],
+        "topics": [topics[0].id],
     }
 
     resp = client.patch(
