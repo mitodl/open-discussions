@@ -12,6 +12,7 @@ import { makeCourse, makeUserList } from "../factories/learning_resources"
 import { courseURL, topicApiURL, userListApiURL } from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
 import { DIALOG_ADD_TO_LIST, setDialogData } from "../actions/ui"
+import { LR_TYPE_USERLIST } from "../lib/constants"
 
 describe("AddToListDialog", () => {
   let renderDialog, userLists, helper, course
@@ -79,6 +80,28 @@ describe("AddToListDialog", () => {
 
     const userListCheck = checkboxes.at(1)
     assert.equal(userListCheck.find("label").text(), userLists[1].title)
+  })
+
+  it("if list is in a resource's items, dont let user add that resource to the list", async () => {
+    const object = userLists[0]
+    object.items.push({
+      content_type: LR_TYPE_USERLIST,
+      object_id:    userLists[1].id
+    })
+    helper.handleRequestStub
+      .withArgs(`${userListApiURL}/${object.id}/`)
+      .returns({
+        status: 200,
+        body:   object
+      })
+    const { wrapper } = await render(object)
+    const checkboxes = wrapper.find(Checkbox)
+
+    // Should be 1 checkbox for each list, plus 1 for favorites, -2 for non-authored lists, -2 for excluded lists
+    assert.equal(checkboxes.length, userLists.length - 3)
+
+    const userListCheck = checkboxes.at(1)
+    assert.equal(userListCheck.find("label").text(), userLists[2].title)
   })
 
   //
