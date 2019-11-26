@@ -1,4 +1,5 @@
 """API for general search-related functionality"""
+import collections
 from base64 import urlsafe_b64encode
 
 from elasticsearch_dsl import Q, Search
@@ -15,6 +16,7 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
+from course_catalog.models import FavoriteItem, UserListItem
 from search.connection import get_conn, get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
@@ -133,6 +135,52 @@ def gen_video_id(video_obj):
     return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
 
 
+def gen_doc_ids(favorites):
+    """
+    Return a list of ES document ids for user favorites
+
+    Args:
+        favorites(list of FavoriteItem): a user's favorites
+
+    Returns:
+        list of str: the ES document ids for the favorited items
+
+    """
+    doc_ids = []
+    for favorite in favorites:
+        classname = favorite.content_type.name
+        print(classname)
+        if  classname == "course":
+            doc_ids.append(gen_course_id(favorite.item.platform, favorite.item.course_id))
+        elif classname == "bootcamp":
+            doc_ids.append(gen_bootcamp_id(favorite.item.course_id))
+        elif classname == "program":
+            doc_ids.append(gen_program_id(favorite.item))
+        elif classname == "video":
+            doc_ids.append(gen_video_id(favorite.item))
+        elif classname == "userlist":
+            doc_ids.append(gen_user_list_id(favorite.item))
+    return doc_ids
+
+
+def gen_lists_dict(user):
+    """
+    Return a dict of list ids for each item in a user's lists
+
+    Args:
+        user(User): a user to retrieve UserListItems for
+
+    Returns:
+        dict: a mapping of list ids (value) per resource item ES id (key)
+
+    """
+    lists_dict = collections.defaultdict(list)
+    items = UserListItem.objects.filter(user_list__author=user).select_related("user_list").iterator()
+    for item in items:
+        lists_dict[gen_doc_ids([item])[0]].append(item.user_list.id)
+    return lists_dict
+
+
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators
@@ -215,18 +263,36 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
+    search = search.script_fields(
+        is_favorite={
+            'script': {
+                'lang': 'painless',
+                'inline': 'params.favorites.contains(doc._id.value)',
+                'params': {'favorites': gen_doc_ids(FavoriteItem.objects.filter(user=user))}
+            }
+        },
+        lists={
+            'script': {
+                'lang': 'painless',
+                'inline': 'params.lists[doc._id.value]',
+                'params': {'lists': gen_lists_dict(user)}
+            }
+        }
+    )
+    search._source = True
     return transform_aggregates(search.execute().to_dict())
 
 
 def transform_aggregates(search_result):
     """
-    Transform the reverse nested availability aggregate counts into a format matching the other facets
+    Transform the reverse nested availability aggregate counts into a format matching the other facets.
+    Move 'is_favorite' and 'lists' fields to the '_source' attributes.
 
     Args:
         search_result (dict): The results from ElasticSearch
 
     Returns:
-        dict: The Elasticsearch response dict with transformed availability aggregates
+        dict: The Elasticsearch response dict with transformed availability aggregates and source values
     """
     availability_runs = (
         search_result.get("aggregations", {}).get("availability", {}).pop("runs", {})
@@ -244,6 +310,10 @@ def transform_aggregates(search_result):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
+    for hit in search_result.get("hits", {}).get("hits"):
+        fields = hit.pop("fields")
+        hit["_source"]['is_favorite'] = fields['is_favorite'][0]
+        hit["_source"]['lists'] = (fields['lists'] if fields['lists'][0] is not None else [])
     return search_result
 
 

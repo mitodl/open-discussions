@@ -96,8 +96,7 @@ type StateProps = {|
   loaded: boolean,
   processing: boolean,
   total: number,
-  favorites: Object,
-  lists: Array<UserList>
+  entities: Object
 |}
 
 type DispatchProps = {|
@@ -320,24 +319,21 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
-    const { favorites } = this.props
-    const { lists } = this.props
-    // $FlowFixMe: this is a pseudo-result
-    result.lists = filterListsByResource(result, lists)
-    const { bootcamps, courses, programs, userLists, videos } = favorites
+    const {entities} = this.props
+    const { bootcamps, courses, programs, userLists, videos } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
-      return courses[result.id] || result
+      return courses ? courses[result.id] || result : result
     case LR_TYPE_BOOTCAMP:
-      return bootcamps[result.id] || result
+      return bootcamps ? bootcamps[result.id] || result : result
     case LR_TYPE_PROGRAM:
-      return programs[result.id] || result
+      return programs ? programs[result.id] || result : result
     case LR_TYPE_USERLIST:
-      return userLists[result.id] || result
+      return userLists ? userLists[result.id] || result : result
     case LR_TYPE_VIDEO:
-      return videos[result.id] || result
+      return videos ? videos[result.id] || result : result
     case LR_TYPE_LEARNINGPATH:
-      return userLists[result.id] || result
+      return userLists ? userLists[result.id] || result : result
     }
   }
 
@@ -509,7 +505,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { search } = state
+  const { search, entities } = state
   const { results, total, initialLoad, facets } = search.data
 
   return {
@@ -519,8 +515,7 @@ const mapStateToProps = (state): StateProps => {
     initialLoad,
     loaded:     search.loaded,
     processing: search.processing,
-    favorites:  favoritesSelector(state),
-    lists:      myUserListsSelector(state)
+    entities
   }
 }
 
@@ -535,12 +530,10 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
-const mapPropsToConfig = () => [favoritesRequest(), userListsRequest()]
 
 export default compose(
   connect<Props, OwnProps, _, _, _, _>(
     mapStateToProps,
     mapDispatchToProps
-  ),
-  connectRequest(mapPropsToConfig)
+  )
 )(CourseSearchPage)
