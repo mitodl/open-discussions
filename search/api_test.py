@@ -9,7 +9,13 @@ from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
 from course_catalog.constants import PrivacyLevel
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import (
+    CourseFactory,
+    UserListCourseFactory,
+    UserListBootcampFactory,
+    UserListFactory,
+    UserListVideoFactory,
+)
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -18,6 +24,9 @@ from search.api import (
     gen_video_id,
     find_related_documents,
     transform_results,
+    gen_lists_dict,
+    gen_course_id,
+    gen_bootcamp_id,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -437,3 +446,23 @@ def test_transform_results():
     results["aggregations"].pop("availability", None)
     results["aggregations"].pop("cost", None)
     assert transform_results(results) == results
+
+
+def test_gen_lists_dict(user):
+    """Test that gen_lists_dict returns an expected dict of userLists ids by ES doc id"""
+    user_lists = UserListFactory.create_batch(3, author=user)
+    course_items = UserListCourseFactory.create_batch(2, user_list=user_lists[0])
+    bootcamp_items = UserListBootcampFactory.create_batch(2, user_list=user_lists[1])
+    video_items = UserListVideoFactory.create_batch(2, user_list=user_lists[2])
+
+    lists_dict = gen_lists_dict(user)
+    for course_item in course_items:
+        assert lists_dict[
+            gen_course_id(course_item.item.platform, course_item.item.course_id)
+        ] == [user_lists[0].id]
+    for bootcamp_item in bootcamp_items:
+        assert lists_dict[gen_bootcamp_id(bootcamp_item.item.course_id)] == [
+            user_lists[1].id
+        ]
+    for video_item in video_items:
+        assert lists_dict[gen_video_id(video_item.item)] == [user_lists[2].id]

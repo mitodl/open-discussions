@@ -135,33 +135,31 @@ def gen_video_id(video_obj):
     return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
 
 
-def gen_doc_ids(favorites):
+def gen_doc_ids(items):
     """
-    Return a list of ES document ids for user favorites
+    Return a list of ES document ids for user favorites or list items
 
     Args:
-        favorites(list of FavoriteItem): a user's favorites
+        items(list of FavoriteItem or UserListItem): a user's favorites/list items
 
     Returns:
-        list of str: the ES document ids for the favorited items
+        list of str: the ES document ids for the favorited/list items
 
     """
     doc_ids = []
-    for favorite in favorites:
-        classname = favorite.content_type.name
+    for item in items:
+        classname = item.content_type.name
         print(classname)
         if classname == "course":
-            doc_ids.append(
-                gen_course_id(favorite.item.platform, favorite.item.course_id)
-            )
+            doc_ids.append(gen_course_id(item.item.platform, item.item.course_id))
         elif classname == "bootcamp":
-            doc_ids.append(gen_bootcamp_id(favorite.item.course_id))
+            doc_ids.append(gen_bootcamp_id(item.item.course_id))
         elif classname == "program":
-            doc_ids.append(gen_program_id(favorite.item))
+            doc_ids.append(gen_program_id(item.item))
         elif classname == "video":
-            doc_ids.append(gen_video_id(favorite.item))
+            doc_ids.append(gen_video_id(item.item))
         elif classname == "userlist":
-            doc_ids.append(gen_user_list_id(favorite.item))
+            doc_ids.append(gen_user_list_id(item.item))
     return doc_ids
 
 
