@@ -15,6 +15,9 @@ from course_catalog.factories import (
     UserListBootcampFactory,
     UserListFactory,
     UserListVideoFactory,
+    ProgramFactory,
+    UserListProgramFactory,
+    UserListUserListFactory,
 )
 from search.api import (
     execute_search,
@@ -27,6 +30,8 @@ from search.api import (
     gen_lists_dict,
     gen_course_id,
     gen_bootcamp_id,
+    gen_program_id,
+    gen_user_list_id,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -454,6 +459,13 @@ def test_gen_lists_dict(user):
     course_items = UserListCourseFactory.create_batch(2, user_list=user_lists[0])
     bootcamp_items = UserListBootcampFactory.create_batch(2, user_list=user_lists[1])
     video_items = UserListVideoFactory.create_batch(2, user_list=user_lists[2])
+    program = ProgramFactory.create()
+    learning_path = UserListFactory.create(list_type=LEARNING_PATH_TYPE)
+    for user_list in user_lists:
+        UserListProgramFactory.create(content_object=program, user_list=user_list)
+        UserListUserListFactory.create(
+            content_object=learning_path, user_list=user_list
+        )
 
     lists_dict = gen_lists_dict(user)
     for course_item in course_items:
@@ -466,3 +478,9 @@ def test_gen_lists_dict(user):
         ]
     for video_item in video_items:
         assert lists_dict[gen_video_id(video_item.item)] == [user_lists[2].id]
+    assert sorted(lists_dict[gen_program_id(program)]) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
+    assert sorted(lists_dict[gen_user_list_id(learning_path)]) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
