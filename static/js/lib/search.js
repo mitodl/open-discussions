@@ -116,7 +116,7 @@ export const searchResultToLearningResource = (
   platform: "platform" in result ? result.platform : null,
   topics:   result.topics.map(topic => ({ name: topic })),
   runs:     "runs" in result ? result.runs : [],
-  ...overrideObject,
+  ...overrideObject
 })
 
 const POST_QUERY_FIELDS = [

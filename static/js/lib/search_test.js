@@ -9,7 +9,9 @@ import {
   makePostResult,
   makeProfileResult,
   makeLearningResourceResult,
-  makeProgramResult
+  makeProgramResult,
+  makeVideoResult,
+  makeUserListResult
 } from "../factories/search"
 import {
   AVAILABILITY_MAPPING,
@@ -27,7 +29,9 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_VIDEO,
-  DEFAULT_START_DT
+  DEFAULT_START_DT,
+  LR_TYPE_USERLIST,
+  LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
 import { LR_TYPE_PROGRAM } from "./constants"
 
@@ -130,7 +134,9 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_COURSE,
       offered_by:  result.offered_by,
-      runs:        result.runs
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
     })
   })
 
@@ -145,7 +151,9 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_BOOTCAMP,
       offered_by:  result.offered_by,
-      runs:        result.runs
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
     })
   })
 
@@ -160,7 +168,46 @@ describe("search functions", () => {
       topics:      result.topics.map(topic => ({ name: topic })),
       object_type: LR_TYPE_PROGRAM,
       offered_by:  result.offered_by,
-      runs:        result.runs
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
+    })
+  })
+
+  it("converts a video search result to a learning resource", () => {
+    const result = makeVideoResult()
+    const video = searchResultToLearningResource(result)
+    assert.deepEqual(video, {
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    null,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_VIDEO,
+      offered_by:  result.offered_by,
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
+    })
+  })
+
+  //
+  ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].forEach(listType => {
+    it(`converts a ${listType} search result to a learning resource`, () => {
+      const result = makeUserListResult(listType)
+      const video = searchResultToLearningResource(result)
+      assert.deepEqual(video, {
+        id:          result.id,
+        title:       result.title,
+        image_src:   result.image_src,
+        platform:    null,
+        topics:      result.topics.map(topic => ({ name: topic })),
+        object_type: listType,
+        offered_by:  result.offered_by,
+        runs:        result.runs,
+        is_favorite: result.is_favorite,
+        lists:       result.lists
+      })
     })
   })
 

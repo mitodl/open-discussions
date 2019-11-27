@@ -1,5 +1,7 @@
 # pylint: disable=redefined-outer-name
 """Search API function tests"""
+from collections import defaultdict
+
 from django.contrib.auth.models import AnonymousUser
 import pytest
 
@@ -7,6 +9,7 @@ from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
 from course_catalog.constants import PrivacyLevel
+from course_catalog.factories import CourseFactory
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -14,7 +17,7 @@ from search.api import (
     gen_comment_id,
     gen_video_id,
     find_related_documents,
-    transform_aggregates,
+    transform_results,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -23,6 +26,7 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
 )
+from search.serializers import ESCourseSerializer
 
 
 @pytest.fixture()
@@ -93,6 +97,23 @@ def test_execute_search(mocker, user):
     get_conn_mock.return_value.search.assert_called_once_with(
         body={
             **query,
+            "_source": True,
+            "script_fields": {
+                "is_favorite": {
+                    "script": {
+                        "lang": "painless",
+                        "inline": "params.favorites.contains(doc._id.value)",
+                        "params": {"favorites": []},
+                    }
+                },
+                "lists": {
+                    "script": {
+                        "lang": "painless",
+                        "inline": "params.lists[doc._id.value]",
+                        "params": {"lists": defaultdict(list)},
+                    }
+                },
+            },
             "query": {
                 "bool": {
                     "filter": [
@@ -325,9 +346,26 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     assert constructed_query["body"]["size"] == posts_to_return
 
 
-def test_transform_aggregates():
-    """transform_aggregates should transform reverse nested availability results if present"""
-    raw_aggregate = {
+@pytest.mark.django_db
+def test_transform_results():
+    """
+    transform_results should transform reverse nested availability results if present, and move
+    scripted fields into the source result
+    """
+    scripted_fields = {"is_favorite": [True], "lists": [100, 101]}
+    results = {
+        "hits": {
+            "hits": [
+                {
+                    "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+                    "_type": "_doc",
+                    "_id": "co_mitx_TUlUeCsyLjAxeA",
+                    "_score": 1.0,
+                    "_source": ESCourseSerializer(CourseFactory.create()).data,
+                    "fields": scripted_fields,
+                }
+            ]
+        },
         "aggregations": {
             "availability": {
                 "runs": {
@@ -361,9 +399,22 @@ def test_transform_aggregates():
                 }
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    assert transform_aggregates(raw_aggregate) == {
+    expected_source = results["hits"]["hits"][0]["_source"]
+    expected_source.update(scripted_fields)
+    assert transform_results(results) == {
+        "hits": {
+            "hits": [
+                {
+                    "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+                    "_type": "_doc",
+                    "_id": "co_mitx_TUlUeCsyLjAxeA",
+                    "_score": 1.0,
+                    "_source": expected_source,
+                }
+            ]
+        },
         "aggregations": {
             "availability": {
                 "buckets": [
@@ -378,11 +429,11 @@ def test_transform_aggregates():
                 ]
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    raw_aggregate["aggregations"]["availability"].pop("runs", None)
-    raw_aggregate["aggregations"]["cost"].pop("prices", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
-    raw_aggregate["aggregations"].pop("availability", None)
-    raw_aggregate["aggregations"].pop("cost", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
+    results["aggregations"]["availability"].pop("runs", None)
+    results["aggregations"]["cost"].pop("prices", None)
+    assert transform_results(results) == results
+    results["aggregations"].pop("availability", None)
+    results["aggregations"].pop("cost", None)
+    assert transform_results(results) == results

@@ -7,7 +7,6 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
-import { connectRequest } from "redux-query-react"
 import { compose } from "redux"
 import debounce from "lodash/debounce"
 
@@ -32,7 +31,6 @@ import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
   availabilityFacetLabel,
-  filterListsByResource,
   resourceLabel
 } from "../lib/learning_resources"
 import {
@@ -58,10 +56,6 @@ import {
   SEARCH_LIST_UI
 } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
-import {
-  favoritesRequest,
-  favoritesSelector
-} from "../lib/queries/learning_resources"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -73,11 +67,6 @@ import type {
   CurrentFacet,
   LearningResourceResult
 } from "../flow/searchTypes"
-import {
-  myUserListsSelector,
-  userListsRequest
-} from "../lib/queries/user_lists"
-import type { UserList } from "../flow/discussionTypes"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,
@@ -319,7 +308,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
-    const {entities} = this.props
+    // Get the latest data from state if any to reflect recent changes in favorites/lists
+    const { entities } = this.props
     const { bootcamps, courses, programs, userLists, videos } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
@@ -529,7 +519,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   },
   dispatch
 })
-
 
 export default compose(
   connect<Props, OwnProps, _, _, _, _>(
