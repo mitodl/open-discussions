@@ -25,6 +25,10 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
     LEARNING_RESOURCE_TYPES,
+    COURSE_TYPE,
+    BOOTCAMP_TYPE,
+    PROGRAM_TYPE,
+    VIDEO_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -151,15 +155,15 @@ def gen_doc_ids(items):
     doc_ids = []
     for item in filter(lambda i: i.item is not None, items):
         classname = item.content_type.name
-        if classname == "course":
+        if classname == COURSE_TYPE:
             doc_ids.append(gen_course_id(item.item.platform, item.item.course_id))
-        elif classname == "bootcamp":
+        elif classname == BOOTCAMP_TYPE:
             doc_ids.append(gen_bootcamp_id(item.item.course_id))
-        elif classname == "program":
+        elif classname == PROGRAM_TYPE:
             doc_ids.append(gen_program_id(item.item))
-        elif classname == "video":
+        elif classname == VIDEO_TYPE:
             doc_ids.append(gen_video_id(item.item))
-        elif classname == "userlist":
+        elif classname == USER_LIST_TYPE:
             doc_ids.append(gen_user_list_id(item.item))
     return doc_ids
 
