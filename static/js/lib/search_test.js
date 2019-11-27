@@ -9,9 +9,7 @@ import {
   makePostResult,
   makeProfileResult,
   makeLearningResourceResult,
-  makeProgramResult,
-  makeVideoResult,
-  makeUserListResult
+  makeProgramResult
 } from "../factories/search"
 import {
   AVAILABILITY_MAPPING,
@@ -29,9 +27,9 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_VIDEO,
-  DEFAULT_START_DT,
   LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_LEARNINGPATH,
+  DEFAULT_START_DT
 } from "../lib/constants"
 import { LR_TYPE_PROGRAM } from "./constants"
 
@@ -175,7 +173,7 @@ describe("search functions", () => {
   })
 
   it("converts a video search result to a learning resource", () => {
-    const result = makeVideoResult()
+    const result = makeLearningResourceResult(LR_TYPE_VIDEO)
     const video = searchResultToLearningResource(result)
     assert.deepEqual(video, {
       id:          result.id,
@@ -194,7 +192,7 @@ describe("search functions", () => {
   //
   ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].forEach(listType => {
     it(`converts a ${listType} search result to a learning resource`, () => {
-      const result = makeUserListResult(listType)
+      const result = makeLearningResourceResult(listType)
       const video = searchResultToLearningResource(result)
       assert.deepEqual(video, {
         id:          result.id,

@@ -93,7 +93,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   object_type:       LR_TYPE_COURSE,
   runs:              R.times(makeRun, 3),
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element[([], [100, 200])]
+  lists:             casual.random_element([[], [100, 200]])
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
@@ -109,7 +109,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   offered_by:        [offeredBys.bootcamps],
   runs:              [makeRun()],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element[([], [100, 200])]
+  lists:             casual.random_element([[], [100, 200]])
 })
 
 export const makeProgramResult = (): LearningResourceResult => ({
@@ -126,7 +126,7 @@ export const makeProgramResult = (): LearningResourceResult => ({
   ],
   runs:        [makeRun()],
   is_favorite: casual.coin_flip,
-  lists:       casual.random_element[([], [100, 200])]
+  lists:       casual.random_element([[], [100, 200]])
 })
 
 export const makeVideoResult = (): LearningResourceResult => ({
@@ -141,14 +141,13 @@ export const makeVideoResult = (): LearningResourceResult => ({
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element[([], [100, 200])]
+  lists:             casual.random_element([[], [100, 200]])
 })
 
 export const makeUserListResult = (
   listType: string
 ): LearningResourceResult => ({
   id:                casual.integer(1, 1000),
-  video_id:          `video_${String(casual.random)}`,
   title:             casual.title,
   url:               casual.url,
   image_src:         "http://image.medium.url",
@@ -159,7 +158,7 @@ export const makeUserListResult = (
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element[([], [100, 200])]
+  lists:             casual.random_element([[], [100, 200]])
 })
 
 export const makeLearningResourceResult = (objectType: string) => {
