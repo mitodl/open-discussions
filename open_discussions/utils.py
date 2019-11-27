@@ -264,3 +264,34 @@ def generate_filepath(filename, directory_name, suffix, prefix):
     )
 
     return full_path
+
+
+def extract_values(obj, key):
+    """
+    Pull all values of specified key from nested JSON.
+
+    Args:
+        obj(dict): The JSON object
+        key(str): The JSON key to search for and extract
+
+    Returns:
+        list of matching key values
+
+    """
+    array = []
+
+    def extract(obj, array, key):
+        """Recursively search for values of key in JSON tree."""
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                if isinstance(v, (dict, list)):
+                    extract(v, array, key)
+                elif k == key:
+                    array.append(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                extract(item, array, key)
+        return array
+
+    results = extract(obj, array, key)
+    return results

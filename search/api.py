@@ -17,12 +17,14 @@ from channels.constants import (
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from course_catalog.models import FavoriteItem, UserListItem
+from open_discussions.utils import extract_values
 from search.connection import get_conn, get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     GLOBAL_DOC_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    LEARNING_RESOURCE_TYPES,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -147,9 +149,8 @@ def gen_doc_ids(items):
 
     """
     doc_ids = []
-    for item in items:
+    for item in filter(lambda i: i.item is not None, items):
         classname = item.content_type.name
-        print(classname)
         if classname == "course":
             doc_ids.append(gen_course_id(item.item.platform, item.item.course_id))
         elif classname == "bootcamp":
@@ -252,6 +253,21 @@ def _apply_general_query_filters(search, user):
     )
 
 
+def is_learning_query(query):
+    """
+    Return True if the query includes learning resource types, False otherwise
+
+    Args:
+        query (dict): The query sent to ElasticSearch
+
+    Returns:
+        bool: if the query includes learning resource types
+
+    """
+    object_types = set(extract_values(query, "object_type"))
+    return len(object_types.intersection(set(LEARNING_RESOURCE_TYPES))) > 0
+
+
 def execute_search(*, user, query):
     """
     Execute a search based on the query
@@ -267,7 +283,7 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    if not user.is_anonymous:
+    if not user.is_anonymous and is_learning_query(query):
         search = search.script_fields(
             is_favorite={
                 "script": {
@@ -287,7 +303,8 @@ def execute_search(*, user, query):
             },
         )
         search._source = True
-    return transform_results(search.execute().to_dict())
+        return transform_results(search.execute().to_dict())
+    return search.execute().to_dict()
 
 
 def transform_results(search_result):

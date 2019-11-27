@@ -5,7 +5,7 @@ from collections import defaultdict
 from django.contrib.auth.models import AnonymousUser
 import pytest
 
-from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
+from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED, POST_TYPE
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
 from course_catalog.constants import PrivacyLevel
@@ -39,6 +39,7 @@ from search.constants import (
     GLOBAL_DOC_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    COURSE_TYPE,
 )
 from search.serializers import ESCourseSerializer
 
@@ -96,134 +97,148 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
-def test_execute_search(mocker, user):
+@pytest.mark.parametrize(
+    "object_type, is_learning", [[COURSE_TYPE, True], [POST_TYPE, False]]
+)
+def test_execute_search(mocker, user, object_type, is_learning):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
+    query = {
+        "bool": {
+            "should": [
+                {
+                    "bool": {
+                        "filter": {
+                            "bool": {"must": [{"term": {"object_type": object_type}}]}
+                        }
+                    }
+                }
+            ]
+        }
+    }
 
-    query = {"a": "query"}
+    expected_body = {
+        **query,
+        "query": {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": ["comment", "post"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "channel_type": [
+                                            CHANNEL_TYPE_PUBLIC,
+                                            CHANNEL_TYPE_RESTRICTED,
+                                        ]
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "channel_name": [
+                                            channel.name for channel in channels
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must": [
+                                            {"term": {"deleted": False}},
+                                            {"term": {"removed": False}},
+                                        ]
+                                    }
+                                },
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": ["comment", "post"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": [
+                                                        USER_LIST_TYPE,
+                                                        LEARNING_PATH_TYPE,
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {"term": {"privacy_level": PrivacyLevel.public.value}},
+                                {"term": {"author": user.id}},
+                            ]
+                        }
+                    },
+                ]
+            }
+        },
+    }
+
+    if is_learning:
+        expected_body.update(
+            {
+                "_source": True,
+                "script_fields": {
+                    "is_favorite": {
+                        "script": {
+                            "lang": "painless",
+                            "source": "params.favorites.contains(doc._id.value)",
+                            "params": {"favorites": []},
+                        }
+                    },
+                    "lists": {
+                        "script": {
+                            "lang": "painless",
+                            "source": "params.lists[doc._id.value]",
+                            "params": {"lists": defaultdict(list)},
+                        }
+                    },
+                },
+            }
+        )
+
     assert (
         execute_search(user=user, query=query)
         == get_conn_mock.return_value.search.return_value
     )
+
     get_conn_mock.return_value.search.assert_called_once_with(
-        body={
-            **query,
-            "_source": True,
-            "script_fields": {
-                "is_favorite": {
-                    "script": {
-                        "lang": "painless",
-                        "source": "params.favorites.contains(doc._id.value)",
-                        "params": {"favorites": []},
-                    }
-                },
-                "lists": {
-                    "script": {
-                        "lang": "painless",
-                        "source": "params.lists[doc._id.value]",
-                        "params": {"lists": defaultdict(list)},
-                    }
-                },
-            },
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_name": [
-                                                channel.name for channel in channels
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            LEARNING_PATH_TYPE,
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author": user.id}},
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
+        body=expected_body,
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
