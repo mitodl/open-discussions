@@ -116,14 +116,14 @@ def test_execute_search(mocker, user):
                 "is_favorite": {
                     "script": {
                         "lang": "painless",
-                        "inline": "params.favorites.contains(doc._id.value)",
+                        "source": "params.favorites.contains(doc._id.value)",
                         "params": {"favorites": []},
                     }
                 },
                 "lists": {
                     "script": {
                         "lang": "painless",
-                        "inline": "params.lists[doc._id.value]",
+                        "source": "params.lists[doc._id.value]",
                         "params": {"lists": defaultdict(list)},
                     }
                 },

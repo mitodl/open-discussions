@@ -272,7 +272,7 @@ def execute_search(*, user, query):
             is_favorite={
                 "script": {
                     "lang": "painless",
-                    "inline": "params.favorites.contains(doc._id.value)",
+                    "source": "params.favorites.contains(doc._id.value)",
                     "params": {
                         "favorites": gen_doc_ids(FavoriteItem.objects.filter(user=user))
                     },
@@ -281,7 +281,7 @@ def execute_search(*, user, query):
             lists={
                 "script": {
                     "lang": "painless",
-                    "inline": "params.lists[doc._id.value]",
+                    "source": "params.lists[doc._id.value]",
                     "params": {"lists": gen_lists_dict(user)},
                 }
             },
