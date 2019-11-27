@@ -307,8 +307,7 @@ def execute_search(*, user, query):
             },
         )
         search._source = True
-        return transform_results(search.execute().to_dict())
-    return search.execute().to_dict()
+    return transform_results(search.execute().to_dict())
 
 
 def transform_results(search_result):
@@ -338,7 +337,7 @@ def transform_results(search_result):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
-    for hit in search_result.get("hits", {}).get("hits"):
+    for hit in search_result.get("hits", {}).get("hits", []):
         fields = hit.pop("fields", None)
         if fields:
             hit["_source"]["is_favorite"] = fields["is_favorite"][0]

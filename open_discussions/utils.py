@@ -284,10 +284,10 @@ def extract_values(obj, key):
         """Recursively search for values of key in JSON tree."""
         if isinstance(obj, dict):
             for k, v in obj.items():
+                if k == key:
+                    array.append(v)
                 if isinstance(v, (dict, list)):
                     extract(v, array, key)
-                elif k == key:
-                    array.append(v)
         elif isinstance(obj, list):
             for item in obj:
                 extract(item, array, key)
