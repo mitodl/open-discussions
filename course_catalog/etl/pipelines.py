@@ -1,7 +1,16 @@
 """ETL pipelines"""
 from toolz import compose, first, juxt
 
-from course_catalog.etl import micromasters, loaders, mitx, xpro, ocw, oll, youtube
+from course_catalog.etl import (
+    micromasters,
+    loaders,
+    mitx,
+    xpro,
+    ocw,
+    oll,
+    video,
+    youtube,
+)
 from course_catalog.etl.utils import log_exceptions
 
 # A few notes on how this module works:
@@ -47,3 +56,6 @@ mitx_etl = compose(
 oll_etl = compose(loaders.load_courses, oll.transform, oll.extract)
 
 youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)
+
+# pipeline for generating topic data for videos based on course topics
+video_topics_etl = compose(loaders.load_videos, video.extract_videos_topics)

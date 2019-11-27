@@ -1,5 +1,6 @@
 """API for general search-related functionality"""
 from base64 import urlsafe_b64encode
+from collections import Counter
 
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
@@ -19,6 +20,7 @@ from search.connection import get_conn, get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     GLOBAL_DOC_TYPE,
+    COURSE_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
 )
@@ -272,3 +274,43 @@ def find_related_documents(*, user, post_id):
     # Limit results to the number indicated in settings
     search = search[0 : settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT]
     return search.execute().to_dict()
+
+
+def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):
+    """
+    Get a list of similar topics based on text values
+
+    Args:
+        value_doc (dict):
+            a document representing the data fields we want to search with
+        num_topics (int):
+            number of topics to return
+        min_term_freq (int):
+            minimum times a term needs to show up in input
+        min_doc_freq (int):
+            minimum times a term needs to show up in docs
+
+    Returns:
+        list of str:
+            list of topic values
+    """
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search = search.filter(Q("terms", object_type=[COURSE_TYPE]))
+    search = search.query(
+        MoreLikeThis(
+            like=[{"doc": value_doc, "fields": list(value_doc.keys())}],
+            fields=["course_id", "title", "short_description", "full_description"],
+            min_term_freq=min_term_freq,
+            min_doc_freq=min_doc_freq,
+        )
+    )
+    search = search.source(includes="topics")
+
+    response = search.execute()
+
+    topics = [topic for hit in response.hits for topic in hit.topics]
+
+    counter = Counter(topics)
+
+    return list(dict(counter.most_common(num_topics)).keys())

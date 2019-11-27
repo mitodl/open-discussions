@@ -156,7 +156,7 @@ def load_program(program_data):
     program_id = program_data.pop("program_id")
     courses_data = program_data.pop("courses")
     topics_data = program_data.pop("topics", [])
-    runs_data = program_data.pop("runs")
+    runs_data = program_data.pop("runs", [])
     offered_bys_data = program_data.pop("offered_by", [])
 
     program, created = Program.objects.update_or_create(
@@ -212,7 +212,7 @@ def load_video(video_data):
     platform = video_data.pop("platform")
     topics_data = video_data.pop("topics", [])
     offered_bys_data = video_data.pop("offered_by", [])
-    runs_data = video_data.pop("runs")
+    runs_data = video_data.pop("runs", [])
 
     video, created = Video.objects.update_or_create(
         video_id=video_id, platform=platform, defaults=video_data
@@ -357,6 +357,10 @@ def load_playlist(video_channel, playlist_data):
         ).delete()
 
     load_playlist_user_list(playlist)
+
+    from course_catalog import tasks
+
+    tasks.get_video_topics.delay(video_ids=[video.id for video in videos])
 
     return playlist
 

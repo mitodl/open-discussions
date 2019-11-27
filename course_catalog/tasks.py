@@ -146,3 +146,15 @@ def get_youtube_transcripts(
 
     log.info("Updating transcripts for %i videos", videos.count())
     youtube.get_youtube_transcripts(videos)
+
+
+@app.task(acks_late=True)
+def get_video_topics(*, video_ids=None):
+    """
+    Execute the video topics pipeline
+
+    Args:
+        video_ids (list of int):
+            list of video ids to generate topics for
+    """
+    pipelines.video_topics_etl(video_ids=video_ids)

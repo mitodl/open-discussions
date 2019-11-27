@@ -15,6 +15,7 @@ from search.api import (
     gen_video_id,
     find_related_documents,
     transform_aggregates,
+    get_similar_topics,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -386,3 +387,58 @@ def test_transform_aggregates():
     raw_aggregate["aggregations"].pop("availability", None)
     raw_aggregate["aggregations"].pop("cost", None)
     assert transform_aggregates(raw_aggregate) == raw_aggregate
+
+
+def test_get_similar_topics(settings, mocker):
+    """Test get_similar_topics makes a query for similar document topics"""
+    input_doc = {"title": "title text", "description": "description text"}
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+
+    # topic d is least popular and should not show up, order does not matter
+    get_conn_mock.return_value.search.return_value = {
+        "hits": {
+            "hits": [
+                {"_source": {"topics": ["topic a", "topic b", "topic d"]}},
+                {"_source": {"topics": ["topic a", "topic c"]}},
+                {"_source": {"topics": ["topic a", "topic c"]}},
+                {"_source": {"topics": ["topic a", "topic c"]}},
+                {"_source": {"topics": ["topic a", "topic b"]}},
+            ]
+        }
+    }
+
+    # results should be top 3 in decreasing order of frequency
+    assert get_similar_topics(input_doc, 3, 1, 15) == ["topic a", "topic c", "topic b"]
+
+    get_conn_mock.return_value.search.assert_called_once_with(
+        body={
+            "_source": {"includes": "topics"},
+            "query": {
+                "bool": {
+                    "filter": [{"terms": {"object_type": ["course"]}}],
+                    "must": [
+                        {
+                            "more_like_this": {
+                                "like": [
+                                    {
+                                        "doc": input_doc,
+                                        "fields": ["title", "description"],
+                                    }
+                                ],
+                                "fields": [
+                                    "course_id",
+                                    "title",
+                                    "short_description",
+                                    "full_description",
+                                ],
+                                "min_term_freq": 1,
+                                "min_doc_freq": 15,
+                            }
+                        }
+                    ],
+                }
+            },
+        },
+        doc_type=[],
+        index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
+    )
