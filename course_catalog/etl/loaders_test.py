@@ -49,7 +49,15 @@ from course_catalog.models import (
     UserListItem,
 )
 
-pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mock_upsert_tasks")]
+pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def mock_tasks(mocker):
+    """Mock out course_catalog tasks"""
+    return SimpleNamespace(
+        get_video_topics=mocker.patch("course_catalog.tasks.get_video_topics")
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -417,7 +425,7 @@ def test_load_videos():
     assert Video.objects.count() == len(videos_records)
 
 
-def test_load_playlist():
+def test_load_playlist(mock_tasks):
     """Test load_playlist"""
     channel = VideoChannelFactory.create(playlists=None)
     playlist = PlaylistFactory.build()
@@ -448,6 +456,10 @@ def test_load_playlist():
 
     assert result.videos.count() == len(videos_records)
     assert result.channel == channel
+
+    mock_tasks.get_video_topics.delay.assert_called_once_with(
+        video_ids=list(result.videos.order_by("id").values_list("id", flat=True))
+    )
 
 
 def test_load_playlists_unpublish():

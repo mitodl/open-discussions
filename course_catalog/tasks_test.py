@@ -29,6 +29,7 @@ from course_catalog.tasks import (
     get_oll_data,
     get_youtube_data,
     get_youtube_transcripts,
+    get_video_topics,
 )
 
 
@@ -308,3 +309,11 @@ def test_get_youtube_transcripts(mocker):
     mock_course_catalog_youtube.get_youtube_transcripts.assert_called_once_with(
         mock_course_catalog_youtube.get_youtube_videos_for_transcripts_job.return_value
     )
+
+
+@pytest.mark.parametrize("video_ids", [None, [1, 2]])
+def test_get_video_topics(mocker, video_ids):
+    """Test that get_video_topics calls the corresponding pipeline method"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_video_topics.delay(video_ids=video_ids)
+    mock_pipelines.video_topics_etl.assert_called_once_with(video_ids=video_ids)

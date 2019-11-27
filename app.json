@@ -318,6 +318,18 @@
       "description": "Branch in the open video data repository to use for video downloads",
       "required": false
     },
+    "OPEN_VIDEO_MAX_TOPICS": {
+      "description": "Maximum number of topics to assign a video",
+      "required": false
+    },
+    "OPEN_VIDEO_MIN_DOC_FREQ": {
+      "description": "Elasticsearch min_doc_freq value for determing video topics",
+      "required": false
+    },
+    "OPEN_VIDEO_MIN_TERM_FREQ": {
+      "description": "Elasticsearch min_term_freq value for determing video topics",
+      "required": false
+    },
     "OPEN_VIDEO_USER_LIST_OWNER": {
       "description": "User who will own user lists generated from playlists",
       "required": false
