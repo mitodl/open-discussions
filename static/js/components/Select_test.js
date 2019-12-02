@@ -79,17 +79,29 @@ describe("Select", function() {
     [false, null, null],
     [false, 24, 24]
   ].forEach(([isMulti, value, expected]) => {
-    it(`sets field value to ${String(
-      expected
-    )} when isMulti=${isMulti.toString()}`, () => {
-      field = {
-        name:  "TestName",
-        value: isMulti ? [options[0].value] : options[0].value
-      }
-      const wrapper = render({ isMulti, field })
-      const selector = wrapper.find("Select").at(1)
-      selector.instance().onChange(isMulti ? [{ value }] : { value })
-      sinon.assert.calledWith(setFieldValueStub, field.name, expected)
+    [true, false].forEach(hasOptions => {
+      it(`sets field value to ${String(
+        expected
+      )} when isMulti=${isMulti.toString()} or null/[] when option is null`, () => {
+        field = {
+          name:  "TestName",
+          value: isMulti ? [options[0].value] : options[0].value
+        }
+        const selectOptions = hasOptions ? options : null
+        const wrapper = render({ isMulti, field, options: selectOptions })
+        const selector = wrapper.find("Select").at(1)
+        if (hasOptions) {
+          selector.instance().onChange(isMulti ? [{ value }] : { value })
+          sinon.assert.calledWith(setFieldValueStub, field.name, expected)
+        } else {
+          selector.instance().onChange(isMulti ? [] : null)
+          sinon.assert.calledWith(
+            setFieldValueStub,
+            field.name,
+            isMulti ? [] : null
+          )
+        }
+      })
     })
   })
 })
