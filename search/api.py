@@ -182,11 +182,11 @@ def gen_lists_dict(user):
     lists_dict = collections.defaultdict(list)
     items = (
         UserListItem.objects.filter(user_list__author=user)
-        .select_related("user_list")
+        .only("id", "user_list_id")
         .iterator()
     )
     for item in items:
-        lists_dict[gen_doc_ids([item])[0]].append(item.user_list.id)
+        lists_dict[gen_doc_ids([item])[0]].append(item.user_list_id)
     return lists_dict
 
 
