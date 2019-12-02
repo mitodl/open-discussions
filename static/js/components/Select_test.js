@@ -2,7 +2,7 @@
 import React from "react"
 import { assert } from "chai"
 import sinon from "sinon"
-import { shallow } from "enzyme/build"
+import { mount } from "enzyme/build"
 
 import Select from "./Select"
 
@@ -16,21 +16,26 @@ describe("Select", function() {
     menuPlacement,
     className,
     field,
-    form
+    form,
+    setFieldValueStub
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
+    setFieldValueStub = sandbox.stub()
     closeMenuOnSelect = false
     openMenuOnClick = false
     isMulti = false
     placeholder = "Select something..."
     menuPlacement = "bottom"
     className = "class"
-    field = { name: "TestName" }
-    form = {}
-    options = [
-      [{ value: 1, label: "Option A" }, { value: 2, label: "Option B" }]
-    ]
+    form = {
+      setFieldValue: setFieldValueStub
+    }
+    ;(options = [
+      { value: 1, label: "Option A" },
+      { value: 2, label: "Option B" }
+    ]),
+    (field = { name: "TestName", value: [options[0].value] })
   })
 
   afterEach(() => {
@@ -38,7 +43,7 @@ describe("Select", function() {
   })
 
   const render = (props = {}) => {
-    return shallow(
+    return mount(
       <Select
         options={options}
         closeMenuOnSelect={closeMenuOnSelect}
@@ -55,13 +60,36 @@ describe("Select", function() {
   }
 
   it("passes props to the inner ReactSelect component", () => {
-    const props = render().props()
-    assert.equal(props.name, field.name)
+    const props = render()
+      .find("Select")
+      .at(0)
+      .props()
     assert.equal(props.options, options)
     assert.equal(props.isMulti, isMulti)
     assert.equal(props.closeMenuOnSelect, closeMenuOnSelect)
     assert.equal(props.openMenuOnClick, openMenuOnClick)
     assert.equal(props.menuPlacement, menuPlacement)
     assert.equal(props.className, className)
+  })
+
+  //
+  ;[
+    [true, null, [null]],
+    [true, 23, [23]],
+    [false, null, null],
+    [false, 24, 24]
+  ].forEach(([isMulti, value, expected]) => {
+    it(`sets field value to ${String(
+      expected
+    )} when isMulti=${isMulti.toString()}`, () => {
+      field = {
+        name:  "TestName",
+        value: isMulti ? [options[0].value] : options[0].value
+      }
+      const wrapper = render({ isMulti, field })
+      const selector = wrapper.find("Select").at(1)
+      selector.instance().onChange(isMulti ? [{ value }] : { value })
+      sinon.assert.calledWith(setFieldValueStub, field.name, expected)
+    })
   })
 })
