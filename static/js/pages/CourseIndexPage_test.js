@@ -17,12 +17,14 @@ import {
   featuredCoursesURL,
   upcomingCoursesURL,
   newCoursesURL,
-  userListApiURL
+  userListApiURL,
+  newVideosURL
 } from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 import {
   makeCourse,
-  makeFavoritesResponse
+  makeFavoritesResponse,
+  makeVideo
 } from "../factories/learning_resources"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
@@ -30,6 +32,7 @@ describe("CourseIndexPage", () => {
   let featuredCourses,
     upcomingCourses,
     newCourses,
+    newVideos,
     render,
     helper,
     courseLists,
@@ -51,11 +54,16 @@ describe("CourseIndexPage", () => {
       course.is_favorite = false
       return course
     })
+    newVideos = R.times(makeVideo, 10).map(video => {
+      video.is_favorite = false
+      return video
+    })
 
     courseLists = {
       featuredCourses,
       upcomingCourses,
       newCourses,
+      newVideos,
       // eslint-disable-next-line camelcase
       favorites: favorites.map(({ content_data, content_type }) => ({
         ...content_data, // eslint-disable-line camelcase
@@ -75,6 +83,9 @@ describe("CourseIndexPage", () => {
       .withArgs(newCoursesURL)
       .returns(queryListResponse(newCourses))
     helper.handleRequestStub
+      .withArgs(newVideosURL)
+      .returns(queryListResponse(newVideos))
+    helper.handleRequestStub
       .withArgs(userListApiURL)
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
@@ -89,7 +100,8 @@ describe("CourseIndexPage", () => {
     ["favorites", "Your Favorites"],
     ["featuredCourses", "Featured Courses"],
     ["upcomingCourses", "Upcoming Courses"],
-    ["newCourses", "New Courses"]
+    ["newCourses", "New Courses"],
+    ["newVideos", "New Videos"]
   ].forEach(([courseListName, title], idx) => {
     it(`should pass ${title} down to carousel`, async () => {
       const courseList = courseLists[courseListName]
@@ -115,11 +127,12 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
-    assert.lengthOf(carousels, 3)
+    assert.lengthOf(carousels, 4)
     assert.deepEqual(carousels.map(el => el.prop("title")), [
       "Your Favorites",
       "Upcoming Courses",
-      "New Courses"
+      "New Courses",
+      "New Videos"
     ])
   })
 
@@ -129,11 +142,12 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
-    assert.lengthOf(carousels, 3)
+    assert.lengthOf(carousels, 4)
     assert.deepEqual(carousels.map(el => el.prop("title")), [
       "Featured Courses",
       "Upcoming Courses",
-      "New Courses"
+      "New Courses",
+      "New Videos"
     ])
   })
 
@@ -160,6 +174,6 @@ describe("CourseIndexPage", () => {
   it("should have a loading state", async () => {
     helper.handleRequestStub.withArgs(favoritesURL).returns({})
     const { wrapper } = await render()
-    assert.equal(wrapper.find("CarouselLoading").length, 3)
+    assert.equal(wrapper.find("CarouselLoading").length, 4)
   })
 })

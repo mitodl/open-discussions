@@ -255,6 +255,17 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
+    @action(methods=["GET"], detail=False)
+    def new(self, request):
+        """
+        Get newly published videos
+        """
+        page = self.paginate_queryset(
+            self.queryset.filter(published=True).order_by("-last_modified")
+        )
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
     """
