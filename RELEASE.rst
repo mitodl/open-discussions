@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.101.1
+Version 0.101.1 (Released December 02, 2019)
 ---------------
 
 - Prevent users from adding lists to each other (#2416)
