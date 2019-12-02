@@ -1,0 +1,53 @@
+{
+ "kind": "youtube#playlistListResponse",
+ "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/S2QKCudzm4HavXjpQ4F8sK7ijD8\"",
+ "pageInfo": {
+  "totalResults": 1,
+  "resultsPerPage": 50
+ },
+ "items": [
+  {
+   "kind": "youtube#playlist",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/X_u2CFipu5FpmyfwuVqtUEcLBA8\"",
+   "id": "UUBpxspUNl1Th33XbugiHJzw",
+   "snippet": {
+    "publishedAt": "1970-01-01T00:00:00.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Uploads from MITCSAIL",
+    "description": "",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "localized": {
+     "title": "Uploads from MITCSAIL",
+     "description": ""
+    }
+   }
+  }
+ ]
+}

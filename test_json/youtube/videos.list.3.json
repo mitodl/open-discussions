@@ -1,0 +1,330 @@
+{
+ "kind": "youtube#videoListResponse",
+ "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/d-4pSGseYYx31kCcinCBUiYDELk\"",
+ "pageInfo": {
+  "totalResults": 5,
+  "resultsPerPage": 50
+ },
+ "items": [
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/Txo97ZOGS4QOqWH6FFRbqQGsteE\"",
+   "id": "hhEJMpouMS8",
+   "snippet": {
+    "publishedAt": "2019-12-06T15:31:06.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Computational Mirrors: Revealing Hidden Video",
+    "description": "Paper: https://arxiv.org/abs/1912.02314\nProject page: http://compmirrors.csail.mit.edu/",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "computer vision",
+     "computational mirror"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Computational Mirrors: Revealing Hidden Video",
+     "description": "Paper: https://arxiv.org/abs/1912.02314\nProject page: http://compmirrors.csail.mit.edu/"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M37S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/XKK9ZrKuPQ7GmNv5R-kPHbqB-3U\"",
+   "id": "0VKXm_vEriA",
+   "snippet": {
+    "publishedAt": "2019-11-07T19:52:48.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "\"What is AI?\" according to MIT computer scientists",
+    "description": "Artificial intelligence is everywhere nowadays, but what exactly does it mean?  We asked a group MIT computer science grad students and post-docs how they personally define AI.",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/0VKXm_vEriA/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/0VKXm_vEriA/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/0VKXm_vEriA/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/0VKXm_vEriA/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/0VKXm_vEriA/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "AI",
+     "artificial intelligence",
+     "computer science",
+     "cs"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "\"What is AI?\" according to MIT computer scientists",
+     "description": "Artificial intelligence is everywhere nowadays, but what exactly does it mean?  We asked a group MIT computer science grad students and post-docs how they personally define AI."
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M40S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/irk-skCT-O8F3ZwBOspO7UTmwwc\"",
+   "id": "hI5UDKaWJOo",
+   "snippet": {
+    "publishedAt": "2019-10-30T11:51:59.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "M-Blocks 2.0: Self-assembling Modular Robots",
+    "description": "More info:\nhttp://news.mit.edu/2019/self-transforming-robot-blocks-jump-spin-flip-identify-each-other-1030",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/hI5UDKaWJOo/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/hI5UDKaWJOo/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/hI5UDKaWJOo/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/hI5UDKaWJOo/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/hI5UDKaWJOo/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "robots",
+     "robotics",
+     "M-Blocks",
+     "self-assembly",
+     "modular",
+     "self-assembling",
+     "AI",
+     "artificial intelligence",
+     "CS"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "M-Blocks 2.0: Self-assembling Modular Robots",
+     "description": "More info:\nhttp://news.mit.edu/2019/self-transforming-robot-blocks-jump-spin-flip-identify-each-other-1030"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT2M20S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/DPH8VIFtrAM8dzhzrLbu95W9HJ0\"",
+   "id": "LMmN2Lj61cM",
+   "snippet": {
+    "publishedAt": "2019-10-02T14:22:35.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Better MRIs by Flattening Placental Images",
+    "description": "Paper: https://arxiv.org/abs/1903.05044\nMore info: http://news.mit.edu/2019/using-algorithms-to-build-placenta-map-1002",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/LMmN2Lj61cM/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/LMmN2Lj61cM/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/LMmN2Lj61cM/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/LMmN2Lj61cM/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/LMmN2Lj61cM/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "pregnancy",
+     "MRI",
+     "computer vision",
+     "placenta",
+     "medical imaging"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Better MRIs by Flattening Placental Images",
+     "description": "Paper: https://arxiv.org/abs/1903.05044\nMore info: http://news.mit.edu/2019/using-algorithms-to-build-placenta-map-1002"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/AvudGiSEsos_VOxppv_Bg6QlKaY\"",
+   "id": "fEdN1VciJx0",
+   "snippet": {
+    "publishedAt": "2019-09-10T12:03:23.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Photochromeleon: Creating Color-Changing Objects",
+    "description": "More info: http://news.mit.edu/2019/changing-colors-photochromeleon-mit-csail-0910\nPaper: http://groups.csail.mit.edu/hcie/files/research-projects/photochromeleon/2019-uist-photochromeleon-paper.pdf \nhttps://doi.org/10.1145/3332165.3347905",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/fEdN1VciJx0/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/fEdN1VciJx0/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/fEdN1VciJx0/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/fEdN1VciJx0/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/fEdN1VciJx0/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "color changing",
+     "3d printing",
+     "computer vision",
+     "chameleon",
+     "photochromeleon"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Photochromeleon: Creating Color-Changing Objects",
+     "description": "More info: http://news.mit.edu/2019/changing-colors-photochromeleon-mit-csail-0910\nPaper: http://groups.csail.mit.edu/hcie/files/research-projects/photochromeleon/2019-uist-photochromeleon-paper.pdf \nhttps://doi.org/10.1145/3332165.3347905"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT2M46S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  }
+ ]
+}

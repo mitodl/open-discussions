@@ -28,6 +28,7 @@ CONFIG_FILE_REPO = "mitodl/open-video-data"
 CONFIG_FILE_FOLDER = "youtube"
 YOUTUBE_API_SERVICE_NAME = "youtube"
 YOUTUBE_API_VERSION = "v3"
+WILDCARD_PLAYLIST_ID = "all"
 
 log = logging.getLogger()
 
@@ -113,7 +114,7 @@ def extract_playlist_items(youtube_client, playlist_id):
         ) from exc
 
 
-def extract_playlists(youtube_client, playlist_configs):
+def _extract_playlists(youtube_client, request, playlist_configs):
     """
     Extract a list of playlists
 
@@ -124,17 +125,7 @@ def extract_playlists(youtube_client, playlist_configs):
     Returns:
         A generator that yields playlist data
     """
-
-    playlist_configs_by_id = {
-        playlist_config["id"]: playlist_config for playlist_config in playlist_configs
-    }
-    playlist_ids = playlist_configs_by_id.keys()
-
     try:
-        request = youtube_client.playlists().list(
-            part="snippet", id=",".join(playlist_ids), maxResults=50
-        )
-
         while request is not None:
             response = request.execute()
 
@@ -143,21 +134,73 @@ def extract_playlists(youtube_client, playlist_configs):
 
             for playlist_data in response["items"]:
                 playlist_id = playlist_data["id"]
-                playlist_config = playlist_configs_by_id[playlist_id]
 
-                yield (
-                    playlist_data,
-                    extract_playlist_items(youtube_client, playlist_id),
-                    playlist_config.get("create_user_list", True),
-                )
+                if playlist_id in playlist_configs:
+                    playlist_config = playlist_configs[playlist_id]
+                else:
+                    playlist_config = playlist_configs[WILDCARD_PLAYLIST_ID]
+
+                if not playlist_config.get("ignore", False):
+                    yield (
+                        playlist_data,
+                        extract_playlist_items(youtube_client, playlist_id),
+                        playlist_config.get("create_user_list", True),
+                    )
 
             request = youtube_client.playlists().list_next(request, response)
     except StopIteration:
         return
     except googleapiclient.errors.HttpError as exc:
+        playlist_ids = ", ".join(list(playlist_configs.keys()))
         raise ExtractPlaylistException(
             f"Error fetching channel playlists: playlist_ids={playlist_ids}"
         ) from exc
+
+
+def extract_playlists(youtube_client, playlist_configs, channel_id, upload_playlist_id):
+    """
+    Extract a list of playlists for a channel
+    Args:
+        youtube_client (object): Youtube api client
+        playlist_configs (list of dict): list of playlist configurations
+        channel_id (str): youtube's id for the channel
+        upload_playlist_id (str): youtube's upload playlist id  for the channel
+    Returns:
+        A generator that yields playlist data
+    """
+
+    playlist_configs_by_id = {
+        playlist_config["id"]: playlist_config for playlist_config in playlist_configs
+    }
+
+    requests = []
+
+    if WILDCARD_PLAYLIST_ID in playlist_configs_by_id:
+        # The upload playlist is not included in the playlists by channel id response
+        if not (
+            upload_playlist_id in playlist_configs_by_id
+            and playlist_configs_by_id[upload_playlist_id].get("ignore", False)
+        ):
+            requests.append(
+                youtube_client.playlists().list(part="snippet", id=upload_playlist_id)
+            )
+
+        requests.append(
+            youtube_client.playlists().list(
+                part="snippet", channelId=channel_id, maxResults=50
+            )
+        )
+
+    else:
+        playlist_ids = playlist_configs_by_id.keys()
+        requests.append(
+            youtube_client.playlists().list(
+                part="snippet", id=",".join(playlist_ids), maxResults=50
+            )
+        )
+
+    for request in requests:
+        yield from _extract_playlists(youtube_client, request, playlist_configs_by_id)
 
 
 def extract_channels(youtube_client, channels_config):
@@ -179,7 +222,7 @@ def extract_channels(youtube_client, channels_config):
 
     try:
         request = youtube_client.channels().list(
-            part="snippet", id=",".join(channel_ids), maxResults=50
+            part="snippet,contentDetails", id=",".join(channel_ids), maxResults=50
         )
 
         while request is not None:
@@ -190,12 +233,17 @@ def extract_channels(youtube_client, channels_config):
 
             for channel_data in response["items"]:
                 channel_id = channel_data["id"]
+                upload_playlist_id = channel_data["contentDetails"]["relatedPlaylists"][
+                    "uploads"
+                ]
                 channel_config = channel_configs_by_ids[channel_id]
                 offered_by = channel_config.get("offered_by", None)
                 playlist_configs = channel_config.get("playlists", [])
 
                 # if we hit any error on a playlist, we simply abort
-                playlists = extract_playlists(youtube_client, playlist_configs)
+                playlists = extract_playlists(
+                    youtube_client, playlist_configs, channel_id, upload_playlist_id
+                )
                 yield (offered_by, channel_data, playlists)
 
             request = youtube_client.channels().list_next(request, response)

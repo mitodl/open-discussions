@@ -88,6 +88,20 @@ playlists:
     return Mock(decoded_content=content)
 
 
+def mock_channel_file_with_wildcard(channel_id, ignore_playlist_id):
+    """Mock video channel github file"""
+
+    content = f"""---
+    channel_id: {channel_id}
+    playlists:
+      - id: all
+      - id: {ignore_playlist_id}
+        ignore: true
+    """
+
+    return Mock(decoded_content=content)
+
+
 @pytest.fixture
 def mocked_github_channel_response(mocker):
     """Mock response from github api requst to open-video-data"""
@@ -100,6 +114,9 @@ def mocked_github_channel_response(mocker):
             "UCEBb1b_L6zDS3xTUrIALZOw",
             "PLTz-v-F773kXwTSKsX_E9t8ZnP_3LYaGy",
         ),
+        mock_channel_file_with_wildcard(
+            "UCBpxspUNl1Th33XbugiHJzw", "PLcwbNON2hqP5TFbkw0igt6Wz79WTaeFGi"
+        ),
     ]
     mock_github_client = mocker.patch("github.Github")
     mock_github_client.return_value.get_repo.return_value.get_contents.return_value = (
@@ -109,9 +126,11 @@ def mocked_github_channel_response(mocker):
 
 @pytest.fixture
 def extracted_and_transformed_values(youtube_api_responses):
+    # pylint: disable=too-many-locals
     """Mock data for the API responses and how they are transformed"""
     channels_list = youtube_api_responses[("channels", "list")]
     playlists_list = youtube_api_responses[("playlists", "list")]
+
     playlist_items_list = youtube_api_responses[("playlistItems", "list")]
     playlist_items_list_next = youtube_api_responses[("playlistItems", "list_next")]
     videos_list = youtube_api_responses[("videos", "list")]
@@ -122,6 +141,12 @@ def extracted_and_transformed_values(youtube_api_responses):
     mitx_items = playlist_items_list[1]["items"]
     mitx_items_order = [item["contentDetails"]["videoId"] for item in mitx_items]
 
+    csail_items1 = playlist_items_list[2]["items"]
+    csail_items1_order = [item["contentDetails"]["videoId"] for item in csail_items1]
+
+    csail_items2 = playlist_items_list[3]["items"]
+    csail_items2_order = [item["contentDetails"]["videoId"] for item in csail_items2]
+
     # sort the videos by the order they appeared in playlistItems responses
     ocw_videos = sorted(
         videos_list[0]["items"] + videos_list[1]["items"],
@@ -129,6 +154,12 @@ def extracted_and_transformed_values(youtube_api_responses):
     )
     mitx_videos = sorted(
         videos_list[2]["items"], key=lambda item: mitx_items_order.index(item["id"])
+    )
+    csail_videos1 = sorted(
+        videos_list[3]["items"], key=lambda item: csail_items1_order.index(item["id"])
+    )
+    csail_videos2 = sorted(
+        videos_list[4]["items"], key=lambda item: csail_items2_order.index(item["id"])
     )
 
     extracted = [
@@ -141,6 +172,14 @@ def extracted_and_transformed_values(youtube_api_responses):
             OfferedBy.mitx.value,
             channels_list[0]["items"][1],
             [(playlists_list[1]["items"][0], mitx_videos, True)],
+        ),
+        (
+            None,
+            channels_list[0]["items"][2],
+            [
+                (playlists_list[2]["items"][0], csail_videos1, True),
+                (playlists_list[3]["items"][1], csail_videos2, True),
+            ],
         ),
     ]
 
@@ -315,6 +354,10 @@ def test_extract_with_exception(
         f"{'.return_value.'.join(operation_key)}.return_value.execute.side_effect": side_effect
     }
 
+    modified_config[
+        "playlistItems.return_value.list_next.return_value.execute.side_effect"
+    ] = [None]
+
     if operation_key[0] in ["playlists", "playlistItems"]:
         # if the error was on playlists.list or playlistItems.list
         # then videos.list needs to return the second channel's data on the first call
@@ -346,16 +389,30 @@ def test_extract_with_exception(
         for _, videos, _ in playlists:
             list(videos)
 
-    offered_by, channel_data, playlists = results[1]
-    playlists = list(playlists)
-    assert len(playlists) == 1
+    offered_by_mitx, channel_data_mitx, playlists_mitx = results[1]
+    playlists_mitx = list(playlists_mitx)
+    assert len(playlists_mitx) == 1
 
-    playlist_data, videos, _ = playlists[0]
+    playlist_data_mitx, videos_mitx, _ = playlists_mitx[0]
 
-    assert offered_by == OfferedBy.mitx.value
-    assert channel_data == channels_list[0]["items"][1]
-    assert playlist_data == playlists_list[1]["items"][0]
-    assert list(videos) == videos_list[2]["items"]
+    assert offered_by_mitx == OfferedBy.mitx.value
+    assert channel_data_mitx == channels_list[0]["items"][1]
+    assert playlist_data_mitx == playlists_list[1]["items"][0]
+    assert list(videos_mitx) == videos_list[2]["items"]
+
+    offered_by_csail, channel_data_csail, playlists_csail = results[2]
+    playlists_csail = list(playlists_csail)
+
+    assert len(playlists_csail) == 2
+    playlist_data_csail1, videos_csail1, _ = playlists_csail[0]
+    playlist_data_csail2, videos_csail2, _ = playlists_csail[1]
+
+    assert offered_by_csail is None
+    assert channel_data_csail == channels_list[0]["items"][2]
+    assert playlist_data_csail1 == playlists_list[2]["items"][0]
+    assert list(videos_csail1) == videos_list[3]["items"]
+    assert playlist_data_csail2 == playlists_list[3]["items"][1]
+    assert list(videos_csail2) == videos_list[4]["items"]
 
 
 def test_extract_with_unset_keys(settings):
