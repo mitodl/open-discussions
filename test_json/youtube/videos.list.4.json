@@ -1,0 +1,326 @@
+{
+ "kind": "youtube#videoListResponse",
+ "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/W-S9h00cHipvp8KJq_3fTgawkYc\"",
+ "pageInfo": {
+  "totalResults": 5,
+  "resultsPerPage": 5
+ },
+ "items": [
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/GyaKTm0kehfaK_XCBc2lkmdS1x0\"",
+   "id": "yZ9ApVHx7Ow",
+   "snippet": {
+    "publishedAt": "2018-11-29T14:59:15.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Reproducing Paintings with 3D Printing",
+    "description": "Paper: http://people.csail.mit.edu/liangs/papers/ToG18.pdf\nNews story: http://news.mit.edu/2018/mit-csail-repaint-system-reproducing-paintings-make-impression-1129",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "3D printing",
+     "art",
+     "painting",
+     "printing",
+     "reproduction",
+     "deep learning"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Reproducing Paintings with 3D Printing",
+     "description": "Paper: http://people.csail.mit.edu/liangs/papers/ToG18.pdf\nNews story: http://news.mit.edu/2018/mit-csail-repaint-system-reproducing-paintings-make-impression-1129"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M1S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/wItESDlBgGHviiXuBz6InZy-KTg\"",
+   "id": "v759cZI4cqc",
+   "snippet": {
+    "publishedAt": "2018-02-05T15:37:23.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Designing Printable Microstructures",
+    "description": "More info: http://news.mit.edu/2018/automating-materials-design-0202",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/v759cZI4cqc/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/v759cZI4cqc/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/v759cZI4cqc/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "3D printing",
+     "3-D printing",
+     "microstructures",
+     "design",
+     "manufacturing",
+     "computer science",
+     "CS"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Designing Printable Microstructures",
+     "description": "More info: http://news.mit.edu/2018/automating-materials-design-0202"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M24S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/r0o6UbKD0Jtx8Qqn_MvC-Ksff8Y\"",
+   "id": "novgMFIBcqg",
+   "snippet": {
+    "publishedAt": "2018-01-29T14:59:47.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Color-Changing 3D Printables",
+    "description": "Paper: http://groups.csail.mit.edu/hcie/files/research-projects/colorfab/2018-chi-colorfab-paper.pdf\nMore info: http://news.mit.edu/2018/changing-color-3-d-printed-objects-0129",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/novgMFIBcqg/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/novgMFIBcqg/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/novgMFIBcqg/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/novgMFIBcqg/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/novgMFIBcqg/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "3D printing",
+     "color",
+     "3D printable",
+     "color change",
+     "colorfab",
+     "CS",
+     "computer science"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Color-Changing 3D Printables",
+     "description": "Paper: http://groups.csail.mit.edu/hcie/files/research-projects/colorfab/2018-chi-colorfab-paper.pdf\nMore info: http://news.mit.edu/2018/changing-color-3-d-printed-objects-0129"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT1M31S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/eB10PfS3MDum3BnNHwouPymnIl4\"",
+   "id": "zvNUpQWft1I",
+   "snippet": {
+    "publishedAt": "2017-08-23T17:49:50.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Robogami: 3D Printing Foldable Robots",
+    "description": "Paper: http://journals.sagepub.com/doi/10.1177/0278364917723465",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/zvNUpQWft1I/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/zvNUpQWft1I/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/zvNUpQWft1I/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/zvNUpQWft1I/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/zvNUpQWft1I/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "Massachusetts Institute of Technology",
+     "CSAIL",
+     "Robotics",
+     "robots",
+     "3D printing",
+     "origami",
+     "computer science"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "Robogami: 3D Printing Foldable Robots",
+     "description": "Paper: http://journals.sagepub.com/doi/10.1177/0278364917723465"
+    },
+    "defaultAudioLanguage": "en"
+   },
+   "contentDetails": {
+    "duration": "PT3M22S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "true",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  },
+  {
+   "kind": "youtube#video",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/ZuqnZ2qn5705q5vAnpMUknAOkFY\"",
+   "id": "45YLK7vbL3M",
+   "snippet": {
+    "publishedAt": "2017-08-04T17:42:31.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "InstantCAD: Making CAD Easier",
+    "description": "Paper & code: https://people.csail.mit.edu/aschulz/optCAD/index.html",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/45YLK7vbL3M/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/45YLK7vbL3M/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/45YLK7vbL3M/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/45YLK7vbL3M/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/45YLK7vbL3M/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "tags": [
+     "MIT",
+     "CSAIL",
+     "Massachusetts Institute of Technology",
+     "CAD",
+     "computer graphics",
+     "CS",
+     "computer science",
+     "computer-aided design",
+     "3D printing",
+     "design"
+    ],
+    "categoryId": "28",
+    "liveBroadcastContent": "none",
+    "localized": {
+     "title": "InstantCAD: Making CAD Easier",
+     "description": "Paper & code: https://people.csail.mit.edu/aschulz/optCAD/index.html"
+    }
+   },
+   "contentDetails": {
+    "duration": "PT1M10S",
+    "dimension": "2d",
+    "definition": "hd",
+    "caption": "false",
+    "licensedContent": false,
+    "projection": "rectangular"
+   }
+  }
+ ]
+}

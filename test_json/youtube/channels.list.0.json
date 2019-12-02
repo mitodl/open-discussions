@@ -2,14 +2,21 @@
  "kind": "youtube#channelListResponse",
  "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/4gZiPORgx3xKNcuJUNIzj3uUXr4\"",
  "pageInfo": {
-  "totalResults": 2,
-  "resultsPerPage": 2
+  "totalResults": 3,
+  "resultsPerPage": 3
  },
  "items": [
   {
    "kind": "youtube#channel",
    "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/Z_X_9N7zIPi2tpgNWKGk4eNPQl8\"",
    "id": "UCEBb1b_L6zDS3xTUrIALZOw",
+   "contentDetails": {
+     "relatedPlaylists": {
+      "uploads": "UUEBb1b_L6zDS3xTUrIALZOw",
+      "watchHistory": "HL",
+      "watchLater": "WL"
+     }
+   },
    "snippet": {
     "title": "MIT OpenCourseWare",
     "description": "Whether you’re a student, a teacher, or simply a curious person that wants to learn, MIT OpenCourseWare (OCW) offers a wealth of insight and inspiration. There's videos, and a whole lot more!\n\nOCW is a free and open online publication of material from thousands of MIT courses, covering the entire MIT curriculum, ranging from the introductory to the most advanced graduate courses. At the OCW website, you'll find that each course has a syllabus, instructional material like notes and reading lists, and learning activities like assignments and solutions. Some courses also have videos, online textbooks, or faculty insights on teaching.\n\nKnowledge is your reward. There's no signup or enrollment, and no start/end dates. it's self-paced learning at its best.\n\nGet the full picture at https://ocw.mit.edu. \n\nChannel banner photo by Nietnagel on Flickr (https://flic.kr/p/8WXxfK).",
@@ -43,6 +50,13 @@
    "kind": "youtube#channel",
    "etag": "\"j6xRRd8dTPVVptg711_CSPADRfg/me7-ZjpQJ4SIr1urL-sCPPLSMZw\"",
    "id": "UCTBMWu8yshnAmpzR3MoJFtw",
+   "contentDetails": {
+    "relatedPlaylists": {
+     "uploads": "UUTBMWu8yshnAmpzR3MoJFtw",
+     "watchHistory": "HL",
+     "watchLater": "WL"
+    }
+   },
    "snippet": {
     "title": "MITx Videos",
     "description": "MITx delivers massive open online courses, known as MOOCs, via edX, which MIT founded with Harvard University in 2012. MITx courses are developed and taught by MIT instructors with the aim of enhancing on-campus education, expanding access to quality educational opportunities worldwide, and advancing the understanding of teaching and learning through research. As of Fall 2017, more than 2 million learners worldwide have accessed MITx content.\n\nMITx courses on edX are open to any learner around the world for free. Verified identity certificates, which certify completion by the individual, are available for a fee.",
@@ -70,6 +84,45 @@
      "description": "MITx delivers massive open online courses, known as MOOCs, via edX, which MIT founded with Harvard University in 2012. MITx courses are developed and taught by MIT instructors with the aim of enhancing on-campus education, expanding access to quality educational opportunities worldwide, and advancing the understanding of teaching and learning through research. As of Fall 2017, more than 2 million learners worldwide have accessed MITx content.\n\nMITx courses on edX are open to any learner around the world for free. Verified identity certificates, which certify completion by the individual, are available for a fee."
     },
     "country": "US"
+   }
+  },
+  {
+   "kind": "youtube#channel", 
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/AdWwtJIn0M7S-6CK9hW2yRx6wMs\"", 
+   "id": "UCBpxspUNl1Th33XbugiHJzw", 
+   "contentDetails": {
+    "relatedPlaylists": {
+     "uploads": "UUBpxspUNl1Th33XbugiHJzw", 
+     "watchHistory": "HL", 
+     "watchLater": "WL"
+    }
+   },
+   "snippet": {
+    "title": "MITCSAIL", 
+    "description": "The Massachusetts Institute of Technology's Computer Science and Artificial Intelligence Laboratory (CSAIL) conducts research in all areas of computer science and AI, such as robotics, systems, theory, biology, machine learning, speech recognition, vision and graphics.  Here you'll find videos showcasing the exciting research being done at CSAIL.", 
+    "customUrl": "mitcsail",
+    "publishedAt": "2007-08-09T20:37:40.000Z", 
+    "thumbnails": {
+     "default": {
+      "url": "https://yt3.ggpht.com/a/AGF-l7__JUpDxR7gQD4wekOcG_Mz1Vrq9vwDMjuXZQ=s88-c-k-c0xffffffff-no-rj-mo", 
+      "width": 88,
+      "height": 88
+     }, 
+     "medium": {
+      "url": "https://yt3.ggpht.com/a/AGF-l7__JUpDxR7gQD4wekOcG_Mz1Vrq9vwDMjuXZQ=s240-c-k-c0xffffffff-no-rj-mo", 
+      "width": 240, 
+      "height": 240
+     }, 
+     "high": {
+      "url": "https://yt3.ggpht.com/a/AGF-l7__JUpDxR7gQD4wekOcG_Mz1Vrq9vwDMjuXZQ=s800-c-k-c0xffffffff-no-rj-mo", 
+      "width": 800, 
+      "height": 800
+     }
+    }
+   }, 
+   "localized": {
+    "title": "MITCSAIL",
+    "description": "The Massachusetts Institute of Technology's Computer Science and Artificial Intelligence Laboratory (CSAIL) conducts research in all areas of computer science and AI, such as robotics, systems, theory, biology, machine learning, speech recognition, vision and graphics.  Here you'll find videos showcasing the exciting research being done at CSAIL."
    }
   }
  ]

@@ -1,0 +1,96 @@
+{
+ "kind": "youtube#playlistListResponse",
+ "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/aCYBJVV5pGOT8x5MQiMs_rk5vvM\"",
+ "pageInfo": {
+  "totalResults": 6,
+  "resultsPerPage": 50
+ },
+ "items": [
+  {
+   "kind": "youtube#playlist",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/n7ZKu2B5KrRd33yqT8hFcjPIwcA\"",
+   "id": "PLcwbNON2hqP5TFbkw0igt6Wz79WTaeFGi",
+   "snippet": {
+    "publishedAt": "2017-08-08T18:14:18.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "Unwanted Playlist",
+    "description": "",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/hhEJMpouMS8/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "localized": {
+     "title": "Unwanted Playlist",
+     "description": ""
+    }
+   }
+  },
+  {
+   "kind": "youtube#playlist",
+   "etag": "\"p4VTdlkQv3HQeTEaXgvLePAydmU/_MyZL8gb5BB4jmGsnU_WYt3bUvc\"",
+   "id": "PLcwbNON2hqP4_mGgPvekcSndFezpDdWcY",
+   "snippet": {
+    "publishedAt": "2017-08-08T18:12:13.000Z",
+    "channelId": "UCBpxspUNl1Th33XbugiHJzw",
+    "title": "3D Printing",
+    "description": "",
+    "thumbnails": {
+     "default": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/default.jpg",
+      "width": 120,
+      "height": 90
+     },
+     "medium": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/mqdefault.jpg",
+      "width": 320,
+      "height": 180
+     },
+     "high": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/hqdefault.jpg",
+      "width": 480,
+      "height": 360
+     },
+     "standard": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/sddefault.jpg",
+      "width": 640,
+      "height": 480
+     },
+     "maxres": {
+      "url": "https://i.ytimg.com/vi/yZ9ApVHx7Ow/maxresdefault.jpg",
+      "width": 1280,
+      "height": 720
+     }
+    },
+    "channelTitle": "MITCSAIL",
+    "localized": {
+     "title": "3D Printing",
+     "description": ""
+    }
+   }
+  }
+ ]
+}
