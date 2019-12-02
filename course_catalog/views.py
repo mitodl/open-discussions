@@ -209,7 +209,7 @@ class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     Viewset for User Lists & Learning Paths
     """
 
-    queryset = UserList.objects.prefetch_related("author", "topics", "offered_by").all()
+    queryset = UserList.objects.prefetch_related("author", "topics", "offered_by")
     serializer_class = UserListSerializer
     pagination_class = LargePagination
     permission_classes = (HasUserListPermissions,)

@@ -286,6 +286,14 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
+class LearningResourceRunMixin(serializers.Serializer):
+    """
+    Mixin to serialize LearningResourceRuns for various models
+    """
+
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
+
+
 class SimpleCourseSerializer(BaseCourseSerializer):
     """
     Serializer for Course model, minus runs
@@ -312,12 +320,10 @@ class SimpleCourseSerializer(BaseCourseSerializer):
         extra_kwargs = {"raw_json": {"write_only": True}}
 
 
-class CourseSerializer(SimpleCourseSerializer):
+class CourseSerializer(SimpleCourseSerializer, LearningResourceRunMixin):
     """
     Serializer for Course model
     """
-
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class OCWSerializer(CourseSerializer):
@@ -371,12 +377,10 @@ class SimpleBootcampSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
-class BootcampSerializer(SimpleBootcampSerializer):
+class BootcampSerializer(SimpleBootcampSerializer, LearningResourceRunMixin):
     """
     Serializer for Bootcamp model
     """
-
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class SimpleUserListItemSerializer(
@@ -638,12 +642,10 @@ class SimpleProgramSerializer(
         fields = "__all__"
 
 
-class ProgramSerializer(SimpleProgramSerializer):
+class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
     """
     Serializer for Program model, with runs
     """
-
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class VideoSerializer(
