@@ -340,9 +340,8 @@ def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list
         assert resp.data.get("topics") == [
             CourseTopicSerializer(instance=topics[0]).data
         ]
-        updated_items = sorted(
-            resp.data.get("items"), key=lambda item: item["position"]
-        )
+        updated_items = resp.data.get("items")
+
         assert (
             updated_items[0]["position"] == 33
             and updated_items[0]["id"] == list_items[1].id

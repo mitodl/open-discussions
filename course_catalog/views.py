@@ -30,7 +30,6 @@ from course_catalog.serializers import (
     BootcampSerializer,
     FavoriteItemSerializer,
     VideoSerializer,
-    SimpleUserListSerializer,
     CourseTopicSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
@@ -135,9 +134,11 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
                 "topics",
                 Prefetch(
                     "runs",
-                    queryset=LearningResourceRun.objects.filter(
-                        published=True
-                    ).order_by("-best_start_date"),
+                    queryset=LearningResourceRun.objects.prefetch_related(
+                        "topics", "prices", "instructors"
+                    )
+                    .filter(published=True)
+                    .order_by("-best_start_date"),
                 ),
             )
         )
@@ -182,7 +183,10 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     queryset = Bootcamp.objects.prefetch_related(
         "topics",
         Prefetch(
-            "runs", queryset=LearningResourceRun.objects.order_by("-best_start_date")
+            "runs",
+            queryset=LearningResourceRun.objects.prefetch_related(
+                "topics", "prices", "instructors"
+            ).order_by("-best_start_date"),
         ),
     )
     serializer_class = BootcampSerializer
@@ -205,20 +209,15 @@ class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     Viewset for User Lists & Learning Paths
     """
 
-    queryset = UserList.objects.all().prefetch_related("items")
-    serializer_classes = {"list": SimpleUserListSerializer}
+    queryset = UserList.objects.prefetch_related("author", "topics", "offered_by").all()
+    serializer_class = UserListSerializer
     pagination_class = LargePagination
     permission_classes = (HasUserListPermissions,)
-
-    def get_serializer_class(self):
-        return self.serializer_classes.get(self.action, UserListSerializer)
 
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""
         if request.user and not request.user.is_anonymous:
-            queryset = UserList.objects.filter(author=request.user).prefetch_related(
-                "items"
-            )
+            queryset = self.queryset.filter(author=request.user)
         else:
             queryset = UserList.objects.none()
 
@@ -266,7 +265,9 @@ class FavoriteItemViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = LargePagination
 
     def get_queryset(self):
-        return FavoriteItem.objects.filter(user=self.request.user)
+        return FavoriteItem.objects.select_related("content_type").filter(
+            user=self.request.user
+        )
 
 
 class TopicViewSet(viewsets.ReadOnlyModelViewSet):

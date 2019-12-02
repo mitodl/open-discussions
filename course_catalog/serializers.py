@@ -42,13 +42,13 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
         # Pass context on to the serializers so that they have access to the user
         context = self.context
         if isinstance(instance, Bootcamp):
-            serializer = BootcampSerializer(instance, context=context)
+            serializer = SimpleBootcampSerializer(instance, context=context)
         elif isinstance(instance, Course):
-            serializer = CourseSerializer(instance, context=context)
+            serializer = SimpleCourseSerializer(instance, context=context)
         elif isinstance(instance, UserList):
-            serializer = UserListSerializer(instance, context=context)
+            serializer = SimpleUserListSerializer(instance, context=context)
         elif isinstance(instance, Program):
-            serializer = ProgramSerializer(instance, context=context)
+            serializer = SimpleProgramSerializer(instance, context=context)
         elif isinstance(instance, Video):
             serializer = VideoSerializer(instance, context=context)
         else:
@@ -286,12 +286,11 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
-class CourseSerializer(BaseCourseSerializer):
+class SimpleCourseSerializer(BaseCourseSerializer):
     """
-    Serializer for Course model
+    Serializer for Course model, minus runs
     """
 
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="course")
 
     def validate(self, attrs):
@@ -311,6 +310,14 @@ class CourseSerializer(BaseCourseSerializer):
         model = Course
         fields = "__all__"
         extra_kwargs = {"raw_json": {"write_only": True}}
+
+
+class CourseSerializer(SimpleCourseSerializer):
+    """
+    Serializer for Course model
+    """
+
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class OCWSerializer(CourseSerializer):
@@ -345,12 +352,11 @@ class OCWSerializer(CourseSerializer):
         return super().to_internal_value(course_fields)
 
 
-class BootcampSerializer(BaseCourseSerializer):
+class SimpleBootcampSerializer(BaseCourseSerializer):
     """
-    Serializer for Bootcamp model
+    Serializer for Bootcamp model, minus runs
     """
 
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="bootcamp")
 
     def to_internal_value(self, data):
@@ -365,22 +371,22 @@ class BootcampSerializer(BaseCourseSerializer):
         fields = "__all__"
 
 
+class BootcampSerializer(SimpleBootcampSerializer):
+    """
+    Serializer for Bootcamp model
+    """
+
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
+
+
 class SimpleUserListItemSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin
 ):
     """
-    Simplified serializer for UserListItem model
+    Simplified serializer for UserListItem model, excludes content_data
     """
 
     content_type = serializers.CharField(source="content_type.name")
-    content_data = serializers.SerializerMethodField()
-
-    def get_content_data(self, instance):
-        """Get the item content_data with image_src only"""
-        image_src = None
-        if instance.item and instance.item.image_src:
-            image_src = instance.item.image_src
-        return {"image_src": image_src}
 
     def validate(self, attrs):
         content_type = attrs.get("content_type", {}).get("name", None)
@@ -424,12 +430,12 @@ class SimpleUserListItemSerializer(
 
     class Meta:
         model = UserListItem
-        fields = ("id", "object_id", "content_type", "is_favorite", "content_data")
+        fields = ("id", "object_id", "content_type", "is_favorite")
 
 
 class UserListItemSerializer(SimpleUserListItemSerializer):
     """
-    Serializer for UserListItem model
+    Serializer for UserListItem model, includes content_data
     """
 
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
@@ -467,13 +473,14 @@ class SimpleUserListSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
-    Simplified serializer for UserList model
+    Simplified serializer for UserList model.
+    Uses the SimpleUserListItemSerializer for items, which contains only essential attributes.
     """
 
     items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
     topics = WriteableSerializerMethodField()
-    object_type = serializers.CharField(read_only=True, default="userlist")
     author_name = serializers.SerializerMethodField()
+    object_type = serializers.CharField(read_only=True, source="list_type")
 
     def get_author_name(self, instance):
         """get author name for userlist"""
@@ -481,15 +488,20 @@ class SimpleUserListSerializer(
 
     def validate_topics(self, topics):
         """Validator for topics"""
-        try:
-            valid_topic_ids = set(
-                CourseTopic.objects.filter(id__in=topics).values_list("id", flat=True)
-            )
-        except ValueError:
-            raise ValidationError(f"Topic ids must be integers")
-        missing = set(topics).difference(valid_topic_ids)
-        if missing:
-            raise ValidationError(f"Invalid topic ids: {missing}")
+        if len(topics) > 0:
+            if isinstance(topics[0], dict):
+                topics = [topic["id"] for topic in topics]
+            try:
+                valid_topic_ids = set(
+                    CourseTopic.objects.filter(id__in=topics).values_list(
+                        "id", flat=True
+                    )
+                )
+            except ValueError:
+                raise ValidationError(f"Topic ids must be integers")
+            missing = set(topics).difference(valid_topic_ids)
+            if missing:
+                raise ValidationError(f"Invalid topic ids: {missing}")
         return {"topics": topics}
 
     def get_topics(self, instance):
@@ -537,7 +549,9 @@ class UserListSerializer(SimpleUserListSerializer):
         """Returns the list of items"""
         return [
             UserListItemSerializer(item, context=self.context).data
-            for item in instance.items.all()
+            for item in UserListItem.objects.filter(user_list=instance)
+            .select_related("content_type")
+            .order_by("position")
         ]
 
     def update(self, instance, validated_data):
@@ -607,15 +621,14 @@ class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin
         fields = "__all__"
 
 
-class ProgramSerializer(
+class SimpleProgramSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
-    Serializer for Program model
+    Serializer for Program model, minus runs
     """
 
     items = ProgramItemSerializer(many=True, allow_null=True)
-    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
@@ -623,6 +636,14 @@ class ProgramSerializer(
     class Meta:
         model = Program
         fields = "__all__"
+
+
+class ProgramSerializer(SimpleProgramSerializer):
+    """
+    Serializer for Program model, with runs
+    """
+
+    runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
 class VideoSerializer(

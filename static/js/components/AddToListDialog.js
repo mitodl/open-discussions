@@ -82,9 +82,12 @@ export default function AddToListDialog() {
   const [, toggleListItem] = useMutation((resource, list, remove) => {
     list.items = [
       {
-        content_type: resource.object_type,
-        object_id:    resource.id,
-        delete:       remove
+        content_type:
+          resource.object_type === LR_TYPE_LEARNINGPATH
+            ? LR_TYPE_USERLIST
+            : resource.object_type,
+        object_id: resource.id,
+        delete:    remove
       }
     ]
     return userListMutation(list)
