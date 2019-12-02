@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.101.1 (Released December 02, 2019)
+---------------
+
+- Prevent users from adding lists to each other (#2416)
+- Topics select field for the UserListFormDialog (#2411)
+- Support generating user lists from playlists
+- Update get_active_aliases to reuse connection so verification doesn't thrash
+
 Version 0.101.0 (Released November 25, 2019)
 ---------------
 
