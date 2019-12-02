@@ -1,5 +1,7 @@
 """Tests for course_catalog views"""
 from types import SimpleNamespace
+from datetime import datetime
+import pytz
 
 import pytest
 from django.contrib.auth.models import User
@@ -577,3 +579,29 @@ def test_topic_endpoint(client):
     topic = topics[0]
     resp = client.get(reverse("topics-detail", args=[topic.id]))
     assert resp.data == CourseTopicSerializer(topic).data
+
+
+def test_video_endpoint(client):
+    """Test video endpoint"""
+    video1 = VideoFactory.create(last_modified=datetime(2019, 10, 4, tzinfo=pytz.utc))
+    video2 = VideoFactory.create(last_modified=datetime(2019, 10, 6, tzinfo=pytz.utc))
+    video3 = VideoFactory.create(last_modified=datetime(2019, 10, 5, tzinfo=pytz.utc))
+
+    resp = client.get(reverse("videos-list"))
+    assert resp.data.get("count") == 3
+    assert list(map(lambda video: video["id"], resp.data.get("results"))) == [
+        video1.id,
+        video2.id,
+        video3.id,
+    ]
+
+    resp = client.get(reverse("videos-list") + "new/")
+    assert resp.data.get("count") == 3
+    assert list(map(lambda video: video["id"], resp.data.get("results"))) == [
+        video2.id,
+        video3.id,
+        video1.id,
+    ]
+
+    resp = client.get(reverse("videos-detail", args=[video1.id]))
+    assert resp.data.get("video_id") == video1.video_id

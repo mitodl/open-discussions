@@ -144,6 +144,7 @@ export const bootcampURL = "/api/v0/bootcamps"
 export const programURL = "/api/v0/programs"
 export const userListApiURL = "/api/v0/userlists"
 export const videoApiURL = "/api/v0/videos"
+export const newVideosURL = "/api/v0/videos/new/"
 export const embedlyApiURL = "/api/v0/embedly"
 export const topicApiURL = "/api/v0/topics"
 

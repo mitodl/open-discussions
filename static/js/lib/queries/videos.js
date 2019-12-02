@@ -2,7 +2,7 @@
 import R from "ramda"
 import { createSelector } from "reselect"
 
-import { videoApiURL } from "../url"
+import { videoApiURL, newVideosURL } from "../url"
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { Video } from "../../flow/discussionTypes"
@@ -29,9 +29,29 @@ export const videosRequest = () => ({
   }
 })
 
+export const newVideosRequest = () => ({
+  queryKey:  "newVideosRequest",
+  url:       newVideosURL,
+  transform: (body: ?{ results: Array<Video> }) => ({
+    videos:    body ? constructIdMap(body.results) : {},
+    newVideos: body ? body.results.map<number>(result => result.id) : []
+  }),
+  update: {
+    videos:    R.merge,
+    newVideos: (prev: Array<number>, next: Array<number>) => next
+  }
+})
+
 export const videosSelector = createSelector(
   state => state.entities.videos,
   videos => videos
+)
+
+export const newVideosSelector = createSelector(
+  state => state.entities.videos,
+  state => state.entities.newVideos,
+  (videos, newVideos) =>
+    newVideos && videos ? newVideos.map(id => videos[id]) : null
 )
 
 export const favoriteVideoMutation = (video: Video) => ({

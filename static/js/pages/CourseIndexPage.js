@@ -27,6 +27,7 @@ import {
   newCoursesRequest,
   newCoursesSelector
 } from "../lib/queries/courses"
+import { newVideosRequest, newVideosSelector } from "../lib/queries/videos"
 import {
   favoritesRequest,
   favoritesListSelector
@@ -47,17 +48,20 @@ export default function CourseIndexPage({ history }: Props) {
   )
   const [{ isFinished: isFinishedNew }] = useRequest(newCoursesRequest())
   const [{ isFinished: isFinishedFavorites }] = useRequest(favoritesRequest())
+  const [{ isFinished: isFinishedVideos }] = useRequest(newVideosRequest())
 
   const featuredCourses = useSelector(featuredCoursesSelector)
   const upcomingCourses = useSelector(upcomingCoursesSelector)
   const newCourses = useSelector(newCoursesSelector)
+  const newVideos = useSelector(newVideosSelector)
   const favorites = useSelector(favoritesListSelector)
 
   const loaded =
     isFinishedFeatured &&
     isFinishedUpcoming &&
     isFinishedNew &&
-    isFinishedFavorites
+    isFinishedFavorites &&
+    isFinishedVideos
 
   return (
     <BannerPageWrapper>
@@ -107,9 +111,13 @@ export default function CourseIndexPage({ history }: Props) {
               courses={upcomingCourses}
             />
             <CourseCarousel title="New Courses" courses={newCourses} />
+            {newVideos.length !== 0 ? (
+              <CourseCarousel title="New Videos" courses={newVideos} />
+            ) : null}
           </Cell>
         ) : (
           <Cell width={12}>
+            <CarouselLoading />
             <CarouselLoading />
             <CarouselLoading />
             <CarouselLoading />

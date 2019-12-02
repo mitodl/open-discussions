@@ -1,8 +1,11 @@
 import { assert } from "chai"
 
-import { videoRequest, favoriteVideoMutation } from "./videos"
+import { videoRequest, newVideosRequest, favoriteVideoMutation } from "./videos"
 import { makeVideo } from "../../factories/learning_resources"
-import { videoApiURL } from "../url"
+import { videoApiURL, newVideosURL } from "../url"
+import { constructIdMap } from "../redux_query"
+
+import R from "ramda"
 
 describe("Videos API", () => {
   let video
@@ -18,6 +21,22 @@ describe("Videos API", () => {
       videos: {
         foobar: { id: "foobar" }
       }
+    })
+  })
+
+  it("new videos request allows fetching a list of videos", () => {
+    const results = R.times(makeVideo, 11)
+    const transformTestObject = {
+      results,
+      next: "http://a.url"
+    }
+
+    const request = newVideosRequest()
+
+    assert.equal(request.url, newVideosURL)
+    assert.deepEqual(request.transform(transformTestObject), {
+      videos:    constructIdMap(results),
+      newVideos: results.map(result => result.id)
     })
   })
 
