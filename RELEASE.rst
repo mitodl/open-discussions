@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.102.0
+---------------
+
+- Add tasks for pulling youtube video transcripts
+- fix cropper width issue on channel settings page
+- Added free prices to videos
+
 Version 0.101.1 (Released December 02, 2019)
 ---------------
 
