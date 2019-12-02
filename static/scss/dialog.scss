@@ -1,19 +1,29 @@
-.mdc-dialog__container {
-  .mdc-dialog__title {
-    height: 60px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0;
-    padding-top: 5px;
+.mdc-dialog {
+  top: $toolbar-height-desktop;
+  height: calc(100% - #{$toolbar-height-desktop});
 
-    &::before {
-      content: none;
-    }
+  @include breakpoint(materialmobile) {
+    top: $toolbar-height-mobile;
+    height: calc(100% - #{$toolbar-height-mobile});
+  }
 
-    i {
-      font-size: 30px;
-      cursor: pointer;
+  .mdc-dialog__container {
+    .mdc-dialog__title {
+      height: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0;
+      padding-top: 5px;
+
+      &::before {
+        content: none;
+      }
+
+      i {
+        font-size: 30px;
+        cursor: pointer;
+      }
     }
   }
 }
