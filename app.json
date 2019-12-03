@@ -444,6 +444,10 @@
     "YOUTUBE_FETCH_TRANSCRIPT_SCHEDULE_SECONDS": {
       "description": "The time in seconds between periodic syncs of youtube video transcripts",
       "required": false
+    },
+    "YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS": {
+      "description": "Sleep time between requests to the youtube transcripts api",
+      "required": false
     }
   },
   "keywords": [

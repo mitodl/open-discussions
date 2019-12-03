@@ -3,6 +3,7 @@ import logging
 from html import unescape
 from xml.etree import ElementTree
 from datetime import timedelta
+import time
 from django.conf import settings
 
 from googleapiclient.discovery import build
@@ -516,3 +517,5 @@ def get_youtube_transcripts(videos):
                 upsert_video(video)
                 consecutive_video_unavailable_failures = 0
                 break
+            finally:
+                time.sleep(settings.YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS)

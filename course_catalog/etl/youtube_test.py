@@ -45,6 +45,7 @@ def youtube_api_responses():
 def video_settings(settings):
     """Mock for django settings"""
     settings.YOUTUBE_DEVELOPER_KEY = "key"
+    settings.YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS = 0
     return settings
 
 
@@ -442,6 +443,7 @@ def test_validate_channel_config(config, expected):
     assert youtube.validate_channel_config(config) == expected
 
 
+@pytest.mark.usefixtures("video_settings")
 def test_get_youtube_transcripts(mocker):
     """Verify that get_youtube_transcript downloads, saves and upserts video data"""
     mock_caption = Mock()
@@ -466,6 +468,7 @@ def test_get_youtube_transcripts(mocker):
     mock_upsert_video.assert_called_once_with(mock_video)
 
 
+@pytest.mark.usefixtures("video_settings")
 def test_get_youtube_transcripts_with_a_retry(mocker):
     """Verify that get_youtube_transcript downloads retries once if a transcript download fails"""
     mock_caption = Mock()
@@ -491,6 +494,7 @@ def test_get_youtube_transcripts_with_a_retry(mocker):
     mock_upsert_video.assert_called_once_with(mock_video)
 
 
+@pytest.mark.usefixtures("video_settings")
 def test_get_youtube_transcripts_with_multiple_consecutive_failures(mocker):
     """
     Verify that get_youtube_transcript downloads stops after 15 videos fail to download with VideoUnavailable error
