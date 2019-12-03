@@ -24,9 +24,16 @@ describe("LoginTooltip", () => {
   })
 
   it("should include login and signup buttons", () => {
+    const pathname = "/next/url"
     const wrapper = renderLoginTooltipHelper()
     const links = wrapper.find(Link)
-    assert.equal(links.at(0).prop("to"), "/login")
-    assert.equal(links.at(1).prop("to"), "/signup")
+    assert.equal(
+      links.at(0).prop("to")({ pathname }),
+      `/login/?next=${encodeURIComponent(pathname)}`
+    )
+    assert.equal(
+      links.at(1).prop("to")({ pathname }),
+      `/signup/?next=${encodeURIComponent(pathname)}`
+    )
   })
 })
