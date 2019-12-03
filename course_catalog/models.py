@@ -81,7 +81,7 @@ class AbstractCourse(LearningResource):
     """
 
     full_description = models.TextField(null=True, blank=True)
-    image_src = models.URLField(max_length=400, null=True, blank=True)
+    image_src = models.URLField(max_length=1024, null=True, blank=True)
     image_description = models.CharField(max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
 
