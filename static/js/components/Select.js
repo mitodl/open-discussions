@@ -28,10 +28,14 @@ export const Select = ({
   menuPlacement = "auto"
 }: SelectProps) => {
   const onChange = (option: ValueType<FormOption | FormOption[]>) => {
-    form.setFieldValue(
-      field.name,
-      isMulti ? option.map((item: FormOption) => item.value) : option.value
-    )
+    if (option) {
+      form.setFieldValue(
+        field.name,
+        isMulti ? option.map((item: FormOption) => item.value) : option.value
+      )
+    } else {
+      form.setFieldValue(field.name, isMulti ? [] : null)
+    }
   }
 
   const getValue = () => {
