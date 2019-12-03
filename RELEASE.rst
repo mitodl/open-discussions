@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.102.0
+Version 0.102.0 (Released December 03, 2019)
 ---------------
 
 - Add tasks for pulling youtube video transcripts
