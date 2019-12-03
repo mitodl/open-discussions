@@ -1,5 +1,5 @@
-// flow-typed signature: e15aeed0d3686f71822b54cde7b71c83
-// flow-typed version: fbf3e77efa/react-router_v4.x.x/flow_>=v0.63.x
+// flow-typed signature: 80f03b85756c359f80a69bddbefbf16d
+// flow-typed version: 0fc30f59a5/react-router_v5.x.x/flow_>=v0.63.x <=v0.103.x
 
 declare module "react-router" {
   // NOTE: many of these are re-exported by react-router-dom and
@@ -36,8 +36,8 @@ declare module "react-router" {
     goForward(): void,
     canGo?: (n: number) => boolean,
     block(
-      callback: (location: Location, action: HistoryAction) => boolean
-    ): void,
+      callback: string | (location: Location, action: HistoryAction) => ?string
+    ): () => void,
     // createMemoryHistory
     index?: number,
     entries?: Array<Location>
@@ -104,7 +104,7 @@ declare module "react-router" {
     component?: React$ComponentType<*>,
     render?: (router: ContextRouter) => React$Node,
     children?: React$ComponentType<ContextRouter> | React$Node,
-    path?: string,
+    path?: string | Array<string>,
     exact?: boolean,
     strict?: boolean,
     location?: LocationShape,
@@ -121,7 +121,7 @@ declare module "react-router" {
   ): React$ComponentType<P>;
 
   declare type MatchPathOptions = {
-    path?: string,
+    path?: string | string[],
     exact?: boolean,
     strict?: boolean,
     sensitive?: boolean
@@ -129,6 +129,21 @@ declare module "react-router" {
 
   declare export function matchPath(
     pathname: string,
-    options?: MatchPathOptions | string
+    options?: MatchPathOptions | string | string[]
   ): null | Match;
+  
+  declare export function generatePath(pattern?: string, params?: {}): string;
+
+  declare export default {
+    StaticRouter: typeof StaticRouter,
+    MemoryRouter: typeof MemoryRouter,
+    Router: typeof Router,
+    Prompt: typeof Prompt,
+    Redirect: typeof Redirect,
+    Route: typeof Route,
+    Switch: typeof Switch,
+    withRouter: typeof withRouter,
+    matchPath: typeof matchPath,
+    generatePath: typeof generatePath,
+  };
 }
