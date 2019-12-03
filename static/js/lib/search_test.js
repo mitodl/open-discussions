@@ -730,6 +730,7 @@ describe("search functions", () => {
           "title.english^3",
           "short_description.english^2",
           "full_description.english",
+          "transcript.english^2",
           "topics",
           "platform",
           "video_id",

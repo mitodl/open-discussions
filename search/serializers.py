@@ -488,6 +488,7 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "video_id",
             "short_description",
             "full_description",
+            "transcript",
             "platform",
             "title",
             "image_src",
