@@ -13,11 +13,20 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import {
   makeCourseResult,
+  makeLearningResourceResult,
   makeSearchFacetResult,
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import { LR_TYPE_ALL } from "../lib/constants"
+import {
+  LR_TYPE_ALL,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_LEARNINGPATH,
+  LR_TYPE_PROGRAM,
+  LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO
+} from "../lib/constants"
 import { SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
 
@@ -518,5 +527,45 @@ describe("CourseSearchPage", () => {
     )
     assert.isTrue(_.findIndex(mergedFacets.buckets, missingFacetGroup) > -1)
     await wait(600)
+  })
+
+  LR_TYPE_ALL.forEach(resourceType => {
+    it(`overrides ${resourceType} search results for is_favorite and lists with values from entities`, async () => {
+      const resource = makeLearningResourceResult(resourceType)
+      // Conditional to prevent flow from whining about an undefined resource
+      if (resource) {
+        const entity = {
+          [resource.id]: {
+            is_favorite: !resource.is_favorite,
+            lists:       [9121, 9124, 9129]
+          }
+        }
+        searchResponse.hits.hits[0] = resource
+        helper.searchStub.returns(Promise.resolve(searchResponse))
+        const { inner } = await renderPage({
+          entities: {
+            courses:   resourceType === LR_TYPE_COURSE ? entity : {},
+            bootcamps: resourceType === LR_TYPE_BOOTCAMP ? entity : {},
+            videos:    resourceType === LR_TYPE_VIDEO ? entity : {},
+            programs:  resourceType === LR_TYPE_PROGRAM ? entity : {},
+            userLists: [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(
+              resourceType
+            )
+              ? entity
+              : {}
+          }
+        })
+
+        const overrideObject = inner
+          .find("SearchResult")
+          .at(0)
+          .prop("overrideObject")
+        assert.equal(
+          overrideObject.is_favorite,
+          entity[resource.id].is_favorite
+        )
+        assert.deepEqual(overrideObject.lists, entity[resource.id].lists)
+      }
+    })
   })
 })

@@ -1,12 +1,24 @@
 # pylint: disable=redefined-outer-name
 """Search API function tests"""
+from collections import defaultdict
+
 from django.contrib.auth.models import AnonymousUser
 import pytest
 
-from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
+from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED, POST_TYPE
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
 from course_catalog.constants import PrivacyLevel
+from course_catalog.factories import (
+    CourseFactory,
+    UserListCourseFactory,
+    UserListBootcampFactory,
+    UserListFactory,
+    UserListVideoFactory,
+    ProgramFactory,
+    UserListProgramFactory,
+    UserListUserListFactory,
+)
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -14,7 +26,12 @@ from search.api import (
     gen_comment_id,
     gen_video_id,
     find_related_documents,
-    transform_aggregates,
+    transform_results,
+    gen_lists_dict,
+    gen_course_id,
+    gen_bootcamp_id,
+    gen_program_id,
+    gen_user_list_id,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -22,7 +39,9 @@ from search.constants import (
     GLOBAL_DOC_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    COURSE_TYPE,
 )
+from search.serializers import ESCourseSerializer
 
 
 @pytest.fixture()
@@ -78,117 +97,148 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
-def test_execute_search(mocker, user):
+@pytest.mark.parametrize(
+    "object_type, is_learning", [[COURSE_TYPE, True], [POST_TYPE, False]]
+)
+def test_execute_search(mocker, user, object_type, is_learning):
     """execute_search should execute an Elasticsearch search"""
     get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
+    query = {
+        "bool": {
+            "should": [
+                {
+                    "bool": {
+                        "filter": {
+                            "bool": {"must": [{"term": {"object_type": object_type}}]}
+                        }
+                    }
+                }
+            ]
+        }
+    }
 
-    query = {"a": "query"}
+    expected_body = {
+        **query,
+        "query": {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": ["comment", "post"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "channel_type": [
+                                            CHANNEL_TYPE_PUBLIC,
+                                            CHANNEL_TYPE_RESTRICTED,
+                                        ]
+                                    }
+                                },
+                                {
+                                    "terms": {
+                                        "channel_name": [
+                                            channel.name for channel in channels
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must": [
+                                            {"term": {"deleted": False}},
+                                            {"term": {"removed": False}},
+                                        ]
+                                    }
+                                },
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": ["comment", "post"]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                            ]
+                        }
+                    },
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": [
+                                                        USER_LIST_TYPE,
+                                                        LEARNING_PATH_TYPE,
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {"term": {"privacy_level": PrivacyLevel.public.value}},
+                                {"term": {"author": user.id}},
+                            ]
+                        }
+                    },
+                ]
+            }
+        },
+    }
+
+    if is_learning:
+        expected_body.update(
+            {
+                "_source": True,
+                "script_fields": {
+                    "is_favorite": {
+                        "script": {
+                            "lang": "painless",
+                            "source": "params.favorites.contains(doc._id.value)",
+                            "params": {"favorites": []},
+                        }
+                    },
+                    "lists": {
+                        "script": {
+                            "lang": "painless",
+                            "source": "params.lists[doc._id.value]",
+                            "params": {"lists": defaultdict(list)},
+                        }
+                    },
+                },
+            }
+        )
+
     assert (
         execute_search(user=user, query=query)
         == get_conn_mock.return_value.search.return_value
     )
+
     get_conn_mock.return_value.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_type": [
-                                                CHANNEL_TYPE_PUBLIC,
-                                                CHANNEL_TYPE_RESTRICTED,
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "terms": {
-                                            "channel_name": [
-                                                channel.name for channel in channels
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must": [
-                                                {"term": {"deleted": False}},
-                                                {"term": {"removed": False}},
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            "comment",
-                                                            "post",
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                ]
-                            }
-                        },
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            LEARNING_PATH_TYPE,
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author": user.id}},
-                                ]
-                            }
-                        },
-                    ]
-                }
-            },
-        },
+        body=expected_body,
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
@@ -325,9 +375,26 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     assert constructed_query["body"]["size"] == posts_to_return
 
 
-def test_transform_aggregates():
-    """transform_aggregates should transform reverse nested availability results if present"""
-    raw_aggregate = {
+@pytest.mark.django_db
+def test_transform_results():
+    """
+    transform_results should transform reverse nested availability results if present, and move
+    scripted fields into the source result
+    """
+    scripted_fields = {"is_favorite": [True], "lists": [100, 101]}
+    results = {
+        "hits": {
+            "hits": [
+                {
+                    "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+                    "_type": "_doc",
+                    "_id": "co_mitx_TUlUeCsyLjAxeA",
+                    "_score": 1.0,
+                    "_source": ESCourseSerializer(CourseFactory.create()).data,
+                    "fields": scripted_fields,
+                }
+            ]
+        },
         "aggregations": {
             "availability": {
                 "runs": {
@@ -361,9 +428,22 @@ def test_transform_aggregates():
                 }
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    assert transform_aggregates(raw_aggregate) == {
+    expected_source = results["hits"]["hits"][0]["_source"]
+    expected_source.update(scripted_fields)
+    assert transform_results(results) == {
+        "hits": {
+            "hits": [
+                {
+                    "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+                    "_type": "_doc",
+                    "_id": "co_mitx_TUlUeCsyLjAxeA",
+                    "_score": 1.0,
+                    "_source": expected_source,
+                }
+            ]
+        },
         "aggregations": {
             "availability": {
                 "buckets": [
@@ -378,11 +458,44 @@ def test_transform_aggregates():
                 ]
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    raw_aggregate["aggregations"]["availability"].pop("runs", None)
-    raw_aggregate["aggregations"]["cost"].pop("prices", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
-    raw_aggregate["aggregations"].pop("availability", None)
-    raw_aggregate["aggregations"].pop("cost", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
+    results["aggregations"]["availability"].pop("runs", None)
+    results["aggregations"]["cost"].pop("prices", None)
+    assert transform_results(results) == results
+    results["aggregations"].pop("availability", None)
+    results["aggregations"].pop("cost", None)
+    assert transform_results(results) == results
+
+
+def test_gen_lists_dict(user):
+    """Test that gen_lists_dict returns an expected dict of userLists ids by ES doc id"""
+    user_lists = UserListFactory.create_batch(3, author=user)
+    course_items = UserListCourseFactory.create_batch(2, user_list=user_lists[0])
+    bootcamp_items = UserListBootcampFactory.create_batch(2, user_list=user_lists[1])
+    video_items = UserListVideoFactory.create_batch(2, user_list=user_lists[2])
+    program = ProgramFactory.create()
+    learning_path = UserListFactory.create(list_type=LEARNING_PATH_TYPE)
+    for user_list in user_lists:
+        UserListProgramFactory.create(content_object=program, user_list=user_list)
+        UserListUserListFactory.create(
+            content_object=learning_path, user_list=user_list
+        )
+
+    lists_dict = gen_lists_dict(user)
+    for course_item in course_items:
+        assert lists_dict[
+            gen_course_id(course_item.item.platform, course_item.item.course_id)
+        ] == [user_lists[0].id]
+    for bootcamp_item in bootcamp_items:
+        assert lists_dict[gen_bootcamp_id(bootcamp_item.item.course_id)] == [
+            user_lists[1].id
+        ]
+    for video_item in video_items:
+        assert lists_dict[gen_video_id(video_item.item)] == [user_lists[2].id]
+    assert sorted(lists_dict[gen_program_id(program)]) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
+    assert sorted(lists_dict[gen_user_list_id(learning_path)]) == sorted(
+        [user_list.id for user_list in user_lists]
+    )
