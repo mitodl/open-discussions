@@ -105,18 +105,16 @@ export const searchResultToLearningResource = (
   result: LearningResourceResult,
   overrideObject: LearningResourceSummary = {}
 ): LearningResourceSummary => ({
+  ...overrideObject,
   id:          result.id,
   title:       result.title,
   image_src:   result.image_src,
   object_type: result.object_type,
-  lists:       result.lists,
-  is_favorite: result.is_favorite,
   offered_by:
     "offered_by" in result && result.offered_by ? result.offered_by : [],
   platform: "platform" in result ? result.platform : null,
   topics:   result.topics.map(topic => ({ name: topic })),
-  runs:     "runs" in result ? result.runs : [],
-  ...overrideObject
+  runs:     "runs" in result ? result.runs : []
 })
 
 const POST_QUERY_FIELDS = [

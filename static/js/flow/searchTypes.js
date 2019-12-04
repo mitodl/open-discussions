@@ -88,8 +88,7 @@ export type LearningResourceResult = {
   platform?:           string,
   topics:              Array<string>,
   runs:                Array<LearningResourceRun>,
-  lists:               Array<number>,
-  is_favorite:         boolean
+  lists?:               Array<number>
 }
 
 

@@ -1,5 +1,4 @@
 """API for general search-related functionality"""
-import collections
 from base64 import urlsafe_b64encode
 
 from elasticsearch_dsl import Q, Search
@@ -16,19 +15,12 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
-from course_catalog.models import FavoriteItem, UserListItem
-from open_discussions.utils import extract_values
 from search.connection import get_conn, get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     GLOBAL_DOC_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
-    LEARNING_RESOURCE_TYPES,
-    COURSE_TYPE,
-    BOOTCAMP_TYPE,
-    PROGRAM_TYPE,
-    VIDEO_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -141,55 +133,6 @@ def gen_video_id(video_obj):
     return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
 
 
-def gen_doc_ids(items):
-    """
-    Return a list of ES document ids for user favorites or list items
-
-    Args:
-        items(list of FavoriteItem or UserListItem): a user's favorites/list items
-
-    Returns:
-        list of str: the ES document ids for the favorited/list items
-
-    """
-    doc_ids = []
-    for item in filter(lambda i: i.item is not None, items):
-        classname = item.content_type.name
-        if classname == COURSE_TYPE:
-            doc_ids.append(gen_course_id(item.item.platform, item.item.course_id))
-        elif classname == BOOTCAMP_TYPE:
-            doc_ids.append(gen_bootcamp_id(item.item.course_id))
-        elif classname == PROGRAM_TYPE:
-            doc_ids.append(gen_program_id(item.item))
-        elif classname == VIDEO_TYPE:
-            doc_ids.append(gen_video_id(item.item))
-        elif classname == USER_LIST_TYPE:
-            doc_ids.append(gen_user_list_id(item.item))
-    return doc_ids
-
-
-def gen_lists_dict(user):
-    """
-    Return a dict of list ids for each item in a user's lists
-
-    Args:
-        user(User): a user to retrieve UserListItems for
-
-    Returns:
-        dict: a mapping of list ids (value) per resource item ES id (key)
-
-    """
-    lists_dict = collections.defaultdict(list)
-    items = (
-        UserListItem.objects.filter(user_list__author=user)
-        .only("id", "user_list_id")
-        .iterator()
-    )
-    for item in items:
-        lists_dict[gen_doc_ids([item])[0]].append(item.user_list_id)
-    return lists_dict
-
-
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators
@@ -257,21 +200,6 @@ def _apply_general_query_filters(search, user):
     )
 
 
-def is_learning_query(query):
-    """
-    Return True if the query includes learning resource types, False otherwise
-
-    Args:
-        query (dict): The query sent to ElasticSearch
-
-    Returns:
-        bool: if the query includes learning resource types
-
-    """
-    object_types = set(extract_values(query, "object_type"))
-    return len(object_types.intersection(set(LEARNING_RESOURCE_TYPES))) > 0
-
-
 def execute_search(*, user, query):
     """
     Execute a search based on the query
@@ -287,39 +215,18 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    if not user.is_anonymous and is_learning_query(query):
-        search = search.script_fields(
-            is_favorite={
-                "script": {
-                    "lang": "painless",
-                    "source": "params.favorites.contains(doc._id.value)",
-                    "params": {
-                        "favorites": gen_doc_ids(FavoriteItem.objects.filter(user=user))
-                    },
-                }
-            },
-            lists={
-                "script": {
-                    "lang": "painless",
-                    "source": "params.lists[doc._id.value]",
-                    "params": {"lists": gen_lists_dict(user)},
-                }
-            },
-        )
-        search._source = True
-    return transform_results(search.execute().to_dict())
+    return transform_aggregates(search.execute().to_dict())
 
 
-def transform_results(search_result):
+def transform_aggregates(search_result):
     """
-    Transform the reverse nested availability aggregate counts into a format matching the other facets.
-    Move 'is_favorite' and 'lists' fields to the '_source' attributes.
+    Transform the reverse nested availability aggregate counts into a format matching the other facets
 
     Args:
         search_result (dict): The results from ElasticSearch
 
     Returns:
-        dict: The Elasticsearch response dict with transformed availability aggregates and source values
+        dict: The Elasticsearch response dict with transformed availability aggregates
     """
     availability_runs = (
         search_result.get("aggregations", {}).get("availability", {}).pop("runs", {})
@@ -337,13 +244,6 @@ def transform_results(search_result):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
-    for hit in search_result.get("hits", {}).get("hits", []):
-        fields = hit.pop("fields", None)
-        if fields:
-            hit["_source"]["is_favorite"] = fields["is_favorite"][0]
-            hit["_source"]["lists"] = (
-                fields["lists"] if fields["lists"][0] is not None else []
-            )
     return search_result
 
 
