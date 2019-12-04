@@ -476,7 +476,8 @@ describe("validation library", () => {
         list_type:         "You need to select a list type",
         privacy_level:     "You need to select a privacy level",
         short_description: "Description is required",
-        title:             "Title is required"
+        title:             "Title is required",
+        topics:            "Subject is required"
       })
     })
 
@@ -486,7 +487,8 @@ describe("validation library", () => {
           list_type:         LR_TYPE_USERLIST,
           privacy_level:     LR_PUBLIC,
           short_description: "My list is gonna be GREAT!",
-          title:             "The Best List"
+          title:             "The Best List",
+          topics:            [1, 2, 3]
         }),
         {}
       )
