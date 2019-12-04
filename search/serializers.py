@@ -455,7 +455,12 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     def to_representation(self, instance):
         """Serializes the instance"""
         ret = super().to_representation(instance)
+
         ret["object_type"] = instance.list_type
+        if not instance.image_src:
+            first_item = instance.items.order_by("position").first()
+            if first_item:
+                ret["image_src"] = first_item.item.image_src
         return ret
 
     class Meta:

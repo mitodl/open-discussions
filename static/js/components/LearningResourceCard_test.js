@@ -23,7 +23,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   COURSE_AVAILABLE_NOW,
-  offeredBys
+  offeredBys,
+  LR_TYPE_USERLIST
 } from "../lib/constants"
 import {
   embedlyThumbnail,
@@ -80,6 +81,23 @@ describe("LearningResourceCard", () => {
       )
     )
     assert.equal(coverImage.prop("alt"), `cover image for ${course.title}`)
+  })
+
+  it("should render the 1st item image for a userlist", async () => {
+    const object = makeLearningResource(LR_TYPE_USERLIST)
+    object.image_src = null
+    const { wrapper } = await render({ object })
+    const coverImage = wrapper.find(".cover-image").find("img")
+    assert.equal(
+      coverImage.prop("src"),
+      embedlyThumbnail(
+        SETTINGS.embedlyKey,
+        object.items[0].content_data.image_src,
+        CAROUSEL_IMG_HEIGHT,
+        CAROUSEL_IMG_WIDTH
+      )
+    )
+    assert.equal(coverImage.prop("alt"), `cover image for ${object.title}`)
   })
 
   it("should render the title", async () => {

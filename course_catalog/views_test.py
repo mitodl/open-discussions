@@ -35,6 +35,7 @@ def mock_user_list_index(mocker):
         upsert_user_list=mocker.patch("course_catalog.serializers.upsert_user_list"),
         delete_user_list=mocker.patch("course_catalog.views.delete_user_list"),
         upsert_user_list_view=mocker.patch("course_catalog.views.upsert_user_list"),
+        delete_empty_list=mocker.patch("course_catalog.serializers.delete_user_list"),
     )
 
 
@@ -225,9 +226,7 @@ def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
     if resp.status_code == 201:
         assert resp.data.get("title") == resp.data.get("title")
         assert resp.data.get("author") == user.id
-        mock_user_list_index.upsert_user_list.assert_called_once_with(
-            UserList.objects.first()
-        )
+        mock_user_list_index.upsert_user_list.assert_not_called()
 
 
 @pytest.mark.parametrize("update_topics", [True, False])
@@ -237,6 +236,7 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
     userlist = UserListFactory.create(
         author=user, title="Title 1", topics=[original_topic]
     )
+    UserListCourseFactory.create(user_list=userlist)
 
     client.force_login(user)
 
@@ -402,6 +402,7 @@ def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list
         assert len(updated_items) == 1
         assert updated_items[0]["id"] == list_items[1].id
         assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
+        mock_user_list_index.upsert_user_list.assert_called_with(userlist)
 
         data = {
             "items": [
@@ -420,7 +421,7 @@ def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list
         updated_items = resp.data.get("items")
         assert len(updated_items) == 0
         assert UserListItem.objects.filter(id=list_items[1].id).exists() is False
-        mock_user_list_index.upsert_user_list.assert_called_with(userlist)
+        mock_user_list_index.delete_empty_list.assert_called_with(userlist)
 
 
 @pytest.mark.parametrize("is_author", [True, False])

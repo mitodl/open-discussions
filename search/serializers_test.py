@@ -14,6 +14,7 @@ from course_catalog.factories import (
     ProgramFactory,
     UserListFactory,
     VideoFactory,
+    UserListCourseFactory,
 )
 from course_catalog.models import Course, Video
 from open_discussions.constants import ISOFORMAT
@@ -358,6 +359,30 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
             "short_description": user_list.short_description,
             "title": user_list.title,
             "image_src": user_list.image_src.url,
+            "topics": list(user_list.topics.values_list("name", flat=True)),
+        },
+    )
+
+
+@pytest.mark.django_db
+def test_es_userlist_serializer_image_src():
+    """
+    Test that ESUserListSerializer uses a list item image_src if the list image_src is None
+    """
+    user_list = UserListFactory.create(image_src=None)
+    list_item = UserListCourseFactory.create(user_list=user_list)
+    serialized = ESUserListSerializer(user_list).data
+    assert_json_equal(
+        serialized,
+        {
+            "author": user_list.author.id,
+            "object_type": user_list.list_type,
+            "list_type": user_list.list_type,
+            "privacy_level": user_list.privacy_level,
+            "id": user_list.id,
+            "short_description": user_list.short_description,
+            "title": user_list.title,
+            "image_src": list_item.item.image_src,
             "topics": list(user_list.topics.values_list("name", flat=True)),
         },
     )

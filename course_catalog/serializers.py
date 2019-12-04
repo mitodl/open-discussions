@@ -30,7 +30,7 @@ from course_catalog.utils import (
     semester_year_to_date,
 )
 from open_discussions.serializers import WriteableSerializerMethodField
-from search.task_helpers import upsert_user_list
+from search.task_helpers import upsert_user_list, delete_user_list
 
 
 COMMON_IGNORED_FIELDS = ("created_on", "updated_on", "_deprecated_offered_by")
@@ -575,7 +575,6 @@ class SimpleUserListSerializer(
             with transaction.atomic():
                 userlist = super().create(validated_data)
                 userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
-                upsert_user_list(userlist)
             return userlist
 
     class Meta:
@@ -604,7 +603,7 @@ class UserListSerializer(SimpleUserListSerializer):
             .order_by("position")
         ]
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # pylint: disable=too-many-branches
         """Ensure that the list is authored by the requesting user before modifying"""
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
@@ -654,7 +653,10 @@ class UserListSerializer(SimpleUserListSerializer):
                 userlist = super().update(instance, validated_data)
                 if topics_data is not None:
                     userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
-                upsert_user_list(userlist)
+                if instance.items.exists():
+                    upsert_user_list(userlist)
+                else:
+                    delete_user_list(userlist)
                 return userlist
 
 
