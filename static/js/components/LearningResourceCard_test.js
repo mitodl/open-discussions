@@ -19,20 +19,20 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_ALL,
   COURSE_AVAILABLE_NOW,
-  offeredBys,
-  LR_TYPE_USERLIST
+  LR_TYPE_ALL,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_USERLIST,
+  offeredBys
 } from "../lib/constants"
 import {
-  embedlyThumbnail,
+  COURSE_SEARCH_URL,
   starSelectedURL,
   starUnselectedURL,
-  toQueryString,
-  COURSE_SEARCH_URL,
-  userListApiURL
+  userListApiURL,
+  embedlyThumbnail,
+  toQueryString
 } from "../lib/url"
 import { DIALOG_ADD_TO_LIST } from "../actions/ui"
 import { queryListResponse } from "../lib/test_utils"
