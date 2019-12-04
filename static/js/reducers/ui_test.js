@@ -15,6 +15,9 @@ import {
   HIDE_DROPDOWN,
   SET_BANNER_MESSAGE,
   HIDE_BANNER,
+  PUSH_LR_HISTORY,
+  POP_LR_HISTORY,
+  CLEAR_LR_HISTORY,
   setShowDrawerDesktop,
   setShowDrawerMobile,
   setShowDrawerHover,
@@ -25,7 +28,10 @@ import {
   showDropdown,
   hideDropdown,
   setBannerMessage,
-  hideBanner
+  hideBanner,
+  pushLRHistory,
+  popLRHistory,
+  clearLRHistory
 } from "../actions/ui"
 import { USER_MENU_DROPDOWN } from "../pages/App"
 
@@ -165,5 +171,43 @@ describe("ui reducer", () => {
       message: "",
       visible: false
     })
+  })
+
+  it("should let you push to the LR history", async () => {
+    const state = await dispatchThen(
+      pushLRHistory({ objectId: "HEY!", objectType: "best", runId: 1 }),
+      [PUSH_LR_HISTORY]
+    )
+    assert.deepEqual(state.LRDrawerHistory, [
+      { objectId: "HEY!", objectType: "best", runId: 1 }
+    ])
+  })
+
+  it("should let you pop an entry off the LR history", async () => {
+    await dispatchThen(
+      pushLRHistory({ objectId: "HEY!", objectType: "best", runId: 1 }),
+      [PUSH_LR_HISTORY]
+    )
+    await dispatchThen(
+      pushLRHistory({ objectId: "second one", objectType: "worst", runId: 1 }),
+      [PUSH_LR_HISTORY]
+    )
+    const state = await dispatchThen(popLRHistory(), [POP_LR_HISTORY])
+    assert.deepEqual(state.LRDrawerHistory, [
+      { objectId: "HEY!", objectType: "best", runId: 1 }
+    ])
+  })
+
+  it("should let you clear the LR history", async () => {
+    await dispatchThen(
+      pushLRHistory({ objectId: "HEY!", objectType: "best", runId: 1 }),
+      [PUSH_LR_HISTORY]
+    )
+    await dispatchThen(
+      pushLRHistory({ objectId: "second one", objectType: "worst", runId: 1 }),
+      [PUSH_LR_HISTORY]
+    )
+    const state = await dispatchThen(clearLRHistory(), [CLEAR_LR_HISTORY])
+    assert.deepEqual(state.LRDrawerHistory, [])
   })
 })

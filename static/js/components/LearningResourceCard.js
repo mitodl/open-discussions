@@ -30,7 +30,7 @@ import {
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
 import { emptyOrNil, userIsAnonymous } from "../lib/util"
-import { setShowResourceDrawer, DIALOG_ADD_TO_LIST } from "../actions/ui"
+import { pushLRHistory, DIALOG_ADD_TO_LIST } from "../actions/ui"
 
 import type {
   CourseTopic,
@@ -131,7 +131,7 @@ export function LearningResourceDisplay(props: Props) {
   const showResourceDrawer = useCallback(
     () =>
       dispatch(
-        setShowResourceDrawer({
+        pushLRHistory({
           objectId:   object.id,
           objectType: object.object_type,
           runId:      bestAvailableRun ? bestAvailableRun.id : null

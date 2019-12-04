@@ -63,7 +63,7 @@ describe("LearningResourceCard", () => {
     const { wrapper, store } = await render()
     wrapper.find(".cover-image").simulate("click")
     wrapper.find(".course-title").simulate("click")
-    const { objectId, objectType } = store.getState().ui.courseDetail
+    const { objectId, objectType } = store.getState().ui.LRDrawerHistory[0]
     assert.equal(objectId, course.id)
     assert.equal(objectType, LR_TYPE_COURSE)
   })

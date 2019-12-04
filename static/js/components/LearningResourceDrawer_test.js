@@ -1,12 +1,6 @@
-import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
-import sinon from "sinon"
 
-import {
-  LearningResourceDrawer,
-  mapStateToProps
-} from "./LearningResourceDrawer"
+import LearningResourceDrawer from "./LearningResourceDrawer"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 import * as LRCardMod from "../components/LearningResourceCard"
 
@@ -18,214 +12,149 @@ import {
   makeUserList
 } from "../factories/learning_resources"
 import { makeYoutubeVideo } from "../factories/embedly"
-import { shouldIf } from "../lib/test_utils"
-import {
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO,
-  LR_TYPE_USERLIST
-} from "../lib/constants"
-import { courseRequest } from "../lib/queries/courses"
-import { bootcampRequest } from "../lib/queries/bootcamps"
-import { programRequest } from "../lib/queries/programs"
-import { videoRequest } from "../lib/queries/videos"
+import { LR_TYPE_COURSE, LR_TYPE_LEARNINGPATH } from "../lib/constants"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { pushLRHistory } from "../actions/ui"
+
+import {
+  courseURL,
+  bootcampURL,
+  programURL,
+  userListApiURL,
+  videoApiURL,
+  embedlyApiURL
+} from "../lib/url"
 
 describe("LearningResourceDrawer", () => {
-  let dispatchStub,
-    course,
-    bootcamp,
-    program,
-    video,
-    setShowResourceDrawerStub,
-    helper
+  let course, helper, render
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
-    dispatchStub = helper.sandbox.stub()
     course = makeCourse()
-    bootcamp = makeBootcamp()
-    program = makeProgram()
-    video = makeVideo()
-    setShowResourceDrawerStub = helper.sandbox.stub()
     helper.stubComponent(
       LRCardMod,
       "LearningResourceRow",
       "LearningResourceRow"
     )
+    render = helper.configureReduxQueryRenderer(LearningResourceDrawer)
   })
 
   afterEach(() => {
     helper.cleanup()
   })
 
-  const renderLearningResourceDrawer = (props = {}) =>
-    mount(
-      <LearningResourceDrawer
-        dispatch={dispatchStub}
-        showLearningDrawer={true}
-        object={course}
-        objectId={course.id}
-        runId={course.runs[0].run_id}
-        objectType={LR_TYPE_COURSE}
-        setShowResourceDrawer={setShowResourceDrawerStub}
-        {...props}
-      />
-    )
+  const mockObjectAPI = (object, apiUrl) =>
+    helper.handleRequestStub.withArgs(`${apiUrl}/${object.id}/`).returns({
+      status: 200,
+      body:   object
+    })
+
+  const renderWithObject = async (object, apiUrl) => {
+    mockObjectAPI(object, apiUrl)
+    const { wrapper, store } = await render({}, [
+      pushLRHistory({
+        objectId:   object.id,
+        objectType: object.object_type
+      })
+    ])
+    return { wrapper, store }
+  }
 
   it("should have a button to hide the course drawer", async () => {
-    const wrapper = renderLearningResourceDrawer()
+    const { wrapper, store } = await renderWithObject(course, courseURL)
     wrapper.find(".drawer-close").simulate("click")
-    sinon.assert.calledWith(setShowResourceDrawerStub, { objectId: null })
+    // this means that the history has been cleared
+    assert.deepEqual(store.getState().ui.LRDrawerHistory, [])
   })
 
-  it("should put an event listener on window resize", () => {
+  it("should have a back button if there is more than one object in the drawer history", async () => {
+    const course = makeCourse()
+    const bootcamp = makeBootcamp()
+    mockObjectAPI(course, courseURL)
+    mockObjectAPI(bootcamp, bootcampURL)
+    const { wrapper, store } = await render({}, [
+      pushLRHistory({
+        objectId:   course.id,
+        objectType: course.object_type
+      }),
+      pushLRHistory({
+        objectId:   bootcamp.id,
+        objectType: bootcamp.object_type
+      })
+    ])
+    wrapper.find(".back").simulate("click")
+    assert.deepEqual(store.getState().ui.LRDrawerHistory, [
+      {
+        objectId:   course.id,
+        objectType: LR_TYPE_COURSE,
+        runId:      undefined
+      }
+    ])
+  })
+
+  it("should put an event listener on window resize", async () => {
     const addEventListenerStub = helper.sandbox.stub(window, "addEventListener")
-    renderLearningResourceDrawer()
+    await render()
     assert.ok(addEventListenerStub.called)
   })
 
-  it("should include an ExpandedLearningResourceDisplay", () => {
-    const wrapper = renderLearningResourceDrawer()
-    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
-    assert.deepEqual(expandedDisplay.prop("object"), course)
-  })
-
-  it("should not include an ExpandedLearningResourceDisplay if object is null", () => {
-    const wrapper = renderLearningResourceDrawer({ object: null })
+  it("should not include an ExpandedLearningResourceDisplay if there isn't a focused object", async () => {
+    const { wrapper } = await render()
     assert.isNotOk(wrapper.find(ExpandedLearningResourceDisplay).exists())
   })
 
-  it("should include an ExpandedLearningResourceDisplay for a bootcamp", () => {
-    const bootcamp = makeBootcamp()
-    const wrapper = renderLearningResourceDrawer({
-      object:     bootcamp,
-      objectId:   bootcamp.id,
-      objectType: LR_TYPE_BOOTCAMP
-    })
-    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
-    assert.deepEqual(expandedDisplay.prop("object"), bootcamp)
+  it("should pass a callback to add to the history stack to ExpandedLearningResourceDisplay", async () => {
+    const { wrapper, store } = await renderWithObject(course, courseURL)
+    wrapper.find(ExpandedLearningResourceDisplay).prop("setShowResourceDrawer")(
+      {
+        objectId:   "test-id",
+        objectType: LR_TYPE_LEARNINGPATH
+      }
+    )
+    assert.deepEqual(store.getState().ui.LRDrawerHistory, [
+      {
+        objectId:   course.id,
+        objectType: LR_TYPE_COURSE,
+        runId:      undefined
+      },
+      {
+        objectId:   "test-id",
+        objectType: LR_TYPE_LEARNINGPATH,
+        runId:      undefined
+      }
+    ])
   })
 
-  it("should include an ExpandedLearningResourceDisplay for a program", () => {
-    const program = makeProgram()
-    const wrapper = renderLearningResourceDrawer({
-      object:     program,
-      objectId:   program.id,
-      objectType: LR_TYPE_PROGRAM
+  //
+  ;[
+    [makeBootcamp(), bootcampURL],
+    [makeProgram(), programURL],
+    [makeCourse(), courseURL],
+    [makeUserList(), userListApiURL]
+  ].forEach(([object, apiUrl]) => {
+    it(`should render ExpandedLearningResourceDisplay with object of type ${
+      object.object_type
+    }`, async () => {
+      const { wrapper } = await renderWithObject(object, apiUrl)
+      const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
+      assert.deepEqual(expandedDisplay.prop("object"), object)
     })
-    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
-    assert.deepEqual(expandedDisplay.prop("object"), program)
   })
 
-  it("should include an ExpandedLearningResourceDisplay for a video", () => {
+  it("should include an ExpandedLearningResourceDisplay for a video", async () => {
+    const video = makeVideo()
     const embedly = makeYoutubeVideo()
-    const wrapper = renderLearningResourceDrawer({
-      object:     video,
-      objectId:   video.id,
-      objectType: LR_TYPE_VIDEO,
-      embedly
-    })
+    helper.handleRequestStub
+      .withArgs(
+        `${embedlyApiURL}/${encodeURIComponent(encodeURIComponent(video.url))}/`
+      )
+      .returns({
+        status: 200,
+        body:   embedly
+      })
+    const { wrapper } = await renderWithObject(video, videoApiURL)
     const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), video)
     assert.deepEqual(expandedDisplay.prop("embedly"), embedly)
-  })
-
-  it("should include an ExpandedLearningResourceDisplay for a userList", () => {
-    const userList = makeUserList()
-    const wrapper = renderLearningResourceDrawer({
-      object:     userList,
-      objectId:   userList.id,
-      objectType: LR_TYPE_USERLIST
-    })
-    const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
-    assert.deepEqual(expandedDisplay.prop("object"), userList)
-  })
-
-  describe("mapStateToProps", () => {
-    let state
-
-    beforeEach(() => {
-      state = {
-        entities: {
-          courses: {
-            [course.id]: course
-          },
-          bootcamps: {
-            [bootcamp.id]: bootcamp
-          },
-          programs: {
-            [program.id]: program
-          },
-          videos: {
-            [video.id]: video
-          }
-        },
-        queries: {
-          [courseRequest(course.id).queryKey]: {
-            isFinished: true
-          },
-          [bootcampRequest(bootcamp.id).queryKey]: {
-            isFinished: true
-          },
-          [programRequest(program.id).queryKey]: {
-            isFinished: true
-          },
-          [videoRequest(video.id).queryKey]: {
-            isFinished: true
-          }
-        },
-        ui: {
-          courseDetail: { objectId: course.id, objectType: LR_TYPE_COURSE }
-        }
-      }
-    })
-
-    //
-    ;[[782, true], [null, false], [undefined, false]].forEach(
-      ([courseId, showDrawer]) => {
-        it(`${shouldIf(showDrawer)} show drawer if courseId is ${String(
-          courseId
-        )}`, () => {
-          state.ui.courseDetail.objectId = courseId
-          const props = mapStateToProps(state)
-          assert.equal(props.showLearningDrawer, showDrawer)
-          assert.equal(props.objectId, state.ui.courseDetail.objectId)
-        })
-      }
-    )
-
-    //
-    ;[LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM, LR_TYPE_VIDEO].forEach(
-      testObjectType => {
-        it(`mapStateToProps should grab the right ${testObjectType}`, () => {
-          state.ui.courseDetail.objectType = testObjectType
-          let expectedObject
-          switch (testObjectType) {
-          case LR_TYPE_COURSE:
-            expectedObject = course
-            state.ui.courseDetail.objectId = course.id
-            break
-          case LR_TYPE_BOOTCAMP:
-            expectedObject = bootcamp
-            state.ui.courseDetail.objectId = bootcamp.id
-            break
-          case LR_TYPE_PROGRAM:
-            expectedObject = program
-            state.ui.courseDetail.objectId = program.id
-            break
-          case LR_TYPE_VIDEO:
-            expectedObject = video
-            state.ui.courseDetail.objectId = video.id
-            break
-          }
-          const { object, objectType, objectId } = mapStateToProps(state)
-          assert.deepEqual(object, expectedObject)
-          assert.equal(objectType, testObjectType)
-          assert.equal(objectId, expectedObject.id)
-        })
-      }
-    )
   })
 })

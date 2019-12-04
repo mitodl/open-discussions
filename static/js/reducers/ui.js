@@ -14,7 +14,9 @@ import {
   HIDE_DROPDOWN,
   SET_DIALOG_DATA,
   SET_AUTH_USER_DETAIL,
-  SET_SHOW_RESOURCE_DRAWER
+  PUSH_LR_HISTORY,
+  POP_LR_HISTORY,
+  CLEAR_LR_HISTORY
 } from "../actions/ui"
 
 import type { Action } from "../flow/reduxTypes"
@@ -31,7 +33,7 @@ export type BannerState = {
   visible: boolean
 }
 
-export type CourseDetailState = {
+export type LRHistoryEntry = {
   objectId: ?number,
   objectType: ?string
 }
@@ -40,7 +42,7 @@ export type UIState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   showDrawerHover: boolean,
-  courseDetail?: CourseDetailState,
+  LRDrawerHistory: Array<LRHistoryEntry>,
   snackbar: ?SnackbarState,
   banner: BannerState,
   dialogs: Map<string, any>,
@@ -53,16 +55,13 @@ const INITIAL_BANNER_STATE = {
   visible: false
 }
 
-const INITIAL_COURSE_STATE = {
-  objectId:   null,
-  objectType: null
-}
+const INITIAL_LR_DRAWER_STATE: Array<LRHistoryEntry> = []
 
 export const INITIAL_UI_STATE: UIState = {
   showDrawerDesktop: false,
   showDrawerMobile:  false,
   showDrawerHover:   false,
-  courseDetail:      INITIAL_COURSE_STATE,
+  LRDrawerHistory:   INITIAL_LR_DRAWER_STATE,
   snackbar:          null,
   banner:            INITIAL_BANNER_STATE,
   dialogs:           new Map(),
@@ -126,14 +125,27 @@ export const ui = (
     return { ...state, showDrawerMobile: action.payload }
   case SET_SHOW_DRAWER_HOVER:
     return { ...state, showDrawerHover: action.payload }
-  case SET_SHOW_RESOURCE_DRAWER:
+  case PUSH_LR_HISTORY:
     return {
       ...state,
-      courseDetail: {
+      LRDrawerHistory: state.LRDrawerHistory.concat({
         objectId:   action.payload.objectId,
         objectType: action.payload.objectType,
         runId:      action.payload.runId
-      }
+      })
+    }
+  case POP_LR_HISTORY:
+    return {
+      ...state,
+      LRDrawerHistory: state.LRDrawerHistory.slice(
+        0,
+        state.LRDrawerHistory.length - 1
+      )
+    }
+  case CLEAR_LR_HISTORY:
+    return {
+      ...state,
+      LRDrawerHistory: []
     }
   case SET_SNACKBAR_MESSAGE:
     return {

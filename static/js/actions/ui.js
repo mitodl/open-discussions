@@ -22,10 +22,14 @@ export const setShowDrawerMobile = createAction<string, *>(
 export const SET_SHOW_DRAWER_HOVER = "SET_SHOW_DRAWER_HOVER"
 export const setShowDrawerHover = createAction<string, *>(SET_SHOW_DRAWER_HOVER)
 
-export const SET_SHOW_RESOURCE_DRAWER = "SET_SHOW_RESOURCE_DRAWER"
-export const setShowResourceDrawer = createAction<string, *>(
-  SET_SHOW_RESOURCE_DRAWER
-)
+export const PUSH_LR_HISTORY = "PUSH_LR_HISTORY"
+export const pushLRHistory = createAction<string, *>(PUSH_LR_HISTORY)
+
+export const POP_LR_HISTORY = "POP_LR_HISTORY"
+export const popLRHistory = createAction<string, *>(POP_LR_HISTORY)
+
+export const CLEAR_LR_HISTORY = "CLEAR_LR_HISTORY"
+export const clearLRHistory = createAction<string, *>(CLEAR_LR_HISTORY)
 
 export const SET_SNACKBAR_MESSAGE = "SET_SNACKBAR_MESSAGE"
 export const setSnackbarMessage = createAction<string, *>(SET_SNACKBAR_MESSAGE)

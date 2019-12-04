@@ -40,17 +40,28 @@
   justify-content: space-between;
 }
 
-.drawer-close {
-  float: right;
-  cursor: pointer;
-  text-align: right;
-  padding: 5px 10px;
-  width: 100%;
-  background-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0) 25%
-  );
+.lr-drawer {
+  .drawer-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row-reverse;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0) 25%
+    );
+
+    .back,
+    .drawer-close {
+      cursor: pointer;
+      margin: 10px;
+    }
+
+    .drawer-close {
+      margin-right: 10px;
+    }
+  }
 }
 
 .course-catalog-title {

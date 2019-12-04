@@ -10,12 +10,11 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import * as LRCardModule from "./LearningResourceCard"
 
 describe("CourseCarousel", () => {
-  let courses, setShowResourceDrawerStub, helper, render
+  let courses, helper, render
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     courses = R.times(makeCourse, 10)
-    setShowResourceDrawerStub = helper.sandbox.stub()
     helper.stubComponent(
       LRCardModule,
       "LearningResourceCard",
@@ -26,9 +25,8 @@ describe("CourseCarousel", () => {
       CourseCarousel,
       {},
       {
-        title:                 "Greatest Courses Ever",
-        courses,
-        setShowResourceDrawer: setShowResourceDrawerStub
+        title: "Greatest Courses Ever",
+        courses
       }
     )
   })
