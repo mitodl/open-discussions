@@ -51,31 +51,37 @@ describe("UserListFormDialog", () => {
     assert.ok(privacy.find(`input[value="${LR_PRIVATE}"]`).exists())
   })
 
-  it("should call validator, show the results", async () => {
-    const { wrapper } = await render()
-    // Select all 5 topics (only 3 allowed)
-    topics.forEach(topic => {
-      wrapper
-        .find("Select")
-        .at(1)
-        .instance()
-        .selectOption({ label: topic.name, value: topic.id })
-      wrapper.update()
-    })
+  //
+  ;[
+    [0, "Subject is required"],
+    [4, `Select no more than ${TOPICS_LENGTH_MAXIMUM} subjects`]
+  ].forEach(([selectCount, topicError]) => {
+    it(`should call validator, show the results with ${selectCount} subjects selected`, async () => {
+      const { wrapper } = await render()
+      // Select all 5 topics (only 3 allowed)
+      topics.slice(0, selectCount).forEach(topic => {
+        wrapper
+          .find("Select")
+          .at(1)
+          .instance()
+          .selectOption({ label: topic.name, value: topic.id })
+        wrapper.update()
+      })
 
-    wrapper.find("form").simulate("submit")
-    await wait(50)
-    wrapper.update()
-    assert.deepEqual(
-      [
-        "You need to select a list type",
-        "You need to select a privacy level",
-        "Title is required",
-        "Description is required",
-        `Select ${TOPICS_LENGTH_MAXIMUM} or fewer subjects`
-      ],
-      wrapper.find(".validation-message").map(el => el.text())
-    )
+      wrapper.find("form").simulate("submit")
+      await wait(50)
+      wrapper.update()
+      assert.deepEqual(
+        [
+          "You need to select a list type",
+          "You need to select a privacy level",
+          "Title is required",
+          "Description is required",
+          topicError
+        ],
+        wrapper.find(".validation-message").map(el => el.text())
+      )
+    })
   })
 
   it("should let you fill out the form and create a list", async () => {
