@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.102.1
+---------------
+
+- Revert "Calculate and return is_favorite and lists fields in ES search results (#2423)" (#2451)
+- Added transcripts to searchable fields
+- Calculate and return 'is_favorite' and 'lists' fields in ES search results (#2423)
+- fix Select component when removing last selection (#2430)
+- Adjust resource item serializers (#2415)
+
 Version 0.102.0 (Released December 03, 2019)
 ---------------
 
