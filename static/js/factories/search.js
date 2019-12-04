@@ -11,9 +11,7 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO,
-  LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_VIDEO
 } from "../lib/constants"
 
 import type {
@@ -91,9 +89,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   offered_by:        [casual.random_element(offeredBys)],
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_COURSE,
-  runs:              R.times(makeRun, 3),
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  runs:              R.times(makeRun, 3)
 })
 
 export const makeBootcampResult = (): LearningResourceResult => ({
@@ -107,9 +103,7 @@ export const makeBootcampResult = (): LearningResourceResult => ({
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_BOOTCAMP,
   offered_by:        [offeredBys.bootcamps],
-  runs:              [makeRun()],
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  runs:              [makeRun()]
 })
 
 export const makeProgramResult = (): LearningResourceResult => ({
@@ -124,9 +118,7 @@ export const makeProgramResult = (): LearningResourceResult => ({
   offered_by:        [
     casual.random_element([offeredBys.xpro, offeredBys.micromasters])
   ],
-  runs:        [makeRun()],
-  is_favorite: casual.coin_flip,
-  lists:       casual.random_element([[], [100, 200]])
+  runs: [makeRun()]
 })
 
 export const makeVideoResult = (): LearningResourceResult => ({
@@ -139,26 +131,7 @@ export const makeVideoResult = (): LearningResourceResult => ({
   topics:            [casual.word, casual.word],
   object_type:       LR_TYPE_VIDEO,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
-  runs:              [],
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
-})
-
-export const makeUserListResult = (
-  listType: string
-): LearningResourceResult => ({
-  id:                casual.integer(1, 1000),
-  title:             casual.title,
-  url:               casual.url,
-  image_src:         "http://image.medium.url",
-  short_description: casual.description,
-  topics:            [casual.word, casual.word],
-  list_type:         listType,
-  object_type:       listType,
-  offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
-  runs:              [],
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  runs:              []
 })
 
 export const makeLearningResourceResult = (objectType: string) => {
@@ -171,10 +144,6 @@ export const makeLearningResourceResult = (objectType: string) => {
     return makeProgramResult()
   case LR_TYPE_VIDEO:
     return makeVideoResult()
-  case LR_TYPE_USERLIST:
-    return makeUserListResult(LR_TYPE_USERLIST)
-  case LR_TYPE_LEARNINGPATH:
-    return makeUserListResult(LR_TYPE_LEARNINGPATH)
   }
 }
 

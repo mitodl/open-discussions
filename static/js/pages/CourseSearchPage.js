@@ -7,6 +7,7 @@ import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
+import { connectRequest } from "redux-query-react"
 import { compose } from "redux"
 import debounce from "lodash/debounce"
 
@@ -31,6 +32,7 @@ import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
   availabilityFacetLabel,
+  filterListsByResource,
   resourceLabel
 } from "../lib/learning_resources"
 import {
@@ -56,6 +58,10 @@ import {
   SEARCH_LIST_UI
 } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
+import {
+  favoritesRequest,
+  favoritesSelector
+} from "../lib/queries/learning_resources"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -67,6 +73,11 @@ import type {
   CurrentFacet,
   LearningResourceResult
 } from "../flow/searchTypes"
+import {
+  myUserListsSelector,
+  userListsRequest
+} from "../lib/queries/user_lists"
+import type { UserList } from "../flow/discussionTypes"
 
 type OwnProps = {|
   dispatch: Dispatch<any>,
@@ -85,7 +96,8 @@ type StateProps = {|
   loaded: boolean,
   processing: boolean,
   total: number,
-  entities: Object
+  favorites: Object,
+  lists: Array<UserList>
 |}
 
 type DispatchProps = {|
@@ -308,22 +320,24 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
-    // Get the latest data from state if any to reflect recent changes in favorites/lists
-    const { entities } = this.props
-    const { bootcamps, courses, programs, userLists, videos } = entities
+    const { favorites } = this.props
+    const { lists } = this.props
+    // $FlowFixMe: this is a pseudo-result
+    result.lists = filterListsByResource(result, lists)
+    const { bootcamps, courses, programs, userLists, videos } = favorites
     switch (result.object_type) {
     case LR_TYPE_COURSE:
-      return courses ? courses[result.id] || result : result
+      return courses[result.id] || result
     case LR_TYPE_BOOTCAMP:
-      return bootcamps ? bootcamps[result.id] || result : result
+      return bootcamps[result.id] || result
     case LR_TYPE_PROGRAM:
-      return programs ? programs[result.id] || result : result
+      return programs[result.id] || result
     case LR_TYPE_USERLIST:
-      return userLists ? userLists[result.id] || result : result
+      return userLists[result.id] || result
     case LR_TYPE_VIDEO:
-      return videos ? videos[result.id] || result : result
+      return videos[result.id] || result
     case LR_TYPE_LEARNINGPATH:
-      return userLists ? userLists[result.id] || result : result
+      return userLists[result.id] || result
     }
   }
 
@@ -495,7 +509,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state): StateProps => {
-  const { search, entities } = state
+  const { search } = state
   const { results, total, initialLoad, facets } = search.data
 
   return {
@@ -505,7 +519,8 @@ const mapStateToProps = (state): StateProps => {
     initialLoad,
     loaded:     search.loaded,
     processing: search.processing,
-    entities
+    favorites:  favoritesSelector(state),
+    lists:      myUserListsSelector(state)
   }
 }
 
@@ -520,9 +535,12 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
   dispatch
 })
 
+const mapPropsToConfig = () => [favoritesRequest(), userListsRequest()]
+
 export default compose(
   connect<Props, OwnProps, _, _, _, _>(
     mapStateToProps,
     mapDispatchToProps
-  )
+  ),
+  connectRequest(mapPropsToConfig)
 )(CourseSearchPage)
