@@ -164,12 +164,16 @@ DEFAULT_DATABASE_CONFIG = dj_database_url.parse(
         "DATABASE_URL", "sqlite:///{0}".format(os.path.join(BASE_DIR, "db.sqlite3"))
     )
 )
+DEFAULT_DATABASE_CONFIG["DISABLE_SERVER_SIDE_CURSORS"] = get_bool(
+    "OPEN_DISCUSSIONS_DB_DISABLE_SS_CURSORS", True
+)
 DEFAULT_DATABASE_CONFIG["CONN_MAX_AGE"] = get_int("OPEN_DISCUSSIONS_DB_CONN_MAX_AGE", 0)
 
 if get_bool("OPEN_DISCUSSIONS_DB_DISABLE_SSL", False):
     DEFAULT_DATABASE_CONFIG["OPTIONS"] = {}
 else:
     DEFAULT_DATABASE_CONFIG["OPTIONS"] = {"sslmode": "require"}
+
 
 DATABASES = {"default": DEFAULT_DATABASE_CONFIG}
 
