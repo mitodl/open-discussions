@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.102.2
+---------------
+
+- new videos view
+- fix dialog sizing on mobile
+- Increase the width of the Course.image_src column
+- Add support for next param to login prompt
+- Add a sleep to youtube video transcript downloads
+
 Version 0.102.1 (Released December 05, 2019)
 ---------------
 
