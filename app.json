@@ -220,6 +220,10 @@
     "OPEN_DISCUSSIONS_DB_DISABLE_SSL": {
       "value": "True"
     },
+    "OPEN_DISCUSSIONS_DB_DISABLE_SS_CURSORS": {
+      "description": "Disable server-side cursors",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_EMAIL_HOST": {
       "description": "Outgoing e-mail settings"
     },
