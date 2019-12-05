@@ -222,6 +222,8 @@
 .expanded-learning-resource-userlist {
   .learning-resource-card {
     margin: 20px;
+    border-bottom: 2px solid $pale-grey;
+    padding-bottom: 10px;
   }
 
   .user-list-header {
