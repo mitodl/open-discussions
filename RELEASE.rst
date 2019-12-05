@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.102.1
+Version 0.102.1 (Released December 05, 2019)
 ---------------
 
 - Revert "Calculate and return is_favorite and lists fields in ES search results (#2423)" (#2451)
