@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.102.2
+Version 0.102.2 (Released December 05, 2019)
 ---------------
 
 - new videos view
