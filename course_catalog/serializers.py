@@ -481,10 +481,17 @@ class SimpleUserListSerializer(
     Uses the SimpleUserListItemSerializer for items, which contains only essential attributes.
     """
 
-    items = SimpleUserListItemSerializer(many=True, allow_null=True, read_only=True)
+    items = serializers.SerializerMethodField()
     topics = WriteableSerializerMethodField()
     author_name = serializers.SerializerMethodField()
     object_type = serializers.CharField(read_only=True, source="list_type")
+
+    def get_items(self, instance):
+        """get items"""
+        return [
+            SimpleUserListItemSerializer(item).data
+            for item in instance.items.select_related("content_type")
+        ]
 
     def get_author_name(self, instance):
         """get author name for userlist"""
