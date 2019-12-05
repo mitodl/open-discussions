@@ -416,9 +416,10 @@ export const validateCreateUserListForm = validate([
     R.lensProp("short_description"),
     "Description is required"
   ),
+  validation(emptyOrNil, R.lensProp("topics"), "Subject is required"),
   validation(
     topicsExceeded,
     R.lensProp("topics"),
-    `Select ${TOPICS_LENGTH_MAXIMUM} or fewer subjects`
+    `Select no more than ${TOPICS_LENGTH_MAXIMUM} subjects`
   )
 ])
