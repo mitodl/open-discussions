@@ -90,48 +90,56 @@ export default function UserListFormDialog(props: Props) {
           <Form className="user-list-create-form">
             <span className="input-name">List Type</span>
             <div className="type radio">
-              <Field
-                name="list_type"
-                id="type-list"
-                type="radio"
-                value={LR_TYPE_USERLIST}
-              />
-              <label htmlFor="type-list">
-                <span className="header">Custom List</span>
-                Create a custom list of any of our learning resources
-              </label>
-              <Field
-                name="list_type"
-                type="radio"
-                id="type-lp"
-                value={LR_TYPE_LEARNINGPATH}
-              />
-              <label htmlFor="type-lp">
-                <span className="header">Learning Path</span>
-                An ordered list of learning resources
-              </label>
+              <div className="option">
+                <Field
+                  name="list_type"
+                  id="type-list"
+                  type="radio"
+                  value={LR_TYPE_USERLIST}
+                />
+                <label htmlFor="type-list">
+                  <span className="header">Custom List</span>
+                  Create a custom list of any of our learning resources
+                </label>
+              </div>
+              <div className="option">
+                <Field
+                  name="list_type"
+                  type="radio"
+                  id="type-lp"
+                  value={LR_TYPE_LEARNINGPATH}
+                />
+                <label htmlFor="type-lp">
+                  <span className="header">Learning Path</span>
+                  An ordered list of learning resources
+                </label>
+              </div>
             </div>
             {validationMessage(errors.list_type)}
             <span className="input-name">Privacy</span>
             <div className="privacy radio">
-              <Field
-                name="privacy_level"
-                id="radio-public"
-                type="radio"
-                value={LR_PUBLIC}
-              />
-              <label htmlFor="radio-public">
-                <span className="header">Public</span>
-              </label>
-              <Field
-                name="privacy_level"
-                type="radio"
-                id="radio-private"
-                value={LR_PRIVATE}
-              />
-              <label htmlFor="radio-private">
-                <span className="header">Private</span>
-              </label>
+              <div className="option">
+                <Field
+                  name="privacy_level"
+                  id="radio-public"
+                  type="radio"
+                  value={LR_PUBLIC}
+                />
+                <label htmlFor="radio-public">
+                  <span className="header">Public</span>
+                </label>
+              </div>
+              <div className="option">
+                <Field
+                  name="privacy_level"
+                  type="radio"
+                  id="radio-private"
+                  value={LR_PRIVATE}
+                />
+                <label htmlFor="radio-private">
+                  <span className="header">Private</span>
+                </label>
+              </div>
             </div>
             {validationMessage(errors.privacy_level)}
             <span className="input-name">List Title</span>
