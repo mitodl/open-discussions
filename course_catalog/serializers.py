@@ -565,7 +565,7 @@ class SimpleUserListSerializer(
 
     class Meta:
         model = UserList
-        exclude = ("created_on", "updated_on", "_deprecated_offered_by")
+        exclude = COMMON_IGNORED_FIELDS
         read_only_fields = ["author", "items", "author_name"]
 
 
@@ -679,10 +679,13 @@ class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
     """
 
 
-class VideoSerializer(serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin):
+class VideoSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Serializer for Video model, with runs
     """
+
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="video")
