@@ -53,7 +53,7 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
         elif isinstance(instance, Program):
             serializer = SimpleProgramSerializer(instance, context=context)
         elif isinstance(instance, Video):
-            serializer = VideoSerializer(instance, context=context)
+            serializer = SimpleVideoSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
 
@@ -679,7 +679,7 @@ class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
     """
 
 
-class VideoSerializer(
+class SimpleVideoSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
@@ -689,6 +689,22 @@ class VideoSerializer(
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="video")
+
+    class Meta:
+        model = Video
+        exclude = (
+            "transcript",
+            "raw_data",
+            "short_description",
+            "full_description",
+            *COMMON_IGNORED_FIELDS,
+        )
+
+
+class VideoSerializer(SimpleVideoSerializer):
+    """
+    Serializer for Video model, with runs
+    """
 
     class Meta:
         model = Video
