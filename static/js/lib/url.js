@@ -115,8 +115,8 @@ export const TERMS_OF_SERVICE_URL = "/terms-and-conditions"
 export const PRIVACY_POLICY_URL = "/privacy-statement"
 
 export const SITE_SEARCH_URL = "/search/"
-export const COURSE_URL = "/courses/"
-export const COURSE_SEARCH_URL = "/courses/search"
+export const COURSE_URL = "/learn/"
+export const COURSE_SEARCH_URL = "/learn/search"
 
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
@@ -148,5 +148,5 @@ export const newVideosURL = "/api/v0/videos/new/"
 export const embedlyApiURL = "/api/v0/embedly"
 export const topicApiURL = "/api/v0/topics"
 
-export const userListIndexURL = "/courses/lists/"
-export const userListDetailURL = (id: number) => `/courses/lists/${id}`
+export const userListIndexURL = "/learn/lists/"
+export const userListDetailURL = (id: number) => `/learn/lists/${id}`

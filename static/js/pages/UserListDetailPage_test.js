@@ -134,7 +134,7 @@ describe("UserListDetailPage tests", () => {
       oldIndex: 1,
       newIndex: 2
     })
-    const [url, method, { body }] = helper.handleRequestStub.args[2]
+    const [url, method, { body }] = helper.handleRequestStub.args[1]
     assert.equal(method, "PATCH")
     assert.equal(url, `${userListApiURL}/${userList.id}/`)
     assert.deepEqual(body.id, userList.id)

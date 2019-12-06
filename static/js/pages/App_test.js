@@ -136,14 +136,14 @@ describe("App", () => {
   })
 
   //
-  ;[["/courses/", true], ["/", false]].forEach(([url, isCourseUrl]) => {
-    it(`${shouldIf(!isCourseUrl)} include a Drawer, ${shouldIf(
-      isCourseUrl
+  ;[["/learn/", true], ["/", false]].forEach(([url, isLearnUrl]) => {
+    it(`${shouldIf(!isLearnUrl)} include a Drawer, ${shouldIf(
+      isLearnUrl
     )} include CourseToolbar if url is ${url}`, async () => {
       const [wrapper] = await renderComponent(url, [])
-      assert.equal(wrapper.find("CourseToolbar").exists(), isCourseUrl)
-      assert.equal(wrapper.find("Toolbar").exists(), !isCourseUrl)
-      assert.equal(wrapper.find("Drawer").exists(), !isCourseUrl)
+      assert.equal(wrapper.find("CourseToolbar").exists(), isLearnUrl)
+      assert.equal(wrapper.find("Toolbar").exists(), !isLearnUrl)
+      assert.equal(wrapper.find("Drawer").exists(), !isLearnUrl)
     })
   })
 })

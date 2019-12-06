@@ -3,7 +3,6 @@ import React from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 
-import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import { Cell, Grid } from "../components/Grid"
 import {
   BannerPageWrapper,
@@ -12,7 +11,6 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import { LearningResourceCard } from "../components/LearningResourceCard"
-import AddToListDialog from "../components/AddToListDialog"
 
 import { SEARCH_LIST_UI } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
@@ -53,8 +51,6 @@ export default function FavoritesDetailPage() {
           )}
         </Grid>
       ) : null}
-      <LearningResourceDrawer />
-      <AddToListDialog />
     </BannerPageWrapper>
   )
 }

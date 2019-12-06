@@ -2,7 +2,6 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseIndexPage from "./CourseIndexPage"
 import {
   BannerPageWrapper,
@@ -116,11 +115,6 @@ describe("CourseIndexPage", () => {
     })
   })
 
-  it("should render a LearningResourceDrawer", async () => {
-    const { wrapper } = await render()
-    assert.ok(wrapper.find(LearningResourceDrawer).exists())
-  })
-
   it("shouldnt render a featured carousel if featuredCourses is empty", async () => {
     helper.handleRequestStub
       .withArgs(featuredCoursesURL)
@@ -167,7 +161,7 @@ describe("CourseIndexPage", () => {
     const searchBox = wrapper.find("CourseSearchbox")
     searchBox.prop("onSubmit")({ target: { value: "search term" } })
     const { pathname, search } = helper.currentLocation
-    assert.equal(pathname, "/courses/search")
+    assert.equal(pathname, "/learn/search")
     assert.equal(search, "?q=search%20term")
   })
 

@@ -43,7 +43,7 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
     ) : null}
     <ResponsiveWrapper onlyOn={[PHONE]}>
       <Route
-        path="/courses"
+        path="/learn"
         render={() => (
           <Link className="user-list-link" to={userListIndexURL}>
             My Lists

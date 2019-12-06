@@ -7,7 +7,6 @@ import { createSelector } from "reselect"
 import { memoize } from "lodash"
 import arrayMove from "array-move"
 
-import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import { Cell, Grid } from "../components/Grid"
 import {
   BannerPageWrapper,
@@ -16,7 +15,6 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import { LearningResourceCard } from "../components/LearningResourceCard"
-import AddToListDialog from "../components/AddToListDialog"
 import UserListFormDialog from "../components/UserListFormDialog"
 import { SortableItem, SortableContainer } from "../components/SortableList"
 
@@ -165,8 +163,6 @@ export default function UserListDetailPage(props: Props) {
           hide={() => setIsEditing(false)}
         />
       ) : null}
-      <LearningResourceDrawer />
-      <AddToListDialog />
     </BannerPageWrapper>
   )
 }

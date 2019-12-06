@@ -1,14 +1,13 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { Route, Redirect, Switch } from "react-router-dom"
+import { Route, Redirect, Switch, useLocation } from "react-router-dom"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
 
 import HomePage from "./HomePage"
 import SearchPage from "./SearchPage"
-import CourseSearchPage from "./CourseSearchPage"
 import ContentPolicyPage from "./policies/ContentPolicyPage"
 import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
 import TermsOfServicePage from "./policies/TermsOfServicePage"
@@ -30,10 +29,7 @@ import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import ChannelRouter from "./ChannelRouter"
-import CourseIndexPage from "./CourseIndexPage"
-import UserListsPage from "./UserListsPage"
-import UserListDetailPage from "./UserListDetailPage"
-import FavoritesDetailPage from "./FavoritesDetailPage"
+import LearnRouter from "./LearnRouter"
 
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
@@ -85,6 +81,14 @@ type Props = {|
   ...OwnProps,
   dispatch: Dispatch<*>
 |}
+
+function CourseLearnRedirect() {
+  const { pathname, search } = useLocation()
+
+  const newPath = pathname.replace(/^\/courses/, "/learn").concat(search)
+
+  return <Redirect to={newPath} />
+}
 
 class App extends React.Component<Props> {
   toggleShowDrawer = () => {
@@ -187,7 +191,7 @@ class App extends React.Component<Props> {
         <MetaTags>
           <title>MIT Open Learning</title>
         </MetaTags>
-        <Route path={`${match.url}courses/`}>
+        <Route path={`${match.url}learn/`}>
           {({ match }) =>
             match ? (
               <CourseToolbar
@@ -315,31 +319,12 @@ class App extends React.Component<Props> {
             component={PrivacyPolicyPage}
           />
           {SETTINGS.course_ui_enabled ? (
-            <Switch>
-              <Route
-                exact
-                path={`${match.url}courses`}
-                component={CourseIndexPage}
-              />
-              <Route
-                exact
-                path={`${match.url}courses/search`}
-                component={CourseSearchPage}
-              />
-              <Route
-                path={`${match.url}courses/lists/favorites`}
-                component={FavoritesDetailPage}
-              />
-              <Route
-                path={`${match.url}courses/lists/:id`}
-                component={UserListDetailPage}
-              />
-              <Route
-                exact
-                path={`${match.url}courses/lists`}
-                component={UserListsPage}
-              />
-            </Switch>
+            <>
+              <Route path={`${match.url}courses`}>
+                <CourseLearnRedirect />
+              </Route>
+              <Route path={`${match.url}learn`} component={LearnRouter} />
+            </>
           ) : null}
         </div>
       </div>

@@ -4,7 +4,6 @@ import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 
-import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import CourseCarousel from "../components/CourseCarousel"
 
 import {
@@ -16,7 +15,6 @@ import {
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"
-import AddToListDialog from "../components/AddToListDialog"
 import ResponsiveWrapper from "../components/ResponsiveWrapper"
 
 import {
@@ -124,8 +122,6 @@ export default function CourseIndexPage({ history }: Props) {
           </Cell>
         )}
       </Grid>
-      <LearningResourceDrawer />
-      <AddToListDialog />
     </BannerPageWrapper>
   )
 }

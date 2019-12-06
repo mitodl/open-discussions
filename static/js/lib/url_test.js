@@ -170,7 +170,7 @@ describe("url helper functions", () => {
       assert.equal(AUTH_REQUIRED_URL, "/auth_required/")
       assert.equal(FRONTPAGE_URL, "/")
       assert.equal(SITE_SEARCH_URL, "/search/")
-      assert.equal(COURSE_URL, "/courses/")
+      assert.equal(COURSE_URL, "/learn/")
     })
   })
 
