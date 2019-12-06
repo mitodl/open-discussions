@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.102.3
+---------------
+
+- Added topics generation for videos
+- Get rid of n+1 query on content_type.name (#2460)
+- Require at least 1 subject for lists/paths (#2449)
+- Set DISABLE_SERVER_SIDE_CURSORS=True by default (#2454)
+- add re-ordering UI for learning paths
+
 Version 0.102.2 (Released December 05, 2019)
 ---------------
 
