@@ -58,8 +58,8 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
 @pytest.mark.parametrize("is_safe", [True, False])
 def test_userlistitems_permissions(mocker, user, is_safe, is_public, is_author):
     """
-    HasUserListItemPermissions.has_permission should always return True for safe (GET) requests,
-    should return False for anonymous users if request is a POST
+    HasUserListItemPermissions.has_permission should return correct permission depending
+    on privacy level, author, and request method.
     """
     userlist = UserListFactory.create(
         author=user if is_author else UserFactory.create(),
@@ -81,7 +81,7 @@ def test_userlistitems_permissions(mocker, user, is_safe, is_public, is_author):
 def test_userlistitems_object_permissions(mocker, user, is_public, is_author, is_safe):
     """
     HasUserListItemPermissions.has_object_permission should return correct permission depending
-    on privacy level and author.
+    on privacy level, author, and request method.
     """
     userlist = UserListFactory.create(
         author=user,
@@ -94,7 +94,6 @@ def test_userlistitems_object_permissions(mocker, user, is_public, is_author, is
     request = mocker.MagicMock(
         method="GET" if is_safe else "POST",
         user=(user if is_author else UserFactory.create()),
-        kwargs={"parent_lookup_user_list_id": userlist.id},
     )
     view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": userlist.id})
     assert HasUserListItemPermissions().has_object_permission(
