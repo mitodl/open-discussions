@@ -31,9 +31,6 @@ from course_catalog.utils import (
 )
 from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list
-import logging
-
-log = logging.getLogger()
 
 
 COMMON_IGNORED_FIELDS = ("created_on", "updated_on", "_deprecated_offered_by")
@@ -473,6 +470,13 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
     delete = serializers.BooleanField(write_only=True, default=False, required=False)
 
     def update_index(self, user_list):
+        """
+        If this serializer was instantiated from the UserListItemView, then update the search index
+
+        Args:
+            user_list (UserList): the UserList object to update in the search index.
+
+        """
         view = self.context.get("view", None)
         if view is not None and view.kwargs.get("parent_lookup_user_list_id", None):
             # this was sent via userlistitems API, so update the search index

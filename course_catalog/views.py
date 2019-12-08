@@ -250,15 +250,15 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
     pagination_class = DefaultPagination
     permission_classes = (HasUserListItemPermissions,)
 
-    def create(self, request, pk=None, **kwargs):
+    def create(self, request, *args, **kwargs):
         user_list_id = kwargs["parent_lookup_user_list_id"]
         request.data["user_list"] = user_list_id
-        return super().create(request, pk=pk, **kwargs)
+        return super().create(request, *args, **kwargs)
 
-    def update(self, request, pk=None, **kwargs):
+    def update(self, request, *args, **kwargs):
         user_list_id = kwargs["parent_lookup_user_list_id"]
         request.data["user_list"] = user_list_id
-        return super().update(request, pk=pk, **kwargs)
+        return super().update(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
         instance.delete()
