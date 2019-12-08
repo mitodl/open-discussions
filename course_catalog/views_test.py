@@ -427,7 +427,7 @@ def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list
 def test_user_list_items_endpoint_create_item(
     client, user, is_author, mock_user_list_index
 ):
-    """Test userlist endpoint for creating a UserListItem"""
+    """Test userlistitems endpoint for creating a UserListItem"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
         author=author, privacy_level=PrivacyLevel.public.value
@@ -448,7 +448,7 @@ def test_user_list_items_endpoint_create_item(
 
 
 def test_user_list_items_endpoint_create_item_bad_data(client, user):
-    """Test userlist endpoint for creating a UserListItem"""
+    """Test userlistitems endpoint for creating a UserListItem"""
     userlist = UserListFactory.create(
         author=user, privacy_level=PrivacyLevel.public.value
     )
@@ -472,7 +472,7 @@ def test_user_list_items_endpoint_create_item_bad_data(client, user):
 def test_user_list_items_endpoint_update_item(
     client, user, is_author, mock_user_list_index
 ):
-    """Test userlist endpoint for updating UserListItem positions"""
+    """Test userlistitems endpoint for updating UserListItem positions"""
     author = UserFactory.create()
     topics = CourseTopicFactory.create_batch(3)
     userlist = UserListFactory.create(
@@ -496,7 +496,7 @@ def test_user_list_items_endpoint_update_item(
 
 
 def test_user_list_items_endpoint_update_items_wrong_list(client, user):
-    """Verify that trying an update on UserListItem in wrong list fails"""
+    """Verify that trying an update via userlistitems api in wrong list fails"""
     userlist = UserListFactory.create(
         author=user, privacy_level=PrivacyLevel.public.value
     )
@@ -520,7 +520,7 @@ def test_user_list_items_endpoint_update_items_wrong_list(client, user):
 def test_user_list_items_endpoint_delete_items(
     client, user, is_author, mock_user_list_index
 ):
-    """Test userlist endpoint for deleting UserListItems"""
+    """Test userlistitems endpoint for deleting UserListItems"""
     author = UserFactory.create()
     userlist = UserListFactory.create(
         author=author, privacy_level=PrivacyLevel.public.value

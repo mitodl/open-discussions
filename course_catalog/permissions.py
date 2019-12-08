@@ -40,7 +40,7 @@ class HasUserListItemPermissions(BasePermission):
         return request.user == user_list.author
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS or view.action in ("favorite", "unfavorite"):
+        if request.method in SAFE_METHODS:
             return (
                 obj.user_list.privacy_level == PrivacyLevel.public.value
                 or request.user == obj.user_list.author
