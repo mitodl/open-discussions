@@ -10,6 +10,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from course_catalog.constants import ResourceType, PlatformType
 from course_catalog.models import (
@@ -21,8 +22,12 @@ from course_catalog.models import (
     LearningResourceRun,
     Video,
     CourseTopic,
+    UserListItem,
 )
-from course_catalog.permissions import HasUserListPermissions
+from course_catalog.permissions import (
+    HasUserListPermissions,
+    HasUserListItemPermissions,
+)
 from course_catalog.serializers import (
     CourseSerializer,
     UserListSerializer,
@@ -31,11 +36,12 @@ from course_catalog.serializers import (
     FavoriteItemSerializer,
     VideoSerializer,
     CourseTopicSerializer,
+    UserListItemSerializer,
 )
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
-from search.task_helpers import delete_user_list
+from search.task_helpers import delete_user_list, upsert_user_list
 
 
 @api_view(["GET"])
@@ -204,7 +210,7 @@ class LargePagination(LimitOffsetPagination):
     max_limit = 1000
 
 
-class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
+class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
     """
     Viewset for User Lists & Learning Paths
     """
@@ -232,6 +238,35 @@ class UserListViewSet(viewsets.ModelViewSet, FavoriteViewMixin):
     def perform_destroy(self, instance):
         delete_user_list(instance)
         instance.delete()
+
+
+class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
+    """
+    Viewset for User List Items
+    """
+
+    queryset = UserListItem.objects.select_related("content_type")
+    serializer_class = UserListItemSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (HasUserListItemPermissions,)
+
+    def create(self, request, pk=None, **kwargs):
+        user_list_id = kwargs["parent_lookup_user_list_id"]
+        request.data["user_list"] = user_list_id
+        return super().create(request, pk=pk, **kwargs)
+
+    def update(self, request, pk=None, **kwargs):
+        user_list_id = kwargs["parent_lookup_user_list_id"]
+        request.data["user_list"] = user_list_id
+        return super().update(request, pk=pk, **kwargs)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        user_list = instance.user_list
+        if user_list.items.count() > 0:
+            upsert_user_list(user_list)
+        else:
+            delete_user_list(user_list)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
