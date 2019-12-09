@@ -33,6 +33,9 @@ from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list
 
 
+COMMON_IGNORED_FIELDS = ("created_on", "updated_on", "_deprecated_offered_by")
+
+
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     """
     Special field to handle the generic foreign key in FavoriteItem and ListItem
@@ -50,7 +53,7 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
         elif isinstance(instance, Program):
             serializer = SimpleProgramSerializer(instance, context=context)
         elif isinstance(instance, Video):
-            serializer = VideoSerializer(instance, context=context)
+            serializer = SimpleVideoSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
 
@@ -316,14 +319,26 @@ class SimpleCourseSerializer(BaseCourseSerializer):
 
     class Meta:
         model = Course
-        fields = "__all__"
-        extra_kwargs = {"raw_json": {"write_only": True}}
+        exclude = (
+            "short_description",
+            "full_description",
+            "raw_json",
+            *COMMON_IGNORED_FIELDS,
+        )
 
 
 class CourseSerializer(SimpleCourseSerializer, LearningResourceRunMixin):
     """
     Serializer for Course model
     """
+
+    class Meta:
+        model = Course
+        exclude = COMMON_IGNORED_FIELDS
+        extra_kwargs = {
+            "raw_json": {"write_only": True},
+            "full_description": {"write_only": True},
+        }
 
 
 class OCWSerializer(CourseSerializer):
@@ -374,13 +389,22 @@ class SimpleBootcampSerializer(BaseCourseSerializer):
 
     class Meta:
         model = Bootcamp
-        fields = "__all__"
+        exclude = exclude = (
+            "short_description",
+            "full_description",
+            *COMMON_IGNORED_FIELDS,
+        )
 
 
 class BootcampSerializer(SimpleBootcampSerializer, LearningResourceRunMixin):
     """
     Serializer for Bootcamp model
     """
+
+    class Meta:
+        model = Bootcamp
+        exclude = COMMON_IGNORED_FIELDS
+        extra_kwargs = {"full_description": {"write_only": True}}
 
 
 class SimpleUserListItemSerializer(
@@ -470,7 +494,7 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
     class Meta:
         model = UserListItem
         extra_kwargs = {"position": {"required": False}}
-        fields = "__all__"
+        exclude = ("created_on", "updated_on")
 
 
 class SimpleUserListSerializer(
@@ -541,7 +565,7 @@ class SimpleUserListSerializer(
 
     class Meta:
         model = UserList
-        fields = "__all__"
+        exclude = COMMON_IGNORED_FIELDS
         read_only_fields = ["author", "items", "author_name"]
 
 
@@ -629,7 +653,7 @@ class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin
 
     class Meta:
         model = ProgramItem
-        fields = "__all__"
+        exclude = ("created_on", "updated_on")
 
 
 class SimpleProgramSerializer(
@@ -646,7 +670,7 @@ class SimpleProgramSerializer(
 
     class Meta:
         model = Program
-        fields = "__all__"
+        exclude = COMMON_IGNORED_FIELDS
 
 
 class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
@@ -655,11 +679,11 @@ class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
     """
 
 
-class VideoSerializer(
+class SimpleVideoSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
-    Serializer for Video model
+    Serializer for Video model, with runs
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
@@ -668,7 +692,23 @@ class VideoSerializer(
 
     class Meta:
         model = Video
-        fields = "__all__"
+        exclude = (
+            "transcript",
+            "raw_data",
+            "short_description",
+            "full_description",
+            *COMMON_IGNORED_FIELDS,
+        )
+
+
+class VideoSerializer(SimpleVideoSerializer):
+    """
+    Serializer for Video model, with runs
+    """
+
+    class Meta:
+        model = Video
+        exclude = ("transcript", "raw_data", "full_description", *COMMON_IGNORED_FIELDS)
 
 
 class FavoriteItemSerializer(serializers.ModelSerializer):

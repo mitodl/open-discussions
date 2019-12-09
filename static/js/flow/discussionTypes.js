@@ -376,7 +376,6 @@ export type LearningResource = {
 export type Course = LearningResource & {
   course_id:          string,
   url:                ?string,
-  full_description:   ?string,
   platform:           string,
   runs:               Array<LearningResourceRun>,
   object_type:        LR_TYPE_COURSE
@@ -386,7 +385,6 @@ export type Bootcamp = LearningResource & {
   id:                 number,
   course_id:          string,
   url:                ?string,
-  full_description:   ?string,
   runs:               Array<LearningResourceRun>,
   object_type:        LR_TYPE_BOOTCAMP
 }
@@ -435,7 +433,6 @@ export type UserList = LearningResource & {
 export type Video = LearningResource & {
   image_src:          ?string,
   object_type:        LR_TYPE_VIDEO,
-  transcript:         ?string,
   url:                ?string,
   duration:           ?string,
   last_updated:       ?string

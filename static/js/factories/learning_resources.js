@@ -191,7 +191,6 @@ export const makeVideo = (): Video => ({
   last_updated:      casual.date(DATE_FORMAT),
   image_src:         "http://image.medium.url",
   short_description: casual.description,
-  transcript:        casual.description,
   duration:          moment.duration(casual.integer(30, 60 * 90) * 1000).toISOString(),
   topics:            R.times(makeTopic, 2),
   object_type:       LR_TYPE_VIDEO,
