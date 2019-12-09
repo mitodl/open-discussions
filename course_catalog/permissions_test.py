@@ -4,6 +4,7 @@ course_catalog permissions tests
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.http import Http404
 
 from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import UserListFactory, UserListCourseFactory
@@ -51,6 +52,17 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
     assert HasUserListPermissions().has_object_permission(
         request, mocker.MagicMock(), userlist
     ) is (is_public or is_author)
+
+
+def test_userlistitems_permissions_404(mocker, user):
+    """
+    HasUserListItemPermissions.has_permission should return a 404 if the userlist doesn't exist.
+    """
+    request = mocker.MagicMock(method="GET", user=user)
+
+    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": 99999})
+    with pytest.raises(Http404):
+        HasUserListItemPermissions().has_permission(request, view)
 
 
 @pytest.mark.parametrize("is_author", [True, False])

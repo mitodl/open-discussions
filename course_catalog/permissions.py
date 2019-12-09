@@ -1,7 +1,7 @@
 """
 course_catalog permissions
 """
-
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 from course_catalog.constants import PrivacyLevel
@@ -29,8 +29,8 @@ class HasUserListItemPermissions(BasePermission):
     """Permission to view/modify UserListItems"""
 
     def has_permission(self, request, view):
-        user_list = UserList.objects.get(
-            id=view.kwargs.get("parent_lookup_user_list_id", None)
+        user_list = get_object_or_404(
+            UserList, id=view.kwargs.get("parent_lookup_user_list_id", None)
         )
         if request.method in SAFE_METHODS:
             return (
