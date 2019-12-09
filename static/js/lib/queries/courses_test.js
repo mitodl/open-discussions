@@ -8,7 +8,7 @@ import {
   favoriteCourseMutation
 } from "./courses"
 import { makeCourse } from "../../factories/learning_resources"
-import { courseURL } from "../url"
+import { courseDetailApiURL } from "../url"
 import { constructIdMap } from "../redux_query"
 import { LR_TYPE_COURSE } from "../constants"
 
@@ -30,7 +30,10 @@ describe("Course Queries", () => {
 
   it("courseRequest allows fetching a course", () => {
     const request = courseRequest("fake-id")
-    assert.equal(request.url, `${courseURL}/fake-id/`)
+    assert.equal(
+      request.url,
+      courseDetailApiURL.param({ courseId: "fake-id" }).toString()
+    )
     assert.deepEqual(request.transform({ id: "foobar" }), {
       courses: {
         foobar: { id: "foobar" }
@@ -48,7 +51,9 @@ describe("Course Queries", () => {
       const mutation = favoriteCourseMutation(course)
       assert.equal(
         mutation.url,
-        `${courseURL}/${course.id}/${isFavorite ? "unfavorite" : "favorite"}/`
+        `${courseDetailApiURL.param({ courseId: course.id }).toString()}${
+          isFavorite ? "unfavorite" : "favorite"
+        }/`
       )
       assert.deepEqual(mutation.transform(), {
         courses: {

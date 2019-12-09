@@ -1,5 +1,6 @@
 // @flow
 import R from "ramda"
+import { renameKeys } from "ramda-adjunct"
 import { createSelector } from "reselect"
 import { memoize } from "lodash"
 
@@ -10,13 +11,38 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_LEARNINGPATH
 } from "../constants"
 import { courseRequest } from "./courses"
 import { bootcampRequest } from "./bootcamps"
 import { programRequest } from "./programs"
 import { videoRequest } from "./videos"
 import { userListRequest } from "./user_lists"
+
+// object_type => $KEY for `entities.$KEY` mapping
+export const OBJECT_TYPE_ENTITY_ROUTING = {
+  [LR_TYPE_USERLIST]:     "userLists",
+  [LR_TYPE_LEARNINGPATH]: "userLists",
+  [LR_TYPE_COURSE]:       "courses",
+  [LR_TYPE_BOOTCAMP]:     "bootcamps",
+  [LR_TYPE_PROGRAM]:      "programs",
+  [LR_TYPE_VIDEO]:        "videos"
+}
+
+export const normalizeResourcesByObjectType = R.compose(
+  R.map(constructIdMap),
+  renameKeys(OBJECT_TYPE_ENTITY_ROUTING),
+  R.groupBy(R.prop("object_type"))
+)
+
+export const updateLearningResources = {
+  courses:   R.merge,
+  bootcamps: R.merge,
+  programs:  R.merge,
+  userLists: R.merge,
+  videos:    R.merge
+}
 
 export const filterFavorites = (
   results: Array<Object>,
@@ -46,12 +72,8 @@ export const favoritesRequest = () => ({
     }
   },
   update: {
-    courses:   R.merge,
-    bootcamps: R.merge,
-    programs:  R.merge,
-    userLists: R.merge,
-    videos:    R.merge,
-    next:      (prev: string, next: string) => next
+    ...updateLearningResources,
+    next: (prev: string, next: string) => next
   }
 })
 

@@ -6,7 +6,7 @@ import {
   featuredCoursesURL,
   upcomingCoursesURL,
   newCoursesURL,
-  courseURL
+  courseDetailApiURL
 } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 import { constructIdMap } from "../redux_query"
@@ -15,7 +15,7 @@ import type { Course } from "../../flow/discussionTypes"
 
 export const courseRequest = (courseId: number) => ({
   queryKey:  `courseRequest${courseId}`,
-  url:       `${courseURL}/${courseId}/`,
+  url:       courseDetailApiURL.param({ courseId }).toString(),
   transform: (course: any) => ({
     courses: { [course.id]: course }
   }),
@@ -81,7 +81,7 @@ export const [newCoursesRequest, newCoursesSelector] = courseListRequestFactory(
 
 export const favoriteCourseMutation = (course: Course) => ({
   queryKey: "courseMutation",
-  url:      `${courseURL}/${course.id}/${
+  url:      `${courseDetailApiURL.param({ courseId: course.id }).toString()}${
     course.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {

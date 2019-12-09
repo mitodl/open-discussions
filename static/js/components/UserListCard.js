@@ -20,7 +20,6 @@ import {
   readableLearningResources
 } from "../lib/constants"
 import { deleteUserListMutation } from "../lib/queries/user_lists"
-import { userListCoverImage } from "../lib/learning_resources"
 
 import type { UserList } from "../flow/discussionTypes"
 
@@ -83,7 +82,7 @@ export default function UserListCard(props: Props) {
           {userList.title}
         </Link>
         <div className="actions-and-count">
-          <div className="count">{readableLength(userList.items.length)}</div>
+          <div className="count">{readableLength(userList.item_count)}</div>
           {hideUserListOptions ? null : (
             <i
               className="material-icons grey-surround more_vert"
@@ -104,11 +103,11 @@ export default function UserListCard(props: Props) {
           ) : null}
         </div>
       </div>
-      {userList.items.length > 0 ? (
+      {userList.item_count > 0 ? (
         <img
           src={embedlyThumbnail(
             SETTINGS.embedlyKey,
-            userListCoverImage(userList) || defaultResourceImageURL(),
+            userList.image_src || defaultResourceImageURL(),
             CAROUSEL_IMG_HEIGHT,
             CAROUSEL_IMG_WIDTH
           )}

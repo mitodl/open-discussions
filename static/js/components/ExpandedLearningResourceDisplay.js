@@ -10,6 +10,7 @@ import TruncatedText from "./TruncatedText"
 import Embedly from "./Embedly"
 
 import { LearningResourceRow } from "./LearningResourceCard"
+import { PaginatedUserListItems } from "./UserListItems"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
@@ -24,7 +25,6 @@ import {
   getInstructorName,
   isCoursewareResource,
   formatDurationClockTime,
-  userListCoverImage,
   hasCourseList,
   isUserList
 } from "../lib/learning_resources"
@@ -46,9 +46,6 @@ type Props = {
   similarItems: Array<LearningResourceResult>
 }
 
-const getObjectImg = object =>
-  isUserList(object.object_type) ? userListCoverImage(object) : object.image_src
-
 const lrInfoRow = (iconName, label, value) => (
   <div className="info-row">
     <div className="col-1">
@@ -59,13 +56,20 @@ const lrInfoRow = (iconName, label, value) => (
   </div>
 )
 
-const renderListItems = (
+type CollapsableSectionProps = {
   title: string,
   setShow: Function,
   show: boolean,
-  icon: string,
-  objects: any
-) => (
+  icon: string
+}
+
+const CollapsableSection = ({
+  title,
+  setShow,
+  show,
+  icon,
+  children
+}: CollapsableSectionProps & { children: any }) => (
   <div className="expanded-learning-resource-list">
     <div className="list-header">
       {title}
@@ -76,25 +80,34 @@ const renderListItems = (
         {icon}
       </i>
     </div>
-    {show
-      ? objects.map((object, i) => (
-        <LearningResourceRow
-          key={i}
-          object={object}
-          searchResultLayout={SEARCH_LIST_UI}
-        />
-      ))
-      : null}
+    {show ? children : null}
   </div>
+)
+
+type ListItemsSectionProps = CollapsableSectionProps & {
+  objects: any
+}
+
+const ListItemsSection = ({ objects, ...props }: ListItemsSectionProps) => (
+  <CollapsableSection {...props}>
+    {objects.map((object, i) => (
+      <LearningResourceRow
+        key={i}
+        object={object}
+        searchResultLayout={SEARCH_LIST_UI}
+      />
+    ))}
+  </CollapsableSection>
 )
 
 export default function ExpandedLearningResourceDisplay(props: Props) {
   const { object, runId, setShowResourceDrawer, embedly, similarItems } = props
-
   const [showSimilar, setShowSimilar] = useState(false)
   const [showCourseList, setShowCourseList] = useState(false)
+  const [showResourceList, setShowResourceList] = useState(false)
   const similarIcon = showSimilar ? "remove" : "add"
   const coursesIcon = showCourseList ? "remove" : "add"
+  const resourcesIcon = showResourceList ? "remove" : "add"
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -156,7 +169,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               <img
                 src={embedlyThumbnail(
                   SETTINGS.embedlyKey,
-                  getObjectImg(object) || defaultResourceImageURL(),
+                  object.image_src || defaultResourceImageURL(),
                   COURSE_IMAGE_DISPLAY_HEIGHT,
                   COURSE_IMAGE_DISPLAY_WIDTH
                 )}
@@ -218,11 +231,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               ? lrInfoRow("school", "Instructors:", R.join(", ", instructors))
               : null}
             {object.object_type === LR_TYPE_PROGRAM
-              ? lrInfoRow(
-                "menu_book",
-                "Number of Courses:",
-                object.items.length
-              )
+              ? lrInfoRow("menu_book", "Number of Courses:", object.item_count)
               : null}
             {isCoursewareResource(object.object_type)
               ? lrInfoRow(
@@ -261,32 +270,42 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
                   "Privacy:",
                   capitalize(object.privacy_level)
                 )}
-                {lrInfoRow("view_list", "Items in list:", object.items.length)}
+                {lrInfoRow("view_list", "Items in list:", object.item_count)}
               </React.Fragment>
             ) : null}
           </div>
         </div>
       </div>
-      {hasCourseList(object.object_type) && !emptyOrNil(object.items)
-        ? renderListItems(
-          object.object_type === LR_TYPE_PROGRAM
-            ? "Learning Resources in this Program"
-            : "Learning Resources in this List",
-          setShowCourseList,
-          showCourseList,
-          coursesIcon,
-          object.items.map(item => item.content_data)
-        )
-        : null}
-      {!emptyOrNil(similarItems)
-        ? renderListItems(
-          "Similar Learning Resources",
-          setShowSimilar,
-          showSimilar,
-          similarIcon,
-          similarItems.map(item => searchResultToLearningResource(item))
-        )
-        : null}
+      {hasCourseList(object.object_type) && !emptyOrNil(object.items) ? (
+        <ListItemsSection
+          title="Learning Resources in this Program"
+          setShow={setShowCourseList}
+          show={showCourseList}
+          icon={coursesIcon}
+          objects={object.items.map(item => item.content_data)}
+        />
+      ) : null}
+      {isUserList(object.object_type) ? (
+        <CollapsableSection
+          title="Learning Resources in this List"
+          setShow={setShowResourceList}
+          show={showResourceList}
+          icon={resourcesIcon}
+        >
+          <PaginatedUserListItems userList={object} pageSize={10} />
+        </CollapsableSection>
+      ) : null}
+      {!emptyOrNil(similarItems) ? (
+        <ListItemsSection
+          title="Similar Learning Resources"
+          setShow={setShowSimilar}
+          show={showSimilar}
+          icon={similarIcon}
+          objects={similarItems.map(item =>
+            searchResultToLearningResource(item)
+          )}
+        />
+      ) : null}
     </React.Fragment>
   )
 }

@@ -1,6 +1,7 @@
 // @flow
 import R from "ramda"
 import qs from "query-string"
+import UrlAssembler from "url-assembler"
 
 import type { Post } from "../flow/discussionTypes"
 
@@ -135,15 +136,24 @@ export const MIT_LOGO_URL = "/static/images/MIT_circle.svg"
 export const starSelectedURL = "/static/images/star_selected.png"
 export const starUnselectedURL = "/static/images/star_unselected.png"
 
+const api = UrlAssembler().prefix("/api/v0/")
+
 export const featuredCoursesURL = "/api/v0/courses/featured/"
 export const upcomingCoursesURL = "/api/v0/courses/upcoming/"
 export const newCoursesURL = "/api/v0/courses/new/"
 export const favoritesURL = "/api/v0/favorites"
-export const courseURL = "/api/v0/courses"
-export const bootcampURL = "/api/v0/bootcamps"
-export const programURL = "/api/v0/programs"
-export const userListApiURL = "/api/v0/userlists"
-export const videoApiURL = "/api/v0/videos"
+export const courseApiURL = api.segment("courses/")
+export const courseDetailApiURL = courseApiURL.segment(":courseId/")
+export const bootcampApiURL = api.segment("bootcamps/")
+export const bootcampDetailApiURL = bootcampApiURL.segment(":bootcampId/")
+export const programApiURL = api.segment("programs/")
+export const programDetailApiURL = programApiURL.segment(":programId/")
+export const userListApiURL = api.segment("userlists/")
+export const userListDetailApiURL = userListApiURL.segment(":userListId/")
+export const userListItemsApiURL = userListDetailApiURL.segment("items/")
+export const userListItemsDetailApiURL = userListItemsApiURL.segment(":itemId/")
+export const videoApiURL = api.segment("videos/")
+export const videoDetailApiURL = videoApiURL.segment(":videoId/")
 export const newVideosURL = "/api/v0/videos/new/"
 export const embedlyApiURL = "/api/v0/embedly"
 export const topicApiURL = "/api/v0/topics"

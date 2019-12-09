@@ -12,7 +12,7 @@ from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import (
     CourseFactory,
     UserListFactory,
-    UserListUserListFactory,
+    UserListItemFactory,
     BootcampFactory,
     VideoFactory,
     ProgramFactory,
@@ -473,13 +473,13 @@ def test_transform_results(
             content_type=ContentType.objects.get(model=COURSE_TYPE),
             object_id=favorited_course.id,
         )
-        item_id = UserListUserListFactory.create(
+        item = UserListItemFactory.create(
             user_list=user_list,
             content_type=ContentType.objects.get(model=USER_LIST_TYPE),
             object_id=listed_learningpath.id,
-        ).id
+        )
     else:
-        item_id = None
+        item = None
 
     raw_suggest = {
         "short_description": [
@@ -570,7 +570,16 @@ def test_transform_results(
             "_source": {
                 **ESUserListSerializer(listed_learningpath).data,
                 "is_favorite": False,
-                "lists": [{"list_id": user_list.id, "item_id": item_id}],
+                "lists": [
+                    {
+                        "list_id": user_list.id,
+                        "item_id": item.id,
+                        "content_type": item.content_type.name,
+                        "object_id": item.object_id,
+                    }
+                ]
+                if item
+                else [],
             },
         },
     ]

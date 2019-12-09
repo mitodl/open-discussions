@@ -2,7 +2,7 @@ import { assert } from "chai"
 
 import { bootcampRequest, favoriteBootcampMutation } from "./bootcamps"
 import { makeBootcamp } from "../../factories/learning_resources"
-import { bootcampURL } from "../url"
+import { bootcampDetailApiURL } from "../url"
 
 describe("Bootcamps API", () => {
   let bootcamp
@@ -13,7 +13,10 @@ describe("Bootcamps API", () => {
 
   it("bootcamp request allows fetching a bootcamp", () => {
     const request = bootcampRequest("fake-id")
-    assert.equal(request.url, `${bootcampURL}/fake-id/`)
+    assert.equal(
+      request.url,
+      bootcampDetailApiURL.param({ bootcampId: "fake-id" }).toString()
+    )
     assert.deepEqual(request.transform({ id: "foobar" }), {
       bootcamps: {
         foobar: { id: "foobar" }
@@ -30,7 +33,7 @@ describe("Bootcamps API", () => {
       const mutation = favoriteBootcampMutation(bootcamp)
       assert.equal(
         mutation.url,
-        `${bootcampURL}/${bootcamp.id}/${
+        `${bootcampDetailApiURL.param({ bootcampId: bootcamp.id }).toString()}${
           isFavorite ? "unfavorite" : "favorite"
         }/`
       )

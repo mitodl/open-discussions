@@ -1,7 +1,7 @@
 // @flow
 import R from "ramda"
 
-import { bootcampURL } from "../url"
+import { bootcampDetailApiURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
 import type { Bootcamp } from "../../flow/discussionTypes"
@@ -14,7 +14,7 @@ export const bootcampsSelector = createSelector(
 
 export const bootcampRequest = (bootcampId: number) => ({
   queryKey:  `bootcampRequest${bootcampId}`,
-  url:       `${bootcampURL}/${bootcampId}/`,
+  url:       bootcampDetailApiURL.param({ bootcampId }).toString(),
   transform: (bootcamp: any) => ({
     bootcamps: { [bootcamp.id]: bootcamp }
   }),
@@ -25,7 +25,7 @@ export const bootcampRequest = (bootcampId: number) => ({
 
 export const favoriteBootcampMutation = (bootcamp: Bootcamp) => ({
   queryKey: "bootcampMutation",
-  url:      `${bootcampURL}/${bootcamp.id}/${
+  url:      `${bootcampDetailApiURL.param({ bootcampId: bootcamp.id }).toString()}${
     bootcamp.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {

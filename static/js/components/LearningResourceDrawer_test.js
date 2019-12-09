@@ -9,7 +9,8 @@ import {
   makeCourse,
   makeProgram,
   makeVideo,
-  makeUserList
+  makeUserList,
+  makeLearningResource
 } from "../factories/learning_resources"
 import { makeYoutubeVideo } from "../factories/embedly"
 import {
@@ -21,11 +22,11 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { pushLRHistory } from "../actions/ui"
 
 import {
-  courseURL,
-  bootcampURL,
-  programURL,
-  userListApiURL,
-  videoApiURL,
+  courseDetailApiURL,
+  bootcampDetailApiURL,
+  programDetailApiURL,
+  userListDetailApiURL,
+  videoDetailApiURL,
   embedlyApiURL,
   similarResourcesURL
 } from "../lib/url"
@@ -67,7 +68,11 @@ describe("LearningResourceDrawer", () => {
     })
 
   const renderWithObject = async (object, apiUrl) => {
-    mockObjectAPI(object, apiUrl)
+    helper.handleRequestStub.withArgs(apiUrl).returns({
+      status: 200,
+      body:   object
+    })
+
     const { wrapper, store } = await render({}, [
       pushLRHistory({
         objectId:   object.id,
@@ -78,7 +83,10 @@ describe("LearningResourceDrawer", () => {
   }
 
   it("should have a button to hide the course drawer", async () => {
-    const { wrapper, store } = await renderWithObject(course, courseURL)
+    const { wrapper, store } = await renderWithObject(
+      course,
+      courseDetailApiURL
+    )
     wrapper.find(".drawer-close").simulate("click")
     // this means that the history has been cleared
     assert.deepEqual(store.getState().ui.LRDrawerHistory, [])
@@ -87,8 +95,14 @@ describe("LearningResourceDrawer", () => {
   it("should have a back button if there is more than one object in the drawer history", async () => {
     const course = makeCourse()
     const bootcamp = makeBootcamp()
-    mockObjectAPI(course, courseURL)
-    mockObjectAPI(bootcamp, bootcampURL)
+    mockObjectAPI(
+      course,
+      courseDetailApiURL.param({ courseId: course.id }).toString()
+    )
+    mockObjectAPI(
+      bootcamp,
+      bootcampDetailApiURL.param({ bootcampId: bootcamp.id }).toString()
+    )
     const { wrapper, store } = await render({}, [
       pushLRHistory({
         objectId:   course.id,
@@ -121,7 +135,15 @@ describe("LearningResourceDrawer", () => {
   })
 
   it("should pass a callback to add to the history stack to ExpandedLearningResourceDisplay", async () => {
-    const { wrapper, store } = await renderWithObject(course, courseURL)
+    const learningPath = makeLearningResource(LR_TYPE_LEARNINGPATH)
+    mockObjectAPI(
+      learningPath,
+      userListDetailApiURL.param({ userListId: learningPath.id }).toString()
+    )
+    const { wrapper, store } = await renderWithObject(
+      course,
+      courseDetailApiURL.param({ courseId: course.id }).toString()
+    )
     wrapper.find(ExpandedLearningResourceDisplay).prop("setShowResourceDrawer")(
       {
         objectId:   "test-id",
@@ -144,15 +166,16 @@ describe("LearningResourceDrawer", () => {
 
   //
   ;[
-    [makeBootcamp(), bootcampURL],
-    [makeProgram(), programURL],
-    [makeCourse(), courseURL],
-    [makeUserList(), userListApiURL]
-  ].forEach(([object, apiUrl]) => {
+    [makeBootcamp(), bootcampDetailApiURL, "bootcampId"],
+    [makeProgram(), programDetailApiURL, "programId"],
+    [makeCourse(), courseDetailApiURL, "courseId"],
+    [makeUserList(), userListDetailApiURL, "userListId"]
+  ].forEach(([object, apiUrl, key]) => {
     it(`should render ExpandedLearningResourceDisplay with object of type ${
       object.object_type
     }`, async () => {
-      const { wrapper } = await renderWithObject(object, apiUrl)
+      const url = apiUrl.param({ [key]: object.id }).toString()
+      const { wrapper } = await renderWithObject(object, url)
       const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
       assert.deepEqual(expandedDisplay.prop("object"), object)
     })
@@ -169,7 +192,10 @@ describe("LearningResourceDrawer", () => {
         status: 200,
         body:   embedly
       })
-    const { wrapper } = await renderWithObject(video, videoApiURL)
+    const { wrapper } = await renderWithObject(
+      video,
+      videoDetailApiURL.param({ videoId: video.id }).toString()
+    )
     const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), video)
     assert.deepEqual(expandedDisplay.prop("embedly"), embedly)

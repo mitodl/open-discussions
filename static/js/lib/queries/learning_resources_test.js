@@ -5,7 +5,8 @@ import R from "ramda"
 import {
   filterFavorites,
   similarResourcesRequest,
-  learningResourceSelector
+  learningResourceSelector,
+  normalizeResourcesByObjectType
 } from "./learning_resources"
 import {
   makeCourse,
@@ -18,7 +19,8 @@ import {
   LR_TYPE_ALL,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_USERLIST,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_PROGRAM
 } from "../constants"
 import { similarResourcesURL } from "../url"
 
@@ -85,5 +87,33 @@ describe("learning resource queries", () => {
     }
     const getter = learningResourceSelector(state)
     assert.notDeepEqual(getter(4, LR_TYPE_COURSE), getter(4, LR_TYPE_VIDEO))
+  })
+
+  it("normalizeResourcesByObjectType normalizes objects into the correct key", () => {
+    const course = makeLearningResource(LR_TYPE_COURSE)
+    const video = makeLearningResource(LR_TYPE_VIDEO)
+    const bootcamp = makeLearningResource(LR_TYPE_BOOTCAMP)
+    const userList = makeLearningResource(LR_TYPE_USERLIST)
+    const program = makeLearningResource(LR_TYPE_PROGRAM)
+    const resources = [course, video, bootcamp, userList, program]
+    const normalized = normalizeResourcesByObjectType(resources)
+
+    assert.deepEqual(normalized, {
+      courses: {
+        [course.id]: course
+      },
+      videos: {
+        [video.id]: video
+      },
+      bootcamps: {
+        [bootcamp.id]: bootcamp
+      },
+      userLists: {
+        [userList.id]: userList
+      },
+      programs: {
+        [program.id]: program
+      }
+    })
   })
 })

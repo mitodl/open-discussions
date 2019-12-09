@@ -29,3 +29,10 @@ export type Endpoint = {
   initialState?:         Object,
   usernameInitialState?: Object,
 }
+
+export type PaginatedResponse<T> = {
+  count: number,
+  results: Array<T>,
+  next: ?string,
+  previous: ?string,
+}

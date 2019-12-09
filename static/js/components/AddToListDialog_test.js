@@ -9,8 +9,14 @@ import AddToListDialog from "./AddToListDialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeCourse, makeUserList } from "../factories/learning_resources"
-import { courseURL, topicApiURL, userListApiURL } from "../lib/url"
+import {
+  courseDetailApiURL,
+  topicApiURL,
+  userListApiURL,
+  userListDetailApiURL
+} from "../lib/url"
 import { queryListResponse, shouldIf } from "../lib/test_utils"
+import { LR_TYPE_COURSE } from "../lib/constants"
 import { DIALOG_ADD_TO_LIST, setDialogData } from "../actions/ui"
 
 describe("AddToListDialog", () => {
@@ -26,15 +32,17 @@ describe("AddToListDialog", () => {
     helper = new IntegrationTestHelper()
     renderDialog = helper.configureReduxQueryRenderer(AddToListDialog)
     helper.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse(userLists))
     helper.handleRequestStub
       .withArgs(topicApiURL)
       .returns(queryListResponse([]))
-    helper.handleRequestStub.withArgs(`${courseURL}/${course.id}/`).returns({
-      status: 200,
-      body:   course
-    })
+    helper.handleRequestStub
+      .withArgs(courseDetailApiURL.param({ courseId: course.id }).toString())
+      .returns({
+        status: 200,
+        body:   course
+      })
   })
 
   afterEach(() => {
@@ -66,7 +74,9 @@ describe("AddToListDialog", () => {
   it("if resource is a list, there should only be a Favorites checkbox", async () => {
     const object = userLists[0]
     helper.handleRequestStub
-      .withArgs(`${userListApiURL}/${object.id}/`)
+      .withArgs(
+        userListDetailApiURL.param({ userListId: object.id }).toString()
+      )
       .returns({
         status: 200,
         body:   object
@@ -86,7 +96,12 @@ describe("AddToListDialog", () => {
       inList ? "" : "not"
     } in it`, async () => {
       if (inList) {
-        course.lists.push({ list_id: userLists[0].id, item_id: 1 })
+        course.lists.push({
+          list_id:      userLists[0].id,
+          item_id:      1,
+          content_type: LR_TYPE_COURSE,
+          object_id:    1
+        })
       }
       const { wrapper } = await render(course)
       assert.equal(
@@ -100,9 +115,24 @@ describe("AddToListDialog", () => {
   })
 
   it(`should uncheck the correct userlist`, async () => {
-    course.lists.push({ list_id: userLists[0].id, item_id: 1 })
-    course.lists.push({ list_id: userLists[1].id, item_id: 1 })
-    course.lists.push({ list_id: userLists[2].id, item_id: 1 })
+    course.lists.push({
+      list_id:      userLists[0].id,
+      item_id:      1,
+      content_type: LR_TYPE_COURSE,
+      object_id:    1
+    })
+    course.lists.push({
+      list_id:      userLists[1].id,
+      item_id:      1,
+      content_type: LR_TYPE_COURSE,
+      object_id:    1
+    })
+    course.lists.push({
+      list_id:      userLists[2].id,
+      item_id:      1,
+      content_type: LR_TYPE_COURSE,
+      object_id:    1
+    })
 
     const { wrapper } = await render(course)
     ;[1, 2, 3].forEach(idx => {

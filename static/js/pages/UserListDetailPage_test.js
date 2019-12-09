@@ -1,16 +1,15 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
-import R from "ramda"
-import arrayMove from "array-move"
 
 import UserListDetailPage from "./UserListDetailPage"
-import { LearningResourceCard } from "../components/LearningResourceCard"
-import { SortableContainer } from "../components/SortableList"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeUserList } from "../factories/learning_resources"
-import { userListApiURL } from "../lib/url"
+import {
+  makeUserList,
+  makeUserListItems
+} from "../factories/learning_resources"
+import { userListDetailApiURL, userListItemsApiURL } from "../lib/url"
 import { shouldIf } from "../lib/test_utils"
 import { LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST } from "../lib/constants"
 
@@ -21,10 +20,25 @@ describe("UserListDetailPage tests", () => {
     userList = makeUserList()
     helper = new IntegrationTestHelper()
     helper.handleRequestStub
-      .withArgs(`${userListApiURL}/${userList.id}/`)
+      .withArgs(
+        userListDetailApiURL.param({ userListId: userList.id }).toString()
+      )
+      .onFirstCall()
       .returns({
         status: 200,
         body:   userList
+      })
+    helper.handleRequestStub
+      .withArgs(
+        userListItemsApiURL.param({ userListId: userList.id }).toString()
+      )
+      .onFirstCall()
+      .returns({
+        status: 200,
+        body:   {
+          count:   4,
+          results: makeUserListItems(4)
+        }
       })
     render = helper.configureReduxQueryRenderer(UserListDetailPage, {
       match: {
@@ -52,19 +66,15 @@ describe("UserListDetailPage tests", () => {
     )
   })
 
+  it("should show a scrollable list of items", async () => {
+    const { wrapper } = await render()
+    assert.isTrue(wrapper.find("UserListItemSortableCards").exists())
+  })
+
   it("should not show the description if not there", async () => {
     userList.short_description = undefined
     const { wrapper } = await render()
     assert.isNotOk(wrapper.find(".list-description").exists())
-  })
-
-  it("should render the list items", async () => {
-    const { wrapper } = await render()
-    R.zip([...wrapper.find(LearningResourceCard)], userList.items).forEach(
-      ([card, item]) => {
-        assert.deepEqual(card.props.object, item.content_data)
-      }
-    )
   })
 
   //
@@ -96,21 +106,31 @@ describe("UserListDetailPage tests", () => {
 
   //
   ;[[0, false], [1, false], [2, true], [3, true]].forEach(
-    ([listItems, shouldShowButton]) => {
+    ([itemCount, shouldShowButton]) => {
       it(`${shouldIf(
         shouldShowButton
       )} show the reorder button for LP with ${String(
-        listItems
+        itemCount
       )} items`, async () => {
         // $FlowFixMe: flow thinks this is invalid for who knows what reason
         userList.author = SETTINGS.user_id
         userList.list_type = LR_TYPE_LEARNINGPATH
-        userList.items = userList.items.slice(0, listItems)
+        userList.item_count = itemCount
         const { wrapper } = await render()
         assert.equal(wrapper.find(".sort-list").exists(), shouldShowButton)
       })
     }
   )
+
+  it("should let the user reorder their learning path", async () => {
+    // $FlowFixMe: flow thinks this is invalid for who knows what reason
+    userList.author = SETTINGS.user_id
+    userList.list_type = LR_TYPE_LEARNINGPATH
+    const { wrapper } = await render()
+    assert.isFalse(wrapper.find("UserListItemSortableCards").prop("isSorting"))
+    wrapper.find(".sort-list").simulate("click")
+    assert.isTrue(wrapper.find("UserListItemSortableCards").prop("isSorting"))
+  })
 
   it("should hide the reorder button for a user list", async () => {
     // $FlowFixMe: flow thinks this is invalid for who knows what reason
@@ -118,32 +138,5 @@ describe("UserListDetailPage tests", () => {
     userList.list_type = LR_TYPE_USERLIST
     const { wrapper } = await render()
     assert.isNotOk(wrapper.find(".sort-list").exists())
-  })
-
-  it("should let the user reorder their learning path", async () => {
-    // $FlowFixMe: flow thinks this is invalid for who knows what reason
-    userList.author = SETTINGS.user_id
-    userList.list_type = LR_TYPE_LEARNINGPATH
-    const { wrapper } = await render()
-    wrapper.find(".sort-list").simulate("click")
-    wrapper.find("LearningResourceCard").forEach(card => {
-      assert.isTrue(card.prop("reordering"))
-    })
-
-    wrapper.find(SortableContainer).prop("onSortEnd")({
-      oldIndex: 1,
-      newIndex: 2
-    })
-    const [url, method, { body }] = helper.handleRequestStub.args[1]
-    assert.equal(method, "PATCH")
-    assert.equal(url, `${userListApiURL}/${userList.id}/`)
-    assert.deepEqual(body.id, userList.id)
-    assert.deepEqual(
-      body.items,
-      arrayMove(userList.items, 1, 2).map((item, idx) => ({
-        id:       item.id,
-        position: idx
-      }))
-    )
   })
 })

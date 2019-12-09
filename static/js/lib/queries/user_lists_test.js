@@ -13,7 +13,7 @@ import {
   myUserListsSelector
 } from "./user_lists"
 import { makeUserList } from "../../factories/learning_resources"
-import { userListApiURL } from "../url"
+import { userListApiURL, userListDetailApiURL } from "../url"
 import { LR_TYPE_USERLIST, LR_PUBLIC } from "../constants"
 import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
 
@@ -32,7 +32,10 @@ describe("UserLists API", () => {
 
   it("userList request allows fetching a userList", () => {
     const request = userListRequest(45)
-    assert.equal(request.url, `${userListApiURL}/45/`)
+    assert.equal(
+      request.url,
+      userListDetailApiURL.param({ userListId: 45 }).toString()
+    )
     assert.deepEqual(request.transform({ id: "foobar" }), {
       userLists: {
         foobar: { id: "foobar" }
@@ -49,7 +52,7 @@ describe("UserLists API", () => {
       const mutation = favoriteUserListMutation(userList)
       assert.equal(
         mutation.url,
-        `${userListApiURL}/${userList.id}/${
+        `${userListDetailApiURL.param({ userListId: userList.id }).toString()}${
           isFavorite ? "unfavorite" : "favorite"
         }/`
       )
@@ -74,7 +77,7 @@ describe("UserLists API", () => {
     const query = createUserListMutation(params)
     assert.deepEqual(query.body, params)
     assert.equal(query.queryKey, "createUserListMutation")
-    assert.equal(query.url, `${userListApiURL}/`)
+    assert.equal(query.url, userListApiURL.toString())
     assert.deepEqual(query.options, {
       method: "POST",
       ...DEFAULT_POST_OPTIONS
@@ -90,7 +93,10 @@ describe("UserLists API", () => {
   it("deleteUserListMutation should return what we expect", () => {
     const query = deleteUserListMutation(userList)
     assert.equal(query.queryKey, "deleteUserListMutation")
-    assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
+    assert.equal(
+      query.url,
+      userListDetailApiURL.param({ userListId: userList.id }).toString()
+    )
     assert.deepEqual(query.options, {
       method: "DELETE",
       ...DEFAULT_POST_OPTIONS
@@ -108,7 +114,10 @@ describe("UserLists API", () => {
     const query = userListMutation(userList)
     assert.deepEqual(query.body, userList)
     assert.equal(query.queryKey, "userListMutation")
-    assert.equal(query.url, `${userListApiURL}/${userList.id}/`)
+    assert.equal(
+      query.url,
+      userListDetailApiURL.param({ userListId: userList.id }).toString()
+    )
     assert.deepEqual(query.options, {
       method: "PATCH",
       ...DEFAULT_POST_OPTIONS

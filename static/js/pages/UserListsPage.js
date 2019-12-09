@@ -30,10 +30,11 @@ import { FAVORITES_PSEUDO_LIST } from "../lib/constants"
 const favoritesPseudoListSelector = createSelector(
   favoritesListSelector,
   favorites => ({
-    title:     "My Favorites",
-    list_type: FAVORITES_PSEUDO_LIST,
-    items:     favorites,
-    id:        FAVORITES_PSEUDO_LIST
+    title:      "My Favorites",
+    list_type:  FAVORITES_PSEUDO_LIST,
+    item_count: favorites.length,
+    items:      favorites,
+    id:         FAVORITES_PSEUDO_LIST
   })
 )
 

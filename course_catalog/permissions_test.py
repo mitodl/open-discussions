@@ -7,7 +7,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
 
 from course_catalog.constants import PrivacyLevel
-from course_catalog.factories import UserListFactory, UserListCourseFactory
+from course_catalog.factories import UserListFactory, UserListItemFactory
 from course_catalog.permissions import (
     HasUserListPermissions,
     HasUserListItemPermissions,
@@ -101,7 +101,7 @@ def test_userlistitems_object_permissions(mocker, user, is_public, is_author, is
         if is_public
         else PrivacyLevel.private.value,
     )
-    userlist_item = UserListCourseFactory.create(user_list=userlist)
+    userlist_item = UserListItemFactory.create(user_list=userlist)
 
     request = mocker.MagicMock(
         method="GET" if is_safe else "POST",

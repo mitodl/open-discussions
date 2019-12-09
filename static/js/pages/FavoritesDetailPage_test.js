@@ -19,7 +19,7 @@ describe("FavoritesDetailPage tests", () => {
       .withArgs(favoritesURL)
       .returns(queryListResponse(favorites))
     helper.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(FavoritesDetailPage)
   })

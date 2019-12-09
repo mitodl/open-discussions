@@ -34,15 +34,10 @@ import {
   getStartDate,
   getInstructorName,
   privacyIcon,
-  filterItems,
   isCoursewareResource,
   formatDurationClockTime
 } from "./learning_resources"
-import {
-  makeCourse,
-  makeRun,
-  makeUserList
-} from "../factories/learning_resources"
+import { makeCourse, makeRun } from "../factories/learning_resources"
 import moment from "moment"
 
 describe("Course utils", () => {
@@ -408,12 +403,6 @@ describe("Course run availability utils", () => {
   //
   ;[["public", "lock_open"], ["private", "lock"]].forEach(([privacy, icon]) => {
     assert.equal(privacyIcon(privacy), icon)
-  })
-
-  it("filterItems returns a list of userlists to those including a resource item", () => {
-    const userLists = times(makeUserList, 5)
-    const resource = userLists[3].items[1]
-    assert.deepEqual(filterItems(userLists, "items", resource), [userLists[3]])
   })
 
   //

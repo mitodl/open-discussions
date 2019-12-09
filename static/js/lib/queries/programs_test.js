@@ -2,7 +2,7 @@ import { assert } from "chai"
 
 import { programRequest, favoriteProgramMutation } from "./programs"
 import { makeProgram } from "../../factories/learning_resources"
-import { programURL } from "../url"
+import { programDetailApiURL } from "../url"
 
 describe("Programs API", () => {
   let program
@@ -13,7 +13,10 @@ describe("Programs API", () => {
 
   it("program request allows fetching a program", () => {
     const request = programRequest("fake-id")
-    assert.equal(request.url, `${programURL}/fake-id/`)
+    assert.equal(
+      request.url,
+      programDetailApiURL.param({ programId: "fake-id" }).toString()
+    )
     assert.deepEqual(request.transform({ id: "foobar" }), {
       programs: {
         foobar: { id: "foobar" }
@@ -30,7 +33,9 @@ describe("Programs API", () => {
       const mutation = favoriteProgramMutation(program)
       assert.equal(
         mutation.url,
-        `${programURL}/${program.id}/${isFavorite ? "unfavorite" : "favorite"}/`
+        `${programDetailApiURL.param({ programId: program.id }).toString()}${
+          isFavorite ? "unfavorite" : "favorite"
+        }/`
       )
       assert.deepEqual(mutation.transform(), {
         programs: {

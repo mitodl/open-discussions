@@ -2,7 +2,7 @@ import { assert } from "chai"
 
 import { videoRequest, newVideosRequest, favoriteVideoMutation } from "./videos"
 import { makeVideo } from "../../factories/learning_resources"
-import { videoApiURL, newVideosURL } from "../url"
+import { videoDetailApiURL, newVideosURL } from "../url"
 import { constructIdMap } from "../redux_query"
 
 import R from "ramda"
@@ -16,7 +16,10 @@ describe("Videos API", () => {
 
   it("video request allows fetching a video", () => {
     const request = videoRequest("fake-id")
-    assert.equal(request.url, `${videoApiURL}/fake-id/`)
+    assert.equal(
+      request.url,
+      videoDetailApiURL.param({ videoId: "fake-id" }).toString()
+    )
     assert.deepEqual(request.transform({ id: "foobar" }), {
       videos: {
         foobar: { id: "foobar" }
@@ -49,7 +52,9 @@ describe("Videos API", () => {
       const mutation = favoriteVideoMutation(video)
       assert.equal(
         mutation.url,
-        `${videoApiURL}/${video.id}/${isFavorite ? "unfavorite" : "favorite"}/`
+        `${videoDetailApiURL.param({ videoId: video.id }).toString()}${
+          isFavorite ? "unfavorite" : "favorite"
+        }/`
       )
       assert.deepEqual(mutation.transform(), {
         videos: {

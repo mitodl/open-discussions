@@ -3,14 +3,14 @@
 import R from "ramda"
 import { createSelector } from "reselect"
 
-import { userListApiURL } from "../url"
+import { userListApiURL, userListDetailApiURL } from "../url"
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { UserList } from "../../flow/discussionTypes"
 
 export const userListRequest = (userListId: number) => ({
   queryKey:  `userListRequest${userListId}`,
-  url:       `${userListApiURL}/${userListId}/`,
+  url:       userListDetailApiURL.param({ userListId }).toString(),
   transform: (userList: any) => ({
     userLists: { [userList.id]: userList }
   }),
@@ -21,7 +21,7 @@ export const userListRequest = (userListId: number) => ({
 
 export const userListsRequest = () => ({
   queryKey:  "userListsRequest",
-  url:       userListApiURL,
+  url:       userListApiURL.toString(),
   transform: (body: ?{ results: Array<UserList> }) => ({
     userLists: body ? constructIdMap(body.results) : {}
   }),
@@ -47,7 +47,7 @@ export const myUserListsSelector = createSelector(
 
 export const favoriteUserListMutation = (userList: UserList) => ({
   queryKey: "userListMutation",
-  url:      `${userListApiURL}/${userList.id}/${
+  url:      `${userListDetailApiURL.param({ userListId: userList.id }).toString()}${
     userList.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {
@@ -74,7 +74,7 @@ export const favoriteUserListMutation = (userList: UserList) => ({
 export const createUserListMutation = (params: Object) => ({
   queryKey:  "createUserListMutation",
   body:      params,
-  url:       `${userListApiURL}/`,
+  url:       userListApiURL.toString(),
   transform: (newUserList: ?UserList) => {
     return newUserList
       ? {
@@ -95,7 +95,7 @@ export const createUserListMutation = (params: Object) => ({
 
 export const deleteUserListMutation = (userList: UserList) => ({
   queryKey: "deleteUserListMutation",
-  url:      `${userListApiURL}/${userList.id}/`,
+  url:      userListDetailApiURL.param({ userListId: userList.id }).toString(),
   update:   {
     userLists: R.dissoc(userList.id)
   },
@@ -108,7 +108,7 @@ export const deleteUserListMutation = (userList: UserList) => ({
 export const userListMutation = (userList: Object) => ({
   queryKey:  "userListMutation",
   body:      userList,
-  url:       `${userListApiURL}/${userList.id}/`,
+  url:       userListDetailApiURL.param({ userListId: userList.id }).toString(),
   transform: (userList: any) => ({
     userLists: { [userList.id]: userList }
   }),

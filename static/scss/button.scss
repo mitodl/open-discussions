@@ -96,3 +96,24 @@ a.remove {
   padding: 2px 27px;
   margin: 0;
 }
+
+button.blue-btn.outlined {
+  border: 1px solid $course-blue;
+  background: white;
+  color: black;
+  display: flex;
+  width: 160px;
+  text-align: center;
+  align-items: center;
+
+  &:enabled:hover {
+    border-color: $course-blue;
+    background: $course-blue;
+    color: white;
+  }
+
+  &:disabled {
+    border-color: $medium-grey;
+    color: $medium-grey;
+  }
+}

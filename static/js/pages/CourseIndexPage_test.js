@@ -85,7 +85,7 @@ describe("CourseIndexPage", () => {
       .withArgs(newVideosURL)
       .returns(queryListResponse(newVideos))
     helper.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
   })

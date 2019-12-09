@@ -58,6 +58,7 @@ $text-padding-left: 26px;
 $rouge: #a31f34;
 $navy: #03152d;
 $pale-grey: #f4f6fa;
+$medium-grey: #c2c0bf;
 $white-smoky: #4f4f4f;
 $nice-red: #a32034;
 $course-blue: #126f9a;
@@ -67,6 +68,6 @@ $teal: #3dbdbf;
 $body-font: "Source Sans Pro", helvetica, arial, sans-serif !important;
 
 $search-layout-active: #355b6b;
-$search-layout-inactive: #c2c0bf;
+$search-layout-inactive: $medium-grey;
 
 $search-grey: rgba(0, 0, 0, 0.85);

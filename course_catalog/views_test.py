@@ -14,14 +14,13 @@ from course_catalog.factories import (
     BootcampFactory,
     ProgramFactory,
     UserListFactory,
-    UserListBootcampFactory,
-    UserListCourseFactory,
+    UserListItemFactory,
     ProgramItemCourseFactory,
     ProgramItemBootcampFactory,
     VideoFactory,
     LearningResourceRunFactory,
 )
-from course_catalog.models import UserList, UserListItem
+from course_catalog.models import UserList
 from course_catalog.serializers import (
     CourseTopicSerializer,
     MicroUserListItemSerializer,
@@ -111,7 +110,7 @@ def test_course_detail_endpoint_lists(user_client, user):
     user_lists = UserListFactory.create_batch(3, author=user)
     list_items = sorted(
         [
-            UserListCourseFactory.create(content_object=course, user_list=user_list)
+            UserListItemFactory.create(content_object=course, user_list=user_list)
             for user_list in user_lists
         ],
         key=lambda x: x.id,
@@ -139,7 +138,7 @@ def test_bootcamp_detail_endpoint_lists(user_client, user):
     user_lists = UserListFactory.create_batch(2, author=user)
     list_items = sorted(
         [
-            UserListBootcampFactory.create(content_object=bootcamp, user_list=user_list)
+            UserListItemFactory.create(content_object=bootcamp, user_list=user_list)
             for user_list in user_lists
         ],
         key=lambda x: x.id,
@@ -188,8 +187,8 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
         else PrivacyLevel.private.value,
     )
 
-    bootcamp_item = UserListBootcampFactory.create(user_list=user_list, position=1)
-    course_item = UserListCourseFactory.create(user_list=user_list, position=2)
+    UserListItemFactory.create(user_list=user_list, position=1, is_bootcamp=True)
+    UserListItemFactory.create(user_list=user_list, position=2)
 
     # Anonymous users should get no results
     resp = client.get(reverse("userlists-list"))
@@ -207,12 +206,7 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
     if resp.status_code == 200:
         assert resp.data.get("title") == user_list.title
         assert len(resp.data.get("lists")) == 0
-        for item in resp.data.get("items"):
-            assert "content_data" in item
-            if item.get("position") == 1:
-                assert item.get("id") == bootcamp_item.id
-            else:
-                assert item.get("id") == course_item.id
+        assert resp.data.get("item_count") == 2
 
     # Logged in user should see other person's public list
     resp = client.get(reverse("userlists-detail", args=[another_user_list.id]))
@@ -249,7 +243,7 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
     userlist = UserListFactory.create(
         author=user, title="Title 1", topics=[original_topic]
     )
-    UserListCourseFactory.create(user_list=userlist)
+    UserListItemFactory.create(user_list=userlist)
 
     client.force_login(user)
 
@@ -266,175 +260,6 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
         new_topic.id if update_topics else original_topic.id
     )
     mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
-
-
-@pytest.mark.parametrize("num_topics", [0, 2])
-@pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_create_item(
-    client, user, is_author, mock_user_list_index, num_topics
-):
-    """Test userlist endpoint for creating a UserListItem"""
-    author = UserFactory.create()
-    userlist = UserListFactory.create(
-        author=author, privacy_level=PrivacyLevel.public.value
-    )
-    course = CourseFactory.create()
-
-    topic_ids = sorted(
-        [topic.id for topic in CourseTopicFactory.create_batch(num_topics)]
-    )
-
-    client.force_login(author if is_author else user)
-
-    data = {
-        "items": [{"content_type": "course", "object_id": course.id}],
-        "topics": topic_ids,
-    }
-
-    resp = client.patch(
-        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-    )
-    assert resp.status_code == (200 if is_author else 403)
-    if resp.status_code == 200:
-        assert len(resp.data.get("items")) == 1
-        assert resp.data.get("items")[0]["object_id"] == course.id
-        assert (
-            sorted([topic["id"] for topic in resp.data.get("topics", [])]) == topic_ids
-        )
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
-
-
-def test_user_list_endpoint_create_item_bad_data(client, user):
-    """Test userlist endpoint for creating a UserListItem"""
-    userlist = UserListFactory.create(
-        author=user, privacy_level=PrivacyLevel.public.value
-    )
-    course = CourseFactory.create()
-
-    client.force_login(user)
-
-    data = {"items": [{"content_type": "bad_content", "object_id": course.id}]}
-
-    resp = client.patch(
-        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-    )
-    assert resp.status_code == 400
-    assert resp.json() == {
-        "non_field_errors": ["Incorrect object type bad_content"],
-        "error_type": "ValidationError",
-    }
-
-
-@pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list_index):
-    """Test userlist endpoint for updating UserListItem positions"""
-    author = UserFactory.create()
-    topics = CourseTopicFactory.create_batch(3)
-    userlist = UserListFactory.create(
-        author=author, privacy_level=PrivacyLevel.public.value, topics=topics
-    )
-    list_items = sorted(
-        UserListCourseFactory.create_batch(2, user_list=userlist),
-        key=lambda item: item.position,
-    )
-
-    client.force_login(author if is_author else user)
-
-    data = {
-        "items": [
-            {"id": list_items[0].id, "position": 44},
-            {"id": list_items[1].id, "position": 33},
-        ],
-        "topics": [topics[0].id],
-    }
-
-    resp = client.patch(
-        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-    )
-    assert resp.status_code == (200 if is_author else 403)
-    if resp.status_code == 200:
-        assert resp.data.get("topics") == [
-            CourseTopicSerializer(instance=topics[0]).data
-        ]
-        updated_items = sorted(
-            resp.data.get("items"), key=lambda item: item["position"]
-        )
-        assert (
-            updated_items[0]["position"] == 33
-            and updated_items[0]["id"] == list_items[1].id
-        )
-        assert (
-            updated_items[1]["position"] == 44
-            and updated_items[1]["id"] == list_items[0].id
-        )
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
-
-
-def test_user_list_endpoint_update_items_wrong_list(client, user):
-    """Verify that trying an update on UserListItem in wrong list fails"""
-    userlist = UserListFactory.create(
-        author=user, privacy_level=PrivacyLevel.public.value
-    )
-    list_item_incorrect = UserListCourseFactory.create(
-        user_list=UserListFactory.create()
-    )
-
-    client.force_login(user)
-
-    data = {"items": [{"id": list_item_incorrect.id, "position": 44}]}
-
-    resp = client.patch(
-        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-    )
-    assert resp.status_code == 400
-    assert resp.json() == [f"Item {list_item_incorrect.id} not in list"]
-
-
-@pytest.mark.parametrize("is_author", [True, False])
-def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list_index):
-    """Test userlist endpoint for deleting UserListItems"""
-    author = UserFactory.create()
-    userlist = UserListFactory.create(
-        author=author, privacy_level=PrivacyLevel.public.value
-    )
-    list_items = sorted(
-        UserListCourseFactory.create_batch(2, user_list=userlist),
-        key=lambda item: item.id,
-    )
-
-    client.force_login(author if is_author else user)
-
-    data = {"items": [{"id": list_items[0].id, "delete": True}]}
-
-    resp = client.patch(
-        reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-    )
-    assert resp.status_code == (200 if is_author else 403)
-    if resp.status_code == 200:
-        updated_items = resp.data.get("items")
-        assert len(updated_items) == 1
-        assert updated_items[0]["id"] == list_items[1].id
-        assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
-        mock_user_list_index.upsert_user_list.assert_called_with(userlist.id)
-
-        data = {
-            "items": [
-                {
-                    "object_id": list_items[1].object_id,
-                    "content_type": "course",
-                    "delete": True,
-                }
-            ]
-        }
-
-        resp = client.patch(
-            reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
-        )
-        assert resp.status_code == 200
-        updated_items = resp.data.get("items")
-        assert len(updated_items) == 0
-        assert UserListItem.objects.filter(id=list_items[1].id).exists() is False
-        mock_user_list_index.delete_empty_list.assert_called_with(userlist)
 
 
 @pytest.mark.parametrize("is_author", [True, False])
@@ -492,21 +317,26 @@ def test_user_list_items_endpoint_update_item(
     userlist = UserListFactory.create(
         author=author, privacy_level=PrivacyLevel.public.value, topics=topics
     )
-    list_item = UserListCourseFactory.create(user_list=userlist)
+    list_item_1 = UserListItemFactory.create(user_list=userlist, position=0)
+    list_item_2 = UserListItemFactory.create(user_list=userlist, position=1)
+    list_item_3 = UserListItemFactory.create(user_list=userlist, position=2)
 
     client.force_login(author if is_author else user)
 
-    data = {"id": list_item.id, "position": 44444}
+    data = {"position": 0}
 
     resp = client.patch(
-        reverse("userlistitems-detail", args=[userlist.id, list_item.id]),
+        reverse("userlistitems-detail", args=[userlist.id, list_item_3.id]),
         data=data,
         format="json",
     )
     assert resp.status_code == (200 if is_author else 403)
     if resp.status_code == 200:
-        assert resp.json()["position"] == 44444
+        assert resp.json()["position"] == 0
         mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
+        for idx, item in enumerate([list_item_3, list_item_1, list_item_2]):
+            item.refresh_from_db()
+            assert item.position == idx
 
 
 def test_user_list_items_endpoint_update_items_wrong_list(client, user):
@@ -514,9 +344,7 @@ def test_user_list_items_endpoint_update_items_wrong_list(client, user):
     userlist = UserListFactory.create(
         author=user, privacy_level=PrivacyLevel.public.value
     )
-    list_item_incorrect = UserListCourseFactory.create(
-        user_list=UserListFactory.create()
-    )
+    list_item_incorrect = UserListItemFactory.create()
 
     client.force_login(user)
 
@@ -540,7 +368,7 @@ def test_user_list_items_endpoint_delete_items(
         author=author, privacy_level=PrivacyLevel.public.value
     )
     list_items = sorted(
-        UserListCourseFactory.create_batch(2, user_list=userlist),
+        UserListItemFactory.create_batch(2, user_list=userlist),
         key=lambda item: item.id,
     )
 
