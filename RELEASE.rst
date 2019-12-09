@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.102.3
+Version 0.102.3 (Released December 09, 2019)
 ---------------
 
 - Added topics generation for videos
