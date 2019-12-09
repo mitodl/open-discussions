@@ -15,6 +15,7 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
     UserListCourseFactory,
+    UserListUserListFactory,
 )
 from course_catalog.models import Course, Video
 from open_discussions.constants import ISOFORMAT
@@ -367,10 +368,11 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
 @pytest.mark.django_db
 def test_es_userlist_serializer_image_src():
     """
-    Test that ESUserListSerializer uses a list item image_src if the list image_src is None
+    Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
     """
     user_list = UserListFactory.create(image_src=None)
-    list_item = UserListCourseFactory.create(user_list=user_list)
+    UserListUserListFactory.create(user_list=user_list, position=1)
+    list_item_course = UserListCourseFactory.create(user_list=user_list, position=2)
     serialized = ESUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
@@ -382,7 +384,7 @@ def test_es_userlist_serializer_image_src():
             "id": user_list.id,
             "short_description": user_list.short_description,
             "title": user_list.title,
-            "image_src": list_item.item.image_src,
+            "image_src": list_item_course.item.image_src,
             "topics": list(user_list.topics.values_list("name", flat=True)),
         },
     )
