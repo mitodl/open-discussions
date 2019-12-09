@@ -26,7 +26,8 @@ import {
   getPreferredOfferedBy,
   isCoursewareResource,
   formatDurationClockTime,
-  userListCoverImage
+  userListCoverImage,
+  hasCourseList
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
@@ -229,10 +230,12 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             ) : null}
         </div>
       </div>
-      {[LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(object.object_type) ? (
+      {hasCourseList(object.object_type) ? (
         <div className="expanded-learning-resource-userlist">
           <div className="user-list-header">
-            Learning Resources in this List
+            {object.object_type === LR_TYPE_PROGRAM
+              ? "Learning Resources in this Program"
+              : "Learning Resources in this List"}
           </div>
           {object.items.map((item, i) => (
             <LearningResourceRow

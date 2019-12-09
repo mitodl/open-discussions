@@ -375,17 +375,35 @@ describe("ExpandedLearningResourceDisplay", () => {
         object.items.length
       )
     })
+  })
 
-    it(`should include a display of list items for ${objectType}`, () => {
+  //
+  ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH, LR_TYPE_PROGRAM].forEach(
+    objectType => {
+      it(`should include a display of list items for ${objectType}`, () => {
+        const object = makeLearningResource(objectType)
+        const wrapper = render({
+          object
+        })
+        assert.ok(wrapper.find(".expanded-learning-resource-userlist").exists())
+        R.zip(
+          object.items.map(item => item.content_data),
+          wrapper.find("LearningResourceRow").map(el => el.prop("object"))
+        ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
+      })
+    }
+  )
+
+  //
+  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+    it(`should not include a display of list items for ${objectType}`, () => {
       const object = makeLearningResource(objectType)
       const wrapper = render({
         object
       })
-      assert.ok(wrapper.find(".expanded-learning-resource-userlist").exists())
-      R.zip(
-        object.items.map(item => item.content_data),
-        wrapper.find("LearningResourceRow").map(el => el.prop("object"))
-      ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
+      assert.isNotOk(
+        wrapper.find(".expanded-learning-resource-userlist").exists()
+      )
     })
   })
 

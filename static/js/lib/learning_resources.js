@@ -241,6 +241,12 @@ export const isCoursewareResource = R.contains(R.__, [
   LR_TYPE_BOOTCAMP
 ])
 
+export const hasCourseList = R.contains(R.__, [
+  LR_TYPE_LEARNINGPATH,
+  LR_TYPE_USERLIST,
+  LR_TYPE_PROGRAM
+])
+
 export const formatDurationClockTime = (value: string) => {
   // Format an ISO-8601 duration string so to a readable format
   // The logic here ensures that if there is a colon (:) to the left
