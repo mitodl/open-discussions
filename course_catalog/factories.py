@@ -293,6 +293,37 @@ class ListItemFactory(DjangoModelFactory):
         abstract = True
 
 
+class UserListItemFactory(ListItemFactory):
+    """Factory for UserList items"""
+
+    user_list = factory.SubFactory("course_catalog.factories.UserListFactory")
+    content_object = factory.SubFactory("course_catalog.factories.CourseFactory")
+
+    class Meta:
+        model = UserListItem
+
+    class Params:
+        is_course = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.CourseFactory")
+        )
+        is_bootcamp = factory.Trait(
+            content_object=factory.SubFactory(
+                "course_catalog.factories.BootcampFactory"
+            )
+        )
+        is_userlist = factory.Trait(
+            content_object=factory.SubFactory(
+                "course_catalog.factories.UserListFactory"
+            )
+        )
+        is_program = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.ProgramFactory")
+        )
+        is_video = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.VideoFactory")
+        )
+
+
 class ProgramItemCourseFactory(ListItemFactory):
     """Factory for Program Item Courses"""
 
@@ -379,51 +410,6 @@ class VideoFactory(LearningResourceFactory):
 
     class Meta:
         model = Video
-
-
-class UserListCourseFactory(ListItemFactory):
-    """Factory for Course UserListItems"""
-
-    content_object = factory.SubFactory(CourseFactory)
-
-    class Meta:
-        model = UserListItem
-
-
-class UserListBootcampFactory(ListItemFactory):
-    """Factory for Bootcamp UserListItems"""
-
-    content_object = factory.SubFactory(BootcampFactory)
-
-    class Meta:
-        model = UserListItem
-
-
-class UserListProgramFactory(ListItemFactory):
-    """Factory for Program UserListItems"""
-
-    content_object = factory.SubFactory(ProgramFactory)
-
-    class Meta:
-        model = UserListItem
-
-
-class UserListVideoFactory(ListItemFactory):
-    """Factory for Video UserListItems"""
-
-    content_object = factory.SubFactory(VideoFactory)
-
-    class Meta:
-        model = UserListItem
-
-
-class UserListUserListFactory(ListItemFactory):
-    """Factory for UserList UserListItems"""
-
-    content_object = factory.SubFactory(UserListFactory)
-
-    class Meta:
-        model = UserListItem
 
 
 class VideoChannelFactory(LearningResourceFactory):

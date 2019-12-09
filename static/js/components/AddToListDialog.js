@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useRequest, useMutation } from "redux-query-react"
 import { createSelector } from "reselect"
 import { Checkbox } from "@rmwc/checkbox"
-import { find, propEq } from "ramda"
+import { indexBy, prop, find, propEq } from "ramda"
 
 import Dialog from "./Dialog"
 import UserListFormDialog from "./UserListFormDialog"
@@ -14,9 +14,7 @@ import { capitalize, emptyOrNil } from "../lib/util"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
-  LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
 } from "../lib/constants"
 import { isUserList, privacyIcon } from "../lib/learning_resources"
@@ -25,10 +23,13 @@ import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
 import {
   favoriteUserListMutation,
-  userListMutation,
   userListsRequest,
   myUserListsSelector
 } from "../lib/queries/user_lists"
+import {
+  createUserListItemMutation,
+  deleteUserListItemMutation
+} from "../lib/queries/user_list_items"
 import { favoriteVideoMutation } from "../lib/queries/videos"
 import {
   learningResourceSelector,
@@ -39,6 +40,8 @@ const uiDialogSelector = createSelector(
   state => state.ui,
   ui => ui.dialogs.get(DIALOG_ADD_TO_LIST) || {}
 )
+
+const listsById = indexBy(prop("list_id"))
 
 export default function AddToListDialog() {
   const { id: objectId, object_type: objectType } = useSelector(
@@ -55,8 +58,8 @@ export default function AddToListDialog() {
   const userLists = useSelector(myUserListsSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
 
-  const inLists = (resource && isFinishedResource ? resource.lists : []).map(
-    listitem => listitem.list_id
+  const listItemsById = listsById(
+    resource && isFinishedResource ? resource.lists : []
   )
 
   const dispatch = useDispatch()
@@ -82,18 +85,10 @@ export default function AddToListDialog() {
     }
   })
 
-  const [, toggleListItem] = useMutation((resource, list, remove) => {
-    list.items = [
-      {
-        content_type:
-          resource.object_type === LR_TYPE_LEARNINGPATH
-            ? LR_TYPE_USERLIST
-            : resource.object_type,
-        object_id: resource.id,
-        delete:    remove
-      }
-    ]
-    return userListMutation(list)
+  const [, toggleListItem] = useMutation((resource, list, item, remove) => {
+    return remove
+      ? deleteUserListItemMutation(list.id, item)
+      : createUserListItemMutation(list.id, resource)
   })
 
   const updateResource = (checked: boolean, userListId) => {
@@ -125,33 +120,42 @@ export default function AddToListDialog() {
       </div>
       {resource && !isUserList(resource.object_type) ? (
         <React.Fragment>
-          {userLists.map((userList, i) => (
-            <div className="flex-row" key={i}>
-              <div>
-                <Checkbox
-                  checked={inLists.includes(userList.id)}
-                  onChange={(e: any) => {
-                    toggleListItem(resource, userList, !e.target.checked)
-                    updateResource(e.target.checked, userList.id)
-                  }}
-                >
-                  {`${userList.title}`}
-                </Checkbox>
-              </div>
-              <div>
-                <div className="grey-surround privacy">
-                  <i
-                    className={`material-icons ${privacyIcon(
-                      userList.privacy_level
-                    )}`}
+          {userLists.map((userList, i) => {
+            const listItem = listItemsById[userList.id]
+            return (
+              <div className="flex-row" key={i}>
+                <div>
+                  <Checkbox
+                    checked={!!listItem}
+                    onChange={(e: any) => {
+                      toggleListItem(
+                        resource,
+                        userList,
+                        listItem,
+                        !e.target.checked
+                      )
+                      updateResource(e.target.checked, userList.id)
+                    }}
+                    disabled={listItem && !listItem.item_id}
                   >
-                    {privacyIcon(userList.privacy_level)}
-                  </i>
-                  {capitalize(userList.privacy_level)}
+                    {`${userList.title}`}
+                  </Checkbox>
+                </div>
+                <div>
+                  <div className="grey-surround privacy">
+                    <i
+                      className={`material-icons ${privacyIcon(
+                        userList.privacy_level
+                      )}`}
+                    >
+                      {privacyIcon(userList.privacy_level)}
+                    </i>
+                    {capitalize(userList.privacy_level)}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
 
           <button
             className="create-new-list blue-btn"

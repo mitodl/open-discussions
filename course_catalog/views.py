@@ -1,10 +1,9 @@
 """
 course_catalog views
 """
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch, OuterRef, Exists
+from django.db.models import Prefetch, OuterRef, Exists, Count
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -78,8 +77,8 @@ class DefaultPagination(LimitOffsetPagination):
     Pagination class for course_catalog viewsets which gets default_limit and max_limit from settings
     """
 
-    default_limit = settings.COURSE_API_DEFAULT_LIMIT
-    max_limit = settings.COURSE_API_MAX_LIMIT
+    default_limit = 10
+    max_limit = 100
 
 
 class FavoriteViewMixin:
@@ -215,7 +214,10 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
     Viewset for User Lists & Learning Paths
     """
 
-    queryset = UserList.objects.prefetch_related("author", "topics", "offered_by")
+    queryset = UserList.objects.prefetch_related(
+        "author", "topics", "offered_by"
+    ).annotate(item_count=Count("items"))
+
     serializer_class = UserListSerializer
     pagination_class = LargePagination
     permission_classes = (HasUserListPermissions,)
@@ -245,7 +247,7 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
     Viewset for User List Items
     """
 
-    queryset = UserListItem.objects.select_related("content_type")
+    queryset = UserListItem.objects.select_related("content_type").order_by("position")
     serializer_class = UserListItemSerializer
     pagination_class = DefaultPagination
     permission_classes = (HasUserListItemPermissions,)

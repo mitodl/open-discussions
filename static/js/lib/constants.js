@@ -78,6 +78,15 @@ export const LR_TYPE_ALL = [
   LR_TYPE_VIDEO
 ]
 
+export const OBJECT_TYPE_MAPPING = {
+  [LR_TYPE_COURSE]:       LR_TYPE_COURSE,
+  [LR_TYPE_BOOTCAMP]:     LR_TYPE_BOOTCAMP,
+  [LR_TYPE_PROGRAM]:      LR_TYPE_PROGRAM,
+  [LR_TYPE_USERLIST]:     LR_TYPE_USERLIST,
+  [LR_TYPE_LEARNINGPATH]: LR_TYPE_USERLIST,
+  [LR_TYPE_VIDEO]:        LR_TYPE_VIDEO
+}
+
 export const readableLearningResources = {
   [LR_TYPE_COURSE]:        "Course",
   [LR_TYPE_BOOTCAMP]:      "Bootcamp",
@@ -86,15 +95,6 @@ export const readableLearningResources = {
   [LR_TYPE_LEARNINGPATH]:  "Learning Path",
   [LR_TYPE_VIDEO]:         "Video",
   [FAVORITES_PSEUDO_LIST]: "Favorites"
-}
-
-export const resourceEntities = {
-  [LR_TYPE_COURSE]:       "courses",
-  [LR_TYPE_BOOTCAMP]:     "bootcamps",
-  [LR_TYPE_PROGRAM]:      "programs",
-  [LR_TYPE_USERLIST]:     "userLists",
-  [LR_TYPE_LEARNINGPATH]: "userLists",
-  [LR_TYPE_VIDEO]:        "videos"
 }
 
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"

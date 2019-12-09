@@ -15,7 +15,6 @@ from course_catalog.factories import (
     UserListFactory,
     LearningResourceRunFactory,
     ProgramItemCourseFactory,
-    UserListCourseFactory,
 )
 from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
@@ -26,11 +25,6 @@ from course_catalog.serializers import (
     ProgramSerializer,
     LearningResourceRunSerializer,
     UserListItemSerializer,
-    SimpleUserListSerializer,
-    SimpleUserListItemSerializer,
-    SimpleCourseSerializer,
-    SimpleBootcampSerializer,
-    SimpleProgramSerializer,
     CourseTopicSerializer,
 )
 from open_discussions.factories import UserFactory
@@ -118,12 +112,7 @@ def test_generic_foreign_key_serializer_classes(factory, valid_type):
     Test that generic foreign key serializer properly accepts expected classes and rejects others
     """
     userlist = UserListFactory.create()
-    kwargs = (
-        {"user_list": UserListFactory.create()}
-        if factory == "UserListCourseFactory"
-        else {}
-    )
-    obj = getattr(factories, factory).create(**kwargs)
+    obj = getattr(factories, factory).create()
     list_item = UserListItem(user_list=userlist, item=obj)
     serializer = UserListItemSerializer(list_item)
     if valid_type:
@@ -181,24 +170,6 @@ def test_userlist_serializer_validation_bad_topic(data, error):
     assert serializer.errors["topics"][0] == error
 
 
-@pytest.mark.parametrize(
-    "list_type,valid",
-    [
-        [ListType.LIST.value, True],
-        [ListType.LEARNING_PATH.value, True],
-        ["bad_type", False],
-        [None, False],
-    ],
-)
-def test_simple_userlist_serializer_validation(list_type, valid):
-    """
-    Test that the SimpleUserListSerializer validates list_type correctly
-    """
-    data = {"title": "My List", "list_type": list_type}
-    serializer = SimpleUserListSerializer(data=data)
-    assert serializer.is_valid() == valid
-
-
 @pytest.mark.parametrize("object_exists", [True, False])
 @pytest.mark.parametrize(
     "content_type,factory,valid_type",
@@ -208,7 +179,6 @@ def test_simple_userlist_serializer_validation(list_type, valid):
         ["bootcamp", "BootcampFactory", True],
         ["video", "VideoFactory", True],
         ["userlist", "UserListFactory", False],
-        ["user list item", "UserListCourseFactory", False],
         [None, "CourseFactory", False],
     ],
 )
@@ -219,15 +189,8 @@ def test_userlistitem_serializer_validation(
     Test that the UserListItemSerializer validates content_type and object correctly
     """
     userlist = UserListFactory.create()
-    kwargs = (
-        {"user_list": UserListFactory.create()}
-        if factory == "UserListCourseFactory"
-        else {}
-    )
     # pylint:disable=redefined-builtin
-    object_id = (
-        getattr(factories, factory).create(**kwargs).id if object_exists else 1_001_001
-    )
+    object_id = getattr(factories, factory).create().id if object_exists else 1_001_001
     data = {
         "content_type": content_type,
         "object_id": object_id,
@@ -235,21 +198,6 @@ def test_userlistitem_serializer_validation(
     }
     serializer = UserListItemSerializer(data=data)
     assert serializer.is_valid() == (valid_type and object_exists)
-
-
-def test_simpleuserlistitem_serializer():
-    """
-    Test that the SimpleUserListItemSerializer includes expected data
-    """
-    course = CourseFactory.create()
-    userlistitem = UserListCourseFactory.create(
-        content_object=course, user_list=UserListFactory.create()
-    )
-    item_serializer = SimpleUserListItemSerializer(instance=userlistitem)
-    assert item_serializer.data["content_type"] == userlistitem.content_type.name
-    assert item_serializer.data["object_id"] == userlistitem.object_id
-    list_serializer = SimpleUserListSerializer(instance=userlistitem.user_list)
-    assert list_serializer.data["items"][0] == item_serializer.data
 
 
 def test_favorites_serializer():
@@ -265,23 +213,19 @@ def test_favorites_serializer():
 
     favorite_item = FavoriteItem(user=user, item=course)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == SimpleCourseSerializer(course).data
+    assert serializer.data.get("content_data") == CourseSerializer(course).data
 
     favorite_item = FavoriteItem(user=user, item=bootcamp)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert (
-        serializer.data.get("content_data") == SimpleBootcampSerializer(bootcamp).data
-    )
+    assert serializer.data.get("content_data") == BootcampSerializer(bootcamp).data
 
     favorite_item = FavoriteItem(user=user, item=user_list)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert (
-        serializer.data.get("content_data") == SimpleUserListSerializer(user_list).data
-    )
+    assert serializer.data.get("content_data") == UserListSerializer(user_list).data
 
     favorite_item = FavoriteItem(user=user, item=program)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == SimpleProgramSerializer(program).data
+    assert serializer.data.get("content_data") == ProgramSerializer(program).data
 
     favorite_item = FavoriteItem(user=user, item=course_topic)
     serializer = FavoriteItemSerializer(favorite_item)

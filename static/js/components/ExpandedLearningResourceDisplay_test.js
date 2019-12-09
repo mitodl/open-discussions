@@ -3,6 +3,7 @@ import { assert } from "chai"
 import R from "ramda"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
+import * as UserListItemsMod from "../components/UserListItems"
 
 import {
   makeCourse,
@@ -18,6 +19,7 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_ALL
 } from "../lib/constants"
+import { mockHTMLElHeight } from "../lib/test_utils"
 import { bestRun, getInstructorName } from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
 import { defaultResourceImageURL } from "../lib/url"
@@ -43,6 +45,12 @@ describe("ExpandedLearningResourceDisplay", () => {
       makeLearningResourceResult(LR_TYPE_BOOTCAMP),
       makeLearningResourceResult(LR_TYPE_COURSE)
     ]
+    mockHTMLElHeight(50, 100)
+    helper.stubComponent(
+      UserListItemsMod,
+      "PaginatedUserListItems",
+      "PaginatedUserListItems"
+    )
     render = helper.configureHOCRenderer(
       ExpandedLearningResourceDisplay,
       ExpandedLearningResourceDisplay,
@@ -415,47 +423,64 @@ describe("ExpandedLearningResourceDisplay", () => {
           .closest(".info-row")
           .find(".value")
           .text(),
-        object.items.length
+        object.item_count
       )
+    })
+
+    it(`should include a display of list items for ${objectType}`, async () => {
+      const object = makeLearningResource(objectType)
+      const { wrapper } = await render(
+        {},
+        {
+          object
+        }
+      )
+
+      const listItemsDiv = wrapper
+        .find(".expanded-learning-resource-list")
+        .at(0)
+
+      assert.isNotOk(listItemsDiv.find("PaginatedUserListItems").exists())
+      listItemsDiv.find("i").simulate("click")
+
+      const items = wrapper.find("PaginatedUserListItems")
+      assert.isOk(items.exists())
+      assert.deepEqual(items.at(0).props(), {
+        userList: object,
+        pageSize: 10
+      })
     })
   })
 
-  //
-  ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH, LR_TYPE_PROGRAM].forEach(
-    objectType => {
-      it(`should include a display of list items for ${objectType}`, async () => {
-        const object = makeLearningResource(objectType)
-        const { wrapper } = await render(
-          {},
-          {
-            object
-          }
-        )
+  it("should include a display of list items for program", async () => {
+    const object = makeLearningResource(LR_TYPE_PROGRAM)
+    const { wrapper } = await render(
+      {},
+      {
+        object
+      }
+    )
 
-        const listItemsDiv = wrapper
-          .find(".expanded-learning-resource-list")
-          .at(0)
+    const listItemsDiv = wrapper.find(".expanded-learning-resource-list").at(0)
 
-        assert.equal(listItemsDiv.find("LearningResourceRow").length, 0)
-        listItemsDiv.find("i").simulate("click")
-        assert.equal(
-          wrapper
-            .find(".expanded-learning-resource-list")
-            .at(0)
-            .find("LearningResourceRow").length,
-          object.items.length
-        )
-        R.zip(
-          object.items.map(item => item.content_data),
-          wrapper
-            .find(".expanded-learning-resource-list")
-            .at(0)
-            .find("LearningResourceRow")
-            .map(el => el.prop("object"))
-        ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
-      })
-    }
-  )
+    assert.equal(listItemsDiv.find("LearningResourceRow").length, 0)
+    listItemsDiv.find("i").simulate("click")
+    assert.equal(
+      wrapper
+        .find(".expanded-learning-resource-list")
+        .at(0)
+        .find("LearningResourceRow").length,
+      object.items.length
+    )
+    R.zip(
+      object.items.map(item => item.content_data),
+      wrapper
+        .find(".expanded-learning-resource-list")
+        .at(0)
+        .find("LearningResourceRow")
+        .map(el => el.prop("object"))
+    ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
+  })
 
   //
   ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {

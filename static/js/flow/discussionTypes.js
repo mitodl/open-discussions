@@ -332,7 +332,9 @@ export type SocialAuth = {
 
 export type ListItemMember = {
   list_id: number,
-  item_id: number
+  item_id: number,
+  object_id: number,
+  content_type: string
 }
 
 export type LearningResourceSummary = {
@@ -395,7 +397,7 @@ export type Bootcamp = LearningResource & {
   object_type:        LR_TYPE_BOOTCAMP
 }
 
-export type UserListItem = {
+export type ListItem = {
   id:           number,
   is_favorite:  boolean,
   object_id:    number,
@@ -419,7 +421,7 @@ export type Program = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
   url:                ?string,
-  items:              Array<UserListItem>,
+  items:              Array<ListItem>,
   runs:               Array<LearningResourceRun>,
   object_type:        LR_TYPE_PROGRAM
 }
@@ -427,13 +429,13 @@ export type Program = LearningResource & {
 export type UserList = LearningResource & {
   image_src:          ?string,
   image_description:  ?string,
-  items:              Array<UserListItem | UserListItemEdit>,
   topics:             Array<CourseTopic>,
   list_type:          string,
   object_type:        LR_TYPE_USERLIST | LR_TYPE_LEARNINGPATH,
   privacy_level:      string,
   author:             number,
-  author_name:        string
+  author_name:        string,
+  item_count:         number
 }
 
 export type Video = LearningResource & {

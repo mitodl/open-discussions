@@ -210,18 +210,6 @@ export const getInstructorName = (instructor: CourseInstructor) => {
   return ""
 }
 
-export const filterItems = (
-  results: Array<Object>,
-  property: string,
-  object: Object
-) =>
-  R.filter(
-    R.compose(
-      R.any(R.whereEq(object)),
-      R.prop(property)
-    )
-  )(results)
-
 export const privacyIcon = (privacyLevel: string) =>
   privacyLevel === "public" ? "lock_open" : "lock"
 
@@ -231,10 +219,11 @@ export const isCoursewareResource = R.contains(R.__, [
   LR_TYPE_BOOTCAMP
 ])
 
-export const hasCourseList = R.contains(R.__, [
-  LR_TYPE_LEARNINGPATH,
+export const hasCourseList = R.contains(R.__, [LR_TYPE_PROGRAM])
+
+export const hasListItemsList = R.contains(R.__, [
   LR_TYPE_USERLIST,
-  LR_TYPE_PROGRAM
+  LR_TYPE_LEARNINGPATH
 ])
 
 export const formatDurationClockTime = (value: string) => {
@@ -271,13 +260,6 @@ export const formatDurationClockTime = (value: string) => {
 
   return values.join(":")
 }
-
-export const userListCoverImage = R.pathOr(null, [
-  "items",
-  0,
-  "content_data",
-  "image_src"
-])
 
 export const isUserList = (objectType: string) =>
   R.contains(objectType, [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST])

@@ -26,7 +26,7 @@ describe("UserListsPage tests", () => {
     helper = new IntegrationTestHelper()
 
     helper.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse(userLists))
     favorites = makeFavoritesResponse()
     helper.handleRequestStub
@@ -64,7 +64,7 @@ describe("UserListsPage tests", () => {
 
   it("should pass favorites down to user list card", async () => {
     helper.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     const { wrapper } = await render()
     const card = wrapper.find("UserListCard").at(0)

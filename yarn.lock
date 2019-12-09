@@ -4877,6 +4877,11 @@ extend-shallow@^3.0.0, extend-shallow@^3.0.2:
     assign-symbols "^1.0.0"
     is-extendable "^1.0.1"
 
+extend@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/extend/-/extend-2.0.2.tgz#1b74985400171b85554894459c978de6ef453ab7"
+  integrity sha512-AgFD4VU+lVLP6vjnlNfF7OeInLTyeyckCNPEsuxz1vi786UuK/nk6ynPuhn/h+Ju9++TQyr5EpLRI14fc1QtTQ==
+
 extend@^3.0.0, extend@~3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/extend/-/extend-3.0.2.tgz#f8b1136b4071fbd8eb140aff858b1019ec2915fa"
@@ -8476,6 +8481,11 @@ qs@6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.1.tgz#349cdf6eef89ec45c12d7d5eb3fc0c870343a6d8"
 
+qs@^6.5.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.1.tgz#20082c65cb78223635ab1a9eaca8875a29bf8ec9"
+  integrity sha512-Cxm7/SS/y/Z3MHWSxXb8lIFqgqBowP5JMlTUFyJN88y0SGQhVmZnqFK/PeuMX9LzUyWsqqhNxIyg0jlzq946yA==
+
 qs@^6.7.0:
   version "6.8.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.8.0.tgz#87b763f0d37ca54200334cd57bb2ef8f68a1d081"
@@ -8515,6 +8525,11 @@ raf@^3.1.0, raf@^3.4.0:
 railroad-diagrams@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/railroad-diagrams/-/railroad-diagrams-1.0.0.tgz#eb7e6267548ddedfb899c1b90e57374559cddb7e"
+
+ramda-adjunct@^2.23.0:
+  version "2.23.0"
+  resolved "https://registry.yarnpkg.com/ramda-adjunct/-/ramda-adjunct-2.23.0.tgz#56b99b626e035e72edf9403b66ab33952a76d067"
+  integrity sha512-8fQqrUSSXbe5Sc8ztVEQb3SHkbaZ5mGmIPW/ic5HGF3SYxx36SQhC6fFPeaTwqdn9aQpGQ2DOJxgLa1CUgUwYg==
 
 ramda@0.24.1, ramda@^0.24.1:
   version "0.24.1"
@@ -9069,24 +9084,24 @@ redux-mock-store@^1.5.3:
   dependencies:
     lodash.isplainobject "^4.0.6"
 
-redux-query-interface-superagent@^3.0.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/redux-query-interface-superagent/-/redux-query-interface-superagent-3.1.1.tgz#49805ad3b2ebde4fb255269a8e4982db2bc7b0cf"
-  integrity sha512-6lDR+5CMB6POtevM8nx0WlS+tCNrJ/sRNqif7a9AmDHRnGqfzdrO5QVQ7lyoxuGhVo8NtBLaPKOyplTFJR+b0w==
+redux-query-interface-superagent@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/redux-query-interface-superagent/-/redux-query-interface-superagent-3.3.0.tgz#9ca4b3a6390f7967210038147824ac0d750336ba"
+  integrity sha512-TQ9+syGNgjiARfgfu3LLjNCAmmHMT0c/fO/ZtM9ydepcmcHlEBl+HNFbOhK9E/kn1EbktchjBM7fQ1/jpZIWBg==
   dependencies:
     superagent "^5.0.6"
 
-redux-query-react@^3.0.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/redux-query-react/-/redux-query-react-3.1.1.tgz#2b179e0b18c4279ba92f36855997047dd687b91d"
-  integrity sha512-QuSHXChdyj78ycVmctceNP09OmdO39GnKVtH2Xtk/PphxXJJGxLW/xVY9jmJSuoga5U4gXU0DFMJjX9J1co+iA==
+redux-query-react@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/redux-query-react/-/redux-query-react-3.3.0.tgz#1da55057a0131af7d9395b87b44678263dd76906"
+  integrity sha512-pRrhluHc0Pq+BpxMHUY50k+xhROqXzqTLAxMJAHk/Tcvh4BYl2XYLX/jrjL6rSOveGxOisacz3xxGTAnv+kcZw==
   dependencies:
     hoist-non-react-statics "^3.3.0"
 
-redux-query@^3.0.0:
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/redux-query/-/redux-query-3.1.1.tgz#2f7fb40938f162fe744d5ac63d8238f020214421"
-  integrity sha512-9BGgYPcAssHY293pInPsCcQNT+JeVnCj1DO6EvSaj00SeAsTdYHmT2xj27yoTdUFY2ZK+th7mlY3WwR579bODA==
+redux-query@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/redux-query/-/redux-query-3.3.0.tgz#b62b527666739a7a3a76a0aa6470d3b087c76af3"
+  integrity sha512-jS+H/4P3r9FE2+rG9KljR7t2HxYlgD6TsO8uXUMHAW7bjvtQCNj3ISCu2+BzZybDCEBR5JYm4fXUw6W3eigHSg==
   dependencies:
     backo "^1.1.0"
     idx "^2.5.6"
@@ -10686,6 +10701,14 @@ uri-js@^4.2.2:
 urix@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/urix/-/urix-0.1.0.tgz#da937f7a62e21fec1fd18d49b35c2935067a6c72"
+
+url-assembler@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/url-assembler/-/url-assembler-2.1.0.tgz#40a51d511ef03dd4cfe8e9ee96b1183de8fdf3de"
+  integrity sha512-4rYpA3sT37kKzJD71Y/dwVPjbu1ZbIK1/hte/HPzuhgfDDjuXohRA2WIV2EaqCOlqECjy9ygB4lvOB2o7W9RVg==
+  dependencies:
+    extend "^2.0.2"
+    qs "^6.5.1"
 
 url-loader@^1.0.1:
   version "1.0.1"

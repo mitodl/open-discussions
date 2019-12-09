@@ -9,9 +9,9 @@ import Dialog from "./Dialog"
 import UserListFormDialog from "./UserListFormDialog"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeUserList, makeUserListItem } from "../factories/learning_resources"
-import { LR_TYPE_COURSE, readableLearningResources } from "../lib/constants"
-import { topicApiURL, userListApiURL } from "../lib/url"
+import { makeUserList } from "../factories/learning_resources"
+import { readableLearningResources } from "../lib/constants"
+import { topicApiURL, userListDetailApiURL } from "../lib/url"
 import * as urlLib from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 
@@ -72,10 +72,7 @@ describe("UserListCard tests", () => {
       it(`should have a properly-formatted count of ${String(
         itemCount
       )} items`, async () => {
-        userList.items = R.times(
-          () => makeUserListItem(LR_TYPE_COURSE),
-          itemCount
-        )
+        userList.item_count = itemCount
         const { wrapper } = await renderUserListCard()
         const text = wrapper.find(".count").text()
         assert.include(text, expectedText)
@@ -116,7 +113,7 @@ describe("UserListCard tests", () => {
 
     sinon.assert.calledWith(
       helper.handleRequestStub,
-      `${userListApiURL}/${userList.id}/`,
+      userListDetailApiURL.param({ userListId: userList.id }).toString(),
       "DELETE"
     )
   })

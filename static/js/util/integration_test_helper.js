@@ -113,7 +113,7 @@ export default class IntegrationTestHelper {
       }))
 
     this.handleRequestStub
-      .withArgs(userListApiURL)
+      .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     this.handleRequestStub.withArgs(topicApiURL).returns(queryListResponse([]))
 

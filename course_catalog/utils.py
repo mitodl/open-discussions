@@ -156,6 +156,7 @@ def get_list_items_by_resource(user, object_type, object_id):
     return [
         MicroUserListItemSerializer(item).data
         for item in UserListItem.objects.filter(user_list__author=user)
+        .select_related("content_type")
         .filter(content_type__model=object_type)
         .filter(object_id=object_id)
     ]

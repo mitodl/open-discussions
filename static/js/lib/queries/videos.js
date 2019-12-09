@@ -2,14 +2,14 @@
 import R from "ramda"
 import { createSelector } from "reselect"
 
-import { videoApiURL, newVideosURL } from "../url"
+import { videoDetailApiURL, videoApiURL, newVideosURL } from "../url"
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
 
 import type { Video } from "../../flow/discussionTypes"
 
 export const videoRequest = (videoId: number) => ({
   queryKey:  `videoRequest${videoId}`,
-  url:       `${videoApiURL}/${videoId}/`,
+  url:       videoDetailApiURL.param({ videoId }).toString(),
   transform: (video: any) => ({
     videos: { [video.id]: video }
   }),
@@ -20,7 +20,7 @@ export const videoRequest = (videoId: number) => ({
 
 export const videosRequest = () => ({
   queryKey:  "videosRequest",
-  url:       videoApiURL,
+  url:       videoApiURL.toString(),
   transform: (body: ?{ results: Array<Video> }) => ({
     videos: body ? constructIdMap(body.results) : {}
   }),
@@ -56,7 +56,7 @@ export const newVideosSelector = createSelector(
 
 export const favoriteVideoMutation = (video: Video) => ({
   queryKey: "videoMutation",
-  url:      `${videoApiURL}/${video.id}/${
+  url:      `${videoDetailApiURL.param({ videoId: video.id }).toString()}${
     video.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {

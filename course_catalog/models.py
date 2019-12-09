@@ -64,11 +64,6 @@ class LearningResource(TimestampedModel):
     short_description = models.TextField(null=True, blank=True)
     topics = models.ManyToManyField(CourseTopic, blank=True)
 
-    # deprecated, moved aside to _offered_by, but still mapped to the old column so we don't drop it immediately
-    _deprecated_offered_by = models.CharField(
-        db_column="offered_by", max_length=128, null=True, blank=True
-    )
-
     offered_by = models.ManyToManyField(LearningResourceOfferor, blank=True)
 
     class Meta:

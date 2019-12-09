@@ -4,7 +4,7 @@ course_catalog serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, F, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
@@ -33,7 +33,7 @@ from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list, delete_user_list
 
 
-COMMON_IGNORED_FIELDS = ("created_on", "updated_on", "_deprecated_offered_by")
+COMMON_IGNORED_FIELDS = ("created_on", "updated_on")
 
 
 class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
@@ -45,15 +45,15 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
         # Pass context on to the serializers so that they have access to the user
         context = self.context
         if isinstance(instance, Bootcamp):
-            serializer = SimpleBootcampSerializer(instance, context=context)
+            serializer = BootcampSerializer(instance, context=context)
         elif isinstance(instance, Course):
-            serializer = SimpleCourseSerializer(instance, context=context)
+            serializer = CourseSerializer(instance, context=context)
         elif isinstance(instance, UserList):
-            serializer = SimpleUserListSerializer(instance, context=context)
+            serializer = UserListSerializer(instance, context=context)
         elif isinstance(instance, Program):
-            serializer = SimpleProgramSerializer(instance, context=context)
+            serializer = ProgramSerializer(instance, context=context)
         elif isinstance(instance, Video):
-            serializer = SimpleVideoSerializer(instance, context=context)
+            serializer = VideoSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
         return serializer.data
@@ -100,7 +100,7 @@ class ListsSerializerMixin(serializers.Serializer):
                     user_list__author=request.user,
                     object_id=obj.id,
                     content_type=ContentType.objects.get_for_model(obj),
-                )
+                ).select_related("content_type")
             ]
         else:
             return []
@@ -141,7 +141,7 @@ class LearningResourceOfferorField(serializers.Field):
 
     def to_representation(self, value):
         """Serializes offered_by as a list of OfferedBy names"""
-        return list(value.values_list("name", flat=True))
+        return [offeror.name for offeror in value.all()]
 
 
 class BaseCourseSerializer(
@@ -299,9 +299,9 @@ class LearningResourceRunMixin(serializers.Serializer):
     runs = LearningResourceRunSerializer(read_only=True, many=True, allow_null=True)
 
 
-class SimpleCourseSerializer(BaseCourseSerializer):
+class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
     """
-    Serializer for Course model, minus runs
+    Serializer for Course model
     """
 
     object_type = serializers.CharField(read_only=True, default="course")
@@ -321,22 +321,7 @@ class SimpleCourseSerializer(BaseCourseSerializer):
 
     class Meta:
         model = Course
-        exclude = (
-            "short_description",
-            "full_description",
-            "raw_json",
-            *COMMON_IGNORED_FIELDS,
-        )
-
-
-class CourseSerializer(SimpleCourseSerializer, LearningResourceRunMixin):
-    """
-    Serializer for Course model
-    """
-
-    class Meta:
-        model = Course
-        exclude = COMMON_IGNORED_FIELDS
+        exclude = ("raw_json", *COMMON_IGNORED_FIELDS)
         extra_kwargs = {
             "raw_json": {"write_only": True},
             "full_description": {"write_only": True},
@@ -375,9 +360,9 @@ class OCWSerializer(CourseSerializer):
         return super().to_internal_value(course_fields)
 
 
-class SimpleBootcampSerializer(BaseCourseSerializer):
+class BootcampSerializer(BaseCourseSerializer, LearningResourceRunMixin):
     """
-    Serializer for Bootcamp model, minus runs
+    Serializer for Bootcamp model
     """
 
     object_type = serializers.CharField(read_only=True, default="bootcamp")
@@ -388,20 +373,6 @@ class SimpleBootcampSerializer(BaseCourseSerializer):
         """
         self.topics = data.pop("topics") if "topics" in data else []
         return super().to_internal_value(data)
-
-    class Meta:
-        model = Bootcamp
-        exclude = exclude = (
-            "short_description",
-            "full_description",
-            *COMMON_IGNORED_FIELDS,
-        )
-
-
-class BootcampSerializer(SimpleBootcampSerializer, LearningResourceRunMixin):
-    """
-    Serializer for Bootcamp model
-    """
 
     class Meta:
         model = Bootcamp
@@ -416,19 +387,63 @@ class MicroUserListItemSerializer(serializers.ModelSerializer):
 
     item_id = serializers.IntegerField(source="id")
     list_id = serializers.IntegerField(source="user_list_id")
+    object_id = serializers.IntegerField()
+    content_type = serializers.CharField(source="content_type.name")
 
     class Meta:
         model = UserListItem
-        fields = ("item_id", "list_id")
+        fields = ("item_id", "list_id", "object_id", "content_type")
 
 
-class SimpleUserListItemSerializer(
-    serializers.ModelSerializer, FavoriteSerializerMixin
-):
+class UserListItemListSerializer(serializers.ListSerializer):
     """
-    Simplified serializer for UserListItem model, excludes content_data
+    This class exists to handle the limitation that prefetch_related
+    cannot correctly handle GenericRelation for multiple content types
+
+    Instead, it groups each of the items in a collection by content type
+    and then batch fetches related data for each of those.
     """
 
+    def to_representation(self, data):
+        """Prefetch related data before serializing"""
+        # NOTE: due to the fact that some of these prefetches are many-to-many relations
+        #       be aware that the objects on the left had side of a prefetch
+        #       assignment must all be the same object type because the prefetch
+        #       must hit a single table
+        #
+        # As an example:
+        #   'runs__instructors' works on a list of objects of mixed types
+        #   because 'runs' are all of the same type and hence hit the same join table
+        #
+        #   'content_type' does not work on a list of mixed types because it
+        #   needs to hit a different join table for each type
+
+        def _items_for_classes(*classes):
+            """Returns a list of items that matches a list of classes by content_type"""
+            return [
+                item.item for item in data if item.content_type.model_class() in classes
+            ]
+
+        prefetch_related_objects(
+            _items_for_classes(Bootcamp, Course, Program),
+            "runs__instructors",
+            "runs__prices",
+            "runs__offered_by",
+            "runs__topics",
+        )
+
+        for cls in (Bootcamp, Course, Program):
+            prefetch_related_objects(_items_for_classes(cls), "offered_by")
+
+        return super().to_representation(data)
+
+
+class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+    """
+    Serializer for UserListItem model, includes content_data
+    """
+
+    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     content_type = serializers.CharField(source="content_type.name")
 
     def validate(self, attrs):
@@ -459,19 +474,6 @@ class SimpleUserListItemSerializer(
             ):
                 raise ValidationError("Video does not exist")
         return attrs
-
-    class Meta:
-        model = UserListItem
-        fields = ("id", "object_id", "content_type", "is_favorite")
-
-
-class UserListItemSerializer(SimpleUserListItemSerializer):
-    """
-    Serializer for UserListItem model, includes content_data
-    """
-
-    content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
-    delete = serializers.BooleanField(write_only=True, default=False, required=False)
 
     def update_index(self, user_list):
         """
@@ -504,9 +506,26 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
         return item
 
     def update(self, instance, validated_data):
+        position = validated_data["position"]
+        # to perform an update on position we atomically:
+        # 1) move everything between the old position and the new position towards the old position by 1
+        # 2) move the item into its new position
+        # this operation gets slower the further the item is moved, but it is sufficient for now
         with transaction.atomic():
-            instance.position = validated_data["position"]
+            if position > instance.position:
+                # move items between the old and new positions up, inclusive of the new position
+                UserListItem.objects.filter(
+                    position__lte=position, position__gt=instance.position
+                ).update(position=F("position") - 1)
+            else:
+                # move items between the old and new positions down, inclusive of the new position
+                UserListItem.objects.filter(
+                    position__lt=instance.position, position__gte=position
+                ).update(position=F("position") + 1)
+            # now move the item into place
+            instance.position = position
             instance.save()
+
         self.update_index(instance.user_list)
         return instance
 
@@ -514,31 +533,42 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
         model = UserListItem
         extra_kwargs = {"position": {"required": False}}
         exclude = ("created_on", "updated_on")
+        list_serializer_class = UserListItemListSerializer
 
 
-class SimpleUserListSerializer(
+class UserListSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
     Simplified serializer for UserList model.
-    Uses the SimpleUserListItemSerializer for items, which contains only essential attributes.
     """
 
-    items = serializers.SerializerMethodField()
+    item_count = serializers.SerializerMethodField()
     topics = WriteableSerializerMethodField()
     author_name = serializers.SerializerMethodField()
     object_type = serializers.CharField(read_only=True, source="list_type")
-
-    def get_items(self, instance):
-        """get items"""
-        return [
-            SimpleUserListItemSerializer(item).data
-            for item in instance.items.select_related("content_type")
-        ]
+    image_src = serializers.SerializerMethodField()
 
     def get_author_name(self, instance):
         """get author name for userlist"""
         return instance.author.profile.name
+
+    def get_item_count(self, instance):
+        """Return the number of items in the list"""
+        return getattr(instance, "item_count", None) or instance.items.count()
+
+    def get_image_src(self, instance):
+        """Return the user list's image or the image of the first item"""
+        if instance.image_src:
+            return instance.image_src.url
+
+        # image_src is either a URLField or a ImageField
+        list_item = instance.items.order_by("position").first()
+        if list_item:
+            image_src = list_item.item.image_src
+            if image_src:
+                return image_src if isinstance(image_src, str) else image_src.url
+        return None
 
     def validate_topics(self, topics):
         """Validator for topics"""
@@ -581,79 +611,13 @@ class SimpleUserListSerializer(
                 userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
             return userlist
 
-    class Meta:
-        model = UserList
-        exclude = COMMON_IGNORED_FIELDS
-        read_only_fields = ["author", "items", "author_name"]
-
-
-class UserListSerializer(SimpleUserListSerializer):
-    """
-    Serializer for UserList model
-    """
-
-    items = WriteableSerializerMethodField()
-
-    def validate_items(self, value):
-        """Dummy validation for items"""
-        return {"items": value}
-
-    def get_items(self, instance):
-        """Returns the list of items"""
-        return [
-            UserListItemSerializer(item, context=self.context).data
-            for item in UserListItem.objects.filter(user_list=instance)
-            .select_related("content_type")
-            .order_by("position")
-        ]
-
-    def update(self, instance, validated_data):  # pylint: disable=too-many-branches
+    def update(self, instance, validated_data):
         """Ensure that the list is authored by the requesting user before modifying"""
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
             validated_data["author"] = request.user
             topics_data = validated_data.pop("topics", None)
-            items_data = validated_data.pop("items", [])
-            # iterate through any UserListItem objects that should be created/modified/deleted:
             with transaction.atomic():
-                for data in items_data:
-                    if data.get("id") is not None:
-                        try:
-                            item_obj = UserListItem.objects.get(
-                                id=data["id"], user_list=instance
-                            )
-                        except UserListItem.DoesNotExist:
-                            raise ValidationError(
-                                "Item {} not in list".format(data["id"])
-                            )
-                        item = UserListItemSerializer(
-                            instance=item_obj, data=data, partial=True
-                        )
-                        item.is_valid(raise_exception=True)
-                        if data.get("delete", False) is True:
-                            item_obj.delete()
-                        else:
-                            item.save()
-                    else:
-                        data.setdefault("user_list", instance.id)
-                        if data.get("delete") is True:
-                            # Find and delete an existing item by type/object_id
-                            try:
-                                item_obj = UserListItem.objects.get(
-                                    object_id=data.get("object_id"),
-                                    content_type__model=data.get("content_type"),
-                                    user_list=instance,
-                                )
-                                item_obj.delete()
-                            except UserListItem.DoesNotExist:
-                                raise ValidationError(
-                                    "Item {} not in list".format(data["id"])
-                                )
-                        else:
-                            # Create a new UserListItem
-                            item = UserListItemSerializer(data=data)
-                            item.is_valid(raise_exception=True)
-                            item.save()
                 userlist = super().update(instance, validated_data)
                 if topics_data is not None:
                     userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
@@ -662,6 +626,11 @@ class UserListSerializer(SimpleUserListSerializer):
                 else:
                     delete_user_list(userlist)
                 return userlist
+
+    class Meta:
+        model = UserList
+        exclude = COMMON_IGNORED_FIELDS
+        read_only_fields = ["author", "items", "author_name"]
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
@@ -677,8 +646,11 @@ class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin
         exclude = ("created_on", "updated_on")
 
 
-class SimpleProgramSerializer(
-    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+class ProgramSerializer(
+    serializers.ModelSerializer,
+    FavoriteSerializerMixin,
+    ListsSerializerMixin,
+    LearningResourceRunMixin,
 ):
     """
     Serializer for Program model, minus runs
@@ -694,13 +666,7 @@ class SimpleProgramSerializer(
         exclude = COMMON_IGNORED_FIELDS
 
 
-class ProgramSerializer(SimpleProgramSerializer, LearningResourceRunMixin):
-    """
-    Serializer for Program model, with runs
-    """
-
-
-class SimpleVideoSerializer(
+class VideoSerializer(
     serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
 ):
     """
@@ -710,22 +676,6 @@ class SimpleVideoSerializer(
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="video")
-
-    class Meta:
-        model = Video
-        exclude = (
-            "transcript",
-            "raw_data",
-            "short_description",
-            "full_description",
-            *COMMON_IGNORED_FIELDS,
-        )
-
-
-class VideoSerializer(SimpleVideoSerializer):
-    """
-    Serializer for Video model, with runs
-    """
 
     class Meta:
         model = Video

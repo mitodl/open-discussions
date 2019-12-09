@@ -15,6 +15,7 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_VIDEO,
+  OBJECT_TYPE_MAPPING,
   DATE_FORMAT
 } from "../lib/constants"
 
@@ -25,6 +26,7 @@ import type {
   LearningResourceRun,
   Program,
   UserList,
+  ListItem,
   Video
 } from "../flow/discussionTypes"
 
@@ -119,16 +121,19 @@ export const makeBootcamp = (): Bootcamp => ({
 
 const incrUserListItem = incrementer()
 
-export const makeUserListItem = (objectType: string) => ({
-  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-  id:           incrUserListItem.next().value,
-  is_favorite:  casual.boolean,
-  object_id:    casual.integer(1, 1000),
-  position:     casual.integer(1, 1000),
-  program:      casual.integer(1, 1000),
-  content_type: objectType,
-  content_data: makeLearningResource(objectType)
-})
+export const makeUserListItem = (objectType: string) => {
+  const content = makeLearningResource(objectType)
+  return {
+    // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
+    id:           incrUserListItem.next().value,
+    is_favorite:  casual.boolean,
+    object_id:    content.id,
+    position:     casual.integer(1, 1000),
+    program:      casual.integer(1, 1000),
+    content_type: OBJECT_TYPE_MAPPING[objectType],
+    content_data: content
+  }
+}
 
 const incrProgram = incrementer()
 
@@ -165,21 +170,31 @@ export const makeUserList = (): UserList => ({
   is_favorite:       casual.boolean,
   image_src:         "http://image.medium.url",
   image_description: casual.description,
-  items:             [
-    makeUserListItem(LR_TYPE_COURSE),
-    makeUserListItem(LR_TYPE_BOOTCAMP),
-    makeUserListItem(LR_TYPE_PROGRAM)
-  ],
-  object_type:   "userlist",
-  list_type:     "userlist",
-  profile_img:   casual.url,
-  profile_name:  casual.name,
-  privacy_level: casual.random_element(["public", "private"]),
-  author:        casual.integer(1, 1000),
-  lists:         [],
-  author_name:   casual.name
+  item_count:        3,
+  object_type:       "userlist",
+  list_type:         "userlist",
+  profile_img:       casual.url,
+  profile_name:      casual.name,
+  privacy_level:     casual.random_element(["public", "private"]),
+  author:            casual.integer(1, 1000),
+  lists:             [],
+  author_name:       casual.name
 })
 
+export const makeUserListItems = (count: number = 3): Array<ListItem> =>
+  R.times(
+    () =>
+      makeUserListItem(
+        casual.random_element([
+          LR_TYPE_VIDEO,
+          LR_TYPE_COURSE,
+          LR_TYPE_PROGRAM,
+          LR_TYPE_BOOTCAMP,
+          LR_TYPE_USERLIST
+        ])
+      ),
+    count
+  )
 const incrVideo = incrementer()
 export const makeVideo = (): Video => ({
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be

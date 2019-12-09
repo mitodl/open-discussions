@@ -14,8 +14,7 @@ from course_catalog.factories import (
     ProgramFactory,
     UserListFactory,
     VideoFactory,
-    UserListCourseFactory,
-    UserListUserListFactory,
+    UserListItemFactory,
 )
 from course_catalog.models import Course, Video
 from open_discussions.constants import ISOFORMAT
@@ -371,8 +370,10 @@ def test_es_userlist_serializer_image_src():
     Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
     """
     user_list = UserListFactory.create(image_src=None)
-    UserListUserListFactory.create(user_list=user_list, position=1)
-    list_item_course = UserListCourseFactory.create(user_list=user_list, position=2)
+    UserListItemFactory.create(user_list=user_list, position=1, is_userlist=True)
+    list_item_course = UserListItemFactory.create(
+        user_list=user_list, position=2, is_course=True
+    )
     serialized = ESUserListSerializer(user_list).data
     assert_json_equal(
         serialized,

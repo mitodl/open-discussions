@@ -14,7 +14,7 @@ import {
   LR_PRIVATE
 } from "../lib/constants"
 import { wait } from "../lib/util"
-import { topicApiURL, userListApiURL } from "../lib/url"
+import { topicApiURL, userListApiURL, userListDetailApiURL } from "../lib/url"
 import { changeFormikInput, queryListResponse } from "../lib/test_utils"
 import { TOPICS_LENGTH_MAXIMUM } from "../lib/validation"
 
@@ -29,7 +29,9 @@ describe("UserListFormDialog", () => {
       .withArgs(topicApiURL)
       .returns(queryListResponse(topics))
     userList = makeUserList()
-    helper.handleRequestStub.withArgs(userListApiURL).returns(userList)
+    helper.handleRequestStub
+      .withArgs(userListApiURL.toString())
+      .returns(userList)
     render = helper.configureReduxQueryRenderer(UserListFormDialog, {
       hide: hideStub
     })
@@ -112,7 +114,7 @@ describe("UserListFormDialog", () => {
     await wait(50)
     assert.ok(hideStub.called)
     const [url, method, { body }] = helper.handleRequestStub.args[1]
-    assert.equal(url, `${userListApiURL}/`)
+    assert.equal(url, userListApiURL.toString())
     assert.equal(method, "POST")
     assert.deepEqual(body, {
       title:             "Title",
@@ -164,7 +166,10 @@ describe("UserListFormDialog", () => {
     await wait(50)
     assert.ok(hideStub.called)
     const [url, method, { body }] = helper.handleRequestStub.args[1]
-    assert.equal(url, `${userListApiURL}/${userList.id}/`)
+    assert.equal(
+      url,
+      userListDetailApiURL.param({ userListId: userList.id }).toString()
+    )
     assert.equal(method, "PATCH")
     assert.deepEqual(body, {
       title:             "My Brand New Title",

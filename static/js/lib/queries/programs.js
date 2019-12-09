@@ -1,7 +1,7 @@
 // @flow
 import R from "ramda"
 
-import { programURL } from "../url"
+import { programDetailApiURL } from "../url"
 import { DEFAULT_POST_OPTIONS } from "../redux_query"
 
 import type { Program } from "../../flow/discussionTypes"
@@ -14,7 +14,7 @@ export const programsSelector = createSelector(
 
 export const programRequest = (programId: number) => ({
   queryKey:  `programRequest${programId}`,
-  url:       `${programURL}/${programId}/`,
+  url:       programDetailApiURL.param({ programId }).toString(),
   transform: (program: any) => ({
     programs: { [program.id]: program }
   }),
@@ -25,7 +25,7 @@ export const programRequest = (programId: number) => ({
 
 export const favoriteProgramMutation = (program: Program) => ({
   queryKey: "programMutation",
-  url:      `${programURL}/${program.id}/${
+  url:      `${programDetailApiURL.param({ programId: program.id }).toString()}${
     program.is_favorite ? "unfavorite" : "favorite"
   }/`,
   transform: () => {
