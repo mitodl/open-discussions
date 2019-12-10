@@ -1,6 +1,6 @@
 // @flow
 import React from "react"
-import { Route } from "react-router-dom"
+import { Route, Switch } from "react-router-dom"
 
 import CourseSearchPage from "./CourseSearchPage"
 import CourseIndexPage from "./CourseIndexPage"
@@ -24,11 +24,13 @@ export default function LearnRouter(props: Props) {
     <>
       <Route exact path={`${match.url}`} component={CourseIndexPage} />
       <Route exact path={`${match.url}/search`} component={CourseSearchPage} />
-      <Route
-        path={`${match.url}/lists/favorites`}
-        component={FavoritesDetailPage}
-      />
-      <Route path={`${match.url}/lists/:id`} component={UserListDetailPage} />
+      <Switch>
+        <Route
+          path={`${match.url}/lists/favorites`}
+          component={FavoritesDetailPage}
+        />
+        <Route path={`${match.url}/lists/:id`} component={UserListDetailPage} />
+      </Switch>
       <Route exact path={`${match.url}/lists`} component={UserListsPage} />
       <LearningResourceDrawer />
       <AddToListDialog />
