@@ -469,6 +469,19 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
     delete = serializers.BooleanField(write_only=True, default=False, required=False)
 
+    def update_index(self, user_list):
+        """
+        If this serializer was instantiated from the UserListItemView, then update the search index
+
+        Args:
+            user_list (UserList): the UserList object to update in the search index.
+
+        """
+        view = self.context.get("view", None)
+        if view is not None and view.kwargs.get("parent_lookup_user_list_id", None):
+            # this was sent via userlistitems API, so update the search index
+            upsert_user_list(user_list)
+
     def create(self, validated_data):
         user_list = validated_data["user_list"]
         items = UserListItem.objects.filter(user_list=user_list)
@@ -483,12 +496,14 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
             object_id=validated_data["object_id"],
             defaults={"position": position},
         )
+        self.update_index(item.user_list)
         return item
 
     def update(self, instance, validated_data):
         with transaction.atomic():
             instance.position = validated_data["position"]
             instance.save()
+        self.update_index(instance.user_list)
         return instance
 
     class Meta:

@@ -15,18 +15,25 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.urls import include
-from rest_framework.routers import DefaultRouter
+from rest_framework_extensions.routers import ExtendedSimpleRouter
 
 from course_catalog import views
 
-router = DefaultRouter()
+router = ExtendedSimpleRouter()
+
 router.register(r"courses", views.CourseViewSet, basename="courses")
 router.register(r"bootcamps", views.BootcampViewSet, basename="bootcamps")
 router.register(r"programs", views.ProgramViewSet, basename="programs")
-router.register(r"userlists", views.UserListViewSet, basename="userlists")
+router.register(r"userlists", views.UserListViewSet, basename="userlists").register(
+    r"items",
+    views.UserListItemViewSet,
+    basename="userlistitems",
+    parents_query_lookups=["user_list_id"],
+)
 router.register(r"videos", views.VideoViewSet, basename="videos")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
 router.register(r"topics", views.TopicViewSet, basename="topics")
+
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),

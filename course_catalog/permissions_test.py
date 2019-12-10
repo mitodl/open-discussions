@@ -4,10 +4,14 @@ course_catalog permissions tests
 
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.http import Http404
 
 from course_catalog.constants import PrivacyLevel
-from course_catalog.factories import UserListFactory
-from course_catalog.permissions import HasUserListPermissions
+from course_catalog.factories import UserListFactory, UserListCourseFactory
+from course_catalog.permissions import (
+    HasUserListPermissions,
+    HasUserListItemPermissions,
+)
 from open_discussions.factories import UserFactory
 
 
@@ -48,6 +52,65 @@ def test_userlist_object_permissions(mocker, user, is_public, is_author):
     assert HasUserListPermissions().has_object_permission(
         request, mocker.MagicMock(), userlist
     ) is (is_public or is_author)
+
+
+def test_userlistitems_permissions_404(mocker, user):
+    """
+    HasUserListItemPermissions.has_permission should return a 404 if the userlist doesn't exist.
+    """
+    request = mocker.MagicMock(method="GET", user=user)
+
+    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": 99999})
+    with pytest.raises(Http404):
+        HasUserListItemPermissions().has_permission(request, view)
+
+
+@pytest.mark.parametrize("is_author", [True, False])
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_safe", [True, False])
+def test_userlistitems_permissions(mocker, user, is_safe, is_public, is_author):
+    """
+    HasUserListItemPermissions.has_permission should return correct permission depending
+    on privacy level, author, and request method.
+    """
+    userlist = UserListFactory.create(
+        author=user if is_author else UserFactory.create(),
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    )
+    request = mocker.MagicMock(method="GET" if is_safe else "POST", user=user)
+
+    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": userlist.id})
+    assert HasUserListItemPermissions().has_permission(request, view) is (
+        is_author or (is_safe and is_public)
+    )
+
+
+@pytest.mark.parametrize("is_safe", [True, False])
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_author", [True, False])
+def test_userlistitems_object_permissions(mocker, user, is_public, is_author, is_safe):
+    """
+    HasUserListItemPermissions.has_object_permission should return correct permission depending
+    on privacy level, author, and request method.
+    """
+    userlist = UserListFactory.create(
+        author=user,
+        privacy_level=PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    )
+    userlist_item = UserListCourseFactory.create(user_list=userlist)
+
+    request = mocker.MagicMock(
+        method="GET" if is_safe else "POST",
+        user=(user if is_author else UserFactory.create()),
+    )
+    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": userlist.id})
+    assert HasUserListItemPermissions().has_object_permission(
+        request, view, userlist_item
+    ) is (is_author or (is_safe and is_public))
 
 
 @pytest.mark.parametrize("action", ["favorite", "unfavorite", ""])
