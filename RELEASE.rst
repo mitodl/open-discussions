@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.103.0
+Version 0.103.0 (Released December 10, 2019)
 ---------------
 
 - Only index lists with items, include item image_src values (#2448)
