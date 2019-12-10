@@ -365,7 +365,9 @@ def start_recreate_index(self):
             + [
                 index_user_lists.si(ids)
                 for ids in chunks(
-                    UserList.objects.order_by("id").values_list("id", flat=True),
+                    UserList.objects.order_by("id")
+                    .exclude(items=None)
+                    .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]

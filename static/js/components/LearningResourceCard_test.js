@@ -19,19 +19,20 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
-  LR_TYPE_ALL,
   COURSE_AVAILABLE_NOW,
+  LR_TYPE_ALL,
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_USERLIST,
   offeredBys
 } from "../lib/constants"
 import {
-  embedlyThumbnail,
+  COURSE_SEARCH_URL,
   starSelectedURL,
   starUnselectedURL,
-  toQueryString,
-  COURSE_SEARCH_URL,
-  userListApiURL
+  userListApiURL,
+  embedlyThumbnail,
+  toQueryString
 } from "../lib/url"
 import { DIALOG_ADD_TO_LIST } from "../actions/ui"
 import { queryListResponse } from "../lib/test_utils"
@@ -80,6 +81,23 @@ describe("LearningResourceCard", () => {
       )
     )
     assert.equal(coverImage.prop("alt"), `cover image for ${course.title}`)
+  })
+
+  it("should render the 1st item image for a userlist", async () => {
+    const object = makeLearningResource(LR_TYPE_USERLIST)
+    object.image_src = null
+    const { wrapper } = await render({ object })
+    const coverImage = wrapper.find(".cover-image").find("img")
+    assert.equal(
+      coverImage.prop("src"),
+      embedlyThumbnail(
+        SETTINGS.embedlyKey,
+        object.items[0].content_data.image_src,
+        CAROUSEL_IMG_HEIGHT,
+        CAROUSEL_IMG_WIDTH
+      )
+    )
+    assert.equal(coverImage.prop("alt"), `cover image for ${object.title}`)
   })
 
   it("should render the title", async () => {

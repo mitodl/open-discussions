@@ -420,7 +420,7 @@ class UserListVideoFactory(ListItemFactory):
 class UserListUserListFactory(ListItemFactory):
     """Factory for UserList UserListItems"""
 
-    content_object = factory.SubFactory(VideoFactory)
+    content_object = factory.SubFactory(UserListFactory)
 
     class Meta:
         model = UserListItem

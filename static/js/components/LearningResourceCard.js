@@ -13,7 +13,8 @@ import {
   bestRunLabel,
   bestRun,
   minPrice,
-  getPreferredOfferedBy
+  getPreferredOfferedBy,
+  userListCoverImage
 } from "../lib/learning_resources"
 import {
   defaultResourceImageURL,
@@ -84,7 +85,9 @@ const CoverImage = ({ object, showResourceDrawer }) => (
     <img
       src={embedlyThumbnail(
         SETTINGS.embedlyKey,
-        object.image_src || defaultResourceImageURL(),
+        object.image_src ||
+          userListCoverImage(object) ||
+          defaultResourceImageURL(),
         CAROUSEL_IMG_HEIGHT,
         CAROUSEL_IMG_WIDTH
       )}

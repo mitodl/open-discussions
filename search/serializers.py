@@ -35,6 +35,7 @@ from search.constants import (
     BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     VIDEO_TYPE,
+    USER_LIST_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -455,7 +456,16 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     def to_representation(self, instance):
         """Serializes the instance"""
         ret = super().to_representation(instance)
+
         ret["object_type"] = instance.list_type
+        if not instance.image_src:
+            first_item = (
+                instance.items.exclude(content_type__model=USER_LIST_TYPE)
+                .order_by("position")
+                .first()
+            )
+            if first_item:
+                ret["image_src"] = first_item.item.image_src
         return ret
 
     class Meta:
