@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.103.0
+---------------
+
+- Only index lists with items, include item image_src values (#2448)
+- List Items API (#2470)
+- Exclude large/unused fields from API results (#2468)
+- /courses/ -> /learn/
+- implement mobile design for userlist dialog
+- add visual separation (a line) to list items in the LR drawer
+
 Version 0.102.3 (Released December 09, 2019)
 ---------------
 
