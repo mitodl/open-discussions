@@ -16,6 +16,8 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
+from course_catalog.models import FavoriteItem, UserListItem
+from open_discussions.utils import extract_values
 from search.connection import get_conn, get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
@@ -23,6 +25,7 @@ from search.constants import (
     COURSE_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    LEARNING_RESOURCE_TYPES,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -202,6 +205,21 @@ def _apply_general_query_filters(search, user):
     )
 
 
+def is_learning_query(query):
+    """
+    Return True if the query includes learning resource types, False otherwise
+
+    Args:
+        query (dict): The query sent to ElasticSearch
+
+    Returns:
+        bool: if the query includes learning resource types
+
+    """
+    object_types = set(extract_values(query, "object_type"))
+    return len(object_types.intersection(set(LEARNING_RESOURCE_TYPES))) > 0
+
+
 def execute_search(*, user, query):
     """
     Execute a search based on the query
@@ -217,18 +235,23 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return transform_aggregates(search.execute().to_dict())
+    return transform_results(
+        search.execute().to_dict(), user, inject_favorites=is_learning_query(query)
+    )
 
 
-def transform_aggregates(search_result):
+def transform_results(search_result, user, inject_favorites=False):
     """
-    Transform the reverse nested availability aggregate counts into a format matching the other facets
+    Transform the reverse nested availability aggregate counts into a format matching the other facets.
+    Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
 
     Args:
         search_result (dict): The results from ElasticSearch
+        user (User): the user who performed the search
+        inject_favorites (bool): true if "favorites' and 'lists' should be added to each search result
 
     Returns:
-        dict: The Elasticsearch response dict with transformed availability aggregates
+        dict: The Elasticsearch response dict with transformed availability aggregates and source values
     """
     availability_runs = (
         search_result.get("aggregations", {}).get("availability", {}).pop("runs", {})
@@ -246,6 +269,25 @@ def transform_aggregates(search_result):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
+    if not user.is_anonymous and inject_favorites:
+        favorites = (
+            FavoriteItem.objects.select_related("content_type")
+            .filter(user=user)
+            .values_list("content_type__model", "object_id")
+        )
+        for hit in search_result.get("hits", {}).get("hits", []):
+            object_type = hit["_source"]["object_type"]
+            if object_type in LEARNING_RESOURCE_TYPES:
+                if object_type == LEARNING_PATH_TYPE:
+                    object_type = USER_LIST_TYPE
+                object_id = hit["_source"]["id"]
+                hit["_source"]["is_favorite"] = (object_type, object_id) in favorites
+                hit["_source"]["lists"] = [
+                    {"list_id": item.user_list_id, "item_id": item.id}
+                    for item in UserListItem.objects.filter(user_list__author=user)
+                    .filter(content_type__model=object_type)
+                    .filter(object_id=object_id)
+                ]
     return search_result
 
 

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { useRequest, useMutation } from "redux-query-react"
 import { createSelector } from "reselect"
 import { Checkbox } from "@rmwc/checkbox"
+import { find, propEq } from "ramda"
 
 import Dialog from "./Dialog"
 import UserListFormDialog from "./UserListFormDialog"
@@ -54,7 +55,9 @@ export default function AddToListDialog() {
   const userLists = useSelector(myUserListsSelector)
   const [{ isFinished: isFinishedList }] = useRequest(userListsRequest())
 
-  const inLists = resource && isFinishedResource ? resource.lists : []
+  const inLists = (resource && isFinishedResource ? resource.lists : []).map(
+    listitem => listitem.list_id
+  )
 
   const dispatch = useDispatch()
   const hide = useCallback(
@@ -94,10 +97,11 @@ export default function AddToListDialog() {
   })
 
   const updateResource = (checked: boolean, userListId) => {
-    if (checked && !resource.lists.includes(userListId)) {
-      resource.lists.push(userListId)
+    const matchingList = find(propEq("list_id", userListId), resource.lists)
+    if (checked && !matchingList) {
+      resource.lists.push({ list_id: userListId })
     } else {
-      resource.lists.pop(userListId)
+      resource.lists.pop(matchingList)
     }
   }
 

@@ -329,6 +329,12 @@ export type SocialAuth = {
   provider: string,
 }
 
+
+export type ListItemMember = {
+  list_id: number,
+  item_id: number
+}
+
 export type LearningResourceSummary = {
   id:                 number,
   title:              string,
@@ -338,7 +344,7 @@ export type LearningResourceSummary = {
   offered_by:         Array<string>,
   object_type:        string,
   runs:               Array<LearningResourceRun>,
-  lists:              Array<number>
+  lists:              Array<ListItemMember>
 }
 
 export type LearningResourceRun = {
@@ -359,7 +365,6 @@ export type LearningResourceRun = {
   url:                ?string
 }
 
-
 export type LearningResource = {
   id:                 number,
   title:              string,
@@ -369,7 +374,7 @@ export type LearningResource = {
   offered_by:         Array<string>,
   is_favorite:        boolean,
   object_type:        string,
-  lists:              Array<number>
+  lists:              Array<ListItemMember>
 }
 
 

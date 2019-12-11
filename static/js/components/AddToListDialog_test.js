@@ -110,7 +110,7 @@ describe("AddToListDialog", () => {
       inList ? "" : "not"
     } in it`, async () => {
       if (inList) {
-        course.lists.push(userLists[0].id)
+        course.lists.push({ list_id: userLists[0].id, item_id: 1 })
       }
       const { wrapper } = await render(course)
       assert.equal(

@@ -22,7 +22,10 @@ from course_catalog.factories import (
     LearningResourceRunFactory,
 )
 from course_catalog.models import UserList, UserListItem
-from course_catalog.serializers import CourseTopicSerializer
+from course_catalog.serializers import (
+    CourseTopicSerializer,
+    MicroUserListItemSerializer,
+)
 from open_discussions.factories import UserFactory
 
 # pylint:disable=redefined-outer-name
@@ -106,12 +109,17 @@ def test_course_detail_endpoint_lists(user_client, user):
     """Test that author's list ids are included"""
     course = CourseFactory.create()
     user_lists = UserListFactory.create_batch(3, author=user)
-    for user_list in user_lists:
-        UserListCourseFactory.create(content_object=course, user_list=user_list)
-    resp = user_client.get(reverse("courses-detail", args=[course.id]))
-    assert sorted(resp.data.get("lists")) == sorted(
-        [user_list.id for user_list in user_lists]
+    list_items = sorted(
+        [
+            UserListCourseFactory.create(content_object=course, user_list=user_list)
+            for user_list in user_lists
+        ],
+        key=lambda x: x.id,
     )
+    resp = user_client.get(reverse("courses-detail", args=[course.id]))
+    assert sorted(resp.data.get("lists"), key=lambda x: x["item_id"]) == [
+        MicroUserListItemSerializer(list_item).data for list_item in list_items
+    ]
 
 
 def test_bootcamp_endpoint(client):
@@ -129,12 +137,17 @@ def test_bootcamp_detail_endpoint_lists(user_client, user):
     """Test that author's list ids are included"""
     bootcamp = BootcampFactory.create()
     user_lists = UserListFactory.create_batch(2, author=user)
-    for user_list in user_lists:
-        UserListBootcampFactory.create(content_object=bootcamp, user_list=user_list)
-    resp = user_client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
-    assert sorted(resp.data.get("lists")) == sorted(
-        [user_list.id for user_list in user_lists]
+    list_items = sorted(
+        [
+            UserListBootcampFactory.create(content_object=bootcamp, user_list=user_list)
+            for user_list in user_lists
+        ],
+        key=lambda x: x.id,
     )
+    resp = user_client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
+    assert sorted(resp.data.get("lists"), key=lambda x: x["item_id"]) == [
+        MicroUserListItemSerializer(list_item).data for list_item in list_items
+    ]
 
 
 def test_program_endpoint(client):

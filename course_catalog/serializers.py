@@ -95,11 +95,14 @@ class ListsSerializerMixin(serializers.Serializer):
         """
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
-            return UserListItem.objects.filter(
-                user_list__author=request.user,
-                object_id=obj.id,
-                content_type=ContentType.objects.get_for_model(obj),
-            ).values_list("user_list", flat=True)
+            return [
+                MicroUserListItemSerializer(item).data
+                for item in UserListItem.objects.filter(
+                    user_list__author=request.user,
+                    object_id=obj.id,
+                    content_type=ContentType.objects.get_for_model(obj),
+                )
+            ]
         else:
             return []
 
@@ -405,6 +408,19 @@ class BootcampSerializer(SimpleBootcampSerializer, LearningResourceRunMixin):
         model = Bootcamp
         exclude = COMMON_IGNORED_FIELDS
         extra_kwargs = {"full_description": {"write_only": True}}
+
+
+class MicroUserListItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserListItem containing only the item id and userlist id.
+    """
+
+    item_id = serializers.IntegerField(source="id")
+    list_id = serializers.IntegerField(source="user_list_id")
+
+    class Meta:
+        model = UserListItem
+        fields = ("item_id", "list_id")
 
 
 class SimpleUserListItemSerializer(
