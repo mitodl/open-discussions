@@ -16,7 +16,8 @@ from channels.constants import (
 )
 from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
-from course_catalog.models import FavoriteItem, UserListItem
+from course_catalog.models import FavoriteItem
+from course_catalog.utils import get_list_items_by_resource
 from open_discussions.utils import extract_values
 from search.connection import get_conn, get_default_alias_name
 from search.constants import (
@@ -282,12 +283,9 @@ def transform_results(search_result, user, inject_favorites=False):
                     object_type = USER_LIST_TYPE
                 object_id = hit["_source"]["id"]
                 hit["_source"]["is_favorite"] = (object_type, object_id) in favorites
-                hit["_source"]["lists"] = [
-                    {"list_id": item.user_list_id, "item_id": item.id}
-                    for item in UserListItem.objects.filter(user_list__author=user)
-                    .filter(content_type__model=object_type)
-                    .filter(object_id=object_id)
-                ]
+                hit["_source"]["lists"] = get_list_items_by_resource(
+                    user, object_type, object_id
+                )
     return search_result
 
 
