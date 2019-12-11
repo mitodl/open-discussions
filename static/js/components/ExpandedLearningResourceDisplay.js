@@ -14,7 +14,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
-  platforms
+  platforms,
+  platformLogos
 } from "../lib/constants"
 import {
   bestRun,
@@ -48,11 +49,13 @@ type Props = {
 const getObjectImg = object =>
   isUserList(object.object_type) ? userListCoverImage(object) : object.image_src
 
-const courseInfoRow = (iconName, label, value) => (
-  <div className="course-info-row">
-    <i className={`material-icons ${iconName}`}>{iconName}</i>
-    <div className="course-info-label">{label}</div>
-    <div className="course-info-value">{value}</div>
+const lrInfoRow = (iconName, label, value) => (
+  <div className="info-row">
+    <div className="col-1">
+      <i className={`material-icons ${iconName}`}>{iconName}</i>
+      <div className="label">{label}</div>
+    </div>
+    {value ? <div className="col-2 value">{value}</div> : null}
   </div>
 )
 
@@ -85,12 +88,13 @@ const renderListItems = (
   </div>
 )
 
-const ExpandedLearningResourceDisplay = (props: Props) => {
+export default function ExpandedLearningResourceDisplay(props: Props) {
+  const { object, runId, setShowResourceDrawer, embedly, similarItems } = props
+
   const [showSimilar, setShowSimilar] = useState(false)
   const [showCourseList, setShowCourseList] = useState(false)
   const similarIcon = showSimilar ? "remove" : "add"
   const coursesIcon = showCourseList ? "remove" : "add"
-  const { object, runId, setShowResourceDrawer, embedly, similarItems } = props
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -116,17 +120,19 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
 
   return (
     <React.Fragment>
-      <div className="expanded-course-summary">
+      <div className="expanded-lr-summary">
         <div className="summary">
           {selectedRun ? (
-            <div className="course-info-row form centered">
-              <i className="material-icons school">school</i>
-              <div className="course-info-label">
-                {// $FlowFixMe: only courses will access platform
-                  object.platform === platforms.OCW
-                    ? "As Taught In"
-                    : "Start Date"}
-                :
+            <div className="info-row form centered">
+              <div className="col-1">
+                <i className="material-icons school">school</i>
+                <div className="info-label">
+                  {// $FlowFixMe: only courses will access platform
+                    object.platform === platforms.OCW
+                      ? "As Taught In"
+                      : "Start Date"}
+                  :
+                </div>
               </div>
               <div className="select-semester-div">
                 {objectRuns.length > 1 ? (
@@ -143,7 +149,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
               </div>
             </div>
           ) : null}
-          <div className="course-image-div">
+          <div className="image-div">
             {object.object_type === LR_TYPE_VIDEO ? (
               <Embedly embedly={embedly} />
             ) : (
@@ -158,24 +164,31 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             )}
           </div>
           {isCoursewareResource(object.object_type) && url ? (
-            <div className="course-links">
-              <div>
-                <a
-                  className="link-button"
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {`Take ${capitalize(object.object_type)}`}
-                  {offeredBy && object.object_type !== LR_TYPE_BOOTCAMP
-                    ? ` on ${offeredBy}`
-                    : null}
-                </a>
+            <div className="external-links">
+              <a
+                className="link-button blue-btn"
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {`Take ${capitalize(object.object_type)}`}
+              </a>
+              <div className="platform-logo">
+                <span>on</span>
+                <img
+                  src={
+                    platformLogos[
+                      object.object_type === LR_TYPE_BOOTCAMP
+                        ? platforms.bootcamps
+                        : object.platform || object.offered_by
+                    ]
+                  }
+                />
               </div>
             </div>
           ) : null}
-          <div className="course-title">{object.title}</div>
-          <div className="course-description">
+          <div className="title">{object.title}</div>
+          <div className="description">
             <TruncatedText
               text={entities.decode(striptags(object.short_description))}
               lines={5}
@@ -184,80 +197,74 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             />
           </div>
           {!emptyOrNil(object.topics) ? (
-            <React.Fragment>
-              <div className="course-subheader row">Topics</div>
-              <div className="course-topics">
+            <div className="topics">
+              <div className="section-label">Subjects</div>
+              <div className="topics-list">
                 {object.topics.map((topic, i) => (
                   <div className="grey-surround facet" key={i}>
                     {topic.name}
                   </div>
                 ))}
               </div>
-            </React.Fragment>
+            </div>
           ) : null}
-          <div className="course-subheader row">Info</div>
-          {cost ? courseInfoRow("attach_money", "Cost:", cost) : null}
-          {selectedRun && selectedRun.level
-            ? courseInfoRow("bar_chart", "Level:", selectedRun.level)
-            : null}
-          {!emptyOrNil(instructors)
-            ? courseInfoRow("school", "Instructors:", R.join(", ", instructors))
-            : null}
-          {object.object_type === LR_TYPE_PROGRAM
-            ? courseInfoRow(
-              "menu_book",
-              "Number of Courses:",
-              object.items.length
-            )
-            : null}
-          {isCoursewareResource(object.object_type)
-            ? courseInfoRow(
-              "language",
-              "Language:",
-              languageName(selectedRun ? selectedRun.language : "en")
-            )
-            : null}
-          {object.object_type === LR_TYPE_VIDEO ? (
-            <React.Fragment>
-              {// $FlowFixMe: only videos will get to this code
-                object.duration
-                  ? courseInfoRow(
-                    "restore",
-                    "Duration:",
-                    formatDurationClockTime(object.duration)
-                  )
-                  : null}
-              {offeredBy
-                ? courseInfoRow("local_offer", "Offered By:", offeredBy)
-                : null}
-              {courseInfoRow(
-                "calendar_today",
-                "Date Posted:",
-                moment(object.last_modified).format("MMM D, YYYY")
-              )}
-            </React.Fragment>
-          ) : null}
-          {isUserList(object.object_type) ? (
-            <React.Fragment>
-              {object.author_name
-                ? courseInfoRow(
-                  "local_offer",
-                  "Created By:",
-                  object.author_name
-                )
-                : null}
-              {courseInfoRow(
-                "lock",
-                "Privacy:",
-                capitalize(object.privacy_level)
-              )}
-              {courseInfoRow(
-                "view_list",
-                "Items in list:",
+          <div className="lr-metadata">
+            <div className="section-label">Info</div>
+            {cost ? lrInfoRow("attach_money", "Cost:", cost) : null}
+            {selectedRun && selectedRun.level
+              ? lrInfoRow("bar_chart", "Level:", selectedRun.level)
+              : null}
+            {!emptyOrNil(instructors)
+              ? lrInfoRow("school", "Instructors:", R.join(", ", instructors))
+              : null}
+            {object.object_type === LR_TYPE_PROGRAM
+              ? lrInfoRow(
+                "menu_book",
+                "Number of Courses:",
                 object.items.length
-              )}
-            </React.Fragment>
-          ) : null}
+              )
+              : null}
+            {isCoursewareResource(object.object_type)
+              ? lrInfoRow(
+                "language",
+                "Language:",
+                languageName(selectedRun ? selectedRun.language : "en")
+              )
+              : null}
+            {object.object_type === LR_TYPE_VIDEO ? (
+              <React.Fragment>
+                {// $FlowFixMe: only videos will get to this code
+                  object.duration
+                    ? lrInfoRow(
+                      "restore",
+                      "Duration:",
+                      formatDurationClockTime(object.duration)
+                    )
+                    : null}
+                {offeredBy
+                  ? lrInfoRow("local_offer", "Offered By:", offeredBy)
+                  : null}
+                {lrInfoRow(
+                  "calendar_today",
+                  "Date Posted:",
+                  moment(object.last_modified).format("MMM D, YYYY")
+                )}
+              </React.Fragment>
+            ) : null}
+            {isUserList(object.object_type) ? (
+              <React.Fragment>
+                {object.author_name
+                  ? lrInfoRow("local_offer", "Created By:", object.author_name)
+                  : null}
+                {lrInfoRow(
+                  "lock",
+                  "Privacy:",
+                  capitalize(object.privacy_level)
+                )}
+                {lrInfoRow("view_list", "Items in list:", object.items.length)}
+              </React.Fragment>
+            ) : null}
+          </div>
         </div>
       </div>
       {hasCourseList(object.object_type) && !emptyOrNil(object.items)
@@ -283,5 +290,3 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
     </React.Fragment>
   )
 }
-
-export default ExpandedLearningResourceDisplay

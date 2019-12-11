@@ -17,6 +17,7 @@ const bootcampsPlatform = "bootcamps"
 const micromastersPlatform = "micromasters"
 const xproPlatform = "xpro"
 const youtubePlatform = "youtube"
+const ollPlatform = "oll"
 
 export const platforms = {
   OCW:          ocwPlatform,
@@ -24,7 +25,17 @@ export const platforms = {
   bootcamps:    bootcampsPlatform,
   micromasters: micromastersPlatform,
   xpro:         xproPlatform,
-  youtube:      youtubePlatform
+  youtube:      youtubePlatform,
+  oll:          ollPlatform
+}
+
+export const platformLogos = {
+  [ocwPlatform]:          "/static/images//mit-ocw-logo-square.png",
+  [edxPlatform]:          "/static/images/edx_logo.png",
+  [bootcampsPlatform]:    "/static/images/mit-bootcamp-logo.png",
+  [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
+  [xproPlatform]:         "/static/images/mit-xpro-logo.png",
+  [ollPlatform]:          "/static/images/oll_logo.png"
 }
 
 export const offeredBys = {

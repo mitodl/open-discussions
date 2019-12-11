@@ -65,14 +65,14 @@ describe("ExpandedLearningResourceDisplay", () => {
     const { wrapper } = await render()
     assert.ok(
       wrapper
-        .find(".course-image-div")
+        .find(".image-div")
         .find("img")
         .prop("src")
         .includes("https://i.embed.ly/1/display/crop")
     )
     assert.ok(
       wrapper
-        .find(".course-image-div")
+        .find(".image-div")
         .find("img")
         .prop("src")
         // $FlowFixMe: this won't be null
@@ -85,7 +85,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     const { wrapper } = await render()
     assert.ok(
       wrapper
-        .find(".course-image-div")
+        .find(".image-div")
         .find("img")
         .prop("src")
         .includes(encodeURIComponent(defaultResourceImageURL()))
@@ -110,7 +110,7 @@ describe("ExpandedLearningResourceDisplay", () => {
             runId: run.id
           }
         )
-        const link = wrapper.find(".course-links").find("a")
+        const link = wrapper.find(".external-links").find("a")
         // $FlowFixMe: run won't be null
         assert.equal(link.prop("href"), hasRunUrl ? run.url : object.url)
       })
@@ -131,7 +131,7 @@ describe("ExpandedLearningResourceDisplay", () => {
           object: program
         }
       )
-      const link = wrapper.find(".course-links").find("a")
+      const link = wrapper.find(".external-links").find("a")
       assert.equal(link.exists(), hasProgramUrl)
       if (hasProgramUrl) {
         assert.equal(link.prop("href"), program.url)
@@ -152,7 +152,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const { wrapper } = await render({}, { object })
       assert.equal(
         wrapper
-          .find(".course-title")
+          .find(".title")
           .at(0)
           .text(),
         object.title
@@ -164,7 +164,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     course.url = null
     course.runs.forEach(run => (run.url = null))
     const { wrapper } = await render()
-    assert.isNotOk(wrapper.find(".course-links").exists())
+    assert.isNotOk(wrapper.find(".external-links").exists())
   })
 
   LR_TYPE_ALL.forEach(objectType => {
@@ -178,7 +178,7 @@ describe("ExpandedLearningResourceDisplay", () => {
           object
         }
       )
-      const topicDivs = wrapper.find(".course-topics").find(".grey-surround")
+      const topicDivs = wrapper.find(".topics").find(".grey-surround")
       assert.equal(topicDivs.length, object.topics.length)
       assert.deepEqual(
         topicDivs.map(topicDiv => topicDiv.text()).sort(),
@@ -205,7 +205,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const dateLabel = wrapper
         .find(".form")
         .at(0)
-        .find(".course-info-label")
+        .find(".info-label")
         .text()
       assert.equal(dateLabel, expectedLabel)
     })
@@ -271,8 +271,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       const instructorText = wrapper
         .find(".school")
         .at(1)
-        .closest(".course-info-row")
-        .find(".course-info-value")
+        .closest(".info-row")
+        .find(".value")
         .text()
       // $FlowFixMe: course run won't be null here
       bestRun(object.runs).instructors.forEach(instructor => {
@@ -299,8 +299,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       assert.equal(
         wrapper
           .find(".language")
-          .closest(".course-info-row")
-          .find(".course-info-value")
+          .closest(".info-row")
+          .find(".value")
           .text(),
         langName
       )
@@ -324,7 +324,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         linkText,
         objectType === LR_TYPE_BOOTCAMP
           ? "Take Bootcamp"
-          : `Take ${capitalize(objectType)} on xPro`
+          : `Take ${capitalize(objectType)}`
       )
     })
   })
@@ -355,9 +355,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       assert.equal(
         wrapper
           .find(".attach_money")
-          .at(0)
-          .closest(".course-info-row")
-          .find(".course-info-value")
+          .closest(".info-row")
+          .find(".value")
           .text(),
         "$25.50"
       )
@@ -377,8 +376,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       assert.equal(
         wrapper
           .find(".local_offer")
-          .closest(".course-info-row")
-          .find(".course-info-value")
+          .closest(".info-row")
+          .find(".value")
           .text(),
         object.author_name
       )
@@ -395,8 +394,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       assert.equal(
         wrapper
           .find(".lock")
-          .closest(".course-info-row")
-          .find(".course-info-value")
+          .closest(".info-row")
+          .find(".value")
           .text(),
         capitalize(object.privacy_level)
       )
@@ -413,8 +412,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       assert.equal(
         wrapper
           .find(".view_list")
-          .closest(".course-info-row")
-          .find(".course-info-value")
+          .closest(".info-row")
+          .find(".value")
           .text(),
         object.items.length
       )
@@ -529,8 +528,8 @@ describe("ExpandedLearningResourceDisplay", () => {
     assert.equal(
       wrapper
         .find(".language")
-        .closest(".course-info-row")
-        .find(".course-info-value")
+        .closest(".info-row")
+        .find(".value")
         .text(),
       "English"
     )

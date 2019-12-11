@@ -1,0 +1,114 @@
+.expanded-lr-summary {
+  display: flex;
+  flex-direction: column;
+  font-size: $submission-font-size;
+  line-height: 1.3;
+  padding: 0px 30px;
+
+  .image-div {
+    width: 100%;
+    margin-bottom: 10px;
+    overflow: hidden;
+
+    img {
+      display: block;
+      margin: auto;
+    }
+  }
+
+  .external-links {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px 0;
+
+    a.link-button {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .platform-logo {
+      display: flex;
+      align-items: center;
+
+      img {
+        max-height: 32px;
+      }
+
+      span {
+        margin-right: 15px;
+      }
+    }
+  }
+
+  .section-label {
+    color: black;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .topics {
+    margin: 25px 0;
+
+    .topics-list {
+      display: flex;
+      flex-flow: wrap;
+    }
+  }
+
+  .title {
+    font-size: 18px;
+    color: black;
+    font-weight: bold;
+    margin: 25px 0;
+  }
+
+  .description {
+    font-size: 16px;
+    color: black;
+
+    .tt-expansion-control {
+      color: $font-grey-mid;
+    }
+  }
+
+  .lr-metadata {
+    margin: 25px 0;
+  }
+
+  .info-row {
+    display: flex;
+    cursor: default;
+    margin-bottom: 15px;
+
+    .col-1 {
+      min-width: 33%;
+      display: flex;
+      color: $font-grey-light;
+
+      i {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.expanded-learning-resource-list {
+  padding-bottom: 5px;
+
+  .learning-resource-card {
+    margin: 20px;
+    border-bottom: 2px solid $pale-grey;
+    padding-bottom: 10px;
+  }
+
+  .list-header {
+    background-color: $bg-light-grey;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px 20px;
+  }
+
+  i {
+    cursor: pointer;
+  }
+}
