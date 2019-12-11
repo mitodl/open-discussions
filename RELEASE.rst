@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.103.1
+---------------
+
+- Inject 'is_favorite' and 'lists' fields into search results (#2473)
+- Fixed routing for /learn/lists/favorites
+
 Version 0.103.0 (Released December 10, 2019)
 ---------------
 
