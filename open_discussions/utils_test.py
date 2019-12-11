@@ -18,6 +18,7 @@ from open_discussions.utils import (
     html_to_plain_text,
     markdown_to_plain_text,
     prefetched_iterator,
+    extract_values,
 )
 
 User = get_user_model()
@@ -169,3 +170,15 @@ def test_prefetched_iterator(chunk_size):
     assert len(users) == len(fetched_users)
     for user in users:
         assert user in fetched_users
+
+
+def test_extract_values():
+    """
+    extract_values should return the correct match from a dict
+    """
+    test_json = {
+        "a": {"b": {"c": [{"d": [1, 2, 3]}, {"d": [4, 5], "e": "f", "b": "g"}]}}
+    }
+    assert extract_values(test_json, "b") == [test_json["a"]["b"], "g"]
+    assert extract_values(test_json, "d") == [[1, 2, 3], [4, 5]]
+    assert extract_values(test_json, "e") == ["f"]

@@ -1,12 +1,21 @@
 # pylint: disable=redefined-outer-name
 """Search API function tests"""
-from django.contrib.auth.models import AnonymousUser
+
 import pytest
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.contenttypes.models import ContentType
 
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
 from course_catalog.constants import PrivacyLevel
+from course_catalog.factories import (
+    CourseFactory,
+    UserListFactory,
+    UserListUserListFactory,
+)
+from course_catalog.models import FavoriteItem
+from open_discussions.factories import UserFactory
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -14,8 +23,8 @@ from search.api import (
     gen_comment_id,
     gen_video_id,
     find_related_documents,
-    transform_aggregates,
     get_similar_topics,
+    transform_results,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -23,7 +32,9 @@ from search.constants import (
     GLOBAL_DOC_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    COURSE_TYPE,
 )
+from search.serializers import ESCourseSerializer, ESUserListSerializer
 
 
 @pytest.fixture()
@@ -326,9 +337,98 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     assert constructed_query["body"]["size"] == posts_to_return
 
 
-def test_transform_aggregates():
-    """transform_aggregates should transform reverse nested availability results if present"""
-    raw_aggregate = {
+@pytest.mark.parametrize("is_anonymous", [True, False])
+@pytest.mark.parametrize("inject_favorites", [True, False])
+@pytest.mark.django_db
+def test_transform_results(user, is_anonymous, inject_favorites):
+    """
+    transform_results should transform reverse nested availability results if present, and move
+    scripted fields into the source result
+    """
+
+    favorited_course = CourseFactory.create()
+    generic_course = CourseFactory.create()
+    listed_learningpath = UserListFactory.create(
+        author=UserFactory.create(), list_type=LEARNING_PATH_TYPE
+    )
+    user_list = UserListFactory.create(author=user)
+
+    if not is_anonymous:
+        FavoriteItem.objects.create(
+            user=user,
+            content_type=ContentType.objects.get(model=COURSE_TYPE),
+            object_id=favorited_course.id,
+        )
+        item_id = UserListUserListFactory.create(
+            user_list=user_list,
+            content_type=ContentType.objects.get(model=USER_LIST_TYPE),
+            object_id=listed_learningpath.id,
+        ).id
+    else:
+        item_id = None
+
+    raw_hits = [
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeA",
+            "_score": 1.0,
+            "_source": ESCourseSerializer(generic_course).data,
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a1",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeB",
+            "_score": 1.0,
+            "_source": ESCourseSerializer(favorited_course).data,
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a2",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeC",
+            "_score": 1.0,
+            "_source": ESUserListSerializer(listed_learningpath).data,
+        },
+    ]
+
+    expected_hits = [
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeA",
+            "_score": 1.0,
+            "_source": {
+                **ESCourseSerializer(generic_course).data,
+                "is_favorite": False,
+                "lists": [],
+            },
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a1",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeB",
+            "_score": 1.0,
+            "_source": {
+                **ESCourseSerializer(favorited_course).data,
+                "is_favorite": True,
+                "lists": [],
+            },
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a2",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeC",
+            "_score": 1.0,
+            "_source": {
+                **ESUserListSerializer(listed_learningpath).data,
+                "is_favorite": False,
+                "lists": [{"list_id": user_list.id, "item_id": item_id}],
+            },
+        },
+    ]
+
+    results = {
+        "hits": {"hits": raw_hits},
         "aggregations": {
             "availability": {
                 "runs": {
@@ -362,9 +462,16 @@ def test_transform_aggregates():
                 }
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    assert transform_aggregates(raw_aggregate) == {
+
+    search_user = AnonymousUser() if is_anonymous else user
+    assert transform_results(results, search_user, inject_favorites) == {
+        "hits": {
+            "hits": raw_hits
+            if (is_anonymous or not inject_favorites)
+            else expected_hits
+        },
         "aggregations": {
             "availability": {
                 "buckets": [
@@ -379,14 +486,20 @@ def test_transform_aggregates():
                 ]
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
-        }
+        },
     }
-    raw_aggregate["aggregations"]["availability"].pop("runs", None)
-    raw_aggregate["aggregations"]["cost"].pop("prices", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
-    raw_aggregate["aggregations"].pop("availability", None)
-    raw_aggregate["aggregations"].pop("cost", None)
-    assert transform_aggregates(raw_aggregate) == raw_aggregate
+    results["aggregations"]["availability"].pop("runs", None)
+    results["aggregations"]["cost"].pop("prices", None)
+    assert (
+        transform_results(results, search_user, inject_favorites)["aggregations"]
+        == results["aggregations"]
+    )
+    results["aggregations"].pop("availability", None)
+    results["aggregations"].pop("cost", None)
+    assert (
+        transform_results(results, search_user, inject_favorites)["aggregations"]
+        == results["aggregations"]
+    )
 
 
 def test_get_similar_topics(settings, mocker):

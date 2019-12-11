@@ -1,5 +1,5 @@
 // @flow
-import type {CourseInstructor, CoursePrice, PostType} from './discussionTypes'
+import type {CourseInstructor, CoursePrice, ListItemMember, PostType} from './discussionTypes'
 
 type ResultCommon = {
   author_avatar_small: string,
@@ -88,7 +88,8 @@ export type LearningResourceResult = {
   platform?:           string,
   topics:              Array<string>,
   runs:                Array<LearningResourceRun>,
-  lists?:               Array<number>
+  lists:               Array<ListItemMember>,
+  is_favorite:         boolean
 }
 
 

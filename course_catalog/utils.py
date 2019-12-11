@@ -135,3 +135,26 @@ def semester_year_to_date(semester, year, ending=False):
     return datetime.strptime("{}-{}".format(year, month_day), "%Y-%m-%d").replace(
         tzinfo=pytz.UTC
     )
+
+
+def get_list_items_by_resource(user, object_type, object_id):
+    """
+    Get serialized list items for a particular user and resource
+
+    Args:
+        user (User): the User to filter list items by
+        object_type (string): The object type of the resource
+        object_id (int): the id of the resource
+
+    Returns:
+        list of dicts: serialized UserListItem data
+    """
+    from course_catalog.models import UserListItem
+    from course_catalog.serializers import MicroUserListItemSerializer
+
+    return [
+        MicroUserListItemSerializer(item).data
+        for item in UserListItem.objects.filter(user_list__author=user)
+        .filter(content_type__model=object_type)
+        .filter(object_id=object_id)
+    ]
