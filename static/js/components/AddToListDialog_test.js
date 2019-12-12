@@ -123,6 +123,35 @@ describe("AddToListDialog", () => {
     })
   })
 
+  it(`should uncheck the correct userlist`, async () => {
+    course.lists.push({ list_id: userLists[0].id, item_id: 1 })
+    course.lists.push({ list_id: userLists[1].id, item_id: 1 })
+    course.lists.push({ list_id: userLists[2].id, item_id: 1 })
+
+    const { wrapper } = await render(course)
+    ;[1, 2, 3].forEach(idx => {
+      assert.equal(
+        wrapper
+          .find(Checkbox)
+          .at(idx)
+          .prop("checked"),
+        true
+      )
+    })
+    wrapper
+      .find(Checkbox)
+      .at(2)
+      .find("input")
+      .simulate("change", { target: { checked: false } })
+    assert.equal(
+      wrapper
+        .find(Checkbox)
+        .at(2)
+        .prop("checked"),
+      false
+    )
+  })
+
   it("should have a button for making a new list", async () => {
     const { wrapper } = await render(course)
     wrapper.find(".create-new-list").simulate("click")
