@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.103.1
+Version 0.103.1 (Released December 12, 2019)
 ---------------
 
 - Inject 'is_favorite' and 'lists' fields into search results (#2473)
