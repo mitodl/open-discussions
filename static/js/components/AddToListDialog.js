@@ -100,8 +100,8 @@ export default function AddToListDialog() {
     const matchingList = find(propEq("list_id", userListId), resource.lists)
     if (checked && !matchingList) {
       resource.lists.push({ list_id: userListId })
-    } else {
-      resource.lists.pop(matchingList)
+    } else if (matchingList && !checked) {
+      resource.lists.splice(resource.lists.indexOf(matchingList), 1)
     }
   }
 
