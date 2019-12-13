@@ -24,6 +24,7 @@ import {
   videoApiURL,
   embedlyApiURL
 } from "../lib/url"
+import { mockHTMLElHeight } from "../lib/test_utils"
 
 describe("LearningResourceDrawer", () => {
   let course, helper, render
@@ -37,6 +38,7 @@ describe("LearningResourceDrawer", () => {
       "LearningResourceRow"
     )
     render = helper.configureReduxQueryRenderer(LearningResourceDrawer)
+    mockHTMLElHeight(100, 50)
   })
 
   afterEach(() => {

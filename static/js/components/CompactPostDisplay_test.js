@@ -32,6 +32,7 @@ import {
   LINK_TYPE_TEXT
 } from "../lib/channels"
 import * as urlLib from "../lib/url"
+import { mockHTMLElHeight } from "../lib/test_utils"
 
 describe("CompactPostDisplay", () => {
   let helper, post, openMenu
@@ -59,6 +60,7 @@ describe("CompactPostDisplay", () => {
     post = makePost()
     openMenu = () =>
       helper.store.dispatch(showDropdown(getPostDropdownMenuKey(post)))
+    mockHTMLElHeight(100, 50)
   })
 
   afterEach(() => {

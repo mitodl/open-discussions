@@ -88,3 +88,24 @@ export const changeFormikInput = (
     }
   })
 }
+
+export const mockHTMLElHeight = (
+  scrollHeight: number,
+  offsetHeight: number
+) => {
+  // $FlowFixMe
+  Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+    configurable: true,
+    get:          function() {
+      return scrollHeight || 0
+    }
+  })
+
+  // $FlowFixMe
+  Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+    configurable: true,
+    get:          function() {
+      return offsetHeight || 0
+    }
+  })
+}

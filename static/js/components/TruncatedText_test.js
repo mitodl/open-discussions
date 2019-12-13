@@ -6,8 +6,14 @@ import _ from "lodash"
 
 import TruncatedText from "./TruncatedText"
 
+import { mockHTMLElHeight } from "../lib/test_utils"
+
 describe("TruncatedText", () => {
   const render = (props = {}) => mount(<TruncatedText {...props} />)
+
+  beforeEach(() => {
+    mockHTMLElHeight(100, 50)
+  })
 
   it("displays text", () => {
     const props = {
@@ -60,5 +66,34 @@ describe("TruncatedText", () => {
       dotdotdotText,
       text.substring(0, estCharsPerLine * (lines + 2))
     )
+  })
+
+  it("should show expansion controls if flag is passed", () => {
+    const wrapper = render({
+      text:                  "foofofofofofof",
+      lines:                 1,
+      showExpansionControls: true
+    })
+    assert.ok(wrapper.find(".tt-expansion-control").exists())
+  })
+
+  it("should not show expansion controls if text is not hidden", () => {
+    mockHTMLElHeight(100, 100)
+    const wrapper = render({
+      text:                  "foofofofofofof",
+      lines:                 1,
+      showExpansionControls: true
+    })
+    assert.isNotOk(wrapper.find(".tt-expansion-control").exists())
+  })
+
+  it("should render an empty string ok", () => {
+    mockHTMLElHeight(0, 0)
+    const wrapper = render({
+      text:                  "",
+      lines:                 1,
+      showExpansionControls: true
+    })
+    assert.isNotOk(wrapper.find(".tt-expansion-control").exists())
   })
 })
