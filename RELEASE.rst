@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.103.2
+---------------
+
+- add history to the learning resource drawer
+- add a display of the courses in a program to the program drawer
+- Bump django from 2.1.11 to 2.1.15 (#2478)
+- Fix bug unchecking lists (#2482)
+
 Version 0.103.1 (Released December 12, 2019)
 ---------------
 
