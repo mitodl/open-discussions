@@ -114,7 +114,7 @@ export const searchResultToLearningResource = (
   offered_by:
     "offered_by" in result && result.offered_by ? result.offered_by : [],
   platform: "platform" in result ? result.platform : null,
-  topics:   result.topics.map(topic => ({ name: topic })),
+  topics:   result.topics ? result.topics.map(topic => ({ name: topic })) : [],
   runs:     "runs" in result ? result.runs : [],
   ...overrideObject
 })

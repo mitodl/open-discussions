@@ -7,8 +7,7 @@ from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 from rest_framework.views import APIView
 
 from open_discussions import features
-from search.api import execute_search, find_related_documents
-
+from search.api import execute_search, find_related_documents, find_similar_resources
 
 log = logging.getLogger(__name__)
 
@@ -53,4 +52,17 @@ class RelatedPostsView(ESView):
         response = find_related_documents(
             user=request.user, post_id=self.kwargs["post_id"]
         )
+        return Response(response)
+
+
+class SimilarResourcesView(ESView):
+    """
+    View for retrieving similar learning resources
+    """
+
+    permission_classes = ()
+
+    def post(self, request, *args, **kwargs):
+        """Execute a similar resources search"""
+        response = find_similar_resources(user=request.user, value_doc=request.data)
         return Response(response)

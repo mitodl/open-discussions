@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS: false */
-import React from "react"
+import React, { useState } from "react"
 import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
@@ -8,8 +8,8 @@ import moment from "moment"
 
 import TruncatedText from "./TruncatedText"
 import Embedly from "./Embedly"
-import { LearningResourceRow } from "../components/LearningResourceCard"
 
+import { LearningResourceRow } from "./LearningResourceCard"
 import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
@@ -31,7 +31,9 @@ import {
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
-import { SEARCH_LIST_UI } from "../lib/search"
+import { SEARCH_LIST_UI, searchResultToLearningResource } from "../lib/search"
+
+import type { LearningResourceResult } from "../flow/searchTypes"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
@@ -41,7 +43,8 @@ type Props = {
   object: any, // honestly we had like 10 FlowFixMe in this file before, I think this is just easier
   runId: number,
   setShowResourceDrawer: Function,
-  embedly: ?Object
+  embedly: ?Object,
+  similarItems: Array<LearningResourceResult>
 }
 
 const getObjectImg = object =>
@@ -57,8 +60,41 @@ const courseInfoRow = (iconName, label, value) => (
   </div>
 )
 
+const renderListItems = (
+  title: string,
+  setShow: Function,
+  show: boolean,
+  icon: string,
+  objects: any
+) => (
+  <div className="expanded-learning-resource-list">
+    <div className="list-header">
+      {title}
+      <i
+        className={`material-icons float-right ${icon}`}
+        onClick={() => setShow(!show)}
+      >
+        {icon}
+      </i>
+    </div>
+    {show
+      ? objects.map((object, i) => (
+        <LearningResourceRow
+          key={i}
+          object={object}
+          searchResultLayout={SEARCH_LIST_UI}
+        />
+      ))
+      : null}
+  </div>
+)
+
 const ExpandedLearningResourceDisplay = (props: Props) => {
-  const { object, runId, setShowResourceDrawer, embedly } = props
+  const [showSimilar, setShowSimilar] = useState(false)
+  const [showCourseList, setShowCourseList] = useState(false)
+  const similarIcon = showSimilar ? "remove" : "add"
+  const coursesIcon = showCourseList ? "remove" : "add"
+  const { object, runId, setShowResourceDrawer, embedly, similarItems } = props
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -230,22 +266,26 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
             ) : null}
         </div>
       </div>
-      {hasCourseList(object.object_type) ? (
-        <div className="expanded-learning-resource-userlist">
-          <div className="user-list-header">
-            {object.object_type === LR_TYPE_PROGRAM
-              ? "Learning Resources in this Program"
-              : "Learning Resources in this List"}
-          </div>
-          {object.items.map((item, i) => (
-            <LearningResourceRow
-              key={i}
-              object={item.content_data}
-              searchResultLayout={SEARCH_LIST_UI}
-            />
-          ))}
-        </div>
-      ) : null}
+      {hasCourseList(object.object_type) && !emptyOrNil(object.items)
+        ? renderListItems(
+          object.object_type === LR_TYPE_PROGRAM
+            ? "Learning Resources in this Program"
+            : "Learning Resources in this List",
+          setShowCourseList,
+          showCourseList,
+          coursesIcon,
+          object.items.map(item => item.content_data)
+        )
+        : null}
+      {!emptyOrNil(similarItems)
+        ? renderListItems(
+          "Similar Learning Resources",
+          setShowSimilar,
+          showSimilar,
+          similarIcon,
+          similarItems.map(item => searchResultToLearningResource(item))
+        )
+        : null}
     </React.Fragment>
   )
 }

@@ -30,6 +30,7 @@ from search.constants import (
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
+SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
 
 
 def gen_post_id(reddit_obj_id):
@@ -314,6 +315,42 @@ def find_related_documents(*, user, post_id):
     # Limit results to the number indicated in settings
     search = search[0 : settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT]
     return search.execute().to_dict()
+
+
+def find_similar_resources(*, user, value_doc):
+    """
+    Execute a "more like this" query to find learning resources that are similar to the one provided.
+
+     Args:
+        user (User): The user executing the search
+        value_doc (dict):
+            a document representing the data fields we want to search with
+
+    Returns:
+        dict: The Elasticsearch response dict
+    """
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search = _apply_general_query_filters(search, user)
+    search = search.filter(Q("terms", object_type=LEARNING_RESOURCE_TYPES))
+    search = search.query(
+        MoreLikeThis(
+            like={"doc": value_doc, "fields": list(value_doc.keys())},
+            fields=SIMILAR_RESOURCE_RELEVANT_FIELDS,
+            min_term_freq=settings.OPEN_RESOURCES_MIN_TERM_FREQ,
+            min_doc_freq=settings.OPEN_RESOURCES_MIN_DOC_FREQ,
+        )
+    )
+    response = search.execute()
+
+    return [
+        hit.to_dict()
+        for hit in response.hits
+        if (
+            hit["id"] != value_doc.get("id", None)
+            or hit["object_type"] != value_doc.get("object_type", None)
+        )
+    ][0 : settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT]
 
 
 def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):

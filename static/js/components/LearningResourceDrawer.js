@@ -14,7 +14,9 @@ import { LR_TYPE_VIDEO } from "../lib/constants"
 import { useResponsive } from "../hooks/util"
 import {
   learningResourceSelector,
-  getResourceRequest
+  getResourceRequest,
+  similarResourcesRequest,
+  getSimilarResources
 } from "../lib/queries/learning_resources"
 
 const getLRHistory = createSelector(
@@ -63,6 +65,21 @@ const getEmbedlyForObject = createSelector(
   }
 )
 
+const getSimilarResourcesForObject = createSelector(
+  getLRHistory,
+  learningResourceSelector,
+  getSimilarResources,
+  (LRHistory, lrSelector, similarResources) => {
+    const { objectId, objectType } = LRHistory
+    const object = lrSelector(objectId, objectType)
+
+    if (!object || !object.id || !similarResources) {
+      return null
+    }
+    return similarResources[`${object.object_type}_${object.id}`]
+  }
+)
+
 export default function LearningResourceDrawer() {
   useResponsive()
 
@@ -79,6 +96,9 @@ export default function LearningResourceDrawer() {
   )
 
   const embedly = useSelector(getEmbedlyForObject)
+
+  useRequest(object ? similarResourcesRequest(object) : null)
+  const similarResources = useSelector(getSimilarResourcesForObject)
 
   const dispatch = useDispatch()
   const clearHistory = useCallback(() => dispatch(clearLRHistory()), [dispatch])
@@ -113,6 +133,7 @@ export default function LearningResourceDrawer() {
               runId={runId}
               setShowResourceDrawer={pushHistory}
               embedly={embedly}
+              similarItems={similarResources}
             />
           ) : null}
           <div className="footer" />

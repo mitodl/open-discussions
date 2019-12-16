@@ -230,18 +230,24 @@
   }
 }
 
-.expanded-learning-resource-userlist {
+.expanded-learning-resource-list {
+  padding-bottom: 5px;
+
   .learning-resource-card {
     margin: 20px;
     border-bottom: 2px solid $pale-grey;
     padding-bottom: 10px;
   }
 
-  .user-list-header {
+  .list-header {
     background-color: $bg-light-grey;
     font-size: 18px;
     font-weight: 600;
     padding: 18px 20px;
+  }
+
+  i {
+    cursor: pointer;
   }
 }
 

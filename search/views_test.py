@@ -7,6 +7,8 @@ from django.urls import reverse
 from elasticsearch.exceptions import TransportError
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 
+from course_catalog.factories import CourseFactory
+from search.constants import COURSE_TYPE
 
 FAKE_SEARCH_RESPONSE = {
     "took": 1,
@@ -140,3 +142,23 @@ def test_find_related_documents_feature_flag(settings, client, related_posts_vie
     settings.FEATURES["RELATED_POSTS_UI"] = False
     resp = client.post(related_posts_view.url)
     assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
+
+
+def test_find_similar_resources(mocker, client):
+    """The view should return the results of the API method for finding similar resources"""
+    course = CourseFactory.create()
+    doc_vals = {
+        "id": course.id,
+        "object_id": COURSE_TYPE,
+        "title": course.title,
+        "short_description": course.short_description,
+    }
+    fake_response = {"similar": "resources"}
+    similar_resources_mock = mocker.patch(
+        "search.views.find_similar_resources", autospec=True, return_value=fake_response
+    )
+    resp = client.post(reverse("similar-resources"), data=doc_vals)
+    assert resp.json() == fake_response
+    similar_resources_mock.assert_called_once_with(
+        user=AnonymousUser(), value_doc=doc_vals
+    )
