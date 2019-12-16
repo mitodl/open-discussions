@@ -123,22 +123,12 @@ export default function AddToListDialog() {
           </div>
         </div>
       </div>
-      {userLists.map(
-        (userList, i) =>
-          resource &&
-          (![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
-            resource.object_type
-          ) ||
-            (resource.id !== userList.id &&
-              emptyOrNil(
-                resource.items.filter(
-                  item =>
-                    item.object_id === userList.id &&
-                    [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
-                      item.content_type
-                    )
-                )
-              ))) ? (
+      {resource &&
+      ![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
+        resource.object_type
+      ) ? (
+          <React.Fragment>
+            {userLists.map((userList, i) => (
               <div className="flex-row" key={i}>
                 <div>
                   <Checkbox
@@ -164,14 +154,16 @@ export default function AddToListDialog() {
                   </div>
                 </div>
               </div>
-            ) : null
-      )}
-      <button
-        className="create-new-list blue-btn"
-        onClick={() => setShowUserListFormDialog(true)}
-      >
-        Create New List
-      </button>
+            ))}
+
+            <button
+              className="create-new-list blue-btn"
+              onClick={() => setShowUserListFormDialog(true)}
+            >
+            Create New List
+            </button>
+          </React.Fragment>
+        ) : null}
     </div>
   )
 

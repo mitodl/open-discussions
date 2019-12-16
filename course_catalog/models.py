@@ -227,9 +227,7 @@ class UserListItem(ListItem):
 
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={
-            "model__in": ("course", "bootcamp", "program", "video", "userlist")
-        },
+        limit_choices_to={"model__in": ("course", "bootcamp", "program", "video")},
         on_delete=models.CASCADE,
     )
     user_list = models.ForeignKey(
