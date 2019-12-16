@@ -13,9 +13,13 @@ from course_catalog.factories import (
     CourseFactory,
     UserListFactory,
     UserListUserListFactory,
+    BootcampFactory,
+    VideoFactory,
+    ProgramFactory,
 )
 from course_catalog.models import FavoriteItem
 from open_discussions.factories import UserFactory
+from open_discussions.utils import extract_values
 from search.api import (
     execute_search,
     is_reddit_object_removed,
@@ -25,6 +29,8 @@ from search.api import (
     find_related_documents,
     get_similar_topics,
     transform_results,
+    find_similar_resources,
+    SIMILAR_RESOURCE_RELEVANT_FIELDS,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -34,7 +40,13 @@ from search.constants import (
     LEARNING_PATH_TYPE,
     COURSE_TYPE,
 )
-from search.serializers import ESCourseSerializer, ESUserListSerializer
+from search.serializers import (
+    ESCourseSerializer,
+    ESUserListSerializer,
+    ESBootcampSerializer,
+    ESVideoSerializer,
+    ESProgramSerializer,
+)
 
 
 @pytest.fixture()
@@ -335,6 +347,50 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     }
     assert constructed_query["body"]["from"] == 0
     assert constructed_query["body"]["size"] == posts_to_return
+
+
+def test_find_similar_resources(settings, mocker, user):
+    """find_similar_resources should execute a more-like-this query and not include input resource"""
+    resources_to_return = 4
+    settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT = resources_to_return
+    settings.OPEN_RESOURCES_MIN_TERM_FREQ = 3
+    settings.OPEN_RESOURCES_MIN_DOC_FREQ = 4
+
+    course = CourseFactory.create()
+
+    value_doc = {
+        "title": course.title,
+        "short_description": course.short_description,
+        "id": course.id,
+        "object_type": COURSE_TYPE,
+    }
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+    get_conn_mock.return_value.search.return_value = {
+        "hits": {
+            "hits": [
+                {"_source": ESCourseSerializer(course).data},
+                {"_source": ESCourseSerializer(CourseFactory.create()).data},
+                {"_source": ESBootcampSerializer(BootcampFactory.create()).data},
+                {"_source": ESVideoSerializer(VideoFactory.create()).data},
+                {"_source": ESUserListSerializer(UserListFactory.create()).data},
+                {"_source": ESProgramSerializer(ProgramFactory.create()).data},
+            ]
+        }
+    }
+
+    assert find_similar_resources(user=user, value_doc=value_doc) == [
+        hit["_source"]
+        for hit in get_conn_mock.return_value.search.return_value["hits"]["hits"][1:5]
+    ]
+    constructed_query = get_conn_mock.return_value.search.call_args[1]
+    assert extract_values(constructed_query, "more_like_this") == [
+        {
+            "like": {"doc": value_doc, "fields": list(value_doc.keys())},
+            "fields": SIMILAR_RESOURCE_RELEVANT_FIELDS,
+            "min_term_freq": 3,
+            "min_doc_freq": 4,
+        }
+    ]
 
 
 @pytest.mark.parametrize("is_anonymous", [True, False])

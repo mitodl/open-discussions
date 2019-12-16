@@ -3,8 +3,8 @@ import R from "ramda"
 import { createSelector } from "reselect"
 import { memoize } from "lodash"
 
-import { favoritesURL } from "../url"
-import { constructIdMap } from "../redux_query"
+import { favoritesURL, similarResourcesURL } from "../url"
+import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
 import {
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
@@ -54,6 +54,32 @@ export const favoritesRequest = () => ({
     next:      (prev: string, next: string) => next
   }
 })
+
+export const similarResourcesRequest = (object: any) => ({
+  queryKey: `similarResourceRequest_${object.object_type}_${object.id}`,
+  body:     {
+    title:             object.title,
+    short_description: object.short_description,
+    id:                object.id,
+    object_type:       object.object_type
+  },
+  url:       similarResourcesURL,
+  transform: (results: any) => ({
+    similarResources: { [`${object.object_type}_${object.id}`]: results }
+  }),
+  update: {
+    similarResources: R.merge
+  },
+  options: {
+    method: "POST",
+    ...DEFAULT_POST_OPTIONS
+  }
+})
+
+export const getSimilarResources = createSelector(
+  state => state.entities.similarResources,
+  similarResources => similarResources
+)
 
 const filterFavorite = (entities: Object) =>
   R.filter(R.propEq("is_favorite", true), entities || {})

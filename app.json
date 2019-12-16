@@ -303,6 +303,10 @@
       "description": "Application-level SSL redirect setting.",
       "value": "True"
     },
+    "OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT": {
+      "description": "Number of similar resources to return",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_SUPPORT_EMAIL": {
       "description": "Email address listed for customer support"
     },
@@ -313,6 +317,14 @@
     "OPEN_DISCUSSIONS_USE_S3": {
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "False"
+    },
+    "OPEN_RESOURCES_MIN_DOC_FREQ": {
+      "description": "Elasticsearch min_doc_freq value for determining similar resources",
+      "required": false
+    },
+    "OPEN_RESOURCES_MIN_TERM_FREQ": {
+      "description": "Elasticsearch min_term_freq value for determining similar resources",
+      "required": false
     },
     "OPEN_VIDEO_DATA_BRANCH": {
       "description": "Branch in the open video data repository to use for video downloads",

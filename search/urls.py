@@ -1,7 +1,7 @@
 """URLs for search"""
 from django.conf.urls import url
 
-from search.views import SearchView, RelatedPostsView
+from search.views import SearchView, RelatedPostsView, SimilarResourcesView
 
 urlpatterns = [
     url(r"api/v0/search/", SearchView.as_view(), name="search"),
@@ -10,4 +10,5 @@ urlpatterns = [
         RelatedPostsView.as_view(),
         name="related-posts",
     ),
+    url(r"api/v0/similar/$", SimilarResourcesView.as_view(), name="similar-resources"),
 ]

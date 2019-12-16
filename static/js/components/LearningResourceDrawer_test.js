@@ -12,7 +12,11 @@ import {
   makeUserList
 } from "../factories/learning_resources"
 import { makeYoutubeVideo } from "../factories/embedly"
-import { LR_TYPE_COURSE, LR_TYPE_LEARNINGPATH } from "../lib/constants"
+import {
+  LR_TYPE_BOOTCAMP,
+  LR_TYPE_COURSE,
+  LR_TYPE_LEARNINGPATH
+} from "../lib/constants"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { pushLRHistory } from "../actions/ui"
 
@@ -22,21 +26,32 @@ import {
   programURL,
   userListApiURL,
   videoApiURL,
-  embedlyApiURL
+  embedlyApiURL,
+  similarResourcesURL
 } from "../lib/url"
 import { mockHTMLElHeight } from "../lib/test_utils"
+import { makeSearchResult } from "../factories/search"
 
 describe("LearningResourceDrawer", () => {
-  let course, helper, render
+  let course, helper, render, similarItems
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     course = makeCourse()
+    similarItems = [
+      makeSearchResult(LR_TYPE_COURSE),
+      makeSearchResult(LR_TYPE_BOOTCAMP),
+      makeSearchResult(LR_TYPE_COURSE)
+    ]
     helper.stubComponent(
       LRCardMod,
       "LearningResourceRow",
       "LearningResourceRow"
     )
+    helper.handleRequestStub.withArgs(similarResourcesURL).returns({
+      status: 200,
+      body:   similarItems
+    })
     render = helper.configureReduxQueryRenderer(LearningResourceDrawer)
     mockHTMLElHeight(100, 50)
   })
@@ -158,5 +173,6 @@ describe("LearningResourceDrawer", () => {
     const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)
     assert.deepEqual(expandedDisplay.prop("object"), video)
     assert.deepEqual(expandedDisplay.prop("embedly"), embedly)
+    assert.deepEqual(expandedDisplay.prop("similarItems"), similarItems)
   })
 })
