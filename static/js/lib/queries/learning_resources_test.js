@@ -2,7 +2,11 @@
 import { assert } from "chai"
 import R from "ramda"
 
-import { filterFavorites, similarResourcesRequest } from "./learning_resources"
+import {
+  filterFavorites,
+  similarResourcesRequest,
+  learningResourceSelector
+} from "./learning_resources"
 import {
   makeCourse,
   makeBootcamp,
@@ -13,7 +17,8 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   LR_TYPE_LEARNINGPATH,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  LR_TYPE_VIDEO
 } from "../constants"
 import { similarResourcesURL } from "../url"
 
@@ -61,5 +66,24 @@ describe("learning resource queries", () => {
         }
       })
     })
+  })
+
+  it("learningResourceSelector should return objects correctly", () => {
+    // this is a regression to ensure we're correctly figuring out when to hit
+    // the cache and when to skip it
+    const state = {
+      entities: {
+        courses: {
+          // $FlowFixMe
+          4: { id: 4, message: "im a course" }
+        },
+        videos: {
+          // $FlowFixMe
+          4: { id: 4, message: "🙃 🙃 🙃" }
+        }
+      }
+    }
+    const getter = learningResourceSelector(state)
+    assert.notDeepEqual(getter(4, LR_TYPE_COURSE), getter(4, LR_TYPE_VIDEO))
   })
 })

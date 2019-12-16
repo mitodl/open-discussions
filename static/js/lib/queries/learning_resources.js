@@ -136,18 +136,28 @@ export const learningResourceSelector = createSelector(
   state => state.entities.userLists,
   state => state.entities.videos,
   (courses, bootcamps, programs, userLists, videos) =>
-    memoize((objectId, objectType) => {
-      switch (objectType) {
-      case LR_TYPE_COURSE:
-        return courses ? courses[objectId] : null
-      case LR_TYPE_BOOTCAMP:
-        return bootcamps ? bootcamps[objectId] : null
-      case LR_TYPE_PROGRAM:
-        return programs ? programs[objectId] : null
-      case LR_TYPE_VIDEO:
-        return videos ? videos[objectId] : null
-      default:
-        return userLists ? userLists[objectId] : null
-      }
-    })
+    memoize(
+      (objectId, objectType) => {
+        switch (objectType) {
+        case LR_TYPE_COURSE:
+          return courses ? courses[objectId] : null
+        case LR_TYPE_BOOTCAMP:
+          return bootcamps ? bootcamps[objectId] : null
+        case LR_TYPE_PROGRAM:
+          return programs ? programs[objectId] : null
+        case LR_TYPE_VIDEO:
+          return videos ? videos[objectId] : null
+        default:
+          return userLists ? userLists[objectId] : null
+        }
+      },
+      // by default `_.memoize` only uses the first argument of the function it
+      // wraps as a cache key. since the first arg is the object ID, if we had
+      // two objects with the same ID but a different type we could return the
+      // wrong object.
+      //
+      // We're avoiding this by passing a function to `memoize` to create a
+      // custom cache key that takes the id and type in to account
+      (id, type) => `${id}_${type}`
+    )
 )
