@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 def remove_userlist_listitems(apps, schema_editor):
     """
-    Calculates url's for courses
+    Delete any existing user list items in user lists
     """
     UserListItem = apps.get_model("course_catalog", "UserListItem")
     UserListItem.objects.filter(content_type__model="userlist").delete()
