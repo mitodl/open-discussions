@@ -14,8 +14,6 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
-  LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH,
   platforms
 } from "../lib/constants"
 import {
@@ -27,7 +25,8 @@ import {
   isCoursewareResource,
   formatDurationClockTime,
   userListCoverImage,
-  hasCourseList
+  hasCourseList,
+  isUserList
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
@@ -45,9 +44,7 @@ type Props = {
 }
 
 const getObjectImg = object =>
-  [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(object.object_type)
-    ? userListCoverImage(object)
-    : object.image_src
+  isUserList(object.object_type) ? userListCoverImage(object) : object.image_src
 
 const courseInfoRow = (iconName, label, value) => (
   <div className="course-info-row">
@@ -205,29 +202,27 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
               )}
             </React.Fragment>
           ) : null}
-          {[LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
-            object.object_type
-          ) ? (
-              <React.Fragment>
-                {object.author_name
-                  ? courseInfoRow(
-                    "local_offer",
-                    "Created By:",
-                    object.author_name
-                  )
-                  : null}
-                {courseInfoRow(
-                  "lock",
-                  "Privacy:",
-                  capitalize(object.privacy_level)
-                )}
-                {courseInfoRow(
-                  "view_list",
-                  "Items in list:",
-                  object.items.length
-                )}
-              </React.Fragment>
-            ) : null}
+          {isUserList(object.object_type) ? (
+            <React.Fragment>
+              {object.author_name
+                ? courseInfoRow(
+                  "local_offer",
+                  "Created By:",
+                  object.author_name
+                )
+                : null}
+              {courseInfoRow(
+                "lock",
+                "Privacy:",
+                capitalize(object.privacy_level)
+              )}
+              {courseInfoRow(
+                "view_list",
+                "Items in list:",
+                object.items.length
+              )}
+            </React.Fragment>
+          ) : null}
         </div>
       </div>
       {hasCourseList(object.object_type) ? (

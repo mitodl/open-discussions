@@ -24,11 +24,8 @@ import { capitalize, emptyOrNil, formatPrice } from "./util"
 import type {
   LearningResourceRun,
   CourseInstructor,
-  CoursePrice,
-  LearningResourceSummary,
-  UserList
+  CoursePrice
 } from "../flow/discussionTypes"
-import type { LearningResourceResult } from "../flow/searchTypes"
 
 export const availabilityFacetLabel = (availability: ?string) => {
   const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
@@ -282,22 +279,12 @@ export const formatDurationClockTime = (value: string) => {
   return values.join(":")
 }
 
-export const filterListsByResource = (
-  resource: LearningResourceSummary | LearningResourceResult,
-  userLists: Array<UserList>
-) => {
-  return filterItems(userLists, "items", {
-    content_type:
-      resource.object_type === LR_TYPE_LEARNINGPATH
-        ? LR_TYPE_USERLIST
-        : resource.object_type,
-    object_id: resource.id
-  }).map(userList => userList.id)
-}
-
 export const userListCoverImage = R.pathOr(null, [
   "items",
   0,
   "content_data",
   "image_src"
 ])
+
+export const isUserList = objectType =>
+  R.contains(objectType, [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST])
