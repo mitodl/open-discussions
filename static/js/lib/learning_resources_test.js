@@ -11,7 +11,6 @@ import {
   DATE_FORMAT,
   DEFAULT_END_DT,
   DEFAULT_START_DT,
-  LR_TYPE_ALL,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
@@ -44,8 +43,7 @@ import {
 import {
   makeCourse,
   makeRun,
-  makeUserList,
-  makeUserListItem
+  makeUserList
 } from "../factories/learning_resources"
 import moment from "moment"
 
@@ -431,15 +429,6 @@ describe("Course run availability utils", () => {
     const userLists = times(makeUserList, 5)
     const resource = userLists[3].items[1]
     assert.deepEqual(filterItems(userLists, "items", resource), [userLists[3]])
-  })
-
-  LR_TYPE_ALL.forEach(objectType => {
-    it(`filterListsByResource returns a list of userlists including a ${objectType} item`, () => {
-      const item = makeUserListItem(objectType)
-      const userLists = times(makeUserList, 2)
-      userLists[0].items.push(item)
-      assert.deepEqual(filterItems(userLists, "items", item), [userLists[0]])
-    })
   })
 
   //

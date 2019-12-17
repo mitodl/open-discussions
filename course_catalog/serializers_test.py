@@ -207,7 +207,7 @@ def test_simple_userlist_serializer_validation(list_type, valid):
         ["program", "ProgramFactory", True],
         ["bootcamp", "BootcampFactory", True],
         ["video", "VideoFactory", True],
-        ["userlist", "UserListFactory", True],
+        ["userlist", "UserListFactory", False],
         ["user list item", "UserListCourseFactory", False],
         [None, "CourseFactory", False],
     ],

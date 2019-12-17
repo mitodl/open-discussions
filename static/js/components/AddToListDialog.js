@@ -19,7 +19,7 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
 } from "../lib/constants"
-import { privacyIcon } from "../lib/learning_resources"
+import { isUserList, privacyIcon } from "../lib/learning_resources"
 import { favoriteCourseMutation } from "../lib/queries/courses"
 import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
@@ -123,55 +123,44 @@ export default function AddToListDialog() {
           </div>
         </div>
       </div>
-      {userLists.map(
-        (userList, i) =>
-          resource &&
-          (![LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
-            resource.object_type
-          ) ||
-            (resource.id !== userList.id &&
-              emptyOrNil(
-                resource.items.filter(
-                  item =>
-                    item.object_id === userList.id &&
-                    [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST].includes(
-                      item.content_type
-                    )
-                )
-              ))) ? (
-              <div className="flex-row" key={i}>
-                <div>
-                  <Checkbox
-                    checked={inLists.includes(userList.id)}
-                    onChange={(e: any) => {
-                      toggleListItem(resource, userList, !e.target.checked)
-                      updateResource(e.target.checked, userList.id)
-                    }}
+      {resource && !isUserList(resource.object_type) ? (
+        <React.Fragment>
+          {userLists.map((userList, i) => (
+            <div className="flex-row" key={i}>
+              <div>
+                <Checkbox
+                  checked={inLists.includes(userList.id)}
+                  onChange={(e: any) => {
+                    toggleListItem(resource, userList, !e.target.checked)
+                    updateResource(e.target.checked, userList.id)
+                  }}
+                >
+                  {`${userList.title}`}
+                </Checkbox>
+              </div>
+              <div>
+                <div className="grey-surround privacy">
+                  <i
+                    className={`material-icons ${privacyIcon(
+                      userList.privacy_level
+                    )}`}
                   >
-                    {`${userList.title}`}
-                  </Checkbox>
-                </div>
-                <div>
-                  <div className="grey-surround privacy">
-                    <i
-                      className={`material-icons ${privacyIcon(
-                        userList.privacy_level
-                      )}`}
-                    >
-                      {privacyIcon(userList.privacy_level)}
-                    </i>
-                    {capitalize(userList.privacy_level)}
-                  </div>
+                    {privacyIcon(userList.privacy_level)}
+                  </i>
+                  {capitalize(userList.privacy_level)}
                 </div>
               </div>
-            ) : null
-      )}
-      <button
-        className="create-new-list blue-btn"
-        onClick={() => setShowUserListFormDialog(true)}
-      >
-        Create New List
-      </button>
+            </div>
+          ))}
+
+          <button
+            className="create-new-list blue-btn"
+            onClick={() => setShowUserListFormDialog(true)}
+          >
+            Create New List
+          </button>
+        </React.Fragment>
+      ) : null}
     </div>
   )
 

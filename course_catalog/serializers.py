@@ -56,7 +56,6 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
             serializer = SimpleVideoSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
-
         return serializer.data
 
 
@@ -437,13 +436,7 @@ class SimpleUserListItemSerializer(
         object_id = attrs.get("object_id")
 
         if content_type:
-            if content_type not in [
-                "course",
-                "bootcamp",
-                "program",
-                "userlist",
-                "video",
-            ]:
+            if content_type not in ["course", "bootcamp", "program", "video"]:
                 raise ValidationError("Incorrect object type {}".format(content_type))
             if (
                 content_type == "course"
@@ -460,11 +453,6 @@ class SimpleUserListItemSerializer(
                 and not Program.objects.filter(id=object_id).exists()
             ):
                 raise ValidationError("Program does not exist")
-            if (
-                content_type == "userlist"
-                and not UserList.objects.filter(id=object_id).exists()
-            ):
-                raise ValidationError("UserList does not exist")
             if (
                 content_type == "video"
                 and not Video.objects.filter(id=object_id).exists()
