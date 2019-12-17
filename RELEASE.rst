@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.103.2
+Version 0.103.2 (Released December 17, 2019)
 ---------------
 
 - add history to the learning resource drawer
