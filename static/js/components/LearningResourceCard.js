@@ -165,49 +165,55 @@ export function LearningResourceDisplay(props: Props) {
         <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
         </div>
-        {object.offered_by.length ? (
-          <Subtitle
-            content={offeredBySearchLink(
-              getPreferredOfferedBy(object.offered_by)
-            )}
-            label="Offered by - "
-          />
-        ) : null}
-        {object.topics.length > 0 ? (
-          <Subtitle
-            content={formatTopics(object.topics)}
-            label={`${object.topics.length === 1 ? "Subject" : "Subjects"} - `}
-          />
-        ) : null}
-        <div className="row availability-price-favorite">
-          {cost ? (
-            <div className="price grey-surround">
-              <i className="material-icons attach_money">attach_money</i>
-              {cost}
+        {reordering ? null : (
+          <>
+            {object.offered_by.length ? (
+              <Subtitle
+                content={offeredBySearchLink(
+                  getPreferredOfferedBy(object.offered_by)
+                )}
+                label="Offered by - "
+              />
+            ) : null}
+            {object.topics.length > 0 ? (
+              <Subtitle
+                content={formatTopics(object.topics)}
+                label={`${
+                  object.topics.length === 1 ? "Subject" : "Subjects"
+                } - `}
+              />
+            ) : null}
+            <div className="row availability-price-favorite">
+              {cost ? (
+                <div className="price grey-surround">
+                  <i className="material-icons attach_money">attach_money</i>
+                  {cost}
+                </div>
+              ) : null}
+              <div className="availability grey-surround">
+                <i className="material-icons calendar_today">calendar_today</i>
+                {bestRunLabel(bestAvailableRun)}
+              </div>
+              <LoginTooltip>
+                <div
+                  className="favorite grey-surround"
+                  onClick={e => {
+                    e.preventDefault()
+                    if (!userIsAnonymous()) {
+                      showListDialog(object)
+                    }
+                  }}
+                >
+                  <i className={`material-icons ${bookmarkIconName}`}>
+                    {bookmarkIconName}
+                  </i>
+                </div>
+              </LoginTooltip>
             </div>
-          ) : null}
-          <div className="availability grey-surround">
-            <i className="material-icons calendar_today">calendar_today</i>
-            {bestRunLabel(bestAvailableRun)}
-          </div>
-          <LoginTooltip>
-            <div
-              className="favorite grey-surround"
-              onClick={e => {
-                e.preventDefault()
-                if (!userIsAnonymous()) {
-                  showListDialog(object)
-                }
-              }}
-            >
-              <i className={`material-icons ${bookmarkIconName}`}>
-                {bookmarkIconName}
-              </i>
-            </div>
-          </LoginTooltip>
-        </div>
+          </>
+        )}
       </div>
-      {searchResultLayout === SEARCH_GRID_UI ? null : (
+      {searchResultLayout === SEARCH_GRID_UI || reordering ? null : (
         <CoverImage object={object} showResourceDrawer={showResourceDrawer} />
       )}
     </React.Fragment>

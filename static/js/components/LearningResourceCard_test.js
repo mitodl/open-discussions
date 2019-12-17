@@ -263,6 +263,12 @@ describe("LearningResourceCard", () => {
           : "learning-resource-card"
       )
       assert.equal(wrapper.find(".drag-handle").exists(), reordering)
+      assert.equal(wrapper.find("Subtitle").exists(), !reordering)
+      assert.equal(
+        wrapper.find(".availability-price-favorite").exists(),
+        !reordering
+      )
+      assert.equal(wrapper.find(".cover-image").exists(), !reordering)
     })
   })
 })
