@@ -286,5 +286,5 @@ export const userListCoverImage = R.pathOr(null, [
   "image_src"
 ])
 
-export const isUserList = objectType =>
+export const isUserList = (objectType: string) =>
   R.contains(objectType, [LR_TYPE_LEARNINGPATH, LR_TYPE_USERLIST])
