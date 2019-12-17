@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.104.0
+---------------
+
+- fix issue with learningResourceSelector function
+- Fix search result subject display (#2488)
+- Display similar learning resources in drawer (#2480)
+- fix the display of read more / less in the truncated text component
+
 Version 0.103.2 (Released December 17, 2019)
 ---------------
 
