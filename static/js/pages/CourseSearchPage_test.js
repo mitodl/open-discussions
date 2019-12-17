@@ -530,6 +530,22 @@ describe("CourseSearchPage", () => {
   })
 
   LR_TYPE_ALL.forEach(resourceType => {
+    it(`overrideObject ${resourceType} is null if not in entities`, async () => {
+      const resource = makeLearningResourceResult(resourceType)
+      searchResponse.hits.hits[0] = resource
+      helper.searchStub.returns(Promise.resolve(searchResponse))
+      const { inner } = await renderPage()
+      assert.equal(
+        inner
+          .find("SearchResult")
+          .at(0)
+          .prop("overrideObject"),
+        null
+      )
+    })
+  })
+
+  LR_TYPE_ALL.forEach(resourceType => {
     it(`overrides ${resourceType} search results for is_favorite and lists with values from entities`, async () => {
       const resource = makeLearningResourceResult(resourceType)
       // Conditional to prevent flow from whining about an undefined resource

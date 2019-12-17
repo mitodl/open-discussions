@@ -311,17 +311,17 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const { bootcamps, courses, programs, userLists, videos } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
-      return courses ? courses[result.id] || result : result
+      return courses ? courses[result.id] || null : null
     case LR_TYPE_BOOTCAMP:
-      return bootcamps ? bootcamps[result.id] || result : result
+      return bootcamps ? bootcamps[result.id] || null : null
     case LR_TYPE_PROGRAM:
-      return programs ? programs[result.id] || result : result
+      return programs ? programs[result.id] || null : null
     case LR_TYPE_USERLIST:
-      return userLists ? userLists[result.id] || result : result
+      return userLists ? userLists[result.id] || null : null
     case LR_TYPE_VIDEO:
-      return videos ? videos[result.id] || result : result
+      return videos ? videos[result.id] || null : null
     case LR_TYPE_LEARNINGPATH:
-      return userLists ? userLists[result.id] || result : result
+      return userLists ? userLists[result.id] || null : null
     }
   }
 
