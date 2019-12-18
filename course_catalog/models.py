@@ -52,7 +52,7 @@ class CoursePrice(TimestampedModel):
 class LearningResourceOfferor(TimestampedModel):
     """Data model for who is offering a learning resource"""
 
-    name = models.CharField(max_length=32, unique=True)
+    name = models.CharField(max_length=256, unique=True)
 
 
 class LearningResource(TimestampedModel):
