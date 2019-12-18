@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.104.1
+---------------
+
+- Don't allow userlists to be added to userlists (#2462)
+
 Version 0.104.0 (Released December 18, 2019)
 ---------------
 
