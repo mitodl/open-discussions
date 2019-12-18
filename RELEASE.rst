@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.104.0
+Version 0.104.0 (Released December 18, 2019)
 ---------------
 
 - fix issue with learningResourceSelector function
