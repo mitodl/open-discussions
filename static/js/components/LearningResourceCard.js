@@ -16,12 +16,7 @@ import {
   getPreferredOfferedBy,
   userListCoverImage
 } from "../lib/learning_resources"
-import {
-  defaultResourceImageURL,
-  embedlyThumbnail,
-  starSelectedURL,
-  starUnselectedURL
-} from "../lib/url"
+import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
@@ -150,6 +145,9 @@ export function LearningResourceDisplay(props: Props) {
   const cost = bestAvailableRun ? minPrice(bestAvailableRun.prices) : null
   const inLists = object ? object.lists : []
 
+  const bookmarkIconName =
+    object.is_favorite || !emptyOrNil(inLists) ? "bookmark" : "bookmark_border"
+
   return (
     <React.Fragment>
       {searchResultLayout === SEARCH_GRID_UI ? (
@@ -193,22 +191,18 @@ export function LearningResourceDisplay(props: Props) {
             {bestRunLabel(bestAvailableRun)}
           </div>
           <LoginTooltip>
-            <div className="favorite grey-surround">
-              <img
-                className="favorite"
-                src={
-                  // $FlowFixMe
-                  object.is_favorite || !emptyOrNil(inLists)
-                    ? starSelectedURL
-                    : starUnselectedURL
+            <div
+              className="favorite grey-surround"
+              onClick={e => {
+                e.preventDefault()
+                if (!userIsAnonymous()) {
+                  showListDialog(object)
                 }
-                onClick={e => {
-                  e.preventDefault()
-                  if (!userIsAnonymous()) {
-                    showListDialog(object)
-                  }
-                }}
-              />
+              }}
+            >
+              <i className={`material-icons ${bookmarkIconName}`}>
+                {bookmarkIconName}
+              </i>
             </div>
           </LoginTooltip>
         </div>

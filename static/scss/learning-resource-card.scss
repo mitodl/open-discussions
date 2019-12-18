@@ -153,6 +153,7 @@
         i {
           font-size: 12px;
           margin-right: 4px;
+          padding: 2px;
         }
       }
 
@@ -163,8 +164,13 @@
       .favorite {
         margin-left: auto;
         cursor: pointer;
-        height: 18px;
-        width: 18px;
+        padding: 2px 8px;
+
+        i {
+          color: $course-blue;
+          font-size: 14px;
+          padding: 2px;
+        }
       }
     }
   }

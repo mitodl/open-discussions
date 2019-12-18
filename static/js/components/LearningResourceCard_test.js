@@ -28,8 +28,6 @@ import {
 } from "../lib/constants"
 import {
   COURSE_SEARCH_URL,
-  starSelectedURL,
-  starUnselectedURL,
   userListApiURL,
   embedlyThumbnail,
   toQueryString
@@ -176,14 +174,16 @@ describe("LearningResourceCard", () => {
     LR_TYPE_ALL.forEach(objectType => {
       it(`should render ${
         isFavorite ? "filled-in" : "empty"
-      } star when ${objectType} is ${
+      } bookmark icon when ${objectType} is ${
         isFavorite ? "a" : "not a"
       } favorite`, async () => {
         const object = makeLearningResource(objectType)
         object.is_favorite = isFavorite
         const { wrapper } = await render({ object })
-        const src = wrapper.find("img.favorite").prop("src")
-        assert.equal(src, isFavorite ? starSelectedURL : starUnselectedURL)
+        assert.include(
+          wrapper.find(".favorite i").prop("className"),
+          isFavorite ? "bookmark" : "bookmark_border"
+        )
       })
     })
   })
@@ -197,8 +197,10 @@ describe("LearningResourceCard", () => {
       object.is_favorite = false
       object.lists = inList ? [userList.items[0].id] : []
       const { wrapper } = await render({ object })
-      const src = wrapper.find("img.favorite").prop("src")
-      assert.equal(src, inList ? starSelectedURL : starUnselectedURL)
+      assert.include(
+        wrapper.find(".favorite i").prop("className"),
+        inList ? "bookmark" : "bookmark_border"
+      )
     })
   })
 
@@ -206,7 +208,7 @@ describe("LearningResourceCard", () => {
     it(`should call showListDialog with a ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
       const { wrapper, store } = await render({ object })
-      wrapper.find(".favorite img").simulate("click")
+      wrapper.find(".favorite").simulate("click")
       assert.deepEqual(
         store.getState().ui.dialogs.get(DIALOG_ADD_TO_LIST),
         object

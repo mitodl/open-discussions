@@ -344,7 +344,8 @@ export type LearningResourceSummary = {
   offered_by:         Array<string>,
   object_type:        string,
   runs:               Array<LearningResourceRun>,
-  lists:              Array<ListItemMember>
+  lists:              Array<ListItemMember>,
+  is_favorite?:       boolean
 }
 
 export type LearningResourceRun = {
