@@ -27,9 +27,12 @@ import {
   getNextParam,
   channelSearchURL,
   SITE_SEARCH_URL,
-  COURSE_URL
+  COURSE_URL,
+  learningResourcePermalink
 } from "./url"
 import { makePost } from "../factories/posts"
+import { makeLearningResource } from "../factories/learning_resources"
+import { LR_TYPE_ALL } from "../lib/constants"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -294,6 +297,20 @@ describe("url helper functions", () => {
     it("should return the channel search URL", () => {
       const channelName = "name"
       assert.equal(channelSearchURL(channelName), `/c/${channelName}/search/`)
+    })
+  })
+
+  describe("learningResourcePermalink", () => {
+    LR_TYPE_ALL.forEach(objectType => {
+      it(`learningResourcePermalink should return a good link for ${objectType}`, () => {
+        const object = makeLearningResource(objectType)
+        assert.equal(
+          learningResourcePermalink(object),
+          `${window.location.origin}/learn/?drawerObjectID=${
+            object.id
+          }&drawerObjectType=${object.object_type}`
+        )
+      })
     })
   })
 })

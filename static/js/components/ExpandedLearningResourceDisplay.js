@@ -8,6 +8,7 @@ import moment from "moment"
 
 import TruncatedText from "./TruncatedText"
 import Embedly from "./Embedly"
+import ShareTooltip from "./ShareTooltip"
 
 import { LearningResourceRow } from "./LearningResourceCard"
 import { PaginatedUserListItems } from "./UserListItems"
@@ -15,8 +16,10 @@ import {
   LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
+  LR_PRIVATE,
   platforms,
-  platformLogos
+  platformLogos,
+  readableLearningResources
 } from "../lib/constants"
 import {
   bestRun,
@@ -28,7 +31,11 @@ import {
   hasCourseList,
   isUserList
 } from "../lib/learning_resources"
-import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
+import {
+  defaultResourceImageURL,
+  embedlyThumbnail,
+  learningResourcePermalink
+} from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
 import { SEARCH_LIST_UI, searchResultToLearningResource } from "../lib/search"
 
@@ -276,6 +283,21 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           </div>
         </div>
       </div>
+      {isUserList(object.object_type) &&
+      object.privacy_level === LR_PRIVATE ? null : (
+          <div className="elr-share">
+            <ShareTooltip
+              url={learningResourcePermalink(object)}
+              objectType={readableLearningResources[object.object_type]}
+              placement="topLeft"
+            >
+              <div className="share-contents">
+                <i className="material-icons reply">reply</i>
+              Share
+              </div>
+            </ShareTooltip>
+          </div>
+        )}
       {hasCourseList(object.object_type) && !emptyOrNil(object.items) ? (
         <ListItemsSection
           title="Learning Resources in this Program"

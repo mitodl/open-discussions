@@ -161,3 +161,11 @@ export const similarResourcesURL = "/api/v0/similar/"
 
 export const userListIndexURL = "/learn/lists/"
 export const userListDetailURL = (id: number) => `/learn/lists/${id}`
+
+export const learningResourcePermalink = (object: Object) =>
+  absolutizeURL(
+    `${COURSE_URL}${toQueryString({
+      drawerObjectID:   object.id,
+      drawerObjectType: object.object_type
+    })}`
+  )

@@ -161,6 +161,7 @@ export default class CommentTree extends React.Component<Props, State> {
             <ShareTooltip
               hideSocialButtons={isPrivateChannel}
               url={absolutizeURL(commentPermalink(comment.id))}
+              objectType="comment"
             >
               <div className="comment-action-button share-button">share</div>
             </ShareTooltip>

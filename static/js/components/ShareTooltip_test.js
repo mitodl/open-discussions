@@ -78,6 +78,24 @@ describe("ShareTooltip", () => {
     })
   })
 
+  it("should have a little flavor text ", () => {
+    const wrapper = renderShareTooltipHelper()
+    assert.equal(
+      wrapper.find(".tooltip-text").text(),
+      "Share a link to this post:"
+    )
+  })
+
+  it("should accept an optional object type prop", () => {
+    const wrapper = renderShareTooltipHelper({
+      objectType: "thingamajig"
+    })
+    assert.equal(
+      wrapper.find(".tooltip-text").text(),
+      "Share a link to this thingamajig:"
+    )
+  })
+
   it("should hide buttons, if hideSocialButtons === true", () => {
     const wrapper = renderShareTooltipHelper({ hideSocialButtons: true })
     ;[FacebookShareButton, LinkedinShareButton, TwitterShareButton].forEach(

@@ -26,6 +26,8 @@ import {
   makeVideo
 } from "../factories/learning_resources"
 import IntegrationTestHelper from "../util/integration_test_helper"
+import { LR_TYPE_COURSE } from "../lib/constants"
+import * as lrHooks from "../hooks/learning_resources"
 
 describe("CourseIndexPage", () => {
   let featuredCourses,
@@ -35,7 +37,8 @@ describe("CourseIndexPage", () => {
     render,
     helper,
     courseLists,
-    favorites
+    favorites,
+    paramsStub
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -88,6 +91,11 @@ describe("CourseIndexPage", () => {
       .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
+
+    paramsStub = helper.sandbox.stub(lrHooks, "useLRDrawerParams").returns({
+      objectId:   null,
+      objectType: null
+    })
   })
 
   afterEach(() => {
@@ -169,5 +177,19 @@ describe("CourseIndexPage", () => {
     helper.handleRequestStub.withArgs(favoritesURL).returns({})
     const { wrapper } = await render()
     assert.equal(wrapper.find("CarouselLoading").length, 4)
+  })
+
+  it("should open the drawer if sharing URL params present", async () => {
+    paramsStub.returns({
+      objectId:   1,
+      objectType: LR_TYPE_COURSE
+    })
+    const { store } = await render()
+    const [entry] = store.getState().ui.LRDrawerHistory
+    assert.deepEqual(entry, {
+      objectId:   1,
+      objectType: LR_TYPE_COURSE,
+      runId:      undefined
+    })
   })
 })

@@ -92,6 +92,24 @@
   }
 }
 
+.elr-share {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 25px 20px 0;
+
+  .share-contents {
+    display: flex;
+    align-items: center;
+    color: $course-blue;
+    cursor: pointer;
+
+    i {
+      transform: scaleX(-1);
+      font-size: 30px;
+    }
+  }
+}
+
 .expanded-learning-resource-list {
   padding-bottom: 5px;
 

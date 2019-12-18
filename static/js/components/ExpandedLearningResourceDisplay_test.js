@@ -17,12 +17,19 @@ import {
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
-  LR_TYPE_ALL
+  LR_TYPE_ALL,
+  LR_PUBLIC,
+  LR_PRIVATE,
+  readableLearningResources
 } from "../lib/constants"
 import { mockHTMLElHeight } from "../lib/test_utils"
-import { bestRun, getInstructorName } from "../lib/learning_resources"
+import {
+  bestRun,
+  getInstructorName,
+  isUserList
+} from "../lib/learning_resources"
 import { shouldIf } from "../lib/test_utils"
-import { defaultResourceImageURL } from "../lib/url"
+import { defaultResourceImageURL, learningResourcePermalink } from "../lib/url"
 import { capitalize } from "../lib/util"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeLearningResourceResult } from "../factories/search"
@@ -166,16 +173,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         object.title
       )
     })
-  })
 
-  it("should not render course links if urls are all null", async () => {
-    course.url = null
-    course.runs.forEach(run => (run.url = null))
-    const { wrapper } = await render()
-    assert.isNotOk(wrapper.find(".external-links").exists())
-  })
-
-  LR_TYPE_ALL.forEach(objectType => {
     it(`should display all topics for the ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
       // $FlowFixMe
@@ -193,6 +191,57 @@ describe("ExpandedLearningResourceDisplay", () => {
         object.topics.map(topic => topic.name).sort()
       )
     })
+
+    it(`should include a display of similar resources for ${objectType}`, async () => {
+      const object = makeLearningResource(objectType)
+      const listIdx = [
+        LR_TYPE_LEARNINGPATH,
+        LR_TYPE_USERLIST,
+        LR_TYPE_PROGRAM
+      ].includes(objectType)
+        ? 1
+        : 0
+      const { wrapper } = await render(
+        {},
+        {
+          object,
+          similarItems: similarResources
+        }
+      )
+      const similarResourcesDiv = wrapper
+        .find(".expanded-learning-resource-list")
+        .at(listIdx)
+      assert.ok(similarResourcesDiv.exists())
+      assert.equal(similarResourcesDiv.find("LearningResourceRow").length, 0)
+      similarResourcesDiv.find("i").simulate("click")
+      assert.equal(
+        wrapper
+          .find(".expanded-learning-resource-list")
+          .at(listIdx)
+          .find("LearningResourceRow").length,
+        3
+      )
+    })
+
+    it(`should have a share link for a ${objectType}`, async () => {
+      const object = makeLearningResource(objectType)
+      if (isUserList(objectType)) {
+        object.privacy_level = LR_PUBLIC
+      }
+      const { wrapper } = await render({}, { object })
+      const { objectType: _objectType, url } = wrapper
+        .find("ShareTooltip")
+        .props()
+      assert.equal(_objectType, readableLearningResources[object.object_type])
+      assert.equal(url, learningResourcePermalink(object))
+    })
+  })
+
+  it("should not render course links if urls are all null", async () => {
+    course.url = null
+    course.runs.forEach(run => (run.url = null))
+    const { wrapper } = await render()
+    assert.isNotOk(wrapper.find(".external-links").exists())
   })
 
   //
@@ -450,6 +499,21 @@ describe("ExpandedLearningResourceDisplay", () => {
         pageSize: 10
       })
     })
+
+    //
+    ;[true, false].forEach(isPrivate => {
+      it(`${shouldIf(
+        isPrivate
+      )} hide sharing button for ${objectType} when private === ${String(
+        isPrivate
+      )}`, async () => {
+        const object = makeLearningResource(objectType)
+        object.privacy_level = isPrivate ? LR_PRIVATE : LR_PUBLIC
+
+        const { wrapper } = await render({}, { object })
+        assert.equal(isPrivate, !wrapper.find("ShareTooltip").exists())
+      })
+    })
   })
 
   it("should include a display of list items for program", async () => {
@@ -498,39 +562,6 @@ describe("ExpandedLearningResourceDisplay", () => {
           .find(".expanded-learning-resource-list")
           .text()
           .startsWith("Similar Learning Resources")
-      )
-    })
-  })
-
-  LR_TYPE_ALL.forEach(resourceType => {
-    it(`should include a display of similar resources for ${resourceType}`, async () => {
-      const object = makeLearningResource(resourceType)
-      const listIdx = [
-        LR_TYPE_LEARNINGPATH,
-        LR_TYPE_USERLIST,
-        LR_TYPE_PROGRAM
-      ].includes(resourceType)
-        ? 1
-        : 0
-      const { wrapper } = await render(
-        {},
-        {
-          object,
-          similarItems: similarResources
-        }
-      )
-      const similarResourcesDiv = wrapper
-        .find(".expanded-learning-resource-list")
-        .at(listIdx)
-      assert.ok(similarResourcesDiv.exists())
-      assert.equal(similarResourcesDiv.find("LearningResourceRow").length, 0)
-      similarResourcesDiv.find("i").simulate("click")
-      assert.equal(
-        wrapper
-          .find(".expanded-learning-resource-list")
-          .at(listIdx)
-          .find("LearningResourceRow").length,
-        3
       )
     })
   })

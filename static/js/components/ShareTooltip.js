@@ -15,7 +15,8 @@ import { setSnackbarMessage } from "../actions/ui"
 type HelperProps = {
   url: string,
   hideSocialButtons?: boolean,
-  setSnackbarMessage: Function
+  setSnackbarMessage: Function,
+  objectType?: string
 }
 
 export class ShareTooltipHelper extends React.Component<HelperProps> {
@@ -37,11 +38,13 @@ export class ShareTooltipHelper extends React.Component<HelperProps> {
   }
 
   render() {
-    const { url, hideSocialButtons } = this.props
+    const { url, hideSocialButtons, objectType } = this.props
 
     return (
       <div className="tooltip">
-        <div className="tooltip-text">Share a link to this post:</div>
+        <div className="tooltip-text">
+          {`Share a link to this ${objectType || "post"}:`}
+        </div>
         <input ref={this.input} readOnly value={url} />
         <div className="bottom-row">
           {hideSocialButtons ? null : (
@@ -74,13 +77,14 @@ const ConnectedShareTooltipHelper = connect(
 type Props = {
   url: string,
   hideSocialButtons?: boolean,
-  children: Array<React$Element<any>> | React$Element<any>
+  children: Array<React$Element<any>> | React$Element<any>,
+  placement?: string
 }
 
-export default function ShareTooltip({ children, ...props }: Props) {
+export default function ShareTooltip({ children, placement, ...props }: Props) {
   return (
     <Tooltip
-      placement="top"
+      placement={placement || "top"}
       trigger={["click"]}
       overlay={() => <ConnectedShareTooltipHelper {...props} />}
     >

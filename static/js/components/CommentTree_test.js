@@ -107,7 +107,8 @@ describe("CommentTree", () => {
         wrapper.find(ShareTooltip).map(R.identity),
         flattenCommentTree(comments)
       ).forEach(([toolTip, comment]) => {
-        const { url, hideSocialButtons } = toolTip.props()
+        const { url, hideSocialButtons, objectType } = toolTip.props()
+        assert.equal(objectType, "comment")
         assert.equal(url, absolutizeURL(permalinkFunc(comment.id)))
         assert.equal(hideSocialButtons, isPrivateChannel)
       })
