@@ -52,7 +52,24 @@ UPDATE_CONFLICT_SETTING = "proceed"
 
 ENGLISH_TEXT_FIELD = {
     "type": "text",
-    "fields": {"english": {"type": "text", "analyzer": "english"}},
+    "fields": {
+        "english": {"type": "text", "analyzer": "english"}
+    }
+}
+
+ENGLISH_TEXT_FIELD_WITH_SUGGEST = {
+    "type": "text",
+    "fields": {
+        "english": {"type": "text", "analyzer": "english"},
+        "trigram": {
+            "type": "text",
+            "analyzer": "trigram"
+        },
+        "reverse": {
+            "type": "text",
+            "analyzer": "reverse"
+        }
+    }
 }
 
 BASE_OBJECT_TYPE = {
@@ -96,8 +113,8 @@ CONTENT_OBJECT_TYPE = {
 }
 
 LEARNING_RESOURCE_TYPE = {
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
+    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
@@ -106,8 +123,8 @@ LEARNING_RESOURCE_TYPE = {
         "properties": {
             "id": {"type": "long"},
             "course_id": {"type": "keyword"},
-            "title": ENGLISH_TEXT_FIELD,
-            "short_description": ENGLISH_TEXT_FIELD,
+            "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+            "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
             "full_description": ENGLISH_TEXT_FIELD,
             "language": {"type": "keyword"},
             "level": {"type": "keyword"},
@@ -153,8 +170,8 @@ PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
     "id": {"type": "long"},
-    "title": ENGLISH_TEXT_FIELD,
-    "short_description": ENGLISH_TEXT_FIELD,
+    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
     "author": {"type": "keyword"},
@@ -224,6 +241,23 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
                             "lowercase",
                             "asciifolding",  # remove accents if we use folding analyzer
                         ],
+                    },
+                    "trigram": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase", "shingle"]
+                    },
+                    "reverse": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase", "reverse"]
+                    }
+                },
+                "filter": {
+                    "shingle": {
+                        "type": "shingle",
+                        "min_shingle_size": 2,
+                        "max_shingle_size": 3
                     }
                 }
             }

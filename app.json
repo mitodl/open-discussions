@@ -77,6 +77,10 @@
       "description": "Chunk size to use for Elasticsearch indexing tasks",
       "required": false
     },
+    "ELASTICSEARCH_MIN_SUGGEST_HITS": {
+      "description": "Return suggested search terms if the number of hits is equal to or below this value",
+      "required": false
+    },
     "ELASTICSEARCH_MIN_QUERY_SIZE": {
       "description": "Minimimum number of characters in a query string to search for",
       "required": false

@@ -1,6 +1,6 @@
 """API for general search-related functionality"""
 from base64 import urlsafe_b64encode
-from collections import Counter
+from collections import Counter, defaultdict
 
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
@@ -31,6 +31,7 @@ from search.constants import (
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
+SUGGEST_FIELDS =  ["title", "short_description"]
 
 
 def gen_post_id(reddit_obj_id):
@@ -191,6 +192,27 @@ def _apply_general_query_filters(search, user):
         "terms", object_type=[COMMENT_TYPE, POST_TYPE]
     )
 
+    # Search public channels and channels user is a contributor/moderator of
+    if channel_names:
+        channels_filter = channels_filter | Q("terms", channel_name=channel_names)
+
+    return (
+        search.filter(channels_filter).filter(content_filter)
+    )
+
+
+# pylint: disable=invalid-unary-operand-type
+def _apply_learning_query_filters(search, user):
+    """
+    Applies a series of filters to a Search object so permissions are respected, deleted
+    objects are ignored, etc.
+
+    search (elasticsearch_dsl.Search): Search object
+    user (User): The user executing the search
+
+    Returns:
+        elasticsearch_dsl.Search: Search object with filters applied
+    """
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
         "terms", object_type=[USER_LIST_TYPE, LEARNING_PATH_TYPE]
@@ -198,12 +220,8 @@ def _apply_general_query_filters(search, user):
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author=user.id)
 
-    # Search public channels and channels user is a contributor/moderator of
-    if channel_names:
-        channels_filter = channels_filter | Q("terms", channel_name=channel_names)
-
     return (
-        search.filter(channels_filter).filter(content_filter).filter(user_list_filter)
+        search.filter(user_list_filter)
     )
 
 
@@ -237,12 +255,30 @@ def execute_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
+    return search.execute().to_dict()
+
+
+def execute_learn_search(*, user, query):
+    """
+    Execute a learning resources search based on the query
+
+    Args:
+        user (User): The user executing the search. Used to determine filters to enforce permissions.
+        query (dict): The Elasticsearch query constructed in the frontend
+
+    Returns:
+        dict: The Elasticsearch response dict
+    """
+    index = get_default_alias_name(ALIAS_ALL_INDICES)
+    search = Search(index=index, using=get_conn())
+    search.update_from_dict(query)
+    search = _apply_learning_query_filters(search, user)
     return transform_results(
-        search.execute().to_dict(), user, inject_favorites=is_learning_query(query)
+        search.execute().to_dict(), user
     )
 
 
-def transform_results(search_result, user, inject_favorites=False):
+def transform_results(search_result, user):
     """
     Transform the reverse nested availability aggregate counts into a format matching the other facets.
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
@@ -250,7 +286,6 @@ def transform_results(search_result, user, inject_favorites=False):
     Args:
         search_result (dict): The results from ElasticSearch
         user (User): the user who performed the search
-        inject_favorites (bool): true if "favorites' and 'lists' should be added to each search result
 
     Returns:
         dict: The Elasticsearch response dict with transformed availability aggregates and source values
@@ -271,7 +306,7 @@ def transform_results(search_result, user, inject_favorites=False):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
-    if not user.is_anonymous and inject_favorites:
+    if not user.is_anonymous:
         favorites = (
             FavoriteItem.objects.select_related("content_type")
             .filter(user=user)
@@ -287,6 +322,14 @@ def transform_results(search_result, user, inject_favorites=False):
                 hit["_source"]["lists"] = get_list_items_by_resource(
                     user, object_type, object_id
                 )
+    es_suggest = search_result.pop("suggest", {})
+    if search_result["hits"]["total"] <= settings.ELASTICSEARCH_MIN_SUGGESTION_HITS:
+        suggestion_dict = defaultdict(list)
+        suggestions = [suggestion for suggestion_list in extract_values(es_suggest, "options") for suggestion in
+                       suggestion_list]
+        for suggestion in suggestions:
+            suggestion_dict[suggestion["text"]] = suggestion_dict.setdefault(suggestion["text"], 0) + suggestion["score"]
+        search_result["suggest"] = [key for key, value in sorted(suggestion_dict.items(), key=lambda item: item[1], reverse=True)]
     return search_result
 
 

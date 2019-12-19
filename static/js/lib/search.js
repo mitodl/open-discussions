@@ -11,7 +11,8 @@ import {
   LR_TYPE_VIDEO,
   PHONE,
   TABLET,
-  DESKTOP
+  DESKTOP,
+  LR_TYPE_ALL
 } from "./constants"
 import {
   SEARCH_FILTER_COMMENT,
@@ -171,6 +172,8 @@ const LIST_QUERY_FIELDS = [
   "short_description.english",
   "topics"
 ]
+
+const SUGGEST_FIELDS = ["title", "short_description"]
 
 export const AVAILABLE_NOW = "availableNow"
 const AVAILABLE_NEXT_WEEK = "nextWeek"
@@ -407,11 +410,11 @@ const buildCostQuery = (
 export const buildSearchQuery = ({
   text,
   type,
-  channelName,
   from,
   size,
+  sort,
   facets,
-  sort
+  channelName
 }: SearchParams): Object => {
   let builder = bodybuilder()
 
@@ -425,8 +428,90 @@ export const buildSearchQuery = ({
     const { field, option } = sort
     builder.sort(field, option)
   }
-
   const types = getTypes(type)
+  return emptyOrNil(R.intersection(LR_TYPE_ALL, types))
+    ? buildChannelQuery(builder, text, types, channelName)
+    : buildLearnQuery(builder, text, types, facets)
+}
+
+export const buildFacetSubQuery = (facets, builder) => {
+  const facetClauses = []
+  if (facets) {
+    facets.forEach((values, key) => {
+      if (
+        ![OBJECT_TYPE, "availability", "cost"].includes(key) &&
+        values &&
+        values.length > 0
+      ) {
+        facetClauses.push({
+          bool: {
+            should: values.map(value => ({
+              term: {
+                [key]: value
+              }
+            }))
+          }
+        })
+      }
+      if (key === "availability") {
+        buildAvailabilityQuery(builder, values, facetClauses)
+      } else if (key === "cost") {
+        buildCostQuery(builder, values, facetClauses)
+      } else {
+        builder.agg(
+          "terms",
+          key === OBJECT_TYPE ? "object_type.keyword" : key,
+          { size: 10000 },
+          key
+        )
+      }
+    })
+  }
+  return facetClauses
+}
+
+export const buildSuggestQuery = text => {
+  const suggest = {
+    text
+  }
+  SUGGEST_FIELDS.forEach(
+    field =>
+      (suggest[field] = {
+        phrase: {
+          field:      `${field}.trigram`,
+          size:       5,
+          gram_size:  1,
+          confidence: 0.0001
+        }
+      })
+  )
+  return suggest
+}
+
+export const buildOrQuery = (builder, searchType, textQuery, extraClauses) => {
+  const textFilter = emptyOrNil(textQuery) ? [] : [{ bool: textQuery }]
+  builder = builder.orQuery("bool", {
+    filter: {
+      bool: {
+        must: [
+          {
+            term: {
+              object_type: searchType
+            }
+          },
+          ...extraClauses,
+          // Add multimatch text query here to filter out non-matching results
+          ...textFilter
+        ]
+      }
+    },
+    // Add multimatch text query here again to score results based on match
+    ...textQuery
+  })
+  return builder
+}
+
+export const buildChannelQuery = (builder, text, types, channelName) => {
   for (const type of types) {
     const textQuery = emptyOrNil(text)
       ? {}
@@ -438,25 +523,9 @@ export const buildSearchQuery = ({
               fields:    searchFields(type),
               fuzziness: "AUTO"
             }
-          },
-          [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
-            ? {
-              nested: {
-                path:  "runs",
-                query: {
-                  multi_match: {
-                    query:     text,
-                    fields:    RESOURCE_QUERY_NESTED_FIELDS,
-                    fuzziness: "AUTO"
-                  }
-                }
-              }
-            }
-            : null
+          }
         ].filter(clause => clause !== null)
       }
-
-    const textFilter = emptyOrNil(text) ? [] : [{ bool: textQuery }]
 
     // If channelName is present add a filter for the type
     const channelClauses = channelName
@@ -469,59 +538,47 @@ export const buildSearchQuery = ({
       ]
       : []
 
-    // Add filters for facets if necessary
-    const facetClauses = []
-    if (facets) {
-      facets.forEach((values, key) => {
-        if (
-          ![OBJECT_TYPE, "availability", "cost"].includes(key) &&
-          values &&
-          values.length > 0
-        ) {
-          facetClauses.push({
-            bool: {
-              should: values.map(value => ({
-                term: {
-                  [key]: value
-                }
-              }))
-            }
-          })
-        }
-        if (key === "availability") {
-          buildAvailabilityQuery(builder, values, facetClauses)
-        } else if (key === "cost") {
-          buildCostQuery(builder, values, facetClauses)
-        } else {
-          builder.agg(
-            "terms",
-            key === OBJECT_TYPE ? "object_type.keyword" : key,
-            { size: 10000 },
-            key
-          )
-        }
-      })
-    }
+    builder = buildOrQuery(builder, type, textQuery, channelClauses)
+  }
+  return builder.build()
+}
 
-    builder = builder.orQuery("bool", {
-      filter: {
-        bool: {
-          must: [
-            {
-              term: {
-                object_type: type
+export const buildLearnQuery = (builder, text, types, facets) => {
+  for (const type of types) {
+    const textQuery = emptyOrNil(text)
+      ? {}
+      : {
+        should: [
+          {
+            multi_match: {
+              query:     text,
+              fields:    searchFields(type)
+            }
+          },
+          [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+            ? {
+              nested: {
+                path:  "runs",
+                query: {
+                  multi_match: {
+                    query:     text,
+                    fields:    RESOURCE_QUERY_NESTED_FIELDS
+                  }
+                }
               }
-            },
-            ...channelClauses,
-            ...facetClauses,
-            // Add multimatch text query here to filter out non-matching results
-            ...textFilter
-          ]
-        }
-      },
-      // Add multimatch text query here again to score results based on match
-      ...textQuery
-    })
+            }
+            : null
+        ].filter(clause => clause !== null)
+      }
+
+    // Add filters for facets if necessary
+    const facetClauses = buildFacetSubQuery(facets, builder)
+    builder = buildOrQuery(builder, type, textQuery, facetClauses)
+
+    // Include suggest if search test is not null/empty
+    if (!emptyOrNil(text)) {
+      builder = builder.rawOption("suggest", buildSuggestQuery(text))
+    }
   }
   return builder.build()
 }

@@ -7,7 +7,8 @@ from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 from rest_framework.views import APIView
 
 from open_discussions import features
-from search.api import execute_search, find_related_documents, find_similar_resources
+from search.api import execute_search, find_related_documents, find_similar_resources, execute_learn_search, \
+    is_learning_query
 
 log = logging.getLogger(__name__)
 
@@ -27,14 +28,18 @@ class ESView(APIView):
 
 class SearchView(ESView):
     """
-    View for executing searches
+    View for executing searches of posts, comments, profiles
     """
 
     permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         """Execute a search. Despite being POST this should not modify any data."""
-        response = execute_search(user=request.user, query=request.data)
+        query = request.data
+        if is_learning_query(query):
+            response = execute_learn_search(user=request.user, query=request.data)
+        else:
+            response = execute_search(user=request.user, query=request.data)
         return Response(response)
 
 
