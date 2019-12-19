@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.104.1
+Version 0.104.1 (Released December 19, 2019)
 ---------------
 
 - Don't allow userlists to be added to userlists (#2462)
