@@ -349,6 +349,7 @@ def extract(*, channel_ids=None):
         A generator that yields tuples with offered_by and video data
     """
     if not settings.YOUTUBE_DEVELOPER_KEY:
+        log.error("Missing YOUTUBE_DEVELOPER_KEY")
         return
 
     youtube_client = get_youtube_client()
