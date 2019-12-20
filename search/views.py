@@ -7,8 +7,13 @@ from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 from rest_framework.views import APIView
 
 from open_discussions import features
-from search.api import execute_search, find_related_documents, find_similar_resources, execute_learn_search, \
-    is_learning_query
+from search.api import (
+    execute_search,
+    find_related_documents,
+    find_similar_resources,
+    execute_learn_search,
+    is_learning_query,
+)
 
 log = logging.getLogger(__name__)
 

@@ -438,7 +438,6 @@ describe("search functions", () => {
               multi_match: {
                 query:     text,
                 fields:    fieldNames,
-                fuzziness: "AUTO"
               }
             },
             {
@@ -448,7 +447,6 @@ describe("search functions", () => {
                   multi_match: {
                     query:     text,
                     fields:    RESOURCE_QUERY_NESTED_FIELDS,
-                    fuzziness: "AUTO"
                   }
                 }
               }
@@ -632,6 +630,25 @@ describe("search functions", () => {
                     }
                   }
                 ]
+              }
+            },
+            suggest: {
+              text: text,
+              short_description: {
+                phrase: {
+                  confidence: 0.0001,
+                  field: "short_description.trigram",
+                  gram_size: 1,
+                  size: 5
+                }
+              },
+              title: {
+                phrase: {
+                  confidence: 0.0001,
+                  field: "title.trigram",
+                  gram_size: 1,
+                  size: 5
+                }
               }
             }
           })

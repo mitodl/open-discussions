@@ -31,7 +31,7 @@ from search.constants import (
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
-SUGGEST_FIELDS =  ["title", "short_description"]
+SUGGEST_FIELDS = ["title", "short_description"]
 
 
 def gen_post_id(reddit_obj_id):
@@ -196,9 +196,7 @@ def _apply_general_query_filters(search, user):
     if channel_names:
         channels_filter = channels_filter | Q("terms", channel_name=channel_names)
 
-    return (
-        search.filter(channels_filter).filter(content_filter)
-    )
+    return search.filter(channels_filter).filter(content_filter)
 
 
 # pylint: disable=invalid-unary-operand-type
@@ -220,9 +218,7 @@ def _apply_learning_query_filters(search, user):
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author=user.id)
 
-    return (
-        search.filter(user_list_filter)
-    )
+    return search.filter(user_list_filter)
 
 
 def is_learning_query(query):
@@ -273,9 +269,7 @@ def execute_learn_search(*, user, query):
     search = Search(index=index, using=get_conn())
     search.update_from_dict(query)
     search = _apply_learning_query_filters(search, user)
-    return transform_results(
-        search.execute().to_dict(), user
-    )
+    return transform_results(search.execute().to_dict(), user)
 
 
 def transform_results(search_result, user):
@@ -323,13 +317,28 @@ def transform_results(search_result, user):
                     user, object_type, object_id
                 )
     es_suggest = search_result.pop("suggest", {})
-    if search_result["hits"]["total"] <= settings.ELASTICSEARCH_MIN_SUGGESTION_HITS:
+    if (
+        search_result.get("hits", {}).get("total", 0)
+        <= settings.ELASTICSEARCH_MIN_SUGGEST_HITS
+    ):
         suggestion_dict = defaultdict(list)
-        suggestions = [suggestion for suggestion_list in extract_values(es_suggest, "options") for suggestion in
-                       suggestion_list]
+        suggestions = [
+            suggestion
+            for suggestion_list in extract_values(es_suggest, "options")
+            for suggestion in suggestion_list
+        ]
         for suggestion in suggestions:
-            suggestion_dict[suggestion["text"]] = suggestion_dict.setdefault(suggestion["text"], 0) + suggestion["score"]
-        search_result["suggest"] = [key for key, value in sorted(suggestion_dict.items(), key=lambda item: item[1], reverse=True)]
+            suggestion_dict[suggestion["text"]] = (
+                suggestion_dict.setdefault(suggestion["text"], 0) + suggestion["score"]
+            )
+        search_result["suggest"] = [
+            key
+            for key, value in sorted(
+                suggestion_dict.items(), key=lambda item: item[1], reverse=True
+            )
+        ]
+    else:
+        search_result["suggest"] = []
     return search_result
 
 

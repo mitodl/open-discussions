@@ -31,6 +31,7 @@ from search.api import (
     transform_results,
     find_similar_resources,
     SIMILAR_RESOURCE_RELEVANT_FIELDS,
+    execute_learn_search,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -183,6 +184,34 @@ def test_execute_search(mocker, user):
                                 ]
                             }
                         },
+                    ]
+                }
+            },
+        },
+        doc_type=[],
+        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+    )
+
+
+def test_execute_learn_search(mocker, user):
+    """execute_search should execute an Elasticsearch search"""
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+    get_conn_mock.return_value.search.return_value = {"hits": {"total": 10}}
+    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
+    add_user_role(channels[0], "moderators", user)
+    add_user_role(channels[1], "contributors", user)
+
+    query = {"a": "query"}
+    assert (
+        execute_learn_search(user=user, query=query)
+        == get_conn_mock.return_value.search.return_value
+    )
+    get_conn_mock.return_value.search.assert_called_once_with(
+        body={
+            **query,
+            "query": {
+                "bool": {
+                    "filter": [
                         {
                             "bool": {
                                 "should": [
@@ -208,7 +237,7 @@ def test_execute_search(mocker, user):
                                     {"term": {"author": user.id}},
                                 ]
                             }
-                        },
+                        }
                     ]
                 }
             },
@@ -290,6 +319,31 @@ def test_execute_search_anonymous(mocker):
                                 ]
                             }
                         },
+                    ]
+                }
+            },
+        },
+        doc_type=[],
+        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+    )
+
+
+def test_execute_learn_search_anonymous(mocker):
+    """execute_search should execute an Elasticsearch search with an anonymous user"""
+    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
+    get_conn_mock.return_value.search.return_value = {"hits": {"total": 10}}
+    user = AnonymousUser()
+    query = {"a": "query"}
+    assert (
+        execute_learn_search(user=user, query=query)
+        == get_conn_mock.return_value.search.return_value
+    )
+    get_conn_mock.return_value.search.assert_called_once_with(
+        body={
+            **query,
+            "query": {
+                "bool": {
+                    "filter": [
                         {
                             "bool": {
                                 "should": [
@@ -314,7 +368,7 @@ def test_execute_search_anonymous(mocker):
                                     },
                                 ]
                             }
-                        },
+                        }
                     ]
                 }
             },
@@ -393,15 +447,15 @@ def test_find_similar_resources(settings, mocker, user):
     ]
 
 
+@pytest.mark.parametrize("suggest_min_hits", [2, 4])
 @pytest.mark.parametrize("is_anonymous", [True, False])
-@pytest.mark.parametrize("inject_favorites", [True, False])
 @pytest.mark.django_db
-def test_transform_results(user, is_anonymous, inject_favorites):
+def test_transform_results(user, is_anonymous, suggest_min_hits, settings):
     """
     transform_results should transform reverse nested availability results if present, and move
     scripted fields into the source result
     """
-
+    settings.ELASTICSEARCH_MIN_SUGGEST_HITS = suggest_min_hits
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
@@ -422,6 +476,38 @@ def test_transform_results(user, is_anonymous, inject_favorites):
         ).id
     else:
         item_id = None
+
+    raw_suggest = {
+        "short_description": [
+            {
+                "text": "enginer",
+                "offset": 0,
+                "length": 7,
+                "options": [
+                    {"text": "enginer", "score": 0.723_752_1},
+                    {"text": "engineers", "score": 0.019_246_055},
+                    {"text": "engineer", "score": 0.018_813_284},
+                ],
+            }
+        ],
+        "title": [
+            {
+                "text": "enginer",
+                "offset": 0,
+                "length": 7,
+                "options": [
+                    {"text": "enginer", "score": 0.723_752_1},
+                    {"text": "engineers", "score": 0.208_175_48},
+                    {"text": "engineer", "score": 0.038_069_42},
+                    {"text": "engines", "score": 0.037_050_426},
+                ],
+            }
+        ],
+    }
+
+    expected_suggest = (
+        ["enginer", "engineers", "engineer", "engines"] if suggest_min_hits > 3 else []
+    )
 
     raw_hits = [
         {
@@ -484,7 +570,8 @@ def test_transform_results(user, is_anonymous, inject_favorites):
     ]
 
     results = {
-        "hits": {"hits": raw_hits},
+        "hits": {"hits": raw_hits, "total": 3},
+        "suggest": raw_suggest,
         "aggregations": {
             "availability": {
                 "runs": {
@@ -522,12 +609,9 @@ def test_transform_results(user, is_anonymous, inject_favorites):
     }
 
     search_user = AnonymousUser() if is_anonymous else user
-    assert transform_results(results, search_user, inject_favorites) == {
-        "hits": {
-            "hits": raw_hits
-            if (is_anonymous or not inject_favorites)
-            else expected_hits
-        },
+    assert transform_results(results, search_user) == {
+        "hits": {"hits": raw_hits if is_anonymous else expected_hits, "total": 3},
+        "suggest": expected_suggest,
         "aggregations": {
             "availability": {
                 "buckets": [
@@ -547,13 +631,13 @@ def test_transform_results(user, is_anonymous, inject_favorites):
     results["aggregations"]["availability"].pop("runs", None)
     results["aggregations"]["cost"].pop("prices", None)
     assert (
-        transform_results(results, search_user, inject_favorites)["aggregations"]
+        transform_results(results, search_user)["aggregations"]
         == results["aggregations"]
     )
     results["aggregations"].pop("availability", None)
     results["aggregations"].pop("cost", None)
     assert (
-        transform_results(results, search_user, inject_favorites)["aggregations"]
+        transform_results(results, search_user)["aggregations"]
         == results["aggregations"]
     )
 

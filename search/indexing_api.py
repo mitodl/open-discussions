@@ -52,24 +52,16 @@ UPDATE_CONFLICT_SETTING = "proceed"
 
 ENGLISH_TEXT_FIELD = {
     "type": "text",
-    "fields": {
-        "english": {"type": "text", "analyzer": "english"}
-    }
+    "fields": {"english": {"type": "text", "analyzer": "english"}},
 }
 
 ENGLISH_TEXT_FIELD_WITH_SUGGEST = {
     "type": "text",
     "fields": {
         "english": {"type": "text", "analyzer": "english"},
-        "trigram": {
-            "type": "text",
-            "analyzer": "trigram"
-        },
-        "reverse": {
-            "type": "text",
-            "analyzer": "reverse"
-        }
-    }
+        "trigram": {"type": "text", "analyzer": "trigram"},
+        "reverse": {"type": "text", "analyzer": "reverse"},
+    },
 }
 
 BASE_OBJECT_TYPE = {
@@ -245,21 +237,21 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
                     "trigram": {
                         "type": "custom",
                         "tokenizer": "standard",
-                        "filter": ["lowercase", "shingle"]
+                        "filter": ["lowercase", "shingle"],
                     },
                     "reverse": {
                         "type": "custom",
                         "tokenizer": "standard",
-                        "filter": ["lowercase", "reverse"]
-                    }
+                        "filter": ["lowercase", "reverse"],
+                    },
                 },
                 "filter": {
                     "shingle": {
                         "type": "shingle",
                         "min_shingle_size": 2,
-                        "max_shingle_size": 3
+                        "max_shingle_size": 3,
                     }
-                }
+                },
             }
         }
     }
