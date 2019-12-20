@@ -434,7 +434,10 @@ export const buildSearchQuery = ({
     : buildLearnQuery(builder, text, types, facets)
 }
 
-export const buildFacetSubQuery = (facets, builder) => {
+export const buildFacetSubQuery = (
+  facets: ?Map<string, Array<string>>,
+  builder: any
+) => {
   const facetClauses = []
   if (facets) {
     facets.forEach((values, key) => {
@@ -445,6 +448,7 @@ export const buildFacetSubQuery = (facets, builder) => {
       ) {
         facetClauses.push({
           bool: {
+            // $FlowFixMe: shut up flow
             should: values.map(value => ({
               term: {
                 [key]: value
@@ -470,12 +474,13 @@ export const buildFacetSubQuery = (facets, builder) => {
   return facetClauses
 }
 
-export const buildSuggestQuery = text => {
+export const buildSuggestQuery = (text: string) => {
   const suggest = {
     text
   }
   SUGGEST_FIELDS.forEach(
     field =>
+      // $FlowFixMe: yes the fields are missing and I'm adding them
       (suggest[field] = {
         phrase: {
           field:      `${field}.trigram`,
@@ -488,7 +493,12 @@ export const buildSuggestQuery = text => {
   return suggest
 }
 
-export const buildOrQuery = (builder, searchType, textQuery, extraClauses) => {
+export const buildOrQuery = (
+  builder: any,
+  searchType: string,
+  textQuery: any,
+  extraClauses: any
+) => {
   const textFilter = emptyOrNil(textQuery) ? [] : [{ bool: textQuery }]
   builder = builder.orQuery("bool", {
     filter: {
@@ -511,7 +521,12 @@ export const buildOrQuery = (builder, searchType, textQuery, extraClauses) => {
   return builder
 }
 
-export const buildChannelQuery = (builder, text, types, channelName) => {
+export const buildChannelQuery = (
+  builder: any,
+  text: ?string,
+  types: Array<string>,
+  channelName: ?string
+) => {
   for (const type of types) {
     const textQuery = emptyOrNil(text)
       ? {}
@@ -543,7 +558,12 @@ export const buildChannelQuery = (builder, text, types, channelName) => {
   return builder.build()
 }
 
-export const buildLearnQuery = (builder, text, types, facets) => {
+export const buildLearnQuery = (
+  builder: any,
+  text: ?string,
+  types: Array<string>,
+  facets: ?Map<string, Array<string>>
+) => {
   for (const type of types) {
     const textQuery = emptyOrNil(text)
       ? {}
@@ -551,8 +571,8 @@ export const buildLearnQuery = (builder, text, types, facets) => {
         should: [
           {
             multi_match: {
-              query:     text,
-              fields:    searchFields(type)
+              query:  text,
+              fields: searchFields(type)
             }
           },
           [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
@@ -561,8 +581,8 @@ export const buildLearnQuery = (builder, text, types, facets) => {
                 path:  "runs",
                 query: {
                   multi_match: {
-                    query:     text,
-                    fields:    RESOURCE_QUERY_NESTED_FIELDS
+                    query:  text,
+                    fields: RESOURCE_QUERY_NESTED_FIELDS
                   }
                 }
               }
@@ -577,6 +597,7 @@ export const buildLearnQuery = (builder, text, types, facets) => {
 
     // Include suggest if search test is not null/empty
     if (!emptyOrNil(text)) {
+      // $FlowFixMe: if we get this far, text is not null
       builder = builder.rawOption("suggest", buildSuggestQuery(text))
     }
   }

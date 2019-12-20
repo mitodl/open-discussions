@@ -436,8 +436,8 @@ describe("search functions", () => {
           const textQuery = [
             {
               multi_match: {
-                query:     text,
-                fields:    fieldNames,
+                query:  text,
+                fields: fieldNames
               }
             },
             {
@@ -445,8 +445,8 @@ describe("search functions", () => {
                 path:  "runs",
                 query: {
                   multi_match: {
-                    query:     text,
-                    fields:    RESOURCE_QUERY_NESTED_FIELDS,
+                    query:  text,
+                    fields: RESOURCE_QUERY_NESTED_FIELDS
                   }
                 }
               }
@@ -633,21 +633,21 @@ describe("search functions", () => {
               }
             },
             suggest: {
-              text: text,
+              text:              text,
               short_description: {
                 phrase: {
                   confidence: 0.0001,
-                  field: "short_description.trigram",
-                  gram_size: 1,
-                  size: 5
+                  field:      "short_description.trigram",
+                  gram_size:  1,
+                  size:       5
                 }
               },
               title: {
                 phrase: {
                   confidence: 0.0001,
-                  field: "title.trigram",
-                  gram_size: 1,
-                  size: 5
+                  field:      "title.trigram",
+                  gram_size:  1,
+                  size:       5
                 }
               }
             }
