@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.104.2
+Version 0.104.2 (Released December 20, 2019)
 ---------------
 
 - increase LearningResourceOfferor name length
