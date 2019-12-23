@@ -486,7 +486,19 @@ export const buildSuggestQuery = (text: string) => {
           field:      `${field}.trigram`,
           size:       5,
           gram_size:  1,
-          confidence: 0.0001
+          confidence: 0.0001,
+          max_errors: 3,
+          collate:    {
+            query: {
+              source: {
+                match_phrase: {
+                  "{{field_name}}": "{{suggestion}}"
+                }
+              }
+            },
+            params: { field_name: `${field}.trigram` },
+            prune:  true
+          }
         }
       })
   )

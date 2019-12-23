@@ -482,11 +482,11 @@ def test_transform_results(user, is_anonymous, suggest_min_hits, settings):
             {
                 "text": "enginer",
                 "offset": 0,
-                "length": 7,
+                "length": 3,
                 "options": [
-                    {"text": "enginer", "score": 0.723_752_1},
-                    {"text": "engineers", "score": 0.019_246_055},
-                    {"text": "engineer", "score": 0.018_813_284},
+                    {"text": "enginer", "score": 0.72, "collate_match": False},
+                    {"text": "engineers", "score": 0.019, "collate_match": True},
+                    {"text": "engineer", "score": 0.018, "collate_match": True},
                 ],
             }
         ],
@@ -494,20 +494,18 @@ def test_transform_results(user, is_anonymous, suggest_min_hits, settings):
             {
                 "text": "enginer",
                 "offset": 0,
-                "length": 7,
+                "length": 4,
                 "options": [
-                    {"text": "enginer", "score": 0.723_752_1},
-                    {"text": "engineers", "score": 0.208_175_48},
-                    {"text": "engineer", "score": 0.038_069_42},
-                    {"text": "engines", "score": 0.037_050_426},
+                    {"text": "enginer", "score": 0.721, "collate_match": False},
+                    {"text": "engineers", "score": 0.201, "collate_match": True},
+                    {"text": "engineer", "score": 0.038, "collate_match": True},
+                    {"text": "engines", "score": 0.027, "collate_match": False},
                 ],
             }
         ],
     }
 
-    expected_suggest = (
-        ["enginer", "engineers", "engineer", "engines"] if suggest_min_hits > 3 else []
-    )
+    expected_suggest = ["engineers", "engineer"] if suggest_min_hits > 3 else []
 
     raw_hits = [
         {

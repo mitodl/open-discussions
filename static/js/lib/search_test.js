@@ -639,7 +639,21 @@ describe("search functions", () => {
                   confidence: 0.0001,
                   field:      "short_description.trigram",
                   gram_size:  1,
-                  size:       5
+                  size:       5,
+                  max_errors: 3,
+                  collate:    {
+                    params: {
+                      field_name: "short_description.trigram"
+                    },
+                    prune: true,
+                    query: {
+                      source: {
+                        match_phrase: {
+                          "{{field_name}}": "{{suggestion}}"
+                        }
+                      }
+                    }
+                  }
                 }
               },
               title: {
@@ -647,7 +661,21 @@ describe("search functions", () => {
                   confidence: 0.0001,
                   field:      "title.trigram",
                   gram_size:  1,
-                  size:       5
+                  size:       5,
+                  max_errors: 3,
+                  collate:    {
+                    params: {
+                      field_name: "title.trigram"
+                    },
+                    prune: true,
+                    query: {
+                      source: {
+                        match_phrase: {
+                          "{{field_name}}": "{{suggestion}}"
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

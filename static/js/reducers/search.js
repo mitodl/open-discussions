@@ -15,6 +15,7 @@ type SearchState = {
   results: Array<Result>,
   facets: ?Map<string, FacetResult>,
   total: number,
+  suggest: Array<string>,
   initialLoad: boolean
 }
 
@@ -27,6 +28,7 @@ export const searchEndpoint = {
       initialLoad: true,
       results:     [],
       facets:      null,
+      suggest:     [],
       total:       0
     }
   },
@@ -46,6 +48,7 @@ export const searchEndpoint = {
       results:     oldResults.concat(response.hits.hits.map(item => item._source)),
       // $FlowFixMe: doesn't know about ES structure
       facets:      new Map(Object.entries(response.aggregations || {})),
+      suggest:     response.suggest,
       total:       response.hits.total,
       initialLoad: false
     }
@@ -56,6 +59,7 @@ export const searchEndpoint = {
         // $FlowFixMe: doesn't know about ES structure
         results:     [],
         facets:      null,
+        suggest:     [],
         total:       0,
         initialLoad: true
       }

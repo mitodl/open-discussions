@@ -326,6 +326,7 @@ def transform_results(search_result, user):
             suggestion
             for suggestion_list in extract_values(es_suggest, "options")
             for suggestion in suggestion_list
+            if suggestion["collate_match"] is True
         ]
         for suggestion in suggestions:
             suggestion_dict[suggestion["text"]] = (
