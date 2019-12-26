@@ -14,8 +14,8 @@ type PostFuncReturn = {
 type SearchState = {
   results: Array<Result>,
   facets: ?Map<string, FacetResult>,
-  total: number,
   suggest: Array<string>,
+  total: number,
   initialLoad: boolean
 }
 

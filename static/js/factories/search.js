@@ -250,6 +250,7 @@ export const makeSearchResponse = (
       total,
       hits
     },
+    suggest:      ["engineer", "engineering", "engines"],
     aggregations: withFacets ? makeSearchFacetResult() : {}
   }
 }
