@@ -20,6 +20,7 @@ import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
+  LR_TYPE_VIDEO,
   readableLearningResources
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
@@ -89,6 +90,12 @@ const CoverImage = ({ object, showResourceDrawer }) => (
       height={CAROUSEL_IMG_HEIGHT}
       alt={`cover image for ${object.title}`}
     />
+    {object.object_type === LR_TYPE_VIDEO ? (
+      <img
+        src="/static/images/video_play_overlay.png"
+        className="video-play-icon"
+      />
+    ) : null}
   </div>
 )
 
