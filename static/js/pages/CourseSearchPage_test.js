@@ -68,6 +68,7 @@ describe("CourseSearchPage", () => {
         data:       {
           results:     searchResponse.hits.hits,
           facets:      new Map(Object.entries(searchResponse.aggregations)),
+          suggest:     ["test"],
           total:       searchResponse.hits.total,
           incremental: false
         }
@@ -129,6 +130,13 @@ describe("CourseSearchPage", () => {
         .prop("title"),
       "Learning Resource"
     )
+  })
+
+  it("renders suggestion", async () => {
+    const { inner } = await renderPage()
+    const suggestDiv = inner.find(".suggestion")
+    assert.isOk(suggestDiv.text().includes("Did you mean"))
+    assert.isOk(suggestDiv.text().includes("test"))
   })
 
   //
