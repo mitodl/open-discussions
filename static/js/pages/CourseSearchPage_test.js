@@ -132,11 +132,13 @@ describe("CourseSearchPage", () => {
     )
   })
 
-  it("renders suggestion", async () => {
+  it("renders suggestion and changes search text if clicked", async () => {
     const { inner } = await renderPage()
     const suggestDiv = inner.find(".suggestion")
     assert.isOk(suggestDiv.text().includes("Did you mean"))
     assert.isOk(suggestDiv.text().includes("test"))
+    suggestDiv.find("a").simulate("click")
+    assert.equal(inner.state()["text"], "test")
   })
 
   //
