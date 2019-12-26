@@ -21,7 +21,6 @@ import {
   minPrice,
   getStartDate,
   getInstructorName,
-  getPreferredOfferedBy,
   isCoursewareResource,
   formatDurationClockTime,
   userListCoverImage,
@@ -109,7 +108,7 @@ const ExpandedLearningResourceDisplay = (props: Props) => {
   const url = selectedRun && selectedRun.url ? selectedRun.url : object.url
   const cost = selectedRun ? minPrice(selectedRun.prices, true) : null
 
-  const offeredBy = getPreferredOfferedBy(object.offered_by)
+  const offeredBy = object.offered_by.join(", ")
   const instructors =
     selectedRun && selectedRun.instructors
       ? selectedRun.instructors.map(instructor => getInstructorName(instructor))

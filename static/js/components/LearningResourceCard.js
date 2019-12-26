@@ -13,7 +13,6 @@ import {
   bestRunLabel,
   bestRun,
   minPrice,
-  getPreferredOfferedBy,
   userListCoverImage
 } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
@@ -169,9 +168,7 @@ export function LearningResourceDisplay(props: Props) {
           <>
             {object.offered_by.length ? (
               <Subtitle
-                content={offeredBySearchLink(
-                  getPreferredOfferedBy(object.offered_by)
-                )}
+                content={offeredBySearchLink(object.offered_by.join(", "))}
                 label="Offered by - "
               />
             ) : null}

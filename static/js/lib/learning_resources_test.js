@@ -16,8 +16,7 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
-  LR_TYPE_VIDEO,
-  offeredBys
+  LR_TYPE_VIDEO
 } from "./constants"
 import { AVAILABILITY_MAPPING } from "./search"
 import {
@@ -34,7 +33,6 @@ import {
   runEndDate,
   getStartDate,
   getInstructorName,
-  getPreferredOfferedBy,
   privacyIcon,
   filterItems,
   isCoursewareResource,
@@ -404,19 +402,6 @@ describe("Course run availability utils", () => {
   ].forEach(([input, expected]) => {
     it(`getInstructorName should return ${expected} when given ${input.toString()}`, () => {
       assert.equal(getInstructorName(input), expected)
-    })
-  })
-
-  //
-  ;[
-    [[offeredBys.micromasters, offeredBys.mitx], offeredBys.micromasters],
-    [[offeredBys.mitx, offeredBys.micromasters], offeredBys.micromasters],
-    [[offeredBys.micromasters], offeredBys.micromasters],
-    [[offeredBys.mitx], offeredBys.mitx],
-    [[offeredBys.mitx, offeredBys.xpro], offeredBys.mitx]
-  ].forEach(([input, expected]) => {
-    it(`getPreferredOfferedBy should return ${expected} when given ${input.toString()}`, () => {
-      assert.equal(getPreferredOfferedBy(input), expected)
     })
   })
 

@@ -15,8 +15,7 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
   LR_TYPE_BOOTCAMP,
-  platforms,
-  offeredBys
+  platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
 import { capitalize, emptyOrNil, formatPrice } from "./util"
@@ -210,12 +209,6 @@ export const getInstructorName = (instructor: CourseInstructor) => {
   }
   return ""
 }
-
-// prefer MicroMasters over MITx
-const findMicroMasters = R.find(R.equals(offeredBys.micromasters))
-
-export const getPreferredOfferedBy = (offeredBy: Array<string>): string =>
-  findMicroMasters(offeredBy) || R.head(offeredBy)
 
 export const filterItems = (
   results: Array<Object>,
