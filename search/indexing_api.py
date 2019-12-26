@@ -60,7 +60,6 @@ ENGLISH_TEXT_FIELD_WITH_SUGGEST = {
     "fields": {
         "english": {"type": "text", "analyzer": "english"},
         "trigram": {"type": "text", "analyzer": "trigram"},
-        "reverse": {"type": "text", "analyzer": "reverse"},
     },
 }
 
@@ -238,11 +237,6 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
                         "type": "custom",
                         "tokenizer": "standard",
                         "filter": ["lowercase", "shingle"],
-                    },
-                    "reverse": {
-                        "type": "custom",
-                        "tokenizer": "standard",
-                        "filter": ["lowercase", "reverse"],
                     },
                 },
                 "filter": {
