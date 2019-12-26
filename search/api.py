@@ -319,7 +319,7 @@ def transform_results(search_result, user):
     es_suggest = search_result.pop("suggest", {})
     if (
         search_result.get("hits", {}).get("total", 0)
-        <= settings.ELASTICSEARCH_MIN_SUGGEST_HITS
+        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
     ):
         suggestion_dict = defaultdict(list)
         suggestions = [
@@ -337,7 +337,7 @@ def transform_results(search_result, user):
             for key, value in sorted(
                 suggestion_dict.items(), key=lambda item: item[1], reverse=True
             )
-        ]
+        ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
     else:
         search_result["suggest"] = []
     return search_result

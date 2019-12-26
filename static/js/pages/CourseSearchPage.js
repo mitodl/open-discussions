@@ -396,10 +396,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4
     const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
-    const suggestion =
+    const suggestions =
       !emptyOrNil(suggest) && !emptyOrNil(text)
-        ? R.without([text], suggest)[0]
-        : ""
+        ? R.without([text], suggest)
+        : []
 
     return (
       <BannerPageWrapper>
@@ -428,16 +428,21 @@ export class CourseSearchPage extends React.Component<Props, State> {
         >
           <Cell width={facetColumnWidth} />
           <Cell width={resultsColumnWidth}>
-            {!emptyOrNil(suggestion) ? (
+            {!emptyOrNil(suggestions) ? (
               <div className="suggestion">
-                Did you mean{" "}
-                <a
-                  onClick={preventDefaultAndInvoke(() =>
-                    this.useSuggestion(suggestion)
-                  )}
-                >
-                  {suggestion}
-                </a>?
+                Did you mean
+                {suggestions.map((suggestion, i) => (
+                  <span key={i}>
+                    <a
+                      onClick={preventDefaultAndInvoke(() =>
+                        this.useSuggestion(suggestion)
+                      )}
+                    >
+                      {` ${suggestion}`}
+                    </a>
+                    {i < suggestions.length - 1 ? " | " : ""}
+                  </span>
+                ))}
               </div>
             ) : null}
             <div className="layout-buttons">

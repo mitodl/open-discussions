@@ -447,15 +447,19 @@ def test_find_similar_resources(settings, mocker, user):
     ]
 
 
+@pytest.mark.parametrize("max_suggestions", [1, 3])
 @pytest.mark.parametrize("suggest_min_hits", [2, 4])
 @pytest.mark.parametrize("is_anonymous", [True, False])
 @pytest.mark.django_db
-def test_transform_results(user, is_anonymous, suggest_min_hits, settings):
+def test_transform_results(
+    user, is_anonymous, suggest_min_hits, max_suggestions, settings
+):  # pylint: disable=too-many-locals
     """
     transform_results should transform reverse nested availability results if present, and move
     scripted fields into the source result
     """
-    settings.ELASTICSEARCH_MIN_SUGGEST_HITS = suggest_min_hits
+    settings.ELASTICSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
+    settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
@@ -499,13 +503,17 @@ def test_transform_results(user, is_anonymous, suggest_min_hits, settings):
                     {"text": "enginer", "score": 0.721, "collate_match": False},
                     {"text": "engineers", "score": 0.201, "collate_match": True},
                     {"text": "engineer", "score": 0.038, "collate_match": True},
-                    {"text": "engines", "score": 0.027, "collate_match": False},
+                    {"text": "engines", "score": 0.027, "collate_match": True},
                 ],
             }
         ],
     }
 
-    expected_suggest = ["engineers", "engineer"] if suggest_min_hits > 3 else []
+    expected_suggest = (
+        ["engineers", "engineer", "engines"][:max_suggestions]
+        if suggest_min_hits >= 3
+        else []
+    )
 
     raw_hits = [
         {
