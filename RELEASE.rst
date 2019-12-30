@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.105.0
+---------------
+
+- add all option to video playlist config
+- Log an error for YOUTUBE_DEVELOPER_KEY
+- update user list reordering UI a little bit
+- switch to bookmark icon for learning resource lists menu
+
 Version 0.104.2 (Released December 20, 2019)
 ---------------
 
