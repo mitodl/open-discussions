@@ -17,8 +17,9 @@ from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
 from search import indexing_api as api
-from search.constants import VALID_OBJECT_TYPES
+from search.constants import VALID_OBJECT_TYPES, VIDEO_TYPE
 from search.exceptions import RetryException, ReindexException
+from search.serializers import ESVideoSerializer
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -118,6 +119,21 @@ def upsert_document(doc_id, partial_data, object_type, retry_on_conflict=0):
     """Task that makes a request to create or update an ES document"""
     return api.upsert_document(
         doc_id, partial_data, object_type, retry_on_conflict=retry_on_conflict
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_video(video_id):
+    """Upsert video based on stored database information"""
+    from search.api import gen_video_id
+
+    video_obj = Video.objects.get(id=video_id)
+    video_data = ESVideoSerializer(video_obj).data
+    api.upsert_document(
+        gen_video_id(video_obj),
+        video_data,
+        VIDEO_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
 

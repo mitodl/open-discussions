@@ -229,7 +229,7 @@ def load_video(video_data):
         #       this gets addressed in load_channels after everything has been synced
         search_task_helpers.delete_video(video)
     elif video.published:
-        search_task_helpers.upsert_video(video)
+        search_task_helpers.upsert_video(video.id)
 
     return video
 

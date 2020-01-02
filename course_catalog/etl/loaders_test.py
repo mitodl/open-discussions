@@ -383,7 +383,7 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
     if video_exists and not is_published:
         mock_upsert_tasks.delete_video.assert_called_with(result)
     elif is_published:
-        mock_upsert_tasks.upsert_video.assert_called_with(result)
+        mock_upsert_tasks.upsert_video.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_video.assert_not_called()
         mock_upsert_tasks.upsert_video.assert_not_called()

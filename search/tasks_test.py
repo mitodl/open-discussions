@@ -12,8 +12,10 @@ from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from course_catalog.factories import CourseFactory, VideoFactory
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
-from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES
+from search.api import gen_video_id
+from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES, VIDEO_TYPE
 from search.exceptions import ReindexException, RetryException
+from search.serializers import ESVideoSerializer
 from search.tasks import (
     create_document,
     create_post_document,
@@ -30,6 +32,7 @@ from search.tasks import (
     index_videos,
     delete_document,
     upsert_document,
+    upsert_video,
 )
 
 
@@ -75,6 +78,19 @@ def test_upsert_document_task(mocked_api):
     upsert_document(*indexing_api_args)
     assert mocked_api.upsert_document.call_count == 1
     assert mocked_api.upsert_document.call_args[0] == indexing_api_args
+
+
+def test_upsert_video_task(mocked_api):
+    """Test that upsert_video will serialize the video data and upsert it to the ES index"""
+    video = VideoFactory.create()
+    upsert_video(video.id)
+    video_data = ESVideoSerializer(video).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_video_id(video),
+        video_data,
+        VIDEO_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
 
 
 def test_increment_document_integer_field_task(mocked_api):

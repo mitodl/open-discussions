@@ -38,8 +38,8 @@ from search.serializers import (
     ESBootcampSerializer,
     ESUserListSerializer,
     ESProgramSerializer,
-    ESVideoSerializer,
 )
+from search import tasks
 from search.tasks import (
     create_document,
     create_post_document,
@@ -528,21 +528,14 @@ def delete_user_list(user_list_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_video(video_obj):
+def upsert_video(video_id):
     """
     Run a task to create or update a video Elasticsearch document
 
     Args:
-        video_obj(Video): the Video to update in ES
+        video_id (int): the database primary key of the Video to update in ES
     """
-
-    video_data = ESVideoSerializer(video_obj).data
-    upsert_document.delay(
-        gen_video_id(video_obj),
-        video_data,
-        VIDEO_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_video.delay(video_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)

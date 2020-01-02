@@ -514,16 +514,12 @@ def test_upsert_video(mocker):
     """
     Tests that upsert_video calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    patched_task = mocker.patch("search.tasks.upsert_video")
     video = VideoFactory.create()
-    upsert_video(video)
+    upsert_video(video.id)
     assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
-    assert patched_task.delay.call_args[0] == (
-        gen_video_id(video),
-        ESVideoSerializer(video).data,
-        VIDEO_TYPE,
-    )
+    assert patched_task.delay.call_args[1] == {}
+    assert patched_task.delay.call_args[0] == (video.id,)
 
 
 @pytest.mark.django_db
