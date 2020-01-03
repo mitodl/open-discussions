@@ -67,6 +67,12 @@ def mock_get_bootcamps(mocker):
     )
 
 
+@pytest.fixture
+def mock_blacklist(mocker):
+    """Mock the load_course_blacklist function"""
+    return mocker.patch("course_catalog.api.load_course_blacklist", return_value=[])
+
+
 def setup_s3(settings):
     """
     Set up the fake s3 data
@@ -110,11 +116,16 @@ def test_get_mitx_data_valid(mocker):
 
 
 @mock_s3
-def test_get_ocw_data(settings, mock_course_index_functions):
+@pytest.mark.parametrize("blacklisted", [True, False])
+def test_get_ocw_data(
+    settings, mock_course_index_functions, mock_blacklist, blacklisted
+):
     """
     Test ocw sync task
     """
     setup_s3(settings)
+    if blacklisted:
+        mock_blacklist.return_value = ["9.15"]
 
     # run ocw sync
     get_ocw_data.delay()
@@ -122,28 +133,35 @@ def test_get_ocw_data(settings, mock_course_index_functions):
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
+    mock_blacklist.assert_called_once()
+    assert Course.objects.first().published is not blacklisted
 
+    # mocker.patch("course_catalog.api.load_course_blacklist", return_value=[])
     get_ocw_data.delay()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-    )
-    # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
-    obj = s3.Object(
-        settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_master.json",
-    )
-    assert json.loads(obj.get()["Body"].read())
+
+    if not blacklisted:
+        s3 = boto3.resource(
+            "s3",
+            aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+            aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+        )
+        # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
+        obj = s3.Object(
+            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_master.json",
+        )
+        assert json.loads(obj.get()["Body"].read())
 
 
 @mock_s3
 @pytest.mark.parametrize("overwrite", [True, False])
-def test_get_ocw_overwrite(mocker, settings, mock_course_index_functions, overwrite):
+def test_get_ocw_overwrite(
+    mocker, settings, mock_course_index_functions, mock_blacklist, overwrite
+):
     """Test that courses are overridden if force_overwrite=True"""
     setup_s3(settings)
 
@@ -153,6 +171,7 @@ def test_get_ocw_overwrite(mocker, settings, mock_course_index_functions, overwr
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
+    mock_blacklist.assert_called_once()
 
     mock_digest = mocker.patch("course_catalog.api.digest_ocw_course")
     get_ocw_data.delay(force_overwrite=overwrite)
@@ -169,7 +188,7 @@ def test_get_ocw_data_no_settings(settings):
 
 
 @mock_s3
-def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
+def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mock_blacklist):
     """
     Test that an error parsing ocw data is correctly logged
     """
@@ -182,10 +201,11 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger):
         "Error encountered parsing OCW json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
+    mock_blacklist.assert_called_once()
 
 
 @mock_s3
-def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
+def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mock_blacklist):
     """
     Test that an error reading from S3 is correctly logged
     """
@@ -196,11 +216,12 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger):
         "Error encountered reading 1.json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
+    mock_blacklist.assert_called_once()
 
 
 @mock_s3
 @pytest.mark.parametrize("image_only", [True, False])
-def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
+def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mock_blacklist):
     """
     Test that the ocw parser uploads all files or just images depending on settings
     """
@@ -213,6 +234,7 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only):
     get_ocw_data.delay()
     assert mock_upload_image.call_count == (1 if image_only else 0)
     assert mock_upload_all.call_count == (0 if image_only else 1)
+    mock_blacklist.assert_called_once()
 
 
 @mock_s3

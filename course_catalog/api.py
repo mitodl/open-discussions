@@ -25,7 +25,7 @@ from course_catalog.serializers import (
     OCWSerializer,
     LearningResourceRunSerializer,
 )
-from course_catalog.utils import get_course_url
+from course_catalog.utils import get_course_url, load_course_blacklist
 from search.task_helpers import (
     delete_course,
     upsert_course,
@@ -319,7 +319,9 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
 
 
 # pylint: disable=too-many-locals
-def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3):
+def sync_ocw_course(
+    *, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3, blacklist
+):
     """
     Sync an OCW course run
 
@@ -328,6 +330,7 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
         raw_data_bucket (boto3.resource): The S3 bucket containing the OCW information
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
+        blacklist (list of str): list of course ids that should not be published
 
     Returns:
         str:
@@ -385,6 +388,8 @@ def sync_ocw_course(*, course_prefix, raw_data_bucket, force_overwrite, upload_t
     course_json["course_id"] = "{}.{}".format(
         course_json.get("department_number"), course_json.get("master_course_number")
     )
+    if course_json["course_id"] in blacklist:
+        is_published = False
 
     # if course run synced before, update existing Course instance
     courserun_instance = LearningResourceRun.objects.filter(
@@ -440,6 +445,9 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
     # get all the courses prefixes we care about
     ocw_courses = generate_course_prefix_list(raw_data_bucket)
 
+    # get a list of blacklisted course ids
+    blacklist = load_course_blacklist()
+
     # loop over each course
     uids = set()
     for course_prefix in sorted(ocw_courses):
@@ -449,6 +457,7 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
                 raw_data_bucket=raw_data_bucket,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
+                blacklist=blacklist,
             )
 
             if uid:

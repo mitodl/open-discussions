@@ -4,6 +4,7 @@ from datetime import datetime
 from urllib.parse import urljoin
 
 import pytz
+import requests
 from django.conf import settings
 
 from course_catalog.constants import ocw_edx_mapping, semester_mapping, PlatformType
@@ -158,3 +159,19 @@ def get_list_items_by_resource(user, object_type, object_id):
         .filter(content_type__model=object_type)
         .filter(object_id=object_id)
     ]
+
+
+def load_course_blacklist():
+    """
+    Get a list of blacklisted course ids
+
+    Returns:
+        list of str: list of course ids
+
+    """
+    blacklist_url = settings.BLACKLISTED_COURSES_URL
+    if blacklist_url is not None:
+        response = requests.get(blacklist_url)
+        response.raise_for_status()
+        return [str(line, "utf-8") for line in response.iter_lines()]
+    return []

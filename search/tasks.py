@@ -13,6 +13,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 from channels.constants import LINK_TYPE_LINK, POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
 from course_catalog.models import Course, Bootcamp, Program, UserList, Video
+from course_catalog.utils import load_course_blacklist
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
@@ -461,6 +462,8 @@ def start_recreate_index(self):
             "starting to index all posts, comments, profiles, and course catalog objects..."
         )
 
+        blacklisted_ids = load_course_blacklist()
+
         index_tasks = celery.group(
             [
                 index_posts.si(post_ids)
@@ -491,6 +494,7 @@ def start_recreate_index(self):
                 index_courses.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
+                    .exclude(course_id__in=blacklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

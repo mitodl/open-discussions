@@ -27,6 +27,8 @@ from course_catalog.models import (
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.utils import log_exceptions
 
+from course_catalog.utils import load_course_blacklist
+
 from search import task_helpers as search_task_helpers
 
 log = logging.getLogger()
@@ -118,13 +120,15 @@ def load_run(learning_resource, course_run_data):
     return learning_resource_run
 
 
-def load_course(course_data):
+def load_course(course_data, blacklist):
     """Load the course into the database"""
     course_id = course_data.pop("course_id")
     platform = course_data.get("platform")
     runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
     offered_bys_data = course_data.pop("offered_by", [])
+    if course_id in blacklist:
+        course_data["published"] = False
 
     course, created = Course.objects.update_or_create(
         platform=platform, course_id=course_id, defaults=course_data
@@ -147,11 +151,12 @@ def load_course(course_data):
 @log_exceptions("Error loading courses")
 def load_courses(courses_data):
     """Load a list of programs"""
-    return [load_course(course_data) for course_data in courses_data]
+    blacklist = load_course_blacklist()
+    return [load_course(course_data, blacklist) for course_data in courses_data]
 
 
 @log_exceptions("Error loading program")
-def load_program(program_data):
+def load_program(program_data, blacklist):
     """Load the program into the database"""
     program_id = program_data.pop("program_id")
     courses_data = program_data.pop("courses")
@@ -177,7 +182,7 @@ def load_program(program_data):
         if not course_data.get("course_id", None):
             continue
 
-        course = load_course(course_data)
+        course = load_course(course_data, blacklist)
         courses.append(course)
 
         # create a program item or update its position
@@ -203,7 +208,8 @@ def load_program(program_data):
 
 def load_programs(programs_data):
     """Load a list of programs"""
-    return [load_program(program_data) for program_data in programs_data]
+    blacklist = []  # load_course_blacklist()
+    return [load_program(program_data, blacklist) for program_data in programs_data]
 
 
 def load_video(video_data):
