@@ -73,7 +73,7 @@ def enable_index_update_feature(settings):
 def mock_es_profile_serializer(mocker):
     """Mock ESProfileSerializer with canned serialized data"""
     mocker.patch(
-        "search.task_helpers.ESProfileSerializer.serialize",
+        "search.tasks.ESProfileSerializer.serialize",
         autospec=True,
         return_value=es_profile_serializer_data,
     )
@@ -168,8 +168,7 @@ def test_index_new_profile(mock_index_functions, mocker, user):
     fake_serialized_data = {"serialized": "profile"}
     patched_create_task = mocker.patch("search.indexing_api.create_document")
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.ESProfileSerializer.serialize",
-        return_value=fake_serialized_data,
+        "search.tasks.ESProfileSerializer.serialize", return_value=fake_serialized_data
     )
     index_new_profile(user.profile.id)
     patched_serialize_func.assert_called_once_with(user.profile)
