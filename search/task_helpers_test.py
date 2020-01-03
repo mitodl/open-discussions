@@ -14,16 +14,9 @@ from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
 from search.constants import (
     PROFILE_TYPE,
-    COURSE_TYPE,
-    PROGRAM_TYPE,
     VIDEO_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
-)
-from search.serializers import (
-    ESCourseSerializer,
-    ESProgramSerializer,
-    ESUserListSerializer,
 )
 from search.task_helpers import (
     reddit_object_persist,
@@ -54,8 +47,6 @@ from search.api import (
     gen_post_id,
     gen_comment_id,
     gen_profile_id,
-    gen_course_id,
-    gen_program_id,
     gen_video_id,
     gen_user_list_id,
 )
@@ -461,20 +452,15 @@ def test_update_channel_index(mocker, mock_index_functions):
 
 
 @pytest.mark.django_db
-def test_upsert_course(mock_index_functions, mocker):
+@pytest.mark.usefixtures("mock_index_functions")
+def test_upsert_course(mocker):
     """
     Tests that upsert_course calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    patched_task = mocker.patch("search.tasks.upsert_course")
     course = CourseFactory.create()
-    upsert_course(course)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
-    assert patched_task.delay.call_args[0] == (
-        gen_course_id(course.platform, course.course_id),
-        ESCourseSerializer(course).data,
-        COURSE_TYPE,
-    )
+    upsert_course(course.id)
+    patched_task.delay.assert_called_once_with(course.id)
 
 
 @pytest.mark.django_db
@@ -495,16 +481,10 @@ def test_upsert_program(mock_index_functions, mocker):
     """
     Tests that upsert_program calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    patched_task = mocker.patch("search.tasks.upsert_program")
     program = ProgramFactory.create()
-    upsert_program(program)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
-    assert patched_task.delay.call_args[0] == (
-        gen_program_id(program),
-        ESProgramSerializer(program).data,
-        PROGRAM_TYPE,
-    )
+    upsert_program(program.id)
+    patched_task.delay.assert_called_once_with(program.id)
 
 
 @pytest.mark.django_db
@@ -516,9 +496,7 @@ def test_upsert_video(mocker):
     patched_task = mocker.patch("search.tasks.upsert_video")
     video = VideoFactory.create()
     upsert_video(video.id)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == {}
-    assert patched_task.delay.call_args[0] == (video.id,)
+    patched_task.delay.assert_called_once_with(video.id)
 
 
 @pytest.mark.django_db
@@ -539,16 +517,10 @@ def test_upsert_user_list(mocker, list_type):
     """
     Tests that upsert_user_list calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.upsert_document")
+    patched_task = mocker.patch("search.tasks.upsert_user_list")
     user_list = UserListFactory.create(list_type=list_type)
-    upsert_user_list(user_list)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
-    assert patched_task.delay.call_args[0] == (
-        gen_user_list_id(user_list),
-        ESUserListSerializer(user_list).data,
-        USER_LIST_TYPE,
-    )
+    upsert_user_list(user_list.id)
+    patched_task.delay.assert_called_once_with(user_list.id)
 
 
 @pytest.mark.django_db

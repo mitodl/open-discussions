@@ -34,17 +34,14 @@ from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
     ESProfileSerializer,
-    ESCourseSerializer,
     ESBootcampSerializer,
     ESUserListSerializer,
-    ESProgramSerializer,
 )
 from search import tasks
 from search.tasks import (
     create_document,
     create_post_document,
     update_document_with_partial,
-    upsert_document,
     increment_document_integer_field,
     update_field_values_by_query,
     delete_document,
@@ -387,21 +384,14 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_course(course_obj):
+def upsert_course(course_id):
     """
-    Run a task to create or update a course Elasticsearch document
+    Run a task to create or update a course's Elasticsearch document
 
     Args:
-        course_obj(Course): the Course to update in ES
+        course_id (int): the primary key for the Course to update
     """
-
-    course_data = ESCourseSerializer(course_obj).data
-    upsert_document.delay(
-        gen_course_id(course_obj.platform, course_obj.course_id),
-        course_data,
-        COURSE_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_course.delay(course_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -430,21 +420,14 @@ def index_new_bootcamp(bootcamp_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_bootcamp(bootcamp_obj):
+def update_bootcamp(bootcamp_id):
     """
     Run a task to update all fields of a bootcamp Elasticsearch document
 
     Args:
-        bootcamp_obj(Bootcamp): the Bootcamp to update in ES
+        bootcamp_id (int): the primary key for Bootcamp to update in ES
     """
-
-    bootcamp_data = ESBootcampSerializer(bootcamp_obj).data
-    update_document_with_partial.delay(
-        gen_bootcamp_id(bootcamp_obj.course_id),
-        bootcamp_data,
-        BOOTCAMP_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_bootcamp.delay(bootcamp_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -459,21 +442,14 @@ def delete_bootcamp(bootcamp_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_program(program_obj):
+def upsert_program(program_id):
     """
     Run a task to create or update a program Elasticsearch document
 
     Args:
-        program_obj(Program): the Program to update in ES
+        program_id (int): the primary key for the Program to update in ES
     """
-
-    program_data = ESProgramSerializer(program_obj).data
-    upsert_document.delay(
-        gen_program_id(program_obj),
-        program_data,
-        PROGRAM_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_program.delay(program_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -500,20 +476,14 @@ def index_new_user_list(user_list_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_user_list(user_list_obj):
+def upsert_user_list(user_list_id):
     """
     Run a task to update all fields of a UserList Elasticsearch document
 
     Args:
-        user_list_obj(UserList): the UserList to update in ES
+        user_list_id (int): the primary key for the UserList to update in ES
     """
-    user_list_data = ESUserListSerializer(user_list_obj).data
-    upsert_document.delay(
-        gen_user_list_id(user_list_obj),
-        user_list_data,
-        USER_LIST_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_user_list.delay(user_list_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)

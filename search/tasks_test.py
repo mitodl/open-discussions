@@ -9,13 +9,40 @@ import pytest
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
-from course_catalog.factories import CourseFactory, VideoFactory
+from course_catalog.factories import (
+    BootcampFactory,
+    CourseFactory,
+    ProgramFactory,
+    VideoFactory,
+    UserListFactory,
+)
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
-from search.api import gen_video_id
-from search.constants import POST_TYPE, COMMENT_TYPE, VALID_OBJECT_TYPES, VIDEO_TYPE
+from search.api import (
+    gen_bootcamp_id,
+    gen_course_id,
+    gen_program_id,
+    gen_video_id,
+    gen_user_list_id,
+)
+from search.constants import (
+    BOOTCAMP_TYPE,
+    COURSE_TYPE,
+    POST_TYPE,
+    PROGRAM_TYPE,
+    COMMENT_TYPE,
+    VALID_OBJECT_TYPES,
+    VIDEO_TYPE,
+    USER_LIST_TYPE,
+)
 from search.exceptions import ReindexException, RetryException
-from search.serializers import ESVideoSerializer
+from search.serializers import (
+    ESBootcampSerializer,
+    ESCourseSerializer,
+    ESProgramSerializer,
+    ESVideoSerializer,
+    ESUserListSerializer,
+)
 from search.tasks import (
     create_document,
     create_post_document,
@@ -31,8 +58,11 @@ from search.tasks import (
     index_courses,
     index_videos,
     delete_document,
-    upsert_document,
+    upsert_bootcamp,
+    upsert_course,
+    upsert_program,
     upsert_video,
+    upsert_user_list,
 )
 
 
@@ -72,12 +102,43 @@ def test_update_document_with_partial_task(mocked_api):
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
 
 
-def test_upsert_document_task(mocked_api):
-    """Test that the upsert_document task calls the indexing API function with the right args"""
-    indexing_api_args = ("doc_id", {"test": "data"}, "TYPE")
-    upsert_document(*indexing_api_args)
-    assert mocked_api.upsert_document.call_count == 1
-    assert mocked_api.upsert_document.call_args[0] == indexing_api_args
+def test_upsert_bootcamp_task(mocked_api):
+    """Test that upsert_bootcamp will serialize the bootcamp data and upsert it to the ES index"""
+    bootcamp = BootcampFactory.create()
+    upsert_bootcamp(bootcamp.id)
+    data = ESBootcampSerializer(bootcamp).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_bootcamp_id(bootcamp.course_id),
+        data,
+        BOOTCAMP_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_course_task(mocked_api):
+    """Test that upsert_course will serialize the course data and upsert it to the ES index"""
+    course = CourseFactory.create()
+    upsert_course(course.id)
+    data = ESCourseSerializer(course).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_course_id(course.platform, course.course_id),
+        data,
+        COURSE_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_program_task(mocked_api):
+    """Test that upsert_program will serialize the video data and upsert it to the ES index"""
+    program = ProgramFactory.create()
+    upsert_program(program.id)
+    data = ESProgramSerializer(program).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_program_id(program),
+        data,
+        PROGRAM_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
 
 
 def test_upsert_video_task(mocked_api):
@@ -89,6 +150,19 @@ def test_upsert_video_task(mocked_api):
         gen_video_id(video),
         video_data,
         VIDEO_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_user_list_task(mocked_api):
+    """Test that upsert_user_list will serialize the UserList data and upsert it to the ES index"""
+    user_list = UserListFactory.create()
+    upsert_user_list(user_list.id)
+    data = ESUserListSerializer(user_list).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_user_list_id(user_list),
+        data,
+        USER_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 

@@ -17,9 +17,22 @@ from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
 from search import indexing_api as api
-from search.constants import VALID_OBJECT_TYPES, VIDEO_TYPE
+from search.constants import (
+    BOOTCAMP_TYPE,
+    COURSE_TYPE,
+    PROGRAM_TYPE,
+    VALID_OBJECT_TYPES,
+    VIDEO_TYPE,
+    USER_LIST_TYPE,
+)
 from search.exceptions import RetryException, ReindexException
-from search.serializers import ESVideoSerializer
+from search.serializers import (
+    ESBootcampSerializer,
+    ESCourseSerializer,
+    ESProgramSerializer,
+    ESVideoSerializer,
+    ESUserListSerializer,
+)
 
 User = get_user_model()
 log = logging.getLogger(__name__)
@@ -115,10 +128,47 @@ def update_document_with_partial(
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def upsert_document(doc_id, partial_data, object_type, retry_on_conflict=0):
-    """Task that makes a request to create or update an ES document"""
-    return api.upsert_document(
-        doc_id, partial_data, object_type, retry_on_conflict=retry_on_conflict
+def upsert_course(course_id):
+    """Upsert course based on stored database information"""
+    from search.api import gen_course_id
+
+    course_obj = Course.objects.get(id=course_id)
+    course_data = ESCourseSerializer(course_obj).data
+    api.upsert_document(
+        gen_course_id(course_obj.platform, course_obj.course_id),
+        course_data,
+        COURSE_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_bootcamp(bootcamp_id):
+    """Upsert bootcamp based on stored database information"""
+    from search.api import gen_bootcamp_id
+
+    bootcamp_obj = Bootcamp.objects.get(id=bootcamp_id)
+    bootcamp_data = ESBootcampSerializer(bootcamp_obj).data
+    api.upsert_document(
+        gen_bootcamp_id(bootcamp_obj.course_id),
+        bootcamp_data,
+        BOOTCAMP_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_program(program_id):
+    """Upsert program based on stored database information"""
+    from search.api import gen_program_id
+
+    program_obj = Program.objects.get(id=program_id)
+    program_data = ESProgramSerializer(program_obj).data
+    api.upsert_document(
+        gen_program_id(program_obj),
+        program_data,
+        PROGRAM_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
 
@@ -133,6 +183,21 @@ def upsert_video(video_id):
         gen_video_id(video_obj),
         video_data,
         VIDEO_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_user_list(user_list_id):
+    """Upsert user list based on stored database information"""
+    from search.api import gen_user_list_id
+
+    user_list_obj = UserList.objects.get(id=user_list_id)
+    user_list_data = ESUserListSerializer(user_list_obj).data
+    api.upsert_document(
+        gen_user_list_id(user_list_obj),
+        user_list_data,
+        USER_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
