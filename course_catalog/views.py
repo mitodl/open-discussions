@@ -264,7 +264,7 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
         instance.delete()
         user_list = instance.user_list
         if user_list.items.count() > 0:
-            upsert_user_list(user_list)
+            upsert_user_list(user_list.id)
         else:
             delete_user_list(user_list)
 

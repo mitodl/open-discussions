@@ -10,16 +10,18 @@ from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
 
-from channels.constants import LINK_TYPE_LINK
+from channels.constants import LINK_TYPE_LINK, POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
 from course_catalog.models import Course, Bootcamp, Program, UserList, Video
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
+from profiles.models import Profile
 from search import indexing_api as api
 from search.constants import (
     BOOTCAMP_TYPE,
     COURSE_TYPE,
+    PROFILE_TYPE,
     PROGRAM_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
@@ -30,6 +32,7 @@ from search.serializers import (
     ESBootcampSerializer,
     ESCourseSerializer,
     ESProgramSerializer,
+    ESProfileSerializer,
     ESVideoSerializer,
     ESUserListSerializer,
 )
@@ -76,6 +79,74 @@ def wrap_retry_exception(*exception_classes):
 def create_document(doc_id, data):
     """Task that makes a request to create an ES document"""
     return api.create_document(doc_id, data)
+
+
+@app.task
+def index_new_bootcamp(bootcamp_id):
+    """Task that makes a request to create an ES document for a bootcamp"""
+    from search.api import gen_bootcamp_id
+
+    bootcamp = Bootcamp.objects.get(id=bootcamp_id)
+    data = ESBootcampSerializer(bootcamp).data
+    api.create_document(gen_bootcamp_id(bootcamp.course_id), data)
+
+
+@app.task
+def index_new_profile(profile_id):
+    """Task that indexes a profile based on its primary key"""
+    from search.api import gen_profile_id
+
+    profile = Profile.objects.get(id=profile_id)
+    data = ESProfileSerializer().serialize(profile)
+    api.create_document(gen_profile_id(profile.user.username), data)
+
+
+@app.task
+def update_author(user_id):
+    """Update all fields of a profile document except id (username)"""
+    from search.api import gen_profile_id
+
+    user_obj = User.objects.get(id=user_id)
+    if user_obj.username != settings.INDEXING_API_USERNAME:
+        profile_data = ESProfileSerializer().serialize(user_obj.profile)
+        profile_data.pop("author_id", None)
+        api.update_document_with_partial(
+            gen_profile_id(user_obj.username),
+            profile_data,
+            PROFILE_TYPE,
+            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+        )
+
+
+def _update_fields_by_username(username, field_dict, object_types):
+    """
+    Runs a task to update a field value for all docs associated with a given user.
+
+    Args:
+        username (str): The username to query by
+        field_dict (dict): Dictionary of fields to update
+        object_types (list of str): The object types to update
+    """
+    api.update_field_values_by_query(
+        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
+        field_dict=field_dict,
+        object_types=object_types,
+    )
+
+
+@app.task
+def update_author_posts_comments(profile_id):
+    """Update author name and avatar in all associated post and comment docs"""
+    profile_obj = Profile.objects.get(id=profile_id)
+    profile_data = ESProfileSerializer().serialize(profile_obj)
+    update_keys = {
+        key: value
+        for key, value in profile_data.items()
+        if key in ["author_name", "author_headline", "author_avatar_small"]
+    }
+    _update_fields_by_username(
+        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
+    )
 
 
 @app.task

@@ -484,7 +484,7 @@ class UserListItemSerializer(SimpleUserListItemSerializer):
         view = self.context.get("view", None)
         if view is not None and view.kwargs.get("parent_lookup_user_list_id", None):
             # this was sent via userlistitems API, so update the search index
-            upsert_user_list(user_list)
+            upsert_user_list(user_list.id)
 
     def create(self, validated_data):
         user_list = validated_data["user_list"]
@@ -658,7 +658,7 @@ class UserListSerializer(SimpleUserListSerializer):
                 if topics_data is not None:
                     userlist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
                 if instance.items.exists():
-                    upsert_user_list(userlist)
+                    upsert_user_list(userlist.id)
                 else:
                     delete_user_list(userlist)
                 return userlist

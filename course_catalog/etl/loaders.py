@@ -139,7 +139,7 @@ def load_course(course_data):
     if not created and not course.published:
         search_task_helpers.delete_course(course)
     elif course.published:
-        search_task_helpers.upsert_course(course)
+        search_task_helpers.upsert_course(course.id)
 
     return course
 
@@ -196,7 +196,7 @@ def load_program(program_data):
     if not created and not program.published:
         search_task_helpers.delete_program(program)
     elif program.published:
-        search_task_helpers.upsert_program(program)
+        search_task_helpers.upsert_program(program.id)
 
     return program
 
@@ -312,7 +312,7 @@ def load_playlist_user_list(playlist):
         id__in=[item.id for item in items]
     ).delete()
 
-    search_task_helpers.upsert_user_list(user_list)
+    search_task_helpers.upsert_user_list(user_list.id)
 
     return user_list
 

@@ -166,17 +166,15 @@ def test_index_new_profile(mock_index_functions, mocker, user):
     Test that index_new_profile calls indexing tasks with the right parameters
     """
     fake_serialized_data = {"serialized": "profile"}
-    patched_create_task = mocker.patch("search.task_helpers.create_document")
+    patched_create_task = mocker.patch("search.indexing_api.create_document")
     patched_serialize_func = mocker.patch(
         "search.task_helpers.ESProfileSerializer.serialize",
         return_value=fake_serialized_data,
     )
-    index_new_profile(user.profile)
+    index_new_profile(user.profile.id)
     patched_serialize_func.assert_called_once_with(user.profile)
-    assert patched_create_task.delay.called is True
-    assert patched_create_task.delay.call_args[0] == (
-        gen_profile_id(user.username),
-        fake_serialized_data,
+    patched_create_task.assert_called_once_with(
+        gen_profile_id(user.username), fake_serialized_data
     )
 
 
@@ -378,16 +376,12 @@ def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer,
     """
     Tests that update_author calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch("search.indexing_api.update_document_with_partial")
     call_data = es_profile_serializer_data
     call_data.pop("author_id")
-    update_author(user)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(retry_on_conflict=1)
-    assert patched_task.delay.call_args[0] == (
-        gen_profile_id(user.username),
-        call_data,
-        "profile",
+    update_author(user.id)
+    patched_task.assert_called_once_with(
+        gen_profile_id(user.username), call_data, "profile", retry_on_conflict=1
     )
 
 
@@ -397,7 +391,7 @@ def test_update_indexing_author(mocker, mock_index_functions, index_user, settin
     """
     settings.INDEXING_API_USERNAME = index_user.username
     patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
-    update_author(index_user)
+    update_author(index_user.id)
     assert patched_task.delay.called is False
 
 
@@ -407,15 +401,14 @@ def test_update_author_posts_comments(
     """
     Tests that update_author_posts_comments calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    patched_task = mocker.patch("search.indexing_api.update_field_values_by_query")
     call_data = {
         key: val
         for key, val in es_profile_serializer_data.items()
         if key in {"author_name", "author_avatar_small", "author_headline"}
     }
-    update_author_posts_comments(user.profile)
-    assert patched_task.delay.called is True
-    assert patched_task.delay.call_args[1] == dict(
+    update_author_posts_comments(user.profile.id)
+    patched_task.assert_called_once_with(
         query={"query": {"bool": {"must": [{"match": {"author_id": user.username}}]}}},
         field_dict=call_data,
         object_types=[POST_TYPE, COMMENT_TYPE],

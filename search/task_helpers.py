@@ -30,13 +30,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import (
-    ESPostSerializer,
-    ESCommentSerializer,
-    ESProfileSerializer,
-    ESBootcampSerializer,
-    ESUserListSerializer,
-)
+from search.serializers import ESPostSerializer, ESCommentSerializer
 from search import tasks
 from search.tasks import (
     create_document,
@@ -76,15 +70,14 @@ def reddit_object_persist(*persistence_funcs):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_profile(profile_obj):
+def index_new_profile(profile_id):
     """
     Serializes a profile object and runs a task to create an ES document for it.
 
     Args:
-        profile_obj (profiles.models.Profile): A user Profile object
+        profile_id (int): Primary key for a Profile
     """
-    data = ESProfileSerializer().serialize(profile_obj)
-    create_document.delay(gen_profile_id(profile_obj.user.username), data)
+    tasks.index_new_profile.delay(profile_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -168,22 +161,6 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
     )
 
 
-def update_fields_by_username(username, field_dict, object_types):
-    """
-    Runs a task to update a field value for all docs associated with a given user.
-
-    Args:
-        username (str): The username to query by
-        field_dict (dict): Dictionary of fields to update
-        object_types (list of str): The object types to update
-    """
-    update_field_values_by_query.delay(
-        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
-        field_dict=field_dict,
-        object_types=object_types,
-    )
-
-
 @if_feature_enabled(INDEX_UPDATES)
 def update_channel_index(channel_obj):
     """
@@ -209,22 +186,14 @@ def update_channel_index(channel_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author(user_obj):
+def update_author(user_id):
     """
     Run a task to update all fields of a profile document except id (username)
 
     Args:
-        user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
+        user_id (int): the primary key for the User whose profile to query by and update
     """
-    if user_obj.username != settings.INDEXING_API_USERNAME:
-        profile_data = ESProfileSerializer().serialize(user_obj.profile)
-        profile_data.pop("author_id", None)
-        update_document_with_partial.delay(
-            gen_profile_id(user_obj.username),
-            profile_data,
-            PROFILE_TYPE,
-            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-        )
+    tasks.update_author.delay(user_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -240,22 +209,14 @@ def delete_profile(user_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author_posts_comments(profile_obj):
+def update_author_posts_comments(profile_id):
     """
     Run a task to update author name and avatar in all associated post and comment docs
 
     Args:
-        profile_obj(profiles.models.Profile): the Profile object to query by
+        profile_id (int): the primary key for the Profile object to query by
     """
-    profile_data = ESProfileSerializer().serialize(profile_obj)
-    update_keys = {
-        key: value
-        for key, value in profile_data.items()
-        if key in ["author_name", "author_headline", "author_avatar_small"]
-    }
-    update_fields_by_username(
-        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
-    )
+    tasks.update_author_posts_comments.delay(profile_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -408,15 +369,14 @@ def delete_course(course_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_bootcamp(bootcamp_obj):
+def index_new_bootcamp(bootcamp_id):
     """
     Serializes a bootcamp object and runs a task to create an ES document for it.
 
     Args:
-        bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
+        bootcamp_id (int): A Bootcamp primary key
     """
-    data = ESBootcampSerializer(bootcamp_obj).data
-    create_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), data)
+    tasks.index_new_bootcamp.delay(bootcamp_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -461,18 +421,6 @@ def delete_program(program_obj):
         program_obj (course_catalog.models.Program): A Program object
     """
     delete_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def index_new_user_list(user_list_obj):
-    """
-    Serializes a UserList object and runs a task to create an ES document for it.
-
-    Args:
-        user_list_obj (course_catalog.models.UserList): A UserList object
-    """
-    data = ESUserListSerializer(user_list_obj).data
-    create_document.delay(gen_user_list_id(user_list_obj), data)
 
 
 @if_feature_enabled(INDEX_UPDATES)

@@ -265,7 +265,7 @@ def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_top
     assert resp.data["topics"][0]["id"] == (
         new_topic.id if update_topics else original_topic.id
     )
-    mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
+    mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 @pytest.mark.parametrize("num_topics", [0, 2])
@@ -301,7 +301,7 @@ def test_user_list_endpoint_create_item(
         assert (
             sorted([topic["id"] for topic in resp.data.get("topics", [])]) == topic_ids
         )
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 def test_user_list_endpoint_create_item_bad_data(client, user):
@@ -367,7 +367,7 @@ def test_user_list_endpoint_update_items(client, user, is_author, mock_user_list
             updated_items[1]["position"] == 44
             and updated_items[1]["id"] == list_items[0].id
         )
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 def test_user_list_endpoint_update_items_wrong_list(client, user):
@@ -415,7 +415,7 @@ def test_user_list_endpoint_delete_items(client, user, is_author, mock_user_list
         assert len(updated_items) == 1
         assert updated_items[0]["id"] == list_items[1].id
         assert UserListItem.objects.filter(id=list_items[0].id).exists() is False
-        mock_user_list_index.upsert_user_list.assert_called_with(userlist)
+        mock_user_list_index.upsert_user_list.assert_called_with(userlist.id)
 
         data = {
             "items": [
@@ -458,7 +458,7 @@ def test_user_list_items_endpoint_create_item(
     assert resp.status_code == (201 if is_author else 403)
     if resp.status_code == 201:
         assert resp.json().get("object_id") == course.id
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 def test_user_list_items_endpoint_create_item_bad_data(client, user):
@@ -506,7 +506,7 @@ def test_user_list_items_endpoint_update_item(
     assert resp.status_code == (200 if is_author else 403)
     if resp.status_code == 200:
         assert resp.json()["position"] == 44444
-        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist)
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 def test_user_list_items_endpoint_update_items_wrong_list(client, user):
@@ -552,7 +552,7 @@ def test_user_list_items_endpoint_delete_items(
     )
     assert resp.status_code == (204 if is_author else 403)
     if resp.status_code == 204:
-        mock_user_list_index.upsert_user_list_view.assert_called_with(userlist)
+        mock_user_list_index.upsert_user_list_view.assert_called_with(userlist.id)
         client.delete(
             reverse("userlistitems-detail", args=[userlist.id, list_items[1].id]),
             format="json",

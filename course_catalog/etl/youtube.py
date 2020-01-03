@@ -563,7 +563,7 @@ def get_youtube_transcripts(videos):
             else:
                 video.transcript = parse_video_captions(caption)
                 video.save()
-                upsert_video(video)
+                upsert_video(video.id)
                 consecutive_video_unavailable_failures = 0
                 break
             finally:

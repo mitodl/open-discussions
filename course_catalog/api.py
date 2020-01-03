@@ -315,7 +315,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
 
         load_offered_bys(run, [{"name": OfferedBy.bootcamps.value}])
 
-    index_func(bootcamp)
+    index_func(bootcamp.id)
 
 
 # pylint: disable=too-many-locals
@@ -495,6 +495,6 @@ def sync_ocw_data(*, force_overwrite, upload_to_s3):
     for course in Course.objects.filter(id__in=course_ids):
         # Probably quicker to do this as a bulk operation
         if course.published:
-            upsert_course(course)
+            upsert_course(course.id)
         else:
             delete_course(course)

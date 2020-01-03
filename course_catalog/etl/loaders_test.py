@@ -156,7 +156,7 @@ def test_load_program(
     if program_exists and not is_published:
         mock_upsert_tasks.delete_program.assert_called_with(result)
     elif is_published:
-        mock_upsert_tasks.upsert_program.assert_called_with(result)
+        mock_upsert_tasks.upsert_program.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
         mock_upsert_tasks.upsert_program.assert_not_called()
@@ -215,7 +215,7 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
     if course_exists and not is_published:
         mock_upsert_tasks.delete_course.assert_called_with(result)
     elif is_published:
-        mock_upsert_tasks.upsert_course.assert_called_with(result)
+        mock_upsert_tasks.upsert_course.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
         mock_upsert_tasks.upsert_course.assert_not_called()
@@ -645,7 +645,7 @@ def test_load_playlist_user_list(
                 ).exists()
                 is True
             )
-        mock_upsert_tasks.upsert_user_list.assert_called_once_with(user_list)
+        mock_upsert_tasks.upsert_user_list.assert_called_once_with(user_list.id)
     else:
         if exists:
             mock_upsert_tasks.delete_user_list.assert_called_once_with(user_list)
