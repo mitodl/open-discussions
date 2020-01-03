@@ -23,7 +23,6 @@ from search.constants import (
 from search.serializers import (
     ESCourseSerializer,
     ESProgramSerializer,
-    ESVideoSerializer,
     ESUserListSerializer,
 )
 from search.task_helpers import (
