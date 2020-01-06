@@ -27,7 +27,8 @@ describe("search reducers", () => {
       initialLoad: false,
       results:     response.hits.hits.map(item => item._source),
       facets:      new Map(),
-      total:       response.hits.total
+      total:       response.hits.total,
+      suggest:     response.suggest
     })
   })
 
@@ -42,7 +43,8 @@ describe("search reducers", () => {
       initialLoad: false,
       results:     response.hits.hits.map(item => item._source),
       facets:      new Map(Object.entries(makeSearchFacetResult())),
-      total:       response.hits.total
+      total:       response.hits.total,
+      suggest:     response.suggest
     })
   })
 
@@ -60,7 +62,8 @@ describe("search reducers", () => {
       initialLoad: false,
       results:     hits.slice(0, 2).concat(hits.slice(0, 5)),
       facets:      new Map(),
-      total:       response.hits.total
+      total:       response.hits.total,
+      suggest:     response.suggest
     })
   })
 })

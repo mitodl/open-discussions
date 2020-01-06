@@ -124,6 +124,19 @@ def test_search(mocker, client, search_view):
     search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
 
 
+def test_learn_search(mocker, client, search_view):
+    """The query should be passed from the front end to execute_learn_search to run the search"""
+    search_mock = mocker.patch(
+        "search.views.execute_learn_search",
+        autospec=True,
+        return_value=FAKE_SEARCH_RESPONSE,
+    )
+    query = {"query": {"match": {"object_type": COURSE_TYPE}}}
+    resp = client.post(search_view.url, query)
+    assert resp.json() == FAKE_SEARCH_RESPONSE
+    search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
+
+
 def test_find_related_documents(mocker, client, related_posts_view):
     """The view should return the results of the API method for finding related posts"""
     fake_response = {"related": "posts"}

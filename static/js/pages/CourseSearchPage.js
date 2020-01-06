@@ -80,6 +80,7 @@ type StateProps = {|
   initialLoad: boolean,
   results: Array<Result>,
   facets: Map<string, FacetResult>,
+  suggest: Array<string>,
   loaded: boolean,
   processing: boolean,
   total: number,
@@ -305,6 +306,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
   }
 
+  useSuggestion = async (text: string) => {
+    await this.setState({ text, currentFacetGroup: null })
+    this.runSearch()
+  }
+
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
     // Get the latest data from state if any to reflect recent changes in favorites/lists
     const { entities } = this.props
@@ -382,7 +388,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { match, total, processing } = this.props
+    const { match, total, processing, suggest } = this.props
     const { text, error, activeFacets, searchResultLayout } = this.state
 
     const anyFiltersActive =
@@ -390,6 +396,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4
     const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
+    const suggestions =
+      !emptyOrNil(suggest) && !emptyOrNil(text)
+        ? R.without([text], suggest)
+        : []
 
     return (
       <BannerPageWrapper>
@@ -418,6 +428,23 @@ export class CourseSearchPage extends React.Component<Props, State> {
         >
           <Cell width={facetColumnWidth} />
           <Cell width={resultsColumnWidth}>
+            {!emptyOrNil(suggestions) ? (
+              <div className="suggestion">
+                Did you mean
+                {suggestions.map((suggestion, i) => (
+                  <span key={i}>
+                    <a
+                      onClick={preventDefaultAndInvoke(() =>
+                        this.useSuggestion(suggestion)
+                      )}
+                    >
+                      {` ${suggestion}`}
+                    </a>
+                    {i < suggestions.length - 1 ? " | " : ""}
+                  </span>
+                ))}
+              </div>
+            ) : null}
             <div className="layout-buttons">
               <div
                 onClick={() => this.setSearchUI(SEARCH_LIST_UI)}
@@ -492,11 +519,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
 const mapStateToProps = (state): StateProps => {
   const { search, entities } = state
-  const { results, total, initialLoad, facets } = search.data
+  const { results, total, initialLoad, facets, suggest } = search.data
 
   return {
     results,
     facets,
+    suggest,
     total,
     initialLoad,
     loaded:     search.loaded,
