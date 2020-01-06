@@ -561,7 +561,7 @@ def test_load_playlist_user_list_invalid_settings(mocker, settings):
 
     settings.OPEN_VIDEO_USER_LIST_OWNER = None
 
-    assert load_playlist_user_list(mocker.Mock()) is None
+    assert load_playlist_user_list(mocker.Mock(), None) is None
 
     mock_log.debug.assert_called_once_with(
         "OPEN_VIDEO_USER_LIST_OWNER is not set, skipping"
@@ -569,7 +569,7 @@ def test_load_playlist_user_list_invalid_settings(mocker, settings):
 
     settings.OPEN_VIDEO_USER_LIST_OWNER = "missing"
 
-    assert load_playlist_user_list(mocker.Mock()) is None
+    assert load_playlist_user_list(mocker.Mock(), None) is None
 
     mock_log.error.assert_called_once_with(
         "OPEN_VIDEO_USER_LIST_OWNER is set to '%s', but that user doesn't exist",
@@ -579,10 +579,13 @@ def test_load_playlist_user_list_invalid_settings(mocker, settings):
 
 @pytest.mark.parametrize("exists", [True, False])
 @pytest.mark.parametrize("has_user_list", [True, False])
+@pytest.mark.parametrize("user_list_title", ["Title", None])
 def test_load_playlist_user_list(
-    mock_upsert_tasks, settings, user, exists, has_user_list
+    mock_upsert_tasks, settings, user, exists, has_user_list, user_list_title
 ):
+    # pylint: disable=too-many-arguments
     """Test that load_playlist_user_list updates or create the user list"""
+
     settings.OPEN_VIDEO_USER_LIST_OWNER = user.username
 
     playlist = PlaylistFactory.create(has_user_list=has_user_list)
@@ -593,6 +596,7 @@ def test_load_playlist_user_list(
     prune_video = VideoFactory.create()
     video_content_type = ContentType.objects.get_for_model(Video)
     user_list = None
+
     if exists:
         user_list = UserListFactory.create(is_list=True, is_public=True, author=user)
         UserListItem.objects.create(
@@ -607,7 +611,7 @@ def test_load_playlist_user_list(
     else:
         assert playlist.user_list is None
 
-    load_playlist_user_list(playlist)
+    load_playlist_user_list(playlist, user_list_title)
 
     playlist.refresh_from_db()
 
@@ -616,14 +620,16 @@ def test_load_playlist_user_list(
             assert playlist.user_list == user_list
         else:
             assert playlist.user_list is not None
-    else:
-        assert playlist.user_list is None
 
-    if has_user_list:
         user_list = playlist.user_list
 
         assert user_list.author == user
-        assert user_list.title == playlist.title
+
+        if user_list_title:
+            assert user_list.title == user_list_title
+        else:
+            assert user_list.title == playlist.title
+
         assert user_list.privacy_level == PrivacyLevel.public.value
         assert user_list.list_type == ListType.LIST.value
 
@@ -647,6 +653,8 @@ def test_load_playlist_user_list(
             )
         mock_upsert_tasks.upsert_user_list.assert_called_once_with(user_list)
     else:
+        assert playlist.user_list is None
+
         if exists:
             mock_upsert_tasks.delete_user_list.assert_called_once_with(user_list)
         else:
