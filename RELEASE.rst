@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.105.0
+Version 0.105.0 (Released January 06, 2020)
 ---------------
 
 - add all option to video playlist config
