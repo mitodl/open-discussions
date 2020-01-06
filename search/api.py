@@ -31,6 +31,7 @@ from search.constants import (
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
+SUGGEST_FIELDS = ["title", "short_description"]
 
 
 def gen_post_id(reddit_obj_id):

@@ -175,3 +175,6 @@ export const formatPrice = (price: ?string | number | Decimal): string => {
 
 export const sortBy = (property: string) =>
   R.sortWith([R.ascend(R.prop(property))])
+
+export const isDoubleQuoted = (text: ?string) =>
+  !emptyOrNil(R.match(/^".+"$/, text))

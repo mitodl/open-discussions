@@ -1,6 +1,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import _ from "lodash"
+import bodybuilder from "bodybuilder"
 
 import {
   makeBootcampResult,
@@ -20,7 +21,8 @@ import {
   searchResultToComment,
   searchResultToLearningResource,
   searchResultToPost,
-  searchResultToProfile
+  searchResultToProfile,
+  buildLearnQuery
 } from "./search"
 import * as searchFuncs from "./search"
 import {
@@ -786,6 +788,25 @@ describe("search functions", () => {
       it(`has the right searchFields for ${type}`, () => {
         assert.deepEqual(searchFields(type), fields)
       })
+    })
+  })
+  ;[
+    ['"mechanical engineering"', "query_string"],
+    ["'mechanical engineering\"", "multi_match"],
+    ["'mechanical engineering'", "multi_match"],
+    ["mechanical engineering", "multi_match"]
+  ].forEach(([text, queryType]) => {
+    it(`constructs a ${queryType} query on text ${text}`, () => {
+      const esQuery = buildLearnQuery(
+        bodybuilder(),
+        text,
+        [LR_TYPE_COURSE],
+        null
+      )
+      assert.deepEqual(
+        Object.keys(esQuery.query.bool.should[0].bool.should[0]),
+        [queryType]
+      )
     })
   })
 })

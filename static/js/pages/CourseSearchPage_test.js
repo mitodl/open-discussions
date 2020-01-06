@@ -131,6 +131,42 @@ describe("CourseSearchPage", () => {
       "Learning Resource"
     )
   })
+  ;[
+    ["mechical enginr", "mechanical engineer"],
+    ['"mechical enginr"', '"mechanical engineer"']
+  ].forEach(([text, suggestion]) => {
+    it(`renders suggestion ${suggestion} for query ${text}`, async () => {
+      const { inner } = await renderPage(
+        {
+          search: {
+            data: {
+              suggest: ["mechanical engineer"]
+            }
+          }
+        },
+        {
+          location: {
+            search: `q=${text}`
+          }
+        }
+      )
+      assert.equal(inner.state().text, text)
+      const suggestDiv = inner.find(".suggestion")
+      assert.isOk(suggestDiv.text().includes("Did you mean"))
+      assert.isOk(suggestDiv.text().includes(suggestion))
+      suggestDiv.find("a").simulate("click")
+      assert.equal(inner.state()["text"], suggestion)
+    })
+  })
+
+  it("renders suggestion and changes search text if clicked", async () => {
+    const { inner } = await renderPage()
+    const suggestDiv = inner.find(".suggestion")
+    assert.isOk(suggestDiv.text().includes("Did you mean"))
+    assert.isOk(suggestDiv.text().includes("test"))
+    suggestDiv.find("a").simulate("click")
+    assert.equal(inner.state()["text"], "test")
+  })
 
   it("renders suggestion and changes search text if clicked", async () => {
     const { inner } = await renderPage()
