@@ -31,7 +31,6 @@ from search.constants import (
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
-SUGGEST_FIELDS = ["title", "short_description"]
 
 
 def gen_post_id(reddit_obj_id):
@@ -321,7 +320,7 @@ def transform_results(search_result, user):
         search_result.get("hits", {}).get("total", 0)
         <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
     ):
-        suggestion_dict = defaultdict(list)
+        suggestion_dict = defaultdict(int)
         suggestions = [
             suggestion
             for suggestion_list in extract_values(es_suggest, "options")
@@ -330,7 +329,7 @@ def transform_results(search_result, user):
         ]
         for suggestion in suggestions:
             suggestion_dict[suggestion["text"]] = (
-                suggestion_dict.setdefault(suggestion["text"], 0) + suggestion["score"]
+                suggestion_dict[suggestion["text"]] + suggestion["score"]
             )
         search_result["suggest"] = [
             key

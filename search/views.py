@@ -33,7 +33,7 @@ class ESView(APIView):
 
 class SearchView(ESView):
     """
-    View for executing searches of posts, comments, profiles
+    View for executing searches of posts, comments, profiles, learning resources
     """
 
     permission_classes = ()
