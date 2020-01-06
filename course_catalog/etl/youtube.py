@@ -145,6 +145,7 @@ def _extract_playlists(youtube_client, request, playlist_configs):
                         playlist_data,
                         extract_playlist_items(youtube_client, playlist_id),
                         playlist_config.get("create_user_list", True),
+                        playlist_config.get("user_list_title"),
                     )
 
             request = youtube_client.playlists().list_next(request, response)
@@ -440,14 +441,18 @@ def transform_video(video_data, offered_by):
     }
 
 
-def transform_playlist(playlist_data, videos, offered_by, has_user_list):
+def transform_playlist(
+    playlist_data, videos, offered_by, has_user_list, user_list_title
+):
     """
     Transform a playlist into our normalized data
 
     Args:
-        playlist (tuple): the extracted playlist data
+        playlist_data (tuple): the extracted playlist data
+        videos (generator): generator for data for the playlist's videos
         offered_by (str): the offered_by value for this playlist
-
+        has_user_list (bool): config specifying whether a user list should be created for the playlist
+        user_list_title (str or None): title for the playlist user list or None
     Returns:
         dict:
             normalized playlist data
@@ -458,6 +463,7 @@ def transform_playlist(playlist_data, videos, offered_by, has_user_list):
         "title": playlist_data["snippet"]["title"],
         "offered_by": [{"name": offered_by}] if offered_by else [],
         "has_user_list": has_user_list,
+        "user_list_title": user_list_title,
         # intentional generator expression
         "videos": (
             transform_video(extracted_video, offered_by) for extracted_video in videos
@@ -488,8 +494,10 @@ def transform(extracted_channels):
             "offered_by": [{"name": offered_by}] if offered_by else [],
             # intentional generator expression
             "playlists": (
-                transform_playlist(playlist, videos, offered_by, has_user_list)
-                for playlist, videos, has_user_list in playlists
+                transform_playlist(
+                    playlist, videos, offered_by, has_user_list, user_list_title
+                )
+                for playlist, videos, has_user_list, user_list_title in playlists
             ),
         }
 

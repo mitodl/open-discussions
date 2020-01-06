@@ -248,13 +248,13 @@ def load_videos(videos_data):
     return [load_video(video_data) for video_data in videos_data]
 
 
-def load_playlist_user_list(playlist):
+def load_playlist_user_list(playlist, user_list_title):
     """
     Load a playlist into a user list
 
     Args:
         playlist (Playlist): the playlist to generate a user list from
-
+        user_list_title (str or None): title for the user list
     Returns:
         UserList or None:
             the created/updated user list or None
@@ -292,7 +292,7 @@ def load_playlist_user_list(playlist):
             playlist.save()
 
     user_list = playlist.user_list
-    user_list.title = playlist.title
+    user_list.title = user_list_title if user_list_title else playlist.title
     user_list.save()
 
     video_content_type = ContentType.objects.get_for_model(Video)
@@ -334,6 +334,7 @@ def load_playlist(video_channel, playlist_data):
     videos_data = playlist_data.pop("videos", [])
     topics_data = playlist_data.pop("topics", [])
     offered_by_data = playlist_data.pop("offered_by", [])
+    user_list_title = playlist_data.pop("user_list_title", None)
 
     playlist, _ = Playlist.objects.update_or_create(
         platform=platform,
@@ -356,7 +357,7 @@ def load_playlist(video_channel, playlist_data):
             video_id__in=[video.id for video in videos]
         ).delete()
 
-    load_playlist_user_list(playlist)
+    load_playlist_user_list(playlist, user_list_title)
 
     from course_catalog import tasks
 
