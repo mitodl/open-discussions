@@ -177,4 +177,4 @@ export const sortBy = (property: string) =>
   R.sortWith([R.ascend(R.prop(property))])
 
 export const isDoubleQuoted = (text: ?string) =>
-  !emptyOrNil(R.match(/^".+"$/, text))
+  !emptyOrNil(R.match(/^".+"$/, text || ""))
