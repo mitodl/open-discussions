@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.106.0 (Released January 07, 2020)
+---------------
+
+- implement new design for learning resource drawer
+- mock out HTML height attrs globally
+- add play button overlay for video cover images
+- display all learning reasourse offered bys if there are multiple
+
 Version 0.105.0 (Released January 06, 2020)
 ---------------
 
