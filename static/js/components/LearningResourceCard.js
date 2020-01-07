@@ -55,19 +55,23 @@ const formatTopics = (topics: Array<CourseTopic>) =>
     </a>
   ))
 
-const offeredBySearchLink = offeredBy => (
-  <a
-    href={`${COURSE_SEARCH_URL}${toQueryString({
-      o: offeredBy
-    })}`}
-  >
-    {offeredBy}
-  </a>
-)
+const formatOfferedBys = (offeredBys: Array<string>) =>
+  offeredBys
+    .map((offeror, i) => (
+      <a
+        href={`${COURSE_SEARCH_URL}${toQueryString({
+          o: offeror
+        })}`}
+        key={i}
+      >
+        {offeror}
+      </a>
+    ))
+    .reduce((prev, curr) => [prev, ", ", curr])
 
-const Subtitle = ({ label, content }) => (
-  <div className="subtitle">
-    <div className="lr-subtitle">
+const Subtitle = ({ label, content, htmlClass }) => (
+  <div className="row subtitle">
+    <div className={`lr-subtitle ${htmlClass}`}>
       <span className="grey">{label}</span>
       {content}
     </div>
@@ -173,8 +177,9 @@ export function LearningResourceDisplay(props: Props) {
             <div className="row subtitles">
               {object.offered_by.length ? (
                 <Subtitle
-                  content={offeredBySearchLink(object.offered_by.join(", "))}
+                  content={formatOfferedBys(object.offered_by)}
                   label="Offered by - "
+                  htmlClass=""
                 />
               ) : null}
               {object.topics.length > 0 ? (
@@ -183,6 +188,7 @@ export function LearningResourceDisplay(props: Props) {
                   label={`${
                     object.topics.length === 1 ? "Subject" : "Subjects"
                   } - `}
+                  htmlClass="subject"
                 />
               ) : null}
             </div>
