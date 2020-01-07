@@ -83,7 +83,7 @@ def wrap_retry_mock(mocker):
 
 @pytest.fixture(autouse=True)
 def mocked_search_tasks_api():
-    """Mock object that patches search tasks so that indexing is not run in unrelated tests"""
+    """Override global autouse fixture so tests can apply it selectively"""
 
 
 @pytest.fixture()

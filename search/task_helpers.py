@@ -159,22 +159,6 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
     )
 
 
-def update_fields_by_username(username, field_dict, object_types):
-    """
-    Runs a task to update a field value for all docs associated with a given user.
-
-    Args:
-        username (str): The username to query by
-        field_dict (dict): Dictionary of fields to update
-        object_types (list of str): The object types to update
-    """
-    update_field_values_by_query.delay(
-        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
-        field_dict=field_dict,
-        object_types=object_types,
-    )
-
-
 def update_channel_index(channel_obj):
     """
     Runs a task to update the channel title, type for all posts and comments associated with the given channel.
@@ -418,17 +402,6 @@ def delete_program(program_obj):
         program_obj (course_catalog.models.Program): A Program object
     """
     delete_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
-
-
-def index_new_user_list(user_list_obj):
-    """
-    Serializes a UserList object and runs a task to create an ES document for it.
-
-    Args:
-        user_list_obj (course_catalog.models.UserList): A UserList object
-    """
-    data = ESUserListSerializer(user_list_obj).data
-    create_document.delay(gen_user_list_id(user_list_obj), data)
 
 
 def upsert_user_list(user_list_id):
