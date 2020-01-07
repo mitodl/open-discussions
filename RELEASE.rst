@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.106.0
+Version 0.106.0 (Released January 07, 2020)
 ---------------
 
 - implement new design for learning resource drawer
