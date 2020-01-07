@@ -81,9 +81,14 @@ def wrap_retry_mock(mocker):
     wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
 
 
+@pytest.fixture(autouse=True)
+def mocked_search_tasks_api():
+    """Mock object that patches search tasks so that indexing is not run in unrelated tests"""
+
+
 @pytest.fixture()
 def mocked_api(mocker):
-    """Mock object that patches the channels API"""
+    """Mock object that patches search tasks api calls"""
     return mocker.patch("search.tasks.api")
 
 

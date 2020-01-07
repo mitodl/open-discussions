@@ -6,7 +6,6 @@ from functools import wraps, partial
 
 from django.conf import settings
 
-from open_discussions.features import if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.models import Comment
 from channels.utils import render_article_text

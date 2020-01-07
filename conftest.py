@@ -27,6 +27,6 @@ def prevent_requests(mocker, request):
 
 
 @pytest.fixture(autouse=True)
-def mocked_api(mocker):
+def mocked_search_tasks_api(mocker):
     """Mock object that patches search tasks so that indexing is not run in unrelated tests"""
     return mocker.patch("search.tasks.api")

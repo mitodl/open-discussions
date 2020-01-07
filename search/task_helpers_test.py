@@ -156,20 +156,18 @@ def test_index_new_comment(mocker):
     }
 
 
-def test_index_new_profile(mock_index_functions, mocker, user):
+def test_index_new_profile(mock_index_functions, mocked_search_tasks_api, mocker, user):
     """
     Test that index_new_profile calls indexing tasks with the right parameters
     """
     fake_serialized_data = {"serialized": "profile"}
-    patched_create_task = mocker.patch("search.indexing_api.create_document")
+    patched = mocked_search_tasks_api.create_document
     patched_serialize_func = mocker.patch(
         "search.tasks.ESProfileSerializer.serialize", return_value=fake_serialized_data
     )
     index_new_profile(user.profile.id)
     patched_serialize_func.assert_called_once_with(user.profile)
-    patched_create_task.assert_called_once_with(
-        gen_profile_id(user.username), fake_serialized_data
-    )
+    patched.assert_called_once_with(gen_profile_id(user.username), fake_serialized_data)
 
 
 def test_update_post_text(mocker, reddit_submission_obj):
@@ -366,36 +364,40 @@ def test_update_indexed_score(
     }
 
 
-def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer, user):
+def test_update_author(
+    mocked_search_tasks_api, mock_index_functions, mock_es_profile_serializer, user
+):
     """
     Tests that update_author calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.indexing_api.update_document_with_partial")
+    patched = mocked_search_tasks_api.update_document_with_partial
     call_data = es_profile_serializer_data
     call_data.pop("author_id")
     update_author(user.id)
-    patched_task.assert_called_once_with(
+    patched.assert_called_once_with(
         gen_profile_id(user.username), call_data, "profile", retry_on_conflict=1
     )
 
 
-def test_update_indexing_author(mocker, mock_index_functions, index_user, settings):
+def test_update_indexing_author(
+    mocker, mocked_search_tasks_api, mock_index_functions, index_user, settings
+):
     """
     Tests that update_author does not call update_field_values_by_query for the indexing user
     """
     settings.INDEXING_API_USERNAME = index_user.username
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    patched = mocked_search_tasks_api.update_field_values_by_query
     update_author(index_user.id)
-    assert patched_task.delay.called is False
+    assert patched.delay.called is False
 
 
 def test_update_author_posts_comments(
-    mocker, mock_index_functions, mock_es_profile_serializer, user
+    mocked_search_tasks_api, mock_index_functions, mock_es_profile_serializer, user
 ):
     """
     Tests that update_author_posts_comments calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.indexing_api.update_field_values_by_query")
+    patched_task = mocked_search_tasks_api.update_field_values_by_query
     call_data = {
         key: val
         for key, val in es_profile_serializer_data.items()
