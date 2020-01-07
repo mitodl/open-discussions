@@ -30,21 +30,12 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import (
-    ESPostSerializer,
-    ESCommentSerializer,
-    ESProfileSerializer,
-    ESCourseSerializer,
-    ESBootcampSerializer,
-    ESUserListSerializer,
-    ESProgramSerializer,
-    ESVideoSerializer,
-)
+from search.serializers import ESPostSerializer, ESCommentSerializer
+from search import tasks
 from search.tasks import (
     create_document,
     create_post_document,
     update_document_with_partial,
-    upsert_document,
     increment_document_integer_field,
     update_field_values_by_query,
     delete_document,
@@ -79,15 +70,14 @@ def reddit_object_persist(*persistence_funcs):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_profile(profile_obj):
+def index_new_profile(profile_id):
     """
     Serializes a profile object and runs a task to create an ES document for it.
 
     Args:
-        profile_obj (profiles.models.Profile): A user Profile object
+        profile_id (int): Primary key for a Profile
     """
-    data = ESProfileSerializer().serialize(profile_obj)
-    create_document.delay(gen_profile_id(profile_obj.user.username), data)
+    tasks.index_new_profile.delay(profile_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -171,22 +161,6 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
     )
 
 
-def update_fields_by_username(username, field_dict, object_types):
-    """
-    Runs a task to update a field value for all docs associated with a given user.
-
-    Args:
-        username (str): The username to query by
-        field_dict (dict): Dictionary of fields to update
-        object_types (list of str): The object types to update
-    """
-    update_field_values_by_query.delay(
-        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
-        field_dict=field_dict,
-        object_types=object_types,
-    )
-
-
 @if_feature_enabled(INDEX_UPDATES)
 def update_channel_index(channel_obj):
     """
@@ -212,22 +186,14 @@ def update_channel_index(channel_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author(user_obj):
+def update_author(user_id):
     """
     Run a task to update all fields of a profile document except id (username)
 
     Args:
-        user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
+        user_id (int): the primary key for the User whose profile to query by and update
     """
-    if user_obj.username != settings.INDEXING_API_USERNAME:
-        profile_data = ESProfileSerializer().serialize(user_obj.profile)
-        profile_data.pop("author_id", None)
-        update_document_with_partial.delay(
-            gen_profile_id(user_obj.username),
-            profile_data,
-            PROFILE_TYPE,
-            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-        )
+    tasks.update_author.delay(user_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -243,22 +209,14 @@ def delete_profile(user_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author_posts_comments(profile_obj):
+def update_author_posts_comments(profile_id):
     """
     Run a task to update author name and avatar in all associated post and comment docs
 
     Args:
-        profile_obj(profiles.models.Profile): the Profile object to query by
+        profile_id (int): the primary key for the Profile object to query by
     """
-    profile_data = ESProfileSerializer().serialize(profile_obj)
-    update_keys = {
-        key: value
-        for key, value in profile_data.items()
-        if key in ["author_name", "author_headline", "author_avatar_small"]
-    }
-    update_fields_by_username(
-        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
-    )
+    tasks.update_author_posts_comments.delay(profile_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -387,21 +345,14 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_course(course_obj):
+def upsert_course(course_id):
     """
-    Run a task to create or update a course Elasticsearch document
+    Run a task to create or update a course's Elasticsearch document
 
     Args:
-        course_obj(Course): the Course to update in ES
+        course_id (int): the primary key for the Course to update
     """
-
-    course_data = ESCourseSerializer(course_obj).data
-    upsert_document.delay(
-        gen_course_id(course_obj.platform, course_obj.course_id),
-        course_data,
-        COURSE_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_course.delay(course_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -418,33 +369,25 @@ def delete_course(course_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_bootcamp(bootcamp_obj):
+def index_new_bootcamp(bootcamp_id):
     """
     Serializes a bootcamp object and runs a task to create an ES document for it.
 
     Args:
-        bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
+        bootcamp_id (int): A Bootcamp primary key
     """
-    data = ESBootcampSerializer(bootcamp_obj).data
-    create_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), data)
+    tasks.index_new_bootcamp.delay(bootcamp_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_bootcamp(bootcamp_obj):
+def update_bootcamp(bootcamp_id):
     """
     Run a task to update all fields of a bootcamp Elasticsearch document
 
     Args:
-        bootcamp_obj(Bootcamp): the Bootcamp to update in ES
+        bootcamp_id (int): the primary key for Bootcamp to update in ES
     """
-
-    bootcamp_data = ESBootcampSerializer(bootcamp_obj).data
-    update_document_with_partial.delay(
-        gen_bootcamp_id(bootcamp_obj.course_id),
-        bootcamp_data,
-        BOOTCAMP_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_bootcamp.delay(bootcamp_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -459,21 +402,14 @@ def delete_bootcamp(bootcamp_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_program(program_obj):
+def upsert_program(program_id):
     """
     Run a task to create or update a program Elasticsearch document
 
     Args:
-        program_obj(Program): the Program to update in ES
+        program_id (int): the primary key for the Program to update in ES
     """
-
-    program_data = ESProgramSerializer(program_obj).data
-    upsert_document.delay(
-        gen_program_id(program_obj),
-        program_data,
-        PROGRAM_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_program.delay(program_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -488,32 +424,14 @@ def delete_program(program_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_user_list(user_list_obj):
-    """
-    Serializes a UserList object and runs a task to create an ES document for it.
-
-    Args:
-        user_list_obj (course_catalog.models.UserList): A UserList object
-    """
-    data = ESUserListSerializer(user_list_obj).data
-    create_document.delay(gen_user_list_id(user_list_obj), data)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def upsert_user_list(user_list_obj):
+def upsert_user_list(user_list_id):
     """
     Run a task to update all fields of a UserList Elasticsearch document
 
     Args:
-        user_list_obj(UserList): the UserList to update in ES
+        user_list_id (int): the primary key for the UserList to update in ES
     """
-    user_list_data = ESUserListSerializer(user_list_obj).data
-    upsert_document.delay(
-        gen_user_list_id(user_list_obj),
-        user_list_data,
-        USER_LIST_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_user_list.delay(user_list_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -528,21 +446,14 @@ def delete_user_list(user_list_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def upsert_video(video_obj):
+def upsert_video(video_id):
     """
     Run a task to create or update a video Elasticsearch document
 
     Args:
-        video_obj(Video): the Video to update in ES
+        video_id (int): the database primary key of the Video to update in ES
     """
-
-    video_data = ESVideoSerializer(video_obj).data
-    upsert_document.delay(
-        gen_video_id(video_obj),
-        video_data,
-        VIDEO_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
+    tasks.upsert_video.delay(video_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)

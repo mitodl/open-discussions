@@ -537,7 +537,7 @@ def test_get_youtube_transcripts(mocker):
     mock_parse_call.assert_called_once_with(mock_caption)
     mock_video.save.assert_called_once()
 
-    mock_upsert_video.assert_called_once_with(mock_video)
+    mock_upsert_video.assert_called_once_with(mock_video.id)
 
 
 @pytest.mark.usefixtures("video_settings")
@@ -563,7 +563,7 @@ def test_get_youtube_transcripts_with_a_retry(mocker):
     mock_parse_call.assert_called_once_with(mock_caption)
     mock_video.save.assert_called_once()
 
-    mock_upsert_video.assert_called_once_with(mock_video)
+    mock_upsert_video.assert_called_once_with(mock_video.id)
 
 
 @pytest.mark.usefixtures("video_settings")

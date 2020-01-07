@@ -134,11 +134,11 @@ class Profile(models.Model):
         self.__previous_headline = self.headline
         self.__previous_bio = self.bio
         if is_new:
-            task_helpers.index_new_profile(self)
+            task_helpers.index_new_profile(self.id)
         elif update_author:
-            task_helpers.update_author(self.user)
+            task_helpers.update_author(self.user.id)
         if update_posts:
-            task_helpers.update_author_posts_comments(self)
+            task_helpers.update_author_posts_comments(self.id)
 
     def __str__(self):
         return "{}".format(self.name)

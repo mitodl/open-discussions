@@ -1078,7 +1078,7 @@ def test_add_contributor(mock_client, mock_update_author):
         ).group
         in contributor.groups.all()
     )
-    mock_update_author.assert_called_with(contributor)
+    mock_update_author.assert_called_with(contributor.id)
     assert isinstance(redditor, Redditor)
     assert redditor.name == contributor.username
 
@@ -1111,7 +1111,7 @@ def test_remove_contributor(mock_client, mock_update_author):
         ).group
         not in contributor.groups.all()
     )
-    mock_update_author.assert_called_with(contributor)
+    mock_update_author.assert_called_with(contributor.id)
 
 
 def test_list_contributors(mock_client):
@@ -1138,7 +1138,7 @@ def test_add_moderator(mock_client, mock_update_author):
         ).group
         in moderator.groups.all()
     )
-    mock_update_author.assert_called_with(moderator)
+    mock_update_author.assert_called_with(moderator.id)
 
 
 def test_add_moderator_no_user(mock_client):
@@ -1167,7 +1167,7 @@ def test_remove_moderator(mock_client, mock_update_author):
         ).group
         not in moderator.groups.all()
     )
-    mock_update_author.assert_called_with(moderator)
+    mock_update_author.assert_called_with(moderator.id)
 
 
 def test_list_moderator(mock_client):
@@ -1360,7 +1360,7 @@ def test_add_subscriber(mock_client, mock_update_author):
     assert ChannelSubscription.objects.filter(
         channel__name="channel", user=subscriber
     ).exists()
-    mock_update_author.assert_called_with(subscriber)
+    mock_update_author.assert_called_with(subscriber.id)
 
 
 def test_add_remove_subscriber_no_user(mock_client):
@@ -1385,7 +1385,7 @@ def test_remove_subscriber(mock_client, mock_update_author):
     assert not ChannelSubscription.objects.filter(
         channel__name="testchannel5", user=subscriber
     ).exists()
-    mock_update_author.assert_called_with(subscriber)
+    mock_update_author.assert_called_with(subscriber.id)
 
 
 def test_is_subscriber(mock_client):
