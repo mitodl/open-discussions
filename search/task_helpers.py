@@ -29,11 +29,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import (
-    ESPostSerializer,
-    ESCommentSerializer,
-    ESUserListSerializer,
-)
+from search.serializers import ESPostSerializer, ESCommentSerializer
 from search import tasks
 from search.tasks import (
     create_document,
