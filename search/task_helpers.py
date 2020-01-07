@@ -6,7 +6,7 @@ from functools import wraps, partial
 
 from django.conf import settings
 
-from open_discussions.features import INDEX_UPDATES, if_feature_enabled
+from open_discussions.features import if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.models import Comment
 from channels.utils import render_article_text
@@ -30,7 +30,11 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import ESPostSerializer, ESCommentSerializer
+from search.serializers import (
+    ESPostSerializer,
+    ESCommentSerializer,
+    ESUserListSerializer,
+)
 from search import tasks
 from search.tasks import (
     create_document,
@@ -69,7 +73,6 @@ def reddit_object_persist(*persistence_funcs):
     return api_indexing_listener_inner
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def index_new_profile(profile_id):
     """
     Serializes a profile object and runs a task to create an ES document for it.
@@ -80,7 +83,6 @@ def index_new_profile(profile_id):
     tasks.index_new_profile.delay(profile_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def index_new_post(post_obj):
     """
     Serializes a post object and runs a task to create an ES document for it.
@@ -93,7 +95,6 @@ def index_new_post(post_obj):
     create_post_document.delay(gen_post_id(post.post_id), data)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def index_new_comment(comment_obj):
     """
     Serializes a comment object and runs a task to create an ES document for it.
@@ -107,7 +108,6 @@ def index_new_comment(comment_obj):
     increment_parent_post_comment_count(comment_obj)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_post_text(post_obj):
     """
     Serializes post object text and runs a task to update the text for the associated ES document.
@@ -125,7 +125,6 @@ def update_post_text(post_obj):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_comment_text(comment_obj):
     """
     Serializes comment object text and runs a task to update the text for the associated ES document.
@@ -161,7 +160,22 @@ def update_field_for_all_post_comments(post_obj, field_name, field_value):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
+def update_fields_by_username(username, field_dict, object_types):
+    """
+    Runs a task to update a field value for all docs associated with a given user.
+
+    Args:
+        username (str): The username to query by
+        field_dict (dict): Dictionary of fields to update
+        object_types (list of str): The object types to update
+    """
+    update_field_values_by_query.delay(
+        query={"query": {"bool": {"must": [{"match": {"author_id": username}}]}}},
+        field_dict=field_dict,
+        object_types=object_types,
+    )
+
+
 def update_channel_index(channel_obj):
     """
     Runs a task to update the channel title, type for all posts and comments associated with the given channel.
@@ -185,7 +199,6 @@ def update_channel_index(channel_obj):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_author(user_id):
     """
     Run a task to update all fields of a profile document except id (username)
@@ -196,7 +209,6 @@ def update_author(user_id):
     tasks.update_author.delay(user_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_profile(user_obj):
     """
     Run a task to delete profile document
@@ -208,7 +220,6 @@ def delete_profile(user_obj):
         delete_document.delay(gen_profile_id(user_obj.username), PROFILE_TYPE)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_author_posts_comments(profile_id):
     """
     Run a task to update author name and avatar in all associated post and comment docs
@@ -219,7 +230,6 @@ def update_author_posts_comments(profile_id):
     tasks.update_author_posts_comments.delay(profile_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_post_removal_status(post_obj):
     """
     Serializes the removal status for a post object and runs a task to update that status
@@ -240,7 +250,6 @@ def update_post_removal_status(post_obj):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_comment_removal_status(comment_obj):
     """
     Serializes the removal status for a comment object and runs a task to update that status
@@ -256,7 +265,6 @@ def update_comment_removal_status(comment_obj):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def _update_parent_post_comment_count(comment_obj, incr_amount=1):
     """
     Updates the comment count for a post object (retrieved via a comment object)
@@ -283,7 +291,6 @@ decrement_parent_post_comment_count = partial(
 )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def set_post_to_deleted(post_obj):
     """
     Sets a post to deleted and updates child comments to be deleted as well.
@@ -297,7 +304,6 @@ def set_post_to_deleted(post_obj):
     update_field_for_all_post_comments(post_obj, field_name="deleted", field_value=True)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def set_comment_to_deleted(comment_obj):
     """
     Sets a comment to deleted and updates the parent post's comment count.
@@ -311,7 +317,6 @@ def set_comment_to_deleted(comment_obj):
     decrement_parent_post_comment_count(comment_obj)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_indexed_score(instance, instance_type, vote_action=None):
     """
     Runs a task to update the score for a post/comment document in ES.
@@ -344,7 +349,6 @@ def update_indexed_score(instance, instance_type, vote_action=None):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def upsert_course(course_id):
     """
     Run a task to create or update a course's Elasticsearch document
@@ -355,7 +359,6 @@ def upsert_course(course_id):
     tasks.upsert_course.delay(course_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_course(course_obj):
     """
     Runs a task to delete an ES Course document
@@ -368,7 +371,6 @@ def delete_course(course_obj):
     )
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def index_new_bootcamp(bootcamp_id):
     """
     Serializes a bootcamp object and runs a task to create an ES document for it.
@@ -379,7 +381,6 @@ def index_new_bootcamp(bootcamp_id):
     tasks.index_new_bootcamp.delay(bootcamp_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def update_bootcamp(bootcamp_id):
     """
     Run a task to update all fields of a bootcamp Elasticsearch document
@@ -390,7 +391,6 @@ def update_bootcamp(bootcamp_id):
     tasks.upsert_bootcamp.delay(bootcamp_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_bootcamp(bootcamp_obj):
     """
     Runs a task to delete an ES Bootcamp document
@@ -401,7 +401,6 @@ def delete_bootcamp(bootcamp_obj):
     delete_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), BOOTCAMP_TYPE)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def upsert_program(program_id):
     """
     Run a task to create or update a program Elasticsearch document
@@ -412,7 +411,6 @@ def upsert_program(program_id):
     tasks.upsert_program.delay(program_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_program(program_obj):
     """
     Runs a task to delete an ES Program document
@@ -423,7 +421,17 @@ def delete_program(program_obj):
     delete_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
 
 
-@if_feature_enabled(INDEX_UPDATES)
+def index_new_user_list(user_list_obj):
+    """
+    Serializes a UserList object and runs a task to create an ES document for it.
+
+    Args:
+        user_list_obj (course_catalog.models.UserList): A UserList object
+    """
+    data = ESUserListSerializer(user_list_obj).data
+    create_document.delay(gen_user_list_id(user_list_obj), data)
+
+
 def upsert_user_list(user_list_id):
     """
     Run a task to update all fields of a UserList Elasticsearch document
@@ -434,7 +442,6 @@ def upsert_user_list(user_list_id):
     tasks.upsert_user_list.delay(user_list_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_user_list(user_list_obj):
     """
     Runs a task to delete an ES UserList document
@@ -445,7 +452,6 @@ def delete_user_list(user_list_obj):
     delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def upsert_video(video_id):
     """
     Run a task to create or update a video Elasticsearch document
@@ -456,7 +462,6 @@ def upsert_video(video_id):
     tasks.upsert_video.delay(video_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_video(video_obj):
     """
     Runs a task to delete an ES Video document
