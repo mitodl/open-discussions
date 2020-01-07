@@ -24,3 +24,9 @@ def prevent_requests(mocker, request):
         autospec=True,
         side_effect=DoNotUseRequestException,
     )
+
+
+@pytest.fixture(autouse=True)
+def mocked_api(mocker):
+    """Mock object that patches search tasks so that indexing is not run in unrelated tests"""
+    return mocker.patch("search.tasks.api")
