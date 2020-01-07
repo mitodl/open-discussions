@@ -141,7 +141,6 @@
 
           a {
             color: black;
-            margin-right: 10px;
 
             &:hover {
               color: black;
@@ -152,6 +151,10 @@
           .grey {
             color: $font-grey-light;
           }
+        }
+
+        .lr-subtitle.subject a {
+          margin-right: 10px;
         }
       }
     }

@@ -1,6 +1,5 @@
 /* global SETTINGS:false */
 import { assert } from "chai"
-import R from "ramda"
 
 import {
   LearningResourceCard,
@@ -22,8 +21,7 @@ import {
   COURSE_AVAILABLE_NOW,
   LR_TYPE_ALL,
   LR_TYPE_BOOTCAMP,
-  LR_TYPE_COURSE,
-  offeredBys
+  LR_TYPE_COURSE
 } from "../lib/constants"
 import {
   COURSE_SEARCH_URL,
@@ -124,22 +122,21 @@ describe("LearningResourceCard", () => {
   })
 
   //
-  R.values(offeredBys).forEach(offeredBy => {
-    it(`should render offered_by`, async () => {
-      const object = makeLearningResource(LR_TYPE_COURSE)
-      object.offered_by = [offeredBy]
-      const { wrapper } = await render({ object })
-      const offeredBySubtitle = wrapper.find("Subtitle").at(0)
-      assert.equal(offeredBySubtitle.prop("label"), "Offered by - ")
-      const link = offeredBySubtitle.find("a")
-      assert.equal(link.text(), object.offered_by)
+  it("should render offered_bys as links", async () => {
+    const { wrapper } = await render()
+    const subtitle = wrapper.find("Subtitle").at(0)
+    const links = subtitle.find("a")
+    course.offered_by.forEach((name, i) => {
+      const link = links.at(i)
+      assert.equal(link.text(), name)
       assert.equal(
         link.prop("href"),
         `${COURSE_SEARCH_URL}${toQueryString({
-          o: object.offered_by
+          o: name
         })}`
       )
     })
+    assert.equal(subtitle.prop("label"), "Offered by - ")
   })
 
   //
