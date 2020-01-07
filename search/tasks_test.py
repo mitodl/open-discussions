@@ -51,6 +51,7 @@ from search.tasks import (
     finish_recreate_index,
     increment_document_integer_field,
     update_field_values_by_query,
+    index_new_bootcamp,
     index_posts,
     start_recreate_index,
     wrap_retry_exception,
@@ -100,6 +101,16 @@ def test_update_document_with_partial_task(mocked_api):
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
+
+
+def test_index_new_bootcamp(mocked_api):
+    """index_new_bootcamp should call create_document with the serialized bootcamp document based on the primary key"""
+    bootcamp = BootcampFactory.create()
+    index_new_bootcamp(bootcamp.id)
+    data = ESBootcampSerializer(bootcamp).data
+    mocked_api.create_document.assert_called_once_with(
+        gen_bootcamp_id(bootcamp.course_id), data
+    )
 
 
 def test_upsert_bootcamp_task(mocked_api):

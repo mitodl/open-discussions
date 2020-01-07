@@ -42,6 +42,8 @@ from search.task_helpers import (
     delete_video,
     upsert_user_list,
     delete_user_list,
+    index_new_bootcamp,
+    update_bootcamp,
 )
 from search.api import (
     gen_post_id,
@@ -528,3 +530,19 @@ def test_delete_user_list(mocker, list_type):
         gen_user_list_id(user_list),
         USER_LIST_TYPE,
     )
+
+
+def test_index_new_bootcamp(mocker):
+    """index_new_bootcamp should start a task to index a bootcamp document"""
+    patched = mocker.patch("search.task_helpers.tasks.index_new_bootcamp")
+    bootcamp_id = 345
+    index_new_bootcamp(bootcamp_id)
+    patched.delay.assert_called_once_with(bootcamp_id)
+
+
+def test_update_bootcamp(mocker):
+    """update_bootcamp should start a task to update the indexed document for the bootcamp"""
+    patched = mocker.patch("search.task_helpers.tasks.upsert_bootcamp")
+    bootcamp_id = 345
+    update_bootcamp(bootcamp_id)
+    patched.delay.assert_called_once_with(bootcamp_id)
