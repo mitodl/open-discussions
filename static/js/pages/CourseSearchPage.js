@@ -46,7 +46,8 @@ import {
   toArray,
   capitalize,
   getViewportWidth,
-  GRID_MOBILE_BREAKPOINT
+  GRID_MOBILE_BREAKPOINT,
+  isDoubleQuoted
 } from "../lib/util"
 import {
   mergeFacetResults,
@@ -398,7 +399,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
     const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
     const suggestions =
       !emptyOrNil(suggest) && !emptyOrNil(text)
-        ? R.without([text], suggest)
+        ? R.without([text], suggest).map(
+          suggestion =>
+            isDoubleQuoted(text) ? `"${suggestion}"` : suggestion
+        )
         : []
 
     return (

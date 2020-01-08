@@ -268,7 +268,7 @@ const _channelField = (type: ?string) => {
 }
 export { _channelField as channelField }
 import { channelField } from "./search"
-import { emptyOrNil } from "./util"
+import { emptyOrNil, isDoubleQuoted } from "./util"
 
 const getTypes = (type: ?(string | Array<string>)) => {
   if (type) {
@@ -577,12 +577,13 @@ export const buildLearnQuery = (
   facets: ?Map<string, Array<string>>
 ) => {
   for (const type of types) {
+    const queryType = isDoubleQuoted(text) ? "query_string" : "multi_match"
     const textQuery = emptyOrNil(text)
       ? {}
       : {
         should: [
           {
-            multi_match: {
+            [queryType]: {
               query:  text,
               fields: searchFields(type)
             }
@@ -592,7 +593,7 @@ export const buildLearnQuery = (
               nested: {
                 path:  "runs",
                 query: {
-                  multi_match: {
+                  [queryType]: {
                     query:  text,
                     fields: RESOURCE_QUERY_NESTED_FIELDS
                   }
