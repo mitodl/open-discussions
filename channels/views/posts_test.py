@@ -47,7 +47,7 @@ def test_create_url_post_existing_meta(
     LinkMetaFactory.create(url=link_url, thumbnail=thumbnail)
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     resp = user_client.post(url, {"title": "url title 🐨", "url": link_url})
-    assert embedly_stub.not_called()
+    embedly_stub.assert_not_called()
     assert resp.status_code == status.HTTP_201_CREATED
     assert resp.json() == {
         "title": "url title 🐨",
@@ -98,7 +98,7 @@ def test_post_create_post_new_meta(
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     user_client.post(url, {"title": "url title 🐨", "url": link_url})
-    assert embedly_stub.called_with(link_url)
+    embedly_stub.assert_called_with(link_url)
     assert LinkMeta.objects.filter(url=link_url).first() is not None
 
 
@@ -116,7 +116,7 @@ def test_post_create_post_no_thumbnail(
     )
     url = reverse("post-list", kwargs={"channel_name": channel.name})
     user_client.post(url, {"title": "url title 🐨", "url": link_url})
-    assert embedly_stub.called_once()
+    embedly_stub.assert_called_once_with(link_url)
     assert LinkMeta.objects.filter(url=url).first() is None
 
 
