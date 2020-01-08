@@ -67,7 +67,7 @@ const offeredBySearchLink = offeredBy => (
 )
 
 const Subtitle = ({ label, content }) => (
-  <div className="row subtitle">
+  <div className="subtitle">
     <div className="lr-subtitle">
       <span className="grey">{label}</span>
       {content}
@@ -173,20 +173,22 @@ export function LearningResourceDisplay(props: Props) {
         </div>
         {reordering ? null : (
           <>
-            {object.offered_by.length ? (
-              <Subtitle
-                content={offeredBySearchLink(object.offered_by.join(", "))}
-                label="Offered by - "
-              />
-            ) : null}
-            {object.topics.length > 0 ? (
-              <Subtitle
-                content={formatTopics(object.topics)}
-                label={`${
-                  object.topics.length === 1 ? "Subject" : "Subjects"
-                } - `}
-              />
-            ) : null}
+            <div className="row subtitles">
+              {object.offered_by.length ? (
+                <Subtitle
+                  content={offeredBySearchLink(object.offered_by.join(", "))}
+                  label="Offered by - "
+                />
+              ) : null}
+              {object.topics.length > 0 ? (
+                <Subtitle
+                  content={formatTopics(object.topics)}
+                  label={`${
+                    object.topics.length === 1 ? "Subject" : "Subjects"
+                  } - `}
+                />
+              ) : null}
+            </div>
             <div className="row availability-price-favorite">
               {cost ? (
                 <div className="price grey-surround">
