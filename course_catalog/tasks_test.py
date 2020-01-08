@@ -136,7 +136,6 @@ def test_get_ocw_data(
     mock_blacklist.assert_called_once()
     assert Course.objects.first().published is not blacklisted
 
-    # mocker.patch("course_catalog.api.load_course_blacklist", return_value=[])
     get_ocw_data.delay()
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1

@@ -683,7 +683,7 @@ def test_load_courses(mocker, mock_blacklist):
     )
     load_courses(course_data)
     assert mock_load_course.call_count == len(course_data)
-    assert mock_blacklist.called_once()
+    mock_blacklist.assert_called_once()
 
 
 def test_load_programs(mocker, mock_blacklist):
@@ -694,4 +694,4 @@ def test_load_programs(mocker, mock_blacklist):
     )
     load_programs(program_data)
     assert mock_load_program.call_count == len(program_data)
-    assert mock_blacklist.called_once()
+    mock_blacklist.assert_called_once()

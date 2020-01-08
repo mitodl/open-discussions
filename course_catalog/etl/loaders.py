@@ -208,7 +208,7 @@ def load_program(program_data, blacklist):
 
 def load_programs(programs_data):
     """Load a list of programs"""
-    blacklist = []  # load_course_blacklist()
+    blacklist = load_course_blacklist()
     return [load_program(program_data, blacklist) for program_data in programs_data]
 
 
