@@ -43,6 +43,10 @@
       "description": "S3 Bucket name.",
       "required": false
     },
+    "BLACKLISTED_COURSES_URL": {
+      "description": "URL of a text file containing blacklisted course ids",
+      "required": false
+    },
     "BOOTCAMPS_URL": {
       "description": "URL to retrieve bootcamps data",
       "required": false

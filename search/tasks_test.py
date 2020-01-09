@@ -330,6 +330,7 @@ def test_start_recreate_index(
     """
     settings.INDEXING_API_USERNAME = user.username
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    mock_blacklist = mocker.patch("search.tasks.load_course_blacklist", return_value=[])
     UserFactory.create_batch(
         4, is_active=False
     )  # these should not show up in the indexing
@@ -370,6 +371,7 @@ def test_start_recreate_index(
         }
     )
     assert mocked_celery.group.call_count == 1
+    mock_blacklist.assert_called_once()
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
     # in that generator, 'list' is being called to force iteration through all of those items.

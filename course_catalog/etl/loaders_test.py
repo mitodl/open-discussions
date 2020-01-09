@@ -22,6 +22,8 @@ from course_catalog.etl.loaders import (
     load_playlists,
     load_video_channels,
     load_playlist_user_list,
+    load_courses,
+    load_programs,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -50,6 +52,14 @@ from course_catalog.models import (
 )
 
 pytestmark = pytest.mark.django_db
+
+
+@pytest.fixture(autouse=True)
+def mock_blacklist(mocker):
+    """Mock the load_course_blacklist function"""
+    return mocker.patch(
+        "course_catalog.etl.loaders.load_course_blacklist", return_value=[]
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -150,7 +160,8 @@ def test_load_program(
                 {"course_id": course.course_id, "platform": course.platform}
                 for course in courses
             ],
-        }
+        },
+        [],
     )
 
     if program_exists and not is_published:
@@ -188,7 +199,8 @@ def test_load_program(
 
 @pytest.mark.parametrize("course_exists", [True, False])
 @pytest.mark.parametrize("is_published", [True, False])
-def test_load_course(mock_upsert_tasks, course_exists, is_published):
+@pytest.mark.parametrize("blacklisted", [True, False])
+def test_load_course(mock_upsert_tasks, course_exists, is_published, blacklisted):
     """Test that load_course loads the course"""
     course = (
         CourseFactory.create(runs=None, published=is_published)
@@ -210,11 +222,13 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published):
     del run["id"]
     props["runs"] = [run]
 
-    result = load_course(props)
+    blacklist = [course.course_id] if blacklisted else []
 
-    if course_exists and not is_published:
+    result = load_course(props, blacklist)
+
+    if course_exists and not is_published and not blacklisted:
         mock_upsert_tasks.delete_course.assert_called_with(result)
-    elif is_published:
+    elif is_published and not blacklisted:
         mock_upsert_tasks.upsert_course.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
@@ -659,3 +673,25 @@ def test_load_playlist_user_list(
             mock_upsert_tasks.delete_user_list.assert_called_once_with(user_list)
         else:
             mock_upsert_tasks.delete_user_list.assert_not_called()
+
+
+def test_load_courses(mocker, mock_blacklist):
+    """Test that load_courses calls the expected functions"""
+    course_data = [{"a": "b"}, {"a": "c"}]
+    mock_load_course = mocker.patch(
+        "course_catalog.etl.loaders.load_course", autospec=True
+    )
+    load_courses(course_data)
+    assert mock_load_course.call_count == len(course_data)
+    mock_blacklist.assert_called_once()
+
+
+def test_load_programs(mocker, mock_blacklist):
+    """Test that load_programs calls the expected functions"""
+    program_data = [{"a": "b"}, {"a": "c"}]
+    mock_load_program = mocker.patch(
+        "course_catalog.etl.loaders.load_program", autospec=True
+    )
+    load_programs(program_data)
+    assert mock_load_program.call_count == len(program_data)
+    mock_blacklist.assert_called_once()
