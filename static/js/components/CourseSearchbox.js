@@ -5,6 +5,7 @@ import { validationMessage } from "../lib/validation"
 
 type Props = {
   onChange?: Function,
+  onClear?: Function,
   value?: string,
   onSubmit: Function,
   validation?: ?string,
@@ -13,7 +14,15 @@ type Props = {
 }
 
 export default function CourseSearchbox(props: Props) {
-  const { onChange, value, onSubmit, validation, autoFocus, children } = props
+  const {
+    onChange,
+    onClear,
+    value,
+    onSubmit,
+    validation,
+    autoFocus,
+    children
+  } = props
 
   const [text, setText] = useState("")
 
@@ -44,6 +53,11 @@ export default function CourseSearchbox(props: Props) {
         >
           search
         </i>
+        {value ? (
+          <i className="material-icons clear-icon" onClick={onClear}>
+            clear
+          </i>
+        ) : null}
         {children}
       </div>
       {validationMessage(validation)}
