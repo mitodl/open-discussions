@@ -27,14 +27,22 @@
     i.material-icons {
       position: absolute;
       top: 12px;
-      right: 10px;
       font-size: 33px;
       cursor: pointer;
     }
 
+    i.search-icon {
+      left: 10px;
+      width: 50px;
+    }
+
+    i.clear-icon {
+      right: 10px;
+    }
+
     input.search-input {
       height: 100%;
-      padding-left: 20px;
+      padding-left: 50px;
       font-size: 20px;
       border-radius: 7px;
       border: none;
