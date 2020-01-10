@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.106.1
+Version 0.106.1 (Released January 10, 2020)
 ---------------
 
 - Update indexing methods to reduce data sent to and from redis via celery  (#2520)
