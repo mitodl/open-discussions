@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.107.0
+Version 0.107.0 (Released January 13, 2020)
 ---------------
 
 - ensure course cards have the same height
