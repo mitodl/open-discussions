@@ -63,7 +63,7 @@ def test_create_document(mocked_es, mocker, object_type):
     )
     create_document(doc_id, data)
     mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
-    mocked_es.get_conn.assert_called_once_with(verify=True)
+    mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.create.assert_any_call(
         index=object_type, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id
     )
@@ -87,7 +87,7 @@ def test_update_field_values_by_query(
     }
     update_field_values_by_query(query, {field_name: field_value})
 
-    mocked_es.get_conn.assert_called_once_with(verify=True)
+    mocked_es.get_conn.assert_called_once_with()
     for alias in mocked_es.active_aliases:
         mocked_es.conn.update_by_query.assert_any_call(
             index=alias,
@@ -118,7 +118,7 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     doc_id, data = ("doc_id", {"key1": "value1"})
     update_document_with_partial(doc_id, data, object_type)
     mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
-    mocked_es.get_conn.assert_called_once_with(verify=True)
+    mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.update.assert_called_once_with(
         index=object_type,
         doc_type=GLOBAL_DOC_TYPE,
@@ -166,7 +166,7 @@ def test_increment_document_integer_field(mocked_es):
     """
     doc_id, field_name, incr_amount = ("doc_id", "some_field_name", 1)
     increment_document_integer_field(doc_id, field_name, incr_amount, POST_TYPE)
-    mocked_es.get_conn.assert_called_once_with(verify=True)
+    mocked_es.get_conn.assert_called_once_with()
 
     for alias in mocked_es.active_aliases:
         mocked_es.conn.update.assert_any_call(
@@ -294,7 +294,7 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
     assert create_backing_index(POST_TYPE) == backing_index
 
     get_conn_mock = mocked_es.get_conn
-    get_conn_mock.assert_called_once_with(verify=False)
+    get_conn_mock.assert_called_once_with()
     make_backing_index_mock.assert_called_once_with(POST_TYPE)
     clear_and_create_mock.assert_called_once_with(
         index_name=backing_index, object_type=POST_TYPE

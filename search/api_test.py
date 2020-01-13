@@ -103,19 +103,17 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
-def test_execute_search(mocker, user):
+def test_execute_search(user, elasticsearch):
     """execute_search should execute an Elasticsearch search"""
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
     assert (
-        execute_search(user=user, query=query)
-        == get_conn_mock.return_value.search.return_value
+        execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
     )
-    get_conn_mock.return_value.search.assert_called_once_with(
+    elasticsearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -193,10 +191,9 @@ def test_execute_search(mocker, user):
     )
 
 
-def test_execute_learn_search(mocker, user):
+def test_execute_learn_search(user, elasticsearch):
     """execute_search should execute an Elasticsearch search"""
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-    get_conn_mock.return_value.search.return_value = {"hits": {"total": 10}}
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -204,9 +201,9 @@ def test_execute_learn_search(mocker, user):
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
-        == get_conn_mock.return_value.search.return_value
+        == elasticsearch.conn.search.return_value
     )
-    get_conn_mock.return_value.search.assert_called_once_with(
+    elasticsearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -247,17 +244,14 @@ def test_execute_learn_search(mocker, user):
     )
 
 
-def test_execute_search_anonymous(mocker):
+def test_execute_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
-        execute_search(user=user, query=query)
-        == get_conn_mock.return_value.search.return_value
+        execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
     )
-    get_conn_mock.return_value.search.assert_called_once_with(
+    elasticsearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -328,17 +322,16 @@ def test_execute_search_anonymous(mocker):
     )
 
 
-def test_execute_learn_search_anonymous(mocker):
+def test_execute_learn_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-    get_conn_mock.return_value.search.return_value = {"hits": {"total": 10}}
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
-        == get_conn_mock.return_value.search.return_value
+        == elasticsearch.conn.search.return_value
     )
-    get_conn_mock.return_value.search.assert_called_once_with(
+    elasticsearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -378,19 +371,18 @@ def test_execute_learn_search_anonymous(mocker):
     )
 
 
-def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
+def test_find_related_documents(settings, elasticsearch, user, gen_query_filters_mock):
     """find_related_documents should execute a more-like-this query"""
     posts_to_return = 7
     settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT = posts_to_return
     post_id = "abc"
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
 
     assert (
         find_related_documents(user=user, post_id=post_id)
-        == get_conn_mock.return_value.search.return_value
+        == elasticsearch.conn.search.return_value
     )
     assert gen_query_filters_mock.call_count == 1
-    constructed_query = get_conn_mock.return_value.search.call_args[1]
+    constructed_query = elasticsearch.conn.search.call_args[1]
     assert constructed_query["body"]["query"] == {
         "more_like_this": {
             "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
@@ -403,7 +395,7 @@ def test_find_related_documents(settings, mocker, user, gen_query_filters_mock):
     assert constructed_query["body"]["size"] == posts_to_return
 
 
-def test_find_similar_resources(settings, mocker, user):
+def test_find_similar_resources(settings, elasticsearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 4
     settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT = resources_to_return
@@ -418,8 +410,7 @@ def test_find_similar_resources(settings, mocker, user):
         "id": course.id,
         "object_type": COURSE_TYPE,
     }
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
-    get_conn_mock.return_value.search.return_value = {
+    elasticsearch.conn.search.return_value = {
         "hits": {
             "hits": [
                 {"_source": ESCourseSerializer(course).data},
@@ -434,9 +425,9 @@ def test_find_similar_resources(settings, mocker, user):
 
     assert find_similar_resources(user=user, value_doc=value_doc) == [
         hit["_source"]
-        for hit in get_conn_mock.return_value.search.return_value["hits"]["hits"][1:5]
+        for hit in elasticsearch.conn.search.return_value["hits"]["hits"][1:5]
     ]
-    constructed_query = get_conn_mock.return_value.search.call_args[1]
+    constructed_query = elasticsearch.conn.search.call_args[1]
     assert extract_values(constructed_query, "more_like_this") == [
         {
             "like": {"doc": value_doc, "fields": list(value_doc.keys())},
@@ -657,13 +648,12 @@ def test_transform_results(
     )
 
 
-def test_get_similar_topics(settings, mocker):
+def test_get_similar_topics(settings, elasticsearch):
     """Test get_similar_topics makes a query for similar document topics"""
     input_doc = {"title": "title text", "description": "description text"}
-    get_conn_mock = mocker.patch("search.api.get_conn", autospec=True)
 
     # topic d is least popular and should not show up, order does not matter
-    get_conn_mock.return_value.search.return_value = {
+    elasticsearch.conn.search.return_value = {
         "hits": {
             "hits": [
                 {"_source": {"topics": ["topic a", "topic b", "topic d"]}},
@@ -678,7 +668,7 @@ def test_get_similar_topics(settings, mocker):
     # results should be top 3 in decreasing order of frequency
     assert get_similar_topics(input_doc, 3, 1, 15) == ["topic a", "topic c", "topic b"]
 
-    get_conn_mock.return_value.search.assert_called_once_with(
+    elasticsearch.conn.search.assert_called_once_with(
         body={
             "_source": {"includes": "topics"},
             "query": {

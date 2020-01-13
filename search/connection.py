@@ -9,55 +9,36 @@ from elasticsearch_dsl.connections import connections
 
 from search.constants import VALID_OBJECT_TYPES
 
-_CONN = None
-# When we create the connection, check to make sure all appropriate mappings exist
-_CONN_VERIFIED = False
 
-
-def get_conn(*, verify=True):
+def configure_connections():
     """
-    Lazily create the connection.
+    Create connections for the application
 
-    Args:
-        verify (bool): If true, check the presence of indices and mappings
+    This should only be called once
+    """
+    # this is the default connection
+    http_auth = settings.ELASTICSEARCH_HTTP_AUTH
+    use_ssl = http_auth is not None
+    # configure() lazily creates connections when get_connection() is called
+    connections.configure(
+        default={
+            "hosts": [settings.ELASTICSEARCH_URL],
+            "http_auth": http_auth,
+            "use_ssl": use_ssl,
+            # make sure we verify SSL certificates (off by default)
+            "verify_certs": use_ssl,
+        }
+    )
+
+
+def get_conn():
+    """
+    Get the default connection
 
     Returns:
         elasticsearch.client.Elasticsearch: An Elasticsearch client
     """
-    # pylint: disable=global-statement
-    global _CONN
-    global _CONN_VERIFIED
-
-    do_verify = False
-    if _CONN is None:
-        http_auth = settings.ELASTICSEARCH_HTTP_AUTH
-        use_ssl = http_auth is not None
-        _CONN = connections.create_connection(
-            hosts=[settings.ELASTICSEARCH_URL],
-            http_auth=http_auth,
-            use_ssl=use_ssl,
-            # make sure we verify SSL certificates (off by default)
-            verify_certs=use_ssl,
-        )
-        # Verify connection on first connect if verify=True.
-        do_verify = verify
-
-    if verify and not _CONN_VERIFIED:
-        # If we have a connection but haven't verified before, do it now.
-        do_verify = True
-
-    if not do_verify:
-        if not verify:
-            # We only skip verification if we're reindexing or
-            # deleting the index. Make sure we verify next time we connect.
-            _CONN_VERIFIED = False
-        return _CONN
-
-    if len(get_active_aliases(_CONN, VALID_OBJECT_TYPES)) == 0:
-        raise Exception("Unable to find any active indices to update")
-
-    _CONN_VERIFIED = True
-    return _CONN
+    return connections.get_connection()
 
 
 def make_backing_index_name(object_type):
@@ -130,4 +111,5 @@ def refresh_index(index):
     Args:
         index (str): The elasticsearch index to refresh
     """
-    get_conn().indices.refresh(index)
+    conn = get_conn()
+    conn.indices.refresh(index)
