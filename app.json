@@ -75,7 +75,8 @@
       "description": "Basic auth settings for connecting to Elasticsearch"
     },
     "ELASTICSEARCH_INDEX": {
-      "description": "Index to use on Elasticsearch"
+      "description": "Index to use on Elasticsearch",
+      "required": true
     },
     "ELASTICSEARCH_INDEXING_CHUNK_SIZE": {
       "description": "Chunk size to use for Elasticsearch indexing tasks",

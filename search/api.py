@@ -19,7 +19,7 @@ from course_catalog.constants import PrivacyLevel
 from course_catalog.models import FavoriteItem
 from course_catalog.utils import get_list_items_by_resource
 from open_discussions.utils import extract_values
-from search.connection import get_conn, get_default_alias_name
+from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     GLOBAL_DOC_TYPE,
@@ -247,7 +247,7 @@ def execute_search(*, user, query):
         dict: The Elasticsearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
+    search = Search(index=index)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
     return search.execute().to_dict()
@@ -265,7 +265,7 @@ def execute_learn_search(*, user, query):
         dict: The Elasticsearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
+    search = Search(index=index)
     search.update_from_dict(query)
     search = _apply_learning_query_filters(search, user)
     return transform_results(search.execute().to_dict(), user)
@@ -354,7 +354,7 @@ def find_related_documents(*, user, post_id):
         dict: The Elasticsearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
+    search = Search(index=index)
     search = _apply_general_query_filters(search, user)
     search = search.query(
         MoreLikeThis(
@@ -382,7 +382,7 @@ def find_similar_resources(*, user, value_doc):
         dict: The Elasticsearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
+    search = Search(index=index)
     search = _apply_general_query_filters(search, user)
     search = search.filter(Q("terms", object_type=LEARNING_RESOURCE_TYPES))
     search = search.query(
@@ -424,7 +424,7 @@ def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):
             list of topic values
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index, using=get_conn())
+    search = Search(index=index)
     search = search.filter(Q("terms", object_type=[COURSE_TYPE]))
     search = search.query(
         MoreLikeThis(

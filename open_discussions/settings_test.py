@@ -15,6 +15,7 @@ import semantic_version
 
 
 REQUIRED_SETTINGS = {
+    "ELASTICSEARCH_URL": "http://localhost:9300/",
     "ELASTICSEARCH_INDEX": "some_index",
     "MAILGUN_SENDER_DOMAIN": "mailgun.fake.domain",
     "MAILGUN_KEY": "fake_mailgun_key",

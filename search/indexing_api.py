@@ -218,7 +218,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
         raise ValueError(
             "A valid object type must be specified when clearing and creating an index"
         )
-    conn = get_conn(verify=False)
+    conn = get_conn()
     if conn.indices.exists(index_name):
         conn.indices.delete(index_name)
     index_create_data = {
@@ -265,7 +265,7 @@ def create_document(doc_id, data):
         doc_id (str): The ES document id
         data (dict): Full ES document data
     """
-    conn = get_conn(verify=True)
+    conn = get_conn()
     for alias in get_active_aliases(conn, [data["object_type"]]):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
@@ -278,7 +278,7 @@ def delete_document(doc_id, object_type):
         doc_id (str): The ES document id
         object_type (str): The object type
     """
-    conn = get_conn(verify=True)
+    conn = get_conn()
     for alias in get_active_aliases(conn, [object_type]):
         try:
             conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
@@ -306,7 +306,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
         params.update({new_param: field_value})
     if not object_types:
         object_types = VALID_OBJECT_TYPES
-    conn = get_conn(verify=True)
+    conn = get_conn()
     for alias in get_active_aliases(conn, object_types):
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
@@ -343,7 +343,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
     """
-    conn = get_conn(verify=True)
+    conn = get_conn()
     for alias in get_active_aliases(conn, [object_type]):
         try:
             conn.update(
@@ -545,7 +545,7 @@ def create_backing_index(object_type):
     Returns:
         str: The new backing index
     """
-    conn = get_conn(verify=False)
+    conn = get_conn()
 
     # Create new backing index for reindex
     new_backing_index = make_backing_index_name(object_type)
@@ -573,7 +573,7 @@ def switch_indices(backing_index, object_type):
         backing_index (str): The backing index of the reindex alias
         object_type (str): The object type for the index (post, comment, etc)
     """
-    conn = get_conn(verify=False)
+    conn = get_conn()
     actions = []
     old_backing_indexes = []
     default_alias = get_default_alias_name(object_type)
