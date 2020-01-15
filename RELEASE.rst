@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.107.1
+Version 0.107.1 (Released January 15, 2020)
 ---------------
 
 - Improve ES performance by not validating connection for read operations
