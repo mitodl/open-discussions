@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.107.1 (Released January 15, 2020)
+---------------
+
+- Improve ES performance by not validating connection for read operations
+- add ability to share learning resources
+- Added support for user list items in frontend
+- Bump handlebars from 4.1.2 to 4.5.3 (#2514)
+- Fix a few typos in tests (#2531)
+
 Version 0.107.0 (Released January 13, 2020)
 ---------------
 
