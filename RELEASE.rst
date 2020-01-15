@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.107.2
+---------------
+
+- fix scrollbar on post sort picker
+
 Version 0.107.1 (Released January 15, 2020)
 ---------------
 
