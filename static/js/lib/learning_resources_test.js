@@ -95,7 +95,7 @@ describe("Course utils", () => {
     [LR_TYPE_COURSE, "Courses"],
     [LR_TYPE_BOOTCAMP, "Bootcamps"],
     [LR_TYPE_PROGRAM, "Programs"],
-    [LR_TYPE_USERLIST, "User Lists"],
+    [LR_TYPE_USERLIST, "Learning Lists"],
     [LR_TYPE_LEARNINGPATH, "Learning Paths"]
   ].forEach(([searchType, facetText]) => {
     it(`facet text should be ${facetText} for resource type ${searchType}`, () => {

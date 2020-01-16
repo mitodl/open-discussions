@@ -98,8 +98,8 @@ export default function UserListFormDialog(props: Props) {
                   value={LR_TYPE_USERLIST}
                 />
                 <label htmlFor="type-list">
-                  <span className="header">Custom List</span>
-                  Create a custom list of any of our learning resources
+                  <span className="header">Learning List</span>
+                  Create a list of any of our learning resources
                 </label>
               </div>
               <div className="option">

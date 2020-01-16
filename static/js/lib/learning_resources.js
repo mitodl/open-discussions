@@ -153,7 +153,7 @@ export const filterRunsByAvailability = (
 export const resourceLabel = (resource: string) => {
   switch (resource) {
   case LR_TYPE_USERLIST:
-    return "User Lists"
+    return "Learning Lists"
   case LR_TYPE_LEARNINGPATH:
     return "Learning Paths"
   default:
