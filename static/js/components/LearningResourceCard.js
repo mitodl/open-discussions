@@ -170,7 +170,7 @@ export function LearningResourceDisplay(props: Props) {
           {readableLearningResources[object.object_type]}
         </div>
         <div className="row course-title" onClick={showResourceDrawer}>
-          <Dotdotdot clamp={2}>{object.title}</Dotdotdot>
+          <Dotdotdot clamp={3}>{object.title}</Dotdotdot>
         </div>
         {reordering ? null : (
           <>
