@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.107.3
+Version 0.107.3 (Released January 16, 2020)
 ---------------
 
 - fix LR card height when reordering learning path
