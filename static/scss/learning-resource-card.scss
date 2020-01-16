@@ -42,6 +42,12 @@
   }
 
   &.list-view {
+    &:not(.reordering) {
+      .lr-info {
+        height: 130px;
+      }
+    }
+
     .card-contents {
       display: flex;
 
@@ -63,10 +69,6 @@
         .video-play-icon {
           height: 75px;
         }
-      }
-
-      .lr-info {
-        height: 130px;
       }
     }
 
