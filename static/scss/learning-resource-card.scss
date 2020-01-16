@@ -33,7 +33,7 @@
   &.borderless {
     .lr-info {
       padding: 16px;
-      height: 160px;
+      min-height: 160px;
     }
 
     .cover-image img {
@@ -44,7 +44,7 @@
   &.list-view {
     &:not(.reordering) {
       .lr-info {
-        height: 130px;
+        min-height: 130px;
       }
     }
 
@@ -169,7 +169,7 @@
     &.course-title {
       margin: 10px 0;
       margin-top: 2px;
-      min-height: 40px;
+      min-height: 62px;
       font-size: 18px;
       color: black;
       font-weight: 500;
