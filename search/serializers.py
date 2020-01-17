@@ -391,6 +391,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "published",
             "offered_by",
             "runs",
+            "created_on",
         ]
 
         read_only_fields = fields
@@ -419,6 +420,7 @@ class ESBootcampSerializer(ESCourseSerializer):
             "published",
             "offered_by",
             "runs",
+            "created_on",
         ]
 
         read_only_fields = fields
@@ -443,6 +445,7 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
             "topics",
             "runs",
             "offered_by",
+            "created_on",
         ]
 
         read_only_fields = fields
@@ -506,6 +509,7 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "published",
             "runs",
             "offered_by",
+            "created_on",
         ]
 
         read_only_fields = fields
