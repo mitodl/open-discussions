@@ -307,6 +307,7 @@ def test_es_course_serializer(offered_by):
             ],
             "published": True,
             "offered_by": list(course.offered_by.values_list("name", flat=True)),
+            "created_on": course.created_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         },
     )
 
@@ -333,6 +334,7 @@ def test_es_program_serializer(offered_by):
                 for program_run in program.runs.order_by("-best_start_date")
             ],
             "offered_by": list(program.offered_by.values_list("name", flat=True)),
+            "created_on": program.created_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
         },
     )
 
