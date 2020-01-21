@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS: false */
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
@@ -137,6 +137,19 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     selectedRun && selectedRun.instructors
       ? selectedRun.instructors.map(instructor => getInstructorName(instructor))
       : []
+
+  useEffect(
+    () => {
+      if (
+        object &&
+        !isUserList(object.object_type) &&
+        object.object_type !== LR_TYPE_PROGRAM
+      ) {
+        setShowSimilar(true)
+      }
+    },
+    [object]
+  )
 
   return (
     <React.Fragment>

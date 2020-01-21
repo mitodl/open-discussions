@@ -212,8 +212,14 @@ describe("ExpandedLearningResourceDisplay", () => {
         .find(".expanded-learning-resource-list")
         .at(listIdx)
       assert.ok(similarResourcesDiv.exists())
-      assert.equal(similarResourcesDiv.find("LearningResourceRow").length, 0)
-      similarResourcesDiv.find("i").simulate("click")
+
+      if (
+        isUserList(object.object_type) ||
+        object.object_type === LR_TYPE_PROGRAM
+      ) {
+        assert.equal(similarResourcesDiv.find("LearningResourceRow").length, 0)
+        similarResourcesDiv.find("i").simulate("click")
+      }
       assert.equal(
         wrapper
           .find(".expanded-learning-resource-list")
@@ -411,8 +417,9 @@ describe("ExpandedLearningResourceDisplay", () => {
       )
       assert.equal(
         wrapper
-          .find(".attach_money")
-          .closest(".info-row")
+          .find(".lr-metadata")
+          .find(".info-row")
+          .at(0)
           .find(".value")
           .text(),
         "$25.50"
