@@ -5,6 +5,7 @@ from social_core.backends.saml import SAMLAuth
 from social_core.exceptions import AuthException
 from social_core.pipeline.partial import partial
 from django.conf import settings
+from django.db import transaction
 
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.exceptions import (
@@ -88,15 +89,15 @@ def require_password_and_profile_via_email(
     data = strategy.request_data()
     profile = user.profile
 
-    if "name" in data:
-        profile.name = data["name"]
-        profile.save()
+    with transaction.atomic():
+        if "name" in data:
+            profile = profile_api.ensure_profile(user, {"name": data["name"]})
 
-    if "password" in data:
-        user.set_password(data["password"])
-        user.save()
+        if "password" in data:
+            user.set_password(data["password"])
+            user.save()
 
-    if not user.password or not user.profile.name:
+    if not user.password or not profile.name:
         raise RequirePasswordAndProfileException(backend, current_partial)
 
     return {"user": user, "profile": profile or user.profile}
@@ -120,20 +121,19 @@ def require_profile_update_user_via_saml(
     if backend.name != SAMLAuth.name or not is_new:
         return {}
 
-    profile_api.ensure_profile(user)
+    with transaction.atomic():
+        try:
+            update_full_name(
+                user,
+                kwargs["response"]["attributes"][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][
+                    0
+                ],
+            )
+        except (KeyError, IndexError):
+            # No name information passed, skipping
+            pass
 
-    try:
-        update_full_name(
-            user,
-            kwargs["response"]["attributes"][SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME][0],
-        )
-    except (KeyError, IndexError):
-        # No name information passed, skipping
-        pass
-
-    profile = user.profile
-    profile.name = user.get_full_name()
-    profile.save()
+        profile = profile_api.ensure_profile(user, {"name": user.get_full_name()})
 
     return {"user": user, "profile": profile}
 

@@ -1,7 +1,6 @@
 """User fixtures"""
 # pylint: disable=unused-argument, redefined-outer-name
 from io import BytesIO
-from types import SimpleNamespace
 
 import pytest
 from PIL import Image
@@ -10,16 +9,6 @@ from rest_framework_jwt.settings import api_settings
 
 from open_discussions.factories import UserFactory
 from sites.factories import AuthenticatedSiteFactory
-
-
-@pytest.fixture
-def mock_index_functions(mocker):
-    """Mocks index updating functions for profiles"""
-    return SimpleNamespace(
-        new_profile=mocker.patch("search.task_helpers.index_new_profile"),
-        update_author=mocker.patch("search.task_helpers.update_author"),
-        update_posts=mocker.patch("search.task_helpers.update_author_posts_comments"),
-    )
 
 
 @pytest.fixture

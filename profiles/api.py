@@ -1,6 +1,8 @@
 """Profile API"""
 import tldextract
 
+from django.db import transaction
+
 from channels.models import ChannelGroupRole
 from profiles.models import (
     Profile,
@@ -8,6 +10,7 @@ from profiles.models import (
     SITE_TYPE_OPTIONS,
     PERSONAL_SITE_TYPE,
 )
+from search import task_helpers as search_task_helpers
 
 
 def ensure_profile(user, profile_data=None):
@@ -23,8 +26,31 @@ def ensure_profile(user, profile_data=None):
     """
     defaults = filter_profile_props(profile_data) if profile_data else {}
 
-    profile, _ = Profile.objects.get_or_create(user=user, defaults=defaults)
+    profile, _ = Profile.objects.update_or_create(user=user, defaults=defaults)
+
+    after_profile_created_or_updated(profile)
+
     return profile
+
+
+def after_profile_created_or_updated(profile):
+    """
+    Operations that should be run after the profile has been created or updated
+
+    Args:
+        profile (profiles.models.Profile): the profile that was created or updated
+    """
+
+    def _after_profile_created_or_updated():
+        """
+        Operations that should be run after the profile create or update is committed
+        """
+        search_task_helpers.upsert_profile(profile.id)
+        search_task_helpers.update_author_posts_comments(profile.id)
+
+    # this will either get called when the outermost transaction commits or otherwise immediately
+    # this avoids race conditions where the async tasks may not see the record or the updated values
+    transaction.on_commit(_after_profile_created_or_updated)
 
 
 def get_channels(user):

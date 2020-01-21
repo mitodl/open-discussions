@@ -24,6 +24,7 @@ from search.api import (
     gen_program_id,
     gen_video_id,
     gen_user_list_id,
+    gen_profile_id,
 )
 from search.constants import (
     BOOTCAMP_TYPE,
@@ -34,6 +35,7 @@ from search.constants import (
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
     USER_LIST_TYPE,
+    PROFILE_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
@@ -42,6 +44,7 @@ from search.serializers import (
     ESProgramSerializer,
     ESVideoSerializer,
     ESUserListSerializer,
+    ESProfileSerializer,
 )
 from search.tasks import (
     create_document,
@@ -64,6 +67,7 @@ from search.tasks import (
     upsert_program,
     upsert_video,
     upsert_user_list,
+    upsert_profile,
 )
 
 
@@ -323,7 +327,7 @@ def test_index_videos(mocker, with_error):  # pylint: disable=unused-argument
 
 
 def test_start_recreate_index(
-    mock_index_functions, mocker, mocked_celery, user
+    mocker, mocked_celery, user
 ):  # pylint:disable=too-many-locals
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
@@ -441,3 +445,24 @@ def test_delete_document(mocker):
     delete_document_mock = mocker.patch("search.indexing_api.delete_document")
     delete_document.delay(1, "course").get()
     delete_document_mock.assert_called_once_with(1, "course")
+
+
+@pytest.mark.parametrize("is_indexing_user", [True, False])
+def test_upsert_profile_task(mocked_api, user, settings, is_indexing_user):
+    """Test that upsert_profile will serialize the profile data and upsert it to the ES index"""
+    if is_indexing_user:
+        user.username = settings.INDEXING_API_USERNAME
+        user.save()
+
+    upsert_profile(user.profile.id)
+
+    if is_indexing_user:
+        mocked_api.upsert_document.assert_not_called()
+    else:
+        data = ESProfileSerializer().serialize(user.profile)
+        mocked_api.upsert_document.assert_called_once_with(
+            gen_profile_id(user.username),
+            data,
+            PROFILE_TYPE,
+            retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+        )

@@ -108,10 +108,13 @@ def test_serialize_create_user(db, mocker):
         ("toc_optin", False),
     ],
 )
-def test_update_user_profile(mock_index_functions, user, key, value):
+def test_update_user_profile(mocker, user, key, value):
     """
     Test updating a profile via the UserSerializer
     """
+    mock_after_profile_created_or_updated = mocker.patch(
+        "profiles.serializers.after_profile_created_or_updated"
+    )
     profile = user.profile
 
     serializer = UserSerializer(
@@ -140,12 +143,7 @@ def test_update_user_profile(mock_index_functions, user, key, value):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    assert mock_index_functions.update_author.call_count == (
-        1 if key in ["name", "headline", "bio"] else 0
-    )
-    assert mock_index_functions.update_posts.call_count == (
-        1 if key in ["name", "headline"] else 0
-    )
+    mock_after_profile_created_or_updated.assert_called_once_with(profile)
 
 
 @pytest.mark.parametrize(
@@ -179,10 +177,13 @@ def test_location_validation(user, data, is_valid):
         ),
     ],
 )
-def test_update_profile(mock_index_functions, user, key, value):
+def test_update_profile(mocker, user, key, value):
     """
     Test updating a profile via the ProfileSerializer
     """
+    mock_after_profile_created_or_updated = mocker.patch(
+        "profiles.serializers.after_profile_created_or_updated"
+    )
     profile = user.profile
 
     serializer = ProfileSerializer(
@@ -212,12 +213,7 @@ def test_update_profile(mock_index_functions, user, key, value):
         else:
             assert getattr(profile2, prop) == getattr(profile, prop)
 
-    if key in ("name", "image_file", "headline"):
-        mock_index_functions.update_posts.assert_called_once_with(profile2.id)
-    else:
-        mock_index_functions.update_posts.assert_not_called()
-        if key != "location":
-            mock_index_functions.update_author.assert_called_with(profile2.user.id)
+    mock_after_profile_created_or_updated.assert_called_once_with(profile)
 
 
 def test_serialize_profile_websites(user):

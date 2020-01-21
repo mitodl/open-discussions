@@ -1443,7 +1443,7 @@ class Api:
         with transaction.atomic():
             add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
             proxied_channel.contributor.add(user)
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
         return Redditor(self.reddit, name=contributor_name)
 
     def remove_contributor(self, contributor_name, channel_name):
@@ -1465,7 +1465,7 @@ class Api:
         with transaction.atomic():
             remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
             proxied_channel.contributor.remove(user)
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
 
     def list_contributors(self, channel_name):
         """
@@ -1500,7 +1500,7 @@ class Api:
             except APIException as ex:
                 if ex.error_type != "ALREADY_MODERATOR":
                     raise
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
 
     def accept_invite(self, channel_name):
         """
@@ -1529,7 +1529,7 @@ class Api:
         with transaction.atomic():
             remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
             proxied_channel.moderator.remove(user)
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
 
     def _list_moderators(self, *, channel_name, moderator_name):
         """
@@ -1602,7 +1602,7 @@ class Api:
                 channel.subscribe()
             except PrawForbidden as ex:
                 raise PermissionDenied() from ex
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
         return Redditor(self.reddit, name=subscriber_name)
 
     def remove_subscriber(self, subscriber_name, channel_name):
@@ -1630,7 +1630,7 @@ class Api:
                 # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
                 # and the double removal case is probably more common.
                 pass
-        search_task_helpers.update_author(user.id)
+        search_task_helpers.upsert_profile(user.profile.id)
 
     def is_subscriber(self, subscriber_name, channel_name):
         """

@@ -70,17 +70,6 @@ def reddit_object_persist(*persistence_funcs):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def index_new_profile(profile_id):
-    """
-    Serializes a profile object and runs a task to create an ES document for it.
-
-    Args:
-        profile_id (int): Primary key for a Profile
-    """
-    tasks.index_new_profile.delay(profile_id)
-
-
-@if_feature_enabled(INDEX_UPDATES)
 def index_new_post(post_obj):
     """
     Serializes a post object and runs a task to create an ES document for it.
@@ -186,14 +175,14 @@ def update_channel_index(channel_obj):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def update_author(user_id):
+def upsert_profile(user_id):
     """
     Run a task to update all fields of a profile document except id (username)
 
     Args:
         user_id (int): the primary key for the User whose profile to query by and update
     """
-    tasks.update_author.delay(user_id)
+    tasks.upsert_profile.delay(user_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
