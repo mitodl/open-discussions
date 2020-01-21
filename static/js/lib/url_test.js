@@ -306,9 +306,9 @@ describe("url helper functions", () => {
         const object = makeLearningResource(objectType)
         assert.equal(
           learningResourcePermalink(object),
-          `${window.location.origin}/learn/?drawerObjectID=${
-            object.id
-          }&drawerObjectType=${object.object_type}`
+          `${window.location.origin}/learn/?lr_id=${object.id}&type=${
+            object.object_type
+          }`
         )
       })
     })

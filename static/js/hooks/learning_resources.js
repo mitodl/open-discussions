@@ -4,10 +4,11 @@ import qs from "query-string"
 
 export function useLRDrawerParams() {
   const { search } = useLocation()
-  const { drawerObjectID, drawerObjectType } = qs.parse(search)
+  // eslint-disable-next-line camelcase
+  const { lr_id, type } = qs.parse(search)
 
   return {
-    objectId:   drawerObjectID,
-    objectType: drawerObjectType
+    objectId:   lr_id,
+    objectType: type
   }
 }

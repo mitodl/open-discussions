@@ -165,7 +165,7 @@ export const userListDetailURL = (id: number) => `/learn/lists/${id}`
 export const learningResourcePermalink = (object: Object) =>
   absolutizeURL(
     `${COURSE_URL}${toQueryString({
-      drawerObjectID:   object.id,
-      drawerObjectType: object.object_type
+      lr_id: object.id,
+      type:  object.object_type
     })}`
   )
