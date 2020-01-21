@@ -174,9 +174,9 @@ def mock_client(mock_get_client):
 
 
 @pytest.fixture()
-def mock_update_author(mocker):
-    """Mock of update_author function"""
-    return mocker.patch("channels.api.search_task_helpers.update_author")
+def mock_upsert_profile(mocker):
+    """Mock of upsert_profile function"""
+    return mocker.patch("channels.api.search_task_helpers.upsert_profile")
 
 
 @pytest.fixture()
@@ -232,7 +232,9 @@ def test_vote_indexing(
 ):
     """Test that an upvote/downvote calls a function to update the index"""
     post = PostFactory.create(is_text=True)
-    patched_vote_indexer = mocker.patch("search.task_helpers.update_indexed_score")
+    patched_vote_indexer = mocker.patch(
+        "channels.api.search_task_helpers.update_indexed_score"
+    )
     # Test upvote
     mock_reddit_obj = Mock()
     mock_reddit_obj.id = post.post_id
@@ -1063,7 +1065,7 @@ def test_frontpage(mock_client):
     mock_client.front.hot.assert_called_once_with(limit=25, params={"count": 0})
 
 
-def test_add_contributor(mock_client, mock_update_author):
+def test_add_contributor(mock_client, mock_upsert_profile):
     """Test add contributor"""
     client_user = UserFactory.create()
     contributor = UserFactory.create()
@@ -1078,7 +1080,7 @@ def test_add_contributor(mock_client, mock_update_author):
         ).group
         in contributor.groups.all()
     )
-    mock_update_author.assert_called_with(contributor.id)
+    mock_upsert_profile.assert_called_with(contributor.profile.id)
     assert isinstance(redditor, Redditor)
     assert redditor.name == contributor.username
 
@@ -1096,7 +1098,7 @@ def test_add_remove_contributor_no_user(mock_client):
     assert mock_client.subreddit.return_value.contributor.remove.call_count == 0
 
 
-def test_remove_contributor(mock_client, mock_update_author):
+def test_remove_contributor(mock_client, mock_upsert_profile):
     """Test remove contributor"""
     client_user = UserFactory.create()
     contributor = UserFactory.create()
@@ -1111,7 +1113,7 @@ def test_remove_contributor(mock_client, mock_update_author):
         ).group
         not in contributor.groups.all()
     )
-    mock_update_author.assert_called_with(contributor.id)
+    mock_upsert_profile.assert_called_with(contributor.profile.id)
 
 
 def test_list_contributors(mock_client):
@@ -1123,7 +1125,7 @@ def test_list_contributors(mock_client):
     assert mock_client.subreddit.return_value.contributor.return_value == contributors
 
 
-def test_add_moderator(mock_client, mock_update_author):
+def test_add_moderator(mock_client, mock_upsert_profile):
     """Test add moderator"""
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
@@ -1138,7 +1140,7 @@ def test_add_moderator(mock_client, mock_update_author):
         ).group
         in moderator.groups.all()
     )
-    mock_update_author.assert_called_with(moderator.id)
+    mock_upsert_profile.assert_called_with(moderator.profile.id)
 
 
 def test_add_moderator_no_user(mock_client):
@@ -1153,7 +1155,7 @@ def test_add_moderator_no_user(mock_client):
     assert mock_client.subreddit.return_value.moderator.remove.call_count == 0
 
 
-def test_remove_moderator(mock_client, mock_update_author):
+def test_remove_moderator(mock_client, mock_upsert_profile):
     """Test remove moderator"""
     client = api.Api(UserFactory.create())
     moderator = UserFactory.create()
@@ -1167,7 +1169,7 @@ def test_remove_moderator(mock_client, mock_update_author):
         ).group
         not in moderator.groups.all()
     )
-    mock_update_author.assert_called_with(moderator.id)
+    mock_upsert_profile.assert_called_with(moderator.profile.id)
 
 
 def test_list_moderator(mock_client):
@@ -1350,7 +1352,7 @@ def test_get_or_create_auth_tokens(mocker, settings, user):
     assert RedditRefreshToken.objects.filter(user=user).count() == 1
 
 
-def test_add_subscriber(mock_client, mock_update_author):
+def test_add_subscriber(mock_client, mock_upsert_profile):
     """Test add subscriber"""
     client = api.Api(UserFactory.create())
     subscriber = UserFactory.create()
@@ -1360,7 +1362,7 @@ def test_add_subscriber(mock_client, mock_update_author):
     assert ChannelSubscription.objects.filter(
         channel__name="channel", user=subscriber
     ).exists()
-    mock_update_author.assert_called_with(subscriber.id)
+    mock_upsert_profile.assert_called_with(subscriber.profile.id)
 
 
 def test_add_remove_subscriber_no_user(mock_client):
@@ -1376,7 +1378,7 @@ def test_add_remove_subscriber_no_user(mock_client):
     assert mock_client.subreddit.return_value.unsubscribe.call_count == 0
 
 
-def test_remove_subscriber(mock_client, mock_update_author):
+def test_remove_subscriber(mock_client, mock_upsert_profile):
     """Test remove subscriber"""
     client = api.Api(UserFactory.create(username="mitodl"))
     subscriber = UserFactory.create(username="01BTN7HY2SGT9677JXGNDDW859")
@@ -1385,7 +1387,7 @@ def test_remove_subscriber(mock_client, mock_update_author):
     assert not ChannelSubscription.objects.filter(
         channel__name="testchannel5", user=subscriber
     ).exists()
-    mock_update_author.assert_called_with(subscriber.id)
+    mock_upsert_profile.assert_called_with(subscriber.profile.id)
 
 
 def test_is_subscriber(mock_client):

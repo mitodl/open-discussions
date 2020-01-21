@@ -10,11 +10,8 @@ from widgets.serializers import people
 pytestmark = pytest.mark.django_db
 
 
-def test_people_widget_serialize(mocker):
+def test_people_widget_serialize():
     """Tests that the people widget serializes correctly"""
-    # ugly mock hack to avoid the index_new_profile.delay() call in Profile.save() of the comment author
-    mocker.patch("search.task_helpers.index_new_profile")
-
     widget_instance = WidgetInstanceFactory.create(type_people=True)
     data = people.PeopleWidgetSerializer(widget_instance).data
     profiles = [

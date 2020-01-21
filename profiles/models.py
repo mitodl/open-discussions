@@ -58,10 +58,6 @@ def filter_profile_props(data):
 class Profile(models.Model):
     """Profile model"""
 
-    __previous_name = None
-    __previous_headline = None
-    __previous_bio = None
-
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     name = models.TextField(blank=True, null=True)
@@ -89,20 +85,11 @@ class Profile(models.Model):
     bio = models.TextField(blank=True, null=True)
     location = JSONField(null=True, blank=True)
 
-    def __init__(self, *args, **kwargs):
-        """Track previous name"""
-        super(Profile, self).__init__(*args, **kwargs)
-        self.__previous_name = self.name
-        self.__previous_headline = self.headline
-        self.__previous_bio = self.bio
-
     @transaction.atomic
     def save(
         self, *args, update_image=False, **kwargs
     ):  # pylint: disable=arguments-differ
         """Update thumbnails if necessary"""
-        from search import task_helpers
-
         if update_image:
             if self.image_file:
                 small_thumbnail = make_thumbnail(
@@ -122,23 +109,7 @@ class Profile(models.Model):
             else:
                 self.image_small_file = None
                 self.image_medium_file = None
-        is_new = self.pk is None
-        update_posts = (
-            update_image
-            or self.name != self.__previous_name
-            or self.headline != self.__previous_headline
-        )
-        update_author = update_posts or self.__previous_bio != self.bio
         super(Profile, self).save(*args, **kwargs)
-        self.__previous_name = self.name
-        self.__previous_headline = self.headline
-        self.__previous_bio = self.bio
-        if is_new:
-            task_helpers.index_new_profile(self.id)
-        elif update_author:
-            task_helpers.update_author(self.user.id)
-        if update_posts:
-            task_helpers.update_author_posts_comments(self.id)
 
     def __str__(self):
         return "{}".format(self.name)

@@ -93,27 +93,17 @@ def index_new_bootcamp(bootcamp_id):
 
 
 @app.task
-def index_new_profile(profile_id):
+def upsert_profile(profile_id):
     """Task that indexes a profile based on its primary key"""
     from search.api import gen_profile_id
 
     profile = Profile.objects.get(id=profile_id)
-    data = ESProfileSerializer().serialize(profile)
-    api.create_document(gen_profile_id(profile.user.username), data)
 
-
-@app.task
-def update_author(user_id):
-    """Update all fields of a profile document except id (username)"""
-    from search.api import gen_profile_id
-
-    user_obj = User.objects.get(id=user_id)
-    if user_obj.username != settings.INDEXING_API_USERNAME:
-        profile_data = ESProfileSerializer().serialize(user_obj.profile)
-        profile_data.pop("author_id", None)
-        api.update_document_with_partial(
-            gen_profile_id(user_obj.username),
-            profile_data,
+    if profile.user.username != settings.INDEXING_API_USERNAME:
+        data = ESProfileSerializer().serialize(profile)
+        api.upsert_document(
+            gen_profile_id(profile.user.username),
+            data,
             PROFILE_TYPE,
             retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
         )

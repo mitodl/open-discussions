@@ -11,7 +11,7 @@ from rest_framework.exceptions import ValidationError
 import ulid
 
 from authentication import api as auth_api
-from profiles.api import get_site_type_from_url
+from profiles.api import get_site_type_from_url, after_profile_created_or_updated
 from profiles.models import (
     Profile,
     PROFILE_PROPS,
@@ -70,6 +70,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
             update_image = "image_file" in validated_data
             instance.save(update_image=update_image)
+            after_profile_created_or_updated(instance)
             return instance
 
     def to_representation(self, instance):
@@ -256,6 +257,7 @@ class UserSerializer(serializers.ModelSerializer):
                         profile_data.get(prop_name, getattr(profile, prop_name)),
                     )
                 profile.save()
+                after_profile_created_or_updated(profile)
 
         return instance
 

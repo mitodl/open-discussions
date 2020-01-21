@@ -199,6 +199,7 @@ def test_validate_require_password_and_profile_via_email_exit(
 @pytest.mark.django_db
 def test_validate_require_password_and_profile_via_email(mocker):
     """Tests that require_password_and_profile_via_email processes the request"""
+    mock_profile_api = mocker.patch("authentication.pipeline.user.profile_api")
     user = UserFactory.create(profile__name="")
     mock_strategy = mocker.Mock()
     mock_strategy.request_data.return_value = {
@@ -214,8 +215,11 @@ def test_validate_require_password_and_profile_via_email(mocker):
         user=user,
         flow=SocialAuthState.FLOW_REGISTER,
     )
-    assert response == {"user": user, "profile": user.profile}
-    assert response["profile"].name == "Jane Doe"
+    assert response == {
+        "user": user,
+        "profile": mock_profile_api.ensure_profile.return_value,
+    }
+    mock_profile_api.ensure_profile.assert_called_once_with(user, {"name": "Jane Doe"})
 
 
 @pytest.mark.django_db
@@ -262,6 +266,7 @@ def test_validate_require_password_and_profile_via_email_password_set(mocker):
 )
 def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_new):
     """Tests that require_profile_update_user_via_saml returns {} if not using the saml backend"""
+    mock_profile_api = mocker.patch("authentication.pipeline.user.profile_api")
     user = UserFactory(first_name="Jane", last_name="Doe", profile__name="")
     mock_strategy = mocker.Mock()
     mock_backend = mocker.Mock()
@@ -272,10 +277,14 @@ def test_validate_require_profile_update_user_via_saml(mocker, backend_name, is_
     if not is_new or backend_name != "saml":
         expected = {}
     else:
-        expected = {"user": user, "profile": user.profile}
+        expected = {
+            "user": user,
+            "profile": mock_profile_api.ensure_profile.return_value,
+        }
+        mock_profile_api.ensure_profile.assert_called_once_with(
+            user, {"name": user.get_full_name()}
+        )
     assert response == expected
-    if "user" in response:
-        assert response["profile"].name == "Jane Doe"
 
 
 @pytest.mark.django_db

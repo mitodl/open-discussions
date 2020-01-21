@@ -217,7 +217,6 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
     assert not LearningResourceRun.objects.count()
 
 
-@pytest.mark.usefixtures("mock_index_functions")
 def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     """
     Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
@@ -232,7 +231,6 @@ def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
 
 
-@pytest.mark.usefixtures("mock_index_functions")
 def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
     Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid

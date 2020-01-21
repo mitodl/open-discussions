@@ -31,8 +31,7 @@ from search.task_helpers import (
     decrement_parent_post_comment_count,
     set_comment_to_deleted,
     update_indexed_score,
-    index_new_profile,
-    update_author,
+    upsert_profile,
     update_author_posts_comments,
     update_channel_index,
     upsert_course,
@@ -132,8 +131,6 @@ def test_index_new_comment(mocker):
     Test that index_new_comment calls indexing tasks with the right parameters
     """
     fake_serialized_data = {"serialized": "comment"}
-    # ugly mock hack to avoid the index_new_profile.delay() call in Profile.save() of the comment author
-    mocker.patch("search.task_helpers.index_new_profile")
     comment = CommentFactory.create()
     mock_submission = mocker.Mock(id="123")
     mock_comment = mocker.Mock(id=comment.comment_id, submission=mock_submission)
@@ -161,22 +158,6 @@ def test_index_new_comment(mocker):
         "incr_amount": 1,
         "object_type": POST_TYPE,
     }
-
-
-def test_index_new_profile(mock_index_functions, mocker, user):
-    """
-    Test that index_new_profile calls indexing tasks with the right parameters
-    """
-    fake_serialized_data = {"serialized": "profile"}
-    patched_create_task = mocker.patch("search.indexing_api.create_document")
-    patched_serialize_func = mocker.patch(
-        "search.tasks.ESProfileSerializer.serialize", return_value=fake_serialized_data
-    )
-    index_new_profile(user.profile.id)
-    patched_serialize_func.assert_called_once_with(user.profile)
-    patched_create_task.assert_called_once_with(
-        gen_profile_id(user.username), fake_serialized_data
-    )
 
 
 def test_update_post_text(mocker, reddit_submission_obj):
@@ -373,32 +354,16 @@ def test_update_indexed_score(
     }
 
 
-def test_update_author(mocker, mock_index_functions, mock_es_profile_serializer, user):
+def test_upsert_profile(mocker, mock_es_profile_serializer, user):
     """
-    Tests that update_author calls update_field_values_by_query with the right parameters
+    Tests that upsert_profile calls the task with the right parameters
     """
-    patched_task = mocker.patch("search.indexing_api.update_document_with_partial")
-    call_data = es_profile_serializer_data
-    call_data.pop("author_id")
-    update_author(user.id)
-    patched_task.assert_called_once_with(
-        gen_profile_id(user.username), call_data, "profile", retry_on_conflict=1
-    )
+    patched_task = mocker.patch("search.task_helpers.tasks.upsert_profile")
+    upsert_profile(user.profile.id)
+    patched_task.delay.assert_called_once_with(user.profile.id)
 
 
-def test_update_indexing_author(mocker, mock_index_functions, index_user, settings):
-    """
-    Tests that update_author does not call update_field_values_by_query for the indexing user
-    """
-    settings.INDEXING_API_USERNAME = index_user.username
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
-    update_author(index_user.id)
-    assert patched_task.delay.called is False
-
-
-def test_update_author_posts_comments(
-    mocker, mock_index_functions, mock_es_profile_serializer, user
-):
+def test_update_author_posts_comments(mocker, mock_es_profile_serializer, user):
     """
     Tests that update_author_posts_comments calls update_field_values_by_query with the right parameters
     """
@@ -416,7 +381,7 @@ def test_update_author_posts_comments(
     )
 
 
-def test_update_channel_index(mocker, mock_index_functions):
+def test_update_channel_index(mocker):
     """
     Tests that update_channel_index calls update_field_values_by_query with the right parameters
     """
@@ -446,7 +411,6 @@ def test_update_channel_index(mocker, mock_index_functions):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 def test_upsert_course(mocker):
     """
     Tests that upsert_course calls update_field_values_by_query with the right parameters
@@ -458,7 +422,6 @@ def test_upsert_course(mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 def test_delete_profile(mocker, user):
     """Tests that deleting a user triggers a delete on a profile document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")
@@ -471,7 +434,7 @@ def test_delete_profile(mocker, user):
 
 
 @pytest.mark.django_db
-def test_upsert_program(mock_index_functions, mocker):
+def test_upsert_program(mocker):
     """
     Tests that upsert_program calls update_field_values_by_query with the right parameters
     """
@@ -482,7 +445,6 @@ def test_upsert_program(mock_index_functions, mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 def test_upsert_video(mocker):
     """
     Tests that upsert_video calls update_field_values_by_query with the right parameters
@@ -494,7 +456,6 @@ def test_upsert_video(mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 def test_delete_video(mocker):
     """Tests that deleting a video triggers a delete on a video document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")
@@ -505,7 +466,6 @@ def test_delete_video(mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 @pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
 def test_upsert_user_list(mocker, list_type):
     """
@@ -518,7 +478,6 @@ def test_upsert_user_list(mocker, list_type):
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("mock_index_functions")
 @pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
 def test_delete_user_list(mocker, list_type):
     """Tests that deleting a UserList triggers a delete on a UserList document"""

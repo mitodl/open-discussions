@@ -24,7 +24,7 @@ def create_user(username, email, profile_data=None, user_extra=None):
         profile (dic): the profile data for the user
 
     Returns:
-        User: the user's profile
+        User: the user
     """
     defaults = {}
 
