@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.107.4 (Released January 22, 2020)
+---------------
+
+- add created_on to elasticsearch
+- fix offered by link in the search page
+
 Version 0.107.3 (Released January 16, 2020)
 ---------------
 
