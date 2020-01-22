@@ -241,6 +241,7 @@ def test_execute_learn_search(user, elasticsearch):
         },
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+        search_type="dfs_query_then_fetch",
     )
 
 
@@ -368,6 +369,7 @@ def test_execute_learn_search_anonymous(elasticsearch):
         },
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+        search_type="dfs_query_then_fetch",
     )
 
 

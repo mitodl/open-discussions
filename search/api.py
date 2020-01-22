@@ -31,6 +31,7 @@ from search.constants import (
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
+SEARCH_TYPE = "dfs_query_then_fetch"
 
 
 def gen_post_id(reddit_obj_id):
@@ -266,6 +267,7 @@ def execute_learn_search(*, user, query):
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)
+    search = search.params(search_type=SEARCH_TYPE)
     search.update_from_dict(query)
     search = _apply_learning_query_filters(search, user)
     return transform_results(search.execute().to_dict(), user)
