@@ -22,8 +22,7 @@ import {
   searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile,
-  buildLearnQuery,
-  buildDefaultSort
+  buildLearnQuery
 } from "./search"
 import * as searchFuncs from "./search"
 import {
@@ -381,325 +380,309 @@ describe("search functions", () => {
     })
     ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(type => {
       ["availableNow", "nextWeek", null].forEach(availability => {
-        ["some text here", null].forEach(text => {
-          it(`filters courses by platform, availability ${availability}, type ${type}, and topics`, () => {
-            const fieldNames = ["field1", "field2", "field3"]
-            const stub = sandbox
-              .stub(searchFuncs, "searchFields")
-              .returns(fieldNames)
-            const facets = new Map(
-              Object.entries({
-                offered_by:   ["MITx"],
-                cost:         ["free"],
-                topics:       ["Engineering", "Science"],
-                availability: availability ? [availability] : [],
-                type:         [type]
-              })
-            )
+        it(`filters courses by platform, availability ${availability}, type ${type}, and topics`, () => {
+          const fieldNames = ["field1", "field2", "field3"]
+          const stub = sandbox
+            .stub(searchFuncs, "searchFields")
+            .returns(fieldNames)
+          const text = "some text here"
+          const facets = new Map(
+            Object.entries({
+              offered_by:   ["MITx"],
+              cost:         ["free"],
+              topics:       ["Engineering", "Science"],
+              availability: availability ? [availability] : [],
+              type:         [type]
+            })
+          )
 
-            const availabilityShouldItems = availability
-              ? [
-                {
-                  nested: {
-                    path:  "runs",
-                    query: {
-                      range: {
-                        "runs.best_start_date":
-                            AVAILABILITY_MAPPING[availability].filter
-                      }
-                    }
-                  }
-                }
-              ]
-              : []
-
-            if (availability === "availableNow") {
-              availabilityShouldItems.push({
+          const availabilityShouldItems = availability
+            ? [
+              {
                 nested: {
                   path:  "runs",
                   query: {
-                    bool: {
-                      must_not: {
-                        exists: {
-                          field: "runs.best_start_date"
-                        }
+                    range: {
+                      "runs.best_start_date":
+                          AVAILABILITY_MAPPING[availability].filter
+                    }
+                  }
+                }
+              }
+            ]
+            : []
+
+          if (availability === "availableNow") {
+            availabilityShouldItems.push({
+              nested: {
+                path:  "runs",
+                query: {
+                  bool: {
+                    must_not: {
+                      exists: {
+                        field: "runs.best_start_date"
                       }
                     }
                   }
                 }
-              })
-            }
+              }
+            })
+          }
 
-            const availabilityQuery = {
+          const availabilityQuery = {
+            bool: {
+              should: availabilityShouldItems
+            }
+          }
+
+          const textQuery = [
+            {
+              multi_match: {
+                query:  text,
+                fields: fieldNames
+              }
+            },
+            {
+              nested: {
+                path:  "runs",
+                query: {
+                  multi_match: {
+                    query:  text,
+                    fields: RESOURCE_QUERY_NESTED_FIELDS
+                  }
+                }
+              }
+            }
+          ]
+
+          const mustQuery = [
+            {
+              term: {
+                object_type: type
+              }
+            },
+            {
               bool: {
-                should: availabilityShouldItems
-              }
-            }
-
-            const textQuery = [
-              {
-                multi_match: {
-                  query:  text,
-                  fields: fieldNames
-                }
-              },
-              {
-                nested: {
-                  path:  "runs",
-                  query: {
-                    multi_match: {
-                      query:  text,
-                      fields: RESOURCE_QUERY_NESTED_FIELDS
+                should: [
+                  {
+                    term: {
+                      offered_by: "MITx"
                     }
                   }
-                }
+                ]
               }
-            ]
-
-            const mustQuery = [
-              {
-                term: {
-                  object_type: type
-                }
-              },
-              {
-                bool: {
-                  should: [
-                    {
-                      term: {
-                        offered_by: "MITx"
-                      }
-                    }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  should: [
-                    {
-                      nested: {
-                        path:  "runs.prices",
-                        query: {
-                          range: {
-                            "runs.prices.price": {
-                              to: 0.01
-                            }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    nested: {
+                      path:  "runs.prices",
+                      query: {
+                        range: {
+                          "runs.prices.price": {
+                            to: 0.01
                           }
                         }
                       }
                     }
-                  ]
-                }
-              },
-              {
-                bool: {
-                  should: [
-                    {
-                      term: {
-                        topics: "Engineering"
-                      }
-                    },
-                    {
-                      term: {
-                        topics: "Science"
-                      }
-                    }
-                  ]
-                }
+                  }
+                ]
               }
-            ]
-
-            const boolQuery = {
-              filter: {
-                bool: {
-                  must: mustQuery
-                }
-              }
-            }
-
-            if (availability) {
-              mustQuery.push(availabilityQuery)
-            }
-
-            if (text) {
-              mustQuery.push({
-                bool: {
-                  should: textQuery
-                }
-              })
-
-              boolQuery["should"] = textQuery
-            }
-
-            const expected = {
-              aggs: {
-                availability: {
-                  aggs: {
-                    runs: {
-                      aggs: {
-                        courses: {
-                          reverse_nested: {}
-                        }
-                      },
-                      date_range: {
-                        field:   "runs.best_start_date",
-                        keyed:   false,
-                        missing: DEFAULT_START_DT,
-                        ranges:  [
-                          {
-                            key: "availableNow",
-                            to:  "now"
-                          },
-                          {
-                            from: "now",
-                            key:  "nextWeek",
-                            to:   "now+7d"
-                          },
-                          {
-                            from: "now",
-                            key:  "nextMonth",
-                            to:   "now+1M"
-                          },
-                          {
-                            from: "now",
-                            key:  "next3Months",
-                            to:   "now+3M"
-                          },
-                          {
-                            from: "now",
-                            key:  "next6Months",
-                            to:   "now+6M"
-                          },
-                          {
-                            from: "now",
-                            key:  "nextYear",
-                            to:   "now+12M"
-                          }
-                        ]
-                      }
+            },
+            {
+              bool: {
+                should: [
+                  {
+                    term: {
+                      topics: "Engineering"
                     }
                   },
-                  nested: {
-                    path: "runs"
-                  }
-                },
-                cost: {
-                  aggs: {
-                    prices: {
-                      aggs: {
-                        courses: {
-                          reverse_nested: {}
-                        }
-                      },
-                      range: {
-                        field:   "runs.prices.price",
-                        keyed:   false,
-                        missing: 0,
-                        ranges:  [
-                          {
-                            key: "free",
-                            to:  0.01
-                          },
-                          {
-                            from: 0.01,
-                            key:  "paid"
-                          }
-                        ]
-                      }
+                  {
+                    term: {
+                      topics: "Science"
                     }
-                  },
-                  nested: {
-                    path: "runs.prices"
                   }
-                },
-                offered_by: {
-                  terms: {
-                    field: "offered_by",
-                    size:  10000
-                  }
-                },
-                topics: {
-                  terms: {
-                    field: "topics",
-                    size:  10000
-                  }
-                },
-                type: {
-                  terms: {
-                    field: "object_type.keyword",
-                    size:  10000
-                  }
-                }
-              },
-              query: {
-                bool: {
-                  should: [
-                    {
-                      bool: boolQuery
-                    }
-                  ]
-                }
+                ]
               }
             }
+          ]
 
-            if (text) {
-              expected["suggest"] = {
-                text:              text,
-                short_description: {
-                  phrase: {
-                    confidence: 0.0001,
-                    field:      "short_description.trigram",
-                    gram_size:  1,
-                    size:       5,
-                    max_errors: 3,
-                    collate:    {
-                      params: {
-                        field_name: "short_description.trigram"
-                      },
-                      prune: true,
-                      query: {
-                        source: {
-                          match_phrase: {
-                            "{{field_name}}": "{{suggestion}}"
-                          }
-                        }
-                      }
-                    }
-                  }
-                },
-                title: {
-                  phrase: {
-                    confidence: 0.0001,
-                    field:      "title.trigram",
-                    gram_size:  1,
-                    size:       5,
-                    max_errors: 3,
-                    collate:    {
-                      params: {
-                        field_name: "title.trigram"
-                      },
-                      prune: true,
-                      query: {
-                        source: {
-                          match_phrase: {
-                            "{{field_name}}": "{{suggestion}}"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            } else {
-              expected["sort"] = buildDefaultSort()
-            }
+          if (availability) {
+            mustQuery.push(availabilityQuery)
+          }
 
-            assert.deepEqual(buildSearchQuery({ type, text, facets }), expected)
-
-            if (text) {
-              sinon.assert.calledWith(stub, type)
+          mustQuery.push({
+            bool: {
+              should: textQuery
             }
           })
+
+          assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+            aggs: {
+              availability: {
+                aggs: {
+                  runs: {
+                    aggs: {
+                      courses: {
+                        reverse_nested: {}
+                      }
+                    },
+                    date_range: {
+                      field:   "runs.best_start_date",
+                      keyed:   false,
+                      missing: DEFAULT_START_DT,
+                      ranges:  [
+                        {
+                          key: "availableNow",
+                          to:  "now"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextWeek",
+                          to:   "now+7d"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextMonth",
+                          to:   "now+1M"
+                        },
+                        {
+                          from: "now",
+                          key:  "next3Months",
+                          to:   "now+3M"
+                        },
+                        {
+                          from: "now",
+                          key:  "next6Months",
+                          to:   "now+6M"
+                        },
+                        {
+                          from: "now",
+                          key:  "nextYear",
+                          to:   "now+12M"
+                        }
+                      ]
+                    }
+                  }
+                },
+                nested: {
+                  path: "runs"
+                }
+              },
+              cost: {
+                aggs: {
+                  prices: {
+                    aggs: {
+                      courses: {
+                        reverse_nested: {}
+                      }
+                    },
+                    range: {
+                      field:   "runs.prices.price",
+                      keyed:   false,
+                      missing: 0,
+                      ranges:  [
+                        {
+                          key: "free",
+                          to:  0.01
+                        },
+                        {
+                          from: 0.01,
+                          key:  "paid"
+                        }
+                      ]
+                    }
+                  }
+                },
+                nested: {
+                  path: "runs.prices"
+                }
+              },
+              offered_by: {
+                terms: {
+                  field: "offered_by",
+                  size:  10000
+                }
+              },
+              topics: {
+                terms: {
+                  field: "topics",
+                  size:  10000
+                }
+              },
+              type: {
+                terms: {
+                  field: "object_type.keyword",
+                  size:  10000
+                }
+              }
+            },
+            query: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: mustQuery
+                        }
+                      },
+                      should: textQuery
+                    }
+                  }
+                ]
+              }
+            },
+            suggest: {
+              text:              text,
+              short_description: {
+                phrase: {
+                  confidence: 0.0001,
+                  field:      "short_description.trigram",
+                  gram_size:  1,
+                  size:       5,
+                  max_errors: 3,
+                  collate:    {
+                    params: {
+                      field_name: "short_description.trigram"
+                    },
+                    prune: true,
+                    query: {
+                      source: {
+                        match_phrase: {
+                          "{{field_name}}": "{{suggestion}}"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              title: {
+                phrase: {
+                  confidence: 0.0001,
+                  field:      "title.trigram",
+                  gram_size:  1,
+                  size:       5,
+                  max_errors: 3,
+                  collate:    {
+                    params: {
+                      field_name: "title.trigram"
+                    },
+                    prune: true,
+                    query: {
+                      source: {
+                        match_phrase: {
+                          "{{field_name}}": "{{suggestion}}"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          })
+          sinon.assert.calledWith(stub, type)
         })
       })
     })

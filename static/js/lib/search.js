@@ -505,19 +505,6 @@ export const buildSuggestQuery = (text: string) => {
   return suggest
 }
 
-export const buildDefaultSort = () => {
-  return [
-    {
-      "runs.prices.price": {
-        missing: 0,
-        order:   "asc",
-        nested:  { path: "runs.prices" }
-      }
-    },
-    { created_on: { order: "desc" } }
-  ]
-}
-
 export const buildOrQuery = (
   builder: any,
   searchType: string,
@@ -625,8 +612,6 @@ export const buildLearnQuery = (
     if (!emptyOrNil(text)) {
       // $FlowFixMe: if we get this far, text is not null
       builder = builder.rawOption("suggest", buildSuggestQuery(text))
-    } else {
-      builder.rawOption("sort", buildDefaultSort())
     }
   }
   return builder.build()
