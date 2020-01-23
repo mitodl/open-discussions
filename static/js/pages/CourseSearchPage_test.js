@@ -1,7 +1,6 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
-import qs from "query-string"
 import sinon from "sinon"
 import _ from "lodash"
 
@@ -14,7 +13,6 @@ import { shouldIf } from "../lib/test_utils"
 import {
   makeCourseResult,
   makeLearningResourceResult,
-  makeSearchFacetResult,
   makeSearchResponse
 } from "../factories/search"
 import { makeChannel } from "../factories/channels"
@@ -29,6 +27,10 @@ import {
 } from "../lib/constants"
 import { SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
+import {
+  deserializeSearchParams,
+  serializeSearchParams
+} from "../lib/course_search"
 
 describe("CourseSearchPage", () => {
   let helper,
@@ -36,7 +38,8 @@ describe("CourseSearchPage", () => {
     searchResponse,
     initialState,
     initialProps,
-    searchCourse
+    searchCourse,
+    replaceStub
 
   beforeEach(() => {
     const channel = makeChannel()
@@ -98,6 +101,8 @@ describe("CourseSearchPage", () => {
       initialState,
       initialProps
     )
+
+    replaceStub = helper.sandbox.spy(helper.browserHistory, "replace")
   })
 
   afterEach(() => {
@@ -131,6 +136,8 @@ describe("CourseSearchPage", () => {
       "Learning Resource"
     )
   })
+
+  //
   ;[
     ["mechical enginr", "mechanical engineer"],
     ['"mechical enginr"', '"mechanical engineer"']
@@ -150,22 +157,14 @@ describe("CourseSearchPage", () => {
           }
         }
       )
-      assert.equal(inner.state().text, text)
       const suggestDiv = inner.find(".suggestion")
       assert.isOk(suggestDiv.text().includes("Did you mean"))
       assert.isOk(suggestDiv.text().includes(suggestion))
       suggestDiv.find("a").simulate("click")
-      assert.equal(inner.state()["text"], suggestion)
+      await wait(50)
+      const [[{ search }]] = replaceStub.args
+      assert.equal(search, `q=${escape(suggestion)}`)
     })
-  })
-
-  it("renders suggestion and changes search text if clicked", async () => {
-    const { inner } = await renderPage()
-    const suggestDiv = inner.find(".suggestion")
-    assert.isOk(suggestDiv.text().includes("Did you mean"))
-    assert.isOk(suggestDiv.text().includes("test"))
-    suggestDiv.find("a").simulate("click")
-    assert.equal(inner.state()["text"], "test")
   })
 
   //
@@ -190,9 +189,13 @@ describe("CourseSearchPage", () => {
       search: {
         processing: false,
         loaded:     true
+      },
+      location: {
+        search: `q=text`
       }
     })
     await inner.find("InfiniteScroll").prop("loadMore")()
+    wait(10)
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        SETTINGS.search_page_size,
@@ -214,19 +217,9 @@ describe("CourseSearchPage", () => {
     assert.isFalse(wrapper.find("InfiniteScroll").prop("hasMore"))
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      text:         "text",
-      activeFacets: new Map(
-        Object.entries({
-          offered_by:   [],
-          topics:       [],
-          availability: [],
-          cost:         [],
-          type:         []
-        })
-      ),
-      from:               5,
-      error:              null,
       currentFacetGroup:  null,
+      error:              null,
+      from:               5,
       incremental:        true,
       searchResultLayout: SEARCH_LIST_UI
     })
@@ -340,45 +333,41 @@ describe("CourseSearchPage", () => {
         }
       }
     )
-    assert.equal(inner.state().text, text)
+    assert.equal(inner.find("CourseSearchbox").prop("value"), text)
   })
 
   it("updates the textbox", async () => {
     const { inner } = await renderPage()
-    const text = "text"
+    const text = "newwwww text"
     inner.find("CourseSearchbox").prop("onChange")({
       target: {
         value: text
       }
     })
-    assert.equal(inner.state().text, text)
+    await wait(10)
+    const [[{ search }]] = replaceStub.args
+    assert.equal(search, `q=${escape(text)}`)
   })
 
   it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
-    const { wrapper, inner } = await renderPage()
-    const text = "text"
-    const activeFacets = new Map([
-      ["offered_by", ["OCW"]],
-      ["topics", ["Science", "Law"]],
-      ["availability", ["Current"]],
-      ["cost", ["paid"]],
-      ["type", LR_TYPE_ALL]
-    ])
-    inner.setState({ text, activeFacets })
-    assert.equal(inner.state().text, text)
-    assert.deepEqual(inner.state().activeFacets, activeFacets)
-    wrapper.find(".clear-all-filters").simulate("click")
-    assert.equal(inner.state().text, null)
-    assert.deepEqual(
-      inner.state().activeFacets,
-      new Map([
-        ["offered_by", []],
-        ["topics", []],
-        ["availability", []],
-        ["cost", []],
-        ["type", []]
-      ])
+    const text = "testtext wowowow"
+    const activeFacets = {
+      offered_by:   ["OCW"],
+      topics:       ["Science", "Law"],
+      availability: ["Current"],
+      cost:         ["paid"],
+      type:         LR_TYPE_ALL
+    }
+    const search = serializeSearchParams({ text, activeFacets })
+    const { wrapper } = await renderPage(
+      {},
+      {
+        location: { search }
+      }
     )
+    wrapper.find(".clear-all-filters").simulate("click")
+    const newSearch = replaceStub.args[0][0].search
+    assert.deepEqual(newSearch, "")
   })
 
   it("triggers a non-incremental search from textbox input", async () => {
@@ -391,38 +380,42 @@ describe("CourseSearchPage", () => {
       }
     )
     const text = "some other text"
-    inner.setState({ text, from: 7 })
-    inner.find("CourseSearchbox").prop("onSubmit")({
+    const searchBox = inner.find("CourseSearchbox")
+    searchBox.prop("onChange")({
+      target: { value: text }
+    })
+    searchBox.prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
-    assert.deepEqual(qs.parse(helper.currentLocation.search), {
-      q:    text,
-      type: "course"
-    })
-    assert.deepEqual(inner.state(), {
+    await wait(10)
+
+    const search = replaceStub.args[0][0].search
+
+    assert.deepEqual(deserializeSearchParams({ search }), {
       text,
-      activeFacets: new Map(
-        Object.entries({
-          topics:       [],
-          offered_by:   [],
-          availability: [],
-          cost:         [],
-          type:         ["course"]
-        })
-      ),
-      currentFacetGroup:  null,
-      from:               0,
-      error:              null,
-      incremental:        false,
-      searchResultLayout: SEARCH_LIST_UI
+      activeFacets: {
+        topics:       [],
+        offered_by:   [],
+        availability: [],
+        cost:         [],
+        type:         ["course"]
+      }
     })
   })
 
   it("triggers a non-incremental search when the facet changes", async () => {
-    const { inner } = await renderPage()
-    helper.searchStub.reset()
     const text = "new text"
-    inner.setState({ from: 7, text })
+    const { inner } = await renderPage(
+      {},
+      {
+        location: {
+          search: serializeSearchParams({ text, activeFacets: {} })
+        }
+      }
+    )
+    helper.searchStub.reset()
+    inner.setState({ from: 7 })
+    // inner.find("CourseFilterDrawer").dive()
     inner
       .find(SearchFacet)
       .at(1)
@@ -430,48 +423,18 @@ describe("CourseSearchPage", () => {
       .onUpdate({
         target: { name: "topics", value: "Physics", checked: true }
       })
-    // this ensures that the debounced calls go through without having to wait
-    inner.instance().debouncedRunSearch.flush()
-    sinon.assert.calledWith(helper.searchStub, {
-      channelName: null,
-      from:        0,
-      size:        SETTINGS.search_page_size,
+    await wait(10)
+    const search = replaceStub.args[0][0].search
+
+    assert.deepEqual(deserializeSearchParams({ search }), {
       text,
-      type:        LR_TYPE_ALL,
-      facets:      new Map(
-        Object.entries({
-          offered_by:   [],
-          topics:       ["Physics"],
-          availability: [],
-          cost:         [],
-          type:         LR_TYPE_ALL
-        })
-      )
-    })
-    assert.deepEqual(qs.parse(helper.currentLocation.search), {
-      q: text,
-      t: "Physics"
-    })
-    assert.deepEqual(inner.state(), {
-      // Because this is non-incremental the previous from value of 7 is replaced with 0
-      text,
-      activeFacets: new Map(
-        Object.entries({
-          topics:       ["Physics"],
-          offered_by:   [],
-          availability: [],
-          cost:         [],
-          type:         []
-        })
-      ),
-      from:              0,
-      error:             null,
-      currentFacetGroup: {
-        group:  "topics",
-        result: makeSearchFacetResult().topics
-      },
-      incremental:        false,
-      searchResultLayout: SEARCH_LIST_UI
+      activeFacets: {
+        topics:       ["Physics"],
+        offered_by:   [],
+        availability: [],
+        cost:         [],
+        type:         []
+      }
     })
   })
 
@@ -490,18 +453,22 @@ describe("CourseSearchPage", () => {
     it(`${shouldIf(
       isChecked
     )} include an availability facet in search after checkbox change`, async () => {
-      const { inner } = await renderPage()
-      inner.setState({
-        text:         "some text",
-        activeFacets: new Map(
-          Object.entries({
-            offered_by:   [],
-            topics:       [],
-            cost:         [],
-            availability: isChecked ? [] : ["nextWeek"]
-          })
-        )
-      })
+      const { inner } = await renderPage(
+        {},
+        {
+          location: {
+            search: serializeSearchParams({
+              text:         "some text",
+              activeFacets: {
+                offered_by:   [],
+                topics:       [],
+                cost:         [],
+                availability: isChecked ? [] : ["nextWeek"]
+              }
+            })
+          }
+        }
+      )
       helper.searchStub.reset()
       await inner.instance().onUpdateFacets({
         target: {
@@ -512,34 +479,41 @@ describe("CourseSearchPage", () => {
       })
       // this ensures that the debounced calls go through without having to wait
       inner.instance().debouncedRunSearch.flush()
-      sinon.assert.calledWith(helper.searchStub, {
-        channelName: null,
-        from:        0,
-        size:        SETTINGS.search_page_size,
-        text:        "some text",
-        type:        LR_TYPE_ALL,
-        facets:      new Map(
-          Object.entries({
-            offered_by:   [],
-            cost:         [],
-            topics:       [],
-            availability: isChecked ? ["nextWeek"] : [],
-            type:         LR_TYPE_ALL
-          })
-        )
+      await wait(10)
+      const search = replaceStub.args[0][0].search
+
+      assert.deepEqual(deserializeSearchParams({ search }), {
+        text:         "some text",
+        activeFacets: {
+          topics:       [],
+          offered_by:   [],
+          availability: isChecked ? ["nextWeek"] : [],
+          cost:         [],
+          type:         []
+        }
       })
+      sinon.assert.called(helper.searchStub)
     })
   })
 
   it("mergeFacetOptions adds any selected facets not in results to the group", async () => {
-    const { inner } = await renderPage()
-    const activeFacets = new Map([
-      ["offered_by", []],
-      ["cost", []],
-      ["topics", ["NewTopic"]],
-      ["availability", []]
-    ])
-    inner.setState({ activeFacets })
+    const { inner } = await renderPage(
+      {},
+      {
+        location: {
+          search: serializeSearchParams({
+            text:         "some text",
+            activeFacets: {
+              offered_by:   [],
+              topics:       ["NewTopic"],
+              cost:         [],
+              availability: []
+            }
+          })
+        }
+      }
+    )
+
     const mergedFacets = inner.instance().mergeFacetOptions("topics")
     assert.isTrue(
       _.findIndex(mergedFacets.buckets, { doc_count: 0, key: "NewTopic" }) > -1

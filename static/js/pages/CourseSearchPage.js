@@ -1,6 +1,5 @@
 // @flow
 /* global SETTINGS: false */
-import qs from "query-string"
 import R from "ramda"
 import React from "react"
 import InfiniteScroll from "react-infinite-scroller"
@@ -13,8 +12,6 @@ import debounce from "lodash/debounce"
 import CanonicalLink from "../components/CanonicalLink"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
-import SearchFacet from "../components/SearchFacet"
-import SearchFilter from "../components/SearchFilter"
 import CourseSearchbox from "../components/CourseSearchbox"
 import SearchResult from "../components/SearchResult"
 import {
@@ -28,10 +25,6 @@ import CourseFilterDrawer from "../components/CourseFilterDrawer"
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
-  availabilityFacetLabel,
-  resourceLabel
-} from "../lib/learning_resources"
-import {
   LR_TYPE_ALL,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
@@ -43,8 +36,6 @@ import {
 import {
   emptyOrNil,
   preventDefaultAndInvoke,
-  toArray,
-  capitalize,
   getViewportWidth,
   GRID_MOBILE_BREAKPOINT,
   isDoubleQuoted
@@ -55,12 +46,17 @@ import {
   SEARCH_LIST_UI
 } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
+import {
+  deserializeSearchParams,
+  serializeSearchParams
+} from "../lib/course_search"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type {
   SearchInputs,
   SearchParams,
+  SortParam,
   Result,
   FacetResult,
   CurrentFacet,
@@ -101,8 +97,6 @@ type Props = {|
 |}
 
 type State = {
-  text: ?string,
-  activeFacets: Map<string, Array<string>>,
   from: number,
   error: ?string,
   currentFacetGroup: ?CurrentFacet,
@@ -110,14 +104,16 @@ type State = {
   searchResultLayout: string
 }
 
-const facetDisplayMap = [
-  ["type", "Learning Resource", resourceLabel],
-  ["topics", "Subject Area", null],
-  ["availability", "Availability", availabilityFacetLabel],
-  ["cost", "Cost", capitalize],
-  ["offered_by", "Offered By", null]
-]
-
+export type CourseSearchParams = {
+  type?: ?string | ?Array<string>,
+  text?: ?string,
+  from?: number,
+  size?: number,
+  channelName?: ?string,
+  facets?: Map<string, Array<string>>,
+  sort?: SortParam,
+  activeFacets?: Object
+}
 const shouldRunSearch = R.complement(R.eqProps("activeFacets"))
 
 const THREE_CARD_BREAKPOINT = 1100
@@ -126,25 +122,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
-      text:         qs.parse(props.location.search).q,
-      activeFacets: new Map([
-        ["type", _.union(toArray(qs.parse(props.location.search).type) || [])],
-        [
-          "offered_by",
-          _.union(toArray(qs.parse(props.location.search).o) || [])
-        ],
-        ["topics", _.union(toArray(qs.parse(props.location.search).t) || [])],
-        ["cost", _.union(toArray(qs.parse(props.location.search).c) || [])],
-        [
-          "availability",
-          _.union(toArray(qs.parse(props.location.search).a) || [])
-        ]
-      ]),
-      from:               0,
-      error:              null,
-      currentFacetGroup:  null,
       incremental:        false,
-      searchResultLayout: SEARCH_LIST_UI
+      searchResultLayout: SEARCH_LIST_UI,
+      from:               0,
+      currentFacetGroup:  null,
+      error:              null
     }
   }
 
@@ -162,25 +144,28 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   clearAllFilters = async () => {
-    this.setState({
+    this.updateSearchState({
       text:         null,
-      activeFacets: new Map([
-        ["offered_by", []],
-        ["availability", []],
-        ["topics", []],
-        ["cost", []],
-        ["type", []]
-      ]),
+      activeFacets: {
+        offered_by:   [],
+        availability: [],
+        topics:       [],
+        cost:         [],
+        type:         []
+      }
+    })
+    this.setState({
       currentFacetGroup: null
     })
   }
 
   mergeFacetOptions = (group: string) => {
-    const { facets } = this.props
-    const { activeFacets, currentFacetGroup } = this.state
+    const { facets, location } = this.props
+    const { currentFacetGroup } = this.state
+    const { activeFacets } = deserializeSearchParams(location)
     const emptyFacet = { buckets: [] }
     const emptyActiveFacets = {
-      buckets: (activeFacets.get(group) || []).map(facet => ({
+      buckets: (activeFacets[group] || []).map(facet => ({
         key:       facet,
         doc_count: 0
       }))
@@ -217,30 +202,43 @@ export class CourseSearchPage extends React.Component<Props, State> {
     })
   }
 
-  runSearch = async (params: SearchInputs = { incremental: false }) => {
-    const {
-      clearSearch,
-      history,
-      location: { pathname, search },
-      runSearch
-    } = this.props
+  updateSearchState = (
+    searchParams: CourseSearchParams,
+    debounce: boolean = false
+  ) => {
+    const { location, history } = this.props
+    const { pathname } = location
+    const { activeFacets } = searchParams
 
-    const { activeFacets, text } = this.state
+    const oldParams = deserializeSearchParams(location)
+
+    const text = searchParams.hasOwnProperty("text")
+      ? searchParams.text
+      : oldParams.text
 
     history.replace({
       pathname: pathname,
-      search:   qs.stringify({
-        ...qs.parse(search),
-        q:    text,
-        type: activeFacets.get("type"),
-        o:    activeFacets.get("offered_by"),
-        t:    activeFacets.get("topics"),
-        a:    activeFacets.get("availability"),
-        c:    activeFacets.get("cost")
+      search:   serializeSearchParams({
+        text,
+        activeFacets: activeFacets || oldParams.activeFacets
       })
     })
-    let from = this.state.from + SETTINGS.search_page_size
+    if (debounce) {
+      this.debouncedRunSearch()
+    } else {
+      // this ensures that the `history.replace` update is in place before
+      // we try to pull out the data in `this.runSearch`
+      setTimeout(() => {
+        this.runSearch()
+      })
+    }
+  }
 
+  runSearch = async (params: SearchInputs = { incremental: false }) => {
+    const { clearSearch, runSearch, location } = this.props
+    const { activeFacets, text } = deserializeSearchParams(location)
+
+    let from = this.state.from + SETTINGS.search_page_size
     const { incremental } = params
     if (!incremental) {
       clearSearch()
@@ -248,16 +246,16 @@ export class CourseSearchPage extends React.Component<Props, State> {
     }
     this.setState({ from, incremental })
 
-    // clone the facts so we can search a default of searching all resources if type isn't specified
-    const queryFacets = new Map(activeFacets)
-    const type = queryFacets.get("type")
-    queryFacets.set("type", emptyOrNil(type) ? LR_TYPE_ALL : type)
+    if (emptyOrNil(activeFacets.type)) {
+      activeFacets.type = LR_TYPE_ALL
+    }
+
     await runSearch({
       channelName: null,
       text,
-      type:        queryFacets.get("type"),
+      type:        activeFacets.type,
       // $FlowFixMe: type facet wont be undefined here
-      facets:      queryFacets,
+      facets:      new Map(Object.entries(activeFacets)),
       from,
       size:        SETTINGS.search_page_size
     })
@@ -272,18 +270,20 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
-    const { activeFacets, currentFacetGroup } = this.state
+    const { location } = this.props
+    const { currentFacetGroup } = this.state
+    const { activeFacets } = deserializeSearchParams(location)
     const { facets } = this.props
-    const updatedFacets = new Map(activeFacets)
-    const facetsGroup = facets.get(name) || { buckets: [] }
+
     if (isEnabled) {
-      updatedFacets.set(name, _.union(activeFacets.get(name) || [], [value]))
+      activeFacets[name] = _.union(activeFacets[name] || [], [value])
     } else {
-      updatedFacets.set(name, _.without(activeFacets.get(name) || [], value))
+      activeFacets[name] = _.without(activeFacets[name] || [], value)
     }
-    // $FlowFixMe: nothing undefined here
-    this.setState({
-      activeFacets:      updatedFacets,
+
+    const facetsGroup = facets.get(name) || { buckets: [] }
+
+    await this.setState({
       currentFacetGroup: {
         group:  name,
         result:
@@ -292,23 +292,25 @@ export class CourseSearchPage extends React.Component<Props, State> {
             : facetsGroup
       }
     })
+
+    this.updateSearchState({
+      activeFacets
+    })
   }
 
   onUpdateFacets = (e: Object) => {
     this.toggleFacet(e.target.name, e.target.value, e.target.checked)
   }
 
-  updateText = async (event: ?Event) => {
-    // $FlowFixMe: event.target.value exists
+  updateText = async (event: Object) => {
     const text = event ? event.target.value : ""
-    await this.setState({ text, currentFacetGroup: null })
-    if (!text) {
-      this.runSearch()
-    }
+    await this.setState({ currentFacetGroup: null })
+    await this.updateSearchState({ text }, true)
   }
 
   useSuggestion = async (text: string) => {
-    await this.setState({ text, currentFacetGroup: null })
+    await this.setState({ currentFacetGroup: null })
+    await this.updateSearchState({ text })
     this.runSearch()
   }
 
@@ -348,8 +350,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { results, processing, loaded, total } = this.props
-    const { from, incremental, searchResultLayout, activeFacets } = this.state
+    const { location, results, processing, loaded, total } = this.props
+    const { from, incremental, searchResultLayout } = this.state
+    const { activeFacets } = deserializeSearchParams(location)
 
     if ((processing || !loaded) && !incremental) {
       return <CourseSearchLoading layout={searchResultLayout} />
@@ -378,7 +381,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   this.getFavoriteOrListedObject(result)
                 }
                 toggleFacet={this.toggleFacet}
-                availabilities={activeFacets.get("availability")}
+                availabilities={activeFacets["availability"]}
                 searchResultLayout={searchResultLayout}
               />
             </Cell>
@@ -389,11 +392,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   render() {
-    const { match, total, processing, suggest } = this.props
-    const { text, error, activeFacets, searchResultLayout } = this.state
-
-    const anyFiltersActive =
-      _.flatten(_.toArray(activeFacets.values())).length > 0
+    const { location, match, total, processing, suggest } = this.props
+    const { error, searchResultLayout } = this.state
+    const { text, activeFacets } = deserializeSearchParams(location)
 
     const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4
     const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
@@ -474,43 +475,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
             </div>
           </Cell>
           <Cell className="search-filters" width={facetColumnWidth}>
-            <CourseFilterDrawer>
-              <div className="active-search-filters">
-                {anyFiltersActive ? (
-                  <div className="filter-section-title">
-                    Filters
-                    <span
-                      className="clear-all-filters"
-                      onClick={this.clearAllFilters}
-                    >
-                      Clear All
-                    </span>
-                  </div>
-                ) : null}
-                {facetDisplayMap.map(([name, title, labelFunction]) =>
-                  (activeFacets.get(name) || []).map((facet, i) => (
-                    <SearchFilter
-                      key={i}
-                      title={title}
-                      value={facet}
-                      clearFacet={() => this.toggleFacet(name, facet, false)}
-                      labelFunction={labelFunction}
-                    />
-                  ))
-                )}
-              </div>
-              {facetDisplayMap.map(([name, title, labelFunction], i) => (
-                <SearchFacet
-                  key={i}
-                  title={title}
-                  name={name}
-                  results={this.mergeFacetOptions(name)}
-                  onUpdate={this.onUpdateFacets}
-                  currentlySelected={activeFacets.get(name) || []}
-                  labelFunction={labelFunction}
-                />
-              ))}
-            </CourseFilterDrawer>
+            <CourseFilterDrawer
+              activeFacets={activeFacets}
+              clearAllFilters={this.clearAllFilters}
+              toggleFacet={this.toggleFacet}
+              mergeFacetOptions={this.mergeFacetOptions}
+              onUpdateFacets={this.onUpdateFacets}
+            />
           </Cell>
           <Cell width={resultsColumnWidth}>
             {error ? null : this.renderResults()}

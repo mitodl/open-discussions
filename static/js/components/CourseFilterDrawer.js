@@ -1,21 +1,90 @@
 // @flow
 import React, { useState } from "react"
+import _ from "lodash"
+
+import SearchFacet from "../components/SearchFacet"
+import SearchFilter from "../components/SearchFilter"
 
 import { DESKTOP } from "../lib/constants"
 import { useDeviceCategory } from "../hooks/util"
+import {
+  availabilityFacetLabel,
+  resourceLabel
+} from "../lib/learning_resources"
+import { capitalize } from "../lib/util"
 
-type Props = {
-  children: React$Node
+export const facetDisplayMap = [
+  ["type", "Learning Resource", resourceLabel],
+  ["topics", "Subject Area", null],
+  ["availability", "Availability", availabilityFacetLabel],
+  ["cost", "Cost", capitalize],
+  ["offered_by", "Offered By", null]
+]
+
+type FilterDrawerProps = {
+  activeFacets: Function,
+  clearAllFilters: Function,
+  toggleFacet: Function,
+  mergeFacetOptions: Function,
+  onUpdateFacets: Function
 }
 
-export default function CourseFilterDrawer(props: Props) {
-  const { children } = props
+export function FilterDisplay(props: FilterDrawerProps) {
+  const {
+    activeFacets,
+    clearAllFilters,
+    toggleFacet,
+    mergeFacetOptions,
+    onUpdateFacets
+  } = props
 
+  const anyFiltersActive =
+    _.flatten(_.toArray(Object.values(activeFacets))).length > 0
+
+  return (
+    <>
+      <div className="active-search-filters">
+        {anyFiltersActive ? (
+          <div className="filter-section-title">
+            Filters
+            <span className="clear-all-filters" onClick={clearAllFilters}>
+              Clear All
+            </span>
+          </div>
+        ) : null}
+        {facetDisplayMap.map(([name, title, labelFunction]) =>
+          (activeFacets[name] || []).map((facet, i) => (
+            <SearchFilter
+              key={i}
+              title={title}
+              value={facet}
+              clearFacet={() => toggleFacet(name, facet, false)}
+              labelFunction={labelFunction}
+            />
+          ))
+        )}
+      </div>
+      {facetDisplayMap.map(([name, title, labelFunction], i) => (
+        <SearchFacet
+          key={i}
+          title={title}
+          name={name}
+          results={mergeFacetOptions(name)}
+          onUpdate={onUpdateFacets}
+          currentlySelected={activeFacets[name] || []}
+          labelFunction={labelFunction}
+        />
+      ))}
+    </>
+  )
+}
+
+export default function CourseFilterDrawer(props: FilterDrawerProps) {
   const deviceCategory = useDeviceCategory()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   if (deviceCategory === DESKTOP) {
-    return children
+    return <FilterDisplay {...props} />
   }
 
   const closeDrawer = () => setDrawerOpen(false)
@@ -32,7 +101,9 @@ export default function CourseFilterDrawer(props: Props) {
           Apply Filters
         </button>
       </div>
-      <div className="contents">{children}</div>
+      <div className="contents">
+        <FilterDisplay {...props} />
+      </div>
     </div>
   ) : (
     <div className="controls">

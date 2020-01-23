@@ -1,5 +1,8 @@
 {
   "extends": "eslint-config-mitodl",
+  "rules": {
+      "no-prototype-builtins": [0]
+  },
   "settings": {
     "react": {
       "version": "16.4.0",

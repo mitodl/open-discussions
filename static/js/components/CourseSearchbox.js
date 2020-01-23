@@ -15,13 +15,13 @@ type Props = {
 
 export default function CourseSearchbox(props: Props) {
   const {
+    autoFocus,
+    children,
     onChange,
     onClear,
-    value,
     onSubmit,
     validation,
-    autoFocus,
-    children
+    value
   } = props
 
   const [text, setText] = useState("")

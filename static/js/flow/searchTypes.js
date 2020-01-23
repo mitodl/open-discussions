@@ -121,11 +121,11 @@ export type SortParam = {
 }
 
 export type SearchParams = {
-  type:              ?string|?Array<string>,
-  text:              ?string,
-  from:              number,
-  size:              number,
-  channelName:       ?string,
+  type?:              ?string|?Array<string>,
+  text?:              ?string,
+  from?:              number,
+  size?:              number,
+  channelName?:       ?string,
   facets?:           Map<string, Array<string>>,
   sort?:             SortParam,
 }
