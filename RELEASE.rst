@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.108.0
+---------------
+
+- Revert  "sort default results in search page with no text"
+- change URL params for LR sharing to be friendlier
+- automatically open "similar items" panel for some LRs
+- sort default results in search page with no text
+- change copy for userlists to "learning lists"
+- grabbed a new webpack version
+- prevent course title in search from being cut off
+
 Version 0.107.4 (Released January 22, 2020)
 ---------------
 
