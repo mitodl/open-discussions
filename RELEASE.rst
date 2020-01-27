@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.108.0
+Version 0.108.0 (Released January 27, 2020)
 ---------------
 
 - Revert  "sort default results in search page with no text"
