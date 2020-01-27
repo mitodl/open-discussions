@@ -110,6 +110,9 @@ LEARNING_RESOURCE_TYPE = {
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
+    "created": {"type": "date"},
+    "default_search_priority": {"type": "integer"},
+    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
     "runs": {
         "type": "nested",
         "properties": {
@@ -130,12 +133,16 @@ LEARNING_RESOURCE_TYPE = {
             "instructors": {"type": "text"},
             "prices": {
                 "type": "nested",
-                "properties": {"mode": {"type": "text"}, "price": {"type": "float"}},
+                "properties": {
+                    "mode": {"type": "text"},
+                    "price": {"type": "scaled_float", "scaling_factor": 100},
+                },
             },
             "image_src": {"type": "keyword"},
             "published": {"type": "boolean"},
             "availability": {"type": "keyword"},
             "offered_by": {"type": "keyword"},
+            "created": {"type": "date"},
         },
     },
 }
@@ -169,6 +176,9 @@ USER_LIST_OBJECT_TYPE = {
     "author": {"type": "keyword"},
     "privacy_level": {"type": "keyword"},
     "list_type": {"type": "keyword"},
+    "created": {"type": "date"},
+    "default_search_priority": {"type": "integer"},
+    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
 }
 
 VIDEO_OBJECT_TYPE = {

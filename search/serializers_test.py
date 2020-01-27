@@ -1,5 +1,6 @@
 """Tests for elasticsearch serializers"""
 # pylint: disable=redefined-outer-name,unused-argument
+from functools import reduce
 from datetime import datetime
 import pytest
 
@@ -44,6 +45,18 @@ from search.serializers import (
     serialize_bulk_videos,
     serialize_video_for_bulk,
 )
+
+
+def minimum_price(learning_resource):
+    """Function for calculating the minimum price of a learning resource across runs"""
+
+    prices = [
+        run.prices.values_list("price", flat=True)
+        for run in learning_resource.runs.all()
+    ]
+
+    minimum = min(reduce(lambda x, y: x | y, prices), default=0)
+    return f"{minimum:.2f}"
 
 
 @pytest.fixture
@@ -288,6 +301,7 @@ def test_es_course_serializer(offered_by):
     """
     course = CourseFactory.create(offered_by=offered_by)
     serialized = ESCourseSerializer(course).data
+
     assert_json_equal(
         serialized,
         {
@@ -307,7 +321,9 @@ def test_es_course_serializer(offered_by):
             ],
             "published": True,
             "offered_by": list(course.offered_by.values_list("name", flat=True)),
-            "created_on": course.created_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "created": drf_datetime(course.created_on),
+            "default_search_priority": 1,
+            "minimum_price": minimum_price(course),
         },
     )
 
@@ -334,7 +350,9 @@ def test_es_program_serializer(offered_by):
                 for program_run in program.runs.order_by("-best_start_date")
             ],
             "offered_by": list(program.offered_by.values_list("name", flat=True)),
-            "created_on": program.created_on.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
+            "created": drf_datetime(program.created_on),
+            "default_search_priority": 1,
+            "minimum_price": minimum_price(program),
         },
     )
 
@@ -362,6 +380,9 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
             "title": user_list.title,
             "image_src": user_list.image_src.url,
             "topics": list(user_list.topics.values_list("name", flat=True)),
+            "created": drf_datetime(user_list.created_on),
+            "default_search_priority": 0,
+            "minimum_price": 0,
         },
     )
 
@@ -389,6 +410,9 @@ def test_es_userlist_serializer_image_src():
             "title": user_list.title,
             "image_src": list_item_course.item.image_src,
             "topics": list(user_list.topics.values_list("name", flat=True)),
+            "created": drf_datetime(user_list.created_on),
+            "default_search_priority": 0,
+            "minimum_price": 0,
         },
     )
 

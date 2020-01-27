@@ -1,6 +1,8 @@
 """Serializers for elasticsearch data"""
+# pylint: disable=unused-argument
 import logging
 
+from functools import reduce
 from django.db.models import Prefetch
 from prawcore import NotFound
 from rest_framework import serializers
@@ -300,6 +302,29 @@ class LearningResourceSerializer(serializers.ModelSerializer):
 
     offered_by = ESOfferedByField()
     topics = ESTopicsField()
+    minimum_price = serializers.SerializerMethodField()
+    created = serializers.DateTimeField(source="created_on", read_only=True)
+
+    def get_minimum_price(self, instance):
+        """
+        Minimum price from all learning resource runs
+        """
+
+        if hasattr(instance, "runs") and instance.runs:
+            prices = [
+                run.prices.values_list("price", flat=True)
+                for run in instance.runs.all()
+            ]
+
+            if prices:
+                prices = reduce(lambda x, y: x | y, prices)
+
+                minimum = min(prices, default=0)
+                return f"{minimum:.2f}"
+            else:
+                return 0
+        else:
+            return 0
 
 
 class ESRunSerializer(LearningResourceSerializer):
@@ -369,12 +394,19 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
 
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
+    default_search_priority = serializers.SerializerMethodField()
 
     def get_coursenum(self, course):
         """
         Extract the course number from the course id
         """
         return course.course_id.split("+")[-1]
+
+    def get_default_search_priority(self, instance):
+        """
+        Courses should have higer priority in the default saerch
+        """
+        return 1
 
     class Meta:
         model = Course
@@ -391,7 +423,9 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "published",
             "offered_by",
             "runs",
-            "created_on",
+            "created",
+            "default_search_priority",
+            "minimum_price",
         ]
 
         read_only_fields = fields
@@ -405,6 +439,13 @@ class ESBootcampSerializer(ESCourseSerializer):
     object_type = BOOTCAMP_TYPE
 
     runs = ESRunSerializer(many=True)
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        Bootcamps should have higer priority in the default saerch
+        """
+        return 1
 
     class Meta:
         model = Bootcamp
@@ -420,7 +461,9 @@ class ESBootcampSerializer(ESCourseSerializer):
             "published",
             "offered_by",
             "runs",
-            "created_on",
+            "created",
+            "default_search_priority",
+            "minimum_price",
         ]
 
         read_only_fields = fields
@@ -434,6 +477,13 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
     object_type = PROGRAM_TYPE
 
     runs = ESRunSerializer(many=True)
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        Programs should have higer priority in the default saerch
+        """
+        return 1
 
     class Meta:
         model = Program
@@ -445,7 +495,9 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
             "topics",
             "runs",
             "offered_by",
-            "created_on",
+            "created",
+            "default_search_priority",
+            "minimum_price",
         ]
 
         read_only_fields = fields
@@ -455,6 +507,14 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for user_lists
     """
+
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        User Lists should have lower priority in the default saerch
+        """
+        return 0
 
     def to_representation(self, instance):
         """Serializes the instance"""
@@ -482,6 +542,9 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
             "author",
             "list_type",
             "privacy_level",
+            "created",
+            "default_search_priority",
+            "minimum_price",
         ]
 
         read_only_fields = fields
@@ -493,6 +556,13 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
     object_type = VIDEO_TYPE
 
     runs = ESRunSerializer(many=True)
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        Videos should have lower priority in the default saerch
+        """
+        return 0
 
     class Meta:
         model = Video
@@ -509,7 +579,9 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "published",
             "runs",
             "offered_by",
-            "created_on",
+            "created",
+            "default_search_priority",
+            "minimum_price",
         ]
 
         read_only_fields = fields
