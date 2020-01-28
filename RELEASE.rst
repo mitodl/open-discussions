@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.109.0
+---------------
+
+- Fixed race condition with profile writes
+
 Version 0.108.0 (Released January 27, 2020)
 ---------------
 
