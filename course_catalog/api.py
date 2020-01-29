@@ -2,10 +2,10 @@
 course_catalog api functions
 """
 from datetime import datetime
-import json
 import logging
 
 import boto3
+import rapidjson
 from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -25,7 +25,7 @@ from course_catalog.serializers import (
     OCWSerializer,
     LearningResourceRunSerializer,
 )
-from course_catalog.utils import get_course_url, load_course_blacklist
+from course_catalog.utils import get_course_url
 from search.task_helpers import (
     delete_course,
     upsert_course,
@@ -49,9 +49,9 @@ def safe_load_json(json_string, json_file_key):
         JSON (dict): the JSON contents as JSON
     """
     try:
-        loaded_json = json.loads(json_string)
+        loaded_json = rapidjson.loads(json_string)
         return loaded_json
-    except json.JSONDecodeError:
+    except rapidjson.JSONDecodeError:
         log.exception("%s has a corrupted JSON", json_file_key)
         return {}
 
@@ -138,6 +138,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
             return
         run = run_serializer.save()
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
+    return course, run
 
 
 def get_s3_object_and_read(obj, iteration=0):
@@ -318,7 +319,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     index_func(bootcamp.id)
 
 
-# pylint: disable=too-many-locals
+# pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def sync_ocw_course(
     *, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3, blacklist
 ):
@@ -341,6 +342,7 @@ def sync_ocw_course(
     uid = None
     is_published = True
     log.info("Syncing: %s ...", course_prefix)
+
     # Collect last modified timestamps for all course files of the course
     for obj in raw_data_bucket.objects.filter(Prefix=course_prefix):
         # the "1.json" metadata file contains a course's uid
@@ -370,6 +372,20 @@ def sync_ocw_course(
     # get the latest modified timestamp of any file in the course
     last_modified = max(last_modified_dates)
 
+    # if course run synced before, check if modified since then
+    courserun_instance = LearningResourceRun.objects.filter(
+        platform=PlatformType.ocw.value, run_id=uid
+    ).first()
+
+    # Make sure that the data we are syncing is newer than what we already have
+    if (
+        courserun_instance
+        and last_modified <= courserun_instance.last_modified
+        and not force_overwrite
+    ):
+        log.info("Already synced. No changes found for %s", course_prefix)
+        return None
+
     # fetch JSON contents for each course file in memory (slow)
     log.info("Loading JSON for %s...", course_prefix)
     for obj in sorted(
@@ -391,41 +407,45 @@ def sync_ocw_course(
     if course_json["course_id"] in blacklist:
         is_published = False
 
-    # if course run synced before, update existing Course instance
-    courserun_instance = LearningResourceRun.objects.filter(
-        platform=PlatformType.ocw.value, run_id=uid
-    ).first()
-
-    # Make sure that the data we are syncing is newer than what we already have
-    if (
-        courserun_instance
-        and last_modified <= courserun_instance.last_modified
-        and not force_overwrite
-    ):
-        log.info("Already synced. No changes found for %s", course_prefix)
-        return None
+    log.info("Digesting %s...", course_prefix)
+    course, run = digest_ocw_course(
+        course_json, last_modified, is_published, course_prefix
+    )
 
     if upload_to_s3 and is_published:
-        # Upload all course media to S3 before serializing course to ensure the existence of links
-        parser.setup_s3_uploading(
-            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-            settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
-            # course_prefix now has trailing slash so [-2] below is the last
-            # actual element and [-1] is an empty string
-            course_prefix.split("/")[-2],
-        )
-        if settings.OCW_UPLOAD_IMAGE_ONLY:
-            parser.upload_course_image()
-        else:
-            parser.upload_all_media_to_s3(upload_master_json=True)
+        try:
+            parser.setup_s3_uploading(
+                settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+                settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+                settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+                # course_prefix now has trailing slash so [-2] below is the last
+                # actual element and [-1] is an empty string
+                course_prefix.split("/")[-2],
+            )
+            if settings.OCW_UPLOAD_IMAGE_ONLY:
+                parser.upload_course_image()
+            else:
+                parser.upload_all_media_to_s3(upload_master_json=True)
+        except:  # pylint: disable=bare-except
+            log.exception(
+                (
+                    "Error encountered uploading OCW files for %s, deleting run",
+                    course_prefix,
+                )
+            )
+            run.delete()
+            raise
+    course.published = (
+        Course.objects.get(id=course.id).runs.filter(published=True).count() > 0
+    )
+    course.save()
+    if course.published:
+        upsert_course(course.id)
+    else:
+        delete_course(course)
 
-    log.info("Digesting %s...", course_prefix)
-    digest_ocw_course(course_json, last_modified, is_published, course_prefix)
-    return uid
 
-
-def sync_ocw_courses(*, force_overwrite, upload_to_s3):
+def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3):
     """
     Sync OCW courses to the database
 
@@ -442,68 +462,14 @@ def sync_ocw_courses(*, force_overwrite, upload_to_s3):
         aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
     ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
 
-    # get all the courses prefixes we care about
-    ocw_courses = generate_course_prefix_list(raw_data_bucket)
-
-    # get a list of blacklisted course ids
-    blacklist = load_course_blacklist()
-
-    # loop over each course
-    uids = set()
-    for course_prefix in sorted(ocw_courses):
+    for course_prefix in course_prefixes:
         try:
-            uid = sync_ocw_course(
+            sync_ocw_course(
                 course_prefix=course_prefix,
                 raw_data_bucket=raw_data_bucket,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
                 blacklist=blacklist,
             )
-
-            if uid:
-                uids.add(uid)
         except:  # pylint: disable=bare-except
             log.exception("Error encountered parsing OCW json for %s", course_prefix)
-    return uids
-
-
-def update_course_published(runs):
-    """
-    Fix the is_published value for each course
-
-    Args:
-        runs (iterable of LearningResourceRun): An iterable of LearningResourceRun
-
-    Returns:
-        set[int]: A set of Course ids
-    """
-    log.info("Fixing is_published values for each course...")
-    done_courses = set()
-    for run in runs:
-        course = run.content_object
-        if course.id not in done_courses:
-            runs_published = course.runs.values_list("published", flat=True)
-            course.published = any(runs_published)
-            course.save()
-            done_courses.add(course.id)
-    return done_courses
-
-
-def sync_ocw_data(*, force_overwrite, upload_to_s3):
-    """
-    Sync OCW data to database
-
-    Args:
-        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
-        upload_to_s3 (bool): If True, upload course media to S3
-    """
-    uids = sync_ocw_courses(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
-    course_ids = update_course_published(
-        LearningResourceRun.objects.filter(run_id__in=uids)
-    )
-    for course in Course.objects.filter(id__in=course_ids):
-        # Probably quicker to do this as a bulk operation
-        if course.published:
-            upsert_course(course.id)
-        else:
-            delete_course(course)

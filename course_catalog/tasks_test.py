@@ -30,16 +30,16 @@ from course_catalog.tasks import (
     get_youtube_data,
     get_youtube_transcripts,
     get_video_topics,
+    get_ocw_courses,
 )
 
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument,too-many-arguments
 
-TEST_JSON_PATH = (
-    "./test_json/PROD/9/9.15/Fall_2007/"
-    "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/0"
-)
+TEST_PREFIX = "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/"
+
+TEST_JSON_PATH = f"./test_json/{TEST_PREFIX}0"
 TEST_JSON_FILES = [
     f for f in listdir(TEST_JSON_PATH) if isfile(join(TEST_JSON_PATH, f))
 ]
@@ -70,7 +70,7 @@ def mock_get_bootcamps(mocker):
 @pytest.fixture
 def mock_blacklist(mocker):
     """Mock the load_course_blacklist function"""
-    return mocker.patch("course_catalog.api.load_course_blacklist", return_value=[])
+    return mocker.patch("course_catalog.tasks.load_course_blacklist", return_value=[])
 
 
 def setup_s3(settings):
@@ -116,9 +116,32 @@ def test_get_mitx_data_valid(mocker):
 
 
 @mock_s3
-@pytest.mark.parametrize("blacklisted", [True, False])
+@pytest.mark.parametrize("force_overwrite", [True, False])
+@pytest.mark.parametrize("upload_to_s3", [True, False])
 def test_get_ocw_data(
-    settings, mock_course_index_functions, mock_blacklist, blacklisted
+    settings, mocker, mocked_celery, mock_blacklist, force_overwrite, upload_to_s3
+):
+    """Test get_ocw_data task"""
+    setup_s3(settings)
+    get_ocw_courses_mock = mocker.patch(
+        "course_catalog.tasks.get_ocw_courses", autospec=True
+    )
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        get_ocw_data.delay(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
+    assert mocked_celery.group.call_count == 1
+    get_ocw_courses_mock.si.assert_called_once_with(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=mock_blacklist.return_value,
+        force_overwrite=force_overwrite,
+        upload_to_s3=upload_to_s3,
+    )
+
+
+@mock_s3
+@pytest.mark.parametrize("blacklisted", [True, False])
+def test_get_ocw_courses(
+    settings, mock_course_index_functions, mocked_celery, mock_blacklist, blacklisted
 ):
     """
     Test ocw sync task
@@ -128,15 +151,23 @@ def test_get_ocw_data(
         mock_blacklist.return_value = ["9.15"]
 
     # run ocw sync
-    get_ocw_data.delay()
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=mock_blacklist.return_value,
+        force_overwrite=False,
+        upload_to_s3=True,
+    )
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
-    mock_blacklist.assert_called_once()
     assert Course.objects.first().published is not blacklisted
-
-    get_ocw_data.delay()
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=mock_blacklist.return_value,
+        force_overwrite=False,
+        upload_to_s3=True,
+    )
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
@@ -165,15 +196,24 @@ def test_get_ocw_overwrite(
     setup_s3(settings)
 
     # run ocw sync
-    get_ocw_data.delay()
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=mock_blacklist.return_value,
+        force_overwrite=False,
+        upload_to_s3=True,
+    )
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
-    mock_blacklist.assert_called_once()
 
     mock_digest = mocker.patch("course_catalog.api.digest_ocw_course")
-    get_ocw_data.delay(force_overwrite=overwrite)
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=mock_blacklist.return_value,
+        force_overwrite=overwrite,
+        upload_to_s3=True,
+    )
     assert mock_digest.call_count == (1 if overwrite else 0)
 
 
@@ -182,12 +222,12 @@ def test_get_ocw_data_no_settings(settings):
     No data should be imported if OCW settings are missing
     """
     settings.OCW_CONTENT_ACCESS_KEY = None
-    get_ocw_data.delay()
+    get_ocw_data.delay(force_overwrite=True, upload_to_s3=True)
     assert Course.objects.count() == 0
 
 
 @mock_s3
-def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mock_blacklist):
+def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mocked_celery):
     """
     Test that an error parsing ocw data is correctly logged
     """
@@ -195,32 +235,39 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mock_blacklis
         "course_catalog.api.OCWParser.setup_s3_uploading", side_effect=Exception
     )
     setup_s3(settings)
-    get_ocw_data.delay()
-    mock_logger.assert_called_once_with(
-        "Error encountered parsing OCW json for %s",
-        "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=[],
+        force_overwrite=False,
+        upload_to_s3=True,
     )
-    mock_blacklist.assert_called_once()
+    mock_logger.assert_any_call(
+        "Error encountered parsing OCW json for %s", TEST_PREFIX
+    )
 
 
 @mock_s3
-def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mock_blacklist):
+def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mocked_celery):
     """
     Test that an error reading from S3 is correctly logged
     """
     mocker.patch("course_catalog.api.get_s3_object_and_read", side_effect=Exception)
     setup_s3(settings)
-    get_ocw_data.delay()
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=[],
+        force_overwrite=False,
+        upload_to_s3=True,
+    )
     mock_logger.assert_called_once_with(
         "Error encountered reading 1.json for %s",
         "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/",
     )
-    mock_blacklist.assert_called_once()
 
 
 @mock_s3
 @pytest.mark.parametrize("image_only", [True, False])
-def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mock_blacklist):
+def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mocked_celery):
     """
     Test that the ocw parser uploads all files or just images depending on settings
     """
@@ -230,10 +277,14 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mock_bla
     )
     mock_upload_image = mocker.patch("course_catalog.api.OCWParser.upload_course_image")
     setup_s3(settings)
-    get_ocw_data.delay()
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=[],
+        force_overwrite=False,
+        upload_to_s3=True,
+    )
     assert mock_upload_image.call_count == (1 if image_only else 0)
     assert mock_upload_all.call_count == (0 if image_only else 1)
-    mock_blacklist.assert_called_once()
 
 
 @mock_s3
