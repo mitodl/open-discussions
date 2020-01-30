@@ -436,7 +436,7 @@ def sync_ocw_course(
             run.delete()
             raise
     course.published = (
-        Course.objects.get(id=course.id).runs.filter(published=True).count() > 0
+        Course.objects.get(id=course.id).runs.filter(published=True).exists()
     )
     course.save()
     if course.published:
