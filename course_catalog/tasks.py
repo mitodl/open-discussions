@@ -79,7 +79,7 @@ def get_ocw_data(
                 upload_to_s3=upload_to_s3,
             )
             for prefixes in chunks(
-                ocw_courses, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+                ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
             )
         ]
     )
