@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.109.1
+Version 0.109.1 (Released January 30, 2020)
 ---------------
 
 - Upgrade django
