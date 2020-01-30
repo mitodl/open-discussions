@@ -22,10 +22,12 @@ import {
   searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile,
-  buildLearnQuery
+  buildLearnQuery,
+  buildDefaultSort
 } from "./search"
 import * as searchFuncs from "./search"
 import {
+  LR_TYPE_ALL,
   LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_VIDEO,
@@ -685,6 +687,11 @@ describe("search functions", () => {
           sinon.assert.calledWith(stub, type)
         })
       })
+    })
+
+    it(`sorts the search results when there are no filters or text`, () => {
+      const query = buildLearnQuery(bodybuilder(), null, LR_TYPE_ALL, null)
+      assert.deepEqual(query.sort, buildDefaultSort())
     })
 
     //
