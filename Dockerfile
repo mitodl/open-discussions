@@ -1,4 +1,4 @@
-FROM python:3.6.8
+FROM python:3.6.8-stretch
 LABEL maintainer "ODL DevOps <mitx-devops@mit.edu>"
 
 # Add package files, install updated node and pip

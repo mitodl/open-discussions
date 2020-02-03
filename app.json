@@ -446,6 +446,14 @@
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
     },
+    "TIKA_CLIENT_ONLY": {
+      "description": "use tika-python library in client mode",
+      "required": true
+    },
+    "TIKA_SERVER_ENDPOINT": {
+      "description": "URL of tika server for extracting text",
+      "required": true
+    },
     "USE_X_FORWARDED_PORT": {
       "description": "Use the X-Forwarded-Port",
       "required": false

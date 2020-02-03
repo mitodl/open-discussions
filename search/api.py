@@ -87,6 +87,21 @@ def gen_course_id(platform, course_id):
     return "co_{}_{}".format(platform, safe_id)
 
 
+def gen_content_file_id(key):
+    """
+    Generates the Elasticsearch document id for a ContentFile
+
+    Args:
+        run_id (str): The run id of a ContentFile object
+        key (str): The key of a ContentFile object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    safe_key = urlsafe_b64encode(key.encode("utf-8")).decode("utf-8").rstrip("=")
+    return "cf_{}".format(safe_key)
+
+
 def gen_bootcamp_id(bootcamp_id):
     """
     Generates the Elasticsearch document id for a bootcamp

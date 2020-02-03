@@ -432,3 +432,20 @@ ocw_edx_mapping = {
     "Educational Technology": ["Education & Teacher Training", "Computer Science"],
     "Higher Education": ["Education & Teacher Training"],
 }
+
+VALID_TEXT_FILE_TYPES = [
+    "pdf",
+    "htm",
+    "html",
+    "txt",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "xml",
+    "json",
+    "rtf",
+    "ps",
+]

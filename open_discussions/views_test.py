@@ -33,6 +33,7 @@ def test_webpack_url(
     settings.FEATURES[features.ARTICLE_UI] = False
     settings.FEATURES[features.COURSE_UI] = False
     settings.FEATURES[features.LIVESTREAM_UI] = False
+    settings.FEATURES[features.COURSE_FILE_SEARCH] = False
     settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
@@ -85,6 +86,7 @@ def test_webpack_url(
         "search_min_length": settings.ELASTICSEARCH_MIN_QUERY_SIZE,
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
         "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
+        "file_search_enabled": settings.FEATURES[features.COURSE_FILE_SEARCH],
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
         "algolia_appId": settings.ALGOLIA_APP_ID,
         "algolia_apiKey": settings.ALGOLIA_API_KEY,

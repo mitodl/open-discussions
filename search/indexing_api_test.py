@@ -375,7 +375,9 @@ def test_delete_document(mocked_es, mocker):
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
     delete_document(1, "course")
-    mocked_es.conn.delete.assert_called_with(index="a", doc_type=GLOBAL_DOC_TYPE, id=1)
+    mocked_es.conn.delete.assert_called_with(
+        index="a", doc_type=GLOBAL_DOC_TYPE, id=1, params={}
+    )
 
 
 def test_delete_document_not_found(mocked_es, mocker):

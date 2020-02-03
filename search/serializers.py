@@ -17,6 +17,7 @@ from course_catalog.models import (
     Program,
     UserList,
     Video,
+    ContentFile,
 )
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
@@ -30,6 +31,7 @@ from search.api import (
     gen_user_list_id,
     gen_program_id,
     gen_video_id,
+    gen_content_file_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -38,6 +40,7 @@ from search.constants import (
     PROGRAM_TYPE,
     VIDEO_TYPE,
     USER_LIST_TYPE,
+    RESOURCE_FILE_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -327,6 +330,55 @@ class LearningResourceSerializer(serializers.ModelSerializer):
             return 0
 
 
+class ESResourceFileSerializerMixin(serializers.Serializer):
+    """
+    Elasticsearch base serializer mixin for resource files
+    """
+
+    object_type = RESOURCE_FILE_TYPE
+    resource_relations = serializers.SerializerMethodField()
+
+    def get_resource_relations(self, instance):  # pylint: disable=unused-argument
+        """ Get resource_relations properties"""
+        raise NotImplementedError
+
+
+class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
+    """
+    Elasticsearch serializer class for course run files
+    """
+
+    run_id = serializers.SerializerMethodField()
+    short_description = serializers.CharField(source="description")
+
+    def get_resource_relations(self, instance):
+        """ Get resource_relations properties"""
+        course = Course.objects.get(id=instance.run.object_id)
+        return {
+            "name": "resourcefile",
+            "parent": gen_course_id(course.platform, course.course_id),
+        }
+
+    def get_run_id(self, instance):
+        """ Get the run_id """
+        return instance.run.run_id
+
+    class Meta:
+        model = ContentFile
+        fields = [
+            "run_id",
+            "key",
+            "uid",
+            "content",
+            "resource_relations",
+            "title",
+            "short_description",
+            "file_type",
+            "content_type",
+            "url",
+        ]
+
+
 class ESRunSerializer(LearningResourceSerializer):
     """
     Elasticsearch serializer class for course runs
@@ -391,6 +443,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     """
 
     object_type = COURSE_TYPE
+    resource_relations = {"name": "resource"}
 
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
@@ -407,6 +460,12 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
         Courses should have higer priority in the default saerch
         """
         return 1
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+        ret["resource_relations"] = self.resource_relations
+        return ret
 
     class Meta:
         model = Course
@@ -709,6 +768,19 @@ def serialize_bulk_courses(ids):
         yield serialize_course_for_bulk(course)
 
 
+def serialize_bulk_content_files(run_id):
+    """
+    Serialize content files for bulk indexing
+
+    Args:
+        run_id(int): Course id
+    """
+    for content_file in LearningResourceRun.objects.get(
+        id=run_id
+    ).content_files.iterator():
+        yield serialize_content_file_for_bulk(content_file)
+
+
 def serialize_course_for_bulk(course_obj):
     """
     Serialize a course for bulk API request
@@ -719,6 +791,19 @@ def serialize_course_for_bulk(course_obj):
     return {
         "_id": gen_course_id(course_obj.platform, course_obj.course_id),
         **ESCourseSerializer(course_obj).data,
+    }
+
+
+def serialize_content_file_for_bulk(course_run_file_obj):
+    """
+    Serialize a content file for bulk API request
+
+    Args:
+        course_obj (Course): A course
+    """
+    return {
+        "_id": gen_content_file_id(course_run_file_obj.key),
+        **ESContentFileSerializer(course_run_file_obj).data,
     }
 
 

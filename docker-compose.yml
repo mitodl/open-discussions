@@ -53,6 +53,8 @@ services:
       CELERY_RESULT_BACKEND: redis://redis:6379/4
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
+      TIKA_SERVER_ENDPOINT: ${TIKA_SERVER_ENDPOINT:-http://tika:9998/}
+      TIKA_CLIENT_ONLY: 'True'
     env_file: .env
     # set reddit.local in /etc/hosts
     extra_hosts:
@@ -103,3 +105,8 @@ services:
     links:
       - db
       - redis
+
+  tika:
+    image: apache/tika
+    ports:
+      - "9998:9998"

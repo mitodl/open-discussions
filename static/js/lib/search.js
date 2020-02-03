@@ -600,6 +600,19 @@ export const buildLearnQuery = (
                 }
               }
             }
+            : null,
+          type === LR_TYPE_COURSE && SETTINGS.file_search_enabled
+            ? {
+              has_child: {
+                type:  "resourcefile",
+                query: {
+                  [queryType]: {
+                    query:  text,
+                    fields: ["content", "title", "short_description"]
+                  }
+                }
+              }
+            }
             : null
         ].filter(clause => clause !== null)
       }
