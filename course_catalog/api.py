@@ -408,9 +408,13 @@ def sync_ocw_course(
         is_published = False
 
     log.info("Digesting %s...", course_prefix)
-    course, run = digest_ocw_course(
-        course_json, last_modified, is_published, course_prefix
-    )
+    try:
+        course, run = digest_ocw_course(
+            course_json, last_modified, is_published, course_prefix
+        )
+    except TypeError:
+        log.info("Course and run not returned, skipping")
+        return None
 
     if upload_to_s3 and is_published:
         try:
@@ -450,6 +454,8 @@ def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s
     Sync OCW courses to the database
 
     Args:
+        course_prefixes (list of str): The course prefixes to process
+        blacklist (list of str): list of course ids to skip
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
 

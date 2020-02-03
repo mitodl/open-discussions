@@ -217,6 +217,21 @@ def test_get_ocw_overwrite(
     assert mock_digest.call_count == (1 if overwrite else 0)
 
 
+@mock_s3
+def test_get_ocw_typeerror(mocker, settings):
+    """Test that a course is skipped if digest_ocw_course returns None"""
+    setup_s3(settings)
+    mock_info_logger = mocker.patch("course_catalog.api.log.info")
+    mocker.patch("course_catalog.api.digest_ocw_course", return_value=None)
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blacklist=[],
+        force_overwrite=True,
+        upload_to_s3=True,
+    )
+    mock_info_logger.assert_any_call("Course and run not returned, skipping")
+
+
 def test_get_ocw_data_no_settings(settings):
     """
     No data should be imported if OCW settings are missing
