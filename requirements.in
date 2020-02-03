@@ -41,6 +41,7 @@ psycopg2==2.8.3
 praw==4.5.1
 pyyaml==5.1.2
 python-dateutil
+python-rapidjson==0.9.1
 python3-saml==1.4.1
 pygithub==1.44.1
 pytube==9.5.2

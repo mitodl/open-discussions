@@ -1,8 +1,8 @@
 """OCW course catalog ETL"""
-import json
 import logging
 
 import boto3
+import rapidjson
 from django.conf import settings
 
 log = logging.getLogger()
@@ -52,5 +52,5 @@ def upload_mitx_course_manifest(courses):
     manifest = {"results": courses, "count": len(courses)}
 
     ocw_bucket = _get_ocw_learning_course_bucket()
-    ocw_bucket.put_object(Key="edx_courses.json", Body=json.dumps(manifest))
+    ocw_bucket.put_object(Key="edx_courses.json", Body=rapidjson.dumps(manifest))
     return True

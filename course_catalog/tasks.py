@@ -2,16 +2,24 @@
 course_catalog tasks
 """
 import logging
-import json
+
+import celery
+import rapidjson
 import requests
 import boto3
 from django.conf import settings
 
-from open_discussions.celery import app
+from course_catalog.utils import load_course_blacklist
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course
-from course_catalog.api import sync_ocw_data, parse_bootcamp_json_data
+from course_catalog.api import (
+    parse_bootcamp_json_data,
+    generate_course_prefix_list,
+    sync_ocw_courses,
+)
 from course_catalog.etl import pipelines, youtube
+from open_discussions.celery import app
+from open_discussions.utils import chunks
 
 log = logging.getLogger(__name__)
 
@@ -23,8 +31,19 @@ def get_mitx_data():
 
 
 @app.task
+def get_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3):
+    """Task to sync a batch of OCW courses"""
+    sync_ocw_courses(
+        course_prefixes=course_prefixes,
+        blacklist=blacklist,
+        force_overwrite=force_overwrite,
+        upload_to_s3=upload_to_s3,
+    )
+
+
+@app.task(bind=True)
 def get_ocw_data(
-    force_overwrite=False, upload_to_s3=True
+    self, force_overwrite=False, upload_to_s3=True
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
@@ -39,7 +58,32 @@ def get_ocw_data(
     ):
         log.warning("Required settings missing for get_ocw_data")
         return
-    sync_ocw_data(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
+
+    # get all the courses prefixes we care about
+    raw_data_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
+        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+    ocw_courses = generate_course_prefix_list(raw_data_bucket)
+
+    # get a list of blacklisted course ids
+    blacklist = load_course_blacklist()
+
+    ocw_tasks = celery.group(
+        [
+            get_ocw_courses.si(
+                course_prefixes=prefixes,
+                blacklist=blacklist,
+                force_overwrite=force_overwrite,
+                upload_to_s3=upload_to_s3,
+            )
+            for prefixes in chunks(
+                ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
+            )
+        ]
+    )
+    raise self.replace(ocw_tasks)
 
 
 @app.task
@@ -64,7 +108,7 @@ def upload_ocw_master_json():
 
         s3_bucket.put_object(
             Key=s3_folder + f"/{course.course_id}_master.json",
-            Body=json.dumps(course.raw_json),
+            Body=rapidjson.dumps(course.raw_json),
             ACL="private",
         )
 
