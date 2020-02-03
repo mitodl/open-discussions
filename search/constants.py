@@ -4,6 +4,7 @@ from channels.constants import POST_TYPE, COMMENT_TYPE
 ALIAS_ALL_INDICES = "all"
 PROFILE_TYPE = "profile"
 COURSE_TYPE = "course"
+RESOURCE_FILE_TYPE = "resourcefile"
 BOOTCAMP_TYPE = "bootcamp"
 PROGRAM_TYPE = "program"
 USER_LIST_TYPE = "userlist"

@@ -324,6 +324,7 @@ def test_es_course_serializer(offered_by):
             "created": drf_datetime(course.created_on),
             "default_search_priority": 1,
             "minimum_price": minimum_price(course),
+            "resource_relations": {"name": "resource"},
         },
     )
 

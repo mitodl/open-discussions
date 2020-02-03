@@ -321,7 +321,7 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
 
     class Meta:
         model = Course
-        exclude = ("raw_json", *COMMON_IGNORED_FIELDS)
+        exclude = COMMON_IGNORED_FIELDS
         extra_kwargs = {
             "raw_json": {"write_only": True},
             "full_description": {"write_only": True},
