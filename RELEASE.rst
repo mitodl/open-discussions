@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.110.0
+---------------
+
+- Chunk up OCW import task and use rapidjson to speed up processing (#2567)
+
 Version 0.109.1 (Released January 30, 2020)
 ---------------
 
