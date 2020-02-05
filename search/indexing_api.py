@@ -432,20 +432,19 @@ def update_post(doc_id, post):
     )
 
 
-def index_items(serialize_bulk_items, object_type, ids):
+def index_items(documents, object_type):
     """
     Index items based on list of item ids
 
     Args:
-        serialize_bulk_items (callable): the function to serializer a list of objects by id
+        documents (iterable of dict): An iterable with ElasticSearch documents to index
         object_type (str): the ES object type
-        ids(list of int): List of item id's
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, [object_type]):
         _, errors = bulk(
             conn,
-            serialize_bulk_items(ids),
+            documents,
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             # Adjust chunk size from 500 depending on environment variable
@@ -462,7 +461,7 @@ def index_posts(ids):
     Args:
         ids(list of int): List of Post id's
     """
-    index_items(serialize_bulk_posts, POST_TYPE, ids)
+    index_items(serialize_bulk_posts(ids), POST_TYPE)
 
 
 def index_comments(ids):
@@ -472,7 +471,7 @@ def index_comments(ids):
     Args:
         ids(list of int): List of Comment id's
     """
-    index_items(serialize_bulk_comments, COMMENT_TYPE, ids)
+    index_items(serialize_bulk_comments(ids), COMMENT_TYPE)
 
 
 def index_profiles(ids):
@@ -482,7 +481,7 @@ def index_profiles(ids):
     Args:
         ids(list of int): List of Profile id's
     """
-    index_items(serialize_bulk_profiles, PROFILE_TYPE, ids)
+    index_items(serialize_bulk_profiles(ids), PROFILE_TYPE)
 
 
 def index_courses(ids):
@@ -492,7 +491,7 @@ def index_courses(ids):
     Args:
         ids(list of int): List of Course id's
     """
-    index_items(serialize_bulk_courses, COURSE_TYPE, ids)
+    index_items(serialize_bulk_courses(ids), COURSE_TYPE)
 
 
 def index_bootcamps(ids):
@@ -502,7 +501,7 @@ def index_bootcamps(ids):
     Args:
         ids(list of int): List of Bootcamp id's
     """
-    index_items(serialize_bulk_bootcamps, BOOTCAMP_TYPE, ids)
+    index_items(serialize_bulk_bootcamps(ids), BOOTCAMP_TYPE)
 
 
 def index_programs(ids):
@@ -512,7 +511,7 @@ def index_programs(ids):
     Args:
         ids(list of int): List of Program id's
     """
-    index_items(serialize_bulk_programs, PROGRAM_TYPE, ids)
+    index_items(serialize_bulk_programs(ids), PROGRAM_TYPE)
 
 
 def index_user_lists(ids):
@@ -522,7 +521,7 @@ def index_user_lists(ids):
     Args:
         ids(list of int): List of UserList id's
     """
-    index_items(serialize_bulk_user_lists, USER_LIST_TYPE, ids)
+    index_items(serialize_bulk_user_lists(ids), USER_LIST_TYPE)
 
 
 def index_videos(ids):
@@ -532,7 +531,7 @@ def index_videos(ids):
     Args:
         ids(list of int): List of Video id's
     """
-    index_items(serialize_bulk_videos, VIDEO_TYPE, ids)
+    index_items(serialize_bulk_videos(ids), VIDEO_TYPE)
 
 
 def create_backing_index(object_type):
