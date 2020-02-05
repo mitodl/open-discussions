@@ -329,13 +329,16 @@ export type SocialAuth = {
   provider: string,
 }
 
+export type LearningResourceRef = {
+  object_id: number,
+  content_type: string
+}
+
 
 export type ListItemMember = {
   list_id: number,
   item_id: number,
-  object_id: number,
-  content_type: string
-}
+} & LearningResourceRef
 
 export type LearningResourceSummary = {
   id:                 number,

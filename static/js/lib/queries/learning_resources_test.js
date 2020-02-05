@@ -6,7 +6,9 @@ import {
   filterFavorites,
   similarResourcesRequest,
   learningResourceSelector,
-  normalizeResourcesByObjectType
+  normalizeResourcesByObjectType,
+  mapResourcesToResourceRefs,
+  filterObjectType
 } from "./learning_resources"
 import {
   makeCourse,
@@ -29,6 +31,38 @@ describe("learning resource queries", () => {
 
   beforeEach(() => {
     favorites = [...R.times(makeCourse, 5), ...R.times(makeBootcamp, 5)]
+  })
+
+  it("mapResourcesToResourceRefs should map learning resources to a ref object", () => {
+    assert.deepEqual(
+      mapResourcesToResourceRefs([
+        {
+          id:          1,
+          object_type: "course"
+        },
+        {
+          id:          2,
+          object_type: "video"
+        }
+      ]),
+      [
+        {
+          object_id:    1,
+          content_type: "course"
+        },
+        {
+          object_id:    2,
+          content_type: "video"
+        }
+      ]
+    )
+  })
+
+  it("filterObjectType returns only objects of the specified object_type", () => {
+    assert.deepEqual(
+      filterObjectType([{ object_type: "abc" }, { object_type: "def" }], "abc"),
+      [{ object_type: "abc" }]
+    )
   })
 
   //

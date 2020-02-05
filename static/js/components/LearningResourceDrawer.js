@@ -1,16 +1,16 @@
 // @flow
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Drawer, DrawerContent } from "@rmwc/drawer"
 import { Theme } from "@rmwc/theme"
-import { useRequest } from "redux-query-react"
+import { useRequest, useMutation } from "redux-query-react"
 import { createSelector } from "reselect"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 
 import { pushLRHistory, popLRHistory, clearLRHistory } from "../actions/ui"
 import { embedlyRequest, getEmbedlys } from "../lib/queries/embedly"
-import { LR_TYPE_VIDEO } from "../lib/constants"
+import { LR_TYPE_VIDEO, OBJECT_TYPE_MAPPING } from "../lib/constants"
 import { useResponsive } from "../hooks/util"
 import {
   learningResourceSelector,
@@ -18,6 +18,7 @@ import {
   similarResourcesRequest,
   getSimilarResources
 } from "../lib/queries/learning_resources"
+import { interactionMutation } from "../lib/queries/interactions"
 
 const getLRHistory = createSelector(
   state => state.ui,
@@ -85,6 +86,18 @@ export default function LearningResourceDrawer() {
 
   const { objectId, objectType, runId, numHistoryEntries } = useSelector(
     getLRHistory
+  )
+
+  const [, logInteraction] = useMutation(interactionMutation)
+
+  useEffect(
+    () => {
+      if (!objectId || !objectType) {
+        return
+      }
+      logInteraction("view", OBJECT_TYPE_MAPPING[objectType], objectId)
+    },
+    [objectId, objectType]
   )
 
   useRequest(getResourceRequest(objectId, objectType))

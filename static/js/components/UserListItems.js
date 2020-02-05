@@ -118,12 +118,6 @@ export function UserListItemSortableCards({
 
   const { items, count } = useSelector(createUserListItemsSelector(userListId))
 
-  console.log({
-    isFinished,
-    page,
-    len: items.length
-  })
-
   return initialLoadDone ? (
     <InfiniteScroll
       hasMore={

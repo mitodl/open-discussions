@@ -137,10 +137,11 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
             .filter(has_runs=True, published=True)
             .prefetch_related(
                 "topics",
+                "offered_by",
                 Prefetch(
                     "runs",
                     queryset=LearningResourceRun.objects.prefetch_related(
-                        "topics", "prices", "instructors"
+                        "topics", "prices", "instructors", "offered_by"
                     )
                     .filter(published=True)
                     .order_by("-best_start_date"),
