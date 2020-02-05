@@ -28,7 +28,8 @@ import {
   userListDetailApiURL,
   videoDetailApiURL,
   embedlyApiURL,
-  similarResourcesURL
+  similarResourcesURL,
+  interactionsApiURL
 } from "../lib/url"
 import { mockHTMLElHeight } from "../lib/test_utils"
 import { makeSearchResult } from "../factories/search"
@@ -52,6 +53,10 @@ describe("LearningResourceDrawer", () => {
     helper.handleRequestStub.withArgs(similarResourcesURL).returns({
       status: 200,
       body:   similarItems
+    })
+    helper.handleRequestStub.withArgs(interactionsApiURL).returns({
+      status: 201,
+      body:   {} // body is ignored
     })
     render = helper.configureReduxQueryRenderer(LearningResourceDrawer)
     mockHTMLElHeight(100, 50)
@@ -127,6 +132,11 @@ describe("LearningResourceDrawer", () => {
     const addEventListenerStub = helper.sandbox.stub(window, "addEventListener")
     await render()
     assert.ok(addEventListenerStub.called)
+  })
+
+  it("should log a view interaction when the drawer is shown", async () => {
+    await renderWithObject(course, courseDetailApiURL)
+    assert.ok(helper.handleRequestStub.calledWith(interactionsApiURL))
   })
 
   it("should not include an ExpandedLearningResourceDisplay if there isn't a focused object", async () => {

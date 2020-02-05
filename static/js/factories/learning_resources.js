@@ -255,3 +255,16 @@ export const makeFavoritesResponse = () => {
     ...bootcamps.map(formatFavorite(LR_TYPE_BOOTCAMP))
   ]
 }
+
+export const makeRandomResource = () =>
+  casual.random_element([
+    makeBootcamp,
+    makeCourse,
+    makeVideo,
+    makeProgram,
+    makeUserList
+  ])()
+
+export const makePopularContentResponse = (count: number = 10) => {
+  return R.times(makeRandomResource, count)
+}

@@ -93,6 +93,7 @@ INSTALLED_APPS = (
     "search",
     "widgets",
     "course_catalog",
+    "interactions",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)

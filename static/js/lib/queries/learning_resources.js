@@ -44,6 +44,21 @@ export const updateLearningResources = {
   videos:    R.merge
 }
 
+export const mapResourcesToResourceRefs = R.map(
+  R.compose(
+    renameKeys({
+      id:          "object_id",
+      object_type: "content_type"
+    }),
+    R.pick(["id", "object_type"])
+  )
+)
+
+export const filterObjectType = (
+  results: Array<Object>,
+  objectType: string
+): Array<Object> => results.filter(result => result.object_type === objectType)
+
 export const filterFavorites = (
   results: Array<Object>,
   contentType: string

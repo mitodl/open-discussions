@@ -17,13 +17,15 @@ import {
   upcomingCoursesURL,
   newCoursesURL,
   userListApiURL,
-  newVideosURL
+  newVideosURL,
+  popularContentUrl
 } from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 import {
   makeCourse,
   makeFavoritesResponse,
-  makeVideo
+  makeVideo,
+  makePopularContentResponse
 } from "../factories/learning_resources"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { LR_TYPE_COURSE } from "../lib/constants"
@@ -38,6 +40,7 @@ describe("CourseIndexPage", () => {
     helper,
     courseLists,
     favorites,
+    popularContent,
     paramsStub
 
   beforeEach(() => {
@@ -60,12 +63,17 @@ describe("CourseIndexPage", () => {
       video.is_favorite = false
       return video
     })
+    popularContent = makePopularContentResponse().map(resource => {
+      resource.is_favorite = false
+      return resource
+    })
 
     courseLists = {
       featuredCourses,
       upcomingCourses,
       newCourses,
       newVideos,
+      popularContent,
       // eslint-disable-next-line camelcase
       favorites: favorites.map(({ content_data, content_type }) => ({
         ...content_data, // eslint-disable-line camelcase
@@ -88,6 +96,9 @@ describe("CourseIndexPage", () => {
       .withArgs(newVideosURL)
       .returns(queryListResponse(newVideos))
     helper.handleRequestStub
+      .withArgs(popularContentUrl)
+      .returns(queryListResponse(popularContent))
+    helper.handleRequestStub
       .withArgs(userListApiURL.toString())
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
@@ -106,8 +117,9 @@ describe("CourseIndexPage", () => {
   ;[
     ["favorites", "Your Favorites"],
     ["featuredCourses", "Featured Courses"],
-    ["upcomingCourses", "Upcoming Courses"],
     ["newCourses", "New Courses"],
+    ["popularContent", "Popular Learning Resources"],
+    ["upcomingCourses", "Upcoming Courses"],
     ["newVideos", "New Videos"]
   ].forEach(([courseListName, title], idx) => {
     it(`should pass ${title} down to carousel`, async () => {
@@ -129,11 +141,12 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
-    assert.lengthOf(carousels, 4)
+    assert.lengthOf(carousels, 5)
     assert.deepEqual(carousels.map(el => el.prop("title")), [
       "Your Favorites",
-      "Upcoming Courses",
       "New Courses",
+      "Popular Learning Resources",
+      "Upcoming Courses",
       "New Videos"
     ])
   })
@@ -144,11 +157,28 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
-    assert.lengthOf(carousels, 4)
+    assert.lengthOf(carousels, 5)
     assert.deepEqual(carousels.map(el => el.prop("title")), [
       "Featured Courses",
-      "Upcoming Courses",
       "New Courses",
+      "Popular Learning Resources",
+      "Upcoming Courses",
+      "New Videos"
+    ])
+  })
+
+  it("should hide the popular resources carousel when empty", async () => {
+    helper.handleRequestStub
+      .withArgs(popularContentUrl)
+      .returns(queryListResponse([]))
+    const { wrapper } = await render()
+    const carousels = wrapper.find("CourseCarousel")
+    assert.lengthOf(carousels, 5)
+    assert.deepEqual(carousels.map(el => el.prop("title")), [
+      "Your Favorites",
+      "Featured Courses",
+      "New Courses",
+      "Upcoming Courses",
       "New Videos"
     ])
   })

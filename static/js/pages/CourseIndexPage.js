@@ -27,6 +27,10 @@ import {
 } from "../lib/queries/courses"
 import { newVideosRequest, newVideosSelector } from "../lib/queries/videos"
 import {
+  popularContentSelector,
+  popularContentRequest
+} from "../lib/queries/interactions"
+import {
   favoritesRequest,
   favoritesListSelector
 } from "../lib/queries/learning_resources"
@@ -49,19 +53,24 @@ export default function CourseIndexPage({ history }: Props) {
   const [{ isFinished: isFinishedNew }] = useRequest(newCoursesRequest())
   const [{ isFinished: isFinishedFavorites }] = useRequest(favoritesRequest())
   const [{ isFinished: isFinishedVideos }] = useRequest(newVideosRequest())
+  const [{ isFinished: isFinishedPopular }] = useRequest(
+    popularContentRequest()
+  )
 
   const featuredCourses = useSelector(featuredCoursesSelector)
   const upcomingCourses = useSelector(upcomingCoursesSelector)
   const newCourses = useSelector(newCoursesSelector)
   const newVideos = useSelector(newVideosSelector)
   const favorites = useSelector(favoritesListSelector)
+  const popularResources = useSelector(popularContentSelector)
 
   const loaded =
     isFinishedFeatured &&
     isFinishedUpcoming &&
     isFinishedNew &&
     isFinishedFavorites &&
-    isFinishedVideos
+    isFinishedVideos &&
+    isFinishedPopular
 
   const dispatch = useDispatch()
   const { objectId, objectType } = useLRDrawerParams()
@@ -120,11 +129,17 @@ export default function CourseIndexPage({ history }: Props) {
                 courses={featuredCourses}
               />
             ) : null}
+            <CourseCarousel title="New Courses" courses={newCourses} />
+            {popularResources.length !== 0 ? (
+              <CourseCarousel
+                title="Popular Learning Resources"
+                courses={popularResources}
+              />
+            ) : null}
             <CourseCarousel
               title="Upcoming Courses"
               courses={upcomingCourses}
             />
-            <CourseCarousel title="New Courses" courses={newCourses} />
             {newVideos.length !== 0 ? (
               <CourseCarousel title="New Videos" courses={newVideos} />
             ) : null}
