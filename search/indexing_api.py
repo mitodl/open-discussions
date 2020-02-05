@@ -8,6 +8,7 @@ from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
+from open_discussions.utils import chunks
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -441,17 +442,23 @@ def index_items(documents, object_type):
         object_type (str): the ES object type
     """
     conn = get_conn()
-    for alias in get_active_aliases(conn, [object_type]):
-        _, errors = bulk(
-            conn,
-            documents,
-            index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
-            # Adjust chunk size from 500 depending on environment variable
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-        )
-        if len(errors) > 0:
-            raise ReindexException(f"Error during bulk {object_type} insert: {errors}")
+    # bulk will also break an iterable into chunks. However we should do this here so that
+    # we can use the same documents when indexing to multiple aliases.
+    for chunk in chunks(
+        documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+    ):
+        for alias in get_active_aliases(conn, [object_type]):
+            _, errors = bulk(
+                conn,
+                chunk,
+                index=alias,
+                doc_type=GLOBAL_DOC_TYPE,
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+            if len(errors) > 0:
+                raise ReindexException(
+                    f"Error during bulk {object_type} insert: {errors}"
+                )
 
 
 def index_posts(ids):
