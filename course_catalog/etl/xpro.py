@@ -1,18 +1,37 @@
 """xPro course catalog ETL"""
 import copy
 from datetime import datetime
+import re
+from subprocess import check_call, check_output
+from tempfile import TemporaryDirectory
 
+import boto3
 from django.conf import settings
 import requests
 import pytz
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.utils import log_exceptions
+from course_catalog.etl.utils import extract_text_metadata, log_exceptions
 
 
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 OFFERED_BY = [{"name": OfferedBy.xpro.value}]
+
+
+def get_xpro_learning_course_bucket():
+    """
+    Get the xPRO S3 Bucket
+
+    Returns:
+        boto3.Bucket: the OCW S3 Bucket or None
+    """
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.XPRO_LEARNING_COURSE_ACCESS_KEY,
+        aws_secret_access_key=settings.XPRO_LEARNING_COURSE_SECRET_ACCESS_KEY,
+    )
+    return s3.Bucket(name=settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
 
 
 def _parse_datetime(value):
@@ -165,3 +184,61 @@ def transform_programs(programs):
         }
         for program in programs
     ]
+
+
+def _chunk_string(content):
+    """
+    Helper function to chunk
+
+    Args:
+        content (str): Content string
+
+    Yields:
+        str: Chunks of roughly 8k length or less each, split on whitespace
+    """
+    chunk = ""
+    for match in re.finditer(r"[^\s]+", content):
+        chunk += f" {match.group(0)}"
+        if len(chunk) > 8000:
+            yield chunk
+            chunk = ""
+
+    if chunk:
+        yield chunk
+
+
+def transform_content_files(course_tarpath):
+    """
+    Pass content to tika, then return a JSON document with the transformed content inside it
+
+    Args:
+        course_tarpath (str): The path to the tarball which contains the OLX
+    """
+
+    content = []
+    with TemporaryDirectory() as inner_tempdir:
+        check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
+
+        for document, key in documents_from_olx(inner_tempdir):
+            tika_output = extract_text_metadata(document).get("content") or ""
+            for i, chunk in enumerate(_chunk_string(tika_output)):
+                content.append({"content": chunk.strip(), "key": f"{key}_{i}"})
+    return content
+
+
+def documents_from_olx(olx_path):
+    """
+    Extract text from OLX directory
+
+    Args:
+        olx_path (str): The path to the directory with the OLX data
+
+    Returns:
+        list of tuple:
+            A list of (str of content, unique key for document)
+    """
+    document = check_output(
+        ["find", "-name", "*.xml", "-o", "-name", "*.html", "-exec", "cat", "{}", ";"],
+        cwd=olx_path,
+    ).decode()
+    return [(document, olx_path)]

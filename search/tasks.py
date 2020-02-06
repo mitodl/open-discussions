@@ -577,7 +577,9 @@ def start_recreate_index(self):
                 index_course_content_files.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
-                    .filter(platform=PlatformType.ocw.value)
+                    .filter(
+                        platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+                    )
                     .exclude(course_id__in=blacklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),
