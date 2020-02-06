@@ -8,6 +8,7 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from open_discussions.utils import chunks
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
 from search.exceptions import ReindexException
@@ -333,11 +334,15 @@ def test_index_functions(
     """
     index functions should call bulk with correct arguments
     """
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
     )
-    mock_serialize_items = mocker.patch(
-        f"search.indexing_api.{serializing_func_name}", autospec=True
+    mocker.patch(
+        f"search.indexing_api.{serializing_func_name}",
+        autospec=True,
+        return_value=(doc for doc in documents),
     )
     bulk_mock = mocker.patch(
         "search.indexing_api.bulk", autospec=True, return_value=(0, errors)
@@ -350,13 +355,16 @@ def test_index_functions(
     else:
         index_func([1, 2, 3])
         for alias in mock_get_aliases.return_value:
-            bulk_mock.assert_any_call(
-                mocked_es.conn,
-                mock_serialize_items.return_value,
-                index=alias,
-                doc_type=GLOBAL_DOC_TYPE,
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-            )
+            for chunk in chunks(
+                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+            ):
+                bulk_mock.assert_any_call(
+                    mocked_es.conn,
+                    chunk,
+                    index=alias,
+                    doc_type=GLOBAL_DOC_TYPE,
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
 
 
 def test_delete_document(mocked_es, mocker):
