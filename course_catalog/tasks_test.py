@@ -113,6 +113,7 @@ def setup_s3(settings):
 def test_get_mitx_data_valid(mocker):
     """Verify that the get_mitx_data invokes the MITx ETL pipeline"""
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+
     get_mitx_data.delay()
     mock_pipelines.mitx_etl.assert_called_once_with()
 
@@ -393,6 +394,7 @@ def test_process_bootcamps(mock_get_bootcamps):
 def test_get_micromasters_data(mocker):
     """Verify that the get_micromasters_data invokes the MicroMasters ETL pipeline"""
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+
     get_micromasters_data.delay()
     mock_pipelines.micromasters_etl.assert_called_once_with()
 

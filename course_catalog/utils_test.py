@@ -11,6 +11,7 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
     load_course_blacklist,
+    load_course_duplicates,
 )
 
 
@@ -110,3 +111,38 @@ def test_load_blacklist(url, settings, mocker):
     else:
         mock_request.assert_called_once_with(url)
         assert blacklist == [str(id, "utf-8") for id in file_content]
+
+
+@pytest.mark.parametrize("url", [None, "http://test.me"])
+@pytest.mark.parametrize("platform", ["mitx", "other"])
+def test_load_course_duplicates(url, platform, settings, mocker):
+    """Test that a list of duplicate course id sets is returned if a URL is set"""
+    settings.DUPLICATE_COURSES_URL = url
+    file_content = """
+---
+mitx:
+  - duplicate_course_ids:
+      - MITx+1
+      - MITx+2
+      - MITx+3
+    course_id: MITx+1
+"""
+
+    mock_request = mocker.patch(
+        "requests.get", autospec=True, return_value=mocker.Mock(text=file_content)
+    )
+    duplicates = load_course_duplicates(platform)
+    if url is None:
+        mock_request.assert_not_called()
+        assert duplicates == []
+    elif platform == "other":
+        mock_request.assert_called_once_with(url)
+        assert duplicates == []
+    else:
+        mock_request.assert_called_once_with(url)
+        assert duplicates == [
+            {
+                "duplicate_course_ids": ["MITx+1", "MITx+2", "MITx+3"],
+                "course_id": "MITx+1",
+            }
+        ]

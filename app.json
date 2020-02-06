@@ -47,6 +47,10 @@
       "description": "URL of a text file containing blacklisted course ids",
       "required": false
     },
+    "DUPLICATE_COURSES_URL": {
+      "description": "URL of a text file containing course ids that are duplicates of each other",
+      "required": false
+    },
     "BOOTCAMPS_URL": {
       "description": "URL to retrieve bootcamps data",
       "required": false

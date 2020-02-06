@@ -25,7 +25,10 @@ def test_micromasters_etl(mocker):
     mock_transform = mocker.patch(
         "course_catalog.etl.micromasters.transform", return_value=values
     )
-    mock_load_programs = mocker.patch("course_catalog.etl.loaders.load_programs")
+    mock_load_programs = mocker.Mock()
+    mocker.patch(
+        "course_catalog.etl.loaders.load_programs", return_value=mock_load_programs
+    )
 
     with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_programs):
         result = pipelines.micromasters_etl()
@@ -41,7 +44,11 @@ def test_xpro_programs_etl(mocker):
     """Verify that xpro programs etl pipeline executes correctly"""
     mock_extract = mocker.patch("course_catalog.etl.xpro.extract_programs")
     mock_transform = mocker.patch("course_catalog.etl.xpro.transform_programs")
-    mock_load_programs = mocker.patch("course_catalog.etl.loaders.load_programs")
+    mock_load_programs = mocker.Mock()
+
+    mocker.patch(
+        "course_catalog.etl.loaders.load_programs", return_value=mock_load_programs
+    )
 
     with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_programs):
         result = pipelines.xpro_programs_etl()
