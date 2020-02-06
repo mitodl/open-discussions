@@ -829,6 +829,8 @@ BLACKLISTED_COURSES_URL = get_string(
     "https://raw.githubusercontent.com/mitodl/open-resource-blacklists/master/courses.txt",
 )
 
+DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
+
 # Base URL for bootcamps data
 BOOTCAMPS_URL = get_string(
     "BOOTCAMPS_URL",

@@ -27,7 +27,8 @@ from course_catalog.models import (
     UserListItem,
     ContentFile,
 )
-from course_catalog.utils import load_course_blacklist
+from course_catalog.utils import load_course_blacklist, load_course_duplicates
+from course_catalog.etl.deduplication import get_most_relevant_run
 from search import task_helpers as search_task_helpers
 from search.constants import COURSE_TYPE
 
@@ -122,25 +123,63 @@ def load_run(learning_resource, course_run_data):
     return learning_resource_run
 
 
-def load_course(course_data, blacklist):
+def load_course(course_data, blacklist, duplicates):
     """Load the course into the database"""
+    # pylint: disable=too-many-branches,too-many-locals
+
     course_id = course_data.pop("course_id")
-    platform = course_data.get("platform")
     runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", [])
     offered_bys_data = course_data.pop("offered_by", [])
+
     if course_id in blacklist:
         course_data["published"] = False
 
-    course, created = Course.objects.update_or_create(
-        platform=platform, course_id=course_id, defaults=course_data
+    duplicates_record = next(
+        (
+            record
+            for record in duplicates
+            if course_id in record["duplicate_course_ids"]
+        ),
+        None,
     )
 
-    load_topics(course, topics_data)
-    load_offered_bys(course, offered_bys_data)
+    if duplicates_record:
+        course = Course.objects.filter(course_id=duplicates_record["course_id"]).first()
+        if not course:
+            course_data["course_id"] = duplicates_record["course_id"]
+            course = Course.objects.create(**course_data)
+            created = True
+        else:
+            created = False
+
+        if course_id != duplicates_record["course_id"]:
+            duplicate_course = Course.objects.filter(course_id=course_id).first()
+            if duplicate_course:
+                duplicate_course.published = False
+                duplicate_course.save()
+                search_task_helpers.delete_course(duplicate_course)
+    else:
+        platform = course_data.get("platform")
+        course, created = Course.objects.update_or_create(
+            platform=platform, course_id=course_id, defaults=course_data
+        )
+
+    run_ids_to_update_or_create = [run["run_id"] for run in runs_data]
 
     for course_run_data in runs_data:
         load_run(course, course_run_data)
+
+    if duplicates_record and not created:
+        most_relevent_run = get_most_relevant_run(course.runs.all())
+
+        if most_relevent_run.run_id in run_ids_to_update_or_create:
+            for attr, val in course_data.items():
+                setattr(course, attr, val)
+            course.save()
+
+    load_topics(course, topics_data)
+    load_offered_bys(course, offered_bys_data)
 
     if not created and not course.published:
         search_task_helpers.delete_course(course)
@@ -154,12 +193,23 @@ def load_course(course_data, blacklist):
 def load_courses(courses_data):
     """Load a list of programs"""
     blacklist = load_course_blacklist()
-    return [load_course(course_data, blacklist) for course_data in courses_data]
+
+    if courses_data and len(list(courses_data)) > 0:
+        platform = courses_data[0].get("platform")
+        duplicates = load_course_duplicates(platform)
+    else:
+        duplicates = []
+
+    return [
+        load_course(course_data, blacklist, duplicates) for course_data in courses_data
+    ]
 
 
 @log_exceptions("Error loading program")
-def load_program(program_data, blacklist):
+def load_program(program_data, blacklist, duplicates):
     """Load the program into the database"""
+    # pylint: disable=too-many-locals
+
     program_id = program_data.pop("program_id")
     courses_data = program_data.pop("courses")
     topics_data = program_data.pop("topics", [])
@@ -184,7 +234,7 @@ def load_program(program_data, blacklist):
         if not course_data.get("course_id", None):
             continue
 
-        course = load_course(course_data, blacklist)
+        course = load_course(course_data, blacklist, duplicates)
         courses.append(course)
 
         # create a program item or update its position
@@ -208,10 +258,15 @@ def load_program(program_data, blacklist):
     return program
 
 
-def load_programs(programs_data):
+def load_programs(platform, programs_data):
     """Load a list of programs"""
     blacklist = load_course_blacklist()
-    return [load_program(program_data, blacklist) for program_data in programs_data]
+    duplicates = load_course_duplicates(platform)
+
+    return [
+        load_program(program_data, blacklist, duplicates)
+        for program_data in programs_data
+    ]
 
 
 def load_video(video_data):

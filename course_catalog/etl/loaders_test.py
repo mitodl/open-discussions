@@ -67,6 +67,14 @@ def mock_blacklist(mocker):
 
 
 @pytest.fixture(autouse=True)
+def mock_duplicates(mocker):
+    """Mock the load_course_duplicates function"""
+    return mocker.patch(
+        "course_catalog.etl.loaders.load_course_duplicates", return_value=[]
+    )
+
+
+@pytest.fixture(autouse=True)
 def mock_tasks(mocker):
     """Mock out course_catalog tasks"""
     return SimpleNamespace(
@@ -166,6 +174,7 @@ def test_load_program(
             ],
         },
         [],
+        [],
     )
 
     if program_exists and not is_published:
@@ -228,7 +237,7 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published, blacklisted
 
     blacklist = [course.course_id] if blacklisted else []
 
-    result = load_course(props, blacklist)
+    result = load_course(props, blacklist, [])
 
     if course_exists and not is_published and not blacklisted:
         mock_upsert_tasks.delete_course.assert_called_with(result)
@@ -246,6 +255,75 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published, blacklisted
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
+
+
+@pytest.mark.parametrize("course_exists", [True, False])
+@pytest.mark.parametrize("course_id_is_duplicate", [True, False])
+@pytest.mark.parametrize("duplicate_course_exists", [True, False])
+def test_load_duplicate_course(
+    mock_upsert_tasks, course_exists, course_id_is_duplicate, duplicate_course_exists
+):
+    """Test that load_course loads the course"""
+    course = CourseFactory.create(runs=None) if course_exists else CourseFactory.build()
+
+    duplicate_course = (
+        CourseFactory.create(runs=None, platform=course.platform)
+        if duplicate_course_exists
+        else CourseFactory.build()
+    )
+
+    if course_exists and duplicate_course_exists:
+        assert Course.objects.count() == 2
+    elif course_exists or duplicate_course_exists:
+        assert Course.objects.count() == 1
+    else:
+        assert Course.objects.count() == 0
+
+    assert LearningResourceRun.objects.count() == 0
+
+    duplicates = [
+        {
+            "course_id": course.course_id,
+            "duplicate_course_ids": [course.course_id, duplicate_course.course_id],
+        }
+    ]
+
+    course_id = (
+        duplicate_course.course_id if course_id_is_duplicate else course.course_id
+    )
+
+    props = model_to_dict(
+        CourseFactory.build(course_id=course_id, platform=course.platform)
+    )
+
+    del props["id"]
+    run = model_to_dict(LearningResourceRunFactory.build(platform=course.platform))
+    del run["content_type"]
+    del run["object_id"]
+    del run["id"]
+    props["runs"] = [run]
+
+    result = load_course(props, [], duplicates)
+
+    if course_id_is_duplicate and duplicate_course_exists:
+        mock_upsert_tasks.delete_course.assert_called()
+
+    mock_upsert_tasks.upsert_course.assert_called_with(result.id)
+
+    assert Course.objects.count() == (2 if duplicate_course_exists else 1)
+
+    assert LearningResourceRun.objects.count() == 1
+
+    # assert we got a course back
+    assert isinstance(result, Course)
+
+    saved_course = Course.objects.filter(course_id=course.course_id).first()
+
+    for key, value in props.items():
+        assert getattr(result, key) == value, f"Property {key} should equal {value}"
+        assert (
+            getattr(saved_course, key) == value
+        ), f"Property {key} should be updated to {value} in the database"
 
 
 @pytest.mark.parametrize("run_exists", [True, False])
@@ -679,26 +757,28 @@ def test_load_playlist_user_list(
             mock_upsert_tasks.delete_user_list.assert_not_called()
 
 
-def test_load_courses(mocker, mock_blacklist):
+def test_load_courses(mocker, mock_blacklist, mock_duplicates):
     """Test that load_courses calls the expected functions"""
-    course_data = [{"a": "b"}, {"a": "c"}]
+    course_data = [{"platform": "a"}, {"platform": "b"}]
     mock_load_course = mocker.patch(
         "course_catalog.etl.loaders.load_course", autospec=True
     )
     load_courses(course_data)
     assert mock_load_course.call_count == len(course_data)
     mock_blacklist.assert_called_once()
+    mock_duplicates.assert_called_once()
 
 
-def test_load_programs(mocker, mock_blacklist):
+def test_load_programs(mocker, mock_blacklist, mock_duplicates):
     """Test that load_programs calls the expected functions"""
-    program_data = [{"a": "b"}, {"a": "c"}]
+    program_data = [{"courses": [{"platform": "a"}, {}]}]
     mock_load_program = mocker.patch(
         "course_catalog.etl.loaders.load_program", autospec=True
     )
-    load_programs(program_data)
+    load_programs("mitx", program_data)
     assert mock_load_program.call_count == len(program_data)
     mock_blacklist.assert_called_once()
+    mock_duplicates.assert_called_once_with("mitx")
 
 
 @pytest.mark.parametrize("is_published", [True, False])

@@ -5,6 +5,7 @@ from urllib.parse import urljoin
 
 import pytz
 import requests
+import yaml
 from django.conf import settings
 
 from course_catalog.constants import ocw_edx_mapping, semester_mapping, PlatformType
@@ -175,4 +176,22 @@ def load_course_blacklist():
         response = requests.get(blacklist_url)
         response.raise_for_status()
         return [str(line, "utf-8") for line in response.iter_lines()]
+    return []
+
+
+def load_course_duplicates(platform):
+    """
+    Get a list of blacklisted course ids for a platform
+    Args:
+        platform (string): the platform for which course duplicates are needed
+    Returns:
+        list of lists of courses which are duplicates of each other
+    """
+    duplicates_url = settings.DUPLICATE_COURSES_URL
+    if duplicates_url is not None:
+        response = requests.get(duplicates_url)
+        response.raise_for_status()
+        duplicates_for_all_platforms = yaml.safe_load(response.text)
+        if platform in duplicates_for_all_platforms:
+            return duplicates_for_all_platforms[platform]
     return []

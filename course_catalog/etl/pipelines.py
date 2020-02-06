@@ -1,5 +1,5 @@
 """ETL pipelines"""
-from toolz import compose, first, juxt
+from toolz import compose, first, juxt, curry
 
 from course_catalog.etl import (
     micromasters,
@@ -12,6 +12,7 @@ from course_catalog.etl import (
     youtube,
 )
 from course_catalog.etl.utils import log_exceptions
+from course_catalog.constants import PlatformType
 
 # A few notes on how this module works:
 #
@@ -22,13 +23,16 @@ from course_catalog.etl.utils import log_exceptions
 # - Each step is wrapped with log_exceptions and propogates and empty value forward (usually [])
 #   - This keeps exceptions from being raised all the way up and provides contextual data for the failure
 # - Additional specifics are commented on as needed
+load_programs = curry(loaders.load_programs)
 
 micromasters_etl = compose(
-    loaders.load_programs, micromasters.transform, micromasters.extract
+    load_programs(PlatformType.mitx.value), micromasters.transform, micromasters.extract
 )
 
 xpro_programs_etl = compose(
-    loaders.load_programs, xpro.transform_programs, xpro.extract_programs
+    load_programs(PlatformType.xpro.value),
+    xpro.transform_programs,
+    xpro.extract_programs,
 )
 xpro_courses_etl = compose(
     loaders.load_courses, xpro.transform_courses, xpro.extract_courses
