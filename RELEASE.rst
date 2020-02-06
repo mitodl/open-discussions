@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.110.1
+---------------
+
+- updates to search index for default search ordering
+- Refactor index_items (#2576)
+
 Version 0.110.0 (Released February 06, 2020)
 ---------------
 
