@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.models import Course, ContentFile, LearningResourceRun
+from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks
 from search.api import gen_course_id
 from search.connection import (

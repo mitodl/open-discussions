@@ -324,7 +324,7 @@ def index_profiles(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "index_profiles threw an error"
+        error = f"index_profiles threw an error {ids}"
         log.exception(error)
         return error
 
@@ -343,7 +343,7 @@ def index_posts(post_ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "index_posts threw an error"
+        error = f"index_posts threw an error {post_ids}"
         log.exception(error)
         return error
 
@@ -362,7 +362,7 @@ def index_comments(comment_ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "index_comments threw an error"
+        error = f"index_comments threw an error {comment_ids}"
         log.exception(error)
         return error
 
@@ -381,7 +381,7 @@ def index_courses(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_courses threw an error"
+        error = f"index_courses threw an error {ids}"
         log.exception(error)
         return error
 
@@ -457,7 +457,7 @@ def index_bootcamps(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_bootcamps threw an error"
+        error = f"index_bootcamps threw an error {ids}"
         log.exception(error)
         return error
 
@@ -476,7 +476,7 @@ def index_programs(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_programs threw an error"
+        error = f"index_programs threw an error {ids}"
         log.exception(error)
         return error
 
@@ -495,7 +495,7 @@ def index_user_lists(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_user_lists threw an error"
+        error = f"index_user_lists threw an error {ids}"
         log.exception(error)
         return error
 
@@ -514,7 +514,7 @@ def index_videos(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_videos threw an error"
+        error = f"index_videos threw an error {ids}"
         log.exception(error)
         return error
 
@@ -577,7 +577,9 @@ def start_recreate_index(self):
                 index_course_content_files.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
-                    .filter(platform=PlatformType.ocw.value)
+                    .filter(
+                        platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+                    )
                     .exclude(course_id__in=blacklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),
