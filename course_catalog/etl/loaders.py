@@ -8,13 +8,8 @@ from django.db.models import OuterRef, Exists
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import (
-    PrivacyLevel,
-    ListType,
-    CONTENT_TYPE_FILE,
-    VALID_TEXT_FILE_TYPES,
-    CONTENT_TYPE_PAGE,
-)
+from channels.constants import CONTENT_TYPE_FILE, CONTENT_TYPE_PAGE
+from course_catalog.constants import PrivacyLevel, ListType, VALID_TEXT_FILE_TYPES
 from course_catalog.models import (
     Course,
     CourseInstructor,
