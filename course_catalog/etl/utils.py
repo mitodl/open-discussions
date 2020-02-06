@@ -2,6 +2,7 @@
 from functools import wraps
 import logging
 
+import rapidjson
 from tika import parser as tika_parser
 from toolz import excepts
 
@@ -66,21 +67,25 @@ def get_bucket_for_platform(platform):
     return None
 
 
-def sync_s3_text(platform, key, text):
+def sync_s3_text(platform, key, content_meta):
     """
     Save the extracted text for a ContentFile to S3 for future use
 
     Args:
         platform(str): the platform of the ContentFile
         key(str): the original key of the content file
-        text(str): the text to save
+        content_meta(dict): the content metadata returned by tika
     """
     bucket = get_bucket_for_platform(platform)
-    if bucket and text:
-        bucket.put_object(Key=f"extracts/{key}.txt", Body=text, ACL="public-read")
+    if bucket and content_meta:
+        bucket.put_object(
+            Key=f"extracts/{key}.json",
+            Body=rapidjson.dumps(content_meta),
+            ACL="public-read",
+        )
 
 
-def extract_text(data):
+def extract_text_metadata(data):
     """
     Use tika to extract text content from file data
 
@@ -88,7 +93,7 @@ def extract_text(data):
         data (str): File contents
 
     Returns:
-         str: text contained in file
+         dict: metadata returned by tike, including content
 
     """
-    return tika_parser.from_buffer(data).get("content", None)
+    return tika_parser.from_buffer(data)
