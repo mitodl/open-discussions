@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
-from channels.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
+from course_catalog.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
 from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel

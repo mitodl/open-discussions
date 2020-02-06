@@ -8,8 +8,13 @@ from django.db.models import OuterRef, Exists
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-from channels.constants import CONTENT_TYPE_FILE, CONTENT_TYPE_PAGE
-from course_catalog.constants import PrivacyLevel, ListType, VALID_TEXT_FILE_TYPES
+from course_catalog.constants import (
+    PrivacyLevel,
+    ListType,
+    CONTENT_TYPE_FILE,
+    VALID_TEXT_FILE_TYPES,
+    CONTENT_TYPE_PAGE,
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -31,7 +36,7 @@ from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.utils import (
     log_exceptions,
     get_bucket_for_platform,
-    extract_text,
+    extract_text_metadata,
     sync_s3_text,
 )
 
@@ -510,8 +515,9 @@ def load_content_file(
         file_type = file_json.get("file_type", None)
         extension = key.split(".")[-1].lower()
         if extension in VALID_TEXT_FILE_TYPES and data is not None:
-            content = extract_text(data)
-            sync_s3_text(course_run.platform, key, content)
+            content_meta = extract_text_metadata(data)
+            content = content_meta["content"]
+            sync_s3_text(course_run.platform, key, content_meta)
     else:
         # remove/modify this block after ocw_parser saves HTML pages to S3
         file_type = file_json.get("type", None)
@@ -519,8 +525,9 @@ def load_content_file(
         # ES attachment plugin won't parse partial html
         if text and not text.startswith("<html"):
             text = f"<html><body>{text}</body></html>"
-            content = extract_text(text)
-            sync_s3_text(course_run.platform, key, text)
+            content_meta = extract_text_metadata(text)
+            content = content_meta["content"]
+            sync_s3_text(course_run.platform, key, content_meta)
     content_file, created = ContentFile.objects.update_or_create(
         run=course_run,
         key=key,
