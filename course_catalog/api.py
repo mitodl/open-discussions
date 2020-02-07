@@ -19,7 +19,10 @@ from course_catalog.constants import (
     OfferedBy,
 )
 from course_catalog.etl.loaders import load_offered_bys, load_content_files
-from course_catalog.etl.ocw import _get_ocw_learning_course_bucket
+from course_catalog.etl.ocw import (
+    get_ocw_learning_course_bucket,
+    transform_content_files,
+)
 from course_catalog.models import Bootcamp, LearningResourceRun, Course
 from course_catalog.serializers import (
     BootcampSerializer,
@@ -328,7 +331,7 @@ def sync_ocw_course_files(ids=None):
     Args:
         ids(list of int or None): list of course ids to process, all if None
     """
-    bucket = _get_ocw_learning_course_bucket()
+    bucket = get_ocw_learning_course_bucket()
     courses = Course.objects.filter(platform="ocw").filter(published=True)
     if ids is not None:
         courses = courses.filter(id__in=ids)
@@ -342,7 +345,7 @@ def sync_ocw_course_files(ids=None):
                     .get()["Body"]
                     .read()
                 )
-                load_content_files(run, s3_master_json, bucket=bucket)
+                load_content_files(run, transform_content_files(s3_master_json))
             except:  # pylint: disable=bare-except
                 log.exception("Error syncing files for course run %s", run)
 
