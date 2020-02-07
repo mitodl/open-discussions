@@ -6,9 +6,6 @@ import rapidjson
 from tika import parser as tika_parser
 from toolz import excepts
 
-from course_catalog.constants import PlatformType
-from course_catalog.etl.ocw import _get_ocw_learning_course_bucket
-
 log = logging.getLogger()
 
 
@@ -51,32 +48,15 @@ def log_exceptions(msg, *, exc_return_value=None):
     return _log_exceptions
 
 
-def get_bucket_for_platform(platform):
-    """
-    Get the correct file bucket for a platform
-
-    Args:
-        platform(str): The course run platform
-
-    Returns:
-        s3.Bucket: the platform-specific bucket for content files
-
-    """
-    if platform == PlatformType.ocw.value:
-        return _get_ocw_learning_course_bucket()
-    return None
-
-
-def sync_s3_text(platform, key, content_meta):
+def sync_s3_text(bucket, key, content_meta):
     """
     Save the extracted text for a ContentFile to S3 for future use
 
     Args:
-        platform(str): the platform of the ContentFile
+        bucket(s3.Bucket): the bucket to place data in
         key(str): the original key of the content file
         content_meta(dict): the content metadata returned by tika
     """
-    bucket = get_bucket_for_platform(platform)
     if bucket and content_meta:
         bucket.put_object(
             Key=f"extracts/{key}.json",
@@ -93,7 +73,7 @@ def extract_text_metadata(data):
         data (str): File contents
 
     Returns:
-         dict: metadata returned by tike, including content
+         dict: metadata returned by tika, including content
 
     """
     return tika_parser.from_buffer(data)

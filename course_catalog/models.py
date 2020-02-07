@@ -152,11 +152,16 @@ class ContentFile(TimestampedModel):
     )
     title = models.CharField(max_length=1024, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    content = models.TextField(null=True, blank=True)
 
     url = models.TextField(null=True, blank=True)
     short_url = models.TextField(null=True, blank=True)
     file_type = models.CharField(max_length=128, null=True, blank=True)
+    section = models.CharField(max_length=512, null=True, blank=True)
+
+    content = models.TextField(null=True, blank=True)
+    content_title = models.CharField(max_length=1024, null=True, blank=True)
+    content_author = models.CharField(max_length=1024, null=True, blank=True)
+    content_language = models.CharField(max_length=24, null=True, blank=True)
     content_type = models.CharField(
         choices=VALID_COURSE_CONTENT_CHOICES, default=CONTENT_TYPE_FILE, max_length=10
     )
