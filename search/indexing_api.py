@@ -7,8 +7,9 @@ from elasticsearch.helpers import bulk
 from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.models import Course
+from course_catalog.models import Course, ContentFile, LearningResourceRun
 from open_discussions.utils import chunks
 from search.api import gen_course_id
 from search.connection import (
@@ -44,7 +45,7 @@ from search.serializers import (
     serialize_bulk_programs,
     serialize_bulk_user_lists,
     serialize_bulk_videos,
-    serialize_bulk_content_files,
+    serialize_content_file_for_bulk,
 )
 
 
@@ -548,13 +549,20 @@ def index_content_files(ids):
     Args:
         ids(list of int): List of Course id's
     """
-    for course in Course.objects.filter(id__in=ids).iterator():
-        for run in course.runs.iterator():
-            index_items(
-                serialize_bulk_content_files(run.id),
-                COURSE_TYPE,
-                routing=gen_course_id(course.platform, course.course_id),
-            )
+    course_content_type = ContentType.objects.get_for_model(Course)
+    for run in LearningResourceRun.objects.filter(
+        object_id__in=ids, content_type=course_content_type
+    ):
+        documents = (
+            serialize_content_file_for_bulk(content_file)
+            for content_file in ContentFile.objects.filter(run=run)
+        )
+        course = run.content_object
+        index_items(
+            documents,
+            COURSE_TYPE,
+            routing=gen_course_id(course.platform, course.course_id),
+        )
 
 
 def index_bootcamps(ids):
