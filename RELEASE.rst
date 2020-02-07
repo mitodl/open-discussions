@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.110.1
+Version 0.110.1 (Released February 07, 2020)
 ---------------
 
 - updates to search index for default search ordering
