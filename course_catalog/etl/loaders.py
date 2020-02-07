@@ -1,6 +1,5 @@
 """Course catalog data loaders"""
 import logging
-from urllib.parse import urlparse
 
 from django.conf import settings
 from django.db import transaction
@@ -8,13 +7,7 @@ from django.db.models import OuterRef, Exists
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import (
-    PrivacyLevel,
-    ListType,
-    CONTENT_TYPE_FILE,
-    VALID_TEXT_FILE_TYPES,
-    CONTENT_TYPE_PAGE,
-)
+from course_catalog.constants import PrivacyLevel, ListType
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -33,15 +26,9 @@ from course_catalog.models import (
     ContentFile,
 )
 from course_catalog.etl.exceptions import ExtractException
-from course_catalog.etl.utils import (
-    log_exceptions,
-    get_bucket_for_platform,
-    extract_text_metadata,
-    sync_s3_text,
-)
+from course_catalog.etl.utils import log_exceptions
 
 from course_catalog.utils import load_course_blacklist
-from open_discussions.utils import extract_values
 
 from search import task_helpers as search_task_helpers
 
@@ -115,6 +102,7 @@ def load_run(learning_resource, course_run_data):
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
     offered_bys_data = course_run_data.pop("offered_by", [])
+    content_files = course_run_data.pop("content_files", [])
 
     learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
         run_id=run_id,
@@ -130,7 +118,7 @@ def load_run(learning_resource, course_run_data):
     load_prices(learning_resource_run, prices_data)
     load_instructors(learning_resource_run, instructors_data)
     load_offered_bys(learning_resource_run, offered_bys_data)
-    load_content_files(learning_resource_run, course_run_data)
+    load_content_files(learning_resource_run, content_files)
 
     return learning_resource_run
 
@@ -494,165 +482,46 @@ def load_video_channels(video_channels_data):
     return video_channels
 
 
-def load_content_file(
-    course_run, file_json, key, data=None, content_type=CONTENT_TYPE_FILE
-):
+def load_content_file(course_run, content_file_data):
     """
     Sync a course run file/page to the database
 
     Args:
         course_run (LearningResourceRun): a LearningResourceRun for a Course
-        file_json (dict): File metadata as JSON, containing uid, title, description, url, type, text
-        data (bytes): The data of the file
-        key: The unique key for the file
-        content_type  (str): file or page
+        content_file_data (dict): File metadata as JSON
 
     Returns:
         ContentFile: the object that was created or updated
     """
-    content = None
-    if content_type == "file":
-        file_type = file_json.get("file_type", None)
-        extension = key.split(".")[-1].lower()
-        if extension in VALID_TEXT_FILE_TYPES and data is not None:
-            content_meta = extract_text_metadata(data)
-            content = content_meta["content"]
-            sync_s3_text(course_run.platform, key, content_meta)
-    else:
-        # remove/modify this block after ocw_parser saves HTML pages to S3
-        file_type = file_json.get("type", None)
-        text = file_json.get("text", "")
-        # ES attachment plugin won't parse partial html
-        if text and not text.startswith("<html"):
-            text = f"<html><body>{text}</body></html>"
-            content_meta = extract_text_metadata(text)
-            content = content_meta["content"]
-            sync_s3_text(course_run.platform, key, content_meta)
-    content_file, created = ContentFile.objects.update_or_create(
-        run=course_run,
-        key=key,
-        defaults={
-            "uid": file_json.get("uid", None),
-            "content": content,
-            "title": file_json.get("title", None),
-            "description": file_json.get("description", None),
-            "url": file_json.get("url", None),
-            "file_type": file_type,
-            "content_type": content_type,
-        },
-    )
+    try:
+        content_file, created = ContentFile.objects.update_or_create(
+            run=course_run, key=content_file_data.get("key"), defaults=content_file_data
+        )
+        if not created and not course_run.published:
+            search_task_helpers.delete_content_file(content_file)
+        elif course_run.published:
+            search_task_helpers.upsert_content_file(content_file.id)
+        return content_file
 
-    if not created and not course_run.published:
-        search_task_helpers.delete_content_file(content_file)
-    elif course_run.published:
-        search_task_helpers.upsert_content_file(content_file.id)
-    return content_file
+    except:  # pylint: disable=bare-except
+        log.exception(
+            "ERROR syncing course file %s for run %d",
+            content_file_data.get("uid", ""),
+            course_run.id,
+        )
 
 
-def load_content_files(course_run, course_run_json, bucket=None):
+def load_content_files(course_run, content_files_json):
     """
     Sync all files for a course run to database and S3 if not present in DB
 
     Args:
         course_run (LearningResourceRun): a course run
-        course_run_json (dict): Details about the course run
-        bucket (Bucket): an S3 bucket
+        content_files_json (dict): Details about the course run
 
     """
-    if not bucket:
-        bucket = get_bucket_for_platform(course_run.platform)
-
-    json_course_files = course_run_json.get("course_files", [])
-    json_course_files.extend(course_run_json.get("course_foreign_files", []))
-    json_embedded_medias = [
-        media
-        for sublist in extract_values(course_run_json, "embedded_media")
-        for media in sublist
+    return [
+        load_content_file(course_run, content_file)
+        for content_file in content_files_json
+        if not None
     ]
-
-    content_files = []
-    for course_file in json_course_files:
-        try:
-            s3_url = course_file.get("file_location", None)
-            if not s3_url:
-                # Nothing to do without an S3 URL
-                continue
-            key = urlparse(s3_url).path[1:]
-            s3_obj = bucket.Object(key).get()
-            # course_file_obj = ContentFile.objects.filter(
-            #     run=course_run, key=key
-            # ).first()
-            # if (
-            #     course_file_obj is not None
-            #     and s3_obj["LastModified"] <= course_file_obj.updated_on
-            # ):
-            #     # Nothing's changed, skip it
-            #     continue
-            if course_file.get("uid", None) is not None:
-                # Media info, if it exists, contains external URL details
-                media_info = [
-                    media
-                    for media in json_embedded_medias
-                    if media["uid"] == course_file["uid"]
-                ]
-                if media_info:
-                    course_file["url"] = media_info[0].get(
-                        "technical_location", media_info[0].get("media_info", None)
-                    )
-                else:
-                    course_file["url"] = "https://s3.amazonaws.com/{}/{}".format(
-                        settings.OCW_LEARNING_COURSE_BUCKET_NAME, key
-                    )
-            elif course_file.get("link", None) is not None:
-                course_file["url"] = course_file.get(
-                    "link", course_file.get("file_location", None)
-                )
-            content_files.append(
-                load_content_file(
-                    course_run,
-                    course_file,
-                    key,
-                    data=s3_obj["Body"],
-                    content_type=CONTENT_TYPE_FILE,
-                )
-            )
-            # This is temporary until pages are saved to S3 too by ocw_parser
-            content_files.extend(load_content_pages(course_run, course_run_json))
-        except:  # pylint: disable=bare-except
-            log.exception(
-                "ERROR syncing course file %s for run %d",
-                course_file.get("uid", ""),
-                course_run.id,
-            )
-    return content_files
-
-
-def load_content_pages(course_run, course_run_json):
-    """
-    Sync all HTML pages for a course run to database if not present in DB
-    TODO: remove/modify this function after ocw_parser saves HTML pages to S3
-
-    Args:
-        course_run (LearningResourceRun): an OCW course run
-        course_run_json (dict): Details about the course run
-
-    """
-    json_course_pages = course_run_json.get("course_pages", [])
-    content_pages = []
-    for course_page in json_course_pages:
-        try:
-            content_pages.append(
-                load_content_file(
-                    course_run,
-                    course_page,
-                    f"{course_run.url.split('/')[-1]}/{course_page['uid']}.html",
-                    content_type=CONTENT_TYPE_PAGE,
-                )
-            )
-        except:  # pylint: disable=bare-except
-            log.exception(
-                "ERROR syncing course page %s for run %d",
-                course_page.get("uid"),
-                course_run.id,
-            )
-    return content_pages

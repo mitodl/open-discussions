@@ -349,6 +349,10 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     """
 
     run_id = serializers.SerializerMethodField()
+    run_title = serializers.SerializerMethodField()
+    semester = serializers.SerializerMethodField()
+    year = serializers.SerializerMethodField()
+    topics = serializers.SerializerMethodField()
     short_description = serializers.CharField(source="description")
 
     def get_resource_relations(self, instance):
@@ -363,19 +367,49 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
         """ Get the run_id """
         return instance.run.run_id
 
+    def get_run_title(self, instance):
+        """ Get the run title """
+        return instance.run.title
+
+    def get_semester(self, instance):
+        """ get the run semester """
+        return instance.run.semester
+
+    def get_year(self, instance):
+        """ get the run year """
+        return instance.run.year
+
+    def get_topics(self, instance):
+        """ get the course topics """
+        return [
+            topic
+            for topic in instance.run.content_object.topics.values_list(
+                "name", flat=True
+            )
+        ]
+
     class Meta:
         model = ContentFile
         fields = [
             "run_id",
+            "run_title",
+            "semester",
+            "year",
+            "topics",
             "key",
             "uid",
-            "content",
             "resource_relations",
             "title",
             "short_description",
             "file_type",
             "content_type",
             "url",
+            "section",
+            "content",
+            "content_type",
+            "content_title",
+            "content_author",
+            "content_language",
         ]
 
 

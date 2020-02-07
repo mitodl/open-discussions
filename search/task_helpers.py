@@ -5,7 +5,9 @@ import logging
 from functools import wraps, partial
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
+from course_catalog.models import ContentFile
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.models import Comment
@@ -356,6 +358,10 @@ def delete_course(course_obj):
     delete_document.delay(
         gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
     )
+    for content_file in ContentFile.objects.filter(run__object_id=course_obj.id).filter(
+        run__content_type=ContentType.objects.get(model=COURSE_TYPE)
+    ):
+        delete_content_file(content_file)
 
 
 @if_feature_enabled(INDEX_UPDATES)
