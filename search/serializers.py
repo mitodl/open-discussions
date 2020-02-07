@@ -768,19 +768,6 @@ def serialize_bulk_courses(ids):
         yield serialize_course_for_bulk(course)
 
 
-def serialize_bulk_content_files(run_id):
-    """
-    Serialize content files for bulk indexing
-
-    Args:
-        run_id(int): Course id
-    """
-    for content_file in LearningResourceRun.objects.get(
-        id=run_id
-    ).content_files.iterator():
-        yield serialize_content_file_for_bulk(content_file)
-
-
 def serialize_course_for_bulk(course_obj):
     """
     Serialize a course for bulk API request
