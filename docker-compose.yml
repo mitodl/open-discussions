@@ -111,6 +111,7 @@ services:
     extra_hosts: *default-extra-hosts
 
   tika:
-    image: apache/tika
+    image: apache/tika:1.23
+    entrypoint: java -jar tika-server-1.23.jar -h 0.0.0.0 -spawnChild
     ports:
       - "9998:9998"

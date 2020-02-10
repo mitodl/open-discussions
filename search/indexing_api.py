@@ -544,7 +544,7 @@ def index_courses(ids):
 
 def index_content_files(ids):
     """
-    Index a list of course files by course id
+    Index a list of content files by course ids
 
     Args:
         ids(list of int): List of Course id's

@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PrivacyLevel, ListType
+from course_catalog.etl.exceptions import ExtractException
+from course_catalog.etl.utils import log_exceptions
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -25,11 +27,7 @@ from course_catalog.models import (
     UserListItem,
     ContentFile,
 )
-from course_catalog.etl.exceptions import ExtractException
-from course_catalog.etl.utils import log_exceptions
-
 from course_catalog.utils import load_course_blacklist
-
 from search import task_helpers as search_task_helpers
 
 log = logging.getLogger()
@@ -494,15 +492,17 @@ def load_content_file(course_run, content_file_data):
         ContentFile: the object that was created or updated
     """
     try:
-        content_file, created = ContentFile.objects.update_or_create(
-            run=course_run, key=content_file_data.get("key"), defaults=content_file_data
-        )
-        if not created and not course_run.published:
-            search_task_helpers.delete_content_file(content_file)
-        elif course_run.published:
-            search_task_helpers.upsert_content_file(content_file.id)
-        return content_file
-
+        if content_file_data:
+            content_file, created = ContentFile.objects.update_or_create(
+                run=course_run,
+                key=content_file_data.get("key"),
+                defaults=content_file_data,
+            )
+            if not created and not course_run.published:
+                search_task_helpers.delete_content_file(content_file)
+            elif course_run.published:
+                search_task_helpers.upsert_content_file(content_file.id)
+            return content_file
     except:  # pylint: disable=bare-except
         log.exception(
             "ERROR syncing course file %s for run %d",
@@ -513,15 +513,14 @@ def load_content_file(course_run, content_file_data):
 
 def load_content_files(course_run, content_files_json):
     """
-    Sync all files for a course run to database and S3 if not present in DB
+    Sync all content files for a course run to database and S3 if not present in DB
 
     Args:
         course_run (LearningResourceRun): a course run
-        content_files_json (dict): Details about the course run
+        content_files_json (dict): Details about the course run's content files
 
     """
     return [
         load_content_file(course_run, content_file)
         for content_file in content_files_json
-        if not None
     ]
