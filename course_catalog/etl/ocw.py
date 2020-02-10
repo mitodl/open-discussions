@@ -86,33 +86,24 @@ def transform_content_file(course_run_json, content_file, content_type):
     Returns:
         dict: transformed content_file json
     """
-    bucket = get_ocw_learning_course_bucket()
-    content_json = {}
-    json_course_pages = course_run_json.get("course_pages", [])
+    try:
+        bucket = get_ocw_learning_course_bucket()
+        content_json = {}
+        json_course_pages = course_run_json.get("course_pages", [])
 
-    content_file["content_type"] = content_type
-    if content_type == CONTENT_TYPE_PAGE:
-        key = f"{course_run_json.get('url').split('/')[-1]}/{content_file.get('uid')}.html"
-        content_file["key"] = key
-        partial_url = content_file.get("url", None)
-        if partial_url:
-            content_file["url"] = f"https://ocw.mit.edu{partial_url}"
-        # modify the following after ocw_parser saves HTML pages to S3
-        file_type = content_file.get("type", None)
-        text = content_file.get("text", "")
-        # ES attachment plugin won't parse partial html
-        if text and not text.startswith("<html"):
-            text = f"<html><body>{text}</body></html>"
-            content_json = extract_text_metadata(text)
-            sync_s3_text(bucket, key, content_json)
-    else:
+        content_file["content_type"] = content_type
         s3_url = content_file.get("file_location", None)
-        if not s3_url and content_type == CONTENT_TYPE_FILE:
-            # Nothing to do without an S3 URL
-            return content_file
+        if not s3_url:
+            # Nothing to do without an S3 key
+            # HTML files will be skipped until latest ocw-data-parser is used
+            return None
+
         key = urlparse(s3_url).path[1:]
+        extension = key.split(".")[-1].lower()
         content_file["key"] = key
-        file_type = content_file.get("file_type", None)
+        content_file["file_type"] = content_file.get(
+            "file_type", content_file.get("type", None)
+        )
         content_file["url"] = get_content_file_url(
             content_file,
             [
@@ -120,42 +111,60 @@ def transform_content_file(course_run_json, content_file, content_type):
                 for sublist in extract_values(course_run_json, "embedded_media")
                 for media in sublist
             ],
+            content_type,
         )
-        extension = key.split(".")[-1].lower()
-        s3_obj_body = bucket.Object(key).get().get("Body", None)
-        if extension in VALID_TEXT_FILE_TYPES and s3_obj_body is not None:
-            content_json = extract_text_metadata(s3_obj_body)
-            sync_s3_text(bucket, key, content_json)
 
-    content_file["section"] = get_content_file_section(content_file, json_course_pages)
-    content_json_meta = content_json.get("metadata", {})
-    content_file["content"] = content_json.get("content", None)
-    content_file["content_author"] = content_json_meta.get("Author", None)
-    content_file["content_language"] = content_json_meta.get("language", None)
-    content_file["content_title"] = content_json_meta.get("title", None)
-    content_file["file_type"] = file_type
+        s3_obj = bucket.Object(key).get()
+        course_file_obj = ContentFile.objects.filter(key=key).first()
+        needs_text_update = course_file_obj is None or (
+            s3_obj is not None and s3_obj["LastModified"] >= course_file_obj.updated_on
+        )
+        if needs_text_update and extension in VALID_TEXT_FILE_TYPES:
+            s3_body = s3_obj.get("Body") if s3_obj else None
+            if s3_body:
+                content_json = extract_text_metadata(s3_body)
+                sync_s3_text(bucket, key, content_json)
 
-    for field in list(
-        set(content_file.keys())
-        - {field.name for field in ContentFile._meta.get_fields()}
-    ):
-        content_file.pop(field)
+        content_file["section"] = get_content_file_section(
+            content_file, json_course_pages
+        )
+        if content_json:
+            content_json_meta = content_json.get("metadata", {})
+            content_file["content"] = content_json.get("content", None)
+            content_file["content_author"] = content_json_meta.get("Author", None)
+            content_file["content_language"] = content_json_meta.get("language", None)
+            content_file["content_title"] = content_json_meta.get("title", None)
 
-    return content_file
+        for field in list(
+            set(content_file.keys())
+            - {field.name for field in ContentFile._meta.get_fields()}
+        ):
+            content_file.pop(field)
+
+        return content_file
+    except:  # pylint:disable=bare-except
+        log.exception(
+            "Error transforming %s for course run %s",
+            rapidjson.dumps(content_file),
+            s3_url,
+        )
 
 
-def get_content_file_url(content_file, media_section):
+def get_content_file_url(content_file, media_section, content_type):
     """
     Calculate the best URL for a content file
 
     Args:
     content_file (dict): the content file JSON
     media_section (list of dict): list of media definitions
+    content_type (str): file or page
 
     Returns:
         str: url
     """
-    if content_file.get("uid", None) is not None:
+    if content_type == CONTENT_TYPE_PAGE:
+        return f"https://ocw.mit.edu{content_file.get('url', '')}"
+    elif content_file.get("uid", None) is not None:
         # Media info, if it exists, contains external URL details for a file
         media_info = [
             media for media in media_section if media["uid"] == content_file["uid"]
