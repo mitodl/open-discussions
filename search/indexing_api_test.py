@@ -8,6 +8,7 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from course_catalog.factories import CourseFactory
 from open_discussions.utils import chunks
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
@@ -26,6 +27,7 @@ from search.indexing_api import (
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
     delete_document,
+    index_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -391,3 +393,17 @@ def test_delete_document_not_found(mocked_es, mocker):
     mocked_es.conn.delete.side_effect = NotFoundError
     delete_document(1, "course")
     assert patched_logger.debug.called is True
+
+
+def test_index_content_files(mocker):
+    """
+    ES should try indexing content files for all runs in a course
+    """
+    mock_index_run_content_files = mocker.patch(
+        "search.indexing_api.index_run_content_files", autospec=True
+    )
+    courses = CourseFactory.create_batch(2)
+    index_content_files([course.id for course in courses])
+    for course in courses:
+        for run in course.runs.all():
+            mock_index_run_content_files.assert_any_call(run.id)

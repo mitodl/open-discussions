@@ -29,6 +29,8 @@ from course_catalog.models import (
 )
 from course_catalog.utils import load_course_blacklist
 from search import task_helpers as search_task_helpers
+from search.constants import COURSE_TYPE
+from search.indexing_api import index_run_content_files, delete_run_content_files
 
 log = logging.getLogger()
 
@@ -493,15 +495,11 @@ def load_content_file(course_run, content_file_data):
     """
     try:
         if content_file_data:
-            content_file, created = ContentFile.objects.update_or_create(
+            content_file, _ = ContentFile.objects.update_or_create(
                 run=course_run,
                 key=content_file_data.get("key"),
                 defaults=content_file_data,
             )
-            if not created and not course_run.published:
-                search_task_helpers.delete_content_file(content_file)
-            elif course_run.published:
-                search_task_helpers.upsert_content_file(content_file.id)
             return content_file
     except:  # pylint: disable=bare-except
         log.exception(
@@ -520,7 +518,13 @@ def load_content_files(course_run, content_files_json):
         content_files_json (dict): Details about the course run's content files
 
     """
-    return [
-        load_content_file(course_run, content_file)
-        for content_file in content_files_json
-    ]
+    if course_run.content_type.name == COURSE_TYPE:
+        content_files = [
+            load_content_file(course_run, content_file)
+            for content_file in content_files_json
+        ]
+        if course_run.published:
+            index_run_content_files(course_run.id)
+        else:
+            delete_run_content_files(course_run.id)
+        return content_files
