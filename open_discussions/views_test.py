@@ -78,7 +78,7 @@ def test_webpack_url(
         "support_email": settings.EMAIL_SUPPORT,
         "embedlyKey": "fake",
         "environment": settings.ENVIRONMENT,
-        "sentry_dsn": None,
+        "sentry_dsn": "",
         "release_version": settings.VERSION,
         "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
         "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,

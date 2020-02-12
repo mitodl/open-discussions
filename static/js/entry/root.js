@@ -10,19 +10,18 @@ import { createBrowserHistory } from "history"
 import configureStore from "../store/configureStore"
 import Router, { routes } from "../Router"
 
-import Raven from "raven-js"
+import * as Sentry from "@sentry/browser"
+
+Sentry.init({
+  dsn:         SETTINGS.sentry_dsn,
+  release:     SETTINGS.release_version,
+  environment: SETTINGS.environment
+})
 
 // requirement for creating blob from crop canvas.
 import "blueimp-canvas-to-blob/js/canvas-to-blob.js"
 
 setConfig({ pureSFC: true })
-
-Raven.config(SETTINGS.sentry_dsn, {
-  release:     SETTINGS.release_version,
-  environment: SETTINGS.environment
-}).install()
-
-window.Raven = Raven
 
 // Object.entries polyfill
 import entries from "object.entries"
