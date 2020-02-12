@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name
 import json
 from types import SimpleNamespace
+from urllib.parse import urljoin
 
 import pytest
 
@@ -15,6 +16,7 @@ from course_catalog.etl.ocw import (
     transform_content_files,
     get_content_file_url,
     transform_content_file,
+    get_content_file_section,
 )
 
 OCW_COURSE_JSON = {
@@ -29,9 +31,6 @@ OCW_COURSE_JSON = {
             "title": "Exercise 3: Thickened Plane + the Explosion",
             "caption": None,
             "file_type": "application/pdf",
-            "alt_text": None,
-            "credit": None,
-            "platform_requirements": "Adobe Reader software is required to view this .pdf file.",
             "description": "This resource contains information regarding thickened plane + the explosion.",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
@@ -44,13 +43,45 @@ OCW_COURSE_JSON = {
             "title": "ex6-handle.3dm",
             "caption": None,
             "file_type": "application/octet-stream",
-            "alt_text": None,
-            "credit": None,
-            "platform_requirements": "3DM Viewer is required to run .3dm files",
             "description": "This resource is related to rhino\u00ae model: handle.",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
                 + "78a221020dc9604e6608d57f2a6b6fd0_ex6-handle.3dm"
+            ),
+        },
+        {
+            "uid": "98a221020dc9604e6608d57f2a6b6fd1",
+            "title": "testing.pdf",
+            "caption": None,
+            "file_type": "application/octet-stream",
+            "description": "A test file",
+            "file_location": (
+                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
+                + "98a221020dc9604e6608d57f2a6b6fd1_testing.pdf"
+            ),
+        },
+        {
+            "uid": "00a221020dc9604e6608d57f2a6b6f11",
+            "parent_uid": "0b5f9d523e26f2a622f728050421f5a9",
+            "title": "testing2.pdf",
+            "caption": None,
+            "file_type": "application/octet-stream",
+            "description": "A test file 2",
+            "file_location": (
+                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
+                + "00a221020dc9604e6608d57f2a6b6f11_testing2.pdf"
+            ),
+        },
+        {
+            "uid": "450555028099b6c7beac2e1a39e5cede",
+            "parent_uid": "aa5f9d523e26f2a622f728050421f5zz",
+            "title": "ex7_lz_300k.mp4",
+            "caption": None,
+            "file_type": "application/octet-stream",
+            "description": "Video",
+            "file_location": (
+                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
+                + "450555028099b6c7beac2e1a39e5cede_ex7_lz_300k.mp4"
             ),
         },
     ],
@@ -72,6 +103,19 @@ OCW_COURSE_JSON = {
             ),
         },
     ],
+    "course_embedded_media": {
+        "20547250exercise7video:inflation": {
+            "embedded_media": [
+                {
+                    "uid": "450555028099b6c7beac2e1a39e5cede",
+                    "parent_uid": "37930e14299c238ef9667d294207cc33",
+                    "id": "Video-YouTube-Stream",
+                    "title": "Video-YouTube-Stream",
+                    "media_info": "http://www.archive.org/download/ex7_lz_300k.mp4",
+                }
+            ]
+        }
+    },
     "course_pages": [
         {
             "uid": "bb5f9d523e26f2a622f728050421f5a7",
@@ -86,9 +130,26 @@ OCW_COURSE_JSON = {
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
                 + "bb5f9d523e26f2a622f728050421f5a7.html"
             ),
-        }
+        },
+        {
+            "uid": "0b5f9d523e26f2a622f728050421f5a9",
+            "title": "Sectionless Page",
+            "text": "<p>The Sectionless Page</p>",
+            "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/",
+            "short_url": "",
+            "description": "Extra Page",
+            "type": "SomethingElse",
+            "file_location": (
+                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
+                + "bb5f9d523e26f2a622f728050421f5a7_extra.html"
+            ),
+        },
     ],
 }
+
+COURSE_PAGES = OCW_COURSE_JSON["course_pages"]
+COURSE_FILES = OCW_COURSE_JSON["course_files"]
+FOREIGN_FILES = OCW_COURSE_JSON["course_foreign_files"]
 
 
 @pytest.fixture
@@ -115,30 +176,29 @@ def mock_tika_functions(mocker):
 def mock_s3_content(mock_ocw_learning_bucket):
     """Set up the fake s3 data"""
     # Add data to the bucket
-    for file in (
-        OCW_COURSE_JSON["course_files"] + OCW_COURSE_JSON["course_foreign_files"]
-    ):
-        file_key = file["file_location"].replace("https://s3.amazonaws.com/", "")
-        mock_ocw_learning_bucket.bucket.put_object(Key=file_key, Body=b"fake text")
-    for page in OCW_COURSE_JSON["course_pages"]:
-        file_key = f"{OCW_COURSE_JSON['short_url']}/{page['uid']}.html"
-        mock_ocw_learning_bucket.bucket.put_object(Key=file_key, Body=b"fake html")
+    for file in COURSE_FILES + FOREIGN_FILES:
+        mock_ocw_learning_bucket.bucket.put_object(
+            Key=file["file_location"].replace("https://s3.amazonaws.com/", ""),
+            Body=b"fake text",
+        )
+    for page in COURSE_PAGES:
+        mock_ocw_learning_bucket.bucket.put_object(
+            Key=page["file_location"].replace("https://s3.amazonaws.com/", ""),
+            Body=b"fake html",
+        )
 
 
 @pytest.mark.django_db
 def test_transform_content_files(mock_tika_functions):
     """ Verify that transform_content_files calls tika and returns expected output """
-    file_inputs = (
-        OCW_COURSE_JSON["course_files"] + OCW_COURSE_JSON["course_foreign_files"]
-    )
-    page_inputs = OCW_COURSE_JSON["course_pages"]
+    file_inputs = COURSE_FILES + FOREIGN_FILES
     text_inputs = [
         input
-        for input in (file_inputs + page_inputs)
+        for input in (file_inputs + COURSE_PAGES)
         if input["file_location"].split(".")[-1] in VALID_TEXT_FILE_TYPES
     ]
     all_inputs = [(file, CONTENT_TYPE_FILE) for file in file_inputs] + [
-        (page, CONTENT_TYPE_PAGE) for page in page_inputs
+        (page, CONTENT_TYPE_PAGE) for page in COURSE_PAGES
     ]
 
     transformed_files = transform_content_files(OCW_COURSE_JSON)
@@ -155,7 +215,7 @@ def test_transform_content_files(mock_tika_functions):
 @pytest.mark.django_db
 def test_transform_content_file_course_files(mock_tika_functions):
     """ Test that contents of course_files are transformed correctly """
-    for course_file in OCW_COURSE_JSON["course_files"]:
+    for course_file in COURSE_FILES:
         expected_transform = {
             "content_type": CONTENT_TYPE_FILE,
             "description": course_file["description"],
@@ -163,7 +223,7 @@ def test_transform_content_file_course_files(mock_tika_functions):
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": OCW_COURSE_JSON["course_pages"][0]["title"],
+            "section": get_content_file_section(course_file, COURSE_PAGES),
             "title": course_file["title"],
             "uid": course_file.get("uid", None),
             "url": get_content_file_url(
@@ -200,14 +260,14 @@ def test_transform_content_file_course_files(mock_tika_functions):
 @pytest.mark.django_db
 def test_transform_content_file_course_foreign_files(mock_tika_functions):
     """ Test that contents of course_foreign_files are transformed correctly """
-    for course_file in OCW_COURSE_JSON["course_foreign_files"]:
+    for course_file in FOREIGN_FILES:
         expected_transform = {
             "content_type": CONTENT_TYPE_FILE,
             "file_type": None,
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": OCW_COURSE_JSON["course_pages"][0]["title"],
+            "section": get_content_file_section(course_file, COURSE_PAGES),
             "url": get_content_file_url(
                 OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE
             ),
@@ -242,7 +302,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
 @pytest.mark.django_db
 def test_transform_content_file_course_pages(mock_tika_functions):
     """ Test that contents of course_pages are transformed correctly """
-    for course_page in OCW_COURSE_JSON["course_pages"]:
+    for course_page in COURSE_PAGES:
         expected_transform = {
             "content_type": CONTENT_TYPE_PAGE,
             "description": course_page["description"],
@@ -250,7 +310,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             "key": course_page["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": course_page["title"],
+            "section": get_content_file_section(course_page, COURSE_PAGES),
             "title": course_page["title"],
             "uid": course_page["uid"],
             "url": get_content_file_url(
@@ -283,6 +343,57 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             transform_content_file(OCW_COURSE_JSON, course_page, CONTENT_TYPE_PAGE)
             == expected_transform
         )
+
+
+def test_get_content_file_section():
+    """Test that the correct section for a content file is returned"""
+    # Matching parent_uid page
+    assert (
+        get_content_file_section(COURSE_FILES[0], COURSE_PAGES)
+        == COURSE_PAGES[0]["title"]
+    )
+    # No parent_uid
+    assert get_content_file_section(COURSE_FILES[2], COURSE_PAGES) is None
+    # parent page has no section
+    assert get_content_file_section(COURSE_FILES[3], COURSE_PAGES) is None
+    # page has section
+    assert (
+        get_content_file_section(COURSE_PAGES[0], COURSE_PAGES)
+        == COURSE_PAGES[0]["title"]
+    )
+    # page has no section
+    assert get_content_file_section(COURSE_PAGES[1], COURSE_PAGES) is None
+
+
+def test_get_content_file_url(settings):
+    """ Test that correct URL's are returned """
+    settings.OCW_BASE_URL = "http://ocw.mit.edu"
+
+    for page in COURSE_PAGES:
+        assert (
+            get_content_file_url(OCW_COURSE_JSON, page, CONTENT_TYPE_PAGE)
+            == f"{settings.OCW_BASE_URL}{page.get('url', '')}"
+        )
+
+    # File with a parent page
+    assert get_content_file_url(
+        OCW_COURSE_JSON, COURSE_FILES[0], CONTENT_TYPE_FILE
+    ) == urljoin(
+        settings.OCW_BASE_URL,
+        f"{OCW_COURSE_JSON['url']}/{COURSE_PAGES[0]['short_url']}/MIT4_105F12_ex3-explosion.pdf",
+    )
+
+    # File without a parent page
+    assert (
+        get_content_file_url(OCW_COURSE_JSON, COURSE_FILES[2], CONTENT_TYPE_FILE)
+        == COURSE_FILES[2]["file_location"]
+    )
+
+    # File with a media_info match
+    assert (
+        get_content_file_url(OCW_COURSE_JSON, COURSE_FILES[4], CONTENT_TYPE_FILE)
+        == "http://www.archive.org/download/ex7_lz_300k.mp4"
+    )
 
 
 def test_upload_mitx_course_manifest(mock_ocw_learning_bucket, ocw_aws_settings):

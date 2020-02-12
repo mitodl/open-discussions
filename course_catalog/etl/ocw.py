@@ -211,7 +211,7 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
     if foreign_link is not None:
         return foreign_link
     # If none of the above worked, use an S3 URL generated from the key
-    return f"https://s3.amazonaws.com/{settings.OCW_LEARNING_COURSE_BUCKET_NAME}/{content_file_data.get('key')}"
+    return f"https://s3.amazonaws.com/{settings.OCW_LEARNING_COURSE_BUCKET_NAME}/{content_file_data.get('key', '')}"
 
 
 def get_page_by_uid(uid, pages):
@@ -247,9 +247,7 @@ def get_content_file_section(content_file, pages_section):
         page = get_page_by_uid(uid, pages_section)
         if page and section in page.get("type", ""):
             return page["title"]
-    if content_file.get(
-        "content_type"
-    ) == CONTENT_TYPE_PAGE and section in content_file.get("type", ""):
+    if section in content_file.get("type", ""):
         return content_file.get("title", None)
     return None
 
