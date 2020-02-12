@@ -76,4 +76,6 @@ def extract_text_metadata(data):
          dict: metadata returned by tika, including content
 
     """
-    return tika_parser.from_buffer(data)
+    if data:
+        return tika_parser.from_buffer(data)
+    return None

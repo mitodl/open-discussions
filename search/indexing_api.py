@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.models import Course, ContentFile, LearningResourceRun
 from open_discussions.utils import chunks
-from search.api import gen_course_id
+from search.api import gen_course_id, gen_content_file_id
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -542,27 +542,54 @@ def index_courses(ids):
     index_items(serialize_bulk_courses(ids), COURSE_TYPE)
 
 
-def index_content_files(ids):
+def index_content_files(course_ids):
     """
     Index a list of content files by course ids
 
     Args:
-        ids(list of int): List of Course id's
+        course_ids(list of int): List of Course id's
     """
     course_content_type = ContentType.objects.get_for_model(Course)
-    for run in LearningResourceRun.objects.filter(
-        object_id__in=ids, content_type=course_content_type
-    ):
-        documents = (
-            serialize_content_file_for_bulk(content_file)
-            for content_file in ContentFile.objects.filter(run=run)
-        )
-        course = run.content_object
-        index_items(
-            documents,
-            COURSE_TYPE,
-            routing=gen_course_id(course.platform, course.course_id),
-        )
+    for run_id in LearningResourceRun.objects.filter(
+        object_id__in=course_ids, content_type=course_content_type
+    ).values_list("id", flat=True):
+        index_run_content_files(run_id)
+
+
+def index_run_content_files(run_id):
+    """
+    Index a list of content files by run id
+
+    Args:
+        run_id(int): Course run id
+    """
+    run = LearningResourceRun.objects.get(id=run_id)
+    documents = (
+        serialize_content_file_for_bulk(content_file)
+        for content_file in ContentFile.objects.filter(run=run)
+    )
+    course = run.content_object
+    index_items(
+        documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
+    )
+
+
+def delete_run_content_files(run_id):
+    """
+    Delete a list of content files by run from the index
+
+    Args:
+        run_id(int): Course run id
+    """
+    run = LearningResourceRun.objects.get(id=run_id)
+    documents = (
+        {"_id": gen_content_file_id(content_file.key), "_op_type": "delete"}
+        for content_file in ContentFile.objects.filter(run=run)
+    )
+    course = run.content_object
+    index_items(
+        documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
+    )
 
 
 def index_bootcamps(ids):
