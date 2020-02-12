@@ -63,6 +63,9 @@ def transform_content_files(course_run_json):
                 course_run_json.get("uid", ""),
             )
     for course_page in json_course_pages:
+        # ocw-data_parser only uploads pages with text
+        if course_page.get("text", None) is None:
+            continue
         try:
             content_files.append(
                 transform_content_file(course_run_json, course_page, CONTENT_TYPE_PAGE)

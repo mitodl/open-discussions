@@ -69,7 +69,7 @@ lxml==4.1.1               # via xmlsec
 markdown2==2.3.7
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
-ocw-data-parser==0.2.7
+ocw-data-parser==0.3.0
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 pillow==6.2.0

@@ -8,8 +8,13 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceRunFactory,
+    ContentFileFactory,
+)
 from open_discussions.utils import chunks
+from search.api import gen_course_id
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
 from search.exceptions import ReindexException
@@ -28,6 +33,7 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     delete_document,
     index_content_files,
+    index_run_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -407,3 +413,48 @@ def test_index_content_files(mocker):
     for course in courses:
         for run in course.runs.all():
             mock_index_run_content_files.assert_any_call(run.id)
+
+
+@pytest.mark.usefixtures("indexing_user")
+@pytest.mark.parametrize("errors", ([], ["error"]))
+def test_index_run_content_files(
+    mocked_es, mocker, settings, errors
+):  # pylint: disable=too-many-arguments
+    """
+    index functions should call bulk with correct arguments
+    """
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    doc = "doc"
+    course = CourseFactory.create()
+    run = LearningResourceRunFactory.create(content_object=course)
+    content_files = ContentFileFactory.create_batch(5, run=run)
+    mock_get_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
+    )
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, errors)
+    )
+    mocker.patch(
+        f"search.indexing_api.serialize_content_file_for_bulk",
+        autospec=True,
+        return_value=doc,
+    )
+
+    if errors:
+        with pytest.raises(ReindexException):
+            index_run_content_files(run.id)
+    else:
+        index_run_content_files(run.id)
+        for alias in mock_get_aliases.return_value:
+            for chunk in chunks(
+                [doc for _ in content_files],
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            ):
+                bulk_mock.assert_any_call(
+                    mocked_es.conn,
+                    chunk,
+                    index=alias,
+                    doc_type=GLOBAL_DOC_TYPE,
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    routing=gen_course_id(course.platform, course.course_id),
+                )
