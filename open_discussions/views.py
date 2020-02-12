@@ -7,7 +7,6 @@ from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponsePermanentRedirect
 from django.shortcuts import render
 from django.urls import reverse
-from raven.contrib.django.raven_compat.models import client as sentry
 from social_django.utils import load_strategy, load_backend
 
 from open_discussions import features
@@ -62,7 +61,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
         "environment": settings.ENVIRONMENT,
-        "sentry_dsn": sentry.get_public_dsn(),
+        "sentry_dsn": settings.SENTRY_DSN,
         "release_version": settings.VERSION,
         "public_path": public_path(request),
         "site_url": settings.SITE_BASE_URL,

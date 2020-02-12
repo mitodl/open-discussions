@@ -26,8 +26,18 @@ from open_discussions.envs import (
     get_string,
     get_list_of_str,
 )
+from open_discussions.sentry import init_sentry
 
 VERSION = "0.111.0"
+
+ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
+
+# initialize Sentry before doing anything else so we capture any config errors
+SENTRY_DSN = get_string("SENTRY_DSN", "")
+SENTRY_LOG_LEVEL = get_string("SENTRY_LOG_LEVEL", "ERROR")
+init_sentry(
+    dsn=SENTRY_DSN, environment=ENVIRONMENT, version=VERSION, log_level=SENTRY_LOG_LEVEL
+)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -73,7 +83,6 @@ INSTALLED_APPS = (
     "django.contrib.humanize",
     "social_django",
     "server_status",
-    "raven.contrib.django.raven_compat",
     "rest_framework",
     "corsheaders",
     "anymail",
@@ -102,7 +111,6 @@ if not DISABLE_WEBPACK_LOADER_STATS:
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
-    "raven.contrib.django.raven_compat.middleware.SentryResponseErrorIdMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -427,7 +435,6 @@ CKEDITOR_UPLOAD_URL = get_string("CKEDITOR_UPLOAD_URL", None)
 LOG_LEVEL = get_string("OPEN_DISCUSSIONS_LOG_LEVEL", "INFO")
 DJANGO_LOG_LEVEL = get_string("DJANGO_LOG_LEVEL", "INFO")
 ES_LOG_LEVEL = get_string("ES_LOG_LEVEL", "INFO")
-SENTRY_LOG_LEVEL = get_string("SENTRY_LOG_LEVEL", "ERROR")
 
 # For logging to a remote syslog host
 LOG_HOST = get_string("OPEN_DISCUSSIONS_LOG_HOST", "localhost")
@@ -471,17 +478,12 @@ LOGGING = {
             "filters": ["require_debug_false"],
             "class": "django.utils.log.AdminEmailHandler",
         },
-        "sentry": {
-            "level": SENTRY_LOG_LEVEL,
-            "class": "raven.contrib.django.raven_compat.handlers.SentryHandler",
-            "formatter": "verbose",
-        },
     },
     "loggers": {
         "django": {
             "propagate": True,
             "level": DJANGO_LOG_LEVEL,
-            "handlers": ["console", "syslog", "sentry"],
+            "handlers": ["console", "syslog"],
         },
         "django.request": {
             "handlers": ["mail_admins"],
@@ -489,19 +491,9 @@ LOGGING = {
             "propagate": True,
         },
         "elasticsearch": {"level": ES_LOG_LEVEL},
-        "raven": {"level": SENTRY_LOG_LEVEL, "handlers": []},
         "nplusone": {"handlers": ["console"], "level": "ERROR"},
     },
-    "root": {"handlers": ["console", "syslog", "sentry"], "level": LOG_LEVEL},
-}
-
-# Sentry
-ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
-SENTRY_CLIENT = "raven.contrib.django.raven_compat.DjangoClient"
-RAVEN_CONFIG = {
-    "dsn": get_string("SENTRY_DSN", ""),
-    "environment": ENVIRONMENT,
-    "release": VERSION,
+    "root": {"handlers": ["console", "syslog"], "level": LOG_LEVEL},
 }
 
 STATUS_TOKEN = get_string("STATUS_TOKEN", "")
