@@ -115,7 +115,7 @@ def get_all_ocw_files(self):
                 .exclude(course_id__in=blacklisted_ids)
                 .order_by("id")
                 .values_list("id", flat=True),
-                chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE,
+                chunk_size=settings.OCW_CONTENT_ITERATOR_CHUNK_SIZE,
             )
         ]
     )
