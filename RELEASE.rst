@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.111.0
+---------------
+
+- update default sort order
+- Bump django from 2.2.9 to 2.2.10
+
 Version 0.110.1 (Released February 07, 2020)
 ---------------
 
