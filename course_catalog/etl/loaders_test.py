@@ -86,6 +86,8 @@ def mock_upsert_tasks(mocker):
         delete_video=mocker.patch("search.task_helpers.delete_video"),
         delete_user_list=mocker.patch("search.task_helpers.delete_user_list"),
         upsert_user_list=mocker.patch("search.task_helpers.upsert_user_list"),
+        delete_content_file=mocker.patch("search.task_helpers.delete_content_file"),
+        upsert_content_file=mocker.patch("search.task_helpers.upsert_content_file"),
     )
 
 

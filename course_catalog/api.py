@@ -429,7 +429,7 @@ def sync_ocw_course(
 
     log.info("Parsing for %s...", course_prefix)
     # pass course contents into parser
-    parser = OCWParser("", "", loaded_raw_jsons_for_course)
+    parser = OCWParser(loaded_jsons=loaded_raw_jsons_for_course)
     course_json = parser.get_master_json()
     course_json["uid"] = uid
     course_json["course_id"] = "{}.{}".format(
@@ -473,7 +473,7 @@ def sync_ocw_course(
     course.save()
     if course.published:
         upsert_course(course.id)
-        load_content_files(run, course_json)
+        load_content_files(run, transform_content_files(course_json))
     else:
         delete_course(course)
 
