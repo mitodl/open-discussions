@@ -87,7 +87,7 @@ OCW_COURSE_JSON = {
     ],
     "course_foreign_files": [
         {
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+            "parent_uid": "zz5f9d523e26f2a622f728050421f5a7",
             "link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec1-intro.pdf",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
@@ -415,6 +415,12 @@ def test_get_content_file_url(settings):
     assert (
         get_content_file_url(OCW_COURSE_JSON, COURSE_FILES[4], CONTENT_TYPE_FILE)
         == "http://www.archive.org/download/ex7_lz_300k.mp4"
+    )
+
+    # Foreign file
+    assert (
+        get_content_file_url(OCW_COURSE_JSON, FOREIGN_FILES[0], CONTENT_TYPE_FILE)
+        == FOREIGN_FILES[0]["link"]
     )
 
 
