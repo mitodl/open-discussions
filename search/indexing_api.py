@@ -11,7 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.models import Course, ContentFile, LearningResourceRun
 from open_discussions.utils import chunks
-from search.api import gen_course_id, gen_content_file_id
+from search.api import gen_course_id
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -46,6 +46,7 @@ from search.serializers import (
     serialize_bulk_user_lists,
     serialize_bulk_videos,
     serialize_content_file_for_bulk,
+    serialize_content_file_for_bulk_deletion,
 )
 
 
@@ -583,7 +584,7 @@ def delete_run_content_files(run_id):
     """
     run = LearningResourceRun.objects.get(id=run_id)
     documents = (
-        {"_id": gen_content_file_id(content_file.key), "_op_type": "delete"}
+        serialize_content_file_for_bulk_deletion(content_file)
         for content_file in ContentFile.objects.filter(run=run)
     )
     course = run.content_object

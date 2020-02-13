@@ -47,6 +47,7 @@ from search.serializers import (
     serialize_video_for_bulk,
     serialize_content_file_for_bulk,
     ESContentFileSerializer,
+    serialize_content_file_for_bulk_deletion,
 )
 
 
@@ -578,4 +579,16 @@ def test_serialize_content_file_for_bulk():
     assert serialize_content_file_for_bulk(content_file) == {
         "_id": gen_content_file_id(content_file.key),
         **ESContentFileSerializer(content_file).data,
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_content_file_for_bulk_deletion():
+    """
+    Test that serialize_content_file_for_bulk_deletion yields a valid ESContentFileSerializer
+    """
+    content_file = ContentFileFactory.create()
+    assert serialize_content_file_for_bulk_deletion(content_file) == {
+        "_id": gen_content_file_id(content_file.key),
+        "_op_type": "delete",
     }

@@ -814,17 +814,27 @@ def serialize_course_for_bulk(course_obj):
     }
 
 
-def serialize_content_file_for_bulk(course_run_file_obj):
+def serialize_content_file_for_bulk(content_file_obj):
     """
     Serialize a content file for bulk API request
 
     Args:
-        course_obj (Course): A course
+        content_file_obj (ContentFile): A content file for a course
     """
     return {
-        "_id": gen_content_file_id(course_run_file_obj.key),
-        **ESContentFileSerializer(course_run_file_obj).data,
+        "_id": gen_content_file_id(content_file_obj.key),
+        **ESContentFileSerializer(content_file_obj).data,
     }
+
+
+def serialize_content_file_for_bulk_deletion(content_file_obj):
+    """
+    Serialize a content file for bulk API request
+
+    Args:
+        content_file_obj (ContentFile): A content file for a course
+    """
+    return {"_id": gen_content_file_id(content_file_obj.key), "_op_type": "delete"}
 
 
 def serialize_bulk_bootcamps(ids):

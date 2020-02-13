@@ -33,7 +33,6 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     delete_document,
     index_content_files,
-    index_run_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -416,15 +415,21 @@ def test_index_content_files(mocker):
 
 
 @pytest.mark.usefixtures("indexing_user")
+@pytest.mark.parametrize(
+    "indexing_func_name, doc",
+    [
+        ["index_run_content_files", {"_id": "doc"}],
+        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}],
+    ],
+)
 @pytest.mark.parametrize("errors", ([], ["error"]))
-def test_index_run_content_files(
-    mocked_es, mocker, settings, errors
+def test_bulk_index_content_files(
+    mocked_es, mocker, settings, errors, indexing_func_name, doc
 ):  # pylint: disable=too-many-arguments
     """
-    index functions should call bulk with correct arguments
+    index functions for content files should call bulk with correct arguments
     """
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
-    doc = "doc"
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
     content_files = ContentFileFactory.create_batch(5, run=run)
@@ -439,12 +444,18 @@ def test_index_run_content_files(
         autospec=True,
         return_value=doc,
     )
+    mocker.patch(
+        f"search.indexing_api.serialize_content_file_for_bulk_deletion",
+        autospec=True,
+        return_value=doc,
+    )
 
+    index_func = getattr(indexing_api, indexing_func_name)
     if errors:
         with pytest.raises(ReindexException):
-            index_run_content_files(run.id)
+            index_func(run.id)
     else:
-        index_run_content_files(run.id)
+        index_func(run.id)
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
                 [doc for _ in content_files],
