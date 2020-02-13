@@ -3,6 +3,8 @@ from functools import wraps
 import logging
 
 import rapidjson
+
+from django.conf import settings
 from tika import parser as tika_parser
 from toolz import excepts
 
@@ -77,5 +79,8 @@ def extract_text_metadata(data):
 
     """
     if data:
-        return tika_parser.from_buffer(data)
+        request_options = {}
+        if settings.TIKA_ACCESS_TOKEN:
+            request_options["headers"] = {"X-Access-Token": settings.TIKA_ACCESS_TOKEN}
+        return tika_parser.from_buffer(data, requestOptions=request_options)
     return None

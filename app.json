@@ -458,6 +458,10 @@
       "description": "URL of tika server for extracting text",
       "required": true
     },
+    "TIKA_ACCESS_TOKEN": {
+      "description": "X-Access-Token value for tika requests",
+      "required": false
+    },
     "USE_X_FORWARDED_PORT": {
       "description": "Use the X-Forwarded-Port",
       "required": false

@@ -165,130 +165,130 @@ def bootcamp_valid_data():
     }
 
 
-# @pytest.mark.parametrize("published", [True, False])
-# def test_deserializing_a_valid_ocw_course(
-#     mock_course_index_functions, ocw_valid_data, published
-# ):
-#     """
-#     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
-#     """
-#     digest_ocw_course(ocw_valid_data, timezone.now(), published)
-#     assert Course.objects.count() == 1
-#     digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), published)
-#     assert Course.objects.count() == 1
-#
-#     digest_ocw_course(
-#         ocw_valid_data, timezone.now() + timedelta(hours=1), published, "PROD/RES"
-#     )
-#     assert Course.objects.count() == 1
-#     course = Course.objects.last()
-#     assert course.learning_resource_type == ResourceType.ocw_resource.value
-#     assert course.offered_by.count() == 1
-#     assert course.offered_by.first().name == OfferedBy.ocw.value
-#     assert course.runs.first().offered_by.count() == 1
-#     assert course.runs.first().offered_by.first().name == OfferedBy.ocw.value
-#
-#     course_instructors_count = CourseInstructor.objects.count()
-#     assert course_instructors_count == len(ocw_valid_data.get("instructors"))
-#
-#     course_prices_count = CoursePrice.objects.count()
-#     assert course_prices_count == 1
-#
-#     course_topics_count = CourseTopic.objects.count()
-#     assert course_topics_count == sum(
-#         len(get_ocw_topic(cc)) for cc in ocw_valid_data.get("course_collections")
-#     )
-#
-#
-# def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
-#     """
-#     Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
-#     """
-#     ocw_valid_data.pop("course_id")
-#     digest_ocw_course(ocw_valid_data, timezone.now(), True)
-#     assert not Course.objects.count()
-#
-#
-# def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
-#     """
-#     Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
-#     """
-#     ocw_valid_data.pop("uid")
-#     digest_ocw_course(ocw_valid_data, timezone.now(), True)
-#     assert not LearningResourceRun.objects.count()
-#
-#
-# def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
-#     """
-#     Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
-#     """
-#     parse_bootcamp_json_data(bootcamp_valid_data)
-#     assert Bootcamp.objects.count() == 1
-#     assert LearningResourceRun.objects.count() == 1
-#     bootcamp = Bootcamp.objects.first()
-#     assert bootcamp.offered_by.count() == 1
-#     assert bootcamp.offered_by.first().name == OfferedBy.bootcamps.value
-#     assert bootcamp.runs.first().offered_by.count() == 1
-#     assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
-#
-#
-# def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
-#     """
-#     Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
-#     """
-#     mocker.patch(
-#         "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
-#     )
-#     mocker.patch(
-#         "course_catalog.api.LearningResourceRunSerializer.errors",
-#         return_value={"error": "Bad data"},
-#     )
-#     parse_bootcamp_json_data(bootcamp_valid_data)
-#     assert LearningResourceRun.objects.count() == 0
-#
-#
-# def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
-#     """
-#     Verifies that parse_bootcamp_json_data does not create a new Bootcamp if the serializer is invalid
-#     """
-#     bootcamp_valid_data.pop("course_id")
-#     parse_bootcamp_json_data(bootcamp_valid_data)
-#     assert Bootcamp.objects.count() == 0
-#     assert LearningResourceRun.objects.count() == 0
-#
-#
-# def test_safe_load_bad_json(mocker):
-#     """ Test that safe_load_json returns an empty dict for invalid JSON"""
-#     mock_logger = mocker.patch("course_catalog.api.log.exception")
-#     assert safe_load_json("badjson", "key") == {}
-#     mock_logger.assert_called_with("%s has a corrupted JSON", "key")
-#
-#
-# def test_get_course_availability(mitx_valid_data):
-#     """ Test that availability is calculated as expected """
-#     ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
-#     # test mitx course with raw_json
-#     assert get_course_availability(ocw_course) == AvailabilityType.current.value
-#     mitx_course_with_json = CourseFactory.create(
-#         course_id=mitx_valid_data["course_runs"][0]["key"],
-#         raw_json=mitx_valid_data,
-#         platform=PlatformType.mitx.value,
-#     )
-#     # test mitx course without raw_json
-#     assert (
-#         get_course_availability(mitx_course_with_json)
-#         == mitx_valid_data["course_runs"][0]["availability"]
-#     )
-#     mitx_course_no_json = CourseFactory.create(
-#         raw_json=None, platform=PlatformType.mitx.value
-#     )
-#     assert get_course_availability(mitx_course_no_json) is None
-#     # test mitx course without course_runs
-#     mitx_valid_data["course_runs"] = None  # pop course_runs json
-#     mitx_course_no_runs_json = CourseFactory.create(
-#         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
-#     )
-#     assert get_course_availability(mitx_course_no_runs_json) is None
+@pytest.mark.parametrize("published", [True, False])
+def test_deserializing_a_valid_ocw_course(
+    mock_course_index_functions, ocw_valid_data, published
+):
+    """
+    Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
+    """
+    digest_ocw_course(ocw_valid_data, timezone.now(), published)
+    assert Course.objects.count() == 1
+    digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), published)
+    assert Course.objects.count() == 1
+
+    digest_ocw_course(
+        ocw_valid_data, timezone.now() + timedelta(hours=1), published, "PROD/RES"
+    )
+    assert Course.objects.count() == 1
+    course = Course.objects.last()
+    assert course.learning_resource_type == ResourceType.ocw_resource.value
+    assert course.offered_by.count() == 1
+    assert course.offered_by.first().name == OfferedBy.ocw.value
+    assert course.runs.first().offered_by.count() == 1
+    assert course.runs.first().offered_by.first().name == OfferedBy.ocw.value
+
+    course_instructors_count = CourseInstructor.objects.count()
+    assert course_instructors_count == len(ocw_valid_data.get("instructors"))
+
+    course_prices_count = CoursePrice.objects.count()
+    assert course_prices_count == 1
+
+    course_topics_count = CourseTopic.objects.count()
+    assert course_topics_count == sum(
+        len(get_ocw_topic(cc)) for cc in ocw_valid_data.get("course_collections")
+    )
+
+
+def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
+    """
+    Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
+    """
+    ocw_valid_data.pop("course_id")
+    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    assert not Course.objects.count()
+
+
+def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
+    """
+    Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
+    """
+    ocw_valid_data.pop("uid")
+    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    assert not LearningResourceRun.objects.count()
+
+
+def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
+    """
+    Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
+    """
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert Bootcamp.objects.count() == 1
+    assert LearningResourceRun.objects.count() == 1
+    bootcamp = Bootcamp.objects.first()
+    assert bootcamp.offered_by.count() == 1
+    assert bootcamp.offered_by.first().name == OfferedBy.bootcamps.value
+    assert bootcamp.runs.first().offered_by.count() == 1
+    assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
+
+
+def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
+    """
+    Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
+    """
+    mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
+    )
+    mocker.patch(
+        "course_catalog.api.LearningResourceRunSerializer.errors",
+        return_value={"error": "Bad data"},
+    )
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert LearningResourceRun.objects.count() == 0
+
+
+def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
+    """
+    Verifies that parse_bootcamp_json_data does not create a new Bootcamp if the serializer is invalid
+    """
+    bootcamp_valid_data.pop("course_id")
+    parse_bootcamp_json_data(bootcamp_valid_data)
+    assert Bootcamp.objects.count() == 0
+    assert LearningResourceRun.objects.count() == 0
+
+
+def test_safe_load_bad_json(mocker):
+    """ Test that safe_load_json returns an empty dict for invalid JSON"""
+    mock_logger = mocker.patch("course_catalog.api.log.exception")
+    assert safe_load_json("badjson", "key") == {}
+    mock_logger.assert_called_with("%s has a corrupted JSON", "key")
+
+
+def test_get_course_availability(mitx_valid_data):
+    """ Test that availability is calculated as expected """
+    ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
+    # test mitx course with raw_json
+    assert get_course_availability(ocw_course) == AvailabilityType.current.value
+    mitx_course_with_json = CourseFactory.create(
+        course_id=mitx_valid_data["course_runs"][0]["key"],
+        raw_json=mitx_valid_data,
+        platform=PlatformType.mitx.value,
+    )
+    # test mitx course without raw_json
+    assert (
+        get_course_availability(mitx_course_with_json)
+        == mitx_valid_data["course_runs"][0]["availability"]
+    )
+    mitx_course_no_json = CourseFactory.create(
+        raw_json=None, platform=PlatformType.mitx.value
+    )
+    assert get_course_availability(mitx_course_no_json) is None
+    # test mitx course without course_runs
+    mitx_valid_data["course_runs"] = None  # pop course_runs json
+    mitx_course_no_runs_json = CourseFactory.create(
+        raw_json=mitx_valid_data, platform=PlatformType.mitx.value
+    )
+    assert get_course_availability(mitx_course_no_runs_json) is None
 
 
 @pytest.mark.parametrize("with_error", [True, False])
