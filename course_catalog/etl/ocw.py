@@ -1,6 +1,7 @@
 """OCW course catalog ETL"""
 import copy
 import logging
+from os.path import splitext
 from urllib.parse import urlparse, urljoin
 
 import boto3
@@ -76,7 +77,7 @@ def transform_content_files(course_run_json):
                 course_page.get("uid", ""),
                 course_run_json.get("uid", ""),
             )
-    return content_files
+    return [content_file for content_file in content_files if content_file is not None]
 
 
 def transform_content_file(
@@ -106,7 +107,6 @@ def transform_content_file(
 
         key = urlparse(s3_url).path.lstrip("/")
         content_file["key"] = key
-        extension = key.split(".")[-1].lower()
         content_file["file_type"] = content_file.get(
             "file_type", content_file.get("type")
         )
@@ -119,6 +119,7 @@ def transform_content_file(
         needs_text_update = course_file_obj is None or (
             s3_obj is not None and s3_obj["LastModified"] >= course_file_obj.updated_on
         )
+        extension = splitext(key)[-1].lower()
         if needs_text_update and extension in VALID_TEXT_FILE_TYPES:
             s3_body = s3_obj.get("Body") if s3_obj else None
             if s3_body:
@@ -169,9 +170,9 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
     If all else fails, use the S3 URL.
 
     Args:
-    course_run_json (dict): the course run info
-    content_file_data (dict): content file data
-    content_type (str): file or page
+        course_run_json (dict): the course run info
+        content_file_data (dict): content file data
+        content_type (str): file or page
 
     Returns:
         str: url
@@ -192,7 +193,7 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
             .replace(f"{content_file_data.get('uid', '')}_", "")
         )
 
-        if base_url and suffix:
+        if suffix:
             return urljoin(settings.OCW_BASE_URL, "/".join([base_url, section, suffix]))
 
     # Try the media info section next
@@ -236,8 +237,8 @@ def get_content_file_section(content_file, pages_section):
     This is based on a best guess from designs and may need future tweaking.
 
     Args:
-    content_file (dict): the content file JSON
-    pages_section (list of dict): list of pages
+        content_file (dict): the content file JSON
+        pages_section (list of dict): list of pages
 
     Returns:
         str: page section

@@ -434,20 +434,20 @@ ocw_edx_mapping = {
 }
 
 VALID_TEXT_FILE_TYPES = [
-    "pdf",
-    "htm",
-    "html",
-    "txt",
-    "doc",
-    "docx",
-    "xls",
-    "xlsx",
-    "ppt",
-    "pptx",
-    "xml",
-    "json",
-    "rtf",
-    "ps",
+    ".pdf",
+    ".htm",
+    ".html",
+    ".txt",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx",
+    ".xml",
+    ".json",
+    ".rtf",
+    ".ps",
 ]
 
 

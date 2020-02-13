@@ -494,13 +494,10 @@ def load_content_file(course_run, content_file_data):
         ContentFile: the object that was created or updated
     """
     try:
-        if content_file_data:
-            content_file, _ = ContentFile.objects.update_or_create(
-                run=course_run,
-                key=content_file_data.get("key"),
-                defaults=content_file_data,
-            )
-            return content_file
+        content_file, _ = ContentFile.objects.update_or_create(
+            run=course_run, key=content_file_data.get("key"), defaults=content_file_data
+        )
+        return content_file
     except:  # pylint: disable=bare-except
         log.exception(
             "ERROR syncing course file %s for run %d",

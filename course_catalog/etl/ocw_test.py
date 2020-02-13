@@ -1,6 +1,7 @@
 """OCW ETL tests"""
 # pylint: disable=redefined-outer-name
 import json
+from os.path import splitext
 from types import SimpleNamespace
 from urllib.parse import urljoin
 
@@ -195,7 +196,7 @@ def test_transform_content_files(mock_tika_functions):
     text_inputs = [
         input
         for input in (file_inputs + COURSE_PAGES)
-        if input["file_location"].split(".")[-1] in VALID_TEXT_FILE_TYPES
+        if splitext(input["file_location"])[-1] in VALID_TEXT_FILE_TYPES
     ]
     all_inputs = [(file, CONTENT_TYPE_FILE) for file in file_inputs] + [
         (page, CONTENT_TYPE_PAGE) for page in COURSE_PAGES
@@ -252,7 +253,7 @@ def test_transform_content_file_course_files(mock_tika_functions):
                 OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE
             ),
         }
-        if course_file["file_location"].split(".")[-1] in VALID_TEXT_FILE_TYPES:
+        if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
                 {
                     "content": mock_tika_functions.mock_extract_text.return_value[
@@ -294,7 +295,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
                 OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE
             ),
         }
-        if course_file["file_location"].split(".")[-1] in VALID_TEXT_FILE_TYPES:
+        if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
                 {
                     "content": mock_tika_functions.mock_extract_text.return_value[
@@ -340,7 +341,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             ),
             "short_url": course_page["short_url"],
         }
-        if course_page["file_location"].split(".")[-1] in VALID_TEXT_FILE_TYPES:
+        if splitext(course_page["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
                 {
                     "content": mock_tika_functions.mock_extract_text.return_value[
