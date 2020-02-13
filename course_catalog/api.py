@@ -345,7 +345,7 @@ def sync_ocw_course_files(ids=None):
                     .get()["Body"]
                     .read()
                 )
-                return load_content_files(run, transform_content_files(s3_master_json))
+                load_content_files(run, transform_content_files(s3_master_json))
             except:  # pylint: disable=bare-except
                 log.exception("Error syncing files for course run %d", run.id)
                 raise

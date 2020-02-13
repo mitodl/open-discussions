@@ -83,7 +83,7 @@ def transform_content_file(
     course_run_json, content_file_data, content_type
 ):  # pylint: disable=too-many-locals
     """
-    Transforms content json based on master_json
+    Transforms content file json based on parent course run master_json
 
     Args:
         course_run_json (dict): course run master_json
@@ -99,17 +99,16 @@ def transform_content_file(
         content_json = {}
 
         content_file["content_type"] = content_type
-        s3_url = content_file.get("file_location", None)
+        s3_url = content_file.get("file_location")
         if not s3_url:
             # Nothing to do without an S3 key
-            # HTML files will be skipped until latest ocw-data-parser is used
             return None
 
         key = urlparse(s3_url).path.lstrip("/")
-        extension = key.split(".")[-1].lower()
         content_file["key"] = key
+        extension = key.split(".")[-1].lower()
         content_file["file_type"] = content_file.get(
-            "file_type", content_file.get("type", None)
+            "file_type", content_file.get("type")
         )
         content_file["url"] = get_content_file_url(
             course_run_json, content_file, content_type
@@ -131,7 +130,7 @@ def transform_content_file(
         )
         if content_json:
             content_json_meta = content_json.get("metadata", {})
-            content_file["content"] = content_json.get("content", None)
+            content_file["content"] = content_json.get("content")
             # Sometimes Tika returns very large values (probably a mistake in pdf data), so truncate in case.
             content_file["content_author"] = content_json_meta.get("Author", "")[
                 : _get_max_length("content_author")
@@ -156,13 +155,18 @@ def transform_content_file(
         log.exception(
             "Error transforming %s for course run %s",
             rapidjson.dumps(content_file),
-            course_run_json.get("uid", None),
+            course_run_json.get("uid"),
         )
 
 
 def get_content_file_url(course_run_json, content_file_data, content_type):
     """
-    Calculate the best URL for a content file
+    Calculate the best URL for a content file.
+    For a content page, use the url attribute.
+    For a course file, try to use the run url, parent page short_url, and file_location.
+    If there is no parent page, try to construct a URL from a matching uid in the "embedded_media" entities.
+    Foreign files should have a "link" attribute to use.
+    If all else fails, use the S3 URL.
 
     Args:
     course_run_json (dict): the course run info
@@ -176,13 +180,12 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
         return urljoin(settings.OCW_BASE_URL, content_file_data.get("url", ""))
 
     # Try reverse-engineering the URL from page info
-    base_url = course_run_json.get("url", None)
+    base_url = course_run_json.get("url")
     parent_page = get_page_by_uid(
-        content_file_data.get("parent_uid", None),
-        course_run_json.get("course_pages", []),
+        content_file_data.get("parent_uid"), course_run_json.get("course_pages", [])
     )
     if parent_page and base_url:
-        section = parent_page.get("short_url", None)
+        section = parent_page.get("short_url")
         suffix = (
             content_file_data.get("file_location", "")
             .split("/")[-1]
@@ -200,9 +203,7 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
         if media.get("uid", None) == content_file_data.get("uid", "")
     ]
     if media_info:
-        return media_info[0].get(
-            "technical_location", media_info[0].get("media_info", None)
-        )
+        return media_info[0].get("technical_location", media_info[0].get("media_info"))
 
     # Foreign course files should have a non-S3 url
     foreign_link = content_file_data.get("link")
@@ -230,7 +231,9 @@ def get_page_by_uid(uid, pages):
 
 def get_content_file_section(content_file, pages_section):
     """
-    Get the section the content belongs to if any.  This may need some future tweaking.
+    Get the section the content belongs to if any.
+    Currently this means the title of the parent/current page if it is a 'section' page.
+    This is based on a best guess from designs and may need future tweaking.
 
     Args:
     content_file (dict): the content file JSON
@@ -240,13 +243,13 @@ def get_content_file_section(content_file, pages_section):
         str: page section
     """
     section = "Section"
-    uid = content_file.get("parent_uid", None)
+    uid = content_file.get("parent_uid")
     if uid is not None:
         page = get_page_by_uid(uid, pages_section)
         if page and section in page.get("type", ""):
             return page["title"]
     if section in content_file.get("type", ""):
-        return content_file.get("title", None)
+        return content_file.get("title")
     return None
 
 
