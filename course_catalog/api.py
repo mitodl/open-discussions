@@ -29,7 +29,6 @@ from course_catalog.serializers import (
     OCWSerializer,
     LearningResourceRunSerializer,
 )
-
 from course_catalog.utils import get_course_url
 from search.task_helpers import (
     delete_course,
@@ -462,12 +461,15 @@ def sync_ocw_course(
 
     log.info("Digesting %s...", course_prefix)
     try:
-        course, _ = digest_ocw_course(
+        course, run = digest_ocw_course(
             course_json, last_modified, is_published, course_prefix
         )
     except TypeError:
         log.info("Course and run not returned, skipping")
         return None
+
+    if is_published:
+        load_content_files(run, transform_content_files(course_json))
 
     course.published = is_published or (
         Course.objects.get(id=course.id).runs.filter(published=True).exists()
@@ -475,7 +477,6 @@ def sync_ocw_course(
     course.save()
     if course.published:
         upsert_course(course.id)
-        load_content_files(run, transform_content_files(course_json))
     else:
         delete_course(course)
 

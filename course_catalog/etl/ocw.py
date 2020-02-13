@@ -105,7 +105,7 @@ def transform_content_file(
             # HTML files will be skipped until latest ocw-data-parser is used
             return None
 
-        key = urlparse(s3_url).path[1:]
+        key = urlparse(s3_url).path.lstrip("/")
         extension = key.split(".")[-1].lower()
         content_file["key"] = key
         content_file["file_type"] = content_file.get(
