@@ -221,7 +221,7 @@ class LearningResourceRunFactory(AbstractCourseFactory):
     )
     language = factory.Faker("word")
     year = factory.Faker("year")
-
+    url = factory.Faker("word")
     prices = factory.PostGeneration(_post_gen_prices)
 
     @factory.post_generation

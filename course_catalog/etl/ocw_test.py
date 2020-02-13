@@ -213,6 +213,28 @@ def test_transform_content_files(mock_tika_functions):
 
 
 @pytest.mark.django_db
+def test_transform_content_files_bad_course_file(mocker):
+    """ Verify that transform_content_files calls tika and returns expected output """
+    mocker.patch("course_catalog.etl.ocw.transform_content_file", side_effect=Exception)
+    mock_log = mocker.patch("course_catalog.etl.ocw.log.error")
+    transform_content_files(OCW_COURSE_JSON)
+    for course_file in COURSE_FILES:
+        mock_log.assert_any_call(
+            "ERROR syncing course file %s for run %s",
+            course_file.get("uid", ""),
+            OCW_COURSE_JSON.get("uid", ""),
+            exc_info=True,
+        )
+    for course_page in COURSE_PAGES:
+        mock_log.assert_any_call(
+            "ERROR syncing course page %s for run %s",
+            course_page.get("uid", ""),
+            OCW_COURSE_JSON.get("uid", ""),
+            exc_info=True,
+        )
+
+
+@pytest.mark.django_db
 def test_transform_content_file_course_files(mock_tika_functions):
     """ Test that contents of course_files are transformed correctly """
     for course_file in COURSE_FILES:

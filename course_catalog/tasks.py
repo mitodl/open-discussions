@@ -90,7 +90,7 @@ def get_ocw_data(
 @app.task
 def get_ocw_files(ids=None):
     """
-    Task to sync OCW course files with database
+    Task to sync OCW content files with database
     """
     if not (
         settings.OCW_LEARNING_COURSE_BUCKET_NAME
@@ -103,8 +103,8 @@ def get_ocw_files(ids=None):
 
 
 @app.task(bind=True)
-def get_all_ocw_files(self):
-    """Daily frontpage digest task"""
+def import_all_ocw_files(self):
+    """Import all OCW content files"""
     blacklisted_ids = load_course_blacklist()
     tasks = celery.group(
         [
@@ -119,8 +119,6 @@ def get_all_ocw_files(self):
             )
         ]
     )
-
-    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
     raise self.replace(tasks)
 
 

@@ -517,6 +517,9 @@ def load_content_files(course_run, content_files_json):
         course_run (LearningResourceRun): a course run
         content_files_json (dict): Details about the course run's content files
 
+    Returns:
+        list of ContentFile: ContentFile objects that were created/updated
+
     """
     if course_run.content_type.name == COURSE_TYPE:
         content_files = [

@@ -9,12 +9,15 @@ import pytest
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
+from course_catalog.constants import PlatformType
 from course_catalog.factories import (
     BootcampFactory,
     CourseFactory,
     ProgramFactory,
     VideoFactory,
     UserListFactory,
+    ContentFileFactory,
+    LearningResourceRunFactory,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
@@ -25,6 +28,7 @@ from search.api import (
     gen_video_id,
     gen_user_list_id,
     gen_profile_id,
+    gen_content_file_id,
 )
 from search.constants import (
     BOOTCAMP_TYPE,
@@ -45,6 +49,7 @@ from search.serializers import (
     ESVideoSerializer,
     ESUserListSerializer,
     ESProfileSerializer,
+    ESContentFileSerializer,
 )
 from search.tasks import (
     create_document,
@@ -68,6 +73,8 @@ from search.tasks import (
     upsert_video,
     upsert_user_list,
     upsert_profile,
+    upsert_content_file,
+    index_content_files,
 )
 
 
@@ -466,3 +473,32 @@ def test_upsert_profile_task(mocked_api, user, settings, is_indexing_user):
             PROFILE_TYPE,
             retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
         )
+
+
+def test_upsert_content_file_task(mocked_api):
+    """Test that upsert_content_file will serialize the content file data and upsert it to the ES index"""
+    content_file = ContentFileFactory.create(
+        run=LearningResourceRunFactory.create(platform=PlatformType.ocw.value)
+    )
+    course = content_file.run.content_object
+    upsert_content_file(content_file.id)
+    data = ESContentFileSerializer(content_file).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_content_file_id(content_file.key),
+        data,
+        COURSE_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+        routing=gen_course_id(course.platform, course.course_id),
+    )
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_content_files(mocker, with_error):
+    """index_content_files should call the api function of the same name"""
+    index_content_files_mock = mocker.patch("search.indexing_api.index_content_files")
+    if with_error:
+        index_content_files_mock.side_effect = TabError
+    result = index_content_files.delay([1, 2, 3]).get()
+    assert result == ("index_content_files threw an error" if with_error else None)
+
+    index_content_files_mock.assert_called_once_with([1, 2, 3])

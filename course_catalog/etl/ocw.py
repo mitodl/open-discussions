@@ -58,7 +58,7 @@ def transform_content_files(course_run_json):
             )
         except:  # pylint: disable=bare-except
             log.exception(
-                "ERROR syncing course file %s for run %d",
+                "ERROR syncing course file %s for run %s",
                 course_file.get("uid", ""),
                 course_run_json.get("uid", ""),
             )
@@ -72,7 +72,7 @@ def transform_content_files(course_run_json):
             )
         except:  # pylint: disable=bare-except
             log.exception(
-                "ERROR syncing course page %s for run %d",
+                "ERROR syncing course page %s for run %s",
                 course_page.get("uid", ""),
                 course_run_json.get("uid", ""),
             )
@@ -205,13 +205,11 @@ def get_content_file_url(course_run_json, content_file_data, content_type):
         )
 
     # Foreign course files should have a non-S3 url
-    foreign_link = content_file_data.get(
-        "link", content_file_data.get("file_location", None)
-    )
+    foreign_link = content_file_data.get("link")
     if foreign_link is not None:
         return foreign_link
-    # If none of the above worked, use an S3 URL generated from the key
-    return f"https://s3.amazonaws.com/{settings.OCW_LEARNING_COURSE_BUCKET_NAME}/{content_file_data.get('key', '')}"
+    # If none of the above worked, use the S3 URL as a last resort
+    return content_file_data.get("file_location")
 
 
 def get_page_by_uid(uid, pages):

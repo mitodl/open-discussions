@@ -377,7 +377,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
 
     def get_year(self, instance):
         """ get the run year """
-        return instance.run.year
+        return str(instance.run.year)
 
     def get_topics(self, instance):
         """ get the course topics """

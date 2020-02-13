@@ -86,8 +86,6 @@ def mock_upsert_tasks(mocker):
         delete_video=mocker.patch("search.task_helpers.delete_video"),
         delete_user_list=mocker.patch("search.task_helpers.delete_user_list"),
         upsert_user_list=mocker.patch("search.task_helpers.upsert_user_list"),
-        delete_content_file=mocker.patch("search.task_helpers.delete_content_file"),
-        upsert_content_file=mocker.patch("search.task_helpers.upsert_content_file"),
     )
 
 
@@ -742,3 +740,13 @@ def test_load_content_file():
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
+
+
+def test_load_content_file_error(mocker):
+    """ Test that an exception in load_content_file is logged """
+    learning_resource_run = LearningResourceRunFactory.create()
+    mock_log = mocker.patch("course_catalog.etl.loaders.log.exception")
+    load_content_file(learning_resource_run, {"uid": "badfile", "bad": "data"})
+    mock_log.assert_called_once_with(
+        "ERROR syncing course file %s for run %d", "badfile", learning_resource_run.id
+    )

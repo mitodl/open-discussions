@@ -339,15 +339,17 @@ def sync_ocw_course_files(ids=None):
         runs = course.runs.exclude(url="").exclude(published=False)
         for run in runs.iterator():
             try:
-                prefix = run.url.split("/")[-1]
                 s3_master_json = rapidjson.loads(
-                    bucket.Object("{}/{}_master.json".format(prefix, run.run_id))
+                    bucket.Object(
+                        "{}/{}_master.json".format(run.url.split("/")[-1], run.run_id)
+                    )
                     .get()["Body"]
                     .read()
                 )
-                load_content_files(run, transform_content_files(s3_master_json))
+                return load_content_files(run, transform_content_files(s3_master_json))
             except:  # pylint: disable=bare-except
-                log.exception("Error syncing files for course run %s", run)
+                log.exception("Error syncing files for course run %d", run.id)
+                raise
 
 
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements

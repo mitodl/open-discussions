@@ -47,6 +47,7 @@ from search.task_helpers import (
     update_bootcamp,
     delete_content_file,
     upsert_content_file,
+    delete_course,
 )
 from search.api import (
     gen_post_id,
@@ -55,6 +56,7 @@ from search.api import (
     gen_video_id,
     gen_user_list_id,
     gen_content_file_id,
+    gen_course_id,
 )
 
 es_profile_serializer_data = {
@@ -424,6 +426,24 @@ def test_upsert_course(mocker):
     course = CourseFactory.create()
     upsert_course(course.id)
     patched_task.delay.assert_called_once_with(course.id)
+
+
+@pytest.mark.django_db
+def test_delete_course(mocker):
+    """
+    Tests that delete_course calls the delete tasks for the course and its content files
+    """
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    course = CourseFactory.create()
+    course_es_id = gen_course_id(course.platform, course.course_id)
+    content_files = [ContentFileFactory.create(run=run) for run in course.runs.all()]
+
+    delete_course(course)
+    patched_delete_task.delay.assert_any_call(course_es_id, COURSE_TYPE)
+    for content_file in content_files:
+        patched_delete_task.delay.assert_any_call(
+            gen_content_file_id(content_file.key), COURSE_TYPE, routing=course_es_id
+        )
 
 
 @pytest.mark.django_db

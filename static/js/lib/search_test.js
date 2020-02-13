@@ -1,3 +1,4 @@
+/* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
 import _ from "lodash"
@@ -36,6 +37,7 @@ import {
   DEFAULT_START_DT
 } from "../lib/constants"
 import { LR_TYPE_PROGRAM } from "./constants"
+import { shouldIf } from "./test_utils"
 
 describe("search functions", () => {
   let sandbox
@@ -814,6 +816,39 @@ describe("search functions", () => {
         Object.keys(esQuery.query.bool.should[0].bool.should[0]),
         [queryType]
       )
+    })
+  })
+  ;[
+    [LR_TYPE_COURSE, true, true],
+    [LR_TYPE_COURSE, false, false],
+    [LR_TYPE_BOOTCAMP, true, false],
+    [LR_TYPE_BOOTCAMP, false, false]
+  ].forEach(([resourceType, fileSearchEnabled, includeChildQuery]) => {
+    it(`${shouldIf(
+      includeChildQuery
+    )} include a childQuery for ${resourceType} if fileSearchEnabled is ${String(
+      fileSearchEnabled
+    )}`, () => {
+      SETTINGS.file_search_enabled = fileSearchEnabled
+      const text = "search query"
+      const esQuery = buildLearnQuery(bodybuilder(), text, [resourceType], null)
+      assert.equal(
+        esQuery.query.bool.should[0].bool.should.length,
+        includeChildQuery ? 3 : 2
+      )
+      if (includeChildQuery) {
+        assert.deepEqual(esQuery.query.bool.should[0].bool.should[2], {
+          has_child: {
+            type:  "resourcefile",
+            query: {
+              multi_match: {
+                query:  text,
+                fields: ["content", "title", "short_description"]
+              }
+            }
+          }
+        })
+      }
     })
   })
 })

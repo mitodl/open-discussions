@@ -2,7 +2,7 @@
 
 from django.core.management import BaseCommand
 
-from course_catalog.tasks import get_all_ocw_files
+from course_catalog.tasks import import_all_ocw_files
 from open_discussions.utils import now_in_utc
 
 
@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Run Populate ocw course run files"""
-        task = get_all_ocw_files.delay()
+        task = import_all_ocw_files.delay()
         self.stdout.write(
             "Started task {task} to get ocw course run file data".format(task=task)
         )
