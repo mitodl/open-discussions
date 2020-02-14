@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.111.2
+---------------
+
+- Updated sentry and added filter to exclude typical shutdown errors
+
 Version 0.111.1 (Released February 14, 2020)
 ---------------
 
