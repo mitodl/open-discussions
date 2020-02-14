@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.111.1
+Version 0.111.1 (Released February 14, 2020)
 ---------------
 
 - Added support for tracking and displaying popular learning resources
