@@ -348,64 +348,20 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     Elasticsearch serializer class for course run files
     """
 
-    run_id = serializers.SerializerMethodField()
-    run_title = serializers.SerializerMethodField()
-    semester = serializers.SerializerMethodField()
-    year = serializers.SerializerMethodField()
-    topics = serializers.SerializerMethodField()
     short_description = serializers.CharField(source="description")
-
-    def get_resource_relations(self, instance):
-        """ Get resource_relations properties"""
-        course = Course.objects.get(id=instance.run.object_id)
-        return {
-            "name": "resourcefile",
-            "parent": gen_course_id(course.platform, course.course_id),
-        }
-
-    def get_run_id(self, instance):
-        """ Get the run_id """
-        return instance.run.run_id
-
-    def get_run_title(self, instance):
-        """ Get the run title """
-        return instance.run.title
-
-    def get_semester(self, instance):
-        """ get the run semester """
-        return instance.run.semester
-
-    def get_year(self, instance):
-        """ get the run year """
-        return str(instance.run.year)
-
-    def get_topics(self, instance):
-        """ get the course topics """
-        return [
-            topic
-            for topic in instance.run.content_object.topics.values_list(
-                "name", flat=True
-            )
-        ]
 
     class Meta:
         model = ContentFile
         fields = [
-            "run_id",
-            "run_title",
-            "semester",
-            "year",
-            "topics",
             "key",
             "uid",
-            "resource_relations",
             "title",
             "short_description",
             "url",
             "section",
             "file_type",
-            "content_type",
             "content",
+            "content_type",
             "content_title",
             "content_author",
             "content_language",

@@ -565,14 +565,23 @@ def index_run_content_files(run_id):
         run_id(int): Course run id
     """
     run = LearningResourceRun.objects.get(id=run_id)
+    course = run.content_object
+    course_ed_id = gen_course_id(course.platform, course.course_id)
+    extra_fields = {
+        "run_id": run.run_id,
+        "run_title": run.title,
+        "year": str(run.year),
+        "semester": run.semester,
+        "topics": [topic for topic in course.topics.values_list("name", flat=True)],
+        "resource_relations": {"name": "resourcefile", "parent": course_ed_id},
+    }
+
     documents = (
-        serialize_content_file_for_bulk(content_file)
+        dict(serialize_content_file_for_bulk(content_file), **extra_fields)
         for content_file in ContentFile.objects.filter(run=run)
     )
-    course = run.content_object
-    index_items(
-        documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
-    )
+
+    index_items(documents, COURSE_TYPE, routing=course_ed_id)
 
 
 def delete_run_content_files(run_id):

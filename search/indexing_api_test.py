@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
+from mock import ANY
 
 from course_catalog.factories import (
     CourseFactory,
@@ -458,7 +459,7 @@ def test_bulk_index_content_files(
         index_func(run.id)
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
-                [doc for _ in content_files],
+                [ANY for _ in content_files],
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
             ):
                 bulk_mock.assert_any_call(
