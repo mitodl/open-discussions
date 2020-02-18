@@ -4,12 +4,13 @@
 #
 #    pip-compile
 #
-amqp==2.1.4               # via kombu
+amqp==2.5.2               # via kombu
+backcall==0.1.0           # via ipython
 base36==0.1.1
 beautifulsoup4==4.6.0
 betamax-serializers==0.2.0
 betamax==0.8.0
-billiard==3.5.0.2         # via celery
+billiard==3.6.2.0         # via celery
 boto3==1.9.76             # via ocw-data-parser, smart-open
 boto==2.39.0
 botocore==1.12.76         # via boto3, s3transfer
@@ -17,12 +18,12 @@ bz2file==0.98             # via smart-open
 cachetools==3.1.1         # via google-auth
 cairocffi==0.8.1          # via cairosvg
 cairosvg==2.1.3
-celery==4.2.0
+celery==4.3.0
 certifi==2017.4.17        # via requests, sentry-sdk
 cffi==1.11.5              # via cairocffi
 chardet==3.0.4            # via requests
 cssselect2==0.2.1         # via cairosvg
-decorator==4.0.11         # via ipython, traitlets
+decorator==4.4.1          # via ipython, traitlets
 defusedxml==0.5.0         # via cairosvg, python3-openid, python3-saml, social-auth-core
 deprecated==1.2.7         # via pygithub
 dj-database-url==0.3.0
@@ -36,7 +37,7 @@ django-guardian==1.4.9
 django-hijack-admin==2.1.10
 django-hijack==2.1.10
 django-json-widget==0.2.0
-django-redis==4.7.0
+django-redis==4.10.0
 django-server-status==0.5.0
 django-storages==1.6.6
 django-templated-mail==1.1.1  # via djoser
@@ -58,32 +59,34 @@ google-auth==1.6.3        # via google-api-python-client, google-auth-httplib2
 html5lib==0.999999999
 httplib2==0.14.0          # via google-api-python-client, google-auth-httplib2
 idna==2.5                 # via requests, tldextract
+importlib-metadata==1.5.0  # via kombu
 ipaddress==1.0.22         # via elasticsearch-dsl
 ipython-genutils==0.2.0   # via traitlets
-ipython==6.1.0
+ipython==7.12.0
 isodate==0.6.0            # via python3-saml
-jedi==0.10.2              # via ipython
+jedi==0.16.0              # via ipython
 jmespath==0.9.3           # via boto3, botocore
-kombu==4.2.1              # via celery, django-server-status
+kombu==4.6.7              # via celery, django-server-status
 lxml==4.1.1               # via xmlsec
 markdown2==2.3.7
 newrelic==4.2.0.100
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
 ocw-data-parser==0.2.7
-pexpect==4.2.1            # via ipython
-pickleshare==0.7.4        # via ipython
+parso==0.6.1              # via jedi
+pexpect==4.8.0            # via ipython
+pickleshare==0.7.5        # via ipython
 pillow==6.2.0
 pkgconfig==1.3.1          # via xmlsec
 praw==4.5.1
 prawcore==0.10.1          # via praw
-prompt-toolkit==1.0.14    # via ipython
+prompt-toolkit==3.0.3     # via ipython
 psycopg2==2.8.3
-ptyprocess==0.5.1         # via pexpect
+ptyprocess==0.6.0         # via pexpect
 pyasn1-modules==0.2.7     # via google-auth
 pyasn1==0.4.7             # via pyasn1-modules, rsa
 pycparser==2.18           # via cffi
 pygithub==1.44.1
-pygments==2.2.0           # via ipython
+pygments==2.5.2           # via ipython
 pyjwt==1.5.2              # via djangorestframework-jwt, pygithub, social-auth-core
 python-dateutil==2.6.0
 python-rapidjson==0.9.1
@@ -92,15 +95,14 @@ python3-saml==1.4.1
 pytube==9.5.2
 pytz==2018.9              # via celery, django
 pyyaml==5.1.2
-redis==2.10.5
+redis==3.2.1
 requests-file==1.4.3      # via tldextract
 requests-oauthlib==0.8.0  # via social-auth-core
 requests==2.21.0
 rsa==4.0                  # via google-auth
 s3transfer==0.1.13        # via boto3
 sentry-sdk==0.14.1
-simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via django-anymail, django-bitfield, django-compat, django-guardian, django-server-status, elasticsearch-dsl, faker, google-api-python-client, google-auth, html5lib, isodate, prompt-toolkit, pygithub, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
+six==1.10.0               # via django-anymail, django-bitfield, django-compat, django-guardian, django-server-status, elasticsearch-dsl, faker, google-api-python-client, google-auth, html5lib, isodate, pygithub, python-dateutil, requests-file, social-auth-app-django, social-auth-core, traitlets
 smart-open==1.8.0         # via ocw-data-parser
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
@@ -110,17 +112,18 @@ text-unidecode==1.2       # via faker
 tinycss2==0.6.1           # via cairosvg, cssselect2
 tldextract==2.2.0
 toolz==0.10.0
-traitlets==4.3.2          # via ipython
+traitlets==4.3.3          # via ipython
 ulid-py==0.0.3
 update-checker==0.16      # via praw
 uritemplate==3.0.0        # via google-api-python-client
 urllib3==1.24.2
-uwsgi==2.0.15
-vine==1.1.3               # via amqp
-wcwidth==0.1.7            # via prompt-toolkit
+uwsgi==2.0.18
+vine==1.3.0               # via amqp, celery
+wcwidth==0.1.8            # via prompt-toolkit
 webencodings==0.5.1       # via html5lib, tinycss2
 wrapt==1.10.11
 xmlsec==1.3.3             # via python3-saml
+zipp==3.0.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
