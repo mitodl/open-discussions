@@ -1,11 +1,1 @@
-version: '2.1'
-services:
-  python:
-    build:
-      context: .
-      dockerfile: ./travis/Dockerfile-travis-web
-
-  web:
-    build:
-      context: .
-      dockerfile: ./travis/Dockerfile-travis-web
+version: '3.7'

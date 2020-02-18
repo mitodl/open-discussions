@@ -1,7 +1,34 @@
-version: '2.1'
+version: '3.7'
+
+x-environment:
+  &py-environment
+  DEBUG: 'False'
+  DEV_ENV: 'True'  # necessary to have nginx connect to web container
+  NODE_ENV: 'production'
+  COVERAGE_DIR: htmlcov
+  DATABASE_URL: postgres://postgres@db:5432/postgres
+  OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
+  OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
+  OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
+  OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
+  OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
+  OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
+  OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
+  ELASTICSEARCH_URL: elastic:9200
+  CELERY_TASK_ALWAYS_EAGER: 'False'
+  CELERY_BROKER_URL: redis://redis:6379/4
+  CELERY_RESULT_BACKEND: redis://redis:6379/4
+  DOCKER_HOST: ${DOCKER_HOST:-missing}
+  WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
+
+x-extra-hosts:
+  &default-extra-hosts
+  # see reddit.local in /etc/hosts
+  - "reddit.local:192.168.56.111"
+
 services:
   db:
-    image: postgres
+    image: postgres:11.6
     ports:
       - "5432"
 
@@ -28,40 +55,14 @@ services:
     links:
       - web
 
-  python:
+  web:
     build:
       context: .
       dockerfile: Dockerfile
-    command: /bin/true
     environment:
-      DEBUG: 'False'
-      DEV_ENV: 'True'  # necessary to have nginx connect to web container
-      NODE_ENV: 'production'
+      << : *py-environment
       PORT: 8061
-      COVERAGE_DIR: htmlcov
-      DATABASE_URL: postgres://postgres@db:5432/postgres
-      OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
-      OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
-      OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
-      OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
-      OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
-      OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
-      OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-      ELASTICSEARCH_URL: elastic:9200
-      CELERY_TASK_ALWAYS_EAGER: 'False'
-      CELERY_BROKER_URL: redis://redis:6379/4
-      CELERY_RESULT_BACKEND: redis://redis:6379/4
-      DOCKER_HOST: ${DOCKER_HOST:-missing}
-      WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
     env_file: .env
-    # set reddit.local in /etc/hosts
-    extra_hosts:
-      - "reddit.local:192.168.56.111"
-
-  web:
-    image: open_discussions_python
-    extends:
-      service: python
     command: >
       /bin/bash -c '
       sleep 3 &&
@@ -76,6 +77,7 @@ services:
       - db
       - elastic
       - redis
+    extra_hosts: *default-extra-hosts
 
   watch:
     build:
@@ -93,9 +95,11 @@ services:
     env_file: .env
 
   celery:
-    image: open_discussions_python
-    extends:
-      service: python
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment: *py-environment
+    env_file: .env
     command: >
       /bin/bash -c '
       sleep 3;
@@ -103,3 +107,4 @@ services:
     links:
       - db
       - redis
+    extra_hosts: *default-extra-hosts
