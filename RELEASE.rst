@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.112.0
+Version 0.112.0 (Released February 24, 2020)
 ---------------
 
 - Revert "Upgrade celery, use Python 3.7 in docker (#2592)" (#2595)
