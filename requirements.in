@@ -6,12 +6,12 @@ betamax
 betamax_serializers
 boto==2.39.0
 cairosvg
-celery==4.2.0
+celery==4.3.0
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-bitfield==1.9.3
 django-cache-memoize==0.1.6
-django-redis==4.7.0
+django-redis==4.10.0
 django-guardian==1.4.9
 django-server-status==0.5.0
 django-storages==1.6.6
@@ -45,7 +45,7 @@ python-rapidjson==0.9.1
 python3-saml==1.4.1
 pygithub==1.44.1
 pytube==9.5.2
-redis==2.10.5
+redis==3.2.1
 requests
 sentry-sdk==0.14.1 
 social-auth-app-django==2.1.0
