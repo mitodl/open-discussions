@@ -7,7 +7,7 @@
 amqp==2.5.2               # via kombu
 backcall==0.1.0           # via ipython
 base36==0.1.1
-beautifulsoup4==4.6.0
+beautifulsoup4==4.8.2
 betamax-serializers==0.2.0
 betamax==0.8.0
 billiard==3.6.2.0         # via celery
@@ -88,7 +88,7 @@ pycparser==2.18           # via cffi
 pygithub==1.44.1
 pygments==2.5.2           # via ipython
 pyjwt==1.5.2              # via djangorestframework-jwt, pygithub, social-auth-core
-python-dateutil==2.6.0
+python-dateutil==2.8.1
 python-rapidjson==0.9.1
 python3-openid==3.1.0     # via social-auth-core
 python3-saml==1.4.1

@@ -6,12 +6,7 @@ from django.http import HttpResponseRedirect
 from social_django.views import _do_login as login
 from social_core.backends.email import EmailAuth
 from social_core.exceptions import InvalidEmail, AuthException
-from social_core.utils import (
-    user_is_authenticated,
-    user_is_active,
-    partial_pipeline_data,
-    sanitize_redirect,
-)
+from social_core.utils import partial_pipeline_data, sanitize_redirect
 from rest_framework import serializers
 
 from authentication.exceptions import (
@@ -86,7 +81,7 @@ class SocialAuthSerializer(serializers.Serializer):
         backend = self.context["backend"]
         user = request.user
 
-        is_authenticated = user_is_authenticated(user)
+        is_authenticated = user.is_authenticated
         user = user if is_authenticated else None
 
         kwargs = {"request": request, "flow": flow}
@@ -115,7 +110,7 @@ class SocialAuthSerializer(serializers.Serializer):
                 SocialAuthState.STATE_SUCCESS, redirect_url=redirect_url
             )
         elif user:
-            if user_is_active(user):
+            if user.is_active:
                 social_user = user.social_user
 
                 login(backend, user, social_user)

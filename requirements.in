@@ -1,7 +1,7 @@
 django-cors-headers==2.1.0
 Django==2.2.10
 base36
-beautifulsoup4==4.6.0
+beautifulsoup4==4.8.2
 betamax
 betamax_serializers
 boto==2.39.0
