@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.112.0
+---------------
+
+- Revert "Upgrade celery, use Python 3.7 in docker (#2592)" (#2595)
+- Upgrade celery, use Python 3.7 in docker (#2592)
+- Update postgres version and docker-compose setup (#2591)
+- Updated sentry and added filter to exclude typical shutdown errors
+
 Version 0.111.1 (Released February 14, 2020)
 ---------------
 
