@@ -543,7 +543,7 @@ def index_courses(ids):
     index_items(serialize_bulk_courses(ids), COURSE_TYPE)
 
 
-def index_content_files(course_ids):
+def index_course_content_files(course_ids):
     """
     Index a list of content files by course ids
 

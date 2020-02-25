@@ -387,20 +387,58 @@ def index_courses(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_content_files(ids):
+def index_course_content_files(course_ids):
     """
-    Index content files
+    Index content files for a list of course ids
 
     Args:
-        ids(list of int): List of course id's
+        course_ids(list of int): List of course id's
 
     """
     try:
-        api.index_content_files(ids)
+        api.index_course_content_files(course_ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_content_files threw an error"
+        error = f"index_course_content_files threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_run_content_files(run_id):
+    """
+    Index content files for a LearningResourceRun
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    try:
+        api.index_run_content_files(run_id)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_run_content_files threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def delete_run_content_files(run_id):
+    """
+    Deleted content files for a LearningResourceRun from the index
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    try:
+        api.delete_run_content_files(run_id)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"delete_run_content_files threw an error"
         log.exception(error)
         return error
 
@@ -536,7 +574,7 @@ def start_recreate_index(self):
                 )
             ]
             + [
-                index_content_files.si(ids)
+                index_course_content_files.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
                     .filter(platform=PlatformType.ocw.value)

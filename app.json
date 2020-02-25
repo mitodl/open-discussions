@@ -452,11 +452,11 @@
     },
     "TIKA_CLIENT_ONLY": {
       "description": "use tika-python library in client mode",
-      "required": true
+      "required": false
     },
     "TIKA_SERVER_ENDPOINT": {
       "description": "URL of tika server for extracting text",
-      "required": true
+      "required": false
     },
     "TIKA_ACCESS_TOKEN": {
       "description": "X-Access-Token value for tika requests",

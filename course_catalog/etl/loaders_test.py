@@ -710,10 +710,12 @@ def test_load_content_files(mocker, is_published):
         "course_catalog.etl.loaders.load_content_file", autospec=True
     )
     mock_bulk_index = mocker.patch(
-        "course_catalog.etl.loaders.index_run_content_files", autospec=True
+        "course_catalog.etl.loaders.search_task_helpers.index_run_content_files",
+        autospec=True,
     )
     mock_bulk_delete = mocker.patch(
-        "course_catalog.etl.loaders.delete_run_content_files", autospec=True
+        "course_catalog.etl.loaders.search_task_helpers.delete_run_content_files",
+        autospec=True,
     )
     load_content_files(course_run, content_data)
     assert mock_load_content_file.call_count == len(content_data)

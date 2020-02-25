@@ -74,7 +74,9 @@ from search.tasks import (
     upsert_user_list,
     upsert_profile,
     upsert_content_file,
-    index_content_files,
+    index_course_content_files,
+    index_run_content_files,
+    delete_run_content_files,
 )
 
 
@@ -493,12 +495,44 @@ def test_upsert_content_file_task(mocked_api):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_content_files(mocker, with_error):
-    """index_content_files should call the api function of the same name"""
-    index_content_files_mock = mocker.patch("search.indexing_api.index_content_files")
+def test_index_course_content_files(mocker, with_error):
+    """index_course_content_files should call the api function of the same name"""
+    index_content_files_mock = mocker.patch(
+        "search.indexing_api.index_course_content_files"
+    )
     if with_error:
         index_content_files_mock.side_effect = TabError
-    result = index_content_files.delay([1, 2, 3]).get()
-    assert result == ("index_content_files threw an error" if with_error else None)
+    result = index_course_content_files.delay([1, 2, 3]).get()
+    assert result == (
+        "index_course_content_files threw an error" if with_error else None
+    )
 
     index_content_files_mock.assert_called_once_with([1, 2, 3])
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_index_run_content_files(mocker, with_error):
+    """index_run_content_files should call the api function of the same name"""
+    index_run_content_files_mock = mocker.patch(
+        "search.indexing_api.index_run_content_files"
+    )
+    if with_error:
+        index_run_content_files_mock.side_effect = TabError
+    result = index_run_content_files.delay(1).get()
+    assert result == ("index_run_content_files threw an error" if with_error else None)
+
+    index_run_content_files_mock.assert_called_once_with(1)
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_delete_run_content_files(mocker, with_error):
+    """delete_run_content_files should call the api function of the same name"""
+    delete_run_content_files_mock = mocker.patch(
+        "search.indexing_api.delete_run_content_files"
+    )
+    if with_error:
+        delete_run_content_files_mock.side_effect = TabError
+    result = delete_run_content_files.delay(1).get()
+    assert result == ("delete_run_content_files threw an error" if with_error else None)
+
+    delete_run_content_files_mock.assert_called_once_with(1)

@@ -33,7 +33,7 @@ from search.indexing_api import (
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
     delete_document,
-    index_content_files,
+    index_course_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -409,7 +409,7 @@ def test_index_content_files(mocker):
         "search.indexing_api.index_run_content_files", autospec=True
     )
     courses = CourseFactory.create_batch(2)
-    index_content_files([course.id for course in courses])
+    index_course_content_files([course.id for course in courses])
     for course in courses:
         for run in course.runs.all():
             mock_index_run_content_files.assert_any_call(run.id)

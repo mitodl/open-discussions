@@ -364,7 +364,6 @@ def delete_course(course_obj):
         delete_content_file(content_file)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def upsert_content_file(content_file_id):
     """
     Run a task to create or update a content file's Elasticsearch document
@@ -375,7 +374,6 @@ def upsert_content_file(content_file_id):
     tasks.upsert_content_file.delay(content_file_id)
 
 
-@if_feature_enabled(INDEX_UPDATES)
 def delete_content_file(content_file_obj):
     """
     Runs a task to delete an ES CourseRunFile document
@@ -389,6 +387,28 @@ def delete_content_file(content_file_obj):
         COURSE_TYPE,
         routing=gen_course_id(course.platform, course.course_id),
     )
+
+
+def index_run_content_files(run_id):
+    """
+    Runs a task to index content files for a LearningResourceRun
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    tasks.index_run_content_files.delay(run_id)
+
+
+def delete_run_content_files(run_id):
+    """
+    Runs a task to delete content files for a LearningResourceRun from the index
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    tasks.delete_run_content_files.delay(run_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)

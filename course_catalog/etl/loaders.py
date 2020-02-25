@@ -30,7 +30,6 @@ from course_catalog.models import (
 from course_catalog.utils import load_course_blacklist
 from search import task_helpers as search_task_helpers
 from search.constants import COURSE_TYPE
-from search.indexing_api import index_run_content_files, delete_run_content_files
 
 log = logging.getLogger()
 
@@ -524,7 +523,7 @@ def load_content_files(course_run, content_files_json):
             for content_file in content_files_json
         ]
         if course_run.published:
-            index_run_content_files(course_run.id)
+            search_task_helpers.index_run_content_files(course_run.id)
         else:
-            delete_run_content_files(course_run.id)
+            search_task_helpers.delete_run_content_files(course_run.id)
         return content_files

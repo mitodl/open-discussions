@@ -332,7 +332,7 @@ def sync_ocw_course_files(ids=None):
     """
     bucket = get_ocw_learning_course_bucket()
     courses = Course.objects.filter(platform="ocw").filter(published=True)
-    if ids is not None:
+    if ids:
         courses = courses.filter(id__in=ids)
     for course in courses.iterator():
         runs = course.runs.exclude(url="").exclude(published=False)
