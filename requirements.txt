@@ -24,7 +24,7 @@ cffi==1.11.5              # via cairocffi
 chardet==3.0.4            # via requests
 cssselect2==0.2.1         # via cairosvg
 decorator==4.4.1          # via ipython, traitlets
-defusedxml==0.5.0         # via cairosvg, python3-openid, python3-saml, social-auth-core
+defusedxml==0.6.0         # via cairosvg, python3-openid, python3-saml, social-auth-core
 deprecated==1.2.7         # via pygithub
 dj-database-url==0.3.0
 dj-static==0.0.6
