@@ -467,7 +467,7 @@ def sync_ocw_course(
         log.info("Course and run not returned, skipping")
         return None
 
-    if is_published:
+    if upload_to_s3 and is_published:
         load_content_files(run, transform_content_files(course_json))
 
     course.published = is_published or (
