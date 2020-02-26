@@ -161,17 +161,8 @@ def test_get_ocw_courses(
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 3
-    assert Course.objects.first().published is not blacklisted
-    get_ocw_courses.delay(
-        course_prefixes=[TEST_PREFIX],
-        blacklist=mock_blacklist.return_value,
-        force_overwrite=False,
-        upload_to_s3=True,
-    )
-    assert Course.objects.count() == 1
-    assert CoursePrice.objects.count() == 1
-    assert CourseInstructor.objects.count() == 1
-    assert CourseTopic.objects.count() == 3
+    course = Course.objects.first()
+    assert course.published is not blacklisted
 
     if not blacklisted:
         s3 = boto3.resource(
@@ -185,6 +176,9 @@ def test_get_ocw_courses(
             "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_master.json",
         )
         assert json.loads(obj.get()["Body"].read())
+        assert course.image_src.startswith("http")
+    else:
+        assert course.image_src == ""
 
 
 @mock_s3

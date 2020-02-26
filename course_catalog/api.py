@@ -407,15 +407,6 @@ def sync_ocw_course(
     if course_json["course_id"] in blacklist:
         is_published = False
 
-    log.info("Digesting %s...", course_prefix)
-    try:
-        course, run = digest_ocw_course(
-            course_json, last_modified, is_published, course_prefix
-        )
-    except TypeError:
-        log.info("Course and run not returned, skipping")
-        return None
-
     if upload_to_s3 and is_published:
         try:
             parser.setup_s3_uploading(
@@ -432,13 +423,19 @@ def sync_ocw_course(
                 parser.upload_all_media_to_s3(upload_master_json=True)
         except:  # pylint: disable=bare-except
             log.exception(
-                (
-                    "Error encountered uploading OCW files for %s, deleting run",
-                    course_prefix,
-                )
+                ("Error encountered uploading OCW files for %s", course_prefix)
             )
-            run.delete()
             raise
+
+    log.info("Digesting %s...", course_prefix)
+    try:
+        course, _ = digest_ocw_course(
+            course_json, last_modified, is_published, course_prefix
+        )
+    except TypeError:
+        log.info("Course and run not returned, skipping")
+        return None
+
     course.published = is_published or (
         Course.objects.get(id=course.id).runs.filter(published=True).exists()
     )
