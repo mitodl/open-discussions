@@ -94,70 +94,71 @@ def transform_content_file(
     Returns:
         dict: transformed content_file json
     """
+    content_json = {}
     content_file = copy.deepcopy(content_file_data)
-    try:
-        bucket = get_ocw_learning_course_bucket()
-        content_json = {}
+    content_file["content_type"] = content_type
+    content_file["file_type"] = content_file.get("file_type", content_file.get("type"))
+    content_file["url"] = get_content_file_url(
+        course_run_json, content_file, content_type
+    )
+    content_file["section"] = get_content_file_section(
+        content_file, course_run_json.get("course_pages", [])
+    )
 
-        content_file["content_type"] = content_type
-        s3_url = content_file.get("file_location")
-        if not s3_url:
-            # Nothing to do without an S3 key
-            return None
+    s3_url = content_file.get("file_location", "")
+    key = urlparse(s3_url).path.lstrip("/")
+    content_file["key"] = key
+    if splitext(key)[-1].lower() in VALID_TEXT_FILE_TYPES:
+        try:
+            bucket = get_ocw_learning_course_bucket()
+            s3_obj = bucket.Object(key).get()
+            course_file_obj = ContentFile.objects.filter(key=key).first()
 
-        key = urlparse(s3_url).path.lstrip("/")
-        content_file["key"] = key
-        content_file["file_type"] = content_file.get(
-            "file_type", content_file.get("type")
-        )
-        content_file["url"] = get_content_file_url(
-            course_run_json, content_file, content_type
-        )
+            needs_text_update = course_file_obj is None or (
+                s3_obj is not None
+                and s3_obj["LastModified"] >= course_file_obj.updated_on
+            )
 
-        s3_obj = bucket.Object(key).get()
-        course_file_obj = ContentFile.objects.filter(key=key).first()
-        needs_text_update = course_file_obj is None or (
-            s3_obj is not None and s3_obj["LastModified"] >= course_file_obj.updated_on
-        )
-        extension = splitext(key)[-1].lower()
-        if needs_text_update and extension in VALID_TEXT_FILE_TYPES:
-            s3_body = s3_obj.get("Body") if s3_obj else None
-            if s3_body:
-                content_json = extract_text_metadata(s3_body)
-                sync_s3_text(bucket, key, content_json)
+            if needs_text_update:
+                s3_body = s3_obj.get("Body") if s3_obj else None
+                if s3_body:
+                    content_json = extract_text_metadata(s3_body)
+                    sync_s3_text(bucket, key, content_json)
 
-        content_file["section"] = get_content_file_section(
-            content_file, course_run_json.get("course_pages", [])
-        )
-        if content_json:
-            content_json_meta = content_json.get("metadata", {})
-            content_file["content"] = content_json.get("content")
-            # Sometimes Tika returns very large values (probably a mistake in pdf data), so truncate in case.
-            content_file["content_author"] = content_json_meta.get("Author", "")[
-                : _get_max_length("content_author")
-            ]
-            content_file["content_language"] = content_json_meta.get("language", "")[
-                : _get_max_length("content_language")
-            ]
-            content_file["content_title"] = content_json_meta.get("title", "")[
-                : _get_max_length("content_title")
-            ]
+            if content_json:
+                content_json_meta = content_json.get("metadata", {})
+                content_file["content"] = content_json.get("content")
+                # Sometimes Tika returns very large values (probably a mistake in pdf data), so truncate in case.
+                content_file["content_author"] = content_json_meta.get("Author", "")[
+                    : _get_max_length("content_author")
+                ]
+                content_file["content_language"] = content_json_meta.get(
+                    "language", ""
+                )[: _get_max_length("content_language")]
+                content_file["content_title"] = content_json_meta.get("title", "")[
+                    : _get_max_length("content_title")
+                ]
+        except bucket.meta.client.exceptions.NoSuchKey:
+            log.warning(
+                "No S3 object found for %s in course run %s",
+                key,
+                course_run_json.get("uid"),
+            )
+        except:  # pylint:disable=bare-except
+            log.exception(
+                "Error extracting text from key %s for course run %s",
+                key,
+                course_run_json.get("uid"),
+            )
+    # Get rid of other fields
+    for field in list(
+        set(content_file.keys())
+        - {field.name for field in ContentFile._meta.get_fields()}
+    ):
+        content_file.pop(field)
+    content_file.pop("id", None)
 
-        # Get rid of other fields
-        for field in list(
-            set(content_file.keys())
-            - {field.name for field in ContentFile._meta.get_fields()}
-        ):
-            content_file.pop(field)
-        content_file.pop("id", None)
-
-        return content_file
-    except:  # pylint:disable=bare-except
-        log.exception(
-            "Error transforming %s for course run %s",
-            rapidjson.dumps(content_file),
-            course_run_json.get("uid"),
-        )
+    return content_file
 
 
 def get_content_file_url(course_run_json, content_file_data, content_type):

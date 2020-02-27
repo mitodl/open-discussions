@@ -353,7 +353,6 @@ def test_get_ocw_files_missing_settings(mocker, settings):
 def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blacklist):
     """Test get_ocw_data task"""
     setup_s3(settings)
-    settings.OCW_CONTENT_ITERATOR_CHUNK_SIZE = 3
     get_ocw_files_mock = mocker.patch(
         "course_catalog.tasks.get_ocw_files", autospec=True
     )
@@ -363,7 +362,7 @@ def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blacklist):
     CourseFactory.create_batch(3, platform=PlatformType.oll.value, published=False)
 
     with pytest.raises(mocked_celery.replace_exception_class):
-        import_all_ocw_files.delay()
+        import_all_ocw_files.delay(3)
     assert mocked_celery.group.call_count == 1
     get_ocw_files_mock.si.assert_called_once_with([course.id for course in courses])
 

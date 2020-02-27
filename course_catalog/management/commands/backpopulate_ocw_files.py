@@ -11,11 +11,21 @@ class Command(BaseCommand):
 
     help = "Populate ocw course run files"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "-c",
+            "--chunk-size",
+            dest="chunk_size",
+            default=1000,
+            help="Chunk size for batch import task",
+        )
+
     def handle(self, *args, **options):
         """Run Populate ocw course run files"""
-        task = import_all_ocw_files.delay()
+        chunk_size = options["chunk_size"]
+        task = import_all_ocw_files.delay(chunk_size=chunk_size)
         self.stdout.write(
-            "Started task {task} to get ocw course run file data".format(task=task)
+            f"Started task {task} to get ocw course run file data w/chunk size {chunk_size}"
         )
         self.stdout.write("Waiting on task...")
         start = now_in_utc()

@@ -352,9 +352,7 @@ def test_es_content_file_serializer():
             "run_title": content_file.run.title,
             "semester": content_file.run.semester,
             "year": int(content_file.run.year),
-            "topics": list(
-                content_file.run.topics.values_list("name", flat=True)
-            ),
+            "topics": list(content_file.run.topics.values_list("name", flat=True)),
             "key": content_file.key,
             "uid": content_file.uid,
             "resource_relations": {

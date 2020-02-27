@@ -3,7 +3,7 @@
 import json
 from os.path import splitext
 from types import SimpleNamespace
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import pytest
 
@@ -190,8 +190,9 @@ def mock_s3_content(mock_ocw_learning_bucket):
 
 
 @pytest.mark.django_db
-def test_transform_content_files(mock_tika_functions):
+def test_transform_content_files(mock_tika_functions, mocker):
     """ Verify that transform_content_files calls tika and returns expected output """
+    mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
     file_inputs = COURSE_FILES + FOREIGN_FILES
     text_inputs = [
         input
@@ -211,28 +212,69 @@ def test_transform_content_files(mock_tika_functions):
         transform_content_file(OCW_COURSE_JSON, file, ftype)
         for (file, ftype) in all_inputs
     ]
+    mock_exception_log.assert_not_called()
 
 
 @pytest.mark.django_db
-def test_transform_content_files_bad_course_file(mocker):
-    """ Verify that transform_content_files calls tika and returns expected output """
+def test_transform_content_files_error(mocker):
+    """ Verify that errors are logged when transforming content files """
     mocker.patch("course_catalog.etl.ocw.transform_content_file", side_effect=Exception)
-    mock_log = mocker.patch("course_catalog.etl.ocw.log.error")
+    mock_error_log = mocker.patch("course_catalog.etl.ocw.log.error")
     transform_content_files(OCW_COURSE_JSON)
     for course_file in COURSE_FILES:
-        mock_log.assert_any_call(
+        mock_error_log.assert_any_call(
             "ERROR syncing course file %s for run %s",
             course_file.get("uid", ""),
             OCW_COURSE_JSON.get("uid", ""),
             exc_info=True,
         )
+
     for course_page in COURSE_PAGES:
-        mock_log.assert_any_call(
+        mock_error_log.assert_any_call(
             "ERROR syncing course page %s for run %s",
             course_page.get("uid", ""),
             OCW_COURSE_JSON.get("uid", ""),
             exc_info=True,
         )
+
+
+@pytest.mark.django_db
+def test_transform_content_files_generic_s3_error(mocker):
+    """ Verify that ex eptions are logged when extracting text from content files  """
+    mocker.patch("course_catalog.etl.ocw.extract_text_metadata", side_effect=Exception)
+    mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
+    transform_content_files(OCW_COURSE_JSON)
+
+    mock_exception_log.assert_any_call(
+        "Error extracting text from key %s for course run %s",
+        "4-105-geometric-disciplines-fall-2012/e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf",
+        "0007de9b4a0cd7c298d822b4123c2eaf",
+    )
+
+    for course_page in COURSE_PAGES:
+        mock_exception_log.assert_any_call(
+            "Error extracting text from key %s for course run %s",
+            urlparse(course_page.get("file_location")).path.lstrip("/"),
+            OCW_COURSE_JSON.get("uid", ""),
+        )
+
+
+@pytest.mark.django_db
+def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_bucket):
+    """ Verify that transform_content_files calls tika and returns expected output """
+    mock_warn_log = mocker.patch("course_catalog.etl.ocw.log.warning")
+    bad_key = "4-105-geometric-disciplines-fall-2012/e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
+
+    mock_ocw_learning_bucket.bucket.delete_objects(
+        Delete={"Objects": [{"Key": bad_key}], "Quiet": True}
+    )
+    transform_content_files(OCW_COURSE_JSON)
+
+    mock_warn_log.assert_any_call(
+        "No S3 object found for %s in course run %s",
+        bad_key,
+        "0007de9b4a0cd7c298d822b4123c2eaf",
+    )
 
 
 @pytest.mark.django_db

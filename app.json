@@ -160,10 +160,6 @@
       "description": "Chunk size for iterating over OCW courses for master json",
       "required": false
     },
-    "OCW_CONTENT_ITERATOR_CHUNK_SIZE": {
-      "description": "Chunk size for iterating over OCW content files",
-      "required": false
-    },
     "OCW_LEARNING_COURSE_BUCKET_NAME": {
       "description": "Name of S3 bucket to upload OCW course media",
       "required": false

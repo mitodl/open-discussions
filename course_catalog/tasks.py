@@ -103,7 +103,7 @@ def get_ocw_files(ids=None):
 
 
 @app.task(bind=True)
-def import_all_ocw_files(self):
+def import_all_ocw_files(self, chunk_size):
     """Import all OCW content files"""
     blacklisted_ids = load_course_blacklist()
     tasks = celery.group(
@@ -115,7 +115,7 @@ def import_all_ocw_files(self):
                 .exclude(course_id__in=blacklisted_ids)
                 .order_by("id")
                 .values_list("id", flat=True),
-                chunk_size=settings.OCW_CONTENT_ITERATOR_CHUNK_SIZE,
+                chunk_size=chunk_size,
             )
         ]
     )
