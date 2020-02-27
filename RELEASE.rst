@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.112.1
+---------------
+
+- digest_ocw_course() needs to be run after OCWParser.upload_all_media_to_s3() (#2597)
+- Upgrade to Python 3.7 (#2594)
+
 Version 0.112.0 (Released February 24, 2020)
 ---------------
 
