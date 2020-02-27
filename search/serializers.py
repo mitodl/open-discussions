@@ -348,20 +348,39 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     Elasticsearch serializer class for course run files
     """
 
+    run_id = serializers.CharField(source="run.run_id")
+    run_title = serializers.CharField(source="run.title")
+    semester = serializers.CharField(source="run.semester")
+    year = serializers.IntegerField(source="run.year")
+    topics = topics = ESTopicsField(source="run.topics")
     short_description = serializers.CharField(source="description")
+
+    def get_resource_relations(self, instance):
+        """ Get resource_relations properties"""
+        course = Course.objects.get(id=instance.run.object_id)
+        return {
+            "name": "resourcefile",
+            "parent": gen_course_id(course.platform, course.course_id),
+        }
 
     class Meta:
         model = ContentFile
         fields = [
+            "run_id",
+            "run_title",
+            "semester",
+            "year",
+            "topics",
             "key",
             "uid",
+            "resource_relations",
             "title",
             "short_description",
             "url",
             "section",
             "file_type",
-            "content",
             "content_type",
+            "content",
             "content_title",
             "content_author",
             "content_language",
@@ -749,9 +768,9 @@ def serialize_bulk_courses(ids):
         "offered_by",
         Prefetch(
             "runs",
-            queryset=LearningResourceRun.objects.filter(published=True).order_by(
-                "-best_start_date"
-            ),
+            queryset=LearningResourceRun.objects.filter(published=True)
+            .order_by("-best_start_date")
+            .defer("raw_json"),
         ),
     ):
         yield serialize_course_for_bulk(course)

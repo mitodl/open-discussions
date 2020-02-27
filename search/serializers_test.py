@@ -348,8 +348,22 @@ def test_es_content_file_serializer():
         serialized,
         {
             "object_type": RESOURCE_FILE_TYPE,
+            "run_id": content_file.run.run_id,
+            "run_title": content_file.run.title,
+            "semester": content_file.run.semester,
+            "year": int(content_file.run.year),
+            "topics": list(
+                content_file.run.topics.values_list("name", flat=True)
+            ),
             "key": content_file.key,
             "uid": content_file.uid,
+            "resource_relations": {
+                "name": "resourcefile",
+                "parent": gen_course_id(
+                    content_file.run.content_object.platform,
+                    content_file.run.content_object.course_id,
+                ),
+            },
             "title": content_file.title,
             "short_description": content_file.description,
             "file_type": content_file.file_type,
