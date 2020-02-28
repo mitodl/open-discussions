@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.112.2
+---------------
+
+- Refresh requirements.txt (#2601)
+- Bump codecov from 3.5.0 to 3.6.5
+- Dedupe mitx courses with multiple edx records
+- OLX/OCW ingestion work (#2574)
+
 Version 0.112.1 (Released February 27, 2020)
 ---------------
 
