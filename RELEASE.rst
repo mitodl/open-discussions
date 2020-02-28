@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.112.2
+---------------
+
+- Dedupe mitx courses with multiple edx records
+- OLX/OCW ingestion work (#2574)
+
 Version 0.112.1 (Released February 27, 2020)
 ---------------
 
