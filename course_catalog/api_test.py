@@ -28,6 +28,7 @@ from course_catalog.api import (
     safe_load_json,
     get_course_availability,
     parse_bootcamp_json_data,
+    sync_ocw_course_files,
 )
 
 pytestmark = pytest.mark.django_db
@@ -288,3 +289,32 @@ def test_get_course_availability(mitx_valid_data):
         raw_json=mitx_valid_data, platform=PlatformType.mitx.value
     )
     assert get_course_availability(mitx_course_no_runs_json) is None
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_sync_ocw_course_files(mock_ocw_learning_bucket, mocker, with_error):
+    """Test that sync_ocw_course_files calls load_content_files for each run"""
+    fake_data = '{"key": "data"}'
+    mock_log = mocker.patch("course_catalog.api.log.exception")
+    mock_transform = mocker.patch(
+        "course_catalog.api.transform_content_files", return_value=fake_data
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_valiue=[]
+    )
+    if with_error:
+        mock_load_content_files.side_effect = Exception
+    course = CourseFactory.create(published=True, platform=PlatformType.ocw.value)
+    runs = course.runs.all()
+    for run in runs:
+        mock_ocw_learning_bucket.bucket.put_object(
+            Key="{}/{}_master.json".format(run.url.split("/")[-1], run.run_id),
+            Body=fake_data,
+            ACL="public-read",
+        )
+    sync_ocw_course_files(ids=[course.id])
+    assert mock_load_content_files.call_count == len(runs)
+    for run in runs:
+        mock_load_content_files.assert_any_call(run, mock_transform.return_value)
+        if with_error:
+            mock_log.assert_any_call("Error syncing files for course run %d", run.id)

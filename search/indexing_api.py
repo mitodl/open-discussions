@@ -7,8 +7,11 @@ from elasticsearch.helpers import bulk
 from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 
+from course_catalog.models import Course, ContentFile, LearningResourceRun
 from open_discussions.utils import chunks
+from search.api import gen_course_id
 from search.connection import (
     get_active_aliases,
     get_conn,
@@ -42,6 +45,8 @@ from search.serializers import (
     serialize_bulk_programs,
     serialize_bulk_user_lists,
     serialize_bulk_videos,
+    serialize_content_file_for_bulk,
+    serialize_content_file_for_bulk_deletion,
 )
 
 
@@ -104,7 +109,17 @@ CONTENT_OBJECT_TYPE = {
     "removed": {"type": "boolean"},
 }
 
+
+"""
+Each resource index needs this relation even if it won't be used,
+otherwise no results will be returned from indices without it.
+"""
+RESOURCE_RELATIONS = {
+    "resource_relations": {"type": "join", "relations": {"resource": "resourcefile"}}
+}
+
 LEARNING_RESOURCE_TYPE = {
+    **RESOURCE_RELATIONS,
     "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "image_src": {"type": "keyword"},
@@ -147,14 +162,25 @@ LEARNING_RESOURCE_TYPE = {
     },
 }
 
+COURSE_FILE_OBJECT_TYPE = {
+    "run_id": {"type": "keyword"},
+    "uid": {"type": "keyword"},
+    "key": {"type": "keyword"},
+    "url": {"type": "keyword"},
+    "file_type": {"type": "keyword"},
+    "content": ENGLISH_TEXT_FIELD,
+}
+
 COURSE_OBJECT_TYPE = {
     **LEARNING_RESOURCE_TYPE,
+    **COURSE_FILE_OBJECT_TYPE,
     "id": {"type": "long"},
     "course_id": {"type": "keyword"},
     "full_description": ENGLISH_TEXT_FIELD,
     "platform": {"type": "keyword"},
     "published": {"type": "boolean"},
 }
+
 
 BOOTCAMP_OBJECT_TYPE = {
     **LEARNING_RESOURCE_TYPE,
@@ -168,6 +194,7 @@ BOOTCAMP_OBJECT_TYPE = {
 PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
+    **RESOURCE_RELATIONS,
     "id": {"type": "long"},
     "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
@@ -281,18 +308,19 @@ def create_document(doc_id, data):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
-def delete_document(doc_id, object_type):
+def delete_document(doc_id, object_type, **kwargs):
     """
     Makes a request to ES to delete a document
 
     Args:
         doc_id (str): The ES document id
         object_type (str): The object type
+        kwargs (dict): optional parameters for the request
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, [object_type]):
         try:
-            conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id)
+            conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id, params=kwargs)
         except NotFoundError:
             log.debug(
                 "Tried to delete an ES document that didn't exist, doc_id: '%s'", doc_id
@@ -344,7 +372,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
             )
 
 
-def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
+def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **kwargs):
     """
     Makes a request to ES to update an existing document
 
@@ -353,6 +381,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
         body (dict): ES update operation body
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
+        kwargs (dict): Optional kwargs to be passed to ElasticSearch
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, [object_type]):
@@ -362,7 +391,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0):
                 doc_type=GLOBAL_DOC_TYPE,
                 body=body,
                 id=doc_id,
-                params={"retry_on_conflict": retry_on_conflict},
+                params={"retry_on_conflict": retry_on_conflict, **kwargs},
             )
         # Our policy for document update-related version conflicts right now is to log them
         # and allow the app to continue as normal.
@@ -389,7 +418,7 @@ def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=
     )
 
 
-def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0):
+def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
     """
     Makes a request to ES to create or update a document
 
@@ -398,12 +427,14 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0):
         doc (dict): Full ES document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
+        kwargs (dict): Optional kwargs to be passed to ElasticSearch
     """
     _update_document_by_id(
         doc_id,
         {"doc": doc, "doc_as_upsert": True},
         object_type,
         retry_on_conflict=retry_on_conflict,
+        **kwargs,
     )
 
 
@@ -443,7 +474,7 @@ def update_post(doc_id, post):
     )
 
 
-def index_items(documents, object_type):
+def index_items(documents, object_type, **kwargs):
     """
     Index items based on list of item ids
 
@@ -464,6 +495,7 @@ def index_items(documents, object_type):
                 index=alias,
                 doc_type=GLOBAL_DOC_TYPE,
                 chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                **kwargs,
             )
             if len(errors) > 0:
                 raise ReindexException(
@@ -509,6 +541,61 @@ def index_courses(ids):
         ids(list of int): List of Course id's
     """
     index_items(serialize_bulk_courses(ids), COURSE_TYPE)
+
+
+def index_course_content_files(course_ids):
+    """
+    Index a list of content files by course ids
+
+    Args:
+        course_ids(list of int): List of Course id's
+    """
+    course_content_type = ContentType.objects.get_for_model(Course)
+    for run_id in LearningResourceRun.objects.filter(
+        object_id__in=course_ids, content_type=course_content_type
+    ).values_list("id", flat=True):
+        index_run_content_files(run_id)
+
+
+def index_run_content_files(run_id):
+    """
+    Index a list of content files by run id
+
+    Args:
+        run_id(int): Course run id
+    """
+    run = LearningResourceRun.objects.get(id=run_id)
+    documents = (
+        serialize_content_file_for_bulk(content_file)
+        for content_file in run.content_files.select_related("run")
+        .prefetch_related("run__content_object")
+        .defer("run__raw_json")
+    )
+    index_items(
+        documents,
+        COURSE_TYPE,
+        routing=gen_course_id(
+            run.content_object.platform, run.content_object.course_id
+        ),
+    )
+
+
+def delete_run_content_files(run_id):
+    """
+    Delete a list of content files by run from the index
+
+    Args:
+        run_id(int): Course run id
+    """
+    run = LearningResourceRun.objects.get(id=run_id)
+    documents = (
+        serialize_content_file_for_bulk_deletion(content_file)
+        for content_file in ContentFile.objects.filter(run=run)
+    )
+    course = run.content_object
+    index_items(
+        documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
+    )
 
 
 def index_bootcamps(ids):

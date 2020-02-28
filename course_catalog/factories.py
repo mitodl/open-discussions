@@ -15,6 +15,8 @@ from course_catalog.constants import (
     OfferedBy,
     PlatformType,
     PrivacyLevel,
+    CONTENT_TYPE_FILE,
+    CONTENT_TYPE_PAGE,
 )
 from course_catalog.models import (
     Course,
@@ -31,6 +33,7 @@ from course_catalog.models import (
     Video,
     Playlist,
     VideoChannel,
+    ContentFile,
 )
 
 
@@ -218,7 +221,7 @@ class LearningResourceRunFactory(AbstractCourseFactory):
     )
     language = factory.Faker("word")
     year = factory.Faker("year")
-
+    url = factory.Faker("word")
     prices = factory.PostGeneration(_post_gen_prices)
 
     @factory.post_generation
@@ -249,6 +252,21 @@ class LearningResourceRunFactory(AbstractCourseFactory):
                 "date_time_between", start_date="+15d", tzinfo=pytz.utc
             )
         )
+
+
+class ContentFileFactory(DjangoModelFactory):
+    """Factory for ContentFiles"""
+
+    run = factory.SubFactory(LearningResourceRunFactory)
+    key = factory.Faker("file_path")
+    title = factory.Faker("sentence")
+    description = factory.Faker("sentence")
+    uid = factory.Faker("text", max_nb_chars=32)
+    url = factory.Faker("url")
+    content_type = FuzzyChoice((CONTENT_TYPE_FILE, CONTENT_TYPE_PAGE))
+
+    class Meta:
+        model = ContentFile
 
 
 class BootcampRunFactory(LearningResourceRunFactory):

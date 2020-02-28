@@ -8,7 +8,13 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceRunFactory,
+    ContentFileFactory,
+)
 from open_discussions.utils import chunks
+from search.api import gen_course_id
 from search.connection import get_default_alias_name
 from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
 from search.exceptions import ReindexException
@@ -26,6 +32,7 @@ from search.indexing_api import (
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
     delete_document,
+    index_course_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -375,7 +382,9 @@ def test_delete_document(mocked_es, mocker):
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
     delete_document(1, "course")
-    mocked_es.conn.delete.assert_called_with(index="a", doc_type=GLOBAL_DOC_TYPE, id=1)
+    mocked_es.conn.delete.assert_called_with(
+        index="a", doc_type=GLOBAL_DOC_TYPE, id=1, params={}
+    )
 
 
 def test_delete_document_not_found(mocked_es, mocker):
@@ -389,3 +398,74 @@ def test_delete_document_not_found(mocked_es, mocker):
     mocked_es.conn.delete.side_effect = NotFoundError
     delete_document(1, "course")
     assert patched_logger.debug.called is True
+
+
+def test_index_content_files(mocker):
+    """
+    ES should try indexing content files for all runs in a course
+    """
+    mock_index_run_content_files = mocker.patch(
+        "search.indexing_api.index_run_content_files", autospec=True
+    )
+    courses = CourseFactory.create_batch(2)
+    index_course_content_files([course.id for course in courses])
+    for course in courses:
+        for run in course.runs.all():
+            mock_index_run_content_files.assert_any_call(run.id)
+
+
+@pytest.mark.usefixtures("indexing_user")
+@pytest.mark.parametrize(
+    "indexing_func_name, doc",
+    [
+        ["index_run_content_files", {"_id": "doc"}],
+        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}],
+    ],
+)
+@pytest.mark.parametrize("errors", ([], ["error"]))
+def test_bulk_index_content_files(
+    mocked_es, mocker, settings, errors, indexing_func_name, doc
+):  # pylint: disable=too-many-arguments
+    """
+    index functions for content files should call bulk with correct arguments
+    """
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    course = CourseFactory.create()
+    run = LearningResourceRunFactory.create(content_object=course)
+    content_files = ContentFileFactory.create_batch(5, run=run)
+    mock_get_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
+    )
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, errors)
+    )
+    mocker.patch(
+        f"search.indexing_api.serialize_content_file_for_bulk",
+        autospec=True,
+        return_value=doc,
+    )
+    mocker.patch(
+        f"search.indexing_api.serialize_content_file_for_bulk_deletion",
+        autospec=True,
+        return_value=doc,
+    )
+
+    index_func = getattr(indexing_api, indexing_func_name)
+    if errors:
+        with pytest.raises(ReindexException):
+            index_func(run.id)
+    else:
+        index_func(run.id)
+        for alias in mock_get_aliases.return_value:
+            for chunk in chunks(
+                [doc for _ in content_files],
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            ):
+                bulk_mock.assert_any_call(
+                    mocked_es.conn,
+                    chunk,
+                    index=alias,
+                    doc_type=GLOBAL_DOC_TYPE,
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    routing=gen_course_id(course.platform, course.course_id),
+                )

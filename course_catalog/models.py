@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.contrib.postgres.fields import JSONField
 
+from course_catalog.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
 from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel
@@ -88,6 +89,7 @@ class AbstractCourse(LearningResource):
     learning_resource_type = models.CharField(
         max_length=20, default=ResourceType.course.value
     )
+    raw_json = JSONField(null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -138,6 +140,37 @@ class LearningResourceRun(AbstractCourse):
         return f"LearningResourceRun platform={self.platform} run_id={self.run_id}"
 
 
+class ContentFile(TimestampedModel):
+    """
+    ContentFile model for courserun files
+    """
+
+    uid = models.CharField(max_length=36, null=True, blank=True)
+    key = models.CharField(max_length=1024, null=True, blank=True)
+    run = models.ForeignKey(
+        LearningResourceRun, related_name="content_files", on_delete=models.CASCADE
+    )
+    title = models.CharField(max_length=1024, null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    url = models.TextField(null=True, blank=True)
+    short_url = models.TextField(null=True, blank=True)
+    file_type = models.CharField(max_length=128, null=True, blank=True)
+    section = models.CharField(max_length=512, null=True, blank=True)
+
+    content = models.TextField(null=True, blank=True)
+    content_title = models.CharField(max_length=1024, null=True, blank=True)
+    content_author = models.CharField(max_length=1024, null=True, blank=True)
+    content_language = models.CharField(max_length=24, null=True, blank=True)
+    content_type = models.CharField(
+        choices=VALID_COURSE_CONTENT_CHOICES, default=CONTENT_TYPE_FILE, max_length=10
+    )
+
+    class Meta:
+        unique_together = (("key", "run"),)
+        verbose_name = "contentfile"
+
+
 class Course(AbstractCourse):
     """
     Course model for courses on all platforms
@@ -145,8 +178,6 @@ class Course(AbstractCourse):
 
     course_id = models.CharField(max_length=128)
     platform = models.CharField(max_length=128)
-
-    raw_json = JSONField(null=True, blank=True)
 
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)

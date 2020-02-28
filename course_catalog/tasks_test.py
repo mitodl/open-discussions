@@ -31,6 +31,8 @@ from course_catalog.tasks import (
     get_youtube_transcripts,
     get_video_topics,
     get_ocw_courses,
+    get_ocw_files,
+    import_all_ocw_files,
 )
 
 
@@ -321,6 +323,48 @@ def test_upload_ocw_master_json(settings, mocker):
         f"9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/{course.course_id}_master.json",
     )
     assert json.loads(obj.get()["Body"].read())
+
+
+@mock_s3
+def test_get_ocw_files(mocker, settings):
+    """Test that get_ocw_files calls api.sync_ocw_course_files with the correct ids"""
+    mock_sync_ocw_course_files = mocker.patch(
+        "course_catalog.tasks.sync_ocw_course_files"
+    )
+    setup_s3(settings)
+    ids = [1, 2, 3]
+    get_ocw_files(ids)
+    mock_sync_ocw_course_files.assert_called_with(ids)
+
+
+def test_get_ocw_files_missing_settings(mocker, settings):
+    """Test that get_ocw_files does nothing without required settings"""
+    mock_sync_ocw_course_files = mocker.patch(
+        "course_catalog.tasks.sync_ocw_course_files"
+    )
+    mock_log = mocker.patch("course_catalog.tasks.log.warning")
+    settings.OCW_LEARNING_COURSE_BUCKET_NAME = None
+    get_ocw_files([1, 2])
+    mock_sync_ocw_course_files.assert_not_called()
+    mock_log.assert_called_once_with("Required settings missing for get_ocw_files")
+
+
+@mock_s3
+def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blacklist):
+    """Test get_ocw_data task"""
+    setup_s3(settings)
+    get_ocw_files_mock = mocker.patch(
+        "course_catalog.tasks.get_ocw_files", autospec=True
+    )
+    courses = CourseFactory.create_batch(
+        3, platform=PlatformType.ocw.value, published=True
+    )
+    CourseFactory.create_batch(3, platform=PlatformType.oll.value, published=False)
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        import_all_ocw_files.delay(3)
+    assert mocked_celery.group.call_count == 1
+    get_ocw_files_mock.si.assert_called_once_with([course.id for course in courses])
 
 
 def test_process_bootcamps(mock_get_bootcamps):

@@ -24,6 +24,8 @@ from course_catalog.etl.loaders import (
     load_playlist_user_list,
     load_courses,
     load_programs,
+    load_content_files,
+    load_content_file,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -38,6 +40,7 @@ from course_catalog.factories import (
     PlaylistFactory,
     VideoChannelFactory,
     UserListFactory,
+    ContentFileFactory,
 )
 from course_catalog.models import (
     Program,
@@ -49,6 +52,7 @@ from course_catalog.models import (
     VideoChannel,
     PlaylistVideo,
     UserListItem,
+    ContentFile,
 )
 
 pytestmark = pytest.mark.django_db
@@ -695,3 +699,56 @@ def test_load_programs(mocker, mock_blacklist):
     load_programs(program_data)
     assert mock_load_program.call_count == len(program_data)
     mock_blacklist.assert_called_once()
+
+
+@pytest.mark.parametrize("is_published", [True, False])
+def test_load_content_files(mocker, is_published):
+    """Test that load_content_files calls the expected functions"""
+    course_run = LearningResourceRunFactory.create(published=is_published)
+    content_data = [{"a": "b"}, {"a": "c"}]
+    mock_load_content_file = mocker.patch(
+        "course_catalog.etl.loaders.load_content_file", autospec=True
+    )
+    mock_bulk_index = mocker.patch(
+        "course_catalog.etl.loaders.search_task_helpers.index_run_content_files",
+        autospec=True,
+    )
+    mock_bulk_delete = mocker.patch(
+        "course_catalog.etl.loaders.search_task_helpers.delete_run_content_files",
+        autospec=True,
+    )
+    load_content_files(course_run, content_data)
+    assert mock_load_content_file.call_count == len(content_data)
+    assert mock_bulk_index.call_count == (1 if is_published else 0)
+    assert mock_bulk_delete.call_count == (0 if is_published else 1)
+
+
+def test_load_content_file():
+    """Test that load_content_file saves a ContentFile object"""
+    learning_resource_run = LearningResourceRunFactory.create()
+
+    props = model_to_dict(ContentFileFactory.build(run_id=learning_resource_run.id))
+    props.pop("run")
+    props.pop("id")
+
+    result = load_content_file(learning_resource_run, props)
+
+    assert ContentFile.objects.count() == 1
+
+    assert result.run == learning_resource_run
+
+    # assert we got a content file back
+    assert isinstance(result, ContentFile)
+
+    for key, value in props.items():
+        assert getattr(result, key) == value, f"Property {key} should equal {value}"
+
+
+def test_load_content_file_error(mocker):
+    """ Test that an exception in load_content_file is logged """
+    learning_resource_run = LearningResourceRunFactory.create()
+    mock_log = mocker.patch("course_catalog.etl.loaders.log.exception")
+    load_content_file(learning_resource_run, {"uid": "badfile", "bad": "data"})
+    mock_log.assert_called_once_with(
+        "ERROR syncing course file %s for run %d", "badfile", learning_resource_run.id
+    )

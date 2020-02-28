@@ -7,6 +7,7 @@ from course_catalog.factories import (
     ProgramFactory,
     VideoFactory,
     UserListFactory,
+    ContentFileFactory,
 )
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
@@ -17,6 +18,7 @@ from search.constants import (
     VIDEO_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
+    COURSE_TYPE,
 )
 from search.task_helpers import (
     reddit_object_persist,
@@ -43,6 +45,11 @@ from search.task_helpers import (
     delete_user_list,
     index_new_bootcamp,
     update_bootcamp,
+    delete_content_file,
+    upsert_content_file,
+    delete_course,
+    index_run_content_files,
+    delete_run_content_files,
 )
 from search.api import (
     gen_post_id,
@@ -50,6 +57,8 @@ from search.api import (
     gen_profile_id,
     gen_video_id,
     gen_user_list_id,
+    gen_content_file_id,
+    gen_course_id,
 )
 
 es_profile_serializer_data = {
@@ -422,6 +431,24 @@ def test_upsert_course(mocker):
 
 
 @pytest.mark.django_db
+def test_delete_course(mocker):
+    """
+    Tests that delete_course calls the delete tasks for the course and its content files
+    """
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    course = CourseFactory.create()
+    course_es_id = gen_course_id(course.platform, course.course_id)
+    content_files = [ContentFileFactory.create(run=run) for run in course.runs.all()]
+
+    delete_course(course)
+    patched_delete_task.delay.assert_any_call(course_es_id, COURSE_TYPE)
+    for content_file in content_files:
+        patched_delete_task.delay.assert_any_call(
+            gen_content_file_id(content_file.key), COURSE_TYPE, routing=course_es_id
+        )
+
+
+@pytest.mark.django_db
 def test_delete_profile(mocker, user):
     """Tests that deleting a user triggers a delete on a profile document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")
@@ -489,6 +516,50 @@ def test_delete_user_list(mocker, list_type):
         gen_user_list_id(user_list),
         USER_LIST_TYPE,
     )
+
+
+@pytest.mark.django_db
+def test_upsert_content_file(mocker):
+    """
+    Tests that upsert_content_file calls the correct celery task with parameters
+    """
+    patched_task = mocker.patch("search.tasks.upsert_content_file")
+    content_file = ContentFileFactory.create()
+    upsert_content_file(content_file.id)
+    patched_task.delay.assert_called_once_with(content_file.id)
+
+
+@pytest.mark.django_db
+def test_delete_content_file(mocker):
+    """Tests that deleting a content_file triggers the correct ES delete task"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    content_file = ContentFileFactory.create()
+    delete_content_file(content_file)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (
+        gen_content_file_id(content_file.key),
+        COURSE_TYPE,
+    )
+
+
+@pytest.mark.django_db
+def test_index_run_content_files(mocker):
+    """
+    Tests that index_run_content_files calls the correct celery task w/parameter
+    """
+    patched_task = mocker.patch("search.tasks.index_run_content_files")
+    content_file = ContentFileFactory.create()
+    index_run_content_files(content_file.id)
+    patched_task.delay.assert_called_once_with(content_file.id)
+
+
+@pytest.mark.django_db
+def test_delete_run_content_files(mocker):
+    """Tests that delete_run_content_files triggers the correct ES delete task"""
+    patched_task = mocker.patch("search.tasks.delete_run_content_files")
+    content_file = ContentFileFactory.create()
+    delete_run_content_files(content_file.id)
+    patched_task.delay.assert_called_once_with(content_file.id)
 
 
 def test_index_new_bootcamp(mocker):

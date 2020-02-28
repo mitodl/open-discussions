@@ -12,13 +12,22 @@ from prawcore.exceptions import PrawcoreException, NotFound
 
 from channels.constants import LINK_TYPE_LINK, POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.models import Course, Bootcamp, Program, UserList, Video
+from course_catalog.constants import PlatformType
+from course_catalog.models import (
+    Course,
+    Bootcamp,
+    Program,
+    UserList,
+    Video,
+    ContentFile,
+)
 from course_catalog.utils import load_course_blacklist
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
 from profiles.models import Profile
 from search import indexing_api as api
+from search.api import gen_content_file_id, gen_course_id
 from search.constants import (
     BOOTCAMP_TYPE,
     COURSE_TYPE,
@@ -36,6 +45,7 @@ from search.serializers import (
     ESProfileSerializer,
     ESVideoSerializer,
     ESUserListSerializer,
+    ESContentFileSerializer,
 )
 
 User = get_user_model()
@@ -192,8 +202,6 @@ def update_document_with_partial(
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
 def upsert_course(course_id):
     """Upsert course based on stored database information"""
-    from search.api import gen_course_id
-
     course_obj = Course.objects.get(id=course_id)
     course_data = ESCourseSerializer(course_obj).data
     api.upsert_document(
@@ -201,6 +209,24 @@ def upsert_course(course_id):
         course_data,
         COURSE_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_content_file(file_id):
+    """Upsert content file based on stored database information"""
+
+    content_file_obj = ContentFile.objects.get(id=file_id)
+    content_file_data = ESContentFileSerializer(content_file_obj).data
+    api.upsert_document(
+        gen_content_file_id(content_file_obj.key),
+        content_file_data,
+        COURSE_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+        routing=gen_course_id(
+            content_file_obj.run.content_object.platform,
+            content_file_obj.run.content_object.course_id,
+        ),
     )
 
 
@@ -265,9 +291,9 @@ def upsert_user_list(user_list_id):
 
 
 @app.task
-def delete_document(doc_id, object_type):
+def delete_document(doc_id, object_type, **kwargs):
     """Task that makes a request to remove an ES document"""
-    return api.delete_document(doc_id, object_type)
+    return api.delete_document(doc_id, object_type, **kwargs)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -356,6 +382,63 @@ def index_courses(ids):
         raise
     except:  # pylint: disable=bare-except
         error = f"index_courses threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_course_content_files(course_ids):
+    """
+    Index content files for a list of course ids
+
+    Args:
+        course_ids(list of int): List of course id's
+
+    """
+    try:
+        api.index_course_content_files(course_ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_course_content_files threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_run_content_files(run_id):
+    """
+    Index content files for a LearningResourceRun
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    try:
+        api.index_run_content_files(run_id)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_run_content_files threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def delete_run_content_files(run_id):
+    """
+    Deleted content files for a LearningResourceRun from the index
+
+    Args:
+        run_id(int): LearningResourceRun id
+
+    """
+    try:
+        api.delete_run_content_files(run_id)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"delete_run_content_files threw an error"
         log.exception(error)
         return error
 
@@ -484,6 +567,17 @@ def start_recreate_index(self):
                 index_courses.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
+                    .exclude(course_id__in=blacklisted_ids)
+                    .order_by("id")
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_course_content_files.si(ids)
+                for ids in chunks(
+                    Course.objects.filter(published=True)
+                    .filter(platform=PlatformType.ocw.value)
                     .exclude(course_id__in=blacklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),

@@ -13,9 +13,10 @@ from course_catalog.utils import load_course_blacklist
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.api import (
-    parse_bootcamp_json_data,
     generate_course_prefix_list,
+    parse_bootcamp_json_data,
     sync_ocw_courses,
+    sync_ocw_course_files,
 )
 from course_catalog.etl import pipelines, youtube
 from open_discussions.celery import app
@@ -84,6 +85,41 @@ def get_ocw_data(
         ]
     )
     raise self.replace(ocw_tasks)
+
+
+@app.task
+def get_ocw_files(ids=None):
+    """
+    Task to sync OCW content files with database
+    """
+    if not (
+        settings.OCW_LEARNING_COURSE_BUCKET_NAME
+        and settings.OCW_LEARNING_COURSE_ACCESS_KEY
+        and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
+    ):
+        log.warning("Required settings missing for get_ocw_files")
+        return
+    sync_ocw_course_files(ids)
+
+
+@app.task(bind=True)
+def import_all_ocw_files(self, chunk_size):
+    """Import all OCW content files"""
+    blacklisted_ids = load_course_blacklist()
+    tasks = celery.group(
+        [
+            get_ocw_files.si(ids)
+            for ids in chunks(
+                Course.objects.filter(published=True)
+                .filter(platform=PlatformType.ocw.value)
+                .exclude(course_id__in=blacklisted_ids)
+                .order_by("id")
+                .values_list("id", flat=True),
+                chunk_size=chunk_size,
+            )
+        ]
+    )
+    raise self.replace(tasks)
 
 
 @app.task

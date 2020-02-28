@@ -8,6 +8,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PrivacyLevel, ListType
+from course_catalog.etl.exceptions import ExtractException
+from course_catalog.etl.utils import log_exceptions
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -23,13 +25,11 @@ from course_catalog.models import (
     PlaylistVideo,
     UserList,
     UserListItem,
+    ContentFile,
 )
-from course_catalog.etl.exceptions import ExtractException
-from course_catalog.etl.utils import log_exceptions
-
 from course_catalog.utils import load_course_blacklist
-
 from search import task_helpers as search_task_helpers
+from search.constants import COURSE_TYPE
 
 log = logging.getLogger()
 
@@ -101,6 +101,7 @@ def load_run(learning_resource, course_run_data):
     prices_data = course_run_data.pop("prices", [])
     topics_data = course_run_data.pop("topics", [])
     offered_bys_data = course_run_data.pop("offered_by", [])
+    content_files = course_run_data.pop("content_files", [])
 
     learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
         run_id=run_id,
@@ -116,6 +117,7 @@ def load_run(learning_resource, course_run_data):
     load_prices(learning_resource_run, prices_data)
     load_instructors(learning_resource_run, instructors_data)
     load_offered_bys(learning_resource_run, offered_bys_data)
+    load_content_files(learning_resource_run, content_files)
 
     return learning_resource_run
 
@@ -477,3 +479,51 @@ def load_video_channels(video_channels_data):
         video.save()
 
     return video_channels
+
+
+def load_content_file(course_run, content_file_data):
+    """
+    Sync a course run file/page to the database
+
+    Args:
+        course_run (LearningResourceRun): a LearningResourceRun for a Course
+        content_file_data (dict): File metadata as JSON
+
+    Returns:
+        ContentFile: the object that was created or updated
+    """
+    try:
+        content_file, _ = ContentFile.objects.update_or_create(
+            run=course_run, key=content_file_data.get("key"), defaults=content_file_data
+        )
+        return content_file
+    except:  # pylint: disable=bare-except
+        log.exception(
+            "ERROR syncing course file %s for run %d",
+            content_file_data.get("uid", ""),
+            course_run.id,
+        )
+
+
+def load_content_files(course_run, content_files_json):
+    """
+    Sync all content files for a course run to database and S3 if not present in DB
+
+    Args:
+        course_run (LearningResourceRun): a course run
+        content_files_json (dict): Details about the course run's content files
+
+    Returns:
+        list of ContentFile: ContentFile objects that were created/updated
+
+    """
+    if course_run.content_type.name == COURSE_TYPE:
+        content_files = [
+            load_content_file(course_run, content_file)
+            for content_file in content_files_json
+        ]
+        if course_run.published:
+            search_task_helpers.index_run_content_files(course_run.id)
+        else:
+            search_task_helpers.delete_run_content_files(course_run.id)
+        return content_files

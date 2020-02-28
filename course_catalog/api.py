@@ -18,7 +18,11 @@ from course_catalog.constants import (
     AvailabilityType,
     OfferedBy,
 )
-from course_catalog.etl.loaders import load_offered_bys
+from course_catalog.etl.loaders import load_offered_bys, load_content_files
+from course_catalog.etl.ocw import (
+    get_ocw_learning_course_bucket,
+    transform_content_files,
+)
 from course_catalog.models import Bootcamp, LearningResourceRun, Course
 from course_catalog.serializers import (
     BootcampSerializer,
@@ -80,7 +84,6 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
             "last_modified": last_modified,
             "is_published": True,  # This will be updated after all course runs are serialized
             "course_prefix": course_prefix,
-            "raw_json": master_json,  # This is slightly cleaner than popping the extra fields inside the serializer
         },
         instance=course_instance,
     )
@@ -126,6 +129,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
                 "url": get_course_url(
                     master_json.get("uid"), master_json, PlatformType.ocw.value
                 ),
+                "raw_json": master_json,
             },
             instance=courserun_instance,
         )
@@ -319,6 +323,33 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
     index_func(bootcamp.id)
 
 
+def sync_ocw_course_files(ids=None):
+    """
+    Sync all OCW course run files for a list of course ids to database
+
+    Args:
+        ids(list of int or None): list of course ids to process, all if None
+    """
+    bucket = get_ocw_learning_course_bucket()
+    courses = Course.objects.filter(platform="ocw").filter(published=True)
+    if ids:
+        courses = courses.filter(id__in=ids)
+    for course in courses.iterator():
+        runs = course.runs.exclude(url="").exclude(published=False)
+        for run in runs.iterator():
+            try:
+                s3_master_json = rapidjson.loads(
+                    bucket.Object(
+                        "{}/{}_master.json".format(run.url.split("/")[-1], run.run_id)
+                    )
+                    .get()["Body"]
+                    .read()
+                )
+                load_content_files(run, transform_content_files(s3_master_json))
+            except:  # pylint: disable=bare-except
+                log.exception("Error syncing files for course run %d", run.id)
+
+
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def sync_ocw_course(
     *, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3, blacklist
@@ -398,7 +429,7 @@ def sync_ocw_course(
 
     log.info("Parsing for %s...", course_prefix)
     # pass course contents into parser
-    parser = OCWParser("", "", loaded_raw_jsons_for_course)
+    parser = OCWParser(loaded_jsons=loaded_raw_jsons_for_course)
     course_json = parser.get_master_json()
     course_json["uid"] = uid
     course_json["course_id"] = "{}.{}".format(
@@ -429,12 +460,15 @@ def sync_ocw_course(
 
     log.info("Digesting %s...", course_prefix)
     try:
-        course, _ = digest_ocw_course(
+        course, run = digest_ocw_course(
             course_json, last_modified, is_published, course_prefix
         )
     except TypeError:
         log.info("Course and run not returned, skipping")
         return None
+
+    if upload_to_s3 and is_published:
+        load_content_files(run, transform_content_files(course_json))
 
     course.published = is_published or (
         Course.objects.get(id=course.id).runs.filter(published=True).exists()

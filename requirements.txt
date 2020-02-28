@@ -106,9 +106,11 @@ six==1.10.0               # via django-anymail, django-bitfield, django-compat, 
 smart-open==1.8.0         # via ocw-data-parser
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
+soupsieve==2.0            # via beautifulsoup4
 sqlparse==0.3.0           # via django
 static3==0.5.1
 text-unidecode==1.2       # via faker
+tika==1.23.1              # via -r requirements.in
 tinycss2==0.6.1           # via cairosvg, cssselect2
 tldextract==2.2.0
 toolz==0.10.0

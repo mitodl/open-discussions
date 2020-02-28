@@ -17,6 +17,7 @@ from course_catalog.models import (
     Program,
     UserList,
     Video,
+    ContentFile,
 )
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
@@ -30,6 +31,7 @@ from search.api import (
     gen_user_list_id,
     gen_program_id,
     gen_video_id,
+    gen_content_file_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -38,6 +40,7 @@ from search.constants import (
     PROGRAM_TYPE,
     VIDEO_TYPE,
     USER_LIST_TYPE,
+    RESOURCE_FILE_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -327,6 +330,63 @@ class LearningResourceSerializer(serializers.ModelSerializer):
             return 0
 
 
+class ESResourceFileSerializerMixin(serializers.Serializer):
+    """
+    Elasticsearch base serializer mixin for resource files
+    """
+
+    object_type = RESOURCE_FILE_TYPE
+    resource_relations = serializers.SerializerMethodField()
+
+    def get_resource_relations(self, instance):  # pylint: disable=unused-argument
+        """ Get resource_relations properties"""
+        raise NotImplementedError
+
+
+class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
+    """
+    Elasticsearch serializer class for course run files
+    """
+
+    run_id = serializers.CharField(source="run.run_id")
+    run_title = serializers.CharField(source="run.title")
+    semester = serializers.CharField(source="run.semester")
+    year = serializers.IntegerField(source="run.year")
+    topics = topics = ESTopicsField(source="run.topics")
+    short_description = serializers.CharField(source="description")
+
+    def get_resource_relations(self, instance):
+        """ Get resource_relations properties"""
+        course = Course.objects.get(id=instance.run.object_id)
+        return {
+            "name": "resourcefile",
+            "parent": gen_course_id(course.platform, course.course_id),
+        }
+
+    class Meta:
+        model = ContentFile
+        fields = [
+            "run_id",
+            "run_title",
+            "semester",
+            "year",
+            "topics",
+            "key",
+            "uid",
+            "resource_relations",
+            "title",
+            "short_description",
+            "url",
+            "section",
+            "file_type",
+            "content_type",
+            "content",
+            "content_title",
+            "content_author",
+            "content_language",
+        ]
+
+
 class ESRunSerializer(LearningResourceSerializer):
     """
     Elasticsearch serializer class for course runs
@@ -391,6 +451,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     """
 
     object_type = COURSE_TYPE
+    resource_relations = {"name": "resource"}
 
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
@@ -407,6 +468,12 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
         Courses should have higer priority in the default saerch
         """
         return 1
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+        ret["resource_relations"] = self.resource_relations
+        return ret
 
     class Meta:
         model = Course
@@ -701,9 +768,9 @@ def serialize_bulk_courses(ids):
         "offered_by",
         Prefetch(
             "runs",
-            queryset=LearningResourceRun.objects.filter(published=True).order_by(
-                "-best_start_date"
-            ),
+            queryset=LearningResourceRun.objects.filter(published=True)
+            .order_by("-best_start_date")
+            .defer("raw_json"),
         ),
     ):
         yield serialize_course_for_bulk(course)
@@ -720,6 +787,29 @@ def serialize_course_for_bulk(course_obj):
         "_id": gen_course_id(course_obj.platform, course_obj.course_id),
         **ESCourseSerializer(course_obj).data,
     }
+
+
+def serialize_content_file_for_bulk(content_file_obj):
+    """
+    Serialize a content file for bulk API request
+
+    Args:
+        content_file_obj (ContentFile): A content file for a course
+    """
+    return {
+        "_id": gen_content_file_id(content_file_obj.key),
+        **ESContentFileSerializer(content_file_obj).data,
+    }
+
+
+def serialize_content_file_for_bulk_deletion(content_file_obj):
+    """
+    Serialize a content file for bulk API request
+
+    Args:
+        content_file_obj (ContentFile): A content file for a course
+    """
+    return {"_id": gen_content_file_id(content_file_obj.key), "_op_type": "delete"}
 
 
 def serialize_bulk_bootcamps(ids):

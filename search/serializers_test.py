@@ -16,6 +16,7 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
     UserListItemFactory,
+    ContentFileFactory,
 )
 from course_catalog.models import Course, Video
 from open_discussions.constants import ISOFORMAT
@@ -23,8 +24,8 @@ from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
-from search.api import gen_course_id, gen_video_id
-from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE
+from search.api import gen_course_id, gen_video_id, gen_content_file_id
+from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE, RESOURCE_FILE_TYPE
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
@@ -44,6 +45,9 @@ from search.serializers import (
     ESUserListSerializer,
     serialize_bulk_videos,
     serialize_video_for_bulk,
+    serialize_content_file_for_bulk,
+    ESContentFileSerializer,
+    serialize_content_file_for_bulk_deletion,
 )
 
 
@@ -324,6 +328,50 @@ def test_es_course_serializer(offered_by):
             "created": drf_datetime(course.created_on),
             "default_search_priority": 1,
             "minimum_price": minimum_price(course),
+            "resource_relations": {"name": "resource"},
+        },
+    )
+
+
+@pytest.mark.django_db
+def test_es_content_file_serializer():
+    """ Verify that the ESContentFileSerializer has the correct data"""
+    content_kwargs = {
+        "content": "Some text",
+        "content_author": "MIT",
+        "content_language": "en",
+        "content_title": "test title",
+    }
+    content_file = ContentFileFactory.create(**content_kwargs)
+    serialized = ESContentFileSerializer(content_file).data
+    assert_json_equal(
+        serialized,
+        {
+            "object_type": RESOURCE_FILE_TYPE,
+            "run_id": content_file.run.run_id,
+            "run_title": content_file.run.title,
+            "semester": content_file.run.semester,
+            "year": int(content_file.run.year),
+            "topics": list(content_file.run.topics.values_list("name", flat=True)),
+            "key": content_file.key,
+            "uid": content_file.uid,
+            "resource_relations": {
+                "name": "resourcefile",
+                "parent": gen_course_id(
+                    content_file.run.content_object.platform,
+                    content_file.run.content_object.course_id,
+                ),
+            },
+            "title": content_file.title,
+            "short_description": content_file.description,
+            "file_type": content_file.file_type,
+            "content_type": content_file.content_type,
+            "url": content_file.url,
+            "section": content_file.section,
+            "content": content_kwargs["content"],
+            "content_title": content_kwargs["content_title"],
+            "content_author": content_kwargs["content_author"],
+            "content_language": content_kwargs["content_language"],
         },
     )
 
@@ -484,13 +532,16 @@ def test_serialize_bulk_courses(mocker):
 @pytest.mark.django_db
 def test_serialize_course_for_bulk():
     """
-    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    Test that serialize_course_for_bulk yields a valid ESCourseSerializer
     """
     course = CourseFactory.create()
-    assert serialize_course_for_bulk(course) == {
-        "_id": gen_course_id(course.platform, course.course_id),
-        **ESCourseSerializer(course).data,
-    }
+    assert_json_equal(
+        serialize_course_for_bulk(course),
+        {
+            "_id": gen_course_id(course.platform, course.course_id),
+            **ESCourseSerializer(course).data,
+        },
+    )
 
 
 @pytest.mark.django_db
@@ -508,10 +559,34 @@ def test_serialize_bulk_video(mocker):
 @pytest.mark.django_db
 def test_serialize_video_for_bulk():
     """
-    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    Test that serialize_video_for_bulk yields a valid ESVideoSerializer
     """
     video = VideoFactory.create()
     assert serialize_video_for_bulk(video) == {
         "_id": gen_video_id(video),
         **ESVideoSerializer(video).data,
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_content_file_for_bulk():
+    """
+    Test that serialize_content_file_for_bulk yields a valid ESContentFileSerializer
+    """
+    content_file = ContentFileFactory.create()
+    assert serialize_content_file_for_bulk(content_file) == {
+        "_id": gen_content_file_id(content_file.key),
+        **ESContentFileSerializer(content_file).data,
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_content_file_for_bulk_deletion():
+    """
+    Test that serialize_content_file_for_bulk_deletion yields a valid ESContentFileSerializer
+    """
+    content_file = ContentFileFactory.create()
+    assert serialize_content_file_for_bulk_deletion(content_file) == {
+        "_id": gen_content_file_id(content_file.key),
+        "_op_type": "delete",
     }

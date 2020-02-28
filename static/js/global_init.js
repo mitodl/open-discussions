@@ -26,6 +26,7 @@ const _createSettings = () => ({
   user_id:                0,
   profile_ui_enabled:     false,
   course_ui_enabled:      false,
+  file_search_enabled:    false,
   support_email:          "support@fake.url",
   reactGaDebug:           true,
   gaTrackingID:           "fake",

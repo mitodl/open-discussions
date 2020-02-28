@@ -432,3 +432,28 @@ ocw_edx_mapping = {
     "Educational Technology": ["Education & Teacher Training", "Computer Science"],
     "Higher Education": ["Education & Teacher Training"],
 }
+
+VALID_TEXT_FILE_TYPES = [
+    ".pdf",
+    ".htm",
+    ".html",
+    ".txt",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".ppt",
+    ".pptx",
+    ".xml",
+    ".json",
+    ".rtf",
+    ".ps",
+]
+
+
+CONTENT_TYPE_PAGE = "page"
+CONTENT_TYPE_FILE = "file"
+VALID_COURSE_CONTENT_TYPES = (CONTENT_TYPE_PAGE, CONTENT_TYPE_FILE)
+VALID_COURSE_CONTENT_CHOICES = list(
+    zip(VALID_COURSE_CONTENT_TYPES, VALID_COURSE_CONTENT_TYPES)
+)
