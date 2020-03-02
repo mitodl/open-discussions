@@ -5,6 +5,7 @@ import json
 from datetime import timedelta
 
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
 from course_catalog.constants import (
@@ -13,7 +14,7 @@ from course_catalog.constants import (
     ResourceType,
     OfferedBy,
 )
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import (
     Course,
     LearningResourceRun,
@@ -29,6 +30,7 @@ from course_catalog.api import (
     get_course_availability,
     parse_bootcamp_json_data,
     sync_ocw_course_files,
+    sync_xpro_course_files,
 )
 
 pytestmark = pytest.mark.django_db
@@ -300,7 +302,7 @@ def test_sync_ocw_course_files(mock_ocw_learning_bucket, mocker, with_error):
         "course_catalog.api.transform_content_files", return_value=fake_data
     )
     mock_load_content_files = mocker.patch(
-        "course_catalog.api.load_content_files", autospec=True, return_valiue=[]
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
     )
     if with_error:
         mock_load_content_files.side_effect = Exception
@@ -318,3 +320,127 @@ def test_sync_ocw_course_files(mock_ocw_learning_bucket, mocker, with_error):
         mock_load_content_files.assert_any_call(run, mock_transform.return_value)
         if with_error:
             mock_log.assert_any_call("Error syncing files for course run %d", run.id)
+
+
+def test_sync_xpro_course_files_no_course(mock_xpro_learning_bucket, mocker):
+    """a tarball which doesn't contain other course tarballs should be skipped"""
+
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=open("test_json/empty.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    sync_xpro_course_files(ids=[123])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files_contains_invalid_tarfile(
+    mock_xpro_learning_bucket, mocker
+):
+    """a tarball which contains an invalid tarball should be skipped"""
+
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=open("test_json/empty.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    sync_xpro_course_files(ids=[123])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files_invalid_tarfile(mock_xpro_learning_bucket, mocker):
+    """an invalid tarball should be skipped"""
+
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=b"".join([b"x" for _ in range(100)]),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    sync_xpro_course_files(ids=[123])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files_empty_bucket(mock_xpro_learning_bucket, mocker):
+    """If the bucket has no tarballs, it should be skipped"""
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/not.a.tarball",
+        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    sync_xpro_course_files(ids=[123])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files_no_runs(mock_xpro_learning_bucket, mocker):
+    """If there are no matching runs for the given courses, it should be skipped"""
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    sync_xpro_course_files(ids=[123])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files_no_courses(mock_xpro_learning_bucket, mocker):
+    """If there are no matching runs for the given courses, it should be skipped"""
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    course_content_type = ContentType.objects.get_for_model(Course)
+    LearningResourceRunFactory.create(
+        platform=PlatformType.xpro.value,
+        run_id="content-devops-0001",
+        content_type=course_content_type,
+    )
+    sync_xpro_course_files(ids=[])
+    mock_load_content_files.assert_not_called()
+
+
+def test_sync_xpro_course_files(mock_xpro_learning_bucket, mocker):
+    """sync xpro courses from a tarball stored in S3"""
+    mock_xpro_learning_bucket.bucket.put_object(
+        Key="path/to/exported_courses_123.tar.gz",
+        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.api.load_content_files", autospec=True, return_value=[]
+    )
+    course_content_type = ContentType.objects.get_for_model(Course)
+    run = LearningResourceRunFactory.create(
+        platform=PlatformType.xpro.value,
+        run_id="content-devops-0001",
+        content_type=course_content_type,
+    )
+    course_id = run.object_id
+    fake_data = '{"key": "data"}'
+    mock_log = mocker.patch("course_catalog.api.log.exception")
+    mock_transform = mocker.patch(
+        "course_catalog.api.transform_content_files_xpro", return_value=fake_data
+    )
+    sync_xpro_course_files(ids=[course_id])
+    assert mock_transform.call_count == 1
+    assert mock_transform.call_args[0][0].endswith("content-devops-0001.tar.gz") is True
+    mock_load_content_files.assert_called_once_with(run, fake_data)
+    mock_log.assert_not_called()

@@ -124,7 +124,7 @@ def import_all_ocw_files(self, chunk_size):
 
 
 @app.task
-def get_xpro_files(ids=None):
+def get_xpro_files(ids):
     """
     Task to sync xPRO OLX course files with database
     """
