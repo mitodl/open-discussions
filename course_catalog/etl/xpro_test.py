@@ -2,12 +2,14 @@
 # pylint: disable=redefined-outer-name
 from datetime import datetime
 import json
+import os
+import pathlib
 
 import pytest
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl import xpro
-from course_catalog.etl.xpro import _parse_datetime
+from course_catalog.etl.xpro import _parse_datetime, transform_content_files
 from open_discussions.test_utils import any_instance_of
 
 
@@ -208,3 +210,22 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
         for course_data in mock_xpro_courses_data
     ]
     assert expected == result
+
+
+def test_transform_content_files(mocker):
+    """transform_content_files """
+    document = "some text in the document"
+    key = "a key here"
+    tika_output = {"content": "tika'ed text"}
+    documents_mock = mocker.patch("course_catalog.etl.xpro.documents_from_olx", return_value=[(document, key)])
+    extract_mock = mocker.patch("course_catalog.etl.xpro.extract_text_metadata", return_value=tika_output)
+
+    script_dir = os.path.dirname(os.path.dirname(pathlib.Path(__file__).parent.absolute()))
+    content = transform_content_files(
+        os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
+    )
+    assert content == [
+        {"content": tika_output["content"], "key": key}
+    ]
+    extract_mock.assert_called_once_with(document)
+    assert documents_mock.called is True

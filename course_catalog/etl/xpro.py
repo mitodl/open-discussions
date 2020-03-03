@@ -186,27 +186,6 @@ def transform_programs(programs):
     ]
 
 
-def _chunk_string(content):
-    """
-    Helper function to chunk
-
-    Args:
-        content (str): Content string
-
-    Yields:
-        str: Chunks of roughly 8k length or less each, split on whitespace
-    """
-    chunk = ""
-    for match in re.finditer(r"[^\s]+", content):
-        chunk += f" {match.group(0)}"
-        if len(chunk) > 8000:
-            yield chunk
-            chunk = ""
-
-    if chunk:
-        yield chunk
-
-
 def transform_content_files(course_tarpath):
     """
     Pass content to tika, then return a JSON document with the transformed content inside it
@@ -221,8 +200,7 @@ def transform_content_files(course_tarpath):
 
         for document, key in documents_from_olx(inner_tempdir):
             tika_output = extract_text_metadata(document).get("content") or ""
-            for i, chunk in enumerate(_chunk_string(tika_output)):
-                content.append({"content": chunk.strip(), "key": f"{key}_{i}"})
+            content.append({"content": tika_output.strip(), "key": key})
     return content
 
 

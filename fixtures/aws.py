@@ -24,7 +24,7 @@ def ocw_aws_settings(settings):
 
 
 @pytest.fixture(autouse=True)
-def mock_ocw_learning_bucket(ocw_aws_settings, mock_s3_fixture):
+def mock_ocw_learning_bucket(ocw_aws_settings, mock_s3_fixture):  # pylint: disable=unused-argument
     """Mock OCW learning bucket"""
     s3 = boto3.resource(
         "s3",
@@ -47,7 +47,7 @@ def xpro_aws_settings(settings):
 
 
 @pytest.fixture(autouse=True)
-def mock_xpro_learning_bucket(xpro_aws_settings, mock_s3_fixture):
+def mock_xpro_learning_bucket(xpro_aws_settings, mock_s3_fixture):  # pylint: disable=unused-argument
     """Mock OCW learning bucket"""
     s3 = boto3.resource(
         "s3",
