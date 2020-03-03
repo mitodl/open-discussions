@@ -543,7 +543,6 @@ def sync_xpro_course_files(ids):
             )
         )
     except StopIteration:
-        # TODO: warning or error?
         log.warning("No xPRO exported courses found in xPRO S3 bucket")
         return
 
