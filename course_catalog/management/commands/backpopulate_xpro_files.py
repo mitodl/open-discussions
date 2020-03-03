@@ -2,7 +2,7 @@
 
 from django.core.management import BaseCommand
 
-from course_catalog.tasks import get_all_xpro_files
+from course_catalog.tasks import import_all_xpro_files
 from open_discussions.utils import now_in_utc
 
 
@@ -11,9 +11,19 @@ class Command(BaseCommand):
 
     help = "Populate xpro course run files"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "-c",
+            "--chunk-size",
+            dest="chunk_size",
+            default=1000,
+            help="Chunk size for batch import task",
+        )
+
     def handle(self, *args, **options):
         """Run Populate xpro course run files"""
-        task = get_all_xpro_files.delay()
+        chunk_size = options["chunk_size"]
+        task = import_all_xpro_files.delay(chunk_size=chunk_size)
         self.stdout.write(
             "Started task {task} to get xpro course run file data".format(task=task)
         )
