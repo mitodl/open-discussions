@@ -57,3 +57,4 @@ ulid-py
 urllib3>=1.24.2
 uwsgi
 wrapt==1.10.11
+xbundle==0.3.1

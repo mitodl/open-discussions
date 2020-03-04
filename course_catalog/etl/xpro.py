@@ -1,13 +1,16 @@
 """xPro course catalog ETL"""
 import copy
 from datetime import datetime
-from subprocess import check_call, check_output
+from subprocess import check_call
 from tempfile import TemporaryDirectory
+import glob
+from lxml import etree
 
 import boto3
 from django.conf import settings
 import requests
 import pytz
+from xbundle import XBundle
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.utils import extract_text_metadata, log_exceptions
@@ -214,8 +217,14 @@ def documents_from_olx(olx_path):
         list of tuple:
             A list of (str of content, unique key for document)
     """
-    document = check_output(
-        ["find", "-name", "*.xml", "-o", "-name", "*.html", "-exec", "cat", "{}", ";"],
-        cwd=olx_path,
-    ).decode()
-    return [(document, olx_path)]
+
+    documents = []
+
+    inner_olx_path = glob.glob(olx_path + "/*")[0]
+
+    bundle = XBundle()
+    bundle.import_from_directory(inner_olx_path)
+    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+        documents.append((etree.tostring(vertical), f"vertical_{index}"))
+
+    return documents
