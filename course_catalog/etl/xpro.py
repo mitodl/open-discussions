@@ -195,12 +195,11 @@ def transform_content_files(course_tarpath):
     Args:
         course_tarpath (str): The path to the tarball which contains the OLX
     """
-
     content = []
     with TemporaryDirectory() as inner_tempdir:
         check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
-
-        for document, key in documents_from_olx(inner_tempdir):
+        olx_path = glob.glob(inner_tempdir + "/*")[0]
+        for document, key in documents_from_olx(olx_path):
             tika_output = extract_text_metadata(document).get("content") or ""
             content.append({"content": tika_output.strip(), "key": key})
     return content
@@ -219,12 +218,9 @@ def documents_from_olx(olx_path):
     """
 
     documents = []
-
-    inner_olx_path = glob.glob(olx_path + "/*")[0]
-
     bundle = XBundle()
-    bundle.import_from_directory(inner_olx_path)
+    bundle.import_from_directory(olx_path)
     for index, vertical in enumerate(bundle.course.findall(".//vertical")):
-        documents.append((etree.tostring(vertical), f"vertical_{index}"))
+        documents.append((etree.tostring(vertical), f"vertical_{index + 1}"))
 
     return documents

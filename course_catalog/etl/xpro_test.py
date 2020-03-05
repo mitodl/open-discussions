@@ -9,7 +9,11 @@ import pytest
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl import xpro
-from course_catalog.etl.xpro import _parse_datetime, transform_content_files
+from course_catalog.etl.xpro import (
+    _parse_datetime,
+    transform_content_files,
+    documents_from_olx,
+)
 from open_discussions.test_utils import any_instance_of
 
 
@@ -233,3 +237,13 @@ def test_transform_content_files(mocker):
     assert content == [{"content": tika_output["content"], "key": key}]
     extract_mock.assert_called_once_with(document)
     assert documents_mock.called is True
+
+
+def test_documents_from_olx():
+    """test for documents_from_olx"""
+    path = "./test_json/exported_courses_12345/"
+    parsed_documents = documents_from_olx(path)
+    assert len(parsed_documents) == 16
+
+    expected_parsed_vertical = b'<vertical display_name="HTML">\n  <html display_name="Jasmine tests: HTML module edition" editor="raw"><head><link rel="stylesheet" type="text/css" href="/static/jasmine.css"/><script type="text/javascript" src="/static/jasmine.js"/><script type="text/javascript" src="/static/jasmine-html.js"/><script type="text/javascript" src="/static/boot.js"/><!-- Where all of the tests are defined --><script type="text/javascript" src="/static/jasmine-tests.js"/><script>\n  (function () {\n    window.runJasmineTests()\n  }());\n</script></head><body><h2>Jasmine tests: HTML module edition</h2>\n<h3>Did it break? Dunno; let\'s find out.</h3>\n<p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>\n\n<!-- Where Jasmine will inject its output (dictated in boot.js) -->\n<div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div></body></html></vertical>'
+    assert parsed_documents[0] == (expected_parsed_vertical, "vertical_1")
