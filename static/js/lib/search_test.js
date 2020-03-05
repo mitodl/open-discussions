@@ -845,7 +845,8 @@ describe("search functions", () => {
                 query:  text,
                 fields: ["content", "title", "short_description"]
               }
-            }
+            },
+            score_mode: "avg"
           }
         })
       }

@@ -618,7 +618,8 @@ export const buildLearnQuery = (
                     query:  text,
                     fields: ["content", "title", "short_description"]
                   }
-                }
+                },
+                score_mode: "avg"
               }
             }
             : null
