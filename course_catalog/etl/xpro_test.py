@@ -4,6 +4,8 @@ from datetime import datetime
 import json
 import os
 import pathlib
+from subprocess import check_call
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -241,9 +243,33 @@ def test_transform_content_files(mocker):
 
 def test_documents_from_olx():
     """test for documents_from_olx"""
-    path = "./test_json/exported_courses_12345/"
-    parsed_documents = documents_from_olx(path)
+    script_dir = os.path.dirname(
+        os.path.dirname(pathlib.Path(__file__).parent.absolute())
+    )
+    with TemporaryDirectory() as temp:
+        check_call(
+            [
+                "tar",
+                "xf",
+                os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz"),
+            ],
+            cwd=temp,
+        )
+        check_call(["tar", "xf", "content-devops-0001.tar.gz"], cwd=temp)
+
+        olx_path = os.path.join(temp, "content-devops-0001")
+        parsed_documents = documents_from_olx(olx_path)
     assert len(parsed_documents) == 16
 
-    expected_parsed_vertical = b'<vertical display_name="HTML">\n  <html display_name="Jasmine tests: HTML module edition" editor="raw"><head><link rel="stylesheet" type="text/css" href="/static/jasmine.css"/><script type="text/javascript" src="/static/jasmine.js"/><script type="text/javascript" src="/static/jasmine-html.js"/><script type="text/javascript" src="/static/boot.js"/><!-- Where all of the tests are defined --><script type="text/javascript" src="/static/jasmine-tests.js"/><script>\n  (function () {\n    window.runJasmineTests()\n  }());\n</script></head><body><h2>Jasmine tests: HTML module edition</h2>\n<h3>Did it break? Dunno; let\'s find out.</h3>\n<p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>\n\n<!-- Where Jasmine will inject its output (dictated in boot.js) -->\n<div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div></body></html></vertical>'
+    expected_parsed_vertical = b"""<vertical display_name="HTML">
+  <html display_name="Jasmine tests: HTML module edition" editor="raw"><head><link rel="stylesheet" type="text/css" href="/static/jasmine.css"/><script type="text/javascript" src="/static/jasmine.js"/><script type="text/javascript" src="/static/jasmine-html.js"/><script type="text/javascript" src="/static/boot.js"/><!-- Where all of the tests are defined --><script type="text/javascript" src="/static/jasmine-tests.js"/><script>
+  (function () {
+    window.runJasmineTests()
+  }());
+</script></head><body><h2>Jasmine tests: HTML module edition</h2>
+<h3>Did it break? Dunno; let's find out.</h3>
+<p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>
+
+<!-- Where Jasmine will inject its output (dictated in boot.js) -->
+<div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div></body></html></vertical>"""
     assert parsed_documents[0] == (expected_parsed_vertical, "vertical_1")
