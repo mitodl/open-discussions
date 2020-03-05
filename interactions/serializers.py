@@ -85,14 +85,15 @@ class PopularContentListSerializer(serializers.ListSerializer):
             for item in query:
                 fetched_items[(content_type_id, item.id)] = item
 
+        item_keys = [(item["content_type_id"], item["content_id"]) for item in data]
+
         # return the items in the correct order
         # we'll use the GenericForeignKeyFieldSerializer from course_catalog
         # since those will be the only favorited items for now
         return [
-            GenericForeignKeyFieldSerializer(
-                instance=fetched_items[(item["content_type_id"], item["content_id"])]
-            ).data
-            for item in data
+            GenericForeignKeyFieldSerializer(instance=fetched_items[item_key]).data
+            for item_key in item_keys
+            if item_key in fetched_items
         ]
 
 
