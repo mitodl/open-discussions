@@ -56,7 +56,8 @@ def test_content_type_interactions_serializer_invalid():
     assert serializer.errors["content_type"][0].code == "does_not_exist"
 
 
-def test_popular_content_serializer():
+@pytest.mark.parametrize("is_deleted", [True, False])
+def test_popular_content_serializer(is_deleted):
     """Test PopularContentSerializer"""
     resources = [
         VideoFactory.create(),
@@ -73,6 +74,11 @@ def test_popular_content_serializer():
         }
         for resource in resources
     ]
+
+    if is_deleted:
+        for resource in resources:
+            resource.delete()
+        resources = []
 
     # NOTE: we test PopularContentSerializer instead of PopularContentListSerializer
     #       because the list serializer is never used directly, but rather many=True tells
