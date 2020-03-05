@@ -1,0 +1,20 @@
+<link rel="stylesheet" type="text/css" href="/static/jasmine.css"> 
+<script type="text/javascript" src="/static/jasmine.js"></script>
+<script type="text/javascript" src="/static/jasmine-html.js"></script>
+
+<script type="text/javascript" src="/static/boot.js"></script>
+<!-- Where all of the tests are defined -->
+<script type="text/javascript" src="/static/jasmine-tests.js"></script>
+
+<script>
+  (function () {
+    window.runJasmineTests()
+  }());
+</script>
+
+<h2>Jasmine tests: HTML module edition</h2>
+<h3>Did it break? Dunno; let's find out.</h3>
+<p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>
+
+<!-- Where Jasmine will inject its output (dictated in boot.js) -->
+<div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div>

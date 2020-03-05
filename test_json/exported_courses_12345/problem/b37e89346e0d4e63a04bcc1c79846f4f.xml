@@ -1,0 +1,20 @@
+<problem display_name="Jasmine tests: JS Input problem edition (same origin)" markdown="null">
+  <script type="loncapa/python">
+import json
+def grader_cfn(e, ans):
+  par = json.loads(ans)
+
+  # We can use the value of the answer key to grade
+  answer = json.loads(par["answer"])
+  return answer["works"]
+
+  state = json.loads(par["state"])
+  answer = state['answer']
+  return state["works"]
+</script>
+  <h3>Did it break? Dunno; let's find out.</h3>
+  <p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>
+  <customresponse cfn="grader_cfn">
+    <jsinput gradefn="getJSInputGrade" set_statefn="setJSInputState" get_statefn="getJSInputState" width="100%" height="1000" html_file="/static/jsinput-tests.html"/>
+  </customresponse>
+</problem>

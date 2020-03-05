@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en_US">
+  <head>
+    <link rel="stylesheet" type="text/css" href="jasmine.css">
+    <script type="text/javascript" src="jasmine.js"></script>
+    <script type="text/javascript" src="jasmine-html.js"></script>
+    <script type="text/javascript" src="boot.js"></script>
+    <!-- Where all of the tests are defined -->
+    <script type="text/javascript" src="jasmine-tests.js"></script>
+
+    <title>JS Input jasmine tests</title>
+  </head>
+  <body>
+    <!-- Where Jasmine will inject its output (dictated in boot.js) -->
+    <div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div>
+
+    <script>
+      (function() {
+        window.runJasmineTests();
+      }());
+
+      // Setup JS Input problem
+      function getJSInputGrade() {
+        // Check whether there are any failures marked in the spec summary
+        var answer = {
+          works: (document.querySelector('.symbol-summary .failed') === null)
+        };
+        return JSON.stringify(answer);
+      }
+      function getJSInputState() {
+        return {answer: getJSInputGrade()};
+      }
+      function setJSInputState() {}
+    </script>
+  </body>
+</html>

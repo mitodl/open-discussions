@@ -1,0 +1,47 @@
+<problem attempts="" empty="True" display_name="While loops" markdown="null" max_attempts="null">
+  <text>
+    <p>Write MATLAB code that calculates the factorial, <code>facto</code>, of a number <code>numero</code>. Test your code with a value of 13 for <code>numero</code>. Use a while loop to accomplish this task.</p>
+    <p>
+      <i>Tip: MATLAB doesn't display excess digits when it outputs a value with many digits in scientific notation. Precede the output line with <code>format long</code> to get a complete output.</i>
+    </p>
+  </text>
+  <coderesponse queuename="matlab">
+    <matlabinput rows="10" cols="80" mode="" tabsize="4">
+      <plot_payload>
+        %api_key=SolsRMsNeis
+      %%
+      </plot_payload>
+    </matlabinput>
+    <codeparam>
+      <initial_display/>
+      <answer_display/>
+      <grader_payload>
+      %api_key=SolsRMsNeis
+      %%
+      assert(~isempty(whos('numero')), 'You must create a variable ''numero''')
+      %%
+      assert(isequal(numero, 13), 'The variable numero should contain the value 13')
+        assert(~isempty(whos('facto')), 'You must create a variable ''facto''')
+        %% 
+        assert(isequal(facto, 6227020800), 'The variable facto should contain the value of numero factorial')
+        %%
+      </grader_payload>
+    </codeparam>
+  </coderesponse>
+  <solution>
+    <p>Here's one way you could have done it.</p>
+    <pre>
+&gt;&gt; numero = 13;
+counter = 1;
+facto = 1;
+
+while counter &lt;= numero
+facto = counter*facto;
+counter = counter+1;
+end
+
+format long
+facto
+    </pre>
+  </solution>
+</problem>

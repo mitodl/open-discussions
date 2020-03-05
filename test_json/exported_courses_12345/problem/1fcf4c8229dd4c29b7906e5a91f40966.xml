@@ -1,0 +1,31 @@
+<problem display_name="Creating matrices" markdown="null">
+  <text>
+    <p>Write MATLAB code to creates a 10-by-10 matrix <code>biology</code> that is all zeros except for ones in the diagonal (running from top left to bottom right). Be sure to use the same letter case for the matrix name as given.</p>
+  </text>
+  <coderesponse queuename="matlab">
+    <matlabinput rows="10" cols="80" mode="" tabsize="4">
+      <plot_payload>
+        %api_key=SolsRMsNeis
+      %%
+      </plot_payload>
+    </matlabinput>
+    <codeparam>
+      <initial_display/>
+      <answer_display> </answer_display>
+      <grader_payload>
+      %api_key=SolsRMsNeis
+      %%
+      s = whos;
+      aBExists = any(strcmpi('biology',{s.name}));
+      assert(aBExists, 'You have not created a variable with name ''biology''.');
+      %%
+      assert(~any(size(biology)==1), 'Use square brackets to concatenate values together.  Remember that commas separate columns and semicolons separate rows.');
+      %%
+      assert(isequal(biology,eye(10)), 'The matrix ''biology'' does not contain the correct values.')
+      </grader_payload>
+    </codeparam>
+  </coderesponse>
+  <solution>
+    <pre>There are multiple solutions, here is a simple one:<br/><br/>biology = zeros(10,10);<br/>for i = 1:10  % row/column indices<br/>biology(i,i) = 1;   % for indices where row and column are equal, replace 0 with 1 <br/>end <br/></pre>
+  </solution>
+</problem>

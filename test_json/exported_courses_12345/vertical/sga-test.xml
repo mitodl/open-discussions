@@ -1,0 +1,3 @@
+<vertical display_name="Test SGA">
+  <edx_sga url_name="test-sgap1" xblock-family="xblock.v1" display_name="SGA Unit 1"/>
+</vertical>

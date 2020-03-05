@@ -1,0 +1,36 @@
+<problem attempts="" empty="True" display_name="Assignments" markdown="null" max_attempts="null">
+  <text>
+    <p>
+      <p>Write MATLAB code that assigns the value <code>80</code> to the variable <code>NucleotidesPerTurn</code>, and <code>'green'</code> to the variable <code>chlorophyll</code> </p>
+    </p>
+  </text>
+  <coderesponse queuename="matlab">
+    <matlabinput rows="10" cols="80" mode="" tabsize="4">
+      <plot_payload>
+        %api_key=SolsRMsNeis
+      %%
+      </plot_payload>
+    </matlabinput>
+    <codeparam>
+      <initial_display/>
+      <answer_display/>
+      <grader_payload>
+      %api_key=SolsRMsNeis
+      %%
+      assert(~isempty(whos('NucleotidesPerTurn')), 'You must create a variable ''NucleotidesPerTurn''')
+      %%
+      assert(isequal(NucleotidesPerTurn, 80), 'The variable fingerCount should contain the value 5')
+        assert(~isempty(whos('chlorophyll')), 'You must create a variable ''chlorophyll''')
+        %% 
+        assert(strcmp(chlorophyll,'green'), 'The variable sky should contain the value ''green''')
+        %%
+      </grader_payload>
+    </codeparam>
+  </coderesponse>
+  <solution>
+    <pre>
+    &gt;&gt; NucleotidesPerTurn = 80
+    &gt;&gt; chlorophyll = 'green'
+    </pre>
+  </solution>
+</problem>

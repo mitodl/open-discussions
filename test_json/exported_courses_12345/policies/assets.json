@@ -1,0 +1,137 @@
+{
+    "boot.js": {
+        "contentType": "application/javascript", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "boot.js", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "boot.js", 
+        "filename": "/c4x/DevOps/0.001/asset/boot.js", 
+        "import_path": "boot.js", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "devops_course_logo.jpg": {
+        "contentType": "image/jpeg", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "devops_course_logo.jpg", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "devops_course_logo.jpg", 
+        "filename": "/c4x/DevOps/0.001/asset/devops_course_logo.jpg", 
+        "import_path": "devops_course_logo.jpg", 
+        "locked": false, 
+        "thumbnail_location": [
+            "c4x", 
+            "DevOps", 
+            "0.001", 
+            "thumbnail", 
+            "devops_course_logo.jpg", 
+            null
+        ]
+    }, 
+    "jasmine-html.js": {
+        "contentType": "application/javascript", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "jasmine-html.js", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "jasmine-html.js", 
+        "filename": "/c4x/DevOps/0.001/asset/jasmine-html.js", 
+        "import_path": "jasmine-html.js", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "jasmine-tests.js": {
+        "contentType": "application/javascript", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "jasmine-tests.js", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "jasmine-tests.js", 
+        "filename": "/c4x/DevOps/0.001/asset/jasmine-tests.js", 
+        "import_path": "jasmine-tests.js", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "jasmine.css": {
+        "contentType": "text/css", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "jasmine.css", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "jasmine.css", 
+        "filename": "/c4x/DevOps/0.001/asset/jasmine.css", 
+        "import_path": "jasmine.css", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "jasmine.js": {
+        "contentType": "application/javascript", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "jasmine.js", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "jasmine.js", 
+        "filename": "/c4x/DevOps/0.001/asset/jasmine.js", 
+        "import_path": "jasmine.js", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "jsinput-tests.html": {
+        "contentType": "text/html", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "jsinput-tests.html", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "jsinput-tests.html", 
+        "filename": "/c4x/DevOps/0.001/asset/jsinput-tests.html", 
+        "import_path": "jsinput-tests.html", 
+        "locked": false, 
+        "thumbnail_location": null
+    }, 
+    "subs_OEoXaMPEzfM.srt.sjson": {
+        "contentType": "application/json", 
+        "content_son": {
+            "category": "asset", 
+            "course": "0.001", 
+            "name": "subs_OEoXaMPEzfM.srt.sjson", 
+            "org": "DevOps", 
+            "revision": null, 
+            "tag": "c4x"
+        }, 
+        "displayname": "subs_OEoXaMPEzfM.srt.sjson", 
+        "filename": "/c4x/DevOps/0.001/asset/subs_OEoXaMPEzfM.srt.sjson", 
+        "import_path": "subs_OEoXaMPEzfM.srt.sjson", 
+        "locked": false, 
+        "thumbnail_location": null
+    }
+}

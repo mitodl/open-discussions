@@ -1,0 +1,3 @@
+<course advanced_modules="[&quot;edx_sga&quot;, &quot;lti&quot;]" course_image="devops_course_logo.jpg" display_name="Ops" giturl="git@github.mit.edu:mitx/content-devops-0001.git" lti_passports="[&quot;mitxr:mitxr:pypoodMigyikbiwr&quot;]" matlab_api_key="SolsRMsNeis" remote_gradebook="{&quot;section&quot;: &quot;devops01&quot;, &quot;name&quot;: &quot;STELLAR:/project/mitxdemosite&quot;}" start="&quot;2014-08-25T15:00:00+00:00&quot;" static_asset_path="content-devops-0001">
+  <wiki slug="DevOps.0.001.2015_Summer"/>
+</course>

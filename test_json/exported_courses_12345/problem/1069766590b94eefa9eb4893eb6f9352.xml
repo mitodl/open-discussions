@@ -1,0 +1,24 @@
+<problem display_name="Sandbox" markdown="null">
+  <p>Use the MATLAB "sandbox" below to carry out the code instructions above. When you want to see the output of your lines of code, click check to evaluate your code. This may take a few moments, please be patient. You will automatically see a green check for valid lines of MATLAB code, but there is no evaulation for a correct or incorrect answer. This box is to provide space for you to practice. Click check each time after you enter new lines of code and want to see the output of the lines of code. Click reset or delete the previous input if you do not want to see the output from those lines.</p>
+  <coderesponse queuename="matlab">
+    <matlabinput rows="10" cols="80" mode="" tabsize="4">
+      <plot_payload>
+        %api_key=SolsRMsNeis
+      %%
+      </plot_payload>
+    </matlabinput>
+    <codeparam>
+      <initial_display>
+      </initial_display>
+      <answer_display>
+</answer_display>
+      <grader_payload>
+      %api_key=SolsRMsNeis
+        %%
+%% 
+
+      
+      </grader_payload>
+    </codeparam>
+  </coderesponse>
+</problem>

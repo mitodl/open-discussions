@@ -1,0 +1,57 @@
+{
+    "course/2015_Summer": {
+        "start": "2014-08-25T15:00",
+        "advanced_modules": [
+            "edx_sga", 
+            "lti"
+        ], 
+        "course_image": "devops_course_logo.jpg", 
+        "discussion_topics": {
+            "General": {
+                "id": "i4x-DevOps-0_001-course-2015_Summer"
+            }
+        }, 
+        "display_name": "Ops", 
+        "giturl": "git@github.mit.edu:mitx/content-devops-0001.git", 
+        "lti_passports": [
+            "mitxr:mitxr:pypoodMigyikbiwr"
+        ], 
+        "matlab_api_key": "SolsRMsNeis", 
+        "remote_gradebook": {
+            "name": "STELLAR:/project/mitxdemosite", 
+            "section": "devops01"
+        }, 
+        "tabs": [
+            {
+                "name": "Courseware", 
+                "type": "courseware"
+            }, 
+            {
+                "name": "Course Info", 
+                "type": "course_info"
+            }, 
+            {
+                "name": "Textbooks", 
+                "type": "textbooks"
+            }, 
+            {
+                "name": "Discussion", 
+                "type": "discussion"
+            }, 
+            {
+                "name": "Wiki", 
+                "type": "wiki"
+            }, 
+            {
+                "name": "Progress", 
+                "type": "progress"
+            }
+        ], 
+        "xml_attributes": {
+            "filename": [
+                "course/2015_Summer.xml", 
+                "course/2015_Summer.xml"
+            ]
+        }
+    }
+}

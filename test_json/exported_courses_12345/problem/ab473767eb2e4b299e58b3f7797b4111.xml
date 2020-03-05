@@ -1,0 +1,43 @@
+<problem attempts="" empty="True" display_name="For loops" markdown="null" max_attempts="null">
+  <text>
+    <p>Your brother has strange banking habits. Every day, he spends 10% of the money in his account. If he has $36,672 in his account at the end of today, how much will he have left in 60 days?
+      <p>Write MATLAB code to figure it out. Use the variable 'money_left' for how much money your brother will have left, and the variable 'days' for the 60 days of spending.</p>
+    </p>
+  </text>
+  <coderesponse queuename="matlab">
+    <matlabinput rows="10" cols="80" mode="" tabsize="4">
+      <plot_payload>
+        %api_key=SolsRMsNeis
+        %%
+      </plot_payload>
+    </matlabinput>
+    <codeparam>
+      <initial_display/>
+      <answer_display/>
+      <grader_payload>
+      %api_key=SolsRMsNeis
+        %%
+      assert(~isempty(whos('money_left')), 'You must have a variable ''money_left''')
+      %%
+        tolerance = 0.1
+        assert((abs(money_left - 65.9) &lt;= tolerance), 'The variable ''money_left'' should contain the money left after 60 days when your code is done running.')
+        %%
+        assert(~isempty(whos('days')), 'You must create a variable ''days''')
+        %% 
+        assert(isequal(days,60), 'The variable days should contain the value ''60''')
+        %%
+      </grader_payload>
+    </codeparam>
+  </coderesponse>
+  <solution>
+    <pre>
+    &gt;&gt; money_left = 36672;
+days = 60;
+
+      <span class="key">for</span> n = 1:days
+money_left = money_left - money_left*0.1;
+      <span class="key">end</span>
+money_left
+    </pre>
+  </solution>
+</problem>
