@@ -573,6 +573,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_xpro_data",
         "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
     },
+    "update-xpro-files-every-1-days": {
+        "task": "course_catalog.tasks.import_all_xpro_files",
+        "schedule": crontab(minute=0, hour=18),  # 2:00pm EST
+    },
     "update-oll-courses-every-1-days": {
         "task": "course_catalog.tasks.get_oll_data",
         "schedule": crontab(minute=30, hour=18),  # 2:30pm EST

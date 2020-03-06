@@ -139,8 +139,11 @@ def get_xpro_files(ids):
 
 
 @app.task(bind=True)
-def import_all_xpro_files(self, chunk_size):
+def import_all_xpro_files(self, chunk_size=None):
     """Ingest xPRO OLX files from the S3 bucket"""
+    if chunk_size is None:
+        chunk_size = settings.XPRO_ITERATOR_CHUNK_SIZE
+
     blacklisted_ids = load_course_blacklist()
     tasks = celery.group(
         [
