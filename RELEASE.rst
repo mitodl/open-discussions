@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.113.0
+Version 0.113.0 (Released March 09, 2020)
 ---------------
 
 - Fixed bug with missing popular resources
