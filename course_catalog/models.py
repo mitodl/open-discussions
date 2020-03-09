@@ -171,6 +171,19 @@ class ContentFile(TimestampedModel):
         verbose_name = "contentfile"
 
 
+def get_max_length(field):
+    """
+    Get the max length of a ContentFile field
+
+    Args:
+        field (str): the name of the field
+
+    Returns:
+        int: the max_length of the field
+    """
+    return ContentFile._meta.get_field(field).max_length
+
+
 class Course(AbstractCourse):
     """
     Course model for courses on all platforms

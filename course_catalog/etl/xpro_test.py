@@ -218,11 +218,17 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
     assert expected == result
 
 
-def test_transform_content_files(mocker):
+@pytest.mark.parametrize("has_metadata", [True, False])
+def test_transform_content_files(mocker, has_metadata):
     """transform_content_files """
     document = "some text in the document"
     key = "a key here"
-    tika_output = {"content": "tika'ed text"}
+    metadata = (
+        {"Author": "author", "language": "French", "title": "the title of the course"}
+        if has_metadata
+        else None
+    )
+    tika_output = {"content": "tika'ed text", "metadata": metadata}
     documents_mock = mocker.patch(
         "course_catalog.etl.xpro.documents_from_olx", return_value=[(document, key)]
     )
@@ -236,7 +242,15 @@ def test_transform_content_files(mocker):
     content = transform_content_files(
         os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
     )
-    assert content == [{"content": tika_output["content"], "key": key}]
+    assert content == [
+        {
+            "content": tika_output["content"],
+            "key": key,
+            "content_author": metadata["Author"] if has_metadata else "",
+            "content_title": metadata["title"] if has_metadata else "",
+            "content_language": metadata["language"] if has_metadata else "",
+        }
+    ]
     extract_mock.assert_called_once_with(document)
     assert documents_mock.called is True
 

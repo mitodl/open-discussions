@@ -14,7 +14,7 @@ from course_catalog.constants import (
     VALID_TEXT_FILE_TYPES,
 )
 from course_catalog.etl.utils import extract_text_metadata, sync_s3_text
-from course_catalog.models import ContentFile
+from course_catalog.models import ContentFile, get_max_length
 from open_discussions.utils import extract_values
 
 log = logging.getLogger()
@@ -130,13 +130,13 @@ def transform_content_file(
                 content_file["content"] = content_json.get("content")
                 # Sometimes Tika returns very large values (probably a mistake in pdf data), so truncate in case.
                 content_file["content_author"] = content_json_meta.get("Author", "")[
-                    : _get_max_length("content_author")
+                    : get_max_length("content_author")
                 ]
                 content_file["content_language"] = content_json_meta.get(
                     "language", ""
-                )[: _get_max_length("content_language")]
+                )[: get_max_length("content_language")]
                 content_file["content_title"] = content_json_meta.get("title", "")[
-                    : _get_max_length("content_title")
+                    : get_max_length("content_title")
                 ]
         except bucket.meta.client.exceptions.NoSuchKey:
             log.warning(
@@ -286,16 +286,3 @@ def upload_mitx_course_manifest(courses):
     ocw_bucket = get_ocw_learning_course_bucket()
     ocw_bucket.put_object(Key="edx_courses.json", Body=rapidjson.dumps(manifest))
     return True
-
-
-def _get_max_length(field):
-    """
-    Get the max length of a ContentFile field
-
-    Args:
-        field (str): the name of the field
-
-    Returns:
-        int: the max_length of the field
-    """
-    return ContentFile._meta.get_field(field).max_length

@@ -14,6 +14,7 @@ from xbundle import XBundle
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.utils import extract_text_metadata, log_exceptions
+from course_catalog.models import get_max_length
 
 
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -200,8 +201,24 @@ def transform_content_files(course_tarpath):
         check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
         olx_path = glob.glob(inner_tempdir + "/*")[0]
         for document, key in documents_from_olx(olx_path):
-            tika_output = extract_text_metadata(document).get("content") or ""
-            content.append({"content": tika_output.strip(), "key": key})
+            tika_output = extract_text_metadata(document)
+            tika_content = tika_output.get("content") or ""
+            tika_metadata = tika_output.get("metadata") or {}
+            content.append(
+                {
+                    "content": tika_content.strip(),
+                    "key": key,
+                    "content_title": (tika_metadata.get("title") or "")[
+                        : get_max_length("content_title")
+                    ],
+                    "content_author": (tika_metadata.get("Author") or "")[
+                        : get_max_length("content_author")
+                    ],
+                    "content_language": (tika_metadata.get("language") or "")[
+                        : get_max_length("content_language")
+                    ],
+                }
+            )
     return content
 
 
