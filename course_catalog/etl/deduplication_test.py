@@ -2,9 +2,16 @@
 from datetime import datetime
 import pytest
 import pytz
-from course_catalog.etl.deduplication import get_most_relevant_run
+from course_catalog.etl.deduplication import (
+    get_most_relevant_run,
+    generate_duplicates_yaml,
+)
 from course_catalog.constants import AvailabilityType
-from course_catalog.factories import LearningResourceRunFactory
+from course_catalog.factories import (
+    LearningResourceRunFactory,
+    CourseFactory,
+    LearningResourceOfferorFactory,
+)
 from course_catalog.models import LearningResourceRun
 
 
@@ -57,3 +64,44 @@ def test_get_most_relevant_run():
         )
         == most_relevant_run
     )
+
+
+@pytest.mark.django_db
+def test_generate_duplicates_yaml(settings, mocker):
+    """Test for generate_duplicates_yaml"""
+    duplicate_course1 = CourseFactory.create(title="course1", platform="mitx")
+    desired_course1 = CourseFactory.create(title="course1", platform="mitx")
+    extra_offered_by = LearningResourceOfferorFactory.create()
+    desired_course1.offered_by.add(extra_offered_by)
+
+    duplicate_course2 = CourseFactory.create(title="course2", platform="mitx")
+    desired_course2 = CourseFactory.create(title="course2", platform="mitx")
+
+    settings.DUPLICATE_COURSES_URL = "url"
+    duplicate_file_content = f"""mitx:
+- course_id: {desired_course2.course_id}
+  duplicate_course_ids:
+  - {desired_course2.course_id}
+  - {duplicate_course2.course_id}
+  title: course2
+"""
+    mocker.patch(
+        "requests.get",
+        autospec=True,
+        return_value=mocker.Mock(text=duplicate_file_content),
+    )
+
+    expected_output = f"""mitx:
+- course_id: {desired_course1.course_id}
+  duplicate_course_ids:
+  - {desired_course1.course_id}
+  - {duplicate_course1.course_id}
+  title: course1
+- course_id: {desired_course2.course_id}
+  duplicate_course_ids:
+  - {desired_course2.course_id}
+  - {duplicate_course2.course_id}
+  title: course2
+"""
+
+    assert generate_duplicates_yaml() == expected_output
