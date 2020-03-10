@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.113.1
+Version 0.113.1 (Released March 10, 2020)
 ---------------
 
 - OLX ingestion for xPRO courses (#2599)
