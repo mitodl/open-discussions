@@ -1,18 +1,40 @@
 """xPro course catalog ETL"""
 import copy
 from datetime import datetime
+from subprocess import check_call
+from tempfile import TemporaryDirectory
+import glob
+from lxml import etree
 
+import boto3
 from django.conf import settings
 import requests
 import pytz
+from xbundle import XBundle
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.utils import log_exceptions
+from course_catalog.etl.utils import extract_text_metadata, log_exceptions
+from course_catalog.models import get_max_length
 
 
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 OFFERED_BY = [{"name": OfferedBy.xpro.value}]
+
+
+def get_xpro_learning_course_bucket():
+    """
+    Get the xPRO S3 Bucket
+
+    Returns:
+        boto3.Bucket: the OCW S3 Bucket or None
+    """
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.XPRO_LEARNING_COURSE_ACCESS_KEY,
+        aws_secret_access_key=settings.XPRO_LEARNING_COURSE_SECRET_ACCESS_KEY,
+    )
+    return s3.Bucket(name=settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
 
 
 def _parse_datetime(value):
@@ -165,3 +187,57 @@ def transform_programs(programs):
         }
         for program in programs
     ]
+
+
+def transform_content_files(course_tarpath):
+    """
+    Pass content to tika, then return a JSON document with the transformed content inside it
+
+    Args:
+        course_tarpath (str): The path to the tarball which contains the OLX
+    """
+    content = []
+    with TemporaryDirectory() as inner_tempdir:
+        check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
+        olx_path = glob.glob(inner_tempdir + "/*")[0]
+        for document, key in documents_from_olx(olx_path):
+            tika_output = extract_text_metadata(document)
+            tika_content = tika_output.get("content") or ""
+            tika_metadata = tika_output.get("metadata") or {}
+            content.append(
+                {
+                    "content": tika_content.strip(),
+                    "key": key,
+                    "content_title": (tika_metadata.get("title") or "")[
+                        : get_max_length("content_title")
+                    ],
+                    "content_author": (tika_metadata.get("Author") or "")[
+                        : get_max_length("content_author")
+                    ],
+                    "content_language": (tika_metadata.get("language") or "")[
+                        : get_max_length("content_language")
+                    ],
+                }
+            )
+    return content
+
+
+def documents_from_olx(olx_path):
+    """
+    Extract text from OLX directory
+
+    Args:
+        olx_path (str): The path to the directory with the OLX data
+
+    Returns:
+        list of tuple:
+            A list of (str of content, unique key for document)
+    """
+
+    documents = []
+    bundle = XBundle()
+    bundle.import_from_directory(olx_path)
+    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+        documents.append((etree.tostring(vertical), f"vertical_{index + 1}"))
+
+    return documents

@@ -352,7 +352,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     run_title = serializers.CharField(source="run.title")
     semester = serializers.CharField(source="run.semester")
     year = serializers.IntegerField(source="run.year")
-    topics = topics = ESTopicsField(source="run.topics")
+    topics = ESTopicsField(source="run.topics")
     short_description = serializers.CharField(source="description")
 
     def get_resource_relations(self, instance):

@@ -350,13 +350,28 @@ def test_start_recreate_index(
     comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)
     posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
     users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
-    courses = sorted(CourseFactory.create_batch(4), key=lambda course: course.id)
+    platforms = [
+        PlatformType.ocw,
+        PlatformType.mitx,
+        PlatformType.xpro,
+        PlatformType.micromasters,
+        PlatformType.bootcamps,
+        PlatformType.oll,
+        PlatformType.youtube,
+    ]
+    courses = sorted(
+        [CourseFactory.create(platform=platform.value) for platform in platforms],
+        key=lambda course: course.id,
+    )
     videos = sorted(VideoFactory.create_batch(4), key=lambda video: video.id)
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
     index_videos_mock = mocker.patch("search.tasks.index_videos", autospec=True)
+    index_course_content_mock = mocker.patch(
+        "search.tasks.index_course_content_files", autospec=True
+    )
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
         "search.indexing_api.create_backing_index",
@@ -404,9 +419,28 @@ def test_start_recreate_index(
             [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id]
         )
 
-    assert index_courses_mock.si.call_count == 2
+    assert index_courses_mock.si.call_count == 4
     index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
     index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
+    index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id])
+    index_courses_mock.si.assert_any_call([courses[6].id])
+
+    # chunk size is 2 and there is only one course each for ocw and xpro
+    assert index_course_content_mock.si.call_count == 1
+    index_course_content_mock.si.assert_any_call(
+        [
+            *[
+                course.id
+                for course in courses
+                if course.platform == PlatformType.ocw.value
+            ],
+            *[
+                course.id
+                for course in courses
+                if course.platform == PlatformType.xpro.value
+            ],
+        ]
+    )
 
     assert index_videos_mock.si.call_count == 2
     index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id])

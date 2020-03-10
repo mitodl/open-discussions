@@ -17,6 +17,7 @@ from course_catalog.api import (
     parse_bootcamp_json_data,
     sync_ocw_courses,
     sync_ocw_course_files,
+    sync_xpro_course_files,
 )
 from course_catalog.etl import pipelines, youtube
 from open_discussions.celery import app
@@ -119,6 +120,46 @@ def import_all_ocw_files(self, chunk_size):
             )
         ]
     )
+    raise self.replace(tasks)
+
+
+@app.task
+def get_xpro_files(ids):
+    """
+    Task to sync xPRO OLX course files with database
+    """
+    if not (
+        settings.XPRO_LEARNING_COURSE_BUCKET_NAME
+        and settings.XPRO_LEARNING_COURSE_ACCESS_KEY
+        and settings.XPRO_LEARNING_COURSE_SECRET_ACCESS_KEY
+    ):
+        log.warning("Required settings missing for get_xpro_files")
+        return
+    sync_xpro_course_files(ids)
+
+
+@app.task(bind=True)
+def import_all_xpro_files(self, chunk_size=None):
+    """Ingest xPRO OLX files from the S3 bucket"""
+    if chunk_size is None:
+        chunk_size = settings.XPRO_ITERATOR_CHUNK_SIZE
+
+    blacklisted_ids = load_course_blacklist()
+    tasks = celery.group(
+        [
+            get_xpro_files.si(ids)
+            for ids in chunks(
+                Course.objects.filter(published=True)
+                .filter(platform=PlatformType.xpro.value)
+                .exclude(course_id__in=blacklisted_ids)
+                .order_by("id")
+                .values_list("id", flat=True),
+                chunk_size=chunk_size,
+            )
+        ]
+    )
+
+    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
     raise self.replace(tasks)
 
 

@@ -490,6 +490,22 @@
       "description": "The api url for xpro courses",
       "required": false
     },
+    "XPRO_ITERATOR_CHUNK_SIZE": {
+      "description": "Chunk size for iterating over xPRO courses for master json",
+      "required": false
+    },
+    "XPRO_LEARNING_COURSE_BUCKET_NAME": {
+      "description": "Name of S3 bucket to upload xPRO course media",
+      "required": false
+    },
+    "XPRO_LEARNING_COURSE_ACCESS_KEY": {
+      "description": "AWS access key for xPRO media upload bucket",
+      "required": false
+    },
+    "XPRO_LEARNING_COURSE_SECRET_ACCESS_KEY": {
+      "description": "AWS secret key for xPRO media upload bucket",
+      "required": false
+    },
     "YOUTUBE_DEVELOPER_KEY": {
       "description": "The key to the google youtube api",
       "required": false
