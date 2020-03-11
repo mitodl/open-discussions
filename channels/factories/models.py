@@ -27,6 +27,7 @@ from channels.models import (
     LinkMeta,
     Channel,
     ChannelInvitation,
+    ChannelMembershipConfig,
     Post,
     Comment,
     Article,
@@ -82,6 +83,16 @@ class LinkMetaFactory(DjangoModelFactory):
 
     class Meta:
         model = LinkMeta
+
+
+class ChannelMembershipConfigFactory(DjangoModelFactory):
+    """Factory for channels.models.ChannelMembershipConfig"""
+
+    name = factory.Faker("text", max_nb_chars=50)
+    query = factory.LazyFunction(lambda: {"email__endswith": "@mit.edu"})
+
+    class Meta:
+        model = ChannelMembershipConfig
 
 
 class ChannelFactory(DjangoModelFactory):

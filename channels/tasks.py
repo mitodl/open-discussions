@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from django.shortcuts import reverse
 from prawcore.exceptions import ResponseException
 
-from channels import api, backpopulate_api
+from channels import api, backpopulate_api, membership_api
 from channels.api import (
     Api,
     sync_channel_subscription_model,
@@ -445,3 +445,11 @@ def maybe_repair_post_in_host_listing(channel_name, reddit_post_id):
             reddit_post_id,
             channel_name,
         )
+
+
+@app.task(acks_late=True)
+def update_memberships_for_managed_channels(*, channel_ids=None, user_ids=None):
+    """Cron task to update managed channel memberships"""
+    membership_api.update_memberships_for_managed_channels(
+        channel_ids=channel_ids, user_ids=user_ids
+    )

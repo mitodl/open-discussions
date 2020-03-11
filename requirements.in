@@ -11,6 +11,7 @@ dj-database-url==0.3.0
 dj-static==0.0.6
 django-bitfield==1.9.3
 django-cache-memoize==0.1.6
+django-filter==2.2.0
 django-redis==4.10.0
 django-guardian==1.4.9
 django-server-status==0.5.0
@@ -20,7 +21,7 @@ django-anymail[mailgun]==3.*
 django-compat==1.0.15
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
-django-json-widget==0.2.0
+django-json-widget==1.0.0
 djangorestframework==3.9.3
 djangorestframework-jwt==1.11.0
 drf-extensions==0.5.0
@@ -48,7 +49,7 @@ pygithub==1.44.1
 pytube==9.5.2
 redis==3.2.1
 requests
-sentry-sdk==0.14.1 
+sentry-sdk==0.14.1
 social-auth-app-django==2.1.0
 static3==0.5.1
 tika==1.23.1
