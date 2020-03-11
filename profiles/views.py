@@ -12,7 +12,10 @@ from rest_framework.response import Response
 
 from cairosvg import svg2png  # pylint:disable=no-name-in-module
 
-from open_discussions.permissions import IsStaffPermission
+from open_discussions.permissions import (
+    IsStaffPermission,
+    AnonymousAccessReadonlyPermission,
+)
 from profiles.models import Profile, UserWebsite
 from profiles.permissions import HasEditPermission, HasSiteEditPermission
 from profiles.serializers import (
@@ -46,7 +49,7 @@ class ProfileViewSet(
 ):
     """View for profile"""
 
-    permission_classes = (IsAuthenticated, HasEditPermission)
+    permission_classes = (AnonymousAccessReadonlyPermission, HasEditPermission)
     serializer_class = ProfileSerializer
     queryset = Profile.objects.prefetch_related("userwebsite_set").filter(
         user__is_active=True
@@ -81,6 +84,8 @@ def name_initials_avatar_view(
 
 class UserContributionListView(APIView):
     """View that returns user a user's posts or comments depending on the request URL"""
+
+    permission_classes = (AnonymousAccessReadonlyPermission,)
 
     def get_serializer_context(self):
         """Context for the request and view"""

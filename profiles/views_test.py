@@ -156,6 +156,33 @@ def test_get_user(staff_client, user):
     }
 
 
+@pytest.mark.parametrize("logged_in", [True, False])
+def test_get_profile(logged_in, user, user_client):
+    """Anonymous users should be able to view a person's profile"""
+    profile = user.profile
+    url = reverse("profile_api-detail", kwargs={"user__username": user.username})
+    resp = user_client.get(url)
+    if not logged_in:
+        user_client.logout()
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "name": profile.name,
+        "image": profile.image,
+        "image_small": profile.image_small,
+        "image_medium": profile.image_medium,
+        "image_file": "{}".format(profile.image_file.url),
+        "image_small_file": "{}".format(profile.image_small_file.url),
+        "image_medium_file": "{}".format(profile.image_medium_file.url),
+        "profile_image_small": profile.image_small_file.url,
+        "profile_image_medium": profile.image_medium_file.url,
+        "bio": profile.bio,
+        "headline": profile.headline,
+        "username": profile.user.username,
+        "placename": profile.location.get("value", ""),
+        "user_websites": [],
+    }
+
+
 @pytest.mark.parametrize("uid", [None, "abc123"])
 @pytest.mark.parametrize("email", ["", "test.email@example.com"])
 @pytest.mark.parametrize("email_optin", [None, True, False])
@@ -311,7 +338,10 @@ class TestUserContributionListView:
         return SimpleNamespace(fake_pagination={"fake": "pagination"})
 
     @pytest.mark.usefixtures("mock_req_channel_api")
-    def test_user_posts_view(self, mocker, user_client, user, scenario, post_proxy):
+    @pytest.mark.parametrize("logged_in", [True, False])
+    def test_user_posts_view(
+        self, mocker, user_client, user, scenario, post_proxy, logged_in
+    ):
         """Test that a request for user posts fetches and serializes a user's posts correctly"""
         mock_get_obj_list = mocker.patch(
             "profiles.views.get_pagination_and_reddit_obj_list",
@@ -327,6 +357,8 @@ class TestUserContributionListView:
             "user-contribution-list",
             kwargs={"username": user.username, "object_type": "posts"},
         )
+        if not logged_in:
+            user_client.logout()
         response = user_client.get(url)
         assert mock_get_obj_list.called is True
         assert mock_proxy_posts.called is True
@@ -337,8 +369,9 @@ class TestUserContributionListView:
         assert serialized_post == BasePostSerializer(post_proxy).data
 
     @pytest.mark.usefixtures("mock_req_channel_api")
+    @pytest.mark.parametrize("logged_in", [True, False])
     def test_user_comments_view(
-        self, mocker, user_client, user, scenario, reddit_comment_obj
+        self, mocker, user_client, user, scenario, reddit_comment_obj, logged_in
     ):
         """Test that a request for user comments fetches and serializes a user's comments correctly"""
         mock_get_obj_list = mocker.patch(
@@ -349,6 +382,8 @@ class TestUserContributionListView:
             "user-contribution-list",
             kwargs={"username": user.username, "object_type": "comments"},
         )
+        if not logged_in:
+            user_client.logout()
         response = user_client.get(url)
         assert mock_get_obj_list.called is True
         resp_data = json.loads(response.content)
