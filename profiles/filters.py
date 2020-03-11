@@ -14,7 +14,10 @@ class UserFilter(django_filters.FilterSet):
     social_auth_provider = django_filters.Filter(
         field_name="social_auth", lookup_expr="provider__in"
     )
+    moira_lists = django_filters.Filter(
+        field_name="moira_lists", lookup_expr="name__in"
+    )
 
     class Meta:
         model = User
-        fields = ("email__endswith", "social_auth_provider")
+        fields = ("email__endswith", "social_auth_provider", "moira_lists")

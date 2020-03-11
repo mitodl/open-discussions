@@ -1,4 +1,5 @@
 """API for managing channel memberships"""
+<<<<<<< HEAD
 import logging
 import operator
 from functools import reduce
