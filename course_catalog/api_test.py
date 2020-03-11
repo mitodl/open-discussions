@@ -8,6 +8,7 @@ from subprocess import CalledProcessError
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from mock import ANY
 
 from course_catalog.constants import (
     PlatformType,
@@ -212,13 +213,17 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
     assert not Course.objects.count()
 
 
-def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data):
+def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
     """
     Verifies that LearningResourceRunSerializer validation works correctly if the OCW course run serializer is invalid
     """
-    ocw_valid_data.pop("uid")
+    mock_log = mocker.patch("course_catalog.api.log.error")
+    ocw_valid_data["enrollment_start"] = "This is not a date"
     digest_ocw_course(ocw_valid_data, timezone.now(), True)
-    assert not LearningResourceRun.objects.count()
+    assert LearningResourceRun.objects.count() == 0
+    mock_log.assert_called_once_with(
+        "OCW LearningResourceRun %s is not valid: %s", ocw_valid_data.get("uid"), ANY
+    )
 
 
 def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
