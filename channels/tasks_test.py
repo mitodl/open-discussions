@@ -453,3 +453,18 @@ def test_maybe_repair_post_in_host_listing(
                 post_id,
                 channel_name,
             )
+
+
+def test_update_memberships_for_managed_channels(mocker):
+    """Test that update_memberships_for_managed_channels task calls the matching API"""
+    mock_update_memberships_for_managed_channels_api = mocker.patch(
+        "channels.membership_api.update_memberships_for_managed_channels", autospec=True
+    )
+
+    tasks.update_memberships_for_managed_channels.delay(
+        channel_ids=[1, 2, 3], user_ids=[4, 5, 6]
+    )
+
+    mock_update_memberships_for_managed_channels_api.assert_called_once_with(
+        channel_ids=[1, 2, 3], user_ids=[4, 5, 6]
+    )

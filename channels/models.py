@@ -137,6 +137,7 @@ class Channel(TimestampedModel):
     name = models.CharField(unique=True, max_length=100)
     title = models.CharField(max_length=100, null=True)
     membership_is_managed = models.BooleanField(default=False)
+
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
     avatar_small = models.ImageField(
         null=True, max_length=2083, upload_to=avatar_uri_small
@@ -346,3 +347,16 @@ class ChannelGroupRole(TimestampedModel):
         return (
             f"Group {self.group.name} role {self.role} for Channel {self.channel.name}"
         )
+
+
+class ChannelMembershipConfig(TimestampedModel):
+    """Data model for managed channel membership configuration"""
+
+    name = models.CharField(max_length=150)
+    query = JSONField(default=dict)
+    channels = models.ManyToManyField(
+        Channel, related_name="channel_membership_configs"
+    )
+
+    def __str__(self):
+        return self.name

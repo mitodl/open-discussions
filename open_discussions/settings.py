@@ -284,6 +284,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     # Resolve outstanding channel invitations
     "authentication.pipeline.invite.resolve_outstanding_channel_invites",
+    # update the user's managed channels
+    "authentication.pipeline.user.update_managed_channel_memberships",
 )
 
 
@@ -592,6 +594,10 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": get_int(
             "YOUTUBE_FETCH_TRANSCRIPT_SCHEDULE_SECONDS", 60 * 60 * 12
         ),  # default is 12 hours
+    },
+    "update-managed-channel-memberships": {
+        "task": "channels.tasks.update_memberships_for_managed_channels",
+        "schedule": crontab(minute=30, hour=10),  # 6:30am EST
     },
 }
 

@@ -54,6 +54,7 @@ if [[ $(
     grep -v "This browser doesn't support the \`onScroll\` event" |
     grep -v "Accessing PropTypes" |
     grep -v "Accessing createClass" |
+    grep -v "Browserslist: caniuse-lite is outdated" |
     wc -l |
     awk '{print $1}'
     ) -ne 0 ]]  # is file empty?

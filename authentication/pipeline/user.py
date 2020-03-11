@@ -16,6 +16,7 @@ from authentication.exceptions import (
     RequireRegistrationException,
 )
 from authentication.utils import SocialAuthState
+from channels import membership_api
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
@@ -249,10 +250,25 @@ def forbid_hijack(strategy, backend, **kwargs):  # pylint: disable=unused-argume
     Args:
         strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
         backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
-        user (User): the current user
-        flow (str): the type of flow (login or register)
     """
     # As first step in pipeline, stop a hijacking admin from going any further
     if strategy.session_get("is_hijacked_user"):
         raise AuthException("You are hijacking another user, don't try to login again")
+    return {}
+
+
+def update_managed_channel_memberships(
+    strategy, backend, user=None, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    Update a user's managed channel memberships
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+    """
+    if user and user.is_active:
+        membership_api.update_memberships_for_managed_channels(user_ids=[user.id])
+
     return {}
