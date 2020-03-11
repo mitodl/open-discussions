@@ -51,6 +51,12 @@ http {
     }
 
     server {
+        server_name discussions.odl.mit.edu;
+        listen <%= ENV["PORT"] %>;
+        return 301 https://open.mit.edu$request_uri;
+    }
+
+    server {
         listen <%= ENV["PORT"] %> default_server;
         server_name _;
         root /app;
