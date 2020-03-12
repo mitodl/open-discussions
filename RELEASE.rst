@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.113.2
+Version 0.113.2 (Released March 12, 2020)
 ---------------
 
 - Redirect discussions.odl.mit.edu to open.mit.edu (#2616)
