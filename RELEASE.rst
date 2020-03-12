@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.113.2 (Released March 12, 2020)
+---------------
+
+- Redirect discussions.odl.mit.edu to open.mit.edu (#2616)
+- Assign a score to child document results (#2608)
+
 Version 0.113.1 (Released March 10, 2020)
 ---------------
 
