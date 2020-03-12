@@ -194,15 +194,14 @@ def load_courses(courses_data):
     """Load a list of programs"""
     blacklist = load_course_blacklist()
 
-    if courses_data and len(list(courses_data)) > 0:
-        platform = courses_data[0].get("platform")
+    courses_list = list(courses_data or [])
+    if len(courses_list) > 0:
+        platform = courses_list[0].get("platform")
         duplicates = load_course_duplicates(platform)
     else:
         duplicates = []
 
-    return [
-        load_course(course_data, blacklist, duplicates) for course_data in courses_data
-    ]
+    return [load_course(course, blacklist, duplicates) for course in courses_list]
 
 
 @log_exceptions("Error loading program")

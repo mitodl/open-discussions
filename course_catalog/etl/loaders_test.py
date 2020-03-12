@@ -769,6 +769,18 @@ def test_load_courses(mocker, mock_blacklist, mock_duplicates):
     mock_duplicates.assert_called_once()
 
 
+def test_load_courses_map(mocker, mock_blacklist, mock_duplicates):
+    """Test that load_courses works on a map of courses"""
+    course_data = map(lambda course: course, [{"platform": "a"}, {"platform": "b"}])
+    mock_load_course = mocker.patch(
+        "course_catalog.etl.loaders.load_course", autospec=True
+    )
+    load_courses(course_data)
+    assert mock_load_course.call_count == 2
+    mock_blacklist.assert_called_once()
+    mock_duplicates.assert_called_once()
+
+
 def test_load_programs(mocker, mock_blacklist, mock_duplicates):
     """Test that load_programs calls the expected functions"""
     program_data = [{"courses": [{"platform": "a"}, {}]}]
