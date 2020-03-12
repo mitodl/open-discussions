@@ -25,6 +25,7 @@ from open_discussions.envs import (
     get_int,
     get_string,
     get_list_of_str,
+    get_key,
 )
 from open_discussions.sentry import init_sentry
 
@@ -887,3 +888,17 @@ YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS = get_int(
 
 # Tika security
 TIKA_ACCESS_TOKEN = get_string("TIKA_ACCESS_TOKEN", None)
+
+
+# x509 certificate for moira
+MIT_WS_CERTIFICATE = get_key("MIT_WS_CERTIFICATE", "")
+MIT_WS_PRIVATE_KEY = get_key("MIT_WS_PRIVATE_KEY", "")
+
+# x509 filenames
+MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
+MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
+
+# write the moira x509 certification & key to files
+from channels.moira import write_x509_files
+
+write_x509_files()

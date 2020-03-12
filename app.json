@@ -144,6 +144,14 @@
       "description": "Base default URL for MITx courses",
       "required": false
     },
+    "MIT_WS_CERTIFICATE": {
+      "description": "X509 certificate as a string",
+      "required": true
+    },
+    "MIT_WS_PRIVATE_KEY": {
+      "description": "X509 private key as a string",
+      "required": true
+    },
     "OCW_BASE_URL": {
       "description": "Base URL for OCW courses",
       "required": false

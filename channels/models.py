@@ -360,3 +360,30 @@ class ChannelMembershipConfig(TimestampedModel):
 
     def __str__(self):
         return self.name
+
+
+class MoiraList(TimestampedModel):
+    """
+    Moira list
+    """
+
+    name = models.CharField(max_length=250, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "<MoiraList: {self.name!r}>".format(self=self)
+
+
+class ChannelMoiraList(TimestampedModel):
+    """
+    Moira list - Channel relation
+    """
+
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, related_name="moira_lists"
+    )
+    moira_list = models.ForeignKey(
+        MoiraList, on_delete=models.CASCADE, related_name="channels"
+    )
