@@ -104,6 +104,7 @@ INSTALLED_APPS = (
     "widgets",
     "course_catalog",
     "interactions",
+    "moira_lists",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -276,6 +277,8 @@ SOCIAL_AUTH_PIPELINE = (
     "authentication.pipeline.user.require_password_and_profile_via_email",
     # require a profile if they're not set via SAML
     "authentication.pipeline.user.require_profile_update_user_via_saml",
+    # Create the moira list associations for the user if any.
+    "authentication.pipeline.user.update_user_moira_lists",
     # Create the record that associates the social account with the user.
     "social_core.pipeline.social_auth.associate_user",
     # Populate the extra_data field in the social record with the values
@@ -899,6 +902,6 @@ MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
 MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
 
 # write the moira x509 certification & key to files
-from channels.moira import write_x509_files
+from open_discussions.utils import write_x509_files
 
 write_x509_files()

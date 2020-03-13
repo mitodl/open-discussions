@@ -57,6 +57,13 @@ class ChannelMembershipConfigAdmin(admin.ModelAdmin):
                                 },
                                 "minItems": 1,
                             },
+                            "moira_lists": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                },
+                                "minItems": 0,
+                            },
                         },
                         "minProperties": 1,
                         "additionalProperties": False,
@@ -72,6 +79,12 @@ class ChannelMembershipConfigAdmin(admin.ModelAdmin):
                             "text": "Social Auth",
                             "title": "Social Auth",
                             "field": "social_auth_provider",
+                            "value": [""],
+                        },
+                        {
+                            "text": "Moira Lists",
+                            "title": "Moira Lists",
+                            "field": "moira_lists",
                             "value": [""],
                         },
                     ],

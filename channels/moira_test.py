@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from zeep.exceptions import Fault
 
 from channels.exceptions import MoiraException
-from channels.moira import (
+from moira_lists.moira_api import (
     user_moira_lists,
     get_moira_client,
     write_to_file,

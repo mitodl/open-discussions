@@ -4,33 +4,14 @@ import re
 from collections import namedtuple
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.db import transaction
 from mit_moira import Moira
 
 from channels.exceptions import MoiraException
-
+from moira_lists.models import MoiraList
 
 MoiraUser = namedtuple("MoiraUser", "username type")
-
-
-def write_to_file(filename, contents):
-    """
-    Write content to a file in binary mode, creating directories if necessary
-
-    Args:
-        filename (str): The full-path filename to write to.
-        contents (bytes): What to write to the file.
-
-    """
-    if not os.path.exists(os.path.dirname(filename)):
-        os.makedirs(os.path.dirname(filename))
-    with open(filename, "wb") as infile:
-        infile.write(contents)
-
-
-def write_x509_files():
-    """Write the x509 certificate and key to files"""
-    write_to_file(settings.MIT_WS_CERTIFICATE_FILE, settings.MIT_WS_CERTIFICATE)
-    write_to_file(settings.MIT_WS_PRIVATE_KEY_FILE, settings.MIT_WS_PRIVATE_KEY)
 
 
 def get_moira_client():
@@ -135,3 +116,33 @@ def moira_user_emails(member_list):
         list of str: Member emails in list
     """
     return list(map(lambda member: member if "@" in member else f"{member}@mit.edu", member_list))
+
+
+@transaction.atomic
+def update_user_moira_lists(user):
+    """
+    Add moira lists the user is a member of, remove any expired lists
+
+    Args:
+        user (User): user to update moira lists for
+    """
+    moira_lists = query_moira_lists(user)
+
+    for list_name in moira_lists:
+        moira_list, _ = MoiraList.objects.get_or_create(name=list_name)
+        moira_list.users.add(user)
+
+    user.moira_lists.remove(*[prior_list for prior_list in  user.moira_lists.exclude(name__in=moira_lists)])
+
+
+@transaction.atomic
+def update_moira_list_users(moira_list):
+    """
+    Update the users in a moira list
+
+    Args:
+        moira_list (MoiraList): the moira list
+    """
+    users = User.objects.filter(email__in=moira_user_emails(get_moira_client().list_members(moira_list.name)))
+    moira_list.users.add(*[user for user in users])
+    moira_list.users.remove(*[prior_user for prior_user in moira_list.users.exclude(pk__in=users)])

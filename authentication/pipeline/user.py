@@ -21,6 +21,7 @@ from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
+from moira_lists.tasks import update_user_moira_lists
 
 # pylint: disable=keyword-arg-before-vararg
 
@@ -271,4 +272,12 @@ def update_managed_channel_memberships(
     if user and user.is_active:
         membership_api.update_memberships_for_managed_channels(user_ids=[user.id])
 
+    return {}
+
+
+def update_moira_lists(
+    strategy, backend, user=None, is_new=False, *args, **kwargs
+):  # pylint: disable=unused-argument
+    if user:
+        update_user_moira_lists.delay(user.id)
     return {}

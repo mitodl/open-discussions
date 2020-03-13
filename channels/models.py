@@ -6,7 +6,7 @@ from bitfield import BitField
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
-from django.db import models
+from django.db import models, transaction
 from widgets.models import WidgetList
 
 
@@ -358,21 +358,16 @@ class ChannelMembershipConfig(TimestampedModel):
         Channel, related_name="channel_membership_configs"
     )
 
-    def __str__(self):
-        return self.name
-
-
-class MoiraList(TimestampedModel):
-    """
-    Moira list
-    """
-
-    name = models.CharField(max_length=250, unique=True, primary_key=True)
-    users = models.ManyToManyField(User, related_name="moira_lists")
-    channels = models.ManyToManyField(Channel, related_name="moira_lists")
+    @transaction.atomic
+    def save(
+        self, *args, update_image=False, **kwargs
+    ):  # pylint: disable=arguments-differ
+        """Update moira lists if necessary"""
+        from moira_lists.tasks import update_moira_list
+        for moira_list in self.query.get("moira_lists", []):
+            print(self.query)
+            update_moira_list.delay(moira_list)
+        super(ChannelMembershipConfig, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
-
-    def __repr__(self):
-        return "<MoiraList: {self.name!r}>".format(self=self)
