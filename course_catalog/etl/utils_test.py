@@ -46,7 +46,8 @@ def test_sync_s3_text(mock_ocw_learning_bucket, has_bucket, metadata):
 
 @pytest.mark.parametrize("token", ["abc123", "", None])
 @pytest.mark.parametrize("data", [b"data", b"", None])
-def test_extract_text_metadata(mocker, data, token, settings):
+@pytest.mark.parametrize("headers", [None, {"a": "header"}])
+def test_extract_text_metadata(mocker, data, token, settings, headers):
     """
     Verify that tika is called and returns a response
     """
@@ -55,13 +56,20 @@ def test_extract_text_metadata(mocker, data, token, settings):
     mock_tika = mocker.patch(
         "course_catalog.etl.utils.tika_parser.from_buffer", return_value=mock_response
     )
-    response = extract_text_metadata(data)
-    options = {}
+    response = extract_text_metadata(data, other_headers=headers)
+
+    expected_headers = {}
     if token:
-        options["headers"] = {"X-Access-Token": token}
+        expected_headers["X-Access-Token"] = token
+    if headers:
+        expected_headers = {**expected_headers, **headers}
+
     if data:
         assert response == mock_response
-        mock_tika.assert_called_once_with(data, requestOptions=options)
+        mock_tika.assert_called_once_with(
+            data,
+            requestOptions={"headers": expected_headers} if expected_headers else {},
+        )
     else:
         assert response is None
         mock_tika.assert_not_called()
