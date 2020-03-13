@@ -144,7 +144,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
         if not run_serializer.is_valid():
             log.error(
                 "OCW LearningResourceRun %s is not valid: %s",
-                master_json.get("key"),
+                master_json.get("uid"),
                 run_serializer.errors,
             )
             return
