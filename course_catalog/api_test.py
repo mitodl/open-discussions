@@ -2,7 +2,7 @@
 Test course_catalog.api
 """
 import json
-from datetime import timedelta
+from datetime import timedelta, datetime
 from subprocess import CalledProcessError
 
 import pytest
@@ -186,7 +186,11 @@ def test_deserializing_a_valid_ocw_course(
     )
     assert Course.objects.count() == 1
     course = Course.objects.last()
-    assert course.learning_resource_type == ResourceType.ocw_resource.value
+
+    if published:
+        assert course.learning_resource_type == ResourceType.ocw_resource.value
+
+    assert course.title == ocw_valid_data["title"]
     assert course.offered_by.count() == 1
     assert course.offered_by.first().name == OfferedBy.ocw.value
     assert course.runs.first().offered_by.count() == 1
@@ -202,6 +206,31 @@ def test_deserializing_a_valid_ocw_course(
     assert course_topics_count == sum(
         len(get_ocw_topic(cc)) for cc in ocw_valid_data.get("course_collections")
     )
+
+
+def deserializing_a_valid_ocw_course_with_existing_newer_run(
+    mock_course_index_functions, ocw_valid_data
+):
+    """
+    Verify that course values are not overwritten if the course already has a newer run
+    """
+
+    course = CourseFactory.create(
+        platform=PlatformType.ocw.value,
+        course_id=ocw_valid_data["course_id"],
+        title="existing",
+    )
+
+    assert course.runs.count() == 3
+    existing_run = course.runs.first()
+    existing_run.best_start_date = datetime.now(timezone.utc)
+    existing_run.save()
+
+    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    assert Course.objects.count() == 1
+    course = Course.objects.last()
+    assert course.title == "existing"
+    assert course.runs.count() == 4
 
 
 def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
