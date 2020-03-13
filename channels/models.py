@@ -364,6 +364,7 @@ class ChannelMembershipConfig(TimestampedModel):
     ):  # pylint: disable=arguments-differ
         """Update moira lists if necessary"""
         from moira_lists.tasks import update_moira_list
+
         for moira_list in self.query.get("moira_lists", []):
             print(self.query)
             update_moira_list.delay(moira_list)

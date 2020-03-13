@@ -1,6 +1,6 @@
 """Models for moira lists"""
 from django.contrib.auth.models import User
-from django.db import models, transaction
+from django.db import models
 
 from channels.models import Channel
 from open_discussions.models import TimestampedModel

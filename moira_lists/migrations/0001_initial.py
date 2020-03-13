@@ -10,21 +10,34 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('channels', '0024_channel_membership_config'),
+        ("channels", "0024_channel_membership_config"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='MoiraList',
+            name="MoiraList",
             fields=[
-                ('created_on', models.DateTimeField(auto_now_add=True)),
-                ('updated_on', models.DateTimeField(auto_now=True)),
-                ('name', models.CharField(max_length=250, primary_key=True, serialize=False, unique=True)),
-                ('channels', models.ManyToManyField(related_name='moira_lists', to='channels.Channel')),
-                ('users', models.ManyToManyField(related_name='moira_lists', to=settings.AUTH_USER_MODEL)),
+                ("created_on", models.DateTimeField(auto_now_add=True)),
+                ("updated_on", models.DateTimeField(auto_now=True)),
+                (
+                    "name",
+                    models.CharField(
+                        max_length=250, primary_key=True, serialize=False, unique=True
+                    ),
+                ),
+                (
+                    "channels",
+                    models.ManyToManyField(
+                        related_name="moira_lists", to="channels.Channel"
+                    ),
+                ),
+                (
+                    "users",
+                    models.ManyToManyField(
+                        related_name="moira_lists", to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
-            options={
-                'abstract': False,
-            },
-        ),
+            options={"abstract": False},
+        )
     ]

@@ -59,9 +59,7 @@ class ChannelMembershipConfigAdmin(admin.ModelAdmin):
                             },
                             "moira_lists": {
                                 "type": "array",
-                                "items": {
-                                    "type": "string",
-                                },
+                                "items": {"type": "string"},
                                 "minItems": 0,
                             },
                         },

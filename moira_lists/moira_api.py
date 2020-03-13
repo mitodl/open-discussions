@@ -115,7 +115,11 @@ def moira_user_emails(member_list):
     Returns:
         list of str: Member emails in list
     """
-    return list(map(lambda member: member if "@" in member else f"{member}@mit.edu", member_list))
+    return list(
+        map(
+            lambda member: member if "@" in member else f"{member}@mit.edu", member_list
+        )
+    )
 
 
 @transaction.atomic
@@ -132,7 +136,9 @@ def update_user_moira_lists(user):
         moira_list, _ = MoiraList.objects.get_or_create(name=list_name)
         moira_list.users.add(user)
 
-    user.moira_lists.remove(*[prior_list for prior_list in  user.moira_lists.exclude(name__in=moira_lists)])
+    user.moira_lists.remove(
+        *[prior_list for prior_list in user.moira_lists.exclude(name__in=moira_lists)]
+    )
 
 
 @transaction.atomic
@@ -143,6 +149,10 @@ def update_moira_list_users(moira_list):
     Args:
         moira_list (MoiraList): the moira list
     """
-    users = User.objects.filter(email__in=moira_user_emails(get_moira_client().list_members(moira_list.name)))
+    users = User.objects.filter(
+        email__in=moira_user_emails(get_moira_client().list_members(moira_list.name))
+    )
     moira_list.users.add(*[user for user in users])
-    moira_list.users.remove(*[prior_user for prior_user in moira_list.users.exclude(pk__in=users)])
+    moira_list.users.remove(
+        *[prior_user for prior_user in moira_list.users.exclude(pk__in=users)]
+    )
