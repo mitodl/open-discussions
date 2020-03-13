@@ -367,23 +367,12 @@ class MoiraList(TimestampedModel):
     Moira list
     """
 
-    name = models.CharField(max_length=250, unique=True)
+    name = models.CharField(max_length=250, unique=True, primary_key=True)
+    users = models.ManyToManyField(User, related_name="moira_lists")
+    channels = models.ManyToManyField(Channel, related_name="moira_lists")
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
         return "<MoiraList: {self.name!r}>".format(self=self)
-
-
-class ChannelMoiraList(TimestampedModel):
-    """
-    Moira list - Channel relation
-    """
-
-    channel = models.ForeignKey(
-        Channel, on_delete=models.CASCADE, related_name="moira_lists"
-    )
-    moira_list = models.ForeignKey(
-        MoiraList, on_delete=models.CASCADE, related_name="channels"
-    )

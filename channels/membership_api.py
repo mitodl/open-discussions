@@ -1,5 +1,4 @@
 """API for managing channel memberships"""
-<<<<<<< HEAD
 import logging
 import operator
 from functools import reduce
@@ -8,6 +7,7 @@ from django.contrib.auth import get_user_model
 
 from channels.api import get_admin_api
 from channels.models import Channel
+from channels.moira import get_moira_client, moira_user_emails
 from profiles.filters import UserFilter
 
 log = logging.getLogger()
@@ -92,3 +92,39 @@ def update_memberships_for_managed_channel(channel, *, user_ids=None):
     for user in users_in_channel.only("username").distinct():
         admin_api.add_contributor(user.username, channel.name)
         admin_api.add_subscriber(user.username, channel.name)
+
+
+# def update_moira_membership(list_names):
+#     """
+#
+#     :param list_names:
+#     :return:
+#     """
+#     client = get_moira_client()
+#     admin_api = get_admin_api()
+#     for list_name in list_names:
+#         current_members = UserMoiraList.objects.filter(pk=list_name).values_list("user")
+#         list_users = User.objects.filter(email__in=moira_user_emails(client.list_members(list_name)))
+#
+#         for channel in ChannelMoiraList.objects.filter(pk=list_name).values_list("channel__name"):
+#             for expired_member in current_members.exclude(id__in=list_users).valuse_list("user__username", flat=True):
+#                 admin_api.remove_contributor(channel, expired_member)
+#                 admin_api.remove_subscriber(channel.name, expired_member)
+#             for new_member in list_users.exclude(id__i=current_members):
+#                 UserMoiraList.create(user=new_member, moira_list=MoiraList.objects.get_or_create(list_name=list_name)[0])
+#                 admin_api.add_contributor(channel, new_member.username)
+#                 admin_api.add_subscriber(channel, new_member.username)
+#
+#
+# def set_moira_config_query(moira_lists):
+#     """
+#     Return a query to be used for a moira-based ChannelMembershipConfig
+#     """
+#     # channels associated with moira lists
+#     moira_client = get_moira_client()
+#
+#     return {
+#         "email__in": moira_user_emails(
+#             set(reduce(operator.iconcat, [moira_client.list_members(moira_list) for moira_list in moira_lists], []))
+#         )
+#     }

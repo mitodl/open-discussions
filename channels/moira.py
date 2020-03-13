@@ -121,3 +121,17 @@ def user_moira_lists(user):
         return []
     list_names = set(query_moira_lists(user))
     return list_names
+
+
+def moira_user_emails(member_list):
+    """
+    Transform a list of moira list members to emails.
+    Assumes kerberos id => <kerberos_id>@mit.edu
+
+    Args:
+        member_list (list of str): List of members returned by Moira
+
+    Returns:
+        list of str: Member emails in list
+    """
+    return list(map(lambda member: member if "@" in member else f"{member}@mit.edu", member_list))
