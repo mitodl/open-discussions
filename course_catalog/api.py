@@ -82,7 +82,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
         log.error("Course %s is missing 'course_id'", master_json.get("uid"))
         return
 
-    course_instance = Course.objects.filter(
+    existing_course_instance = Course.objects.filter(
         platform=PlatformType.ocw.value, course_id=master_json["course_id"]
     ).first()
 
@@ -93,7 +93,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
             "is_published": True,  # This will be updated after all course runs are serialized
             "course_prefix": course_prefix,
         },
-        instance=course_instance,
+        instance=existing_course_instance,
     )
     if not ocw_serializer.is_valid():
         log.error(
@@ -106,7 +106,11 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
 
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
-        course = ocw_serializer.save()
+        if existing_course_instance is None:
+            course = ocw_serializer.save()
+        else:
+            course = existing_course_instance
+
         load_offered_bys(course, [{"name": OfferedBy.ocw.value}])
 
         # Try and get the run instance.
@@ -149,6 +153,17 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
             )
             return
         run = run_serializer.save()
+
+        if existing_course_instance is not None:
+            best_run = (
+                existing_course_instance.runs.filter(published=True)
+                .filter(best_start_date__isnull=False)
+                .order_by("-best_start_date")
+                .first()
+            )
+            if best_run is not None and run.id == best_run.id:
+                ocw_serializer.save()
+
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
     return course, run
 
