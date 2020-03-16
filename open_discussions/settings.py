@@ -277,8 +277,6 @@ SOCIAL_AUTH_PIPELINE = (
     "authentication.pipeline.user.require_password_and_profile_via_email",
     # require a profile if they're not set via SAML
     "authentication.pipeline.user.require_profile_update_user_via_saml",
-    # Create the moira list associations for the user if any.
-    "authentication.pipeline.user.update_user_moira_lists",
     # Create the record that associates the social account with the user.
     "social_core.pipeline.social_auth.associate_user",
     # Populate the extra_data field in the social record with the values
@@ -288,6 +286,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     # Resolve outstanding channel invitations
     "authentication.pipeline.invite.resolve_outstanding_channel_invites",
+    # Create the moira list associations for the user if any.
+    "authentication.pipeline.user.update_user_moira_lists",
     # update the user's managed channels
     "authentication.pipeline.user.update_managed_channel_memberships",
 )

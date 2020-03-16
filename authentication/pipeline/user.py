@@ -1,4 +1,6 @@
 """Auth pipline functions for email authentication"""
+import logging
+
 import ulid
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
@@ -17,13 +19,16 @@ from authentication.exceptions import (
 )
 from authentication.utils import SocialAuthState
 from channels import membership_api
+from channels.exceptions import MoiraException
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
-from moira_lists.tasks import update_user_moira_lists
+from moira_lists.moira_api import update_user_moira_lists
 
 # pylint: disable=keyword-arg-before-vararg
+
+log = logging.getLogger()
 
 
 def validate_email_auth_request(
@@ -278,6 +283,11 @@ def update_managed_channel_memberships(
 def update_moira_lists(
     strategy, backend, user=None, is_new=False, *args, **kwargs
 ):  # pylint: disable=unused-argument
-    if user:
-        update_user_moira_lists.delay(user.id)
+    if user and user.is_active:
+        try:
+            update_user_moira_lists(user.id)
+        except MoiraException:
+            log.exception(
+                "Error occurred communicating with moira for user %s", user.id
+            )
     return {}
