@@ -87,6 +87,20 @@ def test_query_moira_lists_error(mock_moira_client):
         query_moira_lists(UserFactory())
 
 
+def test_user_moira_lists(mocker):
+    """
+    Test that expected list is returned for a user
+    """
+    user = UserFactory.create()
+    mock_lists = ["test.list.1", "test.list.2"]
+    mock_query_moira_lists = mocker.patch(
+        "moira_lists.moira_api.query_moira_lists", return_value=mock_lists
+    )
+
+    assert user_moira_lists(user) == set(mock_lists)
+    mock_query_moira_lists.assert_called_once_with(user)
+
+
 def test_user_moira_lists_anonymous():
     """
     Test that empty list is returned for anonymous user
