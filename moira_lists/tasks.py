@@ -22,7 +22,7 @@ def update_user_moira_lists(user_id):
 
 
 @app.task
-def update_moira_list(name):
+def update_moira_list_users(name):
     """
     Update the users for each moira list
 

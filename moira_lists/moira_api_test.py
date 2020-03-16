@@ -2,15 +2,19 @@
 from tempfile import NamedTemporaryFile
 
 import pytest
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, User
 from zeep.exceptions import Fault
 
 from channels.exceptions import MoiraException
+from moira_lists.factories import MoiraListFactory
+from moira_lists.models import MoiraList
 from moira_lists.moira_api import (
     user_moira_lists,
     get_moira_client,
-    write_to_file,
     query_moira_lists,
+    update_user_moira_lists,
+    moira_user_emails,
+    update_moira_list_users,
 )
 from open_discussions.factories import UserFactory
 
@@ -47,15 +51,6 @@ def test_get_moira_client_success(mock_moira, settings):
     assert mock_moira.called_once_with(
         settings.MIT_WS_CERTIFICATE_FILE, settings.MIT_WS_PRIVATE_KEY_FILE
     )
-
-
-def test_write_to_file():
-    """Test that write_to_file creates a file with the correct contents"""
-    content = b"-----BEGIN CERTIFICATE-----\nMIID5DCCA02gAwIBAgIRTUTVwsj4Vy+l6+XTYjnIQ==\n-----END CERTIFICATE-----"
-    with NamedTemporaryFile() as outfile:
-        write_to_file(outfile.name, content)
-        with open(outfile.name, "rb") as infile:
-            assert infile.read() == content
 
 
 def test_query_moira_lists(mock_moira_client):
@@ -97,3 +92,55 @@ def test_user_moira_lists_anonymous():
     Test that empty list is returned for anonymous user
     """
     assert user_moira_lists(AnonymousUser()) == []
+
+
+def test_moira_user_emails():
+    """Test that moira_user_emails returns expected list of emails"""
+    inlist = ["test1", "Te.st.2", "test@test.edu", "tester@mit.edu"]
+    expected = ["test1@mit.edu", "Te.st.2@mit.edu", "test@test.edu", "tester@mit.edu"]
+    assert moira_user_emails(inlist) == expected
+
+
+def test_update_user_moira_lists(mocker):
+    """Test that update_user_moira_lists updates the user's related moira lists """
+    moira_user = UserFactory.create()
+    user_lists = ["test.list.1", "test.list.2"]
+    mocker.patch("moira_lists.moira_api.query_moira_lists", return_value=user_lists)
+
+    moira_list_3 = MoiraListFactory.create(name="test.list.3", users=[moira_user])
+    assert list(moira_list_3.users.all()) == [moira_user]
+    assert list(moira_user.moira_lists.all()) == [moira_list_3]
+
+    update_user_moira_lists(moira_user)
+
+    assert (
+        list(
+            User.objects.get(id=moira_user.id)
+            .moira_lists.order_by("name")
+            .values_list("name", flat=True)
+        )
+        == user_lists
+    )
+    for name in user_lists:
+        assert list(MoiraList.objects.get(name=name).users.all()) == [moira_user]
+    assert list(MoiraList.objects.get(name=moira_list_3.name).users.all()) == []
+    assert (
+        list(
+            moira_user.moira_lists.order_by("name").all().values_list("name", flat=True)
+        )
+        == user_lists
+    )
+
+
+def test_update_moira_list_users(mock_moira_client):
+    """ Test that update_moira_list_users updates the moira lists' users"""
+    moira_users = UserFactory.create_batch(3)
+    moira_list = MoiraListFactory.create(users=[moira_users[2]])
+    assert list(moira_list.users.all()) == [moira_users[2]]
+    mock_moira_client.return_value.list_members.return_value = [
+        user.email for user in moira_users[:2]
+    ]
+    update_moira_list_users(moira_list)
+    assert list(moira_list.users.order_by("id")) == sorted(
+        moira_users[:2], key=lambda user: user.id
+    )
