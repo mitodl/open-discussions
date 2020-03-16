@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.113.3
+Version 0.113.3 (Released March 16, 2020)
 ---------------
 
 - Improve error reporting (#2620)
