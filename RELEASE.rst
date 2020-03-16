@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.113.3 (Released March 16, 2020)
+---------------
+
+- Improve error reporting (#2620)
+- Fix OLL import (#2625)
+- script to generate duplicate courses file
+- Allow anonymous users to view the profile page and related posts and comments (#2619)
+
 Version 0.113.2 (Released March 12, 2020)
 ---------------
 
