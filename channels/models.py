@@ -359,14 +359,11 @@ class ChannelMembershipConfig(TimestampedModel):
     )
 
     @transaction.atomic
-    def save(
-        self, *args, update_image=False, **kwargs
-    ):  # pylint: disable=arguments-differ
+    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Update moira lists if necessary"""
         from moira_lists.tasks import update_moira_list_users
 
         for moira_list in self.query.get("moira_lists", []):
-            print(self.query)
             update_moira_list_users.delay(moira_list)
         super(ChannelMembershipConfig, self).save(*args, **kwargs)
 

@@ -19,12 +19,12 @@ from authentication.exceptions import (
 )
 from authentication.utils import SocialAuthState
 from channels import membership_api
-from channels.exceptions import MoiraException
+from moira_lists import moira_api
+from moira_lists.exceptions import MoiraException
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
 from profiles.utils import update_full_name
-from moira_lists.moira_api import update_user_moira_lists
 
 # pylint: disable=keyword-arg-before-vararg
 
@@ -281,11 +281,20 @@ def update_managed_channel_memberships(
 
 
 def update_moira_lists(
-    strategy, backend, user=None, is_new=False, *args, **kwargs
+    strategy, backend, user=None, **kwargs
 ):  # pylint: disable=unused-argument
+    """
+    Update a user's moira lists
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+
+    """
     if user and user.is_active:
         try:
-            update_user_moira_lists(user.id)
+            moira_api.update_user_moira_lists(user)
         except MoiraException:
             log.exception(
                 "Error occurred communicating with moira for user %s", user.id

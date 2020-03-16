@@ -14,7 +14,7 @@ from prawcore.exceptions import Forbidden, NotFound as PrawNotFound, Redirect
 from rest_framework.exceptions import NotAuthenticated, NotFound, PermissionDenied
 
 from channels.constants import POSTS_SORT_HOT, POSTS_SORT_NEW
-from channels.exceptions import ConflictException, GoneException, MoiraException
+from channels.exceptions import ConflictException, GoneException
 from embedly.api import get_embedly_summary, THUMBNAIL_URL
 
 AVATAR_SMALL_MAX_DIMENSION = 22

@@ -29,7 +29,3 @@ class GoneException(APIException):
     status_code = status.HTTP_410_GONE
     default_detail = "Resource is gone."
     default_code = "resource_gone"
-
-
-class MoiraException(Exception):
-    """Custom exception to be used when something goes wrong with Moira API calls"""

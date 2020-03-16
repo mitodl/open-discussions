@@ -104,7 +104,7 @@ INSTALLED_APPS = (
     "widgets",
     "course_catalog",
     "interactions",
-    "moira_lists",
+    "moira_lists.apps.MoiraListsConfig",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -287,7 +287,7 @@ SOCIAL_AUTH_PIPELINE = (
     # Resolve outstanding channel invitations
     "authentication.pipeline.invite.resolve_outstanding_channel_invites",
     # Create the moira list associations for the user if any.
-    "authentication.pipeline.user.update_user_moira_lists",
+    "authentication.pipeline.user.update_moira_lists",
     # update the user's managed channels
     "authentication.pipeline.user.update_managed_channel_memberships",
 )
@@ -900,8 +900,3 @@ MIT_WS_PRIVATE_KEY = get_key("MIT_WS_PRIVATE_KEY", "")
 # x509 filenames
 MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
 MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
-
-# write the moira x509 certification & key to files
-from open_discussions.utils import write_x509_files
-
-write_x509_files()

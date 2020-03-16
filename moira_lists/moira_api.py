@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from mit_moira import Moira
 
-from channels.exceptions import MoiraException
+from moira_lists.exceptions import MoiraException
 from moira_lists.models import MoiraList
 
 MoiraUser = namedtuple("MoiraUser", "username type")

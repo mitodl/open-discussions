@@ -5,7 +5,7 @@ import pytest
 from django.contrib.auth.models import AnonymousUser, User
 from zeep.exceptions import Fault
 
-from channels.exceptions import MoiraException
+from moira_lists.exceptions import MoiraException
 from moira_lists.factories import MoiraListFactory
 from moira_lists.models import MoiraList
 from moira_lists.moira_api import (
