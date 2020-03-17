@@ -54,7 +54,6 @@ def test_user_filter_social_auth_name(social_auth_provider, user_providers, matc
     else:
         assert matching_user not in query
     assert nonmatching_user not in query
-<<<<<<< HEAD
 
 
 @pytest.mark.parametrize("email", [None, "@matching.domain"])

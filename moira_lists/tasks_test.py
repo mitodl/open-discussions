@@ -27,6 +27,7 @@ def test_update_user_moira_lists(mocker, update_memberships):
 def test_update_moira_list_users(mocker):
     """Test that the update_moira_list_users task calls the api function of the same name"""
     mock_api = mocker.patch("moira_lists.moira_api.update_moira_list_users")
-    moira_list = MoiraListFactory.create()
-    update_moira_list_users(moira_list.name)
-    mock_api.assert_called_once_with(moira_list)
+    moira_lists = MoiraListFactory.create_batch(3)
+    update_moira_list_users([moira_list.name for moira_list in moira_lists])
+    for moira_list in moira_lists:
+        mock_api.assert_any_call(moira_list)

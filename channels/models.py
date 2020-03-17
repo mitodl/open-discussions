@@ -6,11 +6,9 @@ from bitfield import BitField
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
-from django.db import models, transaction
+from django.db import models
 
-from open_discussions import features
 from widgets.models import WidgetList
-
 
 from channels.constants import (
     ROLE_CHOICES,
@@ -25,6 +23,7 @@ from channels.utils import (
     reddit_slugify,
     render_article_text,
 )
+from open_discussions import features
 from open_discussions.models import TimestampedModel
 from open_discussions.utils import markdown_to_plain_text
 from profiles.utils import (
@@ -360,14 +359,12 @@ class ChannelMembershipConfig(TimestampedModel):
         Channel, related_name="channel_membership_configs"
     )
 
-    @transaction.atomic
     def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
         """Update moira lists if necessary"""
         from moira_lists.tasks import update_moira_list_users
 
         if features.is_enabled(features.MOIRA):
-            for moira_list in self.query.get("moira_lists", []):
-                update_moira_list_users.delay(moira_list)
+            update_moira_list_users.delay(self.query.get("moira_lists", []))
         super(ChannelMembershipConfig, self).save(*args, **kwargs)
 
     def __str__(self):

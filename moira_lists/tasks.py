@@ -26,12 +26,13 @@ def update_user_moira_lists(user_id, update_memberships=False):
 
 
 @app.task
-def update_moira_list_users(name):
+def update_moira_list_users(names):
     """
     Update the users for each moira list
 
     Args:
-        name (str): Moira list name
+        names (list of str): Moira list name
     """
-    moira_list, _ = MoiraList.objects.get_or_create(name=name)
-    moira_api.update_moira_list_users(moira_list)
+    for name in names:
+        moira_list, _ = MoiraList.objects.get_or_create(name=name)
+        moira_api.update_moira_list_users(moira_list)
