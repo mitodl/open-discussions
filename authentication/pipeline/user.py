@@ -19,8 +19,7 @@ from authentication.exceptions import (
 )
 from authentication.utils import SocialAuthState
 from channels import membership_api
-from moira_lists import moira_api
-from moira_lists.exceptions import MoiraException
+from moira_lists.tasks import update_user_moira_lists
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
@@ -293,10 +292,5 @@ def update_moira_lists(
 
     """
     if user and user.is_active:
-        try:
-            moira_api.update_user_moira_lists(user)
-        except MoiraException:
-            log.exception(
-                "Error occurred communicating with moira for user %s", user.id
-            )
+        update_user_moira_lists.delay(user.id, update_memberships=True)
     return {}
