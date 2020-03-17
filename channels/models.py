@@ -7,6 +7,8 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
 from django.db import models, transaction
+
+from open_discussions import features
 from widgets.models import WidgetList
 
 
@@ -363,8 +365,9 @@ class ChannelMembershipConfig(TimestampedModel):
         """Update moira lists if necessary"""
         from moira_lists.tasks import update_moira_list_users
 
-        for moira_list in self.query.get("moira_lists", []):
-            update_moira_list_users.delay(moira_list)
+        if features.is_enabled(features.MOIRA):
+            for moira_list in self.query.get("moira_lists", []):
+                update_moira_list_users.delay(moira_list)
         super(ChannelMembershipConfig, self).save(*args, **kwargs)
 
     def __str__(self):

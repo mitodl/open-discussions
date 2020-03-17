@@ -291,6 +291,6 @@ def update_moira_lists(
         user (User): the current user
 
     """
-    if user and user.is_active:
+    if features.is_enabled(features.MOIRA) and user and user.is_active:
         update_user_moira_lists.delay(user.id, update_memberships=True)
     return {}
