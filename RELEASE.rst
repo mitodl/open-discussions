@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.114.0
+---------------
+
+- Support for subscribing users via criteria
+- don't overwrite ocw course with old run data
+
 Version 0.113.3 (Released March 16, 2020)
 ---------------
 
