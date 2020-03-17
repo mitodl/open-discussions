@@ -363,8 +363,14 @@ class ChannelMembershipConfig(TimestampedModel):
         """Update moira lists if necessary"""
         from moira_lists.tasks import update_moira_list_users
 
-        if features.is_enabled(features.MOIRA):
-            update_moira_list_users.delay(self.query.get("moira_lists", []))
+        if "moira_lists" in self.query and features.is_enabled(features.MOIRA):
+            update_moira_list_users.delay(
+                self.query.get("moira_lists", []),
+                channel_ids=[
+                    channel_id
+                    for channel_id in self.channels.values_list("id", flat=True)
+                ],
+            )
         super(ChannelMembershipConfig, self).save(*args, **kwargs)
 
     def __str__(self):

@@ -104,7 +104,7 @@ INSTALLED_APPS = (
     "widgets",
     "course_catalog",
     "interactions",
-    "moira_lists.apps.MoiraListsConfig",
+    "moira_lists",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -900,3 +900,13 @@ MIT_WS_PRIVATE_KEY = get_key("MIT_WS_PRIVATE_KEY", "")
 # x509 filenames
 MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
 MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
+
+
+def setup_x509():
+    """ write the moira x509 certification & key to files"""
+    from open_discussions.utils import write_x509_files
+
+    write_x509_files()
+
+
+setup_x509()

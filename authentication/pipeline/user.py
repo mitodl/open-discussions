@@ -1,6 +1,4 @@
 """Auth pipline functions for email authentication"""
-import logging
-
 import ulid
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
@@ -26,8 +24,6 @@ from profiles import api as profile_api
 from profiles.utils import update_full_name
 
 # pylint: disable=keyword-arg-before-vararg
-
-log = logging.getLogger()
 
 
 def validate_email_auth_request(

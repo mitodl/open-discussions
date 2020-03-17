@@ -24,10 +24,20 @@ def test_update_user_moira_lists(mocker, update_memberships):
         mock_member_api.assert_not_called()
 
 
-def test_update_moira_list_users(mocker):
+@pytest.mark.parametrize("channel_ids", [None, [1, 2]])
+def test_update_moira_list_users(mocker, channel_ids):
     """Test that the update_moira_list_users task calls the api function of the same name"""
     mock_api = mocker.patch("moira_lists.moira_api.update_moira_list_users")
+    mock_member_api = mocker.patch(
+        "moira_lists.tasks.update_memberships_for_managed_channels"
+    )
     moira_lists = MoiraListFactory.create_batch(3)
-    update_moira_list_users([moira_list.name for moira_list in moira_lists])
+    update_moira_list_users(
+        [moira_list.name for moira_list in moira_lists], channel_ids=channel_ids
+    )
     for moira_list in moira_lists:
         mock_api.assert_any_call(moira_list)
+    if channel_ids is not None:
+        mock_member_api.assert_called_once_with(channel_ids=channel_ids)
+    else:
+        mock_member_api.assert_not_called()
