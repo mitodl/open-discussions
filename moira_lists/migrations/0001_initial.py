@@ -26,12 +26,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "channels",
-                    models.ManyToManyField(
-                        related_name="moira_lists", to="channels.Channel"
-                    ),
-                ),
-                (
                     "users",
                     models.ManyToManyField(
                         related_name="moira_lists", to=settings.AUTH_USER_MODEL

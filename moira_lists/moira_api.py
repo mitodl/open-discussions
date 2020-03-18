@@ -68,7 +68,7 @@ def query_moira_lists(user):
         user (django.contrib.auth.User): the Django user.
 
     Returns:
-        list_names(list): A list of names of moira lists which contain the user as a member.
+        list_names(list of str): A list of names of moira lists which contain the user as a member.
     """
     moira_user = get_moira_user(user)
     moira = get_moira_client()
@@ -117,7 +117,8 @@ def moira_user_emails(member_list):
     """
     return list(
         map(
-            lambda member: member if "@" in member else f"{member}@mit.edu", member_list
+            lambda member: member if "@" in member else f"{member}@mit.edu",
+            filter(None, member_list),
         )
     )
 
@@ -136,9 +137,7 @@ def update_user_moira_lists(user):
         moira_list, _ = MoiraList.objects.get_or_create(name=list_name)
         moira_list.users.add(user)
 
-    user.moira_lists.remove(
-        *[prior_list for prior_list in user.moira_lists.exclude(name__in=moira_lists)]
-    )
+    user.moira_lists.set(MoiraList.objects.filter(name__in=moira_lists))
 
 
 @transaction.atomic
@@ -152,7 +151,4 @@ def update_moira_list_users(moira_list):
     users = User.objects.filter(
         email__in=moira_user_emails(get_moira_client().list_members(moira_list.name))
     )
-    moira_list.users.add(*[user for user in users])
-    moira_list.users.remove(
-        *[prior_user for prior_user in moira_list.users.exclude(pk__in=users)]
-    )
+    moira_list.users.set(users)

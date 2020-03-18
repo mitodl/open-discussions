@@ -2,7 +2,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from channels.models import Channel
 from open_discussions.models import TimestampedModel
 
 
@@ -13,7 +12,6 @@ class MoiraList(TimestampedModel):
 
     name = models.CharField(max_length=250, unique=True, primary_key=True)
     users = models.ManyToManyField(User, related_name="moira_lists")
-    channels = models.ManyToManyField(Channel, related_name="moira_lists")
 
     def __str__(self):
         return self.name

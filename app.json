@@ -146,11 +146,11 @@
     },
     "MIT_WS_CERTIFICATE": {
       "description": "X509 certificate as a string",
-      "required": true
+      "required": false
     },
     "MIT_WS_PRIVATE_KEY": {
       "description": "X509 private key as a string",
-      "required": true
+      "required": false
     },
     "OCW_BASE_URL": {
       "description": "Base URL for OCW courses",

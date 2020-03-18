@@ -23,7 +23,6 @@ from channels.utils import (
     reddit_slugify,
     render_article_text,
 )
-from open_discussions import features
 from open_discussions.models import TimestampedModel
 from open_discussions.utils import markdown_to_plain_text
 from profiles.utils import (
@@ -358,20 +357,6 @@ class ChannelMembershipConfig(TimestampedModel):
     channels = models.ManyToManyField(
         Channel, related_name="channel_membership_configs"
     )
-
-    def save(self, *args, **kwargs):  # pylint: disable=arguments-differ
-        """Update moira lists if necessary"""
-        from moira_lists.tasks import update_moira_list_users
-
-        if "moira_lists" in self.query and features.is_enabled(features.MOIRA):
-            update_moira_list_users.delay(
-                self.query.get("moira_lists", []),
-                channel_ids=[
-                    channel_id
-                    for channel_id in self.channels.values_list("id", flat=True)
-                ],
-            )
-        super(ChannelMembershipConfig, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.name
