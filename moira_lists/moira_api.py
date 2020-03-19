@@ -140,6 +140,23 @@ def update_user_moira_lists(user):
     user.moira_lists.set(MoiraList.objects.filter(name__in=moira_lists))
 
 
+def get_list_members(moira_name):
+    """
+    Get all the members of a moira list
+
+    Args:
+        moira_name (str): Moira list name
+
+    Returns:
+        list of str: moira list members
+
+    """
+    moira_client = get_moira_client()
+    members = moira_client.list_members(moira_name, type="USER")
+    members.extend(moira_client.list_members(moira_name, type="STRING"))
+    return members
+
+
 @transaction.atomic
 def update_moira_list_users(moira_list):
     """
@@ -149,6 +166,6 @@ def update_moira_list_users(moira_list):
         moira_list (MoiraList): the moira list
     """
     users = User.objects.filter(
-        email__in=moira_user_emails(get_moira_client().list_members(moira_list.name))
+        email__in=moira_user_emails(get_list_members(moira_list.name))
     )
     moira_list.users.set(users)

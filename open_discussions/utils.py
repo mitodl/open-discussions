@@ -308,6 +308,10 @@ def write_to_file(filename, contents):
     """
     if not os.path.exists(os.path.dirname(filename)):
         os.makedirs(os.path.dirname(filename))
+    if os.path.exists(filename):
+        with open(filename, "rb") as infile:
+            if infile.read() == contents:
+                return
     with open(filename, "wb") as infile:
         infile.write(contents)
 

@@ -15,6 +15,7 @@ from moira_lists.moira_api import (
     update_user_moira_lists,
     moira_user_emails,
     update_moira_list_users,
+    get_list_members,
 )
 from open_discussions.factories import UserFactory
 
@@ -51,6 +52,13 @@ def test_get_moira_client_success(mock_moira, settings):
     assert mock_moira.called_once_with(
         settings.MIT_WS_CERTIFICATE_FILE, settings.MIT_WS_PRIVATE_KEY_FILE
     )
+
+
+def test_get_moira_client_error(mock_moira):
+    """Test that a MoiraException is returned if anything goes wrong with the moira call"""
+    mock_moira.side_effect = TabError
+    with pytest.raises(MoiraException):
+        get_moira_client()
 
 
 def test_query_moira_lists(mock_moira_client):
@@ -147,7 +155,7 @@ def test_update_user_moira_lists(mocker):
 
 
 def test_update_moira_list_users(mock_moira_client):
-    """ Test that update_moira_list_users updates the moira lists' users"""
+    """Test that update_moira_list_users updates the moira lists' users"""
     moira_users = UserFactory.create_batch(3)
     moira_list = MoiraListFactory.create(users=[moira_users[2]])
     assert list(moira_list.users.all()) == [moira_users[2]]
@@ -158,3 +166,17 @@ def test_update_moira_list_users(mock_moira_client):
     assert list(moira_list.users.order_by("id")) == sorted(
         moira_users[:2], key=lambda user: user.id
     )
+
+
+def test_get_list_members(mock_moira_client):
+    """Test that both kerberos and email members are retrieved"""
+    mock_moira_client.return_value.list_members.side_effect = [
+        ["kerberos1", "kerberos2"],
+        ["email1@test.edu", "email2@test.edu"],
+    ]
+    assert get_list_members("foo") == [
+        "kerberos1",
+        "kerberos2",
+        "email1@test.edu",
+        "email2@test.edu",
+    ]
