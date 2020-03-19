@@ -25,6 +25,7 @@ from open_discussions.envs import (
     get_int,
     get_string,
     get_list_of_str,
+    get_key,
 )
 from open_discussions.sentry import init_sentry
 
@@ -103,6 +104,7 @@ INSTALLED_APPS = (
     "widgets",
     "course_catalog",
     "interactions",
+    "moira_lists",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -284,6 +286,8 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.user.user_details",
     # Resolve outstanding channel invitations
     "authentication.pipeline.invite.resolve_outstanding_channel_invites",
+    # Create the moira list associations for the user if any.
+    "authentication.pipeline.user.update_moira_lists",
     # update the user's managed channels
     "authentication.pipeline.user.update_managed_channel_memberships",
 )
@@ -887,3 +891,22 @@ YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS = get_int(
 
 # Tika security
 TIKA_ACCESS_TOKEN = get_string("TIKA_ACCESS_TOKEN", None)
+
+
+# x509 certificate for moira
+MIT_WS_CERTIFICATE = get_key("MIT_WS_CERTIFICATE", "")
+MIT_WS_PRIVATE_KEY = get_key("MIT_WS_PRIVATE_KEY", "")
+
+# x509 filenames
+MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
+MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
+
+
+def setup_x509():
+    """ write the moira x509 certification & key to files"""
+    from open_discussions.utils import write_x509_files
+
+    write_x509_files()
+
+
+setup_x509()

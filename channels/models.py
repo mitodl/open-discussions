@@ -7,8 +7,8 @@ from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.contrib.postgres.fields import JSONField
 from django.db import models
-from widgets.models import WidgetList
 
+from widgets.models import WidgetList
 
 from channels.constants import (
     ROLE_CHOICES,

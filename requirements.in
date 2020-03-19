@@ -46,6 +46,7 @@ python-dateutil
 python-rapidjson==0.9.1
 python3-saml==1.9.0
 pygithub==1.44.1
+pyopenssl==17.5.0
 pytube==9.5.2
 redis==3.2.1
 requests
@@ -60,3 +61,4 @@ urllib3>=1.24.2
 uwsgi
 wrapt==1.10.11
 xbundle==0.3.1
+git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4

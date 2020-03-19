@@ -1,6 +1,7 @@
 """Utils tests"""
 import datetime
 from math import ceil
+from tempfile import NamedTemporaryFile
 
 from django.contrib.auth import get_user_model
 import pytest
@@ -19,6 +20,7 @@ from open_discussions.utils import (
     markdown_to_plain_text,
     prefetched_iterator,
     extract_values,
+    write_to_file,
 )
 
 User = get_user_model()
@@ -182,3 +184,12 @@ def test_extract_values():
     assert extract_values(test_json, "b") == [test_json["a"]["b"], "g"]
     assert extract_values(test_json, "d") == [[1, 2, 3], [4, 5]]
     assert extract_values(test_json, "e") == ["f"]
+
+
+def test_write_to_file():
+    """Test that write_to_file creates a file with the correct contents"""
+    content = b"-----BEGIN CERTIFICATE-----\nMIID5DCCA02gAwIBAgIRTUTVwsj4Vy+l6+XTYjnIQ==\n-----END CERTIFICATE-----"
+    with NamedTemporaryFile() as outfile:
+        write_to_file(outfile.name, content)
+        with open(outfile.name, "rb") as infile:
+            assert infile.read() == content

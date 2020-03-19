@@ -17,6 +17,7 @@ from authentication.exceptions import (
 )
 from authentication.utils import SocialAuthState
 from channels import membership_api
+from moira_lists.tasks import update_user_moira_lists
 from open_discussions import features
 from open_discussions.settings import SOCIAL_AUTH_SAML_IDP_ATTRIBUTE_NAME
 from profiles import api as profile_api
@@ -271,4 +272,21 @@ def update_managed_channel_memberships(
     if user and user.is_active:
         membership_api.update_memberships_for_managed_channels(user_ids=[user.id])
 
+    return {}
+
+
+def update_moira_lists(
+    strategy, backend, user=None, **kwargs
+):  # pylint: disable=unused-argument
+    """
+    Update a user's moira lists
+
+    Args:
+        strategy (social_django.strategy.DjangoStrategy): the strategy used to authenticate
+        backend (social_core.backends.base.BaseAuth): the backend being used to authenticate
+        user (User): the current user
+
+    """
+    if features.is_enabled(features.MOIRA) and user and user.is_active:
+        update_user_moira_lists.delay(user.id, update_memberships=True)
     return {}

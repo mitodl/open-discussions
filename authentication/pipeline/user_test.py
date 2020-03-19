@@ -409,3 +409,34 @@ def test_update_managed_channel_memberships(mocker, has_user, user, is_active):
         )
     else:
         mock_membership_api.update_memberships_for_managed_channels.assert_not_called()
+
+
+@pytest.mark.parametrize("moira_enabled", [True, False])
+@pytest.mark.parametrize("has_user", [True, False])
+@pytest.mark.parametrize("is_active", [True, False])
+def test_update_moira_lists(
+    mocker, settings, has_user, user, is_active, moira_enabled
+):  # pylint: disable=too-many-arguments
+    """Test that update_moira_lists calls the moira api if the user is authenticated"""
+    settings.FEATURES[features.MOIRA] = moira_enabled
+    user.is_active = is_active
+    user.save()
+
+    mock_strategy = mocker.Mock()
+    mock_backend = mocker.Mock(name="email")
+
+    mock_update_user_moira_lists = mocker.patch(
+        "authentication.pipeline.user.update_user_moira_lists.delay"
+    )
+
+    args = [mock_strategy, mock_backend]
+    kwargs = {"user": user if has_user else None}
+
+    assert user_actions.update_moira_lists(*args, **kwargs) == {}
+
+    if moira_enabled and has_user and is_active:
+        mock_update_user_moira_lists.assert_called_once_with(
+            user.id, update_memberships=True
+        )
+    else:
+        mock_update_user_moira_lists.assert_not_called()

@@ -135,3 +135,22 @@ def get_list_of_str(name, default):
             raise parse_exception
 
     return parsed_value
+
+
+def get_key(name, default):
+    """
+    Get an environment variable as a string representing a private or public key.
+    The difference is that keys are automatically escaped and they need to be unescaped and
+    encoded into bytestrings.
+
+     Args:
+        name (str): An environment variable name
+        default (str): The default value to use if the environment variable doesn't exist.
+
+    Returns:
+        bytes: The environment variable value, or the default as bytestring
+    """
+    value = get_string(name, default)
+    if not isinstance(value, str):
+        return value
+    return value.encode().decode("unicode_escape").encode()
