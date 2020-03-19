@@ -1,6 +1,7 @@
 """OCW course catalog ETL"""
 import copy
 import logging
+import mimetypes
 from os.path import splitext
 from urllib.parse import urlparse, urljoin
 
@@ -108,7 +109,9 @@ def transform_content_file(
     s3_url = content_file.get("file_location", "")
     key = urlparse(s3_url).path.lstrip("/")
     content_file["key"] = key
-    if splitext(key)[-1].lower() in VALID_TEXT_FILE_TYPES:
+    ext_lower = splitext(key)[-1].lower()
+    mime_type = mimetypes.types_map.get(ext_lower)
+    if ext_lower in VALID_TEXT_FILE_TYPES:
         try:
             bucket = get_ocw_learning_course_bucket()
             s3_obj = bucket.Object(key).get()
@@ -122,7 +125,10 @@ def transform_content_file(
             if needs_text_update:
                 s3_body = s3_obj.get("Body") if s3_obj else None
                 if s3_body:
-                    content_json = extract_text_metadata(s3_body)
+                    content_json = extract_text_metadata(
+                        s3_body,
+                        other_headers={"Content-Type": mime_type} if mime_type else {},
+                    )
                     sync_s3_text(bucket, key, content_json)
 
             if content_json:

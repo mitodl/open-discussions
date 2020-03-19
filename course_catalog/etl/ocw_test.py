@@ -1,6 +1,7 @@
 """OCW ETL tests"""
 # pylint: disable=redefined-outer-name
 import json
+import mimetypes
 from os.path import splitext
 from types import SimpleNamespace
 from urllib.parse import urljoin, urlparse
@@ -206,6 +207,14 @@ def test_transform_content_files(mock_tika_functions, mocker):
     transformed_files = transform_content_files(OCW_COURSE_JSON)
     assert len(transformed_files) == len(all_inputs)
     assert mock_tika_functions.mock_extract_text.call_count == len(text_inputs)
+    mock_tika_functions.mock_extract_text.assert_any_call(
+        mocker.ANY,
+        other_headers={
+            "Content-Type": mimetypes.types_map.get(
+                splitext(file_inputs[0]["file_location"])[-1]
+            )
+        },
+    )
     assert mock_tika_functions.mock_sync_text.call_count == len(text_inputs)
 
     assert transformed_files == [
