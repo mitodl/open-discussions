@@ -259,19 +259,17 @@ def _get_text_from_element(element, content):
 
     Args:
         element (Element): An XML element
-        content (str): A string, to be modified with any new material
+        content (list): A list of strings, to be modified with any new material
     """
     if element.tag not in ("style", "script"):
         if element.text:
-            content += element.text
-            content += " "
+            content.append(element.text)
 
         for child in element.getchildren():
             _get_text_from_element(child, content)
 
         if element.tail:
-            content += element.tail
-            content += " "
+            content.append(element.tail)
 
 
 def get_text_from_element(element):
@@ -281,9 +279,9 @@ def get_text_from_element(element):
     Args:
         element (Element): A XML element representing a vertical
     """
-    content = ""
+    content = []
     _get_text_from_element(element, content)
-    return content
+    return " ".join(content)
 
 
 def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
