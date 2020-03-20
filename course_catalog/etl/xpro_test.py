@@ -1,13 +1,13 @@
 """Tests for MicroMasters ETL functions"""
 # pylint: disable=redefined-outer-name
 from datetime import datetime
-from lxml import etree
 import json
 import os
 import pathlib
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 
+from lxml import etree
 import pytest
 
 from course_catalog.constants import (

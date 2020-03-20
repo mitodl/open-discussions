@@ -7,7 +7,6 @@ import os
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 import glob
-from lxml import etree
 
 import boto3
 from django.conf import settings
