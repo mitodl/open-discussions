@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.114.1
+---------------
+
+- raw_json should be write-only on LearningResourceRunSerializer (#2688)
+- Moira integration (#2627)
+- bump ocw data parser verison
+
 Version 0.114.0 (Released March 20, 2020)
 ---------------
 
