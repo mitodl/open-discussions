@@ -253,6 +253,39 @@ def _infinite_counter():
         count += 1
 
 
+def _get_text_from_element(element, content):
+    """
+    Helper method to recurse through XML elements
+
+    Args:
+        element (Element): An XML element
+        content (str): A string, to be modified with any new material
+    """
+    if element.tag not in ("style", "script"):
+        if element.text:
+            content += element.text
+            content += " "
+
+        for child in element.getchildren():
+            _get_text_from_element(child, content)
+
+        if element.tail:
+            content += element.tail
+            content += " "
+
+
+def get_text_from_element(element):
+    """
+    Get relevant text for ingestion from XML element
+
+    Args:
+        element (Element): A XML element representing a vertical
+    """
+    content = ""
+    _get_text_from_element(element, content)
+    return content
+
+
 def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
     """
     Extract text from OLX directory
@@ -268,9 +301,11 @@ def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
     bundle = XBundle()
     bundle.import_from_directory(olx_path)
     for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+        content = get_text_from_element(vertical)
+
         documents.append(
             (
-                etree.tostring(vertical),
+                content,
                 {
                     "key": f"vertical_{index + 1}",
                     "content_type": CONTENT_TYPE_VERTICAL,
