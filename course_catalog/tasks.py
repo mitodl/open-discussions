@@ -20,6 +20,7 @@ from course_catalog.api import (
     sync_xpro_course_files,
 )
 from course_catalog.etl import pipelines, youtube
+from open_discussions import features
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 
@@ -45,7 +46,7 @@ def get_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3
 
 @app.task(bind=True)
 def get_ocw_data(
-    self, force_overwrite=False, upload_to_s3=True
+    self, force_overwrite=False, upload_to_s3=True, ignore_flag=False
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
@@ -59,6 +60,9 @@ def get_ocw_data(
         and settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY
     ):
         log.warning("Required settings missing for get_ocw_data")
+        return
+
+    if features.is_enabled(features.WEBHOOK_OCW) and not ignore_flag:
         return
 
     # get all the courses prefixes we care about

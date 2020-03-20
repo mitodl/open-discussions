@@ -44,6 +44,7 @@ class Command(BaseCommand):
             task = get_ocw_data.delay(
                 force_overwrite=options["force_overwrite"],
                 upload_to_s3=options["upload_to_s3"],
+                ignore_flag=True,
             )
             self.stdout.write(
                 "Started task {task} to get ocw course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(

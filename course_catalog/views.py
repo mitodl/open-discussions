@@ -1,6 +1,10 @@
 """
 course_catalog views
 """
+import logging
+import rapidjson
+
+import requests
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, OuterRef, Exists, Count
@@ -9,6 +13,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from course_catalog.constants import ResourceType, PlatformType
@@ -37,10 +42,16 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     UserListItemSerializer,
 )
+from course_catalog.tasks import get_ocw_courses
+from course_catalog.utils import load_course_blacklist
+from open_discussions import features, settings
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
+
+
+log = logging.getLogger()
 
 
 @api_view(["GET"])
@@ -328,3 +339,40 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CourseTopicSerializer
     pagination_class = LargePagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class WebhookOCWView(APIView):
+    """
+    Handle webhooks coming from the OCW bucket
+    """
+
+    permission_classes = ()
+    authentication_classes = ()
+
+    def post(self, request):
+        """Process webhook request"""
+        log.debug(request.body)
+        content = rapidjson.loads(request.body.decode())
+        log.debug(content)
+
+        records = content.get("Records")
+        if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
+            for record in content.get("Records"):
+                s3_key = record.get("s3", {}).get("object", {}).get("key")
+                prefix = s3_key.split("0/1.json")[0]
+                get_ocw_courses.apply_async(
+                    countdown=settings.OCW_WEBHOOK_DELAY,
+                    kwargs={
+                        "course_prefixes": [prefix],
+                        "blacklist": load_course_blacklist(),
+                        "force_overwrite": False,
+                        "upload_to_s3": True,
+                    },
+                )
+        else:
+            # Might be an S3 event confirmation URL
+            confirmation_url = content.get("SubscribeURL")
+            if confirmation_url:
+                requests.get(confirmation_url)
+
+        return Response()

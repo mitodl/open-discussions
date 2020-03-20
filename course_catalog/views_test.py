@@ -25,9 +25,33 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     MicroUserListItemSerializer,
 )
+from open_discussions import features
 from open_discussions.factories import UserFactory
 
 # pylint:disable=redefined-outer-name
+
+
+OCW_WEBHOOK_RESPONSE = {
+    "Records": [
+        {
+            "eventVersion": "2.1",
+            "eventSource": "aws:s3",
+            "s3": {
+                "s3SchemaVersion": "1.0",
+                "configurationId": "OCW_Update",
+                "bucket": {
+                    "name": "test-bucket-1",
+                    "ownerIdentity": {"principalId": "A123456789"},
+                    "arn": "arn:aws:s3:::test-trigger-1",
+                },
+                "object": {
+                    "key": "PROD/15/15.879/Spring_2014/15-879-research-seminar-in-system-dynamics-spring-2014/0/1.json",
+                    "size": 20544,
+                },
+            },
+        }
+    ]
+}
 
 
 @pytest.fixture()
@@ -572,3 +596,31 @@ def test_video_endpoint(client):
 
     resp = client.get(reverse("videos-detail", args=[video1.id]))
     assert resp.data.get("video_id") == video1.video_id
+
+
+@pytest.mark.parametrize("webhook_enabled", [True, False])
+@pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}])
+def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
+    """Test that the OCW webhook endpoint schedules a get_ocw_courses task"""
+    settings.FEATURES[features.WEBHOOK_OCW] = webhook_enabled
+    mock_get_ocw = mocker.patch(
+        "course_catalog.views.get_ocw_courses.apply_async", autospec=True
+    )
+    mocker.patch("course_catalog.views.load_course_blacklist", return_value=[])
+    client.post(reverse("ocw-webhook"), data=data)
+    if webhook_enabled and data == OCW_WEBHOOK_RESPONSE:
+        mock_get_ocw.assert_called_once_with(
+            countdown=settings.OCW_WEBHOOK_DELAY,
+            kwargs={
+                "course_prefixes": [
+                    OCW_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"]["key"].split(
+                        "0/1.json"
+                    )[0]
+                ],
+                "blacklist": [],
+                "force_overwrite": False,
+                "upload_to_s3": True,
+            },
+        )
+    else:
+        mock_get_ocw.assert_not_called()

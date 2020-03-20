@@ -18,6 +18,7 @@ from django.urls import include
 from rest_framework_extensions.routers import ExtendedSimpleRouter
 
 from course_catalog import views
+from course_catalog.views import WebhookOCWView
 
 router = ExtendedSimpleRouter()
 
@@ -37,6 +38,7 @@ router.register(r"topics", views.TopicViewSet, basename="topics")
 
 urlpatterns = [
     url(r"^api/v0/", include(router.urls)),
+    url(r"^api/v0/ocw_webhook/$", WebhookOCWView.as_view(), name="ocw-webhook"),
     url(
         r"^api/v0/ocw-course-report", views.ocw_course_report, name="ocw-course-report"
     ),
