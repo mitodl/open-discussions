@@ -289,6 +289,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
     class Meta:
         model = LearningResourceRun
         fields = "__all__"
+        extra_kwargs = {"raw_json": {"write_only": True}}
 
 
 class LearningResourceRunMixin(serializers.Serializer):
