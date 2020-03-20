@@ -64,6 +64,7 @@ def test_serialize_courserun_related_models():
         instructors=CourseInstructorFactory.create_batch(2),
     )
     serializer = LearningResourceRunSerializer(courserun)
+    assert "raw_json" not in serializer.data
     assert len(serializer.data["prices"]) == 2
     for attr in ("mode", "price"):
         assert attr in serializer.data["prices"][0].keys()
