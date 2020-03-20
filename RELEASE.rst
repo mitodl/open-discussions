@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.114.0
+Version 0.114.0 (Released March 20, 2020)
 ---------------
 
 - Support for subscribing users via criteria
