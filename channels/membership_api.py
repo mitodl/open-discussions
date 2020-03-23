@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from channels.api import get_admin_api
 from channels.models import Channel
 from profiles.filters import UserFilter
+from profiles.models import Profile
 
 log = logging.getLogger()
 User = get_user_model()
@@ -31,7 +32,13 @@ def update_memberships_for_managed_channels(*, channel_ids=None, user_ids=None):
     if channel_ids:
         channels = channels.filter(id__in=channel_ids)
     for channel in channels:
-        update_memberships_for_managed_channel(channel, user_ids=user_ids)
+        try:
+            update_memberships_for_managed_channel(channel, user_ids=user_ids)
+        except Profile.DoesNotExist:
+            log.exception(
+                "Channel %s membership update failed due to missing profile",
+                channel.name,
+            )
 
 
 def update_memberships_for_managed_channel(channel, *, user_ids=None):
