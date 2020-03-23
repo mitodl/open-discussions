@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.114.1
+Version 0.114.1 (Released March 23, 2020)
 ---------------
 
 - raw_json should be write-only on LearningResourceRunSerializer (#2688)
