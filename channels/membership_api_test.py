@@ -48,28 +48,6 @@ def test_update_memberships_for_managed_channels(mocker):
     )
 
 
-def test_update_memberships_for_managed_channels_missing_profile(mocker):
-    """Verify that an exception is logged if a profile is missing for a user"""
-    channels = ChannelFactory.create_batch(3, membership_is_managed=True)
-    for channel in channels:
-        channel.channel_membership_configs.add(ChannelMembershipConfigFactory.create())
-
-    mock_update_memberships = mocker.patch(
-        "channels.membership_api.update_memberships_for_managed_channel",
-        side_effect=Profile.DoesNotExist,
-    )
-
-    mock_log = mocker.patch("channels.membership_api.log.exception")
-    update_memberships_for_managed_channels(
-        channel_ids=[channel.id for channel in channels], user_ids=[1, 2, 3]
-    )
-    assert mock_update_memberships.call_count == 3
-    for channel in channels:
-        mock_log.assert_any_call(
-            "Channel %s membership update failed due to missing profile", channel.name
-        )
-
-
 @pytest.mark.usefixtures("indexing_user")
 @pytest.mark.parametrize("is_managed", [True, False])
 @pytest.mark.parametrize("has_configs", [True, False])
@@ -96,6 +74,30 @@ def test_update_memberships_for_managed_channel(mocker, is_managed, has_configs)
     else:
         mock_api.add_subscriber.assert_not_called()
         mock_api.add_contributor.assert_not_called()
+
+
+@pytest.mark.usefixtures("indexing_user")
+def test_update_memberships_for_managed_channel_missing_profile(mocker):
+    """Verify that an exception is logged if a profile is missing for a user"""
+    mock_api = mocker.patch("channels.api.Api", autospec=True).return_value
+    mock_api.add_contributor.side_effect = Profile.DoesNotExist
+    user = UserFactory.create(email="user@matching.email", is_active=True, profile=None)
+    channel = ChannelFactory.create(membership_is_managed=True)
+    channel.channel_membership_configs.add(
+        ChannelMembershipConfigFactory.create(
+            query={"email__endswith": "@matching.email"}
+        )
+    )
+
+    update_memberships_for_managed_channel(channel, user_ids=[user.id])
+
+    mock_log = mocker.patch("channels.membership_api.log.exception")
+    update_memberships_for_managed_channel(channel, user_ids=[user.id])
+    mock_log.assert_called_once_with(
+        "Channel %s membership update failed due to missing user profile: %s",
+        channel.name,
+        user.username,
+    )
 
 
 @pytest.mark.usefixtures("indexing_user")

@@ -32,13 +32,7 @@ def update_memberships_for_managed_channels(*, channel_ids=None, user_ids=None):
     if channel_ids:
         channels = channels.filter(id__in=channel_ids)
     for channel in channels:
-        try:
-            update_memberships_for_managed_channel(channel, user_ids=user_ids)
-        except Profile.DoesNotExist:
-            log.exception(
-                "Channel %s membership update failed due to missing profile",
-                channel.name,
-            )
+        update_memberships_for_managed_channel(channel, user_ids=user_ids)
 
 
 def update_memberships_for_managed_channel(channel, *, user_ids=None):
@@ -96,5 +90,12 @@ def update_memberships_for_managed_channel(channel, *, user_ids=None):
         users_in_channel = users_in_channel.filter(id__in=user_ids)
 
     for user in users_in_channel.only("username").distinct():
-        admin_api.add_contributor(user.username, channel.name)
-        admin_api.add_subscriber(user.username, channel.name)
+        try:
+            admin_api.add_contributor(user.username, channel.name)
+            admin_api.add_subscriber(user.username, channel.name)
+        except Profile.DoesNotExist:
+            log.exception(
+                "Channel %s membership update failed due to missing user profile: %s",
+                channel.name,
+                user.username,
+            )
