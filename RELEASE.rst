@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.115.0
+---------------
+
+- Updated /learn to have per-carousel loaders
+
 Version 0.114.1 (Released March 23, 2020)
 ---------------
 
