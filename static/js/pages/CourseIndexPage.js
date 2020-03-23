@@ -39,9 +39,31 @@ import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 import { useLRDrawerParams } from "../hooks/learning_resources"
 import { pushLRHistory } from "../actions/ui"
 
+import type { LearningResourceSummary } from "../flow/discussionTypes"
+
 type Props = {|
   history: Object
 |}
+
+type CarouselSectionProps = {
+  title: string,
+  isFinished: boolean,
+  items: Array<LearningResourceSummary>
+}
+
+const CarouselSection = ({
+  title,
+  isFinished,
+  items
+}: CarouselSectionProps) => {
+  if (!isFinished) {
+    return <CarouselLoading />
+  }
+
+  return items.length !== 0 ? (
+    <CourseCarousel title={title} courses={items} />
+  ) : null
+}
 
 export default function CourseIndexPage({ history }: Props) {
   const [{ isFinished: isFinishedFeatured }] = useRequest(
@@ -63,14 +85,6 @@ export default function CourseIndexPage({ history }: Props) {
   const newVideos = useSelector(newVideosSelector)
   const favorites = useSelector(favoritesListSelector)
   const popularResources = useSelector(popularContentSelector)
-
-  const loaded =
-    isFinishedFeatured &&
-    isFinishedUpcoming &&
-    isFinishedNew &&
-    isFinishedFavorites &&
-    isFinishedVideos &&
-    isFinishedPopular
 
   const dispatch = useDispatch()
   const { objectId, objectType } = useLRDrawerParams()
@@ -118,40 +132,38 @@ export default function CourseIndexPage({ history }: Props) {
         </div>
       </ResponsiveWrapper>
       <Grid className="main-content one-column">
-        {loaded ? (
-          <Cell width={12}>
-            {favorites.length !== 0 ? (
-              <CourseCarousel title="Your Favorites" courses={favorites} />
-            ) : null}
-            {featuredCourses.length !== 0 ? (
-              <CourseCarousel
-                title="Featured Courses"
-                courses={featuredCourses}
-              />
-            ) : null}
-            <CourseCarousel title="New Courses" courses={newCourses} />
-            {popularResources.length !== 0 ? (
-              <CourseCarousel
-                title="Popular Learning Resources"
-                courses={popularResources}
-              />
-            ) : null}
-            <CourseCarousel
-              title="Upcoming Courses"
-              courses={upcomingCourses}
-            />
-            {newVideos.length !== 0 ? (
-              <CourseCarousel title="New Videos" courses={newVideos} />
-            ) : null}
-          </Cell>
-        ) : (
-          <Cell width={12}>
-            <CarouselLoading />
-            <CarouselLoading />
-            <CarouselLoading />
-            <CarouselLoading />
-          </Cell>
-        )}
+        <Cell width={12}>
+          <CarouselSection
+            title="Your Favorites"
+            isFinished={isFinishedFavorites}
+            items={favorites}
+          />
+          <CarouselSection
+            title="Featured Courses"
+            isFinished={isFinishedFeatured}
+            items={featuredCourses}
+          />
+          <CarouselSection
+            title="New Courses"
+            isFinished={isFinishedNew}
+            items={newCourses}
+          />
+          <CarouselSection
+            title="Popular Learning Resources"
+            isFinished={isFinishedPopular}
+            items={popularResources}
+          />
+          <CarouselSection
+            title="Upcoming Courses"
+            isFinished={isFinishedUpcoming}
+            items={upcomingCourses}
+          />
+          <CarouselSection
+            title="New Videos"
+            isFinished={isFinishedVideos}
+            items={newVideos}
+          />
+        </Cell>
       </Grid>
     </BannerPageWrapper>
   )
