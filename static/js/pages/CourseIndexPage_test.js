@@ -203,10 +203,19 @@ describe("CourseIndexPage", () => {
     assert.equal(search, "?q=search%20term")
   })
 
-  it("should have a loading state", async () => {
-    helper.handleRequestStub.withArgs(favoritesURL).returns({})
-    const { wrapper } = await render()
-    assert.equal(wrapper.find("CarouselLoading").length, 4)
+  //
+  ;[
+    newVideosURL,
+    newCoursesURL,
+    popularContentUrl,
+    featuredCoursesURL,
+    favoritesURL
+  ].forEach(url => {
+    it(`should have a loading state for ${url}`, async () => {
+      helper.handleRequestStub.withArgs(favoritesURL).returns({})
+      const { wrapper } = await render()
+      assert.equal(wrapper.find("CarouselLoading").length, 1)
+    })
   })
 
   it("should open the drawer if sharing URL params present", async () => {
