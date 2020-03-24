@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from channels.api import get_admin_api
 from channels.models import Channel
 from profiles.filters import UserFilter
+from profiles.models import Profile
 
 log = logging.getLogger()
 User = get_user_model()
@@ -89,5 +90,12 @@ def update_memberships_for_managed_channel(channel, *, user_ids=None):
         users_in_channel = users_in_channel.filter(id__in=user_ids)
 
     for user in users_in_channel.only("username").distinct():
-        admin_api.add_contributor(user.username, channel.name)
-        admin_api.add_subscriber(user.username, channel.name)
+        try:
+            admin_api.add_contributor(user.username, channel.name)
+            admin_api.add_subscriber(user.username, channel.name)
+        except Profile.DoesNotExist:
+            log.exception(
+                "Channel %s membership update failed due to missing user profile: %s",
+                channel.name,
+                user.username,
+            )

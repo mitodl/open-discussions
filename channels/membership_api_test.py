@@ -7,6 +7,7 @@ from channels.membership_api import (
     update_memberships_for_managed_channel,
 )
 from open_discussions.factories import UserFactory
+from profiles.models import Profile
 
 pytestmark = pytest.mark.django_db
 
@@ -73,6 +74,30 @@ def test_update_memberships_for_managed_channel(mocker, is_managed, has_configs)
     else:
         mock_api.add_subscriber.assert_not_called()
         mock_api.add_contributor.assert_not_called()
+
+
+@pytest.mark.usefixtures("indexing_user")
+def test_update_memberships_for_managed_channel_missing_profile(mocker):
+    """Verify that an exception is logged if a profile is missing for a user"""
+    mock_api = mocker.patch("channels.api.Api", autospec=True).return_value
+    mock_api.add_contributor.side_effect = Profile.DoesNotExist
+    user = UserFactory.create(email="user@matching.email", is_active=True, profile=None)
+    channel = ChannelFactory.create(membership_is_managed=True)
+    channel.channel_membership_configs.add(
+        ChannelMembershipConfigFactory.create(
+            query={"email__endswith": "@matching.email"}
+        )
+    )
+
+    update_memberships_for_managed_channel(channel, user_ids=[user.id])
+
+    mock_log = mocker.patch("channels.membership_api.log.exception")
+    update_memberships_for_managed_channel(channel, user_ids=[user.id])
+    mock_log.assert_called_once_with(
+        "Channel %s membership update failed due to missing user profile: %s",
+        channel.name,
+        user.username,
+    )
 
 
 @pytest.mark.usefixtures("indexing_user")
