@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.115.1
+---------------
+
+- refactor course search state to live in the URL
+- Log ProfileDoesNotExist exceptions when updating channel memberships (#2696)
+- update ocw-data-parser version to 0.5.0
+- Pin redis and nginx versions (#2626)
+
 Version 0.115.0 (Released March 24, 2020)
 ---------------
 
