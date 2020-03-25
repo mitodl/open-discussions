@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from course_catalog.constants import ResourceType, PlatformType
+from course_catalog.exceptions import WebhookException
 from course_catalog.models import (
     Course,
     UserList,
@@ -349,12 +350,16 @@ class WebhookOCWView(APIView):
     permission_classes = ()
     authentication_classes = ()
 
+    def handle_exception(self, exc):
+        """Raise any exception with request info instead of returning response with error status/message"""
+        raise WebhookException(
+            "REST Error (%s). BODY: %s, META: %s"
+            % (exc, self.request.body, self.request.META)
+        ) from exc
+
     def post(self, request):
         """Process webhook request"""
-        log.debug(request.body)
         content = rapidjson.loads(request.body.decode())
-        log.debug(content)
-
         records = content.get("Records")
         if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
             for record in content.get("Records"):
@@ -370,9 +375,5 @@ class WebhookOCWView(APIView):
                     },
                 )
         else:
-            # Might be an S3 event confirmation URL
-            confirmation_url = content.get("SubscribeURL")
-            if confirmation_url:
-                requests.get(confirmation_url)
-
-        return Response()
+            log.error("No records found in webhook: %s", rapidjson.dumps(content))
+        return Response({})

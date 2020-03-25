@@ -4,10 +4,12 @@ from datetime import datetime
 import pytz
 
 import pytest
+import rapidjson
 from django.contrib.auth.models import User
 from django.urls import reverse
 
 from course_catalog.constants import PlatformType, ResourceType, PrivacyLevel, ListType
+from course_catalog.exceptions import WebhookException
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -599,13 +601,14 @@ def test_video_endpoint(client):
 
 
 @pytest.mark.parametrize("webhook_enabled", [True, False])
-@pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}])
+@pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}, {"foo": "bar"}])
 def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
     """Test that the OCW webhook endpoint schedules a get_ocw_courses task"""
     settings.FEATURES[features.WEBHOOK_OCW] = webhook_enabled
     mock_get_ocw = mocker.patch(
         "course_catalog.views.get_ocw_courses.apply_async", autospec=True
     )
+    mock_log = mocker.patch("course_catalog.views.log.error")
     mocker.patch("course_catalog.views.load_course_blacklist", return_value=[])
     client.post(reverse("ocw-webhook"), data=data)
     if webhook_enabled and data == OCW_WEBHOOK_RESPONSE:
@@ -624,3 +627,14 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
         )
     else:
         mock_get_ocw.assert_not_called()
+        mock_log.assert_called_once_with(
+            "No records found in webhook: %s", rapidjson.dumps(data)
+        )
+
+
+@pytest.mark.parametrize("data", [None, "notjson", {"Records": [{"foo": "bar"}]}])
+def test_ocw_webhook_endpoint_bad_data(settings, client, data):
+    """Test that a webhook exception is raised if bad data is sent"""
+    settings.FEATURES[features.WEBHOOK_OCW] = True
+    with pytest.raises(WebhookException):
+        client.post(reverse("ocw-webhook"), data=data)
