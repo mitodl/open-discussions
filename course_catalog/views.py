@@ -4,7 +4,6 @@ course_catalog views
 import logging
 import rapidjson
 
-import requests
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, OuterRef, Exists, Count
