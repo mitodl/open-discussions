@@ -38,6 +38,7 @@ def test_webpack_url(
     settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
+    settings.USE_WEBPACK_DEV_SERVER = False
     settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE = 123
 
     if test_user:

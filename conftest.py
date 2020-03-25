@@ -12,6 +12,12 @@ from open_discussions.exceptions import DoNotUseRequestException
 
 
 @pytest.fixture(autouse=True)
+def default_settings(settings):
+    """Set default settings for all tests"""
+    settings.DISABLE_WEBPACK_LOADER_STATS = True
+
+
+@pytest.fixture(autouse=True)
 def prevent_requests(mocker, request):
     """Patch requests to error on request by default"""
     if (

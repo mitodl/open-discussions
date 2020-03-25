@@ -168,6 +168,11 @@ docker-compose run --rm web black .
 docker-compose run -p 9001:9001 watch npm run storybook
 ```
 
+### Running tests
+
+To run tests locally, run this command instead:
+
+    docker-compose run --rm web pytest
 
 # Optional Setup
 
