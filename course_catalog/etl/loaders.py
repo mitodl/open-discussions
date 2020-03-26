@@ -571,7 +571,7 @@ def load_content_files(course_run, content_files_json):
         list of ContentFile: ContentFile objects that were created/updated
 
     """
-    if course_run.content_type.name == COURSE_TYPE:
+    if course_run.content_type and course_run.content_type.name == COURSE_TYPE:
         content_files = [
             load_content_file(course_run, content_file)
             for content_file in content_files_json

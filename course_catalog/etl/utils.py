@@ -67,20 +67,24 @@ def sync_s3_text(bucket, key, content_meta):
         )
 
 
-def extract_text_metadata(data):
+def extract_text_metadata(data, *, other_headers=None):
     """
     Use tika to extract text content from file data
 
     Args:
         data (str): File contents
+        other_headers (dict): Optional other headers to send to tika
 
     Returns:
          dict: metadata returned by tika, including content
 
     """
-    if data:
-        request_options = {}
-        if settings.TIKA_ACCESS_TOKEN:
-            request_options["headers"] = {"X-Access-Token": settings.TIKA_ACCESS_TOKEN}
-        return tika_parser.from_buffer(data, requestOptions=request_options)
-    return None
+    if not data:
+        return None
+
+    headers = {**other_headers} if other_headers else {}
+    if settings.TIKA_ACCESS_TOKEN:
+        headers["X-Access-Token"] = settings.TIKA_ACCESS_TOKEN
+    request_options = {"headers": headers} if headers else {}
+
+    return tika_parser.from_buffer(data, requestOptions=request_options)

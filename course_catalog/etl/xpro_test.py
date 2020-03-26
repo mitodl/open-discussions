@@ -7,14 +7,20 @@ import pathlib
 from subprocess import check_call
 from tempfile import TemporaryDirectory
 
+from lxml import etree
 import pytest
 
-from course_catalog.constants import PlatformType
+from course_catalog.constants import (
+    PlatformType,
+    CONTENT_TYPE_VERTICAL,
+    CONTENT_TYPE_FILE,
+)
 from course_catalog.etl import xpro
 from course_catalog.etl.xpro import (
     _parse_datetime,
     transform_content_files,
     documents_from_olx,
+    get_text_from_element,
 )
 from open_discussions.test_utils import any_instance_of
 
@@ -223,6 +229,7 @@ def test_transform_content_files(mocker, has_metadata):
     """transform_content_files """
     document = "some text in the document"
     key = "a key here"
+    content_type = "course"
     metadata = (
         {"Author": "author", "language": "French", "title": "the title of the course"}
         if has_metadata
@@ -230,7 +237,8 @@ def test_transform_content_files(mocker, has_metadata):
     )
     tika_output = {"content": "tika'ed text", "metadata": metadata}
     documents_mock = mocker.patch(
-        "course_catalog.etl.xpro.documents_from_olx", return_value=[(document, key)]
+        "course_catalog.etl.xpro.documents_from_olx",
+        return_value=[(document, {"key": key, "content_type": content_type})],
     )
     extract_mock = mocker.patch(
         "course_catalog.etl.xpro.extract_text_metadata", return_value=tika_output
@@ -249,9 +257,10 @@ def test_transform_content_files(mocker, has_metadata):
             "content_author": metadata["Author"] if has_metadata else "",
             "content_title": metadata["title"] if has_metadata else "",
             "content_language": metadata["language"] if has_metadata else "",
+            "content_type": content_type,
         }
     ]
-    extract_mock.assert_called_once_with(document)
+    extract_mock.assert_called_once_with(document, other_headers={})
     assert documents_mock.called is True
 
 
@@ -273,17 +282,59 @@ def test_documents_from_olx():
 
         olx_path = os.path.join(temp, "content-devops-0001")
         parsed_documents = documents_from_olx(olx_path)
-    assert len(parsed_documents) == 16
+    assert len(parsed_documents) == 106
 
-    expected_parsed_vertical = b"""<vertical display_name="HTML">
-  <html display_name="Jasmine tests: HTML module edition" editor="raw"><head><link rel="stylesheet" type="text/css" href="/static/jasmine.css"/><script type="text/javascript" src="/static/jasmine.js"/><script type="text/javascript" src="/static/jasmine-html.js"/><script type="text/javascript" src="/static/boot.js"/><!-- Where all of the tests are defined --><script type="text/javascript" src="/static/jasmine-tests.js"/><script>
-  (function () {
-    window.runJasmineTests()
-  }());
-</script></head><body><h2>Jasmine tests: HTML module edition</h2>
-<h3>Did it break? Dunno; let's find out.</h3>
-<p>Some of the libraries tested are only served by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio.</p>
+    expected_parsed_vertical = (
+        "\n    Where all of the tests are defined  Jasmine tests: HTML module edition \n"
+        " Did it break? Dunno; let's find out. \n Some of the libraries tested are only served "
+        "by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio."
+        " \n\n  Where Jasmine will inject its output (dictated in boot.js)"
+        "  \n Test output will generate here when viewing in LMS."
+    )
+    assert parsed_documents[0] == (
+        expected_parsed_vertical,
+        {
+            "key": "vertical_1",
+            "title": "HTML",
+            "content_type": CONTENT_TYPE_VERTICAL,
+            "mime_type": "application/xml",
+        },
+    )
+    formula2do = [
+        doc for doc in parsed_documents if doc[1]["key"].endswith("formula2do.xml")
+    ][0]
+    assert formula2do[0] == b'<html filename="formula2do" display_name="To do list"/>\n'
+    assert formula2do[1]["key"].endswith("formula2do.xml")
+    assert formula2do[1]["content_type"] == CONTENT_TYPE_FILE
+    assert formula2do[1]["mime_type"] == "application/xml"
 
-<!-- Where Jasmine will inject its output (dictated in boot.js) -->
-<div id="jasmine-tests"><em>Test output will generate here when viewing in LMS.</em></div></body></html></vertical>"""
-    assert parsed_documents[0] == (expected_parsed_vertical, "vertical_1")
+
+def test_get_text_from_element():
+    """
+    get_text_from_element should walk through elements, extracting text, and ignoring script and style tags completely.
+    """
+    input_xml = """
+    <vertical display_name="name">
+    pre-text
+    <style attr="ibute">
+    style stuff here
+    </style>
+    <script>
+    scripty script
+    </script>
+    <other>
+    some
+    <inner>
+    important
+    </inner>
+    text here
+    </other>
+    post-text
+    </vertical>
+    """
+
+    ret = get_text_from_element(etree.fromstring(input_xml))
+    assert ret == (
+        "\n    pre-text\n     \n    some\n     \n    important"
+        "\n     \n    text here\n     \n    post-text\n    "
+    )
