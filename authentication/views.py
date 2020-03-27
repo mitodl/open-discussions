@@ -199,7 +199,7 @@ class CustomDjoserAPIView(ActionViewMixin):
     when redux-hammock is changed to support 204's.
     """
 
-    def post(self, request):  # pylint: disable=missing-docstring
+    def post(self, request):  # pylint: disable=missing-docstring,arguments-differ
         response = super().post(request)
         if response.status_code == status.HTTP_204_NO_CONTENT:
             return Response({}, status=status.HTTP_200_OK)

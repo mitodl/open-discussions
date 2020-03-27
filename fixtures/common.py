@@ -11,6 +11,7 @@ import factory
 import pytest
 import responses
 from _pytest.deprecated import RemovedInPytest4Warning
+from rest_framework import RemovedInDRF310Warning
 from urllib3.exceptions import InsecureRequestWarning
 
 import channels.api
@@ -47,6 +48,9 @@ def warnings_as_errors():
             "ignore",
             message=r".*(JSONField\.from_db_value).*",
             category=RemovedInDjango30Warning,
+        )
+        warnings.filterwarnings(
+            "ignore", message=r".*(list_route).*", category=RemovedInDRF310Warning
         )
         warnings.filterwarnings("ignore", category=RemovedInPytest4Warning)
 
