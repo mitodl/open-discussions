@@ -2,8 +2,9 @@
 course_catalog views
 """
 import logging
-import rapidjson
+from hmac import compare_digest
 
+import rapidjson
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, OuterRef, Exists, Count
@@ -357,7 +358,9 @@ class WebhookOCWView(APIView):
 
     def post(self, request):
         """Process webhook request"""
-        if request.GET.get("webhook_key", None) != settings.OCW_WEBHOOK_KEY:
+        if not compare_digest(
+            request.GET.get("webhook_key", None), settings.OCW_WEBHOOK_KEY
+        ):
             raise WebhookException("Incorrect webhook key")
         content = request.data
         records = content.get("Records")
