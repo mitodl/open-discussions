@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.115.1
+Version 0.115.1 (Released March 27, 2020)
 ---------------
 
 - More intelligent OLX ingestion, and ingest static files for xPRO (#2631)
