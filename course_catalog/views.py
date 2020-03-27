@@ -352,15 +352,17 @@ class WebhookOCWView(APIView):
     def handle_exception(self, exc):
         """Raise any exception with request info instead of returning response with error status/message"""
         raise WebhookException(
-            "REST Error (%s). BODY: %s, META: %s"
-            % (exc, self.request.body, self.request.META)
+            f"REST Error ({exc}). BODY: {rapidjson.dumps(self.request.data or {})}, META: {self.request.META}"
         ) from exc
 
     def post(self, request):
         """Process webhook request"""
-        content = rapidjson.loads(request.body.decode())
+        if request.GET.get("webhook_key", None) != settings.OCW_WEBHOOK_KEY:
+            raise WebhookException("Incorrect webhook key")
+        content = request.data
         records = content.get("Records")
         if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
+            blacklist = load_course_blacklist()
             for record in content.get("Records"):
                 s3_key = record.get("s3", {}).get("object", {}).get("key")
                 prefix = s3_key.split("0/1.json")[0]
@@ -368,7 +370,7 @@ class WebhookOCWView(APIView):
                     countdown=settings.OCW_WEBHOOK_DELAY,
                     kwargs={
                         "course_prefixes": [prefix],
-                        "blacklist": load_course_blacklist(),
+                        "blacklist": blacklist,
                         "force_overwrite": False,
                         "upload_to_s3": True,
                     },
