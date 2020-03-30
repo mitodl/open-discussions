@@ -44,7 +44,7 @@ def test_content_type_interaction_create(client):
     assert interaction.content == course
 
 
-def test_popular_content_types(client):
+def test_popular_content_types(client, user, mocker):
     """Test the popular content types API"""
     # create 2 of each, generate interactions for only the first one
     # second one shouldn't show up in the results
@@ -74,6 +74,7 @@ def test_popular_content_types(client):
                 for interaction in reversed(interactions)
             ],
             many=True,
+            context={"request": mocker.Mock(user=user)},
         ).data,
         "next": None,
         "previous": None,

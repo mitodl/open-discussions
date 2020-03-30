@@ -64,21 +64,22 @@ class FavoriteSerializerMixin(serializers.Serializer):
     Mixin to serializer is_favorite for various models
     """
 
-    is_favorite = serializers.SerializerMethodField()
+    is_favorite = serializers.BooleanField(read_only=True)
 
-    def get_is_favorite(self, obj):
-        """
-        Check if user has a favorite item for object, otherwise return false
-        """
-        request = self.context.get("request")
-        if request and hasattr(request, "user") and isinstance(request.user, User):
-            return FavoriteItem.objects.filter(
-                user=request.user,
-                object_id=obj.id,
-                content_type=ContentType.objects.get_for_model(obj),
-            ).exists()
-        else:
-            return False
+
+class MicroUserListItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserListItem containing only the item id and userlist id.
+    """
+
+    item_id = serializers.IntegerField(source="id")
+    list_id = serializers.IntegerField(source="user_list_id")
+    object_id = serializers.IntegerField()
+    content_type = serializers.CharField(source="content_type.name")
+
+    class Meta:
+        model = UserListItem
+        fields = ("item_id", "list_id", "object_id", "content_type")
 
 
 class ListsSerializerMixin(serializers.Serializer):
@@ -86,24 +87,7 @@ class ListsSerializerMixin(serializers.Serializer):
     Mixin to serialize lists for various models
     """
 
-    lists = serializers.SerializerMethodField()
-
-    def get_lists(self, obj):
-        """
-        Return a list of user's lists/path id's that a resource is in.
-        """
-        request = self.context.get("request")
-        if request and hasattr(request, "user") and isinstance(request.user, User):
-            return [
-                MicroUserListItemSerializer(item).data
-                for item in UserListItem.objects.filter(
-                    user_list__author=request.user,
-                    object_id=obj.id,
-                    content_type=ContentType.objects.get_for_model(obj),
-                ).select_related("content_type")
-            ]
-        else:
-            return []
+    lists = MicroUserListItemSerializer(source="list_items", read_only=True, many=True)
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):
@@ -379,21 +363,6 @@ class BootcampSerializer(BaseCourseSerializer, LearningResourceRunMixin):
         model = Bootcamp
         exclude = COMMON_IGNORED_FIELDS
         extra_kwargs = {"full_description": {"write_only": True}}
-
-
-class MicroUserListItemSerializer(serializers.ModelSerializer):
-    """
-    Serializer for UserListItem containing only the item id and userlist id.
-    """
-
-    item_id = serializers.IntegerField(source="id")
-    list_id = serializers.IntegerField(source="user_list_id")
-    object_id = serializers.IntegerField()
-    content_type = serializers.CharField(source="content_type.name")
-
-    class Meta:
-        model = UserListItem
-        fields = ("item_id", "list_id", "object_id", "content_type")
 
 
 class UserListItemListSerializer(serializers.ListSerializer):

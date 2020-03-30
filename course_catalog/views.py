@@ -7,7 +7,7 @@ from hmac import compare_digest
 import rapidjson
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch, OuterRef, Exists, Count
+from django.db.models import Prefetch, Count
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -134,19 +134,17 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
-    def get_queryset(self):
-        """Generate a QuerySet for fetching valid courses"""
+    def _get_base_queryset(self, *args, **kwargs):
+        """Return the base queryset for all actions"""
+        user = self.request.user
         return (
-            Course.objects.annotate(
-                has_runs=Exists(
-                    LearningResourceRun.objects.filter(
-                        content_type=ContentType.objects.get_for_model(Course),
-                        object_id=OuterRef("pk"),
-                        published=True,
-                    )
-                )
+            Course.objects.filter(
+                *args,
+                **kwargs,
+                published=True,
+                runs__published=True,
+                runs__isnull=False,
             )
-            .filter(has_runs=True, published=True)
             .prefetch_related(
                 "topics",
                 "offered_by",
@@ -155,11 +153,20 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
                     queryset=LearningResourceRun.objects.prefetch_related(
                         "topics", "prices", "instructors", "offered_by"
                     )
+                    .defer("raw_json")
                     .filter(published=True)
                     .order_by("-best_start_date"),
                 ),
             )
+            .defer("raw_json")
+            .annotate_is_favorite_for_user(user)
+            .prefetch_list_items_for_user(user)
+            .distinct()
         )
+
+    def get_queryset(self):
+        """Generate a QuerySet for fetching valid courses"""
+        return self._get_base_queryset()
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
@@ -176,9 +183,9 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         Get upcoming courses
         """
         page = self.paginate_queryset(
-            self.get_queryset()
-            .filter(runs__start_date__gt=timezone.now())
-            .order_by("runs__start_date")
+            self._get_base_queryset(runs__start_date__gt=timezone.now()).order_by(
+                "runs__start_date"
+            )
         )
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -188,7 +195,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """
         Get featured courses
         """
-        page = self.paginate_queryset(self.get_queryset().filter(featured=True))
+        page = self.paginate_queryset(self._get_base_queryset(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
@@ -198,18 +205,25 @@ class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Bootcamps
     """
 
-    queryset = Bootcamp.objects.prefetch_related(
-        "topics",
-        Prefetch(
-            "runs",
-            queryset=LearningResourceRun.objects.prefetch_related(
-                "topics", "prices", "instructors"
-            ).order_by("-best_start_date"),
-        ),
-    )
     serializer_class = BootcampSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+    def get_queryset(self):
+        user = self.request.user
+        return (
+            Bootcamp.objects.prefetch_related(
+                "topics",
+                Prefetch(
+                    "runs",
+                    queryset=LearningResourceRun.objects.prefetch_related(
+                        "topics", "prices", "instructors"
+                    ).order_by("-best_start_date"),
+                ),
+            )
+            .annotate_is_favorite_for_user(user)
+            .prefetch_list_items_for_user(user)
+        )
 
 
 class LargePagination(LimitOffsetPagination):
@@ -227,18 +241,24 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
     Viewset for User Lists & Learning Paths
     """
 
-    queryset = UserList.objects.prefetch_related(
-        "author", "topics", "offered_by"
-    ).annotate(item_count=Count("items"))
-
     serializer_class = UserListSerializer
     pagination_class = LargePagination
     permission_classes = (HasUserListPermissions,)
 
+    def get_queryset(self):
+        """Return a queryset for this user"""
+        user = self.request.user
+        return (
+            UserList.objects.prefetch_related("author", "topics", "offered_by")
+            .annotate(item_count=Count("items"))
+            .prefetch_list_items_for_user(user)
+            .annotate_is_favorite_for_user(user)
+        )
+
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""
         if request.user and not request.user.is_anonymous:
-            queryset = self.queryset.filter(author=request.user)
+            queryset = self.get_queryset().filter(author=request.user)
         else:
             queryset = UserList.objects.none()
 
@@ -289,10 +309,19 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Programs
     """
 
-    queryset = Program.objects.all().prefetch_related("items")
     serializer_class = ProgramSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+    def get_queryset(self):
+        """Return a queryset for this user"""
+        user = self.request.user
+        return (
+            Program.objects.all()
+            .prefetch_related("items")
+            .prefetch_list_items_for_user(user)
+            .annotate_is_favorite_for_user(user)
+        )
 
 
 class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
@@ -300,10 +329,19 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     Viewset for Videos
     """
 
-    queryset = Video.objects.all().prefetch_related("topics", "offered_by")
     serializer_class = VideoSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+    def get_queryset(self):
+        """Return a queryset for this user"""
+        user = self.request.user
+        return (
+            Video.objects.all()
+            .prefetch_related("topics", "offered_by")
+            .prefetch_list_items_for_user(user)
+            .annotate_is_favorite_for_user(user)
+        )
 
     @action(methods=["GET"], detail=False)
     def new(self, request):
@@ -311,7 +349,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         Get newly published videos
         """
         page = self.paginate_queryset(
-            self.queryset.filter(published=True).order_by("-last_modified")
+            self.get_queryset().filter(published=True).order_by("-last_modified")
         )
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
