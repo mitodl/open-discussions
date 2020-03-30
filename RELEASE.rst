@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.116.1
+Version 0.116.1 (Released March 30, 2020)
 ---------------
 
 - Update djoser and DRF to fix password reset (#2707)
