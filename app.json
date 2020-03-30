@@ -188,6 +188,14 @@
       "description": "Upload course image only instead of all OCW files",
       "required": false
     },
+    "OCW_WEBHOOK_DELAY": {
+      "description": "Delay in seconds to process an OCW course after receiving webhook",
+      "required": false
+    },
+    "OCW_WEBHOOK_KEY": {
+      "description": "Authentication parameter value that should be passed in a webhook",
+      "required": false
+    },
     "OLL_ALT_URL": {
       "description": "Base alternate URL for OLL courses",
       "required": false

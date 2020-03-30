@@ -1,6 +1,10 @@
 """
 course_catalog views
 """
+import logging
+from hmac import compare_digest
+
+import rapidjson
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, OuterRef, Exists, Count
@@ -9,9 +13,11 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from course_catalog.constants import ResourceType, PlatformType
+from course_catalog.exceptions import WebhookException
 from course_catalog.models import (
     Course,
     UserList,
@@ -37,10 +43,16 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     UserListItemSerializer,
 )
+from course_catalog.tasks import get_ocw_courses
+from course_catalog.utils import load_course_blacklist
+from open_discussions import features, settings
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
+
+
+log = logging.getLogger()
 
 
 @api_view(["GET"])
@@ -328,3 +340,44 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CourseTopicSerializer
     pagination_class = LargePagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+
+
+class WebhookOCWView(APIView):
+    """
+    Handle webhooks coming from the OCW bucket
+    """
+
+    permission_classes = ()
+    authentication_classes = ()
+
+    def handle_exception(self, exc):
+        """Raise any exception with request info instead of returning response with error status/message"""
+        raise WebhookException(
+            f"REST Error ({exc}). BODY: {rapidjson.dumps(self.request.data or {})}, META: {self.request.META}"
+        ) from exc
+
+    def post(self, request):
+        """Process webhook request"""
+        if not compare_digest(
+            request.GET.get("webhook_key", None), settings.OCW_WEBHOOK_KEY
+        ):
+            raise WebhookException("Incorrect webhook key")
+        content = request.data
+        records = content.get("Records")
+        if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
+            blacklist = load_course_blacklist()
+            for record in content.get("Records"):
+                s3_key = record.get("s3", {}).get("object", {}).get("key")
+                prefix = s3_key.split("0/1.json")[0]
+                get_ocw_courses.apply_async(
+                    countdown=settings.OCW_WEBHOOK_DELAY,
+                    kwargs={
+                        "course_prefixes": [prefix],
+                        "blacklist": blacklist,
+                        "force_overwrite": False,
+                        "upload_to_s3": True,
+                    },
+                )
+        else:
+            log.error("No records found in webhook: %s", rapidjson.dumps(content))
+        return Response({})
