@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.116.0
+Version 0.116.0 (Released March 30, 2020)
 ---------------
 
 - OCW webhook (#2687)
