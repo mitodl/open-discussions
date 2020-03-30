@@ -602,7 +602,7 @@ def test_video_endpoint(client):
 
 
 @pytest.mark.parametrize("webhook_enabled", [True, False])
-@pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}, {"foo": "bar"}, None])
+@pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}, {"foo": "bar"}])
 def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
     """Test that the OCW webhook endpoint schedules a get_ocw_courses task"""
     settings.FEATURES[features.WEBHOOK_OCW] = webhook_enabled
@@ -613,7 +613,9 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
     mock_log = mocker.patch("course_catalog.views.log.error")
     mocker.patch("course_catalog.views.load_course_blacklist", return_value=[])
     client.post(
-        f"{reverse('ocw-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}", data=data
+        f"{reverse('ocw-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}",
+        data=data,
+        headers={"Content-Type": "text/plain"},
     )
     if webhook_enabled and data == OCW_WEBHOOK_RESPONSE:
         mock_get_ocw.assert_called_once_with(
@@ -632,13 +634,14 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
     else:
         mock_get_ocw.assert_not_called()
         mock_log.assert_called_once_with(
-            "No records found in webhook: %s", rapidjson.dumps(data or {})
+            "No records found in webhook: %s", rapidjson.dumps(data)
         )
 
 
 @pytest.mark.parametrize(
     "data",
     [
+        None,
         "notjson",
         {"Records": [{"foo": "bar"}]},
         {"Records": [{"s3": {"object": {"bucket": "test-bucket-1"}}}]},
@@ -652,7 +655,8 @@ def test_ocw_webhook_endpoint_bad_data(mocker, settings, client, data):
     with pytest.raises(WebhookException):
         client.post(
             f"{reverse('ocw-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}",
-            data=data,
+            data=f"{data}".encode(),
+            headers={"Content-Type": "text/plain"},
         )
 
 
@@ -664,4 +668,5 @@ def test_ocw_webhook_endpoint_bad_key(settings, client):
         client.post(
             f"{reverse('ocw-webhook')}?webhook_key=invalid_key",
             data=OCW_WEBHOOK_RESPONSE,
+            headers={"Content-Type": "text/plain"},
         )

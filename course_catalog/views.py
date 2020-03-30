@@ -353,16 +353,16 @@ class WebhookOCWView(APIView):
     def handle_exception(self, exc):
         """Raise any exception with request info instead of returning response with error status/message"""
         raise WebhookException(
-            f"REST Error ({exc}). BODY: {rapidjson.dumps(self.request.data or {})}, META: {self.request.META}"
+            f"REST Error ({exc}). BODY: {(self.request.body or '')}, META: {self.request.META}"
         ) from exc
 
     def post(self, request):
         """Process webhook request"""
         if not compare_digest(
-            request.GET.get("webhook_key", None), settings.OCW_WEBHOOK_KEY
+            request.GET.get("webhook_key", ""), settings.OCW_WEBHOOK_KEY
         ):
             raise WebhookException("Incorrect webhook key")
-        content = request.data
+        content = rapidjson.loads(request.body.decode())
         records = content.get("Records")
         if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
             blacklist = load_course_blacklist()
@@ -379,5 +379,5 @@ class WebhookOCWView(APIView):
                     },
                 )
         else:
-            log.error("No records found in webhook: %s", rapidjson.dumps(content))
+            log.error("No records found in webhook: %s", request.body.decode())
         return Response({})
