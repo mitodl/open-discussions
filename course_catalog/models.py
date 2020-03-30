@@ -22,6 +22,9 @@ class CourseInstructor(TimestampedModel):
     last_name = models.CharField(max_length=128, null=True, blank=True)
     full_name = models.CharField(max_length=256, null=True, blank=True)
 
+    class Meta:
+        ordering = ["last_name"]
+
     def __str__(self):
         return self.full_name or " ".join((self.first_name, self.last_name))
 

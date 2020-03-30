@@ -10,9 +10,7 @@ from authentication.views import (
     RegisterDetailsView,
     get_social_auth_types,
     login_complete,
-    CustomPasswordResetView,
-    CustomPasswordResetConfirmView,
-    CustomSetPasswordView,
+    CustomDjoserAPIView,
 )
 
 
@@ -40,17 +38,17 @@ urlpatterns = [
     ),
     url(
         r"^api/v0/password_reset/$",
-        CustomPasswordResetView.as_view(),
+        CustomDjoserAPIView.as_view({"post": "reset_password"}),
         name="password-reset-api",
     ),
     url(
         r"^api/v0/password_reset/confirm/$",
-        CustomPasswordResetConfirmView.as_view(),
+        CustomDjoserAPIView.as_view({"post": "reset_password_confirm"}),
         name="password-reset-confirm-api",
     ),
     url(
         r"^api/v0/set_password/$",
-        CustomSetPasswordView.as_view(),
+        CustomDjoserAPIView.as_view({"post": "set_password"}),
         name="set-password-api",
     ),
     url(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
