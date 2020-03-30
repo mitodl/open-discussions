@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.116.0
+---------------
+
+- OCW webhook (#2687)
+- Use file extension to detect mime type, and pass info to tika (#2684)
+
 Version 0.115.1 (Released March 27, 2020)
 ---------------
 
