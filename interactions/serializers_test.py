@@ -14,6 +14,7 @@ from interactions.serializers import (
     ContentTypeInteractionSerializer,
     PopularContentSerializer,
 )
+from open_discussions.test_utils import assert_json_equal
 
 pytestmark = pytest.mark.django_db
 
@@ -57,7 +58,7 @@ def test_content_type_interactions_serializer_invalid():
 
 
 @pytest.mark.parametrize("is_deleted", [True, False])
-def test_popular_content_serializer(is_deleted):
+def test_popular_content_serializer(mocker, is_deleted, user):
     """Test PopularContentSerializer"""
     resources = [
         VideoFactory.create(),
@@ -80,12 +81,26 @@ def test_popular_content_serializer(is_deleted):
             resource.delete()
         resources = []
 
+    resources = [
+        type(resource)
+        .objects.filter(id=resource.id)
+        .prefetch_list_items_for_user(user)
+        .annotate_is_favorite_for_user(user)
+        .first()
+        for resource in resources
+    ]
+
+    context = {"request": mocker.Mock(user=user)}
     # NOTE: we test PopularContentSerializer instead of PopularContentListSerializer
     #       because the list serializer is never used directly, but rather many=True tells
     #       PopularContentSerializer to delegate to PopularContentListSerializer
-    results = PopularContentSerializer(data, many=True).data
+    results = PopularContentSerializer(data, context=context, many=True).data
 
     # should be sorted by the same order they were passed in
-    assert results == [
-        GenericForeignKeyFieldSerializer(resource).data for resource in resources
-    ]
+    assert_json_equal(
+        results,
+        [
+            GenericForeignKeyFieldSerializer(resource, context=context).data
+            for resource in resources
+        ],
+    )

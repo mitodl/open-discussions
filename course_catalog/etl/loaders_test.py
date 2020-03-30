@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 import pytest
 
-from course_catalog.constants import ListType, PrivacyLevel
+from course_catalog.constants import ListType, PrivacyLevel, PlatformType
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.loaders import (
     load_program,
@@ -152,6 +152,7 @@ def test_load_program(
             }
             for price in prices
         ],
+        "platform": PlatformType.mitx.value,
         "run_id": program.program_id,
         "enrollment_start": "2017-01-01T00:00:00Z",
         "start_date": "2017-01-20T00:00:00Z",

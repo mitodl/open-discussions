@@ -1,7 +1,7 @@
 """
 Classes related to models for open_discussions
 """
-from django.db.models import DateTimeField, Manager, Model
+from django.db.models import DateTimeField, Model
 from django.db.models.query import QuerySet
 
 from open_discussions.utils import now_in_utc
@@ -23,30 +23,12 @@ class TimestampedModelQuerySet(QuerySet):
         return super().update(**kwargs)
 
 
-class TimestampedModelManager(Manager):
-    """
-    Subclassed manager for TimestampedModel
-    """
-
-    def update(self, **kwargs):
-        """
-        Allows access to TimestampedModelQuerySet's update method on the manager
-        """
-        return self.get_queryset().update(**kwargs)
-
-    def get_queryset(self):
-        """
-        Returns custom queryset
-        """
-        return TimestampedModelQuerySet(self.model, using=self._db)
-
-
 class TimestampedModel(Model):
     """
     Base model for create/update timestamps
     """
 
-    objects = TimestampedModelManager()
+    objects = TimestampedModelQuerySet.as_manager()
     created_on = DateTimeField(auto_now_add=True)  # UTC
     updated_on = DateTimeField(auto_now=True)  # UTC
 

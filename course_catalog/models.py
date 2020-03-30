@@ -5,12 +5,64 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models import Value, Prefetch, OuterRef, Exists, ExpressionWrapper
 from django.contrib.postgres.fields import JSONField
 
 from course_catalog.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
 from course_catalog.constants import ResourceType, PrivacyLevel
 from course_catalog.utils import user_list_image_upload_uri
-from open_discussions.models import TimestampedModel
+from open_discussions.models import TimestampedModel, TimestampedModelQuerySet
+
+
+class LearningResourceQuerySet(TimestampedModelQuerySet):
+    """QuerySet for resource models that can be favorited"""
+
+    def prefetch_list_items_for_user(self, user=None):
+        """Prefetch list_items based on the current user"""
+        if user and user.is_authenticated:
+            return self.prefetch_related(
+                Prefetch(
+                    "list_items",
+                    queryset=UserListItem.objects.filter(
+                        user_list__author=user
+                    ).prefetch_related("content_type"),
+                )
+            )
+        # force list_items to be an empty query for anonymous users
+        return self.prefetch_related(
+            Prefetch("list_items", queryset=UserListItem.objects.none())
+        )
+
+    def annotate_is_favorite_for_user(self, user=None):
+        """Annotate the query with a subquery for is_favorite"""
+        return self.annotate(
+            is_favorite=ExpressionWrapper(
+                Exists(
+                    FavoriteItem.objects.filter(
+                        content_type=ContentType.objects.get_for_model(self.model),
+                        object_id=OuterRef("id"),
+                    )
+                )
+                if user and user.is_authenticated
+                else Value(False),
+                output_field=models.BooleanField(),
+            )
+        )
+
+
+class LearningResourceGenericRelationsMixin(models.Model):
+    """
+    Model mixin for resource models that are favoriteable
+
+    This is intended to be used only for models that have a
+    GenericRelation referenced by FavoriteItem
+    """
+
+    favorite_items = GenericRelation("course_catalog.FavoriteItem")
+    list_items = GenericRelation("course_catalog.UserListItem")
+
+    class Meta:
+        abstract = True
 
 
 class CourseInstructor(TimestampedModel):
@@ -97,6 +149,8 @@ class AbstractCourse(LearningResource):
     class Meta:
         abstract = True
 
+        index_together = (("id", "published"),)
+
 
 class LearningResourceRun(AbstractCourse):
     """
@@ -104,7 +158,7 @@ class LearningResourceRun(AbstractCourse):
     """
 
     run_id = models.CharField(max_length=128)
-    platform = models.CharField(max_length=128, null=True)
+    platform = models.CharField(max_length=128)
 
     year = models.IntegerField(null=True, blank=True)
     start_date = models.DateTimeField(null=True, blank=True)
@@ -141,6 +195,16 @@ class LearningResourceRun(AbstractCourse):
 
     def __str__(self):
         return f"LearningResourceRun platform={self.platform} run_id={self.run_id}"
+
+    class Meta:
+        unique_together = (("platform", "run_id"),)
+        index_together = (
+            (
+                "content_type",
+                "start_date",
+            ),  # index for sorting course runs by start date
+            ("content_type", "object_id"),
+        )
 
 
 class ContentFile(TimestampedModel):
@@ -187,10 +251,12 @@ def get_max_length(field):
     return ContentFile._meta.get_field(field).max_length
 
 
-class Course(AbstractCourse):
+class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
     """
     Course model for courses on all platforms
     """
+
+    objects = LearningResourceQuerySet.as_manager()
 
     course_id = models.CharField(max_length=128)
     platform = models.CharField(max_length=128)
@@ -199,19 +265,22 @@ class Course(AbstractCourse):
     program_name = models.CharField(max_length=256, null=True, blank=True)
 
     runs = GenericRelation(LearningResourceRun)
-    list_items = GenericRelation("course_catalog.UserListItem")
+
+    class Meta:
+        unique_together = ("platform", "course_id")
 
 
-class Bootcamp(AbstractCourse):
+class Bootcamp(AbstractCourse, LearningResourceGenericRelationsMixin):
     """
     Bootcamp model for bootcamps. Being course-like, it shares a large overlap with Course model.
     """
+
+    objects = LearningResourceQuerySet.as_manager()
 
     course_id = models.CharField(max_length=128, unique=True)
 
     location = models.CharField(max_length=128, null=True, blank=True)
     runs = GenericRelation(LearningResourceRun)
-    list_items = GenericRelation("course_catalog.UserListItem")
 
 
 class List(LearningResource):
@@ -245,10 +314,12 @@ class ListItem(TimestampedModel):
         abstract = True
 
 
-class UserList(List):
+class UserList(List, LearningResourceGenericRelationsMixin):
     """
     UserList is a user-created model tracking a restricted list of LearningResources.
     """
+
+    objects = LearningResourceQuerySet.as_manager()
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     privacy_level = models.CharField(max_length=32, default=PrivacyLevel.private.value)
@@ -256,7 +327,6 @@ class UserList(List):
         null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
     )
     list_type = models.CharField(max_length=128)
-    list_items = GenericRelation("course_catalog.UserListItem")
 
     class Meta:
         verbose_name = "userlist"
@@ -277,17 +347,18 @@ class UserListItem(ListItem):
     )
 
 
-class Program(List):
+class Program(List, LearningResourceGenericRelationsMixin):
     """
     Program model for MIT programs. Consists of specified list of LearningResources.
     """
+
+    objects = LearningResourceQuerySet.as_manager()
 
     program_id = models.CharField(max_length=80, null=True)
     image_src = models.URLField(max_length=2048, null=True, blank=True)
     url = models.URLField(null=True, max_length=2048)
     published = models.BooleanField(default=True)
     runs = GenericRelation(LearningResourceRun)
-    list_items = GenericRelation(UserListItem)
 
 
 class ProgramItem(ListItem):
@@ -321,7 +392,7 @@ class FavoriteItem(TimestampedModel):
         unique_together = ("user", "content_type", "object_id")
 
 
-class VideoChannel(LearningResource):
+class VideoChannel(LearningResource, LearningResourceGenericRelationsMixin):
     """Data model for video channels"""
 
     platform = models.CharField(max_length=40)
@@ -332,8 +403,10 @@ class VideoChannel(LearningResource):
     published = models.BooleanField(default=True)
 
 
-class Video(LearningResource):
+class Video(LearningResource, LearningResourceGenericRelationsMixin):
     """Data model for video resources"""
+
+    objects = LearningResourceQuerySet.as_manager()
 
     video_id = models.CharField(max_length=80)
     platform = models.CharField(max_length=128)
@@ -350,7 +423,6 @@ class Video(LearningResource):
     transcript = models.TextField(blank=True, default="")
 
     raw_data = models.TextField(blank=True, default="")
-    list_items = GenericRelation(UserListItem)
 
     runs = GenericRelation(LearningResourceRun)
 
@@ -358,10 +430,12 @@ class Video(LearningResource):
         unique_together = ("platform", "video_id")
 
 
-class Playlist(List):
+class Playlist(List, LearningResourceGenericRelationsMixin):
     """
     Video playlist model, contains videos
     """
+
+    objects = LearningResourceQuerySet.as_manager()
 
     platform = models.CharField(max_length=40)
     playlist_id = models.CharField(max_length=80)

@@ -48,6 +48,7 @@ class PopularContentListSerializer(serializers.ListSerializer):
     """ListSerializer for popular content"""
 
     def to_representation(self, data):
+        user = self.context["request"].user
 
         # group the data by content_type_id
         items_by_content_type_id = {
@@ -69,17 +70,27 @@ class PopularContentListSerializer(serializers.ListSerializer):
             content_ids = [item["content_id"] for item in items]
             content_model = content_type.model_class()
 
-            query = content_model.objects.filter(id__in=content_ids)
+            query = (
+                content_model.objects.filter(id__in=content_ids)
+                .prefetch_related("offered_by")
+                .annotate_is_favorite_for_user(user)
+                .prefetch_list_items_for_user(user)
+            )
 
             if content_model in (Course, Program, Bootcamp):
                 query = query.prefetch_related(
                     "topics",
-                    "offered_by",
                     "runs__instructors",
                     "runs__prices",
                     "runs__offered_by",
                     "runs__topics",
                 )
+
+            if content_model in (Course, Bootcamp):
+                query = query.defer("raw_json")
+
+            if content_model in (Course, Program, Bootcamp):
+                query = query.defer("runs__raw_json")
 
             # key items off the type and item id
             for item in query:
@@ -91,7 +102,9 @@ class PopularContentListSerializer(serializers.ListSerializer):
         # we'll use the GenericForeignKeyFieldSerializer from course_catalog
         # since those will be the only favorited items for now
         return [
-            GenericForeignKeyFieldSerializer(instance=fetched_items[item_key]).data
+            GenericForeignKeyFieldSerializer(
+                instance=fetched_items[item_key], context=self.context
+            ).data
             for item_key in item_keys
             if item_key in fetched_items
         ]
