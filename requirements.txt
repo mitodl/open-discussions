@@ -49,8 +49,8 @@ django-templated-mail==1.1.1  # via djoser
 django-webpack-loader==0.5.0  # via -r requirements.in
 django==2.2.10            # via -r requirements.in, django-anymail, django-bitfield, django-filter, django-redis
 djangorestframework-jwt==1.11.0  # via -r requirements.in
-djangorestframework==3.9.3  # via -r requirements.in, drf-extensions
-djoser==1.7.0             # via -r requirements.in
+djangorestframework==3.10.3  # via -r requirements.in, drf-extensions
+djoser==2.0.3             # via -r requirements.in
 docopt==0.6.2             # via xbundle
 docutils==0.14            # via botocore
 drf-extensions==0.5.0     # via -r requirements.in
