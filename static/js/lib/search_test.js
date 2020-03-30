@@ -346,9 +346,8 @@ describe("search functions", () => {
         should: [
           {
             multi_match: {
-              query:     text,
-              fields:    fieldNames,
-              fuzziness: "AUTO"
+              query:  text,
+              fields: fieldNames
             }
           }
         ]

@@ -554,9 +554,8 @@ export const buildChannelQuery = (
         should: [
           {
             multi_match: {
-              query:     text,
-              fields:    searchFields(type),
-              fuzziness: "AUTO"
+              query:  text,
+              fields: searchFields(type)
             }
           }
         ].filter(clause => clause !== null)
