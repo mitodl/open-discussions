@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.117.0
+---------------
+
+- Initial proposal for reddit migration work
+- remove fuzzy search
+
 Version 0.116.1 (Released March 30, 2020)
 ---------------
 
