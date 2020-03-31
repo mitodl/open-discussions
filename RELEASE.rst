@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.117.0
+Version 0.117.0 (Released March 31, 2020)
 ---------------
 
 - Initial proposal for reddit migration work
