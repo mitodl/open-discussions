@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.117.1
+---------------
+
+- Handle text/plain requests (#2719)
+- Fix OLL logo image (#2708)
+- Improved performance of /learn APIs
+
 Version 0.117.0 (Released March 31, 2020)
 ---------------
 
