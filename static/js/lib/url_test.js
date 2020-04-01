@@ -211,7 +211,8 @@ describe("url helper functions", () => {
           "nytimes.com"
         ],
         ["http://www.org/Security", "www.org"],
-        ["http://www.www.org/Security", "www.org"]
+        ["http://www.www.org/Security", "www.org"],
+        ["www.mit.edu", "mit.edu"]
       ].forEach(([url, expectation]) => {
         assert.equal(urlHostname(url), expectation)
       })
