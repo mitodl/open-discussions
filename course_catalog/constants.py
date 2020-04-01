@@ -18,6 +18,7 @@ class OfferedBy(Enum):
     bootcamps = "Bootcamps"
     xpro = "xPro"
     oll = "Open Learning Library"
+    see = "Sloan Executive Education"
 
 
 class PlatformType(Enum):
@@ -32,6 +33,7 @@ class PlatformType(Enum):
     xpro = "xpro"
     oll = "oll"
     youtube = "youtube"
+    see = "see"
 
 
 class ResourceType(Enum):

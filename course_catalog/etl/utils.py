@@ -1,6 +1,7 @@
 """Utility functions for ETL processes"""
 from functools import wraps
 import logging
+import uuid
 
 import rapidjson
 
@@ -88,3 +89,17 @@ def extract_text_metadata(data, *, other_headers=None):
     request_options = {"headers": headers} if headers else {}
 
     return tika_parser.from_buffer(data, requestOptions=request_options)
+
+
+def generate_unique_id(text):
+    """
+    Generate a unique UUID based on a string
+
+    Args:
+        text(str): The string to base the uuid on
+
+    Returns:
+        str: The UUID in hex string format
+
+    """
+    return uuid.uuid3(uuid.NAMESPACE_URL, text).hex

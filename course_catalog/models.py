@@ -97,7 +97,7 @@ class CoursePrice(TimestampedModel):
     Price model for all courses (e.g. "price": 0.00, "mode": "audit")
     """
 
-    price = models.DecimalField(decimal_places=2, max_digits=6)
+    price = models.DecimalField(decimal_places=2, max_digits=12)
     mode = models.CharField(max_length=128)
     upgrade_deadline = models.DateTimeField(null=True)
 
