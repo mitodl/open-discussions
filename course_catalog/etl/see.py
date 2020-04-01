@@ -1,10 +1,11 @@
-"""MicroMasters course catalog ETL"""
+"""Sloan course catalog ETL"""
 import logging
 import re
 from datetime import datetime
 from decimal import Decimal
 from urllib.parse import urljoin
 
+import pytz
 import requests
 from bs4 import BeautifulSoup as bs
 
@@ -76,8 +77,11 @@ def _extract_run_dates(course):
         list of tuple: List of start and end date tuples for each course run
 
     """
+    # Start and end dates in same month
     pattern_1_month = re.compile(r"(\w+)\s+(\d+)-?(\d+)?,\s*(\d{4})$")
+    # Start and end dates in different months, same year
     pattern_1_year = re.compile(r"(\w+)\s+(\d+)\s*\-\s*(\w+)\s+(\d+),\s*(\d{4})$")
+    # Start and end dates in different years
     pattern_2_years = re.compile(
         r"(\w+)\s+(\d+),\s*(\d{4})\s*-\s*(\w+)\s+(\d+),\s*(\d{4})$"
     )
@@ -94,7 +98,9 @@ def _extract_run_dates(course):
             end_date = datetime.strptime(
                 f"{match.group(1)} {match.group(3)} {match.group(4)}", "%b %d %Y"
             )
-            runs.append((start_date, end_date))
+            runs.append(
+                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
+            )
             continue
         match = re.match(pattern_1_year, date_string)
         if match:
@@ -104,7 +110,9 @@ def _extract_run_dates(course):
             end_date = datetime.strptime(
                 f"{match.group(3)} {match.group(4)} {match.group(5)}", "%b %d %Y"
             )
-            runs.append((start_date, end_date))
+            runs.append(
+                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
+            )
             continue
         match = re.match(pattern_2_years, date_string)
         if match:
@@ -114,26 +122,26 @@ def _extract_run_dates(course):
             end_date = datetime.strptime(
                 f"{match.group(4)} {match.group(5)} {match.group(6)}", "%b %d %Y"
             )
-            runs.append((start_date, end_date))
+            runs.append(
+                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
+            )
     return runs
 
 
-def _extract_instructors(url):
+def _extract_instructors(details):
     """
     Extract instructor names from the course detail page
 
     Args:
-        url(str): The URL of the course detail page
+        details(BeautifulSoup): BeautifulSoup instance for course details
 
     Returns:
         list of dict: List of first & last names of each instructor
 
     """
-    detail_page = requests.get(urljoin(BASE_URL, url), timeout=10)
-    soup = bs(detail_page.content, "html.parser")
     instructors = [
         instructor.find("h2").get_text().split()
-        for instructor in soup.findAll("article", {"class": "faculty-article"})
+        for instructor in details.findAll("article", {"class": "faculty-article"})
     ]
     return [
         {"first_name": instructor[0], "last_name": instructor[1]}
@@ -141,16 +149,41 @@ def _extract_instructors(url):
     ]
 
 
-def _extract_short_description(course):
-    parent = course.find("strong", text=re.compile(r"Description:.*")).parent
-    print(parent.get_text())
-    description = parent.find(text=True, recursive=True)
-    # for br in parent.findAll("br"):
-    #     description += br.get_text()
-    # return description
+def _extract_short_description(details):
+    """
+    Extract short description from the course detail page
+
+    Args:
+        details(BeautifulSoup): BeautifulSoup instance for course details
+
+    Returns:
+        str: Short course description
+
+    """
+    section = details.find("section", {"class": "lead-content block-inner"})
+    [header.extract() for header in section.findAll("header")]
+    [style.extract() for style in section.findAll("style")]
+    return section.get_text().replace("NEW", "").strip()
 
 
-@log_exceptions("Error extracting MIT Executive Education catalog", exc_return_value=[])
+def _extract_full_description(details):
+    """
+    Extract long description from the course detail page
+
+    Args:
+        details(BeautifulSoup): BeautifulSoup instance for course details
+
+    Returns:
+        str: Long course description
+
+    """
+    desc_ps = details.find(
+        "div", {"class": "course-brochure-details"}
+    ).find_next_siblings("p")
+    return "\n\n".join(p.get_text() for p in desc_ps)
+
+
+@log_exceptions("Error extracting Sloan Executive Education catalog", exc_return_value=[])
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
     resp = requests.get(urljoin(BASE_URL, "/open-enrollment"))
@@ -158,25 +191,30 @@ def extract():
     return soup.find("div", {"id": "title"}).findAll("ul", {"class": "course-details"})
 
 
-@log_exceptions("Error extracting MIT Executive Education catalog", exc_return_value=[])
+@log_exceptions("Error extracting Sloan Executive Education catalog", exc_return_value=[])
 def transform(courses):
-    """Transform the MIT Executive Education catalog data"""
+    """Transform the Sloan Executive Education catalog data"""
     transformed = []
     for course in courses:
         link = course.find("a")
         url = urljoin(BASE_URL, link.get("href"))
         title = link.get_text()
-        description = _extract_short_description(course)
         run_dates = _extract_run_dates(course)
-        instructors = _extract_instructors(url)
         prices = _extract_price(course)
+
+        detail_page = requests.get(urljoin(BASE_URL, url), timeout=10)
+        details = bs(detail_page.content, "html.parser")
+        instructors = _extract_instructors(details)
+        short_description = _extract_short_description(details)
+        full_description = _extract_full_description(details)
 
         transformed.append(
             {
                 "url": url,
                 "title": title,
                 "topics": _extract_topics(course),
-                "short_description": description,
+                "short_description": short_description,
+                "full_description": full_description,
                 "course_id": generate_unique_id(url),
                 "platform": PlatformType.see.value,
                 "offered_by": [{"name": OfferedBy.see.value}],
@@ -193,7 +231,8 @@ def transform(courses):
                         "best_end_date": date_range[1],
                         "offered_by": [{"name": OfferedBy.see.value}],
                         "title": title,
-                        "short_description": description,
+                        "short_description": short_description,
+                        "full_description": full_description,
                         "instructors": instructors,
                     }
                     for date_range in run_dates

@@ -8,7 +8,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_extract_topics(settings, mocker):
-    """Tests that _extract_topics looks up similar topics given a video"""
+    """Tests that extract_topics looks up similar topics given a video"""
     video = VideoFactory.create()
     topics = ["topic a", "topic b"]
     mock_get_similar_topics = mocker.patch(
