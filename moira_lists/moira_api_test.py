@@ -123,11 +123,14 @@ def test_moira_user_emails():
     assert moira_user_emails(inlist) == expected
 
 
-def test_update_user_moira_lists(mocker):
+def test_update_user_moira_lists(mock_moira_client):
     """Test that update_user_moira_lists updates the user's related moira lists """
     moira_user = UserFactory.create()
-    user_lists = ["test.list.1", "test.list.2"]
-    mocker.patch("moira_lists.moira_api.query_moira_lists", return_value=user_lists)
+    user_lists = ["test.list.1", "test.list.2", "", None]
+    mock_moira_client.return_value.user_list_membership.return_value = [
+        {"listName": list_name} for list_name in user_lists
+    ]
+    valid_user_lists = user_lists[0:2]
 
     moira_list_3 = MoiraListFactory.create(name="test.list.3", users=[moira_user])
     assert list(moira_list_3.users.all()) == [moira_user]
@@ -141,17 +144,18 @@ def test_update_user_moira_lists(mocker):
             .moira_lists.order_by("name")
             .values_list("name", flat=True)
         )
-        == user_lists
+        == valid_user_lists
     )
-    for name in user_lists:
+    for name in valid_user_lists:
         assert list(MoiraList.objects.get(name=name).users.all()) == [moira_user]
     assert list(MoiraList.objects.get(name=moira_list_3.name).users.all()) == []
     assert (
         list(
             moira_user.moira_lists.order_by("name").all().values_list("name", flat=True)
         )
-        == user_lists
+        == valid_user_lists
     )
+    assert MoiraList.objects.filter(name="").count() == 0
 
 
 def test_update_moira_list_users(mock_moira_client):
