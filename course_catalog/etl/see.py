@@ -141,6 +141,15 @@ def _extract_instructors(url):
     ]
 
 
+def _extract_short_description(course):
+    parent = course.find("strong", text=re.compile(r"Description:.*")).parent
+    print(parent.get_text())
+    description = parent.find(text=True, recursive=True)
+    # for br in parent.findAll("br"):
+    #     description += br.get_text()
+    # return description
+
+
 @log_exceptions("Error extracting MIT Executive Education catalog", exc_return_value=[])
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
@@ -155,11 +164,9 @@ def transform(courses):
     transformed = []
     for course in courses:
         link = course.find("a")
-        url = link.get("href")
+        url = urljoin(BASE_URL, link.get("href"))
         title = link.get_text()
-        description = course.find(
-            "strong", text=re.compile(r"Description:.*")
-        ).parent.find(text=True, recursive=False)
+        description = _extract_short_description(course)
         run_dates = _extract_run_dates(course)
         instructors = _extract_instructors(url)
         prices = _extract_price(course)
