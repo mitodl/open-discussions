@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.117.1
+Version 0.117.1 (Released April 01, 2020)
 ---------------
 
 - Handle text/plain requests (#2719)
