@@ -76,7 +76,9 @@ def query_moira_lists(user):
         list_infos = moira.user_list_membership(
             moira_user.username, moira_user.type, max_return_count=100_000
         )
-        list_names = [list_info["listName"] for list_info in list_infos]
+        list_names = [
+            list_info["listName"] for list_info in list_infos if list_info["listName"]
+        ]
         return list_names
     except Exception as exc:  # pylint: disable=broad-except
         if "java.lang.NullPointerException" in str(exc):
