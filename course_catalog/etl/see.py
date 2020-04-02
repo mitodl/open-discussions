@@ -14,11 +14,12 @@ from course_catalog.etl.utils import log_exceptions, generate_unique_id
 
 OFFERED_BY = [{"name": OfferedBy.see.value}]
 BASE_URL = "https://executive.mit.edu"
+LISTING_URL = f"{BASE_URL}/open-enrollment"
 
 log = logging.getLogger()
 
 
-def _extract_topics(course):
+def _parse_topics(course):
     """
     Extract topics for a course
 
@@ -45,7 +46,7 @@ def _extract_topics(course):
         return topics
 
 
-def _extract_price(course):
+def _parse_price(course):
     """
     Extract the course price as a list
 
@@ -66,7 +67,7 @@ def _extract_price(course):
     return prices
 
 
-def _extract_run_dates(course):
+def _parse_run_dates(course):
     """
     Extracts the start and end dates for each course run
 
@@ -77,11 +78,11 @@ def _extract_run_dates(course):
         list of tuple: List of start and end date tuples for each course run
 
     """
-    # Start and end dates in same month
+    # Start and end dates in same month (Jun 18-19, 2020)
     pattern_1_month = re.compile(r"(\w+)\s+(\d+)-?(\d+)?,\s*(\d{4})$")
-    # Start and end dates in different months, same year
+    # Start and end dates in different months, same year (Jun 18 - Jul 18, 2020)
     pattern_1_year = re.compile(r"(\w+)\s+(\d+)\s*\-\s*(\w+)\s+(\d+),\s*(\d{4})$")
-    # Start and end dates in different years
+    # Start and end dates in different years (Dec 21, 2020-Jan 10,2021)
     pattern_2_years = re.compile(
         r"(\w+)\s+(\d+),\s*(\d{4})\s*-\s*(\w+)\s+(\d+),\s*(\d{4})$"
     )
@@ -128,7 +129,7 @@ def _extract_run_dates(course):
     return runs
 
 
-def _extract_instructors(details):
+def _parse_instructors(details):
     """
     Extract instructor names from the course detail page
 
@@ -149,7 +150,7 @@ def _extract_instructors(details):
     ]
 
 
-def _extract_short_description(details):
+def _parse_short_description(details):
     """
     Extract short description from the course detail page
 
@@ -166,7 +167,7 @@ def _extract_short_description(details):
     return section.get_text().replace("NEW", "").strip()
 
 
-def _extract_full_description(details):
+def _parse_full_description(details):
     """
     Extract long description from the course detail page
 
@@ -183,36 +184,52 @@ def _extract_full_description(details):
     return "\n\n".join(p.get_text() for p in desc_ps)
 
 
-@log_exceptions("Error extracting Sloan Executive Education catalog", exc_return_value=[])
+@log_exceptions(
+    "Error extracting Sloan Executive Education catalog", exc_return_value=[]
+)
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
-    resp = requests.get(urljoin(BASE_URL, "/open-enrollment"))
-    soup = bs(resp.content, "html.parser")
-    return soup.find("div", {"id": "title"}).findAll("ul", {"class": "course-details"})
+    soup = bs(requests.get(LISTING_URL).content, "html.parser")
+    listings = soup.find("div", {"id": "title"}).findAll(
+        "ul", {"class": "course-details"}
+    )
+    return [
+        {
+            "listing": listing,
+            "details": bs(
+                requests.get(
+                    urljoin(BASE_URL, listing.find("a").get("href")), timeout=30
+                ).content
+            ),
+        }
+        for listing in listings
+    ]
 
 
-@log_exceptions("Error extracting Sloan Executive Education catalog", exc_return_value=[])
+@log_exceptions(
+    "Error transforming Sloan Executive Education catalog", exc_return_value=[]
+)
 def transform(courses):
     """Transform the Sloan Executive Education catalog data"""
     transformed = []
     for course in courses:
-        link = course.find("a")
+        listing = course["listing"]
+        details = course["details"]
+        link = listing.find("a")
         url = urljoin(BASE_URL, link.get("href"))
         title = link.get_text()
-        run_dates = _extract_run_dates(course)
-        prices = _extract_price(course)
+        run_dates = _parse_run_dates(listing)
+        prices = _parse_price(listing)
 
-        detail_page = requests.get(urljoin(BASE_URL, url), timeout=10)
-        details = bs(detail_page.content, "html.parser")
-        instructors = _extract_instructors(details)
-        short_description = _extract_short_description(details)
-        full_description = _extract_full_description(details)
+        instructors = _parse_instructors(details)
+        short_description = _parse_short_description(details)
+        full_description = _parse_full_description(details)
 
         transformed.append(
             {
                 "url": url,
                 "title": title,
-                "topics": _extract_topics(course),
+                "topics": _parse_topics(course),
                 "short_description": short_description,
                 "full_description": full_description,
                 "course_id": generate_unique_id(url),
