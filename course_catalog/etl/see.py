@@ -79,12 +79,16 @@ def _parse_run_dates(course):
 
     """
     # Start and end dates in same month (Jun 18-19, 2020)
-    pattern_1_month = re.compile(r"(\w+)\s+(\d+)-?(\d+)?,\s*(\d{4})$")
+    pattern_1_month = re.compile(
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)-?(?P<end_d>\d+)?,\s*(?P<year>\d{4})$"
+    )
     # Start and end dates in different months, same year (Jun 18 - Jul 18, 2020)
-    pattern_1_year = re.compile(r"(\w+)\s+(\d+)\s*\-\s*(\w+)\s+(\d+),\s*(\d{4})$")
+    pattern_1_year = re.compile(
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)\s*\-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<year>\d{4})$"
+    )
     # Start and end dates in different years (Dec 21, 2020-Jan 10,2021)
     pattern_2_years = re.compile(
-        r"(\w+)\s+(\d+),\s*(\d{4})\s*-\s*(\w+)\s+(\d+),\s*(\d{4})$"
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+),\s*(?P<start_y>\d{4})\s*-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<end_y>\d{4})$"
     )
     date_strings = [
         rundate.strip() for rundate in course.findAll("li")[3].get_text().split("|")
@@ -94,10 +98,12 @@ def _parse_run_dates(course):
         match = re.match(pattern_1_month, date_string)
         if match:
             start_date = datetime.strptime(
-                f"{match.group(1)} {match.group(2)} {match.group(4)}", "%b %d %Y"
+                f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
+                "%b %d %Y",
             )
             end_date = datetime.strptime(
-                f"{match.group(1)} {match.group(3)} {match.group(4)}", "%b %d %Y"
+                f"{match.group('start_m')} {match.group('end_d')} {match.group('year')}",
+                "%b %d %Y",
             )
             runs.append(
                 (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
@@ -106,10 +112,12 @@ def _parse_run_dates(course):
         match = re.match(pattern_1_year, date_string)
         if match:
             start_date = datetime.strptime(
-                f"{match.group(1)} {match.group(2)} {match.group(5)}", "%b %d %Y"
+                f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
+                "%b %d %Y",
             )
             end_date = datetime.strptime(
-                f"{match.group(3)} {match.group(4)} {match.group(5)}", "%b %d %Y"
+                f"{match.group('end_m')} {match.group('end_d')} {match.group('year')}",
+                "%b %d %Y",
             )
             runs.append(
                 (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
@@ -118,10 +126,12 @@ def _parse_run_dates(course):
         match = re.match(pattern_2_years, date_string)
         if match:
             start_date = datetime.strptime(
-                f"{match.group(1)} {match.group(2)} {match.group(3)}", "%b %d %Y"
+                f"{match.group('start_m')} {match.group('start_d')} {match.group('start_y')}",
+                "%b %d %Y",
             )
             end_date = datetime.strptime(
-                f"{match.group(4)} {match.group(5)} {match.group(6)}", "%b %d %Y"
+                f"{match.group('end_m')} {match.group('end_d')} {match.group('end_y')}",
+                "%b %d %Y",
             )
             runs.append(
                 (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
