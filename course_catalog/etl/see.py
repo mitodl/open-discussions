@@ -10,7 +10,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.utils import log_exceptions, generate_unique_id
+from course_catalog.etl.utils import (
+    log_exceptions,
+    generate_unique_id,
+    strip_extra_whitespace,
+)
 
 OFFERED_BY = [{"name": OfferedBy.see.value}]
 BASE_URL = "https://executive.mit.edu"
@@ -35,7 +39,7 @@ def _parse_topics(course):
         try:
             topics.extend(
                 [
-                    {"name": topic.strip()}
+                    {"name": strip_extra_whitespace(topic)}
                     for topic in course.find("span", {"class": classname})
                     .parent.find(text=True, recursive=False)
                     .split(",")
@@ -43,7 +47,7 @@ def _parse_topics(course):
             )
         except AttributeError:
             pass
-        return topics
+    return topics
 
 
 def _parse_price(course):
@@ -164,7 +168,7 @@ def _parse_short_description(details):
     section = details.find("section", {"class": "lead-content block-inner"})
     [header.extract() for header in section.findAll("header")]
     [style.extract() for style in section.findAll("style")]
-    return section.get_text(separator=u" ").replace("\n", " ").strip()
+    return strip_extra_whitespace(section.get_text(separator=" ").strip())
 
 
 def _parse_full_description(details):
@@ -181,7 +185,9 @@ def _parse_full_description(details):
     desc_ps = details.find(
         "div", {"class": "course-brochure-details"}
     ).find_next_siblings("p")
-    return "\n\n".join(p.get_text(separator=u" ").replace("\n", " ").strip() for p in desc_ps)
+    return strip_extra_whitespace(
+        " ".join(p.get_text(separator=" ").strip() for p in desc_ps)
+    )
 
 
 @log_exceptions(
@@ -197,10 +203,8 @@ def extract():
         {
             "listing": listing,
             "details": bs(
-                requests.get(
-                    urljoin(BASE_URL, listing.find("a").get("href")),
-                    "html.parser"
-                ).content
+                requests.get(urljoin(BASE_URL, listing.find("a").get("href"))).content,
+                "html.parser",
             ),
         }
         for listing in listings
@@ -218,7 +222,7 @@ def transform(courses):
         details = course["details"]
         link = listing.find("a")
         url = urljoin(BASE_URL, link.get("href"))
-        title = link.get_text()
+        title = strip_extra_whitespace(link.get_text())
         run_dates = _parse_run_dates(listing)
         prices = _parse_price(listing)
 
@@ -230,7 +234,7 @@ def transform(courses):
             {
                 "url": url,
                 "title": title,
-                "topics": _parse_topics(course),
+                "topics": _parse_topics(listing),
                 "short_description": short_description,
                 "full_description": full_description,
                 "course_id": generate_unique_id(url),
@@ -238,6 +242,7 @@ def transform(courses):
                 "offered_by": [{"name": OfferedBy.see.value}],
                 "runs": [
                     {
+                        "url": url,
                         "prices": prices,
                         "run_id": generate_unique_id(
                             f"{url}{datetime.strftime(date_range[0], '%Y%m%d')}"

@@ -1,4 +1,5 @@
 """Utility functions for ETL processes"""
+import re
 from functools import wraps
 import logging
 import uuid
@@ -103,3 +104,17 @@ def generate_unique_id(text):
 
     """
     return uuid.uuid3(uuid.NAMESPACE_URL, text).hex
+
+
+def strip_extra_whitespace(text):
+    """
+    Remove extra whitespace from text
+
+    Args:
+        text: string to strip extra whitespace from
+
+    Returns:
+        str: text without extra whitespace
+
+    """
+    return re.sub(r"[\s]{2,}", " ", text).strip()

@@ -1,7 +1,13 @@
 """ETL utils test"""
 import pytest
 
-from course_catalog.etl.utils import log_exceptions, sync_s3_text, extract_text_metadata
+from course_catalog.etl.utils import (
+    log_exceptions,
+    sync_s3_text,
+    extract_text_metadata,
+    generate_unique_id,
+    strip_extra_whitespace,
+)
 
 
 @pytest.mark.parametrize("side_effect", ["One", Exception("error")])
@@ -73,3 +79,29 @@ def test_extract_text_metadata(mocker, data, token, settings, headers):
     else:
         assert response is None
         mock_tika.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "url,uuid",
+    [
+        [
+            "https://executive.mit.edu/openenrollment/program/managing-product-platforms",
+            "6626ef0d6c8e3000a9ba7a7f509156aa",
+        ],
+        [
+            "https://executive.mit.edu/openenrollment/program/negotiation-for-executives",
+            "6b7d9f0b7a193048aae11054cbd38753",
+        ],
+    ],
+)
+def test_generate_unique_id(url, uuid):
+    """Test that the same uuid is always created for a given URL"""
+    assert generate_unique_id(url) == uuid
+
+
+def test_strip_extra_whitespace():
+    """
+    Test that extra whitespace is removed from text
+    """
+    text = " This\n\n is      a\t\ttest. "
+    assert strip_extra_whitespace(text) == "This is a test."
