@@ -164,7 +164,7 @@ def _parse_short_description(details):
     section = details.find("section", {"class": "lead-content block-inner"})
     [header.extract() for header in section.findAll("header")]
     [style.extract() for style in section.findAll("style")]
-    return section.get_text().replace("NEW", "").strip()
+    return section.get_text(separator=u" ").replace("\n", " ").strip()
 
 
 def _parse_full_description(details):
@@ -181,7 +181,7 @@ def _parse_full_description(details):
     desc_ps = details.find(
         "div", {"class": "course-brochure-details"}
     ).find_next_siblings("p")
-    return "\n\n".join(p.get_text() for p in desc_ps)
+    return "\n\n".join(p.get_text(separator=u" ").replace("\n", " ").strip() for p in desc_ps)
 
 
 @log_exceptions(
@@ -198,7 +198,8 @@ def extract():
             "listing": listing,
             "details": bs(
                 requests.get(
-                    urljoin(BASE_URL, listing.find("a").get("href")), timeout=30
+                    urljoin(BASE_URL, listing.find("a").get("href")),
+                    "html.parser"
                 ).content
             ),
         }
