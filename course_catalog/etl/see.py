@@ -134,7 +134,7 @@ def _parse_instructors(details):
     Extract instructor names from the course detail page
 
     Args:
-        details(BeautifulSoup): BeautifulSoup instance for course details
+        details(Tag): BeautifulSoup Tag for course details
 
     Returns:
         list of dict: List of first & last names of each instructor
@@ -155,7 +155,7 @@ def _parse_short_description(details):
     Extract short description from the course detail page
 
     Args:
-        details(BeautifulSoup): BeautifulSoup instance for course details
+        details(Tag): BeautifulSoup Tag for course details
 
     Returns:
         str: Short course description
@@ -174,7 +174,7 @@ def _parse_full_description(details):
     Extract long description from the course detail page
 
     Args:
-        details(BeautifulSoup): BeautifulSoup instance for course details
+        details(Tag): BeautifulSoup Tag for course details
 
     Returns:
         str: Long course description
