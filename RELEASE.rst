@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.117.2
+---------------
+
+- Make frontend URL parsing more resilient (#2729)
+- Filter out blank/null moira list names (#2731)
+
 Version 0.117.1 (Released April 01, 2020)
 ---------------
 
