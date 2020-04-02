@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.117.2
+Version 0.117.2 (Released April 02, 2020)
 ---------------
 
 - Make frontend URL parsing more resilient (#2729)
