@@ -77,7 +77,7 @@ from channels.utils import (
     get_kind_and_id,
     num_items_not_none,
 )
-
+from discussions import migration_api
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
 from search.task_helpers import reddit_object_persist
@@ -672,6 +672,8 @@ class Api:
                 name, title, membership_is_managed, allowed_post_types, channel_type
             )
 
+            migration_api.channels.create_channel(channel)
+
             # create in reddit after we persist the db records so an error here rolls back everything
             subreddit = self.reddit.subreddit.create(
                 name,
@@ -734,6 +736,9 @@ class Api:
 
         if channel_kwargs:
             Channel.objects.filter(name=name).update(**channel_kwargs)
+            migration_api.channels.update_channel = Channel.objects.filter(
+                name=name
+            ).first()
 
         values = other_settings.copy()
         if title is not None:
@@ -1494,6 +1499,7 @@ class Api:
         proxied_channel = self.get_channel(channel_name)
         with transaction.atomic():
             add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
+            migration_api.channels.add_moderator(proxied_channel.channel, user)
             try:
                 proxied_channel.moderator.add(user)
                 Api(user).accept_invite(channel_name)

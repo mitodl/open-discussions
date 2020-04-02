@@ -47,6 +47,7 @@ from course_catalog.tasks import get_ocw_courses
 from course_catalog.utils import load_course_blacklist
 from open_discussions import features, settings
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
+from open_discussions.pagination import DefaultPagination
 
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
@@ -82,15 +83,6 @@ def ocw_course_report(request):
             "ocw_resources": ocw_resources,
         }
     )
-
-
-class DefaultPagination(LimitOffsetPagination):
-    """
-    Pagination class for course_catalog viewsets which gets default_limit and max_limit from settings
-    """
-
-    default_limit = 10
-    max_limit = 100
 
 
 class FavoriteViewMixin:

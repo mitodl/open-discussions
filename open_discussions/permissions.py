@@ -97,6 +97,14 @@ def is_readonly(request):
     return request.method in permissions.SAFE_METHODS
 
 
+class IsReadOnly(permissions.BasePermission):
+    """Checks the request is readonly"""
+
+    def has_permission(self, request, view):
+        """Returns True if the request is readonly"""
+        return is_readonly(request)
+
+
 class IsStaffPermission(permissions.BasePermission):
     """Checks the user for the staff permission"""
 

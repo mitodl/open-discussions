@@ -5,6 +5,7 @@ codecov
 ddt
 django-debug-toolbar
 ipdb
+isort
 moto==1.3.13
 nplusone>=0.8.1
 pdbpp

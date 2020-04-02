@@ -96,6 +96,24 @@ def image_uri(profile, image_field=IMAGE_SMALL):
     return DEFAULT_PROFILE_IMAGE
 
 
+def hash_file(file, block_size=65536):
+    """
+    Reads the contents of a file and returns an MD5 hash for it
+
+    Args:
+        file (file): the file object to generate a hash for
+        block_size (int): the block size to read the file with
+
+    Returns:
+        str: the hash for the file
+    """
+    hasher = hashlib.md5()
+    for buf in iter(file.read(block_size), b""):
+        hasher.update(buf)
+
+    return hasher.hexdigest()
+
+
 # These functions are referenced in migrations so be careful refactoring
 def profile_image_upload_uri(instance, filename):
     """
