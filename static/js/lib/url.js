@@ -122,8 +122,20 @@ export const COURSE_SEARCH_URL = "/learn/search"
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 
-export const urlHostname = (url: ?string) =>
-  url ? new URL(url).hostname.replace(/^www\.(.*\.\w)/i, "$1") : ""
+export const urlHostname = (url: ?string) => {
+  if (!url) {
+    return ""
+  }
+
+  if (!url.startsWith("https:") && !url.startsWith("http:")) {
+    url = `https://${url}`
+  }
+  try {
+    return new URL(url).hostname.replace(/^www\.(.*\.\w)/i, "$1")
+  } catch (_) {
+    return ""
+  }
+}
 
 export const getNextParam = (search: string) => qs.parse(search).next || "/"
 
