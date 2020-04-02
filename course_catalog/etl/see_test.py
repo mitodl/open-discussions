@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import pytest
 import pytz
-from bs4 import Tag, BeautifulSoup
+from bs4 import BeautifulSoup
 
 from course_catalog.etl.see import transform, extract, _parse_run_dates
 
@@ -52,18 +52,43 @@ def mock_request(mocker):
     )
 
 
-def test_see_extract():
+@pytest.mark.parametrize("base_url", [None, "", "https://executive.mit.edu"])
+def test_see_extract(settings, base_url):
     """Verify that BeautifulSoup tags are returned per listing and course detail"""
+    settings.SEE_BASE_URL = base_url
     results = extract()
-    assert len(results) == 1
+    assert len(results) == (1 if base_url else 0)
 
-    for course in results:
-        assert isinstance(course["listing"], Tag)
-        assert isinstance(course["details"], Tag)
+    assert results == (
+        [
+            {
+                "url": "https://executive.mit.edu/openenrollment/program/foobar/",
+                "title": title,
+                "dates": [
+                    (
+                        datetime.datetime(2020, 6, 18, 0, 0, tzinfo=pytz.utc),
+                        datetime.datetime(2020, 6, 19, 0, 0, tzinfo=pytz.utc),
+                    )
+                ],
+                "prices": [{"price": Decimal("4100")}],
+                "topics": [
+                    {"name": "Operations"},
+                    {"name": "Organizations & Leadership"},
+                    {"name": "Strategy & Innovation"},
+                ],
+                "short_description": short_description,
+                "full_description": full_description,
+                "instructors": [{"first_name": "Zeynep", "last_name": "Ton"}],
+            }
+        ]
+        if base_url
+        else []
+    )
 
 
-def test_see_transform():
+def test_see_transform(settings):
     """Verify that the correct dict data is returned for a course"""
+    settings.SEE_BASE_URL = "https://executive.mit.edu"
     assert transform(extract()) == [
         {
             "url": "https://executive.mit.edu/openenrollment/program/foobar/",

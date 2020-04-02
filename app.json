@@ -456,6 +456,10 @@
       "description": "Django secret key.",
       "generator": "secret"
     },
+    "SEE_BASE_URL": {
+      "description": "The base URL for Sloan Executive Education",
+      "required": false,
+    },
     "SENTRY_DSN": {
       "description": "The connection settings for Sentry"
     },

@@ -1,5 +1,4 @@
 """Sloan course catalog ETL"""
-import logging
 import re
 from datetime import datetime
 from decimal import Decimal
@@ -8,6 +7,7 @@ from urllib.parse import urljoin
 import pytz
 import requests
 from bs4 import BeautifulSoup as bs
+from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.utils import (
@@ -17,10 +17,6 @@ from course_catalog.etl.utils import (
 )
 
 OFFERED_BY = [{"name": OfferedBy.see.value}]
-BASE_URL = "https://executive.mit.edu"
-LISTING_URL = f"{BASE_URL}/open-enrollment"
-
-log = logging.getLogger()
 
 
 def _parse_topics(course):
@@ -166,7 +162,9 @@ def _parse_short_description(details):
 
     """
     section = details.find("section", {"class": "lead-content block-inner"})
+    # pylint: disable=expression-not-assigned
     [header.extract() for header in section.findAll("header")]
+    # pylint: disable=expression-not-assigned
     [style.extract() for style in section.findAll("style")]
     return strip_extra_whitespace(section.get_text(separator=" ").strip())
 
@@ -195,71 +193,72 @@ def _parse_full_description(details):
 )
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
-    soup = bs(requests.get(LISTING_URL).content, "html.parser")
+    if not settings.SEE_BASE_URL:
+        return []
+    courses = []
+    soup = bs(
+        requests.get(urljoin(settings.SEE_BASE_URL, "/open-enrollment")).content,
+        "html.parser",
+    )
     listings = soup.find("div", {"id": "title"}).findAll(
         "ul", {"class": "course-details"}
     )
-    return [
-        {
-            "listing": listing,
-            "details": bs(
-                requests.get(urljoin(BASE_URL, listing.find("a").get("href"))).content,
-                "html.parser",
-            ),
-        }
-        for listing in listings
-    ]
+    for listing in listings:
+        link = listing.find("a")
+        url = urljoin(settings.SEE_BASE_URL, link.get("href"))
+        details = bs(
+            requests.get(urljoin(settings.SEE_BASE_URL, url)).content, "html.parser"
+        )
+        courses.append(
+            {
+                "url": url,
+                "title": strip_extra_whitespace(link.get_text()),
+                "dates": _parse_run_dates(listing),
+                "prices": _parse_price(listing),
+                "topics": _parse_topics(listing),
+                "instructors": _parse_instructors(details),
+                "short_description": _parse_short_description(details),
+                "full_description": _parse_full_description(details),
+            }
+        )
+    return courses
 
 
 @log_exceptions(
     "Error transforming Sloan Executive Education catalog", exc_return_value=[]
 )
 def transform(courses):
-    """Transform the Sloan Executive Education catalog data"""
-    transformed = []
-    for course in courses:
-        listing = course["listing"]
-        details = course["details"]
-        link = listing.find("a")
-        url = urljoin(BASE_URL, link.get("href"))
-        title = strip_extra_whitespace(link.get_text())
-        run_dates = _parse_run_dates(listing)
-        prices = _parse_price(listing)
-
-        instructors = _parse_instructors(details)
-        short_description = _parse_short_description(details)
-        full_description = _parse_full_description(details)
-
-        transformed.append(
-            {
-                "url": url,
-                "title": title,
-                "topics": _parse_topics(listing),
-                "short_description": short_description,
-                "full_description": full_description,
-                "course_id": generate_unique_id(url),
-                "platform": PlatformType.see.value,
-                "offered_by": [{"name": OfferedBy.see.value}],
-                "runs": [
-                    {
-                        "url": url,
-                        "prices": prices,
-                        "run_id": generate_unique_id(
-                            f"{url}{datetime.strftime(date_range[0], '%Y%m%d')}"
-                        ),
-                        "platform": PlatformType.see.value,
-                        "start_date": date_range[0],
-                        "end_date": date_range[1],
-                        "best_start_date": date_range[0],
-                        "best_end_date": date_range[1],
-                        "offered_by": [{"name": OfferedBy.see.value}],
-                        "title": title,
-                        "short_description": short_description,
-                        "full_description": full_description,
-                        "instructors": instructors,
-                    }
-                    for date_range in run_dates
-                ],
-            }
-        )
-    return transformed
+    """Transform the Sloan Executive Education course data"""
+    return [
+        {
+            "url": course["url"],
+            "title": course["title"],
+            "topics": course["topics"],
+            "short_description": course["short_description"],
+            "full_description": course["full_description"],
+            "course_id": generate_unique_id(course["url"]),
+            "platform": PlatformType.see.value,
+            "offered_by": [{"name": OfferedBy.see.value}],
+            "runs": [
+                {
+                    "url": course["url"],
+                    "prices": course["prices"],
+                    "run_id": generate_unique_id(
+                        f"{course['url']}{datetime.strftime(date_range[0], '%Y%m%d')}"
+                    ),
+                    "platform": PlatformType.see.value,
+                    "start_date": date_range[0],
+                    "end_date": date_range[1],
+                    "best_start_date": date_range[0],
+                    "best_end_date": date_range[1],
+                    "offered_by": [{"name": OfferedBy.see.value}],
+                    "title": course["title"],
+                    "short_description": course["short_description"],
+                    "full_description": course["full_description"],
+                    "instructors": course["instructors"],
+                }
+                for date_range in course["dates"]
+            ],
+        }
+        for course in courses
+    ]
