@@ -173,7 +173,8 @@ const LIST_QUERY_FIELDS = [
   "topics"
 ]
 
-const SUGGEST_FIELDS = ["title", "short_description"]
+const LEARN_SUGGEST_FIELDS = ["title.trigram", "short_description.trigram"]
+const CHANNEL_SUGGEST_FIELDS = ["suggest_field1", "suggest_field2"]
 
 export const AVAILABLE_NOW = "availableNow"
 const AVAILABLE_NEXT_WEEK = "nextWeek"
@@ -474,16 +475,19 @@ export const buildFacetSubQuery = (
   return facetClauses
 }
 
-export const buildSuggestQuery = (text: string) => {
+export const buildSuggestQuery = (
+  text: string,
+  suggestFields: Array<string>
+) => {
   const suggest = {
     text
   }
-  SUGGEST_FIELDS.forEach(
+  suggestFields.forEach(
     field =>
       // $FlowFixMe: yes the fields are missing and I'm adding them
       (suggest[field] = {
         phrase: {
-          field:      `${field}.trigram`,
+          field:      `${field}`,
           size:       5,
           gram_size:  1,
           confidence: 0.0001,
@@ -496,7 +500,7 @@ export const buildSuggestQuery = (text: string) => {
                 }
               }
             },
-            params: { field_name: `${field}.trigram` },
+            params: { field_name: `${field}` },
             prune:  true
           }
         }
@@ -574,6 +578,15 @@ export const buildChannelQuery = (
 
     builder = buildOrQuery(builder, type, textQuery, channelClauses)
   }
+
+  if (!emptyOrNil(text)) {
+    builder = builder.rawOption(
+      "suggest",
+      // $FlowFixMe: if we get this far, text is not null
+      buildSuggestQuery(text, CHANNEL_SUGGEST_FIELDS)
+    )
+  }
+
   return builder.build()
 }
 
@@ -631,8 +644,11 @@ export const buildLearnQuery = (
 
     // Include suggest if search test is not null/empty
     if (!emptyOrNil(text)) {
-      // $FlowFixMe: if we get this far, text is not null
-      builder = builder.rawOption("suggest", buildSuggestQuery(text))
+      builder = builder.rawOption(
+        "suggest",
+        // $FlowFixMe: if we get this far, text is not null
+        buildSuggestQuery(text, LEARN_SUGGEST_FIELDS)
+      )
     } else if (facetClauses.length === 0 && R.equals(types, LR_TYPE_ALL)) {
       builder = builder.rawOption("sort", buildDefaultSort())
     }
