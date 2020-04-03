@@ -57,19 +57,17 @@ def _parse_price(course):
         course(Tag): The BeautifulSoup tag containing course data
 
     Returns:
-          list of int: List containing 1 integer (or empty)
+          Decimal: Price of course or None
     """
-    price = None
     try:
         price_text = course.find("strong", text=re.compile(r"Tuition:.*")).parent.find(
             text=True, recursive=False
         )
     except AttributeError:
-        return price
+        return None
     price_match = re.search(r"([\d,]+)", price_text)
     if price_match:
         return Decimal(price_match.group(0).replace(",", ""))
-    return price
 
 
 def _parse_run_dates(course):
@@ -100,7 +98,7 @@ def _parse_instructors(details):
         details(Tag): BeautifulSoup Tag for course details
 
     Returns:
-        list of dict: List of first & last names of each instructor
+        list of lists: List of first & last names of each instructor
 
     """
     return [
