@@ -15,14 +15,14 @@ from open_discussions.exceptions import DoNotUseRequestException
 def default_settings(settings):
     """Set default settings for all tests"""
     settings.DISABLE_WEBPACK_LOADER_STATS = True
-    settings.OPEN_DISCUSSIONS_BASE_URL = 'http://localhost:8063/'
-    settings.OPEN_DISCUSSIONS_COOKIE_NAME = 'cookie_monster'
-    settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN = 'localhost'
-    settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY = 'mm_test'
-    settings.MAILGUN_SENDER_DOMAIN = 'other.fake.site'
-    settings.MAILGUN_KEY = 'fake_mailgun_key'
-    settings.ELASTICSEARCH_INDEX = 'testindex'
-    settings.INDEXING_API_USERNAME = 'mitodl'
+    settings.OPEN_DISCUSSIONS_BASE_URL = "http://localhost:8063/"
+    settings.OPEN_DISCUSSIONS_COOKIE_NAME = "cookie_monster"
+    settings.OPEN_DISCUSSIONS_COOKIE_DOMAIN = "localhost"
+    settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY = "mm_test"
+    settings.MAILGUN_SENDER_DOMAIN = "other.fake.site"
+    settings.MAILGUN_KEY = "fake_mailgun_key"
+    settings.ELASTICSEARCH_INDEX = "testindex"
+    settings.INDEXING_API_USERNAME = "mitodl"
 
 
 @pytest.fixture(autouse=True)
