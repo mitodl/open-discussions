@@ -204,13 +204,13 @@ def transform(courses):
                     "url": course["url"],
                     "prices": ([{"price": course["price"]}] if course["price"] else []),
                     "run_id": generate_unique_id(
-                        f"{course['url']}{datetime.strftime(date_range[0], '%Y%m%d')}"
+                        f"{course['url']}{datetime.strftime(start_date, '%Y%m%d')}"
                     ),
                     "platform": PlatformType.see.value,
-                    "start_date": date_range[0],
-                    "end_date": date_range[1],
-                    "best_start_date": date_range[0],
-                    "best_end_date": date_range[1],
+                    "start_date": start_date,
+                    "end_date": end_date,
+                    "best_start_date": start_date,
+                    "best_end_date": end_date,
                     "offered_by": [{"name": OfferedBy.see.value}],
                     "title": course["title"],
                     "short_description": course["short_description"],
@@ -220,7 +220,7 @@ def transform(courses):
                         for (first_name, last_name) in course["instructors"]
                     ],
                 }
-                for date_range in course["dates"]
+                for start_date, end_date in course["dates"]
             ],
         }
         for course in courses
