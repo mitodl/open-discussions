@@ -1,5 +1,8 @@
 """ETL utils test"""
+import datetime
+
 import pytest
+import pytz
 
 from course_catalog.etl.utils import (
     log_exceptions,
@@ -7,6 +10,7 @@ from course_catalog.etl.utils import (
     extract_text_metadata,
     generate_unique_id,
     strip_extra_whitespace,
+    parse_dates,
 )
 
 
@@ -100,8 +104,26 @@ def test_generate_unique_id(url, uuid):
 
 
 def test_strip_extra_whitespace():
-    """
-    Test that extra whitespace is removed from text
-    """
+    """Test that extra whitespace is removed from text"""
     text = " This\n\n is      a\t\ttest. "
     assert strip_extra_whitespace(text) == "This is a test."
+
+
+def test_parse_dates():
+    """Test that parse_dates returns correct dates"""
+    for datestring in ("May 13-30, 2020", "May 13 - 20,2020"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 5, 13, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 30, tzinfo=pytz.utc),
+        )
+    for datestring in ("Jun 24-Aug 11, 2020", "Jun  24 -  Aug 11,    2020"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 6, 24, tzinfo=pytz.utc),
+            datetime.datetime(2020, 8, 11, tzinfo=pytz.utc),
+        )
+    for datestring in ("Nov 25, 2020-Jan 26, 2021", "Nov 25,2020  -Jan   26,2021"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 11, 25, tzinfo=pytz.utc),
+            datetime.datetime(2021, 1, 26, tzinfo=pytz.utc),
+        )
+    assert parse_dates("This is not a date") is None

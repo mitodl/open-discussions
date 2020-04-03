@@ -1,11 +1,13 @@
 """Utility functions for ETL processes"""
 import re
+from datetime import datetime
 from functools import wraps
 import logging
 import uuid
 
 import rapidjson
 
+import pytz
 from django.conf import settings
 from tika import parser as tika_parser
 from toolz import excepts
@@ -118,3 +120,60 @@ def strip_extra_whitespace(text):
 
     """
     return re.sub(r"[\s]{2,}", " ", text).strip()
+
+
+def parse_dates(date_string):
+    """
+    Extract a pair of dates from a string
+
+    Args:
+        date_string(str): A string containing start and end dates
+
+    Returns:
+        tuple of datetime: Start and end datetimes
+    """
+    # Start and end dates in same month (Jun 18-19, 2020)
+    pattern_1_month = re.compile(
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)-?(?P<end_d>\d+)?,\s*(?P<year>\d{4})$"
+    )
+    # Start and end dates in different months, same year (Jun 18 - Jul 18, 2020)
+    pattern_1_year = re.compile(
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)\s*\-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<year>\d{4})$"
+    )
+    # Start and end dates in different years (Dec 21, 2020-Jan 10,2021)
+    pattern_2_years = re.compile(
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+),\s*(?P<start_y>\d{4})\s*-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<end_y>\d{4})$"
+    )
+    match = re.match(pattern_1_month, date_string)
+    if match:
+        start_date = datetime.strptime(
+            f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
+            "%b %d %Y",
+        )
+        end_date = datetime.strptime(
+            f"{match.group('start_m')} {match.group('end_d')} {match.group('year')}",
+            "%b %d %Y",
+        )
+        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)
+    match = re.match(pattern_1_year, date_string)
+    if match:
+        start_date = datetime.strptime(
+            f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
+            "%b %d %Y",
+        )
+        end_date = datetime.strptime(
+            f"{match.group('end_m')} {match.group('end_d')} {match.group('year')}",
+            "%b %d %Y",
+        )
+        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)
+    match = re.match(pattern_2_years, date_string)
+    if match:
+        start_date = datetime.strptime(
+            f"{match.group('start_m')} {match.group('start_d')} {match.group('start_y')}",
+            "%b %d %Y",
+        )
+        end_date = datetime.strptime(
+            f"{match.group('end_m')} {match.group('end_d')} {match.group('end_y')}",
+            "%b %d %Y",
+        )
+        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)

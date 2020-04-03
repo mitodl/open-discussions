@@ -1,10 +1,10 @@
 """Sloan course catalog ETL"""
+import logging
 import re
 from datetime import datetime
 from decimal import Decimal
 from urllib.parse import urljoin
 
-import pytz
 import requests
 from bs4 import BeautifulSoup as bs
 from django.conf import settings
@@ -14,9 +14,12 @@ from course_catalog.etl.utils import (
     log_exceptions,
     generate_unique_id,
     strip_extra_whitespace,
+    parse_dates,
 )
 
 OFFERED_BY = [{"name": OfferedBy.see.value}]
+
+log = logging.getLogger()
 
 
 def _parse_topics(course):
@@ -35,7 +38,7 @@ def _parse_topics(course):
         try:
             topics.extend(
                 [
-                    {"name": strip_extra_whitespace(topic)}
+                    strip_extra_whitespace(topic)
                     for topic in course.find("span", {"class": classname})
                     .parent.find(text=True, recursive=False)
                     .split(",")
@@ -56,15 +59,15 @@ def _parse_price(course):
     Returns:
           list of int: List containing 1 integer (or empty)
     """
-    prices = []
+    price = None
     price_text = course.find("strong", text=re.compile(r"Tuition:.*")).parent.find(
         text=True, recursive=False
     )
     if price_text:
         price_match = re.search(r"([\d,]+)", price_text)
         if price_match:
-            return [{"price": Decimal(price_match.group(0).replace(",", ""))}]
-    return prices
+            return Decimal(price_match.group(0).replace(",", ""))
+    return price
 
 
 def _parse_run_dates(course):
@@ -78,65 +81,13 @@ def _parse_run_dates(course):
         list of tuple: List of start and end date tuples for each course run
 
     """
-    # Start and end dates in same month (Jun 18-19, 2020)
-    pattern_1_month = re.compile(
-        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)-?(?P<end_d>\d+)?,\s*(?P<year>\d{4})$"
-    )
-    # Start and end dates in different months, same year (Jun 18 - Jul 18, 2020)
-    pattern_1_year = re.compile(
-        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)\s*\-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<year>\d{4})$"
-    )
-    # Start and end dates in different years (Dec 21, 2020-Jan 10,2021)
-    pattern_2_years = re.compile(
-        r"(?P<start_m>\w+)\s+(?P<start_d>\d+),\s*(?P<start_y>\d{4})\s*-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<end_y>\d{4})$"
-    )
     date_strings = [
         rundate.strip() for rundate in course.findAll("li")[3].get_text().split("|")
     ]
-    runs = []
+    run_dates = []
     for date_string in date_strings:
-        match = re.match(pattern_1_month, date_string)
-        if match:
-            start_date = datetime.strptime(
-                f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
-                "%b %d %Y",
-            )
-            end_date = datetime.strptime(
-                f"{match.group('start_m')} {match.group('end_d')} {match.group('year')}",
-                "%b %d %Y",
-            )
-            runs.append(
-                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
-            )
-            continue
-        match = re.match(pattern_1_year, date_string)
-        if match:
-            start_date = datetime.strptime(
-                f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
-                "%b %d %Y",
-            )
-            end_date = datetime.strptime(
-                f"{match.group('end_m')} {match.group('end_d')} {match.group('year')}",
-                "%b %d %Y",
-            )
-            runs.append(
-                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
-            )
-            continue
-        match = re.match(pattern_2_years, date_string)
-        if match:
-            start_date = datetime.strptime(
-                f"{match.group('start_m')} {match.group('start_d')} {match.group('start_y')}",
-                "%b %d %Y",
-            )
-            end_date = datetime.strptime(
-                f"{match.group('end_m')} {match.group('end_d')} {match.group('end_y')}",
-                "%b %d %Y",
-            )
-            runs.append(
-                (start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc))
-            )
-    return runs
+        run_dates.append(parse_dates(date_string))
+    return [run_date for run_date in run_dates if run_date is not None]
 
 
 def _parse_instructors(details):
@@ -150,13 +101,9 @@ def _parse_instructors(details):
         list of dict: List of first & last names of each instructor
 
     """
-    instructors = [
-        instructor.find("h2").get_text().split()
-        for instructor in details.findAll("article", {"class": "faculty-article"})
-    ]
     return [
-        {"first_name": instructor[0], "last_name": instructor[1]}
-        for instructor in instructors
+        instructor.find("h2").get_text().split(" ", 1)
+        for instructor in details.findAll("article", {"class": "faculty-article"})
     ]
 
 
@@ -204,6 +151,7 @@ def _parse_full_description(details):
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
     if not settings.SEE_BASE_URL:
+        log.error("Sloan base URL not set, skipping ETL")
         return []
     courses = []
     soup = bs(
@@ -224,7 +172,7 @@ def extract():
                 "url": url,
                 "title": strip_extra_whitespace(link.get_text()),
                 "dates": _parse_run_dates(listing),
-                "prices": _parse_price(listing),
+                "price": _parse_price(listing),
                 "topics": _parse_topics(listing),
                 "instructors": _parse_instructors(details),
                 "short_description": _parse_short_description(details),
@@ -243,7 +191,7 @@ def transform(courses):
         {
             "url": course["url"],
             "title": course["title"],
-            "topics": course["topics"],
+            "topics": [{"name": topic} for topic in course["topics"]],
             "short_description": course["short_description"],
             "full_description": course["full_description"],
             "course_id": generate_unique_id(course["url"]),
@@ -252,7 +200,7 @@ def transform(courses):
             "runs": [
                 {
                     "url": course["url"],
-                    "prices": course["prices"],
+                    "prices": ([{"price": course["price"]}] if course["price"] else []),
                     "run_id": generate_unique_id(
                         f"{course['url']}{datetime.strftime(date_range[0], '%Y%m%d')}"
                     ),
@@ -265,7 +213,10 @@ def transform(courses):
                     "title": course["title"],
                     "short_description": course["short_description"],
                     "full_description": course["full_description"],
-                    "instructors": course["instructors"],
+                    "instructors": [
+                        {"first_name": first_name, "last_name": last_name}
+                        for (first_name, last_name) in course["instructors"]
+                    ],
                 }
                 for date_range in course["dates"]
             ],

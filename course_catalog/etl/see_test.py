@@ -9,28 +9,23 @@ from bs4 import BeautifulSoup
 
 from course_catalog.etl.see import transform, extract, _parse_run_dates
 
-short_description = "This program is designed to help senior executives of service businesses—especially those \
-responsible for HR, operations, and customer experience—create and implement an integrated set of strategies that \
-delights customers and keeps them loyal; engages a workforce and helps them find meaning and dignity in their work; \
-and drives high performance and revenue."
+short_description = "Sed elementum tempus egestas sed sed risus pretium quam vulputate. Amet consectetur adipiscing \
+elit ut aliquam purus sit amet luctus. Amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Enim sit \
+amet venenatis urna cursus eget. Eleifend donec pretium vulputate sapien nec sagittis aliquam malesuada. Amet nulla \
+facilisi morbi tempus iaculis urna id."
 
-full_description = "What makes a service business successful? The rule of thumb for many companies in industries \
-like retail, hospitality, finance/banking, and health care has been to drive down wages and operating costs, creating \
-a vicious cycle of disinvestment in search of higher profits. Zeynep Ton, the faculty leader for this course, asked \
-herself, what if the focus shifted … Could organizations hit new standards of excellence and performance? Grounded in \
-Professor Ton’s research over many years and with multiple people-intensive companies, this program is designed to \
-help leaders of service businesses create an organization that delivers superior value to customers, shareholders, \
-and employees at the same time. Through a combination of assessments, recent interactive case studies, lectures, and \
-videos, participants will learn about the key elements of operational excellence in services and how to adapt an \
-integrated set of these strategies in their organization. Participants (and a sample of their frontline employees \
-and managers) can complete an assessment survey in advance of the program. The course content, combined with the data \
-from the surveys, will help participants—especially those who attend as a team—identify key areas for improvement and \
-provide guidance on next steps for their organizations. The course leverages a systems perspective to frame \
-discussions around key elements of operational excellence in services, including: (This course was previously \
-entitled The Good Jobs Strategy: Delivering Superior Value to Customers, Shareholders, and Employees .)"
+full_description = "Accumsan in nisl nisi scelerisque eu. Velit scelerisque in dictum non consectetur a erat nam. \
+Ut faucibus pulvinar elementum integer enim. Augue ut lectus arcu bibendum at varius vel pharetra vel. Amet \
+consectetur adipiscing elit pellentesque habitant morbi tristique senectus. In vitae turpis massa sed elementum \
+tempus. Magna eget est lorem ipsum dolor. Nisi scelerisque eu ultrices vitae auctor. Pulvinar mattis nunc sed blandit \
+libero volutpat sed. Id nibh tortor id aliquet lectus proin nibh nisl. Semper quis lectus nulla at. Vehicula ipsum a \
+arcu cursus vitae congue mauris rhoncus … Dignissim sodales ut eu sem integer vitae justo eget? Id diam maecenas \
+ultricies mi eget mauris pharetra et. Aliquet risus feugiat in ante metus dictum at tempor. Ipsum a arcu cursus \
+vitae congue mauris rhoncus. At tempor commodo ullamcorper a lacus. Ut faucibus pulvinar elementum integer enim \
+neque volutpat. Convallis posuere morbi leo urna molestie. Sed arcu non odio euismod: Cursus in hac habitasse platea \
+dictumst quisque. Sed enim ut sem viverra aliquet eget."
 
-title = "Achieving Operational Excellence Through People: Delivering Superior Value to Customers, Employees, \
-and Shareholders"
+title = "Nunc Eget Lorem Dolor Sed Viverra Ipsum Nunc"
 
 
 @pytest.fixture(autouse=True)
@@ -70,15 +65,15 @@ def test_see_extract(settings, base_url):
                         datetime.datetime(2020, 6, 19, 0, 0, tzinfo=pytz.utc),
                     )
                 ],
-                "prices": [{"price": Decimal("4100")}],
+                "price": Decimal("4100"),
                 "topics": [
-                    {"name": "Operations"},
-                    {"name": "Organizations & Leadership"},
-                    {"name": "Strategy & Innovation"},
+                    "Operations",
+                    "Organizations & Leadership",
+                    "Strategy & Innovation",
                 ],
                 "short_description": short_description,
                 "full_description": full_description,
-                "instructors": [{"first_name": "Zeynep", "last_name": "Ton"}],
+                "instructors": [["Robert", "Van de Graaff"]],
             }
         ]
         if base_url
@@ -121,7 +116,9 @@ def test_see_transform(settings):
                     "url": "https://executive.mit.edu/openenrollment/program/foobar/",
                     "short_description": short_description,
                     "full_description": full_description,
-                    "instructors": [{"first_name": "Zeynep", "last_name": "Ton"}],
+                    "instructors": [
+                        {"first_name": "Robert", "last_name": "Van de Graaff"}
+                    ],
                 }
             ],
         }
