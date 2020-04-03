@@ -352,6 +352,55 @@ describe("search functions", () => {
           }
         ]
       }
+
+      const suggestQuery = {
+        suggest_field1: {
+          phrase: {
+            collate: {
+              params: {
+                field_name: "suggest_field1"
+              },
+              prune: true,
+              query: {
+                source: {
+                  match_phrase: {
+                    "{{field_name}}": "{{suggestion}}"
+                  }
+                }
+              }
+            },
+            confidence: 0.0001,
+            field:      "suggest_field1",
+            gram_size:  1,
+            max_errors: 3,
+            size:       5
+          }
+        },
+        suggest_field2: {
+          phrase: {
+            collate: {
+              params: {
+                field_name: "suggest_field2"
+              },
+              prune: true,
+              query: {
+                source: {
+                  match_phrase: {
+                    "{{field_name}}": "{{suggestion}}"
+                  }
+                }
+              }
+            },
+            confidence: 0.0001,
+            field:      "suggest_field2",
+            gram_size:  1,
+            max_errors: 3,
+            size:       5
+          }
+        },
+        text: "some text here"
+      }
+
       assert.deepEqual(buildSearchQuery({ type, text }), {
         query: {
           bool: {
@@ -377,7 +426,8 @@ describe("search functions", () => {
               }
             ]
           }
-        }
+        },
+        suggest: suggestQuery
       })
       sinon.assert.calledWith(stub, type)
     })
@@ -638,8 +688,8 @@ describe("search functions", () => {
               }
             },
             suggest: {
-              text:              text,
-              short_description: {
+              text:                        text,
+              "short_description.trigram": {
                 phrase: {
                   confidence: 0.0001,
                   field:      "short_description.trigram",
@@ -661,7 +711,7 @@ describe("search functions", () => {
                   }
                 }
               },
-              title: {
+              "title.trigram": {
                 phrase: {
                   confidence: 0.0001,
                   field:      "title.trigram",
