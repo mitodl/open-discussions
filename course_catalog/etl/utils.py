@@ -134,7 +134,7 @@ def parse_dates(date_string):
     """
     # Start and end dates in same month (Jun 18-19, 2020)
     pattern_1_month = re.compile(
-        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)-?(?P<end_d>\d+)?,\s*(?P<year>\d{4})$"
+        r"(?P<start_m>\w+)\s+(?P<start_d>\d+)\s*-\s*(?P<end_d>\d+)?,\s*(?P<year>\d{4})$"
     )
     # Start and end dates in different months, same year (Jun 18 - Jul 18, 2020)
     pattern_1_year = re.compile(

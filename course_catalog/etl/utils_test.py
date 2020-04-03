@@ -111,7 +111,7 @@ def test_strip_extra_whitespace():
 
 def test_parse_dates():
     """Test that parse_dates returns correct dates"""
-    for datestring in ("May 13-30, 2020", "May 13 - 20,2020"):
+    for datestring in ("May 13-30, 2020", "May 13 - 30,2020"):
         assert parse_dates(datestring) == (
             datetime.datetime(2020, 5, 13, tzinfo=pytz.utc),
             datetime.datetime(2020, 5, 30, tzinfo=pytz.utc),

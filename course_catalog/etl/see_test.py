@@ -7,7 +7,13 @@ import pytest
 import pytz
 from bs4 import BeautifulSoup
 
-from course_catalog.etl.see import transform, extract, _parse_run_dates
+from course_catalog.etl.see import (
+    transform,
+    extract,
+    _parse_run_dates,
+    _parse_topics,
+    _parse_price,
+)
 
 short_description = "Sed elementum tempus egestas sed sed risus pretium quam vulputate. Amet consectetur adipiscing \
 elit ut aliquam purus sit amet luctus. Amet mauris commodo quis imperdiet massa tincidunt nunc pulvinar. Enim sit \
@@ -144,3 +150,31 @@ def test__parse_run_dates():
             datetime.datetime(2021, 1, 26, tzinfo=pytz.utc),
         ),
     ]
+
+
+def test_blank_topics():
+    """Test that an empty list is returned if no topic section is found"""
+    html = "<div>test</div>"
+    soup = BeautifulSoup(html, "html.parser")
+    assert _parse_topics(soup) == []
+
+
+@pytest.mark.parametrize(
+    "html, price",
+    [
+        [
+            "<p><strong>Tuition:</strong> $4,100 (excluding accommodations)</p>",
+            Decimal("4100"),
+        ],
+        [
+            "<strong>Tuition:</strong> $75,100 (excluding accommodations)",
+            Decimal("75100"),
+        ],
+        ["<p>$4,100 (excluding accommodations)</p>", None],
+        ["<p><strong>Tuition:</strong> TBD </p>", None],
+    ],
+)
+def test__parse_price(html, price):
+    """Test that __parse_price returns the expected value"""
+    soup = BeautifulSoup(html, "html.parser")
+    assert _parse_price(soup) == price

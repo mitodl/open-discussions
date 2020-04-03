@@ -60,13 +60,15 @@ def _parse_price(course):
           list of int: List containing 1 integer (or empty)
     """
     price = None
-    price_text = course.find("strong", text=re.compile(r"Tuition:.*")).parent.find(
-        text=True, recursive=False
-    )
-    if price_text:
-        price_match = re.search(r"([\d,]+)", price_text)
-        if price_match:
-            return Decimal(price_match.group(0).replace(",", ""))
+    try:
+        price_text = course.find("strong", text=re.compile(r"Tuition:.*")).parent.find(
+            text=True, recursive=False
+        )
+    except AttributeError:
+        return price
+    price_match = re.search(r"([\d,]+)", price_text)
+    if price_match:
+        return Decimal(price_match.group(0).replace(",", ""))
     return price
 
 
