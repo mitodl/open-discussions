@@ -1,7 +1,17 @@
 """ETL utils test"""
-import pytest
+import datetime
 
-from course_catalog.etl.utils import log_exceptions, sync_s3_text, extract_text_metadata
+import pytest
+import pytz
+
+from course_catalog.etl.utils import (
+    log_exceptions,
+    sync_s3_text,
+    extract_text_metadata,
+    generate_unique_id,
+    strip_extra_whitespace,
+    parse_dates,
+)
 
 
 @pytest.mark.parametrize("side_effect", ["One", Exception("error")])
@@ -73,3 +83,47 @@ def test_extract_text_metadata(mocker, data, token, settings, headers):
     else:
         assert response is None
         mock_tika.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "url,uuid",
+    [
+        [
+            "https://executive.mit.edu/openenrollment/program/managing-product-platforms",
+            "6626ef0d6c8e3000a9ba7a7f509156aa",
+        ],
+        [
+            "https://executive.mit.edu/openenrollment/program/negotiation-for-executives",
+            "6b7d9f0b7a193048aae11054cbd38753",
+        ],
+    ],
+)
+def test_generate_unique_id(url, uuid):
+    """Test that the same uuid is always created for a given URL"""
+    assert generate_unique_id(url) == uuid
+
+
+def test_strip_extra_whitespace():
+    """Test that extra whitespace is removed from text"""
+    text = " This\n\n is      a\t\ttest. "
+    assert strip_extra_whitespace(text) == "This is a test."
+
+
+def test_parse_dates():
+    """Test that parse_dates returns correct dates"""
+    for datestring in ("May 13-30, 2020", "May 13 - 30,2020"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 5, 13, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 30, tzinfo=pytz.utc),
+        )
+    for datestring in ("Jun 24-Aug 11, 2020", "Jun  24 -  Aug 11,    2020"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 6, 24, tzinfo=pytz.utc),
+            datetime.datetime(2020, 8, 11, tzinfo=pytz.utc),
+        )
+    for datestring in ("Nov 25, 2020-Jan 26, 2021", "Nov 25,2020  -Jan   26,2021"):
+        assert parse_dates(datestring) == (
+            datetime.datetime(2020, 11, 25, tzinfo=pytz.utc),
+            datetime.datetime(2021, 1, 26, tzinfo=pytz.utc),
+        )
+    assert parse_dates("This is not a date") is None

@@ -4,6 +4,7 @@ from toolz import compose, first, juxt, curry
 from course_catalog.etl import (
     micromasters,
     loaders,
+    see,
     mitx,
     xpro,
     ocw,
@@ -58,6 +59,8 @@ mitx_etl = compose(
 )
 
 oll_etl = compose(loaders.load_courses, oll.transform, oll.extract)
+
+see_etl = compose(loaders.load_courses, see.transform, see.extract)
 
 youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)
 

@@ -35,6 +35,7 @@ from course_catalog.tasks import (
     get_ocw_courses,
     get_ocw_files,
     import_all_ocw_files,
+    get_see_data,
 )
 
 
@@ -456,6 +457,13 @@ def test_get_oll_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_oll_data.delay()
     mock_pipelines.oll_etl.assert_called_once_with()
+
+
+def test_get_see_data(mocker):
+    """Verify that get_see_data invokes the SEE ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_see_data.delay()
+    mock_pipelines.see_etl.assert_called_once_with()
 
 
 @pytest.mark.parametrize("channel_ids", [["abc", "123"], None])

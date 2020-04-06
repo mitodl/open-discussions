@@ -230,6 +230,12 @@ def get_oll_data():
 
 
 @app.task(acks_late=True)
+def get_see_data():
+    """Execute the SEE ETL pipeline"""
+    pipelines.see_etl()
+
+
+@app.task(acks_late=True)
 def get_youtube_data(*, channel_ids=None):
     """
     Execute the YouTube ETL pipeline
