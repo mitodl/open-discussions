@@ -34,6 +34,8 @@ from course_catalog.models import (
     Playlist,
     VideoChannel,
     ContentFile,
+    Podcast,
+    PodcastEpisode,
 )
 
 
@@ -473,3 +475,33 @@ class PlaylistFactory(LearningResourceFactory):
 
     class Meta:
         model = Playlist
+
+
+class PodcastFactory(LearningResourceFactory):
+    """Factory for Podcast"""
+
+    podcast_id = factory.Sequence(lambda n: "PODCAST-%03d.MIT" % n)
+
+    full_description = factory.Faker("text")
+    image_src = factory.Faker("image_url")
+    published = True
+    url = factory.Faker("uri")
+
+    class Meta:
+        model = Podcast
+
+
+class PodcastEpisodeFactory(LearningResourceFactory):
+    """Factory for Podcast Episode"""
+
+    episode_id = factory.Sequence(lambda n: "PODCAST-EPISODE-%03d.MIT" % n)
+
+    full_description = factory.Faker("text")
+    image_src = factory.Faker("image_url")
+    image_src = factory.Faker("image_url")
+    podcast = factory.SubFactory("course_catalog.factories.PodcastFactory")
+    published = True
+    url = factory.Faker("uri")
+
+    class Meta:
+        model = PodcastEpisode

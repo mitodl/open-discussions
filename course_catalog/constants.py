@@ -34,6 +34,7 @@ class PlatformType(Enum):
     oll = "oll"
     youtube = "youtube"
     see = "see"
+    podcast = "podcast"
 
 
 class ResourceType(Enum):
