@@ -9,7 +9,7 @@ from django.db.models import Value, Prefetch, OuterRef, Exists, ExpressionWrappe
 from django.contrib.postgres.fields import JSONField
 
 from course_catalog.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
-from course_catalog.constants import ResourceType, PrivacyLevel
+from course_catalog.constants import ResourceType, PrivacyLevel, PlatformType
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel, TimestampedModelQuerySet
 
@@ -339,7 +339,16 @@ class UserListItem(ListItem):
 
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("course", "bootcamp", "program", "video")},
+        limit_choices_to={
+            "model__in": (
+                "course",
+                "bootcamp",
+                "program",
+                "video",
+                "podcast",
+                "podcastepisode",
+            )
+        },
         on_delete=models.CASCADE,
     )
     user_list = models.ForeignKey(
@@ -381,7 +390,15 @@ class FavoriteItem(TimestampedModel):
     content_type = models.ForeignKey(
         ContentType,
         limit_choices_to={
-            "model__in": ("course", "bootcamp", "userlist", "program", "video")
+            "model__in": (
+                "course",
+                "bootcamp",
+                "userlist",
+                "program",
+                "video",
+                "podcast",
+                "podcastepisode",
+            )
         },
         on_delete=models.CASCADE,
     )
@@ -472,3 +489,51 @@ class PlaylistVideo(models.Model):
 
     class Meta:
         unique_together = ("playlist", "video")
+
+
+class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
+    """Data model for podcast"""
+
+    objects = LearningResourceQuerySet.as_manager()
+
+    podcast_id = models.CharField(max_length=80, unique=True)
+
+    full_description = models.TextField(null=True, blank=True)
+    image_src = models.URLField(max_length=400, null=True, blank=True)
+    published = models.BooleanField(default=True)
+    url = models.URLField(null=True, max_length=2048)
+    searchable = models.BooleanField(default=True)
+
+    @property
+    def platform(self):
+        """Platform for podcasts"""
+        return PlatformType.podcast.value
+
+
+class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
+    """Data model for podcast episodes"""
+
+    objects = LearningResourceQuerySet.as_manager()
+
+    episode_id = models.CharField(max_length=80)
+
+    full_description = models.TextField(null=True, blank=True)
+    image_src = models.URLField(max_length=400, null=True, blank=True)
+    last_modified = models.DateTimeField(null=True, blank=True)
+    podcast = models.ForeignKey(
+        Podcast, related_name="episodes", on_delete=models.CASCADE
+    )
+    published = models.BooleanField(default=True)
+    runs = GenericRelation(LearningResourceRun)
+    transcript = models.TextField(blank=True, default="")
+    url = models.URLField(null=True, max_length=2048)
+    searchable = models.BooleanField(default=True)
+    duration = models.CharField(null=True, blank=True, max_length=10)
+
+    @property
+    def platform(self):
+        """Platform for podcast episode"""
+        return PlatformType.podcast.value
+
+    class Meta:
+        unique_together = ("podcast", "episode_id")
