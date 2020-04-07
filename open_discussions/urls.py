@@ -86,6 +86,7 @@ urlpatterns = [
     url(r"^search/", index, name="site-search"),
     url(r"^courses/", index, name="courses"),
     url(r"^learn/", index, name="learn"),
+    url(r"^podcasts/", index, name="podcasts"),
     url(r"^terms-and-conditions/", index, name="terms-and-conditions"),
     # Hijack
     url(r"^hijack/", include("hijack.urls", namespace="hijack")),

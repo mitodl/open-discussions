@@ -15,6 +15,7 @@ import { makeFrontpageSetting, makeCommentSetting } from "../factories/settings"
 import { makeChannelPostList } from "../factories/posts"
 import { shouldIf, shouldIfGt0, mockCourseAPIMethods } from "../lib/test_utils"
 import * as embedLib from "../lib/embed"
+import * as LearnRouterModule from "./LearnRouter"
 
 describe("App", () => {
   let helper, renderComponent, channels, postList
@@ -37,6 +38,7 @@ describe("App", () => {
     renderComponent = helper.renderComponent.bind(helper)
     mockCourseAPIMethods(helper)
     helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
+    helper.stubComponent(LearnRouterModule, "LearnRouter")
   })
 
   afterEach(() => {
@@ -144,6 +146,31 @@ describe("App", () => {
       assert.equal(wrapper.find("CourseToolbar").exists(), isLearnUrl)
       assert.equal(wrapper.find("Toolbar").exists(), !isLearnUrl)
       assert.equal(wrapper.find("Drawer").exists(), !isLearnUrl)
+    })
+  })
+
+  //
+  ;[true, false].forEach(courseUIEnabled => {
+    it(`${shouldIf(
+      courseUIEnabled
+    )} render something at "/learn"`, async () => {
+      SETTINGS.course_ui_enabled = courseUIEnabled
+      const [wrapper] = await renderComponent("/learn/", [])
+      assert.equal(courseUIEnabled, wrapper.find("LearnRouter").exists())
+    })
+  })
+
+  //
+  ;[true, false].forEach(podcastFrontpageEnabled => {
+    it(`${shouldIf(
+      podcastFrontpageEnabled
+    )} render something at "/podcasts"`, async () => {
+      SETTINGS.podcast_frontpage_enabled = podcastFrontpageEnabled
+      const [wrapper] = await renderComponent("/podcasts/", [])
+      assert.equal(
+        podcastFrontpageEnabled,
+        wrapper.find("PodcastFrontpage").exists()
+      )
     })
   })
 })

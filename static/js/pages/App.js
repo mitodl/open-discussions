@@ -30,6 +30,7 @@ import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import ChannelRouter from "./ChannelRouter"
 import LearnRouter from "./LearnRouter"
+import PodcastFrontpage from "./PodcastFrontpage"
 
 import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
@@ -325,6 +326,11 @@ class App extends React.Component<Props> {
               </Route>
               <Route path={`${match.url}learn`} component={LearnRouter} />
             </>
+          ) : null}
+          {SETTINGS.podcast_frontpage_enabled ? (
+            <Route path={`${match.url}podcasts`}>
+              <PodcastFrontpage />
+            </Route>
           ) : null}
         </div>
       </div>

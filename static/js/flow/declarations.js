@@ -39,7 +39,8 @@ declare var SETTINGS: {
   algolia_apiKey: ?string,
   course_ui_enabled: boolean,
   file_search_enabled: boolean,
-  livestream_ui_enabled: boolean
+  livestream_ui_enabled: boolean,
+  podcast_frontpage_enabled: boolean
 }
 
 // mocha

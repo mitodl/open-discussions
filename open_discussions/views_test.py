@@ -34,6 +34,7 @@ def test_webpack_url(
     settings.FEATURES[features.COURSE_UI] = False
     settings.FEATURES[features.LIVESTREAM_UI] = False
     settings.FEATURES[features.COURSE_FILE_SEARCH] = False
+    settings.FEATURES[features.PODCAST_FRONTPAGE] = False
     settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
@@ -92,6 +93,7 @@ def test_webpack_url(
         "algolia_apiKey": settings.ALGOLIA_API_KEY,
         "course_ui_enabled": settings.FEATURES[features.COURSE_UI],
         "livestream_ui_enabled": settings.FEATURES[features.LIVESTREAM_UI],
+        "podcast_frontpage_enabled": settings.FEATURES[features.PODCAST_FRONTPAGE],
         **expected_user_values,
     }
 
