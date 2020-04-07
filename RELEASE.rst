@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.118.0
+---------------
+
+- Suggested Terms in Channel Search
+- data model for podcasts
+- Import Sloan Executive courses (#2726)
+
 Version 0.117.2 (Released April 02, 2020)
 ---------------
 
