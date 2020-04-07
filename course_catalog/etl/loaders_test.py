@@ -51,6 +51,7 @@ from course_catalog.models import (
     Playlist,
     VideoChannel,
     PlaylistVideo,
+    UserList,
     UserListItem,
     ContentFile,
 )
@@ -562,8 +563,22 @@ def test_load_playlist(mock_tasks):
 def test_load_playlists_unpublish():
     """Test load_playlists when a video/playlist gets unpublished"""
     channel = VideoChannelFactory.create()
-    playlist1 = PlaylistFactory.create(channel=channel, published=True)
-    playlist2 = PlaylistFactory.create(channel=channel, published=True)
+
+    userlist1 = UserListFactory.create()
+    userlist2 = UserListFactory.create()
+
+    playlist1 = PlaylistFactory.create(
+        channel=channel, published=True, has_user_list=True, user_list=userlist1
+    )
+    playlist2 = PlaylistFactory.create(
+        channel=channel, published=True, has_user_list=True, user_list=userlist2
+    )
+    playlist3 = PlaylistFactory.create(
+        channel=channel, published=True, has_user_list=True, user_list=None
+    )
+    playlist4 = PlaylistFactory.create(
+        channel=channel, published=True, has_user_list=False, user_list=None
+    )
 
     playlists_data = [
         {
@@ -577,8 +592,23 @@ def test_load_playlists_unpublish():
 
     playlist1.refresh_from_db()
     playlist2.refresh_from_db()
+    playlist3.refresh_from_db()
+    playlist4.refresh_from_db()
+
     assert playlist1.published is True
+    assert playlist1.has_user_list is True
+
     assert playlist2.published is False
+    assert playlist2.has_user_list is False
+
+    assert playlist3.published is False
+    assert playlist3.has_user_list is False
+
+    assert playlist4.published is False
+    assert playlist4.has_user_list is False
+
+    assert UserList.objects.filter(id=userlist1.id).count() == 1
+    assert UserList.objects.filter(id=userlist2.id).count() == 0
 
 
 def test_load_video_channels():
