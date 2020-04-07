@@ -447,9 +447,17 @@ def load_playlists(video_channel, playlists_data):
     playlist_ids = [playlist.id for playlist in playlists]
 
     # remove playlists that no longer exist
-    Playlist.objects.filter(channel=video_channel).exclude(id__in=playlist_ids).update(
-        published=False
+    playlists_to_unpublish = Playlist.objects.filter(channel=video_channel).exclude(
+        id__in=playlist_ids
     )
+
+    for playlist in playlists_to_unpublish.filter(has_user_list=True):
+        user_list = playlist.user_list
+        if user_list:
+            search_task_helpers.delete_user_list(user_list)
+            user_list.delete()
+
+    playlists_to_unpublish.update(published=False, has_user_list=False)
 
     return playlists
 

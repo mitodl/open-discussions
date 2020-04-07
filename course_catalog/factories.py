@@ -473,6 +473,9 @@ class PlaylistFactory(LearningResourceFactory):
 
     channel = factory.SubFactory("course_catalog.factories.VideoChannelFactory")
 
+    has_user_list = False
+    user_list = None
+
     class Meta:
         model = Playlist
 
