@@ -76,7 +76,6 @@ BASE_OBJECT_TYPE = {
         "type": "text",
         "fields": {
             "english": {"type": "text", "analyzer": "english"},
-            "trigram": {"type": "text", "analyzer": "trigram"},
             "raw": {"type": "keyword"},
         },
     },
@@ -86,15 +85,13 @@ BASE_OBJECT_TYPE = {
 
 PROFILE_OBJECT_TYPE = {
     **BASE_OBJECT_TYPE,
-    "author_bio": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "author_bio": ENGLISH_TEXT_FIELD,
     "author_channel_membership": {"type": "keyword"},
     "author_channel_join_data": {
         "type": "nested",
         "properties": {"name": {"type": "keyword"}, "joined": {"type": "date"}},
     },
     "author_avatar_medium": {"type": "keyword"},
-    "suggest_field1": {"type": "alias", "path": "author_name.trigram"},
-    "suggest_field2": {"type": "alias", "path": "author_bio.trigram"},
 }
 
 CONTENT_OBJECT_TYPE = {
@@ -102,16 +99,14 @@ CONTENT_OBJECT_TYPE = {
     "channel_name": {"type": "keyword"},
     "channel_title": ENGLISH_TEXT_FIELD,
     "channel_type": {"type": "keyword"},
-    "text": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "text": ENGLISH_TEXT_FIELD,
     "score": {"type": "long"},
     "post_id": {"type": "keyword"},
-    "post_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "post_title": ENGLISH_TEXT_FIELD,
     "post_slug": {"type": "keyword"},
     "created": {"type": "date"},
     "deleted": {"type": "boolean"},
     "removed": {"type": "boolean"},
-    "suggest_field1": {"type": "alias", "path": "post_title.trigram"},
-    "suggest_field2": {"type": "alias", "path": "text.trigram"},
 }
 
 

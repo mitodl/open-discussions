@@ -265,7 +265,7 @@ def execute_search(*, user, query):
     search = Search(index=index)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return _transform_search_results_suggest(search.execute().to_dict())
+    return search.execute().to_dict()
 
 
 def execute_learn_search(*, user, query):
@@ -284,45 +284,6 @@ def execute_learn_search(*, user, query):
     search.update_from_dict(query)
     search = _apply_learning_query_filters(search, user)
     return transform_results(search.execute().to_dict(), user)
-
-
-def _transform_search_results_suggest(search_result):
-    """
-    Transform suggest results from elasticsearch
-
-    Args:
-        search_result (dict): The results from ElasticSearch
-
-    Returns:
-        dict: The Elasticsearch response dict with transformed suggestions
-    """
-
-    es_suggest = search_result.pop("suggest", {})
-    if (
-        search_result.get("hits", {}).get("total", 0)
-        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
-    ):
-        suggestion_dict = defaultdict(int)
-        suggestions = [
-            suggestion
-            for suggestion_list in extract_values(es_suggest, "options")
-            for suggestion in suggestion_list
-            if suggestion["collate_match"] is True
-        ]
-        for suggestion in suggestions:
-            suggestion_dict[suggestion["text"]] = (
-                suggestion_dict[suggestion["text"]] + suggestion["score"]
-            )
-        search_result["suggest"] = [
-            key
-            for key, value in sorted(
-                suggestion_dict.items(), key=lambda item: item[1], reverse=True
-            )
-        ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
-    else:
-        search_result["suggest"] = []
-
-    return search_result
 
 
 def transform_results(search_result, user):
@@ -369,8 +330,30 @@ def transform_results(search_result, user):
                 hit["_source"]["lists"] = get_list_items_by_resource(
                     user, object_type, object_id
                 )
-
-    search_result = _transform_search_results_suggest(search_result)
+    es_suggest = search_result.pop("suggest", {})
+    if (
+        search_result.get("hits", {}).get("total", 0)
+        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
+    ):
+        suggestion_dict = defaultdict(int)
+        suggestions = [
+            suggestion
+            for suggestion_list in extract_values(es_suggest, "options")
+            for suggestion in suggestion_list
+            if suggestion["collate_match"] is True
+        ]
+        for suggestion in suggestions:
+            suggestion_dict[suggestion["text"]] = (
+                suggestion_dict[suggestion["text"]] + suggestion["score"]
+            )
+        search_result["suggest"] = [
+            key
+            for key, value in sorted(
+                suggestion_dict.items(), key=lambda item: item[1], reverse=True
+            )
+        ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
+    else:
+        search_result["suggest"] = []
     return search_result
 
 
