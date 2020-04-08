@@ -17,6 +17,8 @@ from course_catalog.models import (
     Bootcamp,
     UserListItem,
     UserList,
+    Podcast,
+    PodcastEpisode,
     Program,
     ProgramItem,
     FavoriteItem,
@@ -663,3 +665,55 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = FavoriteItem
         fields = "__all__"
+
+
+class PodcastEpisodeSerializer(serializers.ModelSerializer):
+    """
+    Serializer for PodcastEpisode
+    """
+
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = PodcastEpisode
+        fields = [
+            "id",
+            "topics",
+            "created_on",
+            "updated_on",
+            "title",
+            "short_description",
+            "episode_id",
+            "full_description",
+            "image_src",
+            "url",
+            "offered_by",
+        ]
+
+
+class PodcastSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Podcasts
+    """
+
+    episodes = PodcastEpisodeSerializer(many=True)
+    topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
+    offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = Podcast
+        fields = [
+            "id",
+            "title",
+            "short_description",
+            "podcast_id",
+            "full_description",
+            "image_src",
+            "url",
+            "topics",
+            "offered_by",
+            "created_on",
+            "updated_on",
+            "episodes",
+        ]

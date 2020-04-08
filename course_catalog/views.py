@@ -28,6 +28,8 @@ from course_catalog.models import (
     Video,
     CourseTopic,
     UserListItem,
+    Podcast,
+    PodcastEpisode,
 )
 from course_catalog.permissions import (
     HasUserListPermissions,
@@ -42,11 +44,16 @@ from course_catalog.serializers import (
     VideoSerializer,
     CourseTopicSerializer,
     UserListItemSerializer,
+    PodcastSerializer,
 )
 from course_catalog.tasks import get_ocw_courses
 from course_catalog.utils import load_course_blacklist
 from open_discussions import features, settings
-from open_discussions.permissions import AnonymousAccessReadonlyPermission
+from open_discussions.permissions import (
+    AnonymousAccessReadonlyPermission,
+    PodcastFeatureFlag,
+    ReadOnly,
+)
 
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
@@ -419,3 +426,16 @@ class WebhookOCWView(APIView):
         else:
             log.error("No records found in webhook: %s", request.body.decode())
         return Response({})
+
+
+class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for Podcasts
+    """
+
+    serializer_class = PodcastSerializer
+    permission_classes = (ReadOnly & PodcastFeatureFlag,)
+
+    queryset = Podcast.objects.filter(published=True).prefetch_related(
+        Prefetch("episodes", queryset=PodcastEpisode.objects.filter(published=True))
+    )
