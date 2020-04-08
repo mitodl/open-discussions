@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.118.0
+Version 0.118.0 (Released April 08, 2020)
 ---------------
 
 - Revert "Suggested Terms in Channel Search"
