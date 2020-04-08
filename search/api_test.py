@@ -50,6 +50,35 @@ from search.serializers import (
 )
 
 
+RAW_SUGGESTIONS = {
+    "short_description": [
+        {
+            "text": "enginer",
+            "offset": 0,
+            "length": 3,
+            "options": [
+                {"text": "enginer", "score": 0.72, "collate_match": False},
+                {"text": "engineers", "score": 0.019, "collate_match": True},
+                {"text": "engineer", "score": 0.018, "collate_match": True},
+            ],
+        }
+    ],
+    "title": [
+        {
+            "text": "enginer",
+            "offset": 0,
+            "length": 4,
+            "options": [
+                {"text": "enginer", "score": 0.721, "collate_match": False},
+                {"text": "engineers", "score": 0.201, "collate_match": True},
+                {"text": "engineer", "score": 0.038, "collate_match": True},
+                {"text": "engines", "score": 0.027, "collate_match": True},
+            ],
+        }
+    ],
+}
+
+
 @pytest.fixture()
 def gen_query_filters_mock(mocker):
     """Mock _apply_general_query_filters"""
@@ -110,6 +139,8 @@ def test_execute_search(user, elasticsearch):
     add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+
     assert (
         execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
     )
@@ -248,6 +279,8 @@ def test_execute_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     user = AnonymousUser()
     query = {"a": "query"}
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+
     assert (
         execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
     )
@@ -320,6 +353,35 @@ def test_execute_search_anonymous(elasticsearch):
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
+
+
+@pytest.mark.parametrize("max_suggestions", [1, 3])
+@pytest.mark.parametrize("suggest_min_hits", [2, 4])
+def test_execute_search_with_suggestion(
+    elasticsearch, suggest_min_hits, max_suggestions, settings
+):
+    """execute_search should execute an Elasticsearch search suggestions"""
+    user = AnonymousUser()
+    query = {"a": "query"}
+
+    settings.ELASTICSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
+    settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
+
+    expected_suggest = (
+        ["engineers", "engineer", "engines"][:max_suggestions]
+        if suggest_min_hits >= 3
+        else []
+    )
+
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": 3},
+        "suggest": RAW_SUGGESTIONS,
+    }
+
+    assert execute_search(user=user, query=query) == {
+        "hits": {"total": 3},
+        "suggest": expected_suggest,
+    }
 
 
 def test_execute_learn_search_anonymous(elasticsearch):
@@ -472,34 +534,6 @@ def test_transform_results(
     else:
         item = None
 
-    raw_suggest = {
-        "short_description": [
-            {
-                "text": "enginer",
-                "offset": 0,
-                "length": 3,
-                "options": [
-                    {"text": "enginer", "score": 0.72, "collate_match": False},
-                    {"text": "engineers", "score": 0.019, "collate_match": True},
-                    {"text": "engineer", "score": 0.018, "collate_match": True},
-                ],
-            }
-        ],
-        "title": [
-            {
-                "text": "enginer",
-                "offset": 0,
-                "length": 4,
-                "options": [
-                    {"text": "enginer", "score": 0.721, "collate_match": False},
-                    {"text": "engineers", "score": 0.201, "collate_match": True},
-                    {"text": "engineer", "score": 0.038, "collate_match": True},
-                    {"text": "engines", "score": 0.027, "collate_match": True},
-                ],
-            }
-        ],
-    }
-
     expected_suggest = (
         ["engineers", "engineer", "engines"][:max_suggestions]
         if suggest_min_hits >= 3
@@ -577,7 +611,7 @@ def test_transform_results(
 
     results = {
         "hits": {"hits": raw_hits, "total": 3},
-        "suggest": raw_suggest,
+        "suggest": RAW_SUGGESTIONS,
         "aggregations": {
             "availability": {
                 "runs": {
