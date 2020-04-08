@@ -17,7 +17,7 @@ import { Cell, Grid } from "../components/Grid"
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
-import { preventDefaultAndInvoke } from "../lib/util"
+import { preventDefaultAndInvoke, emptyOrNil } from "../lib/util"
 import { toggleUpvote } from "../util/api_actions"
 import { validateSearchQuery } from "../lib/validation"
 
@@ -50,6 +50,7 @@ type Props = {
   results: Array<PostResult | CommentResult | ProfileResult>,
   searchLoaded: boolean,
   searchProcessing: boolean,
+  suggest: Array<string>,
   total: number,
   clearSearch: () => void,
   toggleUpvote: () => void,
@@ -119,7 +120,6 @@ export class SearchPage extends React.Component<Props, State> {
       location: { pathname, search },
       runSearch
     } = this.props
-
     const searchObj = qs.parse(search)
     const text = params.text || this.state.text || undefined
 
@@ -165,6 +165,7 @@ export class SearchPage extends React.Component<Props, State> {
       results,
       searchProcessing,
       initialLoad,
+      suggest,
       total,
       toggleUpvote,
       upvotedPosts
@@ -175,7 +176,10 @@ export class SearchPage extends React.Component<Props, State> {
       return <PostLoading />
     }
 
-    if (!results.length) {
+    if (
+      !results.length &&
+      (!suggest.length || suggest[0] === this.state.text)
+    ) {
       return (
         <div className="empty-list-msg">There are no results to display.</div>
       )
@@ -188,25 +192,46 @@ export class SearchPage extends React.Component<Props, State> {
         initialLoad={from === 0}
         loader={<Loading className="infinite" key="loader" />}
       >
-        {results.map((result, i) => (
-          <SearchResult
-            key={i}
-            result={result}
-            toggleUpvote={toggleUpvote}
-            upvotedPost={
-              result.object_type === "post"
-                ? upvotedPosts.get(result.post_id)
-                : null
-            }
-            votedComment={
-              result.object_type === "comment"
-                ? votedComments.get(result.comment_id) || null
-                : null
-            }
-            commentDownvote={this.downvote}
-            commentUpvote={this.upvote}
-          />
-        ))}
+        {!emptyOrNil(suggest) && suggest[0] !== this.state.text ? (
+          <div className="suggestion">
+            Did you mean
+            {suggest.map((suggestion, i) => (
+              <span key={i}>
+                <a
+                  onClick={preventDefaultAndInvoke(() =>
+                    this.useSuggestion(suggestion)
+                  )}
+                >
+                  {` ${suggestion}`}
+                </a>
+                {i < suggest.length - 1 ? " | " : ""}
+              </span>
+            ))}
+          </div>
+        ) : null}
+        {results.length ? (
+          results.map((result, i) => (
+            <SearchResult
+              key={i}
+              result={result}
+              toggleUpvote={toggleUpvote}
+              upvotedPost={
+                result.object_type === "post"
+                  ? upvotedPosts.get(result.post_id)
+                  : null
+              }
+              votedComment={
+                result.object_type === "comment"
+                  ? votedComments.get(result.comment_id) || null
+                  : null
+              }
+              commentDownvote={this.downvote}
+              commentUpvote={this.upvote}
+            />
+          ))
+        ) : (
+          <div className="empty-list-msg">There are no results to display.</div>
+        )}
       </InfiniteScroll>
     )
   }
@@ -215,6 +240,11 @@ export class SearchPage extends React.Component<Props, State> {
     // $FlowFixMe: event.target.value exists
     const text = event ? event.target.value : ""
     this.setState({ text })
+  }
+
+  useSuggestion = async (text: string) => {
+    await this.setState({ text })
+    this.runSearch()
   }
 
   upvote = async (comment: CommentInTree) => {
@@ -285,7 +315,7 @@ const mapStateToProps = (state, ownProps) => {
   const notAuthorized = loaded
     ? channels.error && channels.error.errorStatusCode === 403
     : false
-  const { results, total, initialLoad } = search.data
+  const { results, total, suggest, initialLoad } = search.data
   const upvotedPosts = posts.data
 
   return {
@@ -303,6 +333,7 @@ const mapStateToProps = (state, ownProps) => {
     notAuthorized,
     searchLoaded,
     searchProcessing,
+    suggest,
     upvotedPosts
   }
 }

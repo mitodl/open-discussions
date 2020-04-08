@@ -49,6 +49,7 @@ describe("SearchPage", () => {
         loaded: true,
         data:   {
           results:     searchResponse.hits.hits,
+          suggest:     ["test"],
           total:       searchResponse.hits.total,
           incremental: false
         }
@@ -104,6 +105,15 @@ describe("SearchPage", () => {
         result.post_id === upvotedPost.id ? upvotedPost : null
       )
     })
+  })
+
+  it("renders suggestion and changes search text if clicked", async () => {
+    const { inner } = await renderPage()
+    const suggestDiv = inner.find(".suggestion")
+    assert.isOk(suggestDiv.text().includes("Did you mean"))
+    assert.isOk(suggestDiv.text().includes("test"))
+    suggestDiv.find("a").simulate("click")
+    assert.equal(inner.state()["text"], "test")
   })
 
   //
