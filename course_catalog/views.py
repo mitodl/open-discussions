@@ -24,6 +24,7 @@ from course_catalog.models import (
     Program,
     Bootcamp,
     FavoriteItem,
+    LearningResourceOfferor,
     LearningResourceRun,
     Video,
     CourseTopic,
@@ -437,5 +438,7 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
     queryset = Podcast.objects.filter(published=True).prefetch_related(
-        Prefetch("episodes", queryset=PodcastEpisode.objects.filter(published=True))
+        Prefetch("episodes", queryset=PodcastEpisode.objects.filter(published=True)),
+        Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+        Prefetch("topics", queryset=CourseTopic.objects.all()),
     )
