@@ -91,6 +91,7 @@ INSTALLED_APPS = (
     "hijack",
     "hijack_admin",
     "guardian",
+    "imagekit",
     "django_json_widget",
     # Put our apps after this point
     "open_discussions",
@@ -105,6 +106,7 @@ INSTALLED_APPS = (
     "course_catalog",
     "interactions",
     "moira_lists",
+    "discussions",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
@@ -468,7 +470,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": LOG_LEVEL,
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
@@ -533,6 +535,8 @@ if OPEN_DISCUSSIONS_USE_S3:
     if CLOUDFRONT_DIST:
         AWS_S3_CUSTOM_DOMAIN = "{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST)
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+
+IMAGEKIT_SPEC_CACHEFILE_NAMER = "imagekit.cachefiles.namers.source_name_dot_hash"
 
 # Celery
 USE_CELERY = True

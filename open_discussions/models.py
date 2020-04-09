@@ -34,3 +34,20 @@ class TimestampedModel(Model):
 
     class Meta:
         abstract = True
+
+
+class NoDefaultTimestampedModel(TimestampedModel):
+    """
+    This model is an alternative for TimestampedModel with one
+    important difference: it doesn't specify `auto_now` and `auto_now_add`.
+    This allows us to pass in our own values without django overriding them.
+    You'd typically use this model when backpopulating data from a source that
+    already has values for these fields and then switch to TimestampedModel
+    after existing data has been backpopulated.
+    """
+
+    created_on = DateTimeField(default=now_in_utc)
+    updated_on = DateTimeField(default=now_in_utc)
+
+    class Meta:
+        abstract = True
