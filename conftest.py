@@ -23,6 +23,7 @@ def default_settings(settings):
     settings.MAILGUN_KEY = "fake_mailgun_key"
     settings.ELASTICSEARCH_INDEX = "testindex"
     settings.INDEXING_API_USERNAME = "mitodl"
+    settings.OPEN_DISCUSSIONS_FEATURES_DEFAULT = False
 
 
 @pytest.fixture(autouse=True)
