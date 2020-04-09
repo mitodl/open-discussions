@@ -438,7 +438,13 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
     queryset = Podcast.objects.filter(published=True).prefetch_related(
-        Prefetch("episodes", queryset=PodcastEpisode.objects.filter(published=True)),
+        Prefetch(
+            "episodes",
+            queryset=PodcastEpisode.objects.filter(published=True).prefetch_related(
+                Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+                Prefetch("topics", queryset=CourseTopic.objects.all()),
+            ),
+        ),
         Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
         Prefetch("topics", queryset=CourseTopic.objects.all()),
     )
