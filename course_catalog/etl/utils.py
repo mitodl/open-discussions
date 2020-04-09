@@ -1,4 +1,5 @@
 """Utility functions for ETL processes"""
+import json
 import re
 from datetime import datetime
 from functools import wraps
@@ -122,12 +123,13 @@ def strip_extra_whitespace(text):
     return re.sub(r"[\s]{2,}", " ", text).strip()
 
 
-def parse_dates(date_string):
+def parse_dates(date_string, hour=12):
     """
     Extract a pair of dates from a string
 
     Args:
         date_string(str): A string containing start and end dates
+        hour(int): Default hour of the day
 
     Returns:
         tuple of datetime: Start and end datetimes
@@ -144,36 +146,61 @@ def parse_dates(date_string):
     pattern_2_years = re.compile(
         r"(?P<start_m>\w+)\s+(?P<start_d>\d+),\s*(?P<start_y>\d{4})\s*-\s*(?P<end_m>\w+)\s+(?P<end_d>\d+),\s*(?P<end_y>\d{4})$"
     )
+
     match = re.match(pattern_1_month, date_string)
     if match:
         start_date = datetime.strptime(
             f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
             "%b %d %Y",
-        )
+        ).replace(hour=hour, tzinfo=pytz.utc)
         end_date = datetime.strptime(
             f"{match.group('start_m')} {match.group('end_d')} {match.group('year')}",
             "%b %d %Y",
-        )
-        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)
+        ).replace(hour=hour, tzinfo=pytz.utc)
+        return start_date, end_date
     match = re.match(pattern_1_year, date_string)
     if match:
         start_date = datetime.strptime(
             f"{match.group('start_m')} {match.group('start_d')} {match.group('year')}",
             "%b %d %Y",
-        )
+        ).replace(hour=hour, tzinfo=pytz.utc)
         end_date = datetime.strptime(
             f"{match.group('end_m')} {match.group('end_d')} {match.group('year')}",
             "%b %d %Y",
-        )
-        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)
+        ).replace(hour=hour, tzinfo=pytz.utc)
+        return start_date, end_date
     match = re.match(pattern_2_years, date_string)
     if match:
         start_date = datetime.strptime(
             f"{match.group('start_m')} {match.group('start_d')} {match.group('start_y')}",
             "%b %d %Y",
-        )
+        ).replace(hour=hour, tzinfo=pytz.utc)
         end_date = datetime.strptime(
             f"{match.group('end_m')} {match.group('end_d')} {match.group('end_y')}",
             "%b %d %Y",
-        )
-        return start_date.replace(tzinfo=pytz.utc), end_date.replace(tzinfo=pytz.utc)
+        ).replace(hour=hour, tzinfo=pytz.utc)
+        return start_date, end_date
+
+
+def map_topics(raw_topics, mapping):
+    """
+    Return a list of EdX topics corresponding to the list of raw topics
+
+    Args:
+        raw_topics(list of str): List of raw topics
+        mapping(dict): Dictionary of raw topics to EdX topics
+
+    Returns:
+        list of str: EdX topics
+    """
+    topics = set()
+    for raw_topic in raw_topics:
+        try:
+            for topic in mapping[strip_extra_whitespace(raw_topic)]:
+                topics.add(topic)
+        except KeyError:
+            log.exception(
+                "No topic mapping found for %s in %s", raw_topic, json.dumps(mapping)
+            )
+            continue
+    return sorted(topics)

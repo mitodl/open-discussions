@@ -19,6 +19,7 @@ const xproPlatform = "xpro"
 const youtubePlatform = "youtube"
 const ollPlatform = "oll"
 const seePlatform = "see"
+const mitpePlatform = "mitpe"
 
 export const platforms = {
   OCW:          ocwPlatform,
@@ -28,7 +29,8 @@ export const platforms = {
   xpro:         xproPlatform,
   youtube:      youtubePlatform,
   oll:          ollPlatform,
-  see:          seePlatform
+  see:          seePlatform,
+  mitpe:        mitpePlatform
 }
 
 export const platformLogos = {
@@ -38,7 +40,8 @@ export const platformLogos = {
   [micromastersPlatform]: "/static/images/mit-micromasters-logo.png",
   [xproPlatform]:         "/static/images/mit-xpro-logo.png",
   [ollPlatform]:          "/static/images/oll_logo.png",
-  [seePlatform]:          "/static/images/sloan-logo.png"
+  [seePlatform]:          "/static/images/sloan-logo.png",
+  [mitpePlatform]:        "/static/images/mitpe-logo.png"
 }
 
 export const offeredBys = {
@@ -47,7 +50,8 @@ export const offeredBys = {
   bootcamps:    "Bootcamps",
   mitx:         "MITx",
   xpro:         "xPro",
-  see:          "Sloan"
+  see:          "Sloan",
+  mitpe:        "Professional"
 }
 
 export const WIDGET_TYPE_MARKDOWN = "Markdown"

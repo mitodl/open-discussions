@@ -136,6 +136,10 @@
       "description": "URL to MicroMasters catalog API",
       "required": "false"
     },
+    "MITPE_BASE_URL": {
+      "description": "Base URL for MIT Professional Education website",
+      "required": "false"
+    },
     "MITX_ALT_URL": {
       "description": "Base alternate URL for MITx courses",
       "required": false
