@@ -24,6 +24,7 @@ def default_settings(settings):
     settings.ELASTICSEARCH_INDEX = "testindex"
     settings.INDEXING_API_USERNAME = "mitodl"
     settings.OPEN_DISCUSSIONS_FEATURES_DEFAULT = False
+    settings.OCW_WEBHOOK_KEY = ""
     settings.FEATURES = {}
 
 
