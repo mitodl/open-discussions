@@ -1,5 +1,6 @@
 """ETL utils test"""
 import datetime
+import json
 
 import pytest
 import pytz
@@ -11,6 +12,7 @@ from course_catalog.etl.utils import (
     generate_unique_id,
     strip_extra_whitespace,
     parse_dates,
+    map_topics,
 )
 
 
@@ -113,17 +115,39 @@ def test_parse_dates():
     """Test that parse_dates returns correct dates"""
     for datestring in ("May 13-30, 2020", "May 13 - 30,2020"):
         assert parse_dates(datestring) == (
-            datetime.datetime(2020, 5, 13, tzinfo=pytz.utc),
-            datetime.datetime(2020, 5, 30, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 13, 12, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 30, 12, tzinfo=pytz.utc),
         )
     for datestring in ("Jun 24-Aug 11, 2020", "Jun  24 -  Aug 11,    2020"):
         assert parse_dates(datestring) == (
-            datetime.datetime(2020, 6, 24, tzinfo=pytz.utc),
-            datetime.datetime(2020, 8, 11, tzinfo=pytz.utc),
+            datetime.datetime(2020, 6, 24, 12, tzinfo=pytz.utc),
+            datetime.datetime(2020, 8, 11, 12, tzinfo=pytz.utc),
         )
     for datestring in ("Nov 25, 2020-Jan 26, 2021", "Nov 25,2020  -Jan   26,2021"):
         assert parse_dates(datestring) == (
-            datetime.datetime(2020, 11, 25, tzinfo=pytz.utc),
-            datetime.datetime(2021, 1, 26, tzinfo=pytz.utc),
+            datetime.datetime(2020, 11, 25, 12, tzinfo=pytz.utc),
+            datetime.datetime(2021, 1, 26, 12, tzinfo=pytz.utc),
         )
     assert parse_dates("This is not a date") is None
+
+
+def test_map_topics(mocker):
+    """Test that map_topics returns expected EdX topics"""
+    mock_log = mocker.patch("course_catalog.etl.utils.log.exception")
+    mapping = {
+        "Innovation": ["Business & Management"],
+        "Management & Engineering": ["Engineering", "Business & Management"],
+        "Physics": ["Science"],
+    }
+    assert map_topics(["Physics", "Innovation"], mapping) == [
+        "Business & Management",
+        "Science",
+    ]
+    assert map_topics(["Management & Engineering", "Innovation"], mapping) == [
+        "Business & Management",
+        "Engineering",
+    ]
+    assert map_topics(["Physics", "Biology"], mapping) == ["Science"]
+    mock_log.assert_called_once_with(
+        "No topic mapping found for %s in %s", "Biology", json.dumps(mapping)
+    )

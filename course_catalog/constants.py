@@ -19,6 +19,7 @@ class OfferedBy(Enum):
     xpro = "xPro"
     oll = "Open Learning Library"
     see = "Sloan Executive Education"
+    mitpe = "Professional Education"
 
 
 class PlatformType(Enum):
@@ -34,6 +35,7 @@ class PlatformType(Enum):
     oll = "oll"
     youtube = "youtube"
     see = "see"
+    mitpe = "mitpe"
     podcast = "podcast"
 
 
@@ -434,6 +436,36 @@ ocw_edx_mapping = {
     "Education Policy": ["Education & Teacher Training", "Law"],
     "Educational Technology": ["Education & Teacher Training", "Computer Science"],
     "Higher Education": ["Education & Teacher Training"],
+}
+
+mitpe_edx_mapping = {
+    "Biotechnology & Pharmaceutical": ["Biology & Life Sciences"],
+    "Computer Science": ["Computer Science"],
+    "Crisis Management": ["Business & Management"],
+    "Data Modeling & Analytics": ["Data Analysis & Statistics"],
+    "Design & Manufacturing": ["Design"],
+    "Energy & Sustainability": ["Energy & Earth Sciences"],
+    "Imaging": ["Engineering"],
+    "Innovation": ["Business & Management"],
+    "Leadership & Communication": ["Communication"],
+    "Radar": ["Engineering"],
+    "Real Estate": ["Economics & Finance"],
+    "Systems Engineering": ["Engineering"],
+}
+
+see_edx_mapping = {
+    "Business Analytics": ["Business & Management"],
+    "Digital Business & IT": ["Business & Management"],
+    "Entrepreneurship": ["Entrepreneurship"],
+    "Family Enterprise": ["Business & Management"],
+    "Financial Management": ["Economics & Finance"],
+    "Global Economics & Markets": ["Economics & Finance"],
+    "Marketing": ["Business & Management"],
+    "Negotiation & Communication": ["Communication"],
+    "Operations": ["Business & Management"],
+    "Organizations & Leadership": ["Business & Management"],
+    "Strategy & Innovation": ["Business & Management"],
+    "Systems Thinking": ["Business & Management"],
 }
 
 VALID_TEXT_FILE_TYPES = [

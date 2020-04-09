@@ -67,16 +67,12 @@ def test_see_extract(settings, base_url):
                 "title": title,
                 "dates": [
                     (
-                        datetime.datetime(2020, 6, 18, 0, 0, tzinfo=pytz.utc),
-                        datetime.datetime(2020, 6, 19, 0, 0, tzinfo=pytz.utc),
+                        datetime.datetime(2020, 6, 18, 12, 0, tzinfo=pytz.utc),
+                        datetime.datetime(2020, 6, 19, 12, 0, tzinfo=pytz.utc),
                     )
                 ],
                 "price": Decimal("4100"),
-                "topics": [
-                    "Operations",
-                    "Organizations & Leadership",
-                    "Strategy & Innovation",
-                ],
+                "topics": ["Business & Management"],
                 "short_description": short_description,
                 "full_description": full_description,
                 "instructors": [["Robert", "Van de Graaff"]],
@@ -94,11 +90,7 @@ def test_see_transform(settings):
         {
             "url": "https://executive.mit.edu/openenrollment/program/foobar/",
             "title": title,
-            "topics": [
-                {"name": "Operations"},
-                {"name": "Organizations & Leadership"},
-                {"name": "Strategy & Innovation"},
-            ],
+            "topics": [{"name": "Business & Management"}],
             "short_description": short_description,
             "full_description": full_description,
             "course_id": "b5bdcbf344fe3a43b426844a49b99dc1",
@@ -109,13 +101,15 @@ def test_see_transform(settings):
                     "prices": [{"price": Decimal("4100")}],
                     "run_id": "155263c3961b37d293795db27b89fe5b",
                     "platform": "see",
-                    "start_date": datetime.datetime(2020, 6, 18, 0, 0, tzinfo=pytz.utc),
-                    "end_date": datetime.datetime(2020, 6, 19, 0, 0, tzinfo=pytz.utc),
+                    "start_date": datetime.datetime(
+                        2020, 6, 18, 12, 0, tzinfo=pytz.utc
+                    ),
+                    "end_date": datetime.datetime(2020, 6, 19, 12, 0, tzinfo=pytz.utc),
                     "best_start_date": datetime.datetime(
-                        2020, 6, 18, 0, 0, tzinfo=pytz.utc
+                        2020, 6, 18, 12, 0, tzinfo=pytz.utc
                     ),
                     "best_end_date": datetime.datetime(
-                        2020, 6, 19, 0, 0, tzinfo=pytz.utc
+                        2020, 6, 19, 12, 0, tzinfo=pytz.utc
                     ),
                     "offered_by": [{"name": "Sloan Executive Education"}],
                     "title": title,
@@ -131,6 +125,13 @@ def test_see_transform(settings):
     ]
 
 
+def test_see_transform_nodates(settings, mocker):
+    """A course should not be imported if it has no run dates"""
+    settings.MITPE_BASE_URL = "https://professional.mit.edu"
+    mocker.patch("course_catalog.etl.see.parse_dates", return_value=[])
+    assert transform(extract()) == []
+
+
 def test__parse_run_dates():
     """Test that _parse_run_dates returns correct dates"""
     html = "<ul><li>0</li><li>1</li><li>2</li>\
@@ -138,16 +139,16 @@ def test__parse_run_dates():
     soup = BeautifulSoup(html, "html.parser")
     assert _parse_run_dates(soup) == [
         (
-            datetime.datetime(2020, 5, 13, tzinfo=pytz.utc),
-            datetime.datetime(2020, 5, 30, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 13, 12, tzinfo=pytz.utc),
+            datetime.datetime(2020, 5, 30, 12, tzinfo=pytz.utc),
         ),
         (
-            datetime.datetime(2020, 6, 24, tzinfo=pytz.utc),
-            datetime.datetime(2020, 8, 11, tzinfo=pytz.utc),
+            datetime.datetime(2020, 6, 24, 12, tzinfo=pytz.utc),
+            datetime.datetime(2020, 8, 11, 12, tzinfo=pytz.utc),
         ),
         (
-            datetime.datetime(2020, 11, 25, tzinfo=pytz.utc),
-            datetime.datetime(2021, 1, 26, tzinfo=pytz.utc),
+            datetime.datetime(2020, 11, 25, 12, tzinfo=pytz.utc),
+            datetime.datetime(2021, 1, 26, 12, tzinfo=pytz.utc),
         ),
     ]
 

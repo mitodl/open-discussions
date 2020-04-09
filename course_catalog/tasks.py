@@ -236,6 +236,12 @@ def get_see_data():
 
 
 @app.task(acks_late=True)
+def get_mitpe_data():
+    """Execute the MITPE ETL pipeline"""
+    pipelines.mitpe_etl()
+
+
+@app.task(acks_late=True)
 def get_youtube_data(*, channel_ids=None):
     """
     Execute the YouTube ETL pipeline
