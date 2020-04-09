@@ -76,15 +76,24 @@ a.blue-btn {
   background-color: $course-blue;
 }
 
-.grey-surround {
+.grey-surround,
+.black-surround {
   display: flex;
   align-items: center;
   border-radius: 12.5px;
   cursor: pointer;
-  background-color: $pale-grey;
   padding: 2px;
-  color: $navy;
   font-size: 12px;
+}
+
+.grey-surround {
+  background-color: $pale-grey;
+  color: $navy;
+}
+
+.black-surround {
+  background-color: black;
+  color: white;
 }
 
 button.remove,

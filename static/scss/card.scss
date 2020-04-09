@@ -28,4 +28,10 @@
       padding: 0;
     }
   }
+
+  &.low-padding {
+    .card-contents {
+      padding: 10px;
+    }
+  }
 }

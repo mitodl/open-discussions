@@ -39,9 +39,9 @@ export const myUserListsSelector = createSelector(
   userListsSelector,
   userLists =>
     userLists
-      ? Object.keys(userLists)
-        .map(key => userLists[key])
-        .filter(userList => userList.author === SETTINGS.user_id)
+      ? Object.values(userLists).filter(
+        (userList: any) => userList.author === SETTINGS.user_id
+      )
       : []
 )
 

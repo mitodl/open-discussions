@@ -16,6 +16,7 @@ import { makeChannelPostList } from "../factories/posts"
 import { shouldIf, shouldIfGt0, mockCourseAPIMethods } from "../lib/test_utils"
 import * as embedLib from "../lib/embed"
 import * as LearnRouterModule from "./LearnRouter"
+import * as PodcastFrontpageModule from "./PodcastFrontpage"
 
 describe("App", () => {
   let helper, renderComponent, channels, postList
@@ -39,6 +40,7 @@ describe("App", () => {
     mockCourseAPIMethods(helper)
     helper.sandbox.stub(embedLib, "ensureTwitterEmbedJS")
     helper.stubComponent(LearnRouterModule, "LearnRouter")
+    helper.stubComponent(PodcastFrontpageModule, "PodcastFrontpage")
   })
 
   afterEach(() => {
