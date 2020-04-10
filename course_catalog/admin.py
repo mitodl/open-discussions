@@ -14,6 +14,8 @@ from course_catalog.models import (
     CoursePrice,
     CourseInstructor,
     CourseTopic,
+    Podcast,
+    PodcastEpisode,
 )
 
 
@@ -140,6 +142,20 @@ class UserListAdmin(admin.ModelAdmin):
     inlines = [UserListItemInline]
 
 
+class PodcastAdmin(admin.ModelAdmin):
+    """PodcastAdmin"""
+
+    model = Podcast
+    search_fields = ("full_description",)
+
+
+class PodcastEpisodeAdmin(admin.ModelAdmin):
+    """PodcastEpisodeAdmin"""
+
+    model = PodcastEpisode
+    search_fields = ("full_description",)
+
+
 admin.site.register(CourseTopic, CourseTopicAdmin)
 admin.site.register(CoursePrice, CoursePriceAdmin)
 admin.site.register(CourseInstructor, CourseInstructorAdmin)
@@ -148,3 +164,5 @@ admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
 admin.site.register(Bootcamp, BootcampAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(UserList, UserListAdmin)
+admin.site.register(Podcast, PodcastAdmin)
+admin.site.register(PodcastEpisode, PodcastEpisodeAdmin)

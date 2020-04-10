@@ -110,6 +110,9 @@ class LearningResourceOfferor(TimestampedModel):
 
     name = models.CharField(max_length=256, unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class LearningResource(TimestampedModel):
     """
@@ -504,6 +507,9 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
     url = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.title
+
     @property
     def platform(self):
         """Platform for podcasts"""
@@ -532,6 +538,9 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     url = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
     duration = models.CharField(null=True, blank=True, max_length=10)
+
+    def __str__(self):
+        return self.title
 
     @property
     def platform(self):
