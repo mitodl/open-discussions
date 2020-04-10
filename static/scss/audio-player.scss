@@ -1,5 +1,5 @@
 .audio-player-container-outer {
-  background-color: #A01E35;
+  background-color: #a01e35;
   position: absolute;
   left: 0;
   bottom: 0;
@@ -110,12 +110,12 @@ button::-moz-focus-inner {
 
 .hamburger .line {
   width: 100%;
-  background-color: hsla(0, 0%, 100%, .4);
+  background-color: hsla(0, 0%, 100%, 0.4);
   height: 2px;
   position: absolute;
   top: 0;
   left: 0;
-  transition: all .25s;
+  transition: all 0.25s;
 }
 
 .hamburger .mid {
@@ -128,29 +128,31 @@ button::-moz-focus-inner {
 }
 
 button {
-  background: rgba(15, 15, 15, .95);
+  background: rgba(15, 15, 15, 0.95);
   border: none;
   border-radius: 0;
-  color: hsla(0, 0%, 100%, .95);
+  color: hsla(0, 0%, 100%, 0.95);
   cursor: pointer;
   padding: 7px 15px 9px;
   text-decoration: none;
   text-transform: uppercase;
-  transition: background-color .2s ease-in, border-color .2s ease-in, color .2s ease-in;
-  font: 400 .857rem/20px Roboto Mono, Andale Mono, Menlo, Courier New, Courier, monospace;
-  letter-spacing: .5px;
+  transition: background-color 0.2s ease-in, border-color 0.2s ease-in,
+    color 0.2s ease-in;
+  font: 400 0.857rem/20px Roboto Mono, Andale Mono, Menlo, Courier New, Courier,
+    monospace;
+  letter-spacing: 0.5px;
 }
 
 button:disabled,
 button:disabled:focus,
 button:disabled:hover {
-  background: rgba(15, 15, 15, .6);
-  color: hsla(0, 0%, 100%, .4);
+  background: rgba(15, 15, 15, 0.6);
+  color: hsla(0, 0%, 100%, 0.4);
 }
 
 button:focus,
 button:hover {
-  background: rgba(15, 15, 15, .8);
+  background: rgba(15, 15, 15, 0.8);
 }
 
 *,
@@ -160,7 +162,7 @@ button:hover {
 }
 
 :focus {
-  outline: 1px dotted rgba(15, 15, 15, .8);
+  outline: 1px dotted rgba(15, 15, 15, 0.8);
 }
 
 h3 {
@@ -168,7 +170,8 @@ h3 {
 }
 
 h3 {
-  font: 700 1rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 700 1rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue,
+    Helvetica, Arial, sans-serif;
 }
 
 h3 {
@@ -179,11 +182,11 @@ h3 {
 a {
   color: inherit;
   cursor: pointer;
-  transition: opacity .2s ease-in;
+  transition: opacity 0.2s ease-in;
 }
 
 a:hover {
-  opacity: .6;
+  opacity: 0.6;
 }
 .player-container {
   overflow: hidden;
@@ -216,10 +219,10 @@ a:hover {
 }
 
 .player-control {
-  color: hsla(0, 0%, 100%, .4);
-  fill: hsla(0, 0%, 100%, .4);
+  color: hsla(0, 0%, 100%, 0.4);
+  fill: hsla(0, 0%, 100%, 0.4);
   padding: 0;
-  transition: color .2s ease-in, fill .2s ease-in;
+  transition: color 0.2s ease-in, fill 0.2s ease-in;
 }
 
 .player-control svg {
@@ -228,12 +231,12 @@ a:hover {
 }
 
 .player-control:hover {
-  color: hsla(0, 0%, 100%, .8);
-  fill: hsla(0, 0%, 100%, .8);
+  color: hsla(0, 0%, 100%, 0.8);
+  fill: hsla(0, 0%, 100%, 0.8);
 }
 
 .speed-control {
-  font: 400 .7143rem/16px Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 400 0.7143rem/16px Helvetica Neue, Helvetica, Arial, sans-serif;
   align-self: center;
   border-radius: 4px;
   border: 1.5px solid;
@@ -251,7 +254,7 @@ a:hover {
   width: 52px;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
   .artwork-wrap {
     border-right: 1px solid #3f3f3f;
     width: 53px;
@@ -264,7 +267,7 @@ a:hover {
   width: 100px;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
   .player-titles {
     flex: none;
     width: 320px;
@@ -272,7 +275,8 @@ a:hover {
 }
 
 .title {
-  font: 400 .857rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 400 0.857rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue,
+    Helvetica, Arial, sans-serif;
   line-height: 1.2;
   margin: 0;
   text-transform: none;
@@ -283,11 +287,12 @@ a:hover {
 }
 
 .podcast-title {
-  color: hsla(0, 0%, 100%, .4);
+  color: hsla(0, 0%, 100%, 0.4);
 }
 
 .episode-title {
-  font: 700 .857rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font: 700 0.857rem/24px -apple-system, BlinkMacSystemFont, Helvetica Neue,
+    Helvetica, Arial, sans-serif;
   color: #fff;
   line-height: 1.2;
 }
@@ -333,7 +338,7 @@ a:hover {
   height: 52px;
 }
 
-@media (min-width:550px) {
+@media (min-width: 550px) {
   .burger {
     display: none;
   }
@@ -352,27 +357,27 @@ a:hover {
   width: 53px;
 }
 
-@media (min-width:550px) {
+@media (min-width: 550px) {
   .logo {
     display: flex;
   }
 }
 
 .sc-logo {
-  border: 2px solid hsla(0, 0%, 100%, .4);
+  border: 2px solid hsla(0, 0%, 100%, 0.4);
   display: block;
-  fill: hsla(0, 0%, 100%, .4);
+  fill: hsla(0, 0%, 100%, 0.4);
   padding: 4px;
   width: 28px;
 }
 
-@media (max-width:767px) {
+@media (max-width: 767px) {
   .desktop-player-image {
     display: none;
   }
 }
 
-@media (max-width:767px) {
+@media (max-width: 767px) {
   .desktop-player-controls {
     display: none;
   }
@@ -386,14 +391,14 @@ a:hover {
   padding-left: 12px;
 }
 
-@media (min-width:768px) {
+@media (min-width: 768px) {
   .desktop-player-title {
     display: flex;
   }
 }
 
 .sc-logo g {
-  fill: #0F0F0F;
+  fill: #0f0f0f;
 }
 
 .dark .sc-logo g {
@@ -408,7 +413,7 @@ a:hover {
   top: 0;
   width: 20px;
   z-index: 100;
-  opacity: .1;
+  opacity: 0.1;
   position: absolute;
   z-index: 100;
 }
@@ -426,7 +431,7 @@ a:hover {
 }
 
 .logo.dark {
-  opacity: .2;
+  opacity: 0.2;
 }
 
 .logo svg {
@@ -443,22 +448,22 @@ a:hover {
 }
 
 .artwork .ratio {
-  background-color: #DBDBDB;
+  background-color: #dbdbdb;
   background-size: cover;
   border-radius: 2px;
   position: relative;
 }
 
 .artwork .ratio.dark {
-  background-color: #3F3F3F;
+  background-color: #3f3f3f;
 }
 
 button {
   align-self: center;
   background: none;
   border-radius: 4px;
-  border: solid 1px #0F0F0F;
-  color: #0F0F0F;
+  border: solid 1px #0f0f0f;
+  color: #0f0f0f;
   cursor: pointer;
   height: 20px;
   line-height: 18px;
@@ -476,12 +481,12 @@ button.size-mini {
   height: 16px;
   line-height: 0;
   margin-bottom: 4px;
-  opacity: .95;
-  transition: opacity .2s;
+  opacity: 0.95;
+  transition: opacity 0.2s;
 }
 
 button.size-mini:hover {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 button.dark {
@@ -536,16 +541,17 @@ button.play-pause svg {
 .current-time {
   background: rgba(253, 242, 128, 0.95);
   border-radius: 2px;
-  color: #0F0F0F;
+  color: #0f0f0f;
   height: 16px;
   margin: -8px 0 0 8px;
   padding: 0 5px;
   top: 50%;
   position: absolute;
   z-index: 4;
-  font: 400 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
-  letter-spacing: .5px;
-  font-size: .6428rem;
+  font: 400 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+    Courier, monospace;
+  letter-spacing: 0.5px;
+  font-size: 0.6428rem;
 }
 
 /*! CSS Used from: Embedded */
@@ -559,9 +565,10 @@ button.play-pause svg {
   position: absolute;
   right: 0;
   z-index: 4;
-  font: 400 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
-  letter-spacing: .5px;
-  font-size: .6428rem;
+  font: 400 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+    Courier, monospace;
+  letter-spacing: 0.5px;
+  font-size: 0.6428rem;
 }
 
 .total-time.dark {
@@ -583,7 +590,7 @@ button.play-pause svg {
 .scrubber-waveform .scrubber-hover {
   opacity: 0;
   position: absolute;
-  transition: opacity .2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
   width: 100%;
   z-index: 3;
 }
@@ -612,7 +619,7 @@ button.play-pause svg {
 }
 
 .scrubber-waveform .current-time {
-  transition: opacity .2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .scrubber-waveform .current-time,
@@ -644,7 +651,7 @@ button.play-pause svg {
   cursor: pointer;
   height: 40px;
   position: relative;
-  transition: opacity .5s;
+  transition: opacity 0.5s;
   width: 100%;
 }
 
@@ -668,13 +675,13 @@ div.amplitude-wave-form svg {
   stroke: white;
   height: 36px;
   width: 100%;
-  stroke-width: .5px;
+  stroke-width: 0.5px;
 }
 
 .controls-share {
   background: none;
   border: none;
-  color: #0F0F0F;
+  color: #0f0f0f;
   cursor: pointer;
   flex: 1;
   margin: 0;
@@ -682,8 +689,9 @@ div.amplitude-wave-form svg {
   text-align: right;
   text-transform: uppercase;
   white-space: nowrap;
-  letter-spacing: .5;
-  font: 500 0.5714rem/8px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
+  letter-spacing: 0.5;
+  font: 500 0.5714rem/8px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+    Courier, monospace;
   font-size: 9px;
   height: 9px;
 }
@@ -692,8 +700,9 @@ div.amplitude-wave-form svg {
   .controls-share {
     display: inline-block;
     text-align: center;
-    font: 500 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
-    letter-spacing: .5px;
+    font: 500 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+      Courier, monospace;
+    letter-spacing: 0.5px;
     height: 12px;
   }
 }
@@ -701,18 +710,18 @@ div.amplitude-wave-form svg {
 .controls-share.size-mini {
   align-items: center;
   border-radius: 4px;
-  border: solid 1px #0F0F0F;
-  color: #0F0F0F;
+  border: solid 1px #0f0f0f;
+  color: #0f0f0f;
   display: flex;
   justify-content: center;
   margin-left: 0;
-  opacity: .95;
-  transition: opacity .2s;
+  opacity: 0.95;
+  transition: opacity 0.2s;
   width: 36px;
 }
 
 .controls-share.size-mini:hover {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .controls-share.size-mini.dark {
@@ -736,7 +745,7 @@ div.amplitude-wave-form svg {
 .controls-subscribe {
   background: none;
   border: none;
-  color: #0F0F0F;
+  color: #0f0f0f;
   cursor: pointer;
   flex: 1;
   margin: 0;
@@ -745,8 +754,9 @@ div.amplitude-wave-form svg {
   text-transform: uppercase;
   white-space: nowrap;
   margin-left: 10px;
-  letter-spacing: .5;
-  font: 500 0.5714rem/8px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
+  letter-spacing: 0.5;
+  font: 500 0.5714rem/8px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+    Courier, monospace;
   font-size: 9px;
   height: 9px;
 }
@@ -755,15 +765,16 @@ div.amplitude-wave-form svg {
   .controls-subscribe {
     display: inline-block;
     text-align: center;
-    font: 500 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New, Courier, monospace;
-    letter-spacing: .5px;
+    font: 500 0.7143rem/16px "Roboto Mono", "Andale Mono", Menlo, Courier New,
+      Courier, monospace;
+    letter-spacing: 0.5px;
     height: 12px;
   }
 }
 
 .controls-subscribe svg {
   display: none;
-  fill: #0F0F0F;
+  fill: #0f0f0f;
 }
 
 .dark .controls-subscribe svg {
@@ -777,18 +788,18 @@ div.amplitude-wave-form svg {
 .controls-subscribe.size-mini {
   align-items: center;
   border-radius: 4px;
-  border: solid 1px #0F0F0F;
-  color: #0F0F0F;
+  border: solid 1px #0f0f0f;
+  color: #0f0f0f;
   display: flex;
   justify-content: center;
   margin-left: 0;
-  opacity: .95;
-  transition: opacity .2s;
+  opacity: 0.95;
+  transition: opacity 0.2s;
   width: 36px;
 }
 
 .controls-subscribe.size-mini:hover {
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .controls-subscribe.size-mini.dark {
@@ -803,14 +814,14 @@ div.amplitude-wave-form svg {
   display: block;
   width: 16px;
   height: 2px;
-  color: #0F0F0F;
+  color: #0f0f0f;
   background-color: currentColor;
   position: relative;
 }
 
 .controls-subscribe.size-mini .menu-icon:after,
 .controls-subscribe.size-mini .menu-icon:before {
-  content: '';
+  content: "";
   background-color: currentColor;
   width: 16px;
   height: 2px;
@@ -850,12 +861,12 @@ div.amplitude-wave-form svg {
 }
 
 .controls button {
-  transition: opacity .2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
 
 .controls button:focus {
   outline: 0;
-  opacity: .6;
+  opacity: 0.6;
 }
 
 @media (min-width: 400px) {
@@ -914,14 +925,14 @@ div.amplitude-wave-form svg {
   }
 }
 
-.controls .scrubber-timer>.controls-share-subscribe {
+.controls .scrubber-timer > .controls-share-subscribe {
   flex-basis: 100%;
   margin: 10px 0 23px 0;
   text-align: right;
 }
 
 @media (min-width: 400px) {
-  .controls .scrubber-timer>.controls-share-subscribe {
+  .controls .scrubber-timer > .controls-share-subscribe {
     flex-basis: 50%;
     display: none;
     margin: 0px 0 23px 0;
@@ -931,22 +942,21 @@ div.amplitude-wave-form svg {
 .controls .scrubber-timer:hover .left,
 .controls .scrubber-timer:hover .middle,
 .controls .scrubber-timer:hover .right {
-  opacity: .9;
+  opacity: 0.9;
 }
 
 .controls .scrubber-timer .left,
 .controls .scrubber-timer .middle,
 .controls .scrubber-timer .right {
-  opacity: .95;
+  opacity: 0.95;
 }
 
 @media (min-width: 400px) {
-
   .controls .scrubber-timer .left,
   .controls .scrubber-timer .middle,
   .controls .scrubber-timer .right {
-    opacity: .95;
-    transition: opacity .2s ease-in-out;
+    opacity: 0.95;
+    transition: opacity 0.2s ease-in-out;
   }
 }
 
@@ -1029,7 +1039,6 @@ div.amplitude-wave-form svg {
 }
 
 @media (min-width: 400px) {
-
   .controls .artwork,
   .controls .middle button.play-pause {
     display: none;
@@ -1061,7 +1070,7 @@ div.amplitude-wave-form svg {
   height: auto;
 }
 
-.controls.size-mini .scrubber-timer>.controls-share-subscribe {
+.controls.size-mini .scrubber-timer > .controls-share-subscribe {
   display: none;
 }
 
@@ -1092,7 +1101,7 @@ div.amplitude-wave-form svg {
   opacity: 1;
   padding: 8px 8px 6px 8px;
   position: relative;
-  transition: opacity .5s;
+  transition: opacity 0.5s;
 }
 
 @media (min-width: 400px) {
