@@ -46,6 +46,7 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     UserListItemSerializer,
     PodcastSerializer,
+    PodcastEpisodeSerializer,
 )
 from course_catalog.tasks import get_ocw_courses
 from course_catalog.utils import load_course_blacklist
@@ -447,4 +448,22 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
         ),
         Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
         Prefetch("topics", queryset=CourseTopic.objects.all()),
+    )
+
+
+class RecentPodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for recent PodcastEpisodes
+    """
+
+    serializer_class = PodcastEpisodeSerializer
+    permission_classes = (ReadOnly & PodcastFeatureFlag,)
+
+    queryset = (
+        PodcastEpisode.objects.filter(published=True)
+        .order_by("-last_modified", "-id")
+        .prefetch_related(
+            Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+            Prefetch("topics", queryset=CourseTopic.objects.all()),
+        )
     )

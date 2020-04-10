@@ -283,4 +283,5 @@ def test_podcast_episode_serializer():
         "short_description": episode.short_description,
         "topics": CourseTopicSerializer(many=True, instance=episode.topics).data,
         "url": episode.url,
+        "podcast": episode.podcast_id,
     }

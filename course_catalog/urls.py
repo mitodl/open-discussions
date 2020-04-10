@@ -38,6 +38,11 @@ router.register(r"podcasts", views.PodcastViewSet, basename="podcasts")
 
 
 urlpatterns = [
+    url(
+        r"^api/v0/podcasts/recent/$",
+        views.RecentPodcastEpisodesViewSet.as_view({"get": "list"}),
+        name="recent-podcast-episodes",
+    ),
     url(r"^api/v0/", include(router.urls)),
     url(r"^api/v0/ocw_webhook/$", WebhookOCWView.as_view(), name="ocw-webhook"),
     url(

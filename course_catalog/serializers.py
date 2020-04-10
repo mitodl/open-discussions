@@ -689,6 +689,7 @@ class PodcastEpisodeSerializer(serializers.ModelSerializer):
             "image_src",
             "url",
             "offered_by",
+            "podcast",
         ]
 
 
