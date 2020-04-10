@@ -38,6 +38,7 @@ import Banner from "../components/material/Banner"
 import Drawer from "../components/Drawer"
 import Toolbar from "../components/Toolbar"
 import ContentToolbar from "../components/ContentToolbar"
+import AudioPlayer from "../components/AudioPlayer"
 
 import { actions } from "../actions"
 import {
@@ -330,6 +331,7 @@ class App extends React.Component<Props> {
           {SETTINGS.podcast_frontpage_enabled ? (
             <Route path={`${match.url}podcasts`}>
               <PodcastFrontpage />
+              <AudioPlayer />
             </Route>
           ) : null}
         </div>
