@@ -15,6 +15,9 @@ from course_catalog.factories import (
     UserListFactory,
     LearningResourceRunFactory,
     ProgramItemCourseFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
+    LearningResourceOfferorFactory,
 )
 from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
@@ -26,10 +29,15 @@ from course_catalog.serializers import (
     LearningResourceRunSerializer,
     UserListItemSerializer,
     CourseTopicSerializer,
+    PodcastSerializer,
+    PodcastEpisodeSerializer,
 )
 from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
+
+
+datetime_millis_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
 @pytest.mark.parametrize(
@@ -232,3 +240,47 @@ def test_favorites_serializer():
     serializer = FavoriteItemSerializer(favorite_item)
     with pytest.raises(Exception):
         assert serializer.data.get("content_data").get("id") == course_topic.id
+
+
+def test_podcast_serializer():
+    """PodcastSerializer should generate relevant JSON for a given Podcast"""
+    podcast = PodcastFactory.create()
+    episodes = PodcastEpisodeFactory.create_batch(2, podcast=podcast)
+    offered_by = LearningResourceOfferorFactory.create()
+    podcast.offered_by.add(offered_by)
+
+    assert PodcastSerializer(instance=podcast).data == {
+        "created_on": podcast.created_on.strftime(datetime_millis_format),
+        "updated_on": podcast.updated_on.strftime(datetime_millis_format),
+        "episodes": PodcastEpisodeSerializer(many=True, instance=episodes).data,
+        "full_description": podcast.full_description,
+        "topics": CourseTopicSerializer(many=True, instance=podcast.topics).data,
+        "url": podcast.url,
+        "short_description": podcast.short_description,
+        "podcast_id": podcast.podcast_id,
+        "image_src": podcast.image_src,
+        "offered_by": [offered_by.name],
+        "title": podcast.title,
+        "id": podcast.id,
+    }
+
+
+def test_podcast_episode_serializer():
+    """PodcastEpisodeSerializer should generate relevant JSON for a given PodcastEpisode"""
+    episode = PodcastEpisodeFactory.create()
+    offered_by = LearningResourceOfferorFactory.create()
+    episode.offered_by.add(offered_by)
+
+    assert PodcastEpisodeSerializer(instance=episode).data == {
+        "created_on": episode.created_on.strftime(datetime_millis_format),
+        "updated_on": episode.updated_on.strftime(datetime_millis_format),
+        "id": episode.id,
+        "title": episode.title,
+        "episode_id": episode.episode_id,
+        "full_description": episode.full_description,
+        "image_src": episode.image_src,
+        "offered_by": [offered_by.name],
+        "short_description": episode.short_description,
+        "topics": CourseTopicSerializer(many=True, instance=episode.topics).data,
+        "url": episode.url,
+    }

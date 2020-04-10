@@ -509,6 +509,9 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
         """Platform for podcasts"""
         return PlatformType.podcast.value
 
+    class Meta:
+        ordering = ("id",)
+
 
 class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     """Data model for podcast episodes"""
@@ -537,3 +540,4 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
 
     class Meta:
         unique_together = ("podcast", "episode_id")
+        ordering = ("id",)

@@ -8,6 +8,7 @@ import rapidjson
 
 from django.contrib.auth.models import User
 from django.urls import reverse
+from rest_framework import status
 
 from course_catalog.constants import PlatformType, ResourceType, PrivacyLevel, ListType
 from course_catalog.exceptions import WebhookException
@@ -22,11 +23,14 @@ from course_catalog.factories import (
     ProgramItemBootcampFactory,
     VideoFactory,
     LearningResourceRunFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from course_catalog.models import UserList
 from course_catalog.serializers import (
     CourseTopicSerializer,
     MicroUserListItemSerializer,
+    PodcastSerializer,
 )
 from open_discussions import features
 from open_discussions.factories import UserFactory
@@ -670,3 +674,25 @@ def test_ocw_webhook_endpoint_bad_key(settings, client):
             data=OCW_WEBHOOK_RESPONSE,
             headers={"Content-Type": "text/plain"},
         )
+
+
+def test_podcasts_no_feature_flag(settings, client):
+    """If the feature flag is set to false the end user should get a 403"""
+    settings.FEATURES[features.PODCAST_APIS] = False
+    resp = client.get(reverse("podcasts-list"))
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_podcasts(settings, client):
+    """Podcasts API should return serialized podcast data"""
+    podcasts = sorted(PodcastFactory.create_batch(2), key=lambda p: p.id)
+    for podcast in podcasts:
+        PodcastEpisodeFactory.create_batch(2, podcast=podcast)
+
+    # Make sure these get filtered out
+    PodcastFactory.create(published=False)
+    PodcastEpisodeFactory.create(published=False, podcast__published=False)
+
+    settings.FEATURES[features.PODCAST_APIS] = True
+    resp = client.get(reverse("podcasts-list"))
+    assert resp.json() == PodcastSerializer(instance=podcasts, many=True).data

@@ -34,6 +34,7 @@ router.register(r"userlists", views.UserListViewSet, basename="userlists").regis
 router.register(r"videos", views.VideoViewSet, basename="videos")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
 router.register(r"topics", views.TopicViewSet, basename="topics")
+router.register(r"podcasts", views.PodcastViewSet, basename="podcasts")
 
 
 urlpatterns = [

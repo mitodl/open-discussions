@@ -4,6 +4,7 @@ from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedi
 from rest_framework import permissions
 
 from channels.models import Channel
+from open_discussions import features
 
 
 def channel_exists(view):
@@ -222,3 +223,11 @@ class ObjectOnlyPermissions(permissions.DjangoObjectPermissions):
     def has_permission(self, request, view):
         """Ignores model-level permissions"""
         return True
+
+
+class PodcastFeatureFlag(permissions.BasePermission):
+    """Forbids access if the podcast feature flag is not enabled"""
+
+    def has_permission(self, request, view):
+        """Check that the feature flag is enabled"""
+        return features.is_enabled(features.PODCAST_APIS)

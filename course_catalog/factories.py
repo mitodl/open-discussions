@@ -501,7 +501,6 @@ class PodcastEpisodeFactory(LearningResourceFactory):
 
     full_description = factory.Faker("text")
     image_src = factory.Faker("image_url")
-    image_src = factory.Faker("image_url")
     podcast = factory.SubFactory("course_catalog.factories.PodcastFactory")
     published = True
     url = factory.Faker("uri")
