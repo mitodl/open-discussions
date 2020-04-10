@@ -10,7 +10,7 @@ module.exports = {
     module: {
       rules: [
         {
-          test: /\.(svg|ttf|woff|woff2|eot|gif)$/,
+          test: /\.(svg|ttf|woff|woff2|eot|gif|png)$/,
           use:  "url-loader"
         }
       ]

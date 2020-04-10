@@ -2,5 +2,9 @@
 import React from "react"
 
 export default function PodcastFrontpage() {
-  return <h1>PODCASTS</h1>
+  return (
+    <div className="podcasts">
+      <h1>PODCASTS</h1>
+    </div>
+  )
 }

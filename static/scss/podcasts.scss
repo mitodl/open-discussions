@@ -1,0 +1,16 @@
+.podcasts {
+  background-image: url("../images/stata_curved.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 100%;
+  min-height: calc(100vh - #{$toolbar-height-desktop});
+
+  @include breakpoint(materialmobile) {
+    min-height: calc(100vh - #{$toolbar-height-mobile});
+  }
+
+  h1 {
+    color: white;
+    text-align: center;
+  }
+}
