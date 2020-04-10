@@ -5,18 +5,18 @@ import sinon from "sinon"
 import { assert } from "chai"
 import { shallow } from "enzyme"
 
-import CourseToolbar from "./CourseToolbar"
+import ContentToolbar from "./ContentToolbar"
 
-import { COURSE_URL, userListIndexURL } from "../lib/url"
+import { COURSE_URL, PODCAST_URL, userListIndexURL } from "../lib/url"
 import { makeProfile } from "../factories/profiles"
 import * as util from "../lib/util"
 
-describe("CourseToolbar", () => {
+describe("ContentToolbar", () => {
   let sandbox
 
   const renderToolbar = () =>
     shallow(
-      <CourseToolbar
+      <ContentToolbar
         toggleShowUserMenu={sandbox.stub()}
         showUserMenu={false}
         profile={makeProfile()}
@@ -47,6 +47,16 @@ describe("CourseToolbar", () => {
         .at(1)
         .prop("to"),
       COURSE_URL
+    )
+  })
+
+  it("should include a link to podcasts", () => {
+    assert.equal(
+      renderToolbar()
+        .find("Link")
+        .at(2)
+        .prop("to"),
+      PODCAST_URL
     )
   })
 

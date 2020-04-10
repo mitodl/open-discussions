@@ -141,9 +141,9 @@ describe("App", () => {
   ;[["/learn/", true], ["/", false]].forEach(([url, isLearnUrl]) => {
     it(`${shouldIf(!isLearnUrl)} include a Drawer, ${shouldIf(
       isLearnUrl
-    )} include CourseToolbar if url is ${url}`, async () => {
+    )} include ContentToolbar if url is ${url}`, async () => {
       const [wrapper] = await renderComponent(url, [])
-      assert.equal(wrapper.find("CourseToolbar").exists(), isLearnUrl)
+      assert.equal(wrapper.find("ContentToolbar").exists(), isLearnUrl)
       assert.equal(wrapper.find("Toolbar").exists(), !isLearnUrl)
       assert.equal(wrapper.find("Drawer").exists(), !isLearnUrl)
     })

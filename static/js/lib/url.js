@@ -119,6 +119,8 @@ export const SITE_SEARCH_URL = "/search/"
 export const COURSE_URL = "/learn/"
 export const COURSE_SEARCH_URL = "/learn/search"
 
+export const PODCAST_URL = "/podcasts"
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 

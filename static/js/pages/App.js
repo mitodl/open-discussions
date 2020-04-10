@@ -37,7 +37,7 @@ import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../components/Drawer"
 import Toolbar from "../components/Toolbar"
-import CourseToolbar from "../components/CourseToolbar"
+import ContentToolbar from "../components/ContentToolbar"
 
 import { actions } from "../actions"
 import {
@@ -192,10 +192,10 @@ class App extends React.Component<Props> {
         <MetaTags>
           <title>MIT Open Learning</title>
         </MetaTags>
-        <Route path={`${match.url}learn/`}>
+        <Route path={[`${match.url}learn/`, `${match.url}podcasts/`]}>
           {({ match }) =>
             match ? (
-              <CourseToolbar
+              <ContentToolbar
                 toggleShowUserMenu={this.toggleShowUserMenu}
                 showUserMenu={showUserMenu}
                 profile={profile}

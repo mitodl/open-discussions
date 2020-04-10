@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { Link } from "react-router-dom"
+import { Link, Route } from "react-router-dom"
 import { MDCToolbar } from "@material/toolbar/dist/mdc.toolbar"
 
 import MITLogoLink from "./MITLogoLink"
@@ -9,7 +9,7 @@ import UserMenu from "./UserMenu"
 import ResponsiveWrapper from "./ResponsiveWrapper"
 
 import { TABLET, DESKTOP } from "../lib/constants"
-import { COURSE_URL, userListIndexURL } from "../lib/url"
+import { COURSE_URL, userListIndexURL, PODCAST_URL } from "../lib/url"
 import { userIsAnonymous } from "../lib/util"
 
 import type { Profile } from "../flow/discussionTypes"
@@ -20,7 +20,7 @@ type Props = {
   toggleShowUserMenu: Function
 }
 
-export default class CourseToolbar extends React.Component<Props> {
+export default class ContentToolbar extends React.Component<Props> {
   toolbarRoot: { current: null | React$ElementRef<typeof HTMLElement> }
   toolbar: Object
 
@@ -55,9 +55,16 @@ export default class CourseToolbar extends React.Component<Props> {
                   MIT Open
                 </Link>
                 <div className="bar">{" | "}</div>
-                <Link className="learning-link" to={COURSE_URL}>
-                  LEARN
-                </Link>
+                <Route path="/learn/">
+                  <Link className="section-link" to={COURSE_URL}>
+                    LEARN
+                  </Link>
+                </Route>
+                <Route path="/podcasts/">
+                  <Link className="section-link" to={PODCAST_URL}>
+                    PODCASTS
+                  </Link>
+                </Route>
               </div>
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
