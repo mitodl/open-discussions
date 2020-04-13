@@ -242,6 +242,12 @@ def get_mitpe_data():
 
 
 @app.task(acks_late=True)
+def get_csail_data():
+    """Execute the CSAIL ETL pipeline"""
+    pipelines.csail_etl()
+
+
+@app.task(acks_late=True)
 def get_youtube_data(*, channel_ids=None):
     """
     Execute the YouTube ETL pipeline
