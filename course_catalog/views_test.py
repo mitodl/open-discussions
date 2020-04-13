@@ -31,6 +31,7 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     MicroUserListItemSerializer,
     PodcastSerializer,
+    PodcastEpisodeSerializer,
 )
 from open_discussions import features
 from open_discussions.factories import UserFactory
@@ -695,4 +696,34 @@ def test_podcasts(settings, client):
 
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("podcasts-list"))
-    assert resp.json() == PodcastSerializer(instance=podcasts, many=True).data
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["count"] == 2
+    assert (
+        resp.json()["results"] == PodcastSerializer(instance=podcasts, many=True).data
+    )
+
+
+def test_recent_podcast_episodes_no_feature_flag(settings, client):
+    """Recent podcast episodes API should return a 403 if the feature flag is not set"""
+    settings.FEATURES[features.PODCAST_APIS] = False
+    resp = client.get(reverse("recent-podcast-episodes"))
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_recent_podcast_episodes(settings, client):
+    """Recent podcast episodes API should return recent serialized podcast episodes in order of most recent first"""
+    episodes = reversed(
+        sorted(
+            PodcastEpisodeFactory.create_batch(5),
+            key=lambda episode: (episode.last_modified, episode.id),
+        )
+    )
+
+    settings.FEATURES[features.PODCAST_APIS] = True
+    resp = client.get(reverse("recent-podcast-episodes"))
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["count"] == 5
+    assert (
+        resp.json()["results"]
+        == PodcastEpisodeSerializer(instance=episodes, many=True).data
+    )
