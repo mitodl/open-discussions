@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.118.1
+Version 0.118.1 (Released April 13, 2020)
 ---------------
 
 - MIT Professional Education course import (#2744)
