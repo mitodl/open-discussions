@@ -696,7 +696,11 @@ def test_podcasts(settings, client):
 
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("podcasts-list"))
-    assert resp.json() == PodcastSerializer(instance=podcasts, many=True).data
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["count"] == 2
+    assert (
+        resp.json()["results"] == PodcastSerializer(instance=podcasts, many=True).data
+    )
 
 
 def test_recent_podcast_episodes_no_feature_flag(settings, client):
@@ -718,4 +722,8 @@ def test_recent_podcast_episodes(settings, client):
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("recent-podcast-episodes"))
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == PodcastEpisodeSerializer(instance=episodes, many=True).data
+    assert resp.json()["count"] == 5
+    assert (
+        resp.json()["results"]
+        == PodcastEpisodeSerializer(instance=episodes, many=True).data
+    )

@@ -690,6 +690,7 @@ class PodcastEpisodeSerializer(serializers.ModelSerializer):
             "url",
             "offered_by",
             "podcast",
+            "last_modified",
         ]
 
 

@@ -37,6 +37,7 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
+datetime_format = "%Y-%m-%dT%H:%M:%SZ"
 datetime_millis_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
 
@@ -284,4 +285,5 @@ def test_podcast_episode_serializer():
         "topics": CourseTopicSerializer(many=True, instance=episode.topics).data,
         "url": episode.url,
         "podcast": episode.podcast_id,
+        "last_modified": episode.last_modified.strftime(datetime_format),
     }

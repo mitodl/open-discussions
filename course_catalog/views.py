@@ -436,6 +436,7 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = PodcastSerializer
+    pagination_class = DefaultPagination
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
     queryset = Podcast.objects.filter(published=True).prefetch_related(
@@ -457,6 +458,7 @@ class RecentPodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
     """
 
     serializer_class = PodcastEpisodeSerializer
+    pagination_class = DefaultPagination
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
     queryset = (

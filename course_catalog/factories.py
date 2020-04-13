@@ -504,6 +504,7 @@ class PodcastEpisodeFactory(LearningResourceFactory):
     podcast = factory.SubFactory("course_catalog.factories.PodcastFactory")
     published = True
     url = factory.Faker("uri")
+    last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
 
     class Meta:
         model = PodcastEpisode
