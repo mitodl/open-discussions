@@ -20,6 +20,7 @@ class OfferedBy(Enum):
     oll = "Open Learning Library"
     see = "Sloan Executive Education"
     mitpe = "Professional Education"
+    csail = "CSAIL"
 
 
 class PlatformType(Enum):
@@ -37,6 +38,7 @@ class PlatformType(Enum):
     see = "see"
     mitpe = "mitpe"
     podcast = "podcast"
+    csail = "csail"
 
 
 class ResourceType(Enum):

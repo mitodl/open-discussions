@@ -6,6 +6,7 @@ from course_catalog.etl import (
     loaders,
     see,
     mitpe,
+    csail,
     mitx,
     xpro,
     ocw,
@@ -64,6 +65,8 @@ oll_etl = compose(loaders.load_courses, oll.transform, oll.extract)
 see_etl = compose(loaders.load_courses, see.transform, see.extract)
 
 mitpe_etl = compose(loaders.load_courses, mitpe.transform, mitpe.extract)
+
+csail_etl = compose(loaders.load_courses, csail.transform, csail.extract)
 
 youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)
 

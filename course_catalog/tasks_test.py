@@ -37,6 +37,7 @@ from course_catalog.tasks import (
     import_all_ocw_files,
     get_see_data,
     get_mitpe_data,
+    get_csail_data,
 )
 
 
@@ -472,6 +473,13 @@ def test_get_mitpe_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_mitpe_data.delay()
     mock_pipelines.mitpe_etl.assert_called_once_with()
+
+
+def test_get_csail_data(mocker):
+    """Verify that get_mitpe_data invokes the CSAIL ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_csail_data.delay()
+    mock_pipelines.csail_etl.assert_called_once_with()
 
 
 @pytest.mark.parametrize("channel_ids", [["abc", "123"], None])

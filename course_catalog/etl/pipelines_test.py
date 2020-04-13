@@ -118,6 +118,54 @@ def test_oll_etl(mocker):
     assert result == mock_load_courses.return_value
 
 
+def test_see_etl(mocker):
+    """Verify that SEE etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.see.extract")
+    mock_transform = mocker.patch("course_catalog.etl.see.transform")
+    mock_load_courses = mocker.patch("course_catalog.etl.loaders.load_courses")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_courses):
+        result = pipelines.see_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_courses.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_courses.return_value
+
+
+def test_mitpe_etl(mocker):
+    """Verify that MITPE etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.mitpe.extract")
+    mock_transform = mocker.patch("course_catalog.etl.mitpe.transform")
+    mock_load_courses = mocker.patch("course_catalog.etl.loaders.load_courses")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_courses):
+        result = pipelines.mitpe_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_courses.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_courses.return_value
+
+
+def test_csail_etl(mocker):
+    """Verify that CSAIL etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.csail.extract")
+    mock_transform = mocker.patch("course_catalog.etl.csail.transform")
+    mock_load_courses = mocker.patch("course_catalog.etl.loaders.load_courses")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_courses):
+        result = pipelines.csail_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_courses.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_courses.return_value
+
+
 def test_youtube_etl(mocker):
     """Verify that youtube etl pipeline executes correctly"""
     mock_extract = mocker.patch("course_catalog.etl.youtube.extract")

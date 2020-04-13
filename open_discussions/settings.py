@@ -596,6 +596,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_mitpe_data",
         "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
     },
+    "update-csail-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_csail_data",
+        "schedule": crontab(minute=00, hour=20),  # 4:00pm EST
+    },
     "update-youtube-videos": {
         "task": "course_catalog.tasks.get_youtube_data",
         "schedule": get_int(
@@ -883,6 +887,8 @@ OLL_ALT_URL = get_string("OLL_ALT_URL", None)
 
 SEE_BASE_URL = get_string("SEE_BASE_URL", None)
 MITPE_BASE_URL = get_string("MITPE_BASE_URL", None)
+CSAIL_BASE_URL = get_string("CSAIL_BASE_URL", None)
+
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)

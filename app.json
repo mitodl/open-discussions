@@ -59,6 +59,10 @@
       "description": "Cloudfront distribution",
       "required": false
     },
+    "CSAIL_BASE_URL": {
+      "description": "CSAIL courses base URL",
+      "required": false
+    },
     "EDX_API_ACCESS_TOKEN_URL": {
       "description": "URL to retrieve a MITx access token",
       "required": false
