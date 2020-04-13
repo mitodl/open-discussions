@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.118.1 (Released April 13, 2020)
+---------------
+
+- MIT Professional Education course import (#2744)
+- unpublish userlists for removed playlists
+- add feature flag for podcast landing page
+- index changes to support suggestions in channel search
+
 Version 0.118.0 (Released April 08, 2020)
 ---------------
 
