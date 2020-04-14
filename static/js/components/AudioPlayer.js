@@ -11,7 +11,7 @@ type Props = {
 
 export default class AudioPlayer extends React.Component<Props> {
   seekBar: {
-    current: React$ElementRef<typeof HTMLElement>
+    current: null | React$ElementRef<typeof HTMLElement>
   }
 
   constructor(props: Props) {
@@ -48,6 +48,9 @@ export default class AudioPlayer extends React.Component<Props> {
   }
 
   seekBarClick = (e: Object) => {
+    if (this.seekBar.current === null) {
+      return
+    }
     const offset = this.seekBar.current.getBoundingClientRect()
     const offsetWidth = this.seekBar.current.offsetWidth
     if (offset && offsetWidth) {
