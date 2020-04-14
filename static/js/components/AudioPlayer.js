@@ -11,7 +11,7 @@ type Props = {
 
 export default class AudioPlayer extends React.Component<Props> {
   seekBar: {
-    current: null | React$ElementRef<typeof HTMLElement>
+    current: React$ElementRef<typeof HTMLElement>
   }
 
   constructor(props: Props) {
@@ -29,7 +29,6 @@ export default class AudioPlayer extends React.Component<Props> {
           album: this.props.title,
           name:  this.props.description,
           url:   this.props.url
-
         }
       ],
       waveforms: {
@@ -49,14 +48,14 @@ export default class AudioPlayer extends React.Component<Props> {
   }
 
   seekBarClick = (e: Object) => {
-      const offset = this.seekBar.current.getBoundingClientRect()
-      const offsetWidth = this.seekBar.current.offsetWidth
-      if (offset && offsetWidth) {
-        const x = e.pageX - offset.left
-        Amplitude.setSongPlayedPercentage(
-          (parseFloat(x) / parseFloat(offsetWidth)) * 100
-        )
-      }
+    const offset = this.seekBar.current.getBoundingClientRect()
+    const offsetWidth = this.seekBar.current.offsetWidth
+    if (offset && offsetWidth) {
+      const x = e.pageX - offset.left
+      Amplitude.setSongPlayedPercentage(
+        (parseFloat(x) / parseFloat(offsetWidth)) * 100
+      )
+    }
   }
 
   render() {
