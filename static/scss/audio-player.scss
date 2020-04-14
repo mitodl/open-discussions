@@ -87,7 +87,7 @@ progress {
 }
 
 // disabling no-vendor-prefixes here because autoprefixer doesn't support html5 progress bars
-/* eslint-disable no-vendor-prefixes */
+// sass-lint:disable no-vendor-prefixes
 .audio-player-progress {
   background-color: #ebc1b6;
   color: white;
@@ -105,7 +105,7 @@ progress {
 .audio-player-progress::-moz-progress-bar {
   background: white;
 }
-/* eslint-enable no-vendor-prefixes */
+// sass-lint:disable no-vendor-prefixes
 
 .audio-player-time-text-right {
   text-align: left;
