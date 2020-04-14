@@ -52,7 +52,7 @@ export default class AudioPlayer extends React.Component<Props> {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
   }
 
-  seekBarClick = (e) => {
+  seekBarClick = e => {
     const offset = this.seekBar.current.getBoundingClientRect()
     const x = e.pageX - offset.left
 
