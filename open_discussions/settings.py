@@ -576,6 +576,12 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_micromasters_data",
         "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
     },
+    "update-podcasts": {
+        "task": "course_catalog.tasks.get_podcast_data",
+        "schedule": get_int(
+            "PODCAST_FETCH_SCHEDULE_SECONDS", 60 * 60 * 2
+        ),  # default is every 2 hours
+    },
     "update-xpro-courses-every-1-days": {
         "task": "course_catalog.tasks.get_xpro_data",
         "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
@@ -908,6 +914,9 @@ YOUTUBE_DEVELOPER_KEY = get_string("YOUTUBE_DEVELOPER_KEY", None)
 YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS = get_int(
     "YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS", 5
 )
+
+# course catalog podcast etl settings
+OPEN_PODCAST_DATA_BRANCH = get_string("OPEN_PODCAST_DATA_BRANCH", "master")
 
 # Tika security
 TIKA_ACCESS_TOKEN = get_string("TIKA_ACCESS_TOKEN", None)

@@ -301,3 +301,17 @@ def get_video_topics(*, video_ids=None):
             list of video ids to generate topics for
     """
     pipelines.video_topics_etl(video_ids=video_ids)
+
+
+@app.task(acks_late=True)
+def get_podcast_data():
+    """
+    Execute the Podcast ETL pipeline
+
+    Returns:
+        int:
+            The number of results that were fetched
+    """
+    results = pipelines.podcast_etl()
+
+    return len(list(results))

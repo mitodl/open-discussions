@@ -359,6 +359,10 @@
       "description": "Use S3 for storage backend (required on Heroku)",
       "value": "False"
     },
+    "OPEN_PODCAST_DATA_BRANCH": {
+      "description": "Branch in the open podcast data repository to use for podcast ingestion",
+      "required": false
+    },
     "OPEN_RESOURCES_MIN_DOC_FREQ": {
       "description": "Elasticsearch min_doc_freq value for determining similar resources",
       "required": false
@@ -399,6 +403,10 @@
     },
     "PGBOUNCER_MIN_POOL_SIZE": {
       "value": "5"
+    },
+    "PODCAST_FETCH_SCHEDULE_SECONDS": {
+      "description": "The time in seconds between periodic syncs of podcasts",
+      "required": false
     },
     "RECAPTCHA_SITE_KEY": {
       "description": "Google Recaptcha site key",

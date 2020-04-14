@@ -38,6 +38,7 @@ from course_catalog.tasks import (
     get_see_data,
     get_mitpe_data,
     get_csail_data,
+    get_podcast_data,
 )
 
 
@@ -512,3 +513,10 @@ def test_get_video_topics(mocker, video_ids):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_video_topics.delay(video_ids=video_ids)
     mock_pipelines.video_topics_etl.assert_called_once_with(video_ids=video_ids)
+
+
+def test_get_podcast_data(mocker):
+    """Verify that get_podcast_data invokes the podcast ETL pipeline with expected params"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_podcast_data.delay()
+    mock_pipelines.podcast_etl.assert_called_once()

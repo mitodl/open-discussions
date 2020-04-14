@@ -26,6 +26,8 @@ from course_catalog.etl.loaders import (
     load_programs,
     load_content_files,
     load_content_file,
+    load_podcasts,
+    load_podcast_episode,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
@@ -41,6 +43,8 @@ from course_catalog.factories import (
     VideoChannelFactory,
     UserListFactory,
     ContentFileFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from course_catalog.models import (
     Program,
@@ -54,6 +58,8 @@ from course_catalog.models import (
     UserList,
     UserListItem,
     ContentFile,
+    Podcast,
+    PodcastEpisode,
 )
 
 pytestmark = pytest.mark.django_db
@@ -875,3 +881,77 @@ def test_load_content_file_error(mocker):
     mock_log.assert_called_once_with(
         "ERROR syncing course file %s for run %d", "badfile", learning_resource_run.id
     )
+
+
+def test_load_podcasts():
+    """Test load_podcasts"""
+    assert Podcast.objects.count() == 0
+
+    podcasts_data = []
+    for podcast in PodcastFactory.build_batch(3):
+        podcast_data = model_to_dict(podcast)
+        del podcast_data["id"]
+
+        podcasts_data.append(podcast_data)
+
+    results = load_podcasts(podcasts_data)
+
+    assert len(results) == len(podcasts_data)
+
+    for result in results:
+        assert isinstance(result, Podcast)
+
+
+def test_load_podcasts_unpublish():
+    """Test load_podcast when a podcast gets unpublished"""
+    podcast = PodcastFactory.create(published=True)
+    podcast_episode = PodcastEpisodeFactory.create(podcast=podcast, published=True)
+
+    load_podcasts([])
+
+    podcast.refresh_from_db()
+    podcast_episode.refresh_from_db()
+
+    assert podcast.published is False
+    assert podcast_episode.published is False
+
+
+@pytest.mark.parametrize("podcast_episode_exists", [True, False])
+def test_load_podcast_episode(podcast_episode_exists):
+    """Test that load_podcast loads the podcast episode"""
+    podcast = PodcastFactory.create()
+    podcast_episode = (
+        PodcastEpisodeFactory.create(podcast=podcast)
+        if podcast_episode_exists
+        else PodcastEpisodeFactory.build(podcast=podcast)
+    )
+    assert PodcastEpisode.objects.count() == (1 if podcast_episode_exists else 0)
+
+    props = model_to_dict(
+        PodcastEpisodeFactory.build(episode_id=podcast_episode.episode_id)
+    )
+    del props["id"]
+    del props["podcast"]
+
+    props["runs"] = [
+        {
+            "run_id": podcast_episode.episode_id,
+            "platform": podcast_episode.platform,
+            "prices": [{"price": 0}],
+        }
+    ]
+
+    result = load_podcast_episode(props, podcast)
+
+    assert PodcastEpisode.objects.count() == 1
+
+    # assert we got a podcast episode back
+    assert isinstance(result, PodcastEpisode)
+
+    # verify a free price
+    assert result.runs.count() == 1
+    assert result.runs.first().prices.count() == 1
+    assert result.runs.first().prices.first().price == 0
+
+    for key, value in props.items():
+        assert getattr(result, key) == value, f"Property {key} should equal {value}"
