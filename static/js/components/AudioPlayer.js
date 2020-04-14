@@ -29,6 +29,7 @@ export default class AudioPlayer extends React.Component<Props> {
           album: this.props.title,
           name:  this.props.description,
           url:   this.props.url
+
         }
       ],
       waveforms: {
@@ -47,7 +48,7 @@ export default class AudioPlayer extends React.Component<Props> {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
   }
 
-  seekBarClick = e => {
+  seekBarClick = e: Object => {
     const offset = this.seekBar.current.getBoundingClientRect()
     const x = e.pageX - offset.left
 
