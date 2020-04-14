@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.119.1
+---------------
+
+- import podcast data
+- add suggestions to channel search
+
 Version 0.119.0 (Released April 14, 2020)
 ---------------
 
