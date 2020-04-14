@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.119.0
+Version 0.119.0 (Released April 14, 2020)
 ---------------
 
 - add Podcasts, PodcastEpisodes to the admin
