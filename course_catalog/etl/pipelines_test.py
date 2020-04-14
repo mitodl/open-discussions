@@ -182,3 +182,19 @@ def test_youtube_etl(mocker):
     mock_load_video_channels.assert_called_once_with(mock_transform.return_value)
 
     assert result == mock_load_video_channels.return_value
+
+
+def test_podcast_etl(mocker):
+    """Verify that podcast etl pipeline executes correctly"""
+    mock_extract = mocker.patch("course_catalog.etl.podcast.extract")
+    mock_transform = mocker.patch("course_catalog.etl.podcast.transform")
+    mock_load_podcasts = mocker.patch("course_catalog.etl.loaders.load_podcasts")
+
+    with reload_mocked_pipeline(mock_extract, mock_transform, mock_load_podcasts):
+        result = pipelines.podcast_etl()
+
+    mock_extract.assert_called_once_with()
+    mock_transform.assert_called_once_with(mock_extract.return_value)
+    mock_load_podcasts.assert_called_once_with(mock_transform.return_value)
+
+    assert result == mock_load_podcasts.return_value

@@ -26,6 +26,8 @@ from course_catalog.models import (
     UserList,
     UserListItem,
     ContentFile,
+    Podcast,
+    PodcastEpisode,
 )
 from course_catalog.utils import load_course_blacklist, load_course_duplicates
 from course_catalog.etl.deduplication import get_most_relevant_run
@@ -589,3 +591,102 @@ def load_content_files(course_run, content_files_json):
         else:
             search_task_helpers.delete_run_content_files(course_run.id)
         return content_files
+
+
+def load_podcast_episode(episode_data, podcast):
+    """
+        Load a podcast_episode into the database
+        Args:
+            episode_data (dict): data for the episode
+            podcast (Podcast): podcast that the episode belongs to
+
+        Returns:
+            list of PodcastEpisode objects that were created/updated
+    """
+    episode_id = episode_data.pop("episode_id")
+
+    topics_data = episode_data.pop("topics", [])
+    offered_bys_data = episode_data.pop("offered_by", [])
+    runs_data = episode_data.pop("runs", [])
+
+    episode, _ = PodcastEpisode.objects.update_or_create(
+        episode_id=episode_id, podcast=podcast, defaults=episode_data
+    )
+
+    load_topics(episode, topics_data)
+    load_offered_bys(episode, offered_bys_data)
+
+    for run_data in runs_data:
+        load_run(episode, run_data)
+
+    return episode
+
+
+def load_podcast(podcast_data):
+    """
+    Load a single podcast
+
+    Arg:
+        podcast_data (dict):
+            the normalized podcast data
+    Returns:
+        Podcast:
+            the updated or created podcast
+    """
+    podcast_id = podcast_data.pop("podcast_id")
+    episodes_data = podcast_data.pop("episodes", [])
+    topics_data = podcast_data.pop("topics", [])
+    offered_by_data = podcast_data.pop("offered_by", [])
+    runs_data = podcast_data.pop("runs", [])
+
+    podcast, _ = Podcast.objects.update_or_create(
+        podcast_id=podcast_id, defaults=podcast_data
+    )
+
+    load_topics(podcast, topics_data)
+    load_offered_bys(podcast, offered_by_data)
+
+    episode_ids = []
+
+    for episode_data in episodes_data:
+        episode = load_podcast_episode(episode_data, podcast)
+        episode_ids.append(episode.id)
+
+    for run_data in runs_data:
+        load_run(podcast, run_data)
+
+    PodcastEpisode.objects.exclude(podcast_id__in=episode_ids, podcast=podcast).update(
+        published=False
+    )
+
+    return podcast
+
+
+def load_podcasts(podcasts_data):
+    """
+    Load a list of podcasts
+
+    Args:
+        podcasts_data (iter of dict): iterable of podcast data
+
+    Returns:
+        list of Podcasts:
+            list of the loaded podcasts
+    """
+    podcasts = []
+
+    for podcast_data in podcasts_data:
+        podcast_id = podcast_data["podcast_id"]
+        try:
+            podcast = load_podcast(podcast_data)
+        except ExtractException:
+            log.exception("Error with extracted podcast: podcast_id=%s", podcast_id)
+        else:
+            podcasts.append(podcast)
+
+    # unpublish the podcasts we're no longer tracking
+    ids = [podcast.id for podcast in podcasts]
+    Podcast.objects.exclude(id__in=ids).update(published=False)
+    PodcastEpisode.objects.exclude(podcast_id__in=ids).update(published=False)
+
+    return podcasts

@@ -13,6 +13,7 @@ from course_catalog.etl import (
     oll,
     video,
     youtube,
+    podcast,
 )
 from course_catalog.etl.utils import log_exceptions
 from course_catalog.constants import PlatformType
@@ -72,3 +73,6 @@ youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.ex
 
 # pipeline for generating topic data for videos based on course topics
 video_topics_etl = compose(loaders.load_videos, video.extract_videos_topics)
+
+
+podcast_etl = compose(loaders.load_podcasts, podcast.transform, podcast.extract)

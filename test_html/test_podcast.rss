@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <atom:link href="http://feeds.soundcloud.com/users/soundcloud:users:something/sounds.rss" rel="self" type="application/rss+xml"/>
+    <atom:link href="http://feeds.soundcloud.com/users/soundcloud:users:something/sounds.rss?before=111" rel="next" type="application/rss+xml"/>
+    <title>A Podcast</title>
+    <link>https://awebsite.mit.edu/</link>
+    <pubDate>Wed, 01 Apr 2020 18:20:31 +0000</pubDate>
+    <lastBuildDate>Wed, 01 Apr 2020 18:20:31 +0000</lastBuildDate>
+    <ttl>60</ttl>
+    <language>en</language>
+    <copyright>All rights reserved</copyright>
+    <webMaster>feeds@soundcloud.com (SoundCloud Feeds)</webMaster>
+    <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</description>
+    <itunes:subtitle>Lorem ipsum dolor…</itunes:subtitle>
+    <itunes:owner>
+      <itunes:name>A Podcast</itunes:name>
+      <itunes:email>someemail@mit.edu</itunes:email>
+    </itunes:owner>
+    <itunes:author>An Author</itunes:author>
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:image href="apicture.jpg"/>
+    <image>
+      <url>apicture.jpg</url>
+      <title>A Podcast</title>
+      <link>https://awebsite.mit.edu/</link>
+    </image>
+    <itunes:category text="Science"/>
+    <item>
+      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers</guid>
+      <title>Episode1</title>
+      <pubDate>Wed, 01 Apr 2020 18:20:31 +0000</pubDate>
+      <link>https://soundcloud.com/podcast/episode1</link>
+      <itunes:duration>00:17:16</itunes:duration>
+      <itunes:author>Author</itunes:author>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:summary>Morbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor.</itunes:summary>
+      <itunes:subtitle>Morbi id consequat nisl. Morbi leo elit,…</itunes:subtitle>
+      <description>SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor</description>
+      <enclosure type="audio/mpeg" url="http://feeds.soundcloud.com/stream/episode1.mp3" length="25437522"/>
+      <itunes:image href="image2.jpg"/>
+    </item>
+    <item>
+      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers</guid>
+      <title>Episode2</title>
+      <pubDate>Wed, 01 Apr 2020 18:20:31 +0000</pubDate>
+      <link>https://soundcloud.com/podcast/episode2</link>
+      <itunes:duration>00:17:16</itunes:duration>
+      <itunes:author>Author</itunes:author>
+      <itunes:explicit>no</itunes:explicit>
+      <itunes:summary>Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis. Morbi in ultrices turpis.   Vivamus sollicitudin, magna et faucibus sollicitudin, ipsum nulla mattis lacus, sed ornare justo orci id justo. 
+      </itunes:summary>
+      <itunes:subtitle>Praesent fermentum suscipit metus nec aliquam</itunes:subtitle>
+      <description>Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.</description>
+      <enclosure type="audio/mpeg" url="http://feeds.soundcloud.com/stream/episode2.mp3" length="25437522"/>
+      <itunes:image href="image1.jpg"/>
+    </item>
+  </channel>
+</rss>

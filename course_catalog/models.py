@@ -190,7 +190,16 @@ class LearningResourceRun(AbstractCourse):
     content_type = models.ForeignKey(
         ContentType,
         null=True,
-        limit_choices_to={"model__in": ("course", "bootcamp", "program", "video")},
+        limit_choices_to={
+            "model__in": (
+                "course",
+                "bootcamp",
+                "program",
+                "video",
+                "podcast",
+                "podcastepisode",
+            )
+        },
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField(null=True)
@@ -505,6 +514,7 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
     image_src = models.URLField(max_length=400, null=True, blank=True)
     published = models.BooleanField(default=True)
     url = models.URLField(null=True, max_length=2048)
+    runs = GenericRelation(LearningResourceRun)
     searchable = models.BooleanField(default=True)
 
     def __str__(self):
