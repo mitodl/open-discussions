@@ -4,7 +4,9 @@ import React from "react"
 import Amplitude from "amplitudejs"
 
 type Props = {
-  player: Object
+  title: String,
+  description: String,
+  url: String
 }
 
 export default class AudioPlayer extends React.Component<Props> {
@@ -42,15 +44,15 @@ export default class AudioPlayer extends React.Component<Props> {
 
   componentWillUnmount() {}
 
-  backTenClick() {
+  backTenClick = () => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
   }
 
-  forwardThirtyClick() {
+  forwardThirtyClick = () => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
   }
 
-  seekBarClick(e) {
+  seekBarClick = (e) => {
     const offset = this.seekBar.current.getBoundingClientRect()
     const x = e.pageX - offset.left
 
