@@ -11,7 +11,9 @@ type Props = {
 
 export default class AudioPlayer extends React.Component<Props> {
   seekBar: {
-    current: null | React$ElementRef<typeof HTMLElement>
+    current:
+      | { getBoundingClientRect: null, offsetWidth: null }
+      | React$ElementRef<typeof HTMLElement>
   }
 
   constructor(props: Props) {
