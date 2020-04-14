@@ -4,15 +4,16 @@ import React from "react"
 import Amplitude from "amplitudejs"
 
 type Props = {
-  title: String,
-  description: String,
-  url: String
+  title: string,
+  description: string,
+  url: string
 }
 
 export default class AudioPlayer extends React.Component<Props> {
   seekBar: {
     current: null | React$ElementRef<typeof HTMLElement>
-  }
+  },
+
 
   constructor(props: Props) {
     super(props)
