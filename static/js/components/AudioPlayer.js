@@ -12,8 +12,7 @@ type Props = {
 export default class AudioPlayer extends React.Component<Props> {
   seekBar: {
     current: null | React$ElementRef<typeof HTMLElement>
-  },
-
+  }
 
   constructor(props: Props) {
     super(props)
@@ -24,7 +23,7 @@ export default class AudioPlayer extends React.Component<Props> {
   }
 
   componentDidMount() {
-    this.player = Amplitude.init({
+    Amplitude.init({
       bindings: {
         37: "prev",
         39: "next",
