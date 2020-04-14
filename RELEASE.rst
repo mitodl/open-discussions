@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.119.0 (Released April 14, 2020)
+---------------
+
+- add Podcasts, PodcastEpisodes to the admin
+- Add recent podcasts API (#2765)
+- CSAIL course import (#2759)
+- add podcast-specific top navbar
+- Add read-only podcasts API (#2757)
+
 Version 0.118.1 (Released April 13, 2020)
 ---------------
 
