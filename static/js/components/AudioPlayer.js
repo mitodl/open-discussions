@@ -56,7 +56,9 @@ export default class AudioPlayer extends React.Component<Props> {
     const offset = this.seekBar.current.getBoundingClientRect()
     const x = e.pageX - offset.left
 
-    Amplitude.setSongPlayedPercentage((parseFloat(x) / parseFloat(this.seekBar.current.offsetWidth)) * 100)
+    Amplitude.setSongPlayedPercentage(
+      (parseFloat(x) / parseFloat(this.seekBar.current.offsetWidth)) * 100
+    )
   }
 
   render() {
@@ -83,7 +85,10 @@ export default class AudioPlayer extends React.Component<Props> {
             >
               <span className="material-icons" />
             </div>
-            <div className="audio-player-button" onClick={this.forwardThirtyClick}>
+            <div
+              className="audio-player-button"
+              onClick={this.forwardThirtyClick}
+            >
               <span className="material-icons">forward_30</span>
             </div>
             <div className="audio-player-progress-container">
