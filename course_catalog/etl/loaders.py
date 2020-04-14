@@ -655,7 +655,7 @@ def load_podcast(podcast_data):
     for run_data in runs_data:
         load_run(podcast, run_data)
 
-    PodcastEpisode.objects.exclude(podcast_id__in=episode_ids, podcast=podcast).update(
+    PodcastEpisode.objects.filter(podcast=podcast).exclude(id__in=episode_ids).update(
         published=False
     )
 

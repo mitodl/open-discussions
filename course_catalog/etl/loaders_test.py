@@ -27,6 +27,7 @@ from course_catalog.etl.loaders import (
     load_content_files,
     load_content_file,
     load_podcasts,
+    load_podcast,
     load_podcast_episode,
 )
 from course_catalog.etl.xpro import _parse_datetime
@@ -918,7 +919,7 @@ def test_load_podcasts_unpublish():
 
 @pytest.mark.parametrize("podcast_episode_exists", [True, False])
 def test_load_podcast_episode(podcast_episode_exists):
-    """Test that load_podcast loads the podcast episode"""
+    """Test that load_podcast_episode loads the podcast episode"""
     podcast = PodcastFactory.create()
     podcast_episode = (
         PodcastEpisodeFactory.create(podcast=podcast)
@@ -955,3 +956,31 @@ def test_load_podcast_episode(podcast_episode_exists):
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
+
+
+def test_load_podcast():
+    """Test that load_podcast loads the podcast"""
+
+    podcast = PodcastFactory.create(published=True)
+    podcast_episode = PodcastEpisodeFactory.create(podcast=podcast, published=True)
+
+    podcast_data = model_to_dict(podcast)
+    podcast_data["title"] = "New Title"
+    podcast_data["topics"] = [model_to_dict(topic) for topic in podcast.topics.all()]
+    del podcast_data["id"]
+
+    episode_data = model_to_dict(PodcastEpisodeFactory.build(podcast=podcast))
+    del episode_data["id"]
+    del episode_data["podcast"]
+
+    podcast_data["episodes"] = [episode_data]
+    load_podcast(podcast_data)
+
+    podcast.refresh_from_db()
+    podcast_episode.refresh_from_db()
+    new_podcast_episode = podcast.episodes.exclude(id=podcast_episode.id).first()
+
+    assert podcast.title == "New Title"
+    assert podcast.episodes.count() == 2
+    assert podcast_episode.published is False
+    assert new_podcast_episode.published is True
