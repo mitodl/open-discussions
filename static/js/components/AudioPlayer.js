@@ -24,11 +24,6 @@ export default class AudioPlayer extends React.Component<Props> {
 
   componentDidMount() {
     Amplitude.init({
-      bindings: {
-        37: "prev",
-        39: "next",
-        32: "play_pause"
-      },
       songs: [
         {
           album: this.props.title,
