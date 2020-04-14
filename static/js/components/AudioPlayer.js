@@ -8,14 +8,12 @@ type Props = {
 }
 
 export default class AudioPlayer extends React.Component<Props> {
-  playerRoot: {
+  seekBar: {
     current: null | React$ElementRef<typeof HTMLElement>
   }
-  toolbar: Object
 
   constructor(props: Props) {
     super(props)
-    this.playerRoot = React.createRef()
     this.seekBar = React.createRef()
     this.seekBarClick = this.seekBarClick.bind(this)
     this.backTenClick = this.backTenClick.bind(this)
@@ -44,11 +42,11 @@ export default class AudioPlayer extends React.Component<Props> {
 
   componentWillUnmount() {}
 
-  backTenClick(e) {
+  backTenClick() {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
   }
 
-  forwardThirtyClick(e) {
+  forwardThirtyClick() {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
   }
 
