@@ -20,6 +20,8 @@ from course_catalog.models import (
     UserList,
     Video,
     ContentFile,
+    Podcast,
+    PodcastEpisode,
 )
 from course_catalog.utils import load_course_blacklist
 from embedly.api import get_embedly_content
@@ -519,6 +521,42 @@ def index_videos(ids):
         return error
 
 
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_podcasts(ids):
+    """
+    Index Podcasts
+
+    Args:
+        ids(list of int): List of Podcast id's
+    """
+    try:
+        api.index_podcasts(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_podcasts threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_podcast_episodes(ids):
+    """
+    Index PodcastEpisodes
+
+    Args:
+        ids(list of int): List of PodcastEpisode id's
+    """
+    try:
+        api.index_podcast_episodes(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"index_podcast_episodes threw an error"
+        log.exception(error)
+        return error
+
+
 @app.task(bind=True)
 def start_recreate_index(self):
     """
@@ -617,6 +655,24 @@ def start_recreate_index(self):
                 index_videos.si(ids)
                 for ids in chunks(
                     Video.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_podcasts.si(ids)
+                for ids in chunks(
+                    Podcast.objects.filter(published=True)
+                    .order_by("id")
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+            + [
+                index_podcast_episodes.si(ids)
+                for ids in chunks(
+                    PodcastEpisode.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

@@ -18,6 +18,8 @@ from course_catalog.factories import (
     UserListFactory,
     ContentFileFactory,
     LearningResourceRunFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
@@ -337,7 +339,7 @@ def test_index_videos(mocker, with_error):  # pylint: disable=unused-argument
 
 def test_start_recreate_index(
     mocker, mocked_celery, user
-):  # pylint:disable=too-many-locals
+):  # pylint:disable=too-many-locals,too-many-statements
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """
@@ -364,11 +366,20 @@ def test_start_recreate_index(
         key=lambda course: course.id,
     )
     videos = sorted(VideoFactory.create_batch(4), key=lambda video: video.id)
+    podcasts = sorted(PodcastFactory.create_batch(4), key=lambda podcast: podcast.id)
+    podcast_episodes = sorted(
+        PodcastEpisodeFactory.create_batch(4),
+        key=lambda podcast_episode: podcast_episode.id,
+    )
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
     index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
     index_videos_mock = mocker.patch("search.tasks.index_videos", autospec=True)
+    index_podcasts_mock = mocker.patch("search.tasks.index_podcasts", autospec=True)
+    index_podcast_episodes_mock = mocker.patch(
+        "search.tasks.index_podcast_episodes", autospec=True
+    )
     index_course_content_mock = mocker.patch(
         "search.tasks.index_course_content_files", autospec=True
     )
@@ -396,6 +407,8 @@ def test_start_recreate_index(
             "program": backing_index,
             "userlist": backing_index,
             "video": backing_index,
+            "podcast": backing_index,
+            "podcastepisode": backing_index,
         }
     )
     assert mocked_celery.group.call_count == 1
@@ -445,6 +458,18 @@ def test_start_recreate_index(
     assert index_videos_mock.si.call_count == 2
     index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id])
     index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id])
+
+    assert index_podcasts_mock.si.call_count == 4
+    index_podcasts_mock.si.assert_any_call([podcasts[0].id, podcasts[1].id])
+    index_podcasts_mock.si.assert_any_call([podcasts[2].id, podcasts[3].id])
+
+    assert index_podcast_episodes_mock.si.call_count == 2
+    index_podcast_episodes_mock.si.assert_any_call(
+        [podcast_episodes[0].id, podcast_episodes[1].id]
+    )
+    index_podcast_episodes_mock.si.assert_any_call(
+        [podcast_episodes[2].id, podcast_episodes[3].id]
+    )
 
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value

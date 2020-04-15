@@ -1,4 +1,4 @@
-FROM open_discussions_python
+FROM open-discussions_web
 
 USER root
 

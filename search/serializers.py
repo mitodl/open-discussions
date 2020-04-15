@@ -1,5 +1,5 @@
 """Serializers for elasticsearch data"""
-# pylint: disable=unused-argument
+# pylint: disable=unused-argument,too-many-lines
 import logging
 
 from functools import reduce
@@ -18,6 +18,8 @@ from course_catalog.models import (
     UserList,
     Video,
     ContentFile,
+    Podcast,
+    PodcastEpisode,
 )
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
@@ -32,6 +34,8 @@ from search.api import (
     gen_program_id,
     gen_video_id,
     gen_content_file_id,
+    gen_podcast_id,
+    gen_podcast_episode_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -41,6 +45,8 @@ from search.constants import (
     VIDEO_TYPE,
     USER_LIST_TYPE,
     RESOURCE_FILE_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
@@ -465,7 +471,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
 
     def get_default_search_priority(self, instance):
         """
-        Courses should have higer priority in the default saerch
+        Courses should have higer priority in the default search
         """
         return 1
 
@@ -510,7 +516,7 @@ class ESBootcampSerializer(ESCourseSerializer):
 
     def get_default_search_priority(self, instance):
         """
-        Bootcamps should have higer priority in the default saerch
+        Bootcamps should have higer priority in the default search
         """
         return 1
 
@@ -548,7 +554,7 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
 
     def get_default_search_priority(self, instance):
         """
-        Programs should have higer priority in the default saerch
+        Programs should have higer priority in the default search
         """
         return 1
 
@@ -579,7 +585,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
 
     def get_default_search_priority(self, instance):
         """
-        User Lists should have lower priority in the default saerch
+        User Lists should have lower priority in the default search
         """
         return 0
 
@@ -627,7 +633,7 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
 
     def get_default_search_priority(self, instance):
         """
-        Videos should have lower priority in the default saerch
+        Videos should have lower priority in the default search
         """
         return 0
 
@@ -651,6 +657,75 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "minimum_price",
         ]
 
+        read_only_fields = fields
+
+
+class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
+    """ElasticSearch serializer for Podcasts"""
+
+    object_type = PODCAST_TYPE
+
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        User Lists should have lower priority in the default search
+        """
+        return 0
+
+    class Meta:
+        model = Podcast
+        fields = [
+            "id",
+            "podcast_id",
+            "title",
+            "short_description",
+            "full_description",
+            "url",
+            "image_src",
+            "topics",
+            "default_search_priority",
+            "created",
+        ]
+        read_only_fields = fields
+
+
+class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
+    """ElasticSearch serializer for PodcastEpisodes"""
+
+    object_type = PODCAST_EPISODE_TYPE
+
+    series_title = serializers.SerializerMethodField()
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_series_title(self, instance):
+        """Gets the title of the podcast to which this episode belongs"""
+        return instance.podcast.title
+
+    def get_default_search_priority(self, instance):
+        """
+        User Lists should have lower priority in the default search
+        """
+        return 0
+
+    class Meta:
+        model = PodcastEpisode
+        fields = [
+            "id",
+            "podcast_id",
+            "series_title",
+            "episode_id",
+            "title",
+            "short_description",
+            "full_description",
+            "url",
+            "duration",
+            "last_modified",
+            "image_src",
+            "topics",
+            "default_search_priority",
+            "created",
+        ]
         read_only_fields = fields
 
 
@@ -910,3 +985,52 @@ def serialize_video_for_bulk(video_obj):
         video_obj (Video): A video instance
     """
     return {"_id": gen_video_id(video_obj), **ESVideoSerializer(video_obj).data}
+
+
+def serialize_bulk_podcasts(ids):
+    """
+    Serialize Podcasts for bulk indexing
+
+    Args:
+        ids(list of int): List of Podcast id's
+    """
+    for podcast in Podcast.objects.filter(id__in=ids).prefetch_related(
+        "topics", "offered_by"
+    ):
+        yield serialize_podcast_for_bulk(podcast)
+
+
+def serialize_podcast_for_bulk(podcast_obj):
+    """
+    Serialize a Podcast for bulk API request
+
+    Args:
+        podcast_obj (Podcast): A podcast instance
+    """
+    return {"_id": gen_podcast_id(podcast_obj), **ESPodcastSerializer(podcast_obj).data}
+
+
+def serialize_bulk_podcast_episodes(ids):
+    """
+    Serialize PodcastEpisodes for bulk indexing
+
+    Args:
+        ids(list of int): List of PodcastEpisode id's
+    """
+    for podcast_episode in PodcastEpisode.objects.filter(id__in=ids).prefetch_related(
+        "podcast", "topics", "offered_by"
+    ):
+        yield serialize_podcast_episode_for_bulk(podcast_episode)
+
+
+def serialize_podcast_episode_for_bulk(podcast_episode_obj):
+    """
+    Serialize a PodcastEpisode for bulk API request
+
+    Args:
+        podcast_episode_obj (PodcastEpisode): A podcast episode instance
+    """
+    return {
+        "_id": gen_podcast_episode_id(podcast_episode_obj),
+        **ESPodcastEpisodeSerializer(podcast_episode_obj).data,
+    }

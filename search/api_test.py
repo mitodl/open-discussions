@@ -18,6 +18,7 @@ from course_catalog.factories import (
     ProgramFactory,
 )
 from course_catalog.models import FavoriteItem
+from open_discussions import features
 from open_discussions.factories import UserFactory
 from open_discussions.utils import extract_values
 from search.api import (
@@ -40,6 +41,8 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
     COURSE_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.serializers import (
     ESCourseSerializer,
@@ -77,6 +80,12 @@ RAW_SUGGESTIONS = {
         }
     ],
 }
+
+
+@pytest.fixture(autouse=True)
+def search_features(settings):
+    """Autouse fixture that establishes default feature flags for search tests"""
+    settings.FEATURES[features.PODCAST_SEARCH] = True
 
 
 @pytest.fixture()
@@ -222,59 +231,6 @@ def test_execute_search(user, elasticsearch):
     )
 
 
-def test_execute_learn_search(user, elasticsearch):
-    """execute_search should execute an Elasticsearch search"""
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
-    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
-    add_user_role(channels[0], "moderators", user)
-    add_user_role(channels[1], "contributors", user)
-
-    query = {"a": "query"}
-    assert (
-        execute_learn_search(user=user, query=query)
-        == elasticsearch.conn.search.return_value
-    )
-    elasticsearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            LEARNING_PATH_TYPE,
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author": user.id}},
-                                ]
-                            }
-                        }
-                    ]
-                }
-            },
-        },
-        doc_type=[],
-        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
-    )
-
-
 def test_execute_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     user = AnonymousUser()
@@ -384,8 +340,61 @@ def test_execute_search_with_suggestion(
     }
 
 
+def test_execute_learn_search(user, elasticsearch):
+    """execute_learn_search should execute an Elasticsearch search for learning resources"""
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
+    add_user_role(channels[0], "moderators", user)
+    add_user_role(channels[1], "contributors", user)
+
+    query = {"a": "query"}
+    assert (
+        execute_learn_search(user=user, query=query)
+        == elasticsearch.conn.search.return_value
+    )
+    elasticsearch.conn.search.assert_called_once_with(
+        body={
+            **query,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "bool": {
+                                "should": [
+                                    {
+                                        "bool": {
+                                            "must_not": [
+                                                {
+                                                    "terms": {
+                                                        "object_type": [
+                                                            USER_LIST_TYPE,
+                                                            LEARNING_PATH_TYPE,
+                                                        ]
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "term": {
+                                            "privacy_level": PrivacyLevel.public.value
+                                        }
+                                    },
+                                    {"term": {"author": user.id}},
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+        doc_type=[],
+        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+    )
+
+
 def test_execute_learn_search_anonymous(elasticsearch):
-    """execute_search should execute an Elasticsearch search with an anonymous user"""
+    """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
     elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     user = AnonymousUser()
     query = {"a": "query"}
@@ -431,6 +440,25 @@ def test_execute_learn_search_anonymous(elasticsearch):
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
+
+
+def test_execute_learn_search_podcasts(settings, user, elasticsearch):
+    """execute_learn_search should execute an Elasticsearch search """
+    settings.FEATURES[features.PODCAST_SEARCH] = False
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    query = {"a": "query"}
+    assert (
+        execute_learn_search(user=user, query=query)
+        == elasticsearch.conn.search.return_value
+    )
+    first_call = elasticsearch.conn.search.call_args[1]
+    assert first_call["body"]["query"]["bool"]["filter"][1] == {
+        "bool": {
+            "must_not": [
+                {"terms": {"object_type": [PODCAST_TYPE, PODCAST_EPISODE_TYPE]}}
+            ]
+        }
+    }
 
 
 def test_find_related_documents(settings, elasticsearch, user, gen_query_filters_mock):

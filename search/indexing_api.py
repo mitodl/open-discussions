@@ -33,6 +33,8 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
     VIDEO_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
@@ -47,6 +49,8 @@ from search.serializers import (
     serialize_bulk_videos,
     serialize_content_file_for_bulk,
     serialize_content_file_for_bulk_deletion,
+    serialize_bulk_podcasts,
+    serialize_bulk_podcast_episodes,
 )
 
 
@@ -223,6 +227,23 @@ VIDEO_OBJECT_TYPE = {
     "published": {"type": "boolean"},
 }
 
+PODCAST_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "url": {"type": "keyword"},
+}
+
+PODCAST_EPISODE_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "podcast_id": {"type": "long"},
+    "series_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "full_description": ENGLISH_TEXT_FIELD,
+    "url": {"type": "keyword"},
+    "last_modified": {"type": "date"},
+}
+
 MAPPING = {
     POST_TYPE: {
         **CONTENT_OBJECT_TYPE,
@@ -245,6 +266,8 @@ MAPPING = {
     USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
     LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE,
     VIDEO_TYPE: VIDEO_OBJECT_TYPE,
+    PODCAST_TYPE: PODCAST_OBJECT_TYPE,
+    PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,
 }
 
 
@@ -641,6 +664,26 @@ def index_videos(ids):
         ids(list of int): List of Video id's
     """
     index_items(serialize_bulk_videos(ids), VIDEO_TYPE)
+
+
+def index_podcasts(ids):
+    """
+    Index a list of podcasts by id
+
+    Args:
+        ids(list of int): List of Podcast id's
+    """
+    index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE)
+
+
+def index_podcast_episodes(ids):
+    """
+    Index a list of podcast episodes by id
+
+    Args:
+        ids(list of int): List of PodcastEpisode id's
+    """
+    index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE)
 
 
 def create_backing_index(object_type):
