@@ -48,12 +48,10 @@ export default class AudioPlayer extends React.Component<Props> {
   }
 
   seekBarClick = (e: Object) => {
-    if (
-      this.seekBar.current.getBoundingClientRect !== null &&
-      this.seekBar.current.offsetWidth !== null
-    ) {
-      const offset = this.seekBar.current.getBoundingClientRect()
-      const offsetWidth = this.seekBar.current.offsetWidth
+    const seekBar = this.seekBar && this.seekBar.current
+    if (seekBar && seekBar.getBoundingClientRect && seekBar.offsetWidth) {
+      const offset = seekBar.getBoundingClientRect()
+      const offsetWidth = seekBar.offsetWidth
       const x = e.pageX - offset.left
       Amplitude.setSongPlayedPercentage(
         (parseFloat(x) / parseFloat(offsetWidth)) * 100
