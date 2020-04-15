@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.119.1 (Released April 15, 2020)
+---------------
+
+- fix unpublish code for podcast episodes
+- add curved background to `/podcasts`
+- import podcast data
+- add suggestions to channel search
+
 Version 0.119.0 (Released April 14, 2020)
 ---------------
 
