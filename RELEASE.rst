@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.119.1
+Version 0.119.1 (Released April 15, 2020)
 ---------------
 
 - fix unpublish code for podcast episodes
