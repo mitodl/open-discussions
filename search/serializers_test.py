@@ -17,6 +17,8 @@ from course_catalog.factories import (
     VideoFactory,
     UserListItemFactory,
     ContentFileFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from course_catalog.models import Course, Video
 from open_discussions.constants import ISOFORMAT
@@ -24,8 +26,21 @@ from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
 from profiles.models import Profile
 from profiles.utils import image_uri, IMAGE_MEDIUM
-from search.api import gen_course_id, gen_video_id, gen_content_file_id
-from search.constants import PROFILE_TYPE, COURSE_TYPE, PROGRAM_TYPE, RESOURCE_FILE_TYPE
+from search.api import (
+    gen_course_id,
+    gen_video_id,
+    gen_content_file_id,
+    gen_podcast_id,
+    gen_podcast_episode_id,
+)
+from search.constants import (
+    PROFILE_TYPE,
+    COURSE_TYPE,
+    PROGRAM_TYPE,
+    RESOURCE_FILE_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
+)
 from search.serializers import (
     ESPostSerializer,
     ESCommentSerializer,
@@ -48,6 +63,12 @@ from search.serializers import (
     serialize_content_file_for_bulk,
     ESContentFileSerializer,
     serialize_content_file_for_bulk_deletion,
+    ESPodcastSerializer,
+    serialize_bulk_podcasts,
+    serialize_podcast_for_bulk,
+    ESPodcastEpisodeSerializer,
+    serialize_bulk_podcast_episodes,
+    serialize_podcast_episode_for_bulk,
 )
 
 
@@ -465,6 +486,60 @@ def test_es_userlist_serializer_image_src():
     )
 
 
+@pytest.mark.django_db
+def test_es_podcast_serializer():
+    """
+    Test that ESPodcastSerializer correctly serializes a Podcast object
+    """
+    podcast = PodcastFactory.create()
+    serialized = ESPodcastSerializer(podcast).data
+    assert_json_equal(
+        serialized,
+        {
+            "object_type": PODCAST_TYPE,
+            "id": podcast.id,
+            "podcast_id": podcast.podcast_id,
+            "short_description": podcast.short_description,
+            "full_description": podcast.full_description,
+            "title": podcast.title,
+            "url": podcast.url,
+            "image_src": podcast.image_src,
+            "topics": list(podcast.topics.values_list("name", flat=True)),
+            "created": drf_datetime(podcast.created_on),
+            "default_search_priority": 0,
+        },
+    )
+
+
+@pytest.mark.django_db
+def test_es_podcast_episode_serializer():
+    """
+    Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
+    """
+    podcast_episode = PodcastEpisodeFactory.create()
+    serialized = ESPodcastEpisodeSerializer(podcast_episode).data
+    assert_json_equal(
+        serialized,
+        {
+            "object_type": PODCAST_EPISODE_TYPE,
+            "id": podcast_episode.id,
+            "podcast_id": podcast_episode.podcast.id,
+            "series_title": podcast_episode.podcast.title,
+            "episode_id": podcast_episode.episode_id,
+            "short_description": podcast_episode.short_description,
+            "full_description": podcast_episode.full_description,
+            "title": podcast_episode.title,
+            "url": podcast_episode.url,
+            "duration": podcast_episode.duration,
+            "last_modified": drf_datetime(podcast_episode.last_modified),
+            "image_src": podcast_episode.image_src,
+            "topics": list(podcast_episode.topics.values_list("name", flat=True)),
+            "created": drf_datetime(podcast_episode.created_on),
+            "default_search_priority": 0,
+        },
+    )
+
+
 def test_serialize_post_for_bulk(mocker):
     """
     Test that serialize_post_for_bulk correctly serializes a post/submission object
@@ -589,4 +664,61 @@ def test_serialize_content_file_for_bulk_deletion():
     assert serialize_content_file_for_bulk_deletion(content_file) == {
         "_id": gen_content_file_id(content_file.key),
         "_op_type": "delete",
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_podcasts(mocker):
+    """
+    Test that serialize_bulk_podcasts calls serialize_podcast_for_bulk for every existing podcast
+    """
+    mock_serialize_podcast = mocker.patch(
+        "search.serializers.serialize_podcast_for_bulk"
+    )
+    podcasts = PodcastFactory.create_batch(5)
+    list(serialize_bulk_podcasts([podcast.id for podcast in podcasts]))
+    for podcast in podcasts:
+        mock_serialize_podcast.assert_any_call(podcast)
+
+
+@pytest.mark.django_db
+def test_serialize_podcast_for_bulk():
+    """
+    Test that serialize_podcast_for_bulk yields a valid ESPodcastSerializer
+    """
+    podcast = PodcastFactory.create()
+    assert serialize_podcast_for_bulk(podcast) == {
+        "_id": gen_podcast_id(podcast),
+        **ESPodcastSerializer(podcast).data,
+    }
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_podcast_episodes(mocker):
+    """
+    Test that serialize_bulk_podcast_episodes calls serialize_podcast_episode_for_bulk for every existing
+    podcast episode
+    """
+    mock_serialize_podcast_episode = mocker.patch(
+        "search.serializers.serialize_podcast_episode_for_bulk"
+    )
+    podcast_episodes = PodcastEpisodeFactory.create_batch(5)
+    list(
+        serialize_bulk_podcast_episodes(
+            [podcast_episode.id for podcast_episode in podcast_episodes]
+        )
+    )
+    for podcast_episode in podcast_episodes:
+        mock_serialize_podcast_episode.assert_any_call(podcast_episode)
+
+
+@pytest.mark.django_db
+def test_serialize_podcast_episode_for_bulk():
+    """
+    Test that serialize_podcast_episode_for_bulk yields a valid ESPodcastEpisodeSerializer
+    """
+    podcast_episode = PodcastEpisodeFactory.create()
+    assert serialize_podcast_episode_for_bulk(podcast_episode) == {
+        "_id": gen_podcast_episode_id(podcast_episode),
+        **ESPodcastEpisodeSerializer(podcast_episode).data,
     }

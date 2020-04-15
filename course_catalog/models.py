@@ -504,12 +504,11 @@ class PlaylistVideo(models.Model):
 
 
 class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
-    """Data model for podcast"""
+    """Data model for podcasts"""
 
     objects = LearningResourceQuerySet.as_manager()
 
     podcast_id = models.CharField(max_length=80, unique=True)
-
     full_description = models.TextField(null=True, blank=True)
     image_src = models.URLField(max_length=400, null=True, blank=True)
     published = models.BooleanField(default=True)
@@ -522,7 +521,7 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
 
     @property
     def platform(self):
-        """Platform for podcasts"""
+        """Platform for podcast"""
         return PlatformType.podcast.value
 
     class Meta:
@@ -535,7 +534,6 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     objects = LearningResourceQuerySet.as_manager()
 
     episode_id = models.CharField(max_length=80)
-
     full_description = models.TextField(null=True, blank=True)
     image_src = models.URLField(max_length=400, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)

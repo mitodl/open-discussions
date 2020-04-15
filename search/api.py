@@ -18,6 +18,7 @@ from channels.models import ChannelGroupRole
 from course_catalog.constants import PrivacyLevel
 from course_catalog.models import FavoriteItem
 from course_catalog.utils import get_list_items_by_resource
+from open_discussions import features
 from open_discussions.utils import extract_values
 from search.connection import get_default_alias_name
 from search.constants import (
@@ -27,6 +28,8 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
     LEARNING_RESOURCE_TYPES,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -155,6 +158,32 @@ def gen_video_id(video_obj):
     return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
 
 
+def gen_podcast_id(podcast_obj):
+    """
+    Generates the Elasticsearch document id for a Podcast
+
+    Args:
+        podcast_obj (Podcast): The Podcast object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "podcast_{}".format(podcast_obj.id)
+
+
+def gen_podcast_episode_id(podcast_episode_obj):
+    """
+    Generates the Elasticsearch document id for a Podcast
+
+    Args:
+        podcast_episode_obj (PodcastEpisode): The PodcastEpisode object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "podcast_ep_{}".format(podcast_episode_obj.id)
+
+
 def is_reddit_object_removed(reddit_obj):
     """
     Indicates whether or not a given reddit object is considered to be removed by moderators
@@ -232,7 +261,14 @@ def _apply_learning_query_filters(search, user):
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author=user.id)
 
-    return search.filter(user_list_filter)
+    search = search.filter(user_list_filter)
+    if not features.is_enabled(features.PODCAST_SEARCH):
+        # Exclude podcasts from the search results if the feature flag isn't enabled
+        search = search.exclude(
+            Q("terms", object_type=[PODCAST_TYPE, PODCAST_EPISODE_TYPE])
+        )
+
+    return search
 
 
 def is_learning_query(query):
