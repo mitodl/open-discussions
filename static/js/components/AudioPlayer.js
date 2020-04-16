@@ -1,5 +1,5 @@
 // @flow
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useCallback } from "react"
 import { useSelector } from "react-redux"
 import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 import Amplitude from "amplitudejs"
@@ -29,25 +29,25 @@ export default function AudioPlayer() {
     [currentlyPlaying]
   )
 
-  const backTenClick = () => {
+  const backTenClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
-  }
+  })
 
-  const forwardThirtyClick = () => {
+  const forwardThirtyClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
-  }
+  })
 
-  const seekBarClick = (e: Object) => {
-    const seekBar = this.seekBar && this.seekBar.current
-    if (seekBar && seekBar.getBoundingClientRect && seekBar.offsetWidth) {
-      const offset = seekBar.getBoundingClientRect()
-      const offsetWidth = seekBar.offsetWidth
+  const seekBarClick = useCallback((e: Object) => {
+    const { current } = seekBar
+    if (current && current.getBoundingClientRect && current.offsetWidth) {
+      const offset = current.getBoundingClientRect()
+      const offsetWidth = current.offsetWidth
       const x = e.pageX - offset.left
       Amplitude.setSongPlayedPercentage(
         (parseFloat(x) / parseFloat(offsetWidth)) * 100
       )
     }
-  }
+  })
 
   return (
     <div className="audio-player-container-outer">
