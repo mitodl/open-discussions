@@ -4,6 +4,8 @@ import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 
 import PodcastEpisodeCard from "../components/PodcastEpisodeCard"
+import PodcastCard from "../components/PodcastCard"
+import { Cell, Grid } from "../components/Grid"
 
 import {
   podcastsRequest,
@@ -43,14 +45,18 @@ export default function PodcastFrontpage() {
           </>
         ) : null}
       </div>
-      <h1>PODCASTS</h1>
-      {loaded
-        ? Object.values(podcasts).map((podcast: any, idx) => (
-          <div key={idx}>
-            <h3>{podcast.title}</h3>
-          </div>
-        ))
-        : null}
+      <div className="all-podcasts">
+        <h1>Podcasts Series</h1>
+        {loaded ? (
+          <Grid>
+            {Object.values(podcasts).map((podcast: any) => (
+              <Cell width={4} key={podcast.id}>
+                <PodcastCard podcast={podcast} />
+              </Cell>
+            ))}
+          </Grid>
+        ) : null}
+      </div>
     </div>
   )
 }
