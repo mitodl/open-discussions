@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.119.2
+Version 0.119.2 (Released April 16, 2020)
 ---------------
 
 - Added data models for discussions channels
