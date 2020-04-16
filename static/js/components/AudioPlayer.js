@@ -1,31 +1,24 @@
 // @flow
-/* global SETTINGS: false */
-import React, { useState, useEffect, useRef } from "react"
+import React, { useEffect, useRef } from "react"
+import { useSelector } from "react-redux"
+import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 import Amplitude from "amplitudejs"
 
-type Props = {
-  title: string,
-  description: string,
-  url: string
-}
-
-export default function AudioPlayer(props: Props) {
+export default function AudioPlayer() {
   const seekBar = useRef()
-  const [title, setTitle] = useState(props.title)
-  const [description, setDescription] = useState(props.description)
-  const [url, setUrl] = useState(props.url)
+  const currentlyPlaying = useSelector(currentlyPlayingAudioSelector)
 
   useEffect(
     () => {
-      if (!title || !description || !url) {
+      if (!currentlyPlaying) {
         return
       }
       Amplitude.init({
         songs: [
           {
-            album: title,
-            name:  description,
-            url:   url
+            album: currentlyPlaying.title,
+            name:  currentlyPlaying.description,
+            url:   currentlyPlaying.url
           }
         ],
         waveforms: {
@@ -33,7 +26,7 @@ export default function AudioPlayer(props: Props) {
         }
       })
     },
-    [title, description, url]
+    [currentlyPlaying]
   )
 
   const backTenClick = () => {
@@ -79,10 +72,7 @@ export default function AudioPlayer(props: Props) {
           >
             <span className="material-icons" />
           </div>
-          <div
-            className="audio-player-button"
-            onClick={forwardThirtyClick}
-          >
+          <div className="audio-player-button" onClick={forwardThirtyClick}>
             <span className="material-icons">forward_30</span>
           </div>
           <div className="audio-player-progress-container">
