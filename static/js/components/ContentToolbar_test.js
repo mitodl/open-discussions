@@ -60,10 +60,19 @@ describe("ContentToolbar", () => {
     )
   })
 
-  it("should include a link to the my lists page", () => {
-    const link = renderToolbar().find(".user-list-link")
-    assert.equal(link.prop("children")[1], "My Lists")
-    assert.equal(link.prop("to"), userListIndexURL)
+  //
+  ;[true, false].forEach(courseUIEnabled => {
+    it("should include a link to the my lists page", () => {
+      SETTINGS.course_ui_enabled = courseUIEnabled
+
+      const link = renderToolbar().find(".user-list-link")
+      if (courseUIEnabled) {
+        assert.equal(link.prop("children")[1], "My Lists")
+        assert.equal(link.prop("to"), userListIndexURL)
+      } else {
+        assert.isNotOk(link.exists())
+      }
+    })
   })
 
   it("should hide the my lists link when you're anonymous", () => {
