@@ -16,7 +16,6 @@ describe("audio reducer", () => {
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     store = helper.store
-    console.log(store)
     dispatchThen = store.createDispatchThen(state => state.audio)
   })
 
