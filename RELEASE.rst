@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.119.3 (Released April 17, 2020)
+---------------
+
+- add 'recent episodes' display to /podcasts
+- Added podcasts & podcast episodes to index
+
 Version 0.119.2 (Released April 16, 2020)
 ---------------
 
