@@ -54,11 +54,11 @@ export default function AudioPlayer() {
       <div className="audio-player-container-inner">
         <div className="audio-player-titles">
           <div
-            className="audio-player-podcast-name"
+            className="audio-player-title"
             data-amplitude-song-info="album"
           />
           <div
-            className="audio-player-podcast-title"
+            className="audio-player-description"
             data-amplitude-song-info="name"
           />
         </div>
