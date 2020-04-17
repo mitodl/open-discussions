@@ -108,7 +108,7 @@ def test_transform(mocker, title, topics):
                     "short_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "full_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "url": "http://feeds.soundcloud.com/stream/episode1.mp3",
-                    "image_src": "image2.jpg",
+                    "image_src": "apicture.jpg",
                     "last_modified": datetime.datetime(
                         2020, 4, 1, 18, 20, 31, tzinfo=datetime.timezone.utc
                     ),

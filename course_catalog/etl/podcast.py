@@ -117,14 +117,15 @@ def extract():
         yield (feed, playlist_config)
 
 
-def transform_episode(rss_data, offered_by, topics):
+def transform_episode(rss_data, offered_by, topics, parent_image):
     """
     Transform a podcast episode into our normalized data
 
     Args:
         rss_data (beautiful soup object): the extracted episode data
         offered_by (str): the offered_by value for this episode
-        topics (dict of str): the topics for the podcast
+        topics (list of dict): the topics for the podcast
+        parent_image (str): url for podcast image
     Returns:
         dict:
             normalized podcast episode data
@@ -137,7 +138,9 @@ def transform_episode(rss_data, offered_by, topics):
         "short_description": rss_data.description.text,
         "full_description": rss_data.description.text,
         "url": rss_data.enclosure["url"],
-        "image_src": rss_data.find("image")["href"] if rss_data.find("image") else None,
+        "image_src": rss_data.find("image")["href"]
+        if rss_data.find("image")
+        else parent_image,
         "last_modified": datetime.strptime(
             rss_data.pubDate.text, "%a, %d %b %Y  %H:%M:%S %z"
         ),
@@ -169,6 +172,11 @@ def transform(extracted_podcasts):
 
     for rss_data, config_data in extracted_podcasts:
         try:
+            image = (
+                rss_data.channel.find("itunes:image")["href"]
+                if rss_data.channel.find("itunes:image")
+                else None
+            )
             topics = (
                 [{"name": topic} for topic in config_data["topics"].split(",")]
                 if "topics" in config_data
@@ -188,7 +196,9 @@ def transform(extracted_podcasts):
                 "url": config_data["website"],
                 "topics": topics,
                 "episodes": (
-                    transform_episode(episode_rss, config_data["offered_by"], topics)
+                    transform_episode(
+                        episode_rss, config_data["offered_by"], topics, image
+                    )
                     for episode_rss in rss_data.find_all("item")
                 ),
                 "runs": [
