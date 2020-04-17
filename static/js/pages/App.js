@@ -331,11 +331,7 @@ class App extends React.Component<Props> {
           {SETTINGS.podcast_frontpage_enabled ? (
             <Route path={`${match.url}podcasts`}>
               <PodcastFrontpage />
-              <AudioPlayer
-                title="Chalk Radio"
-                description="Social Impact at Scale, One Project at a Time with Dr. Anjali Sastry"
-                url="https://chtbl.com/track/F9DD6B/cdn.simplecast.com/audio/2c64ac/2c64ace6-baf4-4e86-b527-445e611e6a31/152665b8-894b-4a14-abf5-e817a5e3bf5a/social-impact-at-scale-one-project-at-a-time-with-dr-anjali-sastry_tc.mp3"
-              />
+              <AudioPlayer />
             </Route>
           ) : null}
         </div>
