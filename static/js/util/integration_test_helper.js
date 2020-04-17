@@ -96,6 +96,7 @@ export default class IntegrationTestHelper {
       status: 200
     }
     this.handleRequestStub = this.sandbox.stub().returns(defaultResponse)
+    this.isLoadingStub = this.sandbox.stub().returns(false)
     this.sandbox
       .stub(networkInterfaceFuncs, "makeRequest")
       .callsFake((url, method, options) => ({
@@ -107,7 +108,9 @@ export default class IntegrationTestHelper {
           const resText = (response && response.text) || undefined
           const resHeaders = (response && response.header) || undefined
 
-          callback(err, resStatus, resBody, resText, resHeaders)
+          if (!this.isLoadingStub(url, method, options)) {
+            callback(err, resStatus, resBody, resText, resHeaders)
+          }
         },
         abort: () => {}
       }))

@@ -6,6 +6,7 @@ import { useSelector } from "react-redux"
 import PodcastEpisodeCard from "../components/PodcastEpisodeCard"
 import PodcastCard from "../components/PodcastCard"
 import { Cell, Grid } from "../components/Grid"
+import { PostLoading } from "../components/Loading"
 
 import {
   podcastsRequest,
@@ -20,8 +21,6 @@ export default function PodcastFrontpage() {
     recentPodcastEpisodesRequest()
   )
 
-  const loaded = isFinishedPodcasts && isFinishedRecent
-
   const podcasts = useSelector(podcastsSelector)
   const recentEpisodes = useSelector(recentEpisodesSelector)
 
@@ -31,7 +30,7 @@ export default function PodcastFrontpage() {
         <div className="recent-header">
           <div className="title">RECENT EPISODES</div>
         </div>
-        {loaded ? (
+        {isFinishedRecent && isFinishedPodcasts ? (
           <>
             {recentEpisodes
               .slice(0, 6)
@@ -43,11 +42,13 @@ export default function PodcastFrontpage() {
                 />
               ))}
           </>
-        ) : null}
+        ) : (
+          <PostLoading />
+        )}
       </div>
       <div className="all-podcasts">
         <h1>Podcasts Series</h1>
-        {loaded ? (
+        {isFinishedPodcasts ? (
           <Grid>
             {Object.values(podcasts).map((podcast: any) => (
               <Cell width={4} key={podcast.id}>
@@ -55,7 +56,9 @@ export default function PodcastFrontpage() {
               </Cell>
             ))}
           </Grid>
-        ) : null}
+        ) : (
+          <PostLoading />
+        )}
       </div>
     </div>
   )
