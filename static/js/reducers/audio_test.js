@@ -3,6 +3,7 @@ import { assert } from "chai"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { getCurrentlyPlayingAudio } from "../lib/redux_selectors"
+import { INITIAL_AUDIO_STATE } from "./audio"
 import {
   SET_CURRENTLY_PLAYING_AUDIO,
   setCurrentlyPlayingAudio
@@ -20,6 +21,10 @@ describe("audio reducer", () => {
 
   afterEach(() => {
     helper.cleanup()
+  })
+
+  it("should have some default state", () => {
+    assert.deepEqual(store.getState().audio, INITIAL_AUDIO_STATE)
   })
 
   it("should let you set the currently playing audio", async () => {
