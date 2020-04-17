@@ -246,14 +246,12 @@ def test_favorites_serializer():
 def test_podcast_serializer():
     """PodcastSerializer should generate relevant JSON for a given Podcast"""
     podcast = PodcastFactory.create()
-    episodes = PodcastEpisodeFactory.create_batch(2, podcast=podcast)
     offered_by = LearningResourceOfferorFactory.create()
     podcast.offered_by.add(offered_by)
 
     assert PodcastSerializer(instance=podcast).data == {
         "created_on": podcast.created_on.strftime(datetime_millis_format),
         "updated_on": podcast.updated_on.strftime(datetime_millis_format),
-        "episodes": PodcastEpisodeSerializer(many=True, instance=episodes).data,
         "full_description": podcast.full_description,
         "topics": CourseTopicSerializer(many=True, instance=podcast.topics).data,
         "url": podcast.url,

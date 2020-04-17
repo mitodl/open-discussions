@@ -8,7 +8,6 @@ import type { Podcast, PodcastEpisode } from "../flow/podcastTypes"
 
 export const makePodcast = (): Podcast => ({
   created_on:        casual.moment.toISOString(),
-  episodes:          [],
   full_description:  casual.description,
   // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
   id:                incr.next().value,

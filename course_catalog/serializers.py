@@ -699,7 +699,6 @@ class PodcastSerializer(serializers.ModelSerializer):
     Serializer for Podcasts
     """
 
-    episodes = PodcastEpisodeSerializer(many=True)
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
 
@@ -717,5 +716,4 @@ class PodcastSerializer(serializers.ModelSerializer):
             "offered_by",
             "created_on",
             "updated_on",
-            "episodes",
         ]
