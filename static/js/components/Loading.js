@@ -106,6 +106,53 @@ export const PostLoading = () => (
   </div>
 )
 
+export const PodcastEpisodeLoading = () =>
+  R.times(
+    i => (
+      <Card key={i}>
+        <ContentLoader
+          speed={contentLoaderSpeed}
+          style={{ width: "100%", height: "74px" }}
+          width={1000}
+          height={74}
+          preserveAspectRatio="none"
+        >
+          <rect x="0" y="0" rx="5" ry="5" width="60%" height="12" />
+          <rect x="0" y="25" rx="5" ry="5" width="30%" height="14" />
+          <rect x="0" y="55" rx="15" ry="15" width="140" height="18" />
+          <rect x="66%" y="0" rx="5" ry="5" width="34%" height={69} />
+        </ContentLoader>
+      </Card>
+    ),
+    emptyPostsToRender
+  )
+
+export const PodcastLoading = () => (
+  <Grid>
+    {R.times(
+      i => (
+        <Cell width={4} key={i}>
+          <Card className="borderless">
+            <ContentLoader
+              speed={contentLoaderSpeed}
+              style={{ width: "100%", height: "280px" }}
+              width={1000}
+              height={280}
+              preserveAspectRatio="none"
+            >
+              <rect x="0" y="0" rx="5" ry="5" width="100%" height={180} />
+              <rect x="30" y="190" rx="5" ry="5" width="20%" height="12" />
+              <rect x="30" y="210" rx="5" ry="5" width="80%" height="18" />
+              <rect x="30" y="260" rx="15" ry="15" width="30%" height="12" />
+            </ContentLoader>
+          </Card>
+        </Cell>
+      ),
+      emptyPostsToRender
+    )}
+  </Grid>
+)
+
 type CSLProps = {
   layout: string
 }

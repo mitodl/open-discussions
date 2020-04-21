@@ -6,7 +6,7 @@ import { useSelector } from "react-redux"
 import PodcastEpisodeCard from "../components/PodcastEpisodeCard"
 import PodcastCard from "../components/PodcastCard"
 import { Cell, Grid } from "../components/Grid"
-import { PostLoading } from "../components/Loading"
+import { PodcastLoading, PodcastEpisodeLoading } from "../components/Loading"
 
 import {
   podcastsRequest,
@@ -43,7 +43,7 @@ export default function PodcastFrontpage() {
               ))}
           </>
         ) : (
-          <PostLoading />
+          <PodcastEpisodeLoading />
         )}
       </div>
       <div className="all-podcasts">
@@ -57,7 +57,7 @@ export default function PodcastFrontpage() {
             ))}
           </Grid>
         ) : (
-          <PostLoading />
+          <PodcastLoading />
         )}
       </div>
     </div>
