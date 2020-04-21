@@ -15,7 +15,6 @@ from channels.models import Comment, Post
 from course_catalog.constants import PlatformType
 from course_catalog.models import (
     Course,
-    Bootcamp,
     Program,
     UserList,
     Video,
@@ -31,7 +30,6 @@ from profiles.models import Profile
 from search import indexing_api as api
 from search.api import gen_content_file_id, gen_course_id
 from search.constants import (
-    BOOTCAMP_TYPE,
     COURSE_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
@@ -43,7 +41,6 @@ from search.constants import (
 )
 from search.exceptions import RetryException, ReindexException
 from search.serializers import (
-    ESBootcampSerializer,
     ESCourseSerializer,
     ESProgramSerializer,
     ESProfileSerializer,
@@ -96,16 +93,6 @@ def wrap_retry_exception(*exception_classes):
 def create_document(doc_id, data):
     """Task that makes a request to create an ES document"""
     return api.create_document(doc_id, data)
-
-
-@app.task
-def index_new_bootcamp(bootcamp_id):
-    """Task that makes a request to create an ES document for a bootcamp"""
-    from search.api import gen_bootcamp_id
-
-    bootcamp = Bootcamp.objects.get(id=bootcamp_id)
-    data = ESBootcampSerializer(bootcamp).data
-    api.create_document(gen_bootcamp_id(bootcamp.course_id), data)
 
 
 @app.task
@@ -233,21 +220,6 @@ def upsert_content_file(file_id):
             content_file_obj.run.content_object.platform,
             content_file_obj.run.content_object.course_id,
         ),
-    )
-
-
-@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
-def upsert_bootcamp(bootcamp_id):
-    """Upsert bootcamp based on stored database information"""
-    from search.api import gen_bootcamp_id
-
-    bootcamp_obj = Bootcamp.objects.get(id=bootcamp_id)
-    bootcamp_data = ESBootcampSerializer(bootcamp_obj).data
-    api.upsert_document(
-        gen_bootcamp_id(bootcamp_obj.course_id),
-        bootcamp_data,
-        BOOTCAMP_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
 
@@ -480,25 +452,6 @@ def delete_run_content_files(run_id):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_bootcamps(ids):
-    """
-    Index bootcamps
-
-    Args:
-        ids(list of int): List of bootcamp id's
-
-    """
-    try:
-        api.index_bootcamps(ids)
-    except (RetryException, Ignore):
-        raise
-    except:  # pylint: disable=bare-except
-        error = f"index_bootcamps threw an error"
-        log.exception(error)
-        return error
-
-
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_programs(ids):
     """
     Index programs
@@ -653,15 +606,6 @@ def start_recreate_index(self):
                         platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
                     )
                     .exclude(course_id__in=blacklisted_ids)
-                    .order_by("id")
-                    .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-            + [
-                index_bootcamps.si(ids)
-                for ids in chunks(
-                    Bootcamp.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

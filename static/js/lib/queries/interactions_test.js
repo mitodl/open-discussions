@@ -12,7 +12,6 @@ import { DEFAULT_POST_OPTIONS } from "../redux_query"
 import {
   makeVideo,
   makeCourse,
-  makeBootcamp,
   makeUserList,
   makeProgram
 } from "../../factories/learning_resources"
@@ -64,10 +63,9 @@ describe("Interactions API", () => {
   it("popularContentRequest allows fetching of popular resources", () => {
     const course = makeCourse()
     const video = makeVideo()
-    const bootcamp = makeBootcamp()
     const program = makeProgram()
     const userList = makeUserList()
-    const results = [course, video, bootcamp, program, userList]
+    const results = [course, video, program, userList]
     const request = popularContentRequest()
     assert.equal(request.url, popularContentUrl)
     assert.deepEqual(request.transform({ results }), {
@@ -79,9 +77,6 @@ describe("Interactions API", () => {
       },
       videos: {
         [video.id]: video
-      },
-      bootcamps: {
-        [bootcamp.id]: bootcamp
       },
       userLists: {
         [userList.id]: userList

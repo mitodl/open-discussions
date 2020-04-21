@@ -12,12 +12,11 @@ import {
 } from "./learning_resources"
 import {
   makeCourse,
-  makeBootcamp,
+  makeProgram,
   makeLearningResource
 } from "../../factories/learning_resources"
 import {
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_USERLIST,
@@ -30,7 +29,7 @@ describe("learning resource queries", () => {
   let favorites
 
   beforeEach(() => {
-    favorites = [...R.times(makeCourse, 5), ...R.times(makeBootcamp, 5)]
+    favorites = [...R.times(makeCourse, 5), ...R.times(makeProgram, 5)]
   })
 
   it("mapResourcesToResourceRefs should map learning resources to a ref object", () => {
@@ -66,7 +65,7 @@ describe("learning resource queries", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(resourceType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(resourceType => {
     it("filterFavorites should separate by content type", () => {
       const filtered = filterFavorites(favorites, resourceType)
       filtered.forEach(object => {
@@ -126,10 +125,9 @@ describe("learning resource queries", () => {
   it("normalizeResourcesByObjectType normalizes objects into the correct key", () => {
     const course = makeLearningResource(LR_TYPE_COURSE)
     const video = makeLearningResource(LR_TYPE_VIDEO)
-    const bootcamp = makeLearningResource(LR_TYPE_BOOTCAMP)
     const userList = makeLearningResource(LR_TYPE_USERLIST)
     const program = makeLearningResource(LR_TYPE_PROGRAM)
-    const resources = [course, video, bootcamp, userList, program]
+    const resources = [course, video, userList, program]
     const normalized = normalizeResourcesByObjectType(resources)
 
     assert.deepEqual(normalized, {
@@ -138,9 +136,6 @@ describe("learning resource queries", () => {
       },
       videos: {
         [video.id]: video
-      },
-      bootcamps: {
-        [bootcamp.id]: bootcamp
       },
       userLists: {
         [userList.id]: userList

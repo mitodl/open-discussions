@@ -13,7 +13,6 @@ import ShareTooltip from "./ShareTooltip"
 import { LearningResourceRow } from "./LearningResourceCard"
 import { PaginatedUserListItems } from "./UserListItems"
 import {
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_PRIVATE,
@@ -208,15 +207,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               </a>
               <div className="platform-logo">
                 <span>on</span>
-                <img
-                  src={
-                    platformLogos[
-                      object.object_type === LR_TYPE_BOOTCAMP
-                        ? platforms.bootcamps
-                        : object.platform || object.offered_by
-                    ]
-                  }
-                />
+                <img src={platformLogos[object.platform || object.offered_by]} />
               </div>
             </div>
           ) : null}

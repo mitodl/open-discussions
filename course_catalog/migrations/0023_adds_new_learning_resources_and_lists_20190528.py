@@ -133,7 +133,7 @@ class Migration(migrations.Migration):
                 (
                     "content_type",
                     models.ForeignKey(
-                        limit_choices_to={"model__in": ("Course", "Bootcamp")},
+                        limit_choices_to={"model__in": ("Course",)},
                         on_delete=django.db.models.deletion.CASCADE,
                         to="contenttypes.ContentType",
                     ),

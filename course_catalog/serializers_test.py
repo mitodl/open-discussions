@@ -4,13 +4,12 @@ Test course_catalog serializers
 import pytest
 
 from course_catalog import factories
-from course_catalog.constants import OfferedBy, ListType
+from course_catalog.constants import OfferedBy, ListType, PlatformType
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
     CoursePriceFactory,
     CourseInstructorFactory,
-    BootcampFactory,
     ProgramFactory,
     UserListFactory,
     LearningResourceRunFactory,
@@ -22,7 +21,6 @@ from course_catalog.factories import (
 from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
     CourseSerializer,
-    BootcampSerializer,
     FavoriteItemSerializer,
     UserListSerializer,
     ProgramSerializer,
@@ -84,10 +82,12 @@ def test_serialize_courserun_related_models():
 
 def test_serialize_bootcamp_related_models():
     """
-    Verify that a serialized bootcamp contains attributes for related objects
+    Verify that a serialized bootcamp course contains attributes for related objects
     """
-    bootcamp = BootcampFactory.create(topics=CourseTopicFactory.create_batch(3))
-    serializer = BootcampSerializer(bootcamp)
+    bootcamp = CourseFactory.create(
+        topics=CourseTopicFactory.create_batch(3), platform=PlatformType.bootcamps.value
+    )
+    serializer = CourseSerializer(bootcamp)
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
     assert len(serializer.data["runs"]) == 3
@@ -111,7 +111,6 @@ def test_serialize_program_related_models():
     [
         ["CourseFactory", True],
         ["ProgramFactory", True],
-        ["BootcampFactory", True],
         ["UserListFactory", True],
         ["VideoFactory", True],
         ["CourseTopicFactory", False],
@@ -186,7 +185,6 @@ def test_userlist_serializer_validation_bad_topic(data, error):
     [
         ["course", "CourseFactory", True],
         ["program", "ProgramFactory", True],
-        ["bootcamp", "BootcampFactory", True],
         ["video", "VideoFactory", True],
         ["userlist", "UserListFactory", False],
         [None, "CourseFactory", False],
@@ -216,7 +214,6 @@ def test_favorites_serializer():
     """
     user = UserFactory.create()
     course = CourseFactory.create()
-    bootcamp = BootcampFactory.create()
     user_list = UserListFactory.create(author=user)
     program = ProgramFactory.create()
     course_topic = CourseTopicFactory.create()
@@ -224,10 +221,6 @@ def test_favorites_serializer():
     favorite_item = FavoriteItem(user=user, item=course)
     serializer = FavoriteItemSerializer(favorite_item)
     assert serializer.data.get("content_data") == CourseSerializer(course).data
-
-    favorite_item = FavoriteItem(user=user, item=bootcamp)
-    serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == BootcampSerializer(bootcamp).data
 
     favorite_item = FavoriteItem(user=user, item=user_list)
     serializer = FavoriteItemSerializer(favorite_item)

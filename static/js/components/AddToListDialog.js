@@ -12,14 +12,12 @@ import UserListFormDialog from "./UserListFormDialog"
 import { DIALOG_ADD_TO_LIST, hideDialog } from "../actions/ui"
 import { capitalize, emptyOrNil } from "../lib/util"
 import {
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO
 } from "../lib/constants"
 import { isUserList, privacyIcon } from "../lib/learning_resources"
 import { favoriteCourseMutation } from "../lib/queries/courses"
-import { favoriteBootcampMutation } from "../lib/queries/bootcamps"
 import { favoriteProgramMutation } from "../lib/queries/programs"
 import {
   favoriteUserListMutation,
@@ -74,8 +72,6 @@ export default function AddToListDialog() {
     switch (resource.object_type) {
     case LR_TYPE_COURSE:
       return favoriteCourseMutation(resource)
-    case LR_TYPE_BOOTCAMP:
-      return favoriteBootcampMutation(resource)
     case LR_TYPE_PROGRAM:
       return favoriteProgramMutation(resource)
     case LR_TYPE_VIDEO:

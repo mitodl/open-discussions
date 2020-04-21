@@ -12,13 +12,7 @@ from moto import mock_s3
 
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
-from course_catalog.models import (
-    Course,
-    CoursePrice,
-    CourseInstructor,
-    CourseTopic,
-    Bootcamp,
-)
+from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
 from course_catalog.tasks import (
     get_mitx_data,
     get_ocw_data,
@@ -421,22 +415,20 @@ def test_process_bootcamps(mock_get_bootcamps):
     Test that bootcamp json data is properly parsed
     """
     get_bootcamp_data.delay()
-    assert Bootcamp.objects.count() == 3
-    assert Course.objects.count() == 0
+    assert Course.objects.filter(platform=PlatformType.bootcamps.value).count() == 3
 
-    bootcamp = Bootcamp.objects.get(course_id="Bootcamp1")
+    bootcamp = Course.objects.get(course_id="Bootcamp1")
     assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
 
-    bootcamp = Bootcamp.objects.get(course_id="Bootcamp2")
+    bootcamp = Course.objects.get(course_id="Bootcamp2")
     assert bootcamp.title == "MIT Deep Technology Bootcamp"
 
-    bootcamp = Bootcamp.objects.get(course_id="Bootcamp3")
+    bootcamp = Course.objects.get(course_id="Bootcamp3")
     assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
 
     get_bootcamp_data.delay()
 
-    assert Bootcamp.objects.count() == 3
-    assert Course.objects.count() == 0
+    assert Course.objects.filter(platform=PlatformType.bootcamps.value).count() == 3
 
 
 def test_get_micromasters_data(mocker):

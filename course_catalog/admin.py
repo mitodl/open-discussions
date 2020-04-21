@@ -5,7 +5,6 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 
 from course_catalog.models import (
     Course,
-    Bootcamp,
     Program,
     UserList,
     ProgramItem,
@@ -92,16 +91,6 @@ class CourseAdmin(admin.ModelAdmin):
     autocomplete_fields = ("topics",)
 
 
-class BootcampAdmin(admin.ModelAdmin):
-    """Bootcamp Admin"""
-
-    model = Bootcamp
-    search_fields = ("course_id", "title")
-    list_display = ("course_id", "title")
-    autocomplete_fields = ("topics",)
-    inlines = [LearningResourceRunInline]
-
-
 class UserListItemInline(admin.StackedInline):
     """Inline list items for user lists"""
 
@@ -161,7 +150,6 @@ admin.site.register(CoursePrice, CoursePriceAdmin)
 admin.site.register(CourseInstructor, CourseInstructorAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
-admin.site.register(Bootcamp, BootcampAdmin)
 admin.site.register(Program, ProgramAdmin)
 admin.site.register(UserList, UserListAdmin)
 admin.site.register(Podcast, PodcastAdmin)

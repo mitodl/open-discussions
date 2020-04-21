@@ -8,14 +8,12 @@ import { favoritesURL, similarResourcesURL } from "../url"
 import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
 import {
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO,
   LR_TYPE_LEARNINGPATH
 } from "../constants"
 import { courseRequest } from "./courses"
-import { bootcampRequest } from "./bootcamps"
 import { programRequest } from "./programs"
 import { videoRequest } from "./videos"
 import { userListRequest } from "./user_lists"
@@ -25,7 +23,6 @@ export const OBJECT_TYPE_ENTITY_ROUTING = {
   [LR_TYPE_USERLIST]:     "userLists",
   [LR_TYPE_LEARNINGPATH]: "userLists",
   [LR_TYPE_COURSE]:       "courses",
-  [LR_TYPE_BOOTCAMP]:     "bootcamps",
   [LR_TYPE_PROGRAM]:      "programs",
   [LR_TYPE_VIDEO]:        "videos"
 }
@@ -38,7 +35,6 @@ export const normalizeResourcesByObjectType = R.compose(
 
 export const updateLearningResources = {
   courses:   R.merge,
-  bootcamps: R.merge,
   programs:  R.merge,
   userLists: R.merge,
   videos:    R.merge
@@ -79,7 +75,6 @@ export const favoritesRequest = () => ({
 
     return {
       courses:   constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
-      bootcamps: constructIdMap(filterFavorites(results, LR_TYPE_BOOTCAMP)),
       programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
       userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
       videos:    constructIdMap(filterFavorites(results, LR_TYPE_VIDEO)),
@@ -123,13 +118,11 @@ const filterFavorite = (entities: Object) =>
 
 export const favoritesSelector = createSelector(
   state => state.entities.courses,
-  state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.userLists,
   state => state.entities.videos,
-  (courses, bootcamps, programs, userLists, videos) => ({
+  (courses, programs, userLists, videos) => ({
     courses:   filterFavorite(courses),
-    bootcamps: filterFavorite(bootcamps),
     programs:  filterFavorite(programs),
     userLists: filterFavorite(userLists),
     videos:    filterFavorite(videos)
@@ -138,9 +131,8 @@ export const favoritesSelector = createSelector(
 
 export const favoritesListSelector = createSelector(
   favoritesSelector,
-  ({ courses, bootcamps, programs, userLists, videos }) => [
+  ({ courses, programs, userLists, videos }) => [
     ...Object.values(courses),
-    ...Object.values(bootcamps),
     ...Object.values(programs),
     ...Object.values(userLists),
     ...Object.values(videos)
@@ -155,8 +147,6 @@ export const getResourceRequest = (objectId: ?number, objectType: ?string) => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return courseRequest(objectId)
-  case LR_TYPE_BOOTCAMP:
-    return bootcampRequest(objectId)
   case LR_TYPE_PROGRAM:
     return programRequest(objectId)
   case LR_TYPE_VIDEO:
@@ -168,18 +158,15 @@ export const getResourceRequest = (objectId: ?number, objectType: ?string) => {
 
 export const learningResourceSelector = createSelector(
   state => state.entities.courses,
-  state => state.entities.bootcamps,
   state => state.entities.programs,
   state => state.entities.userLists,
   state => state.entities.videos,
-  (courses, bootcamps, programs, userLists, videos) =>
+  (courses, programs, userLists, videos) =>
     memoize(
       (objectId, objectType) => {
         switch (objectType) {
         case LR_TYPE_COURSE:
           return courses ? courses[objectId] : null
-        case LR_TYPE_BOOTCAMP:
-          return bootcamps ? bootcamps[objectId] : null
         case LR_TYPE_PROGRAM:
           return programs ? programs[objectId] : null
         case LR_TYPE_VIDEO:

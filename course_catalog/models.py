@@ -272,6 +272,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     course_id = models.CharField(max_length=128)
     platform = models.CharField(max_length=128)
+    location = models.CharField(max_length=128, null=True, blank=True)
 
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)
@@ -280,19 +281,6 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     class Meta:
         unique_together = ("platform", "course_id")
-
-
-class Bootcamp(AbstractCourse, LearningResourceGenericRelationsMixin):
-    """
-    Bootcamp model for bootcamps. Being course-like, it shares a large overlap with Course model.
-    """
-
-    objects = LearningResourceQuerySet.as_manager()
-
-    course_id = models.CharField(max_length=128, unique=True)
-
-    location = models.CharField(max_length=128, null=True, blank=True)
-    runs = GenericRelation(LearningResourceRun)
 
 
 class List(LearningResource):
@@ -316,7 +304,7 @@ class ListItem(TimestampedModel):
     position = models.PositiveIntegerField()
     content_type = models.ForeignKey(
         ContentType,
-        limit_choices_to={"model__in": ("course", "bootcamp")},
+        limit_choices_to={"model__in": ("course",)},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField()
@@ -352,14 +340,7 @@ class UserListItem(ListItem):
     content_type = models.ForeignKey(
         ContentType,
         limit_choices_to={
-            "model__in": (
-                "course",
-                "bootcamp",
-                "program",
-                "video",
-                "podcast",
-                "podcastepisode",
-            )
+            "model__in": ("course", "program", "video", "podcast", "podcastepisode")
         },
         on_delete=models.CASCADE,
     )
@@ -404,7 +385,6 @@ class FavoriteItem(TimestampedModel):
         limit_choices_to={
             "model__in": (
                 "course",
-                "bootcamp",
                 "userlist",
                 "program",
                 "video",

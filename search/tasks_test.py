@@ -11,7 +11,6 @@ from channels.models import Post
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from course_catalog.constants import PlatformType
 from course_catalog.factories import (
-    BootcampFactory,
     CourseFactory,
     ProgramFactory,
     VideoFactory,
@@ -24,7 +23,6 @@ from course_catalog.factories import (
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
 from search.api import (
-    gen_bootcamp_id,
     gen_course_id,
     gen_program_id,
     gen_video_id,
@@ -35,7 +33,6 @@ from search.api import (
     gen_podcast_episode_id,
 )
 from search.constants import (
-    BOOTCAMP_TYPE,
     COURSE_TYPE,
     POST_TYPE,
     PROGRAM_TYPE,
@@ -49,7 +46,6 @@ from search.constants import (
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
-    ESBootcampSerializer,
     ESCourseSerializer,
     ESProgramSerializer,
     ESVideoSerializer,
@@ -67,7 +63,6 @@ from search.tasks import (
     finish_recreate_index,
     increment_document_integer_field,
     update_field_values_by_query,
-    index_new_bootcamp,
     index_posts,
     start_recreate_index,
     wrap_retry_exception,
@@ -75,7 +70,6 @@ from search.tasks import (
     index_courses,
     index_videos,
     delete_document,
-    upsert_bootcamp,
     upsert_course,
     upsert_program,
     upsert_video,
@@ -124,29 +118,6 @@ def test_update_document_with_partial_task(mocked_api):
     update_document_with_partial(*indexing_api_args)
     assert mocked_api.update_document_with_partial.call_count == 1
     assert mocked_api.update_document_with_partial.call_args[0] == indexing_api_args
-
-
-def test_index_new_bootcamp(mocked_api):
-    """index_new_bootcamp should call create_document with the serialized bootcamp document based on the primary key"""
-    bootcamp = BootcampFactory.create()
-    index_new_bootcamp(bootcamp.id)
-    data = ESBootcampSerializer(bootcamp).data
-    mocked_api.create_document.assert_called_once_with(
-        gen_bootcamp_id(bootcamp.course_id), data
-    )
-
-
-def test_upsert_bootcamp_task(mocked_api):
-    """Test that upsert_bootcamp will serialize the bootcamp data and upsert it to the ES index"""
-    bootcamp = BootcampFactory.create()
-    upsert_bootcamp(bootcamp.id)
-    data = ESBootcampSerializer(bootcamp).data
-    mocked_api.upsert_document.assert_called_once_with(
-        gen_bootcamp_id(bootcamp.course_id),
-        data,
-        BOOTCAMP_TYPE,
-        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
-    )
 
 
 def test_upsert_course_task(mocked_api):
@@ -437,7 +408,6 @@ def test_start_recreate_index(
             "comment": backing_index,
             "profile": backing_index,
             "course": backing_index,
-            "bootcamp": backing_index,
             "program": backing_index,
             "userlist": backing_index,
             "video": backing_index,

@@ -15,12 +15,10 @@ from course_catalog.exceptions import WebhookException
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
-    BootcampFactory,
     ProgramFactory,
     UserListFactory,
     UserListItemFactory,
     ProgramItemCourseFactory,
-    ProgramItemBootcampFactory,
     VideoFactory,
     LearningResourceRunFactory,
     PodcastFactory,
@@ -153,39 +151,11 @@ def test_course_detail_endpoint_lists(user_client, user):
     ]
 
 
-def test_bootcamp_endpoint(client):
-    """Test bootcamp endpoint"""
-    bootcamp = BootcampFactory.create()
-
-    resp = client.get(reverse("bootcamps-list"))
-    assert resp.data.get("count") == 1
-
-    resp = client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
-    assert resp.data.get("course_id") == bootcamp.course_id
-
-
-def test_bootcamp_detail_endpoint_lists(user_client, user):
-    """Test that author's list ids are included"""
-    bootcamp = BootcampFactory.create()
-    user_lists = UserListFactory.create_batch(2, author=user)
-    list_items = sorted(
-        [
-            UserListItemFactory.create(content_object=bootcamp, user_list=user_list)
-            for user_list in user_lists
-        ],
-        key=lambda x: x.id,
-    )
-    resp = user_client.get(reverse("bootcamps-detail", args=[bootcamp.id]))
-    assert sorted(resp.data.get("lists"), key=lambda x: x["item_id"]) == [
-        MicroUserListItemSerializer(list_item).data for list_item in list_items
-    ]
-
-
 def test_program_endpoint(client):
     """Test program endpoint"""
     program = ProgramFactory.create()
-    bootcamp_item = ProgramItemBootcampFactory.create(program=program, position=1)
-    course_item = ProgramItemCourseFactory.create(program=program, position=2)
+    course_item_1 = ProgramItemCourseFactory.create(program=program, position=1)
+    course_item_2 = ProgramItemCourseFactory.create(program=program, position=2)
 
     resp = client.get(reverse("programs-list"))
     assert resp.data.get("count") == 1
@@ -193,11 +163,9 @@ def test_program_endpoint(client):
     resp = client.get(reverse("programs-detail", args=[program.id]))
     assert resp.data.get("title") == program.title
     assert len(resp.data.get("lists")) == 0
-    for item in resp.data.get("items"):
-        if item.get("position") == 1:
-            assert item.get("id") == bootcamp_item.id
-        else:
-            assert item.get("id") == course_item.id
+    items = sorted(resp.data.get("items"), key=lambda i: i["id"])
+    assert items[0].get("id") == course_item_1.id
+    assert items[1].get("id") == course_item_2.id
 
 
 @pytest.mark.parametrize("is_public", [True, False])
@@ -219,7 +187,7 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
         else PrivacyLevel.private.value,
     )
 
-    UserListItemFactory.create(user_list=user_list, position=1, is_bootcamp=True)
+    UserListItemFactory.create(user_list=user_list, position=1)
     UserListItemFactory.create(user_list=user_list, position=2)
 
     # Anonymous users should get no results
@@ -442,7 +410,6 @@ def test_user_list_endpoint_delete(client, user, is_author, mock_user_list_index
     [
         (CourseFactory, "courses-detail"),
         (ProgramFactory, "programs-detail"),
-        (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
         (UserListFactory, "userlists-detail"),
     ],
@@ -490,7 +457,6 @@ def test_favorites(user_client, factory, route_name):
     [
         (CourseFactory, "courses-detail"),
         (ProgramFactory, "programs-detail"),
-        (BootcampFactory, "bootcamps-detail"),
         (VideoFactory, "videos-detail"),
         (UserListFactory, "userlists-detail"),
     ],

@@ -13,7 +13,6 @@ from course_catalog.factories import (
     CourseFactory,
     UserListFactory,
     UserListItemFactory,
-    BootcampFactory,
     VideoFactory,
     ProgramFactory,
 )
@@ -47,7 +46,6 @@ from search.constants import (
 from search.serializers import (
     ESCourseSerializer,
     ESUserListSerializer,
-    ESBootcampSerializer,
     ESVideoSerializer,
     ESProgramSerializer,
 )
@@ -505,7 +503,6 @@ def test_find_similar_resources(settings, elasticsearch, user):
             "hits": [
                 {"_source": ESCourseSerializer(course).data},
                 {"_source": ESCourseSerializer(CourseFactory.create()).data},
-                {"_source": ESBootcampSerializer(BootcampFactory.create()).data},
                 {"_source": ESVideoSerializer(VideoFactory.create()).data},
                 {"_source": ESUserListSerializer(UserListFactory.create()).data},
                 {"_source": ESProgramSerializer(ProgramFactory.create()).data},

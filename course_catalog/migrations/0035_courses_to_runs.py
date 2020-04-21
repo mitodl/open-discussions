@@ -3,7 +3,7 @@
 from django.db import migrations, models, transaction
 import django.db.models.deletion
 
-from search.task_helpers import delete_course, delete_bootcamp
+from search.task_helpers import delete_course
 
 
 def delete_resources(apps, schema_editor):
@@ -20,7 +20,6 @@ def delete_resources(apps, schema_editor):
         delete_course(course)
     for bootcamp in Bootcamp.objects.all():
         bootcamp.delete()
-        delete_bootcamp(bootcamp)
 
 
 class Migration(migrations.Migration):

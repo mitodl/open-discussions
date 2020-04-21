@@ -28,7 +28,6 @@ from search.constants import (
     ALIAS_ALL_INDICES,
     VALID_OBJECT_TYPES,
     GLOBAL_DOC_TYPE,
-    BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
@@ -43,7 +42,6 @@ from search.serializers import (
     serialize_bulk_profiles,
     serialize_bulk_courses,
     ESPostSerializer,
-    serialize_bulk_bootcamps,
     serialize_bulk_programs,
     serialize_bulk_user_lists,
     serialize_bulk_videos,
@@ -191,15 +189,6 @@ COURSE_OBJECT_TYPE = {
 }
 
 
-BOOTCAMP_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    "id": {"type": "long"},
-    "course_id": {"type": "keyword"},
-    "full_description": ENGLISH_TEXT_FIELD,
-    "location": {"type": "keyword"},
-    "published": {"type": "boolean"},
-}
-
 PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
@@ -261,7 +250,6 @@ MAPPING = {
     },
     PROFILE_TYPE: PROFILE_OBJECT_TYPE,
     COURSE_TYPE: COURSE_OBJECT_TYPE,
-    BOOTCAMP_TYPE: BOOTCAMP_OBJECT_TYPE,
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
     USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
     LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE,
@@ -624,16 +612,6 @@ def delete_run_content_files(run_id):
     index_items(
         documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
     )
-
-
-def index_bootcamps(ids):
-    """
-    Index a list of bootcamps by id
-
-    Args:
-        ids(list of int): List of Bootcamp id's
-    """
-    index_items(serialize_bulk_bootcamps(ids), BOOTCAMP_TYPE)
 
 
 def index_programs(ids):

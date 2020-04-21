@@ -26,7 +26,6 @@ import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
   LR_TYPE_ALL,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
@@ -317,12 +316,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
     // Get the latest data from state if any to reflect recent changes in favorites/lists
     const { entities } = this.props
-    const { bootcamps, courses, programs, userLists, videos } = entities
+    const { courses, programs, userLists, videos } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
       return courses ? courses[result.id] || null : null
-    case LR_TYPE_BOOTCAMP:
-      return bootcamps ? bootcamps[result.id] || null : null
     case LR_TYPE_PROGRAM:
       return programs ? programs[result.id] || null : null
     case LR_TYPE_USERLIST:

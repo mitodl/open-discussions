@@ -14,7 +14,6 @@ from course_catalog.models import (
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    Bootcamp,
     UserListItem,
     UserList,
     Podcast,
@@ -46,9 +45,7 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         # Pass context on to the serializers so that they have access to the user
         context = self.context
-        if isinstance(instance, Bootcamp):
-            serializer = BootcampSerializer(instance, context=context)
-        elif isinstance(instance, Course):
+        if isinstance(instance, Course):
             serializer = CourseSerializer(instance, context=context)
         elif isinstance(instance, UserList):
             serializer = UserListSerializer(instance, context=context)
@@ -134,7 +131,7 @@ class BaseCourseSerializer(
     FavoriteSerializerMixin, ListsSerializerMixin, serializers.ModelSerializer
 ):
     """
-    Serializer with common functions to be used by CourseSerializer and BootcampSerialzer
+    Serializer with common functions to be used by CourseSerializer
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
@@ -347,26 +344,6 @@ class OCWSerializer(CourseSerializer):
         return super().to_internal_value(course_fields)
 
 
-class BootcampSerializer(BaseCourseSerializer, LearningResourceRunMixin):
-    """
-    Serializer for Bootcamp model
-    """
-
-    object_type = serializers.CharField(read_only=True, default="bootcamp")
-
-    def to_internal_value(self, data):
-        """
-        Custom function to parse data out of the raw bootcamp json
-        """
-        self.topics = data.pop("topics") if "topics" in data else []
-        return super().to_internal_value(data)
-
-    class Meta:
-        model = Bootcamp
-        exclude = COMMON_IGNORED_FIELDS
-        extra_kwargs = {"full_description": {"write_only": True}}
-
-
 class UserListItemListSerializer(serializers.ListSerializer):
     """
     This class exists to handle the limitation that prefetch_related
@@ -397,14 +374,14 @@ class UserListItemListSerializer(serializers.ListSerializer):
             ]
 
         prefetch_related_objects(
-            _items_for_classes(Bootcamp, Course, Program),
+            _items_for_classes(Course, Program),
             "runs__instructors",
             "runs__prices",
             "runs__offered_by",
             "runs__topics",
         )
 
-        for cls in (Bootcamp, Course, Program):
+        for cls in (Course, Program):
             prefetch_related_objects(_items_for_classes(cls), "offered_by")
 
         return super().to_representation(data)
@@ -423,18 +400,13 @@ class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixi
         object_id = attrs.get("object_id")
 
         if content_type:
-            if content_type not in ["course", "bootcamp", "program", "video"]:
+            if content_type not in ["course", "program", "video"]:
                 raise ValidationError("Incorrect object type {}".format(content_type))
             if (
                 content_type == "course"
                 and not Course.objects.filter(id=object_id).exists()
             ):
                 raise ValidationError("Course does not exist")
-            if (
-                content_type == "bootcamp"
-                and not Bootcamp.objects.filter(id=object_id).exists()
-            ):
-                raise ValidationError("Bootcamp does not exist")
             if (
                 content_type == "program"
                 and not Program.objects.filter(id=object_id).exists()

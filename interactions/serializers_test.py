@@ -7,7 +7,6 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
     ProgramFactory,
-    BootcampFactory,
 )
 from course_catalog.serializers import GenericForeignKeyFieldSerializer
 from interactions.serializers import (
@@ -65,7 +64,6 @@ def test_popular_content_serializer(mocker, is_deleted, user):
         ProgramFactory.create(),
         CourseFactory.create(),
         UserListFactory.create(),
-        BootcampFactory.create(),
     ]
 
     data = [

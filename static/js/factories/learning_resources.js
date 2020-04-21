@@ -10,7 +10,6 @@ import {
   platforms,
   offeredBys,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
@@ -20,7 +19,6 @@ import {
 } from "../lib/constants"
 
 import type {
-  Bootcamp,
   Course,
   CourseTopic,
   LearningResourceRun,
@@ -99,26 +97,6 @@ export const makeCourse = (): Course => ({
   lists:             []
 })
 
-const incrBootcamp = incrementer()
-const bootcampId: any = incrementer()
-
-export const makeBootcamp = (): Bootcamp => ({
-  // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-  course_id:         `bootcamp_${incrBootcamp.next().value}`,
-  id:                bootcampId.next().value,
-  title:             casual.title,
-  url:               casual.url,
-  image_src:         "http://image.medium.url",
-  short_description: casual.description,
-  full_description:  casual.description,
-  is_favorite:       casual.boolean,
-  offered_by:        [offeredBys.bootcamps],
-  topics:            R.times(makeTopic, 2),
-  runs:              R.times(makeRun, 3),
-  object_type:       "bootcamp",
-  lists:             []
-})
-
 const incrUserListItem = incrementer()
 
 export const makeUserListItem = (objectType: string) => {
@@ -189,7 +167,6 @@ export const makeUserListItems = (count: number = 3): Array<ListItem> =>
           LR_TYPE_VIDEO,
           LR_TYPE_COURSE,
           LR_TYPE_PROGRAM,
-          LR_TYPE_BOOTCAMP,
           LR_TYPE_USERLIST
         ])
       ),
@@ -218,8 +195,6 @@ export const makeLearningResource = (objectType: string): Object => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return R.merge({ object_type: LR_TYPE_COURSE }, makeCourse())
-  case LR_TYPE_BOOTCAMP:
-    return R.merge({ object_type: LR_TYPE_BOOTCAMP }, makeBootcamp())
   case LR_TYPE_PROGRAM:
     return R.merge({ object_type: LR_TYPE_PROGRAM }, makeProgram())
   case LR_TYPE_USERLIST:
@@ -247,23 +222,15 @@ const makeFavorite = obj => ({ ...obj, is_favorite: true })
 export const makeFavoritesResponse = () => {
   const courses = R.times(makeCourse, 3).map(makeFavorite)
   const programs = R.times(makeProgram, 3).map(makeFavorite)
-  const bootcamps = R.times(makeBootcamp, 3).map(makeFavorite)
 
   return [
     ...courses.map(formatFavorite(LR_TYPE_COURSE)),
-    ...programs.map(formatFavorite(LR_TYPE_PROGRAM)),
-    ...bootcamps.map(formatFavorite(LR_TYPE_BOOTCAMP))
+    ...programs.map(formatFavorite(LR_TYPE_PROGRAM))
   ]
 }
 
 export const makeRandomResource = () =>
-  casual.random_element([
-    makeBootcamp,
-    makeCourse,
-    makeVideo,
-    makeProgram,
-    makeUserList
-  ])()
+  casual.random_element([makeCourse, makeVideo, makeProgram, makeUserList])()
 
 export const makePopularContentResponse = (count: number = 10) => {
   return R.times(makeRandomResource, count)

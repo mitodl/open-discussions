@@ -12,7 +12,6 @@ from course_catalog.factories import UserListFactory, UserListItemFactory
     "kwargs",
     [
         {"is_course": True},
-        {"is_bootcamp": True},
         {"is_program": True},
         {"is_video": True},
         {"is_userlist": True},

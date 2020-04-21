@@ -31,19 +31,14 @@ from course_catalog.etl.xpro import (
     get_xpro_learning_course_bucket,
     transform_content_files as transform_content_files_xpro,
 )
-from course_catalog.models import Bootcamp, LearningResourceRun, Course
+from course_catalog.models import LearningResourceRun, Course
 from course_catalog.serializers import (
-    BootcampSerializer,
     OCWSerializer,
     LearningResourceRunSerializer,
+    CourseSerializer,
 )
 from course_catalog.utils import get_course_url
-from search.task_helpers import (
-    delete_course,
-    upsert_course,
-    index_new_bootcamp,
-    update_bootcamp,
-)
+from search.task_helpers import delete_course, upsert_course
 
 log = logging.getLogger(__name__)
 
@@ -275,9 +270,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
 
     # Try and get the bootcamp instance. If it exists check to see if it needs updating
     try:
-        bootcamp_instance = Bootcamp.objects.get(
-            course_id=bootcamp_data.get("course_id")
-        )
+        bootcamp_instance = Course.objects.get(course_id=bootcamp_data.get("course_id"))
         compare_datetime = datetime.strptime(
             bootcamp_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
         ).astimezone(pytz.utc)
@@ -288,14 +281,12 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 bootcamp_data.get("course_id"),
             )
             return
-        index_func = update_bootcamp
-    except Bootcamp.DoesNotExist:
+    except Course.DoesNotExist:
         bootcamp_instance = None
-        index_func = index_new_bootcamp
 
     # Overwrite platform with our own enum value
     bootcamp_data["platform"] = PlatformType.bootcamps.value
-    bootcamp_serializer = BootcampSerializer(
+    bootcamp_serializer = CourseSerializer(
         data=bootcamp_data, instance=bootcamp_instance
     )
     if not bootcamp_serializer.is_valid():
@@ -326,7 +317,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
                 "end": bootcamp_data.get("end_date"),
                 "run_id": bootcamp.course_id,
                 "max_modified": bootcamp_modified,
-                "content_type": ContentType.objects.get(model="bootcamp").id,
+                "content_type": ContentType.objects.get(model="course").id,
                 "object_id": bootcamp.id,
                 "url": bootcamp.url,
             },
@@ -343,7 +334,7 @@ def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
 
         load_offered_bys(run, [{"name": OfferedBy.bootcamps.value}])
 
-    index_func(bootcamp.id)
+    upsert_course(bootcamp.id)
 
 
 def sync_ocw_course_files(ids=None):
