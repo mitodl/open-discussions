@@ -842,6 +842,9 @@ EDX_API_ACCESS_TOKEN_URL = get_string("EDX_API_ACCESS_TOKEN_URL", None)
 EDX_API_CLIENT_ID = get_string("EDX_API_CLIENT_ID", None)
 EDX_API_CLIENT_SECRET = get_string("EDX_API_CLIENT_SECRET", None)
 
+# Authentication for the github api
+GITHUB_ACCESS_TOKEN = get_string("GITHUB_ACCESS_TOKEN", None)
+
 # S3 Bucket info for OCW Plone CMS exports
 OCW_CONTENT_BUCKET_NAME = get_string("OCW_CONTENT_BUCKET_NAME", None)
 OCW_CONTENT_ACCESS_KEY = get_string("OCW_CONTENT_ACCESS_KEY", None)

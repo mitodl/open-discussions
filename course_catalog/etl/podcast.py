@@ -23,7 +23,12 @@ def github_podcast_config_files():
     Returns:
         A list of pyGithub contentFile objects
     """
-    github_client = github.Github()
+
+    if settings.GITHUB_ACCESS_TOKEN:
+        github_client = github.Github(settings.GITHUB_ACCESS_TOKEN)
+    else:
+        github_client = github.Github()
+
     repo = github_client.get_repo(CONFIG_FILE_REPO)
 
     return repo.get_contents(CONFIG_FILE_FOLDER, ref=settings.OPEN_PODCAST_DATA_BRANCH)
