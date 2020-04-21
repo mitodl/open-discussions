@@ -701,6 +701,7 @@ class PodcastSerializer(serializers.ModelSerializer):
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+    episode_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Podcast
@@ -716,4 +717,5 @@ class PodcastSerializer(serializers.ModelSerializer):
             "offered_by",
             "created_on",
             "updated_on",
+            "episode_count",
         ]
