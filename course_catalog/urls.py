@@ -35,12 +35,15 @@ router.register(r"videos", views.VideoViewSet, basename="videos")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
 router.register(r"topics", views.TopicViewSet, basename="topics")
 router.register(r"podcasts", views.PodcastViewSet, basename="podcasts")
+router.register(
+    r"podcastepisodes", views.PodcastEpisodesViewSet, basename="podcastepisodes"
+)
 
 
 urlpatterns = [
     url(
         r"^api/v0/podcasts/recent/$",
-        views.RecentPodcastEpisodesViewSet.as_view({"get": "list"}),
+        views.PodcastEpisodesViewSet.as_view({"get": "list"}),
         name="recent-podcast-episodes",
     ),
     url(r"^api/v0/", include(router.urls)),
