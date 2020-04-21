@@ -9,7 +9,7 @@ import type { PodcastEpisode } from "../../flow/podcastTypes"
 
 export const podcastsRequest = () => ({
   queryKey:  "podcastsRequest",
-  url:       podcastApiURL,
+  url:       podcastApiURL.toString(),
   transform: (podcasts: any) => ({
     podcasts: constructIdMap(podcasts)
   }),
@@ -25,7 +25,7 @@ export const podcastsSelector = createSelector(
 
 export const recentPodcastEpisodesRequest = () => ({
   queryKey:  "recentPodcastRequest",
-  url:       recentPodcastApiURL,
+  url:       recentPodcastApiURL.toString(),
   transform: ({ results }: any) => {
     const recentEpisodes = results.map(episode => episode.id)
 
