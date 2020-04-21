@@ -162,6 +162,7 @@ export const bootcampApiURL = api.segment("bootcamps/")
 export const bootcampDetailApiURL = bootcampApiURL.segment(":bootcampId/")
 export const programApiURL = api.segment("programs/")
 export const programDetailApiURL = programApiURL.segment(":programId/")
+
 export const userListApiURL = api.segment("userlists/")
 export const userListDetailApiURL = userListApiURL.segment(":userListId/")
 export const userListItemsApiURL = userListDetailApiURL.segment("items/")
@@ -172,12 +173,14 @@ export const videoDetailApiURL = videoApiURL.segment(":videoId/")
 export const interactionsApiURL = api.segment("interactions/").toString()
 export const popularContentUrl = api.segment("popular-content/").toString()
 export const newVideosURL = "/api/v0/videos/new/"
+
 export const embedlyApiURL = "/api/v0/embedly"
 export const topicApiURL = "/api/v0/topics"
 export const similarResourcesURL = "/api/v0/similar/"
 
 export const podcastApiURL = api.segment("podcasts/")
 export const recentPodcastApiURL = podcastApiURL.segment("recent/")
+export const podcastDetailURL = podcastApiURL.segment(":podcastId")
 
 export const userListIndexURL = "/learn/lists/"
 export const userListDetailURL = (id: number) => `/learn/lists/${id}`
