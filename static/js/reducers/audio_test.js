@@ -11,7 +11,8 @@ import {
 
 describe("audio reducer", () => {
   let helper, store, dispatchThen
-  const testUrl = "https://chtbl.com/track/F9DD6B/cdn.simplecast.com/audio/2c64ac/2c64ace6-baf4-4e86-b527-445e611e6a31/aa0ca88f-3c4c-4d33-9897-36e45c43e012/film-is-for-everyone-with-prof-david-thorburn_tc.mp3"
+  const testUrl =
+    "https://chtbl.com/track/F9DD6B/cdn.simplecast.com/audio/2c64ac/2c64ace6-baf4-4e86-b527-445e611e6a31/aa0ca88f-3c4c-4d33-9897-36e45c43e012/film-is-for-everyone-with-prof-david-thorburn_tc.mp3"
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -31,7 +32,7 @@ describe("audio reducer", () => {
     const exampleAudio = {
       title:       "Test Title",
       description: "Test Description",
-      url: testUrl
+      url:         testUrl
     }
     dispatchThen(setCurrentlyPlayingAudio(exampleAudio), [
       SET_CURRENTLY_PLAYING_AUDIO
