@@ -17,7 +17,7 @@ def rss_content():
     return content
 
 
-def mock_podcast_file(podcast_title=None, topics=None):
+def mock_podcast_file(podcast_title=None, topics=None, website_url="website_url"):
     """Mock podcast github file"""
 
     content = f"""---
@@ -25,12 +25,12 @@ rss_url: rss_url
 { "podcast_title: " + podcast_title if podcast_title else "" }
 { "topics: " + topics if topics else "" }
 offered_by: A department
-website:  website_url
+website:  {website_url}
 """
     return Mock(decoded_content=content)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_rss_request(mocker):
     """
     Mock request data
@@ -42,8 +42,22 @@ def mock_rss_request(mocker):
     )
 
 
+@pytest.fixture
+def mock_rss_request_with_bad_rss_file(mocker):
+    """
+    Mock request data
+    """
+
+    mocker.patch(
+        "course_catalog.etl.see.requests.get",
+        side_effect=[mocker.Mock(content=""), mocker.Mock(content=rss_content())],
+    )
+
+
+@pytest.mark.usefixtures("mock_rss_request")
 def test_extract(mocker):
     """Test extract function"""
+
     podcast_list = [mock_podcast_file()]
     mock_github_client = mocker.patch("github.Github")
     mock_github_client.return_value.get_repo.return_value.get_contents.return_value = (
@@ -60,6 +74,7 @@ def test_extract(mocker):
     assert results == [(expected_content, yaml.safe_load(mock_config.decoded_content))]
 
 
+@pytest.mark.usefixtures("mock_rss_request")
 @pytest.mark.parametrize("title", [None, "Custom Title"])
 @pytest.mark.parametrize("topics", [None, "Science, Technology"])
 def test_transform(mocker, title, topics):
@@ -151,3 +166,27 @@ def test_transform(mocker, title, topics):
         )
         == expected_results
     )
+
+
+@pytest.mark.usefixtures("mock_rss_request_with_bad_rss_file")
+def test_transform_with_error(mocker):
+    """Test transform function with bad rss file"""
+
+    mock_exception_log = mocker.patch("course_catalog.etl.podcast.log.exception")
+
+    podcast_list = [mock_podcast_file(None, None, "website_url2"), mock_podcast_file()]
+    mock_github_client = mocker.patch("github.Github")
+    mock_github_client.return_value.get_repo.return_value.get_contents.return_value = (
+        podcast_list
+    )
+
+    extract_results = extract()
+
+    results = list(transform(extract_results))
+
+    mock_exception_log.assert_called_once_with(
+        "Error parsing podcast data from %s", "rss_url"
+    )
+
+    assert len(results) == 1
+    assert results[0]["url"] == "website_url"
