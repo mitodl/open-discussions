@@ -109,6 +109,7 @@ def extract():
         rss_url = playlist_config["rss_url"]
         try:
             response = requests.get(rss_url)
+            response.raise_for_status()
         except ConnectionError:
             log.error("Invalid rss url %s", rss_url)
 
@@ -167,34 +168,37 @@ def transform(extracted_podcasts):
     """
 
     for rss_data, config_data in extracted_podcasts:
-        topics = (
-            [{"name": topic} for topic in config_data["topics"].split(",")]
-            if "topics" in config_data
-            else []
-        )
-        podcast_id = generate_unique_id(config_data["website"])
-
-        yield {
-            "podcast_id": podcast_id,
-            "title": config_data["podcast_title"]
-            if "podcast_title" in config_data
-            else rss_data.channel.title.text,
-            "offered_by": [{"name": config_data["offered_by"]}],
-            "full_description": rss_data.channel.description.text,
-            "short_description": rss_data.channel.description.text,
-            "image_src": rss_data.channel.find("itunes:image")["href"],
-            "published": True,
-            "url": config_data["website"],
-            "topics": topics,
-            "episodes": (
-                transform_episode(episode_rss, config_data["offered_by"], topics)
-                for episode_rss in rss_data.find_all("item")
-            ),
-            "runs": [
-                {
-                    "run_id": podcast_id,
-                    "platform": PlatformType.podcast.value,
-                    "prices": [{"price": 0}],
-                }
-            ],
-        }
+        try:
+            topics = (
+                [{"name": topic} for topic in config_data["topics"].split(",")]
+                if "topics" in config_data
+                else []
+            )
+            podcast_id = generate_unique_id(config_data["website"])
+            yield {
+                "podcast_id": podcast_id,
+                "title": config_data["podcast_title"]
+                if "podcast_title" in config_data
+                else rss_data.channel.title.text,
+                "offered_by": [{"name": config_data["offered_by"]}],
+                "full_description": rss_data.channel.description.text,
+                "short_description": rss_data.channel.description.text,
+                "image_src": rss_data.channel.find("itunes:image")["href"],
+                "published": True,
+                "url": config_data["website"],
+                "topics": topics,
+                "episodes": (
+                    transform_episode(episode_rss, config_data["offered_by"], topics)
+                    for episode_rss in rss_data.find_all("item")
+                ),
+                "runs": [
+                    {
+                        "run_id": podcast_id,
+                        "platform": PlatformType.podcast.value,
+                        "prices": [{"price": 0}],
+                    }
+                ],
+            }
+        except AttributeError:
+            log.exception("Error parsing podcast data from %s", config_data["rss_url"])
+            continue
