@@ -1,32 +1,44 @@
 // @flow
-import React, { useEffect, useRef, useCallback } from "react"
+import _ from "lodash"
+import React, { useEffect, useRef, useCallback, useState } from "react"
 import { useSelector } from "react-redux"
 import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 import Amplitude from "amplitudejs"
 
 export default function AudioPlayer() {
   const seekBar = useRef()
-  const currentlyPlaying = useSelector(currentlyPlayingAudioSelector)
+  const playPauseButton = useRef()
+  const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
+  const [audioLoaded, setAudioLoaded] = useState(false)
 
   useEffect(
     () => {
-      if (!currentlyPlaying) {
+      if (Amplitude.getPlayerState() === "playing") {
+        Amplitude.pause()
+      }
+      if (_.values(currentlyPlayingAudio).every(_.isEmpty)) {
+        setAudioLoaded(false)
         return
       }
       Amplitude.init({
         songs: [
           {
-            album: currentlyPlaying.title,
-            name:  currentlyPlaying.description,
-            url:   currentlyPlaying.url
+            album: currentlyPlayingAudio.title,
+            name:  currentlyPlayingAudio.description,
+            url:   currentlyPlayingAudio.url
           }
         ],
         waveforms: {
           sample_rate: 3000
         }
       })
+      const { current } = playPauseButton
+      if (current && current.click) {
+        current.click()
+      }
+      setAudioLoaded(true)
     },
-    [currentlyPlaying]
+    [currentlyPlayingAudio]
   )
 
   const backTenClick = useCallback(() => {
@@ -50,7 +62,9 @@ export default function AudioPlayer() {
   })
 
   return (
-    <div className="audio-player-container-outer">
+    <div
+      className={`audio-player-container-outer${!audioLoaded ? " hidden" : ""}`}
+    >
       <div className="audio-player-container-inner">
         <div className="audio-player-left">
           <div className="audio-player-titles">
@@ -72,6 +86,7 @@ export default function AudioPlayer() {
             <div
               className="audio-player-button amplitude-play-pause"
               id="play-pause"
+              ref={playPauseButton}
             >
               <span className="material-icons" />
             </div>

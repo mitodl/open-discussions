@@ -1,3 +1,7 @@
+.audio-player-container-outer.hidden {
+  display: none;
+}
+
 .audio-player-container-outer {
   background-color: white;
   position: fixed;
@@ -21,12 +25,12 @@
     .audio-player-left {
       width: 36%;
       max-width: 490px;
-  
+
       .audio-player-titles {
         height: min-content;
         padding-left: 12px;
         padding-right: 12px;
-    
+
         .audio-player-title {
           font-weight: 400;
           font-size: 16px;
@@ -36,7 +40,7 @@
           max-height: 25px;
           margin-bottom: 10px;
         }
-      
+
         .audio-player-description {
           display: block;
           font-weight: 500;
@@ -48,7 +52,7 @@
         }
       }
     }
-  
+
     .audio-player-right {
       display: flex;
       flex-direction: row;
@@ -58,7 +62,7 @@
       border-left: 1px solid rgba(0, 0, 0, 0.1);
       height: 100%;
       padding-left: 16px;
-  
+
       .audio-player-button {
         height: 40px;
         display: flex;
@@ -66,7 +70,7 @@
         padding-left: 12px;
         padding-right: 12px;
       }
-      
+
       .audio-player-playback-controls {
         width: 180px;
         display: flex;
@@ -78,29 +82,25 @@
         }
 
         .audio-player-button span,
-          progress {
-            cursor: pointer;
-          }
-        
-          .amplitude-play-pause span {
-            font-size: 48px;
-          }
-        
-          .amplitude-play-pause span:before {
-            content: "play_circle_outline";
-          }
-        
-          .amplitude-play-pause.amplitude-playing span:before {
-            content: "pause_circle_outline";
-          }
-        
-          .amplitude-play-pause.amplitude-paused span:before {
-            content: "play_circle_outline";
-          }
-        
-          .audio-player-button:not(.amplitude-play-pause) span {
-            font-size: 30px;
-          }
+        progress {
+          cursor: pointer;
+        }
+
+        .amplitude-play-pause span {
+          font-size: 48px;
+        }
+
+        .amplitude-play-pause.amplitude-playing span:before {
+          content: "pause_circle_outline";
+        }
+
+        .amplitude-play-pause.amplitude-paused span:before {
+          content: "play_circle_outline";
+        }
+
+        .audio-player-button:not(.amplitude-play-pause) span {
+          font-size: 30px;
+        }
       }
 
       .audio-player-progress-container {
@@ -118,34 +118,34 @@
           text-align: right;
           padding-right: 12px;
         }
-      
+
         // disabling no-vendor-prefixes here because autoprefixer doesn't support html5 progress bars
         // sass-lint:disable no-vendor-prefixes
         .audio-player-progress {
-          background-color: #F6F7F9;
-          color: #7C7B7D;
+          background-color: #f6f7f9;
+          color: #7c7b7d;
           -webkit-appearance: none;
         }
-      
+
         .audio-player-progress::-webkit-progress-value {
-          background: #7C7B7D;
+          background: #7c7b7d;
         }
-      
+
         .audio-player-progress::-webkit-progress-bar {
-          background: #F6F7F9;
+          background: #f6f7f9;
         }
-      
+
         .audio-player-progress::-moz-progress-bar {
-          background: #7C7B7D;
+          background: #7c7b7d;
         }
         // sass-lint:disable no-vendor-prefixes
-      
+
         .audio-player-time-text-right {
           text-align: left;
           padding-left: 12px;
         }
       }
-    
+
       .audio-player-playback-speed-container {
         width: 70px;
         height: 32px;
@@ -157,15 +157,15 @@
           border-radius: 4px;
           font-weight: bold;
         }
-      
+
         .amplitude-playback-speed-10:before {
           content: "1.0x";
         }
-      
+
         .amplitude-playback-speed-15:before {
           content: "1.5x";
         }
-      
+
         .amplitude-playback-speed-20:before {
           content: "2.0x";
         }
