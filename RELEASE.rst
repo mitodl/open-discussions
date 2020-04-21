@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.119.4
+Version 0.119.4 (Released April 21, 2020)
 ---------------
 
 - Set strict = true, rename some UWSGI_ env vars (#2775)
