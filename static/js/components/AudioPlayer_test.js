@@ -27,12 +27,18 @@ describe("AudioPlayer", () => {
       "https://chtbl.com/track/F9DD6B/cdn.simplecast.com/audio/2c64ac/2c64ace6-baf4-4e86-b527-445e611e6a31/aa0ca88f-3c4c-4d33-9897-36e45c43e012/film-is-for-everyone-with-prof-david-thorburn_tc.mp3"
   }
 
-  helper = new IntegrationTestHelper()
-  wrapper = renderAudioPlayer({}, helper.store)
-  dispatchThen = helper.store.createDispatchThen(state => state.audio)
-  dispatchThen(setCurrentlyPlayingAudio(exampleAudio), [
-    SET_CURRENTLY_PLAYING_AUDIO
-  ])
+  beforeEach(() => {
+    helper = new IntegrationTestHelper()
+    wrapper = renderAudioPlayer({}, helper.store)
+    dispatchThen = helper.store.createDispatchThen(state => state.audio)
+    dispatchThen(setCurrentlyPlayingAudio(exampleAudio), [
+      SET_CURRENTLY_PLAYING_AUDIO
+    ])
+  })
+
+  afterEach(() => {
+    helper.cleanup()
+  })
 
   it("should render the component", () => {
     assert.equal(wrapper.find(".audio-player-container-outer").length, 1)
