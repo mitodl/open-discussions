@@ -81,7 +81,13 @@ const getSimilarResourcesForObject = createSelector(
   }
 )
 
-export default function LearningResourceDrawer() {
+type Props = {
+  hideSimilarLearningResources?: boolean
+}
+
+export default function LearningResourceDrawer(props: Props) {
+  const { hideSimilarLearningResources } = props
+
   useResponsive()
 
   const { objectId, objectType, runId, numHistoryEntries } = useSelector(
@@ -147,6 +153,7 @@ export default function LearningResourceDrawer() {
               setShowResourceDrawer={pushHistory}
               embedly={embedly}
               similarItems={similarResources}
+              hideSimilarLearningResources={!!hideSimilarLearningResources}
             />
           ) : null}
           <div className="footer" />

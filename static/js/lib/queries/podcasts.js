@@ -2,7 +2,12 @@
 import R from "ramda"
 import { createSelector } from "reselect"
 
-import { podcastApiURL, recentPodcastApiURL } from "../url"
+import {
+  podcastApiURL,
+  recentPodcastApiURL,
+  podcastDetailApiURL,
+  podcastEpisodeDetailApiURL
+} from "../url"
 import { constructIdMap } from "../redux_query"
 
 import type { PodcastEpisode } from "../../flow/podcastTypes"
@@ -12,6 +17,17 @@ export const podcastsRequest = () => ({
   url:       podcastApiURL.toString(),
   transform: (podcasts: any) => ({
     podcasts: constructIdMap(podcasts)
+  }),
+  update: {
+    podcasts: R.merge
+  }
+})
+
+export const podcastRequest = (podcastId: number) => ({
+  queryKey:  "podcastsRequest",
+  url:       podcastDetailApiURL.param({ podcastId }).toString(),
+  transform: (podcast: any) => ({
+    podcasts: constructIdMap([podcast])
   }),
   update: {
     podcasts: R.merge
@@ -36,6 +52,17 @@ export const recentPodcastEpisodesRequest = () => ({
   },
   update: {
     recentEpisodes:  (_: any, newList: Array<PodcastEpisode>) => newList,
+    podcastEpisodes: R.merge
+  }
+})
+
+export const podcastEpisodeRequest = (episodeId: number) => ({
+  queryKey:  "podcastEpisode",
+  url:       podcastEpisodeDetailApiURL.param({ episodeId }).toString(),
+  transform: (episode: any) => ({
+    podcastEpisodes: constructIdMap([episode])
+  }),
+  update: {
     podcastEpisodes: R.merge
   }
 })

@@ -646,6 +646,12 @@ class PodcastEpisodeSerializer(serializers.ModelSerializer):
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+    podcast_title = serializers.SerializerMethodField()
+    object_type = serializers.CharField(read_only=True, default="episode")
+
+    def get_podcast_title(self, instance):
+        """get the podcast title"""
+        return instance.podcast.title
 
     class Meta:
         model = PodcastEpisode
@@ -663,6 +669,8 @@ class PodcastEpisodeSerializer(serializers.ModelSerializer):
             "offered_by",
             "podcast",
             "last_modified",
+            "podcast_title",
+            "object_type",
         ]
 
 
@@ -674,6 +682,7 @@ class PodcastSerializer(serializers.ModelSerializer):
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     episode_count = serializers.IntegerField(read_only=True)
+    object_type = serializers.CharField(read_only=True, default="podcast")
 
     class Meta:
         model = Podcast
@@ -690,4 +699,5 @@ class PodcastSerializer(serializers.ModelSerializer):
             "created_on",
             "updated_on",
             "episode_count",
+            "object_type",
         ]

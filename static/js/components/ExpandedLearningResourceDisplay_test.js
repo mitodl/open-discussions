@@ -19,6 +19,8 @@ import {
   LR_TYPE_ALL,
   LR_PUBLIC,
   LR_PRIVATE,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE,
   readableLearningResources
 } from "../lib/constants"
 import { mockHTMLElHeight } from "../lib/test_utils"
@@ -32,6 +34,7 @@ import { defaultResourceImageURL, learningResourcePermalink } from "../lib/url"
 import { capitalize } from "../lib/util"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { makeLearningResourceResult } from "../factories/search"
+import PodcastPlayButton from "./PodcastPlayButton"
 
 describe("ExpandedLearningResourceDisplay", () => {
   let course,
@@ -153,6 +156,34 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  it("should render the podcast title for podcast episode", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
+    const { wrapper } = await render({}, { object })
+
+    assert.equal(
+      wrapper
+        .find(".podcast-subtitle")
+        .at(0)
+        .text(),
+      object.podcast_title
+    )
+  })
+
+  it("should render play button for podcast episode", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
+    const { wrapper } = await render({}, { object })
+    assert.deepEqual(wrapper.find(PodcastPlayButton).prop("episode"), object)
+  })
+
+  //
+  ;[LR_TYPE_PODCAST, LR_TYPE_PODCAST_EPISODE].forEach(objectType => {
+    it(`should not display metadata section for ${objectType}`, async () => {
+      const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
+      const { wrapper } = await render({}, { object })
+      assert.isNotOk(wrapper.find(".lr-metadata").exists())
+    })
+  })
+
   LR_TYPE_ALL.forEach(objectType => {
     it(`should render description using the TruncatedText for ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
@@ -164,9 +195,15 @@ describe("ExpandedLearningResourceDisplay", () => {
     it(`should render a title for ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
       const { wrapper } = await render({}, { object })
+
       assert.equal(
         wrapper
-          .find(".title")
+          .find(
+            objectType === LR_TYPE_PODCAST ||
+            objectType === LR_TYPE_PODCAST_EPISODE
+              ? ".podcast-main-title"
+              : ".title"
+          )
           .at(0)
           .text(),
         object.title
@@ -225,6 +262,27 @@ describe("ExpandedLearningResourceDisplay", () => {
           .at(listIdx)
           .find("LearningResourceRow").length,
         3
+      )
+    })
+
+    it(`should hide similar resources for ${objectType} if prop passed`, async () => {
+      const object = makeLearningResource(objectType)
+      const { wrapper } = await render(
+        {},
+        { object, hideSimilarLearningResources: true }
+      )
+      const listIdx = [
+        LR_TYPE_LEARNINGPATH,
+        LR_TYPE_USERLIST,
+        LR_TYPE_PROGRAM
+      ].includes(objectType)
+        ? 1
+        : 0
+      assert.isNotOk(
+        wrapper
+          .find(".expanded-learning-resource-list")
+          .at(listIdx)
+          .exists()
       )
     })
 

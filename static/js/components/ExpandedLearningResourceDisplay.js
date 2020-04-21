@@ -9,6 +9,7 @@ import moment from "moment"
 import TruncatedText from "./TruncatedText"
 import Embedly from "./Embedly"
 import ShareTooltip from "./ShareTooltip"
+import PodcastPlayButton from "./PodcastPlayButton"
 
 import { LearningResourceRow } from "./LearningResourceCard"
 import { PaginatedUserListItems } from "./UserListItems"
@@ -16,6 +17,8 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_PRIVATE,
+  LR_TYPE_PODCAST_EPISODE,
+  LR_TYPE_PODCAST,
   platforms,
   platformLogos,
   readableLearningResources
@@ -49,7 +52,8 @@ type Props = {
   runId: number,
   setShowResourceDrawer: Function,
   embedly: ?Object,
-  similarItems: Array<LearningResourceResult>
+  similarItems: Array<LearningResourceResult>,
+  hideSimilarLearningResources: boolean
 }
 
 const lrInfoRow = (iconName, label, value) => (
@@ -94,6 +98,10 @@ type ListItemsSectionProps = CollapsableSectionProps & {
   objects: any
 }
 
+const isPodcastObject = object =>
+  object.object_type === LR_TYPE_PODCAST_EPISODE ||
+  object.object_type === LR_TYPE_PODCAST
+
 const ListItemsSection = ({ objects, ...props }: ListItemsSectionProps) => (
   <CollapsableSection {...props}>
     {objects.map((object, i) => (
@@ -107,7 +115,14 @@ const ListItemsSection = ({ objects, ...props }: ListItemsSectionProps) => (
 )
 
 export default function ExpandedLearningResourceDisplay(props: Props) {
-  const { object, runId, setShowResourceDrawer, embedly, similarItems } = props
+  const {
+    object,
+    runId,
+    setShowResourceDrawer,
+    embedly,
+    similarItems,
+    hideSimilarLearningResources
+  } = props
   const [showSimilar, setShowSimilar] = useState(false)
   const [showCourseList, setShowCourseList] = useState(false)
   const [showResourceList, setShowResourceList] = useState(false)
@@ -213,7 +228,14 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               </div>
             </div>
           ) : null}
-          <div className="title">{object.title}</div>
+          {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
+            <div className="podcast-subtitle">{object.podcast_title}</div>
+          ) : null}
+          <div
+            className={isPodcastObject(object) ? "podcast-main-title" : "title"}
+          >
+            {object.title}
+          </div>
           <div className="description">
             <TruncatedText
               text={entities.decode(striptags(object.short_description))}
@@ -222,6 +244,11 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               showExpansionControls
             />
           </div>
+          {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
+            <div className="podcast-play-control">
+              <PodcastPlayButton episode={object} />
+            </div>
+          ) : null}
           {!emptyOrNil(object.topics) ? (
             <div className="topics">
               <div className="section-label">Subjects</div>
@@ -234,59 +261,69 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               </div>
             </div>
           ) : null}
-          <div className="lr-metadata">
-            <div className="section-label">Info</div>
-            {cost ? lrInfoRow("attach_money", "Cost:", cost) : null}
-            {selectedRun && selectedRun.level
-              ? lrInfoRow("bar_chart", "Level:", selectedRun.level)
-              : null}
-            {!emptyOrNil(instructors)
-              ? lrInfoRow("school", "Instructors:", R.join(", ", instructors))
-              : null}
-            {object.object_type === LR_TYPE_PROGRAM
-              ? lrInfoRow("menu_book", "Number of Courses:", object.item_count)
-              : null}
-            {isCoursewareResource(object.object_type)
-              ? lrInfoRow(
-                "language",
-                "Language:",
-                languageName(selectedRun ? selectedRun.language : "en")
-              )
-              : null}
-            {object.object_type === LR_TYPE_VIDEO ? (
-              <React.Fragment>
-                {// $FlowFixMe: only videos will get to this code
-                  object.duration
+          {!isPodcastObject(object) ? (
+            <div className="lr-metadata">
+              <div className="section-label">Info</div>
+              {cost ? lrInfoRow("attach_money", "Cost:", cost) : null}
+              {selectedRun && selectedRun.level
+                ? lrInfoRow("bar_chart", "Level:", selectedRun.level)
+                : null}
+              {!emptyOrNil(instructors)
+                ? lrInfoRow("school", "Instructors:", R.join(", ", instructors))
+                : null}
+              {object.object_type === LR_TYPE_PROGRAM
+                ? lrInfoRow(
+                  "menu_book",
+                  "Number of Courses:",
+                  object.item_count
+                )
+                : null}
+              {isCoursewareResource(object.object_type)
+                ? lrInfoRow(
+                  "language",
+                  "Language:",
+                  languageName(selectedRun ? selectedRun.language : "en")
+                )
+                : null}
+              {object.object_type === LR_TYPE_VIDEO ? (
+                <React.Fragment>
+                  {// $FlowFixMe: only videos will get to this code
+                    object.duration
+                      ? lrInfoRow(
+                        "restore",
+                        "Duration:",
+                        formatDurationClockTime(object.duration)
+                      )
+                      : null}
+                  {offeredBy
+                    ? lrInfoRow("local_offer", "Offered By:", offeredBy)
+                    : null}
+                  {lrInfoRow(
+                    "calendar_today",
+                    "Date Posted:",
+                    moment(object.last_modified).format("MMM D, YYYY")
+                  )}
+                </React.Fragment>
+              ) : null}
+              {isUserList(object.object_type) ? (
+                <React.Fragment>
+                  {object.author_name
                     ? lrInfoRow(
-                      "restore",
-                      "Duration:",
-                      formatDurationClockTime(object.duration)
+                      "local_offer",
+                      "Created By:",
+                      object.author_name
                     )
                     : null}
-                {offeredBy
-                  ? lrInfoRow("local_offer", "Offered By:", offeredBy)
-                  : null}
-                {lrInfoRow(
-                  "calendar_today",
-                  "Date Posted:",
-                  moment(object.last_modified).format("MMM D, YYYY")
-                )}
-              </React.Fragment>
-            ) : null}
-            {isUserList(object.object_type) ? (
-              <React.Fragment>
-                {object.author_name
-                  ? lrInfoRow("local_offer", "Created By:", object.author_name)
-                  : null}
-                {lrInfoRow(
-                  "lock",
-                  "Privacy:",
-                  capitalize(object.privacy_level)
-                )}
-                {lrInfoRow("view_list", "Items in list:", object.item_count)}
-              </React.Fragment>
-            ) : null}
-          </div>
+                  {lrInfoRow(
+                    "lock",
+                    "Privacy:",
+                    capitalize(object.privacy_level)
+                  )}
+                  {lrInfoRow("view_list", "Items in list:", object.item_count)}
+                </React.Fragment>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
       {isUserList(object.object_type) &&
@@ -323,7 +360,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           <PaginatedUserListItems userList={object} pageSize={10} />
         </CollapsableSection>
       ) : null}
-      {!emptyOrNil(similarItems) ? (
+      {!emptyOrNil(similarItems) && !hideSimilarLearningResources ? (
         <ListItemsSection
           title="Similar Learning Resources"
           setShow={setShowSimilar}

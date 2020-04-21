@@ -437,6 +437,7 @@ class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
             Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
             Prefetch("topics", queryset=CourseTopic.objects.all()),
         )
+        .select_related("podcast")
     )
 
 
@@ -458,4 +459,5 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
                 Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
                 Prefetch("topics", queryset=CourseTopic.objects.all()),
             )
+            .select_related("podcast")
         )

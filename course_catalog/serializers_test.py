@@ -254,6 +254,7 @@ def test_podcast_serializer():
         "offered_by": [offered_by.name],
         "title": podcast.title,
         "id": podcast.id,
+        "object_type": "podcast",
     }
 
 
@@ -277,4 +278,6 @@ def test_podcast_episode_serializer():
         "url": episode.url,
         "podcast": episode.podcast_id,
         "last_modified": episode.last_modified.strftime(datetime_format),
+        "object_type": "episode",
+        "podcast_title": episode.podcast.title,
     }

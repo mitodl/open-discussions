@@ -7,6 +7,7 @@ import Card from "./Card"
 
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { CAROUSEL_IMG_WIDTH } from "../lib/constants"
+import { useOpenPodcastDrawer } from "../hooks/podcasts"
 
 import type { Podcast } from "../flow/podcastTypes"
 
@@ -19,8 +20,10 @@ export const PODCAST_IMG_HEIGHT = 170
 export default function PodcastCard(props: Props) {
   const { podcast } = props
 
+  const openPodcastDrawer = useOpenPodcastDrawer(podcast.id)
+
   return (
-    <Card className="podcast-card borderless">
+    <Card className="podcast-card borderless" onClick={openPodcastDrawer}>
       <div className="cover-img">
         <img
           src={embedlyThumbnail(

@@ -30,7 +30,9 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 import {
   emptyOrNil,
@@ -316,7 +318,14 @@ export class CourseSearchPage extends React.Component<Props, State> {
   getFavoriteOrListedObject = (result: LearningResourceResult) => {
     // Get the latest data from state if any to reflect recent changes in favorites/lists
     const { entities } = this.props
-    const { courses, programs, userLists, videos } = entities
+    const {
+      courses,
+      programs,
+      userLists,
+      videos,
+      podcasts,
+      episodes
+    } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
       return courses ? courses[result.id] || null : null
@@ -326,6 +335,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
       return userLists ? userLists[result.id] || null : null
     case LR_TYPE_VIDEO:
       return videos ? videos[result.id] || null : null
+    case LR_TYPE_PODCAST:
+      return podcasts ? podcasts[result.id] || null : null
+    case LR_TYPE_PODCAST_EPISODE:
+      return episodes ? episodes[result.id] || null : null
     case LR_TYPE_LEARNINGPATH:
       return userLists ? userLists[result.id] || null : null
     }

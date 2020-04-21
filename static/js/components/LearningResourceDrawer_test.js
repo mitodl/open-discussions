@@ -70,13 +70,13 @@ describe("LearningResourceDrawer", () => {
       body:   object
     })
 
-  const renderWithObject = async (object, apiUrl) => {
+  const renderWithObject = async (object, apiUrl, extraProps = {}) => {
     helper.handleRequestStub.withArgs(apiUrl).returns({
       status: 200,
       body:   object
     })
 
-    const { wrapper, store } = await render({}, [
+    const { wrapper, store } = await render(extraProps, [
       pushLRHistory({
         objectId:   object.id,
         objectType: object.object_type
@@ -88,7 +88,7 @@ describe("LearningResourceDrawer", () => {
   it("should have a button to hide the course drawer", async () => {
     const { wrapper, store } = await renderWithObject(
       course,
-      courseDetailApiURL
+      courseDetailApiURL.param({ courseId: course.id }).toString()
     )
     wrapper.find(".drawer-close").simulate("click")
     // this means that the history has been cleared
@@ -133,7 +133,10 @@ describe("LearningResourceDrawer", () => {
   })
 
   it("should log a view interaction when the drawer is shown", async () => {
-    await renderWithObject(course, courseDetailApiURL)
+    await renderWithObject(
+      course,
+      courseDetailApiURL.param({ courseId: course.id }).toString()
+    )
     assert.ok(helper.handleRequestStub.calledWith(interactionsApiURL))
   })
 
@@ -207,5 +210,17 @@ describe("LearningResourceDrawer", () => {
     assert.deepEqual(expandedDisplay.prop("object"), video)
     assert.deepEqual(expandedDisplay.prop("embedly"), embedly)
     assert.deepEqual(expandedDisplay.prop("similarItems"), similarItems)
+  })
+
+  it("should pass hideSimilarLearningResources prop to ExpandedLearningResourceDisplay", async () => {
+    const url = courseDetailApiURL.param({ courseId: course.id }).toString()
+    const { wrapper } = await renderWithObject(course, url, {
+      hideSimilarLearningResources: true
+    })
+    assert.ok(
+      wrapper
+        .find(ExpandedLearningResourceDisplay)
+        .prop("hideSimilarLearningResources")
+    )
   })
 })

@@ -37,6 +37,7 @@ export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
     podcast:           podcast.id,
     short_description: casual.description,
     title:             casual.title,
+    podcast_title:     podcast.title,
     topics:            [],
     updated_on:        casual.moment.toISOString(),
     url:               casual.url

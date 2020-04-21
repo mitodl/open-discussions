@@ -22,7 +22,9 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 import { SEARCH_LIST_UI } from "../lib/search"
 import { wait } from "../lib/util"
@@ -538,7 +540,10 @@ describe("CourseSearchPage", () => {
     await wait(600)
   })
 
-  LR_TYPE_ALL.forEach(resourceType => {
+  // THIS IS TEMPORARY UNTIL FULL SEARCH SUPPORT IS IN PLACE!
+  LR_TYPE_ALL.filter(
+    type => type !== LR_TYPE_PODCAST && type !== LR_TYPE_PODCAST_EPISODE
+  ).forEach(resourceType => {
     it(`overrideObject ${resourceType} is null if not in entities`, async () => {
       const resource = makeLearningResourceResult(resourceType)
       searchResponse.hits.hits[0] = resource

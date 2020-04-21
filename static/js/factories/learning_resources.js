@@ -14,9 +14,12 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE,
   OBJECT_TYPE_MAPPING,
   DATE_FORMAT
 } from "../lib/constants"
+import { makePodcast, makePodcastEpisode } from "./podcasts"
 
 import type {
   Course,
@@ -191,26 +194,25 @@ export const makeVideo = (): Video => ({
   lists:             []
 })
 
-export const makeLearningResource = (objectType: string): Object => {
-  switch (objectType) {
-  case LR_TYPE_COURSE:
-    return R.merge({ object_type: LR_TYPE_COURSE }, makeCourse())
-  case LR_TYPE_PROGRAM:
-    return R.merge({ object_type: LR_TYPE_PROGRAM }, makeProgram())
-  case LR_TYPE_USERLIST:
-    return R.merge(
-      { object_type: LR_TYPE_USERLIST, list_type: LR_TYPE_USERLIST },
-      makeUserList()
-    )
-  case LR_TYPE_LEARNINGPATH:
-    return R.merge(
-      { object_type: LR_TYPE_LEARNINGPATH, list_type: LR_TYPE_LEARNINGPATH },
-      makeUserList()
-    )
-  case LR_TYPE_VIDEO:
-    return R.merge({ object_type: LR_TYPE_VIDEO }, makeVideo())
-  }
+const LR_FACTORY_MAPPING = {
+  [LR_TYPE_COURSE]:   makeCourse,
+  [LR_TYPE_PROGRAM]:  makeProgram,
+  [LR_TYPE_USERLIST]: R.compose(
+    R.merge({ list_type: LR_TYPE_USERLIST }),
+    makeUserList
+  ),
+  [LR_TYPE_LEARNINGPATH]: R.compose(
+    R.merge({ list_type: LR_TYPE_LEARNINGPATH }),
+    makeUserList
+  ),
+  [LR_TYPE_VIDEO]:           makeVideo,
+  [LR_TYPE_PODCAST]:         makePodcast,
+  [LR_TYPE_PODCAST_EPISODE]: makePodcastEpisode
 }
+
+// eslint-disable-next-line camelcase
+export const makeLearningResource = (object_type: string): Object =>
+  R.merge({ object_type }, LR_FACTORY_MAPPING[object_type]())
 
 const formatFavorite = contentType => resource => ({
   content_data: resource,

@@ -11,7 +11,7 @@ export type Podcast = {
   title: string,
   topics: Array<string>,
   updated_on: string,
-  url: string,
+  url: string
 }
 
 export type PodcastEpisode = {
@@ -27,5 +27,6 @@ export type PodcastEpisode = {
   title: string,
   topics: Array<string>,
   updated_on: string,
-  url: string
+  url: string,
+  podcast_title: string
 }

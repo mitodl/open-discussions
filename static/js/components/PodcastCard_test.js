@@ -1,27 +1,31 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
-import { shallow } from "enzyme"
 import { assert } from "chai"
+import sinon from "sinon"
 
 import PodcastCard, { PODCAST_IMG_HEIGHT } from "./PodcastCard"
 
 import { makePodcast } from "../factories/podcasts"
 import { embedlyThumbnail } from "../lib/url"
 import { CAROUSEL_IMG_WIDTH } from "../lib/constants"
+import IntegrationTestHelper from "../util/integration_test_helper"
+import * as podcastHooks from "../hooks/podcasts"
 
 describe("PodcastCard", () => {
-  let podcast
+  let podcast, helper, render
 
   beforeEach(() => {
     podcast = makePodcast()
+    helper = new IntegrationTestHelper()
+    render = helper.configureReduxQueryRenderer(PodcastCard, { podcast })
   })
 
-  const render = (props = {}) =>
-    shallow(<PodcastCard podcast={podcast} {...props} />)
+  afterEach(() => {
+    helper.cleanup()
+  })
 
-  it("should render basic stuff", () => {
-    const wrapper = render()
+  it("should render basic stuff", async () => {
+    const { wrapper } = await render()
     assert.equal(wrapper.find("Dotdotdot").props().children, podcast.title)
     assert.equal(
       wrapper.find("img").prop("src"),
@@ -32,5 +36,13 @@ describe("PodcastCard", () => {
         CAROUSEL_IMG_WIDTH
       )
     )
+  })
+
+  it("should put a click handler on the card to open drawer", async () => {
+    const openStub = helper.sandbox.stub()
+    helper.sandbox.stub(podcastHooks, "useOpenPodcastDrawer").returns(openStub)
+    const { wrapper } = await render()
+    wrapper.find("Card").simulate("click")
+    sinon.assert.called(openStub)
   })
 })

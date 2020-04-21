@@ -1,16 +1,15 @@
 // @flow
 /* global SETTINGS:false */
-import React, { useCallback } from "react"
-import { useDispatch } from "react-redux"
+import React from "react"
 import Dotdotdot from "react-dotdotdot"
 
 import Card from "./Card"
+import PodcastPlayButton from "./PodcastPlayButton"
 
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
+import { useOpenEpisodeDrawer } from "../hooks/podcasts"
 
 import type { Podcast, PodcastEpisode } from "../flow/podcastTypes"
-
-import { setCurrentlyPlayingAudio } from "../actions/audio"
 
 export const PODCAST_IMG_HEIGHT = 77
 export const PODCAST_IMG_WIDTH = 125
@@ -23,30 +22,19 @@ type Props = {
 export default function PodcastEpisodeCard(props: Props) {
   const { episode, podcast } = props
 
-  const dispatch = useDispatch()
-  const playClick = useCallback(
-    () => {
-      dispatch(
-        setCurrentlyPlayingAudio({
-          title:       podcast.title,
-          description: episode.title,
-          url:         episode.url
-        })
-      )
-    },
-    [dispatch]
-  )
+  const openEpisodeDrawer = useOpenEpisodeDrawer(episode.id)
 
   return (
-    <Card className="podcast-episode-card low-padding">
+    <Card
+      className="podcast-episode-card low-padding"
+      onClick={openEpisodeDrawer}
+    >
       <div className="left-col">
         <div className="episode-title">
           <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
         </div>
         <div className="podcast-name">{podcast.title}</div>
-        <div className="play-button black-surround" onClick={playClick}>
-          Play
-        </div>
+        <PodcastPlayButton episode={episode} />
       </div>
       <div className="right-col">
         <img

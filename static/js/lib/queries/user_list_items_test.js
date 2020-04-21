@@ -16,7 +16,12 @@ import {
   makeUserList
 } from "../../factories/learning_resources"
 import { userListItemsApiURL, userListItemsDetailApiURL } from "../url"
-import { LR_TYPE_ALL, OBJECT_TYPE_MAPPING } from "../constants"
+import {
+  LR_TYPE_ALL,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE,
+  OBJECT_TYPE_MAPPING
+} from "../constants"
 // import { constructIdMap } from "../redux_query"
 
 describe("UserList Items API", () => {
@@ -74,7 +79,12 @@ describe("UserList Items API", () => {
   })
 
   describe("createUserListItemMutation", () => {
-    LR_TYPE_ALL.forEach(objectType => {
+    // TEMPORARY! when we add full support for podcasts and podcast episodes
+    // in user lists we can change this
+    LR_TYPE_ALL.filter(
+      objectType =>
+        objectType !== LR_TYPE_PODCAST && objectType !== LR_TYPE_PODCAST_EPISODE
+    ).forEach(objectType => {
       let item, resource, request, entityKey, contentType
 
       beforeEach(() => {
@@ -223,7 +233,12 @@ describe("UserList Items API", () => {
       assert.equal(request.options.method, "DELETE")
     })
 
-    LR_TYPE_ALL.forEach(contentType => {
+    // TEMPORARY! when we add full support for podcasts and podcast episodes
+    // in user lists we can change this
+    LR_TYPE_ALL.filter(
+      objectType =>
+        objectType !== LR_TYPE_PODCAST && objectType !== LR_TYPE_PODCAST_EPISODE
+    ).forEach(contentType => {
       it(`optimistically updates the state for contentType=${contentType}`, () => {
         const userList = makeUserList()
         const item = makeUserListItem(contentType)

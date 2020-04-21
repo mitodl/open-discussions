@@ -39,6 +39,7 @@ import Drawer from "../components/Drawer"
 import Toolbar from "../components/Toolbar"
 import ContentToolbar from "../components/ContentToolbar"
 import AudioPlayer from "../components/AudioPlayer"
+import LearningResourceDrawer from "../components/LearningResourceDrawer"
 
 import { actions } from "../actions"
 import {
@@ -332,6 +333,7 @@ class App extends React.Component<Props> {
             <Route path={`${match.url}podcasts`}>
               <PodcastFrontpage />
               <AudioPlayer />
+              <LearningResourceDrawer hideSimilarLearningResources />
             </Route>
           ) : null}
         </div>

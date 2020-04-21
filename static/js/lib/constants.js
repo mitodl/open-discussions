@@ -79,13 +79,17 @@ export const LR_TYPE_PROGRAM = "program"
 export const LR_TYPE_USERLIST = "userlist"
 export const LR_TYPE_LEARNINGPATH = "learningpath"
 export const LR_TYPE_VIDEO = "video"
+export const LR_TYPE_PODCAST = "podcast"
+export const LR_TYPE_PODCAST_EPISODE = "episode"
 export const FAVORITES_PSEUDO_LIST = "favorites"
 export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 ]
 
 export const OBJECT_TYPE_MAPPING = {

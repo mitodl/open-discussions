@@ -46,6 +46,10 @@
     font-weight: bold;
   }
 
+  .podcast-play-control {
+    margin-top: 15px;
+  }
+
   .topics {
     margin: 25px 0;
 
@@ -53,6 +57,17 @@
       display: flex;
       flex-flow: wrap;
     }
+  }
+
+  .podcast-subtitle {
+    font-size: 18px;
+    font-weight: bold;
+  }
+
+  .podcast-main-title {
+    font-size: 24px;
+    color: $course-blue;
+    font-weight: bold;
   }
 
   .title {

@@ -11,20 +11,25 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_LEARNINGPATH,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../constants"
 import { courseRequest } from "./courses"
 import { programRequest } from "./programs"
 import { videoRequest } from "./videos"
 import { userListRequest } from "./user_lists"
+import { podcastRequest, podcastEpisodeRequest } from "./podcasts"
 
 // object_type => $KEY for `entities.$KEY` mapping
 export const OBJECT_TYPE_ENTITY_ROUTING = {
-  [LR_TYPE_USERLIST]:     "userLists",
-  [LR_TYPE_LEARNINGPATH]: "userLists",
-  [LR_TYPE_COURSE]:       "courses",
-  [LR_TYPE_PROGRAM]:      "programs",
-  [LR_TYPE_VIDEO]:        "videos"
+  [LR_TYPE_USERLIST]:        "userLists",
+  [LR_TYPE_LEARNINGPATH]:    "userLists",
+  [LR_TYPE_COURSE]:          "courses",
+  [LR_TYPE_PROGRAM]:         "programs",
+  [LR_TYPE_VIDEO]:           "videos",
+  [LR_TYPE_PODCAST]:         "podcasts",
+  [LR_TYPE_PODCAST_EPISODE]: "podcastEpisodes"
 }
 
 export const normalizeResourcesByObjectType = R.compose(
@@ -34,10 +39,12 @@ export const normalizeResourcesByObjectType = R.compose(
 )
 
 export const updateLearningResources = {
-  courses:   R.merge,
-  programs:  R.merge,
-  userLists: R.merge,
-  videos:    R.merge
+  courses:         R.merge,
+  programs:        R.merge,
+  userLists:       R.merge,
+  videos:          R.merge,
+  podcasts:        R.merge,
+  podcastEpisodes: R.merge
 }
 
 export const mapResourcesToResourceRefs = R.map(
@@ -74,11 +81,15 @@ export const favoritesRequest = () => ({
     const { next, results } = responseJson
 
     return {
-      courses:   constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
-      programs:  constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
-      userLists: constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
-      videos:    constructIdMap(filterFavorites(results, LR_TYPE_VIDEO)),
-      next:      next
+      courses:         constructIdMap(filterFavorites(results, LR_TYPE_COURSE)),
+      programs:        constructIdMap(filterFavorites(results, LR_TYPE_PROGRAM)),
+      userLists:       constructIdMap(filterFavorites(results, LR_TYPE_USERLIST)),
+      videos:          constructIdMap(filterFavorites(results, LR_TYPE_VIDEO)),
+      podcasts:        constructIdMap(filterFavorites(results, LR_TYPE_PODCAST)),
+      podcastEpisodes: constructIdMap(
+        filterFavorites(results, LR_TYPE_PODCAST_EPISODE)
+      ),
+      next: next
     }
   },
   update: {
@@ -151,6 +162,10 @@ export const getResourceRequest = (objectId: ?number, objectType: ?string) => {
     return programRequest(objectId)
   case LR_TYPE_VIDEO:
     return videoRequest(objectId)
+  case LR_TYPE_PODCAST:
+    return podcastRequest(objectId)
+  case LR_TYPE_PODCAST_EPISODE:
+    return podcastEpisodeRequest(objectId)
   default:
     return userListRequest(objectId)
   }
@@ -161,7 +176,9 @@ export const learningResourceSelector = createSelector(
   state => state.entities.programs,
   state => state.entities.userLists,
   state => state.entities.videos,
-  (courses, programs, userLists, videos) =>
+  state => state.entities.podcasts,
+  state => state.entities.podcastEpisodes,
+  (courses, programs, userLists, videos, podcasts, podcastEpisodes) =>
     memoize(
       (objectId, objectType) => {
         switch (objectType) {
@@ -171,6 +188,10 @@ export const learningResourceSelector = createSelector(
           return programs ? programs[objectId] : null
         case LR_TYPE_VIDEO:
           return videos ? videos[objectId] : null
+        case LR_TYPE_PODCAST:
+          return podcasts ? podcasts[objectId] : null
+        case LR_TYPE_PODCAST_EPISODE:
+          return podcastEpisodes ? podcastEpisodes[objectId] : null
         default:
           return userLists ? userLists[objectId] : null
         }
