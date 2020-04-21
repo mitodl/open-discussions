@@ -34,6 +34,7 @@
           overflow: hidden;
           text-overflow: ellipsis;
           max-height: 25px;
+          margin-bottom: 10px;
         }
       
         .audio-player-description {
@@ -44,7 +45,6 @@
           text-overflow: ellipsis;
           white-space: nowrap;
           max-height: 46px;
-          line-height: 130%;
         }
       }
     }
@@ -106,6 +106,7 @@
       .audio-player-progress-container {
         display: flex;
         flex: 1;
+        align-items: center;
         padding: 0px 24px;
 
         progress {
