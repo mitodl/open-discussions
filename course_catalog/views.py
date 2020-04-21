@@ -438,9 +438,14 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = PodcastSerializer
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
-    queryset = Podcast.objects.filter(published=True).prefetch_related(
-        Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
-        Prefetch("topics", queryset=CourseTopic.objects.all()),
+    queryset = (
+        Podcast.objects.filter(published=True, episodes__published=True)
+        .prefetch_related(
+            Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+            Prefetch("topics", queryset=CourseTopic.objects.all()),
+        )
+        .annotate(episode_count=Count("episodes"))
+        .order_by("id")
     )
 
 

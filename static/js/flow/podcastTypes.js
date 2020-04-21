@@ -1,6 +1,7 @@
 // @flow
 export type Podcast = {
   created_on: string,
+  episode_count: number,
   full_description: string,
   id: number,
   image_src: string,
