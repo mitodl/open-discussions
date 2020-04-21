@@ -10,10 +10,7 @@ import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 
 import type { Podcast, PodcastEpisode } from "../flow/podcastTypes"
 
-import {
-  SET_CURRENTLY_PLAYING_AUDIO,
-  setCurrentlyPlayingAudio
-} from "../actions/audio"
+import { setCurrentlyPlayingAudio } from "../actions/audio"
 
 export const PODCAST_IMG_HEIGHT = 77
 export const PODCAST_IMG_WIDTH = 125
