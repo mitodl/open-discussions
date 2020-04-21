@@ -166,6 +166,7 @@ export const userListApiURL = api.segment("userlists/")
 export const userListDetailApiURL = userListApiURL.segment(":userListId/")
 export const userListItemsApiURL = userListDetailApiURL.segment("items/")
 export const userListItemsDetailApiURL = userListItemsApiURL.segment(":itemId/")
+
 export const videoApiURL = api.segment("videos/")
 export const videoDetailApiURL = videoApiURL.segment(":videoId/")
 export const interactionsApiURL = api.segment("interactions/").toString()
@@ -174,6 +175,7 @@ export const newVideosURL = "/api/v0/videos/new/"
 export const embedlyApiURL = "/api/v0/embedly"
 export const topicApiURL = "/api/v0/topics"
 export const similarResourcesURL = "/api/v0/similar/"
+
 export const podcastApiURL = api.segment("podcasts/")
 export const recentPodcastApiURL = podcastApiURL.segment("recent/")
 
