@@ -1,11 +1,13 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import { shallow } from "enzyme"
+import { Provider } from "react-redux"
+import { mount } from "enzyme"
 import { assert } from "chai"
 
 import { makePodcast, makePodcastEpisode } from "../factories/podcasts"
 import { embedlyThumbnail } from "../lib/url"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 import PodcastEpisodeCard, {
   PODCAST_IMG_WIDTH,
@@ -13,19 +15,26 @@ import PodcastEpisodeCard, {
 } from "./PodcastEpisodeCard"
 
 describe("PodcastEpisodeCard", () => {
-  let podcast, episode
+  let podcast, episode, helper, wrapper
   beforeEach(() => {
     podcast = makePodcast()
     episode = makePodcastEpisode(podcast)
+    helper = new IntegrationTestHelper()
+    wrapper = render({}, helper.store)
   })
 
-  const render = (props = {}) =>
-    shallow(
-      <PodcastEpisodeCard podcast={podcast} episode={episode} {...props} />
+  afterEach(() => {
+    helper.cleanup()
+  })
+
+  const render = (props = {}, store) =>
+    mount(
+      <Provider store={store}>
+        <PodcastEpisodeCard podcast={podcast} episode={episode} {...props} />
+      </Provider>
     )
 
   it("should render basic stuff", () => {
-    const wrapper = render()
     assert.equal(wrapper.find("Dotdotdot").props().children, episode.title)
     assert.equal(wrapper.find(".podcast-name").text(), podcast.title)
     assert.equal(
