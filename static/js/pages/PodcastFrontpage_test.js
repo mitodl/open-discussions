@@ -31,7 +31,6 @@ describe("PodcastFrontpage tests", () => {
     helper.cleanup()
   })
 
-
   it("should render recent episodes", async () => {
     const { wrapper } = await render()
 

@@ -80,7 +80,6 @@ export const genericQueryResponse = (data: any) => ({
   body:   data
 })
 
-
 export const changeFormikInput = (
   wrapper: Object,
   name: string,
