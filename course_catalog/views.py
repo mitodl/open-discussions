@@ -449,9 +449,9 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
     )
 
 
-class RecentPodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
+class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Viewset for recent PodcastEpisodes
+    Viewset for PodcastEpisodes
     """
 
     serializer_class = PodcastEpisodeSerializer
@@ -459,7 +459,7 @@ class RecentPodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
 
     queryset = (
-        PodcastEpisode.objects.filter(published=True)
+        PodcastEpisode.objects.filter(published=True, podcast__published=True)
         .order_by("-last_modified", "-id")
         .prefetch_related(
             Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
