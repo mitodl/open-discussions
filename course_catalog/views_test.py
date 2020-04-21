@@ -753,3 +753,29 @@ def test_podcast_episodes_detail(settings, client):
     resp = client.get(reverse("podcastepisodes-detail", kwargs={"pk": episode.id}))
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == PodcastEpisodeSerializer(instance=episode).data
+
+
+def test_episodes_per_podcast_no_feature_flag(settings, client):
+    """Recent podcast episodes API should return a 403 if the feature flag is not set"""
+    settings.FEATURES[features.PODCAST_APIS] = False
+    resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": 234}))
+    assert resp.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_episodes_per_podcast(settings, client):
+    """This view should list all published episodes for a given podcast id"""
+    podcast = PodcastFactory.create()
+
+    episodes = reversed(
+        sorted(
+            PodcastEpisodeFactory.create_batch(5, podcast=podcast),
+            key=lambda episode: (episode.last_modified, episode.id),
+        )
+    )
+    # Make sure these aren't included
+    PodcastEpisodeFactory.create_batch(5)
+
+    settings.FEATURES[features.PODCAST_APIS] = True
+    resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": podcast.id}))
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == PodcastEpisodeSerializer(instance=episodes, many=True).data
