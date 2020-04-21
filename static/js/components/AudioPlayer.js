@@ -52,28 +52,32 @@ export default function AudioPlayer() {
   return (
     <div className="audio-player-container-outer">
       <div className="audio-player-container-inner">
-        <div className="audio-player-titles">
-          <div
-            className="audio-player-title"
-            data-amplitude-song-info="album"
-          />
-          <div
-            className="audio-player-description"
-            data-amplitude-song-info="name"
-          />
+        <div className="audio-player-left">
+          <div className="audio-player-titles">
+            <div
+              className="audio-player-title"
+              data-amplitude-song-info="album"
+            />
+            <div
+              className="audio-player-description"
+              data-amplitude-song-info="name"
+            />
+          </div>
         </div>
-        <div className="audio-player-controls">
-          <div className="audio-player-button" onClick={backTenClick}>
-            <span className="material-icons">replay_10</span>
-          </div>
-          <div
-            className="audio-player-button amplitude-play-pause"
-            id="play-pause"
-          >
-            <span className="material-icons" />
-          </div>
-          <div className="audio-player-button" onClick={forwardThirtyClick}>
-            <span className="material-icons">forward_30</span>
+        <div className="audio-player-right">
+          <div className="audio-player-playback-controls">
+            <div className="audio-player-button" onClick={backTenClick}>
+              <span className="material-icons">replay_10</span>
+            </div>
+            <div
+              className="audio-player-button amplitude-play-pause"
+              id="play-pause"
+            >
+              <span className="material-icons" />
+            </div>
+            <div className="audio-player-button" onClick={forwardThirtyClick}>
+              <span className="material-icons">forward_30</span>
+            </div>
           </div>
           <div className="audio-player-progress-container">
             <time className="audio-player-time-text-left">
@@ -92,7 +96,7 @@ export default function AudioPlayer() {
             </time>
           </div>
           <div className="audio-player-playback-speed-container">
-            <button className="light-outlined amplitude-playback-speed" />
+            <button className="dark-outlined amplitude-playback-speed" />
           </div>
         </div>
       </div>
