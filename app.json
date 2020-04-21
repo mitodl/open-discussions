@@ -109,6 +109,10 @@
       "description": "Google analytics tracking ID",
       "required": false
     },
+    "GITHUB_ACCESS_TOKEN": {
+      "description": "Access token for the Github API",
+      "required": false
+    },
     "INDEXING_API_USERNAME": {
       "description": "Reddit username used for indexing"
     },
