@@ -774,8 +774,15 @@ def test_episodes_per_podcast(settings, client):
     )
     # Make sure these aren't included
     PodcastEpisodeFactory.create_batch(5)
+    PodcastEpisodeFactory.create(podcast=podcast, published=False)
 
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": podcast.id}))
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == PodcastEpisodeSerializer(instance=episodes, many=True).data
+
+    podcast.published = False
+    podcast.save()
+    resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": podcast.id}))
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json() == []

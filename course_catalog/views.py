@@ -478,7 +478,9 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return (
-            PodcastEpisode.objects.filter(published=True, podcast=self.kwargs["pk"])
+            PodcastEpisode.objects.filter(
+                published=True, podcast__published=True, podcast=self.kwargs["pk"]
+            )
             .order_by("-last_modified", "-id")
             .prefetch_related(
                 Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
