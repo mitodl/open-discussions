@@ -8,60 +8,111 @@
   display: flex;
   align-items: center;
   box-shadow: 0px -4px 15px rgba(50, 50, 50, 0.3);
+  font-family: Helvetica, sans-serif;
   left: 0;
   bottom: 0;
   width: 100vw;
-  height: 98px;
+
+  @include breakpoint(desktop) {
+    height: 98px;
+  }
+  @include breakpoint(mobile) {
+    height: 128px;
+  }
 
   .audio-player-container-inner {
     position: relative;
     display: flex;
     align-items: center;
     flex: 1;
-    width: 100%;
-    height: 75px;
-    padding: 8px 12px;
 
-    .audio-player-left {
-      width: 36%;
-      max-width: 490px;
+    @include breakpoint(desktop) {
+      height: 75px;
+      padding: 8px 12px;
+      height: calc(100% - 16px);
+      width: calc(100% - 24px);
+    }
+    @include breakpoint(mobile) {
+      flex-direction: column;
+      padding: 8px 12px;
+      height: calc(100% - 16px);
+      width: calc(100% - 24px);
+    }
+
+    .audio-player-text {
+      position: relative;
+      @include breakpoint(desktop) {
+        width: 36%;
+        max-width: 490px;
+      }
+      @include breakpoint(mobile) {
+        text-align: center;
+        width: 100%;
+      }
 
       .audio-player-titles {
         height: min-content;
-        padding-left: 12px;
-        padding-right: 12px;
+
+        @include breakpoint(desktop) {
+          padding: 0px 12px;
+        }
+
+        @include breakpoint(mobile) {
+          display: flex;
+          flex-direction: column-reverse;
+        }
 
         .audio-player-title {
-          font-weight: 400;
           font-size: 16px;
           color: $font-grey-light;
           overflow: hidden;
           text-overflow: ellipsis;
           max-height: 25px;
-          margin-bottom: 10px;
+
+          @include breakpoint(desktop) {
+            font-size: 16px;
+            margin-bottom: 10px;
+          }
+          @include breakpoint(mobile) {
+            font-size: 12px;
+          }
         }
 
         .audio-player-description {
           display: block;
-          font-weight: 500;
+          font-weight: bold;
           font-size: 18px;
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
           max-height: 46px;
+
+          @include breakpoint(desktop) {
+            font-size: 18px;
+          }
+          @include breakpoint(mobile) {
+            font-size: 14px;
+          }
         }
       }
     }
 
-    .audio-player-right {
+    .audio-player-controls {
       display: flex;
-      flex-direction: row;
       flex: 1;
       justify-content: left;
       align-items: center;
-      border-left: 1px solid rgba(0, 0, 0, 0.1);
-      height: 100%;
-      padding-left: 16px;
+
+      @include breakpoint(desktop) {
+        flex-direction: row;
+        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        padding-left: 16px;
+        height: 100%;
+      }
+      @include breakpoint(mobile) {
+        flex-direction: column;
+        width: 100%;
+      }
 
       .audio-player-button {
         height: 40px;
@@ -72,35 +123,90 @@
       }
 
       .audio-player-playback-controls {
-        width: 180px;
         display: flex;
         align-items: center;
 
-        .audio-player-button {
-          display: inline-block;
-          color: $rouge;
-          height: 100%;
+        @include breakpoint(desktop) {
+          width: 180px;
         }
 
-        .audio-player-button span,
-        progress {
-          cursor: pointer;
+        @include breakpoint(mobile) {
+          width: 100%;
         }
 
-        .amplitude-play-pause span {
-          font-size: 48px;
+        .audio-player-button-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+
+          .audio-player-button {
+            display: inline-block;
+            color: $rouge;
+            height: auto;
+          }
+
+          .audio-player-button span,
+          progress {
+            cursor: pointer;
+          }
+
+          .amplitude-play-pause span {
+            font-size: 48px;
+          }
+
+          .amplitude-play-pause.amplitude-playing span:before {
+            content: "pause_circle_outline";
+          }
+
+          .amplitude-play-pause.amplitude-paused span:before {
+            content: "play_circle_outline";
+          }
+
+          .audio-player-button:not(.amplitude-play-pause) span {
+            font-size: 30px;
+          }
         }
 
-        .amplitude-play-pause.amplitude-playing span:before {
-          content: "pause_circle_outline";
-        }
+        .audio-player-playback-speed-container {
+          position: absolute;
 
-        .amplitude-play-pause.amplitude-paused span:before {
-          content: "play_circle_outline";
-        }
+          @include breakpoint(desktop) {
+            width: 70px;
+            height: 32px;
+            right: 50px;
+          }
 
-        .audio-player-button:not(.amplitude-play-pause) span {
-          font-size: 30px;
+          @include breakpoint(mobile) {
+            right: 0px;
+          }
+
+          button {
+            border-radius: 4px;
+            font-weight: bold;
+
+            @include breakpoint(desktop) {
+              font-size: 18px;
+              padding: 5px 20px;
+            }
+
+            @include breakpoint(mobile) {
+              font-size: 12px;
+              padding: 4px 6px;
+            }
+          }
+
+          .amplitude-playback-speed-10:before {
+            content: "1.0x";
+          }
+
+          .amplitude-playback-speed-15:before {
+            content: "1.5x";
+          }
+
+          .amplitude-playback-speed-20:before {
+            content: "2.0x";
+          }
         }
       }
 
@@ -108,7 +214,16 @@
         display: flex;
         flex: 1;
         align-items: center;
-        padding: 0px 24px;
+
+        @include breakpoint(desktop) {
+          font-size: 14px;
+          padding: 0px 144px 0px 24px;
+        }
+
+        @include breakpoint(mobile) {
+          font-size: 10px;
+          width: 100%;
+        }
 
         progress {
           flex: 1;
@@ -144,31 +259,6 @@
         .audio-player-time-text-right {
           text-align: left;
           padding-left: 12px;
-        }
-      }
-
-      .audio-player-playback-speed-container {
-        width: 70px;
-        height: 32px;
-        padding-left: 11px;
-        padding-right: 43px;
-
-        button {
-          padding: 5px 20px;
-          border-radius: 4px;
-          font-weight: bold;
-        }
-
-        .amplitude-playback-speed-10:before {
-          content: "1.0x";
-        }
-
-        .amplitude-playback-speed-15:before {
-          content: "1.5x";
-        }
-
-        .amplitude-playback-speed-20:before {
-          content: "2.0x";
         }
       }
     }

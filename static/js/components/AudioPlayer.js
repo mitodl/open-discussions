@@ -66,7 +66,7 @@ export default function AudioPlayer() {
       className={`audio-player-container-outer${!audioLoaded ? " hidden" : ""}`}
     >
       <div className="audio-player-container-inner">
-        <div className="audio-player-left">
+        <div className="audio-player-text">
           <div className="audio-player-titles">
             <div
               className="audio-player-title"
@@ -78,20 +78,25 @@ export default function AudioPlayer() {
             />
           </div>
         </div>
-        <div className="audio-player-right">
+        <div className="audio-player-controls">
           <div className="audio-player-playback-controls">
-            <div className="audio-player-button" onClick={backTenClick}>
-              <span className="material-icons">replay_10</span>
+            <div className="audio-player-button-container">
+              <div className="audio-player-button" onClick={backTenClick}>
+                <span className="material-icons">replay_10</span>
+              </div>
+              <div
+                className="audio-player-button amplitude-play-pause"
+                id="play-pause"
+                ref={playPauseButton}
+              >
+                <span className="material-icons" />
+              </div>
+              <div className="audio-player-button" onClick={forwardThirtyClick}>
+                <span className="material-icons">forward_30</span>
+              </div>
             </div>
-            <div
-              className="audio-player-button amplitude-play-pause"
-              id="play-pause"
-              ref={playPauseButton}
-            >
-              <span className="material-icons" />
-            </div>
-            <div className="audio-player-button" onClick={forwardThirtyClick}>
-              <span className="material-icons">forward_30</span>
+            <div className="audio-player-playback-speed-container">
+              <button className="dark-outlined amplitude-playback-speed" />
             </div>
           </div>
           <div className="audio-player-progress-container">
@@ -109,9 +114,6 @@ export default function AudioPlayer() {
               <span className="amplitude-duration-minutes" />:
               <span className="amplitude-duration-seconds" />
             </time>
-          </div>
-          <div className="audio-player-playback-speed-container">
-            <button className="dark-outlined amplitude-playback-speed" />
           </div>
         </div>
       </div>
