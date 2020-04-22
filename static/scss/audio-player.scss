@@ -41,9 +41,13 @@
 
     .audio-player-text {
       position: relative;
+
       @include breakpoint(desktop) {
         width: 36%;
         max-width: 490px;
+      }
+      @media only screen and (max-width: 960px) and (min-width: 800px) {
+        width: 25%;
       }
       @include breakpoint(mobile) {
         text-align: center;
@@ -51,6 +55,8 @@
       }
 
       .audio-player-titles {
+        overflow: hidden;
+        text-overflow: ellipsis;
         height: min-content;
 
         @include breakpoint(desktop) {
@@ -65,8 +71,6 @@
         .audio-player-title {
           font-size: 16px;
           color: $font-grey-light;
-          overflow: hidden;
-          text-overflow: ellipsis;
           max-height: 25px;
 
           @include breakpoint(desktop) {
