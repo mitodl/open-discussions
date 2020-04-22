@@ -75,6 +75,11 @@ export const queryListResponse = (list: Array<LearningResource>) => ({
   }
 })
 
+export const genericQueryResponse = (data: any) => ({
+  status: 200,
+  body:   data
+})
+
 export const changeFormikInput = (
   wrapper: Object,
   name: string,
