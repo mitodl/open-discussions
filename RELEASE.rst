@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.120.0 (Released April 22, 2020)
+---------------
+
+- Use github access token for authentication
+- Add episodes list/detail view REST APIs (#2812)
+- update background image asset on `/podcasts`
+- Add episode_count field to episodes REST API (#2810)
+- add Podcast cards
+- hide 'My List' link according to feature flags
+- Remove nested episodes from podcasts API to improve performance (#2799)
+
 Version 0.119.4 (Released April 21, 2020)
 ---------------
 
