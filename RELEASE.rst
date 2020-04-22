@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.120.0
+Version 0.120.0 (Released April 22, 2020)
 ---------------
 
 - Use github access token for authentication
