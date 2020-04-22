@@ -8,32 +8,57 @@ from course_catalog.constants import PlatformType
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ('course_catalog', '0069_delete_bootcamp_items'),
-    ]
+    dependencies = [("course_catalog", "0069_delete_bootcamp_items")]
 
     operations = [
         migrations.AlterField(
-            model_name='favoriteitem',
-            name='content_type',
-            field=models.ForeignKey(limit_choices_to={'model__in': ('course', 'userlist', 'program', 'video', 'podcast', 'podcastepisode')}, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType'),
+            model_name="favoriteitem",
+            name="content_type",
+            field=models.ForeignKey(
+                limit_choices_to={
+                    "model__in": (
+                        "course",
+                        "userlist",
+                        "program",
+                        "video",
+                        "podcast",
+                        "podcastepisode",
+                    )
+                },
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AlterField(
-            model_name='programitem',
-            name='content_type',
-            field=models.ForeignKey(limit_choices_to={'model__in': ('course',)}, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType'),
+            model_name="programitem",
+            name="content_type",
+            field=models.ForeignKey(
+                limit_choices_to={"model__in": ("course",)},
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AlterField(
-            model_name='userlistitem',
-            name='content_type',
-            field=models.ForeignKey(limit_choices_to={'model__in': ('course', 'program', 'video', 'podcast', 'podcastepisode')}, on_delete=django.db.models.deletion.CASCADE, to='contenttypes.ContentType'),
+            model_name="userlistitem",
+            name="content_type",
+            field=models.ForeignKey(
+                limit_choices_to={
+                    "model__in": (
+                        "course",
+                        "program",
+                        "video",
+                        "podcast",
+                        "podcastepisode",
+                    )
+                },
+                on_delete=django.db.models.deletion.CASCADE,
+                to="contenttypes.ContentType",
+            ),
         ),
-        migrations.DeleteModel(
-            name='Bootcamp',
-        ),
+        migrations.DeleteModel(name="Bootcamp"),
         migrations.AddField(
             model_name="course",
             name="location",
             field=models.CharField(blank=True, max_length=128, null=True),
-        )
+        ),
     ]

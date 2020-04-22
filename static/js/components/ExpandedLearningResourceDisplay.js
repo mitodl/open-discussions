@@ -207,7 +207,9 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               </a>
               <div className="platform-logo">
                 <span>on</span>
-                <img src={platformLogos[object.platform || object.offered_by]} />
+                <img
+                  src={platformLogos[object.platform || object.offered_by]}
+                />
               </div>
             </div>
           ) : null}

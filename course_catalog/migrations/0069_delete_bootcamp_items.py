@@ -12,6 +12,7 @@ def delete_related_bootcamps(apps, schema_editor):
     LearningResourceRun.objects.filter(platform=PlatformType.bootcamps.value).delete()
     ContentType.objects.filter(model="bootcamp").delete()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
