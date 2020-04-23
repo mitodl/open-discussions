@@ -15,26 +15,23 @@ import PodcastEpisodeCard, {
 } from "./PodcastEpisodeCard"
 
 describe("PodcastEpisodeCard", () => {
-  let podcast, episode, helper, wrapper
+  let podcast, episode, render, helper
   beforeEach(() => {
     podcast = makePodcast()
     episode = makePodcastEpisode(podcast)
     helper = new IntegrationTestHelper()
-    wrapper = render({}, helper.store)
+    render = helper.configureReduxQueryRenderer(PodcastEpisodeCard, {
+      podcast: podcast,
+      episode: episode
+    })
   })
 
   afterEach(() => {
     helper.cleanup()
   })
 
-  const render = (props = {}, store) =>
-    mount(
-      <Provider store={store}>
-        <PodcastEpisodeCard podcast={podcast} episode={episode} {...props} />
-      </Provider>
-    )
-
-  it("should render basic stuff", () => {
+  it("should render basic stuff", async () => {
+    const { wrapper } = await render()
     assert.equal(wrapper.find("Dotdotdot").props().children, episode.title)
     assert.equal(wrapper.find(".podcast-name").text(), podcast.title)
     assert.equal(
