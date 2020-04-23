@@ -466,3 +466,24 @@ class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
             Prefetch("topics", queryset=CourseTopic.objects.all()),
         )
     )
+
+
+class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
+    """
+    Viewset for listing PodcastEpisodes for a given Podcast primary key
+    """
+
+    serializer_class = PodcastEpisodeSerializer
+    permission_classes = (ReadOnly & PodcastFeatureFlag,)
+
+    def get_queryset(self):
+        return (
+            PodcastEpisode.objects.filter(
+                published=True, podcast__published=True, podcast=self.kwargs["pk"]
+            )
+            .order_by("-last_modified", "-id")
+            .prefetch_related(
+                Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+                Prefetch("topics", queryset=CourseTopic.objects.all()),
+            )
+        )

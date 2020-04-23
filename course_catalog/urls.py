@@ -46,6 +46,11 @@ urlpatterns = [
         views.PodcastEpisodesViewSet.as_view({"get": "list"}),
         name="recent-podcast-episodes",
     ),
+    url(
+        r"^api/v0/podcasts/(?P<pk>[^/.]+)/episodes/$",
+        views.EpisodesInPodcast.as_view({"get": "list"}),
+        name="episodes-in-podcast",
+    ),
     url(r"^api/v0/", include(router.urls)),
     url(r"^api/v0/ocw_webhook/$", WebhookOCWView.as_view(), name="ocw-webhook"),
     url(
