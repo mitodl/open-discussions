@@ -1,8 +1,5 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
-import { Provider } from "react-redux"
-import { mount } from "enzyme"
 import { assert } from "chai"
 
 import { makePodcast, makePodcastEpisode } from "../factories/podcasts"
