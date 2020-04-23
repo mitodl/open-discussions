@@ -47,9 +47,7 @@ describe("AudioPlayer", () => {
   })
 
   it("should properly set the episode info in amplitudejs", async () => {
-    const { wrapper } = await render({}, [
-      setCurrentlyPlayingAudio(exampleAudio)
-    ])
+    await render({}, [setCurrentlyPlayingAudio(exampleAudio)])
     assert.equal(Amplitude.getConfig().songs[0].album, exampleAudio.title)
     assert.equal(Amplitude.getConfig().songs[0].name, exampleAudio.description)
     assert.equal(Amplitude.getConfig().songs[0].url, exampleAudio.url)
