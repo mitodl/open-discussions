@@ -44,7 +44,7 @@ export default function PodcastEpisodeCard(props: Props) {
           <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
         </div>
         <div className="podcast-name">{podcast.title}</div>
-        <div className="play-placeholder black-surround" onClick={playClick}>
+        <div className="play-button black-surround" onClick={playClick}>
           Play
         </div>
       </div>
