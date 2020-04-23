@@ -8,8 +8,7 @@ import {
   withSpinnerLoading,
   withPostLoading,
   PodcastLoading,
-  PodcastEpisodeLoading,
-  PostLoading
+  PodcastEpisodeLoading
 } from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
