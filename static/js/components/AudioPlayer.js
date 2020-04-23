@@ -2,8 +2,9 @@
 import _ from "lodash"
 import React, { useEffect, useRef, useCallback, useState } from "react"
 import { useSelector } from "react-redux"
-import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 import Amplitude from "amplitudejs"
+
+import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 
 export default function AudioPlayer() {
   const seekBar = useRef()
