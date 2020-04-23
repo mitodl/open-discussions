@@ -18,7 +18,7 @@ log = logging.getLogger()
 
 def github_podcast_config_files():
     """
-    Function that returns a list of pyGithub files with youtube config channel data
+    Function that returns a list of pyGithub files with podcast config channel data
 
     Returns:
         A list of pyGithub contentFile objects
@@ -55,7 +55,7 @@ def validate_podcast_config(podcast_config):
         errors.append("Podcast data should be a dict")
         return errors
 
-    for required_key in ["rss_url", "offered_by", "website"]:
+    for required_key in ["rss_url", "website"]:
         if required_key not in podcast_config:
             errors.append(f"Required key '{required_key}' is not present")
 
@@ -80,9 +80,7 @@ def get_podcast_configs():
 
             if errors:
                 log.error(
-                    "Invalid youtube podcast config for path=%s errors=%s",
-                    file.path,
-                    errors,
+                    "Invalid podcast config for path=%s errors=%s", file.path, errors
                 )
             else:
                 podcast_configs.append(podcast_config)
@@ -134,7 +132,7 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
     return {
         "episode_id": episode_id,
         "title": rss_data.title.text,
-        "offered_by": [{"name": offered_by}],
+        "offered_by": offered_by,
         "short_description": rss_data.description.text,
         "full_description": rss_data.description.text,
         "url": rss_data.enclosure["url"],
@@ -182,13 +180,18 @@ def transform(extracted_podcasts):
                 if "topics" in config_data
                 else []
             )
+            offered_by = (
+                [{"name": config_data["offered_by"]}]
+                if "offered_by" in config_data
+                else []
+            )
             podcast_id = generate_unique_id(config_data["website"])
             yield {
                 "podcast_id": podcast_id,
                 "title": config_data["podcast_title"]
                 if "podcast_title" in config_data
                 else rss_data.channel.title.text,
-                "offered_by": [{"name": config_data["offered_by"]}],
+                "offered_by": offered_by,
                 "full_description": rss_data.channel.description.text,
                 "short_description": rss_data.channel.description.text,
                 "image_src": rss_data.channel.find("itunes:image")["href"],
@@ -196,9 +199,7 @@ def transform(extracted_podcasts):
                 "url": config_data["website"],
                 "topics": topics,
                 "episodes": (
-                    transform_episode(
-                        episode_rss, config_data["offered_by"], topics, image
-                    )
+                    transform_episode(episode_rss, offered_by, topics, image)
                     for episode_rss in rss_data.find_all("item")
                 ),
                 "runs": [

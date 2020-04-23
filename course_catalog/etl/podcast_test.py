@@ -17,14 +17,16 @@ def rss_content():
     return content
 
 
-def mock_podcast_file(podcast_title=None, topics=None, website_url="website_url"):
+def mock_podcast_file(
+    podcast_title=None, topics=None, website_url="website_url", offered_by=None
+):
     """Mock podcast github file"""
 
     content = f"""---
 rss_url: rss_url
 { "podcast_title: " + podcast_title if podcast_title else "" }
 { "topics: " + topics if topics else "" }
-offered_by: A department
+{ "offered_by: " + offered_by if offered_by else "" }
 website:  {website_url}
 """
     return Mock(decoded_content=content)
@@ -77,9 +79,10 @@ def test_extract(mocker):
 @pytest.mark.usefixtures("mock_rss_request")
 @pytest.mark.parametrize("title", [None, "Custom Title"])
 @pytest.mark.parametrize("topics", [None, "Science, Technology"])
-def test_transform(mocker, title, topics):
+@pytest.mark.parametrize("offered_by", [None, "Department"])
+def test_transform(mocker, title, topics, offered_by):
     """Test transform function"""
-    podcast_list = [mock_podcast_file(title, topics)]
+    podcast_list = [mock_podcast_file(title, topics, "website_url", offered_by)]
     mock_github_client = mocker.patch("github.Github")
     mock_github_client.return_value.get_repo.return_value.get_contents.return_value = (
         podcast_list
@@ -89,11 +92,13 @@ def test_transform(mocker, title, topics):
 
     expected_title = title if title else "A Podcast"
 
+    expected_offered_by = [{"name": offered_by}] if offered_by else []
+
     expected_results = [
         {
             "podcast_id": "d4c3dcd45dc93fbc9c3634ba0545c2e0",
             "title": expected_title,
-            "offered_by": [{"name": "A department"}],
+            "offered_by": expected_offered_by,
             "full_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "short_description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
             "image_src": "apicture.jpg",
@@ -104,7 +109,7 @@ def test_transform(mocker, title, topics):
                 {
                     "episode_id": "fefc732682f83d1a8945eebcae5364b4",
                     "title": "Episode1",
-                    "offered_by": [{"name": "A department"}],
+                    "offered_by": expected_offered_by,
                     "short_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "full_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "url": "http://feeds.soundcloud.com/stream/episode1.mp3",
@@ -126,7 +131,7 @@ def test_transform(mocker, title, topics):
                 {
                     "episode_id": "e56d3047fad337ca85b577c60ff6a8da",
                     "title": "Episode2",
-                    "offered_by": [{"name": "A department"}],
+                    "offered_by": expected_offered_by,
                     "short_description": "Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.",
                     "full_description": "Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.",
                     "url": "http://feeds.soundcloud.com/stream/episode2.mp3",

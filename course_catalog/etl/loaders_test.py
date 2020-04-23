@@ -448,7 +448,10 @@ def test_load_instructors(instructor_exists):
 )
 @pytest.mark.parametrize("offeror_exists", [True, False])
 @pytest.mark.parametrize("has_other_offered_by", [True, False])
-def test_load_offered_bys(parent_factory, offeror_exists, has_other_offered_by):
+@pytest.mark.parametrize("additive_only", [True, False])
+def test_load_offered_bys(
+    parent_factory, offeror_exists, has_other_offered_by, additive_only
+):
     """Test that load_offered_bys creates and/or assigns offeror to the parent object"""
     offeror = (
         LearningResourceOfferorFactory.create(is_xpro=True)
@@ -464,9 +467,14 @@ def test_load_offered_bys(parent_factory, offeror_exists, has_other_offered_by):
 
     assert parent.offered_by.count() == (1 if has_other_offered_by else 0)
 
-    load_offered_bys(parent, [{"name": offeror.name}])
+    load_offered_bys(parent, [{"name": offeror.name}], additive_only)
 
-    assert parent.offered_by.count() == (2 if has_other_offered_by else 1)
+    if additive_only:
+        assert parent.offered_by.count() == (2 if has_other_offered_by else 1)
+    else:
+        assert parent.offered_by.count() == 1
+
+    assert offeror.name in parent.offered_by.values_list("name", flat=True)
 
 
 @pytest.mark.parametrize("video_exists", [True, False])

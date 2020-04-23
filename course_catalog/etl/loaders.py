@@ -82,15 +82,30 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
-def load_offered_bys(resource, offered_bys_data):
-    """Loads a list of offered_by into the resource. This operation is additive-only."""
+def load_offered_bys(resource, offered_bys_data, additive_only=True):
+    """
+    Loads a list of offered_by into the resource.
+
+    Args:
+        resource (LearningResource): learning resource
+        offered_bys_data (list of dict): the offered by data for the resource
+        additive_only (bool): if True existing offered bys that are not present in offered_bys_data are not deleted
+
+    Returns:
+        offered_bys (list of LearningResourceOfferor): list of created or updated offered_bys
+    """
     offered_bys = []
 
     for offered_by_data in offered_bys_data:
         offered_by, _ = LearningResourceOfferor.objects.get_or_create(
             name=offered_by_data["name"]
         )
-        resource.offered_by.add(offered_by)
+        if additive_only:
+            resource.offered_by.add(offered_by)
+        offered_bys.append(offered_by)
+
+    if not additive_only:
+        resource.offered_by.set(offered_bys)
 
     resource.save()
     return offered_bys
@@ -613,7 +628,7 @@ def load_podcast_episode(episode_data, podcast):
     )
 
     load_topics(episode, topics_data)
-    load_offered_bys(episode, offered_bys_data)
+    load_offered_bys(episode, offered_bys_data, False)
 
     for run_data in runs_data:
         load_run(episode, run_data)
@@ -648,7 +663,7 @@ def load_podcast(podcast_data):
     )
 
     load_topics(podcast, topics_data)
-    load_offered_bys(podcast, offered_by_data)
+    load_offered_bys(podcast, offered_by_data, False)
 
     episode_ids = []
 
