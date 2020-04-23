@@ -17,7 +17,10 @@ describe("PodcastEpisodeCard", () => {
     podcast = makePodcast()
     episode = makePodcastEpisode(podcast)
     helper = new IntegrationTestHelper()
-    render = helper.configureReduxQueryRenderer(PodcastEpisodeCard, { podcast, episode })
+    render = helper.configureReduxQueryRenderer(PodcastEpisodeCard, {
+      podcast,
+      episode
+    })
   })
 
   afterEach(() => {
