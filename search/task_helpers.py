@@ -24,6 +24,8 @@ from search.api import (
     gen_user_list_id,
     gen_video_id,
     gen_content_file_id,
+    gen_podcast_id,
+    gen_podcast_episode_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -32,6 +34,8 @@ from search.constants import (
     PROGRAM_TYPE,
     USER_LIST_TYPE,
     VIDEO_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.serializers import ESPostSerializer, ESCommentSerializer
 from search import tasks
@@ -508,3 +512,49 @@ def delete_video(video_obj):
         video_obj (course_catalog.models.Video): A Video object
     """
     delete_document.delay(gen_video_id(video_obj), VIDEO_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def upsert_podcast(podcast_id):
+    """
+    Run a task to create or update a podcast Elasticsearch document
+
+    Args:
+        podcast_id (int): the database primary key of the Podcast to update in ES
+    """
+    tasks.upsert_podcast.delay(podcast_id)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_podcast(podcast_obj):
+    """
+    Runs a task to delete an ES Podcast document
+
+    Args:
+        podcast_obj (course_catalog.models.Podcast): A Podcast object
+    """
+    delete_document.delay(gen_podcast_id(podcast_obj), PODCAST_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def upsert_podcast_episode(podcast_episode_id):
+    """
+    Run a task to create or update a podcast episode Elasticsearch document
+
+    Args:
+        podcast_episode_id (int): the database primary key of the PodcastEpisode to update in ES
+    """
+    tasks.upsert_podcast_episode.delay(podcast_episode_id)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_podcast_episode(podcast_episode_obj):
+    """
+    Runs a task to delete an ES PodcastEpisode document
+
+    Args:
+        podcast_episode_obj (course_catalog.models.PodcastEpisode): A PodcastEpisode object
+    """
+    delete_document.delay(
+        gen_podcast_episode_id(podcast_episode_obj), PODCAST_EPISODE_TYPE
+    )

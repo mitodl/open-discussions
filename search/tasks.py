@@ -38,6 +38,8 @@ from search.constants import (
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
     USER_LIST_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.exceptions import RetryException, ReindexException
 from search.serializers import (
@@ -48,6 +50,8 @@ from search.serializers import (
     ESVideoSerializer,
     ESUserListSerializer,
     ESContentFileSerializer,
+    ESPodcastSerializer,
+    ESPodcastEpisodeSerializer,
 )
 
 User = get_user_model()
@@ -288,6 +292,36 @@ def upsert_user_list(user_list_id):
         gen_user_list_id(user_list_obj),
         user_list_data,
         USER_LIST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_podcast(podcast_id):
+    """Upsert podcast based on stored database information"""
+    from search.api import gen_podcast_id
+
+    podcast_obj = Podcast.objects.get(id=podcast_id)
+    podcast_data = ESPodcastSerializer(podcast_obj).data
+    api.upsert_document(
+        gen_podcast_id(podcast_obj),
+        podcast_data,
+        PODCAST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_podcast_episode(podcast_episode_id):
+    """Upsert podcast episode based on stored database information"""
+    from search.api import gen_podcast_episode_id
+
+    podcast_episode_obj = PodcastEpisode.objects.get(id=podcast_episode_id)
+    podcast_episode_data = ESPodcastEpisodeSerializer(podcast_episode_obj).data
+    api.upsert_document(
+        gen_podcast_episode_id(podcast_episode_obj),
+        podcast_episode_data,
+        PODCAST_EPISODE_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 

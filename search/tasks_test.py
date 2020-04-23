@@ -31,6 +31,8 @@ from search.api import (
     gen_user_list_id,
     gen_profile_id,
     gen_content_file_id,
+    gen_podcast_id,
+    gen_podcast_episode_id,
 )
 from search.constants import (
     BOOTCAMP_TYPE,
@@ -42,6 +44,8 @@ from search.constants import (
     VIDEO_TYPE,
     USER_LIST_TYPE,
     PROFILE_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
@@ -52,6 +56,8 @@ from search.serializers import (
     ESUserListSerializer,
     ESProfileSerializer,
     ESContentFileSerializer,
+    ESPodcastSerializer,
+    ESPodcastEpisodeSerializer,
 )
 from search.tasks import (
     create_document,
@@ -79,6 +85,8 @@ from search.tasks import (
     index_course_content_files,
     index_run_content_files,
     delete_run_content_files,
+    upsert_podcast,
+    upsert_podcast_episode,
 )
 
 
@@ -189,6 +197,32 @@ def test_upsert_user_list_task(mocked_api):
         gen_user_list_id(user_list),
         data,
         USER_LIST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_podcast_task(mocked_api):
+    """Test that upsert_podcast will serialize the podcast data and upsert it to the ES index"""
+    podcast = PodcastFactory.create()
+    upsert_podcast(podcast.id)
+    podcast_data = ESPodcastSerializer(podcast).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_podcast_id(podcast),
+        podcast_data,
+        PODCAST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_podcast_episode_task(mocked_api):
+    """Test that upsert_podcast_episode will serialize the podcast episode data and upsert it to the ES index"""
+    podcast_episode = PodcastEpisodeFactory.create()
+    upsert_podcast_episode(podcast_episode.id)
+    podcast_episode_data = ESPodcastEpisodeSerializer(podcast_episode).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_podcast_episode_id(podcast_episode),
+        podcast_episode_data,
+        PODCAST_EPISODE_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 

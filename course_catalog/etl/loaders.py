@@ -604,12 +604,11 @@ def load_podcast_episode(episode_data, podcast):
             list of PodcastEpisode objects that were created/updated
     """
     episode_id = episode_data.pop("episode_id")
-
     topics_data = episode_data.pop("topics", [])
     offered_bys_data = episode_data.pop("offered_by", [])
     runs_data = episode_data.pop("runs", [])
 
-    episode, _ = PodcastEpisode.objects.update_or_create(
+    episode, created = PodcastEpisode.objects.update_or_create(
         episode_id=episode_id, podcast=podcast, defaults=episode_data
     )
 
@@ -618,6 +617,11 @@ def load_podcast_episode(episode_data, podcast):
 
     for run_data in runs_data:
         load_run(episode, run_data)
+
+    if not created and not episode.published:
+        search_task_helpers.delete_podcast_episode(episode)
+    elif episode.published:
+        search_task_helpers.upsert_podcast_episode(episode.id)
 
     return episode
 
@@ -639,7 +643,7 @@ def load_podcast(podcast_data):
     offered_by_data = podcast_data.pop("offered_by", [])
     runs_data = podcast_data.pop("runs", [])
 
-    podcast, _ = Podcast.objects.update_or_create(
+    podcast, created = Podcast.objects.update_or_create(
         podcast_id=podcast_id, defaults=podcast_data
     )
 
@@ -658,6 +662,11 @@ def load_podcast(podcast_data):
     PodcastEpisode.objects.filter(podcast=podcast).exclude(id__in=episode_ids).update(
         published=False
     )
+
+    if not created and not podcast.published:
+        search_task_helpers.delete_podcast(podcast)
+    elif podcast.published:
+        search_task_helpers.upsert_podcast(podcast.id)
 
     return podcast
 

@@ -1,5 +1,5 @@
 """Tests for ETL loaders"""
-# pylint: disable=redefined-outer-name,too-many-locals
+# pylint: disable=redefined-outer-name,too-many-locals,too-many-lines
 from types import SimpleNamespace
 
 from django.contrib.contenttypes.models import ContentType
@@ -102,6 +102,14 @@ def mock_upsert_tasks(mocker):
         delete_video=mocker.patch("search.task_helpers.delete_video"),
         delete_user_list=mocker.patch("search.task_helpers.delete_user_list"),
         upsert_user_list=mocker.patch("search.task_helpers.upsert_user_list"),
+        upsert_podcast=mocker.patch("search.task_helpers.upsert_podcast"),
+        upsert_podcast_episode=mocker.patch(
+            "search.task_helpers.upsert_podcast_episode"
+        ),
+        delete_podcast=mocker.patch("search.task_helpers.delete_podcast"),
+        delete_podcast_episode=mocker.patch(
+            "search.task_helpers.delete_podcast_episode"
+        ),
     )
 
 
@@ -918,19 +926,23 @@ def test_load_podcasts_unpublish():
 
 
 @pytest.mark.parametrize("podcast_episode_exists", [True, False])
-def test_load_podcast_episode(podcast_episode_exists):
+@pytest.mark.parametrize("is_published", [True, False])
+def test_load_podcast_episode(mock_upsert_tasks, podcast_episode_exists, is_published):
     """Test that load_podcast_episode loads the podcast episode"""
     podcast = PodcastFactory.create()
     podcast_episode = (
-        PodcastEpisodeFactory.create(podcast=podcast)
+        PodcastEpisodeFactory.create(podcast=podcast, published=is_published)
         if podcast_episode_exists
-        else PodcastEpisodeFactory.build(podcast=podcast)
+        else PodcastEpisodeFactory.build(podcast=podcast, published=is_published)
     )
-    assert PodcastEpisode.objects.count() == (1 if podcast_episode_exists else 0)
 
-    props = model_to_dict(
-        PodcastEpisodeFactory.build(episode_id=podcast_episode.episode_id)
+    props = model_to_dict(podcast_episode)
+    topics = (
+        podcast_episode.topics.all()
+        if podcast_episode_exists
+        else CourseTopicFactory.build_batch(2)
     )
+    props["topics"] = [model_to_dict(topic) for topic in topics]
     del props["id"]
     del props["podcast"]
 
@@ -957,16 +969,36 @@ def test_load_podcast_episode(podcast_episode_exists):
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
 
+    if podcast_episode_exists and not is_published:
+        mock_upsert_tasks.delete_podcast_episode.assert_called_with(result)
+    elif is_published:
+        mock_upsert_tasks.upsert_podcast_episode.assert_called_with(result.id)
+    else:
+        mock_upsert_tasks.delete_podcast_episode.assert_not_called()
+        mock_upsert_tasks.upsert_podcast_episode.assert_not_called()
 
-def test_load_podcast():
+
+@pytest.mark.parametrize("podcast_exists", [True, False])
+@pytest.mark.parametrize("is_published", [True, False])
+def test_load_podcast(mock_upsert_tasks, podcast_exists, is_published):
     """Test that load_podcast loads the podcast"""
-
-    podcast = PodcastFactory.create(published=True)
-    podcast_episode = PodcastEpisodeFactory.create(podcast=podcast, published=True)
+    podcast = (
+        PodcastFactory.create(published=is_published)
+        if podcast_exists
+        else PodcastFactory.build(published=is_published)
+    )
+    existing_podcast_episode = (
+        PodcastEpisodeFactory.create(podcast=podcast, published=is_published)
+        if podcast_exists
+        else None
+    )
 
     podcast_data = model_to_dict(podcast)
     podcast_data["title"] = "New Title"
-    podcast_data["topics"] = [model_to_dict(topic) for topic in podcast.topics.all()]
+    topics = (
+        podcast.topics.all() if podcast_exists else CourseTopicFactory.build_batch(2)
+    )
+    podcast_data["topics"] = [model_to_dict(topic) for topic in topics]
     del podcast_data["id"]
 
     episode_data = model_to_dict(PodcastEpisodeFactory.build(podcast=podcast))
@@ -974,13 +1006,21 @@ def test_load_podcast():
     del episode_data["podcast"]
 
     podcast_data["episodes"] = [episode_data]
-    load_podcast(podcast_data)
+    result = load_podcast(podcast_data)
 
-    podcast.refresh_from_db()
-    podcast_episode.refresh_from_db()
-    new_podcast_episode = podcast.episodes.exclude(id=podcast_episode.id).first()
+    podcast = Podcast.objects.get(podcast_id=podcast.podcast_id)
+    new_podcast_episode = podcast.episodes.order_by("-created_on").first()
 
     assert podcast.title == "New Title"
-    assert podcast.episodes.count() == 2
-    assert podcast_episode.published is False
     assert new_podcast_episode.published is True
+    if podcast_exists:
+        existing_podcast_episode.refresh_from_db()
+        assert existing_podcast_episode.published is False
+
+    if podcast_exists and not is_published:
+        mock_upsert_tasks.delete_podcast.assert_called_with(result)
+    elif is_published:
+        mock_upsert_tasks.upsert_podcast.assert_called_with(result.id)
+    else:
+        mock_upsert_tasks.delete_podcast.assert_not_called()
+        mock_upsert_tasks.upsert_podcast.assert_not_called()

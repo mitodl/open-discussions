@@ -8,6 +8,8 @@ from course_catalog.factories import (
     VideoFactory,
     UserListFactory,
     ContentFileFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
@@ -19,6 +21,8 @@ from search.constants import (
     USER_LIST_TYPE,
     LEARNING_PATH_TYPE,
     COURSE_TYPE,
+    PODCAST_TYPE,
+    PODCAST_EPISODE_TYPE,
 )
 from search.task_helpers import (
     reddit_object_persist,
@@ -50,6 +54,10 @@ from search.task_helpers import (
     delete_course,
     index_run_content_files,
     delete_run_content_files,
+    upsert_podcast,
+    upsert_podcast_episode,
+    delete_podcast,
+    delete_podcast_episode,
 )
 from search.api import (
     gen_post_id,
@@ -59,6 +67,8 @@ from search.api import (
     gen_user_list_id,
     gen_content_file_id,
     gen_course_id,
+    gen_podcast_id,
+    gen_podcast_episode_id,
 )
 
 es_profile_serializer_data = {
@@ -576,3 +586,51 @@ def test_update_bootcamp(mocker):
     bootcamp_id = 345
     update_bootcamp(bootcamp_id)
     patched.delay.assert_called_once_with(bootcamp_id)
+
+
+@pytest.mark.django_db
+def test_upsert_podcast(mocker):
+    """
+    Tests that upsert_podcast calls search.tasks.upsert_podcast with the right parameters
+    """
+    patched_task = mocker.patch("search.tasks.upsert_podcast")
+    podcast = PodcastFactory.create()
+    upsert_podcast(podcast.id)
+    patched_task.delay.assert_called_once_with(podcast.id)
+
+
+@pytest.mark.django_db
+def test_upsert_podcast_episode(mocker):
+    """
+    Tests that upsert_podcast_episode calls search.tasks.upsert_podcast_episode with the right parameters
+    """
+    patched_task = mocker.patch("search.tasks.upsert_podcast_episode")
+    episode = PodcastFactory.create()
+    upsert_podcast_episode(episode.id)
+    patched_task.delay.assert_called_once_with(episode.id)
+
+
+@pytest.mark.django_db
+def test_delete_podcast(mocker):
+    """Tests that deleting a podcast triggers the correct ES delete task"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    podcast = PodcastFactory.create()
+    delete_podcast(podcast)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (
+        gen_podcast_id(podcast),
+        PODCAST_TYPE,
+    )
+
+
+@pytest.mark.django_db
+def test_delete_podcast_episode(mocker):
+    """Tests that deleting a podcast episode triggers the correct ES delete task"""
+    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    episode = PodcastEpisodeFactory.create()
+    delete_podcast_episode(episode)
+    assert patched_delete_task.delay.called is True
+    assert patched_delete_task.delay.call_args[0] == (
+        gen_podcast_episode_id(episode),
+        PODCAST_EPISODE_TYPE,
+    )
