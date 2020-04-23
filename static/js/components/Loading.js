@@ -124,7 +124,7 @@ export const PodcastEpisodeLoading = () =>
         </ContentLoader>
       </Card>
     ),
-    emptyPostsToRender
+    6
   )
 
 export const PodcastLoading = () => (
@@ -148,7 +148,7 @@ export const PodcastLoading = () => (
           </Card>
         </Cell>
       ),
-      emptyPostsToRender
+      9
     )}
   </Grid>
 )

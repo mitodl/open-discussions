@@ -1,9 +1,16 @@
 // @flow
 import React from "react"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import { shallow, mount } from "enzyme"
 
-import { withLoading, withSpinnerLoading, withPostLoading } from "./Loading"
+import {
+  withLoading,
+  withSpinnerLoading,
+  withPostLoading,
+  PodcastLoading,
+  PodcastEpisodeLoading,
+  PostLoading
+} from "./Loading"
 import { NotFound, NotAuthorized } from "../components/ErrorPages"
 
 const GenericLoader = () => <div className="loading">loading...</div>
@@ -79,6 +86,18 @@ describe("Loading component", () => {
       props.loaded = false
       const wrapper = mount(<PostLoadingContent {...props} />)
       assert.lengthOf(wrapper.find(".post-content-loader"), 5)
+    })
+  })
+
+  describe("podcasts", () => {
+    it("should show nine empty items for podcasts", () => {
+      const wrapper = shallow(<PodcastLoading />)
+      assert.equal(wrapper.find("Card.borderless").length, 9)
+    })
+
+    it("should show six empty items for podcast episodes", () => {
+      const wrapper = shallow(<PodcastEpisodeLoading />)
+      assert.equal(wrapper.find("Card").length, 6)
     })
   })
 })
