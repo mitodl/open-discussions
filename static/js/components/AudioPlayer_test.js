@@ -1,25 +1,13 @@
-import React from "react"
-import { Provider } from "react-redux"
 import { assert } from "chai"
-import { mount } from "enzyme"
+import Amplitude from "amplitudejs"
 
 import AudioPlayer from "./AudioPlayer"
-import Amplitude from "amplitudejs"
-import {
-  SET_CURRENTLY_PLAYING_AUDIO,
-  setCurrentlyPlayingAudio
-} from "../actions/audio"
+import { setCurrentlyPlayingAudio } from "../actions/audio"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("AudioPlayer", () => {
-  let helper, wrapper, dispatchThen
+  let helper, render
 
-  const renderAudioPlayer = (props = {}, store) =>
-    mount(
-      <Provider store={store}>
-        <AudioPlayer {...props} />
-      </Provider>
-    )
   const exampleAudio = {
     title:       "Test Title",
     description: "Test Description",
@@ -29,23 +17,24 @@ describe("AudioPlayer", () => {
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
-    wrapper = renderAudioPlayer({}, helper.store)
-    dispatchThen = helper.store.createDispatchThen(state => state.audio)
-    dispatchThen(setCurrentlyPlayingAudio(exampleAudio), [
-      SET_CURRENTLY_PLAYING_AUDIO
-    ])
+    render = helper.configureReduxQueryRenderer(AudioPlayer)
   })
 
   afterEach(() => {
     helper.cleanup()
   })
 
-  it("should render the component", () => {
+  it("should render the component", async () => {
+    const { wrapper } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio)
+    ])
     assert.equal(wrapper.find(".audio-player-container-outer").length, 1)
   })
 
   it("should render all the necessary controls and fields", async () => {
-    wrapper.update()
+    const { wrapper } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio)
+    ])
     assert.equal(wrapper.find(`[data-amplitude-song-info="album"]`).length, 1)
     assert.equal(wrapper.find(`[data-amplitude-song-info="name"]`).length, 1)
     assert.equal(wrapper.find(`.amplitude-play-pause`).length, 1)
@@ -57,7 +46,10 @@ describe("AudioPlayer", () => {
     assert.equal(wrapper.find(`.amplitude-playback-speed`).length, 1)
   })
 
-  it("should properly set the episode info in amplitudejs", () => {
+  it("should properly set the episode info in amplitudejs", async () => {
+    const { wrapper } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio)
+    ])
     assert.equal(Amplitude.getConfig().songs[0].album, exampleAudio.title)
     assert.equal(Amplitude.getConfig().songs[0].name, exampleAudio.description)
     assert.equal(Amplitude.getConfig().songs[0].url, exampleAudio.url)
