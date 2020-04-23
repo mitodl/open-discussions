@@ -656,17 +656,30 @@ def test_podcasts(settings, client):
     for podcast in podcasts:
         PodcastEpisodeFactory.create_batch(2, podcast=podcast)
 
-    # Make sure these get filtered out
+    # Make sure this gets filtered out
     PodcastFactory.create(published=False)
-    PodcastEpisodeFactory.create(published=False, podcast__published=True)
+    # A published podcast with an unpublished episode should still be shown
+    empty_podcast = PodcastEpisodeFactory.create(
+        published=False, podcast__published=True
+    ).podcast
 
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("podcasts-list"))
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == [
-        {"episode_count": 2, "is_favorite": False, **podcast}
-        for podcast in PodcastSerializer(instance=podcasts, many=True).data
-    ]
+    assert resp.json() == sorted(
+        [
+            {"episode_count": 2, "is_favorite": False, **podcast}
+            for podcast in PodcastSerializer(instance=podcasts, many=True).data
+        ]
+        + [
+            {
+                "episode_count": 0,
+                "is_favorite": False,
+                **PodcastSerializer(instance=empty_podcast).data,
+            }
+        ],
+        key=lambda _podcast: _podcast["id"],
+    )
 
 
 def test_recent_podcast_episodes_no_feature_flag(settings, client):

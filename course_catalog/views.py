@@ -7,7 +7,7 @@ from hmac import compare_digest
 import rapidjson
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Q
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -414,12 +414,14 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     def get_queryset(self):
         user = self.request.user
         return (
-            Podcast.objects.filter(published=True, episodes__published=True)
+            Podcast.objects.filter(published=True)
             .prefetch_related(
                 Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
                 Prefetch("topics", queryset=CourseTopic.objects.all()),
             )
-            .annotate(episode_count=Count("episodes"))
+            .annotate(
+                episode_count=Count("episodes", filter=Q(episodes__published=True))
+            )
             .annotate_is_favorite_for_user(user)
             .prefetch_list_items_for_user(user)
             .order_by("id")
