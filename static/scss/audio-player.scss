@@ -14,10 +14,10 @@
   width: 100vw;
 
   @include breakpoint(desktop) {
-    height: 98px;
+    height: $audio-player-height-desktop;
   }
   @include breakpoint(mobile) {
-    height: 128px;
+    height: $audio-player-height-mobile;
   }
 
   .audio-player-container-inner {
@@ -25,17 +25,12 @@
     display: flex;
     align-items: center;
     flex: 1;
+    padding: $audio-player-padding-vertical $audio-player-padding-horizontal;
+    height: calc(100% - $audio-player-padding-vertical);
+    width: calc(100% - $audio-player-padding-horizontal);
 
-    @include breakpoint(desktop) {
-      padding: 8px 12px;
-      height: calc(100% - 16px);
-      width: calc(100% - 24px);
-    }
     @include breakpoint(mobile) {
       flex-direction: column;
-      padding: 8px 12px;
-      height: calc(100% - 16px);
-      width: calc(100% - 24px);
     }
 
     .audio-player-text {
