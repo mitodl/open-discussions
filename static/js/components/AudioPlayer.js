@@ -103,7 +103,11 @@ export default function AudioPlayer() {
                 id="play-pause"
                 ref={playPauseButton}
               >
-                <span className="material-icons">{ audioPlaying ? "pause_circle_outline" : "play_circle_outline" }</span>
+                <span className="material-icons">
+                  {audioPlaying
+                    ? "pause_circle_outline"
+                    : "play_circle_outline"}
+                </span>
               </div>
               <div className="audio-player-button" onClick={forwardThirtyClick}>
                 <span className="material-icons">forward_30</span>
