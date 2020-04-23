@@ -1,6 +1,7 @@
 // @flow
 import { SET_CURRENTLY_PLAYING_AUDIO } from "../actions/audio"
 import type { Action } from "../flow/reduxTypes"
+
 export type Audio = {
   title: string,
   description: string,
