@@ -153,14 +153,6 @@
             font-size: 48px;
           }
 
-          .amplitude-play-pause.amplitude-playing span:before {
-            content: "pause_circle_outline";
-          }
-
-          .amplitude-play-pause.amplitude-paused span:before {
-            content: "play_circle_outline";
-          }
-
           .audio-player-button:not(.amplitude-play-pause) span {
             font-size: 30px;
           }

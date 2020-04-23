@@ -11,6 +11,7 @@ export default function AudioPlayer() {
   const playPauseButton = useRef()
   const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
   const [audioLoaded, setAudioLoaded] = useState(false)
+  const [audioPlaying, setAudioPlaying] = useState(false)
 
   useEffect(
     () => {
@@ -29,18 +30,30 @@ export default function AudioPlayer() {
             url:   currentlyPlayingAudio.url
           }
         ],
-        waveforms: {
-          sample_rate: 3000
+        callbacks: {
+          initialized: amplitudeInitialized
         }
       })
-      const { current } = playPauseButton
-      if (current && current.click) {
-        current.click()
-      }
+      Amplitude.play()
       setAudioLoaded(true)
+      setAudioPlaying(true)
     },
     [currentlyPlayingAudio]
   )
+
+  const amplitudeInitialized = useCallback(() => {
+    const audio = Amplitude.getAudio()
+    audio.addEventListener("play", playbackStarted)
+    audio.addEventListener("pause", playbackPaused)
+  })
+
+  const playbackStarted = useCallback(() => {
+    setAudioPlaying(true)
+  })
+
+  const playbackPaused = useCallback(() => {
+    setAudioPlaying(false)
+  })
 
   const backTenClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
@@ -90,7 +103,7 @@ export default function AudioPlayer() {
                 id="play-pause"
                 ref={playPauseButton}
               >
-                <span className="material-icons" />
+                <span className="material-icons">{ audioPlaying ? "pause_circle_outline" : "play_circle_outline" }</span>
               </div>
               <div className="audio-player-button" onClick={forwardThirtyClick}>
                 <span className="material-icons">forward_30</span>
