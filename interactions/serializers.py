@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.models import Course, Bootcamp, Program
+from course_catalog.models import Course, Program
 from course_catalog.serializers import GenericForeignKeyFieldSerializer
 from interactions.models import ContentTypeInteraction
 
@@ -17,7 +17,7 @@ class ContentTypeInteractionSerializer(serializers.ModelSerializer):
     content_type = serializers.SlugRelatedField(
         slug_field="model",
         queryset=ContentType.objects.filter(
-            model__in=("course", "bootcamp", "userlist", "program", "video")
+            model__in=("course", "userlist", "program", "video")
         ),
     )
 
@@ -77,7 +77,7 @@ class PopularContentListSerializer(serializers.ListSerializer):
                 .prefetch_list_items_for_user(user)
             )
 
-            if content_model in (Course, Program, Bootcamp):
+            if content_model in (Course, Program):
                 query = query.prefetch_related(
                     "topics",
                     "runs__instructors",
@@ -86,10 +86,10 @@ class PopularContentListSerializer(serializers.ListSerializer):
                     "runs__topics",
                 )
 
-            if content_model in (Course, Bootcamp):
+            if content_model == Course:
                 query = query.defer("raw_json")
 
-            if content_model in (Course, Program, Bootcamp):
+            if content_model in (Course, Program):
                 query = query.defer("runs__raw_json")
 
             # key items off the type and item id

@@ -4,7 +4,6 @@ import bodybuilder from "bodybuilder"
 import R from "ramda"
 import {
   DEFAULT_START_DT,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
@@ -151,14 +150,6 @@ const VIDEO_QUERY_FIELDS = [
   "video_id",
   "offered_by"
 ]
-const BOOTCAMP_QUERY_FIELDS = [
-  "title.english^3",
-  "short_description.english^2",
-  "full_description.english",
-  "course_id",
-  "coursenum^5",
-  "offered_by"
-]
 
 export const RESOURCE_QUERY_NESTED_FIELDS = [
   "runs.year",
@@ -235,8 +226,6 @@ const _searchFields = (type: ?string) => {
     return PROFILE_QUERY_FIELDS
   } else if (type === LR_TYPE_COURSE) {
     return COURSE_QUERY_FIELDS
-  } else if (type === LR_TYPE_BOOTCAMP) {
-    return BOOTCAMP_QUERY_FIELDS
   } else if (type === LR_TYPE_VIDEO) {
     return VIDEO_QUERY_FIELDS
   } else if ([LR_TYPE_PROGRAM, LR_TYPE_USERLIST].includes(type)) {
@@ -608,7 +597,7 @@ export const buildLearnQuery = (
               fields: searchFields(type)
             }
           },
-          [LR_TYPE_BOOTCAMP, LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+          [LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
             ? {
               nested: {
                 path:  "runs",

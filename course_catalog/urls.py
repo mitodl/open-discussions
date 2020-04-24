@@ -23,7 +23,6 @@ from course_catalog.views import WebhookOCWView
 router = ExtendedSimpleRouter()
 
 router.register(r"courses", views.CourseViewSet, basename="courses")
-router.register(r"bootcamps", views.BootcampViewSet, basename="bootcamps")
 router.register(r"programs", views.ProgramViewSet, basename="programs")
 router.register(r"userlists", views.UserListViewSet, basename="userlists").register(
     r"items",

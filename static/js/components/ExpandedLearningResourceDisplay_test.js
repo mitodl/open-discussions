@@ -12,7 +12,6 @@ import {
 import { makeYoutubeVideo } from "../factories/embedly"
 import {
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
@@ -49,7 +48,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     embedly = makeYoutubeVideo()
     similarResources = [
       makeLearningResourceResult(LR_TYPE_COURSE),
-      makeLearningResourceResult(LR_TYPE_BOOTCAMP),
+      makeLearningResourceResult(LR_TYPE_PROGRAM),
       makeLearningResourceResult(LR_TYPE_COURSE)
     ]
     mockHTMLElHeight(50, 100)
@@ -320,7 +319,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[LR_TYPE_PROGRAM, LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
+  ;[LR_TYPE_PROGRAM, LR_TYPE_COURSE].forEach(objectType => {
     it(`should display all instructors for the ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
       const { wrapper } = await render(
@@ -371,7 +370,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(objectType => {
     it(`should display the platform in the link button text for ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
       // $FlowFixMe
@@ -383,17 +382,12 @@ describe("ExpandedLearningResourceDisplay", () => {
         }
       )
       const linkText = wrapper.find(".link-button").text()
-      assert.equal(
-        linkText,
-        objectType === LR_TYPE_BOOTCAMP
-          ? "Take Bootcamp"
-          : `Take ${capitalize(objectType)}`
-      )
+      assert.equal(linkText, `Take ${capitalize(objectType)}`)
     })
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_PROGRAM].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(objectType => {
     it(`should display the cost for ${objectType}`, async () => {
       const prices = [{ price: 25.5, mode: "" }]
       const object = makeLearningResource(objectType)
@@ -553,24 +547,22 @@ describe("ExpandedLearningResourceDisplay", () => {
     ).forEach(([obj1, obj2]) => assert.deepEqual(obj1, obj2))
   })
 
-  //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(objectType => {
-    it(`should not include a display of list items for ${objectType}`, async () => {
-      const object = makeLearningResource(objectType)
-      const { wrapper } = await render(
-        {},
-        {
-          object
-        }
-      )
-      assert.equal(wrapper.find(".expanded-learning-resource-list").length, 1)
-      assert.isOk(
-        wrapper
-          .find(".expanded-learning-resource-list")
-          .text()
-          .startsWith("Similar Learning Resources")
-      )
-    })
+  it(`should not include a display of list items for course`, async () => {
+    const objectType = LR_TYPE_COURSE
+    const object = makeLearningResource(objectType)
+    const { wrapper } = await render(
+      {},
+      {
+        object
+      }
+    )
+    assert.equal(wrapper.find(".expanded-learning-resource-list").length, 1)
+    assert.isOk(
+      wrapper
+        .find(".expanded-learning-resource-list")
+        .text()
+        .startsWith("Similar Learning Resources")
+    )
   })
 
   it(`should still display without errors in case of a bad course with no runs`, async () => {
@@ -602,7 +594,6 @@ describe("ExpandedLearningResourceDisplay", () => {
   ;[
     [LR_TYPE_COURSE, false],
     [LR_TYPE_PROGRAM, false],
-    [LR_TYPE_BOOTCAMP, false],
     [LR_TYPE_USERLIST, false],
     [LR_TYPE_VIDEO, true]
   ].forEach(([objectType, hasEmbedly]) => {

@@ -8,7 +8,6 @@ import {
   platforms,
   offeredBys,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_ALL,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
@@ -86,28 +85,17 @@ export const makeCourseResult = (): LearningResourceResult => ({
   url:               casual.url,
   image_src:         "http://image.medium.url",
   short_description: casual.description,
-  platform:          casual.random_element([platforms.edX, platforms.OCW]),
-  offered_by:        [casual.random_element(offeredBys)],
-  topics:            [casual.word, casual.word],
-  object_type:       LR_TYPE_COURSE,
-  runs:              R.times(makeRun, 3),
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
-})
-
-export const makeBootcampResult = (): LearningResourceResult => ({
-  id:                casual.integer(1, 1000),
-  course_id:         `course_${String(casual.random)}`,
-  title:             casual.title,
-  url:               casual.url,
-  image_src:         "http://image.medium.url",
-  short_description: casual.description,
-  topics:            [casual.word, casual.word],
-  object_type:       LR_TYPE_BOOTCAMP,
-  offered_by:        [offeredBys.bootcamps],
-  runs:              [makeRun()],
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  platform:          casual.random_element([
+    platforms.edX,
+    platforms.OCW,
+    platforms.bootcamps
+  ]),
+  offered_by:  [casual.random_element(offeredBys)],
+  topics:      [casual.word, casual.word],
+  object_type: LR_TYPE_COURSE,
+  runs:        R.times(makeRun, 3),
+  is_favorite: casual.coin_flip,
+  lists:       casual.random_element([[], [100, 200]])
 })
 
 export const makeProgramResult = (): LearningResourceResult => ({
@@ -163,8 +151,6 @@ export const makeLearningResourceResult = (objectType: string) => {
   switch (objectType) {
   case LR_TYPE_COURSE:
     return makeCourseResult()
-  case LR_TYPE_BOOTCAMP:
-    return makeBootcampResult()
   case LR_TYPE_PROGRAM:
     return makeProgramResult()
   case LR_TYPE_VIDEO:
@@ -194,8 +180,8 @@ export const makeSearchResult = (type: ?string) => {
   case LR_TYPE_COURSE:
     hit = makeCourseResult()
     break
-  case LR_TYPE_BOOTCAMP:
-    hit = makeBootcampResult()
+  case LR_TYPE_PROGRAM:
+    hit = makeProgramResult()
     break
   default:
     // make flow happy

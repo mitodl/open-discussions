@@ -23,7 +23,6 @@ from course_catalog.models import (
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    Bootcamp,
 )
 from course_catalog.utils import get_ocw_topic
 from course_catalog.api import (
@@ -260,18 +259,17 @@ def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
     Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
     """
     parse_bootcamp_json_data(bootcamp_valid_data)
-    assert Bootcamp.objects.count() == 1
-    assert LearningResourceRun.objects.count() == 1
-    bootcamp = Bootcamp.objects.first()
+    bootcamp = Course.objects.filter(platform=PlatformType.bootcamps.value).first()
     assert bootcamp.offered_by.count() == 1
     assert bootcamp.offered_by.first().name == OfferedBy.bootcamps.value
+    assert bootcamp.runs.count() == 1
     assert bootcamp.runs.first().offered_by.count() == 1
     assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
 
 
 def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
     """
-    Verifies that parse_bootcamp_json_data does not create a new Bootcamp run if the serializer is invalid
+    Verifies that parse_bootcamp_json_data does not create a new Course run if the serializer is invalid
     """
     mocker.patch(
         "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
@@ -286,11 +284,11 @@ def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
 
 def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
     """
-    Verifies that parse_bootcamp_json_data does not create a new Bootcamp if the serializer is invalid
+    Verifies that parse_bootcamp_json_data does not create a new Course if the serializer is invalid
     """
     bootcamp_valid_data.pop("course_id")
     parse_bootcamp_json_data(bootcamp_valid_data)
-    assert Bootcamp.objects.count() == 0
+    assert Course.objects.count() == 0
     assert LearningResourceRun.objects.count() == 0
 
 

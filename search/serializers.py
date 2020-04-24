@@ -13,7 +13,6 @@ from course_catalog.models import (
     Course,
     LearningResourceRun,
     CoursePrice,
-    Bootcamp,
     Program,
     UserList,
     Video,
@@ -29,7 +28,6 @@ from search.api import (
     gen_comment_id,
     gen_profile_id,
     gen_course_id,
-    gen_bootcamp_id,
     gen_user_list_id,
     gen_program_id,
     gen_video_id,
@@ -40,7 +38,6 @@ from search.api import (
 from search.constants import (
     PROFILE_TYPE,
     COURSE_TYPE,
-    BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     VIDEO_TYPE,
     USER_LIST_TYPE,
@@ -504,44 +501,6 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESBootcampSerializer(ESCourseSerializer):
-    """
-    Elasticsearch serializer class for bootcamps
-    """
-
-    object_type = BOOTCAMP_TYPE
-
-    runs = ESRunSerializer(many=True)
-    default_search_priority = serializers.SerializerMethodField()
-
-    def get_default_search_priority(self, instance):
-        """
-        Bootcamps should have higer priority in the default search
-        """
-        return 1
-
-    class Meta:
-        model = Bootcamp
-        fields = [
-            "id",
-            "course_id",
-            "coursenum",
-            "short_description",
-            "full_description",
-            "title",
-            "image_src",
-            "topics",
-            "published",
-            "offered_by",
-            "runs",
-            "created",
-            "default_search_priority",
-            "minimum_price",
-        ]
-
-        read_only_fields = fields
-
-
 class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for programs
@@ -885,36 +844,6 @@ def serialize_content_file_for_bulk_deletion(content_file_obj):
         content_file_obj (ContentFile): A content file for a course
     """
     return {"_id": gen_content_file_id(content_file_obj.key), "_op_type": "delete"}
-
-
-def serialize_bulk_bootcamps(ids):
-    """
-    Serialize bootcamps for bulk indexing
-
-    Args:
-        ids(list of int): List of bootcamp id's
-    """
-    for bootcamp in Bootcamp.objects.filter(id__in=ids).prefetch_related(
-        "topics",
-        "offered_by",
-        Prefetch(
-            "runs", queryset=LearningResourceRun.objects.order_by("-best_start_date")
-        ),
-    ):
-        yield serialize_bootcamp_for_bulk(bootcamp)
-
-
-def serialize_bootcamp_for_bulk(bootcamp_obj):
-    """
-    Serialize a bootcamp for bulk API request
-
-    Args:
-        bootcamp_obj (Bootcamp): A bootcamp
-    """
-    return {
-        "_id": gen_bootcamp_id(bootcamp_obj.course_id),
-        **ESBootcampSerializer(bootcamp_obj).data,
-    }
 
 
 def serialize_bulk_programs(ids):

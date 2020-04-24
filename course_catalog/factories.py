@@ -23,7 +23,6 @@ from course_catalog.models import (
     CourseInstructor,
     CourseTopic,
     CoursePrice,
-    Bootcamp,
     Program,
     ProgramItem,
     UserList,
@@ -271,34 +270,6 @@ class ContentFileFactory(DjangoModelFactory):
         model = ContentFile
 
 
-class BootcampRunFactory(LearningResourceRunFactory):
-    """LearningResourceRun factory specific to Bootcamps"""
-
-    offered_by = factory.RelatedFactoryList(
-        "course_catalog.factories.LearningResourceOfferorFactory",
-        size=1,
-        name=OfferedBy.bootcamps.value,
-    )
-
-
-class BootcampFactory(AbstractCourseFactory):
-    """Factory for Bootcamps"""
-
-    course_id = factory.Sequence(lambda n: "BOOTCAMP%03d.MIT" % n)
-    offered_by = factory.RelatedFactoryList(
-        "course_catalog.factories.LearningResourceOfferorFactory",
-        size=1,
-        name=OfferedBy.bootcamps.value,
-    )
-
-    runs = factory.RelatedFactoryList(
-        "course_catalog.factories.BootcampRunFactory", "content_object", size=3
-    )
-
-    class Meta:
-        model = Bootcamp
-
-
 class ListItemFactory(DjangoModelFactory):
     """Factory for List Items"""
 
@@ -326,11 +297,6 @@ class UserListItemFactory(ListItemFactory):
         is_course = factory.Trait(
             content_object=factory.SubFactory("course_catalog.factories.CourseFactory")
         )
-        is_bootcamp = factory.Trait(
-            content_object=factory.SubFactory(
-                "course_catalog.factories.BootcampFactory"
-            )
-        )
         is_userlist = factory.Trait(
             content_object=factory.SubFactory(
                 "course_catalog.factories.UserListFactory"
@@ -348,15 +314,6 @@ class ProgramItemCourseFactory(ListItemFactory):
     """Factory for Program Item Courses"""
 
     content_object = factory.SubFactory(CourseFactory)
-
-    class Meta:
-        model = ProgramItem
-
-
-class ProgramItemBootcampFactory(ListItemFactory):
-    """Factory for Program Item Bootcamps"""
-
-    content_object = factory.SubFactory(BootcampFactory)
 
     class Meta:
         model = ProgramItem

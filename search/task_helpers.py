@@ -19,7 +19,6 @@ from search.api import (
     gen_profile_id,
     is_reddit_object_removed,
     gen_course_id,
-    gen_bootcamp_id,
     gen_program_id,
     gen_user_list_id,
     gen_video_id,
@@ -30,7 +29,6 @@ from search.api import (
 from search.constants import (
     PROFILE_TYPE,
     COURSE_TYPE,
-    BOOTCAMP_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
     VIDEO_TYPE,
@@ -413,39 +411,6 @@ def delete_run_content_files(run_id):
 
     """
     tasks.delete_run_content_files.delay(run_id)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def index_new_bootcamp(bootcamp_id):
-    """
-    Serializes a bootcamp object and runs a task to create an ES document for it.
-
-    Args:
-        bootcamp_id (int): A Bootcamp primary key
-    """
-    tasks.index_new_bootcamp.delay(bootcamp_id)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def update_bootcamp(bootcamp_id):
-    """
-    Run a task to update all fields of a bootcamp Elasticsearch document
-
-    Args:
-        bootcamp_id (int): the primary key for Bootcamp to update in ES
-    """
-    tasks.upsert_bootcamp.delay(bootcamp_id)
-
-
-@if_feature_enabled(INDEX_UPDATES)
-def delete_bootcamp(bootcamp_obj):
-    """
-    Runs a task to delete an ES Bootcamp document
-
-    Args:
-        bootcamp_obj (course_catalog.models.Bootcamp): A Bootcamp object
-    """
-    delete_document.delay(gen_bootcamp_id(bootcamp_obj.course_id), BOOTCAMP_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)

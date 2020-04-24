@@ -105,20 +105,6 @@ def gen_content_file_id(key):
     return "cf_{}".format(safe_key)
 
 
-def gen_bootcamp_id(bootcamp_id):
-    """
-    Generates the Elasticsearch document id for a bootcamp
-
-    Args:
-        bootcamp_id (str): The course_id of a Bootcamp object
-
-    Returns:
-        str: The Elasticsearch document id for this object
-    """
-    safe_id = urlsafe_b64encode(bootcamp_id.encode("utf-8")).decode("utf-8").rstrip("=")
-    return "bootcamp_{}".format(safe_id)
-
-
 def gen_program_id(program_obj):
     """
     Generates the Elasticsearch document id for a Program

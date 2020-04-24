@@ -10,7 +10,6 @@ import {
   POSTS_OBJECT_TYPE,
   COMMENTS_OBJECT_TYPE,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
@@ -390,14 +389,6 @@ export type Course = LearningResource & {
   platform:           string,
   runs:               Array<LearningResourceRun>,
   object_type:        LR_TYPE_COURSE
-}
-
-export type Bootcamp = LearningResource & {
-  id:                 number,
-  course_id:          string,
-  url:                ?string,
-  runs:               Array<LearningResourceRun>,
-  object_type:        LR_TYPE_BOOTCAMP
 }
 
 export type ListItem = {

@@ -11,7 +11,6 @@ import {
   DATE_FORMAT,
   DEFAULT_END_DT,
   DEFAULT_START_DT,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
@@ -93,7 +92,6 @@ describe("Course utils", () => {
   //
   ;[
     [LR_TYPE_COURSE, "Courses"],
-    [LR_TYPE_BOOTCAMP, "Bootcamps"],
     [LR_TYPE_PROGRAM, "Programs"],
     [LR_TYPE_USERLIST, "Learning Lists"],
     [LR_TYPE_LEARNINGPATH, "Learning Paths"]
@@ -409,7 +407,6 @@ describe("Course run availability utils", () => {
   ;[
     [LR_TYPE_COURSE, true],
     [LR_TYPE_PROGRAM, true],
-    [LR_TYPE_BOOTCAMP, true],
     [LR_TYPE_USERLIST, false],
     [LR_TYPE_VIDEO, false],
     [LR_TYPE_LEARNINGPATH, false]

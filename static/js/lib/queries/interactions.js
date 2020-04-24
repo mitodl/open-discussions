@@ -3,7 +3,6 @@ import { createSelector } from "reselect"
 
 import {
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO
@@ -59,9 +58,6 @@ export const popularContentRequest = () => ({
       ? {
         courses: constructIdMap(
           filterObjectType(body.results, LR_TYPE_COURSE)
-        ),
-        bootcamps: constructIdMap(
-          filterObjectType(body.results, LR_TYPE_BOOTCAMP)
         ),
         programs: constructIdMap(
           filterObjectType(body.results, LR_TYPE_PROGRAM)

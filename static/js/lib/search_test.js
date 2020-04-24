@@ -5,7 +5,6 @@ import _ from "lodash"
 import bodybuilder from "bodybuilder"
 
 import {
-  makeBootcampResult,
   makeCommentResult,
   makeCourseResult,
   makePostResult,
@@ -29,7 +28,6 @@ import {
 import * as searchFuncs from "./search"
 import {
   LR_TYPE_ALL,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
@@ -144,23 +142,6 @@ describe("search functions", () => {
     })
   })
 
-  it("converts a bootcamp search result to a learning resource", () => {
-    const result = makeBootcampResult()
-    const bootcamp = searchResultToLearningResource(result)
-    assert.deepEqual(bootcamp, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    null,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_BOOTCAMP,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
-    })
-  })
-
   it("converts a program search result to a learning resource", () => {
     const result = makeProgramResult()
     const program = searchResultToLearningResource(result)
@@ -216,7 +197,7 @@ describe("search functions", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP, LR_TYPE_VIDEO].forEach(objectType => {
+  ;[LR_TYPE_COURSE, LR_TYPE_VIDEO].forEach(objectType => {
     it(`takes an overrideObject with ${objectType}`, () => {
       const result = makeLearningResourceResult(objectType)
       const object = searchResultToLearningResource(result, {
@@ -431,312 +412,311 @@ describe("search functions", () => {
       })
       sinon.assert.calledWith(stub, type)
     })
-    ;[LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].forEach(type => {
-      ["availableNow", "nextWeek", null].forEach(availability => {
-        it(`filters courses by platform, availability ${availability}, type ${type}, and topics`, () => {
-          const fieldNames = ["field1", "field2", "field3"]
-          const stub = sandbox
-            .stub(searchFuncs, "searchFields")
-            .returns(fieldNames)
-          const text = "some text here"
-          const facets = new Map(
-            Object.entries({
-              offered_by:   ["MITx"],
-              cost:         ["free"],
-              topics:       ["Engineering", "Science"],
-              availability: availability ? [availability] : [],
-              type:         [type]
-            })
-          )
+    ;["availableNow", "nextWeek", null].forEach(availability => {
+      it(`filters courses by platform, availability ${availability} and topics`, () => {
+        const type = LR_TYPE_COURSE
+        const fieldNames = ["field1", "field2", "field3"]
+        const stub = sandbox
+          .stub(searchFuncs, "searchFields")
+          .returns(fieldNames)
+        const text = "some text here"
+        const facets = new Map(
+          Object.entries({
+            offered_by:   ["MITx"],
+            cost:         ["free"],
+            topics:       ["Engineering", "Science"],
+            availability: availability ? [availability] : [],
+            type:         [type]
+          })
+        )
 
-          const availabilityShouldItems = availability
-            ? [
-              {
-                nested: {
-                  path:  "runs",
-                  query: {
-                    range: {
-                      "runs.best_start_date":
-                          AVAILABILITY_MAPPING[availability].filter
-                    }
-                  }
-                }
-              }
-            ]
-            : []
-
-          if (availability === "availableNow") {
-            availabilityShouldItems.push({
-              nested: {
-                path:  "runs",
-                query: {
-                  bool: {
-                    must_not: {
-                      exists: {
-                        field: "runs.best_start_date"
-                      }
-                    }
-                  }
-                }
-              }
-            })
-          }
-
-          const availabilityQuery = {
-            bool: {
-              should: availabilityShouldItems
-            }
-          }
-
-          const textQuery = [
-            {
-              multi_match: {
-                query:  text,
-                fields: fieldNames
-              }
-            },
+        const availabilityShouldItems = availability
+          ? [
             {
               nested: {
                 path:  "runs",
                 query: {
-                  multi_match: {
-                    query:  text,
-                    fields: RESOURCE_QUERY_NESTED_FIELDS
+                  range: {
+                    "runs.best_start_date":
+                        AVAILABILITY_MAPPING[availability].filter
                   }
                 }
               }
             }
           ]
+          : []
 
-          const mustQuery = [
-            {
-              term: {
-                object_type: type
-              }
-            },
-            {
-              bool: {
-                should: [
-                  {
-                    term: {
-                      offered_by: "MITx"
+        if (availability === "availableNow") {
+          availabilityShouldItems.push({
+            nested: {
+              path:  "runs",
+              query: {
+                bool: {
+                  must_not: {
+                    exists: {
+                      field: "runs.best_start_date"
                     }
                   }
-                ]
+                }
               }
-            },
-            {
-              bool: {
-                should: [
-                  {
-                    nested: {
-                      path:  "runs.prices",
-                      query: {
-                        range: {
-                          "runs.prices.price": {
-                            to: 0.01
-                          }
+            }
+          })
+        }
+
+        const availabilityQuery = {
+          bool: {
+            should: availabilityShouldItems
+          }
+        }
+
+        const textQuery = [
+          {
+            multi_match: {
+              query:  text,
+              fields: fieldNames
+            }
+          },
+          {
+            nested: {
+              path:  "runs",
+              query: {
+                multi_match: {
+                  query:  text,
+                  fields: RESOURCE_QUERY_NESTED_FIELDS
+                }
+              }
+            }
+          }
+        ]
+
+        const mustQuery = [
+          {
+            term: {
+              object_type: type
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    offered_by: "MITx"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  nested: {
+                    path:  "runs.prices",
+                    query: {
+                      range: {
+                        "runs.prices.price": {
+                          to: 0.01
                         }
                       }
                     }
                   }
-                ]
-              }
-            },
-            {
-              bool: {
-                should: [
-                  {
-                    term: {
-                      topics: "Engineering"
+                }
+              ]
+            }
+          },
+          {
+            bool: {
+              should: [
+                {
+                  term: {
+                    topics: "Engineering"
+                  }
+                },
+                {
+                  term: {
+                    topics: "Science"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+
+        if (availability) {
+          mustQuery.push(availabilityQuery)
+        }
+
+        mustQuery.push({
+          bool: {
+            should: textQuery
+          }
+        })
+
+        assert.deepEqual(buildSearchQuery({ type, text, facets }), {
+          aggs: {
+            availability: {
+              aggs: {
+                runs: {
+                  aggs: {
+                    courses: {
+                      reverse_nested: {}
                     }
                   },
-                  {
-                    term: {
-                      topics: "Science"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-
-          if (availability) {
-            mustQuery.push(availabilityQuery)
-          }
-
-          mustQuery.push({
-            bool: {
-              should: textQuery
-            }
-          })
-
-          assert.deepEqual(buildSearchQuery({ type, text, facets }), {
-            aggs: {
-              availability: {
-                aggs: {
-                  runs: {
-                    aggs: {
-                      courses: {
-                        reverse_nested: {}
-                      }
-                    },
-                    date_range: {
-                      field:   "runs.best_start_date",
-                      keyed:   false,
-                      missing: DEFAULT_START_DT,
-                      ranges:  [
-                        {
-                          key: "availableNow",
-                          to:  "now"
-                        },
-                        {
-                          from: "now",
-                          key:  "nextWeek",
-                          to:   "now+7d"
-                        },
-                        {
-                          from: "now",
-                          key:  "nextMonth",
-                          to:   "now+1M"
-                        },
-                        {
-                          from: "now",
-                          key:  "next3Months",
-                          to:   "now+3M"
-                        },
-                        {
-                          from: "now",
-                          key:  "next6Months",
-                          to:   "now+6M"
-                        },
-                        {
-                          from: "now",
-                          key:  "nextYear",
-                          to:   "now+12M"
-                        }
-                      ]
-                    }
-                  }
-                },
-                nested: {
-                  path: "runs"
-                }
-              },
-              cost: {
-                aggs: {
-                  prices: {
-                    aggs: {
-                      courses: {
-                        reverse_nested: {}
-                      }
-                    },
-                    range: {
-                      field:   "runs.prices.price",
-                      keyed:   false,
-                      missing: 0,
-                      ranges:  [
-                        {
-                          key: "free",
-                          to:  0.01
-                        },
-                        {
-                          from: 0.01,
-                          key:  "paid"
-                        }
-                      ]
-                    }
-                  }
-                },
-                nested: {
-                  path: "runs.prices"
-                }
-              },
-              offered_by: {
-                terms: {
-                  field: "offered_by",
-                  size:  10000
-                }
-              },
-              topics: {
-                terms: {
-                  field: "topics",
-                  size:  10000
-                }
-              },
-              type: {
-                terms: {
-                  field: "object_type.keyword",
-                  size:  10000
-                }
-              }
-            },
-            query: {
-              bool: {
-                should: [
-                  {
-                    bool: {
-                      filter: {
-                        bool: {
-                          must: mustQuery
-                        }
+                  date_range: {
+                    field:   "runs.best_start_date",
+                    keyed:   false,
+                    missing: DEFAULT_START_DT,
+                    ranges:  [
+                      {
+                        key: "availableNow",
+                        to:  "now"
                       },
-                      should: textQuery
-                    }
+                      {
+                        from: "now",
+                        key:  "nextWeek",
+                        to:   "now+7d"
+                      },
+                      {
+                        from: "now",
+                        key:  "nextMonth",
+                        to:   "now+1M"
+                      },
+                      {
+                        from: "now",
+                        key:  "next3Months",
+                        to:   "now+3M"
+                      },
+                      {
+                        from: "now",
+                        key:  "next6Months",
+                        to:   "now+6M"
+                      },
+                      {
+                        from: "now",
+                        key:  "nextYear",
+                        to:   "now+12M"
+                      }
+                    ]
                   }
-                ]
+                }
+              },
+              nested: {
+                path: "runs"
               }
             },
-            suggest: {
-              text:                        text,
-              "short_description.trigram": {
-                phrase: {
-                  confidence: 0.0001,
-                  field:      "short_description.trigram",
-                  gram_size:  1,
-                  size:       5,
-                  max_errors: 3,
-                  collate:    {
-                    params: {
-                      field_name: "short_description.trigram"
+            cost: {
+              aggs: {
+                prices: {
+                  aggs: {
+                    courses: {
+                      reverse_nested: {}
+                    }
+                  },
+                  range: {
+                    field:   "runs.prices.price",
+                    keyed:   false,
+                    missing: 0,
+                    ranges:  [
+                      {
+                        key: "free",
+                        to:  0.01
+                      },
+                      {
+                        from: 0.01,
+                        key:  "paid"
+                      }
+                    ]
+                  }
+                }
+              },
+              nested: {
+                path: "runs.prices"
+              }
+            },
+            offered_by: {
+              terms: {
+                field: "offered_by",
+                size:  10000
+              }
+            },
+            topics: {
+              terms: {
+                field: "topics",
+                size:  10000
+              }
+            },
+            type: {
+              terms: {
+                field: "object_type.keyword",
+                size:  10000
+              }
+            }
+          },
+          query: {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: {
+                      bool: {
+                        must: mustQuery
+                      }
                     },
-                    prune: true,
-                    query: {
-                      source: {
-                        match_phrase: {
-                          "{{field_name}}": "{{suggestion}}"
-                        }
+                    should: textQuery
+                  }
+                }
+              ]
+            }
+          },
+          suggest: {
+            text:                        text,
+            "short_description.trigram": {
+              phrase: {
+                confidence: 0.0001,
+                field:      "short_description.trigram",
+                gram_size:  1,
+                size:       5,
+                max_errors: 3,
+                collate:    {
+                  params: {
+                    field_name: "short_description.trigram"
+                  },
+                  prune: true,
+                  query: {
+                    source: {
+                      match_phrase: {
+                        "{{field_name}}": "{{suggestion}}"
                       }
                     }
                   }
                 }
-              },
-              "title.trigram": {
-                phrase: {
-                  confidence: 0.0001,
-                  field:      "title.trigram",
-                  gram_size:  1,
-                  size:       5,
-                  max_errors: 3,
-                  collate:    {
-                    params: {
-                      field_name: "title.trigram"
-                    },
-                    prune: true,
-                    query: {
-                      source: {
-                        match_phrase: {
-                          "{{field_name}}": "{{suggestion}}"
-                        }
+              }
+            },
+            "title.trigram": {
+              phrase: {
+                confidence: 0.0001,
+                field:      "title.trigram",
+                gram_size:  1,
+                size:       5,
+                max_errors: 3,
+                collate:    {
+                  params: {
+                    field_name: "title.trigram"
+                  },
+                  prune: true,
+                  query: {
+                    source: {
+                      match_phrase: {
+                        "{{field_name}}": "{{suggestion}}"
                       }
                     }
                   }
                 }
               }
             }
-          })
-          sinon.assert.calledWith(stub, type)
+          }
         })
+        sinon.assert.calledWith(stub, type)
       })
     })
 
@@ -867,38 +847,40 @@ describe("search functions", () => {
       )
     })
   })
-  ;[
-    [LR_TYPE_COURSE, true, true],
-    [LR_TYPE_COURSE, false, false],
-    [LR_TYPE_BOOTCAMP, true, false],
-    [LR_TYPE_BOOTCAMP, false, false]
-  ].forEach(([resourceType, fileSearchEnabled, includeChildQuery]) => {
-    it(`${shouldIf(
-      includeChildQuery
-    )} include a childQuery for ${resourceType} if fileSearchEnabled is ${String(
-      fileSearchEnabled
-    )}`, () => {
-      SETTINGS.file_search_enabled = fileSearchEnabled
-      const text = "search query"
-      const esQuery = buildLearnQuery(bodybuilder(), text, [resourceType], null)
-      assert.equal(
-        esQuery.query.bool.should[0].bool.should.length,
-        includeChildQuery ? 3 : 2
-      )
-      if (includeChildQuery) {
-        assert.deepEqual(esQuery.query.bool.should[0].bool.should[2], {
-          has_child: {
-            type:  "resourcefile",
-            query: {
-              multi_match: {
-                query:  text,
-                fields: ["content", "title", "short_description"]
-              }
-            },
-            score_mode: "avg"
-          }
-        })
-      }
-    })
-  })
+  ;[[LR_TYPE_COURSE, true, true], [LR_TYPE_COURSE, false, false]].forEach(
+    ([resourceType, fileSearchEnabled, includeChildQuery]) => {
+      it(`${shouldIf(
+        includeChildQuery
+      )} include a childQuery for ${resourceType} if fileSearchEnabled is ${String(
+        fileSearchEnabled
+      )}`, () => {
+        SETTINGS.file_search_enabled = fileSearchEnabled
+        const text = "search query"
+        const esQuery = buildLearnQuery(
+          bodybuilder(),
+          text,
+          [resourceType],
+          null
+        )
+        assert.equal(
+          esQuery.query.bool.should[0].bool.should.length,
+          includeChildQuery ? 3 : 2
+        )
+        if (includeChildQuery) {
+          assert.deepEqual(esQuery.query.bool.should[0].bool.should[2], {
+            has_child: {
+              type:  "resourcefile",
+              query: {
+                multi_match: {
+                  query:  text,
+                  fields: ["content", "title", "short_description"]
+                }
+              },
+              score_mode: "avg"
+            }
+          })
+        }
+      })
+    }
+  )
 })

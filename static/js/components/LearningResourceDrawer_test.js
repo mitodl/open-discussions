@@ -5,7 +5,6 @@ import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResou
 import * as LRCardMod from "../components/LearningResourceCard"
 
 import {
-  makeBootcamp,
   makeCourse,
   makeProgram,
   makeVideo,
@@ -14,7 +13,7 @@ import {
 } from "../factories/learning_resources"
 import { makeYoutubeVideo } from "../factories/embedly"
 import {
-  LR_TYPE_BOOTCAMP,
+  LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
   LR_TYPE_LEARNINGPATH
 } from "../lib/constants"
@@ -23,7 +22,6 @@ import { pushLRHistory } from "../actions/ui"
 
 import {
   courseDetailApiURL,
-  bootcampDetailApiURL,
   programDetailApiURL,
   userListDetailApiURL,
   videoDetailApiURL,
@@ -42,7 +40,7 @@ describe("LearningResourceDrawer", () => {
     course = makeCourse()
     similarItems = [
       makeSearchResult(LR_TYPE_COURSE),
-      makeSearchResult(LR_TYPE_BOOTCAMP),
+      makeSearchResult(LR_TYPE_PROGRAM),
       makeSearchResult(LR_TYPE_COURSE)
     ]
     helper.stubComponent(
@@ -99,14 +97,14 @@ describe("LearningResourceDrawer", () => {
 
   it("should have a back button if there is more than one object in the drawer history", async () => {
     const course = makeCourse()
-    const bootcamp = makeBootcamp()
+    const program = makeProgram()
     mockObjectAPI(
       course,
       courseDetailApiURL.param({ courseId: course.id }).toString()
     )
     mockObjectAPI(
-      bootcamp,
-      bootcampDetailApiURL.param({ bootcampId: bootcamp.id }).toString()
+      program,
+      programDetailApiURL.param({ programId: program.id }).toString()
     )
     const { wrapper, store } = await render({}, [
       pushLRHistory({
@@ -114,8 +112,8 @@ describe("LearningResourceDrawer", () => {
         objectType: course.object_type
       }),
       pushLRHistory({
-        objectId:   bootcamp.id,
-        objectType: bootcamp.object_type
+        objectId:   program.id,
+        objectType: program.object_type
       })
     ])
     wrapper.find(".back").simulate("click")
@@ -176,7 +174,6 @@ describe("LearningResourceDrawer", () => {
 
   //
   ;[
-    [makeBootcamp(), bootcampDetailApiURL, "bootcampId"],
     [makeProgram(), programDetailApiURL, "programId"],
     [makeCourse(), courseDetailApiURL, "courseId"],
     [makeUserList(), userListDetailApiURL, "userListId"]

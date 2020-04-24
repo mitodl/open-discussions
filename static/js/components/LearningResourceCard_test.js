@@ -20,7 +20,6 @@ import {
   CAROUSEL_IMG_HEIGHT,
   COURSE_AVAILABLE_NOW,
   LR_TYPE_ALL,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE
 } from "../lib/constants"
 import {
@@ -204,7 +203,7 @@ describe("LearningResourceCard", () => {
           .find(".availability")
           .text()
           .replace("calendar_today", ""),
-        [LR_TYPE_COURSE, LR_TYPE_BOOTCAMP].includes(objectType)
+        LR_TYPE_COURSE === objectType
           ? bestRunLabel(bestRun(object.runs))
           : COURSE_AVAILABLE_NOW
       )

@@ -14,7 +14,6 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
@@ -215,8 +214,7 @@ export const privacyIcon = (privacyLevel: string) =>
 
 export const isCoursewareResource = R.contains(R.__, [
   LR_TYPE_COURSE,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_BOOTCAMP
+  LR_TYPE_PROGRAM
 ])
 
 export const hasCourseList = R.contains(R.__, [LR_TYPE_PROGRAM])

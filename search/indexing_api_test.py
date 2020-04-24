@@ -331,7 +331,6 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
         ("index_courses", "serialize_bulk_courses"),
         ("index_programs", "serialize_bulk_programs"),
         ("index_user_lists", "serialize_bulk_user_lists"),
-        ("index_bootcamps", "serialize_bulk_bootcamps"),
         ("index_videos", "serialize_bulk_videos"),
     ],
 )

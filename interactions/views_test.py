@@ -6,7 +6,6 @@ from rest_framework import status
 
 from course_catalog.factories import (
     CourseFactory,
-    BootcampFactory,
     ProgramFactory,
     UserListFactory,
     VideoFactory,
@@ -49,7 +48,6 @@ def test_popular_content_types(client, user, mocker):
     # create 2 of each, generate interactions for only the first one
     # second one shouldn't show up in the results
     course = CourseFactory.create_batch(2)[0]
-    bootcamp = BootcampFactory.create_batch(2)[0]
     program = ProgramFactory.create_batch(2)[0]
     user_list = UserListFactory.create_batch(2)[0]
     video = VideoFactory.create_batch(2)[0]
@@ -57,7 +55,7 @@ def test_popular_content_types(client, user, mocker):
     # generate interactions with an increasing count
     interactions = [
         ContentTypeInteractionFactory.create_batch(count + 1, content=content)[0]
-        for count, content in enumerate([user_list, bootcamp, video, course, program])
+        for count, content in enumerate([user_list, video, course, program])
     ]
 
     response = client.get(reverse("popular_content-list"))

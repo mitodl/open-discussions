@@ -22,7 +22,6 @@ from course_catalog.models import (
     Course,
     UserList,
     Program,
-    Bootcamp,
     FavoriteItem,
     LearningResourceOfferor,
     LearningResourceRun,
@@ -40,7 +39,6 @@ from course_catalog.serializers import (
     CourseSerializer,
     UserListSerializer,
     ProgramSerializer,
-    BootcampSerializer,
     FavoriteItemSerializer,
     VideoSerializer,
     CourseTopicSerializer,
@@ -207,32 +205,6 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         page = self.paginate_queryset(self._get_base_queryset(featured=True))
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
-
-
-class BootcampViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
-    """
-    Viewset for Bootcamps
-    """
-
-    serializer_class = BootcampSerializer
-    pagination_class = DefaultPagination
-    permission_classes = (AnonymousAccessReadonlyPermission,)
-
-    def get_queryset(self):
-        user = self.request.user
-        return (
-            Bootcamp.objects.prefetch_related(
-                "topics",
-                Prefetch(
-                    "runs",
-                    queryset=LearningResourceRun.objects.prefetch_related(
-                        "topics", "prices", "instructors"
-                    ).order_by("-best_start_date"),
-                ),
-            )
-            .annotate_is_favorite_for_user(user)
-            .prefetch_list_items_for_user(user)
-        )
 
 
 class LargePagination(LimitOffsetPagination):

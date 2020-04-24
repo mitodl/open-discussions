@@ -158,8 +158,6 @@ export const newCoursesURL = "/api/v0/courses/new/"
 export const favoritesURL = "/api/v0/favorites"
 export const courseApiURL = api.segment("courses/")
 export const courseDetailApiURL = courseApiURL.segment(":courseId/")
-export const bootcampApiURL = api.segment("bootcamps/")
-export const bootcampDetailApiURL = bootcampApiURL.segment(":bootcampId/")
 export const programApiURL = api.segment("programs/")
 export const programDetailApiURL = programApiURL.segment(":programId/")
 

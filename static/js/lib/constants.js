@@ -75,7 +75,6 @@ export const CAROUSEL_IMG_HEIGHT = 130
 export const CAROUSEL_IMG_WIDTH = 306
 
 export const LR_TYPE_COURSE = "course"
-export const LR_TYPE_BOOTCAMP = "bootcamp"
 export const LR_TYPE_PROGRAM = "program"
 export const LR_TYPE_USERLIST = "userlist"
 export const LR_TYPE_LEARNINGPATH = "learningpath"
@@ -83,7 +82,6 @@ export const LR_TYPE_VIDEO = "video"
 export const FAVORITES_PSEUDO_LIST = "favorites"
 export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
@@ -92,7 +90,6 @@ export const LR_TYPE_ALL = [
 
 export const OBJECT_TYPE_MAPPING = {
   [LR_TYPE_COURSE]:       LR_TYPE_COURSE,
-  [LR_TYPE_BOOTCAMP]:     LR_TYPE_BOOTCAMP,
   [LR_TYPE_PROGRAM]:      LR_TYPE_PROGRAM,
   [LR_TYPE_USERLIST]:     LR_TYPE_USERLIST,
   [LR_TYPE_LEARNINGPATH]: LR_TYPE_USERLIST,
@@ -101,7 +98,6 @@ export const OBJECT_TYPE_MAPPING = {
 
 export const readableLearningResources = {
   [LR_TYPE_COURSE]:        "Course",
-  [LR_TYPE_BOOTCAMP]:      "Bootcamp",
   [LR_TYPE_PROGRAM]:       "Program",
   [LR_TYPE_USERLIST]:      "Learning List",
   [LR_TYPE_LEARNINGPATH]:  "Learning Path",

@@ -18,7 +18,6 @@ import {
 import { makeChannel } from "../factories/channels"
 import {
   LR_TYPE_ALL,
-  LR_TYPE_BOOTCAMP,
   LR_TYPE_COURSE,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
@@ -80,8 +79,7 @@ describe("CourseSearchPage", () => {
         facets: new Map(Object.entries({ topics: true }))
       },
       entities: {
-        courses:   {},
-        bootcamps: {}
+        courses: {}
       }
     }
     initialProps = {
@@ -572,7 +570,6 @@ describe("CourseSearchPage", () => {
         const { inner } = await renderPage({
           entities: {
             courses:   resourceType === LR_TYPE_COURSE ? entity : {},
-            bootcamps: resourceType === LR_TYPE_BOOTCAMP ? entity : {},
             videos:    resourceType === LR_TYPE_VIDEO ? entity : {},
             programs:  resourceType === LR_TYPE_PROGRAM ? entity : {},
             userLists: [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(
