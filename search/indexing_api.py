@@ -176,6 +176,7 @@ COURSE_FILE_OBJECT_TYPE = {
     "url": {"type": "keyword"},
     "file_type": {"type": "keyword"},
     "content": ENGLISH_TEXT_FIELD,
+    "location": {"type": "keyword"},
 }
 
 COURSE_OBJECT_TYPE = {
