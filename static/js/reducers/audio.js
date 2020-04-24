@@ -1,5 +1,8 @@
 // @flow
-import { SET_CURRENTLY_PLAYING_AUDIO } from "../actions/audio"
+import {
+  SET_AUDIO_PLAYER_STATE,
+  SET_CURRENTLY_PLAYING_AUDIO
+} from "../actions/audio"
 import type { Action } from "../flow/reduxTypes"
 
 export type Audio = {
@@ -11,6 +14,7 @@ export type AudioState = {
   currentlyPlaying: Audio
 }
 export const INITIAL_AUDIO_STATE: AudioState = {
+  playerState:      "paused",
   currentlyPlaying: {
     title:       "",
     description: "",
@@ -23,6 +27,8 @@ export const audio = (
   action: Action<any, null>
 ): AudioState => {
   switch (action.type) {
+  case SET_AUDIO_PLAYER_STATE:
+    return { ...state, playerState: action.payload }
   case SET_CURRENTLY_PLAYING_AUDIO:
     return { ...state, currentlyPlaying: action.payload }
   }

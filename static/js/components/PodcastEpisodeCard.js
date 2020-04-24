@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
+import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 
 import Card from "./Card"

@@ -4,55 +4,30 @@ import React, { useEffect, useRef, useCallback, useState } from "react"
 import { useSelector } from "react-redux"
 import Amplitude from "amplitudejs"
 
-import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
+import { INITIAL_AUDIO_STATE } from "../reducers/audio"
+import {
+  audioPlayerStateSelector,
+  currentlyPlayingAudioSelector
+} from "../lib/redux_selectors"
 
 export default function AudioPlayer() {
   const seekBar = useRef()
   const playPauseButton = useRef()
+  const audioPlayerState = useSelector(audioPlayerStateSelector)
   const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
   const [audioLoaded, setAudioLoaded] = useState(false)
   const [audioPlaying, setAudioPlaying] = useState(false)
 
-  const amplitudeInitialized = useCallback(() => {
-    const audio = Amplitude.getAudio()
-    audio.addEventListener("play", playbackStarted)
-    audio.addEventListener("pause", playbackPaused)
-  })
-
-  const playbackStarted = useCallback(() => {
-    setAudioPlaying(true)
-  })
-
-  const playbackPaused = useCallback(() => {
-    setAudioPlaying(false)
-  })
-
   useEffect(
     () => {
-      if (Amplitude.getPlayerState() === "playing") {
-        Amplitude.pause()
+      if (
+        !_.isEqual(currentlyPlayingAudio, INITIAL_AUDIO_STATE.currentlyPlaying)
+      ) {
+        setAudioLoaded(true)
       }
-      if (_.values(currentlyPlayingAudio).every(_.isEmpty)) {
-        setAudioLoaded(false)
-        return
-      }
-      Amplitude.init({
-        songs: [
-          {
-            album: currentlyPlayingAudio.title,
-            name:  currentlyPlayingAudio.description,
-            url:   currentlyPlayingAudio.url
-          }
-        ],
-        callbacks: {
-          initialized: amplitudeInitialized
-        }
-      })
-      Amplitude.play()
-      setAudioLoaded(true)
-      setAudioPlaying(true)
+      setAudioPlaying(audioPlayerState === "playing")
     },
-    [currentlyPlayingAudio]
+    [audioPlayerState, currentlyPlayingAudio]
   )
 
   const backTenClick = useCallback(() => {

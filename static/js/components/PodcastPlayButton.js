@@ -3,7 +3,7 @@ import React, { useCallback } from "react"
 
 import { useDispatch } from "react-redux"
 
-import { setCurrentlyPlayingAudio } from "../actions/audio"
+import { useInitAudioPlayer } from "../hooks/audio_player"
 
 import type { PodcastEpisode } from "../flow/podcastTypes"
 
@@ -15,17 +15,16 @@ export default function PodcastPlayButton(props: Props) {
   const { episode } = props
 
   const dispatch = useDispatch()
+  const initAudioPlayer = useInitAudioPlayer({
+    title:       episode.podcast.title,
+    description: episode.title,
+    url:         episode.url
+  })
   const playClick = useCallback(
     e => {
       e.stopPropagation()
       e.preventDefault()
-      dispatch(
-        setCurrentlyPlayingAudio({
-          title:       episode.podcast_title,
-          description: episode.title,
-          url:         episode.url
-        })
-      )
+      initAudioPlayer()
     },
     [dispatch]
   )

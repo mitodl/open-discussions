@@ -14,6 +14,14 @@ export const getSubscribedChannels = (state: Object): Array<Channel> =>
 export const getOwnProfile = (state: Object): ?Profile =>
   SETTINGS.username ? state.profiles.data.get(SETTINGS.username) : null
 
+export const getAudioPlayerState = (state: Object): any =>
+  state.audio.playerState
+
+export const audioPlayerStateSelector = createSelector(
+  state => state.audio,
+  audio => audio.playerState
+)
+
 export const getCurrentlyPlayingAudio = (state: Object): any =>
   state.audio.currentlyPlaying
 
