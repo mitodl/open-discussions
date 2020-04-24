@@ -34,6 +34,7 @@
     "@mitodl/mdl-react-components": "^0.0.3",
     "@sentry/browser": "5.5.0",
     "@trust/webcrypto": "^0.9.2",
+    "amplitudejs": "^5.0.3",
     "array-move": "^2.2.0",
     "autoprefixer": "^9.7.4",
     "babel-eslint": "^10.0.3",

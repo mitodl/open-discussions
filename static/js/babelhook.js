@@ -1,4 +1,5 @@
 const { babelSharedLoader } = require("../../webpack.config.shared")
+const sinon = require("sinon")
 const idlUtils = require("jsdom/lib/jsdom/living/generated/utils")
 const whatwgURL = require("whatwg-url")
 const uuid = require("uuid/v4")
@@ -21,6 +22,45 @@ require("mutationobserver-shim")
 global.MutationObserver = window.MutationObserver
 
 global.DOMParser = window.DOMParser
+
+// mock HTML5 audio component for amplitudejs
+global.Audio = class Audio {
+  constructor(url) {
+    this.url = url
+    this.paused = true
+    this.duration = NaN
+    this._loaded = false
+    this._playStub = sinon.stub()
+    this._pauseStub = sinon.stub()
+    this._addEventListenerStub = sinon.stub()
+    this._removeEventListenerStub = sinon.stub()
+  }
+
+  load() {
+    window.dispatchEvent(new Event("loadedmetadata"))
+    window.dispatchEvent(new Event("canplaythrough"))
+  }
+
+  play() {
+    this.paused = false
+    window.dispatchEvent(new Event("play"))
+    this._playStub()
+  }
+
+  pause() {
+    this.paused = true
+    window.dispatchEvent(new Event("pause"))
+    this._pauseStub()
+  }
+
+  addEventListener() {
+    this._addEventListenerStub()
+  }
+
+  removeEventListener() {
+    this._removeEventListenerStub()
+  }
+}
 
 // react got a little more picky about the polyfill for
 // requestAnimaltionFrame, see:

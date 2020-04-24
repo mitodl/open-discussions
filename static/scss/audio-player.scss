@@ -1,0 +1,256 @@
+.audio-player-container-outer.hidden {
+  display: none;
+}
+
+.audio-player-container-outer {
+  background-color: white;
+  position: fixed;
+  display: flex;
+  align-items: center;
+  box-shadow: 0px -4px 15px rgba(50, 50, 50, 0.3);
+  font-family: Helvetica, sans-serif;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+
+  @include breakpoint(desktop) {
+    height: $audio-player-height-desktop;
+  }
+  @include breakpoint(mobile) {
+    height: $audio-player-height-mobile;
+  }
+
+  .audio-player-container-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    padding: $audio-player-padding-vertical $audio-player-padding-horizontal;
+    height: calc(100% - $audio-player-padding-vertical);
+    width: calc(100% - $audio-player-padding-horizontal);
+
+    @include breakpoint(mobile) {
+      flex-direction: column;
+    }
+
+    .audio-player-text {
+      position: relative;
+
+      @include breakpoint(desktop) {
+        width: 36%;
+        max-width: 490px;
+      }
+      @media only screen and (max-width: 960px) and (min-width: 800px) {
+        width: 25%;
+      }
+      @include breakpoint(mobile) {
+        text-align: center;
+        width: 100%;
+      }
+
+      .audio-player-titles {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: min-content;
+
+        @include breakpoint(desktop) {
+          padding: 0px 12px;
+        }
+
+        @include breakpoint(mobile) {
+          display: flex;
+          flex-direction: column-reverse;
+        }
+
+        .audio-player-title {
+          font-size: 16px;
+          color: $font-grey-light;
+          max-height: 25px;
+
+          @include breakpoint(desktop) {
+            font-size: 16px;
+            margin-bottom: 10px;
+          }
+          @include breakpoint(mobile) {
+            font-size: 12px;
+          }
+        }
+
+        .audio-player-description {
+          display: block;
+          font-weight: bold;
+          font-size: 18px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-height: 46px;
+
+          @include breakpoint(desktop) {
+            font-size: 18px;
+          }
+          @include breakpoint(mobile) {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .audio-player-controls {
+      display: flex;
+      flex: 1;
+      justify-content: left;
+      align-items: center;
+
+      @include breakpoint(desktop) {
+        flex-direction: row;
+        border-left: 1px solid rgba(0, 0, 0, 0.1);
+        padding-left: 16px;
+        height: 100%;
+      }
+      @include breakpoint(mobile) {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .audio-player-button {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+
+      .audio-player-playback-controls {
+        display: flex;
+        align-items: center;
+
+        @include breakpoint(desktop) {
+          width: 180px;
+        }
+
+        @include breakpoint(mobile) {
+          width: 100%;
+        }
+
+        .audio-player-button-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+
+          .audio-player-button {
+            display: inline-block;
+            color: $rouge;
+            height: auto;
+          }
+
+          .audio-player-button span,
+          progress {
+            cursor: pointer;
+          }
+
+          .amplitude-play-pause span {
+            font-size: 48px;
+          }
+
+          .audio-player-button:not(.amplitude-play-pause) span {
+            font-size: 30px;
+          }
+        }
+
+        .audio-player-playback-speed-container {
+          position: absolute;
+
+          @include breakpoint(desktop) {
+            width: 70px;
+            height: 32px;
+            right: 50px;
+          }
+
+          @include breakpoint(mobile) {
+            right: 0px;
+          }
+
+          button {
+            border-radius: 4px;
+            font-weight: bold;
+
+            @include breakpoint(desktop) {
+              font-size: 18px;
+              padding: 5px 20px;
+            }
+
+            @include breakpoint(mobile) {
+              font-size: 12px;
+              padding: 4px 6px;
+            }
+          }
+
+          .amplitude-playback-speed-10:before {
+            content: "1.0x";
+          }
+
+          .amplitude-playback-speed-15:before {
+            content: "1.5x";
+          }
+
+          .amplitude-playback-speed-20:before {
+            content: "2.0x";
+          }
+        }
+      }
+
+      .audio-player-progress-container {
+        display: flex;
+        flex: 1;
+        align-items: center;
+
+        @include breakpoint(desktop) {
+          font-size: 14px;
+          padding: 0px 144px 0px 24px;
+        }
+
+        @include breakpoint(mobile) {
+          font-size: 10px;
+          width: 100%;
+        }
+
+        progress {
+          flex: 1;
+          cursor: pointer;
+        }
+
+        .audio-player-time-text-left {
+          text-align: right;
+          padding-right: 12px;
+        }
+
+        // disabling no-vendor-prefixes here because autoprefixer doesn't support html5 progress bars
+        // sass-lint:disable no-vendor-prefixes
+        .audio-player-progress {
+          background-color: #f6f7f9;
+          color: #7c7b7d;
+          -webkit-appearance: none;
+        }
+
+        .audio-player-progress::-webkit-progress-value {
+          background: #7c7b7d;
+        }
+
+        .audio-player-progress::-webkit-progress-bar {
+          background: #f6f7f9;
+        }
+
+        .audio-player-progress::-moz-progress-bar {
+          background: #7c7b7d;
+        }
+        // sass-lint:disable no-vendor-prefixes
+
+        .audio-player-time-text-right {
+          text-align: left;
+          padding-left: 12px;
+        }
+      }
+    }
+  }
+}

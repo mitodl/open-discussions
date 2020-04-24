@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
+import React, { useCallback } from "react"
+import { useDispatch } from "react-redux"
 import Dotdotdot from "react-dotdotdot"
 
 import Card from "./Card"
@@ -8,6 +9,8 @@ import Card from "./Card"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 
 import type { Podcast, PodcastEpisode } from "../flow/podcastTypes"
+
+import { setCurrentlyPlayingAudio } from "../actions/audio"
 
 export const PODCAST_IMG_HEIGHT = 77
 export const PODCAST_IMG_WIDTH = 125
@@ -20,6 +23,20 @@ type Props = {
 export default function PodcastEpisodeCard(props: Props) {
   const { episode, podcast } = props
 
+  const dispatch = useDispatch()
+  const playClick = useCallback(
+    () => {
+      dispatch(
+        setCurrentlyPlayingAudio({
+          title:       podcast.title,
+          description: episode.title,
+          url:         episode.url
+        })
+      )
+    },
+    [dispatch]
+  )
+
   return (
     <Card className="podcast-episode-card low-padding">
       <div className="left-col">
@@ -27,7 +44,9 @@ export default function PodcastEpisodeCard(props: Props) {
           <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
         </div>
         <div className="podcast-name">{podcast.title}</div>
-        <div className="play-placeholder black-surround">Play</div>
+        <div className="play-button black-surround" onClick={playClick}>
+          Play
+        </div>
       </div>
       <div className="right-col">
         <img

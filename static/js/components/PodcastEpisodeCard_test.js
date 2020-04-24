@@ -1,11 +1,10 @@
 // @flow
 /* global SETTINGS:false */
-import React from "react"
-import { shallow } from "enzyme"
 import { assert } from "chai"
 
 import { makePodcast, makePodcastEpisode } from "../factories/podcasts"
 import { embedlyThumbnail } from "../lib/url"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 import PodcastEpisodeCard, {
   PODCAST_IMG_WIDTH,
@@ -13,19 +12,23 @@ import PodcastEpisodeCard, {
 } from "./PodcastEpisodeCard"
 
 describe("PodcastEpisodeCard", () => {
-  let podcast, episode
+  let podcast, episode, render, helper
   beforeEach(() => {
     podcast = makePodcast()
     episode = makePodcastEpisode(podcast)
+    helper = new IntegrationTestHelper()
+    render = helper.configureReduxQueryRenderer(PodcastEpisodeCard, {
+      podcast,
+      episode
+    })
   })
 
-  const render = (props = {}) =>
-    shallow(
-      <PodcastEpisodeCard podcast={podcast} episode={episode} {...props} />
-    )
+  afterEach(() => {
+    helper.cleanup()
+  })
 
-  it("should render basic stuff", () => {
-    const wrapper = render()
+  it("should render basic stuff", async () => {
+    const { wrapper } = await render()
     assert.equal(wrapper.find("Dotdotdot").props().children, episode.title)
     assert.equal(wrapper.find(".podcast-name").text(), podcast.title)
     assert.equal(

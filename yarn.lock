@@ -2571,6 +2571,11 @@ amdefine@>=0.0.4:
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"
   integrity sha1-SlKCrBZHKek2Gbz9OtFR+BfOkfU=
 
+amplitudejs@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/amplitudejs/-/amplitudejs-5.0.3.tgz#5f45936d153d7104698f4a736dd300c28e583a5b"
+  integrity sha512-A093+9kKaOyRiSYLour7cA0zcHEhgmF4gfj0q9a5mPaSt6uACHtNHKdHnH4vG9NUZT1X4oAZ+Z0c9q005iipHw==
+
 ansi-escapes@^1.1.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/ansi-escapes/-/ansi-escapes-1.4.0.tgz#d3a8a83b319aa67793662b13e761c7911422306e"
