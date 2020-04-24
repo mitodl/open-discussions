@@ -13,6 +13,20 @@ export default function AudioPlayer() {
   const [audioLoaded, setAudioLoaded] = useState(false)
   const [audioPlaying, setAudioPlaying] = useState(false)
 
+  const amplitudeInitialized = useCallback(() => {
+    const audio = Amplitude.getAudio()
+    audio.addEventListener("play", playbackStarted)
+    audio.addEventListener("pause", playbackPaused)
+  })
+
+  const playbackStarted = useCallback(() => {
+    setAudioPlaying(true)
+  })
+
+  const playbackPaused = useCallback(() => {
+    setAudioPlaying(false)
+  })
+
   useEffect(
     () => {
       if (Amplitude.getPlayerState() === "playing") {
@@ -40,20 +54,6 @@ export default function AudioPlayer() {
     },
     [currentlyPlayingAudio]
   )
-
-  const amplitudeInitialized = useCallback(() => {
-    const audio = Amplitude.getAudio()
-    audio.addEventListener("play", playbackStarted)
-    audio.addEventListener("pause", playbackPaused)
-  })
-
-  const playbackStarted = useCallback(() => {
-    setAudioPlaying(true)
-  })
-
-  const playbackPaused = useCallback(() => {
-    setAudioPlaying(false)
-  })
 
   const backTenClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
