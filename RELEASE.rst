@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.120.1
+Version 0.120.1 (Released April 24, 2020)
 ---------------
 
 - make config offered_by field optional
