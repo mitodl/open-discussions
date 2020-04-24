@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.120.1 (Released April 24, 2020)
+---------------
+
+- make config offered_by field optional
+- use podcast image when the podcast episode image is missing
+- Add episodes per podcast view (#2815)
+- Added podcast indexing upon ingestion
+- error catching for unparsable rss file
+- add basic tests for podcast frontpage component (#2805)
+
 Version 0.120.0 (Released April 22, 2020)
 ---------------
 
