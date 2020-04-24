@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.120.2
+---------------
+
+- Audio player (#2782)
+- Fix app.json (#2835)
+- Add loader to podcast page (#2804)
+
 Version 0.120.1 (Released April 24, 2020)
 ---------------
 
