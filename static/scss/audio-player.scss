@@ -26,8 +26,8 @@
     align-items: center;
     flex: 1;
     padding: $audio-player-padding-vertical $audio-player-padding-horizontal;
-    height: calc(100% - $audio-player-padding-vertical);
-    width: calc(100% - $audio-player-padding-horizontal);
+    height: calc(100% - #{$audio-player-padding-vertical * 2});
+    width: calc(100% - #{$audio-player-padding-horizontal * 2});
 
     @include breakpoint(mobile) {
       flex-direction: column;
