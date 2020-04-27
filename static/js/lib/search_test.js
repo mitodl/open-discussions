@@ -32,7 +32,9 @@ import {
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
-  DEFAULT_START_DT
+  DEFAULT_START_DT,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 import { LR_TYPE_PROGRAM } from "./constants"
 import { shouldIf } from "./test_utils"
@@ -176,6 +178,40 @@ describe("search functions", () => {
     })
   })
 
+  it("converts a podcast search result to a learning resource", () => {
+    const result = makeLearningResourceResult(LR_TYPE_PODCAST)
+    const podcast = searchResultToLearningResource(result)
+    assert.deepEqual(podcast, {
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    null,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_PODCAST,
+      offered_by:  result.offered_by,
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
+    })
+  })
+
+  it("converts a podcast episode search result to a learning resource", () => {
+    const result = makeLearningResourceResult(LR_TYPE_PODCAST_EPISODE)
+    const podcastEpisode = searchResultToLearningResource(result)
+    assert.deepEqual(podcastEpisode, {
+      id:          result.id,
+      title:       result.title,
+      image_src:   result.image_src,
+      platform:    null,
+      topics:      result.topics.map(topic => ({ name: topic })),
+      object_type: LR_TYPE_PODCAST_EPISODE,
+      offered_by:  result.offered_by,
+      runs:        result.runs,
+      is_favorite: result.is_favorite,
+      lists:       result.lists
+    })
+  })
+
   //
   ;[LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].forEach(listType => {
     it(`converts a ${listType} search result to a learning resource`, () => {
@@ -197,7 +233,12 @@ describe("search functions", () => {
   })
 
   //
-  ;[LR_TYPE_COURSE, LR_TYPE_VIDEO].forEach(objectType => {
+  ;[
+    LR_TYPE_COURSE,
+    LR_TYPE_VIDEO,
+    LR_TYPE_PODCAST,
+    LR_TYPE_PODCAST_EPISODE
+  ].forEach(objectType => {
     it(`takes an overrideObject with ${objectType}`, () => {
       const result = makeLearningResourceResult(objectType)
       const object = searchResultToLearningResource(result, {

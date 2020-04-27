@@ -13,7 +13,9 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_LEARNINGPATH,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 
 export type FormImage = {
@@ -437,6 +439,21 @@ export type Video = LearningResource & {
   object_type:        LR_TYPE_VIDEO,
   url:                ?string,
   duration:           ?string,
+  last_updated:       ?string
+}
+
+export type Podcast = LearningResource & {
+  image_src:          ?string,
+  object_type:        LR_TYPE_PODCAST,
+  url:                ?string,
+  last_updated:       ?string
+}
+
+
+export type PodcastEpisode = LearningResource & {
+  image_src:          ?string,
+  object_type:        LR_TYPE_PODCAST_EPISODE,
+  url:                ?string,
   last_updated:       ?string
 }
 

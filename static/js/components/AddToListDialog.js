@@ -14,7 +14,9 @@ import { capitalize, emptyOrNil } from "../lib/util"
 import {
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_VIDEO
+  LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 import { isUserList, privacyIcon } from "../lib/learning_resources"
 import { favoriteCourseMutation } from "../lib/queries/courses"
@@ -29,6 +31,10 @@ import {
   deleteUserListItemMutation
 } from "../lib/queries/user_list_items"
 import { favoriteVideoMutation } from "../lib/queries/videos"
+import {
+  favoritePodcastMutation,
+  favoritePodcastEpisodeMutation
+} from "../lib/queries/podcasts"
 import {
   learningResourceSelector,
   getResourceRequest
@@ -76,6 +82,10 @@ export default function AddToListDialog() {
       return favoriteProgramMutation(resource)
     case LR_TYPE_VIDEO:
       return favoriteVideoMutation(resource)
+    case LR_TYPE_PODCAST:
+      return favoritePodcastMutation(resource)
+    case LR_TYPE_PODCAST_EPISODE:
+      return favoritePodcastEpisodeMutation(resource)
     default:
       return favoriteUserListMutation(resource)
     }

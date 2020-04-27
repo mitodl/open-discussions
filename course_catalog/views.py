@@ -269,6 +269,7 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
     def create(self, request, *args, **kwargs):
         user_list_id = kwargs["parent_lookup_user_list_id"]
         request.data["user_list"] = user_list_id
+
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -402,43 +403,53 @@ class WebhookOCWView(APIView):
         return Response({})
 
 
-class PodcastViewSet(viewsets.ReadOnlyModelViewSet):
+class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Podcasts
     """
 
     serializer_class = PodcastSerializer
-    permission_classes = (ReadOnly & PodcastFeatureFlag,)
+    permission_classes = (AnonymousAccessReadonlyPermission & PodcastFeatureFlag,)
 
-    queryset = (
-        Podcast.objects.filter(published=True, episodes__published=True)
-        .prefetch_related(
-            Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
-            Prefetch("topics", queryset=CourseTopic.objects.all()),
+    def get_queryset(self):
+        user = self.request.user
+        return (
+            Podcast.objects.filter(published=True, episodes__published=True)
+            .prefetch_related(
+                Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+                Prefetch("topics", queryset=CourseTopic.objects.all()),
+            )
+            .annotate(episode_count=Count("episodes"))
+            .annotate_is_favorite_for_user(user)
+            .prefetch_list_items_for_user(user)
+            .order_by("id")
         )
-        .annotate(episode_count=Count("episodes"))
-        .order_by("id")
-    )
 
 
-class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet):
+class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for PodcastEpisodes
     """
 
     serializer_class = PodcastEpisodeSerializer
     pagination_class = DefaultPagination
-    permission_classes = (ReadOnly & PodcastFeatureFlag,)
+    permission_classes = (AnonymousAccessReadonlyPermission & PodcastFeatureFlag,)
 
-    queryset = (
-        PodcastEpisode.objects.filter(published=True, podcast__published=True)
-        .order_by("-last_modified", "-id")
-        .prefetch_related(
-            Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
-            Prefetch("topics", queryset=CourseTopic.objects.all()),
+    def get_queryset(self):
+
+        user = self.request.user
+
+        return (
+            PodcastEpisode.objects.filter(published=True, podcast__published=True)
+            .order_by("-last_modified", "-id")
+            .prefetch_related(
+                Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+                Prefetch("topics", queryset=CourseTopic.objects.all()),
+            )
+            .annotate_is_favorite_for_user(user)
+            .prefetch_list_items_for_user(user)
+            .select_related("podcast")
         )
-        .select_related("podcast")
-    )
 
 
 class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):

@@ -19,7 +19,8 @@ export const makePodcast = (): Podcast => ({
   title:             casual.title,
   topics:            [],
   updated_on:        casual.moment.toISOString(),
-  url:               casual.url
+  url:               casual.url,
+  is_favorite:       casual.boolean
 })
 
 export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
@@ -40,6 +41,7 @@ export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
     podcast_title:     podcast.title,
     topics:            [],
     updated_on:        casual.moment.toISOString(),
-    url:               casual.url
+    url:               casual.url,
+    is_favorite:       casual.boolean
   }
 }

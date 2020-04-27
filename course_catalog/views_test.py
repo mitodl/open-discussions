@@ -664,7 +664,7 @@ def test_podcasts(settings, client):
     resp = client.get(reverse("podcasts-list"))
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json() == [
-        {"episode_count": 2, **podcast}
+        {"episode_count": 2, "is_favorite": False, **podcast}
         for podcast in PodcastSerializer(instance=podcasts, many=True).data
     ]
 
@@ -696,10 +696,11 @@ def test_recent_podcast_episodes(settings, client):
         resp = client.get(reverse(basename))
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json()["count"] == 5
-        assert (
-            resp.json()["results"]
-            == PodcastEpisodeSerializer(instance=episodes, many=True).data
-        )
+
+        assert resp.json()["results"] == [
+            {"is_favorite": False, **episode}
+            for episode in PodcastEpisodeSerializer(instance=episodes, many=True).data
+        ]
 
 
 def test_podcast_episodes_detail_no_feature_flag(settings, client):
@@ -717,8 +718,10 @@ def test_podcast_episodes_detail(settings, client):
 
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("podcastepisodes-detail", kwargs={"pk": episode.id}))
+    expected_data = PodcastEpisodeSerializer(instance=episode).data
+    expected_data["is_favorite"] = False
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == PodcastEpisodeSerializer(instance=episode).data
+    assert resp.json() == expected_data
 
 
 def test_episodes_per_podcast_no_feature_flag(settings, client):
