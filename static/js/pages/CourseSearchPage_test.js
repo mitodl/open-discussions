@@ -574,9 +574,12 @@ describe("CourseSearchPage", () => {
         helper.searchStub.returns(Promise.resolve(searchResponse))
         const { inner } = await renderPage({
           entities: {
-            courses:   resourceType === LR_TYPE_COURSE ? entity : {},
-            videos:    resourceType === LR_TYPE_VIDEO ? entity : {},
-            programs:  resourceType === LR_TYPE_PROGRAM ? entity : {},
+            courses:         resourceType === LR_TYPE_COURSE ? entity : {},
+            videos:          resourceType === LR_TYPE_VIDEO ? entity : {},
+            programs:        resourceType === LR_TYPE_PROGRAM ? entity : {},
+            podcasts:        resourceType === LR_TYPE_PODCAST ? entity : {},
+            podcastEpisodes:
+              resourceType === LR_TYPE_PODCAST_EPISODE ? entity : {},
             userLists: [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(
               resourceType
             )

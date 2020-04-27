@@ -11,7 +11,8 @@ export type Podcast = {
   title: string,
   topics: Array<string>,
   updated_on: string,
-  url: string
+  url: string,
+  is_favorite: boolean
 }
 
 export type PodcastEpisode = {
@@ -28,5 +29,6 @@ export type PodcastEpisode = {
   topics: Array<string>,
   updated_on: string,
   url: string,
+  is_favorite: boolean,
   podcast_title: string
 }

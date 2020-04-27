@@ -536,5 +536,6 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
         return PlatformType.podcast.value
 
     class Meta:
+        verbose_name = "podcastepisode"
         unique_together = ("podcast", "episode_id")
         ordering = ("id",)

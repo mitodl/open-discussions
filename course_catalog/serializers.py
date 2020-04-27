@@ -53,6 +53,10 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
             serializer = ProgramSerializer(instance, context=context)
         elif isinstance(instance, Video):
             serializer = VideoSerializer(instance, context=context)
+        elif isinstance(instance, Podcast):
+            serializer = PodcastSerializer(instance, context=context)
+        elif isinstance(instance, PodcastEpisode):
+            serializer = PodcastEpisodeSerializer(instance, context=context)
         else:
             raise Exception("Unexpected type of tagged object")
         return serializer.data
@@ -400,7 +404,13 @@ class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixi
         object_id = attrs.get("object_id")
 
         if content_type:
-            if content_type not in ["course", "program", "video"]:
+            if content_type not in [
+                "course",
+                "program",
+                "video",
+                "podcast",
+                "podcastepisode",
+            ]:
                 raise ValidationError("Incorrect object type {}".format(content_type))
             if (
                 content_type == "course"
@@ -417,6 +427,16 @@ class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixi
                 and not Video.objects.filter(id=object_id).exists()
             ):
                 raise ValidationError("Video does not exist")
+            if (
+                content_type == "podcast"
+                and not Podcast.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Podcast does not exist")
+            if (
+                content_type == "podcastepisode"
+                and not PodcastEpisode.objects.filter(id=object_id).exists()
+            ):
+                raise ValidationError("Podcast Episode does not exist")
         return attrs
 
     def update_index(self, user_list):
@@ -639,15 +659,17 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class PodcastEpisodeSerializer(serializers.ModelSerializer):
+class PodcastEpisodeSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Serializer for PodcastEpisode
     """
 
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
+    object_type = serializers.CharField(read_only=True, default="podcastepisode")
     podcast_title = serializers.SerializerMethodField()
-    object_type = serializers.CharField(read_only=True, default="episode")
 
     def get_podcast_title(self, instance):
         """get the podcast title"""
@@ -655,26 +677,12 @@ class PodcastEpisodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PodcastEpisode
-        fields = [
-            "id",
-            "topics",
-            "created_on",
-            "updated_on",
-            "title",
-            "short_description",
-            "episode_id",
-            "full_description",
-            "image_src",
-            "url",
-            "offered_by",
-            "podcast",
-            "last_modified",
-            "podcast_title",
-            "object_type",
-        ]
+        exclude = COMMON_IGNORED_FIELDS
 
 
-class PodcastSerializer(serializers.ModelSerializer):
+class PodcastSerializer(
+    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
+):
     """
     Serializer for Podcasts
     """
@@ -686,18 +694,4 @@ class PodcastSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Podcast
-        fields = [
-            "id",
-            "title",
-            "short_description",
-            "podcast_id",
-            "full_description",
-            "image_src",
-            "url",
-            "topics",
-            "offered_by",
-            "created_on",
-            "updated_on",
-            "episode_count",
-            "object_type",
-        ]
+        exclude = COMMON_IGNORED_FIELDS

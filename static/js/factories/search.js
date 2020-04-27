@@ -12,7 +12,9 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_VIDEO,
   LR_TYPE_USERLIST,
-  LR_TYPE_LEARNINGPATH
+  LR_TYPE_LEARNINGPATH,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../lib/constants"
 
 import type {
@@ -130,6 +132,37 @@ export const makeVideoResult = (): LearningResourceResult => ({
   lists:             casual.random_element([[], [100, 200]])
 })
 
+export const makePodcastResult = (): LearningResourceResult => ({
+  id:                casual.integer(1, 1000),
+  podcast_id:        `podcast_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  topics:            [casual.word, casual.word],
+  object_type:       LR_TYPE_PODCAST,
+  offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
+  runs:              [],
+  is_favorite:       casual.coin_flip,
+  lists:             casual.random_element([[], [100, 200]])
+})
+
+export const makePodcastEpisodeResult = (): LearningResourceResult => ({
+  id:                casual.integer(1, 1000),
+  podcast_id:        `podcastepisode_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  topics:            [casual.word, casual.word],
+  object_type:       LR_TYPE_PODCAST_EPISODE,
+  offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
+  runs:              [],
+  is_favorite:       casual.coin_flip,
+  lists:             casual.random_element([[], [100, 200]]),
+  series_title:      `podcast_${String(casual.random)}`
+})
+
 export const makeUserListResult = (
   listType: string
 ): LearningResourceResult => ({
@@ -155,6 +188,10 @@ export const makeLearningResourceResult = (objectType: string) => {
     return makeProgramResult()
   case LR_TYPE_VIDEO:
     return makeVideoResult()
+  case LR_TYPE_PODCAST:
+    return makePodcastResult()
+  case LR_TYPE_PODCAST_EPISODE:
+    return makePodcastEpisodeResult()
   case LR_TYPE_USERLIST:
     return makeUserListResult(LR_TYPE_USERLIST)
   case LR_TYPE_LEARNINGPATH:

@@ -14,6 +14,7 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
+  LR_TYPE_PODCAST_EPISODE,
   platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
@@ -155,6 +156,8 @@ export const resourceLabel = (resource: string) => {
     return "Learning Lists"
   case LR_TYPE_LEARNINGPATH:
     return "Learning Paths"
+  case LR_TYPE_PODCAST_EPISODE:
+    return "Podcast Episodes"
   default:
     return R.concat(capitalize(resource), "s")
   }

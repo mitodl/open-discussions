@@ -21,6 +21,7 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import CourseFilterDrawer from "../components/CourseFilterDrawer"
+import AudioPlayer from "../components/AudioPlayer"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
@@ -324,7 +325,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       userLists,
       videos,
       podcasts,
-      episodes
+      podcastEpisodes
     } = entities
     switch (result.object_type) {
     case LR_TYPE_COURSE:
@@ -338,7 +339,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     case LR_TYPE_PODCAST:
       return podcasts ? podcasts[result.id] || null : null
     case LR_TYPE_PODCAST_EPISODE:
-      return episodes ? episodes[result.id] || null : null
+      return podcastEpisodes ? podcastEpisodes[result.id] || null : null
     case LR_TYPE_LEARNINGPATH:
       return userLists ? userLists[result.id] || null : null
     }
@@ -497,6 +498,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
             {error ? null : this.renderResults()}
           </Cell>
         </Grid>
+        <AudioPlayer />
       </BannerPageWrapper>
     )
   }

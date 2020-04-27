@@ -132,21 +132,28 @@ export const favoritesSelector = createSelector(
   state => state.entities.programs,
   state => state.entities.userLists,
   state => state.entities.videos,
-  (courses, programs, userLists, videos) => ({
-    courses:   filterFavorite(courses),
-    programs:  filterFavorite(programs),
-    userLists: filterFavorite(userLists),
-    videos:    filterFavorite(videos)
+  state => state.entities.podcasts,
+  state => state.entities.podcastEpisodes,
+
+  (courses, programs, userLists, videos, podcasts, podcastEpisodes) => ({
+    courses:         filterFavorite(courses),
+    programs:        filterFavorite(programs),
+    userLists:       filterFavorite(userLists),
+    videos:          filterFavorite(videos),
+    podcasts:        filterFavorite(podcasts),
+    podcastEpisodes: filterFavorite(podcastEpisodes)
   })
 )
 
 export const favoritesListSelector = createSelector(
   favoritesSelector,
-  ({ courses, programs, userLists, videos }) => [
+  ({ courses, programs, userLists, videos, podcasts, podcastEpisodes }) => [
     ...Object.values(courses),
     ...Object.values(programs),
     ...Object.values(userLists),
-    ...Object.values(videos)
+    ...Object.values(videos),
+    ...Object.values(podcasts),
+    ...Object.values(podcastEpisodes)
   ]
 )
 

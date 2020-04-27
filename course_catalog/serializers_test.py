@@ -243,8 +243,6 @@ def test_podcast_serializer():
     podcast.offered_by.add(offered_by)
 
     assert PodcastSerializer(instance=podcast).data == {
-        "created_on": podcast.created_on.strftime(datetime_millis_format),
-        "updated_on": podcast.updated_on.strftime(datetime_millis_format),
         "full_description": podcast.full_description,
         "topics": CourseTopicSerializer(many=True, instance=podcast.topics).data,
         "url": podcast.url,
@@ -254,7 +252,10 @@ def test_podcast_serializer():
         "offered_by": [offered_by.name],
         "title": podcast.title,
         "id": podcast.id,
+        "lists": [],
         "object_type": "podcast",
+        "published": True,
+        "searchable": True,
     }
 
 
@@ -265,12 +266,10 @@ def test_podcast_episode_serializer():
     episode.offered_by.add(offered_by)
 
     assert PodcastEpisodeSerializer(instance=episode).data == {
-        "created_on": episode.created_on.strftime(datetime_millis_format),
-        "updated_on": episode.updated_on.strftime(datetime_millis_format),
+        "full_description": episode.full_description,
         "id": episode.id,
         "title": episode.title,
         "episode_id": episode.episode_id,
-        "full_description": episode.full_description,
         "image_src": episode.image_src,
         "offered_by": [offered_by.name],
         "short_description": episode.short_description,
@@ -278,6 +277,11 @@ def test_podcast_episode_serializer():
         "url": episode.url,
         "podcast": episode.podcast_id,
         "last_modified": episode.last_modified.strftime(datetime_format),
-        "object_type": "episode",
+        "object_type": "podcastepisode",
         "podcast_title": episode.podcast.title,
+        "transcript": "",
+        "lists": [],
+        "published": True,
+        "searchable": True,
+        "duration": None,
     }

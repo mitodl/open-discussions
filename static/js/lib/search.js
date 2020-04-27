@@ -8,6 +8,8 @@ import {
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE,
   PHONE,
   TABLET,
   DESKTOP,
@@ -164,6 +166,21 @@ const LIST_QUERY_FIELDS = [
   "topics"
 ]
 
+const PODCAST_QUERY_FIELDS = [
+  "title.english^3",
+  "short_description.english^2",
+  "full_description.english",
+  "topics"
+]
+
+const PODCAST_EPISODE_QUERY_FIELDS = [
+  "title.english^3",
+  "short_description.english^2",
+  "full_description.english",
+  "topics",
+  "series_title^2"
+]
+
 const LEARN_SUGGEST_FIELDS = ["title.trigram", "short_description.trigram"]
 const CHANNEL_SUGGEST_FIELDS = ["suggest_field1", "suggest_field2"]
 
@@ -228,6 +245,10 @@ const _searchFields = (type: ?string) => {
     return COURSE_QUERY_FIELDS
   } else if (type === LR_TYPE_VIDEO) {
     return VIDEO_QUERY_FIELDS
+  } else if (type === LR_TYPE_PODCAST) {
+    return PODCAST_QUERY_FIELDS
+  } else if (type === LR_TYPE_PODCAST_EPISODE) {
+    return PODCAST_EPISODE_QUERY_FIELDS
   } else if ([LR_TYPE_PROGRAM, LR_TYPE_USERLIST].includes(type)) {
     return LIST_QUERY_FIELDS
   } else {
