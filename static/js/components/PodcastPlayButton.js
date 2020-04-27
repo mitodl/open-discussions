@@ -16,7 +16,7 @@ export default function PodcastPlayButton(props: Props) {
 
   const dispatch = useDispatch()
   const initAudioPlayer = useInitAudioPlayer({
-    title:       episode.podcast.title,
+    title:       episode.podcast_title,
     description: episode.title,
     url:         episode.url
   })
