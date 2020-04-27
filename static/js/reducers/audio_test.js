@@ -47,7 +47,7 @@ describe("audio reducer", () => {
   })
 
   it("should let you set the audio player state", () => {
-    dispatchThen(setAudioPlayerState("playing", [SET_AUDIO_PLAYER_STATE]))
+    dispatchThen(setAudioPlayerState("playing"), [SET_AUDIO_PLAYER_STATE])
     const audioPlayerState = getAudioPlayerState(store.getState())
     assert.equal("playing", audioPlayerState)
   })
