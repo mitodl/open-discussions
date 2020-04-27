@@ -459,6 +459,7 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = PodcastEpisodeSerializer
     permission_classes = (ReadOnly & PodcastFeatureFlag,)
+    pagination_class = DefaultPagination
 
     def get_queryset(self):
         return (

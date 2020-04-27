@@ -6,7 +6,8 @@ import {
   podcastApiURL,
   recentPodcastApiURL,
   podcastDetailApiURL,
-  podcastEpisodeDetailApiURL
+  podcastEpisodeDetailApiURL,
+  podcastDetailEpisodesApiURL
 } from "../url"
 
 import { DEFAULT_POST_OPTIONS, constructIdMap } from "../redux_query"
@@ -133,3 +134,34 @@ export const favoritePodcastEpisodeMutation = (
     ...DEFAULT_POST_OPTIONS
   }
 })
+
+export const podcastEpisodesKey = (podcastId: number) =>
+  `podcast${podcastId}episodes`
+
+export const podcastEpisodesRequest = (
+  podcastId: number,
+  offset: number,
+  limit: number
+) => {
+  const key = podcastEpisodesKey(podcastId)
+
+  return {
+    url:       podcastDetailEpisodesApiURL.param({ podcastId }).toString(),
+    queryKey:  `${key}Request.page[${offset}:${offset + limit}]`,
+    body:      { offset, limit },
+    transform: ({ count, results }: Object) => ({
+      [key]: {
+        items: results.map(result => result.id),
+        count
+      },
+      podcastEpisodes: constructIdMap(results)
+    }),
+    update: {
+      podcastEpisodes: R.merge,
+      [key]:           (prev, next) => ({
+        items: prev ? [...prev.items, ...next.items] : next.items,
+        count: next.count
+      })
+    }
+  }
+}

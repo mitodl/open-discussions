@@ -748,10 +748,15 @@ def test_episodes_per_podcast(settings, client):
     settings.FEATURES[features.PODCAST_APIS] = True
     resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": podcast.id}))
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == PodcastEpisodeSerializer(instance=episodes, many=True).data
+    assert resp.json() == {
+        "count": 5,
+        "results": PodcastEpisodeSerializer(instance=episodes, many=True).data,
+        "next": None,
+        "previous": None,
+    }
 
     podcast.published = False
     podcast.save()
     resp = client.get(reverse("episodes-in-podcast", kwargs={"pk": podcast.id}))
     assert resp.status_code == status.HTTP_200_OK
-    assert resp.json() == []
+    assert resp.json() == {"count": 0, "results": [], "next": None, "previous": None}

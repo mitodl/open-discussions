@@ -180,7 +180,7 @@ export const similarResourcesURL = "/api/v0/similar/"
 
 export const podcastApiURL = api.segment("podcasts/")
 export const recentPodcastApiURL = podcastApiURL.segment("recent/")
-export const podcastDetailApiURL = podcastApiURL.segment(":podcastId")
+export const podcastDetailApiURL = podcastApiURL.segment(":podcastId/")
 export const podcastDetailEpisodesApiURL = podcastDetailApiURL.segment(
   "episodes/"
 )

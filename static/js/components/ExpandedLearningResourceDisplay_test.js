@@ -4,6 +4,7 @@ import R from "ramda"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 import * as UserListItemsMod from "../components/UserListItems"
+import * as PaginatedPodcastEpisodesMod from "./PaginatedPodcastEpisodes"
 
 import {
   makeCourse,
@@ -59,6 +60,10 @@ describe("ExpandedLearningResourceDisplay", () => {
       UserListItemsMod,
       "PaginatedUserListItems",
       "PaginatedUserListItems"
+    )
+    helper.stubComponent(
+      PaginatedPodcastEpisodesMod,
+      "PaginatedPodcastEpisodes"
     )
     render = helper.configureHOCRenderer(
       ExpandedLearningResourceDisplay,
@@ -184,6 +189,12 @@ describe("ExpandedLearningResourceDisplay", () => {
     })
   })
 
+  it("should put a PaginatedPodcastEpisodes for Podcasts", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST)
+    const { wrapper } = await render({}, { object })
+    assert.ok(wrapper.find("PaginatedPodcastEpisodes").exists())
+  })
+
   LR_TYPE_ALL.forEach(objectType => {
     it(`should render description using the TruncatedText for ${objectType}`, async () => {
       const object = makeLearningResource(objectType)
@@ -233,7 +244,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       const listIdx = [
         LR_TYPE_LEARNINGPATH,
         LR_TYPE_USERLIST,
-        LR_TYPE_PROGRAM
+        LR_TYPE_PROGRAM,
+        LR_TYPE_PODCAST
       ].includes(objectType)
         ? 1
         : 0
@@ -274,7 +286,8 @@ describe("ExpandedLearningResourceDisplay", () => {
       const listIdx = [
         LR_TYPE_LEARNINGPATH,
         LR_TYPE_USERLIST,
-        LR_TYPE_PROGRAM
+        LR_TYPE_PROGRAM,
+        LR_TYPE_PODCAST
       ].includes(objectType)
         ? 1
         : 0

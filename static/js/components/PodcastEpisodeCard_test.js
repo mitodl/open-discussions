@@ -66,4 +66,9 @@ describe("PodcastEpisodeCard", () => {
       .simulate("click")
     sinon.assert.called(openStub)
   })
+
+  it("should pass down persistentShadow to Card if passed", async () => {
+    const { wrapper } = await render({ persistentShadow: true })
+    assert.isTrue(wrapper.find("Card").prop("persistentShadow"))
+  })
 })

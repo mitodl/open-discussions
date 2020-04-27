@@ -17,13 +17,14 @@ export const PODCAST_IMG_WIDTH = 125
 
 type Props = {
   podcast: Podcast,
-  episode: PodcastEpisode
+  episode: PodcastEpisode,
+  persistentShadow?: boolean
 }
 
 export const EPISODE_DATE_FORMAT = "MMMM D, YYYY"
 
 export default function PodcastEpisodeCard(props: Props) {
-  const { episode, podcast } = props
+  const { episode, podcast, persistentShadow } = props
 
   const openEpisodeDrawer = useOpenEpisodeDrawer(episode.id)
 
@@ -31,6 +32,7 @@ export default function PodcastEpisodeCard(props: Props) {
     <Card
       className="podcast-episode-card low-padding"
       onClick={openEpisodeDrawer}
+      persistentShadow={persistentShadow}
     >
       <div className="left-col">
         <div className="episode-title">

@@ -6,23 +6,34 @@ type CardProps = {|
   className?: string,
   title?: any,
   borderless?: boolean,
-  onClick?: Function
+  onClick?: Function,
+  persistentShadow?: boolean
 |}
 
-const getClassName = (className, borderless) =>
-  `card ${className || ""} ${borderless ? "borderless" : ""}`
+const getClassName = (className, borderless, persistentShadow) => {
+  const classes = [
+    "card",
+    className || "",
+    borderless ? "borderless" : "",
+    persistentShadow ? "persistent-shadow" : ""
+  ]
+
+  return classes
+    .join(" ")
     .trim()
     .replace(/\s+/g, " ")
+}
 
 const Card = ({
   children,
   className,
   title,
   borderless,
-  onClick
+  onClick,
+  persistentShadow
 }: CardProps) => (
   <div
-    className={getClassName(className, borderless)}
+    className={getClassName(className, borderless, persistentShadow)}
     onClick={onClick || null}
   >
     <div className="card-contents">

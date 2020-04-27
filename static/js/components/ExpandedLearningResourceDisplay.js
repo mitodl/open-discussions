@@ -10,6 +10,7 @@ import TruncatedText from "./TruncatedText"
 import Embedly from "./Embedly"
 import ShareTooltip from "./ShareTooltip"
 import PodcastPlayButton from "./PodcastPlayButton"
+import PaginatedPodcastEpisodes from "./PaginatedPodcastEpisodes"
 
 import { LearningResourceRow } from "./LearningResourceCard"
 import { PaginatedUserListItems } from "./UserListItems"
@@ -126,9 +127,11 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
   const [showSimilar, setShowSimilar] = useState(false)
   const [showCourseList, setShowCourseList] = useState(false)
   const [showResourceList, setShowResourceList] = useState(false)
+  const [showPodcastList, setShowPodcastList] = useState(true)
   const similarIcon = showSimilar ? "remove" : "add"
   const coursesIcon = showCourseList ? "remove" : "add"
   const resourcesIcon = showResourceList ? "remove" : "add"
+  const podcastIcon = showPodcastList ? "remove" : "add"
 
   const updateRun = (event: Object) =>
     setShowResourceDrawer({
@@ -358,6 +361,16 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           icon={resourcesIcon}
         >
           <PaginatedUserListItems userList={object} pageSize={10} />
+        </CollapsableSection>
+      ) : null}
+      {object.object_type === LR_TYPE_PODCAST ? (
+        <CollapsableSection
+          title="Episodes"
+          setShow={setShowPodcastList}
+          show={showPodcastList}
+          icon={podcastIcon}
+        >
+          <PaginatedPodcastEpisodes podcast={object} pageSize={10} />
         </CollapsableSection>
       ) : null}
       {!emptyOrNil(similarItems) && !hideSimilarLearningResources ? (

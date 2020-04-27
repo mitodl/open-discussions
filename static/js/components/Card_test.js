@@ -31,6 +31,11 @@ describe("Card component", () => {
     assert.equal(wrapper.props().className, "card borderless")
   })
 
+  it("should add .persistent-shadow if given the prop", () => {
+    const wrapper = mountCard(<div />, { persistentShadow: true })
+    assert.equal(wrapper.props().className, "card persistent-shadow")
+  })
+
   it("should set an onClick handler, if given one", () => {
     const onClick = sinon.stub()
     const wrapper = mountCard(<div />, { onClick })

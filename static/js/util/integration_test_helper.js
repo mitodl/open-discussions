@@ -91,6 +91,7 @@ export default class IntegrationTestHelper {
     )
     this.getCKEditorJWTStub.returns(Promise.resolve())
 
+    // for stubbing out redux query
     const defaultResponse = {
       body:   {},
       status: 200

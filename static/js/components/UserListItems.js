@@ -11,6 +11,8 @@ import {
   LearningResourceCard,
   LearningResourceRow
 } from "../components/LearningResourceCard"
+import LRDrawerPaginationControls from "./LRDrawerPaginationControls"
+
 import { SEARCH_LIST_UI } from "../lib/search"
 import {
   userListItemsRequest,
@@ -167,28 +169,13 @@ export function PaginatedUserListItems({
           searchResultLayout={SEARCH_LIST_UI}
         />
       ))}
-      <div className="pagination-nav">
-        <button
-          onClick={() => setPage(page - 1)}
-          disabled={begin === 0}
-          className="blue-btn outlined previous"
-        >
-          <i className="material-icons keyboard_arrow_left">
-            keyboard_arrow_left
-          </i>
-          <span>Previous</span>
-        </button>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={end > count}
-          className="blue-btn outlined next"
-        >
-          <span>Next</span>
-          <i className="material-icons keyboard_arrow_right">
-            keyboard_arrow_right
-          </i>
-        </button>
-      </div>
+      <LRDrawerPaginationControls
+        page={page}
+        begin={begin}
+        setPage={setPage}
+        count={count}
+        end={end}
+      />
     </div>
   ) : (
     loader
