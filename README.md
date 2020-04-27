@@ -373,3 +373,18 @@ OPEN_DISCUSSIONS_BASE_URL=http://docker.for.mac.localhost:8063/
 - You should be redirected back to the open-discussions home page, and be logged in.
 - Log out & back in as a superuser and to go the Users admin page.
   - There should be a new user with the same email address and name that you used to register with SSOCircle.
+
+
+## Commits
+
+To ensure commits to github are safe, you should install the following first:
+```
+pip install pre_commit
+pre-commit install
+```
+
+To automatically install precommit hooks when cloning a repo, you can run this:
+```
+git config --global init.templateDir ~/.git-template
+pre-commit init-templatedir ~/.git-template
+```    
