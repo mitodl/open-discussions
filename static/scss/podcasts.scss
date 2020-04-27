@@ -63,13 +63,33 @@
     padding-top: 10px;
   }
 
+  .play-date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .date {
+      font-size: 14px;
+      color: $podcast-border-grey;
+    }
+  }
+
   .podcast-play-button {
     margin-top: 8px;
+  }
+
+  .left-col {
+    width: 100%;
+    margin-right: 10px;
   }
 
   .episode-cover-image {
     border: 1px solid $podcast-border-grey;
     border-radius: 5px;
+    max-width: 125px;
+    min-width: 125px;
+    max-height: 79px;
+    overflow: hidden;
   }
 }
 

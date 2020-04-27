@@ -2,13 +2,15 @@
 /* global SETTINGS:false */
 import { assert } from "chai"
 import sinon from "sinon"
+import moment from "moment"
 
 import { makePodcast, makePodcastEpisode } from "../factories/podcasts"
 import { embedlyThumbnail } from "../lib/url"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import PodcastEpisodeCard, {
   PODCAST_IMG_WIDTH,
-  PODCAST_IMG_HEIGHT
+  PODCAST_IMG_HEIGHT,
+  EPISODE_DATE_FORMAT
 } from "./PodcastEpisodeCard"
 import * as podcastHooks from "../hooks/podcasts"
 
@@ -33,6 +35,10 @@ describe("PodcastEpisodeCard", () => {
     const { wrapper } = await render()
     assert.equal(wrapper.find("Dotdotdot").props().children, episode.title)
     assert.equal(wrapper.find(".podcast-name").text(), podcast.title)
+    assert.equal(
+      wrapper.find(".date").text(),
+      moment(episode.last_modified).format(EPISODE_DATE_FORMAT)
+    )
     assert.equal(
       wrapper.find("img").prop("src"),
       embedlyThumbnail(

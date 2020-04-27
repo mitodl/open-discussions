@@ -2,6 +2,7 @@
 /* global SETTINGS:false */
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
+import moment from "moment"
 
 import Card from "./Card"
 import PodcastPlayButton from "./PodcastPlayButton"
@@ -19,6 +20,8 @@ type Props = {
   episode: PodcastEpisode
 }
 
+export const EPISODE_DATE_FORMAT = "MMMM D, YYYY"
+
 export default function PodcastEpisodeCard(props: Props) {
   const { episode, podcast } = props
 
@@ -34,7 +37,12 @@ export default function PodcastEpisodeCard(props: Props) {
           <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
         </div>
         <div className="podcast-name">{podcast.title}</div>
-        <PodcastPlayButton episode={episode} />
+        <div className="play-date-row">
+          <PodcastPlayButton episode={episode} />
+          <div className="date">
+            {moment(episode.last_modified).format(EPISODE_DATE_FORMAT)}
+          </div>
+        </div>
       </div>
       <div className="right-col">
         <img
