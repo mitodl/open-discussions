@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.121.0 (Released April 28, 2020)
+---------------
+
+- Audio player Safari / Apple Webkit fix (#2847)
+- add basic drawer support for podcasts, podcastEpisodes
+- fix parsing of variables inside calc (#2843)
+- Bootcamps -> Courses (#2811)
+- Audio player (#2782)
+- Fix app.json (#2835)
+- Add loader to podcast page (#2804)
+
 Version 0.120.1 (Released April 24, 2020)
 ---------------
 
