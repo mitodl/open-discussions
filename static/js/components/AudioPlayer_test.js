@@ -1,8 +1,7 @@
 import { assert } from "chai"
-import Amplitude from "amplitudejs"
 
 import AudioPlayer from "./AudioPlayer"
-import { setCurrentlyPlayingAudio } from "../actions/audio"
+import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("AudioPlayer", () => {
@@ -24,11 +23,21 @@ describe("AudioPlayer", () => {
     helper.cleanup()
   })
 
-  it("should render the component", async () => {
+  it("should be hidden if we try and render it without setting audio", async () => {
+    const { wrapper } = await render({}, [])
+    assert.isTrue(
+      wrapper.find(".audio-player-container-outer").hasClass("hidden")
+    )
+  })
+
+  it("should render the component and be visible if audio is passed in", async () => {
     const { wrapper } = await render({}, [
       setCurrentlyPlayingAudio(exampleAudio)
     ])
-    assert.equal(wrapper.find(".audio-player-container-outer").length, 1)
+    assert.equal(wrapper.find(`.audio-player-container-outer`).length, 1)
+    assert.isFalse(
+      wrapper.find(".audio-player-container-outer").hasClass("hidden")
+    )
   })
 
   it("should render all the necessary controls and fields", async () => {
@@ -46,10 +55,25 @@ describe("AudioPlayer", () => {
     assert.equal(wrapper.find(`.amplitude-playback-speed`).length, 1)
   })
 
-  it("should properly set the episode info in amplitudejs", async () => {
-    await render({}, [setCurrentlyPlayingAudio(exampleAudio)])
-    assert.equal(Amplitude.getConfig().songs[0].album, exampleAudio.title)
-    assert.equal(Amplitude.getConfig().songs[0].name, exampleAudio.description)
-    assert.equal(Amplitude.getConfig().songs[0].url, exampleAudio.url)
+  it("should render a pause icon when the player state is playing", async () => {
+    const { wrapper } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio),
+      setAudioPlayerState("playing")
+    ])
+    assert.equal(
+      wrapper.find(`.amplitude-play-pause span`).text(),
+      "pause_circle_outline"
+    )
+  })
+
+  it("should render a play icon when the player state is paused", async () => {
+    const { wrapper } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio),
+      setAudioPlayerState("paused")
+    ])
+    assert.equal(
+      wrapper.find(`.amplitude-play-pause span`).text(),
+      "play_circle_outline"
+    )
   })
 })

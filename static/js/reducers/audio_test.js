@@ -2,9 +2,14 @@
 import { assert } from "chai"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { getCurrentlyPlayingAudio } from "../lib/redux_selectors"
+import {
+  getAudioPlayerState,
+  getCurrentlyPlayingAudio
+} from "../lib/redux_selectors"
 import { INITIAL_AUDIO_STATE } from "./audio"
 import {
+  SET_AUDIO_PLAYER_STATE,
+  setAudioPlayerState,
   SET_CURRENTLY_PLAYING_AUDIO,
   setCurrentlyPlayingAudio
 } from "../actions/audio"
@@ -39,5 +44,11 @@ describe("audio reducer", () => {
     ])
     const currentlyPlaying = getCurrentlyPlayingAudio(store.getState())
     assert.deepEqual(exampleAudio, currentlyPlaying)
+  })
+
+  it("should let you set the audio player state", () => {
+    dispatchThen(setAudioPlayerState("playing"), [SET_AUDIO_PLAYER_STATE])
+    const audioPlayerState = getAudioPlayerState(store.getState())
+    assert.equal("playing", audioPlayerState)
   })
 })
