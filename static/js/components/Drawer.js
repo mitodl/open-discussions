@@ -20,7 +20,10 @@ import {
   setShowDrawerHover,
   setShowDrawerDesktop
 } from "../actions/ui"
-import { getSubscribedChannels } from "../lib/redux_selectors"
+import {
+  getSubscribedChannels,
+  isAudioPlayerLoaded
+} from "../lib/redux_selectors"
 import {
   getViewportWidth,
   isMobileWidth,
@@ -123,6 +126,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
       showDrawerDesktop,
       showDrawerHover,
       showDrawerMobile,
+      audioPlayerLoaded,
       subscribedChannels,
       location: { pathname }
     } = this.props
@@ -143,9 +147,12 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
     }
 
     const expanded = isMobile ? true : showDrawerDesktop || showDrawerHover
+    const audioPlayerPadding = audioPlayerLoaded
+      ? " audio-player-padding-bottom"
+      : ""
 
     return (
-      <div className={this.wrappingClass}>
+      <div className={`${this.wrappingClass}${audioPlayerPadding}`}>
         <Theme>
           <Drawer
             modal={isMobile}
@@ -189,6 +196,7 @@ export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   showDrawerDesktop:  state.ui.showDrawerDesktop,
   showDrawerHover:    state.ui.showDrawerHover,
   showDrawerMobile:   state.ui.showDrawerMobile,
+  audioPlayerLoaded:  isAudioPlayerLoaded(state),
   channels:           state.channels.data
 })
 
