@@ -2,9 +2,11 @@
 /* global SETTINGS:false */
 import { safeBulkGet } from "../lib/maps"
 import { createSelector } from "reselect"
+import _ from "lodash"
 
 import type { Channel } from "../flow/discussionTypes"
 import type { Profile } from "../flow/discussionTypes"
+import { INITIAL_AUDIO_STATE } from "../reducers/audio"
 
 export const getSubscribedChannels = (state: Object): Array<Channel> =>
   state.subscribedChannels.loaded
@@ -28,4 +30,13 @@ export const getCurrentlyPlayingAudio = (state: Object): any =>
 export const currentlyPlayingAudioSelector = createSelector(
   state => state.audio,
   audio => audio.currentlyPlaying
+)
+
+export const isAudioPlayerLoaded = (state: Object): any =>
+  !_.isEqual(state.audio.currentlyPlaying, INITIAL_AUDIO_STATE.currentlyPlaying)
+
+export const isAudioPlayerLoadedSelector = createSelector(
+  state => state.audio,
+  audio =>
+    !_.isEqual(audio.currentlyPlaying, INITIAL_AUDIO_STATE.currentlyPlaying)
 )
