@@ -71,6 +71,7 @@ type StateProps = {|
   snackbar: SnackbarState,
   banner: BannerState,
   showUserMenu: boolean,
+  audioPlayerLoaded: boolean,
   profile: ?Profile
 |}
 

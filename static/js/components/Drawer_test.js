@@ -19,6 +19,7 @@ import { channelURL, newPostURL } from "../lib/url"
 import { makeChannelList } from "../factories/channels"
 import { makeLocation } from "../factories/util"
 import { shouldIf } from "../lib/test_utils"
+import { INITIAL_AUDIO_STATE } from "../reducers/audio"
 
 describe("Drawer", () => {
   let sandbox, dispatchStub, channels, isMobileWidthStub, getViewportWidthStub
@@ -45,6 +46,7 @@ describe("Drawer", () => {
         showDrawerDesktop={false}
         showDrawerMobile={false}
         showDrawerHover={false}
+        audioPlayerLoaded={false}
         {...props}
       />
     )
@@ -221,7 +223,7 @@ describe("Drawer", () => {
   })
 
   describe("mapStateToProps", () => {
-    let state, getSubscribedChannelsStub
+    let state, getSubscribedChannelsStub, isAudioPlayerLoadedStub
 
     beforeEach(() => {
       state = {
@@ -230,12 +232,16 @@ describe("Drawer", () => {
           showDrawerMobile:  true,
           showDrawerDesktop: true,
           showDrawerHover:   true
+        },
+        audio: {
+          currentlyPlaying: INITIAL_AUDIO_STATE
         }
       }
       getSubscribedChannelsStub = sandbox.stub(
         selectors,
         "getSubscribedChannels"
       )
+      isAudioPlayerLoadedStub = sandbox.stub(selectors, "isAudioPlayerLoaded")
     })
 
     it("should grab state.ui.showDrawer props", () => {
@@ -247,6 +253,11 @@ describe("Drawer", () => {
       assert.equal(showDrawerMobile, state.ui.showDrawerMobile)
       assert.equal(showDrawerDesktop, state.ui.showDrawerDesktop)
       assert.equal(showDrawerHover, state.ui.showDrawerHover)
+    })
+
+    it("should call isAudioPlayerLoaded", () => {
+      mapStateToProps(state)
+      assert.ok(isAudioPlayerLoadedStub.calledWith(state))
     })
 
     it("should call getSubscribedChannels", () => {

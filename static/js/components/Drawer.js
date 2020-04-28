@@ -41,6 +41,7 @@ type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   showDrawerHover: boolean,
+  audioPlayerLoaded: boolean,
   subscribedChannels: Array<Channel>,
   channels: Map<string, Channel>
 }
