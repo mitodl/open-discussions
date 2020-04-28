@@ -254,3 +254,12 @@
     }
   }
 }
+
+.audio-player-padding-bottom {
+  @include breakpoint(desktop) {
+    padding-bottom: $audio-player-height-desktop;
+  }
+  @include breakpoint(mobile) {
+    padding-bottom: $audio-player-height-mobile;
+  }
+}
