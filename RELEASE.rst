@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.121.0
+Version 0.121.0 (Released April 28, 2020)
 ---------------
 
 - Audio player Safari / Apple Webkit fix (#2847)
