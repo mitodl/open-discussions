@@ -14,6 +14,7 @@ import {
   recentPodcastEpisodesRequest,
   recentEpisodesSelector
 } from "../lib/queries/podcasts"
+import { useLearningResourcePermalink } from "../hooks/learning_resources"
 
 export default function PodcastFrontpage() {
   const [{ isFinished: isFinishedPodcasts }] = useRequest(podcastsRequest())
@@ -23,6 +24,8 @@ export default function PodcastFrontpage() {
 
   const podcasts = useSelector(podcastsSelector)
   const recentEpisodes = useSelector(recentEpisodesSelector)
+
+  useLearningResourcePermalink()
 
   return (
     <div className="podcasts">

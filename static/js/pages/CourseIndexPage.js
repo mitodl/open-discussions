@@ -1,7 +1,7 @@
 // @flow
-import React, { useEffect } from "react"
+import React from "react"
 import { useRequest } from "redux-query-react"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 
 import CourseCarousel from "../components/CourseCarousel"
@@ -36,8 +36,7 @@ import {
 } from "../lib/queries/learning_resources"
 import { toQueryString, COURSE_SEARCH_URL, COURSE_BANNER_URL } from "../lib/url"
 import { PHONE, TABLET, DESKTOP } from "../lib/constants"
-import { useLRDrawerParams } from "../hooks/learning_resources"
-import { pushLRHistory } from "../actions/ui"
+import { useLearningResourcePermalink } from "../hooks/learning_resources"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
 
@@ -86,19 +85,7 @@ export default function CourseIndexPage({ history }: Props) {
   const favorites = useSelector(favoritesListSelector)
   const popularResources = useSelector(popularContentSelector)
 
-  const dispatch = useDispatch()
-  const { objectId, objectType } = useLRDrawerParams()
-
-  useEffect(() => {
-    if (objectId && objectType) {
-      dispatch(
-        pushLRHistory({
-          objectId,
-          objectType
-        })
-      )
-    }
-  }, [])
+  useLearningResourcePermalink()
 
   return (
     <BannerPageWrapper>

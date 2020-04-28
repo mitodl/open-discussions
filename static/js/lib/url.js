@@ -3,6 +3,8 @@ import R from "ramda"
 import qs from "query-string"
 import UrlAssembler from "url-assembler"
 
+import { LR_TYPE_PODCAST_EPISODE, LR_TYPE_PODCAST } from "../lib/constants"
+
 import type { Post } from "../flow/discussionTypes"
 
 export const channelURL = (channelName: string) => `/c/${channelName}`
@@ -193,7 +195,12 @@ export const userListDetailURL = (id: number) => `/learn/lists/${id}`
 
 export const learningResourcePermalink = (object: Object) =>
   absolutizeURL(
-    `${COURSE_URL}${toQueryString({
+    `${
+      object.object_type === LR_TYPE_PODCAST ||
+      object.object_type === LR_TYPE_PODCAST_EPISODE
+        ? PODCAST_URL
+        : COURSE_URL
+    }${toQueryString({
       lr_id: object.id,
       type:  object.object_type
     })}`

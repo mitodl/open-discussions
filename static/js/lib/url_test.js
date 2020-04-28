@@ -32,7 +32,11 @@ import {
 } from "./url"
 import { makePost } from "../factories/posts"
 import { makeLearningResource } from "../factories/learning_resources"
-import { LR_TYPE_ALL } from "../lib/constants"
+import {
+  LR_TYPE_ALL,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
+} from "../lib/constants"
 
 describe("url helper functions", () => {
   describe("channelURL", () => {
@@ -305,11 +309,14 @@ describe("url helper functions", () => {
     LR_TYPE_ALL.forEach(objectType => {
       it(`learningResourcePermalink should return a good link for ${objectType}`, () => {
         const object = makeLearningResource(objectType)
+        const isPodcastObject =
+          object.object_type === LR_TYPE_PODCAST ||
+          object.object_type === LR_TYPE_PODCAST_EPISODE
         assert.equal(
           learningResourcePermalink(object),
-          `${window.location.origin}/learn/?lr_id=${object.id}&type=${
-            object.object_type
-          }`
+          `${window.location.origin}/${
+            isPodcastObject ? "podcasts" : "learn/"
+          }?lr_id=${object.id}&type=${object.object_type}`
         )
       })
     })

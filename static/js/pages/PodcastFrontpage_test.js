@@ -1,6 +1,7 @@
 // @flow
 import { assert } from "chai"
 import R from "ramda"
+import sinon from "sinon"
 
 import PodcastFrontpage from "./PodcastFrontpage"
 
@@ -14,9 +15,10 @@ import {
 } from "../lib/test_utils"
 import { podcastApiURL, recentPodcastApiURL } from "../lib/url"
 import { makePodcast, makePodcastEpisode } from "../factories/podcasts"
+import * as lrHooks from "../hooks/learning_resources"
 
 describe("PodcastFrontpage tests", () => {
-  let helper, render, podcasts, episodes
+  let helper, render, podcasts, episodes, hookStub
 
   beforeEach(() => {
     podcasts = R.times(makePodcast, 10)
@@ -30,6 +32,7 @@ describe("PodcastFrontpage tests", () => {
       .withArgs(recentPodcastApiURL.toString())
       .returns(queryListResponse(episodes))
     render = helper.configureReduxQueryRenderer(PodcastFrontpage)
+    hookStub = helper.sandbox.stub(lrHooks, "useLearningResourcePermalink")
   })
 
   afterEach(() => {
@@ -95,5 +98,10 @@ describe("PodcastFrontpage tests", () => {
         })
       }
     )
+  })
+
+  it("should call hook for drawer sharing", async () => {
+    await render()
+    sinon.assert.called(hookStub)
   })
 })

@@ -1,6 +1,7 @@
 // @flow
 import { assert } from "chai"
 import R from "ramda"
+import sinon from "sinon"
 
 import CourseIndexPage from "./CourseIndexPage"
 import {
@@ -28,7 +29,6 @@ import {
   makePopularContentResponse
 } from "../factories/learning_resources"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { LR_TYPE_COURSE } from "../lib/constants"
 import * as lrHooks from "../hooks/learning_resources"
 
 describe("CourseIndexPage", () => {
@@ -41,7 +41,7 @@ describe("CourseIndexPage", () => {
     courseLists,
     favorites,
     popularContent,
-    paramsStub
+    hookStub
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -103,10 +103,7 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
 
-    paramsStub = helper.sandbox.stub(lrHooks, "useLRDrawerParams").returns({
-      objectId:   null,
-      objectType: null
-    })
+    hookStub = helper.sandbox.stub(lrHooks, "useLearningResourcePermalink")
   })
 
   afterEach(() => {
@@ -218,17 +215,8 @@ describe("CourseIndexPage", () => {
     })
   })
 
-  it("should open the drawer if sharing URL params present", async () => {
-    paramsStub.returns({
-      objectId:   1,
-      objectType: LR_TYPE_COURSE
-    })
-    const { store } = await render()
-    const [entry] = store.getState().ui.LRDrawerHistory
-    assert.deepEqual(entry, {
-      objectId:   1,
-      objectType: LR_TYPE_COURSE,
-      runId:      undefined
-    })
+  it("should call hook for drawer sharing", async () => {
+    await render()
+    sinon.assert.called(hookStub)
   })
 })

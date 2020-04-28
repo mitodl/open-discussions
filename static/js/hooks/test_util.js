@@ -11,3 +11,11 @@ export const hookClickTestHarness = (hook: Function) => {
   }
   return TestHarness
 }
+
+export const genericTestHarness = (hook: Function) => {
+  function TestHarness() {
+    hook()
+    return <div />
+  }
+  return TestHarness
+}
