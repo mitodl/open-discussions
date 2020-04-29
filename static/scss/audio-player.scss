@@ -12,6 +12,7 @@
   left: 0;
   bottom: 0;
   width: 100vw;
+  z-index: 45;
 
   @include breakpoint(desktop) {
     height: $audio-player-height-desktop;
