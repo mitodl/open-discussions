@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.121.1 (Released April 29, 2020)
+---------------
+
+- fix podcast and podcast episode sharing URL
+- podcasts search page ui
+- Remove check_pip.sh (#2870)
+- add the date to the PodcastEpisodeCard
+
 Version 0.121.0 (Released April 28, 2020)
 ---------------
 
