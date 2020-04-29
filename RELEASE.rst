@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.121.1
+Version 0.121.1 (Released April 29, 2020)
 ---------------
 
 - fix podcast and podcast episode sharing URL
