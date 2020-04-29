@@ -54,7 +54,10 @@ import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
-import { getOwnProfile, isAudioPlayerLoaded } from "../lib/redux_selectors"
+import {
+  getOwnProfile,
+  isAudioPlayerLoadedSelector
+} from "../lib/redux_selectors"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 import { channelIndexRoute } from "../lib/routing"
 
@@ -361,7 +364,7 @@ const mapStateToProps = state => {
     snackbar,
     banner,
     showUserMenu,
-    audioPlayerLoaded: isAudioPlayerLoaded(state),
+    audioPlayerLoaded: isAudioPlayerLoadedSelector(state),
     profile:           getOwnProfile(state)
   }
 }

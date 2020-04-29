@@ -4,7 +4,7 @@ import { assert } from "chai"
 import Amplitude from "amplitudejs"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { getCurrentlyPlayingAudio } from "../lib/redux_selectors"
+import { currentlyPlayingAudioSelector } from "../lib/redux_selectors"
 import { useInitAudioPlayer } from "./audio_player"
 
 describe("audio player hooks", () => {
@@ -45,7 +45,9 @@ describe("audio player hooks", () => {
     it("sets the example audio as the currently playing audio", async () => {
       const { wrapper, store } = await render()
       wrapper.find("#testDiv").simulate("click")
-      const currentlyPlayingAudio = getCurrentlyPlayingAudio(store.getState())
+      const currentlyPlayingAudio = currentlyPlayingAudioSelector(
+        store.getState()
+      )
       assert.deepEqual(exampleAudio, currentlyPlayingAudio)
     })
   })

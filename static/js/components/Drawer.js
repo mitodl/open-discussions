@@ -22,7 +22,7 @@ import {
 } from "../actions/ui"
 import {
   getSubscribedChannels,
-  isAudioPlayerLoaded
+  isAudioPlayerLoadedSelector
 } from "../lib/redux_selectors"
 import {
   getViewportWidth,
@@ -197,7 +197,7 @@ export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   showDrawerDesktop:  state.ui.showDrawerDesktop,
   showDrawerHover:    state.ui.showDrawerHover,
   showDrawerMobile:   state.ui.showDrawerMobile,
-  audioPlayerLoaded:  isAudioPlayerLoaded(state),
+  audioPlayerLoaded:  isAudioPlayerLoadedSelector(state),
   channels:           state.channels.data
 })
 

@@ -241,7 +241,10 @@ describe("Drawer", () => {
         selectors,
         "getSubscribedChannels"
       )
-      isAudioPlayerLoadedStub = sandbox.stub(selectors, "isAudioPlayerLoaded")
+      isAudioPlayerLoadedStub = sandbox.stub(
+        selectors,
+        "isAudioPlayerLoadedSelector"
+      )
     })
 
     it("should grab state.ui.showDrawer props", () => {
@@ -255,7 +258,7 @@ describe("Drawer", () => {
       assert.equal(showDrawerHover, state.ui.showDrawerHover)
     })
 
-    it("should call isAudioPlayerLoaded", () => {
+    it("should call isAudioPlayerLoadedSelector", () => {
       mapStateToProps(state)
       assert.ok(isAudioPlayerLoadedStub.calledWith(state))
     })
