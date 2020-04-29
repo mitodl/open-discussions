@@ -19,6 +19,7 @@ import {
   getSimilarResources
 } from "../lib/queries/learning_resources"
 import { interactionMutation } from "../lib/queries/interactions"
+import { isAudioPlayerLoadedSelector } from "../lib/redux_selectors"
 
 const getLRHistory = createSelector(
   state => state.ui,
@@ -119,6 +120,11 @@ export default function LearningResourceDrawer(props: Props) {
   useRequest(object ? similarResourcesRequest(object) : null)
   const similarResources = useSelector(getSimilarResourcesForObject)
 
+  const audioPlayerLoaded = useSelector(isAudioPlayerLoadedSelector)
+  const audioPlayerPadding = audioPlayerLoaded
+    ? " audio-player-padding-bottom"
+    : ""
+
   const dispatch = useDispatch()
   const clearHistory = useCallback(() => dispatch(clearLRHistory()), [dispatch])
   const pushHistory = useCallback(object => dispatch(pushLRHistory(object)), [
@@ -132,7 +138,7 @@ export default function LearningResourceDrawer(props: Props) {
         open={numHistoryEntries > 0}
         onClose={clearHistory}
         dir="rtl"
-        className="align-right lr-drawer"
+        className={`align-right lr-drawer${audioPlayerPadding}`}
         modal
       >
         <DrawerContent dir="ltr">

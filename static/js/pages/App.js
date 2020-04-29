@@ -54,7 +54,10 @@ import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
-import { getOwnProfile } from "../lib/redux_selectors"
+import {
+  getOwnProfile,
+  isAudioPlayerLoadedSelector
+} from "../lib/redux_selectors"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 import { channelIndexRoute } from "../lib/routing"
 
@@ -71,6 +74,7 @@ type StateProps = {|
   snackbar: SnackbarState,
   banner: BannerState,
   showUserMenu: boolean,
+  audioPlayerLoaded: boolean,
   profile: ?Profile
 |}
 
@@ -182,12 +186,17 @@ class App extends React.Component<Props> {
       snackbar,
       banner,
       showUserMenu,
+      audioPlayerLoaded,
       profile
     } = this.props
 
     if (needsAuthedSite() && !isAnonAccessiblePath(pathname)) {
       return <Redirect to={AUTH_REQUIRED_URL} />
     }
+
+    const audioPlayerPadding = audioPlayerLoaded
+      ? " audio-player-padding-bottom"
+      : ""
 
     return (
       <div className="app">
@@ -220,7 +229,7 @@ class App extends React.Component<Props> {
           banner={banner}
           hide={preventDefaultAndInvoke(this.hideBanner)}
         />
-        <div className="content">
+        <div className={`content${audioPlayerPadding}`}>
           <Route exact path={match.url} component={HomePage} />
           <Route
             path={channelIndexRoute(match.url)}
@@ -355,7 +364,8 @@ const mapStateToProps = state => {
     snackbar,
     banner,
     showUserMenu,
-    profile: getOwnProfile(state)
+    audioPlayerLoaded: isAudioPlayerLoadedSelector(state),
+    profile:           getOwnProfile(state)
   }
 }
 
