@@ -15,6 +15,7 @@ import {
   makeUserList,
   makeProgram
 } from "../../factories/learning_resources"
+import { makePodcast, makePodcastEpisode } from "../../factories/podcasts"
 
 describe("Interactions API", () => {
   it("interactionMutation should return a correct query", () => {
@@ -65,7 +66,9 @@ describe("Interactions API", () => {
     const video = makeVideo()
     const program = makeProgram()
     const userList = makeUserList()
-    const results = [course, video, program, userList]
+    const podcast = makePodcast()
+    const podcastEpisode = makePodcastEpisode(podcast)
+    const results = [course, video, program, userList, podcast, podcastEpisode]
     const request = popularContentRequest()
     assert.equal(request.url, popularContentUrl)
     assert.deepEqual(request.transform({ results }), {
@@ -80,6 +83,12 @@ describe("Interactions API", () => {
       },
       userLists: {
         [userList.id]: userList
+      },
+      podcasts: {
+        [podcast.id]: podcast
+      },
+      podcastEpisodes: {
+        [podcastEpisode.id]: podcastEpisode
       },
       popularResources: mapResourcesToResourceRefs(results)
     })

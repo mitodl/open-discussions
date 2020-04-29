@@ -1,6 +1,7 @@
 // @flow
 import casual from "casual-browserify"
 
+import { LR_TYPE_PODCAST, LR_TYPE_PODCAST_EPISODE } from "../lib/constants"
 import { incrementer } from "../lib/util"
 
 const incr = incrementer()
@@ -20,7 +21,8 @@ export const makePodcast = (): Podcast => ({
   topics:            [],
   updated_on:        casual.moment.toISOString(),
   url:               casual.url,
-  is_favorite:       casual.boolean
+  is_favorite:       casual.boolean,
+  object_type:       LR_TYPE_PODCAST
 })
 
 export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
@@ -42,6 +44,7 @@ export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
     topics:            [],
     updated_on:        casual.moment.toISOString(),
     url:               casual.url,
-    is_favorite:       casual.boolean
+    is_favorite:       casual.boolean,
+    object_type:       LR_TYPE_PODCAST_EPISODE
   }
 }
