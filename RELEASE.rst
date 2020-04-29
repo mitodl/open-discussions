@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.121.2
+---------------
+
+- add list of episodes to podcast drawer display
+- set the z index of the audio player to sit on top of any drawer (#2873)
+- add test coverage for some utility hooks
+- Audio player padding adjustments (#2872)
+- remove stray console.log
+
 Version 0.121.1 (Released April 29, 2020)
 ---------------
 
