@@ -91,7 +91,6 @@ export const favoritePodcastMutation = (podcast: Podcast) => ({
       is_favorite: !podcast.is_favorite
     }
 
-    console.log(updatedPodcast)
     return {
       podcasts: {
         [updatedPodcast.id]: updatedPodcast
