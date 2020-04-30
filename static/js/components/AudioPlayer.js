@@ -23,7 +23,7 @@ export default function AudioPlayer() {
     INITIAL_AUDIO_STATE.currentlyPlaying
   )
 
-  const skipSeconds = (seconds) => {
+  const skipSeconds = seconds => {
     const duration = Amplitude.getSongDuration()
     const currentTime = parseFloat(Amplitude.getSongPlayedSeconds())
     const targetTime = parseFloat(currentTime + seconds)
@@ -62,8 +62,13 @@ export default function AudioPlayer() {
         <div className="audio-player-controls">
           <div className="audio-player-playback-controls">
             <div className="audio-player-button-container">
-              <div className="audio-player-button" onClick={() => skipSeconds(-10)}>
-                <span id="audio-player-back-ten" className="material-icons">replay_10</span>
+              <div
+                className="audio-player-button"
+                onClick={() => skipSeconds(-10)}
+              >
+                <span id="audio-player-back-ten" className="material-icons">
+                  replay_10
+                </span>
               </div>
               <div
                 className="audio-player-button amplitude-play-pause"
@@ -76,7 +81,11 @@ export default function AudioPlayer() {
                     : "play_circle_outline"}
                 </span>
               </div>
-              <div id="audio-player-forward-thirty" className="audio-player-button" onClick={() => skipSeconds(30)}>
+              <div
+                id="audio-player-forward-thirty"
+                className="audio-player-button"
+                onClick={() => skipSeconds(30)}
+              >
                 <span className="material-icons">forward_30</span>
               </div>
             </div>
