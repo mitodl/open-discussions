@@ -50,7 +50,7 @@ export default function PodcastFrontpage() {
         )}
       </div>
       <div className="all-podcasts">
-        <h1>Podcasts Series</h1>
+        <h1>Podcasts</h1>
         {isFinishedPodcasts ? (
           <Grid>
             {Object.values(podcasts).map((podcast: any) => (
