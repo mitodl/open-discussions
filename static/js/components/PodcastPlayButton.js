@@ -64,12 +64,12 @@ export default function PodcastPlayButton(props: Props) {
     >
       {episodeCurrentlyPlaying ? (
         <>
-          "Pause"
+          Pause
           <i className="material-icons pause">pause</i>
         </>
       ) : (
         <>
-          "Play"
+          Play
           <i className="material-icons play_arrow">play_arrow</i>
         </>
       )}
