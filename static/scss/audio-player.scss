@@ -20,6 +20,7 @@
   }
   @include breakpoint(mobile) {
     height: $audio-player-height-mobile;
+    display: block;
   }
 
   .audio-player-container-inner {
