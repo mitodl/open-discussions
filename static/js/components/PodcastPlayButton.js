@@ -53,11 +53,11 @@ export default function PodcastPlayButton(props: Props) {
     }
   }
 
+  const className = episodeCurrentlyPlaying ? "grey-surround" : "black-surround"
+
   return (
     <div
-      className={`podcast-play-button ${
-        episodeCurrentlyPlaying ? "grey-surround" : "black-surround"
-      }`}
+      className={`podcast-play-button ${className}`}
       onClick={
         episodeAudioInitialized ? togglePlayState : initializeAudioPlayer
       }
