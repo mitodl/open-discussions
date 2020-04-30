@@ -9,7 +9,7 @@ import {
   audioPlayerStateSelector,
   currentlyPlayingAudioSelector
 } from "../lib/redux_selectors"
-import { AUDIO_PLAYER_PLAYING } from '../lib/constants'
+import { AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 export default function AudioPlayer() {
   const seekBar = useRef()
@@ -18,8 +18,10 @@ export default function AudioPlayer() {
   const audioPlayerState = useSelector(audioPlayerStateSelector)
   const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
 
-  const audioLoaded =
-    !_.isEqual(currentlyPlayingAudio, INITIAL_AUDIO_STATE.currentlyPlaying)
+  const audioLoaded = !_.isEqual(
+    currentlyPlayingAudio,
+    INITIAL_AUDIO_STATE.currentlyPlaying
+  )
 
   const backTenClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)

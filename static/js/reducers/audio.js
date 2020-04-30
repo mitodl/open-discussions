@@ -3,7 +3,7 @@ import {
   SET_AUDIO_PLAYER_STATE,
   SET_CURRENTLY_PLAYING_AUDIO
 } from "../actions/audio"
-import { AUDIO_PLAYER_PAUSED, } from '../lib/constants'
+import { AUDIO_PLAYER_PAUSED } from "../lib/constants"
 
 import type { Action } from "../flow/reduxTypes"
 

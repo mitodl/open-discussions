@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux"
 import Amplitude from "amplitudejs"
 
 import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
-import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from '../lib/constants'
+import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 export function useInitAudioPlayer(audio: Object) {
   const dispatch = useDispatch()
