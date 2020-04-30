@@ -53,12 +53,14 @@ global.Audio = class Audio {
     this._pauseStub()
   }
 
-  addEventListener() {
+  addEventListener(name, fn) {
     this._addEventListenerStub()
+    window.addEventListener(name, fn)
   }
 
-  removeEventListener() {
+  removeEventListener(name, fn) {
     this._removeEventListenerStub()
+    window.removeEventListener(name, fn)
   }
 }
 

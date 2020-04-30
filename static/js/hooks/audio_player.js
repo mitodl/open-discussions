@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux"
 import Amplitude from "amplitudejs"
 
 import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
+import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 export function useInitAudioPlayer(audio: Object) {
   const dispatch = useDispatch()
@@ -26,10 +27,10 @@ export function useInitAudioPlayer(audio: Object) {
       const audioElement = Amplitude.getAudio()
       audioElement.pause()
       audioElement.addEventListener("play", () => {
-        dispatch(setAudioPlayerState("playing"))
+        dispatch(setAudioPlayerState(AUDIO_PLAYER_PLAYING))
       })
       audioElement.addEventListener("pause", () => {
-        dispatch(setAudioPlayerState("paused"))
+        dispatch(setAudioPlayerState(AUDIO_PLAYER_PAUSED))
       })
       audioElement.play()
     },

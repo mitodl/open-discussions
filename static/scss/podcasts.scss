@@ -140,8 +140,15 @@
   text-transform: uppercase;
 
   i {
-    color: white;
     font-size: 18px;
+    background-color: $pale-grey;
+  }
+
+  &.black-surround {
+    i {
+      color: white;
+      background-color: black;
+    }
   }
 }
 
