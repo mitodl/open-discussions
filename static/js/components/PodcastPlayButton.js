@@ -27,9 +27,9 @@ export default function PodcastPlayButton(props: Props) {
     episodeAudioInitialized && audioPlayerState === AUDIO_PLAYER_PLAYING
 
   const initAudioPlayer = useInitAudioPlayer({
-    title: episode.podcast_title,
+    title:       episode.podcast_title,
     description: episode.title,
-    url: episode.url
+    url:         episode.url
   })
 
   const initializeAudioPlayer = useCallback(
@@ -62,17 +62,17 @@ export default function PodcastPlayButton(props: Props) {
         episodeAudioInitialized ? togglePlayState : initializeAudioPlayer
       }
     >
-      { episodeCurrentlyPlaying ?
+      {episodeCurrentlyPlaying ? (
         <>
           "Pause"
-        <i className="material-icons pause">pause</i>
+          <i className="material-icons pause">pause</i>
         </>
-        : 
+      ) : (
         <>
           "Play"
-        <i className="material-icons play_arrow">play_arrow</i>
+          <i className="material-icons play_arrow">play_arrow</i>
         </>
-      }
+      )}
     </div>
   )
 }
