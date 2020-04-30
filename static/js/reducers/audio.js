@@ -3,6 +3,8 @@ import {
   SET_AUDIO_PLAYER_STATE,
   SET_CURRENTLY_PLAYING_AUDIO
 } from "../actions/audio"
+import { AUDIO_PLAYER_PAUSED, } from '../lib/constants'
+
 import type { Action } from "../flow/reduxTypes"
 
 export type Audio = {
@@ -14,7 +16,7 @@ export type AudioState = {
   currentlyPlaying: Audio
 }
 export const INITIAL_AUDIO_STATE: AudioState = {
-  playerState:      "paused",
+  playerState:      AUDIO_PLAYER_PAUSED,
   currentlyPlaying: {
     title:       "",
     description: "",

@@ -126,3 +126,6 @@ export const TABLET_WIDTH = 839
 
 export const LR_PUBLIC = "public"
 export const LR_PRIVATE = "private"
+
+export const AUDIO_PLAYER_PAUSED = "paused"
+export const AUDIO_PLAYER_PLAYING = "playing"

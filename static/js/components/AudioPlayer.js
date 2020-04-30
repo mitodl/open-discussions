@@ -1,6 +1,6 @@
 // @flow
 import _ from "lodash"
-import React, { useEffect, useRef, useCallback, useState } from "react"
+import React, { useRef, useCallback } from "react"
 import { useSelector } from "react-redux"
 import Amplitude from "amplitudejs"
 
@@ -9,26 +9,17 @@ import {
   audioPlayerStateSelector,
   currentlyPlayingAudioSelector
 } from "../lib/redux_selectors"
+import { AUDIO_PLAYER_PLAYING } from '../lib/constants'
 
 export default function AudioPlayer() {
   const seekBar = useRef()
   const playPauseButton = useRef()
+
   const audioPlayerState = useSelector(audioPlayerStateSelector)
   const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
-  const [audioLoaded, setAudioLoaded] = useState(false)
-  const [audioPlaying, setAudioPlaying] = useState(false)
 
-  useEffect(
-    () => {
-      if (
-        !_.isEqual(currentlyPlayingAudio, INITIAL_AUDIO_STATE.currentlyPlaying)
-      ) {
-        setAudioLoaded(true)
-      }
-      setAudioPlaying(audioPlayerState === "playing")
-    },
-    [audioPlayerState, currentlyPlayingAudio]
-  )
+  const audioLoaded =
+    !_.isEqual(currentlyPlayingAudio, INITIAL_AUDIO_STATE.currentlyPlaying)
 
   const backTenClick = useCallback(() => {
     Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
@@ -79,7 +70,7 @@ export default function AudioPlayer() {
                 ref={playPauseButton}
               >
                 <span className="material-icons">
-                  {audioPlaying
+                  {audioPlayerState === AUDIO_PLAYER_PLAYING
                     ? "pause_circle_outline"
                     : "play_circle_outline"}
                 </span>

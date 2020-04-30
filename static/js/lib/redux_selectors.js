@@ -4,9 +4,10 @@ import { safeBulkGet } from "../lib/maps"
 import { createSelector } from "reselect"
 import _ from "lodash"
 
+import { INITIAL_AUDIO_STATE } from "../reducers/audio"
+
 import type { Channel } from "../flow/discussionTypes"
 import type { Profile } from "../flow/discussionTypes"
-import { INITIAL_AUDIO_STATE } from "../reducers/audio"
 
 export const getSubscribedChannels = (state: Object): Array<Channel> =>
   state.subscribedChannels.loaded
