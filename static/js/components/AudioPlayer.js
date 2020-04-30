@@ -91,7 +91,7 @@ export default function AudioPlayer() {
             </time>
             <progress
               className="amplitude-song-played-progress audio-player-progress"
-              id="song-played-progress"
+              id="audio-player-progress"
               ref={seekBar}
               onClick={seekBarClick}
             />
