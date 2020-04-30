@@ -30,10 +30,6 @@ export default function AudioPlayer() {
     Amplitude.setSongPlayedPercentage((targetTime / duration) * 100)
   }
 
-  const backTenClick = useCallback(() => skipSeconds(-10))
-
-  const forwardThirtyClick = useCallback(() => skipSeconds(30))
-
   const seekBarClick = useCallback((e: Object) => {
     const { current } = seekBar
     if (current && current.getBoundingClientRect && current.offsetWidth) {
@@ -66,7 +62,7 @@ export default function AudioPlayer() {
         <div className="audio-player-controls">
           <div className="audio-player-playback-controls">
             <div className="audio-player-button-container">
-              <div className="audio-player-button" onClick={backTenClick}>
+              <div className="audio-player-button" onClick={() => skipSeconds(-10)}>
                 <span className="material-icons">replay_10</span>
               </div>
               <div
@@ -80,7 +76,7 @@ export default function AudioPlayer() {
                     : "play_circle_outline"}
                 </span>
               </div>
-              <div className="audio-player-button" onClick={forwardThirtyClick}>
+              <div className="audio-player-button" onClick={() => skipSeconds(30)}>
                 <span className="material-icons">forward_30</span>
               </div>
             </div>
