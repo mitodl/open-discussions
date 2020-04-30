@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.121.2
+Version 0.121.2 (Released April 30, 2020)
 ---------------
 
 - Fix tests for previous commit
