@@ -23,13 +23,12 @@ export default function AudioPlayer() {
     INITIAL_AUDIO_STATE.currentlyPlaying
   )
 
-  const backTenClick = useCallback(() => {
-    Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
-  })
-
-  const forwardThirtyClick = useCallback(() => {
-    Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
-  })
+  const skipSeconds = seconds => {
+    const duration = Amplitude.getSongDuration()
+    const currentTime = parseFloat(Amplitude.getSongPlayedSeconds())
+    const targetTime = parseFloat(currentTime + seconds)
+    Amplitude.setSongPlayedPercentage((targetTime / duration) * 100)
+  }
 
   const seekBarClick = useCallback((e: Object) => {
     const { current } = seekBar
@@ -63,8 +62,13 @@ export default function AudioPlayer() {
         <div className="audio-player-controls">
           <div className="audio-player-playback-controls">
             <div className="audio-player-button-container">
-              <div className="audio-player-button" onClick={backTenClick}>
-                <span className="material-icons">replay_10</span>
+              <div
+                className="audio-player-button"
+                onClick={() => skipSeconds(-10)}
+              >
+                <span id="audio-player-back-ten" className="material-icons">
+                  replay_10
+                </span>
               </div>
               <div
                 className="audio-player-button amplitude-play-pause"
@@ -77,7 +81,11 @@ export default function AudioPlayer() {
                     : "play_circle_outline"}
                 </span>
               </div>
-              <div className="audio-player-button" onClick={forwardThirtyClick}>
+              <div
+                id="audio-player-forward-thirty"
+                className="audio-player-button"
+                onClick={() => skipSeconds(30)}
+              >
                 <span className="material-icons">forward_30</span>
               </div>
             </div>
@@ -92,7 +100,7 @@ export default function AudioPlayer() {
             </time>
             <progress
               className="amplitude-song-played-progress audio-player-progress"
-              id="song-played-progress"
+              id="audio-player-progress"
               ref={seekBar}
               onClick={seekBarClick}
             />

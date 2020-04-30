@@ -1,11 +1,13 @@
 import { assert } from "chai"
+import sinon from "sinon"
+import Amplitude from "amplitudejs"
 
 import AudioPlayer from "./AudioPlayer"
 import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("AudioPlayer", () => {
-  let helper, render
+  let helper, render, sandbox, setSongPlayedPercentageSpy
 
   const exampleAudio = {
     title:       "Test Title",
@@ -13,14 +15,25 @@ describe("AudioPlayer", () => {
     url:
       "https://chtbl.com/track/F9DD6B/cdn.simplecast.com/audio/2c64ac/2c64ace6-baf4-4e86-b527-445e611e6a31/aa0ca88f-3c4c-4d33-9897-36e45c43e012/film-is-for-everyone-with-prof-david-thorburn_tc.mp3"
   }
+  const seekElements = [
+    "audio-player-back-ten",
+    "audio-player-forward-thirty",
+    "audio-player-progress"
+  ]
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
     render = helper.configureReduxQueryRenderer(AudioPlayer)
+    sandbox = sinon.createSandbox()
+    setSongPlayedPercentageSpy = sandbox.spy(
+      Amplitude,
+      "setSongPlayedPercentage"
+    )
   })
 
   afterEach(() => {
     helper.cleanup()
+    sandbox.restore()
   })
 
   it("should be hidden if we try and render it without setting audio", async () => {
@@ -75,5 +88,17 @@ describe("AudioPlayer", () => {
       wrapper.find(`.amplitude-play-pause span`).text(),
       "play_circle_outline"
     )
+  })
+
+  seekElements.forEach(id => {
+    it(`should call Amplitude.setSongPlayedPercentage when you click ${id}`, async () => {
+      const { wrapper } = await render({}, [
+        setCurrentlyPlayingAudio(exampleAudio)
+      ])
+      const element = wrapper.find(`#${id}`)
+      sandbox.stub(element.getDOMNode(), "offsetWidth").value(100)
+      element.simulate("click")
+      assert.isTrue(setSongPlayedPercentageSpy.calledOnce)
+    })
   })
 })
