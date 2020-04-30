@@ -1,18 +1,16 @@
 // @flow
 import { assert } from "chai"
-import sinon from "sinon"
 
 import PodcastPlayButton from "./PodcastPlayButton"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import * as audioPlayerHooks from "../hooks/audio_player"
 import { makePodcastEpisode } from "../factories/podcasts"
 import { wait } from "../lib/util"
 import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
 import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 describe("PodcastPlayButton", () => {
-  let helper, render, episode, initAudioPlayerStub, initAudioPlayerCBStub
+  let helper, render, episode
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
