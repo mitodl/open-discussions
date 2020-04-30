@@ -23,13 +23,16 @@ export default function AudioPlayer() {
     INITIAL_AUDIO_STATE.currentlyPlaying
   )
 
-  const backTenClick = useCallback(() => {
-    Amplitude.skipTo(Amplitude.getSongPlayedSeconds() - 10, 0, null)
-  })
+  const skipSeconds = (seconds) => {
+    const duration = Amplitude.getSongDuration()
+    const currentTime = parseFloat(Amplitude.getSongPlayedSeconds())
+    const targetTime = parseFloat(currentTime + seconds)
+    Amplitude.setSongPlayedPercentage((targetTime / duration) * 100)
+  }
 
-  const forwardThirtyClick = useCallback(() => {
-    Amplitude.skipTo(Amplitude.getSongPlayedSeconds() + 30, 0, null)
-  })
+  const backTenClick = useCallback(() => skipSeconds(-10))
+
+  const forwardThirtyClick = useCallback(() => skipSeconds(30))
 
   const seekBarClick = useCallback((e: Object) => {
     const { current } = seekBar
