@@ -1,9 +1,14 @@
 // @flow
 import React, { useCallback } from "react"
-
-import { useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
+import Amplitude from "amplitudejs"
 
 import { useInitAudioPlayer } from "../hooks/audio_player"
+import {
+  audioPlayerStateSelector,
+  currentlyPlayingAudioSelector
+} from "../lib/redux_selectors"
+import { AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 import type { PodcastEpisode } from "../flow/podcastTypes"
 
@@ -14,25 +19,60 @@ type Props = {
 export default function PodcastPlayButton(props: Props) {
   const { episode } = props
 
-  const dispatch = useDispatch()
+  const audioPlayerState = useSelector(audioPlayerStateSelector)
+  const currentlyPlayingAudio = useSelector(currentlyPlayingAudioSelector)
+
+  const episodeAudioInitialized = currentlyPlayingAudio.url === episode.url
+  const episodeCurrentlyPlaying =
+    episodeAudioInitialized && audioPlayerState === AUDIO_PLAYER_PLAYING
+
   const initAudioPlayer = useInitAudioPlayer({
-    title:       episode.podcast_title,
+    title: episode.podcast_title,
     description: episode.title,
-    url:         episode.url
+    url: episode.url
   })
-  const playClick = useCallback(
+
+  const initializeAudioPlayer = useCallback(
     e => {
       e.stopPropagation()
       e.preventDefault()
       initAudioPlayer()
     },
-    [dispatch]
+    [initAudioPlayer]
   )
 
+  const togglePlayState = e => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    const audioElement = Amplitude.getAudio()
+    if (audioPlayerState === AUDIO_PLAYER_PLAYING) {
+      audioElement.pause()
+    } else {
+      audioElement.play()
+    }
+  }
+
   return (
-    <div className="podcast-play-button black-surround" onClick={playClick}>
-      Play
-      <i className="material-icons play_arrow">play_arrow</i>
+    <div
+      className={`podcast-play-button ${
+        episodeCurrentlyPlaying ? "grey-surround" : "black-surround"
+      }`}
+      onClick={
+        episodeAudioInitialized ? togglePlayState : initializeAudioPlayer
+      }
+    >
+      { episodeCurrentlyPlaying ?
+        <>
+          "Pause"
+        <i className="material-icons pause">pause</i>
+        </>
+        : 
+        <>
+          "Play"
+        <i className="material-icons play_arrow">play_arrow</i>
+        </>
+      }
     </div>
   )
 }
