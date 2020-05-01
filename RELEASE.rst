@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.121.3
+Version 0.121.3 (Released May 01, 2020)
 ---------------
 
 - Audio player skip forward / backward progress reset bug fix (#2891)
