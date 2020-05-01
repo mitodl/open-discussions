@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.121.4
+Version 0.121.4 (Released May 01, 2020)
 ---------------
 
 - mobile ui css
