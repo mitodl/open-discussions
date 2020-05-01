@@ -32,7 +32,7 @@ export default function PodcastFrontpage() {
   return (
     <div className="podcasts">
       <MetaTags>
-        <title>{formatTitle("Podcasts | MIT Open Learning")}</title>
+        <title>{formatTitle("Podcasts")}</title>
       </MetaTags>
       <div className="recent-episodes">
         <div className="recent-header">
