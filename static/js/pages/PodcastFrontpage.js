@@ -1,5 +1,6 @@
 // @flow
 import React from "react"
+import { MetaTags } from "react-meta-tags"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 
@@ -8,6 +9,7 @@ import PodcastCard from "../components/PodcastCard"
 import { Cell, Grid } from "../components/Grid"
 import { PodcastLoading, PodcastEpisodeLoading } from "../components/Loading"
 
+import { formatTitle } from "../lib/title"
 import {
   podcastsRequest,
   podcastsSelector,
@@ -29,6 +31,9 @@ export default function PodcastFrontpage() {
 
   return (
     <div className="podcasts">
+      <MetaTags>
+        <title>{formatTitle("Podcasts | MIT Open Learning")}</title>
+      </MetaTags>
       <div className="recent-episodes">
         <div className="recent-header">
           <div className="title">RECENT EPISODES</div>
