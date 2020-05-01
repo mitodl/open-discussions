@@ -248,8 +248,20 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
             />
           </div>
           {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
-            <div className="podcast-play-control">
+            <div className="podcast-episode-row">
               <PodcastPlayButton episode={object} />
+              <div
+                className="view-all-episodes"
+                onClick={() => {
+                  setShowResourceDrawer({
+                    objectId:   object.podcast,
+                    objectType: LR_TYPE_PODCAST,
+                    runId:      undefined
+                  })
+                }}
+              >
+                View All Episodes
+              </div>
             </div>
           ) : null}
           {!emptyOrNil(object.topics) ? (
