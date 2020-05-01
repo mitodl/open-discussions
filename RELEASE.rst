@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.121.3
+---------------
+
+- Audio player skip forward / backward progress reset bug fix (#2891)
+- Podcasts Series -> Podcasts
+- prevent highlighting of text within the audio player (#2889)
+- add ability to pause / play podcast from the PodcastPlayButton
+
 Version 0.121.2 (Released April 30, 2020)
 ---------------
 
