@@ -491,14 +491,7 @@ def test_upload_mitx_course_manifest(mock_ocw_learning_bucket, ocw_aws_settings)
     assert contents == {"results": courses, "count": len(courses)}
 
 
-@pytest.mark.parametrize(
-    "disabled_setting_name",
-    [
-        "OCW_LEARNING_COURSE_BUCKET_NAME",
-        "OCW_LEARNING_COURSE_ACCESS_KEY",
-        "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY",
-    ],
-)
+@pytest.mark.parametrize("disabled_setting_name", ["OCW_LEARNING_COURSE_BUCKET_NAME"])
 def test_upload_mitx_course_manifest_disabled(ocw_aws_settings, disabled_setting_name):
     """Test that upload_mitx_course_manifest doe not perform the upload is a setting is disabled"""
     # if this tries to hit S3 it will fail since the bucket doesn't exist in moto

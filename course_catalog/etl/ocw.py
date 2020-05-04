@@ -30,8 +30,8 @@ def get_ocw_learning_course_bucket():
     """
     s3 = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
     return s3.Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
@@ -273,8 +273,8 @@ def upload_mitx_course_manifest(courses):
     """
     if not all(
         [
-            settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-            settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY,
             settings.OCW_LEARNING_COURSE_BUCKET_NAME,
         ]
     ):

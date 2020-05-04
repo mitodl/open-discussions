@@ -456,8 +456,8 @@ def sync_ocw_course(
         try:
             parser.setup_s3_uploading(
                 settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-                settings.OCW_LEARNING_COURSE_ACCESS_KEY,
-                settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY,
+                settings.AWS_ACCESS_KEY_ID,
+                settings.AWS_SECRET_ACCESS_KEY,
                 # course_prefix now has trailing slash so [-2] below is the last
                 # actual element and [-1] is an empty string
                 course_prefix.split("/")[-2],
@@ -509,8 +509,8 @@ def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s
     """
     raw_data_bucket = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
 
     for course_prefix in course_prefixes:

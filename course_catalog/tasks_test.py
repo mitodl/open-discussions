@@ -80,17 +80,15 @@ def setup_s3(settings):
     Set up the fake s3 data
     """
     # Fake the settings
-    settings.OCW_CONTENT_ACCESS_KEY = "abc"
-    settings.OCW_CONTENT_SECRET_ACCESS_KEY = "abc"
+    settings.AWS_ACCESS_KEY_ID = "abc"
+    settings.AWS_SECRET_ACCESS_KEY = "abc"
     settings.OCW_CONTENT_BUCKET_NAME = "test_bucket"
     settings.OCW_LEARNING_COURSE_BUCKET_NAME = "testbucket2"
-    settings.OCW_LEARNING_COURSE_ACCESS_KEY = "abc"
-    settings.OCW_LEARNING_COURSE_SECRET_ACCESS_KEY = "abc"
     # Create our fake bucket
     conn = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_CONTENT_ACCESS_KEY,
-        aws_secret_access_key=settings.OCW_CONTENT_SECRET_ACCESS_KEY,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
     conn.create_bucket(Bucket=settings.OCW_CONTENT_BUCKET_NAME)
 
@@ -104,8 +102,8 @@ def setup_s3(settings):
     # Create our upload bucket
     conn = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
     conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
@@ -170,8 +168,8 @@ def test_get_ocw_courses(
     if not blacklisted:
         s3 = boto3.resource(
             "s3",
-            aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
         )
         # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
         obj = s3.Object(
@@ -233,7 +231,7 @@ def test_get_ocw_data_no_settings(settings):
     """
     No data should be imported if OCW settings are missing
     """
-    settings.OCW_CONTENT_ACCESS_KEY = None
+    settings.AWS_ACCESS_KEY_ID = None
     get_ocw_data.delay(force_overwrite=True, upload_to_s3=True)
     assert Course.objects.count() == 0
 
@@ -315,8 +313,8 @@ def test_upload_ocw_master_json(settings, mocker):
 
     s3 = boto3.resource(
         "s3",
-        aws_access_key_id=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        aws_secret_access_key=settings.OCW_LEARNING_COURSE_ACCESS_KEY,
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
     # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
     obj = s3.Object(
