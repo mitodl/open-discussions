@@ -28,7 +28,7 @@
     "@material/list": "^0.2.14",
     "@material/radio": "^0.30.0",
     "@material/rtl": "^0.1.7",
-    "@material/snackbar": "^0.25.0",
+    "@material/snackbar": "^0.44.0",
     "@material/toolbar": "^0.4.4",
     "@mitodl/ckeditor-custom-build": "0.0.4",
     "@mitodl/mdl-react-components": "^0.0.3",
