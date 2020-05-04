@@ -1,4 +1,5 @@
 import { assert } from "chai"
+import sinon from "sinon"
 
 import LearningResourceDrawer from "./LearningResourceDrawer"
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
@@ -93,6 +94,15 @@ describe("LearningResourceDrawer", () => {
     wrapper.find(".drawer-close").simulate("click")
     // this means that the history has been cleared
     assert.deepEqual(store.getState().ui.LRDrawerHistory, [])
+  })
+
+  it("should scroll to the top on drawer close", async () => {
+    const { wrapper } = await renderWithObject(
+      course,
+      courseDetailApiURL.param({ courseId: course.id }).toString()
+    )
+    wrapper.find(".drawer-close").simulate("click")
+    sinon.assert.calledWith(helper.scrollStub, { top: 0 })
   })
 
   it("should have a back button if there is more than one object in the drawer history", async () => {

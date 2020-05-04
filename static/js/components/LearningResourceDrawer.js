@@ -1,5 +1,5 @@
 // @flow
-import React, { useCallback, useEffect } from "react"
+import React, { useRef, useCallback, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Drawer, DrawerContent } from "@rmwc/drawer"
 import { Theme } from "@rmwc/theme"
@@ -89,6 +89,8 @@ type Props = {
 export default function LearningResourceDrawer(props: Props) {
   const { hideSimilarLearningResources } = props
 
+  const drawerContent = useRef()
+
   useResponsive()
 
   const { objectId, objectType, runId, numHistoryEntries } = useSelector(
@@ -126,7 +128,18 @@ export default function LearningResourceDrawer(props: Props) {
     : ""
 
   const dispatch = useDispatch()
-  const clearHistory = useCallback(() => dispatch(clearLRHistory()), [dispatch])
+
+  const closeDrawer = useCallback(
+    () => {
+      dispatch(clearLRHistory())
+      const { current } = drawerContent
+      if (current) {
+        current.scroll({ top: 0 })
+      }
+    },
+    [dispatch]
+  )
+
   const pushHistory = useCallback(object => dispatch(pushLRHistory(object)), [
     dispatch
   ])
@@ -136,14 +149,14 @@ export default function LearningResourceDrawer(props: Props) {
     <Theme>
       <Drawer
         open={numHistoryEntries > 0}
-        onClose={clearHistory}
+        onClose={closeDrawer}
         dir="rtl"
         className={`align-right lr-drawer${audioPlayerPadding}`}
         modal
       >
-        <DrawerContent dir="ltr">
+        <DrawerContent dir="ltr" ref={drawerContent}>
           <div className="drawer-nav">
-            <div className="drawer-close" onClick={clearHistory}>
+            <div className="drawer-close" onClick={closeDrawer}>
               <i className="material-icons clear">clear</i>
             </div>
             {numHistoryEntries > 1 ? (
