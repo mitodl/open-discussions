@@ -305,11 +305,19 @@ describe("ExpandedLearningResourceDisplay", () => {
         object.privacy_level = LR_PUBLIC
       }
       const { wrapper } = await render({}, { object })
-      const { objectType: _objectType, url } = wrapper
-        .find("ShareTooltip")
-        .props()
-      assert.equal(_objectType, readableLearningResources[object.object_type])
-      assert.equal(url, learningResourcePermalink(object))
+
+      if (
+        objectType === LR_TYPE_PODCAST ||
+        objectType === LR_TYPE_PODCAST_EPISODE
+      ) {
+        assert.isNotOk(wrapper.find("ShareTooltip").exists())
+      } else {
+        const { objectType: _objectType, url } = wrapper
+          .find("ShareTooltip")
+          .props()
+        assert.equal(_objectType, readableLearningResources[object.object_type])
+        assert.equal(url, learningResourcePermalink(object))
+      }
     })
   })
 

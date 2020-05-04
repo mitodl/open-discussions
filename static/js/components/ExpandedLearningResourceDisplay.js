@@ -168,6 +168,10 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     [object]
   )
 
+  const shouldHideShareMenu =
+    (isUserList(object.object_type) && object.privacy_level === LR_PRIVATE) ||
+    isPodcastObject(object)
+
   return (
     <React.Fragment>
       <div className="expanded-lr-summary">
@@ -329,21 +333,20 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           ) : null}
         </div>
       </div>
-      {isUserList(object.object_type) &&
-      object.privacy_level === LR_PRIVATE ? null : (
-          <div className="elr-share">
-            <ShareTooltip
-              url={learningResourcePermalink(object)}
-              objectType={readableLearningResources[object.object_type]}
-              placement="topLeft"
-            >
-              <div className="share-contents">
-                <i className="material-icons reply">reply</i>
+      {shouldHideShareMenu ? null : (
+        <div className="elr-share">
+          <ShareTooltip
+            url={learningResourcePermalink(object)}
+            objectType={readableLearningResources[object.object_type]}
+            placement="topLeft"
+          >
+            <div className="share-contents">
+              <i className="material-icons reply">reply</i>
               Share
-              </div>
-            </ShareTooltip>
-          </div>
-        )}
+            </div>
+          </ShareTooltip>
+        </div>
+      )}
       {hasCourseList(object.object_type) && !emptyOrNil(object.items) ? (
         <ListItemsSection
           title="Learning Resources in this Program"
