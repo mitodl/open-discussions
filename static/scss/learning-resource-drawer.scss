@@ -47,16 +47,8 @@
     font-weight: bold;
   }
 
-  .podcast-episode-row {
+  .podcast-play-control {
     margin-top: 15px;
-
-    display: flex;
-    justify-content: space-between;
-
-    .view-all-episodes {
-      color: $course-blue;
-      cursor: pointer;
-    }
   }
 
   .topics {

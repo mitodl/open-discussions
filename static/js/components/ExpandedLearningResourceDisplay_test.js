@@ -1,7 +1,6 @@
 // @flow
 import { assert } from "chai"
 import R from "ramda"
-import sinon from "sinon"
 
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 import * as UserListItemsMod from "../components/UserListItems"
@@ -194,18 +193,6 @@ describe("ExpandedLearningResourceDisplay", () => {
     const object = makeLearningResource(LR_TYPE_PODCAST)
     const { wrapper } = await render({}, { object })
     assert.ok(wrapper.find("PaginatedPodcastEpisodes").exists())
-  })
-
-  it("should have a link to open all episodes for PodcastEpisodes", async () => {
-    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
-    const { wrapper } = await render({}, { object })
-
-    wrapper.find(".view-all-episodes").simulate("click")
-    sinon.assert.calledWith(setShowResourceDrawerStub, {
-      objectId:   object.podcast,
-      objectType: LR_TYPE_PODCAST,
-      runId:      undefined
-    })
   })
 
   LR_TYPE_ALL.forEach(objectType => {
