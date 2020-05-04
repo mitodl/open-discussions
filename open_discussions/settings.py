@@ -856,9 +856,11 @@ OCW_WEBHOOK_DELAY = get_int("OCW_WEBHOOK_DELAY", 120)
 OCW_WEBHOOK_KEY = get_string("OCW_WEBHOOK_KEY", None)
 MAX_S3_GET_ITERATIONS = get_int("MAX_S3_GET_ITERATIONS", 3)
 
-# S3 Bucket info for exporting xPRO OLX
+# S3 Bucket info for exporting OLX
 XPRO_LEARNING_COURSE_BUCKET_NAME = get_string("XPRO_LEARNING_COURSE_BUCKET_NAME", None)
 XPRO_ITERATOR_CHUNK_SIZE = get_int("XPRO_ITERATOR_CHUNK_SIZE", 20)
+OLL_OLX_BUCKET_NAME = get_string("OLL_OLX_BUCKET_NAME", None)
+OLL_ITERATOR_CHUNK_SIZE = get_int("OLL_ITERATOR_CHUNK_SIZE", 20)
 
 # Base URL's for courses
 OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")

@@ -20,3 +20,7 @@ def api_exception_handler(exc, context):
 
 class DoNotUseRequestException(Exception):
     """This exception is raised during unit tests if an HTTP request is attempted"""
+
+
+class TarException(Exception):
+    """Raised if there was an error untarring a file"""

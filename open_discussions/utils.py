@@ -1,10 +1,14 @@
 """open_discussions utilities"""
+from contextlib import contextmanager
 import datetime
 import os
 from enum import auto, Flag
 from itertools import islice
 import logging
+from subprocess import check_call, CalledProcessError
+from tempfile import TemporaryDirectory
 
+import boto3
 import pytz
 from django.conf import settings
 
@@ -320,3 +324,40 @@ def write_x509_files():
     """Write the x509 certificate and key to files"""
     write_to_file(settings.MIT_WS_CERTIFICATE_FILE, settings.MIT_WS_CERTIFICATE)
     write_to_file(settings.MIT_WS_PRIVATE_KEY_FILE, settings.MIT_WS_PRIVATE_KEY)
+
+
+def get_s3_bucket(bucket_name):
+    """
+    Get a Boto object for an S3 Bucket
+
+    Args:
+        bucket_name (str): The name of the S3 bucket
+
+    Args:
+        boto3.Bucket: the S3 Bucket
+    """
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    return s3.Bucket(name=bucket_name)
+
+
+@contextmanager
+def untar_to_tempdir(tarpath):
+    """
+    Untar a tarfile into a temp directory. The temp directory will be deleted after the context manager exits.
+
+    Args:
+        tarpath (str): Path to a tar file to be untarred
+
+    Yields:
+        str: The temporary directory containing the contents of the tar file
+    """
+    with TemporaryDirectory() as tempdir:
+        try:
+            check_call(["tar", "xf", tarpath], cwd=tempdir)
+        except CalledProcessError as ex:
+            raise TarException from ex
+        yield tempdir

@@ -5,7 +5,6 @@ from datetime import datetime
 import logging
 import os
 import re
-from subprocess import check_call, CalledProcessError
 from tempfile import TemporaryDirectory
 
 import boto3
@@ -29,7 +28,8 @@ from course_catalog.etl.ocw import (
 )
 from course_catalog.etl.xpro import (
     get_xpro_learning_course_bucket,
-    transform_content_files as transform_content_files_xpro,
+    get_oll_olx_bucket,
+    transform_content_files as transform_content_files_olx,
 )
 from course_catalog.models import LearningResourceRun, Course
 from course_catalog.serializers import (
@@ -38,6 +38,8 @@ from course_catalog.serializers import (
     CourseSerializer,
 )
 from course_catalog.utils import get_course_url
+from open_discussions.exceptions import TarException
+from open_discussions.utils import untar_to_tempdir
 from search.task_helpers import delete_course, upsert_course
 
 log = logging.getLogger(__name__)
@@ -526,6 +528,31 @@ def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s
             log.exception("Error encountered parsing OCW json for %s", course_prefix)
 
 
+def ingest_olx_from_tarfile(*, run_id, tarpath, course_ids):
+    """
+    Import OLX from a tarfile and ingest as ContentFiles
+
+    Args:
+        run_id (str): A run id
+        tarpath (str): A path to a tarfile
+        course_ids (list of int):
+            A list of Course ids. A run must be part of one of these courses to be ingested
+    """
+    run = LearningResourceRun.objects.filter(
+        run_id=run_id,
+        content_type=ContentType.objects.get_for_model(Course),
+        object_id__in=course_ids,
+    ).first()
+    if not run:
+        log.info("No courses matched course tarfile %s", tarpath)
+        return
+
+    try:
+        load_content_files(run, transform_content_files_olx(tarpath))
+    except:  # pylint: disable=bare-except
+        log.exception("Error ingesting OLX content data for %s", tarpath)
+
+
 def sync_xpro_course_files(ids):
     """
     Sync all xPRO course run files for a list of course ids to database
@@ -552,40 +579,45 @@ def sync_xpro_course_files(ids):
         log.warning("No xPRO exported courses found in xPRO S3 bucket")
         return
 
-    course_content_type = ContentType.objects.get_for_model(Course)
-    with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
+    with TemporaryDirectory() as export_tempdir:
         tarbytes = get_s3_object_and_read(most_recent_export)
         tarpath = os.path.join(export_tempdir, "temp.tar.gz")
         with open(tarpath, "wb") as f:
             f.write(tarbytes)
 
         try:
-            check_call(["tar", "xf", tarpath], cwd=tar_tempdir)
-        except CalledProcessError:
+            with untar_to_tempdir(tarpath) as tar_tempdir:
+                for filename in os.listdir(tar_tempdir):
+                    inner_tarpath = os.path.join(tar_tempdir, filename)
+                    with untar_to_tempdir(inner_tarpath) as inner_tempdir:
+                        run_id = os.listdir(inner_tempdir)[0]
+                        ingest_olx_from_tarfile(
+                            tarpath=inner_tarpath, course_ids=ids, run_id=run_id
+                        )
+        except TarException:
             log.exception("Unable to untar %s", most_recent_export)
-            return
 
-        for course_tarfile in os.listdir(tar_tempdir):
-            matches = re.search(r"(.+)\.tar\.gz$", course_tarfile)
-            if not matches:
-                log.error(
-                    "Expected a tar file in exported courses tarball but found %s",
-                    course_tarfile,
-                )
-                continue
-            run_id = matches.group(1)
-            run = LearningResourceRun.objects.filter(
-                platform=PlatformType.xpro.value,
-                run_id=run_id,
-                content_type=course_content_type,
-                object_id__in=ids,
-            ).first()
-            if not run:
-                log.info("No xPRO courses matched course tarfile %s", course_tarfile)
+
+def sync_oll_course_files(ids):
+    """
+    Sync all OLL OLX from an S3 bucket
+
+    Args:
+        ids(list of int): list of course ids to process
+    """
+    bucket = get_oll_olx_bucket()
+
+    with TemporaryDirectory() as tempdir:
+        for obj in bucket.objects.all():
+            if not re.search(r".+\.tar\.gz$", obj.key):
                 continue
 
-            course_tarpath = os.path.join(tar_tempdir, course_tarfile)
-            try:
-                load_content_files(run, transform_content_files_xpro(course_tarpath))
-            except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)
+            tarbytes = get_s3_object_and_read(obj)
+            tarpath = os.path.join(tempdir, obj.key)
+            with open(tarpath, "wb") as f:
+                f.write(tarbytes)
+
+        with untar_to_tempdir(tarpath) as inner_tempdir:
+            run_id = os.listdir(inner_tempdir)[0]
+
+        ingest_olx_from_tarfile(tarpath=tempdir, course_ids=ids, run_id=run_id)

@@ -16,24 +16,19 @@ from course_catalog.constants import (
 )
 from course_catalog.etl.utils import extract_text_metadata, sync_s3_text
 from course_catalog.models import ContentFile, get_max_length
-from open_discussions.utils import extract_values
+from open_discussions.utils import extract_values, get_s3_bucket
 
 log = logging.getLogger()
 
 
 def get_ocw_learning_course_bucket():
     """
-    Get the OCW S3 Bucket or None
+    Get the OCW S3 Bucket
 
     Returns:
-        boto3.Bucket: the OCW S3 Bucket or None
+        boto3.Bucket: the OCW S3 Bucket
     """
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    return s3.Bucket(name=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
+    return get_s3_bucket(settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
 def transform_content_files(course_run_json):

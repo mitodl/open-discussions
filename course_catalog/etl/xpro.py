@@ -8,7 +8,6 @@ from subprocess import check_call
 from tempfile import TemporaryDirectory
 import glob
 
-import boto3
 from django.conf import settings
 import requests
 import pytz
@@ -23,6 +22,7 @@ from course_catalog.constants import (
 )
 from course_catalog.etl.utils import extract_text_metadata, log_exceptions
 from course_catalog.models import get_max_length
+from open_discussions.utils import get_s3_bucket, untar_to_tempdir
 
 
 log = logging.getLogger(__name__)
@@ -38,14 +38,19 @@ def get_xpro_learning_course_bucket():
     Get the xPRO S3 Bucket
 
     Returns:
-        boto3.Bucket: the OCW S3 Bucket or None
+        boto3.Bucket: the S3 Bucket
     """
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    return s3.Bucket(name=settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
+    return get_s3_bucket(settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
+
+
+def get_oll_olx_bucket():
+    """
+    Get the OLL OLX bucket
+
+    Returns:
+        boto3.Bucket: the S3 Bucket
+    """
+    return get_s3_bucket(settings.OLL_OLX_BUCKET_NAME)
 
 
 def _parse_datetime(value):
@@ -208,8 +213,7 @@ def transform_content_files(course_tarpath):
         course_tarpath (str): The path to the tarball which contains the OLX
     """
     content = []
-    with TemporaryDirectory() as inner_tempdir:
-        check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
+    with untar_to_tempdir(course_tarpath) as inner_tempdir:
         olx_path = glob.glob(inner_tempdir + "/*")[0]
         for document, metadata in documents_from_olx(olx_path):
             key = metadata["key"]
