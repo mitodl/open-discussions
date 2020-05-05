@@ -1,27 +1,33 @@
+@use "@material/snackbar";
+
 .mdc-snackbar {
-  z-index: 10;
-  background-color: $message-component-bg-color;
-  left: 50%;
-  border-radius: $std-border-radius;
+  background-color: transparent;
+  z-index: 50;
 
   @include breakpoint(materialmobile) {
     left: 0;
   }
 
-  &.mdc-snackbar--active {
+  &.mdc-snackbar--open {
     bottom: 10px;
     padding-top: 10px;
     padding-bottom: 10px;
   }
 
-  .mdc-snackbar__text {
+  .mdc-snackbar__surface {
+    background-color: $message-component-bg-color;
+    border-radius: $std-border-radius;
     margin: 5px 0;
     padding: 0;
-    min-width: 100%;
-    width: 100%;
+
+    .mdc-snackbar__label {
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 
-.persistent-drawer-open ~ .mdc-snackbar {
-  left: calc(50% + (#{$drawer-width}/ 2));
+.persistent-drawer.open ~ .mdc-snackbar {
+  width: calc(100% - #{$drawer-width});
+  left: $drawer-width;
 }
