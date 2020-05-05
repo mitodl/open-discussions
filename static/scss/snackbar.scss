@@ -19,6 +19,11 @@
     border-radius: $std-border-radius;
     margin: 5px 0;
     padding: 0;
+
+    .mdc-snackbar__label {
+      width: 100%;
+      text-align: center;
+    }
   }
 }
 
