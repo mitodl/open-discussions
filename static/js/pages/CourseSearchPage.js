@@ -250,6 +250,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
     if (emptyOrNil(activeFacets.type)) {
       activeFacets.type = LR_TYPE_ALL
+    } else if (activeFacets.type.includes(LR_TYPE_PODCAST)) {
+      activeFacets.type.push(LR_TYPE_PODCAST_EPISODE)
     }
 
     await runSearch({

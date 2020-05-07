@@ -15,6 +15,8 @@ from course_catalog.factories import (
     UserListItemFactory,
     VideoFactory,
     ProgramFactory,
+    PodcastFactory,
+    PodcastEpisodeFactory,
 )
 from course_catalog.models import FavoriteItem
 from open_discussions import features
@@ -48,6 +50,8 @@ from search.serializers import (
     ESUserListSerializer,
     ESVideoSerializer,
     ESProgramSerializer,
+    ESPodcastSerializer,
+    ESPodcastEpisodeSerializer,
 )
 
 
@@ -528,10 +532,17 @@ def test_find_similar_resources(settings, elasticsearch, user):
 @pytest.mark.parametrize("max_suggestions", [1, 3])
 @pytest.mark.parametrize("suggest_min_hits", [2, 4])
 @pytest.mark.parametrize("is_anonymous", [True, False])
+@pytest.mark.parametrize("podcast_present_in_aggregate", [True, False])
 @pytest.mark.django_db
 def test_transform_results(
-    user, is_anonymous, suggest_min_hits, max_suggestions, settings
+    user,
+    is_anonymous,
+    suggest_min_hits,
+    max_suggestions,
+    podcast_present_in_aggregate,
+    settings,
 ):  # pylint: disable=too-many-locals
+    # pylint: disable=too-many-arguments
     """
     transform_results should transform reverse nested availability results if present, and move
     scripted fields into the source result
@@ -540,6 +551,8 @@ def test_transform_results(
     settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
+    podcast = PodcastFactory.create()
+    podcast_episode = PodcastEpisodeFactory.create()
     listed_learningpath = UserListFactory.create(
         author=UserFactory.create(), list_type=LEARNING_PATH_TYPE
     )
@@ -587,6 +600,20 @@ def test_transform_results(
             "_score": 1.0,
             "_source": ESUserListSerializer(listed_learningpath).data,
         },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a3",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeD",
+            "_score": 1.0,
+            "_source": ESPodcastSerializer(podcast).data,
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a4",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeE",
+            "_score": 1.0,
+            "_source": ESPodcastEpisodeSerializer(podcast_episode).data,
+        },
     ]
 
     expected_hits = [
@@ -632,7 +659,47 @@ def test_transform_results(
                 else [],
             },
         },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a3",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeD",
+            "_score": 1.0,
+            "_source": {
+                **ESPodcastSerializer(podcast).data,
+                "is_favorite": False,
+                "lists": [],
+            },
+        },
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a4",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeE",
+            "_score": 1.0,
+            "_source": {
+                **ESPodcastEpisodeSerializer(podcast_episode).data,
+                "is_favorite": False,
+                "lists": [],
+            },
+        },
     ]
+
+    if podcast_present_in_aggregate:
+        raw_type_aggregation = {
+            "buckets": [
+                {"key": "podcastepisode", "doc_count": 1},
+                {"key": "podcast", "doc_count": 1},
+                {"key": "course", "doc_count": 2},
+                {"key": "userlist", "doc_count": 1},
+            ]
+        }
+    else:
+        raw_type_aggregation = {
+            "buckets": [
+                {"key": "podcastepisode", "doc_count": 2},
+                {"key": "course", "doc_count": 2},
+                {"key": "userlist", "doc_count": 1},
+            ]
+        }
 
     results = {
         "hits": {"hits": raw_hits, "total": 3},
@@ -670,6 +737,7 @@ def test_transform_results(
                 }
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            "type": raw_type_aggregation,
         },
     }
 
@@ -691,6 +759,13 @@ def test_transform_results(
                 ]
             },
             "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            "type": {
+                "buckets": [
+                    {"key": "podcast", "doc_count": 2},
+                    {"key": "course", "doc_count": 2},
+                    {"key": "userlist", "doc_count": 1},
+                ]
+            },
         },
     }
     results["aggregations"]["availability"].pop("runs", None)

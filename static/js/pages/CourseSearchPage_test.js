@@ -225,6 +225,7 @@ describe("CourseSearchPage", () => {
     })
   })
 
+  //
   it("searches with parameters", async () => {
     SETTINGS.search_page_size = 5
     await renderPage(
@@ -253,6 +254,40 @@ describe("CourseSearchPage", () => {
           topics:       ["Science", "Engineering"],
           availability: ["availableNow"],
           cost:         ["free"]
+        })
+      )
+    })
+  })
+
+  //
+  it("searches for podcast episodes when the type parameter is podcast", async () => {
+    SETTINGS.search_page_size = 5
+    await renderPage(
+      {
+        search: {
+          processing: false,
+          loaded:     false
+        }
+      },
+      {
+        location: {
+          search: "q=text&type=podcast"
+        }
+      }
+    )
+    sinon.assert.calledWith(helper.searchStub, {
+      channelName: null,
+      from:        0,
+      size:        SETTINGS.search_page_size,
+      text:        "text",
+      type:        ["podcast", "podcastepisode"],
+      facets:      new Map(
+        Object.entries({
+          type:         ["podcast", "podcastepisode"],
+          offered_by:   [],
+          topics:       [],
+          availability: [],
+          cost:         []
         })
       )
     })

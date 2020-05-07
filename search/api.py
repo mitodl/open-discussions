@@ -375,6 +375,28 @@ def transform_results(search_result, user):
             for bucket in prices.pop("buckets", [])
             if bucket["courses"]["doc_count"] > 0
         ]
+
+    types = search_result.get("aggregations", {}).get("type", {})
+
+    podcast_episode_bucket = None
+    podcast_bucket = None
+    if types:
+        for type_bucket in search_result["aggregations"]["type"]["buckets"]:
+            if type_bucket["key"] == PODCAST_EPISODE_TYPE:
+                podcast_episode_bucket = type_bucket
+            elif type_bucket["key"] == PODCAST_TYPE:
+                podcast_bucket = type_bucket
+
+        if podcast_episode_bucket and podcast_bucket:
+            podcast_bucket["doc_count"] = (
+                podcast_bucket["doc_count"] + podcast_episode_bucket["doc_count"]
+            )
+            search_result["aggregations"]["type"]["buckets"].remove(
+                podcast_episode_bucket
+            )
+        elif podcast_episode_bucket:
+            podcast_episode_bucket["key"] = PODCAST_TYPE
+
     if not user.is_anonymous:
         favorites = (
             FavoriteItem.objects.select_related("content_type")
