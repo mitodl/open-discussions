@@ -294,6 +294,40 @@ describe("CourseSearchPage", () => {
   })
 
   //
+  it("searches for learning path when the type parameter is userlist", async () => {
+    SETTINGS.search_page_size = 5
+    await renderPage(
+      {
+        search: {
+          processing: false,
+          loaded:     false
+        }
+      },
+      {
+        location: {
+          search: "q=text&type=userlist"
+        }
+      }
+    )
+    sinon.assert.calledWith(helper.searchStub, {
+      channelName: null,
+      from:        0,
+      size:        SETTINGS.search_page_size,
+      text:        "text",
+      type:        ["userlist", "learningpath"],
+      facets:      new Map(
+        Object.entries({
+          type:         ["userlist", "learningpath"],
+          offered_by:   [],
+          topics:       [],
+          availability: [],
+          cost:         []
+        })
+      )
+    })
+  })
+
+  //
   ;[0, 5].forEach(from => {
     it(`InfiniteScroll initialLoad ${shouldIf(
       from > 0

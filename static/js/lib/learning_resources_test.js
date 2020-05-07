@@ -93,8 +93,7 @@ describe("Course utils", () => {
   ;[
     [LR_TYPE_COURSE, "Courses"],
     [LR_TYPE_PROGRAM, "Programs"],
-    [LR_TYPE_USERLIST, "Learning Lists"],
-    [LR_TYPE_LEARNINGPATH, "Learning Paths"]
+    [LR_TYPE_USERLIST, "Learning Lists"]
   ].forEach(([searchType, facetText]) => {
     it(`facet text should be ${facetText} for resource type ${searchType}`, () => {
       assert.equal(resourceLabel(searchType), facetText)

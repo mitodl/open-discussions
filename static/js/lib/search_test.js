@@ -848,8 +848,11 @@ describe("search functions", () => {
           "offered_by"
         ]
       ],
-      ["program", ["title.english", "short_description.english", "topics"]],
-      ["userlist", ["title.english", "short_description.english", "topics"]],
+      ["program", ["title.english^3", "short_description.english^2", "topics"]],
+      [
+        "userlist",
+        ["title.english^3", "short_description.english^2", "topics"]
+      ],
       [
         "video",
         [
