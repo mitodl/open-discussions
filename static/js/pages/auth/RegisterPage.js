@@ -86,9 +86,7 @@ const mergeProps = mergeAndInjectProps(
         processAuthResponse(history, response)
         if (response.state === STATE_REGISTER_CONFIRM_SENT && response.email) {
           setBannerMessage(
-            `We sent an email to <${
-              response.email
-            }>, please validate your address to continue.`
+            `We sent an email to <${response.email}>, please validate your address to continue.`
           )
         }
       },

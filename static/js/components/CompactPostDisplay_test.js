@@ -89,21 +89,22 @@ describe("CompactPostDisplay", () => {
   })
 
   //
-  ;[["My headline", true], [null, false]].forEach(
-    ([headlineText, expElementExists]) => {
-      it(`${shouldIf(
-        expElementExists
-      )} display headline span when text=${String(headlineText)}`, () => {
-        post.author_headline = headlineText
-        const wrapper = renderPostDisplay({ post })
-        const headlineSpan = wrapper.find(".author-headline")
-        assert.equal(headlineSpan.exists(), expElementExists)
-        if (expElementExists && headlineText) {
-          assert(headlineSpan.text().includes(headlineText))
-        }
-      })
-    }
-  )
+  ;[
+    ["My headline", true],
+    [null, false]
+  ].forEach(([headlineText, expElementExists]) => {
+    it(`${shouldIf(expElementExists)} display headline span when text=${String(
+      headlineText
+    )}`, () => {
+      post.author_headline = headlineText
+      const wrapper = renderPostDisplay({ post })
+      const headlineSpan = wrapper.find(".author-headline")
+      assert.equal(headlineSpan.exists(), expElementExists)
+      if (expElementExists && headlineText) {
+        assert(headlineSpan.text().includes(headlineText))
+      }
+    })
+  })
 
   it("should link to the author's profile", () => {
     const link = renderPostDisplay({ post })
@@ -210,22 +211,25 @@ describe("CompactPostDisplay", () => {
   })
 
   it("should set a class and show icon if stickied and showing pin ui", () => {
-    [[true, true], [true, false], [false, true], [false, false]].forEach(
-      ([showPinUI, stickied]) => {
-        post.stickied = stickied
-        const wrapper = renderPostDisplay({ post, showPinUI })
-        assert.equal(
-          wrapper
-            .find(".compact-post-summary")
-            .at(0)
-            .props().className,
-          showPinUI && stickied
-            ? "compact-post-summary sticky"
-            : "compact-post-summary "
-        )
-        assert.equal(wrapper.find("img.pin").exists(), showPinUI && stickied)
-      }
-    )
+    [
+      [true, true],
+      [true, false],
+      [false, true],
+      [false, false]
+    ].forEach(([showPinUI, stickied]) => {
+      post.stickied = stickied
+      const wrapper = renderPostDisplay({ post, showPinUI })
+      assert.equal(
+        wrapper
+          .find(".compact-post-summary")
+          .at(0)
+          .props().className,
+        showPinUI && stickied
+          ? "compact-post-summary sticky"
+          : "compact-post-summary "
+      )
+      assert.equal(wrapper.find("img.pin").exists(), showPinUI && stickied)
+    })
   })
 
   it("should display the domain, for a url post", () => {
@@ -334,7 +338,10 @@ describe("CompactPostDisplay", () => {
     })
 
     it('should include a "pinning" link, if isModerator and showPinUI', () => {
-      [[true, "Unpin"], [false, "Pin"]].forEach(([pinned, linkText]) => {
+      [
+        [true, "Unpin"],
+        [false, "Pin"]
+      ].forEach(([pinned, linkText]) => {
         post.stickied = pinned
         const wrapper = renderPostDisplay({
           post,
@@ -395,31 +402,34 @@ describe("CompactPostDisplay", () => {
     })
 
     //
-    ;[[true, true], [true, false], [false, true], [false, false]].forEach(
-      ([userIsAuthor, passDeleteFunc]) => {
-        it(`${shouldIf(
-          userIsAuthor && passDeleteFunc
-        )} put a delete button, if it ${
-          passDeleteFunc ? "gets" : "doesn't get"
-        } the prop and user ${userIsAuthor ? "is" : "is not"} author`, () => {
-          const deletePostStub = helper.sandbox.stub()
-          if (userIsAuthor) {
-            // $FlowFixMe: go home flow, you're drunk
-            post.author_id = SETTINGS.username
-          }
-          const wrapper = renderPostDisplay({
-            post,
-            deletePost: passDeleteFunc ? deletePostStub : null
-          })
-          const link = wrapper.find({ children: "Delete" })
-          assert.equal(link.exists(), userIsAuthor && passDeleteFunc)
-          if (userIsAuthor && passDeleteFunc) {
-            link.simulate("click")
-            assert.ok(deletePostStub.calledWith(post))
-          }
+    ;[
+      [true, true],
+      [true, false],
+      [false, true],
+      [false, false]
+    ].forEach(([userIsAuthor, passDeleteFunc]) => {
+      it(`${shouldIf(
+        userIsAuthor && passDeleteFunc
+      )} put a delete button, if it ${
+        passDeleteFunc ? "gets" : "doesn't get"
+      } the prop and user ${userIsAuthor ? "is" : "is not"} author`, () => {
+        const deletePostStub = helper.sandbox.stub()
+        if (userIsAuthor) {
+          // $FlowFixMe: go home flow, you're drunk
+          post.author_id = SETTINGS.username
+        }
+        const wrapper = renderPostDisplay({
+          post,
+          deletePost: passDeleteFunc ? deletePostStub : null
         })
-      }
-    )
+        const link = wrapper.find({ children: "Delete" })
+        assert.equal(link.exists(), userIsAuthor && passDeleteFunc)
+        if (userIsAuthor && passDeleteFunc) {
+          link.simulate("click")
+          assert.ok(deletePostStub.calledWith(post))
+        }
+      })
+    })
 
     it("should put an ignore button, if it gets the right props", () => {
       const ignorePostStub = helper.sandbox.stub()

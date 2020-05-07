@@ -24,10 +24,8 @@ export class _DropdownMenu extends React.Component<Props> {
   setClickHandlersOnChildren = () => {
     const { closeMenu, children } = this.props
 
-    return React.Children.map(
-      children,
-      child =>
-        child ? React.cloneElement(child, { onClick: closeMenu }) : child
+    return React.Children.map(children, child =>
+      child ? React.cloneElement(child, { onClick: closeMenu }) : child
     )
   }
 

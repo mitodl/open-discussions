@@ -744,40 +744,36 @@ describe("search functions", () => {
       )
     })
   })
-  ;[[LR_TYPE_COURSE, true, true], [LR_TYPE_COURSE, false, false]].forEach(
-    ([resourceType, fileSearchEnabled, includeChildQuery]) => {
-      it(`${shouldIf(
-        includeChildQuery
-      )} include a childQuery for ${resourceType} if fileSearchEnabled is ${String(
-        fileSearchEnabled
-      )}`, () => {
-        SETTINGS.file_search_enabled = fileSearchEnabled
-        const text = "search query"
-        const esQuery = buildLearnQuery(
-          bodybuilder(),
-          text,
-          [resourceType],
-          null
-        )
-        assert.equal(
-          esQuery.query.bool.should[0].bool.should.length,
-          includeChildQuery ? 3 : 2
-        )
-        if (includeChildQuery) {
-          assert.deepEqual(esQuery.query.bool.should[0].bool.should[2], {
-            has_child: {
-              type:  "resourcefile",
-              query: {
-                multi_match: {
-                  query:  text,
-                  fields: ["content", "title", "short_description"]
-                }
-              },
-              score_mode: "avg"
-            }
-          })
-        }
-      })
-    }
-  )
+  ;[
+    [LR_TYPE_COURSE, true, true],
+    [LR_TYPE_COURSE, false, false]
+  ].forEach(([resourceType, fileSearchEnabled, includeChildQuery]) => {
+    it(`${shouldIf(
+      includeChildQuery
+    )} include a childQuery for ${resourceType} if fileSearchEnabled is ${String(
+      fileSearchEnabled
+    )}`, () => {
+      SETTINGS.file_search_enabled = fileSearchEnabled
+      const text = "search query"
+      const esQuery = buildLearnQuery(bodybuilder(), text, [resourceType], null)
+      assert.equal(
+        esQuery.query.bool.should[0].bool.should.length,
+        includeChildQuery ? 3 : 2
+      )
+      if (includeChildQuery) {
+        assert.deepEqual(esQuery.query.bool.should[0].bool.should[2], {
+          has_child: {
+            type:  "resourcefile",
+            query: {
+              multi_match: {
+                query:  text,
+                fields: ["content", "title", "short_description"]
+              }
+            },
+            score_mode: "avg"
+          }
+        })
+      }
+    })
+  })
 })

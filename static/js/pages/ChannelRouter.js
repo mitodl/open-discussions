@@ -124,9 +124,6 @@ const mapDispatchToProps = {
   getChannel: actions.channels.get
 }
 
-export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(ChannelRouter)
+export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
+  ChannelRouter
+)

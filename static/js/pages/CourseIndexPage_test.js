@@ -139,13 +139,16 @@ describe("CourseIndexPage", () => {
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
     assert.lengthOf(carousels, 5)
-    assert.deepEqual(carousels.map(el => el.prop("title")), [
-      "Your Favorites",
-      "New Courses",
-      "Popular Learning Resources",
-      "Upcoming Courses",
-      "New Videos"
-    ])
+    assert.deepEqual(
+      carousels.map(el => el.prop("title")),
+      [
+        "Your Favorites",
+        "New Courses",
+        "Popular Learning Resources",
+        "Upcoming Courses",
+        "New Videos"
+      ]
+    )
   })
 
   it("should hide the favorites carousel when empty", async () => {
@@ -155,13 +158,16 @@ describe("CourseIndexPage", () => {
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
     assert.lengthOf(carousels, 5)
-    assert.deepEqual(carousels.map(el => el.prop("title")), [
-      "Featured Courses",
-      "New Courses",
-      "Popular Learning Resources",
-      "Upcoming Courses",
-      "New Videos"
-    ])
+    assert.deepEqual(
+      carousels.map(el => el.prop("title")),
+      [
+        "Featured Courses",
+        "New Courses",
+        "Popular Learning Resources",
+        "Upcoming Courses",
+        "New Videos"
+      ]
+    )
   })
 
   it("should hide the popular resources carousel when empty", async () => {
@@ -171,13 +177,16 @@ describe("CourseIndexPage", () => {
     const { wrapper } = await render()
     const carousels = wrapper.find("CourseCarousel")
     assert.lengthOf(carousels, 5)
-    assert.deepEqual(carousels.map(el => el.prop("title")), [
-      "Your Favorites",
-      "Featured Courses",
-      "New Courses",
-      "Upcoming Courses",
-      "New Videos"
-    ])
+    assert.deepEqual(
+      carousels.map(el => el.prop("title")),
+      [
+        "Your Favorites",
+        "Featured Courses",
+        "New Courses",
+        "Upcoming Courses",
+        "New Videos"
+      ]
+    )
   })
 
   it("should include a banner image", async () => {

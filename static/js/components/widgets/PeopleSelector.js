@@ -190,9 +190,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
     )
 })
 
-export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(PeopleSelector)
+export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
+  PeopleSelector
+)

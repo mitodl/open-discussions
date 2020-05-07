@@ -128,7 +128,10 @@ export default class ImageUploaderForm extends React.Component<
         onDropRejected={() => this.setPhotoError("Please select a valid photo")}
       >
         <div className="desktop-upload-message">
-          Drag an image here<br />or<br />
+          Drag an image here
+          <br />
+          or
+          <br />
           <button type="button" className="outlined">
             Click to select an image
           </button>

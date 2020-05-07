@@ -140,7 +140,10 @@ describe("App", () => {
   })
 
   //
-  ;[["/learn/", true], ["/", false]].forEach(([url, isLearnUrl]) => {
+  ;[
+    ["/learn/", true],
+    ["/", false]
+  ].forEach(([url, isLearnUrl]) => {
     it(`${shouldIf(!isLearnUrl)} include a Drawer, ${shouldIf(
       isLearnUrl
     )} include ContentToolbar if url is ${url}`, async () => {

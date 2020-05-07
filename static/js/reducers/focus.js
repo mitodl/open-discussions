@@ -1,12 +1,13 @@
 // @flow
+import { createReducer } from "@reduxjs/toolkit"
+
 import {
-  SET_FOCUSED_COMMENT,
-  CLEAR_FOCUSED_COMMENT,
-  SET_FOCUSED_POST,
-  CLEAR_FOCUSED_POST
+  setFocusedComment,
+  clearFocusedComment,
+  setFocusedPost,
+  clearFocusedPost
 } from "../actions/focus"
 
-import type { Action } from "../flow/reduxTypes"
 import type { CommentInTree, Post } from "../flow/discussionTypes"
 
 export type FocusState = {
@@ -19,19 +20,21 @@ export const INITIAL_FOCUS_STATE: FocusState = {
   post:    null
 }
 
-export const focus = (
-  state: FocusState = INITIAL_FOCUS_STATE,
-  action: Action<any, null>
-): FocusState => {
-  switch (action.type) {
-  case SET_FOCUSED_COMMENT:
-    return { ...state, comment: action.payload }
-  case CLEAR_FOCUSED_COMMENT:
-    return { ...state, comment: null }
-  case SET_FOCUSED_POST:
-    return { ...state, post: action.payload }
-  case CLEAR_FOCUSED_POST:
-    return { ...state, post: null }
+export const focus = createReducer(INITIAL_FOCUS_STATE, {
+  // $FlowFixMe
+  [setFocusedComment]: (state, action) => {
+    state.comment = action.payload
+  },
+  // $FlowFixMe
+  [clearFocusedComment]: state => {
+    state.comment = null
+  },
+  // $FlowFixMe
+  [setFocusedPost]: (state, action) => {
+    state.post = action.payload
+  },
+  // $FlowFixMe
+  [clearFocusedPost]: state => {
+    state.post = null
   }
-  return state
-}
+})

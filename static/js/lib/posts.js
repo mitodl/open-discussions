@@ -94,9 +94,8 @@ export const formatPostTitle = (post: Post) =>
         {post.title}
         <span className="expanded-url-hostname">
           ({urlHostname(post.url)}
-          <i className="material-icons open_in_new overlay-icon">
-            open_in_new
-          </i>)
+          <i className="material-icons open_in_new overlay-icon">open_in_new</i>
+          )
         </span>
       </a>
     </div>

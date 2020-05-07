@@ -181,10 +181,7 @@ const HomepageSidebar = () => (
 )
 
 export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  ),
+  connect(mapStateToProps, mapDispatchToProps),
   withPostModeration,
   withSidebar(HomepageSidebar, "home-page"),
   withPostList,

@@ -39,15 +39,8 @@ export const normalizeListItemsByObjectType = R.compose(
 
 const userListItemsKey = (userListId: number) => `userList.${userListId}.items`
 
-const increment = R.compose(
-  R.add(1),
-  R.defaultTo(0)
-)
-const decrement = R.compose(
-  R.max(0),
-  R.add(-1),
-  R.defaultTo(0)
-)
+const increment = R.compose(R.add(1), R.defaultTo(0))
+const decrement = R.compose(R.max(0), R.add(-1), R.defaultTo(0))
 
 export const transformListItem = R.curry(
   (userListId: number, item: ListItem): ListItemMember => ({
@@ -59,28 +52,25 @@ export const transformListItem = R.curry(
 )
 
 export const createUserListItemsSelector = (userListId: number) => {
-  return useMemo(
-    () => {
-      const key = userListItemsKey(userListId)
-      return createSelector(
-        learningResourceSelector,
-        state => state.entities[`${key}.items`] || [],
-        state => state.entities[`${key}.count`] || 0,
-        (lrSelector, items, count) => {
-          return {
-            items: items
-              .map((item: ListItemMember) => ({
-                resource: lrSelector(item.object_id, item.content_type),
-                item
-              }))
-              .filter(item => !R.isNil(item.resource)),
-            count
-          }
+  return useMemo(() => {
+    const key = userListItemsKey(userListId)
+    return createSelector(
+      learningResourceSelector,
+      state => state.entities[`${key}.items`] || [],
+      state => state.entities[`${key}.count`] || 0,
+      (lrSelector, items, count) => {
+        return {
+          items: items
+            .map((item: ListItemMember) => ({
+              resource: lrSelector(item.object_id, item.content_type),
+              item
+            }))
+            .filter(item => !R.isNil(item.resource)),
+          count
         }
-      )
-    },
-    [userListId]
-  )
+      }
+    )
+  }, [userListId])
 }
 
 export const createUserListItemsPageSelector = (
@@ -251,10 +241,7 @@ export const deleteUserListItemMutation = (
         }
       }),
       // evict the item, decrement the count
-      [`${key}.items`]: R.compose(
-        evictItem,
-        value => value || []
-      ),
+      [`${key}.items`]: R.compose(evictItem, value => value || []),
       [`${key}.count`]: decrement
     },
     options: {

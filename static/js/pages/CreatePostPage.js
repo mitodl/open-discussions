@@ -324,9 +324,7 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
       } catch (err) {
         dispatch(
           setBannerMessage(
-            `Something went wrong creating your post. Please try again or contact us at ${
-              SETTINGS.support_email
-            }`
+            `Something went wrong creating your post. Please try again or contact us at ${SETTINGS.support_email}`
           )
         )
       }

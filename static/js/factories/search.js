@@ -234,7 +234,10 @@ export const makeSearchResult = (type: ?string) => {
 export const makeSearchFacetResult = () => {
   return {
     offered_by: {
-      buckets: [{ key: "MITx", doc_count: 88 }, { key: "OCW", doc_count: 102 }]
+      buckets: [
+        { key: "MITx", doc_count: 88 },
+        { key: "OCW", doc_count: 102 }
+      ]
     },
     topics: {
       buckets: [
@@ -243,7 +246,10 @@ export const makeSearchFacetResult = () => {
       ]
     },
     cost: {
-      buckets: [{ key: "free", doc_count: 102 }, { key: "paid", doc_count: 88 }]
+      buckets: [
+        { key: "free", doc_count: 102 },
+        { key: "paid", doc_count: 88 }
+      ]
     },
     availability: {
       buckets: [

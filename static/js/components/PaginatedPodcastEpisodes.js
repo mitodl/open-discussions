@@ -31,44 +31,39 @@ export default function PaginatedPodcastEpisodes({ podcast, pageSize }: Props) {
     podcastEpisodesRequest(podcast.id, begin, pageSize)
   )
 
-  const selector = useMemo(
-    () => {
-      const key = podcastEpisodesKey(podcast.id)
+  const selector = useMemo(() => {
+    const key = podcastEpisodesKey(podcast.id)
 
-      return createSelector(
-        state => state.entities.podcastEpisodes,
-        state => state.entities[key],
-        (podcastEpisodes, podcastSpecificState) => {
-          if (!podcastSpecificState) {
-            return {}
-          }
-
-          const { items, count } = podcastSpecificState
-
-          return {
-            episodes: items.map(item => podcastEpisodes[item]),
-            count
-          }
+    return createSelector(
+      state => state.entities.podcastEpisodes,
+      state => state.entities[key],
+      (podcastEpisodes, podcastSpecificState) => {
+        if (!podcastSpecificState) {
+          return {}
         }
-      )
-    },
-    [podcast]
-  )
+
+        const { items, count } = podcastSpecificState
+
+        return {
+          episodes: items.map(item => podcastEpisodes[item]),
+          count
+        }
+      }
+    )
+  }, [podcast])
 
   const { episodes, count } = useSelector(selector)
 
   return isFinished && episodes ? (
     <div className="paginated-podcast-episodes">
-      {episodes
-        .slice(begin, end)
-        .map(episode => (
-          <PodcastEpisodeCard
-            episode={episode}
-            podcast={podcast}
-            persistentShadow
-            key={episode.id}
-          />
-        ))}
+      {episodes.slice(begin, end).map(episode => (
+        <PodcastEpisodeCard
+          episode={episode}
+          podcast={podcast}
+          persistentShadow
+          key={episode.id}
+        />
+      ))}
       <LRDrawerPaginationControls
         page={page}
         begin={begin}

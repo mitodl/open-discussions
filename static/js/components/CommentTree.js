@@ -248,9 +248,10 @@ export default class CommentTree extends React.Component<Props, State> {
     const { commentPermalink, post } = this.props
     const { editing, replying } = this.state
     // ramda can't determine arity here so use curryN
-    const renderGenericComment = R.curryN(2, this.renderGenericComment)(
-      depth + 1
-    )
+    const renderGenericComment = R.curryN(
+      2,
+      this.renderGenericComment
+    )(depth + 1)
 
     const atMaxDepth = depth + 1 >= SETTINGS.max_comment_depth
 
