@@ -10,6 +10,7 @@ import {
   LR_TYPE_VIDEO,
   LR_TYPE_PODCAST,
   LR_TYPE_PODCAST_EPISODE,
+  LR_TYPE_LEARNINGPATH,
   PHONE,
   TABLET,
   DESKTOP,
@@ -161,8 +162,8 @@ export const RESOURCE_QUERY_NESTED_FIELDS = [
 ]
 
 const LIST_QUERY_FIELDS = [
-  "title.english",
-  "short_description.english",
+  "title.english^3",
+  "short_description.english^2",
   "topics"
 ]
 
@@ -249,7 +250,9 @@ const _searchFields = (type: ?string) => {
     return PODCAST_QUERY_FIELDS
   } else if (type === LR_TYPE_PODCAST_EPISODE) {
     return PODCAST_EPISODE_QUERY_FIELDS
-  } else if ([LR_TYPE_PROGRAM, LR_TYPE_USERLIST].includes(type)) {
+  } else if (
+    [LR_TYPE_PROGRAM, LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(type)
+  ) {
     return LIST_QUERY_FIELDS
   } else {
     return R.uniq([

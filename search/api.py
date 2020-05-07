@@ -347,6 +347,7 @@ def _transform_search_results_suggest(search_result):
     return search_result
 
 
+# pylint: disable=too-many-branches
 def transform_results(search_result, user):
     """
     Transform the reverse nested availability aggregate counts into a format matching the other facets.
@@ -378,24 +379,33 @@ def transform_results(search_result, user):
 
     types = search_result.get("aggregations", {}).get("type", {})
 
-    podcast_episode_bucket = None
-    podcast_bucket = None
     if types:
-        for type_bucket in search_result["aggregations"]["type"]["buckets"]:
-            if type_bucket["key"] == PODCAST_EPISODE_TYPE:
-                podcast_episode_bucket = type_bucket
-            elif type_bucket["key"] == PODCAST_TYPE:
-                podcast_bucket = type_bucket
+        type_merges = dict(
+            zip(
+                (PODCAST_EPISODE_TYPE, LEARNING_PATH_TYPE),
+                (PODCAST_TYPE, USER_LIST_TYPE),
+            )
+        )
 
-        if podcast_episode_bucket and podcast_bucket:
-            podcast_bucket["doc_count"] = (
-                podcast_bucket["doc_count"] + podcast_episode_bucket["doc_count"]
-            )
-            search_result["aggregations"]["type"]["buckets"].remove(
-                podcast_episode_bucket
-            )
-        elif podcast_episode_bucket:
-            podcast_episode_bucket["key"] = PODCAST_TYPE
+        for child_type, parent_type in type_merges.items():
+            child_type_bucket = None
+            parent_type_bucket = None
+
+            for type_bucket in search_result["aggregations"]["type"]["buckets"]:
+                if type_bucket["key"] == child_type:
+                    child_type_bucket = type_bucket
+                elif type_bucket["key"] == parent_type:
+                    parent_type_bucket = type_bucket
+
+            if child_type_bucket and parent_type_bucket:
+                parent_type_bucket["doc_count"] = (
+                    child_type_bucket["doc_count"] + parent_type_bucket["doc_count"]
+                )
+                search_result["aggregations"]["type"]["buckets"].remove(
+                    child_type_bucket
+                )
+            elif child_type_bucket:
+                child_type_bucket["key"] = parent_type
 
     if not user.is_anonymous:
         favorites = (

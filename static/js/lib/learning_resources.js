@@ -14,7 +14,6 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
-  LR_TYPE_PODCAST_EPISODE,
   platforms
 } from "./constants"
 import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
@@ -151,14 +150,9 @@ export const filterRunsByAvailability = (
     : []
 
 export const resourceLabel = (resource: string) => {
-  switch (resource) {
-  case LR_TYPE_USERLIST:
+  if (resource === LR_TYPE_USERLIST) {
     return "Learning Lists"
-  case LR_TYPE_LEARNINGPATH:
-    return "Learning Paths"
-  case LR_TYPE_PODCAST_EPISODE:
-    return "Podcast Episodes"
-  default:
+  } else {
     return R.concat(capitalize(resource), "s")
   }
 }
