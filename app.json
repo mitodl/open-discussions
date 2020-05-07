@@ -172,28 +172,12 @@
       "description": "Name of S3 bucket containing OCW course data",
       "required": false
     },
-    "OCW_CONTENT_ACCESS_KEY": {
-      "description": "AWS access key for OCW content bucket",
-      "required": false
-    },
-    "OCW_CONTENT_SECRET_ACCESS_KEY": {
-      "description": "AWS secret key for OCW content bucket",
-      "required": false
-    },
     "OCW_ITERATOR_CHUNK_SIZE": {
       "description": "Chunk size for iterating over OCW courses for master json",
       "required": false
     },
     "OCW_LEARNING_COURSE_BUCKET_NAME": {
       "description": "Name of S3 bucket to upload OCW course media",
-      "required": false
-    },
-    "OCW_LEARNING_COURSE_ACCESS_KEY": {
-      "description": "AWS access key for OCW media upload bucket",
-      "required": false
-    },
-    "OCW_LEARNING_COURSE_SECRET_ACCESS_KEY": {
-      "description": "AWS secret key for OCW media upload bucket",
       "required": false
     },
     "OCW_UPLOAD_IMAGE_ONLY": {
@@ -536,14 +520,6 @@
     },
     "XPRO_LEARNING_COURSE_BUCKET_NAME": {
       "description": "Name of S3 bucket to upload xPRO course media",
-      "required": false
-    },
-    "XPRO_LEARNING_COURSE_ACCESS_KEY": {
-      "description": "AWS access key for xPRO media upload bucket",
-      "required": false
-    },
-    "XPRO_LEARNING_COURSE_SECRET_ACCESS_KEY": {
-      "description": "AWS secret key for xPRO media upload bucket",
       "required": false
     },
     "YOUTUBE_DEVELOPER_KEY": {
