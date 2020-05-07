@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.122.0 (Released May 07, 2020)
+---------------
+
+- Revert "add link in drawer from podcast episode to all episodes"
+- add link in drawer from podcast episode to all episodes
+- Precommit hooks (#2859)
+- Update Podcasts page title (#2893)
+
 Version 0.121.4 (Released May 01, 2020)
 ---------------
 
