@@ -24,7 +24,7 @@ from course_catalog.models import (
     CoursePrice,
     CourseTopic,
 )
-from course_catalog.utils import get_ocw_topic
+from course_catalog.utils import get_ocw_topics
 from course_catalog.api import (
     digest_ocw_course,
     safe_load_json,
@@ -202,8 +202,8 @@ def test_deserializing_a_valid_ocw_course(
     assert course_prices_count == 1
 
     course_topics_count = CourseTopic.objects.count()
-    assert course_topics_count == sum(
-        len(get_ocw_topic(cc)) for cc in ocw_valid_data.get("course_collections")
+    assert course_topics_count == len(
+        get_ocw_topics(ocw_valid_data.get("course_collections"))
     )
 
 

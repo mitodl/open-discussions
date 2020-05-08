@@ -72,7 +72,12 @@ def test_see_extract(settings, base_url):
                     )
                 ],
                 "price": Decimal("4100"),
-                "topics": ["Business & Management"],
+                "topics": [
+                    "Innovation",
+                    "Leadership",
+                    "Operations Management",
+                    "Organizational Behavior",
+                ],
                 "short_description": short_description,
                 "full_description": full_description,
                 "instructors": [["Robert", "Van de Graaff"]],
@@ -90,7 +95,12 @@ def test_see_transform(settings):
         {
             "url": "https://executive.mit.edu/openenrollment/program/foobar/",
             "title": title,
-            "topics": [{"name": "Business & Management"}],
+            "topics": [
+                {"name": "Innovation"},
+                {"name": "Leadership"},
+                {"name": "Operations Management"},
+                {"name": "Organizational Behavior"},
+            ],
             "short_description": short_description,
             "full_description": full_description,
             "course_id": "b5bdcbf344fe3a43b426844a49b99dc1",
