@@ -25,7 +25,7 @@ from course_catalog.models import (
     Video,
 )
 from course_catalog.utils import (
-    get_ocw_topic,
+    get_ocw_topics,
     get_year_and_semester,
     get_course_url,
     semester_year_to_date,
@@ -325,10 +325,10 @@ class OCWSerializer(CourseSerializer):
         """
         Custom function to parse data out of the raw ocw json
         """
-        topics = []
-        for topic_obj in data.get("course_collections"):
-            for topic in get_ocw_topic(topic_obj):
-                topics.append({"name": topic})
+        topics = [
+            {"name": topic_name}
+            for topic_name in get_ocw_topics(data.get("course_collections"))
+        ]
         course_fields = {
             "course_id": data.get("course_id"),
             "title": data.get("title"),

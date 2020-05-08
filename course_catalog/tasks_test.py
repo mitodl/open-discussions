@@ -161,7 +161,7 @@ def test_get_ocw_courses(
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
-    assert CourseTopic.objects.count() == 3
+    assert CourseTopic.objects.count() == 5
     course = Course.objects.first()
     assert course.published is not blacklisted
 
@@ -200,7 +200,7 @@ def test_get_ocw_overwrite(
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
     assert CourseInstructor.objects.count() == 1
-    assert CourseTopic.objects.count() == 3
+    assert CourseTopic.objects.count() == 5
 
     mock_digest = mocker.patch("course_catalog.api.digest_ocw_course")
     get_ocw_courses.delay(

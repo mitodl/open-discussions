@@ -61,7 +61,7 @@ def test_mitpe_extract(settings, base_url):
                     )
                 ],
                 "price": Decimal("5500"),
-                "topics": ["Business & Management", "Design"],
+                "topics": ["Innovation", "Systems Engineering"],
                 "short_description": short_description,
                 "full_description": full_description,
                 "instructors": [["Marcus", "Aurelius I"]],
@@ -79,7 +79,7 @@ def test_mitpe_transform(settings):
         {
             "url": "https://professional.mit.edu/course-catalog/mitpe-course-detail",
             "title": title,
-            "topics": [{"name": "Business & Management"}, {"name": "Design"}],
+            "topics": [{"name": "Innovation"}, {"name": "Systems Engineering"}],
             "short_description": short_description,
             "full_description": full_description,
             "course_id": "1521458eeb30384493bf77850e3fa004",

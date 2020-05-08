@@ -8,7 +8,7 @@ import requests
 import yaml
 from django.conf import settings
 
-from course_catalog.constants import ocw_edx_mapping, semester_mapping, PlatformType
+from course_catalog.constants import semester_mapping, PlatformType
 
 from open_discussions.utils import generate_filepath
 
@@ -30,27 +30,25 @@ def program_image_upload_uri(instance, filename):
     return generate_filepath(filename, instance.title, "", "program")
 
 
-def get_ocw_topic(topic_object):
+def get_ocw_topics(topics_collection):
     """
-    Maps OCW features to edx subjects. Tries to map first by speciality, and if that fails then subfeature,
-    and if that fails then feature.
+    Extracts OCW topics and subtopics and returns a unique list of them
 
     Args:
-        topic_object (dict): The JSON object representing the topic
+        topics_collection (dict): The JSON object representing the topic
 
     Returns:
         list of str: list of topics
     """
+    topics = []
 
-    # Get topic list by specialty first, subfeature second, and feature last
-    topics = (
-        ocw_edx_mapping.get(topic_object.get("ocw_speciality"))
-        or ocw_edx_mapping.get(topic_object.get("ocw_subfeature"))
-        or ocw_edx_mapping.get(topic_object.get("ocw_feature"))
-        or []
-    )
+    for topic_object in topics_collection:
+        if topic_object["ocw_feature"]:
+            topics.append(topic_object["ocw_feature"])
+        if topic_object["ocw_subfeature"]:
+            topics.append(topic_object["ocw_subfeature"])
 
-    return topics
+    return list(set(topics))
 
 
 def get_year_and_semester(course_run):
