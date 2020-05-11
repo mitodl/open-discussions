@@ -57,10 +57,24 @@ describe("learning resource queries", () => {
     )
   })
 
-  it("filterObjectType returns only objects of the specified object_type", () => {
+  it("filterObjectType returns only objects of the specified object_type when object_type is a string", () => {
     assert.deepEqual(
       filterObjectType([{ object_type: "abc" }, { object_type: "def" }], "abc"),
       [{ object_type: "abc" }]
+    )
+  })
+
+  it("filterObjectType returns only objects of the specified object_type when object_type is and array", () => {
+    assert.deepEqual(
+      filterObjectType(
+        [
+          { object_type: "abc" },
+          { object_type: "def" },
+          { object_type: "ghi" }
+        ],
+        ["abc", "ghi"]
+      ),
+      [{ object_type: "abc" }, { object_type: "ghi" }]
     )
   })
 

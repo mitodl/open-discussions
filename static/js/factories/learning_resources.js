@@ -214,6 +214,14 @@ const LR_FACTORY_MAPPING = {
 export const makeLearningResource = (object_type: string): Object =>
   R.merge({ object_type }, LR_FACTORY_MAPPING[object_type]())
 
+export const makeLearningPath = R.compose(
+  R.merge({
+    list_type:   LR_TYPE_LEARNINGPATH,
+    object_type: LR_TYPE_LEARNINGPATH
+  }),
+  makeUserList
+)
+
 const formatFavorite = contentType => resource => ({
   content_data: resource,
   content_type: contentType

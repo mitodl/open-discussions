@@ -13,7 +13,8 @@ import {
   makeVideo,
   makeCourse,
   makeUserList,
-  makeProgram
+  makeProgram,
+  makeLearningPath
 } from "../../factories/learning_resources"
 import { makePodcast, makePodcastEpisode } from "../../factories/podcasts"
 
@@ -66,9 +67,18 @@ describe("Interactions API", () => {
     const video = makeVideo()
     const program = makeProgram()
     const userList = makeUserList()
+    const learningPath = makeLearningPath()
     const podcast = makePodcast()
     const podcastEpisode = makePodcastEpisode(podcast)
-    const results = [course, video, program, userList, podcast, podcastEpisode]
+    const results = [
+      course,
+      video,
+      program,
+      userList,
+      learningPath,
+      podcast,
+      podcastEpisode
+    ]
     const request = popularContentRequest()
     assert.equal(request.url, popularContentUrl)
     assert.deepEqual(request.transform({ results }), {
@@ -82,7 +92,8 @@ describe("Interactions API", () => {
         [video.id]: video
       },
       userLists: {
-        [userList.id]: userList
+        [userList.id]:     userList,
+        [learningPath.id]: learningPath
       },
       podcasts: {
         [podcast.id]: podcast
