@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.122.1
+Version 0.122.1 (Released May 11, 2020)
 ---------------
 
 - Remove extra AWS access key and secret environment variables (#2900)
