@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.122.1 (Released May 11, 2020)
+---------------
+
+- Remove extra AWS access key and secret environment variables (#2900)
+- Snackbar update (#2899)
+- hide 'share' button on podcasts, podcast episodes in drawer
+
 Version 0.122.0 (Released May 07, 2020)
 ---------------
 
