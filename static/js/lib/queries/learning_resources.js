@@ -59,8 +59,14 @@ export const mapResourcesToResourceRefs = R.map(
 
 export const filterObjectType = (
   results: Array<Object>,
-  objectType: string
-): Array<Object> => results.filter(result => result.object_type === objectType)
+  objectType: string | Array<string>
+): Array<Object> => {
+  if (Array.isArray(objectType)) {
+    return results.filter(result => objectType.includes(result.object_type))
+  } else {
+    return results.filter(result => result.object_type === objectType)
+  }
+}
 
 export const filterFavorites = (
   results: Array<Object>,
