@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.123.0
+Version 0.123.0 (Released May 12, 2020)
 ---------------
 
 - combine podcast and podcast episode in search facets
