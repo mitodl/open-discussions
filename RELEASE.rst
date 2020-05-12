@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.123.0
+---------------
+
+- combine podcast and podcast episode in search facets
+- fix an issue with scroll position in the LR drawer
+
 Version 0.122.1 (Released May 11, 2020)
 ---------------
 
