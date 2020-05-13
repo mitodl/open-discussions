@@ -626,6 +626,8 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
 
     default_search_priority = serializers.SerializerMethodField()
 
+    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
+
     def get_default_search_priority(self, instance):
         """
         User Lists should have lower priority in the default search
@@ -645,6 +647,8 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
             "topics",
             "default_search_priority",
             "created",
+            "offered_by",
+            "runs",
         ]
         read_only_fields = fields
 
@@ -656,6 +660,7 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
 
     series_title = serializers.SerializerMethodField()
     default_search_priority = serializers.SerializerMethodField()
+    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_series_title(self, instance):
         """Gets the title of the podcast to which this episode belongs"""
@@ -684,6 +689,8 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
             "topics",
             "default_search_priority",
             "created",
+            "offered_by",
+            "runs",
         ]
         read_only_fields = fields
 
