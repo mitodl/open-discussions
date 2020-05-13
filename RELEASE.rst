@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.123.1
+Version 0.123.1 (Released May 13, 2020)
 ---------------
 
 - fix podcast card height issues
