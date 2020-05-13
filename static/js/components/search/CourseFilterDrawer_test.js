@@ -6,8 +6,8 @@ import { assert } from "chai"
 
 import CourseFilterDrawer, { facetDisplayMap } from "./CourseFilterDrawer"
 
-import * as utilHooks from "../hooks/util"
-import { DESKTOP, PHONE, TABLET } from "../lib/constants"
+import * as utilHooks from "../../hooks/util"
+import { DESKTOP, PHONE, TABLET } from "../../lib/constants"
 
 describe("CourseFilterDrawer", () => {
   let clearAllFiltersStub,
@@ -124,8 +124,14 @@ describe("CourseFilterDrawer", () => {
         activeFacets
       })
 
-      facetDisplayMap.map(([name, title, labelFn], idx) => {
-        const searchFacet = wrapper.find("SearchFacet").at(idx)
+      facetDisplayMap.map(([name, title, labelFn, useFilterableFacet]) => {
+        const searchFacet = wrapper.find({
+          name
+        })
+        assert.equal(
+          searchFacet.name(),
+          useFilterableFacet ? "FilterableSearchFacet" : "SearchFacet"
+        )
         assert.equal(searchFacet.prop("title"), title)
         assert.equal(searchFacet.prop("name"), name)
         assert.equal(searchFacet.prop("onUpdate"), onUpdateFacetsStub)

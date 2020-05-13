@@ -7,9 +7,9 @@ import R from "ramda"
 
 import SearchFacet from "./SearchFacet"
 
-import IntegrationTestHelper from "../util/integration_test_helper"
-import { makeSearchFacetResult } from "../factories/search"
-import { shouldIf } from "../lib/test_utils"
+import IntegrationTestHelper from "../../util/integration_test_helper"
+import { makeSearchFacetResult } from "../../factories/search"
+import { shouldIf } from "../../lib/test_utils"
 
 describe("SearchFacet", () => {
   let helper, onUpdateStub, results, facet

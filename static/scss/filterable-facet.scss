@@ -1,0 +1,33 @@
+.filterable-facet {
+  .input-wrapper {
+    position: relative;
+
+    i.material-icons {
+      position: absolute;
+      right: 5px;
+      top: 8px;
+      color: $font-grey;
+    }
+
+    i.clear-icon {
+      cursor: pointer;
+    }
+  }
+
+  input.facet-filter {
+    background-color: initial;
+    border-radius: 0;
+    border: 1px solid $podcast-border-grey;
+    padding: 10px;
+    margin-bottom: 5px;
+
+    &::placeholder {
+      color: $font-grey;
+    }
+  }
+
+  .facet-list {
+    max-height: 400px;
+    overflow: auto;
+  }
+}

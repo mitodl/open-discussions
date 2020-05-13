@@ -65,6 +65,7 @@
     "flow-bin": "^0.94.0",
     "flow-typed": "^2.4.0",
     "formik": "^2.0.3",
+    "fuse.js": "^6.0.0",
     "history": "^4.7.2",
     "html-entities": "^1.2.1",
     "isomorphic-fetch": "^2.2.1",

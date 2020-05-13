@@ -3,7 +3,9 @@ import React, { useState } from "react"
 import R from "ramda"
 import _ from "lodash"
 
-import type { FacetResult } from "../flow/searchTypes"
+import SearchFacetItem from "./SearchFacetItem"
+
+import type { FacetResult } from "../../flow/searchTypes"
 
 type Props = {|
   results: ?FacetResult,
@@ -45,51 +47,21 @@ function SearchFacet(props: Props) {
       {showFacetList ? (
         <React.Fragment>
           {results && results.buckets
-            ? results.buckets.map((facet, i) => {
-              const isChecked = R.contains(facet.key, currentlySelected || [])
-
-              return (
-                <div
-                  key={i}
-                  className={`${
-                    showAllFacets ||
-                      i < MAX_DISPLAY_COUNT ||
-                      results.buckets.length < FACET_COLLAPSE_THRESHOLD
-                      ? "facet-visible"
-                      : "facet-hidden"
-                  } ${isChecked ? "checked" : ""}`}
-                  onClick={() => {
-                    onUpdate({
-                      target: {
-                        name,
-                        value:   facet.key,
-                        checked: !isChecked
-                      }
-                    })
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    name={name}
-                    value={facet.key}
-                    checked={isChecked}
-                    onChange={onUpdate}
-                  />
-                  <div className="facet-label-div">
-                    <div
-                      className={
-                        ["audience", "certification"].includes(name)
-                          ? "facet-key facet-key-large"
-                          : "facet-key"
-                      }
-                    >
-                      {labelFunction ? labelFunction(facet.key) : facet.key}
-                    </div>
-                    <div className="facet-count">{facet.doc_count}</div>
-                  </div>
-                </div>
-              )
-            })
+            ? results.buckets.map(
+              (facet, i) =>
+                showAllFacets ||
+                  i < MAX_DISPLAY_COUNT ||
+                  results.buckets.length < FACET_COLLAPSE_THRESHOLD ? (
+                    <SearchFacetItem
+                      key={i}
+                      facet={facet}
+                      isChecked={R.contains(facet.key, currentlySelected || [])}
+                      onUpdate={onUpdate}
+                      labelFunction={labelFunction}
+                      name={name}
+                    />
+                  ) : null
+            )
             : null}
           {results && results.buckets.length >= FACET_COLLAPSE_THRESHOLD ? (
             <div

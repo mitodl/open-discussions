@@ -20,7 +20,7 @@ import {
   BannerContainer,
   BannerImage
 } from "../components/PageBanner"
-import CourseFilterDrawer from "../components/CourseFilterDrawer"
+import CourseFilterDrawer from "../components/search/CourseFilterDrawer"
 import AudioPlayer from "../components/AudioPlayer"
 
 import { actions } from "../actions"

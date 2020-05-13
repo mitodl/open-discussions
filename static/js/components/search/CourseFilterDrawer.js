@@ -2,19 +2,22 @@
 import React, { useState } from "react"
 import _ from "lodash"
 
-import SearchFacet from "../components/SearchFacet"
-import SearchFilter from "../components/SearchFilter"
+import SearchFacet from "./SearchFacet"
+import FilterableSearchFacet from "./FilterableSearchFacet"
+import SearchFilter from "./SearchFilter"
 
-import { DESKTOP } from "../lib/constants"
-import { useDeviceCategory } from "../hooks/util"
-import { resourceLabel } from "../lib/learning_resources"
+import { DESKTOP } from "../../lib/constants"
+import { useDeviceCategory } from "../../hooks/util"
+import { resourceLabel } from "../../lib/learning_resources"
 
-export const facetDisplayMap = [
-  ["audience", null, null],
-  ["certification", "Certification", null],
-  ["type", "Learning Resource", resourceLabel],
-  ["topics", "Subject Area", null],
-  ["offered_by", "Offered By", null]
+type DMap = Array<[string, ?string, ?Function, boolean]>
+
+export const facetDisplayMap: DMap = [
+  ["audience", null, null, false],
+  ["certification", "Certification", null, false],
+  ["type", "Learning Resource", resourceLabel, false],
+  ["topics", "Subject Area", null, true],
+  ["offered_by", "Offered By", null, true]
 ]
 
 type FilterDrawerProps = {
@@ -59,17 +62,30 @@ export function FilterDisplay(props: FilterDrawerProps) {
           ))
         )}
       </div>
-      {facetDisplayMap.map(([name, title, labelFunction], i) => (
-        <SearchFacet
-          key={i}
-          title={title}
-          name={name}
-          results={mergeFacetOptions(name)}
-          onUpdate={onUpdateFacets}
-          currentlySelected={activeFacets[name] || []}
-          labelFunction={labelFunction}
-        />
-      ))}
+      {facetDisplayMap.map(
+        ([name, title, labelFunction, useFilterableFacet], i) =>
+          useFilterableFacet ? (
+            <FilterableSearchFacet
+              key={i}
+              title={title}
+              name={name}
+              results={mergeFacetOptions(name)}
+              onUpdate={onUpdateFacets}
+              currentlySelected={activeFacets[name] || []}
+              labelFunction={labelFunction}
+            />
+          ) : (
+            <SearchFacet
+              key={i}
+              title={title}
+              name={name}
+              results={mergeFacetOptions(name)}
+              onUpdate={onUpdateFacets}
+              currentlySelected={activeFacets[name] || []}
+              labelFunction={labelFunction}
+            />
+          )
+      )}
     </>
   )
 }

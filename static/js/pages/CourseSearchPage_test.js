@@ -6,7 +6,7 @@ import _ from "lodash"
 
 import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
 
-import SearchFacet from "../components/SearchFacet"
+import SearchFacet from "../components/search/SearchFacet"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
