@@ -487,11 +487,12 @@ def test_es_userlist_serializer_image_src():
 
 
 @pytest.mark.django_db
-def test_es_podcast_serializer():
+@pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
+def test_es_podcast_serializer(offered_by):
     """
     Test that ESPodcastSerializer correctly serializes a Podcast object
     """
-    podcast = PodcastFactory.create()
+    podcast = PodcastFactory.create(offered_by=offered_by)
     serialized = ESPodcastSerializer(podcast).data
     assert_json_equal(
         serialized,
@@ -507,16 +508,22 @@ def test_es_podcast_serializer():
             "topics": list(podcast.topics.values_list("name", flat=True)),
             "created": drf_datetime(podcast.created_on),
             "default_search_priority": 0,
+            "offered_by": list(podcast.offered_by.values_list("name", flat=True)),
+            "runs": [
+                ESRunSerializer(run).data
+                for run in podcast.runs.order_by("-best_start_date")
+            ],
         },
     )
 
 
 @pytest.mark.django_db
-def test_es_podcast_episode_serializer():
+@pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
+def test_es_podcast_episode_serializer(offered_by):
     """
     Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
     """
-    podcast_episode = PodcastEpisodeFactory.create()
+    podcast_episode = PodcastEpisodeFactory.create(offered_by=offered_by)
     serialized = ESPodcastEpisodeSerializer(podcast_episode).data
     assert_json_equal(
         serialized,
@@ -536,6 +543,13 @@ def test_es_podcast_episode_serializer():
             "topics": list(podcast_episode.topics.values_list("name", flat=True)),
             "created": drf_datetime(podcast_episode.created_on),
             "default_search_priority": 0,
+            "offered_by": list(
+                podcast_episode.offered_by.values_list("name", flat=True)
+            ),
+            "runs": [
+                ESRunSerializer(run).data
+                for run in podcast_episode.runs.order_by("-best_start_date")
+            ],
         },
     )
 
