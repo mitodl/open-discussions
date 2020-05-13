@@ -533,8 +533,7 @@ def test_transform_results(
     user, is_anonymous, suggest_min_hits, max_suggestions, settings
 ):  # pylint: disable=too-many-locals
     """
-    transform_results should transform reverse nested availability results if present, and move
-    scripted fields into the source result
+    transform_results should move scripted fields into the source result
     """
     settings.ELASTICSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
     settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
@@ -638,38 +637,7 @@ def test_transform_results(
         "hits": {"hits": raw_hits, "total": 3},
         "suggest": RAW_SUGGESTIONS,
         "aggregations": {
-            "availability": {
-                "runs": {
-                    "buckets": [
-                        {
-                            "key": "availableNow",
-                            "doc_count": 1000,
-                            "courses": {"doc_count": 800},
-                        },
-                        {"key": "next30", "doc_count": 0, "courses": {"doc_count": 0}},
-                        {"key": "next60", "doc_count": 10, "courses": {"doc_count": 7}},
-                    ]
-                }
-            },
-            "cost": {
-                "prices": {
-                    "buckets": [
-                        {
-                            "key": "free",
-                            "to": 0.01,
-                            "doc_count": 3290,
-                            "courses": {"doc_count": 1937},
-                        },
-                        {
-                            "key": "paid",
-                            "from": 0.01,
-                            "doc_count": 545,
-                            "courses": {"doc_count": 267},
-                        },
-                    ]
-                }
-            },
-            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]}
         },
     }
 
@@ -678,23 +646,10 @@ def test_transform_results(
         "hits": {"hits": raw_hits if is_anonymous else expected_hits, "total": 3},
         "suggest": expected_suggest,
         "aggregations": {
-            "availability": {
-                "buckets": [
-                    {"key": "availableNow", "doc_count": 800},
-                    {"key": "next60", "doc_count": 7},
-                ]
-            },
-            "cost": {
-                "buckets": [
-                    {"key": "free", "doc_count": 1937},
-                    {"key": "paid", "doc_count": 267},
-                ]
-            },
-            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]}
         },
     }
-    results["aggregations"]["availability"].pop("runs", None)
-    results["aggregations"]["cost"].pop("prices", None)
+
     assert (
         transform_results(results, search_user)["aggregations"]
         == results["aggregations"]

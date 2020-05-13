@@ -11,9 +11,7 @@ type URLSearchParams = {
   activeFacets: {
     type: Array<string>,
     offered_by: Array<string>,
-    topics: Array<string>,
-    cost: Array<string>,
-    availability: Array<string>
+    topics: Array<string>
   }
 }
 
@@ -22,16 +20,14 @@ type Loc = {
 }
 
 export const deserializeSearchParams = (location: Loc): URLSearchParams => {
-  const { type, o, t, c, a, q } = qs.parse(location.search)
+  const { type, o, t, q } = qs.parse(location.search)
 
   return {
     text:         q,
     activeFacets: {
-      type:         urlParamToArray(type),
-      offered_by:   urlParamToArray(o),
-      topics:       urlParamToArray(t),
-      cost:         urlParamToArray(c),
-      availability: urlParamToArray(a)
+      type:       urlParamToArray(type),
+      offered_by: urlParamToArray(o),
+      topics:     urlParamToArray(t)
     }
   }
 }
@@ -41,14 +37,12 @@ export const serializeSearchParams = ({
   activeFacets
 }: Object): string => {
   // eslint-disable-next-line camelcase
-  const { type, offered_by, topics, availability, cost } = activeFacets
+  const { type, offered_by, topics } = activeFacets
 
   return qs.stringify({
     q: text || undefined,
     type,
     o: offered_by,
-    t: topics,
-    a: availability,
-    c: cost
+    t: topics
   })
 }

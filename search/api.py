@@ -350,7 +350,7 @@ def _transform_search_results_suggest(search_result):
 # pylint: disable=too-many-branches
 def transform_results(search_result, user):
     """
-    Transform the reverse nested availability aggregate counts into a format matching the other facets.
+    Transform podcast and podcast episode, and userlist and learning path in aggergations
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
 
     Args:
@@ -358,24 +358,8 @@ def transform_results(search_result, user):
         user (User): the user who performed the search
 
     Returns:
-        dict: The Elasticsearch response dict with transformed availability aggregates and source values
+        dict: The Elasticsearch response dict with transformed aggregates and source values
     """
-    availability_runs = (
-        search_result.get("aggregations", {}).get("availability", {}).pop("runs", {})
-    )
-    if availability_runs:
-        search_result["aggregations"]["availability"]["buckets"] = [
-            {"key": bucket["key"], "doc_count": bucket["courses"]["doc_count"]}
-            for bucket in availability_runs.pop("buckets", [])
-            if bucket["courses"]["doc_count"] > 0
-        ]
-    prices = search_result.get("aggregations", {}).get("cost", {}).pop("prices", {})
-    if prices:
-        search_result["aggregations"]["cost"]["buckets"] = [
-            {"key": bucket["key"], "doc_count": bucket["courses"]["doc_count"]}
-            for bucket in prices.pop("buckets", [])
-            if bucket["courses"]["doc_count"] > 0
-        ]
 
     types = search_result.get("aggregations", {}).get("type", {})
 

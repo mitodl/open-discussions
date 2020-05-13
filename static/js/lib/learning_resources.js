@@ -16,7 +16,7 @@ import {
   LR_TYPE_COURSE,
   platforms
 } from "./constants"
-import { AVAILABILITY_MAPPING, AVAILABLE_NOW } from "./search"
+
 import { capitalize, emptyOrNil, formatPrice } from "./util"
 
 import type {
@@ -25,9 +25,33 @@ import type {
   CoursePrice
 } from "../flow/discussionTypes"
 
-export const availabilityFacetLabel = (availability: ?string) => {
-  const facetKey = availability ? AVAILABILITY_MAPPING[availability] : null
-  return facetKey ? facetKey.label : availability
+export const AVAILABLE_NOW = "availableNow"
+
+export const AVAILABILITY_MAPPING = {
+  [AVAILABLE_NOW]: {
+    label:  "Available Now",
+    filter: { to: "now" }
+  },
+  ["nextWeek"]: {
+    label:  "Within next week",
+    filter: { from: "now", to: "now+7d" }
+  },
+  ["nextMonth"]: {
+    label:  "Within next month",
+    filter: { from: "now", to: "now+1M" }
+  },
+  ["next3Months"]: {
+    label:  "Within next 3 months",
+    filter: { from: "now", to: "now+3M" }
+  },
+  ["next6Months"]: {
+    label:  "Within next 6 months",
+    filter: { from: "now", to: "now+6M" }
+  },
+  ["nextYear"]: {
+    label:  "Within next year",
+    filter: { from: "now", to: "now+12M" }
+  }
 }
 
 export const availabilityLabel = (availability: ?string) => {

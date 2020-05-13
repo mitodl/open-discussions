@@ -30,11 +30,9 @@ describe("CourseFilterDrawer", () => {
     )
 
   const activeFacets = {
-    type:         ["course"],
-    topics:       ["Physics"],
-    availability: ["nextWeek"],
-    cost:         ["free"],
-    offered_by:   ["mitx"]
+    type:       ["course"],
+    topics:     ["Physics"],
+    offered_by: ["mitx"]
   }
 
   beforeEach(() => {

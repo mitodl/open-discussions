@@ -17,13 +17,11 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_VIDEO
 } from "./constants"
-import { AVAILABILITY_MAPPING } from "./search"
 import {
   availabilityLabel,
   minPrice,
   maxPrice,
   resourceLabel,
-  availabilityFacetLabel,
   availabilityFilterToMoment,
   inDateRanges,
   bestRunLabel,
@@ -34,7 +32,8 @@ import {
   getInstructorName,
   privacyIcon,
   isCoursewareResource,
-  formatDurationClockTime
+  formatDurationClockTime,
+  AVAILABILITY_MAPPING
 } from "./learning_resources"
 import { makeCourse, makeRun } from "../factories/learning_resources"
 import moment from "moment"
@@ -97,24 +96,6 @@ describe("Course utils", () => {
   ].forEach(([searchType, facetText]) => {
     it(`facet text should be ${facetText} for resource type ${searchType}`, () => {
       assert.equal(resourceLabel(searchType), facetText)
-    })
-  })
-
-  //
-  ;[
-    ["availableNow", AVAILABILITY_MAPPING["availableNow"].label],
-    ["nextWeek", AVAILABILITY_MAPPING["nextWeek"].label],
-    ["nextMonth", AVAILABILITY_MAPPING["nextMonth"].label],
-    ["next3Months", AVAILABILITY_MAPPING["next3Months"].label],
-    ["next6Months", AVAILABILITY_MAPPING["next6Months"].label],
-    ["nextYear", AVAILABILITY_MAPPING["nextYear"].label],
-    ["something", "something"],
-    [null, null]
-  ].forEach(([searchType, label]) => {
-    it(`facet label should be ${String(label)} for search type ${String(
-      searchType
-    )}`, () => {
-      assert.equal(availabilityFacetLabel(searchType), label)
     })
   })
 })
