@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.123.1
+---------------
+
+- fix podcast card height issues
+- combine learning list and learning path
+- fix popular resourses view for learning paths
+
 Version 0.123.0 (Released May 12, 2020)
 ---------------
 
