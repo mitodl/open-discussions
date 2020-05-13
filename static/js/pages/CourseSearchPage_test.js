@@ -204,11 +204,9 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          offered_by:   [],
-          topics:       [],
-          availability: [],
-          cost:         [],
-          type:         LR_TYPE_ALL
+          offered_by: [],
+          topics:     [],
+          type:       LR_TYPE_ALL
         })
       )
     })
@@ -237,7 +235,7 @@ describe("CourseSearchPage", () => {
       },
       {
         location: {
-          search: "q=text&o=OCW&t=Science&t=Engineering&a=availableNow&c=free"
+          search: "q=text&o=OCW&t=Science&t=Engineering"
         }
       }
     )
@@ -249,11 +247,9 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:         LR_TYPE_ALL,
-          offered_by:   ["OCW"],
-          topics:       ["Science", "Engineering"],
-          availability: ["availableNow"],
-          cost:         ["free"]
+          type:       LR_TYPE_ALL,
+          offered_by: ["OCW"],
+          topics:     ["Science", "Engineering"]
         })
       )
     })
@@ -283,11 +279,9 @@ describe("CourseSearchPage", () => {
       type:        ["podcast", "podcastepisode"],
       facets:      new Map(
         Object.entries({
-          type:         ["podcast", "podcastepisode"],
-          offered_by:   [],
-          topics:       [],
-          availability: [],
-          cost:         []
+          type:       ["podcast", "podcastepisode"],
+          offered_by: [],
+          topics:     []
         })
       )
     })
@@ -317,11 +311,9 @@ describe("CourseSearchPage", () => {
       type:        ["userlist", "learningpath"],
       facets:      new Map(
         Object.entries({
-          type:         ["userlist", "learningpath"],
-          offered_by:   [],
-          topics:       [],
-          availability: [],
-          cost:         []
+          type:       ["userlist", "learningpath"],
+          offered_by: [],
+          topics:     []
         })
       )
     })
@@ -421,11 +413,9 @@ describe("CourseSearchPage", () => {
   it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
     const text = "testtext wowowow"
     const activeFacets = {
-      offered_by:   ["OCW"],
-      topics:       ["Science", "Law"],
-      availability: ["Current"],
-      cost:         ["paid"],
-      type:         LR_TYPE_ALL
+      offered_by: ["OCW"],
+      topics:     ["Science", "Law"],
+      type:       LR_TYPE_ALL
     }
     const search = serializeSearchParams({ text, activeFacets })
     const { wrapper } = await renderPage(
@@ -463,11 +453,9 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        topics:       [],
-        offered_by:   [],
-        availability: [],
-        cost:         [],
-        type:         ["course"]
+        topics:     [],
+        offered_by: [],
+        type:       ["course"]
       }
     })
   })
@@ -498,11 +486,9 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        topics:       ["Physics"],
-        offered_by:   [],
-        availability: [],
-        cost:         [],
-        type:         []
+        topics:     ["Physics"],
+        offered_by: [],
+        type:       []
       }
     })
   })
@@ -517,54 +503,6 @@ describe("CourseSearchPage", () => {
     sinon.assert.notCalled(helper.searchStub)
   })
 
-  //
-  ;[false, true].forEach(isChecked => {
-    it(`${shouldIf(
-      isChecked
-    )} include an availability facet in search after checkbox change`, async () => {
-      const { inner } = await renderPage(
-        {},
-        {
-          location: {
-            search: serializeSearchParams({
-              text:         "some text",
-              activeFacets: {
-                offered_by:   [],
-                topics:       [],
-                cost:         [],
-                availability: isChecked ? [] : ["nextWeek"]
-              }
-            })
-          }
-        }
-      )
-      helper.searchStub.reset()
-      await inner.instance().onUpdateFacets({
-        target: {
-          checked: isChecked,
-          name:    "availability",
-          value:   "nextWeek"
-        }
-      })
-      // this ensures that the debounced calls go through without having to wait
-      inner.instance().debouncedRunSearch.flush()
-      await wait(10)
-      const search = replaceStub.args[0][0].search
-
-      assert.deepEqual(deserializeSearchParams({ search }), {
-        text:         "some text",
-        activeFacets: {
-          topics:       [],
-          offered_by:   [],
-          availability: isChecked ? ["nextWeek"] : [],
-          cost:         [],
-          type:         []
-        }
-      })
-      sinon.assert.called(helper.searchStub)
-    })
-  })
-
   it("mergeFacetOptions adds any selected facets not in results to the group", async () => {
     const { inner } = await renderPage(
       {},
@@ -573,10 +511,8 @@ describe("CourseSearchPage", () => {
           search: serializeSearchParams({
             text:         "some text",
             activeFacets: {
-              offered_by:   [],
-              topics:       ["NewTopic"],
-              cost:         [],
-              availability: []
+              offered_by: [],
+              topics:     ["NewTopic"]
             }
           })
         }

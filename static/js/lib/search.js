@@ -3,7 +3,6 @@
 import bodybuilder from "bodybuilder"
 import R from "ramda"
 import {
-  DEFAULT_START_DT,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
@@ -185,54 +184,6 @@ const PODCAST_EPISODE_QUERY_FIELDS = [
 const LEARN_SUGGEST_FIELDS = ["title.trigram", "short_description.trigram"]
 const CHANNEL_SUGGEST_FIELDS = ["suggest_field1", "suggest_field2"]
 
-export const AVAILABLE_NOW = "availableNow"
-const AVAILABLE_NEXT_WEEK = "nextWeek"
-const AVAILABLE_NEXT_MONTH = "nextMonth"
-const AVAILABLE_NEXT_3MONTHS = "next3Months"
-const AVAILABLE_NEXT_6MONTHS = "next6Months"
-const AVAILABLE_NEXT_YEAR = "nextYear"
-
-const COST_FREE = "free"
-const COST_PAID = "paid"
-
-export const AVAILABILITY_MAPPING = {
-  [AVAILABLE_NOW]: {
-    label:  "Available Now",
-    filter: { to: "now" }
-  },
-  [AVAILABLE_NEXT_WEEK]: {
-    label:  "Within next week",
-    filter: { from: "now", to: "now+7d" }
-  },
-  [AVAILABLE_NEXT_MONTH]: {
-    label:  "Within next month",
-    filter: { from: "now", to: "now+1M" }
-  },
-  [AVAILABLE_NEXT_3MONTHS]: {
-    label:  "Within next 3 months",
-    filter: { from: "now", to: "now+3M" }
-  },
-  [AVAILABLE_NEXT_6MONTHS]: {
-    label:  "Within next 6 months",
-    filter: { from: "now", to: "now+6M" }
-  },
-  [AVAILABLE_NEXT_YEAR]: {
-    label:  "Within next year",
-    filter: { from: "now", to: "now+12M" }
-  }
-}
-
-export const COST_MAPPING = {
-  [COST_FREE]: {
-    label:  "Free",
-    filter: { to: 0.01 }
-  },
-  [COST_PAID]: {
-    label:  "Paid",
-    filter: { from: 0.01 }
-  }
-}
-
 const OBJECT_TYPE = "type"
 
 const _searchFields = (type: ?string) => {
@@ -292,135 +243,6 @@ const getTypes = (type: ?(string | Array<string>)) => {
   }
 }
 
-const buildAvailabilityQuery = (
-  builder: Object,
-  values: Array<string>,
-  facetClauses: Array<Object>
-) => {
-  // Filter results by course run availability facet converted to date ranges
-  if (values && values.length > 0) {
-    const facetFilter = values.map(value => ({
-      nested: {
-        path:  "runs",
-        query: {
-          range: {
-            "runs.best_start_date": AVAILABILITY_MAPPING[value].filter
-          }
-        }
-      }
-    }))
-    // 'availableNow' should include courses without start dates
-    if (values.includes(AVAILABLE_NOW)) {
-      facetFilter.push({
-        nested: {
-          path:  "runs",
-          query: {
-            bool: {
-              must_not: {
-                exists: {
-                  field: "runs.best_start_date"
-                }
-              }
-            }
-          }
-        }
-      })
-    }
-    facetClauses.push({
-      bool: {
-        should: facetFilter
-      }
-    })
-  }
-  // Make availability aggregations based on course run date ranges
-  builder.agg("nested", { path: "runs" }, "availability", aggr =>
-    aggr.agg(
-      "date_range",
-      "runs.best_start_date",
-      {
-        missing: DEFAULT_START_DT,
-        keyed:   false,
-        ranges:  [
-          {
-            key: AVAILABLE_NOW,
-            ...AVAILABILITY_MAPPING.availableNow.filter
-          },
-          {
-            key: AVAILABLE_NEXT_WEEK,
-            ...AVAILABILITY_MAPPING.nextWeek.filter
-          },
-          {
-            key: AVAILABLE_NEXT_MONTH,
-            ...AVAILABILITY_MAPPING.nextMonth.filter
-          },
-          {
-            key: AVAILABLE_NEXT_3MONTHS,
-            ...AVAILABILITY_MAPPING.next3Months.filter
-          },
-          {
-            key: AVAILABLE_NEXT_6MONTHS,
-            ...AVAILABILITY_MAPPING.next6Months.filter
-          },
-          {
-            key: AVAILABLE_NEXT_YEAR,
-            ...AVAILABILITY_MAPPING.nextYear.filter
-          }
-        ]
-      },
-      "runs",
-      aggr => aggr.agg("reverse_nested", null, {}, "courses")
-    )
-  )
-}
-
-const buildCostQuery = (
-  builder: Object,
-  values: Array<string>,
-  facetClauses: Array<Object>
-) => {
-  // Filter results by course run price (free or paid)
-  if (values && values.length > 0) {
-    const facetFilter = values.map(value => ({
-      nested: {
-        path:  "runs.prices",
-        query: {
-          range: {
-            "runs.prices.price": COST_MAPPING[value].filter
-          }
-        }
-      }
-    }))
-    facetClauses.push({
-      bool: {
-        should: facetFilter
-      }
-    })
-  }
-  // Make cost aggregations based on course run prices
-  builder.agg("nested", { path: "runs.prices" }, "cost", aggr =>
-    aggr.agg(
-      "range",
-      "runs.prices.price",
-      {
-        missing: 0,
-        keyed:   false,
-        ranges:  [
-          {
-            key: COST_FREE,
-            ...COST_MAPPING.free.filter
-          },
-          {
-            key: COST_PAID,
-            ...COST_MAPPING.paid.filter
-          }
-        ]
-      },
-      "prices",
-      aggr => aggr.agg("reverse_nested", null, {}, "courses")
-    )
-  )
-}
-
 export const buildSearchQuery = ({
   text,
   type,
@@ -455,11 +277,7 @@ export const buildFacetSubQuery = (
   const facetClauses = []
   if (facets) {
     facets.forEach((values, key) => {
-      if (
-        ![OBJECT_TYPE, "availability", "cost"].includes(key) &&
-        values &&
-        values.length > 0
-      ) {
+      if (OBJECT_TYPE !== key && values && values.length > 0) {
         facetClauses.push({
           bool: {
             // $FlowFixMe: shut up flow
@@ -471,18 +289,13 @@ export const buildFacetSubQuery = (
           }
         })
       }
-      if (key === "availability") {
-        buildAvailabilityQuery(builder, values, facetClauses)
-      } else if (key === "cost") {
-        buildCostQuery(builder, values, facetClauses)
-      } else {
-        builder.agg(
-          "terms",
-          key === OBJECT_TYPE ? "object_type.keyword" : key,
-          { size: 10000 },
-          key
-        )
-      }
+
+      builder.agg(
+        "terms",
+        key === OBJECT_TYPE ? "object_type.keyword" : key,
+        { size: 10000 },
+        key
+      )
     })
   }
   return facetClauses

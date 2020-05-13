@@ -7,17 +7,11 @@ import SearchFilter from "../components/SearchFilter"
 
 import { DESKTOP } from "../lib/constants"
 import { useDeviceCategory } from "../hooks/util"
-import {
-  availabilityFacetLabel,
-  resourceLabel
-} from "../lib/learning_resources"
-import { capitalize } from "../lib/util"
+import { resourceLabel } from "../lib/learning_resources"
 
 export const facetDisplayMap = [
   ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
-  ["availability", "Availability", availabilityFacetLabel],
-  ["cost", "Cost", capitalize],
   ["offered_by", "Offered By", null]
 ]
 

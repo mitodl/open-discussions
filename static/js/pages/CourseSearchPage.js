@@ -149,11 +149,9 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.updateSearchState({
       text:         null,
       activeFacets: {
-        offered_by:   [],
-        availability: [],
-        topics:       [],
-        cost:         [],
-        type:         []
+        offered_by: [],
+        topics:     [],
+        type:       []
       }
     })
     this.setState({
@@ -369,9 +367,8 @@ export class CourseSearchPage extends React.Component<Props, State> {
   }
 
   renderResults = () => {
-    const { location, results, processing, loaded, total } = this.props
+    const { results, processing, loaded, total } = this.props
     const { from, incremental, searchResultLayout } = this.state
-    const { activeFacets } = deserializeSearchParams(location)
 
     if ((processing || !loaded) && !incremental) {
       return <CourseSearchLoading layout={searchResultLayout} />
@@ -400,7 +397,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
                   this.getFavoriteOrListedObject(result)
                 }
                 toggleFacet={this.toggleFacet}
-                availabilities={activeFacets["availability"]}
                 searchResultLayout={searchResultLayout}
               />
             </Cell>

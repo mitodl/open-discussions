@@ -9,51 +9,21 @@ describe("course search library", () => {
         deserializeSearchParams({ search: "q=The Best Course" }),
         {
           activeFacets: {
-            availability: [],
-            cost:         [],
-            offered_by:   [],
-            topics:       [],
-            type:         []
+            offered_by: [],
+            topics:     [],
+            type:       []
           },
           text: "The Best Course"
         }
       )
     })
 
-    it("should deserialize availability", () => {
-      assert.deepEqual(deserializeSearchParams({ search: "a=next3Months" }), {
-        activeFacets: {
-          availability: ["next3Months"],
-          cost:         [],
-          offered_by:   [],
-          topics:       [],
-          type:         []
-        },
-        text: undefined
-      })
-    })
-
-    it("should deserialize cost", () => {
-      assert.deepEqual(deserializeSearchParams({ search: "c=paid" }), {
-        activeFacets: {
-          availability: [],
-          cost:         ["paid"],
-          offered_by:   [],
-          topics:       [],
-          type:         []
-        },
-        text: undefined
-      })
-    })
-
     it("should deserialize offered by", () => {
       assert.deepEqual(deserializeSearchParams({ search: "o=MITx" }), {
         activeFacets: {
-          availability: [],
-          cost:         [],
-          offered_by:   ["MITx"],
-          topics:       [],
-          type:         []
+          offered_by: ["MITx"],
+          topics:     [],
+          type:       []
         },
         text: undefined
       })
@@ -67,10 +37,8 @@ describe("course search library", () => {
         }),
         {
           activeFacets: {
-            availability: [],
-            cost:         [],
-            offered_by:   [],
-            topics:       [
+            offered_by: [],
+            topics:     [
               "Science",
               "Physics",
               "Chemistry",
@@ -87,11 +55,9 @@ describe("course search library", () => {
     it("should deserialize type from the URL", () => {
       assert.deepEqual(deserializeSearchParams({ search: "type=course" }), {
         activeFacets: {
-          availability: [],
-          cost:         [],
-          offered_by:   [],
-          topics:       [],
-          type:         ["course"]
+          offered_by: [],
+          topics:     [],
+          type:       ["course"]
         },
         text: undefined
       })
@@ -100,11 +66,9 @@ describe("course search library", () => {
     it("should ignore unknown params", () => {
       assert.deepEqual(deserializeSearchParams({ search: "eeee=beeeeeep" }), {
         activeFacets: {
-          availability: [],
-          cost:         [],
-          offered_by:   [],
-          topics:       [],
-          type:         []
+          offered_by: [],
+          topics:     [],
+          type:       []
         },
         text: undefined
       })
@@ -149,17 +113,6 @@ describe("course search library", () => {
       )
     })
 
-    it("should serialize cost", () => {
-      assert.deepEqual(
-        serializeSearchParams({
-          activeFacets: {
-            cost: ["paid"]
-          }
-        }),
-        "c=paid"
-      )
-    })
-
     it("should serialize offered by", () => {
       assert.deepEqual(
         serializeSearchParams({
@@ -168,17 +121,6 @@ describe("course search library", () => {
           }
         }),
         "o=MITx"
-      )
-    })
-
-    it("should serialize availability to URL", () => {
-      assert.deepEqual(
-        serializeSearchParams({
-          activeFacets: {
-            availability: ["next3Months"]
-          }
-        }),
-        "a=next3Months"
       )
     })
 
