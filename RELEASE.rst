@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.123.2
+---------------
+
+- upgrade dependencies, add @reduxjs/toolkit
+- fix facets for podcasts
+- remove cost and availability facets
+
 Version 0.123.1 (Released May 13, 2020)
 ---------------
 
