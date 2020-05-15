@@ -75,8 +75,7 @@ const PrivacyPolicyPage = ({ match }: Props) => (
           communicate with you, please contact us at{" "}
           <a href={`mailto:${SETTINGS.support_email}`}>
             {SETTINGS.support_email}
-          </a>
-          . We will always respect a request by you to stop processing your
+          </a>. We will always respect a request by you to stop processing your
           personal information (subject to our legal obligations).
         </p>
         <h4>When we share your personal information</h4>

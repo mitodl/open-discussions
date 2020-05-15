@@ -40,13 +40,15 @@ export default function PodcastFrontpage() {
         </div>
         {isFinishedRecent && isFinishedPodcasts ? (
           <>
-            {recentEpisodes.slice(0, 6).map((episode, idx) => (
-              <PodcastEpisodeCard
-                episode={episode}
-                podcast={podcasts[episode.podcast]}
-                key={idx}
-              />
-            ))}
+            {recentEpisodes
+              .slice(0, 6)
+              .map((episode, idx) => (
+                <PodcastEpisodeCard
+                  episode={episode}
+                  podcast={podcasts[episode.podcast]}
+                  key={idx}
+                />
+              ))}
           </>
         ) : (
           <PodcastEpisodeLoading />

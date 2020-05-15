@@ -43,10 +43,7 @@ describe("UserListsPage tests", () => {
   })
 
   //
-  ;[
-    [userId, 2],
-    [null, 0]
-  ].forEach(([authorId, numLists]) => {
+  ;[[userId, 2], [null, 0]].forEach(([authorId, numLists]) => {
     it(`should pass ${numLists} user lists down to user list card`, async () => {
       SETTINGS.user_id = authorId
       const { wrapper } = await render()

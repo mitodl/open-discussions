@@ -6,8 +6,4 @@ import R from "ramda"
 export const safeBulkGet = <T>(
   keys: Array<string>,
   data: Map<string, T>
-): Array<T> =>
-    R.reject(
-      R.isNil,
-      keys.map(key => data.get(key))
-    )
+): Array<T> => R.reject(R.isNil, keys.map(key => data.get(key)))

@@ -180,7 +180,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => ({
         // Unknown errors
         dispatch(
           setBannerMessage(
-            `Something went wrong creating your comment. Please try again or contact us at ${SETTINGS.support_email}`
+            `Something went wrong creating your comment. Please try again or contact us at ${
+              SETTINGS.support_email
+            }`
           )
         )
       }
@@ -200,7 +202,9 @@ const mapDispatchToProps = (dispatch): DispatchProps => ({
         // Unknown errors
         dispatch(
           setBannerMessage(
-            `Something went wrong editing your comment. Please try again or contact us at ${SETTINGS.support_email}`
+            `Something went wrong editing your comment. Please try again or contact us at ${
+              SETTINGS.support_email
+            }`
           )
         )
       }

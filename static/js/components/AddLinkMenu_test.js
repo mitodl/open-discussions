@@ -26,10 +26,7 @@ describe("AddLinkMenu", () => {
   })
 
   //
-  ;[
-    ["text", 0],
-    ["url", 1]
-  ].forEach(([name, index]) => {
+  ;[["text", 0], ["url", 1]].forEach(([name, index]) => {
     it(`has the input for ${name} that we expect`, () => {
       const wrapper = renderLinkMenu()
       const { onChange, name, value } = wrapper

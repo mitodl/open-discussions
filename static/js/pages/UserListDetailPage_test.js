@@ -105,25 +105,22 @@ describe("UserListDetailPage tests", () => {
   })
 
   //
-  ;[
-    [0, false],
-    [1, false],
-    [2, true],
-    [3, true]
-  ].forEach(([itemCount, shouldShowButton]) => {
-    it(`${shouldIf(
-      shouldShowButton
-    )} show the reorder button for LP with ${String(
-      itemCount
-    )} items`, async () => {
-      // $FlowFixMe: flow thinks this is invalid for who knows what reason
-      userList.author = SETTINGS.user_id
-      userList.list_type = LR_TYPE_LEARNINGPATH
-      userList.item_count = itemCount
-      const { wrapper } = await render()
-      assert.equal(wrapper.find(".sort-list").exists(), shouldShowButton)
-    })
-  })
+  ;[[0, false], [1, false], [2, true], [3, true]].forEach(
+    ([itemCount, shouldShowButton]) => {
+      it(`${shouldIf(
+        shouldShowButton
+      )} show the reorder button for LP with ${String(
+        itemCount
+      )} items`, async () => {
+        // $FlowFixMe: flow thinks this is invalid for who knows what reason
+        userList.author = SETTINGS.user_id
+        userList.list_type = LR_TYPE_LEARNINGPATH
+        userList.item_count = itemCount
+        const { wrapper } = await render()
+        assert.equal(wrapper.find(".sort-list").exists(), shouldShowButton)
+      })
+    }
+  )
 
   it("should let the user reorder their learning path", async () => {
     // $FlowFixMe: flow thinks this is invalid for who knows what reason

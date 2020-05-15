@@ -264,7 +264,9 @@ export const withPostModeration = (
   }
 
   WithPostModeration.WrappedComponent = WrappedComponent
-  WithPostModeration.displayName = `withPostModeration(${WrappedComponent.name})`
+  WithPostModeration.displayName = `withPostModeration(${
+    WrappedComponent.name
+  })`
   return WithPostModeration
 }
 

@@ -178,7 +178,9 @@ describe("Channels API", () => {
 
       assert.ok(
         fetchStub.calledWith(
-          `/api/v0/channels/${channelName}/contributors/${contributor.contributor_name}/`
+          `/api/v0/channels/${channelName}/contributors/${
+            contributor.contributor_name
+          }/`
         )
       )
       assert.deepEqual(fetchStub.args[0][1], {

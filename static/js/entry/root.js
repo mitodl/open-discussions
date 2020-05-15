@@ -10,9 +10,6 @@ import { createBrowserHistory } from "history"
 import configureStore from "../store/configureStore"
 import Router, { routes } from "../Router"
 
-import { enableMapSet } from "immer"
-enableMapSet()
-
 import * as Sentry from "@sentry/browser"
 
 Sentry.init({

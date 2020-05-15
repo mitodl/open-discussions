@@ -98,6 +98,9 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
 })
 
 export default R.compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   withSingleColumn("home-page")
 )(ChannelAboutPage)

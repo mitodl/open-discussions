@@ -67,21 +67,18 @@ describe("UserListCard tests", () => {
   })
 
   //
-  ;[
-    [0, "Items"],
-    [1, "Item"],
-    [2, "Items"],
-    [10, "Items"]
-  ].forEach(([itemCount, expectedText]) => {
-    it(`should have a properly-formatted count of ${String(
-      itemCount
-    )} items`, async () => {
-      userList.item_count = itemCount
-      const { wrapper } = await renderUserListCard()
-      const text = wrapper.find(".count").text()
-      assert.include(text, expectedText)
-    })
-  })
+  ;[[0, "Items"], [1, "Item"], [2, "Items"], [10, "Items"]].forEach(
+    ([itemCount, expectedText]) => {
+      it(`should have a properly-formatted count of ${String(
+        itemCount
+      )} items`, async () => {
+        userList.item_count = itemCount
+        const { wrapper } = await renderUserListCard()
+        const text = wrapper.find(".count").text()
+        assert.include(text, expectedText)
+      })
+    }
+  )
 
   it("should render the image of the first list item", async () => {
     helper.sandbox.stub(urlLib, "embedlyThumbnail").returns("南瓜")

@@ -1,20 +1,19 @@
 // @flow
 import { GET, POST, PATCH, INITIAL_STATE } from "redux-hammock/constants"
 import R from "ramda"
-import { produce } from "immer"
 
 import { SET_CHANNEL_DATA, CLEAR_CHANNEL_ERROR } from "../actions/channel"
-import * as channelAPI from "../lib/api/channels"
-
 import type { Channel } from "../flow/discussionTypes"
+import * as channelAPI from "../lib/api/channels"
 
 const updateChannelHandler = (
   payload: Channel,
   data: Map<string, Channel>
-): Map<string, Channel> =>
-  produce(data, draftState => {
-    draftState.set(payload.name, payload)
-  })
+): Map<string, Channel> => {
+  const update = new Map(data)
+  update.set(payload.name, payload)
+  return update
+}
 
 export const channelsEndpoint = {
   name:                "channels",
@@ -27,12 +26,17 @@ export const channelsEndpoint = {
   patchFunc:           (channel: Channel) => channelAPI.updateChannel(channel),
   patchSuccessHandler: updateChannelHandler,
   extraActions:        {
-    [SET_CHANNEL_DATA]: (state: Object, action: Action<*>) =>
-      produce(state, draftState => {
-        action.payload.forEach(channel => {
-          draftState.data.set(channel.name, channel)
-        })
-      }),
+    [SET_CHANNEL_DATA]: (state: Object, action: Action<*>) => {
+      const updatedData = new Map(state.data)
+      for (const channel of action.payload) {
+        updatedData.set(channel.name, channel)
+      }
+
+      return {
+        ...state,
+        data: updatedData
+      }
+    },
     [CLEAR_CHANNEL_ERROR]: R.dissoc("error")
   }
 }

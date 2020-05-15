@@ -191,7 +191,9 @@ describe("LearningResourceDrawer", () => {
     [makeCourse(), courseDetailApiURL, "courseId"],
     [makeUserList(), userListDetailApiURL, "userListId"]
   ].forEach(([object, apiUrl, key]) => {
-    it(`should render ExpandedLearningResourceDisplay with object of type ${object.object_type}`, async () => {
+    it(`should render ExpandedLearningResourceDisplay with object of type ${
+      object.object_type
+    }`, async () => {
       const url = apiUrl.param({ [key]: object.id }).toString()
       const { wrapper } = await renderWithObject(object, url)
       const expandedDisplay = wrapper.find(ExpandedLearningResourceDisplay)

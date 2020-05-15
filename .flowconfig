@@ -5,7 +5,6 @@
 .*/node_modules/react-event-listener/src/index.js
 .*/node_modules/react-select/.*.flow
 .*/node_modules/rmwc/.*.flow
-.*/node_modules/immer/.*.flow
 .*.git/.*
 .*/staticfiles/.*
 .*/static/bundles/.*

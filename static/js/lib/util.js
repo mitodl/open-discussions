@@ -41,7 +41,11 @@ export function* enumerate<T>(
   }
 }
 
-export const isEmptyText = R.compose(R.isEmpty, R.trim, R.defaultTo(""))
+export const isEmptyText = R.compose(
+  R.isEmpty,
+  R.trim,
+  R.defaultTo("")
+)
 
 export const notNil = R.complement(R.isNil)
 
@@ -141,10 +145,16 @@ export const languageName = (langCode: ?string): string =>
     `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
   )
 
-export const flatZip = R.compose(R.flatten, R.zip)
+export const flatZip = R.compose(
+  R.flatten,
+  R.zip
+)
 
 export const capitalize = R.converge(R.concat(), [
-  R.compose(R.toUpper, R.head),
+  R.compose(
+    R.toUpper,
+    R.head
+  ),
   R.tail
 ])
 

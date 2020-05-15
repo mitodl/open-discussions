@@ -83,7 +83,9 @@ const mergeProps = mergeAndInjectProps(
       await addSubscriber(channel.name, newMember.moderator.moderator_name)
 
       setSnackbarMessage({
-        message: `Successfully added ${newMember.moderator.email} as a moderator`
+        message: `Successfully added ${
+          newMember.moderator.email
+        } as a moderator`
       })
     }
   })

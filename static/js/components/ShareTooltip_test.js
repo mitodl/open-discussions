@@ -98,10 +98,8 @@ describe("ShareTooltip", () => {
 
   it("should hide buttons, if hideSocialButtons === true", () => {
     const wrapper = renderShareTooltipHelper({ hideSocialButtons: true })
-    ;[
-      FacebookShareButton,
-      LinkedinShareButton,
-      TwitterShareButton
-    ].forEach(button => assert.isNotOk(wrapper.find(button).exists()))
+    ;[FacebookShareButton, LinkedinShareButton, TwitterShareButton].forEach(
+      button => assert.isNotOk(wrapper.find(button).exists())
+    )
   })
 })

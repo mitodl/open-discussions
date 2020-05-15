@@ -49,10 +49,7 @@ describe("PostDetailSidebar", () => {
     })
     assert.isTrue(inner.find("Loading").exists())
   })
-  ;[
-    [null, "null"],
-    [[], "empty"]
-  ].forEach(([relatedPostsValue, desc]) => {
+  ;[[null, "null"], [[], "empty"]].forEach(([relatedPostsValue, desc]) => {
     it(`returns null when related post data is ${desc}`, async () => {
       const { inner } = await render({
         relatedPosts: {

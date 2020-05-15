@@ -151,65 +151,62 @@ describe("EditChannelAppearancePage", () => {
   })
 
   describe("onSubmit", () => {
-    [
-      [true, true],
-      [true, false],
-      [false, true],
-      [false, false]
-    ].forEach(([hasAvatar, hasBanner]) => {
-      it(`submits the form${hasAvatar ? " with an avatar" : ""}${
-        hasBanner ? " with a banner" : ""
-      }`, async () => {
-        const avatar = makeImage("avatar")
-        const banner = makeImage("banner")
+    [[true, true], [true, false], [false, true], [false, false]].forEach(
+      ([hasAvatar, hasBanner]) => {
+        it(`submits the form${hasAvatar ? " with an avatar" : ""}${
+          hasBanner ? " with a banner" : ""
+        }`, async () => {
+          const avatar = makeImage("avatar")
+          const banner = makeImage("banner")
 
-        const { inner } = await render({
-          forms: {
-            [EDIT_CHANNEL_KEY]: {
-              value: {
-                description: "a description",
-                avatar:      hasAvatar ? avatar : null,
-                banner:      hasBanner ? banner : null
+          const { inner } = await render({
+            forms: {
+              [EDIT_CHANNEL_KEY]: {
+                value: {
+                  description: "a description",
+                  avatar:      hasAvatar ? avatar : null,
+                  banner:      hasBanner ? banner : null
+                }
               }
             }
-          }
-        })
-        await inner
-          .find("EditChannelAppearanceForm")
-          .props()
-          .onSubmit({ preventDefault: helper.sandbox.stub() })
+          })
+          await inner
+            .find("EditChannelAppearanceForm")
+            .props()
+            .onSubmit({ preventDefault: helper.sandbox.stub() })
 
-        sinon.assert.calledWith(helper.updateChannelStub, {
-          name:        channel.name,
-          description: "a description"
+          sinon.assert.calledWith(helper.updateChannelStub, {
+            name:        channel.name,
+            description: "a description"
+          })
+          if (hasAvatar) {
+            sinon.assert.calledWith(
+              helper.patchChannelAvatarStub,
+              channel.name,
+              avatar.edit,
+              avatar.image.name
+            )
+          } else {
+            assert.isFalse(helper.patchChannelAvatarStub.called)
+          }
+          if (hasBanner) {
+            sinon.assert.calledWith(
+              helper.patchChannelBannerStub,
+              channel.name,
+              banner.edit,
+              banner.image.name
+            )
+          } else {
+            assert.isFalse(helper.patchChannelBannerStub.called)
+          }
+          assert.equal(
+            helper.currentLocation.pathname,
+            channelURL(channel.name)
+          )
         })
-        if (hasAvatar) {
-          sinon.assert.calledWith(
-            helper.patchChannelAvatarStub,
-            channel.name,
-            avatar.edit,
-            avatar.image.name
-          )
-        } else {
-          assert.isFalse(helper.patchChannelAvatarStub.called)
-        }
-        if (hasBanner) {
-          sinon.assert.calledWith(
-            helper.patchChannelBannerStub,
-            channel.name,
-            banner.edit,
-            banner.image.name
-          )
-        } else {
-          assert.isFalse(helper.patchChannelBannerStub.called)
-        }
-        assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
-      })
-    })
-    ;[
-      [true, true],
-      [false, false]
-    ].forEach(([isAdmin, expectIncludeTitle]) => {
+      }
+    )
+    ;[[true, true], [false, false]].forEach(([isAdmin, expectIncludeTitle]) => {
       it(`${shouldIf(
         expectIncludeTitle
       )} send patch request with title if user ${isIf(

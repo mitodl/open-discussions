@@ -106,38 +106,37 @@ describe("ProfileContributionFeed", function() {
     firstPost.prop("toggleUpvote")()
     sinon.assert.calledOnce(fakeUpvoteHandler)
   })
-  ;[
-    ["upvote", "upvoted", true],
-    ["downvote", "downvoted", true]
-  ].forEach(([voteFuncName, votePropertyName, isUpvote]) => {
-    it(`should handle comment ${voteFuncName}`, async () => {
-      const comment = commentsResult[0]
-      const wrapper = await renderFeed({ selectedTab: COMMENTS_OBJECT_TYPE })
-      const firstCommentComp = wrapper.find("CommentTree").at(0)
-      helper.updateCommentStub.returns(
-        Promise.resolve({
-          ...comment,
-          downvoted: !isUpvote,
-          upvoted:   isUpvote
+  ;[["upvote", "upvoted", true], ["downvote", "downvoted", true]].forEach(
+    ([voteFuncName, votePropertyName, isUpvote]) => {
+      it(`should handle comment ${voteFuncName}`, async () => {
+        const comment = commentsResult[0]
+        const wrapper = await renderFeed({ selectedTab: COMMENTS_OBJECT_TYPE })
+        const firstCommentComp = wrapper.find("CommentTree").at(0)
+        helper.updateCommentStub.returns(
+          Promise.resolve({
+            ...comment,
+            downvoted: !isUpvote,
+            upvoted:   isUpvote
+          })
+        )
+
+        await listenForActions(
+          [
+            actions.comments.patch.requestType,
+            actions.comments.patch.successType
+          ],
+          () => {
+            firstCommentComp.prop(voteFuncName)(comment)
+          }
+        )
+
+        sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+          // $FlowFixMe
+          [votePropertyName]: !comment[votePropertyName]
         })
-      )
-
-      await listenForActions(
-        [
-          actions.comments.patch.requestType,
-          actions.comments.patch.successType
-        ],
-        () => {
-          firstCommentComp.prop(voteFuncName)(comment)
-        }
-      )
-
-      sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
-        // $FlowFixMe
-        [votePropertyName]: !comment[votePropertyName]
       })
-    })
-  })
+    }
+  )
   ;[
     [POSTS_OBJECT_TYPE, "no posts to display"],
     [COMMENTS_OBJECT_TYPE, "no comments to display"]

@@ -16,19 +16,18 @@ describe("ui lib", () => {
   })
 
   //
-  ;[
-    ["showDropdown", SHOW_DROPDOWN],
-    ["hideDropdown", HIDE_DROPDOWN]
-  ].forEach(([funcName, actionType]) => {
-    it(`should call ${funcName} to dispatch ${actionType} with key`, () => {
-      const dispatchStub = sinon.stub()
-      const func = dropdownMenuFuncs(dispatchStub, "a key")[funcName]
-      func()
+  ;[["showDropdown", SHOW_DROPDOWN], ["hideDropdown", HIDE_DROPDOWN]].forEach(
+    ([funcName, actionType]) => {
+      it(`should call ${funcName} to dispatch ${actionType} with key`, () => {
+        const dispatchStub = sinon.stub()
+        const func = dropdownMenuFuncs(dispatchStub, "a key")[funcName]
+        func()
 
-      sinon.assert.called(dispatchStub)
-      const [[{ type, payload }]] = dispatchStub.args
-      assert.equal(type, actionType)
-      assert.equal(payload, "a key")
-    })
-  })
+        sinon.assert.called(dispatchStub)
+        const [[{ type, payload }]] = dispatchStub.args
+        assert.equal(type, actionType)
+        assert.equal(payload, "a key")
+      })
+    }
+  )
 })

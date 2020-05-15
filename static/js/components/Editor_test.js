@@ -213,13 +213,12 @@ describe("Editor component", () => {
       })
 
       it("should defer to command if active is null", () => {
-        [
-          [true, "menu-button"],
-          [false, "menu-button disabled"]
-        ].forEach(([command, exp]) => {
-          const commandStub = helper.sandbox.stub().returns(command)
-          assert.equal(exp, menuButtonClass({}, commandStub, null))
-        })
+        [[true, "menu-button"], [false, "menu-button disabled"]].forEach(
+          ([command, exp]) => {
+            const commandStub = helper.sandbox.stub().returns(command)
+            assert.equal(exp, menuButtonClass({}, commandStub, null))
+          }
+        )
       })
     })
 
@@ -337,28 +336,27 @@ describe("Editor component", () => {
     })
 
     //
-    ;[
-      [true, "link_off"],
-      [false, "link"]
-    ].forEach(([linkActive, linkNameExp]) => {
-      it(`should use right link icon when linkActive === ${String(
-        linkActive
-      )}`, () => {
-        const wrapper = renderEditor()
-        const markIsActiveStub = helper.sandbox
-          .stub(pmLib, "markIsActive")
-          .returns(linkActive)
-        wrapper.instance().forceUpdate()
-        assert.equal(
-          wrapper
-            .find(".menu-button")
-            .last()
-            .text(),
-          linkNameExp
-        )
-        sinon.assert.calledWith(markIsActiveStub, schema.marks.link)
-      })
-    })
+    ;[[true, "link_off"], [false, "link"]].forEach(
+      ([linkActive, linkNameExp]) => {
+        it(`should use right link icon when linkActive === ${String(
+          linkActive
+        )}`, () => {
+          const wrapper = renderEditor()
+          const markIsActiveStub = helper.sandbox
+            .stub(pmLib, "markIsActive")
+            .returns(linkActive)
+          wrapper.instance().forceUpdate()
+          assert.equal(
+            wrapper
+              .find(".menu-button")
+              .last()
+              .text(),
+            linkNameExp
+          )
+          sinon.assert.calledWith(markIsActiveStub, schema.marks.link)
+        })
+      }
+    )
   })
 
   describe("<AddLinkMenu />", () => {

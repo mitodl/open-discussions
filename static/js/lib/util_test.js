@@ -49,13 +49,7 @@ describe("utility functions", () => {
       list.push(item)
     }
 
-    assert.deepEqual(list, [
-      [0, 6],
-      [1, 7],
-      [2, 8],
-      [3, 9],
-      [4, 10]
-    ])
+    assert.deepEqual(list, [[0, 6], [1, 7], [2, 8], [3, 9], [4, 10]])
   })
 
   it("isEmptyText works as expected", () => {
@@ -96,40 +90,35 @@ describe("utility functions", () => {
   })
 
   it("should check if SETTINGS.username is nil", () => {
-    [
-      [null, true],
-      ["username", false]
-    ].forEach(([username, expectation]) => {
+    [[null, true], ["username", false]].forEach(([username, expectation]) => {
       SETTINGS.username = username
       assert.equal(userIsAnonymous(), expectation)
     })
   })
 
   it("isProfileComplete returns false if any required fields are missing", () => {
-    [
-      [null, "bio"],
-      [null, "headline"],
-      [null, "image"]
-    ].forEach(([bio, headline, image]) => {
-      const profile = {
-        name:                 "Test User",
-        username:             "AHJS123123FHG",
-        image:                image,
-        image_small:          image,
-        image_medium:         image,
-        image_file:           image,
-        image_small_file:     image,
-        image_medium_file:    image,
-        profile_image_small:  defaultProfileImageUrl,
-        profile_image_medium: defaultProfileImageUrl,
-        bio:                  bio,
-        headline:             headline
+    [[null, "bio"], [null, "headline"], [null, "image"]].forEach(
+      ([bio, headline, image]) => {
+        const profile = {
+          name:                 "Test User",
+          username:             "AHJS123123FHG",
+          image:                image,
+          image_small:          image,
+          image_medium:         image,
+          image_file:           image,
+          image_small_file:     image,
+          image_medium_file:    image,
+          profile_image_small:  defaultProfileImageUrl,
+          profile_image_medium: defaultProfileImageUrl,
+          bio:                  bio,
+          headline:             headline
+        }
+        assert.equal(
+          isProfileComplete(profile),
+          bio !== null && headline !== null && image !== null
+        )
       }
-      assert.equal(
-        isProfileComplete(profile),
-        bio !== null && headline !== null && image !== null
-      )
-    })
+    )
   })
 
   it("notNil works as expected", () => {

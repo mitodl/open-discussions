@@ -86,7 +86,9 @@ const mergeProps = mergeAndInjectProps(
       try {
         const newMember = await addMember(channel.name, form.email)
         setSnackbarMessage({
-          message: `Successfully added ${newMember.contributor.email} as a contributor`
+          message: `Successfully added ${
+            newMember.contributor.email
+          } as a contributor`
         })
       } catch (e) {
         // trigger an invite for private channels if the email didn't exist

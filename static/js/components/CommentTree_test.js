@@ -268,19 +268,18 @@ describe("CommentTree", () => {
   })
 
   //
-  ;[
-    [true, "Unfollow"],
-    [false, "Follow"]
-  ].forEach(([subscribed, buttonText]) => {
-    it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
-      comments[0].subscribed = subscribed
-      const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
-      const button = wrapper.find(".subscribe-comment").at(0)
-      assert.equal(button.text(), buttonText)
-      button.simulate("click")
-      assert.ok(toggleFollowCommentStub.called)
-    })
-  })
+  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
+    ([subscribed, buttonText]) => {
+      it(`should include a ${buttonText} button when subscribed === ${subscribed}`, () => {
+        comments[0].subscribed = subscribed
+        const wrapper = renderCommentTree(openDropdownMenu(comments[0]))
+        const button = wrapper.find(".subscribe-comment").at(0)
+        assert.equal(button.text(), buttonText)
+        button.simulate("click")
+        assert.ok(toggleFollowCommentStub.called)
+      })
+    }
+  )
 
   it("should include a 'delete' button, if the user wrote the comment", () => {
     SETTINGS.username = comments[0].author_id

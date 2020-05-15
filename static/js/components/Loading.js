@@ -102,12 +102,7 @@ export const PostLoading = () => (
         <rect x="0" y="0" rx="5" ry="5" width="100%" height="100%" />
       </ContentLoader>
     </div>
-    {R.times(
-      i => (
-        <AnimatedEmptyCard key={i} />
-      ),
-      emptyPostsToRender
-    )}
+    {R.times(i => <AnimatedEmptyCard key={i} />, emptyPostsToRender)}
   </div>
 )
 
@@ -197,12 +192,7 @@ export const CarouselLoading = () => {
         <rect x="92%" y="0" rx="5" ry="5" width="8%" height="22" />
       </ContentLoader>
       <div className="loader-row">
-        {R.times(
-          i => (
-            <AnimatedEmptyLRPortrait key={i} />
-          ),
-          width
-        )}
+        {R.times(i => <AnimatedEmptyLRPortrait key={i} />, width)}
       </div>
     </div>
   )

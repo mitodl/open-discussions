@@ -119,7 +119,9 @@ describe("Moderation API", () => {
 
       assert.ok(
         fetchStub.calledWith(
-          `/api/v0/channels/${channelName}/moderators/${moderator.moderator_name}/`
+          `/api/v0/channels/${channelName}/moderators/${
+            moderator.moderator_name
+          }/`
         )
       )
       assert.deepEqual(fetchStub.args[0][1], {

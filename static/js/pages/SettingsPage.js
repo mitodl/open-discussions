@@ -182,4 +182,7 @@ const mapStateToProps = (state, ownProps): StateProps => ({
     state.settings.processing && state.settings.patchStatus === FETCH_PROCESSING
 })
 
-export default R.compose(connect(mapStateToProps), withRouter)(SettingsPage)
+export default R.compose(
+  connect(mapStateToProps),
+  withRouter
+)(SettingsPage)
