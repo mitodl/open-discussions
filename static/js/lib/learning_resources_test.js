@@ -344,8 +344,8 @@ describe("Course run availability utils", () => {
   //
   ;[
     ["ocw", "2019-09-01", "2019-08-01", "Fall 2019"],
-    ["mitx", "2019-09-01", "2019-08-01", "September 01, 2019"],
-    ["mitx", null, "2019-08-01", "August 01, 2019"],
+    ["mitx", "2019-09-01", "2019-08-01", "september 01, 2019"],
+    ["mitx", null, "2019-08-01", "august 01, 2019"],
     ["mitx", null, null, "Ongoing"]
   ].forEach(([platform, startDt, bestDt, expected]) => {
     it(`getStartDate should return ${expected} for ${platform} run with start_dt ${String(
@@ -379,10 +379,7 @@ describe("Course run availability utils", () => {
   })
 
   //
-  ;[
-    ["public", "lock_open"],
-    ["private", "lock"]
-  ].forEach(([privacy, icon]) => {
+  ;[["public", "lock_open"], ["private", "lock"]].forEach(([privacy, icon]) => {
     assert.equal(privacyIcon(privacy), icon)
   })
 

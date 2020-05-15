@@ -211,7 +211,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         wrapper
           .find(
             objectType === LR_TYPE_PODCAST ||
-              objectType === LR_TYPE_PODCAST_EPISODE
+            objectType === LR_TYPE_PODCAST_EPISODE
               ? ".podcast-main-title"
               : ".title"
           )
@@ -330,7 +330,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[
-    ["mitx", "September 01, 2019", "Start Date:"],
+    ["mitx", "september 01, 2019", "Start Date:"],
     ["ocw", "Fall 2019", "As Taught In:"]
   ].forEach(([platform, expectedValue, expectedLabel]) => {
     it(`should display the correct date label and options for ${platform} courses`, async () => {
@@ -364,10 +364,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[
-    [1, false],
-    [2, true]
-  ].forEach(([runs, showDropdown]) => {
+  ;[[1, false], [2, true]].forEach(([runs, showDropdown]) => {
     it(`${shouldIf(
       showDropdown
     )} display a course run dropdown for a course with ${runs} run(s)`, async () => {
@@ -379,8 +376,8 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[
-    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "September 01, 2019"],
-    [null, "2019-08-01T00:00:00Z", "August 01, 2019"],
+    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "september 01, 2019"],
+    [null, "2019-08-01T00:00:00Z", "august 01, 2019"],
     [null, null, "Ongoing"]
   ].forEach(([startDate, bestDate, expected]) => {
     it(`mitx run date should be ${expected} for start date ${String(

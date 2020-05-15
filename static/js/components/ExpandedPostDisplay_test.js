@@ -114,22 +114,21 @@ describe("ExpandedPostDisplay", () => {
   })
 
   //
-  ;[
-    ["My headline", true],
-    [null, false]
-  ].forEach(([headlineText, expElementExists]) => {
-    it(`${shouldIf(expElementExists)} display headline span when text=${String(
-      headlineText
-    )}`, () => {
-      post.author_headline = headlineText
-      const wrapper = renderPostDisplay({ post })
-      const headlineSpan = wrapper.find(".author-headline").at(1)
-      assert.equal(headlineSpan.exists(), expElementExists)
-      if (expElementExists && headlineText) {
-        assert(headlineSpan.text().includes(headlineText))
-      }
-    })
-  })
+  ;[["My headline", true], [null, false]].forEach(
+    ([headlineText, expElementExists]) => {
+      it(`${shouldIf(
+        expElementExists
+      )} display headline span when text=${String(headlineText)}`, () => {
+        post.author_headline = headlineText
+        const wrapper = renderPostDisplay({ post })
+        const headlineSpan = wrapper.find(".author-headline").at(1)
+        assert.equal(headlineSpan.exists(), expElementExists)
+        if (expElementExists && headlineText) {
+          assert(headlineSpan.text().includes(headlineText))
+        }
+      })
+    }
+  )
 
   it("should hide text content if passed showPermalinkUI", () => {
     const wrapper = renderPostDisplay({ showPermalinkUI: true })

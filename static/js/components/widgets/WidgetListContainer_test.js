@@ -305,8 +305,8 @@ describe("WidgetListContainer", () => {
           ...makeWidgetInstance(),
           id: updateId
         }
-        const list = updatedWidgetList.map(item =>
-          item.id === updateId ? replaceInstance : item
+        const list = updatedWidgetList.map(
+          item => (item.id === updateId ? replaceInstance : item)
         )
         const data: WidgetDialogData = {
           instance:   replaceInstance,

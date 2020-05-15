@@ -120,24 +120,23 @@ describe("LoginPasswordPage", () => {
     const errorText = "error text"
 
     //
-    ;[
-      [[errorText], true],
-      [[], false]
-    ].forEach(([errors, expectErrorObject]) => {
-      it(`${shouldIf(
-        expectErrorObject
-      )} return error object if API response error count == ${String(
-        errors.length
-      )}`, async () => {
-        const { inner } = await renderPage()
-        const getSubmitResultErrors = inner.prop("getSubmitResultErrors")
-        const submitResultErrors = getSubmitResultErrors({ errors: errors })
+    ;[[[errorText], true], [[], false]].forEach(
+      ([errors, expectErrorObject]) => {
+        it(`${shouldIf(
+          expectErrorObject
+        )} return error object if API response error count == ${String(
+          errors.length
+        )}`, async () => {
+          const { inner } = await renderPage()
+          const getSubmitResultErrors = inner.prop("getSubmitResultErrors")
+          const submitResultErrors = getSubmitResultErrors({ errors: errors })
 
-        const expectedResult = expectErrorObject
-          ? { password: errorText }
-          : undefined
-        assert.deepEqual(submitResultErrors, expectedResult)
-      })
-    })
+          const expectedResult = expectErrorObject
+            ? { password: errorText }
+            : undefined
+          assert.deepEqual(submitResultErrors, expectedResult)
+        })
+      }
+    )
   })
 })

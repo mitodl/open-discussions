@@ -165,6 +165,10 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) => {
 }
 
 export default R.compose(
-  connect(mapStateToProps, mapDispatchToProps, mergeProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps
+  ),
   withForm(ImageUploaderForm)
 )(ImageUploader)

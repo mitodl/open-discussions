@@ -37,18 +37,19 @@ describe("FollowButton", () => {
   })
 
   //
-  ;[
-    [true, "Unfollow"],
-    [false, "Follow"]
-  ].forEach(([subscribed, buttonText]) => {
-    it(`should include a ${buttonText} button when subscribed === ${subscribed.toString()}`, () => {
-      helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
-      post.subscribed = subscribed
-      const wrapper = renderButton()
-      const button = wrapper.find(subscribed ? ".subscribed" : ".unsubscribed")
-      assert.include(button.text(), buttonText)
-      button.simulate("click")
-      assert.ok(toggleFollowPostStub.calledOnce)
-    })
-  })
+  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
+    ([subscribed, buttonText]) => {
+      it(`should include a ${buttonText} button when subscribed === ${subscribed.toString()}`, () => {
+        helper.sandbox.stub(utilFuncs, "userIsAnonymous").returns(false)
+        post.subscribed = subscribed
+        const wrapper = renderButton()
+        const button = wrapper.find(
+          subscribed ? ".subscribed" : ".unsubscribed"
+        )
+        assert.include(button.text(), buttonText)
+        button.simulate("click")
+        assert.ok(toggleFollowPostStub.calledOnce)
+      })
+    }
+  )
 })

@@ -82,7 +82,9 @@ describe("fetch_auth", function() {
 
       //
       [errorNotAuthenticated, errorAuthenticationFailed].forEach(error => {
-        it(`redirects to login page for error: ${error.error_type}`, async () => {
+        it(`redirects to login page for error: ${
+          error.error_type
+        }`, async () => {
           fetchStub.returns(Promise.reject(error)) // original api call
 
           await assert.isRejected(authFunc("/url"))

@@ -79,6 +79,9 @@ const mapDispatchToProps = (dispatch: Dispatch<*>, ownProps) =>
     dispatch
   )
 
-export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
-  ManageWidgetHeader
-)
+export default R.compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(ManageWidgetHeader)

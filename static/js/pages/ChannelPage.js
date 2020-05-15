@@ -200,7 +200,10 @@ const mapDispatchToProps = (
 })
 
 export default R.compose(
-  connect(mapStateToProps, mapDispatchToProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ),
   withPostModeration,
   withChannelTracker,
   withPostList,

@@ -133,12 +133,18 @@ export const postArticleValidation = validateIfPostType(
 
 export const validatePostCreateForm = validate([
   validation(
-    R.compose(R.gt(R.__, 300), R.length),
+    R.compose(
+      R.gt(R.__, 300),
+      R.length
+    ),
     formLens("title"),
     "Title length is limited to 300 characters"
   ),
   validation(
-    R.compose(R.gt(R.__, 40000), R.length),
+    R.compose(
+      R.gt(R.__, 40000),
+      R.length
+    ),
     formLens("text"),
     "This post is too long. Please reduce the length and try again."
   ),
@@ -153,7 +159,10 @@ export const validateProfileForm = validate([
 
 export const validateUserWebsiteForm = validate([
   validation(
-    R.compose(R.complement(R.unary(isURL)), R.defaultTo("")),
+    R.compose(
+      R.complement(R.unary(isURL)),
+      R.defaultTo("")
+    ),
     R.lensPath(["value", "url"]),
     "Must be a valid URL"
   ),
@@ -162,7 +171,10 @@ export const validateUserWebsiteForm = validate([
 
 export const validateChannelAppearanceEditForm = validate([
   validation(
-    R.compose(R.gt(R.__, 80), R.length),
+    R.compose(
+      R.gt(R.__, 80),
+      R.length
+    ),
     formLens("public_description"),
     "Headline length is limited to 80 characters"
   ),
@@ -185,19 +197,28 @@ export const validateImageForm = validate([])
 
 export const validateContentReportForm = validate([
   validation(
-    R.compose(R.lt(100), R.length),
+    R.compose(
+      R.lt(100),
+      R.length
+    ),
     formLens("reason"),
     "Reason length is limited to 100 characters"
   ),
   validation(
-    R.compose(R.gt(3), R.length),
+    R.compose(
+      R.gt(3),
+      R.length
+    ),
     formLens("reason"),
     "Reason must be at least 3 characters"
   )
 ])
 
 export const validateSearchQuery = (text: ?string): ?string =>
-  R.compose(R.lte(SETTINGS.search_min_length), R.length)(text)
+  R.compose(
+    R.lte(SETTINGS.search_min_length),
+    R.length
+  )(text)
     ? null
     : `Query string must be at least ${SETTINGS.search_min_length} characters`
 
@@ -243,7 +264,10 @@ export const validateNewEmailForm = validate(
 
 export const validatePasswordForm = validate([
   validation(
-    R.compose(R.gt(8), R.length),
+    R.compose(
+      R.gt(8),
+      R.length
+    ),
     formLens("password"),
     "Password must be at least 8 characters"
   )
@@ -253,7 +277,10 @@ export const validateRegisterDetailsForm = validate([
   validation(emptyOrNil, R.lensPath(["value", "name"]), "Name is required"),
   validation(emptyOrNil, formLens("password"), "Password is required"),
   validation(
-    R.compose(R.gt(PASSWORD_LENGTH_MINIMUM), R.length),
+    R.compose(
+      R.gt(PASSWORD_LENGTH_MINIMUM),
+      R.length
+    ),
     formLens("password"),
     `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
   )
@@ -261,7 +288,10 @@ export const validateRegisterDetailsForm = validate([
 
 const newPasswordValidations = [
   validation(
-    R.compose(R.gt(PASSWORD_LENGTH_MINIMUM), R.length),
+    R.compose(
+      R.gt(PASSWORD_LENGTH_MINIMUM),
+      R.length
+    ),
     formLens("new_password"),
     `Password must be at least ${PASSWORD_LENGTH_MINIMUM} characters`
   ),
@@ -364,7 +394,10 @@ export const validateWidgetDialog = (data: WidgetDialogData) => {
   return validate(validationList)(data.instance)
 }
 
-const topicsExceeded = R.compose(R.lt(TOPICS_LENGTH_MAXIMUM), R.length)
+const topicsExceeded = R.compose(
+  R.lt(TOPICS_LENGTH_MAXIMUM),
+  R.length
+)
 
 export const validateCreateUserListForm = validate([
   validation(

@@ -27,9 +27,6 @@ describe("search reducers", () => {
       actions.relatedPosts.post.successType
     ])
     sinon.assert.calledWith(helper.getRelatedPostsStub, postId)
-    assert.deepEqual(
-      data,
-      response.hits.hits.map(item => item._source)
-    )
+    assert.deepEqual(data, response.hits.hits.map(item => item._source))
   })
 })

@@ -141,6 +141,10 @@ const mapDispatchToProps = {
 }
 
 export default R.compose(
-  connect(mapStateToProps, mapDispatchToProps, mergeProps),
+  connect(
+    mapStateToProps,
+    mapDispatchToProps,
+    mergeProps
+  ),
   withForm(AuthPasswordForm)
 )(LoginPasswordPage)

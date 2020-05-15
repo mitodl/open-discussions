@@ -32,8 +32,8 @@ const Footer = () => (
       </a>
     </div>
     <div className="row legal">
-      Massachusetts Institute of Technology
-      <br />© 2016-{moment().format("Y")} - All rights reserved
+      Massachusetts Institute of Technology<br />
+      © 2016-{moment().format("Y")} - All rights reserved
     </div>
   </div>
 )

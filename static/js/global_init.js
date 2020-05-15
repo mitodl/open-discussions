@@ -5,12 +5,6 @@ import ReactDOM from "react-dom"
 import { configure } from "enzyme"
 import Adapter from "enzyme-adapter-react-16"
 
-import moment from "moment"
-moment.locale("en")
-
-import { enableMapSet } from "immer"
-enableMapSet()
-
 configure({ adapter: new Adapter() })
 
 // Define globals we would usually get from Django

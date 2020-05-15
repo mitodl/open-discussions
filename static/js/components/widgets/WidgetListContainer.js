@@ -143,8 +143,9 @@ export class WidgetListContainer extends React.Component<Props> {
     const key = getWidgetKey(instanceFromDialog)
     const replacementInstances =
       data.state === WIDGET_EDIT
-        ? instances.map(instance =>
-          getWidgetKey(instance) === key ? instanceFromDialog : instance
+        ? instances.map(
+          instance =>
+            getWidgetKey(instance) === key ? instanceFromDialog : instance
         )
         : instances.concat([instanceFromDialog])
     updateWidgetInstances(replacementInstances)
@@ -237,6 +238,9 @@ const mapDispatchToProps = (dispatch: Dispatch<any>, ownProps) =>
     dispatch
   )
 
-export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
-  WidgetListContainer
-)
+export default R.compose(
+  connect(
+    mapStateToProps,
+    mapDispatchToProps
+  )
+)(WidgetListContainer)

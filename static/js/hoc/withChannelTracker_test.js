@@ -56,10 +56,7 @@ describe("withTracker", () => {
   })
 
   //
-  ;[
-    [true, 4],
-    [false, 2]
-  ].forEach(([missingPrevChannel, gaCalls]) => {
+  ;[[true, 4], [false, 2]].forEach(([missingPrevChannel, gaCalls]) => {
     it(`${shouldIf(
       missingPrevChannel
     )} call google analytics on componentDidUpdate`, async () => {
