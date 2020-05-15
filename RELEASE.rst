@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.123.3
+---------------
+
+- Revert "upgrade dependencies, add @reduxjs/toolkit"
+- Added remapping for edx topics
+
 Version 0.123.2 (Released May 15, 2020)
 ---------------
 
