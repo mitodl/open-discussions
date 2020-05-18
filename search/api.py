@@ -347,7 +347,6 @@ def _transform_search_results_suggest(search_result):
     return search_result
 
 
-# pylint: disable=too-many-branches
 def transform_results(search_result, user):
     """
     Transform podcast and podcast episode, and userlist and learning path in aggergations
@@ -390,6 +389,10 @@ def transform_results(search_result, user):
                 )
             elif child_type_bucket:
                 child_type_bucket["key"] = parent_type
+
+        search_result["aggregations"]["type"]["buckets"].sort(
+            key=lambda bucket: bucket["doc_count"], reverse=True
+        )
 
     if not user.is_anonymous:
         favorites = (

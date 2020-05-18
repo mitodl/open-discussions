@@ -700,8 +700,8 @@ def test_transform_results_for_aggregates(
         "aggregations": {
             "type": {
                 "buckets": [
-                    {"key": "podcast", "doc_count": 2},
                     {"key": "userlist", "doc_count": 3},
+                    {"key": "podcast", "doc_count": 2},
                 ]
             }
         },
