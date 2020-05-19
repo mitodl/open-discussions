@@ -33,7 +33,7 @@ def get_mitx_data():
     pipelines.mitx_etl()
 
 
-@app.task
+@app.task(acks_late=True)
 def get_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3):
     """Task to sync a batch of OCW courses"""
     sync_ocw_courses(
