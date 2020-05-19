@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.124.0
+---------------
+
+- Ensure ocw subtasks don't ack until task completes
+- Revert "upgrade dependencies, add @reduxjs/toolkit"
+- Added remapping for edx topics
+
 Version 0.123.3 (Released May 15, 2020)
 ---------------
 
