@@ -158,6 +158,12 @@
         color: black;
       }
 
+      .facet-key-large {
+        font-size: 16;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+
       .facet-count {
         color: $font-grey-mid;
       }

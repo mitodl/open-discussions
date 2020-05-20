@@ -8,7 +8,7 @@ import type { FacetResult } from "../flow/searchTypes"
 type Props = {|
   results: ?FacetResult,
   name: string,
-  title: string,
+  title: ?string,
   currentlySelected: Array<string>,
   labelFunction?: Function,
   onUpdate: Function
@@ -33,13 +33,15 @@ function SearchFacet(props: Props) {
 
   return results && results.buckets && results.buckets.length === 0 ? null : (
     <div className="facets">
-      <div
-        className="filter-section-title"
-        onClick={() => setShowFacetList(!showFacetList)}
-      >
-        {title}
-        <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
-      </div>
+      {title ? (
+        <div
+          className="filter-section-title"
+          onClick={() => setShowFacetList(!showFacetList)}
+        >
+          {title}
+          <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
+        </div>
+      ) : null}
       {showFacetList ? (
         <React.Fragment>
           {results && results.buckets
@@ -74,7 +76,13 @@ function SearchFacet(props: Props) {
                     onChange={onUpdate}
                   />
                   <div className="facet-label-div">
-                    <div className="facet-key">
+                    <div
+                      className={
+                        ["audience", "certification"].includes(name)
+                          ? "facet-key facet-key-large"
+                          : "facet-key"
+                      }
+                    >
                       {labelFunction ? labelFunction(facet.key) : facet.key}
                     </div>
                     <div className="facet-count">{facet.doc_count}</div>
@@ -85,7 +93,7 @@ function SearchFacet(props: Props) {
             : null}
           {results && results.buckets.length >= FACET_COLLAPSE_THRESHOLD ? (
             <div
-              className="facet-more-less"
+              className={"facet-more-less"}
               onClick={() => setShowAllFacets(!showAllFacets)}
             >
               {showAllFacets ? "View less" : "View more"}

@@ -30,9 +30,11 @@ describe("CourseFilterDrawer", () => {
     )
 
   const activeFacets = {
-    type:       ["course"],
-    topics:     ["Physics"],
-    offered_by: ["mitx"]
+    audience:      ["Open Content"],
+    certification: ["Certificate"],
+    type:          ["course"],
+    topics:        ["Physics"],
+    offered_by:    ["mitx"]
   }
 
   beforeEach(() => {
@@ -101,10 +103,9 @@ describe("CourseFilterDrawer", () => {
         activeFacets
       })
 
-      facetDisplayMap.map(([name, title, labelFn], idx) => {
+      facetDisplayMap.map(([name, , labelFn], idx) => {
         const searchFilter = wrapper.find("SearchFilter").at(idx)
 
-        assert.equal(searchFilter.prop("title"), title)
         assert.equal(searchFilter.prop("value"), activeFacets[name][0])
         assert.equal(searchFilter.prop("labelFunction"), labelFn)
         searchFilter.prop("clearFacet")()

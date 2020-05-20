@@ -9,6 +9,8 @@ const urlParamToArray = param => _.union(toArray(param) || [])
 type URLSearchParams = {
   text: string,
   activeFacets: {
+    audience: Array<string>,
+    certification: Array<string>,
     type: Array<string>,
     offered_by: Array<string>,
     topics: Array<string>
@@ -20,14 +22,16 @@ type Loc = {
 }
 
 export const deserializeSearchParams = (location: Loc): URLSearchParams => {
-  const { type, o, t, q } = qs.parse(location.search)
+  const { type, o, t, q, a, c } = qs.parse(location.search)
 
   return {
     text:         q,
     activeFacets: {
-      type:       urlParamToArray(type),
-      offered_by: urlParamToArray(o),
-      topics:     urlParamToArray(t)
+      audience:      urlParamToArray(a),
+      certification: urlParamToArray(c),
+      type:          urlParamToArray(type),
+      offered_by:    urlParamToArray(o),
+      topics:        urlParamToArray(t)
     }
   }
 }
@@ -37,11 +41,13 @@ export const serializeSearchParams = ({
   activeFacets
 }: Object): string => {
   // eslint-disable-next-line camelcase
-  const { type, offered_by, topics } = activeFacets
+  const { type, offered_by, topics, audience, certification } = activeFacets
 
   return qs.stringify({
     q: text || undefined,
     type,
+    a: audience,
+    c: certification,
     o: offered_by,
     t: topics
   })

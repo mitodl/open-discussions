@@ -149,9 +149,11 @@ export class CourseSearchPage extends React.Component<Props, State> {
     this.updateSearchState({
       text:         null,
       activeFacets: {
-        offered_by: [],
-        topics:     [],
-        type:       []
+        audience:      [],
+        certification: [],
+        offered_by:    [],
+        topics:        [],
+        type:          []
       }
     })
     this.setState({

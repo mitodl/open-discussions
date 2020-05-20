@@ -9,9 +9,11 @@ describe("course search library", () => {
         deserializeSearchParams({ search: "q=The Best Course" }),
         {
           activeFacets: {
-            offered_by: [],
-            topics:     [],
-            type:       []
+            audience:      [],
+            certification: [],
+            offered_by:    [],
+            topics:        [],
+            type:          []
           },
           text: "The Best Course"
         }
@@ -21,9 +23,11 @@ describe("course search library", () => {
     it("should deserialize offered by", () => {
       assert.deepEqual(deserializeSearchParams({ search: "o=MITx" }), {
         activeFacets: {
-          offered_by: ["MITx"],
-          topics:     [],
-          type:       []
+          audience:      [],
+          certification: [],
+          offered_by:    ["MITx"],
+          topics:        [],
+          type:          []
         },
         text: undefined
       })
@@ -37,8 +41,10 @@ describe("course search library", () => {
         }),
         {
           activeFacets: {
-            offered_by: [],
-            topics:     [
+            audience:      [],
+            certification: [],
+            offered_by:    [],
+            topics:        [
               "Science",
               "Physics",
               "Chemistry",
@@ -55,9 +61,40 @@ describe("course search library", () => {
     it("should deserialize type from the URL", () => {
       assert.deepEqual(deserializeSearchParams({ search: "type=course" }), {
         activeFacets: {
-          offered_by: [],
-          topics:     [],
-          type:       ["course"]
+          audience:      [],
+          certification: [],
+          offered_by:    [],
+          topics:        [],
+          type:          ["course"]
+        },
+        text: undefined
+      })
+    })
+
+    it("should deserialize audience from the URL", () => {
+      assert.deepEqual(
+        deserializeSearchParams({ search: "a=Open%20Content" }),
+        {
+          activeFacets: {
+            audience:      ["Open Content"],
+            certification: [],
+            offered_by:    [],
+            topics:        [],
+            type:          []
+          },
+          text: undefined
+        }
+      )
+    })
+
+    it("should deserialize certification from the URL", () => {
+      assert.deepEqual(deserializeSearchParams({ search: "c=Certification" }), {
+        activeFacets: {
+          audience:      [],
+          certification: ["Certification"],
+          offered_by:    [],
+          topics:        [],
+          type:          []
         },
         text: undefined
       })
@@ -66,9 +103,11 @@ describe("course search library", () => {
     it("should ignore unknown params", () => {
       assert.deepEqual(deserializeSearchParams({ search: "eeee=beeeeeep" }), {
         activeFacets: {
-          offered_by: [],
-          topics:     [],
-          type:       []
+          audience:      [],
+          certification: [],
+          offered_by:    [],
+          topics:        [],
+          type:          []
         },
         text: undefined
       })
@@ -132,6 +171,28 @@ describe("course search library", () => {
           }
         }),
         "type=course"
+      )
+    })
+
+    it("should serialize audience", () => {
+      assert.deepEqual(
+        serializeSearchParams({
+          activeFacets: {
+            audience: ["Open Content"]
+          }
+        }),
+        "a=Open%20Content"
+      )
+    })
+
+    it("should serialize certification", () => {
+      assert.deepEqual(
+        serializeSearchParams({
+          activeFacets: {
+            certification: ["Certificate"]
+          }
+        }),
+        "c=Certificate"
       )
     })
   })
