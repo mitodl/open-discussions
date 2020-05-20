@@ -19,7 +19,9 @@ from course_catalog.models import (
     ContentFile,
     Podcast,
     PodcastEpisode,
+    ContentType,
 )
+from course_catalog.constants import PlatformType, AvailabilityType, OfferedBy
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -45,9 +47,58 @@ from search.constants import (
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
 )
+
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 log = logging.getLogger()
+
+OPEN = "Open Content"
+PROFESSIONAL = "Professional Offerings"
+CERTIFICATE = "Certificates"
+
+PROFESSIONAL_COURSE_PLATFORMS = [
+    PlatformType.bootcamps.value,
+    PlatformType.xpro.value,
+    PlatformType.see.value,
+    PlatformType.mitpe.value,
+    PlatformType.csail.value,
+]
+
+
+def get_audience_for_course(course):
+    """
+    Determines whether a course should be classified as Open or Professional Education
+
+    Args:
+        course (Course): A course
+
+    Returns:
+        Array of str: The audience tags that apply to the course
+    """
+
+    if course.platform in PROFESSIONAL_COURSE_PLATFORMS:
+        return [PROFESSIONAL]
+    else:
+        return [OPEN]
+
+
+def get_audience_for_program(program):
+    """
+    Determines whether a program should be classified as Open or Professional Education or both
+
+    Args:
+        program (Program): A program
+
+    Returns:
+        Array of str: The audience tags that apply to the program
+    """
+
+    if OfferedBy.micromasters.value in program.offered_by.values_list(
+        "name", flat=True
+    ):
+        return [OPEN, PROFESSIONAL]
+    else:
+        return [PROFESSIONAL]
 
 
 class ESModelSerializer(serializers.ModelSerializer):
@@ -310,6 +361,8 @@ class LearningResourceSerializer(serializers.ModelSerializer):
     topics = ESTopicsField()
     minimum_price = serializers.SerializerMethodField()
     created = serializers.DateTimeField(source="created_on", read_only=True)
+    audience = serializers.SerializerMethodField()
+    certification = serializers.SerializerMethodField()
 
     def get_minimum_price(self, instance):
         """
@@ -478,6 +531,27 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
         ret["resource_relations"] = self.resource_relations
         return ret
 
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        return get_audience_for_course(instance)
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+        if instance.platform in PROFESSIONAL_COURSE_PLATFORMS or (
+            instance.platform == PlatformType.mitx.value
+            and any(
+                availability != AvailabilityType.archived.value
+                for availability in instance.runs.values_list("availability", flat=True)
+            )
+        ):
+            return [CERTIFICATE]
+        else:
+            return []
+
     class Meta:
         model = Course
         fields = [
@@ -496,6 +570,8 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "default_search_priority",
             "minimum_price",
+            "audience",
+            "certification",
         ]
 
         read_only_fields = fields
@@ -517,6 +593,19 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
         """
         return 1
 
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        return get_audience_for_program(instance)
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+
+        return [CERTIFICATE]
+
     class Meta:
         model = Program
         fields = [
@@ -530,6 +619,8 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "default_search_priority",
             "minimum_price",
+            "audience",
+            "certification",
         ]
 
         read_only_fields = fields
@@ -563,6 +654,27 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
                 ret["image_src"] = first_item.item.image_src
         return ret
 
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        for list_item in instance.items.all():
+            if list_item.content_type == ContentType.objects.get_for_model(Course):
+                if OPEN not in get_audience_for_course(list_item.item):
+                    return []
+            elif list_item.content_type == ContentType.objects.get_for_model(Program):
+                if OPEN not in get_audience_for_program(list_item.item):
+                    return []
+
+        return [OPEN]
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+
+        return []
+
     class Meta:
         model = UserList
         fields = [
@@ -577,6 +689,8 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "default_search_priority",
             "minimum_price",
+            "audience",
+            "certification",
         ]
 
         read_only_fields = fields
@@ -596,6 +710,18 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
         """
         return 0
 
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        return [OPEN]
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+        return []
+
     class Meta:
         model = Video
         fields = [
@@ -614,6 +740,8 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "default_search_priority",
             "minimum_price",
+            "audience",
+            "certification",
         ]
 
         read_only_fields = fields
@@ -625,14 +753,25 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
     object_type = PODCAST_TYPE
 
     default_search_priority = serializers.SerializerMethodField()
-
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_default_search_priority(self, instance):
         """
-        User Lists should have lower priority in the default search
+        Podcasts should have lower priority in the default search
         """
         return 0
+
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        return [OPEN]
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+        return []
 
     class Meta:
         model = Podcast
@@ -649,6 +788,8 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "offered_by",
             "runs",
+            "audience",
+            "certification",
         ]
         read_only_fields = fields
 
@@ -672,6 +813,18 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
         """
         return 0
 
+    def get_audience(self, instance):
+        """
+        Sets audience content facet filter
+        """
+        return [OPEN]
+
+    def get_certification(self, instance):
+        """
+        Sets certification facet filter
+        """
+        return []
+
     class Meta:
         model = PodcastEpisode
         fields = [
@@ -691,6 +844,8 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
             "created",
             "offered_by",
             "runs",
+            "audience",
+            "certification",
         ]
         read_only_fields = fields
 

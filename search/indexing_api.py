@@ -131,6 +131,8 @@ LEARNING_RESOURCE_TYPE = {
     "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "image_src": {"type": "keyword"},
     "topics": {"type": "keyword"},
+    "audience": {"type": "keyword"},
+    "certification": {"type": "keyword"},
     "offered_by": {"type": "keyword"},
     "created": {"type": "date"},
     "default_search_priority": {"type": "integer"},
@@ -194,6 +196,8 @@ PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
 USER_LIST_OBJECT_TYPE = {
     **RESOURCE_RELATIONS,
+    "audience": {"type": "keyword"},
+    "certification": {"type": "keyword"},
     "id": {"type": "long"},
     "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
     "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
