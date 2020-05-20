@@ -131,7 +131,7 @@ describe("CourseSearchPage", () => {
     assert.equal(
       inner
         .find(SearchFacet)
-        .at(0)
+        .at(2)
         .prop("title"),
       "Learning Resource"
     )
@@ -204,9 +204,11 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          offered_by: [],
-          topics:     [],
-          type:       LR_TYPE_ALL
+          audience:      [],
+          certification: [],
+          offered_by:    [],
+          topics:        [],
+          type:          LR_TYPE_ALL
         })
       )
     })
@@ -247,9 +249,11 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          type:       LR_TYPE_ALL,
-          offered_by: ["OCW"],
-          topics:     ["Science", "Engineering"]
+          audience:      [],
+          certification: [],
+          type:          LR_TYPE_ALL,
+          offered_by:    ["OCW"],
+          topics:        ["Science", "Engineering"]
         })
       )
     })
@@ -279,9 +283,11 @@ describe("CourseSearchPage", () => {
       type:        ["podcast", "podcastepisode"],
       facets:      new Map(
         Object.entries({
-          type:       ["podcast", "podcastepisode"],
-          offered_by: [],
-          topics:     []
+          audience:      [],
+          certification: [],
+          type:          ["podcast", "podcastepisode"],
+          offered_by:    [],
+          topics:        []
         })
       )
     })
@@ -311,9 +317,11 @@ describe("CourseSearchPage", () => {
       type:        ["userlist", "learningpath"],
       facets:      new Map(
         Object.entries({
-          type:       ["userlist", "learningpath"],
-          offered_by: [],
-          topics:     []
+          audience:      [],
+          certification: [],
+          type:          ["userlist", "learningpath"],
+          offered_by:    [],
+          topics:        []
         })
       )
     })
@@ -453,9 +461,11 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        topics:     [],
-        offered_by: [],
-        type:       ["course"]
+        audience:      [],
+        certification: [],
+        topics:        [],
+        offered_by:    [],
+        type:          ["course"]
       }
     })
   })
@@ -486,9 +496,11 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        topics:     ["Physics"],
-        offered_by: [],
-        type:       []
+        audience:      [],
+        certification: [],
+        topics:        ["Physics"],
+        offered_by:    [],
+        type:          []
       }
     })
   })
@@ -511,8 +523,10 @@ describe("CourseSearchPage", () => {
           search: serializeSearchParams({
             text:         "some text",
             activeFacets: {
-              offered_by: [],
-              topics:     ["NewTopic"]
+              audience:      [],
+              certification: [],
+              offered_by:    [],
+              topics:        ["NewTopic"]
             }
           })
         }

@@ -18,20 +18,17 @@ describe("SearchFilter", () => {
   })
 
   it("should render a search filter correctly", () => {
-    const title = "Availability"
     const value = "Upcoming"
     const wrapper = renderSearchFilter({
-      title,
       value,
       labelFunction: _.upperCase
     })
     const label = wrapper.text()
     assert.isTrue(label.includes(_.upperCase(value)))
-    assert.isTrue(label.includes(title))
   })
 
   it("should trigger clearFacet function on click", async () => {
-    const wrapper = renderSearchFilter({ title: "Platform", value: "ocw" })
+    const wrapper = renderSearchFilter({ value: "ocw" })
     wrapper.find(".remove-filter").simulate("click")
     sinon.assert.calledOnce(onClickStub)
   })

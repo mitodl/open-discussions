@@ -10,6 +10,8 @@ import { useDeviceCategory } from "../hooks/util"
 import { resourceLabel } from "../lib/learning_resources"
 
 export const facetDisplayMap = [
+  ["audience", null, null],
+  ["certification", "Certification", null],
   ["type", "Learning Resource", resourceLabel],
   ["topics", "Subject Area", null],
   ["offered_by", "Offered By", null]
@@ -46,11 +48,10 @@ export function FilterDisplay(props: FilterDrawerProps) {
             </span>
           </div>
         ) : null}
-        {facetDisplayMap.map(([name, title, labelFunction]) =>
+        {facetDisplayMap.map(([name, , labelFunction]) =>
           (activeFacets[name] || []).map((facet, i) => (
             <SearchFilter
               key={i}
-              title={title}
               value={facet}
               clearFacet={() => toggleFacet(name, facet, false)}
               labelFunction={labelFunction}
