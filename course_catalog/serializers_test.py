@@ -275,6 +275,7 @@ def test_podcast_episode_serializer():
         "short_description": episode.short_description,
         "topics": CourseTopicSerializer(many=True, instance=episode.topics).data,
         "url": episode.url,
+        "episode_link": episode.episode_link,
         "podcast": episode.podcast_id,
         "last_modified": episode.last_modified.strftime(datetime_format),
         "object_type": "podcastepisode",
