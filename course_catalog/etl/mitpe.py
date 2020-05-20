@@ -17,6 +17,7 @@ from course_catalog.etl.utils import (
     parse_dates,
     map_topics,
 )
+from course_catalog.models import Course
 
 log = logging.getLogger()
 
@@ -131,6 +132,21 @@ def _parse_description(details):
     return paragraphs
 
 
+def _has_existing_published_run(course_id):
+    """
+    Returns true if there's an existing published run for the course
+
+    Args:
+        course_id (str): the course id to check
+
+    Returns:
+        bool: True if such a course and run exists, False otherwise
+    """
+    course = Course.objects.filter(platform=PLATFORM, course_id=course_id).first()
+
+    return bool(course) and course.runs.filter(published=True).exists()
+
+
 @log_exceptions(
     "Error extracting MIT Professional Education catalog", exc_return_value=[]
 )
@@ -170,45 +186,49 @@ def extract():
     return courses
 
 
+def transform_course(course):
+    """Transform a single course"""
+    course_id = generate_unique_id(course["url"])
+    runs = [
+        {
+            "url": course["url"],
+            "prices": ([{"price": course["price"]}] if course["price"] else []),
+            "run_id": generate_unique_id(
+                f"{course['url']}{datetime.strftime(date_range[0], '%Y%m%d')}"
+            ),
+            "platform": PLATFORM,
+            "start_date": date_range[0],
+            "end_date": date_range[1],
+            "best_start_date": date_range[0],
+            "best_end_date": date_range[1],
+            "offered_by": OFFERED_BY,
+            "title": course["title"],
+            "short_description": course["short_description"],
+            "full_description": course["full_description"],
+            "instructors": [
+                {"first_name": first_name, "last_name": last_name}
+                for (first_name, last_name) in course["instructors"]
+            ],
+        }
+        for date_range in course.get("dates", [])
+    ]
+    return {
+        "url": course["url"],
+        "title": course["title"],
+        "topics": [{"name": topic} for topic in course["topics"]],
+        "short_description": course["short_description"],
+        "full_description": course["full_description"],
+        "course_id": course_id,
+        "platform": PLATFORM,
+        "offered_by": OFFERED_BY,
+        "published": bool(runs) or _has_existing_published_run(course_id),
+        "runs": runs,
+    }
+
+
 @log_exceptions(
     "Error transforming MIT Professional Education catalog", exc_return_value=[]
 )
 def transform(courses):
     """Transform the MIT Professional Education course data"""
-    return [
-        {
-            "url": course["url"],
-            "title": course["title"],
-            "topics": [{"name": topic} for topic in course["topics"]],
-            "short_description": course["short_description"],
-            "full_description": course["full_description"],
-            "course_id": generate_unique_id(course["url"]),
-            "platform": PLATFORM,
-            "offered_by": OFFERED_BY,
-            "runs": [
-                {
-                    "url": course["url"],
-                    "prices": ([{"price": course["price"]}] if course["price"] else []),
-                    "run_id": generate_unique_id(
-                        f"{course['url']}{datetime.strftime(date_range[0], '%Y%m%d')}"
-                    ),
-                    "platform": PLATFORM,
-                    "start_date": date_range[0],
-                    "end_date": date_range[1],
-                    "best_start_date": date_range[0],
-                    "best_end_date": date_range[1],
-                    "offered_by": OFFERED_BY,
-                    "title": course["title"],
-                    "short_description": course["short_description"],
-                    "full_description": course["full_description"],
-                    "instructors": [
-                        {"first_name": first_name, "last_name": last_name}
-                        for (first_name, last_name) in course["instructors"]
-                    ],
-                }
-                for date_range in course["dates"]
-            ],
-        }
-        for course in courses
-        if course["dates"]
-    ]
+    return [transform_course(course) for course in courses]

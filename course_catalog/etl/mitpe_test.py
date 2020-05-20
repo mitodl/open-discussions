@@ -7,7 +7,14 @@ import pytest
 import pytz
 from bs4 import BeautifulSoup
 
-from course_catalog.etl.mitpe import transform, extract, _parse_price, _parse_topics
+from course_catalog.etl.mitpe import (
+    transform,
+    extract,
+    _parse_price,
+    _parse_topics,
+    PLATFORM,
+)
+from course_catalog.factories import LearningResourceRunFactory
 
 short_description = "Eleifend donec pretium vulputate sapien. Magna eget est lorem ipsum. Sed adipiscing diam donec \
 adipiscing tristique risus. Eget arcu dictum varius duis at consectetur lorem donec massa. Semper quis lectus nulla \
@@ -72,6 +79,7 @@ def test_mitpe_extract(settings, base_url):
     )
 
 
+@pytest.mark.django_db
 def test_mitpe_transform(settings):
     """Verify that the correct dict data is returned for a course"""
     settings.MITPE_BASE_URL = "https://professional.mit.edu"
@@ -85,6 +93,7 @@ def test_mitpe_transform(settings):
             "course_id": "1521458eeb30384493bf77850e3fa004",
             "platform": "mitpe",
             "offered_by": [{"name": "Professional Education"}],
+            "published": True,
             "runs": [
                 {
                     "prices": [{"price": Decimal("5500")}],
@@ -114,11 +123,35 @@ def test_mitpe_transform(settings):
     ]
 
 
-def test_mitpe_transform_nodates(settings, mocker):
+@pytest.mark.django_db
+@pytest.mark.parametrize("run_exists", [True, False])
+def test_mitpe_transform_nodates(settings, mocker, run_exists):
     """A course should not be imported if it has no run dates"""
     settings.MITPE_BASE_URL = "https://professional.mit.edu"
     mocker.patch("course_catalog.etl.mitpe.parse_dates", return_value=[])
-    assert transform(extract()) == []
+
+    if run_exists:
+        LearningResourceRunFactory.create(
+            platform=PLATFORM,
+            run_id="244ecdafc79537ffa058dc151abd0783",
+            content_object__platform=PLATFORM,
+            content_object__course_id="1521458eeb30384493bf77850e3fa004",
+        )
+
+    assert transform(extract()) == [
+        {
+            "url": "https://professional.mit.edu/course-catalog/mitpe-course-detail",
+            "title": title,
+            "topics": [{"name": "Innovation"}, {"name": "Systems Engineering"}],
+            "short_description": short_description,
+            "full_description": full_description,
+            "course_id": "1521458eeb30384493bf77850e3fa004",
+            "platform": "mitpe",
+            "offered_by": [{"name": "Professional Education"}],
+            "published": run_exists,
+            "runs": [],
+        }
+    ]
 
 
 @pytest.mark.parametrize(
