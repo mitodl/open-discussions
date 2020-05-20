@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.124.0
+Version 0.124.0 (Released May 20, 2020)
 ---------------
 
 - Ensure ocw subtasks don't ack until task completes
