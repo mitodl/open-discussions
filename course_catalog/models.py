@@ -524,6 +524,7 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     runs = GenericRelation(LearningResourceRun)
     transcript = models.TextField(blank=True, default="")
     url = models.URLField(null=True, max_length=2048)
+    episode_link = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
     duration = models.CharField(null=True, blank=True, max_length=10)
 

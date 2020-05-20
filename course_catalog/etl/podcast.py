@@ -136,6 +136,7 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
         "short_description": rss_data.description.text,
         "full_description": rss_data.description.text,
         "url": rss_data.enclosure["url"],
+        "episode_link": rss_data.link.text if rss_data.link else None,
         "image_src": rss_data.find("image")["href"]
         if rss_data.find("image")
         else parent_image,

@@ -113,6 +113,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "short_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "full_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
                     "url": "http://feeds.soundcloud.com/stream/episode1.mp3",
+                    "episode_link": "https://soundcloud.com/podcast/episode1",
                     "image_src": "apicture.jpg",
                     "last_modified": datetime.datetime(
                         2020, 4, 1, 18, 20, 31, tzinfo=datetime.timezone.utc
@@ -135,6 +136,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "short_description": "Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.",
                     "full_description": "Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.",
                     "url": "http://feeds.soundcloud.com/stream/episode2.mp3",
+                    "episode_link": "https://soundcloud.com/podcast/episode2",
                     "image_src": "image1.jpg",
                     "last_modified": datetime.datetime(
                         2020, 4, 1, 18, 20, 31, tzinfo=datetime.timezone.utc
