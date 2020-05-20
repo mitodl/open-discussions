@@ -130,6 +130,8 @@ def semester_year_to_date(semester, year, ending=False):
         month_day = "08-30" if ending else "06-01"
     elif semester.lower() == "spring":
         month_day = "05-31" if ending else "01-01"
+    elif semester.lower() == "january iap":
+        month_day = "01-31" if ending else "01-01"
     else:
         return
     return datetime.strptime("{}-{}".format(year, month_day), "%Y-%m-%d").replace(

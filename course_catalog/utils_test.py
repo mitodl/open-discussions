@@ -80,6 +80,8 @@ def test_get_course_url(course_id, course_json, platform, expected):
         [None, 2020, False, None],
         ["something", 2020, False, None],
         ["something", 2020, True, None],
+        ["January IAP", 2018, False, "2018-01-01"],
+        ["January IAP", 2018, True, "2018-01-31"],
     ],
 )
 def test_semester_year_to_date(semester, year, ending, expected):
