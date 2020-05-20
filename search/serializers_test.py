@@ -7,7 +7,13 @@ import pytest
 from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
 from channels.factories.models import PostFactory, CommentFactory
 from channels.utils import render_article_text
-from course_catalog.constants import OfferedBy, ListType, PrivacyLevel
+from course_catalog.constants import (
+    OfferedBy,
+    PlatformType,
+    ListType,
+    PrivacyLevel,
+    AvailabilityType,
+)
 from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
@@ -19,8 +25,9 @@ from course_catalog.factories import (
     ContentFileFactory,
     PodcastFactory,
     PodcastEpisodeFactory,
+    LearningResourceOfferorFactory,
 )
-from course_catalog.models import Course, Video
+from course_catalog.models import Course, Video, ContentType, Program
 from open_discussions.constants import ISOFORMAT
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
@@ -69,6 +76,7 @@ from search.serializers import (
     ESPodcastEpisodeSerializer,
     serialize_bulk_podcast_episodes,
     serialize_podcast_episode_for_bulk,
+    PROFESSIONAL_COURSE_PLATFORMS,
 )
 
 
@@ -320,12 +328,31 @@ def test_es_run_serializer(has_full_name):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
-def test_es_course_serializer(offered_by):
+@pytest.mark.parametrize("platform", [platform.value for platform in PlatformType])
+def test_es_course_serializer(offered_by, platform):
     """
     Test that ESCourseSerializer correctly serializes a course object
     """
-    course = CourseFactory.create(offered_by=offered_by)
+    course = CourseFactory.create(platform=platform)
+    course.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+
     serialized = ESCourseSerializer(course).data
+
+    if platform in PROFESSIONAL_COURSE_PLATFORMS:
+        expected_audience = ["Professional Offerings"]
+    else:
+        expected_audience = ["Open Content"]
+
+    if platform in PROFESSIONAL_COURSE_PLATFORMS or (
+        platform == PlatformType.mitx.value
+        and any(
+            availability != AvailabilityType.archived.value
+            for availability in course.runs.values_list("availability", flat=True)
+        )
+    ):
+        expected_certification = ["Certificates"]
+    else:
+        expected_certification = []
 
     assert_json_equal(
         serialized,
@@ -345,11 +372,13 @@ def test_es_course_serializer(offered_by):
                 for course_run in course.runs.order_by("-best_start_date")
             ],
             "published": True,
-            "offered_by": list(course.offered_by.values_list("name", flat=True)),
+            "offered_by": [offered_by],
             "created": drf_datetime(course.created_on),
             "default_search_priority": 1,
             "minimum_price": minimum_price(course),
             "resource_relations": {"name": "resource"},
+            "audience": expected_audience,
+            "certification": expected_certification,
         },
     )
 
@@ -403,8 +432,16 @@ def test_es_program_serializer(offered_by):
     """
     Test that ESProgramSerializer correctly serializes a program object
     """
-    program = ProgramFactory.create(offered_by=offered_by)
+    program = ProgramFactory.create()
+    program.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+
     serialized = ESProgramSerializer(program).data
+
+    if offered_by == OfferedBy.micromasters.value:
+        expected_audience = ["Open Content", "Professional Offerings"]
+    else:
+        expected_audience = ["Professional Offerings"]
+
     assert_json_equal(
         serialized,
         {
@@ -418,12 +455,32 @@ def test_es_program_serializer(offered_by):
                 ESRunSerializer(program_run).data
                 for program_run in program.runs.order_by("-best_start_date")
             ],
-            "offered_by": list(program.offered_by.values_list("name", flat=True)),
+            "offered_by": [offered_by],
             "created": drf_datetime(program.created_on),
             "default_search_priority": 1,
             "minimum_price": minimum_price(program),
+            "audience": expected_audience,
+            "certification": ["Certificates"],
         },
     )
+
+
+def expected_audience_for_list(user_list):
+    """
+    The exprcted value of the serialized audience filter field for a user list
+    """
+    for list_item in user_list.items.all():
+        if list_item.content_type == ContentType.objects.get_for_model(Course):
+            if list_item.item.platform in PROFESSIONAL_COURSE_PLATFORMS:
+                return []
+        elif list_item.content_type == ContentType.objects.get_for_model(Program):
+            if (
+                OfferedBy.micromasters.value
+                not in list_item.item.offered_by.values_list("name", flat=True)
+            ):
+                return []
+
+    return ["Open Content"]
 
 
 @pytest.mark.django_db
@@ -452,6 +509,8 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
             "created": drf_datetime(user_list.created_on),
             "default_search_priority": 0,
             "minimum_price": 0,
+            "certification": [],
+            "audience": expected_audience_for_list(user_list),
         },
     )
 
@@ -466,6 +525,7 @@ def test_es_userlist_serializer_image_src():
     list_item_course = UserListItemFactory.create(
         user_list=user_list, position=2, is_course=True
     )
+
     serialized = ESUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
@@ -482,6 +542,8 @@ def test_es_userlist_serializer_image_src():
             "created": drf_datetime(user_list.created_on),
             "default_search_priority": 0,
             "minimum_price": 0,
+            "certification": [],
+            "audience": expected_audience_for_list(user_list),
         },
     )
 
@@ -492,7 +554,9 @@ def test_es_podcast_serializer(offered_by):
     """
     Test that ESPodcastSerializer correctly serializes a Podcast object
     """
-    podcast = PodcastFactory.create(offered_by=offered_by)
+    podcast = PodcastFactory.create()
+    podcast.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+
     serialized = ESPodcastSerializer(podcast).data
     assert_json_equal(
         serialized,
@@ -508,11 +572,13 @@ def test_es_podcast_serializer(offered_by):
             "topics": list(podcast.topics.values_list("name", flat=True)),
             "created": drf_datetime(podcast.created_on),
             "default_search_priority": 0,
-            "offered_by": list(podcast.offered_by.values_list("name", flat=True)),
+            "offered_by": [offered_by],
             "runs": [
                 ESRunSerializer(run).data
                 for run in podcast.runs.order_by("-best_start_date")
             ],
+            "audience": ["Open Content"],
+            "certification": [],
         },
     )
 
@@ -523,7 +589,9 @@ def test_es_podcast_episode_serializer(offered_by):
     """
     Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
     """
-    podcast_episode = PodcastEpisodeFactory.create(offered_by=offered_by)
+    podcast_episode = PodcastEpisodeFactory.create()
+    podcast_episode.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+
     serialized = ESPodcastEpisodeSerializer(podcast_episode).data
     assert_json_equal(
         serialized,
@@ -543,13 +611,13 @@ def test_es_podcast_episode_serializer(offered_by):
             "topics": list(podcast_episode.topics.values_list("name", flat=True)),
             "created": drf_datetime(podcast_episode.created_on),
             "default_search_priority": 0,
-            "offered_by": list(
-                podcast_episode.offered_by.values_list("name", flat=True)
-            ),
+            "offered_by": [offered_by],
             "runs": [
                 ESRunSerializer(run).data
                 for run in podcast_episode.runs.order_by("-best_start_date")
             ],
+            "audience": ["Open Content"],
+            "certification": [],
         },
     )
 
