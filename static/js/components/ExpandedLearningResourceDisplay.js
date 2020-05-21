@@ -175,17 +175,11 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     (isUserList(object.object_type) && object.privacy_level === LR_PRIVATE) ||
     isPodcastObject(object)
 
-  const episodePodcastSelector =
-    object.object_type === LR_TYPE_PODCAST_EPISODE
-      ? createSelector(
-        podcastsSelector,
-        podcasts => (podcasts ? podcasts[object.podcast] : null)
-      )
-      : null
-  const episodePodcast =
-    object.object_type === LR_TYPE_PODCAST_EPISODE
-      ? useSelector(episodePodcastSelector)
-      : null
+  const episodePodcastSelector = createSelector(
+    podcastsSelector,
+    podcasts => (podcasts ? podcasts[object.podcast] : null)
+  )
+  const episodePodcast = useSelector(episodePodcastSelector)
 
   return (
     <React.Fragment>
