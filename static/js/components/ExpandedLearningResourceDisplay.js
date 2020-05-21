@@ -1,6 +1,8 @@
 // @flow
 /* global SETTINGS: false */
 import React, { useState, useEffect } from "react"
+import { createSelector } from "reselect"
+import { useSelector } from "react-redux"
 import R from "ramda"
 import striptags from "striptags"
 import { AllHtmlEntities } from "html-entities"
@@ -34,6 +36,7 @@ import {
   hasCourseList,
   isUserList
 } from "../lib/learning_resources"
+import { podcastsSelector } from "../lib/queries/podcasts"
 import {
   defaultResourceImageURL,
   embedlyThumbnail,
@@ -172,6 +175,18 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     (isUserList(object.object_type) && object.privacy_level === LR_PRIVATE) ||
     isPodcastObject(object)
 
+  const episodePodcastSelector =
+    object.object_type === LR_TYPE_PODCAST_EPISODE
+      ? createSelector(
+        podcastsSelector,
+        podcasts => (podcasts ? podcasts[object.podcast] : null)
+      )
+      : null
+  const episodePodcast =
+    object.object_type === LR_TYPE_PODCAST_EPISODE
+      ? useSelector(episodePodcastSelector)
+      : null
+
   return (
     <React.Fragment>
       <div className="expanded-lr-summary">
@@ -254,6 +269,20 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
             <div className="podcast-play-control">
               <PodcastPlayButton episode={object} />
+              <a
+                className="link podcast-episode-detail-link"
+                href={
+                  object.episode_link
+                    ? object.episode_link
+                    : episodePodcast
+                      ? episodePodcast.url
+                      : "#"
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View Episode Details
+              </a>
             </div>
           ) : null}
           {!emptyOrNil(object.topics) ? (

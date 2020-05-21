@@ -44,6 +44,7 @@ export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
     topics:            [],
     updated_on:        casual.moment.toISOString(),
     url:               casual.url,
+    episode_link:      casual.url,
     is_favorite:       casual.boolean,
     object_type:       LR_TYPE_PODCAST_EPISODE
   }

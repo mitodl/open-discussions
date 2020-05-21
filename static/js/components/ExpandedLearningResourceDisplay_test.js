@@ -180,6 +180,27 @@ describe("ExpandedLearningResourceDisplay", () => {
     assert.deepEqual(wrapper.find(PodcastPlayButton).prop("episode"), object)
   })
 
+  it("should render a view episode details button for podcast episode", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
+    const { wrapper } = await render({}, { object })
+    assert.ok(
+      wrapper
+        .find(".podcast-play-control .podcast-episode-detail-link")
+        .exists()
+    )
+  })
+
+  it("should set the href property of the view episode details button to the podcast episode's episode_link property", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
+    const { wrapper } = await render({}, { object })
+    assert.equal(
+      wrapper
+        .find(".podcast-play-control .podcast-episode-detail-link")
+        .prop("href"),
+      object.episode_link
+    )
+  })
+
   //
   ;[LR_TYPE_PODCAST, LR_TYPE_PODCAST_EPISODE].forEach(objectType => {
     it(`should not display metadata section for ${objectType}`, async () => {
