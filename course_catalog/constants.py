@@ -16,7 +16,7 @@ class OfferedBy(Enum):
     ocw = "OCW"
     micromasters = "MicroMasters"
     bootcamps = "Bootcamps"
-    xpro = "xPro"
+    xpro = "xPRO"
     oll = "Open Learning Library"
     see = "Sloan Executive Education"
     mitpe = "Professional Education"
@@ -121,7 +121,7 @@ mitpe_edx_mapping = {
     "Imaging": ["Computer Science", "Electrical Engineering"],
     "Innovation": ["Innovation"],
     "Leadership & Communication": ["Leadership", "Communication"],
-    "Radar": ["Electronics", "Signal Processing"],
+    "Radar": ["Electrical Engineering"],
     "Real Estate": ["Real Estate"],
     "Systems Engineering": ["Systems Engineering"],
 }
