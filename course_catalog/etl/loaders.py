@@ -41,15 +41,16 @@ User = get_user_model()
 
 def load_topics(resource, topics_data):
     """Load the topics for a resource into the database"""
-    topics = []
+    if topics_data is not None:
+        topics = []
 
-    for topic_data in topics_data:
-        topic, _ = CourseTopic.objects.get_or_create(name=topic_data["name"])
-        topics.append(topic)
+        for topic_data in topics_data:
+            topic, _ = CourseTopic.objects.get_or_create(name=topic_data["name"])
+            topics.append(topic)
 
-    resource.topics.set(topics)
-    resource.save()
-    return topics
+        resource.topics.set(topics)
+        resource.save()
+    return resource.topics.all()
 
 
 def load_prices(resource, prices_data):
@@ -117,7 +118,7 @@ def load_run(learning_resource, course_run_data):
     platform = course_run_data.get("platform")
     instructors_data = course_run_data.pop("instructors", [])
     prices_data = course_run_data.pop("prices", [])
-    topics_data = course_run_data.pop("topics", [])
+    topics_data = course_run_data.pop("topics", None)
     offered_bys_data = course_run_data.pop("offered_by", [])
     content_files = course_run_data.pop("content_files", [])
 
@@ -146,7 +147,7 @@ def load_course(course_data, blacklist, duplicates):
 
     course_id = course_data.pop("course_id")
     runs_data = course_data.pop("runs", [])
-    topics_data = course_data.pop("topics", [])
+    topics_data = course_data.pop("topics", None)
     offered_bys_data = course_data.pop("offered_by", [])
 
     if course_id in blacklist:
