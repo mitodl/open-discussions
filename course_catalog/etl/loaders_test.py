@@ -396,6 +396,14 @@ def test_load_topics(parent_factory, topics_exist):
 
     assert parent.topics.count() == len(topics)
 
+    load_topics(parent, None)
+
+    assert parent.topics.count() == len(topics)
+
+    load_topics(parent, [])
+
+    assert parent.topics.count() == 0
+
 
 @pytest.mark.parametrize("prices_exist", [True, False])
 def test_load_prices(prices_exist):
