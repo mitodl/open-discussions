@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.124.1
+Version 0.124.1 (Released May 21, 2020)
 ---------------
 
 - Podcast drawer "view episode details" link (#2945)
