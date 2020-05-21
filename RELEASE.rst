@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.124.1
+---------------
+
+- Fixed loading topics when not defined by the input data
+- Handle 'January IAP' semester and MITPE empty dates
+- PodcastEpisode.episode_link (#2941)
+
 Version 0.124.0 (Released May 20, 2020)
 ---------------
 
