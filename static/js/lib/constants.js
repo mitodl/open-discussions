@@ -52,7 +52,7 @@ export const offeredBys = {
   micromasters: "MicroMasters",
   bootcamps:    "Bootcamps",
   mitx:         "MITx",
-  xpro:         "xPro",
+  xpro:         "xPRO",
   see:          "Sloan",
   mitpe:        "Professional",
   csail:        "CSAIL"
