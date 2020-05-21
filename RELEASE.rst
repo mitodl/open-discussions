@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.124.2 (Released May 21, 2020)
+---------------
+
+- don't use conditionals on selectors! (#2952)
+
 Version 0.124.1 (Released May 21, 2020)
 ---------------
 
