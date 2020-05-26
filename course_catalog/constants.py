@@ -139,6 +139,7 @@ see_edx_mapping = {
     "Organizations & Leadership": ["Organizational Behavior", "Leadership"],
     "Strategy & Innovation": ["Innovation"],
     "Systems Thinking": ["Management"],
+    "Business & Management": ["Management"],
 }
 
 VALID_TEXT_FILE_TYPES = [
