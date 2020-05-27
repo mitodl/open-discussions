@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.125.0 (Released May 27, 2020)
+---------------
+
+- sort type facet
+- Fix the xPRO offered by value
+- don't use conditionals on selectors! (#2952)
+- index changes for new filters
+
 Version 0.124.2 (Released May 21, 2020)
 ---------------
 
