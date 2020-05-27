@@ -8,6 +8,8 @@ import { makePodcastEpisode } from "../factories/podcasts"
 import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 describe("PodcastPlayButton", () => {
+  const podcastPlayButton = ".podcast-play-button"
+  const podcastPlayButtonAnchor = ".podcast-play-button a"
   let helper, render, episode
 
   beforeEach(() => {
@@ -22,7 +24,7 @@ describe("PodcastPlayButton", () => {
 
   it("should initialize a podcast", async () => {
     const { wrapper, store } = await render()
-    wrapper.find(".podcast-play-button").simulate("click")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
     assert.deepEqual(store.getState().audio, {
       playerState:      AUDIO_PLAYER_PLAYING,
       currentlyPlaying: {
@@ -35,39 +37,39 @@ describe("PodcastPlayButton", () => {
 
   it("should show black play button if not playing, not initialized", async () => {
     const { wrapper } = await render()
-    assert.equal(wrapper.find(".podcast-play-button").text(), "Playplay_arrow")
+    assert.equal(wrapper.find(podcastPlayButtonAnchor).text(), "Playplay_arrow")
     assert.equal(
-      wrapper.find(".podcast-play-button").prop("className"),
+      wrapper.find(podcastPlayButton).prop("className"),
       "podcast-play-button black-surround"
     )
   })
 
   it("should show grey pause button when initialized, playing", async () => {
     const { wrapper } = await render()
-    wrapper.find(".podcast-play-button").simulate("click")
-    assert.equal(wrapper.find(".podcast-play-button").text(), "Pausepause")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
+    assert.equal(wrapper.find(podcastPlayButtonAnchor).text(), "Pausepause")
     assert.equal(
-      wrapper.find(".podcast-play-button").prop("className"),
+      wrapper.find(podcastPlayButton).prop("className"),
       "podcast-play-button grey-surround"
     )
   })
 
   it("should show black play button when initialized, paused", async () => {
     const { wrapper } = await render()
-    wrapper.find(".podcast-play-button").simulate("click")
-    wrapper.find(".podcast-play-button").simulate("click")
-    assert.equal(wrapper.find(".podcast-play-button").text(), "Playplay_arrow")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
+    assert.equal(wrapper.find(podcastPlayButtonAnchor).text(), "Playplay_arrow")
     assert.equal(
-      wrapper.find(".podcast-play-button").prop("className"),
+      wrapper.find(podcastPlayButton).prop("className"),
       "podcast-play-button black-surround"
     )
   })
 
   it("should play / pause an initialized podcast", async () => {
     const { wrapper, store } = await render()
-    wrapper.find(".podcast-play-button").simulate("click")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
     assert.equal(store.getState().audio.playerState, AUDIO_PLAYER_PLAYING)
-    wrapper.find(".podcast-play-button").simulate("click")
+    wrapper.find(podcastPlayButtonAnchor).simulate("click")
     assert.equal(store.getState().audio.playerState, AUDIO_PLAYER_PAUSED)
   })
 })
