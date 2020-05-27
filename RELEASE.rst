@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.125.0
+Version 0.125.0 (Released May 27, 2020)
 ---------------
 
 - sort type facet
