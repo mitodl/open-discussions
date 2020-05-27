@@ -32,7 +32,6 @@ export default function PodcastEpisodeCard(props: Props) {
     <Card
       className="podcast-episode-card low-padding"
       persistentShadow={persistentShadow}
-      role="button"
     >
       <button onClick={openEpisodeDrawer}>
         <div className="left-col">
