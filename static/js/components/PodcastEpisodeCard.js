@@ -31,34 +31,36 @@ export default function PodcastEpisodeCard(props: Props) {
   return (
     <Card
       className="podcast-episode-card low-padding"
-      onClick={openEpisodeDrawer}
       persistentShadow={persistentShadow}
+      role="button"
     >
-      <div className="left-col">
-        <div className="episode-title">
-          <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
-        </div>
-        <div className="podcast-name">{podcast.title}</div>
-        <div className="play-date-row">
-          <PodcastPlayButton episode={episode} />
-          <div className="date">
-            {moment(episode.last_modified).format(EPISODE_DATE_FORMAT)}
+      <button onClick={openEpisodeDrawer}>
+        <div className="left-col">
+          <div className="episode-title">
+            <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
+          </div>
+          <div className="podcast-name">{podcast.title}</div>
+          <div className="play-date-row">
+            <PodcastPlayButton episode={episode} />
+            <div className="date">
+              {moment(episode.last_modified).format(EPISODE_DATE_FORMAT)}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="right-col">
-        <img
-          src={embedlyThumbnail(
-            SETTINGS.embedlyKey,
-            episode.image_src || defaultResourceImageURL(),
-            PODCAST_IMG_HEIGHT,
-            PODCAST_IMG_WIDTH
-          )}
-          height={PODCAST_IMG_HEIGHT}
-          alt={`cover image for ${episode.title}`}
-          className="episode-cover-image"
-        />
-      </div>
+        <div className="right-col">
+          <img
+            src={embedlyThumbnail(
+              SETTINGS.embedlyKey,
+              episode.image_src || defaultResourceImageURL(),
+              PODCAST_IMG_HEIGHT,
+              PODCAST_IMG_WIDTH
+            )}
+            height={PODCAST_IMG_HEIGHT}
+            alt={`cover image for ${episode.title}`}
+            className="episode-cover-image"
+          />
+        </div>
+      </button>
     </Card>
   )
 }

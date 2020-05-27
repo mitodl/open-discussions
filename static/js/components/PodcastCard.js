@@ -23,26 +23,28 @@ export default function PodcastCard(props: Props) {
   const openPodcastDrawer = useOpenPodcastDrawer(podcast.id)
 
   return (
-    <Card className="podcast-card borderless" onClick={openPodcastDrawer}>
-      <div className="cover-img">
-        <img
-          src={embedlyThumbnail(
-            SETTINGS.embedlyKey,
-            podcast.image_src || defaultResourceImageURL(),
-            PODCAST_IMG_HEIGHT,
-            CAROUSEL_IMG_WIDTH
-          )}
-          height={PODCAST_IMG_HEIGHT}
-          alt={`cover image for ${podcast.title}`}
-        />
-      </div>
-      <div className="podcast-info">
-        <div className="row resource-type">PODCAST</div>
-        <div className="row podcast-title">
-          <Dotdotdot clamp={3}>{podcast.title}</Dotdotdot>
+    <Card className="podcast-card borderless">
+      <button onClick={openPodcastDrawer}>
+        <div className="cover-img">
+          <img
+            src={embedlyThumbnail(
+              SETTINGS.embedlyKey,
+              podcast.image_src || defaultResourceImageURL(),
+              PODCAST_IMG_HEIGHT,
+              CAROUSEL_IMG_WIDTH
+            )}
+            height={PODCAST_IMG_HEIGHT}
+            alt={`cover image for ${podcast.title}`}
+          />
         </div>
-        <div className="row podcast-author">{podcast.offered_by}</div>
-      </div>
+        <div className="podcast-info">
+          <div className="row resource-type">PODCAST</div>
+          <div className="row podcast-title">
+            <Dotdotdot clamp={3}>{podcast.title}</Dotdotdot>
+          </div>
+          <div className="row podcast-author">{podcast.offered_by}</div>
+        </div>
+      </button>
     </Card>
   )
 }
