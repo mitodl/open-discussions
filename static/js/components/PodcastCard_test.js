@@ -42,7 +42,7 @@ describe("PodcastCard", () => {
     const openStub = helper.sandbox.stub()
     helper.sandbox.stub(podcastHooks, "useOpenPodcastDrawer").returns(openStub)
     const { wrapper } = await render()
-    wrapper.find("Card").simulate("click")
+    wrapper.find("Card button").simulate("click")
     sinon.assert.called(openStub)
   })
 })
