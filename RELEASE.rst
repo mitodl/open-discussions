@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.125.2
+Version 0.125.2 (Released May 28, 2020)
 ---------------
 
 - new facets ui
