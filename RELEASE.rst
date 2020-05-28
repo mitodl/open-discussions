@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.125.1 (Released May 28, 2020)
+---------------
+
+- Added new topic mapping to SEE
+
 Version 0.125.0 (Released May 27, 2020)
 ---------------
 
