@@ -18,6 +18,7 @@
     padding-top: 60px;
     max-width: 480px;
     margin: auto;
+
     @include breakpoint(materialmobile) {
       padding-top: 50px;
     }
@@ -30,6 +31,7 @@
       .title {
         font-size: 20px;
         color: white;
+
         @include breakpoint(materialmobile) {
           margin-left: 15px;
           padding-bottom: 25px;
@@ -41,6 +43,7 @@
   .all-podcasts {
     max-width: 900px;
     margin: auto;
+
     @include breakpoint(materialmobile) {
       padding-left: 20px;
       padding-right: 20px;
@@ -51,9 +54,90 @@
       color: black;
       text-transform: uppercase;
       font-size: 20px;
+
       @include breakpoint(materialmobile) {
         padding-top: 15px;
         padding-bottom: 15px;
+      }
+    }
+  }
+
+  .podcast-footer {
+    width: 100%;
+    border-top: 10px solid $course-blue;
+
+    .cells {
+      display: flex;
+      justify-content: space-between;
+      max-width: 900px;
+      margin: auto;
+      align-items: center;
+
+      @include breakpoint(mobile) {
+        flex-direction: column;
+      }
+
+      padding: 0 10px;
+
+      @include breakpoint(desktopwide) {
+        padding: 0 60px;
+      }
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      padding: 6px 0;
+
+      @include breakpoint(desktop) {
+        padding: 33px 0;
+      }
+    }
+
+    .cell.logo-legal {
+      a {
+        margin-right: 28px;
+      }
+
+      .legal {
+        font-size: 12px;
+      }
+    }
+
+    .cell.links {
+      a,
+      .bar {
+        color: black;
+        font-size: 12px;
+      }
+
+      .bar {
+        padding: 0 3px;
+      }
+    }
+
+    .cell.title {
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+
+      .bar {
+        margin-bottom: 3px;
+      }
+
+      .home-link {
+        margin-right: 8px;
+        color: black;
+      }
+
+      .section-link {
+        font-size: 24px;
+        color: $nice-red;
+        margin-left: 8px;
+
+        @include breakpoint(mobile) {
+          font-size: 18px;
+        }
       }
     }
   }

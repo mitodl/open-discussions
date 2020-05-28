@@ -8,6 +8,7 @@ import PodcastEpisodeCard from "../components/PodcastEpisodeCard"
 import PodcastCard from "../components/PodcastCard"
 import { Cell, Grid } from "../components/Grid"
 import { PodcastLoading, PodcastEpisodeLoading } from "../components/Loading"
+import PodcastFooter from "../components/PodcastFooter"
 
 import { formatTitle } from "../lib/title"
 import {
@@ -76,6 +77,7 @@ export default function PodcastFrontpage() {
           <PodcastLoading />
         )}
       </div>
+      <PodcastFooter />
     </div>
   )
 }
