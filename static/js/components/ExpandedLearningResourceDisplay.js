@@ -264,6 +264,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
             <div className="podcast-play-control">
               <PodcastPlayButton episode={object} />
               <a
+                tabIndex="0"
                 className="link podcast-episode-detail-link"
                 href={
                   object.episode_link

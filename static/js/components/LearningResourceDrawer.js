@@ -156,11 +156,29 @@ export default function LearningResourceDrawer(props: Props) {
       >
         <DrawerContent dir="ltr" ref={drawerContent}>
           <div className="drawer-nav">
-            <div className="drawer-close" onClick={closeDrawer}>
+            <div
+              tabIndex="0"
+              className="drawer-close"
+              onKeyPress={e => {
+                if (e.key === "Enter") {
+                  closeDrawer()
+                }
+              }}
+              onClick={closeDrawer}
+            >
               <i className="material-icons clear">clear</i>
             </div>
             {numHistoryEntries > 1 ? (
-              <div className="back" onClick={popHistory}>
+              <div
+                tabIndex="0"
+                className="back"
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    popHistory()
+                  }
+                }}
+                onClick={popHistory}
+              >
                 <i className="material-icons arrow_back">arrow_back</i>
               </div>
             ) : null}

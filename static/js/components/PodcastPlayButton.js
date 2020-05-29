@@ -53,26 +53,35 @@ export default function PodcastPlayButton(props: Props) {
     }
   }
 
+  const playButtonClick = e => {
+    episodeAudioInitialized ? togglePlayState(e) : initializeAudioPlayer(e)
+  }
+
   const className = episodeCurrentlyPlaying ? "grey-surround" : "black-surround"
 
   return (
-    <div
-      className={`podcast-play-button ${className}`}
-      onClick={
-        episodeAudioInitialized ? togglePlayState : initializeAudioPlayer
-      }
-    >
-      {episodeCurrentlyPlaying ? (
-        <>
-          Pause
-          <i className="material-icons pause">pause</i>
-        </>
-      ) : (
-        <>
-          Play
-          <i className="material-icons play_arrow">play_arrow</i>
-        </>
-      )}
+    <div className={`podcast-play-button ${className}`}>
+      <div
+        tabIndex="0"
+        onKeyPress={e => {
+          if (e.key === "Enter") {
+            playButtonClick(e)
+          }
+        }}
+        onClick={playButtonClick}
+      >
+        {episodeCurrentlyPlaying ? (
+          <>
+            Pause
+            <i className="material-icons pause">pause</i>
+          </>
+        ) : (
+          <>
+            Play
+            <i className="material-icons play_arrow">play_arrow</i>
+          </>
+        )}
+      </div>
     </div>
   )
 }

@@ -16,6 +16,9 @@ export function useInitAudioPlayer(audio: Object) {
         Amplitude.getAudio().pause()
       }
       Amplitude.init({
+        bindings: {
+          [32]: "play_pause"
+        },
         songs: [
           {
             album: audio.title,

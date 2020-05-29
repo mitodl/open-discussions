@@ -29,6 +29,14 @@ export default function PodcastFrontpage() {
 
   useLearningResourcePermalink()
 
+  // prevent spacebar from scrolling the page
+  window.addEventListener("keydown", e => {
+    if (e.key === " ") {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+  })
+
   return (
     <div className="podcasts">
       <MetaTags>
