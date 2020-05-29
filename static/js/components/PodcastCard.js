@@ -24,7 +24,17 @@ export default function PodcastCard(props: Props) {
 
   return (
     <Card className="podcast-card borderless">
-      <button onClick={openPodcastDrawer}>
+      <div
+        tabIndex="0"
+        onKeyPress={e => {
+          if (e.key === "Enter") {
+            e.preventDefault()
+            e.stopPropagation()
+            openPodcastDrawer(e)
+          }
+        }}
+        onClick={openPodcastDrawer}
+      >
         <div className="cover-img">
           <img
             src={embedlyThumbnail(
@@ -44,7 +54,7 @@ export default function PodcastCard(props: Props) {
           </div>
           <div className="row podcast-author">{podcast.offered_by}</div>
         </div>
-      </button>
+      </div>
     </Card>
   )
 }

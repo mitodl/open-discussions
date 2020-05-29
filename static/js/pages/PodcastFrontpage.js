@@ -31,7 +31,7 @@ export default function PodcastFrontpage() {
 
   // prevent spacebar from scrolling the page
   window.addEventListener("keydown", e => {
-    if (e.keyCode === 32) {
+    if (e.key === " ") {
       e.stopPropagation()
       e.preventDefault()
     }

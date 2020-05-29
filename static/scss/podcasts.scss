@@ -61,7 +61,7 @@
 
 .podcast-episode-card {
   > .card-contents {
-    > button {
+    > div {
       display: flex;
       justify-content: space-between;
       background-color: white;
@@ -130,7 +130,7 @@
 
 .podcast-card {
   > .card-contents {
-    > button {
+    > div {
       background-color: white;
       margin: 0;
       padding: 0;
@@ -179,7 +179,7 @@
 }
 
 .podcast-play-button {
-  a {
+  div {
     display: inline-flex;
     font-family: $body-font;
     font-size: 14px;
@@ -194,7 +194,7 @@
   }
 
   &.grey-surround {
-    > a {
+    > div {
       color: black;
 
       i {
@@ -205,7 +205,7 @@
   }
 
   &.black-surround {
-    > a {
+    > div {
       color: white;
 
       i {

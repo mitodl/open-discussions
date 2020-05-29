@@ -33,7 +33,15 @@ export default function PodcastEpisodeCard(props: Props) {
       className="podcast-episode-card low-padding"
       persistentShadow={persistentShadow}
     >
-      <button onClick={openEpisodeDrawer}>
+      <div
+        tabIndex="0"
+        onKeyPress={e => {
+          if (e.key === "Enter") {
+            openEpisodeDrawer(e)
+          }
+        }}
+        onClick={openEpisodeDrawer}
+      >
         <div className="left-col">
           <div className="episode-title">
             <Dotdotdot clamp={2}>{episode.title}</Dotdotdot>
@@ -59,7 +67,7 @@ export default function PodcastEpisodeCard(props: Props) {
             className="episode-cover-image"
           />
         </div>
-      </button>
+      </div>
     </Card>
   )
 }
