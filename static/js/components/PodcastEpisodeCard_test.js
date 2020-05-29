@@ -61,7 +61,7 @@ describe("PodcastEpisodeCard", () => {
     helper.sandbox.stub(podcastHooks, "useOpenEpisodeDrawer").returns(openStub)
     const { wrapper } = await render()
     wrapper
-      .find(".podcast-episode-card button")
+      .find("#podcast-episode-card-inner-container")
       .at(0)
       .simulate("click")
     sinon.assert.called(openStub)

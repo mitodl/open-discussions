@@ -34,6 +34,7 @@ export default function PodcastEpisodeCard(props: Props) {
       persistentShadow={persistentShadow}
     >
       <div
+        id="podcast-episode-card-inner-container"
         tabIndex="0"
         onKeyPress={e => {
           if (e.key === "Enter") {

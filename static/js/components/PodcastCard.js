@@ -25,6 +25,7 @@ export default function PodcastCard(props: Props) {
   return (
     <Card className="podcast-card borderless">
       <div
+        id="podcast-card-inner-container"
         tabIndex="0"
         onKeyPress={e => {
           if (e.key === "Enter") {

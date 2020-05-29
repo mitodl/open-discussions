@@ -9,7 +9,7 @@ import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 describe("PodcastPlayButton", () => {
   const podcastPlayButton = ".podcast-play-button"
-  const podcastPlayButtonAnchor = ".podcast-play-button a"
+  const podcastPlayButtonAnchor = ".podcast-play-button div"
   let helper, render, episode
 
   beforeEach(() => {
