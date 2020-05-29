@@ -7,9 +7,19 @@ from django.db.models import OuterRef, Exists
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 
+
 from course_catalog.constants import PrivacyLevel, ListType
+from course_catalog.etl.constants import (
+    LearningResourceRunLoaderConfig,
+    OfferedByLoaderConfig,
+    CourseLoaderConfig,
+    ProgramLoaderConfig,
+    PodcastEpisodeLoaderConfig,
+    PodcastLoaderConfig,
+    PlaylistLoaderConfig,
+    VideoLoaderConfig,
+)
 from course_catalog.etl.exceptions import ExtractException
-from course_catalog.etl.utils import log_exceptions
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -83,14 +93,14 @@ def load_instructors(resource, instructors_data):
     return instructors
 
 
-def load_offered_bys(resource, offered_bys_data, additive_only=True):
+def load_offered_bys(resource, offered_bys_data, *, config=OfferedByLoaderConfig()):
     """
     Loads a list of offered_by into the resource.
 
     Args:
         resource (LearningResource): learning resource
         offered_bys_data (list of dict): the offered by data for the resource
-        additive_only (bool): if True existing offered bys that are not present in offered_bys_data are not deleted
+        config (OfferedByLoaderConfig): loader configuration
 
     Returns:
         offered_bys (list of LearningResourceOfferor): list of created or updated offered_bys
@@ -101,50 +111,80 @@ def load_offered_bys(resource, offered_bys_data, additive_only=True):
         offered_by, _ = LearningResourceOfferor.objects.get_or_create(
             name=offered_by_data["name"]
         )
-        if additive_only:
+        if config.additive:
             resource.offered_by.add(offered_by)
         offered_bys.append(offered_by)
 
-    if not additive_only:
+    if not config.additive:
         resource.offered_by.set(offered_bys)
 
     resource.save()
     return offered_bys
 
 
-def load_run(learning_resource, course_run_data):
-    """Load the course run into the database"""
-    run_id = course_run_data.pop("run_id")
-    platform = course_run_data.get("platform")
-    instructors_data = course_run_data.pop("instructors", [])
-    prices_data = course_run_data.pop("prices", [])
-    topics_data = course_run_data.pop("topics", None)
-    offered_bys_data = course_run_data.pop("offered_by", [])
-    content_files = course_run_data.pop("content_files", [])
+def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderConfig()):
+    """
+    Load the resource run into the database
 
-    learning_resource_run, _ = LearningResourceRun.objects.update_or_create(
-        run_id=run_id,
-        platform=platform,
-        defaults={
-            **course_run_data,
-            "object_id": learning_resource.id,
-            "content_type": ContentType.objects.get_for_model(learning_resource),
-        },
-    )
+    Args:
+        learning_resource (LearningResource): the concrete parent learning resource
+        run_data (dict): dictionary of data to create/update the run with
+        config (LearningResourceRunLoaderConfig): configuration on how to load this run
 
-    load_topics(learning_resource_run, topics_data)
-    load_prices(learning_resource_run, prices_data)
-    load_instructors(learning_resource_run, instructors_data)
-    load_offered_bys(learning_resource_run, offered_bys_data)
-    load_content_files(learning_resource_run, content_files)
+    Returns:
+        LearningResourceRun: the created/updated resource run
+    """
+    run_id = run_data.pop("run_id")
+    platform = run_data.get("platform")
+    instructors_data = run_data.pop("instructors", [])
+    prices_data = run_data.pop("prices", [])
+    topics_data = run_data.pop("topics", None)
+    offered_bys_data = run_data.pop("offered_by", [])
+    content_files = run_data.pop("content_files", [])
+
+    with transaction.atomic():
+        learning_resource_run, _ = LearningResourceRun.objects.select_for_update().update_or_create(
+            run_id=run_id,
+            platform=platform,
+            defaults={
+                **run_data,
+                "object_id": learning_resource.id,
+                "content_type": ContentType.objects.get_for_model(learning_resource),
+            },
+        )
+
+        load_topics(learning_resource_run, topics_data)
+        load_prices(learning_resource_run, prices_data)
+        load_instructors(learning_resource_run, instructors_data)
+        load_offered_bys(
+            learning_resource_run, offered_bys_data, config=config.offered_by
+        )
+        load_content_files(learning_resource_run, content_files)
 
     return learning_resource_run
 
 
-def load_course(course_data, blacklist, duplicates):
-    """Load the course into the database"""
+def load_course(course_data, blacklist, duplicates, *, config=CourseLoaderConfig()):
+    """
+    Load the course into the database
+
+    Args:
+        course_data (dict):
+            a dict of course data values
+        blacklist (list of str):
+            list of course ids not to load
+        duplicates (list of dict):
+            list of duplicate course data
+        config (CourseLoaderConfig):
+            configuration on how to load this program
+
+    Returns:
+        Course:
+            the created/updated course
+    """
     # pylint: disable=too-many-branches,too-many-locals
 
+    platform = course_data.get("platform")
     course_id = course_data.pop("course_id")
     runs_data = course_data.pop("runs", [])
     topics_data = course_data.pop("topics", None)
@@ -153,51 +193,52 @@ def load_course(course_data, blacklist, duplicates):
     if course_id in blacklist:
         course_data["published"] = False
 
-    duplicates_record = next(
+    deduplicated_course_id = next(
         (
-            record
+            record["course_id"]
             for record in duplicates
             if course_id in record["duplicate_course_ids"]
         ),
         None,
     )
 
-    if duplicates_record:
-        course = Course.objects.filter(course_id=duplicates_record["course_id"]).first()
-        if not course:
-            course_data["course_id"] = duplicates_record["course_id"]
-            course = Course.objects.create(**course_data)
-            created = True
+    with transaction.atomic():
+        if deduplicated_course_id:
+            # intentionally not updating if the course doesn't exist
+            course, created = Course.objects.select_for_update().get_or_create(
+                platform=platform,
+                course_id=deduplicated_course_id,
+                defaults=course_data,
+            )
+
+            if course_id != deduplicated_course_id:
+                duplicate_course = Course.objects.filter(
+                    platform=platform, course_id=course_id
+                ).first()
+                if duplicate_course:
+                    duplicate_course.published = False
+                    duplicate_course.save()
+                    search_task_helpers.delete_course(duplicate_course)
         else:
-            created = False
+            course, created = Course.objects.select_for_update().update_or_create(
+                platform=platform, course_id=course_id, defaults=course_data
+            )
 
-        if course_id != duplicates_record["course_id"]:
-            duplicate_course = Course.objects.filter(course_id=course_id).first()
-            if duplicate_course:
-                duplicate_course.published = False
-                duplicate_course.save()
-                search_task_helpers.delete_course(duplicate_course)
-    else:
-        platform = course_data.get("platform")
-        course, created = Course.objects.update_or_create(
-            platform=platform, course_id=course_id, defaults=course_data
-        )
+        run_ids_to_update_or_create = [run["run_id"] for run in runs_data]
 
-    run_ids_to_update_or_create = [run["run_id"] for run in runs_data]
+        for course_run_data in runs_data:
+            load_run(course, course_run_data, config=config.runs)
 
-    for course_run_data in runs_data:
-        load_run(course, course_run_data)
+        if deduplicated_course_id and not created:
+            most_relevent_run = get_most_relevant_run(course.runs.all())
 
-    if duplicates_record and not created:
-        most_relevent_run = get_most_relevant_run(course.runs.all())
+            if most_relevent_run.run_id in run_ids_to_update_or_create:
+                for attr, val in course_data.items():
+                    setattr(course, attr, val)
+                course.save()
 
-        if most_relevent_run.run_id in run_ids_to_update_or_create:
-            for attr, val in course_data.items():
-                setattr(course, attr, val)
-            course.save()
-
-    load_topics(course, topics_data)
-    load_offered_bys(course, offered_bys_data)
+        load_topics(course, topics_data)
+        load_offered_bys(course, offered_bys_data, config=config.offered_by)
 
     if not created and not course.published:
         search_task_helpers.delete_course(course)
@@ -207,24 +248,55 @@ def load_course(course_data, blacklist, duplicates):
     return course
 
 
-@log_exceptions("Error loading courses")
-def load_courses(courses_data):
-    """Load a list of programs"""
+def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
+    """
+    Load a list of courses
+
+    Args:
+        courses_data (list of dict):
+            a list of course data values
+        config (CourseLoaderConfig):
+            configuration on how to load this program
+    """
     blacklist = load_course_blacklist()
+    duplicates = load_course_duplicates(platform)
 
     courses_list = list(courses_data or [])
-    if len(courses_list) > 0:
-        platform = courses_list[0].get("platform")
-        duplicates = load_course_duplicates(platform)
-    else:
-        duplicates = []
 
-    return [load_course(course, blacklist, duplicates) for course in courses_list]
+    courses = [
+        load_course(course, blacklist, duplicates, config=config)
+        for course in courses_list
+    ]
+
+    if courses and config.prune:
+        for course in Course.objects.filter(platform=platform).exclude(
+            id__in=[course.id for course in courses]
+        ):
+            course.published = False
+            course.save()
+            search_task_helpers.delete_course(course)
+
+    return courses
 
 
-@log_exceptions("Error loading program")
-def load_program(program_data, blacklist, duplicates):
-    """Load the program into the database"""
+def load_program(program_data, blacklist, duplicates, *, config=ProgramLoaderConfig()):
+    """
+    Load the program into the database
+
+    Args:
+        program_data (dict):
+            a dict of program data values
+        blacklist (list of str):
+            list of course ids not to load
+        duplicates (list of dict):
+            list of duplicate course data
+        config (ProgramLoaderConfig):
+            configuration on how to load this program
+
+    Returns:
+        Program:
+            the created/updated program
+    """
     # pylint: disable=too-many-locals
 
     program_id = program_data.pop("program_id")
@@ -233,39 +305,43 @@ def load_program(program_data, blacklist, duplicates):
     runs_data = program_data.pop("runs", [])
     offered_bys_data = program_data.pop("offered_by", [])
 
-    program, created = Program.objects.update_or_create(
-        program_id=program_id, defaults=program_data
-    )
-
-    load_topics(program, topics_data)
-    load_offered_bys(program, offered_bys_data)
-
-    for run_data in runs_data:
-        load_run(program, run_data)
-
-    courses = []
-    course_content_type = ContentType.objects.get(model="course")
-
-    for position, course_data in enumerate(courses_data):
-        # skip courses that don't define a course_id
-        if not course_data.get("course_id", None):
-            continue
-
-        course = load_course(course_data, blacklist, duplicates)
-        courses.append(course)
-
-        # create a program item or update its position
-        ProgramItem.objects.update_or_create(
-            program=program,
-            content_type=course_content_type,
-            object_id=course.id,
-            defaults={"position": position},
+    with transaction.atomic():
+        # lock on the program record
+        program, created = Program.objects.select_for_update().update_or_create(
+            program_id=program_id, defaults=program_data
         )
 
-    # remove courses from the program that are no longer
-    program.items.filter(content_type=course_content_type).exclude(
-        object_id__in=[course.id for course in courses]
-    ).delete()
+        load_topics(program, topics_data)
+        load_offered_bys(program, offered_bys_data, config=config.offered_by)
+
+        for run_data in runs_data:
+            load_run(program, run_data, config=config.runs)
+
+        courses = []
+        course_content_type = ContentType.objects.get(model="course")
+
+        for position, course_data in enumerate(courses_data):
+            # skip courses that don't define a course_id
+            if not course_data.get("course_id", None):
+                continue
+
+            course = load_course(
+                course_data, blacklist, duplicates, config=config.courses
+            )
+            courses.append(course)
+
+            # create a program item or update its position
+            ProgramItem.objects.update_or_create(
+                program=program,
+                content_type=course_content_type,
+                object_id=course.id,
+                defaults={"position": position},
+            )
+
+        # remove courses from the program that are no longer
+        program.items.filter(content_type=course_content_type).exclude(
+            object_id__in=[course.id for course in courses]
+        ).delete()
 
     if not created and not program.published:
         search_task_helpers.delete_program(program)
@@ -275,18 +351,18 @@ def load_program(program_data, blacklist, duplicates):
     return program
 
 
-def load_programs(platform, programs_data):
+def load_programs(platform, programs_data, *, config=ProgramLoaderConfig()):
     """Load a list of programs"""
     blacklist = load_course_blacklist()
     duplicates = load_course_duplicates(platform)
 
     return [
-        load_program(program_data, blacklist, duplicates)
+        load_program(program_data, blacklist, duplicates, config=config)
         for program_data in programs_data
     ]
 
 
-def load_video(video_data):
+def load_video(video_data, *, config=VideoLoaderConfig()):
     """Load a video into the database"""
     video_id = video_data.pop("video_id")
     platform = video_data.pop("platform")
@@ -294,15 +370,17 @@ def load_video(video_data):
     offered_bys_data = video_data.pop("offered_by", [])
     runs_data = video_data.pop("runs", [])
 
-    video, created = Video.objects.update_or_create(
-        video_id=video_id, platform=platform, defaults=video_data
-    )
+    with transaction.atomic():
+        # lock on the video record
+        video, created = Video.objects.select_for_update().update_or_create(
+            video_id=video_id, platform=platform, defaults=video_data
+        )
 
-    load_topics(video, topics_data)
-    load_offered_bys(video, offered_bys_data)
+        load_topics(video, topics_data)
+        load_offered_bys(video, offered_bys_data, config=config.offered_by)
 
-    for run_data in runs_data:
-        load_run(video, run_data)
+        for run_data in runs_data:
+            load_run(video, run_data, config=config.runs)
 
     if not created and not video.published:
         # NOTE: if we didn't see a video in a playlist, it is likely NOT being removed here
@@ -314,7 +392,7 @@ def load_video(video_data):
     return video
 
 
-def load_videos(videos_data):
+def load_videos(videos_data, *, config=VideoLoaderConfig()):
     """
     Loads a list of videos data
 
@@ -325,7 +403,7 @@ def load_videos(videos_data):
         list of Video:
             the list of loaded videos
     """
-    return [load_video(video_data) for video_data in videos_data]
+    return [load_video(video_data, config=config) for video_data in videos_data]
 
 
 def load_playlist_user_list(playlist, user_list_title):
@@ -397,7 +475,7 @@ def load_playlist_user_list(playlist, user_list_title):
     return user_list
 
 
-def load_playlist(video_channel, playlist_data):
+def load_playlist(video_channel, playlist_data, *, config=PlaylistLoaderConfig()):
     """
     Load a playlist
 
@@ -416,16 +494,17 @@ def load_playlist(video_channel, playlist_data):
     offered_by_data = playlist_data.pop("offered_by", [])
     user_list_title = playlist_data.pop("user_list_title", None)
 
-    playlist, _ = Playlist.objects.update_or_create(
-        platform=platform,
-        playlist_id=playlist_id,
-        defaults={"channel": video_channel, **playlist_data},
-    )
+    with transaction.atomic():
+        playlist, _ = Playlist.objects.update_or_create(
+            platform=platform,
+            playlist_id=playlist_id,
+            defaults={"channel": video_channel, **playlist_data},
+        )
 
-    load_topics(playlist, topics_data)
-    load_offered_bys(playlist, offered_by_data)
+        load_topics(playlist, topics_data)
+        load_offered_bys(playlist, offered_by_data, config=config.offered_by)
 
-    videos = load_videos(videos_data)
+    videos = load_videos(videos_data, config=config.videos)
 
     # atomically remove existing videos in the playlist and add the current ones in bulk
     with transaction.atomic():
@@ -497,13 +576,14 @@ def load_video_channel(video_channel_data):
     topics_data = video_channel_data.pop("topics", [])
     offered_by_data = video_channel_data.pop("offered_by", [])
 
-    video_channel, _ = VideoChannel.objects.update_or_create(
-        platform=platform, channel_id=channel_id, defaults=video_channel_data
-    )
+    with transaction.atomic():
+        video_channel, _ = VideoChannel.objects.select_for_update().update_or_create(
+            platform=platform, channel_id=channel_id, defaults=video_channel_data
+        )
 
-    load_topics(video_channel, topics_data)
-    load_offered_bys(video_channel, offered_by_data)
-    load_playlists(video_channel, playlists_data)
+        load_topics(video_channel, topics_data)
+        load_offered_bys(video_channel, offered_by_data)
+        load_playlists(video_channel, playlists_data)
 
     return video_channel
 
@@ -553,10 +633,9 @@ def load_video_channels(video_channels_data):
         .filter(published=True)
         .exclude(in_published_playlist=True)
     ):
-        # remove it from the index first
-        search_task_helpers.delete_video(video)
         video.published = False
         video.save()
+        search_task_helpers.delete_video(video)
 
     return video_channels
 
@@ -609,15 +688,17 @@ def load_content_files(course_run, content_files_json):
         return content_files
 
 
-def load_podcast_episode(episode_data, podcast):
+def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderConfig()):
     """
-        Load a podcast_episode into the database
-        Args:
-            episode_data (dict): data for the episode
-            podcast (Podcast): podcast that the episode belongs to
+    Load a podcast_episode into the database
+    Args:
+        episode_data (dict): data for the episode
+        podcast (Podcast): podcast that the episode belongs to
+        config (PodcastLoaderConfig):
+            configuration for this loader
 
-        Returns:
-            list of PodcastEpisode objects that were created/updated
+    Returns:
+        list of PodcastEpisode objects that were created/updated
     """
     episode_id = episode_data.pop("episode_id")
     topics_data = episode_data.pop("topics", [])
@@ -629,10 +710,10 @@ def load_podcast_episode(episode_data, podcast):
     )
 
     load_topics(episode, topics_data)
-    load_offered_bys(episode, offered_bys_data, False)
+    load_offered_bys(episode, offered_bys_data, config=config.offered_by)
 
     for run_data in runs_data:
-        load_run(episode, run_data)
+        load_run(episode, run_data, config=config.runs)
 
     if not created and not episode.published:
         search_task_helpers.delete_podcast_episode(episode)
@@ -642,13 +723,15 @@ def load_podcast_episode(episode_data, podcast):
     return episode
 
 
-def load_podcast(podcast_data):
+def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
     """
     Load a single podcast
 
     Arg:
         podcast_data (dict):
             the normalized podcast data
+        config (PodcastLoaderConfig):
+            configuration for this loader
     Returns:
         Podcast:
             the updated or created podcast
@@ -664,16 +747,16 @@ def load_podcast(podcast_data):
     )
 
     load_topics(podcast, topics_data)
-    load_offered_bys(podcast, offered_by_data, False)
+    load_offered_bys(podcast, offered_by_data, config=config.offered_by)
 
     episode_ids = []
 
     for episode_data in episodes_data:
-        episode = load_podcast_episode(episode_data, podcast)
+        episode = load_podcast_episode(episode_data, podcast, config=config.episodes)
         episode_ids.append(episode.id)
 
     for run_data in runs_data:
-        load_run(podcast, run_data)
+        load_run(podcast, run_data, config=config.runs)
 
     PodcastEpisode.objects.filter(podcast=podcast).exclude(id__in=episode_ids).update(
         published=False

@@ -7,6 +7,7 @@ from django.forms.models import model_to_dict
 import pytest
 
 from course_catalog.constants import ListType, PrivacyLevel, PlatformType
+from course_catalog.etl.constants import OfferedByLoaderConfig, CourseLoaderConfig
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.loaders import (
     load_program,
@@ -456,9 +457,9 @@ def test_load_instructors(instructor_exists):
 )
 @pytest.mark.parametrize("offeror_exists", [True, False])
 @pytest.mark.parametrize("has_other_offered_by", [True, False])
-@pytest.mark.parametrize("additive_only", [True, False])
+@pytest.mark.parametrize("additive", [True, False])
 def test_load_offered_bys(
-    parent_factory, offeror_exists, has_other_offered_by, additive_only
+    parent_factory, offeror_exists, has_other_offered_by, additive
 ):
     """Test that load_offered_bys creates and/or assigns offeror to the parent object"""
     offeror = (
@@ -475,9 +476,13 @@ def test_load_offered_bys(
 
     assert parent.offered_by.count() == (1 if has_other_offered_by else 0)
 
-    load_offered_bys(parent, [{"name": offeror.name}], additive_only)
+    load_offered_bys(
+        parent,
+        [{"name": offeror.name}],
+        config=OfferedByLoaderConfig(additive=additive),
+    )
 
-    if additive_only:
+    if additive:
         assert parent.offered_by.count() == (2 if has_other_offered_by else 1)
     else:
         assert parent.offered_by.count() == 1
@@ -819,28 +824,29 @@ def test_load_playlist_user_list(
             mock_upsert_tasks.delete_user_list.assert_not_called()
 
 
-def test_load_courses(mocker, mock_blacklist, mock_duplicates):
+@pytest.mark.parametrize("prune", [True, False])
+def test_load_courses(mocker, mock_blacklist, mock_duplicates, prune):
     """Test that load_courses calls the expected functions"""
-    course_data = [{"platform": "a"}, {"platform": "b"}]
+    course_to_unpublish = CourseFactory.create()
+    courses = CourseFactory.create_batch(3, platform=course_to_unpublish.platform)
+    courses_data = [{"course_id": course.course_id} for course in courses]
     mock_load_course = mocker.patch(
-        "course_catalog.etl.loaders.load_course", autospec=True
+        "course_catalog.etl.loaders.load_course", autospec=True, side_effect=courses
     )
-    load_courses(course_data)
-    assert mock_load_course.call_count == len(course_data)
-    mock_blacklist.assert_called_once()
-    mock_duplicates.assert_called_once()
-
-
-def test_load_courses_map(mocker, mock_blacklist, mock_duplicates):
-    """Test that load_courses works on a map of courses"""
-    course_data = map(lambda course: course, [{"platform": "a"}, {"platform": "b"}])
-    mock_load_course = mocker.patch(
-        "course_catalog.etl.loaders.load_course", autospec=True
-    )
-    load_courses(course_data)
-    assert mock_load_course.call_count == 2
-    mock_blacklist.assert_called_once()
-    mock_duplicates.assert_called_once()
+    config = CourseLoaderConfig(prune=prune)
+    load_courses(course_to_unpublish.platform, courses_data, config=config)
+    assert mock_load_course.call_count == len(courses)
+    for course_data in courses_data:
+        mock_load_course.assert_any_call(
+            course_data,
+            mock_blacklist.return_value,
+            mock_duplicates.return_value,
+            config=config,
+        )
+    mock_blacklist.assert_called_once_with()
+    mock_duplicates.assert_called_once_with(course_to_unpublish.platform)
+    course_to_unpublish.refresh_from_db()
+    assert course_to_unpublish.published is not prune
 
 
 def test_load_programs(mocker, mock_blacklist, mock_duplicates):

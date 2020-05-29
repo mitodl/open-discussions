@@ -11,7 +11,6 @@ import rapidjson
 import pytz
 from django.conf import settings
 from tika import parser as tika_parser
-from toolz import excepts
 
 log = logging.getLogger()
 
@@ -40,17 +39,20 @@ def log_exceptions(msg, *, exc_return_value=None):
         """
 
         @wraps(func)
-        def _log_exceptions_wrapper(_):
+        def _log_exceptions_wrapper(*args, **kwargs):
             """
             Log the exception and return the exc_return_value
 
             Returns:
                 Any: the exc_return_value
             """
-            log.exception(msg)
-            return exc_return_value
+            try:
+                return func(*args, **kwargs)
+            except:  # pylint: disable=bare-except
+                log.exception(msg)
+                return exc_return_value
 
-        return excepts(Exception, func, _log_exceptions_wrapper)
+        return _log_exceptions_wrapper
 
     return _log_exceptions
 

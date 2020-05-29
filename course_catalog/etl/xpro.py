@@ -21,7 +21,7 @@ from course_catalog.constants import (
     PlatformType,
     VALID_TEXT_FILE_TYPES,
 )
-from course_catalog.etl.utils import extract_text_metadata, log_exceptions
+from course_catalog.etl.utils import extract_text_metadata
 from course_catalog.models import get_max_length
 
 
@@ -65,7 +65,6 @@ def _parse_datetime(value):
     )
 
 
-@log_exceptions("Error extracting xPro catalog", exc_return_value=[])
 def extract_programs():
     """Loads the xPro catalog data"""
     if settings.XPRO_CATALOG_API_URL:
@@ -141,7 +140,6 @@ def _transform_course(course):
     }
 
 
-@log_exceptions("Error transforming xPro courses", exc_return_value=[])
 def transform_courses(courses):
     """
     Transforms a list of courses into our normalized data structure
@@ -152,11 +150,9 @@ def transform_courses(courses):
     Returns:
         list of dict: normalized courses data
     """
-    # NOTE: don't use this in `transform_programs`, because this is wrapped in `log_exceptions`
     return [_transform_course(course) for course in courses]
 
 
-@log_exceptions("Error transforming xPro programs", exc_return_value=[])
 def transform_programs(programs):
     """Transform the xPro catalog data"""
     # normalize the xPro data into the course_catalog/models.py data structures

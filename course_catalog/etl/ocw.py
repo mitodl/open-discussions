@@ -287,8 +287,12 @@ def upload_mitx_course_manifest(courses):
 
     log.info("Uploading edX courses data to S3")
 
-    manifest = {"results": courses, "count": len(courses)}
+    try:
+        manifest = {"results": courses, "count": len(courses)}
 
-    ocw_bucket = get_ocw_learning_course_bucket()
-    ocw_bucket.put_object(Key="edx_courses.json", Body=rapidjson.dumps(manifest))
-    return True
+        ocw_bucket = get_ocw_learning_course_bucket()
+        ocw_bucket.put_object(Key="edx_courses.json", Body=rapidjson.dumps(manifest))
+        return True
+    except:  # pylint: disable=bare-except
+        log.exception("Error uploading OCW manifest")
+        return False

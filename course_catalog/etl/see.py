@@ -11,7 +11,6 @@ from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType, see_edx_mapping
 from course_catalog.etl.utils import (
-    log_exceptions,
     generate_unique_id,
     strip_extra_whitespace,
     parse_dates,
@@ -147,9 +146,6 @@ def _parse_full_description(details):
     )
 
 
-@log_exceptions(
-    "Error extracting Sloan Executive Education catalog", exc_return_value=[]
-)
 def extract():
     """Loads the MIT Executive Education catalog data via BeautifulSoup"""
     if not settings.SEE_BASE_URL:
@@ -182,9 +178,6 @@ def extract():
     return courses
 
 
-@log_exceptions(
-    "Error transforming Sloan Executive Education catalog", exc_return_value=[]
-)
 def transform(courses):
     """Transform the Sloan Executive Education course data"""
     return [
