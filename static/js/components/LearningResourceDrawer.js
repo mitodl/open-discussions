@@ -161,7 +161,7 @@ export default function LearningResourceDrawer(props: Props) {
               className="drawer-close"
               onKeyPress={e => {
                 if (e.key === "Enter") {
-                  closeDrawer(e)
+                  closeDrawer()
                 }
               }}
               onClick={closeDrawer}
@@ -174,7 +174,7 @@ export default function LearningResourceDrawer(props: Props) {
                 className="back"
                 onKeyPress={e => {
                   if (e.key === "Enter") {
-                    popHistory(e)
+                    popHistory()
                   }
                 }}
                 onClick={popHistory}
