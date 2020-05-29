@@ -18,7 +18,6 @@ from course_catalog.etl.exceptions import (
     ExtractPlaylistException,
     ExtractPlaylistItemException,
 )
-from course_catalog.etl.utils import log_exceptions
 from course_catalog.models import Video
 from open_discussions.utils import now_in_utc
 from search.task_helpers import upsert_video
@@ -391,7 +390,6 @@ def get_youtube_channel_configs(*, channel_ids=None):
     return channel_configs
 
 
-@log_exceptions("Error extracting youtube data", exc_return_value=[])
 def extract(*, channel_ids=None):
     """
     Function which returns video data for all videos in our watched playlists
@@ -476,7 +474,6 @@ def transform_playlist(
     }
 
 
-@log_exceptions("Error transforming youtube data", exc_return_value=[])
 def transform(extracted_channels):
     """
     Transforms raw video data into normalized data structure

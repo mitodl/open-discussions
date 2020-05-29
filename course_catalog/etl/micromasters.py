@@ -6,12 +6,10 @@ import requests
 
 from course_catalog.constants import OfferedBy, PlatformType
 from course_catalog.etl.constants import COMMON_HEADERS
-from course_catalog.etl.utils import log_exceptions
 
 OFFERED_BY = [{"name": OfferedBy.micromasters.value}]
 
 
-@log_exceptions("Error extracting MicroMasters catalog", exc_return_value=[])
 def extract():
     """Loads the MicroMasters catalog data"""
     if settings.MICROMASTERS_CATALOG_API_URL:
@@ -21,7 +19,6 @@ def extract():
     return []
 
 
-@log_exceptions("Error extracting MicroMasters catalog", exc_return_value=[])
 def transform(programs):
     """Transform the micromasters catalog data"""
     # normalize the micromasters data into the course_catalog/models.py data structures

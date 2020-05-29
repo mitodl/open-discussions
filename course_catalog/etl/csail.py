@@ -12,11 +12,7 @@ from bs4 import BeautifulSoup as bs
 from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.utils import (
-    log_exceptions,
-    generate_unique_id,
-    strip_extra_whitespace,
-)
+from course_catalog.etl.utils import generate_unique_id, strip_extra_whitespace
 
 OFFERED_BY = [{"name": OfferedBy.csail.value}]
 PLATFORM = PlatformType.csail.value
@@ -170,12 +166,12 @@ def _parse_full_description(details):
     return strip_extra_whitespace(" ".join([p for p in p_texts]))
 
 
-@log_exceptions("Error extracting CSAIL catalog", exc_return_value=[])
 def extract():
     """Loads the CSAIL catalog data via BeautifulSoup"""
     if not settings.CSAIL_BASE_URL:
         log.error("CSAIL base URL not set, skipping ETL")
         return []
+
     courses = []
     soup = bs(
         _unverified_cert_request(
@@ -209,7 +205,6 @@ def extract():
     return courses
 
 
-@log_exceptions("Error transforming CSAIL catalog", exc_return_value=[])
 def transform(courses):
     """Transform the CSAIL course data"""
     return [

@@ -11,7 +11,6 @@ from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType, mitpe_edx_mapping
 from course_catalog.etl.utils import (
-    log_exceptions,
     generate_unique_id,
     strip_extra_whitespace,
     parse_dates,
@@ -147,9 +146,6 @@ def _has_existing_published_run(course_id):
     return bool(course) and course.runs.filter(published=True).exists()
 
 
-@log_exceptions(
-    "Error extracting MIT Professional Education catalog", exc_return_value=[]
-)
 def extract():
     """Loads the MIT Professional Education catalog data via BeautifulSoup"""
     if not settings.MITPE_BASE_URL:
@@ -226,9 +222,6 @@ def transform_course(course):
     }
 
 
-@log_exceptions(
-    "Error transforming MIT Professional Education catalog", exc_return_value=[]
-)
 def transform(courses):
     """Transform the MIT Professional Education course data"""
     return [transform_course(course) for course in courses]
