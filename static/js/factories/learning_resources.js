@@ -97,7 +97,9 @@ export const makeCourse = (): Course => ({
   topics:            R.times(makeTopic, 2),
   runs:              R.times(makeRun, 3),
   object_type:       "course",
-  lists:             []
+  lists:             [],
+  audience:          [],
+  certification:     []
 })
 
 const incrUserListItem = incrementer()
@@ -134,9 +136,11 @@ export const makeProgram = (): Program => ({
     makeUserListItem(LR_TYPE_COURSE),
     makeUserListItem(LR_TYPE_COURSE)
   ],
-  object_type: "program",
-  runs:        [makeRun()],
-  lists:       []
+  object_type:   "program",
+  runs:          [makeRun()],
+  lists:         [],
+  audience:      [],
+  certification: []
 })
 
 const incrUserList = incrementer()
@@ -159,7 +163,9 @@ export const makeUserList = (): UserList => ({
   privacy_level:     casual.random_element(["public", "private"]),
   author:            casual.integer(1, 1000),
   lists:             [],
-  author_name:       casual.name
+  author_name:       casual.name,
+  audience:          [],
+  certification:     []
 })
 
 export const makeUserListItems = (count: number = 3): Array<ListItem> =>
@@ -191,7 +197,9 @@ export const makeVideo = (): Video => ({
   object_type:       LR_TYPE_VIDEO,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
-  lists:             []
+  lists:             [],
+  audience:          [],
+  certification:     []
 })
 
 const LR_FACTORY_MAPPING = {

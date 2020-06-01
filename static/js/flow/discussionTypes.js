@@ -351,7 +351,9 @@ export type LearningResourceSummary = {
   object_type:        string,
   runs:               Array<LearningResourceRun>,
   lists:              Array<ListItemMember>,
-  is_favorite?:       boolean
+  is_favorite?:       boolean,
+  audience:           Array<string>,
+  certification:      Array<string>
 }
 
 export type LearningResourceRun = {

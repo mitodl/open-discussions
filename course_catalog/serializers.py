@@ -293,6 +293,8 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
     """
 
     object_type = serializers.CharField(read_only=True, default="course")
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     def validate(self, attrs):
         """
@@ -512,6 +514,8 @@ class UserListSerializer(
     author_name = serializers.SerializerMethodField()
     object_type = serializers.CharField(read_only=True, source="list_type")
     image_src = serializers.SerializerMethodField()
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     def get_author_name(self, instance):
         """get author name for userlist"""
@@ -624,6 +628,8 @@ class ProgramSerializer(
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="program")
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     class Meta:
         model = Program
@@ -640,6 +646,8 @@ class VideoSerializer(
     topics = CourseTopicSerializer(read_only=True, many=True, allow_null=True)
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="video")
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     class Meta:
         model = Video
@@ -670,6 +678,8 @@ class PodcastEpisodeSerializer(
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     object_type = serializers.CharField(read_only=True, default="podcastepisode")
     podcast_title = serializers.SerializerMethodField()
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     def get_podcast_title(self, instance):
         """get the podcast title"""
@@ -691,6 +701,9 @@ class PodcastSerializer(
     offered_by = LearningResourceOfferorField(read_only=True, allow_null=True)
     episode_count = serializers.IntegerField(read_only=True)
     object_type = serializers.CharField(read_only=True, default="podcast")
+    platform = serializers.ReadOnlyField()
+    audience = serializers.ReadOnlyField()
+    certification = serializers.ReadOnlyField()
 
     class Meta:
         model = Podcast

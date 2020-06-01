@@ -1,5 +1,6 @@
 /* global SETTINGS:false */
 import { assert } from "chai"
+import moment from "moment"
 
 import {
   LearningResourceCard,
@@ -9,7 +10,7 @@ import Card from "./Card"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 
-import { bestRun, bestRunLabel, minPrice } from "../lib/learning_resources"
+import { bestRun } from "../lib/learning_resources"
 import {
   makeCourse,
   makeLearningResource,
@@ -18,9 +19,13 @@ import {
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
-  COURSE_AVAILABLE_NOW,
   LR_TYPE_ALL,
-  LR_TYPE_COURSE
+  LR_TYPE_COURSE,
+  OPEN_CONTENT,
+  PROFESSIONAL,
+  CERTIFICATE,
+  DISPLAY_DATE_FORMAT,
+  iconMap
 } from "../lib/constants"
 import {
   COURSE_SEARCH_URL,
@@ -194,30 +199,6 @@ describe("LearningResourceCard", () => {
     })
   })
 
-  LR_TYPE_ALL.forEach(objectType => {
-    it(`should render availability for a ${objectType}`, async () => {
-      const object = makeLearningResource(objectType)
-      const { wrapper } = await render({ object })
-      assert.equal(
-        wrapper
-          .find(".availability")
-          .text()
-          .replace("calendar_today", ""),
-        LR_TYPE_COURSE === objectType
-          ? bestRunLabel(bestRun(object.runs))
-          : COURSE_AVAILABLE_NOW
-      )
-    })
-  })
-
-  it("should render price", async () => {
-    const { wrapper } = await render()
-    assert.include(
-      wrapper.find(".price").text(),
-      minPrice(bestRun(course.runs).prices)
-    )
-  })
-
   it("should render a LearningResourceRow", async () => {
     const { wrapper } = await renderRow()
     assert.ok(wrapper.find("LearningResourceDisplay").exists())
@@ -242,11 +223,59 @@ describe("LearningResourceCard", () => {
       )
       assert.equal(wrapper.find(".drag-handle").exists(), reordering)
       assert.equal(wrapper.find("Subtitle").exists(), !reordering)
-      assert.equal(
-        wrapper.find(".availability-price-favorite").exists(),
-        !reordering
-      )
+      assert.equal(wrapper.find(".start-date-favorite").exists(), !reordering)
       assert.equal(wrapper.find(".cover-image").exists(), !reordering)
     })
+  })
+
+  it(`should render a start date if there is a certificate`, async () => {
+    const object = makeLearningResource(LR_TYPE_COURSE)
+    object.certification = [CERTIFICATE]
+    const { wrapper } = await render({ object })
+    const startDate = wrapper
+      .find(".start-date")
+      .text()
+      .replace("calendar_today", "")
+    assert.equal(
+      startDate,
+      moment(bestRun(object.runs).best_start_date).format(DISPLAY_DATE_FORMAT)
+    )
+  })
+
+  it(`should not render a certificate icon or start date if there is no certificate`, async () => {
+    const object = makeLearningResource(LR_TYPE_COURSE)
+    object.certification = []
+    const { wrapper } = await render({ object })
+    assert.isNotOk(
+      wrapper
+        .find(".audience-certificates")
+        .find("img")
+        .exists()
+    )
+    assert.isNotOk(wrapper.find(".start-date").exists())
+  })
+
+  //
+  ;[[], [CERTIFICATE]].forEach(certification => {
+    [[], [OPEN_CONTENT], [PROFESSIONAL], [OPEN_CONTENT, PROFESSIONAL]].forEach(
+      audience => {
+        it(`should render the corret icons for certificate=[${certification}] and audience=[${audience}]`, async () => {
+          const object = makeLearningResource(LR_TYPE_COURSE)
+          object.audience = audience
+          object.certification = certification
+          const { wrapper } = await render({ object })
+
+          const expectedIcons = audience
+            .concat(certification)
+            .map(attribute => iconMap[attribute])
+          const displayedIcons = wrapper
+            .find(".audience-certificates")
+            .find("img")
+            .map(image => image.prop("src"))
+
+          assert.deepEqual(expectedIcons, displayedIcons)
+        })
+      }
+    )
   })
 })

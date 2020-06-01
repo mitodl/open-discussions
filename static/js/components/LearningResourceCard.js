@@ -1,5 +1,6 @@
 // @flow
 /* global SETTINGS:false */
+import moment from "moment"
 import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { useDispatch } from "react-redux"
@@ -8,18 +9,15 @@ import Card from "./Card"
 import LoginTooltip from "./LoginTooltip"
 
 import { setDialogData } from "../actions/ui"
-import {
-  filterRunsByAvailability,
-  bestRunLabel,
-  bestRun,
-  minPrice
-} from "../lib/learning_resources"
+import { bestRun } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
   LR_TYPE_VIDEO,
-  readableLearningResources
+  DISPLAY_DATE_FORMAT,
+  readableLearningResources,
+  iconMap
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
@@ -34,7 +32,6 @@ import type {
 type Props = {|
   object: LearningResourceSummary,
   searchResultLayout?: string,
-  availabilities?: Array<string>,
   reordering?: boolean
 |}
 
@@ -123,11 +120,9 @@ export function LearningResourceRow(props: Props) {
 }
 
 export function LearningResourceDisplay(props: Props) {
-  const { object, searchResultLayout, availabilities, reordering } = props
+  const { object, searchResultLayout, reordering } = props
 
-  const bestAvailableRun =
-    bestRun(filterRunsByAvailability(object.runs, availabilities)) ||
-    (object.runs ? object.runs[0] : null)
+  const bestAvailableRun = object.runs ? bestRun(object.runs) : null
 
   const dispatch = useDispatch()
   const showResourceDrawer = useCallback(
@@ -149,7 +144,15 @@ export function LearningResourceDisplay(props: Props) {
     [dispatch]
   )
 
-  const cost = bestAvailableRun ? minPrice(bestAvailableRun.prices) : null
+  const hasCertificate = object.certification && object.certification.length > 0
+  const startDate =
+    hasCertificate && bestAvailableRun
+      ? moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT)
+      : null
+  const icons =
+    object.audience && object.certification
+      ? object.audience.concat(object.certification).map(key => iconMap[key])
+      : []
   const inLists = object ? object.lists : []
 
   const bookmarkIconName =
@@ -166,8 +169,15 @@ export function LearningResourceDisplay(props: Props) {
         </div>
       ) : null}
       <div className="lr-info">
-        <div className="row resource-type">
-          {readableLearningResources[object.object_type]}
+        <div className="row resource-type-audience-certificates">
+          <div className="resource-type">
+            {readableLearningResources[object.object_type]}
+          </div>
+          <div className="audience-certificates">
+            {icons.length > 0
+              ? icons.map((icon, i) => <img src={icon} key={i} />)
+              : null}
+          </div>
         </div>
         <div className="row course-title" onClick={showResourceDrawer}>
           <Dotdotdot clamp={3}>{object.title}</Dotdotdot>
@@ -192,17 +202,15 @@ export function LearningResourceDisplay(props: Props) {
                 />
               ) : null}
             </div>
-            <div className="row availability-price-favorite">
-              {cost ? (
-                <div className="price grey-surround">
-                  <i className="material-icons attach_money">attach_money</i>
-                  {cost}
+            <div className="row start-date-favorite">
+              {startDate ? (
+                <div className="start-date grey-surround">
+                  <i className="material-icons calendar_today">
+                    calendar_today
+                  </i>
+                  {startDate}
                 </div>
               ) : null}
-              <div className="availability grey-surround">
-                <i className="material-icons calendar_today">calendar_today</i>
-                {bestRunLabel(bestAvailableRun)}
-              </div>
               <LoginTooltip>
                 <div
                   className="favorite grey-surround"

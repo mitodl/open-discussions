@@ -41,7 +41,9 @@ function SearchFacet(props: Props) {
           onClick={() => setShowFacetList(!showFacetList)}
         >
           {title}
-          <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
+          {name !== "certification" ? (
+            <i className={`material-icons ${titleLineIcon}`}>{titleLineIcon}</i>
+          ) : null}
         </div>
       ) : null}
       {showFacetList ? (

@@ -89,7 +89,9 @@ export type LearningResourceResult = {
   topics:              Array<string>,
   runs:                Array<LearningResourceRun>,
   lists:               Array<ListItemMember>,
-  is_favorite:         boolean
+  is_favorite:         boolean,
+  certification:       Array<string>,
+  audience:            Array<string>
 }
 
 

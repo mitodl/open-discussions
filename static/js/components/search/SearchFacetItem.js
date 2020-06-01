@@ -1,6 +1,12 @@
 // @flow
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
+import {
+  iconMap,
+  OPEN_CONTENT,
+  PROFESSIONAL,
+  CERTIFICATE
+} from "../../lib/constants"
 
 type Props = {
   facet: Object,
@@ -8,6 +14,14 @@ type Props = {
   onUpdate: Function,
   labelFunction: ?Function,
   name: string
+}
+
+const featuredFacetNames = ["audience", "certification"]
+
+const tooltipTextMap = {
+  [OPEN_CONTENT]: "For those looking to learn now",
+  [PROFESSIONAL]: "For those looking to invest in professional development",
+  [CERTIFICATE]:  "Recieve a certificate upon completion"
 }
 
 export default function SearchFacetItem(props: Props) {
@@ -38,14 +52,23 @@ export default function SearchFacetItem(props: Props) {
       <div className="facet-label-div">
         <div
           className={
-            ["audience", "certification"].includes(name)
+            featuredFacetNames.includes(name)
               ? "facet-key facet-key-large"
               : "facet-key"
           }
         >
           <Dotdotdot clamp={1}>{labelText}</Dotdotdot>
         </div>
-        <div className="facet-count">{facet.doc_count}</div>
+        {featuredFacetNames.includes(name) ? (
+          <div className="facet-icon">
+            <span className="icon-tooltip-text">
+              {tooltipTextMap[facet.key]}
+            </span>
+            <img src={iconMap[facet.key]} />
+          </div>
+        ) : (
+          <div className="facet-count">{facet.doc_count}</div>
+        )}
       </div>
     </div>
   )

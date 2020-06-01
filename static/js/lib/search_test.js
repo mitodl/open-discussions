@@ -129,16 +129,18 @@ describe("search functions", () => {
     const result = makeCourseResult()
     const course = searchResultToLearningResource(result)
     assert.deepEqual(course, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    result.platform,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_COURSE,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
+      id:            result.id,
+      title:         result.title,
+      image_src:     result.image_src,
+      platform:      result.platform,
+      topics:        result.topics.map(topic => ({ name: topic })),
+      object_type:   LR_TYPE_COURSE,
+      offered_by:    result.offered_by,
+      runs:          result.runs,
+      is_favorite:   result.is_favorite,
+      lists:         result.lists,
+      audience:      result.audience,
+      certification: result.certification
     })
   })
 
@@ -146,16 +148,18 @@ describe("search functions", () => {
     const result = makeProgramResult()
     const program = searchResultToLearningResource(result)
     assert.deepEqual(program, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    null,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_PROGRAM,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
+      id:            result.id,
+      title:         result.title,
+      image_src:     result.image_src,
+      platform:      null,
+      topics:        result.topics.map(topic => ({ name: topic })),
+      object_type:   LR_TYPE_PROGRAM,
+      offered_by:    result.offered_by,
+      runs:          result.runs,
+      is_favorite:   result.is_favorite,
+      lists:         result.lists,
+      audience:      result.audience,
+      certification: result.certification
     })
   })
 
@@ -163,16 +167,18 @@ describe("search functions", () => {
     const result = makeLearningResourceResult(LR_TYPE_VIDEO)
     const video = searchResultToLearningResource(result)
     assert.deepEqual(video, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    null,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_VIDEO,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
+      id:            result.id,
+      title:         result.title,
+      image_src:     result.image_src,
+      platform:      null,
+      topics:        result.topics.map(topic => ({ name: topic })),
+      object_type:   LR_TYPE_VIDEO,
+      offered_by:    result.offered_by,
+      runs:          result.runs,
+      is_favorite:   result.is_favorite,
+      lists:         result.lists,
+      audience:      result.audience,
+      certification: result.certification
     })
   })
 
@@ -180,16 +186,18 @@ describe("search functions", () => {
     const result = makeLearningResourceResult(LR_TYPE_PODCAST)
     const podcast = searchResultToLearningResource(result)
     assert.deepEqual(podcast, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    null,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_PODCAST,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
+      id:            result.id,
+      title:         result.title,
+      image_src:     result.image_src,
+      platform:      null,
+      topics:        result.topics.map(topic => ({ name: topic })),
+      object_type:   LR_TYPE_PODCAST,
+      offered_by:    result.offered_by,
+      runs:          result.runs,
+      is_favorite:   result.is_favorite,
+      lists:         result.lists,
+      audience:      result.audience,
+      certification: result.certification
     })
   })
 
@@ -197,16 +205,18 @@ describe("search functions", () => {
     const result = makeLearningResourceResult(LR_TYPE_PODCAST_EPISODE)
     const podcastEpisode = searchResultToLearningResource(result)
     assert.deepEqual(podcastEpisode, {
-      id:          result.id,
-      title:       result.title,
-      image_src:   result.image_src,
-      platform:    null,
-      topics:      result.topics.map(topic => ({ name: topic })),
-      object_type: LR_TYPE_PODCAST_EPISODE,
-      offered_by:  result.offered_by,
-      runs:        result.runs,
-      is_favorite: result.is_favorite,
-      lists:       result.lists
+      id:            result.id,
+      title:         result.title,
+      image_src:     result.image_src,
+      platform:      null,
+      topics:        result.topics.map(topic => ({ name: topic })),
+      object_type:   LR_TYPE_PODCAST_EPISODE,
+      offered_by:    result.offered_by,
+      runs:          result.runs,
+      is_favorite:   result.is_favorite,
+      lists:         result.lists,
+      audience:      result.audience,
+      certification: result.certification
     })
   })
 
@@ -216,16 +226,18 @@ describe("search functions", () => {
       const result = makeLearningResourceResult(listType)
       const video = searchResultToLearningResource(result)
       assert.deepEqual(video, {
-        id:          result.id,
-        title:       result.title,
-        image_src:   result.image_src,
-        platform:    null,
-        topics:      result.topics.map(topic => ({ name: topic })),
-        object_type: listType,
-        offered_by:  result.offered_by,
-        runs:        result.runs,
-        is_favorite: result.is_favorite,
-        lists:       result.lists
+        id:            result.id,
+        title:         result.title,
+        image_src:     result.image_src,
+        platform:      null,
+        topics:        result.topics.map(topic => ({ name: topic })),
+        object_type:   listType,
+        offered_by:    result.offered_by,
+        runs:          result.runs,
+        is_favorite:   result.is_favorite,
+        lists:         result.lists,
+        audience:      result.audience,
+        certification: result.certification
       })
     })
   })

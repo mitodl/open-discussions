@@ -208,6 +208,7 @@
   .layout-buttons {
     display: flex;
     align-items: center;
+    float: right;
 
     .option {
       height: 40px;
@@ -228,7 +229,7 @@
     }
 
     .results-count {
-      margin-left: 50px;
+      margin-left: 150px;
       margin-right: 20px;
       font-size: 14px;
       color: black;
@@ -236,6 +237,10 @@
       @include breakpoint(phone) {
         margin-left: auto;
       }
+    }
+
+    @include breakpoint(phone) {
+      float: auto;
     }
   }
 }
