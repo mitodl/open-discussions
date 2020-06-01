@@ -17,7 +17,7 @@ export default function SearchFacetItem(props: Props) {
 
   return (
     <div
-      className="facet-visible"
+      className={isChecked ? "facet-visible checked" : "facet-visible"}
       onClick={() => {
         onUpdate({
           target: {
