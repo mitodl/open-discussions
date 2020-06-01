@@ -115,9 +115,11 @@ export const searchResultToLearningResource = (
   is_favorite: result.is_favorite,
   offered_by:
     "offered_by" in result && result.offered_by ? result.offered_by : [],
-  platform: "platform" in result ? result.platform : null,
-  topics:   result.topics ? result.topics.map(topic => ({ name: topic })) : [],
-  runs:     "runs" in result ? result.runs : [],
+  platform:      "platform" in result ? result.platform : null,
+  topics:        result.topics ? result.topics.map(topic => ({ name: topic })) : [],
+  runs:          "runs" in result ? result.runs : [],
+  audience:      result.audience,
+  certification: result.certification,
   ...overrideObject
 })
 

@@ -42,26 +42,26 @@ export function FilterDisplay(props: FilterDrawerProps) {
 
   return (
     <>
-      <div className="active-search-filters">
-        {anyFiltersActive ? (
+      {anyFiltersActive ? (
+        <div className="active-search-filters">
           <div className="filter-section-title">
             Filters
             <span className="clear-all-filters" onClick={clearAllFilters}>
               Clear All
             </span>
           </div>
-        ) : null}
-        {facetDisplayMap.map(([name, , labelFunction]) =>
-          (activeFacets[name] || []).map((facet, i) => (
-            <SearchFilter
-              key={i}
-              value={facet}
-              clearFacet={() => toggleFacet(name, facet, false)}
-              labelFunction={labelFunction}
-            />
-          ))
-        )}
-      </div>
+          {facetDisplayMap.map(([name, , labelFunction]) =>
+            (activeFacets[name] || []).map((facet, i) => (
+              <SearchFilter
+                key={i}
+                value={facet}
+                clearFacet={() => toggleFacet(name, facet, false)}
+                labelFunction={labelFunction}
+              />
+            ))
+          )}
+        </div>
+      ) : null}
       {facetDisplayMap.map(
         ([name, title, labelFunction, useFilterableFacet], i) =>
           useFilterableFacet ? (

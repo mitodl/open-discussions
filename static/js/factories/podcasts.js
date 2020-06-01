@@ -22,7 +22,9 @@ export const makePodcast = (): Podcast => ({
   updated_on:        casual.moment.toISOString(),
   url:               casual.url,
   is_favorite:       casual.boolean,
-  object_type:       LR_TYPE_PODCAST
+  object_type:       LR_TYPE_PODCAST,
+  audience:          [],
+  certification:     []
 })
 
 export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
@@ -46,6 +48,8 @@ export const makePodcastEpisode = (podcast?: Podcast): PodcastEpisode => {
     url:               casual.url,
     episode_link:      casual.url,
     is_favorite:       casual.boolean,
-    object_type:       LR_TYPE_PODCAST_EPISODE
+    object_type:       LR_TYPE_PODCAST_EPISODE,
+    audience:          [],
+    certification:     []
   }
 }

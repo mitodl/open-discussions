@@ -10,10 +10,11 @@ import SearchFacet from "./SearchFacet"
 import IntegrationTestHelper from "../../util/integration_test_helper"
 import { makeSearchFacetResult } from "../../factories/search"
 import { shouldIf } from "../../lib/test_utils"
+import { CERTIFICATE } from "../../lib/constants"
 
 describe("SearchFacet", () => {
   let helper, onUpdateStub, results, facet
-  const name = "topics"
+  let name = "topics"
   const title = "Search Topics"
 
   const renderSearchFacet = props =>
@@ -133,5 +134,21 @@ describe("SearchFacet", () => {
         isSelected
       )
     })
+  })
+
+  it("should show item counts for facets that are not featured", () => {
+    const wrapper = renderSearchFacet()
+    assert.ok(wrapper.find(".facet-count").exists())
+    assert.isNotOk(wrapper.find(".facet-icon").exists())
+  })
+
+  it("should show icons instead of item counts for featured facets", () => {
+    name = "certification"
+    // $FlowFixMe: it's a test
+    results.buckets = [{ key: CERTIFICATE, doc_count: 32 }]
+    const wrapper = renderSearchFacet()
+    assert.isNotOk(wrapper.find(".facet-count").exists())
+    assert.ok(wrapper.find(".facet-icon").exists())
+    assert.ok(wrapper.find(".icon-tooltip-text").exists())
   })
 })

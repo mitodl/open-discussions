@@ -8,10 +8,30 @@ from django.db import models
 from django.db.models import Value, Prefetch, OuterRef, Exists, ExpressionWrapper
 from django.contrib.postgres.fields import JSONField
 
-from course_catalog.constants import VALID_COURSE_CONTENT_CHOICES, CONTENT_TYPE_FILE
-from course_catalog.constants import ResourceType, PrivacyLevel, PlatformType
+from course_catalog.constants import (
+    VALID_COURSE_CONTENT_CHOICES,
+    CONTENT_TYPE_FILE,
+    PlatformType,
+    OfferedBy,
+    ResourceType,
+    PrivacyLevel,
+    AvailabilityType,
+)
+
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel, TimestampedModelQuerySet
+
+OPEN = "Open Content"
+PROFESSIONAL = "Professional Offerings"
+CERTIFICATE = "Certificates"
+
+PROFESSIONAL_COURSE_PLATFORMS = [
+    PlatformType.bootcamps.value,
+    PlatformType.xpro.value,
+    PlatformType.see.value,
+    PlatformType.mitpe.value,
+    PlatformType.csail.value,
+]
 
 
 class LearningResourceQuerySet(TimestampedModelQuerySet):
@@ -279,6 +299,28 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     runs = GenericRelation(LearningResourceRun)
 
+    @property
+    def audience(self):
+        """Returns the audience for the course"""
+        if self.platform in PROFESSIONAL_COURSE_PLATFORMS:
+            return [PROFESSIONAL]
+        else:
+            return [OPEN]
+
+    @property
+    def certification(self):
+        """Returns the certification for the course"""
+        if self.platform in PROFESSIONAL_COURSE_PLATFORMS or (
+            self.platform == PlatformType.mitx.value
+            and any(
+                availability != AvailabilityType.archived.value
+                for availability in self.runs.values_list("availability", flat=True)
+            )
+        ):
+            return [CERTIFICATE]
+        else:
+            return []
+
     class Meta:
         unique_together = ("platform", "course_id")
 
@@ -328,6 +370,20 @@ class UserList(List, LearningResourceGenericRelationsMixin):
     )
     list_type = models.CharField(max_length=128)
 
+    @property
+    def audience(self):
+        """Returns the audience for the user list"""
+        for list_item in self.items.all():
+            if OPEN not in list_item.item.audience:
+                return []
+
+        return [OPEN]
+
+    @property
+    def certification(self):
+        """Returns the certification for the user list"""
+        return []
+
     class Meta:
         verbose_name = "userlist"
 
@@ -361,6 +417,22 @@ class Program(List, LearningResourceGenericRelationsMixin):
     url = models.URLField(null=True, max_length=2048)
     published = models.BooleanField(default=True)
     runs = GenericRelation(LearningResourceRun)
+
+    @property
+    def audience(self):
+        """Returns the audience for the program"""
+
+        if OfferedBy.micromasters.value in self.offered_by.values_list(
+            "name", flat=True
+        ):
+            return [OPEN, PROFESSIONAL]
+        else:
+            return [PROFESSIONAL]
+
+    @property
+    def certification(self):
+        """Returns the certification for the program"""
+        return [CERTIFICATE]
 
 
 class ProgramItem(ListItem):
@@ -435,6 +507,16 @@ class Video(LearningResource, LearningResourceGenericRelationsMixin):
 
     runs = GenericRelation(LearningResourceRun)
 
+    @property
+    def audience(self):
+        """Returns the audience"""
+        return [OPEN]
+
+    @property
+    def certification(self):
+        """Returns the certification"""
+        return []
+
     class Meta:
         unique_together = ("platform", "video_id")
 
@@ -504,6 +586,16 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
         """Platform for podcast"""
         return PlatformType.podcast.value
 
+    @property
+    def audience(self):
+        """Returns the audience"""
+        return [OPEN]
+
+    @property
+    def certification(self):
+        """Returns the certification"""
+        return []
+
     class Meta:
         ordering = ("id",)
 
@@ -535,6 +627,16 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     def platform(self):
         """Platform for podcast episode"""
         return PlatformType.podcast.value
+
+    @property
+    def audience(self):
+        """Returns the audience"""
+        return [OPEN]
+
+    @property
+    def certification(self):
+        """Returns the certification"""
+        return []
 
     class Meta:
         verbose_name = "podcastepisode"

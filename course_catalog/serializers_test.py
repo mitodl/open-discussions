@@ -256,6 +256,9 @@ def test_podcast_serializer():
         "object_type": "podcast",
         "published": True,
         "searchable": True,
+        "platform": "podcast",
+        "audience": ["Open Content"],
+        "certification": [],
     }
 
 
@@ -285,4 +288,6 @@ def test_podcast_episode_serializer():
         "published": True,
         "searchable": True,
         "duration": None,
+        "audience": ["Open Content"],
+        "certification": [],
     }

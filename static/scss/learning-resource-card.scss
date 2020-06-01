@@ -82,7 +82,7 @@
         width: 100%;
       }
 
-      .availability-price-favorite {
+      .start-date-favorite {
         margin-top: 12px;
       }
 
@@ -159,11 +159,18 @@
       }
     }
 
-    &.resource-type {
-      font-size: 13px;
-      color: $font-grey-mid;
-      text-transform: uppercase;
-      font-weight: 500;
+    &.resource-type-audience-certificates {
+      .resource-type {
+        font-size: 13px;
+        color: $font-grey-mid;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      img {
+        height: 20px;
+        padding-left: 15px;
+      }
     }
 
     &.course-title {
@@ -176,12 +183,11 @@
       cursor: pointer;
     }
 
-    &.availability-price-favorite {
+    &.start-date-favorite {
       justify-content: flex-start;
       margin-top: 25px;
 
-      .availability,
-      .price {
+      .start-date {
         font-size: 12px;
         padding-right: 10px;
         cursor: default;
@@ -191,10 +197,6 @@
           margin-right: 4px;
           padding: 2px;
         }
-      }
-
-      .price {
-        margin-right: 5px;
       }
 
       .favorite {

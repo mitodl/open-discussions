@@ -14,7 +14,10 @@ import {
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PODCAST,
-  LR_TYPE_PODCAST_EPISODE
+  LR_TYPE_PODCAST_EPISODE,
+  OPEN,
+  PROFESSIONAL,
+  CERTIFICATE
 } from "../lib/constants"
 
 import type {
@@ -97,7 +100,14 @@ export const makeCourseResult = (): LearningResourceResult => ({
   object_type: LR_TYPE_COURSE,
   runs:        R.times(makeRun, 3),
   is_favorite: casual.coin_flip,
-  lists:       casual.random_element([[], [100, 200]])
+  lists:       casual.random_element([[], [100, 200]]),
+  audience:    casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makeProgramResult = (): LearningResourceResult => ({
@@ -114,7 +124,14 @@ export const makeProgramResult = (): LearningResourceResult => ({
   ],
   runs:        [makeRun()],
   is_favorite: casual.coin_flip,
-  lists:       casual.random_element([[], [100, 200]])
+  lists:       casual.random_element([[], [100, 200]]),
+  audience:    casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makeVideoResult = (): LearningResourceResult => ({
@@ -129,7 +146,14 @@ export const makeVideoResult = (): LearningResourceResult => ({
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  lists:             casual.random_element([[], [100, 200]]),
+  audience:          casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makePodcastResult = (): LearningResourceResult => ({
@@ -144,7 +168,14 @@ export const makePodcastResult = (): LearningResourceResult => ({
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  lists:             casual.random_element([[], [100, 200]]),
+  audience:          casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makePodcastEpisodeResult = (): LearningResourceResult => ({
@@ -160,7 +191,14 @@ export const makePodcastEpisodeResult = (): LearningResourceResult => ({
   runs:              [],
   is_favorite:       casual.coin_flip,
   lists:             casual.random_element([[], [100, 200]]),
-  series_title:      `podcast_${String(casual.random)}`
+  series_title:      `podcast_${String(casual.random)}`,
+  audience:          casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makeUserListResult = (
@@ -177,7 +215,14 @@ export const makeUserListResult = (
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]])
+  lists:             casual.random_element([[], [100, 200]]),
+  audience:          casual.random_element([
+    [],
+    [OPEN],
+    [PROFESSIONAL],
+    [OPEN, PROFESSIONAL]
+  ]),
+  certification: casual.random_element([[], [CERTIFICATE]])
 })
 
 export const makeLearningResourceResult = (objectType: string) => {
@@ -257,7 +302,9 @@ export const makeSearchFacetResult = () => {
         }
       ]
     },
-    type: LR_TYPE_ALL
+    audience:      [OPEN],
+    certification: [],
+    type:          LR_TYPE_ALL
   }
 }
 

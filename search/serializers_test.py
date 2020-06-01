@@ -27,7 +27,13 @@ from course_catalog.factories import (
     PodcastEpisodeFactory,
     LearningResourceOfferorFactory,
 )
-from course_catalog.models import Course, Video, ContentType, Program
+from course_catalog.models import (
+    Course,
+    Video,
+    ContentType,
+    Program,
+    PROFESSIONAL_COURSE_PLATFORMS,
+)
 from open_discussions.constants import ISOFORMAT
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import drf_datetime, assert_json_equal
@@ -76,7 +82,6 @@ from search.serializers import (
     ESPodcastEpisodeSerializer,
     serialize_bulk_podcast_episodes,
     serialize_podcast_episode_for_bulk,
-    PROFESSIONAL_COURSE_PLATFORMS,
 )
 
 
