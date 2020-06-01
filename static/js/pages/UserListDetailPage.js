@@ -68,9 +68,7 @@ export default function UserListDetailPage(props: Props) {
                       onClick={() => setIsSorting(!sorting)}
                     >
                       {sorting
-                        ? `Stop sorting ${
-                          readableLearningResources[userList.object_type]
-                        }`
+                        ? "Save"
                         : `Reorder ${
                           readableLearningResources[userList.object_type]
                         }`}
