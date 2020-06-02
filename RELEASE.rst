@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.126.0 (Released June 02, 2020)
+---------------
+
+- Bump httplib2 from 0.14.0 to 0.18.0 (#2943)
+- add footer to podcast page
+- add FilterableSearchFacet component
+- /podcasts keyboard accessibility (#2963)
+
 Version 0.125.2 (Released May 28, 2020)
 ---------------
 
