@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.126.0
+Version 0.126.0 (Released June 02, 2020)
 ---------------
 
 - Bump httplib2 from 0.14.0 to 0.18.0 (#2943)
