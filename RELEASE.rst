@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.127.0 (Released June 03, 2020)
+---------------
+
+- Various fixes for ETL loading bugs
+- change reorder text
+- fix a height issue with the author on the podcast card
+- fix checked facet highlight
+
 Version 0.126.0 (Released June 02, 2020)
 ---------------
 
