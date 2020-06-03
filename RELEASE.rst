@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.127.1
+---------------
+
+- search restyling
+
 Version 0.127.0 (Released June 03, 2020)
 ---------------
 
