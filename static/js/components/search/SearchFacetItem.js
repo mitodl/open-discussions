@@ -1,12 +1,7 @@
 // @flow
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
-import {
-  iconMap,
-  OPEN_CONTENT,
-  PROFESSIONAL,
-  CERTIFICATE
-} from "../../lib/constants"
+import LearningResourceIcon from "../LearningResourceIcon"
 
 type Props = {
   facet: Object,
@@ -17,12 +12,6 @@ type Props = {
 }
 
 const featuredFacetNames = ["audience", "certification"]
-
-const tooltipTextMap = {
-  [OPEN_CONTENT]: "For those looking to learn now",
-  [PROFESSIONAL]: "For those looking to invest in professional development",
-  [CERTIFICATE]:  "Recieve a certificate upon completion"
-}
 
 export default function SearchFacetItem(props: Props) {
   const { facet, isChecked, onUpdate, labelFunction, name } = props
@@ -60,11 +49,8 @@ export default function SearchFacetItem(props: Props) {
           <Dotdotdot clamp={1}>{labelText}</Dotdotdot>
         </div>
         {featuredFacetNames.includes(name) ? (
-          <div className="facet-icon">
-            <span className="icon-tooltip-text">
-              {tooltipTextMap[facet.key]}
-            </span>
-            <img src={iconMap[facet.key]} />
+          <div>
+            <LearningResourceIcon iconKey={facet.key} />
           </div>
         ) : (
           <div className="facet-count">{facet.doc_count}</div>
