@@ -675,6 +675,12 @@ class FavoriteItemSerializer(serializers.ModelSerializer):
     content_data = GenericForeignKeyFieldSerializer(source="item")
     content_type = serializers.CharField(source="content_type.name")
 
+    def to_representation(self, instance):
+        """put `is_favorite` in to the content data"""
+        data = super().to_representation(instance)
+        data["content_data"]["is_favorite"] = True
+        return data
+
     class Meta:
         model = FavoriteItem
         fields = "__all__"

@@ -349,7 +349,7 @@ def _transform_search_results_suggest(search_result):
 
 def transform_results(search_result, user):
     """
-    Transform podcast and podcast episode, and userlist and learning path in aggergations
+    Transform podcast and podcast episode, and userlist and learning path in aggregations
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
 
     Args:
@@ -468,14 +468,34 @@ def find_similar_resources(*, user, value_doc):
     )
     response = search.execute()
 
-    return [
-        hit.to_dict()
-        for hit in response.hits
-        if (
-            hit["id"] != value_doc.get("id", None)
-            or hit["object_type"] != value_doc.get("object_type", None)
+    if not user.is_anonymous:
+        favorites = (
+            FavoriteItem.objects.select_related("content_type")
+            .filter(user=user)
+            .values_list("content_type__model", "object_id")
         )
-    ][0 : settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT]
+
+    objects = []
+
+    for hit in response.hits:
+        if hit["id"] != value_doc.get("id", None) or hit[
+            "object_type"
+        ] != value_doc.get("object_type", None):
+            if user.is_anonymous:
+                hit["is_favorite"] = False
+                hit["lists"] = []
+            else:
+                object_type = hit["object_type"]
+                if object_type in LEARNING_RESOURCE_TYPES:
+                    if object_type == LEARNING_PATH_TYPE:
+                        object_type = USER_LIST_TYPE
+                    object_id = hit["id"]
+                    hit["is_favorite"] = (object_type, object_id) in favorites
+                    hit["lists"] = get_list_items_by_resource(
+                        user, object_type, object_id
+                    )
+            objects.append(hit.to_dict())
+    return objects[0 : settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT]
 
 
 def get_similar_topics(value_doc, num_topics, min_term_freq, min_doc_freq):

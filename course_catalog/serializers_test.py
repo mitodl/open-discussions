@@ -17,6 +17,7 @@ from course_catalog.factories import (
     PodcastFactory,
     PodcastEpisodeFactory,
     LearningResourceOfferorFactory,
+    VideoFactory,
 )
 from course_catalog.models import FavoriteItem, UserListItem
 from course_catalog.serializers import (
@@ -29,6 +30,7 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     PodcastSerializer,
     PodcastEpisodeSerializer,
+    VideoSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -216,19 +218,52 @@ def test_favorites_serializer():
     course = CourseFactory.create()
     user_list = UserListFactory.create(author=user)
     program = ProgramFactory.create()
+    video = VideoFactory.create()
+    podcast = PodcastFactory.create()
+    podcast_episode = PodcastEpisodeFactory.create()
     course_topic = CourseTopicFactory.create()
 
     favorite_item = FavoriteItem(user=user, item=course)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == CourseSerializer(course).data
+    assert serializer.data.get("content_data") == {
+        **CourseSerializer(course).data,
+        "is_favorite": True,
+    }
 
     favorite_item = FavoriteItem(user=user, item=user_list)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == UserListSerializer(user_list).data
+    assert serializer.data.get("content_data") == {
+        **UserListSerializer(user_list).data,
+        "is_favorite": True,
+    }
 
     favorite_item = FavoriteItem(user=user, item=program)
     serializer = FavoriteItemSerializer(favorite_item)
-    assert serializer.data.get("content_data") == ProgramSerializer(program).data
+    assert serializer.data.get("content_data") == {
+        **ProgramSerializer(program).data,
+        "is_favorite": True,
+    }
+
+    favorite_item = FavoriteItem(user=user, item=video)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == {
+        **VideoSerializer(video).data,
+        "is_favorite": True,
+    }
+
+    favorite_item = FavoriteItem(user=user, item=podcast)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == {
+        **PodcastSerializer(podcast).data,
+        "is_favorite": True,
+    }
+
+    favorite_item = FavoriteItem(user=user, item=podcast_episode)
+    serializer = FavoriteItemSerializer(favorite_item)
+    assert serializer.data.get("content_data") == {
+        **PodcastEpisodeSerializer(podcast_episode).data,
+        "is_favorite": True,
+    }
 
     favorite_item = FavoriteItem(user=user, item=course_topic)
     serializer = FavoriteItemSerializer(favorite_item)

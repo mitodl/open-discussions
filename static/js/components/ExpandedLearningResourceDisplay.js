@@ -43,7 +43,8 @@ import {
   learningResourcePermalink
 } from "../lib/url"
 import { capitalize, emptyOrNil, languageName } from "../lib/util"
-import { SEARCH_LIST_UI, searchResultToLearningResource } from "../lib/search"
+import { SEARCH_LIST_UI } from "../lib/search"
+import { useSearchResultToFavoriteLR } from "../hooks/learning_resources"
 
 import type { LearningResourceResult } from "../flow/searchTypes"
 
@@ -180,6 +181,8 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     podcasts => (podcasts ? podcasts[object.podcast] : null)
   )
   const episodePodcast = useSelector(episodePodcastSelector)
+
+  const searchResultToFavoriteLR = useSearchResultToFavoriteLR()
 
   return (
     <React.Fragment>
@@ -406,9 +409,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           setShow={setShowSimilar}
           show={showSimilar}
           icon={similarIcon}
-          objects={similarItems.map(item =>
-            searchResultToLearningResource(item)
-          )}
+          objects={similarItems.map(searchResultToFavoriteLR)}
         />
       ) : null}
     </React.Fragment>

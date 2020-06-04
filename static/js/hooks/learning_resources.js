@@ -1,10 +1,15 @@
 // @flow
-import { useEffect } from "react"
+import { useEffect, useCallback } from "react"
 import { useLocation } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import qs from "query-string"
+import { useSelector } from "react-redux"
 
+import { searchResultToLearningResource } from "../lib/search"
+import { learningResourceSelector } from "../lib/queries/learning_resources"
 import { pushLRHistory } from "../actions/ui"
+
+import type { LearningResourceResult } from "../flow/searchTypes"
 
 export function useLRDrawerParams() {
   const { search } = useLocation()
@@ -31,4 +36,18 @@ export function useLearningResourcePermalink() {
       )
     }
   }, [])
+}
+
+export function useSearchResultToFavoriteLR() {
+  const selector = useSelector(learningResourceSelector)
+
+  const getFavoriteOrListedObject = useCallback(
+    (searchResult: LearningResourceResult) => {
+      const object = searchResultToLearningResource(searchResult)
+      const storedObject = selector(object.id, object.object_type)
+      return storedObject || object
+    },
+    [selector]
+  )
+  return getFavoriteOrListedObject
 }

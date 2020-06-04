@@ -1,6 +1,7 @@
 // @flow
 import React from "react"
 import { Route, Switch } from "react-router-dom"
+import { useRequest } from "redux-query-react"
 
 import CourseSearchPage from "./CourseSearchPage"
 import CourseIndexPage from "./CourseIndexPage"
@@ -11,6 +12,8 @@ import FavoritesDetailPage from "./FavoritesDetailPage"
 import LearningResourceDrawer from "../components/LearningResourceDrawer"
 import AddToListDialog from "../components/AddToListDialog"
 
+import { favoritesRequest } from "../lib/queries/learning_resources"
+
 import type { Match } from "react-router"
 
 type Props = {
@@ -19,6 +22,8 @@ type Props = {
 
 export default function LearnRouter(props: Props) {
   const { match } = props
+
+  useRequest(favoritesRequest())
 
   return (
     <>

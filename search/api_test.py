@@ -483,14 +483,33 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
     assert constructed_query["body"]["size"] == posts_to_return
 
 
-def test_find_similar_resources(settings, elasticsearch, user):
+@pytest.mark.parametrize("is_anonymous", [True, False])
+@pytest.mark.django_db
+def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
-    resources_to_return = 4
+    resources_to_return = 5
     settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT = resources_to_return
     settings.OPEN_RESOURCES_MIN_TERM_FREQ = 3
     settings.OPEN_RESOURCES_MIN_DOC_FREQ = 4
 
     course = CourseFactory.create()
+    favorited_course = CourseFactory.create()
+    saved_course = CourseFactory.create()
+    user_list = UserListFactory.create(author=user)
+
+    if not is_anonymous:
+        FavoriteItem.objects.create(
+            user=user,
+            content_type=ContentType.objects.get(model=COURSE_TYPE),
+            object_id=favorited_course.id,
+        )
+        item = UserListItemFactory.create(
+            user_list=user_list,
+            content_type=ContentType.objects.get(model=COURSE_TYPE),
+            object_id=saved_course.id,
+        )
+
+    search_user = AnonymousUser() if is_anonymous else user
 
     value_doc = {
         "title": course.title,
@@ -502,18 +521,35 @@ def test_find_similar_resources(settings, elasticsearch, user):
         "hits": {
             "hits": [
                 {"_source": ESCourseSerializer(course).data},
-                {"_source": ESCourseSerializer(CourseFactory.create()).data},
+                {"_source": ESCourseSerializer(favorited_course).data},
+                {"_source": ESCourseSerializer(saved_course).data},
                 {"_source": ESVideoSerializer(VideoFactory.create()).data},
-                {"_source": ESUserListSerializer(UserListFactory.create()).data},
                 {"_source": ESProgramSerializer(ProgramFactory.create()).data},
+                {"_source": ESUserListSerializer(UserListFactory.create()).data},
             ]
         }
     }
+    similar_resources = find_similar_resources(user=search_user, value_doc=value_doc)
 
-    assert find_similar_resources(user=user, value_doc=value_doc) == [
+    assert similar_resources == [
         hit["_source"]
-        for hit in elasticsearch.conn.search.return_value["hits"]["hits"][1:5]
+        for hit in elasticsearch.conn.search.return_value["hits"]["hits"][1:6]
     ]
+
+    if is_anonymous:
+        assert similar_resources[0]["is_favorite"] is False
+        assert similar_resources[1]["lists"] == []
+    else:
+        assert similar_resources[0]["is_favorite"] is True
+        assert similar_resources[1]["lists"] == [
+            {
+                "list_id": user_list.id,
+                "item_id": item.id,
+                "content_type": item.content_type.name,
+                "object_id": item.object_id,
+            }
+        ]
+
     constructed_query = elasticsearch.conn.search.call_args[1]
     assert extract_values(constructed_query, "more_like_this") == [
         {

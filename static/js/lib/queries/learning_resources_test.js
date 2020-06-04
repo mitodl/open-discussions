@@ -13,15 +13,20 @@ import {
 import {
   makeCourse,
   makeProgram,
-  makeLearningResource
+  makeLearningResource,
+  makeUserList,
+  makeVideo
 } from "../../factories/learning_resources"
+import { makePodcast, makePodcastEpisode } from "../../factories/podcasts"
 import {
   LR_TYPE_COURSE,
   LR_TYPE_ALL,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_USERLIST,
   LR_TYPE_VIDEO,
-  LR_TYPE_PROGRAM
+  LR_TYPE_PROGRAM,
+  LR_TYPE_PODCAST,
+  LR_TYPE_PODCAST_EPISODE
 } from "../constants"
 import { similarResourcesURL } from "../url"
 
@@ -29,7 +34,25 @@ describe("learning resource queries", () => {
   let favorites
 
   beforeEach(() => {
-    favorites = [...R.times(makeCourse, 5), ...R.times(makeProgram, 5)]
+    favorites = R.flatten(
+      [
+        [makeCourse, LR_TYPE_COURSE],
+        [makeProgram, LR_TYPE_PROGRAM],
+        [makeUserList, LR_TYPE_USERLIST],
+        [makeVideo, LR_TYPE_VIDEO],
+        [makePodcast, LR_TYPE_PODCAST],
+        [makePodcastEpisode, LR_TYPE_PODCAST_EPISODE]
+      ].map(([factory, LRType]) => [
+        {
+          content_data: factory(),
+          content_type: LRType
+        },
+        {
+          content_data: factory(),
+          content_type: LRType
+        }
+      ])
+    )
   })
 
   it("mapResourcesToResourceRefs should map learning resources to a ref object", () => {
@@ -78,12 +101,11 @@ describe("learning resource queries", () => {
     )
   })
 
-  //
-  ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(resourceType => {
-    it("filterFavorites should separate by content type", () => {
+  LR_TYPE_ALL.forEach(resourceType => {
+    it(`filterFavorites should separate out ${resourceType}`, () => {
       const filtered = filterFavorites(favorites, resourceType)
       filtered.forEach(object => {
-        assert.equal(resourceType, object.content_type)
+        assert.equal(resourceType, object.object_type)
       })
     })
   })
