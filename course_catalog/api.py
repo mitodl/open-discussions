@@ -452,7 +452,7 @@ def sync_ocw_course(
     if course_json["course_id"] in blacklist:
         is_published = False
 
-    if upload_to_s3 and is_published:
+    if is_published:
         try:
             parser.setup_s3_uploading(
                 settings.OCW_LEARNING_COURSE_BUCKET_NAME,
@@ -462,9 +462,8 @@ def sync_ocw_course(
                 # actual element and [-1] is an empty string
                 course_prefix.split("/")[-2],
             )
-            if settings.OCW_UPLOAD_IMAGE_ONLY:
-                parser.upload_course_image()
-            else:
+            parser.upload_course_image()
+            if upload_to_s3:
                 parser.upload_all_media_to_s3(upload_master_json=True)
         except:  # pylint: disable=bare-except
             log.exception(
