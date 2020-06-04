@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux"
 
 import Card from "./Card"
 import LoginTooltip from "./LoginTooltip"
+import LearningResourceIcon from "./LearningResourceIcon"
 
 import { setDialogData } from "../actions/ui"
 import { bestRun } from "../lib/learning_resources"
@@ -16,8 +17,7 @@ import {
   CAROUSEL_IMG_HEIGHT,
   LR_TYPE_VIDEO,
   DISPLAY_DATE_FORMAT,
-  readableLearningResources,
-  iconMap
+  readableLearningResources
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
@@ -149,10 +149,12 @@ export function LearningResourceDisplay(props: Props) {
     hasCertificate && bestAvailableRun
       ? moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT)
       : null
-  const icons =
+
+  const iconKeys =
     object.audience && object.certification
-      ? object.audience.concat(object.certification).map(key => iconMap[key])
+      ? object.audience.concat(object.certification)
       : []
+
   const inLists = object ? object.lists : []
 
   const bookmarkIconName =
@@ -174,8 +176,10 @@ export function LearningResourceDisplay(props: Props) {
             {readableLearningResources[object.object_type]}
           </div>
           <div className="audience-certificates">
-            {icons.length > 0
-              ? icons.map((icon, i) => <img src={icon} key={i} />)
+            {iconKeys.length > 0
+              ? iconKeys.map((key, i) => (
+                <LearningResourceIcon iconKey={key} key={i} />
+              ))
               : null}
           </div>
         </div>

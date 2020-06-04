@@ -15,10 +15,6 @@ export const OPEN_CONTENT = "Open Content"
 export const PROFESSIONAL = "Professional Offerings"
 export const CERTIFICATE = "Certificates"
 
-export const OPEN_CONTENT_ICON = "/static/images/open_content_icon.png"
-export const PROFESSIONAL_ICON = "/static/images/professional_icon.png"
-export const CERTIFICATE_ICON = "/static/images/certificate_icon.png"
-
 const ocwPlatform = "ocw"
 const edxPlatform = "mitx"
 const bootcampsPlatform = "bootcamps"
@@ -53,12 +49,6 @@ export const platformLogos = {
   [seePlatform]:          "/static/images/sloan-logo.png",
   [mitpePlatform]:        "/static/images/mitpe-logo.png",
   [csailPlatform]:        "/static/images/csail-logo.png"
-}
-
-export const iconMap = {
-  [OPEN_CONTENT]: OPEN_CONTENT_ICON,
-  [PROFESSIONAL]: PROFESSIONAL_ICON,
-  [CERTIFICATE]:  CERTIFICATE_ICON
 }
 
 export const offeredBys = {

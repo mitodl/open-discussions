@@ -1,0 +1,29 @@
+.learning-resource-icon {
+  img {
+    height: 20px;
+  }
+
+  .icon-tooltip-text {
+    visibility: hidden;
+    width: 120px;
+    background-color: $font-grey-mid;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    font-size: 12px;
+
+    position: absolute;
+    z-index: 1;
+    margin-left: -50px;
+    margin-top: 25px;
+  }
+
+  @include breakpoint(desktop) {
+    &:hover {
+      .icon-tooltip-text {
+        visibility: visible;
+      }
+    }
+  }
+}

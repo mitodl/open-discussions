@@ -139,7 +139,7 @@ describe("SearchFacet", () => {
   it("should show item counts for facets that are not featured", () => {
     const wrapper = renderSearchFacet()
     assert.ok(wrapper.find(".facet-count").exists())
-    assert.isNotOk(wrapper.find(".facet-icon").exists())
+    assert.isNotOk(wrapper.find(".learning-resource-icon").exists())
   })
 
   it("should show icons instead of item counts for featured facets", () => {
@@ -148,7 +148,7 @@ describe("SearchFacet", () => {
     results.buckets = [{ key: CERTIFICATE, doc_count: 32 }]
     const wrapper = renderSearchFacet()
     assert.isNotOk(wrapper.find(".facet-count").exists())
-    assert.ok(wrapper.find(".facet-icon").exists())
+    assert.ok(wrapper.find(".learning-resource-icon").exists())
     assert.ok(wrapper.find(".icon-tooltip-text").exists())
   })
 })

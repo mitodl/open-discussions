@@ -24,8 +24,7 @@ import {
   OPEN_CONTENT,
   PROFESSIONAL,
   CERTIFICATE,
-  DISPLAY_DATE_FORMAT,
-  iconMap
+  DISPLAY_DATE_FORMAT
 } from "../lib/constants"
 import {
   COURSE_SEARCH_URL,
@@ -35,6 +34,12 @@ import {
 } from "../lib/url"
 import { DIALOG_ADD_TO_LIST } from "../actions/ui"
 import { queryListResponse } from "../lib/test_utils"
+
+const iconMap = {
+  [OPEN_CONTENT]: "/static/images/open_content_icon.png",
+  [PROFESSIONAL]: "/static/images/professional_icon.png",
+  [CERTIFICATE]:  "/static/images/certificate_icon.png"
+}
 
 describe("LearningResourceCard", () => {
   let course, userList, helper, render, renderRow
