@@ -1,5 +1,5 @@
 django-cors-headers==2.1.0
-Django==2.2.10
+Django==2.2.13
 base36
 beautifulsoup4==4.8.2
 betamax
