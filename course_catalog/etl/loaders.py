@@ -105,6 +105,9 @@ def load_offered_bys(resource, offered_bys_data, *, config=OfferedByLoaderConfig
     Returns:
         offered_bys (list of LearningResourceOfferor): list of created or updated offered_bys
     """
+    if offered_bys_data is None:
+        return resource.offered_by.all()
+
     offered_bys = []
 
     for offered_by_data in offered_bys_data:
@@ -366,8 +369,8 @@ def load_video(video_data, *, config=VideoLoaderConfig()):
     """Load a video into the database"""
     video_id = video_data.pop("video_id")
     platform = video_data.pop("platform")
-    topics_data = video_data.pop("topics", [])
-    offered_bys_data = video_data.pop("offered_by", [])
+    topics_data = video_data.pop("topics", None)
+    offered_bys_data = video_data.pop("offered_by", None)
     runs_data = video_data.pop("runs", [])
 
     with transaction.atomic():

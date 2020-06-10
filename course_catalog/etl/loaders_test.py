@@ -458,47 +458,58 @@ def test_load_instructors(instructor_exists):
 @pytest.mark.parametrize("offeror_exists", [True, False])
 @pytest.mark.parametrize("has_other_offered_by", [True, False])
 @pytest.mark.parametrize("additive", [True, False])
+@pytest.mark.parametrize("null_data", [True, False])
 def test_load_offered_bys(
-    parent_factory, offeror_exists, has_other_offered_by, additive
+    parent_factory, offeror_exists, has_other_offered_by, additive, null_data
 ):
     """Test that load_offered_bys creates and/or assigns offeror to the parent object"""
-    offeror = (
+    xpro_offeror = (
         LearningResourceOfferorFactory.create(is_xpro=True)
         if offeror_exists
         else LearningResourceOfferorFactory.build(is_xpro=True)
     )
-
+    mitx_offeror = LearningResourceOfferorFactory.create(is_mitx=True)
     parent = parent_factory.create(no_topics=True)
 
+    expected = []
+
+    if not null_data:
+        expected.append(xpro_offeror.name)
+
+    if has_other_offered_by and (additive or null_data):
+        expected.append(mitx_offeror.name)
+
     if has_other_offered_by:
-        parent.offered_by.add(LearningResourceOfferorFactory.create(is_mitx=True))
-        parent.save()
+        parent.offered_by.set([mitx_offeror])
 
     assert parent.offered_by.count() == (1 if has_other_offered_by else 0)
 
     load_offered_bys(
         parent,
-        [{"name": offeror.name}],
+        None if null_data else [{"name": xpro_offeror.name}],
         config=OfferedByLoaderConfig(additive=additive),
     )
 
-    if additive:
-        assert parent.offered_by.count() == (2 if has_other_offered_by else 1)
-    else:
-        assert parent.offered_by.count() == 1
-
-    assert offeror.name in parent.offered_by.values_list("name", flat=True)
+    assert set(parent.offered_by.values_list("name", flat=True)) == set(expected)
 
 
 @pytest.mark.parametrize("video_exists", [True, False])
 @pytest.mark.parametrize("is_published", [True, False])
-def test_load_video(mock_upsert_tasks, video_exists, is_published):
+@pytest.mark.parametrize("pass_topics", [True, False])
+def test_load_video(mock_upsert_tasks, video_exists, is_published, pass_topics):
     """Test that load_video loads the video"""
     video = (
         VideoFactory.create(published=is_published)
         if video_exists
         else VideoFactory.build()
     )
+    topics = CourseTopicFactory.create_batch(3) if video_exists else []
+    passed_topics = CourseTopicFactory.create_batch(1)
+    loading_topics = [{"name": topic.name} for topic in passed_topics]
+    expected_topics = passed_topics if pass_topics else topics
+    if video_exists:
+        video.topics.set(topics)
+
     assert Video.objects.count() == (1 if video_exists else 0)
 
     props = model_to_dict(
@@ -507,6 +518,10 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
         )
     )
     del props["id"]
+    if pass_topics:
+        props["topics"] = loading_topics
+    else:
+        del props["topics"]
 
     props["runs"] = [
         {"run_id": video.video_id, "platform": video.platform, "prices": [{"price": 0}]}
@@ -531,6 +546,7 @@ def test_load_video(mock_upsert_tasks, video_exists, is_published):
     assert result.runs.count() == 1
     assert result.runs.first().prices.count() == 1
     assert result.runs.first().prices.first().price == 0
+    assert list(result.topics.all()) == expected_topics
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
