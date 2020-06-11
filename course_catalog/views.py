@@ -47,7 +47,7 @@ from course_catalog.serializers import (
     PodcastEpisodeSerializer,
 )
 from course_catalog.tasks import get_ocw_courses
-from course_catalog.utils import load_course_blacklist
+from course_catalog.utils import load_course_blocklist
 from open_discussions import features, settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
@@ -385,7 +385,7 @@ class WebhookOCWView(APIView):
         content = rapidjson.loads(request.body.decode())
         records = content.get("Records")
         if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
-            blacklist = load_course_blacklist()
+            blocklist = load_course_blocklist()
             for record in content.get("Records"):
                 s3_key = record.get("s3", {}).get("object", {}).get("key")
                 prefix = s3_key.split("0/1.json")[0]
@@ -393,7 +393,7 @@ class WebhookOCWView(APIView):
                     countdown=settings.OCW_WEBHOOK_DELAY,
                     kwargs={
                         "course_prefixes": [prefix],
-                        "blacklist": blacklist,
+                        "blocklist": blocklist,
                         "force_overwrite": False,
                         "upload_to_s3": True,
                     },

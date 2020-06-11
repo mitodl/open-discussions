@@ -366,7 +366,7 @@ def sync_ocw_course_files(ids=None):
 
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
 def sync_ocw_course(
-    *, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3, blacklist
+    *, course_prefix, raw_data_bucket, force_overwrite, upload_to_s3, blocklist
 ):
     """
     Sync an OCW course run
@@ -376,7 +376,7 @@ def sync_ocw_course(
         raw_data_bucket (boto3.resource): The S3 bucket containing the OCW information
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
-        blacklist (list of str): list of course ids that should not be published
+        blocklist (list of str): list of course ids that should not be published
 
     Returns:
         str:
@@ -449,7 +449,7 @@ def sync_ocw_course(
     course_json["course_id"] = "{}.{}".format(
         course_json.get("department_number"), course_json.get("master_course_number")
     )
-    if course_json["course_id"] in blacklist:
+    if course_json["course_id"] in blocklist:
         is_published = False
 
     if upload_to_s3 and is_published:
@@ -494,13 +494,13 @@ def sync_ocw_course(
         delete_course(course)
 
 
-def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3):
+def sync_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3):
     """
     Sync OCW courses to the database
 
     Args:
         course_prefixes (list of str): The course prefixes to process
-        blacklist (list of str): list of course ids to skip
+        blocklist (list of str): list of course ids to skip
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
 
@@ -520,7 +520,7 @@ def sync_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s
                 raw_data_bucket=raw_data_bucket,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
-                blacklist=blacklist,
+                blocklist=blocklist,
             )
         except:  # pylint: disable=bare-except
             log.exception("Error encountered parsing OCW json for %s", course_prefix)

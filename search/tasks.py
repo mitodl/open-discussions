@@ -22,7 +22,7 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
-from course_catalog.utils import load_course_blacklist
+from course_catalog.utils import load_course_blocklist
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import merge_strings, chunks, html_to_plain_text
@@ -560,7 +560,7 @@ def start_recreate_index(self):
             "starting to index all posts, comments, profiles, and course catalog objects..."
         )
 
-        blacklisted_ids = load_course_blacklist()
+        blocklisted_ids = load_course_blocklist()
 
         index_tasks = celery.group(
             [
@@ -592,7 +592,7 @@ def start_recreate_index(self):
                 index_courses.si(ids)
                 for ids in chunks(
                     Course.objects.filter(published=True)
-                    .exclude(course_id__in=blacklisted_ids)
+                    .exclude(course_id__in=blocklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
@@ -605,7 +605,7 @@ def start_recreate_index(self):
                     .filter(
                         platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
                     )
-                    .exclude(course_id__in=blacklisted_ids)
+                    .exclude(course_id__in=blocklisted_ids)
                     .order_by("id")
                     .values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,

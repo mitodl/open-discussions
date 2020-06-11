@@ -10,7 +10,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
-    load_course_blacklist,
+    load_course_blocklist,
     load_course_duplicates,
 )
 
@@ -97,22 +97,22 @@ def test_semester_year_to_date(semester, year, ending, expected):
 
 
 @pytest.mark.parametrize("url", [None, "http://test.me"])
-def test_load_blacklist(url, settings, mocker):
+def test_load_blocklist(url, settings, mocker):
     """Test that a list of course ids is returned if a URL is set"""
-    settings.BLACKLISTED_COURSES_URL = url
+    settings.BLOCKLISTED_COURSES_URL = url
     file_content = [b"MITX_Test1_FAKE", b"MITX_Test2_Fake", b"OCW_Test_Fake"]
     mock_request = mocker.patch(
         "requests.get",
         autospec=True,
         return_value=mocker.Mock(iter_lines=mocker.Mock(return_value=file_content)),
     )
-    blacklist = load_course_blacklist()
+    blocklist = load_course_blocklist()
     if url is None:
         mock_request.assert_not_called()
-        assert blacklist == []
+        assert blocklist == []
     else:
         mock_request.assert_called_once_with(url)
-        assert blacklist == [str(id, "utf-8") for id in file_content]
+        assert blocklist == [str(id, "utf-8") for id in file_content]
 
 
 @pytest.mark.parametrize("url", [None, "http://test.me"])

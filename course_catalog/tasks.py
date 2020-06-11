@@ -9,7 +9,7 @@ import requests
 import boto3
 from django.conf import settings
 
-from course_catalog.utils import load_course_blacklist
+from course_catalog.utils import load_course_blocklist
 from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.api import (
@@ -34,11 +34,11 @@ def get_mitx_data():
 
 
 @app.task(acks_late=True)
-def get_ocw_courses(*, course_prefixes, blacklist, force_overwrite, upload_to_s3):
+def get_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3):
     """Task to sync a batch of OCW courses"""
     sync_ocw_courses(
         course_prefixes=course_prefixes,
-        blacklist=blacklist,
+        blocklist=blocklist,
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
     )
@@ -71,14 +71,14 @@ def get_ocw_data(
     ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
     ocw_courses = generate_course_prefix_list(raw_data_bucket)
 
-    # get a list of blacklisted course ids
-    blacklist = load_course_blacklist()
+    # get a list of blocklisted course ids
+    blocklist = load_course_blocklist()
 
     ocw_tasks = celery.group(
         [
             get_ocw_courses.si(
                 course_prefixes=prefixes,
-                blacklist=blacklist,
+                blocklist=blocklist,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
             )
@@ -108,14 +108,14 @@ def get_ocw_files(ids=None):
 @app.task(bind=True)
 def import_all_ocw_files(self, chunk_size):
     """Import all OCW content files"""
-    blacklisted_ids = load_course_blacklist()
+    blocklisted_ids = load_course_blocklist()
     tasks = celery.group(
         [
             get_ocw_files.si(ids)
             for ids in chunks(
                 Course.objects.filter(published=True)
                 .filter(platform=PlatformType.ocw.value)
-                .exclude(course_id__in=blacklisted_ids)
+                .exclude(course_id__in=blocklisted_ids)
                 .order_by("id")
                 .values_list("id", flat=True),
                 chunk_size=chunk_size,
@@ -146,14 +146,14 @@ def import_all_xpro_files(self, chunk_size=None):
     if chunk_size is None:
         chunk_size = settings.XPRO_ITERATOR_CHUNK_SIZE
 
-    blacklisted_ids = load_course_blacklist()
+    blocklisted_ids = load_course_blocklist()
     tasks = celery.group(
         [
             get_xpro_files.si(ids)
             for ids in chunks(
                 Course.objects.filter(published=True)
                 .filter(platform=PlatformType.xpro.value)
-                .exclude(course_id__in=blacklisted_ids)
+                .exclude(course_id__in=blocklisted_ids)
                 .order_by("id")
                 .values_list("id", flat=True),
                 chunk_size=chunk_size,

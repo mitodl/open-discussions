@@ -390,7 +390,7 @@ Version 0.107.0 (Released January 13, 2020)
 
 - ensure course cards have the same height
 - allow user to reset search text on the search page
-- Dont publish/index blacklisted courses (#2519)
+- Dont publish/index blocklisted courses (#2519)
 - Supported double-quoted search terms (#2516)
 
 Version 0.106.1 (Released January 10, 2020)

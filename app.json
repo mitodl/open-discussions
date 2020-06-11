@@ -43,8 +43,8 @@
       "description": "S3 Bucket name.",
       "required": false
     },
-    "BLACKLISTED_COURSES_URL": {
-      "description": "URL of a text file containing blacklisted course ids",
+    "BLOCKLISTED_COURSES_URL": {
+      "description": "URL of a text file containing blocklisted course ids",
       "required": false
     },
     "DUPLICATE_COURSES_URL": {

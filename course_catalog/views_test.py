@@ -582,7 +582,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
         "course_catalog.views.get_ocw_courses.apply_async", autospec=True
     )
     mock_log = mocker.patch("course_catalog.views.log.error")
-    mocker.patch("course_catalog.views.load_course_blacklist", return_value=[])
+    mocker.patch("course_catalog.views.load_course_blocklist", return_value=[])
     client.post(
         f"{reverse('ocw-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}",
         data=data,
@@ -597,7 +597,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
                         "0/1.json"
                     )[0]
                 ],
-                "blacklist": [],
+                "blocklist": [],
                 "force_overwrite": False,
                 "upload_to_s3": True,
             },
@@ -620,7 +620,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
 )
 def test_ocw_webhook_endpoint_bad_data(mocker, settings, client, data):
     """Test that a webhook exception is raised if bad data is sent"""
-    mocker.patch("course_catalog.views.load_course_blacklist", return_value=[])
+    mocker.patch("course_catalog.views.load_course_blocklist", return_value=[])
     settings.FEATURES[features.WEBHOOK_OCW] = True
     settings.OCW_WEBHOOK_KEY = "fake_key"
     with pytest.raises(WebhookException):
