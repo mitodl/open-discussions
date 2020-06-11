@@ -70,9 +70,9 @@ def mock_get_bootcamps(mocker):
 
 
 @pytest.fixture
-def mock_blacklist(mocker):
-    """Mock the load_course_blacklist function"""
-    return mocker.patch("course_catalog.tasks.load_course_blacklist", return_value=[])
+def mock_blocklist(mocker):
+    """Mock the load_course_blocklist function"""
+    return mocker.patch("course_catalog.tasks.load_course_blocklist", return_value=[])
 
 
 def setup_s3(settings):
@@ -120,7 +120,7 @@ def test_get_mitx_data_valid(mocker):
 @pytest.mark.parametrize("force_overwrite", [True, False])
 @pytest.mark.parametrize("upload_to_s3", [True, False])
 def test_get_ocw_data(
-    settings, mocker, mocked_celery, mock_blacklist, force_overwrite, upload_to_s3
+    settings, mocker, mocked_celery, mock_blocklist, force_overwrite, upload_to_s3
 ):
     """Test get_ocw_data task"""
     setup_s3(settings)
@@ -133,28 +133,28 @@ def test_get_ocw_data(
     assert mocked_celery.group.call_count == 1
     get_ocw_courses_mock.si.assert_called_once_with(
         course_prefixes=[TEST_PREFIX],
-        blacklist=mock_blacklist.return_value,
+        blocklist=mock_blocklist.return_value,
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
     )
 
 
 @mock_s3
-@pytest.mark.parametrize("blacklisted", [True, False])
+@pytest.mark.parametrize("blocklisted", [True, False])
 def test_get_ocw_courses(
-    settings, mock_course_index_functions, mocked_celery, mock_blacklist, blacklisted
+    settings, mock_course_index_functions, mocked_celery, mock_blocklist, blocklisted
 ):
     """
     Test ocw sync task
     """
     setup_s3(settings)
-    if blacklisted:
-        mock_blacklist.return_value = ["9.15"]
+    if blocklisted:
+        mock_blocklist.return_value = ["9.15"]
 
     # run ocw sync
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=mock_blacklist.return_value,
+        blocklist=mock_blocklist.return_value,
         force_overwrite=False,
         upload_to_s3=True,
     )
@@ -163,9 +163,9 @@ def test_get_ocw_courses(
     assert CourseInstructor.objects.count() == 1
     assert CourseTopic.objects.count() == 5
     course = Course.objects.first()
-    assert course.published is not blacklisted
+    assert course.published is not blocklisted
 
-    if not blacklisted:
+    if not blocklisted:
         s3 = boto3.resource(
             "s3",
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
@@ -185,7 +185,7 @@ def test_get_ocw_courses(
 @mock_s3
 @pytest.mark.parametrize("overwrite", [True, False])
 def test_get_ocw_overwrite(
-    mocker, settings, mock_course_index_functions, mock_blacklist, overwrite
+    mocker, settings, mock_course_index_functions, mock_blocklist, overwrite
 ):
     """Test that courses are overridden if force_overwrite=True"""
     setup_s3(settings)
@@ -193,7 +193,7 @@ def test_get_ocw_overwrite(
     # run ocw sync
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=mock_blacklist.return_value,
+        blocklist=mock_blocklist.return_value,
         force_overwrite=False,
         upload_to_s3=True,
     )
@@ -205,7 +205,7 @@ def test_get_ocw_overwrite(
     mock_digest = mocker.patch("course_catalog.api.digest_ocw_course")
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=mock_blacklist.return_value,
+        blocklist=mock_blocklist.return_value,
         force_overwrite=overwrite,
         upload_to_s3=True,
     )
@@ -220,7 +220,7 @@ def test_get_ocw_typeerror(mocker, settings):
     mocker.patch("course_catalog.api.digest_ocw_course", return_value=None)
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=[],
+        blocklist=[],
         force_overwrite=True,
         upload_to_s3=True,
     )
@@ -247,7 +247,7 @@ def test_get_ocw_data_error_parsing(settings, mocker, mock_logger, mocked_celery
     setup_s3(settings)
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=[],
+        blocklist=[],
         force_overwrite=False,
         upload_to_s3=True,
     )
@@ -265,7 +265,7 @@ def test_get_ocw_data_error_reading_s3(settings, mocker, mock_logger, mocked_cel
     setup_s3(settings)
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=[],
+        blocklist=[],
         force_overwrite=False,
         upload_to_s3=True,
     )
@@ -289,7 +289,7 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mocked_c
     setup_s3(settings)
     get_ocw_courses.delay(
         course_prefixes=[TEST_PREFIX],
-        blacklist=[],
+        blocklist=[],
         force_overwrite=False,
         upload_to_s3=True,
     )
@@ -349,7 +349,7 @@ def test_get_ocw_files_missing_settings(mocker, settings):
 
 
 @mock_s3
-def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blacklist):
+def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blocklist):
     """Test get_ocw_data task"""
     setup_s3(settings)
     get_ocw_files_mock = mocker.patch(
@@ -391,7 +391,7 @@ def test_get_xpro_files_missing_settings(mocker, settings):
 
 
 @mock_s3
-def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blacklist):
+def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
     """import_all_xpro_files should start chunked tasks which """
     setup_s3(settings)
     get_xpro_files_mock = mocker.patch(

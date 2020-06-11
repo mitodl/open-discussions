@@ -68,10 +68,10 @@ pytestmark = pytest.mark.django_db
 
 
 @pytest.fixture(autouse=True)
-def mock_blacklist(mocker):
-    """Mock the load_course_blacklist function"""
+def mock_blocklist(mocker):
+    """Mock the load_course_blocklist function"""
     return mocker.patch(
-        "course_catalog.etl.loaders.load_course_blacklist", return_value=[]
+        "course_catalog.etl.loaders.load_course_blocklist", return_value=[]
     )
 
 
@@ -230,8 +230,8 @@ def test_load_program(
 
 @pytest.mark.parametrize("course_exists", [True, False])
 @pytest.mark.parametrize("is_published", [True, False])
-@pytest.mark.parametrize("blacklisted", [True, False])
-def test_load_course(mock_upsert_tasks, course_exists, is_published, blacklisted):
+@pytest.mark.parametrize("blocklisted", [True, False])
+def test_load_course(mock_upsert_tasks, course_exists, is_published, blocklisted):
     """Test that load_course loads the course"""
     course = (
         CourseFactory.create(runs=None, published=is_published)
@@ -253,13 +253,13 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published, blacklisted
     del run["id"]
     props["runs"] = [run]
 
-    blacklist = [course.course_id] if blacklisted else []
+    blocklist = [course.course_id] if blocklisted else []
 
-    result = load_course(props, blacklist, [])
+    result = load_course(props, blocklist, [])
 
-    if course_exists and not is_published and not blacklisted:
+    if course_exists and not is_published and not blocklisted:
         mock_upsert_tasks.delete_course.assert_called_with(result)
-    elif is_published and not blacklisted:
+    elif is_published and not blocklisted:
         mock_upsert_tasks.upsert_course.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
@@ -825,7 +825,7 @@ def test_load_playlist_user_list(
 
 
 @pytest.mark.parametrize("prune", [True, False])
-def test_load_courses(mocker, mock_blacklist, mock_duplicates, prune):
+def test_load_courses(mocker, mock_blocklist, mock_duplicates, prune):
     """Test that load_courses calls the expected functions"""
     course_to_unpublish = CourseFactory.create()
     courses = CourseFactory.create_batch(3, platform=course_to_unpublish.platform)
@@ -839,17 +839,17 @@ def test_load_courses(mocker, mock_blacklist, mock_duplicates, prune):
     for course_data in courses_data:
         mock_load_course.assert_any_call(
             course_data,
-            mock_blacklist.return_value,
+            mock_blocklist.return_value,
             mock_duplicates.return_value,
             config=config,
         )
-    mock_blacklist.assert_called_once_with()
+    mock_blocklist.assert_called_once_with()
     mock_duplicates.assert_called_once_with(course_to_unpublish.platform)
     course_to_unpublish.refresh_from_db()
     assert course_to_unpublish.published is not prune
 
 
-def test_load_programs(mocker, mock_blacklist, mock_duplicates):
+def test_load_programs(mocker, mock_blocklist, mock_duplicates):
     """Test that load_programs calls the expected functions"""
     program_data = [{"courses": [{"platform": "a"}, {}]}]
     mock_load_program = mocker.patch(
@@ -857,7 +857,7 @@ def test_load_programs(mocker, mock_blacklist, mock_duplicates):
     )
     load_programs("mitx", program_data)
     assert mock_load_program.call_count == len(program_data)
-    mock_blacklist.assert_called_once()
+    mock_blocklist.assert_called_once()
     mock_duplicates.assert_called_once_with("mitx")
 
 

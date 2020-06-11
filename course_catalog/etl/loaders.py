@@ -39,7 +39,7 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
-from course_catalog.utils import load_course_blacklist, load_course_duplicates
+from course_catalog.utils import load_course_blocklist, load_course_duplicates
 from course_catalog.etl.deduplication import get_most_relevant_run
 from search import task_helpers as search_task_helpers
 from search.constants import COURSE_TYPE
@@ -164,14 +164,14 @@ def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderCon
     return learning_resource_run
 
 
-def load_course(course_data, blacklist, duplicates, *, config=CourseLoaderConfig()):
+def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig()):
     """
     Load the course into the database
 
     Args:
         course_data (dict):
             a dict of course data values
-        blacklist (list of str):
+        blocklist (list of str):
             list of course ids not to load
         duplicates (list of dict):
             list of duplicate course data
@@ -190,7 +190,7 @@ def load_course(course_data, blacklist, duplicates, *, config=CourseLoaderConfig
     topics_data = course_data.pop("topics", None)
     offered_bys_data = course_data.pop("offered_by", [])
 
-    if course_id in blacklist:
+    if course_id in blocklist:
         course_data["published"] = False
 
     deduplicated_course_id = next(
@@ -258,13 +258,13 @@ def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
         config (CourseLoaderConfig):
             configuration on how to load this program
     """
-    blacklist = load_course_blacklist()
+    blocklist = load_course_blocklist()
     duplicates = load_course_duplicates(platform)
 
     courses_list = list(courses_data or [])
 
     courses = [
-        load_course(course, blacklist, duplicates, config=config)
+        load_course(course, blocklist, duplicates, config=config)
         for course in courses_list
     ]
 
@@ -279,14 +279,14 @@ def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
     return courses
 
 
-def load_program(program_data, blacklist, duplicates, *, config=ProgramLoaderConfig()):
+def load_program(program_data, blocklist, duplicates, *, config=ProgramLoaderConfig()):
     """
     Load the program into the database
 
     Args:
         program_data (dict):
             a dict of program data values
-        blacklist (list of str):
+        blocklist (list of str):
             list of course ids not to load
         duplicates (list of dict):
             list of duplicate course data
@@ -326,7 +326,7 @@ def load_program(program_data, blacklist, duplicates, *, config=ProgramLoaderCon
                 continue
 
             course = load_course(
-                course_data, blacklist, duplicates, config=config.courses
+                course_data, blocklist, duplicates, config=config.courses
             )
             courses.append(course)
 
@@ -353,11 +353,11 @@ def load_program(program_data, blacklist, duplicates, *, config=ProgramLoaderCon
 
 def load_programs(platform, programs_data, *, config=ProgramLoaderConfig()):
     """Load a list of programs"""
-    blacklist = load_course_blacklist()
+    blocklist = load_course_blocklist()
     duplicates = load_course_duplicates(platform)
 
     return [
-        load_program(program_data, blacklist, duplicates, config=config)
+        load_program(program_data, blocklist, duplicates, config=config)
         for program_data in programs_data
     ]
 

@@ -163,17 +163,17 @@ def get_list_items_by_resource(user, object_type, object_id):
     ]
 
 
-def load_course_blacklist():
+def load_course_blocklist():
     """
-    Get a list of blacklisted course ids
+    Get a list of blocklisted course ids
 
     Returns:
         list of str: list of course ids
 
     """
-    blacklist_url = settings.BLACKLISTED_COURSES_URL
-    if blacklist_url is not None:
-        response = requests.get(blacklist_url)
+    blocklist_url = settings.BLOCKLISTED_COURSES_URL
+    if blocklist_url is not None:
+        response = requests.get(blocklist_url)
         response.raise_for_status()
         return [str(line, "utf-8") for line in response.iter_lines()]
     return []
@@ -181,7 +181,7 @@ def load_course_blacklist():
 
 def load_course_duplicates(platform):
     """
-    Get a list of blacklisted course ids for a platform
+    Get a list of blocklisted course ids for a platform
     Args:
         platform (string): the platform for which course duplicates are needed
     Returns:

@@ -864,9 +864,9 @@ XPRO_ITERATOR_CHUNK_SIZE = get_int("XPRO_ITERATOR_CHUNK_SIZE", 20)
 OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
 MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
 MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
-BLACKLISTED_COURSES_URL = get_string(
-    "BLACKLISTED_COURSES_URL",
-    "https://raw.githubusercontent.com/mitodl/open-resource-blacklists/master/courses.txt",
+BLOCKLISTED_COURSES_URL = get_string(
+    "BLOCKLISTED_COURSES_URL",
+    "https://raw.githubusercontent.com/mitodl/open-resource-blocklists/master/courses.txt",
 )
 
 DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
