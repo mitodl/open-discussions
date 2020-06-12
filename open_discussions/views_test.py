@@ -75,6 +75,7 @@ def test_webpack_url(
             "tos_url": authenticated_site.tos_url,
         },
         "is_authenticated": expect_auth,
+        "is_list_staff": False,
         "allow_saml_auth": False,
         "allow_related_posts_ui": False,
         "support_email": settings.EMAIL_SUPPORT,

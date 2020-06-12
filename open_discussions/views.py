@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from social_django.utils import load_strategy, load_backend
 
+from moira_lists.moira_api import is_list_staff
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
@@ -33,6 +34,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     user_email = None
     user_is_superuser = False
     user_id = None
+    user_list_staff = False
 
     if request.user.is_authenticated:
         user = request.user
@@ -41,6 +43,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         user_email = user.email
         user_is_superuser = user.is_superuser
         user_id = user.id
+        user_list_staff = is_list_staff(user)
 
     site = get_default_site()
 
@@ -71,6 +74,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "user_email": user_email,
         "user_id": user_id,
         "is_admin": user_is_superuser,
+        "is_list_staff": user_list_staff,
         "authenticated_site": {
             "title": site.title,
             "base_url": site.base_url,

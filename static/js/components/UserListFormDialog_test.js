@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import { assert } from "chai"
 import { times } from "ramda"
 
@@ -41,16 +42,27 @@ describe("UserListFormDialog", () => {
     helper.cleanup()
   })
 
-  it("should render a form with all the right inputs", async () => {
-    const { wrapper } = await render()
-    assert.ok(wrapper.find('textarea[name="short_description"]').exists())
-    assert.ok(wrapper.find('input[name="title"]').exists())
-    const listType = wrapper.find(".radio").at(0)
-    assert.ok(listType.find(`input[value="${LR_TYPE_USERLIST}"]`).exists())
-    assert.ok(listType.find(`input[value="${LR_TYPE_LEARNINGPATH}"]`).exists())
-    const privacy = wrapper.find(".radio").at(1)
-    assert.ok(privacy.find(`input[value="${LR_PUBLIC}"]`).exists())
-    assert.ok(privacy.find(`input[value="${LR_PRIVATE}"]`).exists())
+  //
+  ;[true, false].forEach(isListStaff => {
+    it("should render a form with all the right inputs", async () => {
+      SETTINGS.is_list_staff = isListStaff
+      const { wrapper } = await render()
+      assert.ok(wrapper.find('textarea[name="short_description"]').exists())
+      assert.ok(wrapper.find('input[name="title"]').exists())
+      const listType = wrapper.find(".radio").at(0)
+      assert.ok(listType.find(`input[value="${LR_TYPE_USERLIST}"]`).exists())
+      assert.ok(
+        listType.find(`input[value="${LR_TYPE_LEARNINGPATH}"]`).exists()
+      )
+      assert.equal(
+        wrapper.find(`input[value="${LR_PUBLIC}"]`).exists(),
+        isListStaff
+      )
+      assert.equal(
+        wrapper.find(`input[value="${LR_PRIVATE}"]`).exists(),
+        isListStaff
+      )
+    })
   })
 
   //
@@ -59,6 +71,7 @@ describe("UserListFormDialog", () => {
     [4, `Select no more than ${TOPICS_LENGTH_MAXIMUM} subjects`]
   ].forEach(([selectCount, topicError]) => {
     it(`should call validator, show the results with ${selectCount} subjects selected`, async () => {
+      SETTINGS.is_list_staff = true
       const { wrapper } = await render()
       // Select all 5 topics (only 3 allowed)
       topics.slice(0, selectCount).forEach(topic => {
@@ -86,7 +99,8 @@ describe("UserListFormDialog", () => {
     })
   })
 
-  it("should let you fill out the form and create a list", async () => {
+  it("should let a user with correct permissions fill out the form and create a public list", async () => {
+    SETTINGS.is_list_staff = true
     const { wrapper } = await render()
     changeFormikInput(
       wrapper.find(`input[value="${LR_TYPE_USERLIST}"]`),
@@ -125,7 +139,43 @@ describe("UserListFormDialog", () => {
     })
   })
 
+  it("should let a user fill out the form and create a private list", async () => {
+    SETTINGS.is_list_staff = false
+    const { wrapper } = await render()
+    changeFormikInput(
+      wrapper.find(`input[value="${LR_TYPE_USERLIST}"]`),
+      "list_type",
+      LR_TYPE_USERLIST
+    )
+    changeFormikInput(wrapper.find('input[name="title"]'), "title", "Title")
+    wrapper
+      .find("Select")
+      .at(1)
+      .instance()
+      .selectOption({ label: topics[0].name, value: topics[0].id })
+    changeFormikInput(
+      wrapper.find("textarea"),
+      "short_description",
+      "My Great Description"
+    )
+    wrapper.update()
+    wrapper.find("form").simulate("submit")
+    await wait(50)
+    assert.ok(hideStub.called)
+    const [url, method, { body }] = helper.handleRequestStub.args[1]
+    assert.equal(url, userListApiURL.toString())
+    assert.equal(method, "POST")
+    assert.deepEqual(body, {
+      title:             "Title",
+      short_description: "My Great Description",
+      list_type:         LR_TYPE_USERLIST,
+      privacy_level:     LR_PRIVATE,
+      topics:            [topics[0].id]
+    })
+  })
+
   it("should pre-populate fields when you pass a list", async () => {
+    SETTINGS.is_list_staff = true
     const { wrapper } = await render({ userList })
     assert.equal(wrapper.find(Dialog).prop("title"), `Edit ${userList.title}`)
     assert.isTrue(

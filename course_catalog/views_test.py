@@ -31,6 +31,7 @@ from course_catalog.serializers import (
     PodcastSerializer,
     PodcastEpisodeSerializer,
 )
+from moira_lists.factories import MoiraListFactory
 from open_discussions import features
 from open_discussions.factories import UserFactory
 
@@ -215,51 +216,85 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
         assert resp.data.get("title") == another_user_list.title
 
 
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_staff", [True, False])
+@pytest.mark.parametrize("is_super", [True, False])
+@pytest.mark.parametrize("on_moira", [True, False])
 @pytest.mark.parametrize("is_anonymous", [True, False])
-def test_user_list_endpoint_create(client, is_anonymous, mock_user_list_index):
+def test_user_list_endpoint_create(  # pylint: disable=too-many-arguments
+    client,
+    is_anonymous,
+    mock_user_list_index,
+    is_public,
+    is_staff,
+    is_super,
+    on_moira,
+    settings,
+):
     """Test userlist endpoint for creating a UserList"""
-    user = UserFactory.create()
+    staff_lists = ["test-list1", "test-list2"]
+    settings.STAFF_MOIRA_LISTS = staff_lists
+    user = UserFactory.create(is_staff=is_staff, is_superuser=is_super)
+    if on_moira:
+        user.moira_lists.set([MoiraListFactory(name=staff_lists[0])])
     if not is_anonymous:
         client.force_login(user)
 
     data = {
         "title": "My List",
-        "privacy_level": PrivacyLevel.public.value,
+        "privacy_level": (
+            PrivacyLevel.public.value if is_public else PrivacyLevel.private.value
+        ),
         "list_type": ListType.LEARNING_PATH.value,
     }
 
+    has_permission = is_staff or is_super or on_moira or not is_public
     resp = client.post(reverse("userlists-list"), data=data, format="json")
-    assert resp.status_code == (403 if is_anonymous else 201)
+    assert resp.status_code == (403 if is_anonymous else 201 if has_permission else 400)
     if resp.status_code == 201:
         assert resp.data.get("title") == resp.data.get("title")
         assert resp.data.get("author") == user.id
         mock_user_list_index.upsert_user_list.assert_not_called()
 
 
+@pytest.mark.parametrize("is_public", [True, False])
+@pytest.mark.parametrize("is_staff", [True, False])
 @pytest.mark.parametrize("update_topics", [True, False])
-def test_user_list_endpoint_patch(client, user, mock_user_list_index, update_topics):
+def test_user_list_endpoint_patch(
+    client, mock_user_list_index, update_topics, is_public, is_staff
+):
     """Test userlist endpoint for updating a UserList"""
     [original_topic, new_topic] = CourseTopicFactory.create_batch(2)
+    list_user = UserFactory.create(is_staff=is_staff)
     userlist = UserListFactory.create(
-        author=user, title="Title 1", topics=[original_topic]
+        author=list_user,
+        title="Title 1",
+        topics=[original_topic],
+        privacy_level=PrivacyLevel.private.value,
     )
     UserListItemFactory.create(user_list=userlist)
 
-    client.force_login(user)
+    client.force_login(list_user)
 
-    data = {"title": "Title 2"}
+    data = {
+        "title": "Title 2",
+        "privacy_level": PrivacyLevel.public.value
+        if is_public
+        else PrivacyLevel.private.value,
+    }
     if update_topics:
         data["topics"] = [new_topic.id]
 
     resp = client.patch(
         reverse("userlists-detail", args=[userlist.id]), data=data, format="json"
     )
-    assert resp.status_code == 200
-    assert UserList.objects.get(id=userlist.id).title == "Title 2"
-    assert resp.data["topics"][0]["id"] == (
-        new_topic.id if update_topics else original_topic.id
-    )
-    mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
+    assert resp.status_code == (200 if (is_staff or not is_public) else 400)
+    if resp.status_code == 200:
+        assert resp.data["title"] == "Title 2"
+        assert resp.data["topics"][0]["id"] == (
+            new_topic.id if update_topics else original_topic.id
+        )
+        mock_user_list_index.upsert_user_list.assert_called_once_with(userlist.id)
 
 
 @pytest.mark.parametrize("is_author", [True, False])
