@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import React from "react"
 import { useMutation, useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
@@ -71,7 +72,8 @@ export default function UserListFormDialog(props: Props) {
           : {
             title:             "",
             short_description: "",
-            topics:            []
+            topics:            [],
+            privacy_level:     SETTINGS.is_list_staff ? null : LR_PRIVATE
           }
       }
       validate={validateCreateUserListForm}
@@ -116,31 +118,36 @@ export default function UserListFormDialog(props: Props) {
               </div>
             </div>
             {validationMessage(errors.list_type)}
-            <span className="input-name">Privacy</span>
-            <div className="privacy radio">
-              <div className="option">
-                <Field
-                  name="privacy_level"
-                  id="radio-public"
-                  type="radio"
-                  value={LR_PUBLIC}
-                />
-                <label htmlFor="radio-public">
-                  <span className="header">Public</span>
-                </label>
-              </div>
-              <div className="option">
-                <Field
-                  name="privacy_level"
-                  type="radio"
-                  id="radio-private"
-                  value={LR_PRIVATE}
-                />
-                <label htmlFor="radio-private">
-                  <span className="header">Private</span>
-                </label>
-              </div>
-            </div>
+            {SETTINGS.is_list_staff ? (
+              <>
+                <span className="input-name">Privacy</span>
+                <div className="privacy radio">
+                  <div className="option">
+                    <Field
+                      name="privacy_level"
+                      id="radio-public"
+                      type="radio"
+                      value={LR_PUBLIC}
+                    />
+                    <label htmlFor="radio-public">
+                      <span className="header">Public</span>
+                    </label>
+                  </div>
+                  <div className="option">
+                    <Field
+                      name="privacy_level"
+                      type="radio"
+                      id="radio-private"
+                      value={LR_PRIVATE}
+                    />
+                    <label htmlFor="radio-private">
+                      <span className="header">Private</span>
+                    </label>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
             {validationMessage(errors.privacy_level)}
             <span className="input-name">List Title</span>
             <Field name="title" className="title" />

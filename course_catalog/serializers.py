@@ -8,7 +8,7 @@ from django.db.models import Max, F, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import PlatformType, ResourceType, ListType
+from course_catalog.constants import PlatformType, ResourceType, ListType, PrivacyLevel
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -30,6 +30,7 @@ from course_catalog.utils import (
     get_course_url,
     semester_year_to_date,
 )
+from moira_lists.moira_api import is_list_staff
 from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import upsert_user_list, delete_user_list
 
@@ -567,6 +568,18 @@ class UserListSerializer(
         if not list_type or list_type not in [listtype.value for listtype in ListType]:
             raise ValidationError("Missing/incorrect list type information")
         return list_type
+
+    def validate_privacy_level(self, privacy_level):
+        """
+        Validator for privacy_level
+        """
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            if privacy_level == PrivacyLevel.public.value and not is_list_staff(
+                request.user
+            ):
+                raise ValidationError("Invalid permissions for public lists")
+        return privacy_level
 
     def create(self, validated_data):
         """Ensure that the list is created by the requesting user"""

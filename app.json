@@ -471,6 +471,10 @@
       "description": "The log level for Sentry",
       "required": false
     },
+    "STAFF_MOIRA_LISTS": {
+      "description": "moira lists of users who can create public lists",
+      "required": false
+    },
     "STATUS_TOKEN": {
       "description": "Token to access the status API."
     },

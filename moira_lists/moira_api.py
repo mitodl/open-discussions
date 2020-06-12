@@ -171,3 +171,25 @@ def update_moira_list_users(moira_list):
         email__in=moira_user_emails(get_list_members(moira_list.name))
     )
     moira_list.users.set(users)
+
+
+def is_list_staff(user):
+    """
+    Determine if a user can author lists & paths
+
+    Args:
+        user (User): a user
+
+    Returns:
+        boolean: True or False
+    """
+    return user and (
+        user.is_superuser
+        or user.is_staff
+        or len(
+            set(user.moira_lists.values_list("name", flat=True)).intersection(
+                settings.STAFF_MOIRA_LISTS
+            )
+        )
+        > 0
+    )

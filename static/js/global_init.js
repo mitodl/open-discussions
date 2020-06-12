@@ -21,6 +21,7 @@ const _createSettings = () => ({
   allow_related_posts_ui: false,
   is_authenticated:       true,
   is_admin:               false,
+  is_list_staff:          false,
   username:               "greatusername",
   user_full_name:         "Great User",
   user_id:                0,

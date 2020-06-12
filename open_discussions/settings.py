@@ -927,6 +927,8 @@ MIT_WS_PRIVATE_KEY = get_key("MIT_WS_PRIVATE_KEY", "")
 MIT_WS_CERTIFICATE_FILE = os.path.join(STATIC_ROOT, "mit_x509.cert")
 MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
 
+STAFF_MOIRA_LISTS = get_list_of_str("STAFF_MOIRA_LISTS", [])
+
 
 def setup_x509():
     """ write the moira x509 certification & key to files"""

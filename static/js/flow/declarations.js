@@ -22,6 +22,7 @@ declare var SETTINGS: {
   },
   is_authenticated: boolean,
   is_admin: boolean,
+  is_list_staff: boolean,
   allow_saml_auth: boolean,
   search_page_size: number,
   search_min_length: number,
