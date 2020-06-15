@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.128.0 (Released June 15, 2020)
+---------------
+
+- Rename blacklist -> blocklist
+- add tooltips to learning resource card
+
 Version 0.127.1 (Released June 03, 2020)
 ---------------
 
