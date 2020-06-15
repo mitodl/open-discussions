@@ -279,28 +279,74 @@ export const buildFacetSubQuery = (
   const facetClauses = []
   if (facets) {
     facets.forEach((values, key) => {
-      if (OBJECT_TYPE !== key && values && values.length > 0) {
-        facetClauses.push({
-          bool: {
-            // $FlowFixMe: shut up flow
-            should: values.map(value => ({
-              term: {
-                [key]: value
-              }
-            }))
-          }
-        })
+      const facetClausesForFacet = []
+
+      if (values && values.length > 0) {
+        addFacetClauseToArray(facetClauses, key, values)
       }
 
-      builder.agg(
-        "terms",
-        key === OBJECT_TYPE ? "object_type.keyword" : key,
-        { size: 10000 },
-        key
-      )
+      // $FlowFixMe: we check for null facets earlier
+      facets.forEach((otherValues, otherKey) => {
+        if (otherKey !== key && otherValues && otherValues.length > 0) {
+          addFacetClauseToArray(facetClausesForFacet, otherKey, otherValues)
+        }
+      })
+
+      if (facetClausesForFacet.length > 0) {
+        const filter = {
+          filter: {
+            bool: {
+              must: [...facetClausesForFacet]
+            }
+          }
+        }
+
+        builder.agg("filter", key, aggregation => {
+          return aggregation
+            .orFilter("bool", filter)
+            .agg(
+              "terms",
+              key === OBJECT_TYPE ? "object_type.keyword" : key,
+              { size: 10000 },
+              key
+            )
+        })
+      } else {
+        builder.agg(
+          "terms",
+          key === OBJECT_TYPE ? "object_type.keyword" : key,
+          { size: 10000 },
+          key
+        )
+      }
     })
   }
   return facetClauses
+}
+
+const addFacetClauseToArray = (
+  facetClauses: Array<any>,
+  facet: string,
+  values: Array<string>
+) => {
+  if (
+    facet === OBJECT_TYPE &&
+    values.toString() === buildSearchQuery.toString()
+  ) {
+    return
+  }
+
+  const filterKey = facet === OBJECT_TYPE ? "object_type.keyword" : facet
+
+  facetClauses.push({
+    bool: {
+      should: values.map(value => ({
+        term: {
+          [filterKey]: value
+        }
+      }))
+    }
+  })
 }
 
 export const buildSuggestQuery = (
@@ -424,7 +470,7 @@ export const buildLearnQuery = (
   types: Array<string>,
   facets: ?Map<string, Array<string>>
 ) => {
-  for (const type of types) {
+  for (const type of LR_TYPE_ALL) {
     const queryType = isDoubleQuoted(text) ? "query_string" : "multi_match"
     const textQuery = emptyOrNil(text)
       ? {}
@@ -468,7 +514,12 @@ export const buildLearnQuery = (
 
     // Add filters for facets if necessary
     const facetClauses = buildFacetSubQuery(facets, builder)
-    builder = buildOrQuery(builder, type, textQuery, facetClauses)
+    builder = buildOrQuery(builder, type, textQuery, [])
+    builder = builder.rawOption("post_filter", {
+      bool: {
+        must: [...facetClauses]
+      }
+    })
 
     // Include suggest if search test is not null/empty
     if (!emptyOrNil(text)) {

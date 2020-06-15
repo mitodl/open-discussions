@@ -347,6 +347,7 @@ def _transform_search_results_suggest(search_result):
     return search_result
 
 
+# pylint: disable=too-many-branches
 def transform_results(search_result, user):
     """
     Transform podcast and podcast episode, and userlist and learning path in aggregations
@@ -359,6 +360,18 @@ def transform_results(search_result, user):
     Returns:
         dict: The Elasticsearch response dict with transformed aggregates and source values
     """
+
+    for aggregation_key in [
+        "type",
+        "topics",
+        "offered_by",
+        "audience",
+        "certification",
+    ]:
+        if f"agg_filter_{aggregation_key}" in search_result.get("aggregations", {}):
+            search_result["aggregations"][aggregation_key] = search_result[
+                "aggregations"
+            ][f"agg_filter_{aggregation_key}"][aggregation_key]
 
     types = search_result.get("aggregations", {}).get("type", {})
 

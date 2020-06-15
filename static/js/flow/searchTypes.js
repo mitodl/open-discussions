@@ -104,11 +104,6 @@ export type FacetResult = {
   buckets:    Array<FacetBucket>
 }
 
-export type CurrentFacet = {
-  group: string,
-  result: FacetResult
-}
-
 export type Result = PostResult | CommentResult | ProfileResult | LearningResourceResult
 
 export type SearchInputs = {

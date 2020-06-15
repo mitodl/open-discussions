@@ -692,10 +692,41 @@ def test_transform_results(
     )
 
 
+@pytest.mark.django_db
+def test_transform_nested_aggregations():
+    """
+    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    """
+    results = {
+        "hits": {"hits": {}, "total": 15},
+        "suggest": {},
+        "aggregations": {
+            "agg_filter_topics": {
+                "doc_count": 11680,
+                "topics": {
+                    "buckets": [
+                        {"key": "Engineering", "doc_count": 7232},
+                        {"key": "Science", "doc_count": 4404},
+                        {"key": "Physics", "doc_count": 2639},
+                    ]
+                },
+            }
+        },
+    }
+
+    expected_transformed_results = results.copy()
+    expected_transformed_results["suggest"] = []
+    expected_transformed_results["aggregations"][
+        "topics"
+    ] = expected_transformed_results["aggregations"]["agg_filter_topics"]["topics"]
+
+    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+
+
 @pytest.mark.parametrize("podcast_present_in_aggregate", [True, False])
 @pytest.mark.parametrize("userlist_present_in_aggregate", [True, False])
 @pytest.mark.django_db
-def test_transform_results_for_aggregates(
+def test_combine_type_buckets_in_aggregates(
     podcast_present_in_aggregate, userlist_present_in_aggregate
 ):
     """

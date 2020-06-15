@@ -477,114 +477,263 @@ describe("search functions", () => {
         })
       )
 
-      const textQuery = [
-        {
-          multi_match: {
-            query:  text,
-            fields: fieldNames
-          }
-        },
-        {
-          nested: {
-            path:  "runs",
-            query: {
-              multi_match: {
-                query:  text,
-                fields: RESOURCE_QUERY_NESTED_FIELDS
-              }
+      const innerTextQuery = {
+        multi_match: {
+          query:  text,
+          fields: fieldNames
+        }
+      }
+
+      const textQueryRuns = {
+        nested: {
+          path:  "runs",
+          query: {
+            multi_match: {
+              query:  text,
+              fields: RESOURCE_QUERY_NESTED_FIELDS
             }
           }
         }
-      ]
+      }
 
-      const mustQuery = [
-        {
-          term: {
-            object_type: type
-          }
-        },
-        {
+      const textQuery = []
+      LR_TYPE_ALL.forEach(type => {
+        const innerQuery = [LR_TYPE_COURSE, LR_TYPE_PROGRAM].includes(type)
+          ? [innerTextQuery, textQueryRuns]
+          : [innerTextQuery]
+        textQuery.push({
           bool: {
-            should: [
-              {
-                term: {
-                  offered_by: "MITx"
-                }
+            filter: {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      object_type: type
+                    }
+                  },
+                  {
+                    bool: {
+                      should: innerQuery
+                    }
+                  }
+                ]
               }
-            ]
+            },
+            should: innerQuery
           }
-        },
-        {
-          bool: {
-            should: [
-              {
-                term: {
-                  topics: "Engineering"
-                }
-              },
-              {
-                term: {
-                  topics: "Science"
-                }
-              }
-            ]
-          }
-        }
-      ]
-
-      mustQuery.push({
-        bool: {
-          should: textQuery
-        }
+        })
       })
 
       assert.deepEqual(buildSearchQuery({ type, text, facets }), {
         aggs: {
-          offered_by: {
-            terms: {
-              field: "offered_by",
-              size:  10000
+          agg_filter_offered_by: {
+            aggs: {
+              offered_by: {
+                terms: {
+                  field: "offered_by",
+                  size:  10000
+                }
+              }
+            },
+            filter: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: [
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      topics: "Engineering"
+                                    }
+                                  },
+                                  {
+                                    term: {
+                                      topics: "Science"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      "object_type.keyword": "course"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
             }
           },
-          topics: {
-            terms: {
-              field: "topics",
-              size:  10000
+          agg_filter_topics: {
+            aggs: {
+              topics: {
+                terms: {
+                  field: "topics",
+                  size:  10000
+                }
+              }
+            },
+            filter: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: [
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      offered_by: "MITx"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      "object_type.keyword": "course"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
             }
           },
-          type: {
-            terms: {
-              field: "object_type.keyword",
-              size:  10000
+          agg_filter_type: {
+            aggs: {
+              type: {
+                terms: {
+                  field: "object_type.keyword",
+                  size:  10000
+                }
+              }
+            },
+            filter: {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      filter: {
+                        bool: {
+                          must: [
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      offered_by: "MITx"
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              bool: {
+                                should: [
+                                  {
+                                    term: {
+                                      topics: "Engineering"
+                                    }
+                                  },
+                                  {
+                                    term: {
+                                      topics: "Science"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
             }
           }
         },
-        query: {
+        post_filter: {
           bool: {
-            should: [
+            must: [
               {
                 bool: {
-                  filter: {
-                    bool: {
-                      must: mustQuery
+                  should: [
+                    {
+                      term: {
+                        offered_by: "MITx"
+                      }
                     }
-                  },
-                  should: textQuery
+                  ]
+                }
+              },
+              {
+                bool: {
+                  should: [
+                    {
+                      term: {
+                        topics: "Engineering"
+                      }
+                    },
+                    {
+                      term: {
+                        topics: "Science"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  should: [
+                    {
+                      term: {
+                        "object_type.keyword": "course"
+                      }
+                    }
+                  ]
                 }
               }
             ]
           }
         },
+        query: {
+          bool: {
+            should: textQuery
+          }
+        },
         suggest: {
-          text:                        text,
           "short_description.trigram": {
             phrase: {
-              confidence: 0.0001,
-              field:      "short_description.trigram",
-              gram_size:  1,
-              size:       5,
-              max_errors: 3,
-              collate:    {
+              collate: {
                 params: {
                   field_name: "short_description.trigram"
                 },
@@ -596,17 +745,18 @@ describe("search functions", () => {
                     }
                   }
                 }
-              }
+              },
+              confidence: 0.0001,
+              field:      "short_description.trigram",
+              gram_size:  1,
+              max_errors: 3,
+              size:       5
             }
           },
+          text:            "some text here",
           "title.trigram": {
             phrase: {
-              confidence: 0.0001,
-              field:      "title.trigram",
-              gram_size:  1,
-              size:       5,
-              max_errors: 3,
-              collate:    {
+              collate: {
                 params: {
                   field_name: "title.trigram"
                 },
@@ -618,7 +768,12 @@ describe("search functions", () => {
                     }
                   }
                 }
-              }
+              },
+              confidence: 0.0001,
+              field:      "title.trigram",
+              gram_size:  1,
+              max_errors: 3,
+              size:       5
             }
           }
         }

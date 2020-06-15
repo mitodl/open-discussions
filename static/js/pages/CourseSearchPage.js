@@ -61,7 +61,6 @@ import type {
   SortParam,
   Result,
   FacetResult,
-  CurrentFacet,
   LearningResourceResult
 } from "../flow/searchTypes"
 
@@ -101,7 +100,6 @@ type Props = {|
 type State = {
   from: number,
   error: ?string,
-  currentFacetGroup: ?CurrentFacet,
   incremental: boolean,
   searchResultLayout: string
 }
@@ -127,7 +125,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
       incremental:        false,
       searchResultLayout: SEARCH_LIST_UI,
       from:               0,
-      currentFacetGroup:  null,
       error:              null
     }
   }
@@ -156,14 +153,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
         type:          []
       }
     })
-    this.setState({
-      currentFacetGroup: null
-    })
   }
 
-  mergeFacetOptions = (group: string) => {
+  facetOptions = (group: string) => {
     const { facets, location } = this.props
-    const { currentFacetGroup } = this.state
     const { activeFacets } = deserializeSearchParams(location)
     const emptyFacet = { buckets: [] }
     const emptyActiveFacets = {
@@ -177,18 +170,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
       return null
     }
 
-    if (currentFacetGroup && currentFacetGroup.group === group) {
-      return mergeFacetResults(
-        currentFacetGroup.result,
-        emptyActiveFacets,
-        facets.get(group) || emptyFacet
-      )
-    } else {
-      return mergeFacetResults(
-        facets.get(group) || emptyFacet,
-        emptyActiveFacets
-      )
-    }
+    return mergeFacetResults(facets.get(group) || emptyFacet, emptyActiveFacets)
   }
 
   loadMore = async () => {
@@ -281,27 +263,13 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   toggleFacet = async (name: string, value: string, isEnabled: boolean) => {
     const { location } = this.props
-    const { currentFacetGroup } = this.state
     const { activeFacets } = deserializeSearchParams(location)
-    const { facets } = this.props
 
     if (isEnabled) {
       activeFacets[name] = _.union(activeFacets[name] || [], [value])
     } else {
       activeFacets[name] = _.without(activeFacets[name] || [], value)
     }
-
-    const facetsGroup = facets.get(name) || { buckets: [] }
-
-    await this.setState({
-      currentFacetGroup: {
-        group:  name,
-        result:
-          currentFacetGroup && currentFacetGroup.group === name
-            ? mergeFacetResults(currentFacetGroup.result, facetsGroup)
-            : facetsGroup
-      }
-    })
 
     this.updateSearchState({
       activeFacets
@@ -314,12 +282,10 @@ export class CourseSearchPage extends React.Component<Props, State> {
 
   updateText = async (event: Object) => {
     const text = event ? event.target.value : ""
-    await this.setState({ currentFacetGroup: null })
     await this.updateSearchState({ text }, true)
   }
 
   useSuggestion = async (text: string) => {
-    await this.setState({ currentFacetGroup: null })
     await this.updateSearchState({ text })
     this.runSearch()
   }
@@ -496,7 +462,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
               activeFacets={activeFacets}
               clearAllFilters={this.clearAllFilters}
               toggleFacet={this.toggleFacet}
-              mergeFacetOptions={this.mergeFacetOptions}
+              facetOptions={this.facetOptions}
               onUpdateFacets={this.onUpdateFacets}
             />
           </Cell>
