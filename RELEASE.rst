@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.129.0
+---------------
+
+- Fix video loading of offerors and topics
+- fix display of favorite icon in 'similar items' panel
+- Restrict public list creation (#2988)
+- Update ocw data parser (#2989)
+
 Version 0.128.0 (Released June 15, 2020)
 ---------------
 
