@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.128.0
+Version 0.128.0 (Released June 15, 2020)
 ---------------
 
 - Rename blacklist -> blocklist
