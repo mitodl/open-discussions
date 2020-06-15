@@ -74,6 +74,25 @@ describe("PaginatedPodcastEpisodes", () => {
     })
   })
 
+  it("should disable next button when one full page is present", async () => {
+    helper.handleRequestStub
+      .withArgs(
+        podcastDetailEpisodesApiURL.param({ podcastId: podcast.id }).toString()
+      )
+      .onFirstCall()
+      .returns({
+        status: 200,
+        body:   {
+          count:   10,
+          results: episodes1,
+          prev:    null,
+          next:    "/next"
+        }
+      })
+    const { wrapper } = await render()
+    assert.isTrue(wrapper.find(".next").prop("disabled"))
+  })
+
   it("should let the user navigate items pages", async () => {
     const { wrapper } = await render()
     wrapper.find(".next").simulate("click")

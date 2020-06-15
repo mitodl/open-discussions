@@ -26,7 +26,7 @@ export default function LRDrawerPaginationControls(props: Props) {
       </button>
       <button
         onClick={() => setPage(page + 1)}
-        disabled={end > count}
+        disabled={end >= count}
         className="blue-btn outlined next"
       >
         <span>Next</span>
