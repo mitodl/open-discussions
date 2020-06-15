@@ -217,7 +217,6 @@ describe("CourseSearchPage", () => {
     assert.isFalse(wrapper.find("InfiniteScroll").prop("hasMore"))
     assert.deepEqual(inner.state(), {
       // Because this is non-incremental the previous from value of 7 is replaced with 0
-      currentFacetGroup:  null,
       error:              null,
       from:               5,
       incremental:        true,
@@ -515,7 +514,7 @@ describe("CourseSearchPage", () => {
     sinon.assert.notCalled(helper.searchStub)
   })
 
-  it("mergeFacetOptions adds any selected facets not in results to the group", async () => {
+  it("facetOptions adds any selected facets not in results to the group", async () => {
     const { inner } = await renderPage(
       {},
       {
@@ -533,30 +532,10 @@ describe("CourseSearchPage", () => {
       }
     )
 
-    const mergedFacets = inner.instance().mergeFacetOptions("topics")
+    const mergedFacets = inner.instance().facetOptions("topics")
     assert.isTrue(
       _.findIndex(mergedFacets.buckets, { doc_count: 0, key: "NewTopic" }) > -1
     )
-  })
-
-  it("mergeFacetOptions adds any search facets not in current facet group", async () => {
-    const { inner } = await renderPage()
-    const currentFacetGroup = {
-      group:  "offered_by",
-      result: { buckets: [{ key: "OCW", doc_count: 20 }] }
-    }
-    const missingFacetGroup = _.find(
-      // $FlowFixMe: platform exists in aggregation result
-      searchResponse.aggregations.offered_by.buckets,
-      { key: "MITx" }
-    )
-    inner.setState({ currentFacetGroup })
-    const mergedFacets = inner.instance().mergeFacetOptions("offered_by")
-    assert.isTrue(
-      _.findIndex(mergedFacets.buckets, { doc_count: 20, key: "OCW" }) > -1
-    )
-    assert.isTrue(_.findIndex(mergedFacets.buckets, missingFacetGroup) > -1)
-    await wait(600)
   })
 
   // THIS IS TEMPORARY UNTIL FULL SEARCH SUPPORT IS IN PLACE!

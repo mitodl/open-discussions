@@ -24,7 +24,7 @@ type FilterDrawerProps = {
   activeFacets: Function,
   clearAllFilters: Function,
   toggleFacet: Function,
-  mergeFacetOptions: Function,
+  facetOptions: Function,
   onUpdateFacets: Function
 }
 
@@ -33,7 +33,7 @@ export function FilterDisplay(props: FilterDrawerProps) {
     activeFacets,
     clearAllFilters,
     toggleFacet,
-    mergeFacetOptions,
+    facetOptions,
     onUpdateFacets
   } = props
 
@@ -69,7 +69,7 @@ export function FilterDisplay(props: FilterDrawerProps) {
               key={i}
               title={title}
               name={name}
-              results={mergeFacetOptions(name)}
+              results={facetOptions(name)}
               onUpdate={onUpdateFacets}
               currentlySelected={activeFacets[name] || []}
               labelFunction={labelFunction}
@@ -79,7 +79,7 @@ export function FilterDisplay(props: FilterDrawerProps) {
               key={i}
               title={title}
               name={name}
-              results={mergeFacetOptions(name)}
+              results={facetOptions(name)}
               onUpdate={onUpdateFacets}
               currentlySelected={activeFacets[name] || []}
               labelFunction={labelFunction}

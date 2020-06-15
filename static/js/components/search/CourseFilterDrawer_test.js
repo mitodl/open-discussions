@@ -12,7 +12,7 @@ import { DESKTOP, PHONE, TABLET } from "../../lib/constants"
 describe("CourseFilterDrawer", () => {
   let clearAllFiltersStub,
     toggleFacetStub,
-    mergeFacetOptionsStub,
+    facetOptionsStub,
     onUpdateFacetsStub,
     sandbox,
     useDeviceCategoryStub
@@ -23,7 +23,7 @@ describe("CourseFilterDrawer", () => {
         activeFacets={{}}
         clearAllFilters={clearAllFiltersStub}
         toggleFacet={toggleFacetStub}
-        mergeFacetOptions={mergeFacetOptionsStub}
+        facetOptions={facetOptionsStub}
         onUpdateFacets={onUpdateFacetsStub}
         {...props}
       />
@@ -41,7 +41,7 @@ describe("CourseFilterDrawer", () => {
     sandbox = createSandbox()
     clearAllFiltersStub = sandbox.stub()
     toggleFacetStub = sandbox.stub()
-    mergeFacetOptionsStub = sandbox.stub()
+    facetOptionsStub = sandbox.stub()
     onUpdateFacetsStub = sandbox.stub()
 
     useDeviceCategoryStub = sandbox
