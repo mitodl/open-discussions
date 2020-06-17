@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.129.0
+Version 0.129.0 (Released June 17, 2020)
 ---------------
 
 - Fix video loading of offerors and topics
