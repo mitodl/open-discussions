@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.129.1
+---------------
+
+- fix facet filters
+- fix off-by-one error
+
 Version 0.129.0 (Released June 17, 2020)
 ---------------
 
