@@ -78,7 +78,7 @@ def test_extract(mocker):
 
 @pytest.mark.usefixtures("mock_rss_request")
 @pytest.mark.parametrize("title", [None, "Custom Title"])
-@pytest.mark.parametrize("topics", [None, "Science, Technology"])
+@pytest.mark.parametrize("topics", [None, "Science,  Technology"])
 @pytest.mark.parametrize("offered_by", [None, "Department"])
 def test_transform(mocker, title, topics, offered_by):
     """Test transform function"""
@@ -88,7 +88,9 @@ def test_transform(mocker, title, topics, offered_by):
         podcast_list
     )
 
-    expected_topics = [{"name": topic} for topic in topics.split(",")] if topics else []
+    expected_topics = (
+        [{"name": topic.strip()} for topic in topics.split(",")] if topics else []
+    )
 
     expected_title = title if title else "A Podcast"
 

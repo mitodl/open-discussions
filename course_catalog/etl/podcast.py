@@ -177,7 +177,7 @@ def transform(extracted_podcasts):
                 else None
             )
             topics = (
-                [{"name": topic} for topic in config_data["topics"].split(",")]
+                [{"name": topic.strip()} for topic in config_data["topics"].split(",")]
                 if "topics" in config_data
                 else []
             )
