@@ -1,5 +1,6 @@
 // @flow
 import { assert } from "chai"
+import moment from "moment"
 
 import {
   COURSE_ARCHIVED,
@@ -8,15 +9,17 @@ import {
   COURSE_PRIOR,
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST
+  LR_TYPE_USERLIST,
+  DATE_FORMAT
 } from "./constants"
 import {
   availabilityLabel,
   minPrice,
   maxPrice,
-  resourceLabel
+  resourceLabel,
+  bestRun
 } from "./learning_resources"
-import { makeCourse } from "../factories/learning_resources"
+import { makeCourse, makeRun } from "../factories/learning_resources"
 
 describe("Course utils", () => {
   [
@@ -78,4 +81,110 @@ describe("Course utils", () => {
       assert.equal(resourceLabel(searchType), facetText)
     })
   })
+
+  //
+  ;[
+    [true, true, true, true],
+    [false, true, true, true],
+    [false, false, true, true],
+    [false, false, false, true],
+    [false, false, false, false]
+  ].forEach(
+    ([
+      currentRunAvailable,
+      futureRunAvailable,
+      pastRunAvailable,
+      runWithNullStartDatesAvailable
+    ]) => {
+      let message = ""
+      if (currentRunAvailable) {
+        message =
+          "bestRun should return the current run when there is a current run"
+      } else if (futureRunAvailable) {
+        message =
+          "bestRun should return the next future run when there is a future run and no current run"
+      } else if (pastRunAvailable) {
+        message =
+          "bestRun should return the last past run when there is a past run and no future run or current run"
+      } else if (runWithNullStartDatesAvailable) {
+        message = "bestRun should not return a run with no start or end dates"
+      } else {
+        message = "bestRun should return null when there are no runs"
+      }
+
+      it(message, () => {
+        const course = makeCourse()
+        course.runs = []
+        const currentDate = new Date()
+        const currentRun = makeRun()
+        const futureRun = makeRun()
+        const pastRun = makeRun()
+        const nullRun = makeRun()
+
+        if (currentRunAvailable) {
+          currentRun.best_start_date = moment(currentDate)
+            .add(5, "days")
+            .format(DATE_FORMAT)
+          currentRun.best_end_date = moment(currentDate)
+            .subtract(5, "days")
+            .format(DATE_FORMAT)
+          course.runs.push(currentRun)
+        }
+
+        if (futureRunAvailable) {
+          futureRun.best_start_date = moment(currentDate)
+            .add(5, "days")
+            .format(DATE_FORMAT)
+          futureRun.best_end_date = moment(currentDate)
+            .add(6, "days")
+            .format(DATE_FORMAT)
+          course.runs.push(futureRun)
+
+          const otherFutureRun = makeRun()
+          otherFutureRun.best_start_date = moment(currentDate)
+            .add(15, "days")
+            .format(DATE_FORMAT)
+          otherFutureRun.best_end_date = moment(currentDate)
+            .add(16, "days")
+            .format(DATE_FORMAT)
+          course.runs.push(otherFutureRun)
+        }
+
+        if (pastRunAvailable) {
+          pastRun.best_start_date = moment(currentDate)
+            .subtract(5, "days")
+            .format(DATE_FORMAT)
+          pastRun.best_end_date = moment(currentDate)
+            .subtract(4, "days")
+            .format(DATE_FORMAT)
+          course.runs.push(pastRun)
+
+          const otherPastRun = makeRun()
+          otherPastRun.best_start_date = moment(currentDate)
+            .subtract(15, "days")
+            .format(DATE_FORMAT)
+          otherPastRun.best_end_date = moment(currentDate)
+            .subtract(14, "days")
+            .format(DATE_FORMAT)
+          course.runs.push(otherPastRun)
+        }
+
+        if (runWithNullStartDatesAvailable) {
+          nullRun.best_start_date = null
+          nullRun.best_end_date = null
+          course.runs.push(nullRun)
+        }
+
+        if (currentRunAvailable) {
+          assert.equal(bestRun(course.runs), currentRun)
+        } else if (futureRunAvailable) {
+          assert.equal(bestRun(course.runs), futureRun)
+        } else if (pastRunAvailable) {
+          assert.equal(bestRun(course.runs), pastRun)
+        } else {
+          assert.equal(bestRun(course.runs), null)
+        }
+      })
+    }
+  )
 })
