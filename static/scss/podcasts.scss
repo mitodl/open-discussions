@@ -255,10 +255,14 @@
       cursor: pointer;
     }
 
-    .podcast-author {
+    .podcast-author,
+    .podcast-episode-count {
       font-size: 14px;
-      color: $font-grey-light;
       min-height: 32px;
+    }
+
+    .podcast-author {
+      color: $font-grey-light;
     }
   }
 }

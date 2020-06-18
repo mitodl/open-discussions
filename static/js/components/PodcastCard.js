@@ -56,6 +56,9 @@ export default function PodcastCard(props: Props) {
           <div className="row podcast-author">
             <Dotdotdot clamp={2}>{podcast.offered_by}</Dotdotdot>
           </div>
+          <div className="row podcast-episode-count">
+            {podcast.episode_count} Episodes
+          </div>
         </div>
       </div>
     </Card>
