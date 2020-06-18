@@ -41,6 +41,10 @@ describe("PodcastCard", () => {
       podcast.offered_by
     )
     assert.equal(
+      wrapper.find(".podcast-episode-count").text(),
+      `${podcast.episode_count} Episodes`
+    )
+    assert.equal(
       wrapper.find("img").prop("src"),
       embedlyThumbnail(
         SETTINGS.embedlyKey,
