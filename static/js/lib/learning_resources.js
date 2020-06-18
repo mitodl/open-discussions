@@ -8,8 +8,6 @@ import {
   COURSE_CURRENT,
   COURSE_PRIOR,
   DATE_FORMAT,
-  DEFAULT_END_DT,
-  DEFAULT_START_DT,
   LR_TYPE_USERLIST,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
@@ -38,18 +36,20 @@ export const availabilityLabel = (availability: ?string) => {
   }
 }
 
-export const runStartDate = (objectRun: LearningResourceRun): moment$Moment =>
-  moment(objectRun.best_start_date || DEFAULT_START_DT, DATE_FORMAT)
+const runStartDate = (objectRun: LearningResourceRun): moment$Moment =>
+  moment(objectRun.best_start_date, DATE_FORMAT)
 
-export const runEndDate = (objectRun: LearningResourceRun): moment$Moment =>
-  moment(objectRun.best_end_date || DEFAULT_END_DT, DATE_FORMAT)
+const runEndDate = (objectRun: LearningResourceRun): moment$Moment =>
+  moment(objectRun.best_end_date, DATE_FORMAT)
 
-export const compareRuns = (
+const compareRuns = (
   firstRun: LearningResourceRun,
   secondRun: LearningResourceRun
 ) => runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
 export const bestRun = (runs: Array<LearningResourceRun>) => {
+  runs = runs.filter(run => run.best_start_date && run.best_end_date)
+
   // Runs that are running right now
   const currentRuns = runs.filter(
     run => runStartDate(run).isSameOrBefore() && runEndDate(run).isAfter()
