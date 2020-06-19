@@ -42,7 +42,7 @@ router.register(
 urlpatterns = [
     url(
         r"^api/v0/podcasts/recent/$",
-        views.PodcastEpisodesViewSet.as_view({"get": "list"}),
+        views.RecentPodcastEpisodesViewSet.as_view({"get": "list"}),
         name="recent-podcast-episodes",
     ),
     url(
