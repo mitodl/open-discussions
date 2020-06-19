@@ -1,6 +1,7 @@
 """Tests for course_catalog views"""
 from types import SimpleNamespace
-from datetime import datetime
+from datetime import datetime, timedelta
+from operator import itemgetter
 import pytz
 
 import pytest
@@ -725,30 +726,57 @@ def test_recent_podcast_episodes_no_feature_flag(settings, client):
         assert resp.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_recent_podcast_episodes(settings, client):
-    """Recent podcast episodes API should return recent serialized podcast episodes in order of most recent first"""
-    episodes = list(
-        reversed(
-            sorted(
-                PodcastEpisodeFactory.create_batch(5),
-                key=lambda episode: (episode.last_modified, episode.id),
-            )
-        )
+def test_podcast_episodes(settings, client):
+    """
+    Podcast episodes and tecent podcast episodes APIs should return recent serialized podcast episodes in order of most recent first.
+    Recent podcast episodes API should limit to only one episode per podcast
+    """
+    latest_episodes_by_podcast = PodcastEpisodeFactory.create_batch(5)
+
+    older_episode = PodcastEpisodeFactory.create(
+        podcast=latest_episodes_by_podcast[0].podcast,
+        last_modified=latest_episodes_by_podcast[0].last_modified - timedelta(days=10),
     )
+
     # Make sure these don't get counted
     PodcastEpisodeFactory.create(published=False)
     PodcastEpisodeFactory.create(published=True, podcast__published=False)
 
     settings.FEATURES[features.PODCAST_APIS] = True
     for basename in ["recent-podcast-episodes", "podcastepisodes-list"]:
+        if basename == "recent-podcast-episodes":
+            episodes = latest_episodes_by_podcast
+            count = 5
+        else:
+            episodes = latest_episodes_by_podcast + [older_episode]
+            count = 6
+
+        episodes = list(
+            reversed(
+                sorted(
+                    episodes, key=lambda episode: (episode.last_modified, episode.id)
+                )
+            )
+        )
+
         resp = client.get(reverse(basename))
         assert resp.status_code == status.HTTP_200_OK
-        assert resp.json()["count"] == 5
+        assert resp.json()["count"] == count
 
-        assert resp.json()["results"] == [
+        expected_results = [
             {"is_favorite": False, **episode}
             for episode in PodcastEpisodeSerializer(instance=episodes, many=True).data
         ]
+
+        results = resp.json()["results"]
+
+        for result in expected_results:
+            result["topics"] = sorted(result["topics"], key=itemgetter("id"))
+
+        for result in results:
+            result["topics"] = sorted(result["topics"], key=itemgetter("id"))
+
+        assert results == expected_results
 
 
 def test_podcast_episodes_detail_no_feature_flag(settings, client):

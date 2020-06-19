@@ -2,6 +2,8 @@
 course_catalog views
 """
 import logging
+import operator
+
 from hmac import compare_digest
 
 import rapidjson
@@ -428,6 +430,23 @@ class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         )
 
 
+def shared_podcast_episode_query(user):
+    """
+    Shared query set for PodcastEpisodesViewSet and RecentPodcastEpisodesViewSet
+    """
+
+    return (
+        PodcastEpisode.objects.filter(published=True, podcast__published=True)
+        .prefetch_related(
+            Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
+            Prefetch("topics", queryset=CourseTopic.objects.all()),
+        )
+        .annotate_is_favorite_for_user(user)
+        .prefetch_list_items_for_user(user)
+        .select_related("podcast")
+    )
+
+
 class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for PodcastEpisodes
@@ -441,16 +460,27 @@ class PodcastEpisodesViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
 
         user = self.request.user
 
-        return (
-            PodcastEpisode.objects.filter(published=True, podcast__published=True)
-            .order_by("-last_modified", "-id")
-            .prefetch_related(
-                Prefetch("offered_by", queryset=LearningResourceOfferor.objects.all()),
-                Prefetch("topics", queryset=CourseTopic.objects.all()),
-            )
-            .annotate_is_favorite_for_user(user)
-            .prefetch_list_items_for_user(user)
-            .select_related("podcast")
+        return shared_podcast_episode_query(user).order_by("-last_modified", "-id")
+
+
+class RecentPodcastEpisodesViewSet(PodcastEpisodesViewSet):
+    """
+    Viewset for most recent PodcastEpisode for each Podcast
+    """
+
+    def get_queryset(self):
+        user = self.request.user
+
+        latest_episode_by_podcast = (
+            shared_podcast_episode_query(user)
+            .order_by("podcast_id", "-last_modified", "-id")
+            .distinct("podcast_id")
+        )
+
+        return sorted(
+            latest_episode_by_podcast,
+            key=operator.attrgetter("last_modified"),
+            reverse=True,
         )
 
 
