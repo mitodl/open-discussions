@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.130.0
+---------------
+
+- limit to one recent episode per podcast
+- Bump django from 2.2.10 to 2.2.13
+- do not select run with missing dates
+- add episode count to podcast card
+- trim white space
+
 Version 0.129.1 (Released June 18, 2020)
 ---------------
 
