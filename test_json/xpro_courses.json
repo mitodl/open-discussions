@@ -6,7 +6,8 @@
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+SysEngxB1",
     "courseruns": [],
-    "next_run_id": null
+    "next_run_id": null,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 20,
@@ -30,7 +31,8 @@
         "product_id": 13
       }
     ],
-    "next_run_id": 49
+    "next_run_id": 49,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 19,
@@ -54,7 +56,8 @@
         "product_id": 12
       }
     ],
-    "next_run_id": 48
+    "next_run_id": 48,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 21,
@@ -63,7 +66,8 @@
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+SysEngxB4",
     "courseruns": [],
-    "next_run_id": null
+    "next_run_id": null,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 30,
@@ -109,7 +113,8 @@
         "product_id": null
       }
     ],
-    "next_run_id": 73
+    "next_run_id": 73,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 31,
@@ -118,7 +123,8 @@
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+DgtlLearn2",
     "courseruns": [],
-    "next_run_id": null
+    "next_run_id": null,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   },
   {
     "id": 32,
@@ -127,6 +133,7 @@
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+DgtlLearn3",
     "courseruns": [],
-    "next_run_id": null
+    "next_run_id": null,
+    "topics": [{"name": "Business:Leadership & Organizations"}]
   }
 ]

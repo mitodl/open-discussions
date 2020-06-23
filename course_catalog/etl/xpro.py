@@ -1,6 +1,8 @@
 """xPro course catalog ETL"""
 import copy
+import csv
 from datetime import datetime
+from itertools import chain
 import logging
 import mimetypes
 import os
@@ -10,6 +12,7 @@ import glob
 
 import boto3
 from django.conf import settings
+from django.utils.functional import SimpleLazyObject
 import requests
 import pytz
 from xbundle import XBundle
@@ -31,6 +34,28 @@ log = logging.getLogger(__name__)
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 OFFERED_BY = [{"name": OfferedBy.xpro.value}]
+
+
+def _load_ucc_topic_mappings():
+    """
+    Loads the topic mappings from the crosswalk CSV file
+
+    Returns:
+        dict:
+            the mapping dictionary
+    """
+    with open("course_catalog/data/ucc-topic-mappings.csv", "r") as mapping_file:
+        rows = list(csv.reader(mapping_file))
+        # drop the column headers (first row)
+        rows = rows[1:]
+        mapping = {
+            f"{row[0]}:{row[1]}": list(filter(lambda item: item, row[2:]))
+            for row in rows
+        }
+        return mapping
+
+
+UCC_TOPIC_MAPPINGS = SimpleLazyObject(_load_ucc_topic_mappings)
 
 
 def get_xpro_learning_course_bucket():
@@ -77,6 +102,25 @@ def extract_courses():
     if settings.XPRO_COURSES_API_URL:
         return requests.get(settings.XPRO_COURSES_API_URL).json()
     return []
+
+
+def _transform_topics(topics):
+    """
+    Transform the topics by using our crosswalk mapping
+
+    Args:
+        topics (list of dict):
+            the topics to transform
+
+    Return:
+        list of dict: the transformed topics
+    """
+    return [
+        {"name": topic_name}
+        for topic_name in chain.from_iterable(
+            [UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]]) for topic in topics]
+        )
+    ]
 
 
 def _transform_run(course_run):
@@ -135,7 +179,7 @@ def _transform_course(course):
                 course["courseruns"],
             )
         ),
-        "topics": course.get("topics", []),
+        "topics": _transform_topics(course.get("topics", [])),
         "runs": [_transform_run(course_run) for course_run in course["courseruns"]],
     }
 
@@ -167,7 +211,7 @@ def transform_programs(programs):
                 program["current_price"]
             ),  # a program is only considered published if it has a product/price
             "url": program["url"],
-            "topics": program.get("topics", []),
+            "topics": _transform_topics(program.get("topics", [])),
             "runs": [
                 {
                     "prices": [{"price": program["current_price"], "mode": ""}]

@@ -1,6 +1,7 @@
 """Tests for MicroMasters ETL functions"""
 # pylint: disable=redefined-outer-name
 from datetime import datetime
+from itertools import chain
 import json
 import os
 import pathlib
@@ -21,6 +22,7 @@ from course_catalog.etl.xpro import (
     transform_content_files,
     documents_from_olx,
     get_text_from_element,
+    UCC_TOPIC_MAPPINGS,
 )
 from open_discussions.test_utils import any_instance_of
 
@@ -97,7 +99,15 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
             "offered_by": xpro.OFFERED_BY,
             "published": bool(program_data["current_price"]),
             "url": program_data["url"],
-            "topics": program_data.get("topics", []),
+            "topics": [
+                {"name": topic_name}
+                for topic_name in chain.from_iterable(
+                    [
+                        UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]])
+                        for topic in program_data.get("topics", [])
+                    ]
+                )
+            ],
             "runs": [
                 {
                     "run_id": program_data["readable_id"],
@@ -135,7 +145,15 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                             course_data["courseruns"],
                         )
                     ),
-                    "topics": course_data.get("topics", []),
+                    "topics": [
+                        {"name": topic_name}
+                        for topic_name in chain.from_iterable(
+                            [
+                                UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]])
+                                for topic in course_data.get("topics", [])
+                            ]
+                        )
+                    ],
                     "runs": [
                         {
                             "run_id": course_run_data["courseware_id"],
@@ -190,7 +208,15 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
                     course_data["courseruns"],
                 )
             ),
-            "topics": course_data.get("topics", []),
+            "topics": [
+                {"name": topic_name}
+                for topic_name in chain.from_iterable(
+                    [
+                        UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]])
+                        for topic in course_data.get("topics", [])
+                    ]
+                )
+            ],
             "runs": [
                 {
                     "run_id": course_run_data["courseware_id"],
