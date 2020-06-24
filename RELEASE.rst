@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.130.0
+Version 0.130.0 (Released June 24, 2020)
 ---------------
 
 - limit to one recent episode per podcast
