@@ -8,6 +8,7 @@
 .*.git/.*
 .*/staticfiles/.*
 .*/static/bundles/.*
+.*/node_modules/immer/.*.flow
 
 [include]
 ./static/js

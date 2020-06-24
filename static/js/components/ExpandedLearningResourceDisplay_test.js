@@ -351,7 +351,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[
-    ["mitx", "september 01, 2019", "Start Date:"],
+    ["mitx", "September 01, 2019", "Start Date:"],
     ["ocw", "Fall 2019", "As Taught In:"]
   ].forEach(([platform, expectedValue, expectedLabel]) => {
     it(`should display the correct date label and options for ${platform} courses`, async () => {
@@ -397,8 +397,8 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   //
   ;[
-    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "september 01, 2019"],
-    [null, "2019-08-01T00:00:00Z", "august 01, 2019"],
+    ["2019-09-01T00:00:00Z", "2019-08-01T00:00:00Z", "September 01, 2019"],
+    [null, "2019-08-01T00:00:00Z", "August 01, 2019"],
     [null, null, "Ongoing"]
   ].forEach(([startDate, bestDate, expected]) => {
     it(`mitx run date should be ${expected} for start date ${String(
