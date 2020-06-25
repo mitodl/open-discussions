@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.131.0
+---------------
+
+- dependency upgrades, add @reduxjs/toolkit
+- Added xPro topic mapping
+
 Version 0.130.0 (Released June 24, 2020)
 ---------------
 
