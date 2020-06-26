@@ -65,6 +65,7 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
+import "focus-visible"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 

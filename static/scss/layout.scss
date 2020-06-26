@@ -92,6 +92,10 @@ body {
   width: 100%;
   min-height: 100vh;
 
+  *:focus:not(.focus-visible) {
+    outline: none;
+  }
+
   .mdc-layout-grid {
     padding: 0;
   }

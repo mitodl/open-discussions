@@ -183,7 +183,16 @@ export function LearningResourceDisplay(props: Props) {
               : null}
           </div>
         </div>
-        <div className="row course-title" onClick={showResourceDrawer}>
+        <div
+          className="row course-title"
+          onClick={showResourceDrawer}
+          onKeyPress={e => {
+            if (e.key === "Enter") {
+              showResourceDrawer()
+            }
+          }}
+          tabIndex="0"
+        >
           <Dotdotdot clamp={3}>{object.title}</Dotdotdot>
         </div>
         {reordering ? null : (
