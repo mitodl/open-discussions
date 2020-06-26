@@ -231,6 +231,7 @@ class App extends React.Component<Props> {
           hide={preventDefaultAndInvoke(this.hideBanner)}
         />
         <div className={`content${audioPlayerPadding}`}>
+          <AudioPlayer />
           <Route exact path={match.url} component={HomePage} />
           <Route
             path={channelIndexRoute(match.url)}
@@ -342,7 +343,6 @@ class App extends React.Component<Props> {
           {SETTINGS.podcast_frontpage_enabled ? (
             <Route path={`${match.url}podcasts`}>
               <PodcastFrontpage />
-              <AudioPlayer />
               <LearningResourceDrawer hideSimilarLearningResources />
             </Route>
           ) : null}

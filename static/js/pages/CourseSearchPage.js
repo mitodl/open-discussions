@@ -21,7 +21,6 @@ import {
   BannerImage
 } from "../components/PageBanner"
 import CourseFilterDrawer from "../components/search/CourseFilterDrawer"
-import AudioPlayer from "../components/AudioPlayer"
 
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
@@ -470,7 +469,6 @@ export class CourseSearchPage extends React.Component<Props, State> {
             {error ? null : this.renderResults()}
           </Cell>
         </Grid>
-        <AudioPlayer />
       </BannerPageWrapper>
     )
   }

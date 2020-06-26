@@ -3,7 +3,11 @@ import { useCallback } from "react"
 import { useDispatch } from "react-redux"
 import Amplitude from "amplitudejs"
 
-import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
+import {
+  setAudioPlayerState,
+  setCurrentlyPlayingAudio,
+  stopAudioPlayer
+} from "../reducers/audio"
 import { AUDIO_PLAYER_PAUSED, AUDIO_PLAYER_PLAYING } from "../lib/constants"
 
 export function useInitAudioPlayer(audio: Object) {
@@ -15,6 +19,7 @@ export function useInitAudioPlayer(audio: Object) {
       if (Amplitude.getAudio()) {
         Amplitude.getAudio().pause()
       }
+
       Amplitude.init({
         bindings: {
           [32]: "play_pause"
@@ -41,4 +46,20 @@ export function useInitAudioPlayer(audio: Object) {
   )
 
   return initAudioPlayer
+}
+
+export function useStopAudioPlayer() {
+  const dispatch = useDispatch()
+
+  const stopAudioPlayerCB = useCallback(
+    () => {
+      if (Amplitude.getAudio()) {
+        Amplitude.getAudio().pause()
+      }
+      dispatch(stopAudioPlayer())
+    },
+    [dispatch]
+  )
+
+  return stopAudioPlayerCB
 }

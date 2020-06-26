@@ -10,6 +10,7 @@ import {
   currentlyPlayingAudioSelector
 } from "../lib/redux_selectors"
 import { AUDIO_PLAYER_PLAYING } from "../lib/constants"
+import { useStopAudioPlayer } from "../hooks/audio_player"
 
 export default function AudioPlayer() {
   const seekBar = useRef()
@@ -42,6 +43,8 @@ export default function AudioPlayer() {
     }
   })
 
+  const stopAudioPlayer = useStopAudioPlayer()
+
   return (
     <div
       className={`audio-player-container-outer${!audioLoaded ? " hidden" : ""}`}
@@ -62,6 +65,12 @@ export default function AudioPlayer() {
         <div className="audio-player-controls">
           <div className="audio-player-playback-controls">
             <div className="audio-player-button-container">
+              <i
+                className="audio-player-close material-icons close"
+                onClick={stopAudioPlayer}
+              >
+                close
+              </i>
               <div
                 className="audio-player-button"
                 onClick={() => skipSeconds(-10)}

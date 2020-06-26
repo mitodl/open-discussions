@@ -6,13 +6,12 @@ import {
   audioPlayerStateSelector,
   currentlyPlayingAudioSelector
 } from "../lib/redux_selectors"
-import { INITIAL_AUDIO_STATE } from "./audio"
 import {
-  SET_AUDIO_PLAYER_STATE,
+  INITIAL_AUDIO_STATE,
   setAudioPlayerState,
-  SET_CURRENTLY_PLAYING_AUDIO,
-  setCurrentlyPlayingAudio
-} from "../actions/audio"
+  setCurrentlyPlayingAudio,
+  stopAudioPlayer
+} from "./audio"
 
 describe("audio reducer", () => {
   let helper, store, dispatchThen
@@ -40,15 +39,20 @@ describe("audio reducer", () => {
       url:         testUrl
     }
     dispatchThen(setCurrentlyPlayingAudio(exampleAudio), [
-      SET_CURRENTLY_PLAYING_AUDIO
+      setCurrentlyPlayingAudio.type
     ])
     const currentlyPlaying = currentlyPlayingAudioSelector(store.getState())
     assert.deepEqual(exampleAudio, currentlyPlaying)
   })
 
   it("should let you set the audio player state", () => {
-    dispatchThen(setAudioPlayerState("playing"), [SET_AUDIO_PLAYER_STATE])
+    dispatchThen(setAudioPlayerState("playing"), [setAudioPlayerState.type])
     const audioPlayerState = audioPlayerStateSelector(store.getState())
     assert.equal("playing", audioPlayerState)
+  })
+
+  it("should let you clear the audio player state", () => {
+    dispatchThen(stopAudioPlayer(), [stopAudioPlayer.type])
+    assert.deepEqual(store.getState().audio, INITIAL_AUDIO_STATE)
   })
 })

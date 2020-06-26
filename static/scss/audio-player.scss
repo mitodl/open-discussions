@@ -115,6 +115,18 @@
         width: 100%;
       }
 
+      .audio-player-close {
+        position: absolute;
+        top: 3px;
+        right: 16px;
+        font-size: 20px;
+        cursor: pointer;
+
+        @include breakpoint(mobile) {
+          right: 3px;
+        }
+      }
+
       .audio-player-button {
         height: 40px;
         display: flex;

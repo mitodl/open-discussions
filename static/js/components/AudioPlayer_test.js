@@ -3,7 +3,11 @@ import sinon from "sinon"
 import Amplitude from "amplitudejs"
 
 import AudioPlayer from "./AudioPlayer"
-import { setAudioPlayerState, setCurrentlyPlayingAudio } from "../actions/audio"
+import {
+  INITIAL_AUDIO_STATE,
+  setAudioPlayerState,
+  setCurrentlyPlayingAudio
+} from "../reducers/audio"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("AudioPlayer", () => {
@@ -88,6 +92,14 @@ describe("AudioPlayer", () => {
       wrapper.find(`.amplitude-play-pause span`).text(),
       "play_circle_outline"
     )
+  })
+
+  it("should have a close button that clears the audio player state", async () => {
+    const { wrapper, store } = await render({}, [
+      setCurrentlyPlayingAudio(exampleAudio)
+    ])
+    wrapper.find(".audio-player-close").simulate("click")
+    assert.deepEqual(store.getState().audio, INITIAL_AUDIO_STATE)
   })
 
   seekElements.forEach(id => {
