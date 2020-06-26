@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.131.0
+Version 0.131.0 (Released June 26, 2020)
 ---------------
 
 - dependency upgrades, add @reduxjs/toolkit
