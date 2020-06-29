@@ -109,7 +109,7 @@ def test_transform(mocker, title, topics, offered_by):
             "topics": expected_topics,
             "episodes": [
                 {
-                    "episode_id": "fefc732682f83d1a8945eebcae5364b4",
+                    "episode_id": "0a19bfc1f30334389fc039e716d35306",
                     "title": "Episode1",
                     "offered_by": expected_offered_by,
                     "short_description": "SMorbi id consequat nisl. Morbi leo elit, vulputate nec aliquam molestie, ullamcorper sit amet tortor",
@@ -125,7 +125,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "topics": expected_topics,
                 },
                 {
-                    "episode_id": "e56d3047fad337ca85b577c60ff6a8da",
+                    "episode_id": "85855fa506bf36999f8978302f3413ec",
                     "title": "Episode2",
                     "offered_by": expected_offered_by,
                     "short_description": "Praesent fermentum suscipit metus nec aliquam. Proin hendrerit felis ut varius facilisis.",

@@ -1015,6 +1015,9 @@ def test_load_podcast(mock_upsert_tasks, podcast_exists, is_published):
     if podcast_exists:
         existing_podcast_episode.refresh_from_db()
         assert existing_podcast_episode.published is False
+        mock_upsert_tasks.delete_podcast_episode.assert_called_with(
+            existing_podcast_episode
+        )
 
     if podcast_exists and not is_published:
         mock_upsert_tasks.delete_podcast.assert_called_with(result)

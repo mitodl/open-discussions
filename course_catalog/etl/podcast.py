@@ -127,7 +127,7 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
         dict:
             normalized podcast episode data
     """
-    episode_id = generate_unique_id(rss_data.enclosure["url"])
+    episode_id = generate_unique_id(rss_data.guid.text)
     return {
         "episode_id": episode_id,
         "title": rss_data.title.text,
