@@ -749,9 +749,14 @@ def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
         episode = load_podcast_episode(episode_data, podcast, config=config.episodes)
         episode_ids.append(episode.id)
 
-    PodcastEpisode.objects.filter(podcast=podcast).exclude(id__in=episode_ids).update(
-        published=False
+    unpublished_episodes = PodcastEpisode.objects.filter(podcast=podcast).exclude(
+        id__in=episode_ids
     )
+
+    for episode in unpublished_episodes:
+        search_task_helpers.delete_podcast_episode(episode)
+
+    unpublished_episodes.update(published=False)
 
     if not created and not podcast.published:
         search_task_helpers.delete_podcast(podcast)

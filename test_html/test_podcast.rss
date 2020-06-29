@@ -27,7 +27,7 @@
     </image>
     <itunes:category text="Science"/>
     <item>
-      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers</guid>
+      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers1</guid>
       <title>Episode1</title>
       <pubDate>Wed, 01 Apr 2020 18:20:31 +0000</pubDate>
       <link>https://soundcloud.com/podcast/episode1</link>
@@ -40,7 +40,7 @@
       <enclosure type="audio/mpeg" url="http://feeds.soundcloud.com/stream/episode1.mp3" length="25437522"/>
     </item>
     <item>
-      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers</guid>
+      <guid isPermaLink="false">tag:soundcloud,2010:tracks/numbers2</guid>
       <title>Episode2</title>
       <pubDate>Wed, 01 Apr 2020 18:20:31 +0000</pubDate>
       <link>https://soundcloud.com/podcast/episode2</link>
