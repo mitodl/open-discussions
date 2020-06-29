@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.132.0
+---------------
+
+- update requirements with new version (#3012)
+
 Version 0.131.0 (Released June 26, 2020)
 ---------------
 
