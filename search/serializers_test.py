@@ -578,10 +578,6 @@ def test_es_podcast_serializer(offered_by):
             "created": drf_datetime(podcast.created_on),
             "default_search_priority": 0,
             "offered_by": [offered_by],
-            "runs": [
-                ESRunSerializer(run).data
-                for run in podcast.runs.order_by("-best_start_date")
-            ],
             "audience": ["Open Content"],
             "certification": [],
         },
@@ -617,10 +613,6 @@ def test_es_podcast_episode_serializer(offered_by):
             "created": drf_datetime(podcast_episode.created_on),
             "default_search_priority": 0,
             "offered_by": [offered_by],
-            "runs": [
-                ESRunSerializer(run).data
-                for run in podcast_episode.runs.order_by("-best_start_date")
-            ],
             "audience": ["Open Content"],
             "certification": [],
         },

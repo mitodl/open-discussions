@@ -8,7 +8,6 @@ import yaml
 from bs4 import BeautifulSoup as bs
 import requests
 from course_catalog.etl.utils import generate_unique_id
-from course_catalog.constants import PlatformType
 
 CONFIG_FILE_REPO = "mitodl/open-podcast-data"
 CONFIG_FILE_FOLDER = "podcasts"
@@ -148,13 +147,6 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
         if rss_data.find("itunes:duration")
         else None,
         "topics": topics,
-        "runs": [
-            {
-                "run_id": episode_id,
-                "platform": PlatformType.podcast.value,
-                "prices": [{"price": 0}],
-            }
-        ],
     }
 
 
@@ -203,13 +195,6 @@ def transform(extracted_podcasts):
                     transform_episode(episode_rss, offered_by, topics, image)
                     for episode_rss in rss_data.find_all("item")
                 ),
-                "runs": [
-                    {
-                        "run_id": podcast_id,
-                        "platform": PlatformType.podcast.value,
-                        "prices": [{"price": 0}],
-                    }
-                ],
             }
         except AttributeError:
             log.exception("Error parsing podcast data from %s", config_data["rss_url"])

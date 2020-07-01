@@ -123,13 +123,6 @@ def test_transform(mocker, title, topics, offered_by):
                     "published": True,
                     "duration": "00:17:16",
                     "topics": expected_topics,
-                    "runs": [
-                        {
-                            "run_id": "fefc732682f83d1a8945eebcae5364b4",
-                            "platform": "podcast",
-                            "prices": [{"price": 0}],
-                        }
-                    ],
                 },
                 {
                     "episode_id": "e56d3047fad337ca85b577c60ff6a8da",
@@ -146,21 +139,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "published": True,
                     "duration": "00:17:16",
                     "topics": expected_topics,
-                    "runs": [
-                        {
-                            "run_id": "e56d3047fad337ca85b577c60ff6a8da",
-                            "platform": "podcast",
-                            "prices": [{"price": 0}],
-                        }
-                    ],
                 },
-            ],
-            "runs": [
-                {
-                    "run_id": "d4c3dcd45dc93fbc9c3634ba0545c2e0",
-                    "platform": "podcast",
-                    "prices": [{"price": 0}],
-                }
             ],
         }
     ]
