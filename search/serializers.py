@@ -594,7 +594,6 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
 
     object_type = VIDEO_TYPE
 
-    runs = ESRunSerializer(many=True)
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
@@ -616,7 +615,6 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
             "image_src",
             "topics",
             "published",
-            "runs",
             "offered_by",
             "created",
             "default_search_priority",
@@ -634,8 +632,6 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
     object_type = PODCAST_TYPE
 
     default_search_priority = serializers.SerializerMethodField()
-
-    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_default_search_priority(self, instance):
         """
@@ -657,7 +653,6 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
             "default_search_priority",
             "created",
             "offered_by",
-            "runs",
             "audience",
             "certification",
         ]
@@ -671,7 +666,6 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
 
     series_title = serializers.SerializerMethodField()
     default_search_priority = serializers.SerializerMethodField()
-    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
 
     def get_series_title(self, instance):
         """Gets the title of the podcast to which this episode belongs"""
@@ -701,7 +695,6 @@ class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
             "default_search_priority",
             "created",
             "offered_by",
-            "runs",
             "audience",
             "certification",
         ]

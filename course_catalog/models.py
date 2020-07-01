@@ -210,16 +210,7 @@ class LearningResourceRun(AbstractCourse):
     content_type = models.ForeignKey(
         ContentType,
         null=True,
-        limit_choices_to={
-            "model__in": (
-                "course",
-                "bootcamp",
-                "program",
-                "video",
-                "podcast",
-                "podcastepisode",
-            )
-        },
+        limit_choices_to={"model__in": ("course", "bootcamp", "program")},
         on_delete=models.CASCADE,
     )
     object_id = models.PositiveIntegerField(null=True)
@@ -505,8 +496,6 @@ class Video(LearningResource, LearningResourceGenericRelationsMixin):
 
     raw_data = models.TextField(blank=True, default="")
 
-    runs = GenericRelation(LearningResourceRun)
-
     @property
     def audience(self):
         """Returns the audience"""
@@ -575,7 +564,6 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
     image_src = models.URLField(max_length=400, null=True, blank=True)
     published = models.BooleanField(default=True)
     url = models.URLField(null=True, max_length=2048)
-    runs = GenericRelation(LearningResourceRun)
     searchable = models.BooleanField(default=True)
 
     def __str__(self):
@@ -613,7 +601,6 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
         Podcast, related_name="episodes", on_delete=models.CASCADE
     )
     published = models.BooleanField(default=True)
-    runs = GenericRelation(LearningResourceRun)
     transcript = models.TextField(blank=True, default="")
     url = models.URLField(null=True, max_length=2048)
     episode_link = models.URLField(null=True, max_length=2048)

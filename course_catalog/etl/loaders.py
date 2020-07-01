@@ -371,7 +371,6 @@ def load_video(video_data, *, config=VideoLoaderConfig()):
     platform = video_data.pop("platform")
     topics_data = video_data.pop("topics", None)
     offered_bys_data = video_data.pop("offered_by", None)
-    runs_data = video_data.pop("runs", [])
 
     with transaction.atomic():
         # lock on the video record
@@ -381,9 +380,6 @@ def load_video(video_data, *, config=VideoLoaderConfig()):
 
         load_topics(video, topics_data)
         load_offered_bys(video, offered_bys_data, config=config.offered_by)
-
-        for run_data in runs_data:
-            load_run(video, run_data, config=config.runs)
 
     if not created and not video.published:
         # NOTE: if we didn't see a video in a playlist, it is likely NOT being removed here
@@ -706,7 +702,6 @@ def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderCo
     episode_id = episode_data.pop("episode_id")
     topics_data = episode_data.pop("topics", [])
     offered_bys_data = episode_data.pop("offered_by", [])
-    runs_data = episode_data.pop("runs", [])
 
     episode, created = PodcastEpisode.objects.update_or_create(
         episode_id=episode_id, podcast=podcast, defaults=episode_data
@@ -714,9 +709,6 @@ def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderCo
 
     load_topics(episode, topics_data)
     load_offered_bys(episode, offered_bys_data, config=config.offered_by)
-
-    for run_data in runs_data:
-        load_run(episode, run_data, config=config.runs)
 
     if not created and not episode.published:
         search_task_helpers.delete_podcast_episode(episode)
@@ -743,7 +735,6 @@ def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
     episodes_data = podcast_data.pop("episodes", [])
     topics_data = podcast_data.pop("topics", [])
     offered_by_data = podcast_data.pop("offered_by", [])
-    runs_data = podcast_data.pop("runs", [])
 
     podcast, created = Podcast.objects.update_or_create(
         podcast_id=podcast_id, defaults=podcast_data
@@ -757,9 +748,6 @@ def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
     for episode_data in episodes_data:
         episode = load_podcast_episode(episode_data, podcast, config=config.episodes)
         episode_ids.append(episode.id)
-
-    for run_data in runs_data:
-        load_run(podcast, run_data, config=config.runs)
 
     PodcastEpisode.objects.filter(podcast=podcast).exclude(id__in=episode_ids).update(
         published=False

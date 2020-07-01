@@ -434,13 +434,6 @@ def transform_video(video_data, offered_by):
         "offered_by": [{"name": offered_by}] if offered_by else [],
         "title": video_data["snippet"]["localized"]["title"],
         "raw_data": video_data,
-        "runs": [
-            {
-                "run_id": video_data["id"],
-                "platform": PlatformType.youtube.value,
-                "prices": [{"price": 0}],
-            }
-        ],
     }
 
 
