@@ -39,14 +39,12 @@ micromasters_etl = compose(
         PlatformType.micromasters.value,
         # MicroMasters courses overlap with MITx, so configure course and run level offerors to be additive
         config=ProgramLoaderConfig(
-            courses=[
-                CourseLoaderConfig(
-                    offered_by=OfferedByLoaderConfig(additive=True),
-                    runs=LearningResourceRunLoaderConfig(
-                        offered_by=OfferedByLoaderConfig(additive=True)
-                    ),
-                )
-            ]
+            courses=CourseLoaderConfig(
+                offered_by=OfferedByLoaderConfig(additive=True),
+                runs=LearningResourceRunLoaderConfig(
+                    offered_by=OfferedByLoaderConfig(additive=True)
+                ),
+            )
         ),
     ),
     micromasters.transform,

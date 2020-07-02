@@ -50,14 +50,12 @@ def test_micromasters_etl():
         PlatformType.micromasters.value,
         mock_transform.return_value,
         config=ProgramLoaderConfig(
-            courses=[
-                CourseLoaderConfig(
-                    offered_by=OfferedByLoaderConfig(additive=True),
-                    runs=LearningResourceRunLoaderConfig(
-                        offered_by=OfferedByLoaderConfig(additive=True)
-                    ),
-                )
-            ]
+            courses=CourseLoaderConfig(
+                offered_by=OfferedByLoaderConfig(additive=True),
+                runs=LearningResourceRunLoaderConfig(
+                    offered_by=OfferedByLoaderConfig(additive=True)
+                ),
+            )
         ),
     )
 
