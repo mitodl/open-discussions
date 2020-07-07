@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.133.0
+---------------
+
+- remove runs from videos and podcasts
+- refactor CommentTree to use a separate Comment component
+- show focus outlines for tabbing only
+
 Version 0.132.0 (Released July 07, 2020)
 ---------------
 
