@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.133.0
+Version 0.133.0 (Released July 07, 2020)
 ---------------
 
 - fix micromasters loader
