@@ -263,23 +263,25 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               showExpansionControls
             />
           </div>
-          {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
-            <div className="podcast-play-control">
-              <PodcastPlayButton episode={object} />
+          {isPodcastObject(object) ? (
+            <div className="podcast-detail-row">
+              {object.object_type === LR_TYPE_PODCAST_EPISODE ? (
+                <PodcastPlayButton episode={object} />
+              ) : null}
               <a
                 tabIndex="0"
-                className="link podcast-episode-detail-link"
+                className="link podcast-detail-link"
                 href={
-                  object.episode_link
-                    ? object.episode_link
-                    : episodePodcast
-                      ? episodePodcast.url
-                      : "#"
+                  object.object_type === LR_TYPE_PODCAST
+                    ? object.url ?? "#"
+                    : object.episode_link ?? episodePodcast?.url ?? "#"
                 }
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View Episode Details
+                View{" "}
+                {object.object_type === LR_TYPE_PODCAST ? "Podcast" : "Episode"}{" "}
+                Details
               </a>
             </div>
           ) : null}

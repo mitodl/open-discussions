@@ -180,24 +180,34 @@ describe("ExpandedLearningResourceDisplay", () => {
     assert.deepEqual(wrapper.find(PodcastPlayButton).prop("episode"), object)
   })
 
-  it("should render a view episode details button for podcast episode", async () => {
-    const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
-    const { wrapper } = await render({}, { object })
-    assert.ok(
-      wrapper
-        .find(".podcast-play-control .podcast-episode-detail-link")
-        .exists()
-    )
+  //
+  ;[
+    [LR_TYPE_PODCAST_EPISODE, "View Episode Details"],
+    [LR_TYPE_PODCAST, "View Podcast Details"]
+  ].forEach(([lrType, expectedText]) => {
+    it(`should render a view episode details button for ${lrType}`, async () => {
+      const object = makeLearningResource(lrType)
+      const { wrapper } = await render({}, { object })
+      const link = wrapper.find(".podcast-detail-row .podcast-detail-link")
+      assert.equal(link.text(), expectedText)
+    })
   })
 
   it("should set the href property of the view episode details button to the podcast episode's episode_link property", async () => {
     const object = makeLearningResource(LR_TYPE_PODCAST_EPISODE)
     const { wrapper } = await render({}, { object })
     assert.equal(
-      wrapper
-        .find(".podcast-play-control .podcast-episode-detail-link")
-        .prop("href"),
+      wrapper.find(".podcast-detail-row .podcast-detail-link").prop("href"),
       object.episode_link
+    )
+  })
+
+  it("should set href for podcast to the podcasts URL", async () => {
+    const object = makeLearningResource(LR_TYPE_PODCAST)
+    const { wrapper } = await render({}, { object })
+    assert.equal(
+      wrapper.find(".podcast-detail-row .podcast-detail-link").prop("href"),
+      object.url
     )
   })
 
