@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.133.1
+Version 0.133.1 (Released July 08, 2020)
 ---------------
 
 - add a link to the podcast to the LR drawer
