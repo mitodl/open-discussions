@@ -1,6 +1,6 @@
 // @flow
 /* global SETTINGS: false */
-import React from "react"
+import React, { useCallback } from "react"
 import moment from "moment"
 import R from "ramda"
 import { Link } from "react-router-dom"
@@ -51,188 +51,194 @@ type Props = {|
   channel: Channel
 |}
 
-export default class ExpandedPostDisplay extends React.Component<Props> {
-  renderPostContent = () => {
-    const { forms, post, embedly, showPermalinkUI } = this.props
+function PostContent(props) {
+  const { forms, post, embedly, showPermalinkUI } = props
 
-    if (R.has(editPostKey(post), forms)) {
-      return <EditPostForm post={post} editing />
-    }
-
-    switch (post.post_type) {
-    case LINK_TYPE_LINK:
-      return (
-        <React.Fragment>
-          {embedly && embedly.provider_name ? (
-            <div className="provider-name">{embedly.provider_name}</div>
-          ) : null}
-          <Embedly embedly={embedly} />
-        </React.Fragment>
-      )
-    case LINK_TYPE_TEXT:
-      return showPermalinkUI ? null : renderTextContent(post)
-    case LINK_TYPE_ARTICLE:
-      return showPermalinkUI ? null : (
-        <React.Fragment>
-          {post.cover_image ? (
-            <img
-              className="cover-image"
-              src={embedlyResizeImage(
-                SETTINGS.embedlyKey,
-                post.cover_image,
-                COVER_IMAGE_DISPLAY_HEIGHT
-              )}
-            />
-          ) : null}
-          <ArticleEditor readOnly initialData={post.article_content || []} />
-        </React.Fragment>
-      )
-    }
+  if (R.has(editPostKey(post), forms)) {
+    return <EditPostForm post={post} editing />
   }
 
-  approvePost = (e: Event) => {
-    const { post, approvePost } = this.props
-
-    e.preventDefault()
-    approvePost(post)
-  }
-
-  removePost = (e: Event) => {
-    const { post, removePost } = this.props
-
-    e.preventDefault()
-    removePost(post)
-  }
-
-  postActionButtons = () => {
-    const {
-      toggleFollowPost,
-      post,
-      beginEditing,
-      isModerator,
-      showPostDeleteDialog,
-      showPostReportDialog,
-      postDropdownMenuOpen,
-      showPostMenu,
-      hidePostMenu,
-      channel
-    } = this.props
-
+  switch (post.post_type) {
+  case LINK_TYPE_LINK:
     return (
-      <div className="post-actions">
-        <div className="left">
-          <PostUpvoteButton post={post} />
-          <ReportCount count={post.num_reports} />
-        </div>
-        <div className="right">
-          {SETTINGS.username === post.author_id && isEditablePostType(post) ? (
-            <div
-              className="post-action edit-post grey-surround"
-              onClick={beginEditing(editPostKey(post), post)}
-            >
-              <i className="material-icons edit">edit</i>
-              <span>Edit</span>
-            </div>
-          ) : null}
-          <ShareTooltip
-            url={postPermalink(post)}
-            hideSocialButtons={isPrivate(channel)}
-          >
-            <div className="post-action share-action grey-surround">
-              <i className="material-icons reply">reply</i>
-              <span>Share</span>
-            </div>
-          </ShareTooltip>
-          <FollowButton post={post} toggleFollowPost={toggleFollowPost} />
-          {userIsAnonymous() ? null : (
-            <i
-              className="material-icons more_vert grey-surround"
-              onClick={postDropdownMenuOpen ? null : showPostMenu}
-            >
-              more_vert
-            </i>
-          )}
-          {postDropdownMenuOpen ? (
-            <DropdownMenu
-              closeMenu={hidePostMenu}
-              className="post-comment-dropdown"
-            >
-              {SETTINGS.username === post.author_id ? (
-                <li className="comment-action-button delete-post">
-                  <a onClick={showPostDeleteDialog} href="#">
-                    Delete
-                  </a>
-                </li>
-              ) : null}
-              {isModerator &&
-              !post.removed &&
-              SETTINGS.username !== post.author_id ? (
-                  <li className="comment-action-button remove-post">
-                    <a onClick={this.removePost.bind(this)} href="#">
-                    Remove
-                    </a>
-                  </li>
-                ) : null}
-              {isModerator &&
-              post.removed &&
-              SETTINGS.username !== post.author_id ? (
-                  <li className="comment-action-button approve-post">
-                    <a onClick={this.approvePost.bind(this)} href="#">
-                    Approve
-                    </a>
-                  </li>
-                ) : null}
-              {!userIsAnonymous() ? (
-                <li className="comment-action-button report-post">
-                  <a onClick={showPostReportDialog} href="#">
-                    Report
-                  </a>
-                </li>
-              ) : null}
-            </DropdownMenu>
-          ) : null}
+      <React.Fragment>
+        {embedly && embedly.provider_name ? (
+          <div className="provider-name">{embedly.provider_name}</div>
+        ) : null}
+        <Embedly embedly={embedly} />
+      </React.Fragment>
+    )
+  case LINK_TYPE_TEXT:
+    return showPermalinkUI ? null : renderTextContent(post)
+  case LINK_TYPE_ARTICLE:
+    return showPermalinkUI ? null : (
+      <React.Fragment>
+        {post.cover_image ? (
+          <img
+            className="cover-image"
+            src={embedlyResizeImage(
+              SETTINGS.embedlyKey,
+              post.cover_image,
+              COVER_IMAGE_DISPLAY_HEIGHT
+            )}
+          />
+        ) : null}
+        <ArticleEditor readOnly initialData={post.article_content || []} />
+      </React.Fragment>
+    )
+  default:
+    return null
+  }
+}
+
+export default function ExpandedPostDisplay(props: Props) {
+  const {
+    forms,
+    post,
+    embedly,
+    showPermalinkUI,
+    toggleFollowPost,
+    beginEditing,
+    isModerator,
+    showPostDeleteDialog,
+    showPostReportDialog,
+    postDropdownMenuOpen,
+    showPostMenu,
+    hidePostMenu,
+    channel,
+    removePost,
+    approvePost
+  } = props
+
+  const formattedDate = moment(post.created).fromNow()
+
+  const approvePostCB = useCallback(
+    (e: Event) => {
+      e.preventDefault()
+      approvePost(post)
+    },
+    [approvePost, post]
+  )
+
+  const removePostCB = useCallback(
+    (e: Event) => {
+      e.preventDefault()
+      removePost(post)
+    },
+    [removePost, post]
+  )
+
+  return (
+    <div className="expanded-post-summary">
+      <div className="summary">
+        <div className="post-title">{formatPostTitle(post)}</div>
+        <div className="authored-by">
+          <div className="left">
+            <Link to={profileURL(post.author_id)}>
+              <ProfileImage
+                profile={makeProfile({
+                  name:                post.author_name,
+                  profile_image_small: post.profile_image
+                })}
+                imageSize={PROFILE_IMAGE_MICRO}
+              />
+              <span className="author-name">{post.author_name}</span>
+            </Link>
+            {post.author_headline ? (
+              <React.Fragment>
+                <span className="author-headline separator">
+                  &nbsp;&#8212;&nbsp;
+                </span>
+                <span className="author-headline">{post.author_headline}</span>
+              </React.Fragment>
+            ) : null}
+          </div>
+          <div className="right date">{formattedDate}</div>
         </div>
       </div>
-    )
-  }
-
-  render() {
-    const { post, forms } = this.props
-    const formattedDate = moment(post.created).fromNow()
-
-    return (
-      <div className="expanded-post-summary">
-        <div className="summary">
-          <div className="post-title">{formatPostTitle(post)}</div>
-          <div className="authored-by">
-            <div className="left">
-              <Link to={profileURL(post.author_id)}>
-                <ProfileImage
-                  profile={makeProfile({
-                    name:                post.author_name,
-                    profile_image_small: post.profile_image
-                  })}
-                  imageSize={PROFILE_IMAGE_MICRO}
-                />
-                <span className="author-name">{post.author_name}</span>
-              </Link>
-              {post.author_headline ? (
-                <React.Fragment>
-                  <span className="author-headline separator">
-                    &nbsp;&#8212;&nbsp;
-                  </span>
-                  <span className="author-headline">
-                    {post.author_headline}
-                  </span>
-                </React.Fragment>
+      <PostContent
+        forms={forms}
+        post={post}
+        embedly={embedly}
+        showPermalinkUI={showPermalinkUI}
+      />
+      {R.has(editPostKey(post), forms) ? null : (
+        <div className="post-actions">
+          <div className="left">
+            <PostUpvoteButton post={post} />
+            <ReportCount count={post.num_reports} />
+          </div>
+          <div className="right">
+            {SETTINGS.username === post.author_id &&
+            isEditablePostType(post) ? (
+                <div
+                  className="post-action edit-post grey-surround"
+                  onClick={beginEditing(editPostKey(post), post)}
+                >
+                  <i className="material-icons edit">edit</i>
+                  <span>Edit</span>
+                </div>
               ) : null}
-            </div>
-            <div className="right date">{formattedDate}</div>
+            <ShareTooltip
+              url={postPermalink(post)}
+              hideSocialButtons={isPrivate(channel)}
+            >
+              <div className="post-action share-action grey-surround">
+                <i className="material-icons reply">reply</i>
+                <span>Share</span>
+              </div>
+            </ShareTooltip>
+            <FollowButton post={post} toggleFollowPost={toggleFollowPost} />
+            {userIsAnonymous() ? null : (
+              <i
+                className="material-icons more_vert grey-surround"
+                onClick={postDropdownMenuOpen ? null : showPostMenu}
+              >
+                more_vert
+              </i>
+            )}
+            {postDropdownMenuOpen ? (
+              <DropdownMenu
+                closeMenu={hidePostMenu}
+                className="post-comment-dropdown"
+              >
+                {SETTINGS.username === post.author_id ? (
+                  <li className="comment-action-button delete-post">
+                    <a onClick={showPostDeleteDialog} href="#">
+                      Delete
+                    </a>
+                  </li>
+                ) : null}
+                {isModerator &&
+                !post.removed &&
+                SETTINGS.username !== post.author_id ? (
+                    <li className="comment-action-button remove-post">
+                      <a onClick={removePostCB} href="#">
+                      Remove
+                      </a>
+                    </li>
+                  ) : null}
+                {isModerator &&
+                post.removed &&
+                SETTINGS.username !== post.author_id ? (
+                    <li className="comment-action-button approve-post">
+                      <a onClick={approvePostCB} href="#">
+                      Approve
+                      </a>
+                    </li>
+                  ) : null}
+                {!userIsAnonymous() ? (
+                  <li className="comment-action-button report-post">
+                    <a onClick={showPostReportDialog} href="#">
+                      Report
+                    </a>
+                  </li>
+                ) : null}
+              </DropdownMenu>
+            ) : null}
           </div>
         </div>
-        {this.renderPostContent()}
-        {R.has(editPostKey(post), forms) ? null : this.postActionButtons()}
-      </div>
-    )
-  }
+      )}
+    </div>
+  )
 }
