@@ -5,12 +5,11 @@ import { connect } from "react-redux"
 import R from "ramda"
 import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
-import { Link } from "react-router-dom"
 
 import NewCoursesWidget from "../components/NewCoursesWidget"
 import LiveStream from "../components/LiveStream"
-import Card from "../components/Card"
 import CanonicalLink from "../components/CanonicalLink"
+import IntroCard from "../components/IntroCard"
 import { withPostLoading } from "../components/Loading"
 import { withSidebar } from "../hoc/withSidebar"
 import { PostSortPicker } from "../components/Picker"
@@ -26,9 +25,6 @@ import { safeBulkGet } from "../lib/maps"
 import { getPostIds } from "../lib/posts"
 import { getSubscribedChannels } from "../lib/redux_selectors"
 import { updatePostSortParam, POSTS_SORT_HOT } from "../lib/picker"
-import { REGISTER_URL, newPostURL } from "../lib/url"
-import { userIsAnonymous } from "../lib/util"
-import { MIT_LOGO_URL } from "../lib/url"
 
 import type { Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -84,39 +80,6 @@ export class HomePage extends React.Component<Props> {
     await loadPosts(qs.parse(search))
   }
 
-  renderIntroCard() {
-    let buttonText, buttonLinkHref
-    if (userIsAnonymous()) {
-      buttonText = "Become a member"
-      buttonLinkHref = REGISTER_URL
-    } else {
-      buttonText = "Create a post"
-      buttonLinkHref = newPostURL()
-    }
-
-    return (
-      <Card className="home-callout">
-        <div className="logo-col">
-          <img src={MIT_LOGO_URL} alt="MIT Logo" />
-        </div>
-        <div className="callout-body">
-          <div className="text-col">
-            <h3>Learn. Share. Connect.</h3>
-            <p>
-              A place where learners, teachers and scientists worldwide meet
-              with MIT.
-            </p>
-          </div>
-          <div className="action-col">
-            <Link className="link-button" to={buttonLinkHref}>
-              {buttonText}
-            </Link>
-          </div>
-        </div>
-      </Card>
-    )
-  }
-
   render() {
     const {
       location: { search },
@@ -129,7 +92,7 @@ export class HomePage extends React.Component<Props> {
         <MetaTags>
           <CanonicalLink match={match} />
         </MetaTags>
-        {this.renderIntroCard()}
+        <IntroCard />
         <div className="post-list-title">
           <PostSortPicker
             updatePickerParam={updatePostSortParam(this.props)}

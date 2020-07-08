@@ -15,7 +15,6 @@ import { makeChannelList } from "../factories/channels"
 import { makeChannelPostList } from "../factories/posts"
 import { SET_POST_DATA } from "../actions/post"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
-import { REGISTER_URL, newPostURL } from "../lib/url"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf, mockCourseAPIMethods } from "../lib/test_utils"
 
@@ -220,21 +219,9 @@ describe("HomePage", () => {
     })
   })
 
-  //
-  ;[
-    ["username1", "Create a post", newPostURL()],
-    [null, "Become a member", REGISTER_URL]
-  ].forEach(([username, expButtonText, expLinkTo]) => {
-    it(`shows intro card with correct content when user is ${
-      username ? "" : "not "
-    }logged in`, async () => {
-      SETTINGS.username = username
-      const { wrapper } = await render()
-      const introCard = wrapper.find(".home-callout")
-      assert.isTrue(introCard.exists())
-      const linkButton = introCard.find("Link")
-      assert.equal(linkButton.prop("children"), expButtonText)
-      assert.equal(linkButton.prop("to"), expLinkTo)
-    })
+  it("renders an intro card", async () => {
+    const { wrapper } = await render()
+    const introCard = wrapper.find(".home-callout")
+    assert.isTrue(introCard.exists())
   })
 })
