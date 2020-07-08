@@ -9,7 +9,6 @@ type Props = {
   posts: Array<Post>,
   showChannelLinks: boolean,
   showPinUI: boolean,
-  toggleUpvote: Post => void,
   togglePinPost?: ?(post: Post) => Promise<*>,
   isModerator: boolean,
   reportPost?: ?(post: Post) => void,
@@ -22,7 +21,6 @@ const PostList = ({
   showChannelLinks,
   showPinUI,
   isModerator,
-  toggleUpvote,
   togglePinPost,
   reportPost,
   removePost,
@@ -35,7 +33,6 @@ const PostList = ({
           post={post}
           key={index}
           showChannelLink={showChannelLinks}
-          toggleUpvote={toggleUpvote}
           showPinUI={showPinUI}
           isModerator={isModerator}
           togglePinPost={togglePinPost}

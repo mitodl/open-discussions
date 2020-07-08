@@ -6,7 +6,6 @@ import { actions } from "../actions"
 import { SET_POST_DATA } from "../actions/post"
 import { SET_SNACKBAR_MESSAGE } from "../actions/ui"
 import {
-  toggleUpvote,
   approvePost,
   removePost,
   approveComment,
@@ -30,25 +29,6 @@ describe("api_actions util", () => {
 
   afterEach(() => {
     helper.cleanup()
-  })
-
-  describe("toggleUpvote", () => {
-    beforeEach(() => {
-      helper.updateUpvoteStub.returns(Promise.resolve(makePost))
-    })
-
-    for (const value of [true, false]) {
-      it(`should set invert the upvoted value for upvoted:${value.toString()}`, async () => {
-        const { requestType, successType } = actions.postUpvotes.patch
-        const post = makePost()
-        post.upvoted = value
-        await helper.listenForActions([requestType, successType], () => {
-          toggleUpvote(helper.store.dispatch, post)
-        })
-
-        assert.isOk(helper.updateUpvoteStub.calledWith(post.id, !value))
-      })
-    }
   })
 
   describe("toggleFollowPost", () => {

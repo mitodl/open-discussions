@@ -6,7 +6,6 @@ import InfiniteScroll from "react-infinite-scroller"
 import { Loading } from "../components/Loading"
 import PostList from "../components/PostList"
 
-import { toggleUpvote } from "../util/api_actions"
 import { actions } from "../actions"
 import { evictPostsForChannel } from "../actions/posts_for_channel"
 
@@ -24,7 +23,6 @@ type Props = {
   reportPost: (p: Post) => void,
   removePost: (p: Post) => void,
   deletePost: (p: Post) => void,
-  toggleUpvote: (post: Post) => Promise<*>,
   dispatch: Dispatch<any>,
   showChannelLinks: boolean,
   showReportPost: boolean,
@@ -77,7 +75,6 @@ const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
 
     renderPosts = () => {
       const {
-        dispatch,
         pagination,
         posts,
         isModerator,
@@ -99,7 +96,6 @@ const withPostList = (WrappedComponent: Class<React.Component<*, *>>) => {
       let postList = (
         <PostList
           posts={posts}
-          toggleUpvote={toggleUpvote(dispatch)}
           isModerator={isModerator}
           togglePinPost={showTogglePinPost ? this.togglePinPost : null}
           reportPost={showReportPost ? reportPost : null}

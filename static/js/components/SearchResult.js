@@ -26,16 +26,14 @@ import type {
 import type { CommentInTree, Post } from "../flow/discussionTypes"
 
 type PostProps = {
-  post: Post,
-  toggleUpvote?: Function
+  post: Post
 }
-const PostSearchResult = ({ post, toggleUpvote }: PostProps) => (
+const PostSearchResult = ({ post }: PostProps) => (
   <CompactPostDisplay
     post={post}
     isModerator={false}
     menuOpen={false}
     useSearchPageUI
-    toggleUpvote={toggleUpvote}
   />
 )
 
@@ -113,7 +111,6 @@ type Props = {
   commentUpvote?: Function,
   commentDownvote?: Function,
   result: Result,
-  toggleUpvote?: Post => void,
   upvotedPost?: ?Post,
   votedComment?: ?CommentInTree,
   setShowResourceDrawer?: ({
@@ -128,7 +125,6 @@ export default class SearchResult extends React.Component<Props> {
   render() {
     const {
       result,
-      toggleUpvote,
       upvotedPost,
       votedComment,
       commentUpvote,
@@ -140,7 +136,7 @@ export default class SearchResult extends React.Component<Props> {
     if (result.object_type === "post") {
       // $FlowFixMe: This will always be a PostResult
       const post = upvotedPost || searchResultToPost(result)
-      return <PostSearchResult post={post} toggleUpvote={toggleUpvote} />
+      return <PostSearchResult post={post} />
     } else if (result.object_type === "comment") {
       // $FlowFixMe: This will always be a Comment result
       let comment = searchResultToComment(result)

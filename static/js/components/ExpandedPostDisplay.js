@@ -35,7 +35,6 @@ const COVER_IMAGE_DISPLAY_HEIGHT = 300
 
 type Props = {|
   post: Post,
-  toggleUpvote: Post => void,
   approvePost: Post => void,
   removePost: Post => void,
   forms: FormsState,
@@ -107,7 +106,6 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
 
   postActionButtons = () => {
     const {
-      toggleUpvote,
       toggleFollowPost,
       post,
       beginEditing,
@@ -123,7 +121,7 @@ export default class ExpandedPostDisplay extends React.Component<Props> {
     return (
       <div className="post-actions">
         <div className="left">
-          <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
+          <PostUpvoteButton post={post} />
           <ReportCount count={post.num_reports} />
         </div>
         <div className="right">

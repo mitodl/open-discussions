@@ -12,7 +12,6 @@ import {
   makePost
 } from "../factories/posts"
 import IntegrationTestHelper from "../util/integration_test_helper"
-import * as apiActions from "../util/api_actions"
 import { actions } from "../actions"
 import { EVICT_POSTS_FOR_CHANNEL } from "../actions/posts_for_channel"
 
@@ -137,21 +136,6 @@ describe("withPostList", () => {
         const props = inner.find("PostList").props()
 
         assert.deepEqual(props.posts, postList)
-      })
-
-      it("toggles an upvote", async () => {
-        const post = makePost()
-        const innerStub = helper.sandbox.stub()
-        const stub = helper.sandbox.stub(apiActions, "toggleUpvote")
-        stub.get(() =>
-          R.curry(async (dispatch, post) => innerStub(dispatch, post))
-        )
-        const { inner } = await render()
-        const props = inner.find("PostList").props()
-        await props.toggleUpvote(post)
-
-        assert.equal(innerStub.callCount, 1)
-        assert.equal(innerStub.firstCall.args[1], post)
       })
       ;[
         ["reportPost", "showReportPost", true],

@@ -15,7 +15,6 @@ import FollowButton from "./FollowButton"
 import ProfileImage from "./ProfileImage"
 import ShareTooltip from "./ShareTooltip"
 
-import { wait } from "../lib/util"
 import {
   postPermalink,
   postDetailURL,
@@ -43,7 +42,6 @@ describe("ExpandedPostDisplay", () => {
     toggleFollowPostStub
 
   const postProps = (props = {}) => ({
-    toggleUpvote: () => {},
     beginEditing: R.curry((key, post, e) => {
       beginEditingStub(key, post, e)
     }),
@@ -297,51 +295,6 @@ describe("ExpandedPostDisplay", () => {
       forms: helper.store.getState().forms
     })
     assert.lengthOf(wrapper.find(".post-actions"), 0)
-  })
-
-  const assertButton = (wrapper, isUpvote) => {
-    if (isUpvote) {
-      assert.include(
-        wrapper.find(".post-upvote-button").props().className,
-        "upvoted"
-      )
-    } else {
-      assert.notInclude(
-        wrapper.find(".post-upvote-button").props().className,
-        "upvoted"
-      )
-    }
-  }
-
-  //
-  ;[true, false].forEach(prevUpvote => {
-    it(`should show the correct UI when the upvote
-    button is clicked when prev state was ${String(prevUpvote)}`, async () => {
-      post.upvoted = prevUpvote
-      // setting to a function so Flow doesn't complain
-      let resolveUpvote = () => null
-      const toggleUpvote = helper.sandbox.stub().returns(
-        new Promise(resolve => {
-          resolveUpvote = resolve
-        })
-      )
-      const wrapper = renderPostDisplay({
-        post:         post,
-        toggleUpvote: toggleUpvote
-      })
-      assertButton(wrapper, prevUpvote)
-      wrapper.find(".post-upvote-button").simulate("click")
-      assert.isOk(toggleUpvote.calledOnce)
-
-      assertButton(wrapper, !prevUpvote)
-      resolveUpvote()
-      post.upvoted = !prevUpvote
-      wrapper.setProps({ post })
-      // wait for promise resolve to trigger state changes
-      await wait(10)
-      wrapper.update()
-      assertButton(wrapper, !prevUpvote)
-    })
   })
 
   //

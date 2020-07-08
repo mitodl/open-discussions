@@ -13,7 +13,6 @@ import CompactPostDisplay from "../components/CompactPostDisplay"
 import Comment from "../components/Comment"
 
 import { actions } from "../actions"
-import { toggleUpvote } from "../util/api_actions"
 import { POSTS_SORT_NEW } from "../lib/picker"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 import { commentPermalink } from "../lib/url"
@@ -134,7 +133,7 @@ class ProfileContributionFeed extends React.Component<Props, State> {
   }
 
   renderContributionList = () => {
-    const { dispatch, upvotedPosts, selectedTab } = this.props
+    const { upvotedPosts, selectedTab } = this.props
     const { votedComments } = this.state
 
     if (selectedTab === POSTS_OBJECT_TYPE) {
@@ -155,7 +154,6 @@ class ProfileContributionFeed extends React.Component<Props, State> {
               post={post}
               isModerator={false}
               menuOpen={false}
-              toggleUpvote={toggleUpvote(dispatch)}
               useSearchPageUI
             />
           ))}

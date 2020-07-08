@@ -36,7 +36,6 @@ import type { Post } from "../flow/discussionTypes"
 type OwnProps = {|
   post: Post,
   showChannelLink?: boolean,
-  toggleUpvote?: Post => void,
   togglePinPost?: ?(post: Post) => Promise<*>,
   showPinUI?: boolean,
   isModerator: boolean,
@@ -77,7 +76,6 @@ export class CompactPostDisplay extends React.Component<Props> {
     const {
       dispatch,
       post,
-      toggleUpvote,
       showPinUI,
       togglePinPost,
       isModerator,
@@ -93,7 +91,7 @@ export class CompactPostDisplay extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <PostUpvoteButton post={post} toggleUpvote={toggleUpvote} />
+        <PostUpvoteButton post={post} />
         <Link
           className="comment-link grey-surround"
           to={postDetailURL(post.channel_name, post.id, post.slug)}

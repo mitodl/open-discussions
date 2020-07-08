@@ -11,7 +11,6 @@ import { makeProfile } from "../factories/profiles"
 import { makeChannelPostList } from "../factories/posts"
 import { makeCommentsList } from "../factories/comments"
 import { actions } from "../actions"
-import * as apiActions from "../util/api_actions"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 
 import ProfileContributionFeed from "./ProfileContributionFeed"
@@ -96,17 +95,6 @@ describe("ProfileContributionFeed", function() {
       sinon.assert.calledOnce(helper[expStubCalled])
       assert.isTrue(wrapper.find(expFeedComponent).exists())
     })
-  })
-
-  it("should handle post voting", async () => {
-    const fakeUpvoteHandler = sinon.fake()
-    helper.sandbox.stub(apiActions, "toggleUpvote").returns(fakeUpvoteHandler)
-
-    const wrapper = await renderFeed()
-
-    const firstPost = wrapper.find("CompactPostDisplay").at(0)
-    firstPost.prop("toggleUpvote")()
-    sinon.assert.calledOnce(fakeUpvoteHandler)
   })
 
   //

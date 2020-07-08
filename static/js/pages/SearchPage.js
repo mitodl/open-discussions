@@ -18,7 +18,6 @@ import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import { SEARCH_FILTER_ALL, updateSearchFilterParam } from "../lib/picker"
 import { preventDefaultAndInvoke, emptyOrNil } from "../lib/util"
-import { toggleUpvote } from "../util/api_actions"
 import { validateSearchQuery } from "../lib/validation"
 
 import type { Location, Match } from "react-router"
@@ -53,7 +52,6 @@ type Props = {
   suggest: Array<string>,
   total: number,
   clearSearch: () => void,
-  toggleUpvote: () => void,
   upvotedPosts: Map<string, Post>
 }
 
@@ -167,7 +165,6 @@ export class SearchPage extends React.Component<Props, State> {
       initialLoad,
       suggest,
       total,
-      toggleUpvote,
       upvotedPosts
     } = this.props
     const { from, votedComments } = this.state
@@ -214,7 +211,6 @@ export class SearchPage extends React.Component<Props, State> {
             <SearchResult
               key={i}
               result={result}
-              toggleUpvote={toggleUpvote}
               upvotedPost={
                 result.object_type === "post"
                   ? upvotedPosts.get(result.post_id)
@@ -346,7 +342,6 @@ const mapDispatchToProps = (dispatch: Dispatch<*>) => ({
     dispatch(actions.search.clear())
     await dispatch(clearSearch())
   },
-  toggleUpvote: toggleUpvote(dispatch),
   dispatch
 })
 

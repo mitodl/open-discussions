@@ -8,15 +8,6 @@ import { setSnackbarMessage } from "../actions/ui"
 import type { Post, CommentInTree } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
 
-export const toggleUpvote = R.curry(
-  async (dispatch: Dispatch<*>, post: Post) => {
-    const result = await dispatch(
-      actions.postUpvotes.patch(post.id, !post.upvoted)
-    )
-    return dispatch(setPostData(result))
-  }
-)
-
 export const approvePost = R.curry(
   async (dispatch: Dispatch<*>, post: Post) => {
     const result = await dispatch(actions.postRemoved.patch(post.id, false))

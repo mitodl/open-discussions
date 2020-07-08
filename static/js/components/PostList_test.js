@@ -13,9 +13,8 @@ describe("PostList", () => {
 
   beforeEach(() => {
     renderPostList = configureShallowRenderer(PostList, {
-      reportPost:   sinon.stub(),
-      toggleUpvote: sinon.stub(),
-      posts:        makeChannelPostList()
+      reportPost: sinon.stub(),
+      posts:      makeChannelPostList()
     })
   })
 

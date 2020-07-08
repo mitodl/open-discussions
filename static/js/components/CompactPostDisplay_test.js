@@ -12,7 +12,6 @@ import Router from "../Router"
 import DropdownMenu from "./DropdownMenu"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
-import { wait } from "../lib/util"
 import { channelURL, postDetailURL, urlHostname, profileURL } from "../lib/url"
 import {
   PostTitleAndHostname,
@@ -39,7 +38,6 @@ describe("CompactPostDisplay", () => {
 
   const renderPostDisplay = props => {
     props = {
-      toggleUpvote:    () => {},
       menuOpen:        false,
       isModerator:     false,
       reportPost:      helper.sandbox.stub(),
@@ -241,51 +239,6 @@ describe("CompactPostDisplay", () => {
     const { to } = detailLink.props()
     assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
     assert.ok(detailLink.find(PostTitleAndHostname).exists())
-  })
-
-  const assertButton = (wrapper, isUpvote) => {
-    if (isUpvote) {
-      assert.include(
-        wrapper.find(".post-upvote-button").props().className,
-        "upvoted"
-      )
-    } else {
-      assert.notInclude(
-        wrapper.find(".post-upvote-button").props().className,
-        "upvoted"
-      )
-    }
-  }
-
-  //
-  ;[true, false].forEach(prevUpvote => {
-    it(`should show the correct UI when the upvote
-    button is clicked when prev state was ${String(prevUpvote)}`, async () => {
-      post.upvoted = prevUpvote
-      // setting to a function so Flow doesn't complain
-      let resolveUpvote = () => null
-      const toggleUpvote = helper.sandbox.stub().returns(
-        new Promise(resolve => {
-          resolveUpvote = resolve
-        })
-      )
-      const wrapper = renderPostDisplay({
-        post,
-        toggleUpvote
-      })
-      assertButton(wrapper, prevUpvote)
-      wrapper.find(".post-upvote-button").simulate("click")
-      assert.isOk(toggleUpvote.calledOnce)
-
-      assertButton(wrapper, !prevUpvote)
-      resolveUpvote()
-      post.upvoted = !prevUpvote
-      wrapper.setProps({ post })
-      // wait for promise resolve to trigger state changes
-      await wait(10)
-      wrapper.update()
-      assertButton(wrapper, !prevUpvote)
-    })
   })
 
   describe("Dropdown menu tests", () => {

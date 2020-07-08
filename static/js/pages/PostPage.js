@@ -31,7 +31,7 @@ import {
 import { actions } from "../actions"
 import { clearCommentError, replaceMoreComments } from "../actions/comment"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
-import { toggleUpvote, toggleFollowPost } from "../util/api_actions"
+import { toggleFollowPost } from "../util/api_actions"
 import { getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
@@ -293,7 +293,6 @@ export class PostPage extends React.Component<PostPageProps> {
             <ExpandedPostDisplay
               post={post}
               isModerator={isModerator}
-              toggleUpvote={toggleUpvote(dispatch)}
               approvePost={approvePost.bind(this)}
               removePost={removePost.bind(this)}
               forms={forms}
