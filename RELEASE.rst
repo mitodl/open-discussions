@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.133.2
+---------------
+
+- pull method on HomePage.js out as separate component
+- ensure the AudioPlayer works across the site
+
 Version 0.133.1 (Released July 08, 2020)
 ---------------
 
