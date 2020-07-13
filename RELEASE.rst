@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.133.2
+Version 0.133.2 (Released July 13, 2020)
 ---------------
 
 - pull method on HomePage.js out as separate component
