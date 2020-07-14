@@ -48,10 +48,24 @@ $drawer-trans: width 500ms;
   }
 }
 
+$nav-min-height: calc(100vh - #{$toolbar-height-desktop} - #{$footer-height});
+
+.audio-player-padding-bottom {
+  .mdc-drawer__content .navigation {
+    @include breakpoint(desktop) {
+      min-height: calc(#{$nav-min-height} - #{$audio-player-height-desktop});
+    }
+
+    @include breakpoint(mobile) {
+      min-height: calc(#{$nav-min-height} - #{$audio-player-height-mobile});
+    }
+  }
+}
+
 .mdc-drawer__content .navigation {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - #{$toolbar-height-desktop} - #{$footer-height});
+  min-height: $nav-min-height;
 
   .title {
     margin-left: $text-padding-left;
