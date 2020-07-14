@@ -7,7 +7,7 @@ from social_core.backends.email import EmailAuth
 from social_django.utils import load_backend, load_strategy
 
 from mail import verification_api
-from mail.models import BlockedEmailRegex
+from authentication.models import BlockedEmailRegex
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]

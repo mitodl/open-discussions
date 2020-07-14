@@ -1,10 +1,10 @@
 """
-Admin site bindings for mail
+Admin site bindings for authentication
 """
 
 from django.contrib import admin
 
-from .models import BlockedEmailRegex
+from authentication.models import BlockedEmailRegex
 
 
 class BlockedEmailRegexAdmin(admin.ModelAdmin):

@@ -4,7 +4,7 @@ from urllib.parse import quote_plus
 from django.urls import reverse
 
 from mail import api
-from mail.models import BlockedEmailRegex
+from authentication.models import BlockedEmailRegex
 
 VERIFICATION_TEMPLATE_NAME = "verification"
 
