@@ -4,6 +4,7 @@ from urllib.parse import quote_plus
 from django.urls import reverse
 
 from mail import api
+from mail.models import BlockedEmailRegex
 
 VERIFICATION_TEMPLATE_NAME = "verification"
 
@@ -26,16 +27,21 @@ def send_verification_email(
         quote_plus(partial_token),
     )
 
-    api.send_messages(
-        list(
-            api.messages_for_recipients(
-                [
-                    (
-                        code.email,
-                        api.context_for_user(extra_context={"confirmation_url": url}),
-                    )
-                ],
-                VERIFICATION_TEMPLATE_NAME,
+    if not BlockedEmailRegex.objects.extra(
+        where=["%s ~ match"], params=[code.email]
+    ).exists():
+        api.send_messages(
+            list(
+                api.messages_for_recipients(
+                    [
+                        (
+                            code.email,
+                            api.context_for_user(
+                                extra_context={"confirmation_url": url}
+                            ),
+                        )
+                    ],
+                    VERIFICATION_TEMPLATE_NAME,
+                )
             )
         )
-    )
