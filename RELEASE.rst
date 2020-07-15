@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.134.0
+Version 0.134.0 (Released July 15, 2020)
 ---------------
 
 - refactor post voting to be more straightforward
