@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.134.1
+---------------
+
+- Block certain emails during registration (#3051)
+
 Version 0.134.0 (Released July 15, 2020)
 ---------------
 
