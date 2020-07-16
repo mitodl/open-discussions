@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.134.2
+---------------
+
+- refactor ExpandedPostDisplay to be a function-based component
+- fix audio player drawer padding issue
+
 Version 0.134.1 (Released July 15, 2020)
 ---------------
 
