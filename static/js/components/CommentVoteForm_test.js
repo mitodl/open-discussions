@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS:false */
 import { assert } from "chai"
 
 import CommentVoteForm from "./CommentVoteForm"
@@ -12,7 +13,7 @@ import { makeComment } from "../factories/comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("CommentVoteForm", () => {
-  let comment, resolveRequest, helper, render, anonStub
+  let comment, resolveRequest, rejectRequest, helper, render, anonStub
 
   beforeEach(async () => {
     // use promise which will never resolve
@@ -20,9 +21,12 @@ describe("CommentVoteForm", () => {
     helper.updateCommentStub.resetBehavior()
     helper.updateCommentStub.callsFake(
       () =>
-        new Promise(resolve => {
+        new Promise((resolve, reject) => {
           resolveRequest = comment => {
             resolve(comment)
+          }
+          rejectRequest = () => {
+            reject()
           }
         })
     )
@@ -103,6 +107,21 @@ describe("CommentVoteForm", () => {
   //
   ;[true, false].forEach(isUpvote => {
     describe(`clicks the ${isUpvote ? "upvote" : "downvote"} button`, () => {
+      it("gracefully handles a failed request", async () => {
+        const { wrapper, store } = await render()
+        wrapper
+          .find(isUpvote ? ".upvote-button" : ".downvote-button")
+          .simulate("click")
+        await rejectRequest()
+        await wait(1)
+        assert.deepEqual(
+          store.getState().ui.banner.message,
+          `Something went wrong ${
+            isUpvote ? "upvoting" : "downvoting"
+          } this comment. Contact us at ${SETTINGS.support_email}`
+        )
+      })
+
       it("when the previous state was clear", async () => {
         const { wrapper } = await render()
 
@@ -113,6 +132,12 @@ describe("CommentVoteForm", () => {
 
         assertButtons(wrapper, isUpvote, false, true)
 
+        // should pre-emptively adjust the score so user's action looks instant
+        assert.equal(
+          wrapper.find(".score").text(),
+          isUpvote ? `${comment.score + 1}` : `${comment.score - 1}`
+        )
+
         if (isUpvote) {
           comment.upvoted = true
         } else {
@@ -120,10 +145,19 @@ describe("CommentVoteForm", () => {
         }
 
         resolveRequest(comment)
-
-        await wait(10)
+        await wait(1)
         wrapper.update()
         assertButtons(wrapper, isUpvote, false, false)
+      })
+
+      it("should not optimistically update score when its the users own comment", async () => {
+        SETTINGS.username = comment.author_id
+        const { wrapper } = await render()
+        wrapper
+          .find(isUpvote ? ".upvote-button" : ".downvote-button")
+          .simulate("click")
+        wrapper.update()
+        assert.equal(wrapper.find(".score").text(), comment.score)
       })
 
       //
@@ -143,6 +177,25 @@ describe("CommentVoteForm", () => {
           wrapper
             .find(isUpvote ? ".upvote-button" : ".downvote-button")
             .simulate("click")
+
+          // expectedScore[isUpvote][wasUpvote]
+          const expectedScore = {
+            true: {
+              true:  comment.score - 1,
+              false: comment.score + 2
+            },
+            false: {
+              true:  comment.score - 2,
+              false: comment.score + 1
+            }
+          }
+
+          // should pre-emptively adjust the score so user's action looks instant
+          assert.equal(
+            wrapper.find(".score").text(),
+            // $FlowFixMe: it's a test, leave me alone
+            expectedScore[isUpvote][wasUpvote].toString()
+          )
 
           assertButtons(wrapper, isUpvote, wasUpvote === isUpvote, true)
         })

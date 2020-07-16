@@ -16,9 +16,10 @@ import { actions } from "../actions"
 import { POSTS_SORT_NEW } from "../lib/picker"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
 import { commentPermalink } from "../lib/url"
+import { ORPHAN_COMMENTS_KEY } from "../reducers/comments"
 
 import type { Dispatch } from "redux"
-import type { CommentInTree, Post } from "../flow/discussionTypes"
+import type { Post } from "../flow/discussionTypes"
 import type { UserContributionState } from "../reducers/user_contributions"
 
 type OwnProps = {|
@@ -29,7 +30,8 @@ type OwnProps = {|
 type StateProps = {|
   contributions: UserContributionState,
   upvotedPosts: Map<string, Post>,
-  canLoadMore: boolean
+  canLoadMore: boolean,
+  votedComments: Object
 |}
 
 type Props = {|
@@ -38,21 +40,10 @@ type Props = {|
   dispatch: Dispatch<*>
 |}
 
-type State = {
-  votedComments: Map<string, CommentInTree>
-}
-
 const profileFeedDefaultParams = { sort: POSTS_SORT_NEW }
 const tabs = [POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE]
 
-class ProfileContributionFeed extends React.Component<Props, State> {
-  constructor() {
-    super()
-    this.state = {
-      votedComments: new Map()
-    }
-  }
-
+class ProfileContributionFeed extends React.Component<Props> {
   componentDidMount() {
     const { contributions, selectedTab } = this.props
 
@@ -97,44 +88,24 @@ class ProfileContributionFeed extends React.Component<Props, State> {
     await this.loadData(paginationParams)
   }
 
-  updateVotedComments = (comment: CommentInTree) => {
-    const { votedComments } = this.state
-    const upvotedCommentMap = new Map(votedComments)
-    upvotedCommentMap.set(comment.id, comment)
-    this.setState({ votedComments: upvotedCommentMap })
-  }
-
-  setCommentVote = R.curry(
-    async (voteStatusName: string, comment: CommentInTree) => {
-      const { dispatch } = this.props
-      const updatedComment = await dispatch(
-        actions.comments.patch(comment.id, {
-          [voteStatusName]: !comment[voteStatusName]
-        })
-      )
-      this.updateVotedComments(updatedComment)
-    }
-  )
-
-  upvoteComment = this.setCommentVote("upvoted")
-
-  downvoteComment = this.setCommentVote("downvoted")
-
   getUpdatedContributionsList = (
     objectKey: string,
     updatedObjects: Map<string, Object>
   ) => {
     const { contributions } = this.props
     return updatedObjects
-      ? contributions[objectKey].data.map(
-        contribution => updatedObjects.get(contribution.id) || contribution
-      )
+      ? contributions[objectKey].data.map(contribution => {
+        if (objectKey === POSTS_OBJECT_TYPE) {
+          return updatedObjects.get(contribution.id) || contribution
+        } else {
+          return updatedObjects[contribution.id] || contribution
+        }
+      })
       : contributions[objectKey].data
   }
 
   renderContributionList = () => {
-    const { upvotedPosts, selectedTab } = this.props
-    const { votedComments } = this.state
+    const { upvotedPosts, votedComments, selectedTab } = this.props
 
     if (selectedTab === POSTS_OBJECT_TYPE) {
       const posts = this.getUpdatedContributionsList(
@@ -232,14 +203,16 @@ class ProfileContributionFeed extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state, ownProps): StateProps => {
-  const { userContributions, posts } = state
+  const { userContributions, posts, comments } = state
   const contributions = userContributions.data.get(ownProps.userName)
   const upvotedPosts = posts.data
+  const votedComments = comments.data.get(ORPHAN_COMMENTS_KEY) ?? {}
   const canLoadMore = !userContributions.processing
   return {
     contributions,
     upvotedPosts,
-    canLoadMore
+    canLoadMore,
+    votedComments
   }
 }
 

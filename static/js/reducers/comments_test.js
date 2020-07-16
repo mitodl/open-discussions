@@ -5,7 +5,7 @@ import { INITIAL_STATE, FETCH_SUCCESS } from "redux-hammock/constants"
 
 import { actions } from "../actions"
 import { replaceMoreComments } from "../actions/comment"
-import { createCommentTree } from "../reducers/comments"
+import { createCommentTree, ORPHAN_COMMENTS_KEY } from "./comments"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
@@ -191,6 +191,38 @@ describe("comments reducers", () => {
     const commentInState = R.view(findComment(stateTree, comment.id), stateTree)
     assert.deepEqual(commentInState, { ...commentInTree, upvoted: true })
     assert.equal(state.patchStatus, FETCH_SUCCESS)
+    sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
+      upvoted: true
+    })
+  })
+
+  it("should let you update a comment without a tree in state", async () => {
+    const comment = response[0]
+    comment.upvoted = false
+    helper.updateCommentStub.returns(
+      Promise.resolve({
+        ...comment,
+        upvoted: true
+      })
+    )
+    const state = await listenForActions(
+      [actions.comments.patch.requestType, actions.comments.patch.successType],
+      async () => {
+        await store.dispatch(
+          actions.comments.patch(comment.id, {
+            upvoted: true
+          })
+        )
+      }
+    )
+    assert.isTrue(state.loaded)
+    assert.deepEqual(
+      {
+        ...comment,
+        upvoted: true
+      },
+      state.data.get(ORPHAN_COMMENTS_KEY)[comment.id]
+    )
     sinon.assert.calledWith(helper.updateCommentStub, comment.id, {
       upvoted: true
     })

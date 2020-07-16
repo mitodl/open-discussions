@@ -37,6 +37,7 @@ const anySpecificError = code =>
 export const any404Error = anySpecificError(404)
 export const anyErrorExcept404 = anyErrorExcept([404])
 export const anyErrorExcept404or410 = anyErrorExcept([404, 410])
+export const anyErrorExcept404or410or500 = anyErrorExcept([404, 410, 500])
 
 // 401/403 status codes are unreliable for detecting authentication errors.
 // Our auth endpoints return an error type in the response, and these values

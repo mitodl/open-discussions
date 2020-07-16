@@ -22,6 +22,8 @@ import type {
   ReplaceMoreCommentsPayload
 } from "../flow/discussionTypes"
 
+export const ORPHAN_COMMENTS_KEY = "orphans"
+
 /**
  * Remove the more_comments instance at the level of the parentId
  */
@@ -209,7 +211,7 @@ type DeleteCommentPayload = {
   postId: string
 }
 
-type CommentData = Map<string, Array<GenericComment>>
+type CommentData = Map<string, Object>
 
 export const commentsEndpoint = {
   name:    "comments",
@@ -285,6 +287,15 @@ export const commentsEndpoint = {
     const oldTree = data.get(postId)
     if (oldTree) {
       update.set(postId, updateCommentTree(oldTree, response))
+    } else {
+      // comments may be upvoted on the profile contributed feed, but
+      // there will not be a comment tree to insert them into. so instead
+      // we put them in a different object where they can be accessed by id
+      const orphanComments = data.get(ORPHAN_COMMENTS_KEY) ?? {}
+      update.set(ORPHAN_COMMENTS_KEY, {
+        ...orphanComments,
+        [response.id]: response
+      })
     }
     return update
   },

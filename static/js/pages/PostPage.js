@@ -35,7 +35,7 @@ import { toggleFollowPost } from "../util/api_actions"
 import { getPostID, getCommentID, truncate } from "../lib/util"
 import {
   anyErrorExcept404,
-  anyErrorExcept404or410,
+  anyErrorExcept404or410or500,
   any404Error,
   anyNotAuthorizedErrorType
 } from "../util/rest"
@@ -384,7 +384,7 @@ const mapStateToProps = (state, ownProps) => {
     isModerator: channel?.user_is_moderator ?? false, // eslint-disable-line camelcase
     errored:
       anyErrorExcept404([posts, channels]) ||
-      anyErrorExcept404or410([comments]),
+      anyErrorExcept404or410or500([comments]),
     subscribedChannels:         getSubscribedChannels(state),
     commentInFlight:            comments.processing,
     postDeleteDialogVisible:    ui.dialogs.has(DELETE_POST_DIALOG),
