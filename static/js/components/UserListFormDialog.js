@@ -98,6 +98,7 @@ export default function UserListFormDialog(props: Props) {
                   id="type-list"
                   type="radio"
                   value={LR_TYPE_USERLIST}
+                  tabIndex="0"
                 />
                 <label htmlFor="type-list">
                   <span className="header">Learning List</span>
@@ -110,6 +111,7 @@ export default function UserListFormDialog(props: Props) {
                   type="radio"
                   id="type-lp"
                   value={LR_TYPE_LEARNINGPATH}
+                  tabIndex="0"
                 />
                 <label htmlFor="type-lp">
                   <span className="header">Learning Path</span>
@@ -128,6 +130,7 @@ export default function UserListFormDialog(props: Props) {
                       id="radio-public"
                       type="radio"
                       value={LR_PUBLIC}
+                      tabIndex="0"
                     />
                     <label htmlFor="radio-public">
                       <span className="header">Public</span>
@@ -139,6 +142,7 @@ export default function UserListFormDialog(props: Props) {
                       type="radio"
                       id="radio-private"
                       value={LR_PRIVATE}
+                      tabIndex="0"
                     />
                     <label htmlFor="radio-private">
                       <span className="header">Private</span>

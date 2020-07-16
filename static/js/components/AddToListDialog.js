@@ -166,6 +166,12 @@ export default function AddToListDialog() {
           <button
             className="create-new-list blue-btn"
             onClick={() => setShowUserListFormDialog(true)}
+            onKeyPress={e => {
+              if (e.key === "Enter") {
+                setShowUserListFormDialog(true)
+              }
+            }}
+            tabIndex="0"
           >
             Create New List
           </button>

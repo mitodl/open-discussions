@@ -52,7 +52,8 @@ type CellProps = {
   children?: any,
   width: CellWidth,
   mobileWidth?: CellWidth,
-  className?: string
+  className?: string,
+  tabIndex?: string
 }
 
 const cellClassName = (width, className) =>
@@ -62,7 +63,8 @@ export const Cell = ({
   children,
   width,
   mobileWidth,
-  className
+  className,
+  tabIndex
 }: CellProps) => {
   useResponsive()
 
@@ -72,6 +74,7 @@ export const Cell = ({
         mobileWidth && isMobileGridWidth() ? mobileWidth : width,
         className
       )}
+      tabIndex={tabIndex || "-1"}
     >
       {children}
     </div>

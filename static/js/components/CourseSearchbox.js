@@ -14,15 +14,7 @@ type Props = {
 }
 
 export default function CourseSearchbox(props: Props) {
-  const {
-    autoFocus,
-    children,
-    onChange,
-    onClear,
-    onSubmit,
-    validation,
-    value
-  } = props
+  const { children, onChange, onClear, onSubmit, validation, value } = props
 
   const [text, setText] = useState("")
 
@@ -30,7 +22,6 @@ export default function CourseSearchbox(props: Props) {
     <div className="course-searchbox">
       <div className="input-wrapper">
         <input
-          autoFocus={autoFocus}
           type="text"
           name="query"
           className="search-input"
@@ -54,7 +45,16 @@ export default function CourseSearchbox(props: Props) {
           search
         </i>
         {value ? (
-          <i className="material-icons clear-icon" onClick={onClear}>
+          <i
+            className="material-icons clear-icon"
+            onClick={onClear}
+            onKeyPress={e => {
+              if (e.key === "Enter" && onClear) {
+                onClear()
+              }
+            }}
+            tabIndex="0"
+          >
             clear
           </i>
         ) : null}

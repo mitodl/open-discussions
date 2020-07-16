@@ -73,7 +73,16 @@ const UserMenu = ({ toggleShowUserMenu, showUserMenu, profile }: Props) => {
 
   return (
     <div className="user-menu">
-      <div className="user-menu-clickarea" onClick={toggleShowUserMenu}>
+      <div
+        className="user-menu-clickarea"
+        onClick={toggleShowUserMenu}
+        onKeyPress={e => {
+          if (e.key === "Enter") {
+            toggleShowUserMenu()
+          }
+        }}
+        tabIndex="0"
+      >
         <ProfileImage
           editable={false}
           userName={SETTINGS.username}
