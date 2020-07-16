@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.134.2
+Version 0.134.2 (Released July 16, 2020)
 ---------------
 
 - refactor ExpandedPostDisplay to be a function-based component
