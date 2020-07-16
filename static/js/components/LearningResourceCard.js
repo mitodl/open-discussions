@@ -233,6 +233,14 @@ export function LearningResourceDisplay(props: Props) {
                       showListDialog(object)
                     }
                   }}
+                  onKeyPress={e => {
+                    if (e.key === "Enter") {
+                      if (!userIsAnonymous()) {
+                        showListDialog(object)
+                      }
+                    }
+                  }}
+                  tabIndex="0"
                 >
                   <i className={`material-icons ${bookmarkIconName}`}>
                     {bookmarkIconName}

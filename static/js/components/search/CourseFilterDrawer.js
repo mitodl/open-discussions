@@ -46,7 +46,16 @@ export function FilterDisplay(props: FilterDrawerProps) {
         <div className="active-search-filters">
           <div className="filter-section-title">
             Filters
-            <span className="clear-all-filters" onClick={clearAllFilters}>
+            <span
+              className="clear-all-filters"
+              onClick={clearAllFilters}
+              onKeyPress={e => {
+                if (e.key === "Enter") {
+                  clearAllFilters()
+                }
+              }}
+              tabIndex="0"
+            >
               Clear All
             </span>
           </div>

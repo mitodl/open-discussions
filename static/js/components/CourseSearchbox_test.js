@@ -57,16 +57,6 @@ describe("CourseSearchbox", () => {
     sinon.assert.called(onSubmitStub)
   })
 
-  //
-  ;[true, false].forEach(autoFocus => {
-    it(`should pass down autoFocus of ${String(
-      autoFocus
-    )} to the input`, () => {
-      const wrapper = renderSearchbox({ autoFocus })
-      assert.equal(autoFocus, wrapper.find("input").prop("autoFocus"))
-    })
-  })
-
   it("should have a little icon", () => {
     renderSearchbox()
       .find(".search-icon")

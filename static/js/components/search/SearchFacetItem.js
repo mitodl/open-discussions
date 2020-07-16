@@ -13,6 +13,17 @@ type Props = {
 
 const featuredFacetNames = ["audience", "certification"]
 
+function updateFacetCheckbox(props: Props) {
+  const { facet, isChecked, name, onUpdate } = props
+  onUpdate({
+    target: {
+      name,
+      value:   facet.key,
+      checked: !isChecked
+    }
+  })
+}
+
 export default function SearchFacetItem(props: Props) {
   const { facet, isChecked, onUpdate, labelFunction, name } = props
 
@@ -21,14 +32,11 @@ export default function SearchFacetItem(props: Props) {
   return (
     <div
       className={isChecked ? "facet-visible checked" : "facet-visible"}
-      onClick={() => {
-        onUpdate({
-          target: {
-            name,
-            value:   facet.key,
-            checked: !isChecked
-          }
-        })
+      onClick={() => updateFacetCheckbox(props)}
+      onKeyPress={e => {
+        if (e.key === "Space") {
+          updateFacetCheckbox(props)
+        }
       }}
     >
       <input

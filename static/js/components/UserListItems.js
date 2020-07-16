@@ -70,7 +70,7 @@ const SortItems = ({ userListId, items, className }: ItemsProps) => {
       <Grid className={isPending ? `${className} saving` : className}>
         {items.map((item, i) => (
           <SortableItem key={`item-${item.item.item_id}`} index={i}>
-            <Cell width={12}>
+            <Cell width={12} tabIndex="0">
               <LearningResourceCard
                 object={item.resource}
                 searchResultLayout={SEARCH_LIST_UI}

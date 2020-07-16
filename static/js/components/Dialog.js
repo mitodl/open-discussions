@@ -34,7 +34,16 @@ export default function OurDialog(props: Props) {
     <Dialog open={open} onClose={hideDialog} id={id} className={className}>
       <DialogTitle>
         <span>{title}</span>
-        <i onClick={hideDialog} className="material-icons close">
+        <i
+          onClick={hideDialog}
+          onKeyPress={e => {
+            if (e.key === "Enter") {
+              hideDialog()
+            }
+          }}
+          className="material-icons close"
+          tabIndex="0"
+        >
           close
         </i>
       </DialogTitle>

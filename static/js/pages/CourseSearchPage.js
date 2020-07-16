@@ -424,6 +424,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
                       onClick={preventDefaultAndInvoke(() =>
                         this.useSuggestion(suggestion)
                       )}
+                      onKeyPress={e => {
+                        if (e.key === "Enter") {
+                          this.useSuggestion(suggestion)
+                        }
+                      }}
+                      tabIndex="0"
                     >
                       {` ${suggestion}`}
                     </a>
@@ -435,6 +441,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
             <div className="layout-buttons">
               <div
                 onClick={() => this.setSearchUI(SEARCH_LIST_UI)}
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    this.setSearchUI(SEARCH_LIST_UI)
+                  }
+                }}
+                tabIndex="0"
                 className={`option ${
                   searchResultLayout === SEARCH_LIST_UI ? "active" : ""
                 }`}
@@ -443,6 +455,12 @@ export class CourseSearchPage extends React.Component<Props, State> {
               </div>
               <div
                 onClick={() => this.setSearchUI(SEARCH_GRID_UI)}
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    this.setSearchUI(SEARCH_GRID_UI)
+                  }
+                }}
+                tabIndex="0"
                 className={`option ${
                   searchResultLayout === SEARCH_GRID_UI ? "active" : ""
                 }`}

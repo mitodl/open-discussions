@@ -110,6 +110,12 @@ function FilterableSearchFacet(props: Props) {
               <i
                 className="material-icons clear-icon"
                 onClick={() => setFilterText("")}
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    setFilterText("")
+                  }
+                }}
+                tabIndex="0"
               >
                 clear
               </i>
