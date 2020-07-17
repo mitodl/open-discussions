@@ -51,6 +51,16 @@ $drawer-trans: width 500ms;
 $nav-min-height: calc(100vh - #{$toolbar-height-desktop} - #{$footer-height});
 
 .audio-player-padding-bottom {
+  .scrollarea-content {
+    @include breakpoint(desktop) {
+      padding-bottom: $audio-player-height-desktop;
+    }
+
+    @include breakpoint(mobile) {
+      padding-bottom: $audio-player-height-mobile;
+    }
+  }
+
   .mdc-drawer__content .navigation {
     @include breakpoint(desktop) {
       min-height: calc(#{$nav-min-height} - #{$audio-player-height-desktop});
