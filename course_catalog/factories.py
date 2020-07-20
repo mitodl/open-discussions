@@ -446,6 +446,8 @@ class PodcastFactory(LearningResourceFactory):
     image_src = factory.Faker("image_url")
     published = True
     url = factory.Faker("uri")
+    apple_podcasts_url = factory.Faker("uri")
+    google_podcasts_url = factory.Faker("uri")
 
     class Meta:
         model = Podcast

@@ -564,6 +564,8 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
     image_src = models.URLField(max_length=400, null=True, blank=True)
     published = models.BooleanField(default=True)
     url = models.URLField(null=True, max_length=2048)
+    apple_podcasts_url = models.URLField(null=True, max_length=2048)
+    google_podcasts_url = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
 
     def __str__(self):

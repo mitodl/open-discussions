@@ -655,6 +655,8 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
             "offered_by",
             "audience",
             "certification",
+            "apple_podcasts_url",
+            "google_podcasts_url",
         ]
         read_only_fields = fields
 

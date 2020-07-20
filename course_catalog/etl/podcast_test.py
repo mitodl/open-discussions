@@ -17,8 +17,13 @@ def rss_content():
     return content
 
 
-def mock_podcast_file(
-    podcast_title=None, topics=None, website_url="website_url", offered_by=None
+def mock_podcast_file(  # pylint: disable=too-many-arguments
+    podcast_title=None,
+    topics=None,
+    website_url="website_url",
+    offered_by=None,
+    google_podcasts_url="google_podcasts_url",
+    apple_podcasts_url="apple_podcasts_url",
 ):
     """Mock podcast github file"""
 
@@ -28,6 +33,8 @@ rss_url: rss_url
 { "topics: " + topics if topics else "" }
 { "offered_by: " + offered_by if offered_by else "" }
 website:  {website_url}
+google_podcasts_url: {google_podcasts_url}
+apple_podcasts_url: {apple_podcasts_url}
 """
     return Mock(decoded_content=content)
 
@@ -106,6 +113,8 @@ def test_transform(mocker, title, topics, offered_by):
             "image_src": "apicture.jpg",
             "published": True,
             "url": "website_url",
+            "google_podcasts_url": "google_podcasts_url",
+            "apple_podcasts_url": "apple_podcasts_url",
             "topics": expected_topics,
             "episodes": [
                 {

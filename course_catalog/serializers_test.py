@@ -294,6 +294,8 @@ def test_podcast_serializer():
         "platform": "podcast",
         "audience": ["Open Content"],
         "certification": [],
+        "apple_podcasts_url": podcast.apple_podcasts_url,
+        "google_podcasts_url": podcast.google_podcasts_url,
     }
 
 

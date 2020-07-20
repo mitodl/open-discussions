@@ -580,6 +580,8 @@ def test_es_podcast_serializer(offered_by):
             "offered_by": [offered_by],
             "audience": ["Open Content"],
             "certification": [],
+            "apple_podcasts_url": podcast.apple_podcasts_url,
+            "google_podcasts_url": podcast.google_podcasts_url,
         },
     )
 

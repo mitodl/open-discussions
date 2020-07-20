@@ -178,6 +178,16 @@ def transform(extracted_podcasts):
                 if "offered_by" in config_data
                 else []
             )
+            apple_podcasts_url = (
+                config_data["apple_podcasts_url"]
+                if "apple_podcasts_url" in config_data
+                else None
+            )
+            google_podcasts_url = (
+                config_data["google_podcasts_url"]
+                if "google_podcasts_url" in config_data
+                else None
+            )
             podcast_id = generate_unique_id(config_data["website"])
             yield {
                 "podcast_id": podcast_id,
@@ -195,6 +205,8 @@ def transform(extracted_podcasts):
                     transform_episode(episode_rss, offered_by, topics, image)
                     for episode_rss in rss_data.find_all("item")
                 ),
+                "apple_podcasts_url": apple_podcasts_url,
+                "google_podcasts_url": google_podcasts_url,
             }
         except AttributeError:
             log.exception("Error parsing podcast data from %s", config_data["rss_url"])
