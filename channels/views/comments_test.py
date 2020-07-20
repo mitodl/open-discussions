@@ -7,6 +7,7 @@ import time
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.request import Request
 
 from channels.constants import DELETED_COMMENT_OR_POST_TEXT
 from channels.models import Comment
@@ -22,6 +23,12 @@ from open_discussions.test_utils import any_instance_of
 from profiles.utils import image_uri, DEFAULT_PROFILE_IMAGE
 
 pytestmark = pytest.mark.betamax
+
+
+@pytest.fixture(autouse=True)
+def mock_spam_check(mocker):
+    """Mock the check_comment_for_spam task"""
+    return mocker.patch("channels.task_helpers.check_comment_for_spam")
 
 
 @pytest.fixture(autouse=True)
@@ -540,6 +547,7 @@ def test_create_comment(
     reddit_factories,
     private_channel_and_contributor,
     mock_notify_subscribed_users,
+    mock_spam_check,
     extra_params,
     extra_expected,
     score,
@@ -588,6 +596,7 @@ def test_create_comment(
     mock_notify_subscribed_users.assert_called_once_with(
         post.id, None, resp.json()["id"]
     )
+    mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
 def test_create_comment_forbidden(user_client):
@@ -619,6 +628,7 @@ def test_create_comment_reply_to_comment(
     reddit_factories,
     private_channel_and_contributor,
     mock_notify_subscribed_users,
+    mock_spam_check,
 ):
     """Create a comment that's a reply to another comment"""
     channel, user = private_channel_and_contributor
@@ -652,6 +662,7 @@ def test_create_comment_reply_to_comment(
     mock_notify_subscribed_users.assert_called_once_with(
         post.id, comment.id, resp.json()["id"]
     )
+    mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
 def test_create_comment_reply_to_deleted_comment(
@@ -671,13 +682,14 @@ def test_create_comment_reply_to_deleted_comment(
     assert resp.json() == {"detail": "Resource is gone.", "error_type": "GoneException"}
 
 
-def test_update_comment_text(user_client):
+def test_update_comment_text(user_client, mock_spam_check):
     """Update a comment's text"""
     updated_text = "updated text"
     url = reverse("comment-detail", kwargs={"comment_id": "6"})
     resp = user_client.patch(url, type="json", data={"text": updated_text})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["text"] == updated_text
+    mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
 # Reddit returns the same result for updating a missing comment

@@ -19,6 +19,7 @@ from channels.constants import (
 from channels.factories.models import (
     ChannelFactory,
     PostFactory,
+    CommentFactory,
     ChannelInvitationFactory,
 )
 from channels.models import ChannelSubscription, Channel, Post
@@ -468,3 +469,47 @@ def test_update_memberships_for_managed_channels(mocker):
     mock_update_memberships_for_managed_channels_api.assert_called_once_with(
         channel_ids=[1, 2, 3], user_ids=[4, 5, 6]
     )
+
+
+@pytest.mark.parametrize("is_spam", [True, False])
+def test_check_comment_for_spam(mocker, is_spam):
+    """Verify that check_comment_for_spam removes a comment if it is spam"""
+    mock_api = mocker.patch("channels.tasks.get_admin_api").return_value
+    mock_spam_checker = mocker.patch("channels.tasks.SPAM_CHECKER")
+    mock_spam_checker.is_comment_spam.return_value = is_spam
+    comment = CommentFactory.create()
+
+    tasks.check_comment_for_spam.delay(
+        user_agent="user-agent", user_ip="user-ip", comment_id=comment.comment_id
+    )
+
+    mock_spam_checker.is_comment_spam.assert_called_once_with(
+        user_agent="user-agent", user_ip="user-ip", comment=comment
+    )
+
+    if is_spam:
+        mock_api.remove_comment.assert_called_once_with(comment.comment_id)
+    else:
+        mock_api.remove_comment.assert_not_called()
+
+
+@pytest.mark.parametrize("is_spam", [True, False])
+def test_check_post_for_spam(mocker, is_spam):
+    """Verify that check_post_for_spam removes a post if it is spam"""
+    mock_api = mocker.patch("channels.tasks.get_admin_api").return_value
+    mock_spam_checker = mocker.patch("channels.tasks.SPAM_CHECKER")
+    mock_spam_checker.is_post_spam.return_value = is_spam
+    post = PostFactory.create()
+
+    tasks.check_post_for_spam.delay(
+        user_agent="user-agent", user_ip="user-ip", post_id=post.post_id
+    )
+
+    mock_spam_checker.is_post_spam.assert_called_once_with(
+        user_agent="user-agent", user_ip="user-ip", post=post
+    )
+
+    if is_spam:
+        mock_api.remove_post.assert_called_once_with(post.post_id)
+    else:
+        mock_api.remove_post.assert_not_called()

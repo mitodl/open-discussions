@@ -1,11 +1,12 @@
 """Tests for views for REST APIs for posts"""
-# pylint: disable=unused-argument,too-many-lines
+# pylint: disable=unused-argument,too-many-lines,redefined-outer-name
 import json
 import os
 from types import SimpleNamespace
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.request import Request
 
 from profiles.utils import image_uri
 from channels.factories.models import LinkMetaFactory
@@ -31,6 +32,12 @@ from open_discussions.factories import UserFactory
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = pytest.mark.betamax
+
+
+@pytest.fixture(autouse=True)
+def mock_spam_check(mocker):
+    """Mock the check_comment_for_spam task"""
+    return mocker.patch("channels.task_helpers.check_post_for_spam")
 
 
 def test_create_url_post_existing_meta(
@@ -120,7 +127,9 @@ def test_post_create_post_no_thumbnail(
     assert LinkMeta.objects.filter(url=url).first() is None
 
 
-def test_create_text_post(user_client, private_channel_and_contributor):
+def test_create_text_post(
+    user_client, private_channel_and_contributor, mock_spam_check
+):
     """
     Create a new text post
     """
@@ -160,9 +169,12 @@ def test_create_text_post(user_client, private_channel_and_contributor):
         "num_reports": None,
         "post_type": LINK_TYPE_SELF,
     }
+    mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
-def test_create_article_post(user_client, private_channel_and_contributor):
+def test_create_article_post(
+    user_client, private_channel_and_contributor, mock_spam_check
+):
     """
     Create a new article post
     """
@@ -207,6 +219,7 @@ def test_create_article_post(user_client, private_channel_and_contributor):
     article = Article.objects.filter(post__post_id=resp.json()["id"])
     assert article.exists()
     assert article.first().content == article_content
+    mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
 def test_create_article_post_with_cover(user_client, private_channel_and_contributor):
@@ -788,7 +801,9 @@ class PostDetailTests:
             ({"upvoted": True}, {"upvoted": True}),
         ],
     )
-    def test_update_post(self, user_client, scenario, request_data, exp_response_data):
+    def test_update_post(
+        self, user_client, scenario, request_data, exp_response_data, mock_spam_check
+    ):
         """
         Test that non-staff users are allowed to make certain requests to update a post, and that
         the response from the API matches our expectations
@@ -796,6 +811,7 @@ class PostDetailTests:
         resp = user_client.patch(scenario.url, format="json", data=request_data)
         assert resp.status_code == status.HTTP_200_OK
         assert resp.json() == {**scenario.default_response, **exp_response_data}
+        mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
     @pytest.mark.parametrize(
         "request_data,exp_response_data",

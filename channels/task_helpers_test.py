@@ -22,3 +22,47 @@ def test_maybe_repair_post_in_host_listing(mocker, settings, delay):
     patched_maybe_repair_post_in_host_listing.apply_async.assert_called_once_with(
         args=[self_post.channel.name, self_post.post_id], countdown=delay
     )
+
+
+def test_check_post_for_spam(mocker, rf):
+    """Test that check_post_for_spam calls the task"""
+    mock_extract_spam_check_headers = mocker.patch(
+        "channels.task_helpers.extract_spam_check_headers"
+    )
+    mock_headers = mock_extract_spam_check_headers.return_value
+    mock_task = mocker.patch("channels.tasks.check_post_for_spam")
+    mock_request = rf.post("/api")
+
+    task_helpers.check_post_for_spam(mock_request, "post-id")
+
+    mock_extract_spam_check_headers.assert_called_once_with(mock_request)
+    mock_task.apply_async.assert_called_once_with(
+        kwargs=dict(
+            user_agent=mock_headers.user_agent,
+            user_ip=mock_headers.user_ip,
+            post_id="post-id",
+        ),
+        countdown=15,
+    )
+
+
+def test_check_comment_for_spam(mocker, rf):
+    """Test that check_comment_for_spam calls the task"""
+    mock_extract_spam_check_headers = mocker.patch(
+        "channels.task_helpers.extract_spam_check_headers"
+    )
+    mock_headers = mock_extract_spam_check_headers.return_value
+    mock_task = mocker.patch("channels.tasks.check_comment_for_spam")
+    mock_request = rf.post("/api")
+
+    task_helpers.check_comment_for_spam(mock_request, "comment-id")
+
+    mock_extract_spam_check_headers.assert_called_once_with(mock_request)
+    mock_task.apply_async.assert_called_once_with(
+        kwargs=dict(
+            user_agent=mock_headers.user_agent,
+            user_ip=mock_headers.user_ip,
+            comment_id="comment-id",
+        ),
+        countdown=15,
+    )

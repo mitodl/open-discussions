@@ -4,6 +4,7 @@
 #
 #    pip-compile
 #
+akismet==1.1              # via -r requirements.in
 amqp==2.5.2               # via kombu
 appdirs==1.4.3            # via zeep
 attrs==19.3.0             # via zeep
@@ -43,6 +44,7 @@ django-guardian==1.4.9    # via -r requirements.in
 django-hijack-admin==2.1.10  # via -r requirements.in
 django-hijack==2.1.10     # via -r requirements.in, django-hijack-admin
 django-imagekit==4.0.2    # via -r requirements.in
+django-ipware==3.0.0      # via -r requirements.in
 django-json-widget==1.0.0  # via -r requirements.in
 django-redis==4.10.0      # via -r requirements.in
 django-server-status==0.5.0  # via -r requirements.in
@@ -111,7 +113,7 @@ redis==3.2.1              # via -r requirements.in, django-redis, django-server-
 requests-file==1.4.3      # via tldextract
 requests-oauthlib==0.8.0  # via social-auth-core
 requests-toolbelt==0.9.1  # via zeep
-requests==2.21.0          # via -r requirements.in, betamax, django-anymail, ocw-data-parser, prawcore, pygithub, requests-file, requests-oauthlib, requests-toolbelt, smart-open, social-auth-core, tika, tldextract, update-checker, zeep
+requests==2.21.0          # via -r requirements.in, akismet, betamax, django-anymail, ocw-data-parser, prawcore, pygithub, requests-file, requests-oauthlib, requests-toolbelt, smart-open, social-auth-core, tika, tldextract, update-checker, zeep
 rsa==4.0                  # via google-auth
 s3transfer==0.1.13        # via boto3
 sentry-sdk==0.14.1        # via -r requirements.in

@@ -22,7 +22,8 @@ from channels.api import (
     allowed_post_types_bitmask,
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation
+from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation, Comment
+from channels.spam import SpamChecker
 from channels.utils import SORT_NEW_LISTING_PARAMS, SORT_HOT_LISTING_PARAMS
 from mail import api as mail_api
 from open_discussions.celery import app
@@ -31,6 +32,8 @@ from search.exceptions import PopulateUserRolesException, RetryException
 
 User = get_user_model()
 log = logging.getLogger()
+
+SPAM_CHECKER = SpamChecker()
 
 
 @app.task()
@@ -453,3 +456,41 @@ def update_memberships_for_managed_channels(*, channel_ids=None, user_ids=None):
     membership_api.update_memberships_for_managed_channels(
         channel_ids=channel_ids, user_ids=user_ids
     )
+
+
+@app.task(acks_late=True)
+def check_post_for_spam(*, user_ip, user_agent, post_id):
+    """
+    Check posts for spam and remove them accordingly
+
+    Args:
+        user_ip (str): user's ip address for the request that created the post
+        user_agent (str): useragent for the request that created the post
+        post_id (str): reddit base36 post id
+    """
+    admin_api = get_admin_api()
+
+    post = Post.objects.get(post_id=post_id)
+
+    if SPAM_CHECKER.is_post_spam(user_ip=user_ip, user_agent=user_agent, post=post):
+        admin_api.remove_post(post.post_id)
+
+
+@app.task(acks_late=True)
+def check_comment_for_spam(*, user_ip, user_agent, comment_id):
+    """
+    Check comments for spam and remove them accordingly
+
+    Args:
+        user_ip (str): user's ip address for the request that created the comment
+        user_agent (str): useragent for the request that created the comment
+        comment_id (str): reddit base36 comment id
+    """
+    admin_api = get_admin_api()
+
+    comment = Comment.objects.get(comment_id=comment_id)
+
+    if SPAM_CHECKER.is_comment_spam(
+        user_ip=user_ip, user_agent=user_agent, comment=comment
+    ):
+        admin_api.remove_comment(comment.comment_id)

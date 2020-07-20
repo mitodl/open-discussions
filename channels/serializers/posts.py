@@ -200,6 +200,9 @@ class PostSerializer(BasePostSerializer):
         return {"cover_image": value}
 
     def create(self, validated_data):
+        """Create a post"""
+        from channels import task_helpers
+
         title = validated_data["title"]
         text = validated_data.get("text", None)
         url = validated_data.get("url", None)
@@ -234,9 +237,14 @@ class PostSerializer(BasePostSerializer):
         if changed or cover_image:
             post = api.get_post(post_id=post.id)
 
+        task_helpers.check_post_for_spam(self.context["request"], post.id)
+
         return post
 
     def update(self, instance, validated_data):  # pylint: disable=too-many-branches
+        """Update the post"""
+        from channels import task_helpers
+
         post_id = self.context["view"].kwargs["post_id"]
 
         if "url" in validated_data:
@@ -276,4 +284,7 @@ class PostSerializer(BasePostSerializer):
                 api.remove_post_subscription(post_id)
 
         api.apply_post_vote(instance, validated_data)
+
+        task_helpers.check_post_for_spam(self.context["request"], post_id)
+
         return api.get_post(post_id=post_id)

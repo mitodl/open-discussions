@@ -23,6 +23,14 @@
   ],
   "description": "open-discussions",
   "env": {
+    "AKISMET_API_KEY": {
+      "description": "API key for Akismet",
+      "required": false
+    },
+    "AKISMET_BLOG_URL": {
+      "description": "Blog urlfor Akismet",
+      "required": false
+    },
     "ALGOLIA_APP_ID": {
       "description": "Algolia Places app ID",
       "required": false

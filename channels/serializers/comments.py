@@ -7,6 +7,7 @@ from praw.models.reddit.submission import Submission
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from channels import task_helpers
 from channels.constants import DELETED_COMMENT_OR_POST_TEXT
 from channels.utils import get_kind_mapping, get_kind_and_id, get_reddit_slug
 from channels.models import Subscription
@@ -196,6 +197,8 @@ class CommentSerializer(BaseCommentSerializer):
             post_id, validated_data.get("comment_id", None), comment.id
         )
 
+        task_helpers.check_comment_for_spam(self.context["request"], comment.id)
+
         if changed:
             return api.get_comment(comment.id)
         else:
@@ -207,7 +210,8 @@ class CommentSerializer(BaseCommentSerializer):
 
         api = self.context["channel_api"]
         if "body" in validated_data:
-            api.update_comment(comment_id=instance.id, text=validated_data["body"])
+            text = validated_data["body"]
+            api.update_comment(comment_id=instance.id, text=text)
 
         if "removed" in validated_data:
             if validated_data["removed"] is True:
@@ -229,6 +233,8 @@ class CommentSerializer(BaseCommentSerializer):
                 api.remove_comment_subscription(post_id, instance.id)
 
         api.apply_comment_vote(instance, validated_data)
+
+        task_helpers.check_comment_for_spam(self.context["request"], instance.id)
 
         return api.get_comment(comment_id=instance.id)
 
