@@ -1,6 +1,7 @@
 """Channel tasks helpers"""
 from django.conf import settings
 
+from channels.spam import extract_spam_check_headers
 from open_discussions.features import HOT_POST_REPAIR, if_feature_enabled
 
 
@@ -19,4 +20,44 @@ def maybe_repair_post_in_host_listing(post_obj):
     tasks.maybe_repair_post_in_host_listing.apply_async(
         args=[post.channel.name, post.post_id],
         countdown=settings.OPEN_DISCUSSIONS_HOT_POST_REPAIR_DELAY,
+    )
+
+
+def check_post_for_spam(request, post_id):
+    """
+    Run a task to determine if the post is spam
+
+    Args:
+        request(): the request to create or update the post
+        post_id(str): the base36 post id
+    """
+    from channels import tasks
+
+    headers = extract_spam_check_headers(request)
+    tasks.check_post_for_spam.apply_async(
+        kwargs=dict(
+            user_ip=headers.user_ip, user_agent=headers.user_agent, post_id=post_id
+        ),
+        countdown=15,
+    )
+
+
+def check_comment_for_spam(request, comment_id):
+    """
+    Run a task to determine if the post is spam
+
+    Args:
+        request(): the request to create or update the post
+        comment_id(str): the base36 comment id
+    """
+    from channels import tasks
+
+    headers = extract_spam_check_headers(request)
+    tasks.check_comment_for_spam.apply_async(
+        kwargs=dict(
+            user_ip=headers.user_ip,
+            user_agent=headers.user_agent,
+            comment_id=comment_id,
+        ),
+        countdown=15,
     )

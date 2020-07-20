@@ -165,3 +165,10 @@ def mocked_responses():
     """Mock responses fixture"""
     with responses.RequestsMock() as rsps:
         yield rsps
+
+
+@pytest.fixture(autouse=True)
+def default_settings(settings):
+    """Default settings for tests"""
+    settings.AKISMET_API_KEY = None
+    settings.AKISMET_BLOG_URL = None

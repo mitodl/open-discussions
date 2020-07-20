@@ -929,6 +929,14 @@ MIT_WS_PRIVATE_KEY_FILE = os.path.join(STATIC_ROOT, "mit_x509.key")
 
 STAFF_MOIRA_LISTS = get_list_of_str("STAFF_MOIRA_LISTS", [])
 
+AKISMET_API_KEY = get_string("AKISMET_API_KEY", None)
+AKISMET_BLOG_URL = get_string("AKISMET_BLOG_URL", None)
+AKISMET_IS_TESTING = get_string("AKISMET_IS_TESTING", False)
+
+if DEBUG:
+    # allow for all IPs to be routable, including localhost, for testing
+    IPWARE_PRIVATE_IP_PREFIX = ()
+
 
 def setup_x509():
     """ write the moira x509 certification & key to files"""
