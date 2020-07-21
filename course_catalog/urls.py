@@ -55,4 +55,5 @@ urlpatterns = [
     url(
         r"^api/v0/ocw-course-report", views.ocw_course_report, name="ocw-course-report"
     ),
+    url(r"^podcasts/rss_feed", views.podcast_rss_feed, name="podcast-rss-feed"),
 ]

@@ -706,7 +706,7 @@ class PodcastEpisodeSerializer(
 
     class Meta:
         model = PodcastEpisode
-        exclude = COMMON_IGNORED_FIELDS
+        exclude = ("created_on", "updated_on", "rss")
 
 
 class PodcastSerializer(

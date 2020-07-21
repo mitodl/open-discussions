@@ -2,15 +2,20 @@
 
 import logging
 from datetime import datetime
+from urllib.parse import urljoin
 from django.conf import settings
 import github
 import yaml
 from bs4 import BeautifulSoup as bs
 import requests
+from requests.exceptions import HTTPError
+from open_discussions.utils import now_in_utc
 from course_catalog.etl.utils import generate_unique_id
+from course_catalog.models import PodcastEpisode
 
 CONFIG_FILE_REPO = "mitodl/open-podcast-data"
 CONFIG_FILE_FOLDER = "podcasts"
+TIMESTAMP_FORMAT = "%a, %d %b %Y  %H:%M:%S %z"
 
 log = logging.getLogger()
 
@@ -107,14 +112,15 @@ def extract():
         try:
             response = requests.get(rss_url)
             response.raise_for_status()
-        except ConnectionError:
-            log.error("Invalid rss url %s", rss_url)
 
-        feed = bs(response.content, "xml")
-        yield (feed, playlist_config)
+            feed = bs(response.content, "xml")
+            yield (feed, playlist_config)
+
+        except (ConnectionError, HTTPError):
+            log.exception("Invalid rss url %s", rss_url)
 
 
-def transform_episode(rss_data, offered_by, topics, parent_image):
+def transform_episode(rss_data, offered_by, topics, parent_image, podcast_id):
     """
     Transform a podcast episode into our normalized data
 
@@ -123,11 +129,15 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
         offered_by (str): the offered_by value for this episode
         topics (list of dict): the topics for the podcast
         parent_image (str): url for podcast image
+        podcast_id (str): unique id for podcast
     Returns:
         dict:
             normalized podcast episode data
     """
+
     episode_id = generate_unique_id(rss_data.guid.text)
+    rss_data.guid.string = f"{podcast_id}: {rss_data.guid.text}"
+
     return {
         "episode_id": episode_id,
         "title": rss_data.title.text,
@@ -139,14 +149,13 @@ def transform_episode(rss_data, offered_by, topics, parent_image):
         "image_src": rss_data.find("image")["href"]
         if rss_data.find("image")
         else parent_image,
-        "last_modified": datetime.strptime(
-            rss_data.pubDate.text, "%a, %d %b %Y  %H:%M:%S %z"
-        ),
+        "last_modified": datetime.strptime(rss_data.pubDate.text, TIMESTAMP_FORMAT),
         "published": True,
         "duration": rss_data.find("itunes:duration").text
         if rss_data.find("itunes:duration")
         else None,
         "topics": topics,
+        "rss": rss_data.prettify(),
     }
 
 
@@ -202,7 +211,9 @@ def transform(extracted_podcasts):
                 "url": config_data["website"],
                 "topics": topics,
                 "episodes": (
-                    transform_episode(episode_rss, offered_by, topics, image)
+                    transform_episode(
+                        episode_rss, offered_by, topics, image, podcast_id
+                    )
                     for episode_rss in rss_data.find_all("item")
                 ),
                 "apple_podcasts_url": apple_podcasts_url,
@@ -211,3 +222,72 @@ def transform(extracted_podcasts):
         except AttributeError:
             log.exception("Error parsing podcast data from %s", config_data["rss_url"])
             continue
+
+
+def get_all_mit_podcasts_channel_rss():
+    """
+    Get channel information for the MIT aggregate podcast
+    Returns:
+        Beautiful soup object of the rss for the  MIT aggregate podcast, excluding episodes
+    """
+    current_timestamp = now_in_utc().strftime(TIMESTAMP_FORMAT)
+
+    podcasts_url = urljoin(settings.SITE_BASE_URL, "podcasts")
+    cover_image_url = urljoin(
+        settings.SITE_BASE_URL, "/static/images/podcast_cover_art.png"
+    )
+
+    rss = """<?xml version='1.0' encoding='UTF-8'?>
+    <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+        <channel>
+            <title>MIT Open Aggregated Podcast Feed</title>
+            <link>{podcast_url}</link>
+            <language>en-us</language>
+            <pubDate>{current_timestamp}</pubDate>
+            <lastBuildDate>{current_timestamp}</lastBuildDate>
+            <ttl>60</ttl>
+            <itunes:subtitle>Episodes from podcasts from around MIT</itunes:subtitle>
+            <itunes:author>MIT Open Learning</itunes:author>
+            <itunes:summary>Episodes from podcasts from around MIT</itunes:summary>
+            <description>Episodes from podcasts from around MIT</description>
+            <itunes:owner>
+                <itunes:name>MIT Open Learning</itunes:name>
+                <itunes:email>{email}</itunes:email>
+            </itunes:owner>
+            <image>
+              <url>{cover_image_url}</url>
+              <title>MIT Open Aggregated Podcast Feed</title>
+              <link>{podcast_url}</link>
+            </image>
+            <itunes:explicit>no</itunes:explicit>
+            <itunes:category text="Education"/></itunes:category>
+        </channel>
+    </rss>""".format(
+        podcast_url=podcasts_url,
+        current_timestamp=current_timestamp,
+        email=settings.EMAIL_SUPPORT,
+        cover_image_url=cover_image_url,
+    )
+    return bs(rss, "xml")
+
+
+def generate_aggregate_podcast_rss():
+    """
+    Creates and saves an rss file for the MIT aggregate podcast
+
+    Returns:
+        Beautiful soup object of the rss for the  MIT aggregate podcast
+    """
+
+    rss = get_all_mit_podcasts_channel_rss()
+    episode_rss_list = (
+        PodcastEpisode.objects.filter(published=True)
+        .order_by("last_modified")
+        .reverse()
+        .values_list("rss", flat=True)
+    )
+
+    for episode in episode_rss_list:
+        rss.channel.append(bs(episode, "xml"))
+
+    return rss
