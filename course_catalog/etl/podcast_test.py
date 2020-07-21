@@ -2,10 +2,19 @@
 
 from unittest.mock import Mock
 import datetime
+from urllib.parse import urljoin
 import pytest
+import pytz
+from django.conf import settings
 from bs4 import BeautifulSoup as bs
 import yaml
-from course_catalog.etl.podcast import extract, transform
+from freezegun import freeze_time
+from course_catalog.factories import PodcastEpisodeFactory
+from course_catalog.etl.podcast import (
+    extract,
+    transform,
+    generate_aggregate_podcast_rss,
+)
 
 
 def rss_content():
@@ -46,7 +55,7 @@ def mock_rss_request(mocker):
     """
 
     mocker.patch(
-        "course_catalog.etl.see.requests.get",
+        "course_catalog.etl.podcast.requests.get",
         side_effect=[mocker.Mock(content=rss_content())],
     )
 
@@ -58,7 +67,7 @@ def mock_rss_request_with_bad_rss_file(mocker):
     """
 
     mocker.patch(
-        "course_catalog.etl.see.requests.get",
+        "course_catalog.etl.podcast.requests.get",
         side_effect=[mocker.Mock(content=""), mocker.Mock(content=rss_content())],
     )
 
@@ -103,6 +112,11 @@ def test_transform(mocker, title, topics, offered_by):
 
     expected_offered_by = [{"name": offered_by}] if offered_by else []
 
+    episodes_rss = list(bs(rss_content(), "xml").find_all("item"))
+
+    for episode in episodes_rss:
+        episode.guid.string = f"d4c3dcd45dc93fbc9c3634ba0545c2e0: {episode.guid.text}"
+
     expected_results = [
         {
             "podcast_id": "d4c3dcd45dc93fbc9c3634ba0545c2e0",
@@ -132,6 +146,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "published": True,
                     "duration": "00:17:16",
                     "topics": expected_topics,
+                    "rss": episodes_rss[0].prettify(),
                 },
                 {
                     "episode_id": "85855fa506bf36999f8978302f3413ec",
@@ -148,6 +163,7 @@ def test_transform(mocker, title, topics, offered_by):
                     "published": True,
                     "duration": "00:17:16",
                     "topics": expected_topics,
+                    "rss": episodes_rss[1].prettify(),
                 },
             ],
         }
@@ -187,3 +203,58 @@ def test_transform_with_error(mocker):
 
     assert len(results) == 1
     assert results[0]["url"] == "website_url"
+
+
+@pytest.mark.django_db
+@freeze_time("2020-07-20")
+def test_generate_aggregate_podcast_rss():
+    """Testgenerate_aggregate_podcast_rss"""
+
+    PodcastEpisodeFactory.create(
+        rss="<item>rss1</item>",
+        last_modified=datetime.datetime(2020, 2, 1, tzinfo=pytz.UTC),
+    )
+    PodcastEpisodeFactory.create(
+        rss="<item>rss2</item>",
+        last_modified=datetime.datetime(2020, 1, 1, tzinfo=pytz.UTC),
+    )
+
+    podcasts_url = urljoin(settings.SITE_BASE_URL, "podcasts")
+    cover_image_url = urljoin(
+        settings.SITE_BASE_URL, "/static/images/podcast_cover_art.png"
+    )
+
+    expected_rss = """<?xml version='1.0' encoding='UTF-8'?>
+    <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+        <channel>
+            <title>MIT Open Aggregated Podcast Feed</title>
+            <link>{0}</link>
+            <language>en-us</language>
+            <pubDate>Mon, 20 Jul 2020  00:00:00 +0000</pubDate>
+            <lastBuildDate>Mon, 20 Jul 2020  00:00:00 +0000</lastBuildDate>
+            <ttl>60</ttl>
+            <itunes:subtitle>Episodes from podcasts from around MIT</itunes:subtitle>
+            <itunes:author>MIT Open Learning</itunes:author>
+            <itunes:summary>Episodes from podcasts from around MIT</itunes:summary>
+            <description>Episodes from podcasts from around MIT</description>
+            <itunes:owner>
+                <itunes:name>MIT Open Learning</itunes:name>
+                <itunes:email>{1}</itunes:email>
+            </itunes:owner>
+            <image>
+              <url>{2}</url>
+              <title>MIT Open Aggregated Podcast Feed</title>
+              <link>{0}</link>
+            </image>
+            <itunes:explicit>no</itunes:explicit>
+            <itunes:category text="Education"/>
+            <item>rss1</item>
+            <item>rss2</item>
+        </channel>
+    </rss>""".format(
+        podcasts_url, settings.EMAIL_SUPPORT, cover_image_url
+    )
+
+    result = generate_aggregate_podcast_rss().prettify()
+
+    assert result == bs(expected_rss, "xml").prettify()

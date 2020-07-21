@@ -12,6 +12,7 @@ from django.db import IntegrityError
 from django.db.models import Prefetch, Count, Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
+from django.http import HttpResponse
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -52,6 +53,7 @@ from course_catalog.serializers import (
 )
 from course_catalog.tasks import get_ocw_courses
 from course_catalog.utils import load_course_blocklist
+from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from open_discussions import features, settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
@@ -508,3 +510,15 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
             )
             .select_related("podcast")
         )
+
+
+@api_view(["GET"])
+def podcast_rss_feed(request):
+    """
+    View to display the combined podcast rss file
+    """
+
+    rss = generate_aggregate_podcast_rss()
+    return HttpResponse(
+        rss.prettify(), content_type="application/rss+xml; charset=utf-8"
+    )

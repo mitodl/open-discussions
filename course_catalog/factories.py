@@ -464,6 +464,7 @@ class PodcastEpisodeFactory(LearningResourceFactory):
     published = True
     url = factory.Faker("uri")
     last_modified = factory.Faker("past_datetime", tzinfo=pytz.utc)
+    rss = factory.Faker("text")
 
     class Meta:
         model = PodcastEpisode

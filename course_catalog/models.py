@@ -608,6 +608,7 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
     episode_link = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
     duration = models.CharField(null=True, blank=True, max_length=10)
+    rss = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.title
