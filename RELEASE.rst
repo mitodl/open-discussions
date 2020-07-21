@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.135.0
+---------------
+
+- Added spam checking to posts and comments (#3062)
+
 Version 0.134.2 (Released July 16, 2020)
 ---------------
 
