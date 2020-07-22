@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.135.1
+---------------
+
+- add podcast subscribe URLs to podcast ETL
+- make learn and search pages tababble
+- fix some issues with comment voting
+- Bump lodash from 4.17.15 to 4.17.19
+
 Version 0.135.0 (Released July 21, 2020)
 ---------------
 
