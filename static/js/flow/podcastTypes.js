@@ -12,7 +12,9 @@ export type Podcast = {
   topics: Array<string>,
   updated_on: string,
   url: string,
-  is_favorite: boolean
+  is_favorite: boolean,
+  google_podcasts_url: ?string,
+  apple_podcasts_url: ?string
 }
 
 export type PodcastEpisode = {

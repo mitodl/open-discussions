@@ -13,6 +13,7 @@ import Embedly from "./Embedly"
 import ShareTooltip from "./ShareTooltip"
 import PodcastPlayButton from "./PodcastPlayButton"
 import PaginatedPodcastEpisodes from "./PaginatedPodcastEpisodes"
+import PodcastSubscribeButton from "./PodcastSubscribeButton"
 
 import { LearningResourceRow } from "./LearningResourceCard"
 import { PaginatedUserListItems } from "./UserListItems"
@@ -283,6 +284,11 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
                 {object.object_type === LR_TYPE_PODCAST ? "Podcast" : "Episode"}{" "}
                 Details
               </a>
+            </div>
+          ) : null}
+          {object.object_type === LR_TYPE_PODCAST ? (
+            <div className="row">
+              <PodcastSubscribeButton podcast={object} />
             </div>
           ) : null}
           {!emptyOrNil(object.topics) ? (

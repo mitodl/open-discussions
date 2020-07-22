@@ -312,3 +312,27 @@
 .paginated-podcast-episodes {
   padding: 10px;
 }
+
+.podcast-subscribe-button {
+  height: 50px;
+  width: 200px;
+  border-radius: 4px;
+  margin: 0;
+
+  &.links {
+    background-color: $podcast-subscribe-bg;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    a {
+      margin: 0 5px;
+      height: 35px;
+
+      img {
+        height: 35px;
+        border-radius: 50%;
+      }
+    }
+  }
+}
