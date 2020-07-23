@@ -51,7 +51,7 @@
     "detect-browser": "^2.5.1",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.2",
-    "eslint": "^6.2.1",
+    "eslint": "^7.5.0",
     "eslint-config-google": "^0.13.0",
     "eslint-config-mitodl": "^0.0.7",
     "eslint-plugin-babel": "^5.3.0",
@@ -79,7 +79,7 @@
     "mutationobserver-shim": "^0.3.2",
     "node-sass": "^4.9.0",
     "nuka-carousel": "^4.5.2",
-    "nyc": "^14.1.1",
+    "nyc": "^15.1.0",
     "object.entries": "^1.0.4",
     "places.js": "^1.14.0",
     "postcss-loader": "^2.1.5",
@@ -148,7 +148,7 @@
     "url-loader": "^4.1.0",
     "validator": "^10.7.1",
     "webpack": "^4.43.0",
-    "webpack-bundle-tracker": "^0.3.0",
+    "webpack-bundle-tracker": "^0.4.3",
     "webpack-cli": "^3.3.12",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-hot-middleware": "^2.25.0",
@@ -157,7 +157,11 @@
   "resolutions": {
     "mixin-deep": "^1.3.2",
     "set-value": "^2.0.1",
-    "merge": "^1.2.1"
+    "merge": "^1.2.1",
+    "**/minimist": "^1.2.5",
+    "**/acorn": "^7.1.1",
+    "**/kind-of": "^6.0.3"
+
   },
   "engines": {
     "node": "10.15.1",
@@ -172,8 +176,8 @@
     "codecov": "NODE_ENV=development CODECOV=1 ./scripts/test/js_test.sh",
     "watch": "WATCH=1 ./scripts/test/js_test.sh",
     "flow": "flow check",
-    "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore 'static/js/flow/**/*.js' 'static/js/**/*.js' 'static/scss/**/*.scss'",
-    "fmt:check": "prettier-eslint --list-different --no-semi --ignore 'static/js/flow/**/*.js' 'static/js/**/*.js' 'static/scss/**/*.scss'",
+    "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore $PWD/'static/js/flow/**/*.js' $PWD/'static/js/**/*.js' $PWD/'static/scss/**/*.scss'",
+    "fmt:check": "prettier-eslint --list-different --no-semi --ignore $PWD/'static/js/flow/**/*.js' $PWD/'static/js/**/*.js' $PWD/'static/scss/**/*.scss'",
     "repl": "node --require ./scripts/repl.js"
   },
   "devDependencies": {}

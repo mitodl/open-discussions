@@ -79,7 +79,7 @@ jedi==0.16.0              # via ipython
 jmespath==0.9.3           # via boto3, botocore
 kombu==4.6.7              # via celery, django-server-status
 lxml==4.5.0               # via -r requirements.in, xbundle, xmlsec, zeep
-markdown2==2.3.7          # via -r requirements.in
+markdown2==2.3.9          # via -r requirements.in
 git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4  # via -r requirements.in
 newrelic==4.2.0.100       # via -r requirements.in
 oauthlib==2.0.7           # via requests-oauthlib, social-auth-core
@@ -88,7 +88,7 @@ parso==0.6.1              # via jedi
 pexpect==4.8.0            # via ipython
 pickleshare==0.7.5        # via ipython
 pilkit==2.0               # via django-imagekit
-pillow==6.2.0             # via -r requirements.in, cairosvg
+pillow==6.2.2             # via -r requirements.in, cairosvg
 pkgconfig==1.3.1          # via xmlsec
 praw==4.5.1               # via -r requirements.in
 prawcore==0.10.1          # via praw
