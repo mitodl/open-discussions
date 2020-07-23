@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.135.1
+Version 0.135.1 (Released July 23, 2020)
 ---------------
 
 - add podcast subscribe URLs to podcast ETL
