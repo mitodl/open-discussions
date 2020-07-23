@@ -31,9 +31,16 @@ export default function TruncatedText(props: Props) {
   const [expanded, setExpanded] = useState(false)
   const [hasOverflow, setHasOverflow] = useState(false)
   const [, forceReRender] = useState(0)
+  const [currentText, setCurrentText] = useState(text)
   const dotRef = useRef(null)
 
   useLayoutEffect(() => {
+    if (text !== currentText) {
+      setCurrentText(text)
+      setExpanded(false)
+      setHasOverflow(false)
+    }
+
     if (dotRef.current) {
       // the .container on the Dotdotdot holds the ref for the div it uses to
       // wrap the text

@@ -96,4 +96,21 @@ describe("TruncatedText", () => {
     })
     assert.isNotOk(wrapper.find(".tt-expansion-control").exists())
   })
+
+  it("should reset if the text changes", () => {
+    const wrapper = render({
+      text:                  "text",
+      lines:                 1,
+      showExpansionControls: true
+    })
+    wrapper.find(".tt-expansion-control").simulate("click")
+    assert.equal(wrapper.find(".tt-expansion-control").text(), "Read less")
+
+    wrapper.update()
+    assert.equal(wrapper.find(".tt-expansion-control").text(), "Read less")
+
+    wrapper.setProps({ text: "new text" })
+    wrapper.update()
+    assert.equal(wrapper.find(".tt-expansion-control").text(), "Read more")
+  })
 })
