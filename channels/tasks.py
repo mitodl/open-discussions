@@ -9,6 +9,7 @@ import celery
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import reverse
 from prawcore.exceptions import ResponseException
 
@@ -23,7 +24,7 @@ from channels.api import (
 )
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
 from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation, Comment
-from channels.spam import SpamChecker
+from channels.spam import SpamChecker, save_spam_result
 from channels.utils import SORT_NEW_LISTING_PARAMS, SORT_HOT_LISTING_PARAMS
 from mail import api as mail_api
 from open_discussions.celery import app
@@ -472,7 +473,16 @@ def check_post_for_spam(*, user_ip, user_agent, post_id):
 
     post = Post.objects.get(post_id=post_id)
 
-    if SPAM_CHECKER.is_post_spam(user_ip=user_ip, user_agent=user_agent, post=post):
+    is_spam = SPAM_CHECKER.is_post_spam(user_ip=user_ip, user_agent=user_agent, post=post)
+    save_spam_result(
+        user_ip=user_ip,
+        user_agent=user_agent,
+        object_type=ContentType.objects.get_for_model(Post),
+        object_id=post.id,
+        is_spam=is_spam
+    )
+
+    if is_spam:
         admin_api.remove_post(post.post_id)
 
 
@@ -490,7 +500,15 @@ def check_comment_for_spam(*, user_ip, user_agent, comment_id):
 
     comment = Comment.objects.get(comment_id=comment_id)
 
-    if SPAM_CHECKER.is_comment_spam(
+    is_spam = SPAM_CHECKER.is_comment_spam(
         user_ip=user_ip, user_agent=user_agent, comment=comment
-    ):
+    )
+    save_spam_result(
+        user_ip=user_ip,
+        user_agent=user_agent,
+        object_type=ContentType.objects.get_for_model(Comment),
+        object_id=comment.id,
+        is_spam=is_spam
+    )
+    if is_spam:
         admin_api.remove_comment(comment.comment_id)

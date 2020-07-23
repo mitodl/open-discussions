@@ -4,10 +4,42 @@ from types import SimpleNamespace
 
 import akismet
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import F
 from django.utils.functional import SimpleLazyObject
 from ipware import get_client_ip
 
+from channels.models import SpamCheckResult
+
 log = logging.getLogger()
+
+
+def save_spam_result(*, user_ip, user_agent, object_type, object_id, is_spam):
+    """
+    Create or update a SpamCheck object with Akismet result
+
+    Args:
+        user_ip(str): user's ip address
+        user_agent(str): user's browser agent
+        object_type(ContentType): the type of object (post, comment) to check
+        object_id(int): The id of the object
+        is_spam(bool): if the object was flagged as spam
+    """
+    result, created = SpamCheckResult.objects.get_or_create(
+        content_type=ContentType.objects.get(model=object_type),
+        object_id=object_id,
+        defaults={
+            "checks": 0,
+            "user_ip": user_ip,
+            "user_agent": user_agent,
+            "is_spam": is_spam
+        }
+    )
+    if not created:
+        result.user_ip = user_ip
+        result.user_agent = user_agent
+        result.checks = result.checks + 1
+        result.save()
 
 
 def extract_spam_check_headers(request):
