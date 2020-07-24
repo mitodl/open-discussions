@@ -376,7 +376,7 @@ class SpamCheckResult(TimestampedModel):
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey("content_type", "object_id")
 
-    user_ip = models.GenericIPAddressField(null=True, blank=True)
+    user_ip = models.CharField(max_length=256, null=True, blank=True)
     user_agent = models.TextField(null=True, blank=True)
     checks = models.IntegerField(default=1)
     is_spam = models.BooleanField(default=False)

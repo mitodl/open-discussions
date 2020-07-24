@@ -29,16 +29,17 @@ def save_spam_result(*, user_ip, user_agent, object_type, object_id, is_spam):
         content_type=ContentType.objects.get(model=object_type),
         object_id=object_id,
         defaults={
-            "checks": 0,
+            "checks": 1,
             "user_ip": user_ip,
             "user_agent": user_agent,
-            "is_spam": is_spam
-        }
+            "is_spam": is_spam,
+        },
     )
     if not created:
         result.user_ip = user_ip
         result.user_agent = user_agent
         result.checks = result.checks + 1
+        result.is_spam = is_spam
         result.save()
 
 

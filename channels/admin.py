@@ -3,7 +3,12 @@ from django.contrib import admin
 from django.contrib.postgres import fields
 from django_json_widget.widgets import JSONEditorWidget
 
-from channels.models import Channel, ChannelInvitation, ChannelMembershipConfig, SpamCheckResult
+from channels.models import (
+    Channel,
+    ChannelInvitation,
+    ChannelMembershipConfig,
+    SpamCheckResult,
+)
 from open_discussions.utils import get_field_names
 
 

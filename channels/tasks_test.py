@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 import base36
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import reverse
 from praw.models import Redditor
 from prawcore.exceptions import ResponseException
@@ -15,6 +16,8 @@ from channels.constants import (
     ROLE_MODERATORS,
     ROLE_CONTRIBUTORS,
     LINK_TYPE_ANY,
+    COMMENT_TYPE,
+    POST_TYPE,
 )
 from channels.factories.models import (
     ChannelFactory,
@@ -22,7 +25,7 @@ from channels.factories.models import (
     CommentFactory,
     ChannelInvitationFactory,
 )
-from channels.models import ChannelSubscription, Channel, Post
+from channels.models import ChannelSubscription, Channel, Post, SpamCheckResult
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 
@@ -492,6 +495,15 @@ def test_check_comment_for_spam(mocker, is_spam):
     else:
         mock_api.remove_comment.assert_not_called()
 
+    assert (
+        SpamCheckResult.objects.filter(
+            content_type=ContentType.objects.get(model=COMMENT_TYPE),
+            object_id=comment.id,
+            is_spam=is_spam,
+        ).count()
+        == 1
+    )
+
 
 @pytest.mark.parametrize("is_spam", [True, False])
 def test_check_post_for_spam(mocker, is_spam):
@@ -513,3 +525,12 @@ def test_check_post_for_spam(mocker, is_spam):
         mock_api.remove_post.assert_called_once_with(post.post_id)
     else:
         mock_api.remove_post.assert_not_called()
+
+    assert (
+        SpamCheckResult.objects.filter(
+            content_type=ContentType.objects.get(model=POST_TYPE),
+            object_id=post.id,
+            is_spam=is_spam,
+        ).count()
+        == 1
+    )

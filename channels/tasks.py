@@ -473,13 +473,15 @@ def check_post_for_spam(*, user_ip, user_agent, post_id):
 
     post = Post.objects.get(post_id=post_id)
 
-    is_spam = SPAM_CHECKER.is_post_spam(user_ip=user_ip, user_agent=user_agent, post=post)
+    is_spam = SPAM_CHECKER.is_post_spam(
+        user_ip=user_ip, user_agent=user_agent, post=post
+    )
     save_spam_result(
         user_ip=user_ip,
         user_agent=user_agent,
         object_type=ContentType.objects.get_for_model(Post),
         object_id=post.id,
-        is_spam=is_spam
+        is_spam=is_spam,
     )
 
     if is_spam:
@@ -508,7 +510,7 @@ def check_comment_for_spam(*, user_ip, user_agent, comment_id):
         user_agent=user_agent,
         object_type=ContentType.objects.get_for_model(Comment),
         object_id=comment.id,
-        is_spam=is_spam
+        is_spam=is_spam,
     )
     if is_spam:
         admin_api.remove_comment(comment.comment_id)
