@@ -222,6 +222,28 @@ def test_create_article_post(
     mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
+def test_create_and_update_post_moderator(
+    user_client, private_channel_and_contributor, mock_spam_check, staff_api
+):
+    """
+    Create and update a post as a moderator
+    """
+    channel, user = private_channel_and_contributor
+    staff_api.add_moderator(user.username, channel.name)
+
+    url = reverse("post-list", kwargs={"channel_name": channel.name})
+    resp = user_client.post(
+        url, {"title": "parameterized testing", "text": "tests are great"}
+    )
+    assert resp.status_code == status.HTTP_201_CREATED
+
+    url = reverse("post-detail", kwargs={"post_id": resp.json()["id"]})
+    resp = user_client.patch(url, {"date": {"text": "updated"}})
+    assert resp.status_code == status.HTTP_200_OK
+
+    mock_spam_check.assert_not_called()
+
+
 def test_create_article_post_with_cover(user_client, private_channel_and_contributor):
     """
     Create a new article post with a cover image
@@ -696,12 +718,12 @@ def test_create_post_without_upvote(user_client, private_channel_and_contributor
         "cover_image": None,
         "thumbnail": None,
         "author_id": user.username,
-        "created": "2018-08-24T18:14:32+00:00",
+        "created": "2020-07-28T22:15:27+00:00",
         "upvoted": False,
         "removed": False,
         "deleted": False,
         "subscribed": True,
-        "id": "43",
+        "id": "10",
         "slug": "x",
         "num_comments": 0,
         "score": 1,

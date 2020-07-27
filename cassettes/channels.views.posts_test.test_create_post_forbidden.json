@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2018-08-24T18:03:32",
+      "recorded_at": "2020-07-28T22:15:06",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -18,15 +18,15 @@
             "keep-alive"
           ],
           "User-Agent": [
-            "python-requests/2.18.1"
+            "python-requests/2.21.0"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHNY9E09M41YSR2JP0P8A2"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBQWJ6CBMZMB2D61JXYC6V4"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIyMtX1rIpyKjCrCndzi6iw9EuNSCnPSEsLdS4qNkhW0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLaFpJr6VFo667qF+EV4+Jo6mfiGJWX7OUd6l4aC9KSklmUmp8ZnpoAMhnCUagHvKSXeuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDK31PUOyUiqDA72da5wzok0M4oyDAotK3WMiAwLDlXSUVBKrSjILEotjs8EqTc2MzAAioG1x5dUFqSCzEhKTSxKLQKpLU7OhwhpgXhFqWlAjRkolqXEe5gZRkYGWeZkBCSmRzmFueekOLr6G5cYJoO0pKSWZSanxmemgMyFcJRqASChMsG2AAAA",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:03:32 GMT"
+            "Tue, 28 Jul 2020 22:15:06 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=zEPwSvJApXy0urrmbh; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 18:03:32 GMT",
-            "loidcreated=2018-08-24T18%3A03%3A31.966Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sun, 23-Aug-2020 18:03:32 GMT"
+            "loid=v8ygdNk9dqDPCoE7y5; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 28-Jul-2022 22:15:06 GMT",
+            "loidcreated=2020-07-28T22%3A15%3A05.614Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 28-Jul-2022 22:15:06 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,15 +66,83 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHNY9E09M41YSR2JP0P8A2"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBQWJ6CBMZMB2D61JXYC6V4"
       }
     },
     {
-      "recorded_at": "2018-08-24T18:03:32",
+      "recorded_at": "2020-07-28T22:15:09",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": "allow_top=True&api_type=json&description=Dolores+omnis+natus+quo+expedita.+Officiis+soluta+incidunt+sint+odio.+Delectus+aliquam+totam+quidem+maxime.%0ACorrupti+nobis+dolor+dolorum+voluptatibus+labore+debitis+debitis.+Ab+voluptatibus+magni+voluptates+aspernatur+incidunt+eaque+placeat.+Fuga+dolorem+doloremque+eos+totam+nesciunt.+Unde+dignissimos+occaecati+reiciendis.+Aspernatur+non+officiis+ab+dolorum+occaecati+voluptas+consequatur+voluptates.&link_type=any&name=1535133812_blanditiis&public_description=Velit+omnis+quis+atque+omnis+laborum+dolorem+adipisci.+Cum+quo+incidunt+placeat+natus+blanditiis.&title=Totam+quae+non+illum+sequi+quasi+illo.&type=private&wikimode=disabled"
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=v8ygdNk9dqDPCoE7y5; loidcreated=2020-07-28T22%3A15%3A05.614Z"
+          ],
+          "User-Agent": [
+            "python-requests/2.21.0"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBQWNHJ4KK5R392QHWXFHTQ"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSULIw0C2r8DcsdTQqMynMLMtzyk70sHDPdMn1NcgxiVTSUVBKrSjILEotjs8EqTc2MzAAioG1x5dUFqSCzEhKTSxKLQKpLU7OhwhpgXhFqWlAjRkolhVWVLk6B2aGZnimJQcnRfkUlyYbe4VF+AQ7moC0pKSWZSanxmemgMyFcJRqAQBkyum2AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Tue, 28 Jul 2020 22:15:09 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBQWNHJ4KK5R392QHWXFHTQ"
+      }
+    },
+    {
+      "recorded_at": "2020-07-28T22:15:09",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Deep+money+situation+assume+individual+subject+ever.+Indeed+say+make+wife+voice.%0ATax+member+number+pull.%0ASurface+them+in+standard+try+pick.+Party+final+company+able+cover.+During+cost+opportunity+middle+spend+black+letter+stuff.%0AUnit+teach+view+maybe+marriage+per+with+door.+Foot+plan+professor+bar+east+of+whom+theory.%0AInvolve+minute+strategy+treat+may.+Wear+however+upon+business+cell+arm.+Need+also+month+adult+spend+war+force.+Feeling+yet+finish+certainly+young+station+your.&link_type=any&name=1595974509_8_practice&public_description=True+boy+door+threat+tonight+him.+Miss+idea+dream+many+five+can+wind.&title=Gun+chair+fall+north+any.&type=private&wikimode=disabled"
         },
         "headers": {
           "Accept": [
@@ -84,22 +152,22 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 225-IzZBp6zWFFXx9NeXdwhffUCrs0c"
+            "bearer 80-vxO1uA2v4qivnBkaH8GiDmM0l4Y"
           ],
           "Connection": [
             "keep-alive"
           ],
           "Content-Length": [
-            "679"
+            "721"
           ],
           "Content-Type": [
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zEPwSvJApXy0urrmbh; loidcreated=2018-08-24T18%3A03%3A31.966Z"
+            "loid=v8ygdNk9dqDPCoE7y5; loidcreated=2020-07-28T22%3A15%3A05.614Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.135.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +189,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:03:32 GMT"
+            "Tue, 28 Jul 2020 22:15:09 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -142,7 +210,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "388"
+            "291"
           ],
           "x-ratelimit-used": [
             "1"
@@ -162,79 +230,11 @@
       }
     },
     {
-      "recorded_at": "2018-08-24T18:03:38",
+      "recorded_at": "2020-07-28T22:15:12",
       "request": {
         "body": {
           "encoding": "utf-8",
-          "string": ""
-        },
-        "headers": {
-          "Accept": [
-            "*/*"
-          ],
-          "Accept-Encoding": [
-            "gzip, deflate"
-          ],
-          "Connection": [
-            "keep-alive"
-          ],
-          "Cookie": [
-            "loid=zEPwSvJApXy0urrmbh; loidcreated=2018-08-24T18%3A03%3A31.966Z"
-          ],
-          "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
-          ]
-        },
-        "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHP4JTFNVK8CXCWBPM2GPH"
-      },
-      "response": {
-        "body": {
-          "base64_string": "H4sIAAAAAAAAA1WNOwvCMBhF/0rJKAq1hQzOFheJg0LVJcT0y4OatOaFIv53Gzs53sM9974R4xy8p2HowaJNgaoKr0iKRoZYX7RIgpgt1vf9NfB4fDRoWSB4jtqBpzoLNS7Lif18Gl4j5JEbMAcudz0fZrTIyYGYRPX/tlOHYM6Wy1ZJOPVNFOuUiAXW+ux0kDQHqrs8PAf0+QJ9fGlZuAAAAA==",
-          "encoding": "UTF-8"
-        },
-        "headers": {
-          "Connection": [
-            "keep-alive"
-          ],
-          "Content-Encoding": [
-            "gzip"
-          ],
-          "Content-Type": [
-            "text/html; charset=UTF-8"
-          ],
-          "Date": [
-            "Fri, 24 Aug 2018 18:03:38 GMT"
-          ],
-          "Server": [
-            "PasteWSGIServer/0.5 Python/2.7.6"
-          ],
-          "Transfer-Encoding": [
-            "chunked"
-          ],
-          "x-content-type-options": [
-            "nosniff"
-          ],
-          "x-frame-options": [
-            "SAMEORIGIN"
-          ],
-          "x-xss-protection": [
-            "1; mode=block"
-          ]
-        },
-        "status": {
-          "code": 200,
-          "message": "OK"
-        },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01CNPHP4JTFNVK8CXCWBPM2GPH"
-      }
-    },
-    {
-      "recorded_at": "2018-08-24T18:03:38",
-      "request": {
-        "body": {
-          "encoding": "utf-8",
-          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1535133812_blanditiis&text=tests+are+great&title=parameterized+testing"
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1595974509_8_practice&text=tests+are+great&title=parameterized+testing"
         },
         "headers": {
           "Accept": [
@@ -244,7 +244,7 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 226-Nvumgtu3YifvfNmD6ilLZtcuSqE"
+            "bearer 79-KThbySSMCxClY62Z1RUvuAXYVSU"
           ],
           "Connection": [
             "keep-alive"
@@ -256,10 +256,10 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=zEPwSvJApXy0urrmbh; loidcreated=2018-08-24T18%3A03%3A31.966Z"
+            "loid=v8ygdNk9dqDPCoE7y5; loidcreated=2020-07-28T22%3A15%3A05.614Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.42.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.135.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -281,7 +281,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Fri, 24 Aug 2018 18:03:38 GMT"
+            "Tue, 28 Jul 2020 22:15:12 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -302,7 +302,7 @@
             "299.0"
           ],
           "x-ratelimit-reset": [
-            "382"
+            "288"
           ],
           "x-ratelimit-used": [
             "1"

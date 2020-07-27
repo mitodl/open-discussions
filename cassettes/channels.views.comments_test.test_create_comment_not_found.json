@@ -1,7 +1,7 @@
 {
   "http_interactions": [
     {
-      "recorded_at": "2017-11-06T15:13:25",
+      "recorded_at": "2020-07-28T21:54:30",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -18,15 +18,15 @@
             "keep-alive"
           ],
           "User-Agent": [
-            "python-requests/2.18.1"
+            "python-requests/2.21.0"
           ]
         },
         "method": "GET",
-        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBPPV8YQNTRK7SQ936G6269"
       },
       "response": {
         "body": {
-          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0NdctLA0Myi42ychPcYrUDSkPjXKuKM6s8o0MdLNQ0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLYFV5Ukx8cXpbr4ensW6XoXO1pYlKZERka5ZfuC9KSklmUmp8ZnpoAMhnCUagFt0nwcuAAAAA==",
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDIx000vcDU2Ms02NfLPSvcwTcvLrTRLLfXNSjYKLVbSUVBKrSjILEotjs8EqTc2MzAAioG1x5dUFqSCzEhKTSxKLQKpLU7OhwhpgXhFqWlAjRkoljkZlYSWOgX7Rwal5afHZxuap3r6FhXFG+Q4loO0pKSWZSanxmemgMyFcJRqAW5pvdC2AAAA",
           "encoding": "UTF-8"
         },
         "headers": {
@@ -40,7 +40,7 @@
             "text/html; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:13:27 GMT"
+            "Tue, 28 Jul 2020 21:54:30 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -49,8 +49,8 @@
             "chunked"
           ],
           "set-cookie": [
-            "loid=rXFDV9gg2KCEWJ8YPn; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:13:27 GMT",
-            "loidcreated=2017-11-06T15%3A13%3A27.787Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Wed, 06-Nov-2019 15:13:27 GMT"
+            "loid=ntqbdC9R3l23EpYTiV; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 28-Jul-2022 21:54:30 GMT",
+            "loidcreated=2020-07-28T21%3A54%3A29.729Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Thu, 28-Jul-2022 21:54:30 GMT"
           ],
           "x-content-type-options": [
             "nosniff"
@@ -66,11 +66,11 @@
           "code": 200,
           "message": "OK"
         },
-        "url": "https://reddit.local/api/v1/generate_refresh_token?username=george"
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EEBPPV8YQNTRK7SQ936G6269"
       }
     },
     {
-      "recorded_at": "2017-11-06T15:13:25",
+      "recorded_at": "2020-07-28T21:54:30",
       "request": {
         "body": {
           "encoding": "utf-8",
@@ -84,7 +84,7 @@
             "gzip, deflate"
           ],
           "Authorization": [
-            "bearer 157-quQRks4hodBY-TwUZCxsizMYQF8"
+            "bearer 46-gpE325k52OjgH5fnmy6euMjc2Us"
           ],
           "Connection": [
             "keep-alive"
@@ -96,10 +96,10 @@
             "application/x-www-form-urlencoded"
           ],
           "Cookie": [
-            "loid=rXFDV9gg2KCEWJ8YPn; loidcreated=2017-11-06T15%3A13%3A27.787Z"
+            "loid=ntqbdC9R3l23EpYTiV; loidcreated=2020-07-28T21%3A54%3A29.729Z"
           ],
           "User-Agent": [
-            "MIT-Open: 0.3.0 PRAW/4.5.1 prawcore/0.10.1"
+            "MIT-Open: 0.135.1 PRAW/4.5.1 prawcore/0.10.1"
           ]
         },
         "method": "POST",
@@ -121,7 +121,7 @@
             "application/json; charset=UTF-8"
           ],
           "Date": [
-            "Mon, 06 Nov 2017 15:13:27 GMT"
+            "Tue, 28 Jul 2020 21:54:30 GMT"
           ],
           "Server": [
             "PasteWSGIServer/0.5 Python/2.7.6"
@@ -139,13 +139,13 @@
             "SAMEORIGIN"
           ],
           "x-ratelimit-remaining": [
-            "298.0"
+            "299.0"
           ],
           "x-ratelimit-reset": [
-            "393"
+            "330"
           ],
           "x-ratelimit-used": [
-            "2"
+            "1"
           ],
           "x-ua-compatible": [
             "IE=edge"

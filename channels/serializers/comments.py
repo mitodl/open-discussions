@@ -197,7 +197,8 @@ class CommentSerializer(BaseCommentSerializer):
             post_id, validated_data.get("comment_id", None), comment.id
         )
 
-        task_helpers.check_comment_for_spam(self.context["request"], comment.id)
+        if not api.is_moderator(comment.subreddit.display_name, comment.author.name):
+            task_helpers.check_comment_for_spam(self.context["request"], comment.id)
 
         if changed:
             return api.get_comment(comment.id)
@@ -234,7 +235,8 @@ class CommentSerializer(BaseCommentSerializer):
 
         api.apply_comment_vote(instance, validated_data)
 
-        task_helpers.check_comment_for_spam(self.context["request"], instance.id)
+        if not api.is_moderator(instance.subreddit.display_name, instance.author.name):
+            task_helpers.check_comment_for_spam(self.context["request"], instance.id)
 
         return api.get_comment(comment_id=instance.id)
 
