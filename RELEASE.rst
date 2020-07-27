@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.136.0
+---------------
+
+- add podcast subscription links
+- fix padding issue with the drawer
+- python and JS upgrades (#3073)
+- Save spam check results (#3076)
+
 Version 0.135.2 (Released July 27, 2020)
 ---------------
 
