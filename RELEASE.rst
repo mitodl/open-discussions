@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.135.2 (Released July 27, 2020)
+---------------
+
+- fix read more
+- Bump codecov from 3.6.5 to 3.7.1
+
 Version 0.135.1 (Released July 23, 2020)
 ---------------
 
