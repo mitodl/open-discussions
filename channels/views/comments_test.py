@@ -599,6 +599,25 @@ def test_create_comment(
     mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
 
 
+def test_create_comment_moderator(
+    user_client,
+    reddit_factories,
+    private_channel_and_contributor,
+    mock_notify_subscribed_users,
+    mock_spam_check,
+    staff_api,
+):  # pylint: disable=too-many-arguments
+    """Create a comment as a moderator"""
+    channel, user = private_channel_and_contributor
+    staff_api.add_moderator(user.username, channel.name)
+    post = reddit_factories.text_post("a post", user, channel=channel)
+    url = reverse("comment-list", kwargs={"post_id": post.id})
+    resp = user_client.post(url, data={"text": "reply_to_post 2"})
+    assert resp.status_code == status.HTTP_201_CREATED
+
+    mock_spam_check.assert_not_called()
+
+
 def test_create_comment_forbidden(user_client):
     """Create a comment for a post the user doesn't have access to"""
     post_id = "adc"
@@ -682,14 +701,41 @@ def test_create_comment_reply_to_deleted_comment(
     assert resp.json() == {"detail": "Resource is gone.", "error_type": "GoneException"}
 
 
-def test_update_comment_text(user_client, mock_spam_check):
+def test_update_comment_text(
+    user_client, private_channel_and_contributor, reddit_factories, mock_spam_check
+):
     """Update a comment's text"""
+    channel, user = private_channel_and_contributor
+    post = reddit_factories.text_post("my geat post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+
     updated_text = "updated text"
-    url = reverse("comment-detail", kwargs={"comment_id": "6"})
+    url = reverse("comment-detail", kwargs={"comment_id": comment.id})
     resp = user_client.patch(url, type="json", data={"text": updated_text})
     assert resp.status_code == status.HTTP_200_OK
     assert resp.json()["text"] == updated_text
     mock_spam_check.assert_called_with(any_instance_of(Request), resp.json()["id"])
+
+
+def test_update_comment_text_moderator(
+    user_client,
+    private_channel_and_contributor,
+    reddit_factories,
+    mock_spam_check,
+    staff_api,
+):
+    """Update a comment's text as a moderator"""
+    channel, user = private_channel_and_contributor
+    staff_api.add_moderator(user.username, channel.name)
+    post = reddit_factories.text_post("my geat post", user, channel=channel)
+    comment = reddit_factories.comment("comment", user, post_id=post.id)
+
+    updated_text = "updated text"
+    url = reverse("comment-detail", kwargs={"comment_id": comment.id})
+    resp = user_client.patch(url, type="json", data={"text": updated_text})
+    assert resp.status_code == status.HTTP_200_OK
+    assert resp.json()["text"] == updated_text
+    mock_spam_check.assert_not_called()
 
 
 # Reddit returns the same result for updating a missing comment

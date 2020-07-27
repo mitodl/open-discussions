@@ -237,7 +237,8 @@ class PostSerializer(BasePostSerializer):
         if changed or cover_image:
             post = api.get_post(post_id=post.id)
 
-        task_helpers.check_post_for_spam(self.context["request"], post.id)
+        if not api.is_moderator(post.subreddit.display_name, post.author.name):
+            task_helpers.check_post_for_spam(self.context["request"], post.id)
 
         return post
 
@@ -285,6 +286,7 @@ class PostSerializer(BasePostSerializer):
 
         api.apply_post_vote(instance, validated_data)
 
-        task_helpers.check_post_for_spam(self.context["request"], post_id)
+        if not api.is_moderator(instance.subreddit.display_name, instance.author.name):
+            task_helpers.check_post_for_spam(self.context["request"], post_id)
 
         return api.get_post(post_id=post_id)
