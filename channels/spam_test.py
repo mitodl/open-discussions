@@ -3,9 +3,13 @@ from types import SimpleNamespace
 
 from akismet import AkismetError
 import pytest
+from django.contrib.contenttypes.models import ContentType
 
+from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.factories.models import PostFactory, CommentFactory
-from channels.spam import SpamChecker, extract_spam_check_headers
+from channels.models import SpamCheckResult
+from channels.spam import SpamChecker, extract_spam_check_headers, save_spam_result
+
 
 # pylint: disable=redefined-outer-name
 
@@ -184,3 +188,31 @@ def test_is_text_post_spam(mock_akismet, post_checker, user_request_args, user):
         comment_author_email=user.email,
         is_test=True,
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("model", [POST_TYPE, COMMENT_TYPE])
+@pytest.mark.parametrize("is_spam", [True, False])
+@pytest.mark.parametrize("ip_address", ["10.1.1.18", "fake", None, ""])
+def test_save_spam_result(*, model, is_spam, ip_address):
+    """ Test that a SpamCheckResult object is created with correct values """
+    user_ip = ip_address
+    user_agent = "Fake"
+    object_type = ContentType.objects.get(model=model)
+    kwargs = {
+        "user_ip": user_ip,
+        "user_agent": user_agent,
+        "object_type": object_type,
+        "object_id": 1,
+        "is_spam": is_spam,
+    }
+    save_spam_result(**kwargs)
+    result = SpamCheckResult.objects.get(content_type__model=object_type, object_id=1)
+    assert result.is_spam is is_spam
+    assert result.checks == 1
+    assert result.user_ip == ip_address
+    kwargs["is_spam"] = not is_spam
+    save_spam_result(**kwargs)
+    result = SpamCheckResult.objects.get(content_type__model=object_type, object_id=1)
+    assert result.is_spam is not is_spam
+    assert result.checks == 2

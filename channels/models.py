@@ -5,6 +5,8 @@ import base36
 from bitfield import BitField
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import JSONField
 from django.db import models
 
@@ -360,3 +362,25 @@ class ChannelMembershipConfig(TimestampedModel):
 
     def __str__(self):
         return self.name
+
+
+class SpamCheckResult(TimestampedModel):
+    """ Data model for spam checks """
+
+    content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        limit_choices_to={"model__in": ("post", "comment")},
+        on_delete=models.CASCADE,
+    )
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = GenericForeignKey("content_type", "object_id")
+
+    user_ip = models.CharField(max_length=256, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    checks = models.IntegerField(default=1)
+    is_spam = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = (("content_type", "object_id"),)
+        index_together = (("content_type", "object_id"),)

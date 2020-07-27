@@ -3,7 +3,13 @@ from django.contrib import admin
 from django.contrib.postgres import fields
 from django_json_widget.widgets import JSONEditorWidget
 
-from channels.models import Channel, ChannelInvitation, ChannelMembershipConfig
+from channels.models import (
+    Channel,
+    ChannelInvitation,
+    ChannelMembershipConfig,
+    SpamCheckResult,
+)
+from open_discussions.utils import get_field_names
 
 
 class ChannelAdmin(admin.ModelAdmin):
@@ -93,3 +99,19 @@ class ChannelMembershipConfigAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ChannelMembershipConfig, ChannelMembershipConfigAdmin)
+
+
+class SpamCheckResultAdmin(admin.ModelAdmin):
+    """Customized SpamCheckResult admin model"""
+
+    model = SpamCheckResult
+    search_fields = ("object_id", "user_ip")
+    list_filter = ("content_type", "is_spam")
+    list_display = ("content_type", "object_id", "user_ip", "is_spam")
+    readonly_fields = get_field_names(SpamCheckResult)
+
+    def has_add_permission(self, request):
+        return False
+
+
+admin.site.register(SpamCheckResult, SpamCheckResultAdmin)
