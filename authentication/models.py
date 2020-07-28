@@ -1,11 +1,10 @@
 """ Models for mail app """
+from ipaddress import ip_address
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.safestring import mark_safe
-from ipaddress import ip_address, ip_interface, ip_network
-
 from ipware.utils import is_private_ip
-
 from open_discussions.models import TimestampedModel
 
 
@@ -16,8 +15,6 @@ spam.com: blocks all emails containing `spam.com` like `joe@antispam.com.edu`<br
 sue@gmail.com: blocks `sue@gmail.com` and `bobbysue@gmail.com`<br/>
 ^sue@gmail.com: blocks `sue@gmail.com` but not `bobbysue@gmail.com`
 """
-
-FORBIDDEN_IP_RANGES = ["168.0.0.0/24", "10.0.0.0/24"]
 
 
 class BlockedEmailRegex(TimestampedModel):

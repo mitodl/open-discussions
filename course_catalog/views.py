@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Prefetch, Count, Q
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -18,6 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
+from authentication.decorators import blocked_ip_exempt
 from course_catalog.constants import ResourceType, PlatformType
 from course_catalog.exceptions import WebhookException
 from course_catalog.models import (
@@ -364,6 +366,7 @@ class TopicViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (AnonymousAccessReadonlyPermission,)
 
 
+@method_decorator(blocked_ip_exempt, name="dispatch")
 class WebhookOCWView(APIView):
     """
     Handle webhooks coming from the OCW bucket
