@@ -311,6 +311,7 @@ def test_initialized_avatar(client, user):
     assert resp.__getitem__("Content-Type") == "image/png"
 
 
+@pytest.mark.usefixtures("authenticated_site")
 def test_initials_avatar_fake_user(client):
     """
     Test that a default avatar image is returned for a fake user

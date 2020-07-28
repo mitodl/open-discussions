@@ -70,6 +70,11 @@ class PostProxy(ObjectProxy):
         """Return preview_text for this post"""
         return self._self_post.preview_text
 
+    @property
+    def removed(self):
+        """Return removed flag for this post"""
+        return self._self_post.removed
+
 
 def proxy_post(submission):
     """

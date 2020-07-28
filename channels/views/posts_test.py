@@ -361,6 +361,37 @@ def test_get_deleted_post(
         assert resp.status_code == status.HTTP_200_OK
 
 
+@pytest.mark.parametrize(
+    "client_user, expected_status",
+    [
+        [None, status.HTTP_404_NOT_FOUND],
+        [pytest.lazy_fixture("user"), status.HTTP_404_NOT_FOUND],
+        [pytest.lazy_fixture("staff_user"), status.HTTP_200_OK],
+    ],
+)
+def test_get_removed_post(
+    client,
+    user,
+    public_channel,
+    reddit_factories,
+    staff_api,
+    client_user,
+    expected_status,
+):  # pylint: disable=too-many-arguments
+    """Get an existing post for a removed post"""
+    post = reddit_factories.text_post("removed", user, channel=public_channel)
+
+    staff_api.remove_post(post.id)
+
+    if client_user is not None:
+        client.force_login(client_user)
+
+    url = reverse("post-detail", kwargs={"post_id": post.id})
+    resp = client.get(url)
+
+    assert resp.status_code == expected_status
+
+
 # pylint: disable=too-many-arguments
 @pytest.mark.parametrize("missing_image", [True, False])
 def test_get_post(
