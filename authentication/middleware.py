@@ -1,9 +1,20 @@
 """Authentication middleware"""
+import logging
+
+from django.db.models import Q
 from django.shortcuts import redirect
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import urlquote
+from ipware import get_client_ip
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import SAFE_METHODS
 
 from social_core.exceptions import SocialAuthBaseException
 from social_django.middleware import SocialAuthExceptionMiddleware
+
+from authentication.models import BlockedIPRange
+
+log = logging.getLogger()
 
 
 class SocialAuthExceptionRedirectMiddleware(SocialAuthExceptionMiddleware):
@@ -33,3 +44,48 @@ class SocialAuthExceptionRedirectMiddleware(SocialAuthExceptionMiddleware):
                     urlquote(message), backend_name
                 )
                 return redirect(url)
+
+
+class BlockedIPMiddleware(MiddlewareMixin):
+    """
+    Only allow GET/HEAD requests for blocked ips, unless exempt or a superuser
+    """
+
+    def _accept(self, request):
+        # Avoid checking the request multiple times
+        request.ip_processing_done = True
+        return None
+
+    def process_view(
+        self, request, callback, callback_args, callback_kwargs
+    ):  # pylint:disable=unused-arguments
+        """
+        Blocks an individual request if: it is from a blocked ip range, routable, not a safe request
+        and not from a superuser (don't want admins accidentally locking themselves out).
+
+        Args:
+            request (django.http.request.Request): the request to inspect
+        """
+
+        if getattr(request, "ip_processing_done", False):
+            return None
+
+        if (
+            not getattr(callback, "blocked_ip_exempt", False)
+            and not request.user.is_superuser
+            and not request.path.startswith("/admin/")
+        ):
+            user_ip, is_routable = get_client_ip(request)
+            log.error(f"IP is {user_ip}, routable? {is_routable}")
+
+            if user_ip is None or (
+                is_routable
+                and request.method not in SAFE_METHODS
+                and BlockedIPRange.objects.filter(
+                    Q(ip_start__lte=user_ip) & Q(ip_end__gte=user_ip)
+                ).count()
+                > 0
+            ):
+                raise PermissionDenied
+
+        return self._accept(request)

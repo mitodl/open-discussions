@@ -125,6 +125,7 @@ MIDDLEWARE = (
     "open_discussions.middleware.user_activity.UserActivityMiddleware",
     "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
+    "authentication.middleware.BlockedIPMiddleware",
 )
 
 # CORS
