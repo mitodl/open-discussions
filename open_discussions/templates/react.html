@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load render_bundle %}
+
+{% block extrahead %}
+{{ js_settings|json_script:'js-settings' }}
+<script type="text/javascript">
+var SETTINGS = JSON.parse(document.getElementById('js-settings').textContent);
+</script>
+{% render_bundle 'style' %}
+{% endblock %}
+
+{% block content %}
+<div id="container"></div>
+{% render_bundle 'root' %}
+{% endblock %}

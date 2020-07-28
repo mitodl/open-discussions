@@ -2,12 +2,13 @@
 Test end to end django views.
 """
 # pylint: disable=redefined-outer-name,too-many-arguments
-import json
 import xml.etree.ElementTree as etree
 
 import pytest
 from django.urls import reverse
+from rest_framework import status
 
+from channels.factories.models import PostFactory, CommentFactory
 from open_discussions import features
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
@@ -60,7 +61,7 @@ def test_webpack_url(
     response = client.get(reverse("open_discussions-index"))
     bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
     assert set(bundles) == {"root", "style"}
-    js_settings = json.loads(response.context["js_settings_json"])
+    js_settings = response.context["js_settings"]
     assert js_settings == {
         "gaTrackingID": "fake",
         "public_path": "/static/bundles/",
@@ -130,7 +131,7 @@ def test_article_ui_flag(
     settings.FEATURES[features.ARTICLE_UI] = feature_enabled
 
     response = client.get(reverse("open_discussions-index"))
-    js_settings = json.loads(response.context["js_settings_json"])
+    js_settings = response.context["js_settings"]
     assert js_settings["article_ui_enabled"] == exp
 
 
@@ -181,6 +182,48 @@ def test_channel_redirect(client, url, redirect):
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url == redirect
+
+
+@pytest.mark.parametrize("removed", [True, False])
+def test_missing_post_404(client, removed):
+    """Test that the 404 page works"""
+    post = PostFactory.create(removed=removed)
+
+    resp = client.get(
+        reverse(
+            "channel-post",
+            kwargs=dict(
+                channel_name=post.channel.name, post_id=post.post_id, post_slug="slug"
+            ),
+        )
+    )
+    if removed:
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    else:
+        assert resp.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.parametrize("removed", [True, False])
+def test_missing_post_comments_404(client, removed):
+    """Test that the 404 page works"""
+    post = PostFactory.create(removed=removed)
+    comment = CommentFactory.create()
+
+    resp = client.get(
+        reverse(
+            "channel-post-comment",
+            kwargs=dict(
+                channel_name=post.channel.name,
+                post_id=post.post_id,
+                post_slug="slug",
+                comment_id=comment.comment_id,
+            ),
+        )
+    )
+    if removed:
+        assert resp.status_code == status.HTTP_404_NOT_FOUND
+    else:
+        assert resp.status_code == status.HTTP_200_OK
 
 
 def test_facebook_user_agent(client):

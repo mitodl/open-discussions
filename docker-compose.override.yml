@@ -5,7 +5,7 @@ services:
       - .:/src
       - django_media:/var/media
     environment:
-      DEBUG: 'True'
+      DEBUG: ${DEBUG:-True}
       NODE_ENV: 'development'
       OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
 
@@ -14,7 +14,7 @@ services:
       - .:/src
       - django_media:/var/media
     environment:
-      DEBUG: 'True'
+      DEBUG: ${DEBUG:-True}
       NODE_ENV: 'development'
       OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
 

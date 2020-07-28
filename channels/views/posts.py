@@ -106,6 +106,12 @@ class PostDetailView(APIView):
         """Get post"""
         with translate_praw_exceptions(request.user):
             post = self.get_object()
+            if post.removed and (
+                request.user.is_anonymous
+                or not (self.api.is_moderator(post.channel.name, request.user.username))
+            ):
+                raise NotFound()
+
             users = lookup_users_for_posts([post])
             if not post.author or post.author.name not in users:
                 raise NotFound()

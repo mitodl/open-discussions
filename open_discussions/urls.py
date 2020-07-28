@@ -19,13 +19,17 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index, saml_metadata, channel_redirect
+from open_discussions.views import index, saml_metadata, channel_redirect, channel_post
 
 # Post slugs can contain unicode characters, so a letter-matching pattern like [A-Za-z] doesn't work.
 # "[^\W]" Matches any character that is NOT a non-alphanumeric character, including underscores.
 # "[^\W]" will match all numbers, underscores, and letters, unicode or otherwise. To accept dashes
 # as well, that character is added to the pattern via an alternation (|).
 POST_SLUG_PATTERN = "([^\\W]|-)+"
+
+handler400 = "open_discussions.views.handle_400"
+handler403 = "open_discussions.views.handle_403"
+handler404 = "open_discussions.views.handle_404"
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
@@ -50,17 +54,17 @@ urlpatterns = [
     url(r"^content_policy/$", index),
     url(
         r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/"
-        r"(?P<post_slug>{post_slug_pattern})/comment/(?P<comment_id>[A-Za-z0-9_]+)/$".format(
+        r"(?P<post_slug>{post_slug_pattern})/comment/(?P<comment_id>[A-Za-z0-9_]+)/?$".format(
             post_slug_pattern=POST_SLUG_PATTERN
         ),
-        index,
+        channel_post,
         name="channel-post-comment",
     ),
     url(
-        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>{post_slug_pattern})/$".format(
+        r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>{post_slug_pattern})/?$".format(
             post_slug_pattern=POST_SLUG_PATTERN
         ),
-        index,
+        channel_post,
         name="channel-post",
     ),
     url(r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"),
