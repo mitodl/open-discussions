@@ -47,12 +47,6 @@ class BlockedIPMiddleware(MiddlewareMixin):
     Only allow GET/HEAD requests for blocked ips, unless exempt or a superuser
     """
 
-    def _accept(self, request):
-        """
-        Avoid checking the request multiple times
-        """
-        request.ip_processing_done = True
-
     def process_view(self, request, callback, callback_args, callback_kwargs):
         """
         Blocks an individual request if: it is from a blocked ip range, routable, not a safe request
@@ -61,9 +55,6 @@ class BlockedIPMiddleware(MiddlewareMixin):
         Args:
             request (django.http.request.Request): the request to inspect
         """
-
-        if getattr(request, "ip_processing_done", False):
-            return None
 
         if (
             not getattr(callback, "blocked_ip_exempt", False)
@@ -81,5 +72,3 @@ class BlockedIPMiddleware(MiddlewareMixin):
                 > 0
             ):
                 raise PermissionDenied
-
-        return self._accept(request)
