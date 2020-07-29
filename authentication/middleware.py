@@ -1,10 +1,10 @@
 """Authentication middleware"""
 from django.db.models import Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import urlquote
 from ipware import get_client_ip
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import SAFE_METHODS
 
 from social_core.exceptions import SocialAuthBaseException
@@ -71,4 +71,4 @@ class BlockedIPMiddleware(MiddlewareMixin):
                 ).count()
                 > 0
             ):
-                raise PermissionDenied
+                return HttpResponseForbidden()

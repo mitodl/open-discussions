@@ -5,7 +5,6 @@ from django.contrib.sessions.middleware import SessionMiddleware
 from django.shortcuts import reverse
 from django.utils.http import urlquote
 from rest_framework import status
-from rest_framework.exceptions import PermissionDenied
 from social_core.exceptions import AuthAlreadyAssociated
 from social_django.utils import load_backend, load_strategy
 
@@ -86,7 +85,6 @@ def test_process_view_blocked_ip_middleware(  # pylint:disable=too-many-argument
 
     middleware = BlockedIPMiddleware()
     if is_blocked and is_routable and not exempt_view and not is_super:
-        with pytest.raises(PermissionDenied):
-            middleware.process_view(request, callback, None, {})
+        assert middleware.process_view(request, callback, None, {}).status_code == 403
     else:
         assert middleware.process_view(request, callback, None, {}) is None
