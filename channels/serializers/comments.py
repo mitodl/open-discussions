@@ -214,6 +214,13 @@ class CommentSerializer(BaseCommentSerializer):
             text = validated_data["body"]
             api.update_comment(comment_id=instance.id, text=text)
 
+            if not api.is_moderator(
+                instance.subreddit.display_name, instance.author.name
+            ):
+                task_helpers.check_comment_for_spam(
+                    self.context["request"], instance.id
+                )
+
         if "removed" in validated_data:
             if validated_data["removed"] is True:
                 api.remove_comment(comment_id=instance.id)
@@ -234,9 +241,6 @@ class CommentSerializer(BaseCommentSerializer):
                 api.remove_comment_subscription(post_id, instance.id)
 
         api.apply_comment_vote(instance, validated_data)
-
-        if not api.is_moderator(instance.subreddit.display_name, instance.author.name):
-            task_helpers.check_comment_for_spam(self.context["request"], instance.id)
 
         return api.get_comment(comment_id=instance.id)
 

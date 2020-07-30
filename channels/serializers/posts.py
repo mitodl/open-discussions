@@ -274,6 +274,11 @@ class PostSerializer(BasePostSerializer):
         if update_kwargs:
             instance = api.update_post(post_id=post_id, **update_kwargs)
 
+            if not api.is_moderator(
+                instance.subreddit.display_name, instance.author.name
+            ):
+                task_helpers.check_post_for_spam(self.context["request"], post_id)
+
         if "stickied" in validated_data:
             sticky = validated_data["stickied"]
             api.pin_post(post_id, sticky)
@@ -285,8 +290,5 @@ class PostSerializer(BasePostSerializer):
                 api.remove_post_subscription(post_id)
 
         api.apply_post_vote(instance, validated_data)
-
-        if not api.is_moderator(instance.subreddit.display_name, instance.author.name):
-            task_helpers.check_post_for_spam(self.context["request"], post_id)
 
         return api.get_post(post_id=post_id)
