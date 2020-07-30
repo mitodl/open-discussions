@@ -288,7 +288,12 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           ) : null}
           {object.object_type === LR_TYPE_PODCAST ? (
             <div className="row">
-              <PodcastSubscribeButton podcast={object} />
+              <PodcastSubscribeButton
+                rssUrl={object.rss_url}
+                appleUrl={object.apple_podcasts_url}
+                googleUrl={object.google_podcasts_url}
+                buttonText="Subscribe"
+              />
             </div>
           ) : null}
           {!emptyOrNil(object.topics) ? (

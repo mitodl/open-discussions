@@ -1,19 +1,16 @@
 // @flow
 import React, { useState, useCallback } from "react"
 
-import type { Podcast } from "../flow/podcastTypes"
-
 type Props = {
-  podcast: Podcast
+  rssUrl: string,
+  appleUrl?: ?string,
+  googleUrl?: ?string,
+  buttonText: string
 }
 
 export default function PodcastSubscribeButton(props: Props) {
-  const { podcast } = props
+  const { rssUrl, appleUrl, googleUrl, buttonText } = props
   const [showButtons, setShowButtons] = useState(false)
-
-  if (!podcast.google_podcasts_url && !podcast.apple_podcasts_url) {
-    return null
-  }
 
   const toggleShowButtons = useCallback(
     e => {
@@ -28,24 +25,19 @@ export default function PodcastSubscribeButton(props: Props) {
       className="podcast-subscribe-button links"
       onMouseLeave={toggleShowButtons}
     >
-      {podcast.google_podcasts_url ? (
-        <a
-          href={podcast.google_podcasts_url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+      {googleUrl ? (
+        <a href={googleUrl} target="_blank" rel="noopener noreferrer">
           <img src="/static/images/google_podcasts.png" />
         </a>
       ) : null}
-      {podcast.apple_podcasts_url ? (
-        <a
-          href={podcast.apple_podcasts_url}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+      {appleUrl ? (
+        <a href={appleUrl} target="_blank" rel="noopener noreferrer">
           <img src="/static/images/apple_podcasts.png" />
         </a>
       ) : null}
+      <a href={rssUrl} target="_blank" rel="noopener noreferrer">
+        <img src="/static/images/rss_logo.png" />
+      </a>
     </div>
   ) : (
     <button
@@ -53,7 +45,7 @@ export default function PodcastSubscribeButton(props: Props) {
       onClick={toggleShowButtons}
       onMouseEnter={toggleShowButtons}
     >
-      Subscribe
+      {buttonText}
     </button>
   )
 }

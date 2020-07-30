@@ -9,6 +9,7 @@ import PodcastCard from "../components/PodcastCard"
 import { Cell, Grid } from "../components/Grid"
 import { PodcastLoading, PodcastEpisodeLoading } from "../components/Loading"
 import PodcastFooter from "../components/PodcastFooter"
+import PodcastSubscribeButton from "../components/PodcastSubscribeButton"
 
 import { formatTitle } from "../lib/title"
 import {
@@ -18,6 +19,7 @@ import {
   recentEpisodesSelector
 } from "../lib/queries/podcasts"
 import { useLearningResourcePermalink } from "../hooks/learning_resources"
+import { PODCAST_RSS_URL } from "../lib/url"
 
 export default function PodcastFrontpage() {
   const [{ isFinished: isFinishedPodcasts }] = useRequest(podcastsRequest())
@@ -62,6 +64,12 @@ export default function PodcastFrontpage() {
         ) : (
           <PodcastEpisodeLoading />
         )}
+        <div className="subscribe-button-div">
+          <PodcastSubscribeButton
+            buttonText="Subscribe to new episodes"
+            rssUrl={`${window.location.origin.toString()}${PODCAST_RSS_URL}`}
+          />
+        </div>
       </div>
       <div className="all-podcasts">
         <h1>Podcasts</h1>

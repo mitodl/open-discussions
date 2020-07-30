@@ -23,6 +23,7 @@ export const makePodcast = (): Podcast => ({
   url:                 casual.url,
   apple_podcasts_url:  casual.url,
   google_podcasts_url: casual.url,
+  rss_url:             casual.url,
   is_favorite:         casual.boolean,
   object_type:         LR_TYPE_PODCAST,
   audience:            [],
