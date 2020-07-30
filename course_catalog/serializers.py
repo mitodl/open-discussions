@@ -725,6 +725,7 @@ class PodcastSerializer(
     certification = serializers.ReadOnlyField()
     apple_podcasts_url = serializers.ReadOnlyField()
     google_podcasts_url = serializers.ReadOnlyField()
+    rss_url = serializers.ReadOnlyField()
 
     class Meta:
         model = Podcast

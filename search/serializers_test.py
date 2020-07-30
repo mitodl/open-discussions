@@ -582,6 +582,7 @@ def test_es_podcast_serializer(offered_by):
             "certification": [],
             "apple_podcasts_url": podcast.apple_podcasts_url,
             "google_podcasts_url": podcast.google_podcasts_url,
+            "rss_url": podcast.rss_url,
         },
     )
 
