@@ -567,6 +567,7 @@ class Podcast(LearningResource, LearningResourceGenericRelationsMixin):
     apple_podcasts_url = models.URLField(null=True, max_length=2048)
     google_podcasts_url = models.URLField(null=True, max_length=2048)
     searchable = models.BooleanField(default=True)
+    rss_url = models.URLField(null=True, max_length=2048)
 
     def __str__(self):
         return self.title

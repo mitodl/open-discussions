@@ -218,6 +218,7 @@ def transform(extracted_podcasts):
                 ),
                 "apple_podcasts_url": apple_podcasts_url,
                 "google_podcasts_url": google_podcasts_url,
+                "rss_url": config_data["rss_url"],
             }
         except AttributeError:
             log.exception("Error parsing podcast data from %s", config_data["rss_url"])

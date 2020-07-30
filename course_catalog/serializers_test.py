@@ -296,6 +296,7 @@ def test_podcast_serializer():
         "certification": [],
         "apple_podcasts_url": podcast.apple_podcasts_url,
         "google_podcasts_url": podcast.google_podcasts_url,
+        "rss_url": podcast.rss_url,
     }
 
 
