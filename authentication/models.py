@@ -1,7 +1,10 @@
 """ Models for mail app """
+from ipaddress import ip_address
+
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.safestring import mark_safe
-
+from ipware.utils import is_private_ip
 from open_discussions.models import TimestampedModel
 
 
@@ -22,3 +25,23 @@ class BlockedEmailRegex(TimestampedModel):
     match = models.CharField(
         max_length=256, null=False, blank=False, help_text=mark_safe(HELP_TEXT)
     )
+
+
+class BlockedIPRange(TimestampedModel):
+    """
+    An object indicating ip ranges to block
+    """
+
+    ip_start = models.GenericIPAddressField(null=False, blank=False)
+    ip_end = models.GenericIPAddressField(null=False, blank=False)
+
+    def clean(self):
+        for ip in (self.ip_start, self.ip_end):
+            if ip is None:
+                raise ValidationError(f"IP cannot be null", code="invalid")
+            if is_private_ip(ip):
+                raise ValidationError(f"IP {ip} is not routable", code="invalid")
+        if ip_address(self.ip_start) > ip_address(self.ip_end):
+            raise ValidationError(
+                f"IP {self.ip_end} < IP {self.ip_start}", code="invalid"
+            )

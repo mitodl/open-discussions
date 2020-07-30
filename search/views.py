@@ -1,11 +1,13 @@
 """View for search"""
 import logging
 
+from django.utils.decorators import method_decorator
 from elasticsearch.exceptions import TransportError
 from rest_framework.response import Response
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 from rest_framework.views import APIView
 
+from authentication.decorators import blocked_ip_exempt
 from open_discussions import features
 from search.api import (
     execute_search,
@@ -31,6 +33,7 @@ class ESView(APIView):
         raise exc
 
 
+@method_decorator(blocked_ip_exempt, name="dispatch")
 class SearchView(ESView):
     """
     View for executing searches of posts, comments, profiles, learning resources
@@ -48,6 +51,7 @@ class SearchView(ESView):
         return Response(response)
 
 
+@method_decorator(blocked_ip_exempt, name="dispatch")
 class RelatedPostsView(ESView):
     """
     View for retrieving related posts
@@ -65,6 +69,7 @@ class RelatedPostsView(ESView):
         return Response(response)
 
 
+@method_decorator(blocked_ip_exempt, name="dispatch")
 class SimilarResourcesView(ESView):
     """
     View for retrieving similar learning resources
