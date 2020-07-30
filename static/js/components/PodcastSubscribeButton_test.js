@@ -3,18 +3,23 @@ import { assert } from "chai"
 
 import PodcastSubscribeButton from "./PodcastSubscribeButton"
 
-import { makePodcast } from "../factories/podcasts"
-
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("PodcastSubscribeButton", () => {
-  let podcast, helper, render
+  let rssUrl, appleUrl, googleUrl, buttonText, helper, render
 
   beforeEach(() => {
-    podcast = makePodcast()
+    rssUrl = "rss url"
+    appleUrl = "apple url"
+    googleUrl = "google url"
+    buttonText = "text"
+
     helper = new IntegrationTestHelper()
     render = helper.configureReduxQueryRenderer(PodcastSubscribeButton, {
-      podcast
+      rssUrl:     rssUrl,
+      appleUrl:   appleUrl,
+      googleUrl:  googleUrl,
+      buttonText: buttonText
     })
   })
 
@@ -23,21 +28,15 @@ describe("PodcastSubscribeButton", () => {
   })
 
   const assertLinks = wrapper => {
-    const [google, apple] = wrapper.find("a")
-    assert.equal(google.props.href, podcast.google_podcasts_url)
-    assert.equal(apple.props.href, podcast.apple_podcasts_url)
+    const [google, apple, rss] = wrapper.find("a")
+    assert.equal(google.props.href, googleUrl)
+    assert.equal(apple.props.href, appleUrl)
+    assert.equal(rss.props.href, rssUrl)
   }
 
-  it("should return null if no urls", async () => {
-    podcast.google_podcasts_url = undefined
-    podcast.apple_podcasts_url = undefined
+  it("should show the button text initially", async () => {
     const { wrapper } = await render()
-    assert.isTrue(wrapper.find("PodcastSubscribeButton").isEmptyRender())
-  })
-
-  it("should just say 'subscribe' initially", async () => {
-    const { wrapper } = await render()
-    assert.equal(wrapper.find("PodcastSubscribeButton").text(), "Subscribe")
+    assert.equal(wrapper.find("PodcastSubscribeButton").text(), buttonText)
   })
 
   it("should show URLs for the podcast when hovered", async () => {

@@ -123,6 +123,8 @@ export const COURSE_SEARCH_URL = "/learn/search"
 
 export const PODCAST_URL = "/podcasts"
 
+export const PODCAST_RSS_URL = "/podcasts/rss_feed"
+
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
 
