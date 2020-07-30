@@ -33,6 +33,7 @@ def mock_podcast_file(  # pylint: disable=too-many-arguments
     offered_by=None,
     google_podcasts_url="google_podcasts_url",
     apple_podcasts_url="apple_podcasts_url",
+    rss_url="rss_url",
 ):
     """Mock podcast github file"""
 
@@ -44,6 +45,7 @@ rss_url: rss_url
 website:  {website_url}
 google_podcasts_url: {google_podcasts_url}
 apple_podcasts_url: {apple_podcasts_url}
+rss_url: {rss_url}
 """
     return Mock(decoded_content=content)
 
@@ -129,6 +131,7 @@ def test_transform(mocker, title, topics, offered_by):
             "url": "website_url",
             "google_podcasts_url": "google_podcasts_url",
             "apple_podcasts_url": "apple_podcasts_url",
+            "rss_url": "rss_url",
             "topics": expected_topics,
             "episodes": [
                 {
