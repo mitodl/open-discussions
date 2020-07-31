@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.136.1 (Released July 31, 2020)
+---------------
+
+- Spam check only if the content changes
+- Added server-side 404 page for posts
+- do not spam check moderators
+- Blocked IP model and middleware (#3082)
+
 Version 0.136.0 (Released July 28, 2020)
 ---------------
 
