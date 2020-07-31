@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.136.1
+Version 0.136.1 (Released July 31, 2020)
 ---------------
 
 - Spam check only if the content changes
