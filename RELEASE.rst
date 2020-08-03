@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.137.0
+---------------
+
+- add rss_url to podcast etl
+- Bump elliptic from 6.4.0 to 6.5.3
+- generate rss for all MIT podcast episodes
+
 Version 0.136.1 (Released July 31, 2020)
 ---------------
 
