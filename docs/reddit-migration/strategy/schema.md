@@ -1,3 +1,9 @@
+---
+layout: default
+parent: Strategy
+grand_parent: Reddit Migration
+nav_order: 1
+---
 # Establish a New Schema
 
 We want to establish a new schema so that we have a clean slate to work with and because there will be some incompatible changes with the current schema. An example of this is the `Post.post_id` column is a reference to the reddit id, but in the future needs to be the primary key of the row (see [Reddit Ids](reddit-ids.md)). We can't do that in-place with the current table.

@@ -1,18 +1,18 @@
-## Caching System for Third-Party Data
+---
+layout: default
+parent: RFCs
+nav_order: 1
+---
+# 0001: Caching System for Third-Party Data
+{: .no_toc }
 
-### Table of Contents
+## Table of Contents
+{: .no_toc .text-delta }
 
-- [Abstract](#abstract)
-- [Architecture Changes](#architecture-changes)
-- [Security Considerations](#security-considerations)
-  - [Authentication](#authentication)
-  - [Encrypted Transport](#encrypted-transport)
-  - [Backend Security Comparison](#backend-security-comparison)
-- [Testing & Rollout](#testing--rollout)
-  - [Backend Deployment Complexity](#backend-deployment-complexity)
-- [Conclusion](#conclusion)
+- Table of Contents
+{:toc}
 
-#### Abstract
+### Abstract
 
 We need a caching system for caching third-party data. Some known needs are:
 
@@ -25,7 +25,7 @@ Additionally, caching arbitrary blobs of response data is likely to grow cache m
 
 So for both the above reasons at a minimum the cache system used for caching arbitrary blobs of data should be a separate physical system and we should evaluate which backing cache is best for the needs that are known.
 
-#### Architecture Changes
+### Architecture Changes
 
 Django has a built-in [caching system](https://docs.djangoproject.com/en/2.1/topics/cache/) with pluggable backends that we should try to use instead of rolling our own. It supports several backend types the most practical for us being:
 
@@ -35,24 +35,24 @@ Django has a built-in [caching system](https://docs.djangoproject.com/en/2.1/top
 
 Using this means there's no big architecture to put in place.
 
-#### Security Considerations
+### Security Considerations
 
 Since we run our application in Heroku, the backing store needs to be secured for public access. There are two aspects of this we need to look at:
 
-##### Authentication
+#### Authentication
 
 The backing store should support some flavor of credentials so we can ensure writes to this system are from an authorized source (our application). Particularly because often this information is being rendered back to users on the discussions site (e.g. Embedly descriptions or widget responses). An unauthenticated store would be an easy attack vector for getting unauthorized content to show up on the site.
 
 See [Backend Security Comparison](#backend-security-comparison).
 
 
-##### Encrypted Transport
+#### Encrypted Transport
 
 It's ideal to encrypt traffic if it is going to the store across the public internet. Particularly because unencrypted traffic negates some of the benefits of the requests being authenticated.
 
 See [Backend Security Comparison](#backend-security-comparison).
 
-##### Backend Security Comparison
+#### Backend Security Comparison
 
 | Backend | Credential Type | Transport Type | Notes |
 | --- | --- | --- | --- |
@@ -60,12 +60,12 @@ See [Backend Security Comparison](#backend-security-comparison).
 | Redis | Username/Password | TLS | Security Docs:<br>[Redis Enterprise](https://redislabs.com/redis-enterprise/technology/redis-security-reliability/) (formerly RedisCloud)<BR>[Elasticache Redis](https://docs.aws.amazon.com/AmazonElastiCache/latest/red-ug/in-transit-encryption.html) |
 | Database | Username/Password | TLS | Same security considerations as our existing DB connections which we can consider a solved problem. |
 
-#### Testing & Rollout
+### Testing & Rollout
 
 Caching should be optional to configure so that we can roll out the code for this without being blocked by the backing stores needing to be operationally setup first. We can then coordinate configuring the app once operations has the environment setup.
 
 
-##### Backend Deployment Complexity
+#### Backend Deployment Complexity
 
 Aside from generally needing to configure each of these with some runtime settings, here are some extra per-backend considerations are:
 
@@ -76,7 +76,7 @@ Aside from generally needing to configure each of these with some runtime settin
 | Database | Requires an additional out-of-band management command (`manage.py createcachetable`) to be run per environment (including all PR builds). <br><br>A major downside to this is the table is **not** managed via standard django migration mechanisms which makes this difficult to automate environments for. |
 
 
-#### Conclusion
+### Conclusion
 
 `django.cache` backed by Redis is the most appealing option in terms of familiarity and security.
 

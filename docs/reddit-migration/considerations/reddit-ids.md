@@ -1,4 +1,9 @@
-
+---
+layout: default
+parent: Considerations
+grand_parent: Reddit Migration
+nav_order: 1
+---
 ### Reddit Ids
 
 Ids have to get handled carefully because we're moving the source of truth of these from Reddit to postgres, but it is a gradual switchover that will be paced out over several releases so we can't just put the site offline while we do this.

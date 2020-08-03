@@ -1,7 +1,9 @@
-Email Notifications Infrastructure
 ---
+parent: Architecture
+---
+## Email Notifications
 
-#### Summary
+### Summary
 
 - Be able to send frontpage email notifications on a daily or weekly basis
   - Frequency is user-configurable
@@ -21,9 +23,9 @@ Email Notifications Infrastructure
       - Weekly (digest/aggregation of new events)
 
 
-#### Architecture
+### Architecture
 
-##### State Machine
+#### State Machine
 
 Email Notifications proceed through the following state machine:
 
@@ -34,21 +36,21 @@ Email Notifications proceed through the following state machine:
 
 **\* NOTE:** to ensure we don't send an email multiple times we follow a `At Most Once` sending strategy where we mark the record as sent first, then attempt to send the email. This can cause some emails to be dropped if the ESP errors.
 
-##### Frontpage Emails:
+#### Frontpage Emails:
 
  - Tasks are triggered on a daily and weekly basis. Each of these tasks triggers the following task flow:
    - For all users with notifications enabled, fan out a set of batch tasks to determine if the user has posts in their feed since the last notification.
      - These tasks are idempotent and will be retried if there's any failure
    - If the user has posts in their feed, create a `PENDING` `EmailNotification` record for that user
 
-##### Comment Notifications
+#### Comment Notifications
 
  - When a comment occurs, fire a celery task to check subscriptions
  - Walk all subscriptions to that the posts and/or a comment (if the new comment was a reply to another comment) and for each one create a pending `EmailNotification` record
    - If their `NotificationSettings` record for that type has `frequency_type` of `never`, then we don't create this record. This has the effect of muting subscriptions temporarily without necessitating the removal of the subscriptions or effecting a massive catch-up of notifications if they turn it back on
 
 
-##### Notification Email Sending
+#### Notification Email Sending
 
 For both notification types, an asynchronous task set to run every minute via `crontab` will trigger another set of batch tasks in the following manner:
  - Marks the notifications as being in the `SENDING` state, trigers batch tasks for these to send the email
@@ -59,7 +61,7 @@ For both notification types, an asynchronous task set to run every minute via `c
  - Sends the email to the ESP
 
 
-##### Configuration
+#### Configuration
 
 We have a number of configuration options available to control our sending:
 
