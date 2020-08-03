@@ -1,3 +1,9 @@
+---
+layout: default
+parent: Strategy
+grand_parent: Reddit Migration
+nav_order: 3
+---
 # Cleanup
 
 These steps are not urgent, but should be done in areasonable timeframe.

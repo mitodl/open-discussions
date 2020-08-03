@@ -1,3 +1,9 @@
+---
+layout: default
+parent: Considerations
+grand_parent: Reddit Migration
+nav_order: 1
+---
 ### Sorting
 
 There are several areas where reddit sorts objects coming back from their APIs in a way that isn't necessarily trivial via standard django ORM methods. This list is meant to be comprehensive so we know the problem space:

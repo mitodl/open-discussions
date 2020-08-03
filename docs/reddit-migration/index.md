@@ -1,3 +1,9 @@
+---
+layout: default
+title: Reddit Migration
+nav_order: 12
+has_children: true
+---
 # Reddit Migration
 
 ## Major Considerations

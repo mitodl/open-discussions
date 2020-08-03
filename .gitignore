@@ -105,3 +105,6 @@ celerybeat-schedule
 
 # for testing out NPM packages
 *.tgz
+
+# docs/bundler/jekyll
+docs/_site

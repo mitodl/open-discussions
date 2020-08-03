@@ -1,3 +1,9 @@
+---
+layout: default
+parent: Strategy
+grand_parent: Reddit Migration
+nav_order: 2
+---
 # Migrate Reads and Writes
 
 We need to gracefully migrate our APIs over to the new schema. We want to avoid or at the very least minimize any sort of downtime.
