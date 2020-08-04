@@ -512,7 +512,6 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
         )
 
 
-@api_view(["GET"])
 def podcast_rss_feed(request):
     """
     View to display the combined podcast rss file
