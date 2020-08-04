@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.137.0
+Version 0.137.0 (Released August 04, 2020)
 ---------------
 
 - add rss_url to podcast etl
