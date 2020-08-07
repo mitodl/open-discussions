@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.138.0
+---------------
+
+- remove podcast rss authentication
+- Document spam mitigation and modernize docs
+
 Version 0.137.0 (Released August 04, 2020)
 ---------------
 
