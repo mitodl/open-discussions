@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.138.0
+Version 0.138.0 (Released August 10, 2020)
 ---------------
 
 - fix requirements
