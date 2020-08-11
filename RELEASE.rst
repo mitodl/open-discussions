@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.138.1
+---------------
+
+- add rss to subscribe button
+
 Version 0.138.0 (Released August 10, 2020)
 ---------------
 
