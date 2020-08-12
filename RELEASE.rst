@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.138.1
+---------------
+
+- pin requests to fix urllib3 error
+- add rss to subscribe button
+
 Version 0.138.0 (Released August 10, 2020)
 ---------------
 
