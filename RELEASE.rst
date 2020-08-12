@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.138.1
+Version 0.138.1 (Released August 12, 2020)
 ---------------
 
 - pin requests to fix urllib3 error
