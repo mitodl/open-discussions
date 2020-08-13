@@ -13,6 +13,7 @@ from django.db.models import Prefetch, Count, Q
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.http import HttpResponse
+from django.views.decorators.cache import cache_page
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -512,6 +513,7 @@ class EpisodesInPodcast(viewsets.ReadOnlyModelViewSet):
         )
 
 
+@cache_page(60 * settings.RSS_FEED_CACHE_MINUTES)
 def podcast_rss_feed(request):
     """
     View to display the combined podcast rss file
