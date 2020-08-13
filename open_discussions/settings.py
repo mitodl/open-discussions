@@ -933,6 +933,7 @@ STAFF_MOIRA_LISTS = get_list_of_str("STAFF_MOIRA_LISTS", [])
 AKISMET_API_KEY = get_string("AKISMET_API_KEY", None)
 AKISMET_BLOG_URL = get_string("AKISMET_BLOG_URL", None)
 AKISMET_IS_TESTING = get_string("AKISMET_IS_TESTING", False)
+SPAM_EXEMPT_EMAILS = get_list_of_str("SPAM_EXEMPT_EMAILS", ["[@\\.]mit\\.edu"])
 
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing

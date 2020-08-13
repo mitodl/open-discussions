@@ -1,7 +1,7 @@
 """Channel tasks helpers"""
 from django.conf import settings
 
-from channels.spam import extract_spam_check_headers
+from channels.spam import extract_spam_check_headers, exempt_from_spamcheck
 from open_discussions.features import HOT_POST_REPAIR, if_feature_enabled
 
 
@@ -33,6 +33,9 @@ def check_post_for_spam(request, post_id):
     """
     from channels import tasks
 
+    if exempt_from_spamcheck(request.user.email):
+        return
+
     headers = extract_spam_check_headers(request)
     tasks.check_post_for_spam.apply_async(
         kwargs=dict(
@@ -51,6 +54,9 @@ def check_comment_for_spam(request, comment_id):
         comment_id(str): the base36 comment id
     """
     from channels import tasks
+
+    if exempt_from_spamcheck(request.user.email):
+        return
 
     headers = extract_spam_check_headers(request)
     tasks.check_comment_for_spam.apply_async(

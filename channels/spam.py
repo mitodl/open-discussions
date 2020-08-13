@@ -1,5 +1,6 @@
 """Check for spam"""
 import logging
+import re
 from types import SimpleNamespace
 
 import akismet
@@ -9,6 +10,7 @@ from django.utils.functional import SimpleLazyObject
 from ipware import get_client_ip
 
 from channels.models import SpamCheckResult
+from open_discussions import features
 
 log = logging.getLogger()
 
@@ -48,6 +50,23 @@ def extract_spam_check_headers(request):
     user_agent = request.META.get("HTTP_USER_AGENT", "")
 
     return SimpleNamespace(user_ip=user_ip, user_agent=user_agent)
+
+
+def exempt_from_spamcheck(email):
+    """
+    Determine if a user should be exempt from a spam check based on email
+
+    Args:
+        email(str): The email of the user
+
+    Returns:
+        bool: True if exempt else False
+    """
+    pattern = "|".join([email for email in settings.SPAM_EXEMPT_EMAILS])
+    return (
+        features.is_enabled(features.SPAM_EXEMPTIONS)
+        and re.search(r"({})$".format(pattern), email) is not None
+    )
 
 
 def _create_akismet_client():
