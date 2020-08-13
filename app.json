@@ -416,6 +416,10 @@
       "description": "Number of episodes included in aggregated rss feed",
       "required": false
     },
+    "RSS_FEED_CACHE_MINUTES":{
+      "description": "Minutes that /podcasts/rss_feed will be cached",
+      "required": false
+    },
     "SOCIAL_AUTH_SAML_LOGIN_URL": {
       "description": "Custom login url for SAML",
       "required": false
