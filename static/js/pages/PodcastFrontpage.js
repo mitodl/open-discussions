@@ -19,7 +19,7 @@ import {
   recentEpisodesSelector
 } from "../lib/queries/podcasts"
 import { useLearningResourcePermalink } from "../hooks/learning_resources"
-import { PODCAST_RSS_URL } from "../lib/url"
+import { PODCAST_RSS_URL, PODCAST_GOOGLE_URL } from "../lib/url"
 
 export default function PodcastFrontpage() {
   const [{ isFinished: isFinishedPodcasts }] = useRequest(podcastsRequest())
@@ -49,6 +49,13 @@ export default function PodcastFrontpage() {
         <div className="recent-header">
           <div className="title">RECENT EPISODES</div>
         </div>
+        <div className="subscribe-button-div">
+          <PodcastSubscribeButton
+            buttonText="Subscribe to new episodes"
+            rssUrl={`${window.location.origin.toString()}${PODCAST_RSS_URL}`}
+            googleUrl={PODCAST_GOOGLE_URL}
+          />
+        </div>
         {isFinishedRecent && isFinishedPodcasts ? (
           <>
             {recentEpisodes
@@ -64,12 +71,6 @@ export default function PodcastFrontpage() {
         ) : (
           <PodcastEpisodeLoading />
         )}
-        <div className="subscribe-button-div">
-          <PodcastSubscribeButton
-            buttonText="Subscribe to new episodes"
-            rssUrl={`${window.location.origin.toString()}${PODCAST_RSS_URL}`}
-          />
-        </div>
       </div>
       <div className="all-podcasts">
         <h1>Podcasts</h1>

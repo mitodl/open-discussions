@@ -7,6 +7,7 @@
 
   @include breakpoint(materialmobile) {
     min-height: calc(100vh - #{$toolbar-height-mobile});
+    background-image: url("../images/podcasts_bg_mobile.png");
   }
 
   h1 {
@@ -26,7 +27,7 @@
     .recent-header {
       display: flex;
       justify-content: space-between;
-      padding-bottom: 10px;
+      padding-bottom: 20px;
 
       .title {
         font-size: 20px;
@@ -34,19 +35,27 @@
 
         @include breakpoint(materialmobile) {
           margin-left: 15px;
-          padding-bottom: 25px;
+          padding-bottom: 0px;
         }
       }
     }
 
     .subscribe-button-div {
-      height: 75px;
+      height: 60px;
     }
 
     .podcast-subscribe-button {
       padding: 2px;
       width: 250px;
+      height: 45px;
       float: right;
+    }
+
+    @include breakpoint(materialmobile) {
+      .podcast-subscribe-button {
+        width: 95%;
+        margin-right: 2.5%;
+      }
     }
   }
 
@@ -220,6 +229,10 @@
         overflow: hidden;
       }
     }
+  }
+
+  @include breakpoint(materialmobile) {
+    margin-bottom: 10px;
   }
 }
 
