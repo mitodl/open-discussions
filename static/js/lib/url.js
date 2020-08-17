@@ -124,6 +124,8 @@ export const COURSE_SEARCH_URL = "/learn/search"
 export const PODCAST_URL = "/podcasts"
 
 export const PODCAST_RSS_URL = "/podcasts/rss_feed"
+export const PODCAST_GOOGLE_URL =
+  "https://podcasts.google.com/feed/aHR0cHM6Ly9vcGVuLm1pdC5lZHUvcG9kY2FzdHMvcnNzX2ZlZWQ"
 
 export const toQueryString = (params: Object) =>
   R.isEmpty(params || {}) ? "" : `?${qs.stringify(params)}`
