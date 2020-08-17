@@ -479,6 +479,10 @@
       "description": "The log level for Sentry",
       "required": false
     },
+    "SPAM_EXEMPT_EMAILS": {
+      "description": "list of email regex patterns that are exempt from spam checking",
+      "required": false
+    },
     "STAFF_MOIRA_LISTS": {
       "description": "moira lists of users who can create public lists",
       "required": false

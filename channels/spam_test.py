@@ -8,10 +8,15 @@ from django.contrib.contenttypes.models import ContentType
 from channels.constants import POST_TYPE, COMMENT_TYPE
 from channels.factories.models import PostFactory, CommentFactory
 from channels.models import SpamCheckResult
-from channels.spam import SpamChecker, extract_spam_check_headers, save_spam_result
-
+from channels.spam import (
+    SpamChecker,
+    extract_spam_check_headers,
+    save_spam_result,
+    exempt_from_spamcheck,
+)
 
 # pylint: disable=redefined-outer-name
+from open_discussions import features
 
 
 @pytest.fixture(autouse=True)
@@ -216,3 +221,26 @@ def test_save_spam_result(*, model, is_spam, ip_address):
     result = SpamCheckResult.objects.get(content_type__model=object_type, object_id=1)
     assert result.is_spam is not is_spam
     assert result.checks == 2
+
+
+@pytest.mark.parametrize("feature_enabled", [True, False])
+@pytest.mark.parametrize(
+    "email,is_exempt",
+    [
+        ["joe@mit.edu", True],
+        ["jane@csail.mit.edu", True],
+        ["tester@summit.edu", False],
+        ["tester@mit.edu.com", False],
+        ["tester@foobar.edu", True],
+        ["tester@specialcase.com", True],
+    ],
+)
+def test_exempt_from_spamcheck(settings, email, is_exempt, feature_enabled):
+    """ Test that emails are correctly determined to be exempt or not from span checks"""
+    settings.FEATURES[features.SPAM_EXEMPTIONS] = feature_enabled
+    settings.SPAM_EXEMPT_EMAILS = [
+        "[@\\.]mit\\.edu",
+        "@foobar\\.edu",
+        "tester@specialcase\\.com",
+    ]
+    assert exempt_from_spamcheck(email) is (feature_enabled and is_exempt)
