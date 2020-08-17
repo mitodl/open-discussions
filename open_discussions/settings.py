@@ -935,6 +935,8 @@ AKISMET_BLOG_URL = get_string("AKISMET_BLOG_URL", None)
 AKISMET_IS_TESTING = get_string("AKISMET_IS_TESTING", False)
 SPAM_EXEMPT_EMAILS = get_list_of_str("SPAM_EXEMPT_EMAILS", ["[@\\.]mit\\.edu"])
 
+RSS_FEED_EPISODE_LIMIT = get_int("RSS_FEED_EPISODE_LIMIT", 100)
+
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing
     IPWARE_PRIVATE_IP_PREFIX = ()

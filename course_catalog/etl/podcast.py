@@ -285,7 +285,7 @@ def generate_aggregate_podcast_rss():
         PodcastEpisode.objects.filter(published=True)
         .order_by("last_modified")
         .reverse()
-        .values_list("rss", flat=True)
+        .values_list("rss", flat=True)[: settings.RSS_FEED_EPISODE_LIMIT]
     )
 
     for episode in episode_rss_list:
