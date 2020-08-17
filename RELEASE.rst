@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.139.0
+Version 0.139.0 (Released August 17, 2020)
 ---------------
 
 - Spam exemptions check and feature flag (#3096)
