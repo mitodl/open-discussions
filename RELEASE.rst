@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.139.1
+---------------
+
+- add cache to rss page
+- limit rss feed episodes
+
 Version 0.139.0 (Released August 17, 2020)
 ---------------
 
