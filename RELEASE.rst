@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.139.1
+Version 0.139.1 (Released August 19, 2020)
 ---------------
 
 - add cache to rss page
