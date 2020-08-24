@@ -385,6 +385,7 @@ def test_es_course_serializer(offered_by, platform):
             "audience": expected_audience,
             "certification": expected_certification,
         },
+        sort=True,
     )
 
 

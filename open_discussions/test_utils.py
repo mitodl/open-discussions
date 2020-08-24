@@ -77,7 +77,23 @@ def drf_datetime(dt):
     return dt.isoformat().replace("+00:00", "Z")
 
 
-def assert_json_equal(obj1, obj2):
+def _sort_values(dict_like):
+    """
+    Sort each value of a dictionary if applicable to the value
+
+    Args:
+        dict_like (dict): A dict or similar
+
+    Returns:
+        dict: A dictionary with sorted values for each value which is a list
+    """
+    return {
+        key: (sorted(value) if isinstance(value, list) else value)
+        for key, value in dict_like.items()
+    }
+
+
+def assert_json_equal(obj1, obj2, sort=False):
     """
     Asserts that two objects are equal after a round trip through JSON serialization/deserialization.
     Particularly helpful when testing DRF serializers where you may get back OrderedDict and other such objects.
@@ -85,9 +101,15 @@ def assert_json_equal(obj1, obj2):
     Args:
         obj1 (object): the first object
         obj2 (object): the second object
+        sort (bool): If true, sort items which are iterable before comparing
     """
     converted1 = json.loads(json.dumps(obj1))
     converted2 = json.loads(json.dumps(obj2))
+    if sort:
+        if isinstance(converted1, dict):
+            converted1 = _sort_values(converted1)
+        if isinstance(converted2, dict):
+            converted2 = _sort_values(converted2)
     assert converted1 == converted2
 
 
