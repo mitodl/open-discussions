@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.140.0
+Version 0.140.0 (Released August 24, 2020)
 ---------------
 
 - podcast button styling update
