@@ -53,12 +53,13 @@
     "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^7.5.0",
     "eslint-config-google": "^0.13.0",
-    "eslint-config-mitodl": "^0.0.7",
+    "eslint-config-mitodl": "^0.0.8",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-flow-vars": "^0.5.0",
     "eslint-plugin-flowtype": "^4.2.0",
     "eslint-plugin-mocha": "^6.0.0",
     "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^4.1.0",
     "express": "^4.16.3",
     "fetch-mock": "^6.4.4",
     "flow-bin": "^0.94.0",
@@ -161,7 +162,6 @@
     "**/minimist": "^1.2.5",
     "**/acorn": "^7.1.1",
     "**/kind-of": "^6.0.3"
-
   },
   "engines": {
     "node": "10.15.1",

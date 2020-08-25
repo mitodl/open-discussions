@@ -60,9 +60,12 @@ export default function Comment(props: Props) {
   const [commentMenuOpen, setCommentMenuOpen] = useState(false)
 
   const dispatch = useDispatch()
-  const toggleFollowCommentCB = useCallback(toggleFollowComment(dispatch), [
-    dispatch
-  ])
+  const toggleFollowCommentCB = useCallback(
+    comment => {
+      toggleFollowComment(dispatch, comment)
+    },
+    [dispatch]
+  )
 
   const [commentRemoveDialogOpen, setCommentRemoveDialogOpen] = useState(false)
   const [commentDeleteDialogOpen, setCommentDeleteDialogOpen] = useState(false)

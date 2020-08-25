@@ -134,7 +134,7 @@ export function LearningResourceDisplay(props: Props) {
           runId:      bestAvailableRun ? bestAvailableRun.id : null
         })
       ),
-    [dispatch, object]
+    [dispatch, object, bestAvailableRun]
   )
 
   const showListDialog = useCallback(

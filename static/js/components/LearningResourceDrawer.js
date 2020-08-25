@@ -106,7 +106,7 @@ export default function LearningResourceDrawer(props: Props) {
       }
       logInteraction("view", OBJECT_TYPE_MAPPING[objectType], objectId)
     },
-    [objectId, objectType]
+    [objectId, objectType, logInteraction]
   )
 
   useRequest(getResourceRequest(objectId, objectType))

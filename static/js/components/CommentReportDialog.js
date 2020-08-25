@@ -36,7 +36,7 @@ export default function CommentReportDialog(props: Props) {
         })
       )
     },
-    [dispatch]
+    [dispatch, comment, hideDialog]
   )
 
   return (

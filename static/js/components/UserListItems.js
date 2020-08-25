@@ -17,8 +17,8 @@ import { SEARCH_LIST_UI } from "../lib/search"
 import {
   userListItemsRequest,
   updateUserListItemPositionMutation,
-  createUserListItemsSelector,
-  createUserListItemsPageSelector
+  useUserListItemsSelector,
+  useUserListItemsPageSelector
 } from "../lib/queries/user_list_items"
 
 import type { ResourceItem } from "../lib/queries/user_list_items"
@@ -118,7 +118,9 @@ export function UserListItemSortableCards({
   )
   const initialLoadDone = page !== 0 || isFinished
 
-  const { items, count } = useSelector(createUserListItemsSelector(userListId))
+  const userListItemsSelector = useUserListItemsSelector(userListId)
+
+  const { items, count } = useSelector(userListItemsSelector)
 
   return initialLoadDone ? (
     <InfiniteScroll
@@ -156,9 +158,13 @@ export function PaginatedUserListItems({
     userListItemsRequest(userListId, begin, pageSize)
   )
 
-  const { items, count } = useSelector(
-    createUserListItemsPageSelector(userListId, begin, end)
+  const userListItemsPageSelector = useUserListItemsPageSelector(
+    userListId,
+    begin,
+    end
   )
+
+  const { items, count } = useSelector(userListItemsPageSelector)
 
   return isFinished ? (
     <div className="user-list-items">

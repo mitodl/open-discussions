@@ -82,6 +82,8 @@ function ChannelMembersPage(props: Props) {
     runSearch(channelMemberParams(channelName, from, sortField))
     setFrom(from + CHANNEL_MEMBERS_PAGE_SIZE)
     return clearSearch
+    // empty dependencies is to run this effect only on startup, so
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

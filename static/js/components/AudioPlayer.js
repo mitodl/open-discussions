@@ -31,17 +31,20 @@ export default function AudioPlayer() {
     Amplitude.setSongPlayedPercentage((targetTime / duration) * 100)
   }
 
-  const seekBarClick = useCallback((e: Object) => {
-    const { current } = seekBar
-    if (current && current.getBoundingClientRect && current.offsetWidth) {
-      const offset = current.getBoundingClientRect()
-      const offsetWidth = current.offsetWidth
-      const x = e.pageX - offset.left
-      Amplitude.setSongPlayedPercentage(
-        (parseFloat(x) / parseFloat(offsetWidth)) * 100
-      )
-    }
-  })
+  const seekBarClick = useCallback(
+    (e: Object) => {
+      const { current } = seekBar
+      if (current && current.getBoundingClientRect && current.offsetWidth) {
+        const offset = current.getBoundingClientRect()
+        const offsetWidth = current.offsetWidth
+        const x = e.pageX - offset.left
+        Amplitude.setSongPlayedPercentage(
+          (parseFloat(x) / parseFloat(offsetWidth)) * 100
+        )
+      }
+    },
+    [seekBar]
+  )
 
   const stopAudioPlayer = useStopAudioPlayer()
 

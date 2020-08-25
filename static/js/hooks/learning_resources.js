@@ -35,6 +35,9 @@ export function useLearningResourcePermalink() {
         })
       )
     }
+    // dependencies intentionall blank here
+    // this effect should only run on component mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 }
 

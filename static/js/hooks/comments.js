@@ -26,7 +26,7 @@ export const useCommentModeration = (
         })
       )
     },
-    [dispatch]
+    [dispatch, channelName, shouldGetReports]
   )
 
   const removeComment = useCallback(
@@ -42,7 +42,7 @@ export const useCommentModeration = (
         })
       )
     },
-    [dispatch]
+    [dispatch, channelName, shouldGetReports]
   )
 
   const ignoreReports = useCallback(
@@ -54,7 +54,7 @@ export const useCommentModeration = (
         await dispatch(actions.reports.get(channelName))
       }
     },
-    [dispatch]
+    [dispatch, channelName, shouldGetReports]
   )
 
   // ⚠️  this is a destructive action! ⚠️

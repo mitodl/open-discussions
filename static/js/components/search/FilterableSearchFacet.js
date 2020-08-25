@@ -65,14 +65,11 @@ function FilterableSearchFacet(props: Props) {
     [searcher, filterText]
   )
 
-  const handleFilterInput = useCallback(
-    e => {
-      e.preventDefault()
-      const filterText = e.target.value
-      setFilterText(filterText)
-    },
-    [searcher]
-  )
+  const handleFilterInput = useCallback(e => {
+    e.preventDefault()
+    const filterText = e.target.value
+    setFilterText(filterText)
+  }, [])
 
   const titleLineIcon = showFacetList ? "arrow_drop_down" : "arrow_drop_up"
 

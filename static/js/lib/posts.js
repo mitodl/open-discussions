@@ -30,6 +30,7 @@ export const newPostForm = (): PostForm => ({
   show_cover_image: true
 })
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const postFormIsContentless = R.useWith(
   R.equals,
   R.repeat(R.omit(["postType", "title", "show_cover_image"]), 2)

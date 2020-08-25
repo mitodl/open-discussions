@@ -34,6 +34,7 @@ export default function TruncatedText(props: Props) {
   const [currentText, setCurrentText] = useState(text)
   const dotRef = useRef(null)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useLayoutEffect(() => {
     if (text !== currentText) {
       setCurrentText(text)

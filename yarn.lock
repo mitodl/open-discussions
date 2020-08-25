@@ -5413,10 +5413,10 @@ eslint-config-google@^0.13.0:
   resolved "https://registry.yarnpkg.com/eslint-config-google/-/eslint-config-google-0.13.0.tgz#e277d16d2cb25c1ffd3fd13fb0035ad7421382fe"
   integrity sha512-ELgMdOIpn0CFdsQS+FuxO+Ttu4p+aLaXHv9wA9yVnzqlUGV7oN/eRRnJekk7TCur6Cu2FXX0fqfIXRBaM14lpQ==
 
-eslint-config-mitodl@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/eslint-config-mitodl/-/eslint-config-mitodl-0.0.7.tgz#b40dc2f8adc1d2812439914d5da130d35fa19593"
-  integrity sha512-eiB48kpZdGU+cZ0QTYINlZjOuvnrdlk2lX9Wx6i12i5rHo3hcOFPmF09LqOPc5Q+szesz98WF+y/WulLnQKEQg==
+eslint-config-mitodl@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/eslint-config-mitodl/-/eslint-config-mitodl-0.0.8.tgz#7c134e69682a565d644a809fed97312b6141cff9"
+  integrity sha512-HGUfYa3Qa/4EkXohKtoimoXTkbNZn20ieS/j1554bgspjNPnRLKDIbw2Ec7flmR7NZUQlR/WERtrqo59A0wC3A==
 
 eslint-plugin-babel@^5.3.0:
   version "5.3.0"
@@ -5442,6 +5442,11 @@ eslint-plugin-mocha@^6.0.0:
   integrity sha512-Qgy1q64cTKqiHiYP3ZPAcMlEoPejeM7GLKDs2pvYG/fXbVDYDJw7ELlHlbn3147SL9+cPSqat7uCCbbNmVpc1g==
   dependencies:
     ramda "^0.26.1"
+
+eslint-plugin-react-hooks@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-4.1.0.tgz#6323fbd5e650e84b2987ba76370523a60f4e7925"
+  integrity sha512-36zilUcDwDReiORXmcmTc6rRumu9JIM3WjSvV0nclHoUQ0CNrX866EwONvLR/UqaeqFutbAnVu8PEmctdo2SRQ==
 
 eslint-plugin-react@^7.14.3:
   version "7.14.3"

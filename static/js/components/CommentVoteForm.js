@@ -51,7 +51,7 @@ export default function CommentVoteForm(props: Props) {
       }
       setUpvoting(false)
     },
-    [dispatch, setUpvoting, comment]
+    [dispatch, setUpvoting, comment, showErrorBanner]
   )
 
   const downvote = useCallback(
@@ -70,7 +70,7 @@ export default function CommentVoteForm(props: Props) {
       }
       setDownvoting(false)
     },
-    [dispatch, setDownvoting, comment]
+    [dispatch, setDownvoting, comment, showErrorBanner]
   )
 
   const disabled = upvoting || downvoting

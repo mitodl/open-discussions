@@ -58,8 +58,8 @@ export const transformListItem = R.curry(
   })
 )
 
-export const createUserListItemsSelector = (userListId: number) => {
-  return useMemo(
+export const useUserListItemsSelector = (userListId: number) => {
+  const selector = useMemo(
     () => {
       const key = userListItemsKey(userListId)
       return createSelector(
@@ -81,14 +81,15 @@ export const createUserListItemsSelector = (userListId: number) => {
     },
     [userListId]
   )
+  return selector
 }
 
-export const createUserListItemsPageSelector = (
+export const useUserListItemsPageSelector = (
   userListId: number,
   begin: number,
   end: number
 ) => {
-  const itemsSelector = createUserListItemsSelector(userListId)
+  const itemsSelector = useUserListItemsSelector(userListId)
   return useMemo(
     () =>
       createSelector(itemsSelector, ({ items, count }) => ({
