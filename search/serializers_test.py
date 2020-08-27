@@ -359,34 +359,34 @@ def test_es_course_serializer(offered_by, platform):
     else:
         expected_certification = []
 
+    assert_json_equal(serialized["object_type"], COURSE_TYPE)
+    assert_json_equal(serialized["id"], course.id)
+    assert_json_equal(serialized["course_id"], course.course_id)
+    assert_json_equal(serialized["coursenum"], course.course_id.split("+")[-1])
+    assert_json_equal(serialized["short_description"], course.short_description)
+    assert_json_equal(serialized["full_description"], course.full_description)
+    assert_json_equal(serialized["platform"], course.platform)
+    assert_json_equal(serialized["title"], course.title)
+    assert_json_equal(serialized["image_src"], course.image_src)
     assert_json_equal(
-        serialized,
-        {
-            "object_type": COURSE_TYPE,
-            "id": course.id,
-            "course_id": course.course_id,
-            "coursenum": course.course_id.split("+")[-1],
-            "short_description": course.short_description,
-            "full_description": course.full_description,
-            "platform": course.platform,
-            "title": course.title,
-            "image_src": course.image_src,
-            "topics": list(course.topics.values_list("name", flat=True)),
-            "runs": [
-                ESRunSerializer(course_run).data
-                for course_run in course.runs.order_by("-best_start_date")
-            ],
-            "published": True,
-            "offered_by": [offered_by],
-            "created": drf_datetime(course.created_on),
-            "default_search_priority": 1,
-            "minimum_price": minimum_price(course),
-            "resource_relations": {"name": "resource"},
-            "audience": expected_audience,
-            "certification": expected_certification,
-        },
-        sort=True,
+        sorted(serialized["topics"]),
+        sorted(course.topics.values_list("name", flat=True)),
     )
+    assert_json_equal(
+        serialized["runs"],
+        [
+            ESRunSerializer(course_run).data
+            for course_run in course.runs.order_by("-best_start_date")
+        ],
+    )
+    assert_json_equal(serialized["published"], True)
+    assert_json_equal(serialized["offered_by"], [offered_by])
+    assert_json_equal(serialized["created"], drf_datetime(course.created_on))
+    assert_json_equal(serialized["default_search_priority"], 1)
+    assert_json_equal(serialized["minimum_price"], minimum_price(course))
+    assert_json_equal(serialized["resource_relations"], {"name": "resource"})
+    assert_json_equal(serialized["audience"], expected_audience)
+    assert_json_equal(serialized["certification"], expected_certification)
 
 
 @pytest.mark.django_db
