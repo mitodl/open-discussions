@@ -77,20 +77,23 @@ def drf_datetime(dt):
     return dt.isoformat().replace("+00:00", "Z")
 
 
-def _sort_values(dict_like):
+def _sort_values(obj):
     """
-    Sort each value of a dictionary if applicable to the value
+    Sort an object recursively if possible to do so
 
     Args:
-        dict_like (dict): A dict or similar
+        obj (any): A dict, list, or some other JSON type
 
     Returns:
-        dict: A dictionary with sorted values for each value which is a list
+        any: A sorted version of the object passed in, or the same object if no sorting can be done
     """
-    return {
-        key: (sorted(value) if isinstance(value, list) else value)
-        for key, value in dict_like.items()
-    }
+    if isinstance(obj, dict):
+        return {key: _sort_values(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        items = [_sort_values(value) for value in obj]
+        return sorted(items, key=json.dumps)
+    else:
+        return obj
 
 
 def assert_json_equal(obj1, obj2, sort=False):
@@ -106,10 +109,8 @@ def assert_json_equal(obj1, obj2, sort=False):
     converted1 = json.loads(json.dumps(obj1))
     converted2 = json.loads(json.dumps(obj2))
     if sort:
-        if isinstance(converted1, dict):
-            converted1 = _sort_values(converted1)
-        if isinstance(converted2, dict):
-            converted2 = _sort_values(converted2)
+        converted1 = _sort_values(converted1)
+        converted2 = _sort_values(converted2)
     assert converted1 == converted2
 
 
