@@ -77,7 +77,7 @@ def drf_datetime(dt):
     return dt.isoformat().replace("+00:00", "Z")
 
 
-def _sort_values(obj):
+def _sort_values_for_testing(obj):
     """
     Sort an object recursively if possible to do so
 
@@ -88,9 +88,12 @@ def _sort_values(obj):
         any: A sorted version of the object passed in, or the same object if no sorting can be done
     """
     if isinstance(obj, dict):
-        return {key: _sort_values(value) for key, value in obj.items()}
+        return {key: _sort_values_for_testing(value) for key, value in obj.items()}
     elif isinstance(obj, list):
-        items = [_sort_values(value) for value in obj]
+        items = [_sort_values_for_testing(value) for value in obj]
+        # this will produce incorrect results since everything is converted to a string
+        # for example [10, 9] will be sorted like that
+        # but here we only care that the items are compared in a consistent way so tests pass
         return sorted(items, key=json.dumps)
     else:
         return obj
@@ -109,8 +112,8 @@ def assert_json_equal(obj1, obj2, sort=False):
     converted1 = json.loads(json.dumps(obj1))
     converted2 = json.loads(json.dumps(obj2))
     if sort:
-        converted1 = _sort_values(converted1)
-        converted2 = _sort_values(converted2)
+        converted1 = _sort_values_for_testing(converted1)
+        converted2 = _sort_values_for_testing(converted2)
     assert converted1 == converted2
 
 
