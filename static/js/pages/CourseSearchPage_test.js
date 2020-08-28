@@ -538,10 +538,7 @@ describe("CourseSearchPage", () => {
     )
   })
 
-  // THIS IS TEMPORARY UNTIL FULL SEARCH SUPPORT IS IN PLACE!
-  LR_TYPE_ALL.filter(
-    type => type !== LR_TYPE_PODCAST && type !== LR_TYPE_PODCAST_EPISODE
-  ).forEach(resourceType => {
+  LR_TYPE_ALL.forEach(resourceType => {
     it(`overrideObject ${resourceType} is null if not in entities`, async () => {
       const resource = makeLearningResourceResult(resourceType)
       searchResponse.hits.hits[0] = resource
