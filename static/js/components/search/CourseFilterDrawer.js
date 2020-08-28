@@ -28,76 +28,89 @@ type FilterDrawerProps = {
   onUpdateFacets: Function
 }
 
-export function FilterDisplay(props: FilterDrawerProps) {
-  const {
-    activeFacets,
-    clearAllFilters,
-    toggleFacet,
-    facetOptions,
-    onUpdateFacets
-  } = props
+// I had to add a `React.memo` call here because this component
+// was slowing down rendering for the whole page.
+export const FilterDisplay = React.memo<FilterDrawerProps>(
+  function FilterDisplay(props: FilterDrawerProps) {
+    const {
+      activeFacets,
+      clearAllFilters,
+      toggleFacet,
+      facetOptions,
+      onUpdateFacets
+    } = props
 
-  const anyFiltersActive =
-    _.flatten(_.toArray(Object.values(activeFacets))).length > 0
+    const anyFiltersActive =
+      _.flatten(_.toArray(Object.values(activeFacets))).length > 0
 
-  return (
-    <>
-      {anyFiltersActive ? (
-        <div className="active-search-filters">
-          <div className="filter-section-title">
-            Filters
-            <span
-              className="clear-all-filters"
-              onClick={clearAllFilters}
-              onKeyPress={e => {
-                if (e.key === "Enter") {
-                  clearAllFilters()
-                }
-              }}
-              tabIndex="0"
-            >
-              Clear All
-            </span>
+    return (
+      <>
+        {anyFiltersActive ? (
+          <div className="active-search-filters">
+            <div className="filter-section-title">
+              Filters
+              <span
+                className="clear-all-filters"
+                onClick={clearAllFilters}
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    clearAllFilters()
+                  }
+                }}
+                tabIndex="0"
+              >
+                Clear All
+              </span>
+            </div>
+            {facetDisplayMap.map(([name, , labelFunction]) =>
+              (activeFacets[name] || []).map((facet, i) => (
+                <SearchFilter
+                  key={i}
+                  value={facet}
+                  clearFacet={() => toggleFacet(name, facet, false)}
+                  labelFunction={labelFunction}
+                />
+              ))
+            )}
           </div>
-          {facetDisplayMap.map(([name, , labelFunction]) =>
-            (activeFacets[name] || []).map((facet, i) => (
-              <SearchFilter
+        ) : null}
+        {facetDisplayMap.map(
+          ([name, title, labelFunction, useFilterableFacet], i) =>
+            useFilterableFacet ? (
+              <FilterableSearchFacet
                 key={i}
-                value={facet}
-                clearFacet={() => toggleFacet(name, facet, false)}
+                title={title}
+                name={name}
+                results={facetOptions(name)}
+                onUpdate={onUpdateFacets}
+                currentlySelected={activeFacets[name] || []}
                 labelFunction={labelFunction}
               />
-            ))
-          )}
-        </div>
-      ) : null}
-      {facetDisplayMap.map(
-        ([name, title, labelFunction, useFilterableFacet], i) =>
-          useFilterableFacet ? (
-            <FilterableSearchFacet
-              key={i}
-              title={title}
-              name={name}
-              results={facetOptions(name)}
-              onUpdate={onUpdateFacets}
-              currentlySelected={activeFacets[name] || []}
-              labelFunction={labelFunction}
-            />
-          ) : (
-            <SearchFacet
-              key={i}
-              title={title}
-              name={name}
-              results={facetOptions(name)}
-              onUpdate={onUpdateFacets}
-              currentlySelected={activeFacets[name] || []}
-              labelFunction={labelFunction}
-            />
-          )
-      )}
-    </>
-  )
-}
+            ) : (
+              <SearchFacet
+                key={i}
+                title={title}
+                name={name}
+                results={facetOptions(name)}
+                onUpdate={onUpdateFacets}
+                currentlySelected={activeFacets[name] || []}
+                labelFunction={labelFunction}
+              />
+            )
+        )}
+      </>
+    )
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.activeFacets === nextProps.activeFacets &&
+      prevProps.clearAllFilters === nextProps.clearAllFilters &&
+      prevProps.toggleFacet === nextProps.toggleFacet &&
+      prevProps.facetOptions === nextProps.facetOptions &&
+      prevProps.onUpdateFacets === nextProps.onUpdateFacets
+    )
+  }
+)
 
 export default function CourseFilterDrawer(props: FilterDrawerProps) {
   const deviceCategory = useDeviceCategory()

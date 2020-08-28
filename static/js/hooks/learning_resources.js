@@ -46,9 +46,9 @@ export function useSearchResultToFavoriteLR() {
 
   const getFavoriteOrListedObject = useCallback(
     (searchResult: LearningResourceResult) => {
-      const object = searchResultToLearningResource(searchResult)
-      const storedObject = selector(object.id, object.object_type)
-      return storedObject || object
+      const storedObject = selector(searchResult.id, searchResult.object_type)
+      const object = searchResultToLearningResource(searchResult, storedObject)
+      return object
     },
     [selector]
   )

@@ -10,7 +10,7 @@ import {
   DESKTOP
 } from "../lib/constants"
 
-export const useDeviceCategory = () => {
+export const useWidth = () => {
   const [width, setWidth] = useState(getViewportWidth())
 
   useEffect(() => {
@@ -22,6 +22,12 @@ export const useDeviceCategory = () => {
       window.removeEventListener("resize", cb)
     }
   }, [])
+
+  return width
+}
+
+export const useDeviceCategory = () => {
+  const width = useWidth()
 
   if (width <= PHONE_WIDTH) {
     return PHONE

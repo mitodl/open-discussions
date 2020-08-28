@@ -2,47 +2,48 @@
 /* global SETTINGS: false */
 import { assert } from "chai"
 import sinon from "sinon"
-import _ from "lodash"
+import R from "ramda"
 
-import ConnectedCourseSearchPage, { CourseSearchPage } from "./CourseSearchPage"
+import CourseSearchPage from "./CourseSearchPage"
 
 import SearchFacet from "../components/search/SearchFacet"
+import * as LRCardModule from "../components/LearningResourceCard"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
-import {
-  makeCourseResult,
-  makeLearningResourceResult,
-  makeSearchResponse
-} from "../factories/search"
+import { makeSearchResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import {
-  LR_TYPE_ALL,
-  LR_TYPE_COURSE,
-  LR_TYPE_LEARNINGPATH,
-  LR_TYPE_PROGRAM,
-  LR_TYPE_USERLIST,
-  LR_TYPE_VIDEO,
-  LR_TYPE_PODCAST,
-  LR_TYPE_PODCAST_EPISODE
-} from "../lib/constants"
-import { SEARCH_LIST_UI } from "../lib/search"
+import { LR_TYPE_ALL, LR_TYPE_COURSE } from "../lib/constants"
 import { wait } from "../lib/util"
 import {
   deserializeSearchParams,
   serializeSearchParams
 } from "../lib/course_search"
 
+const setLocation = (helper, params) => {
+  const newParams = {
+    text:         params.text ?? "text",
+    activeFacets: R.merge(
+      {
+        audience:      [],
+        certification: [],
+        topics:        [],
+        offered_by:    [],
+        type:          []
+      },
+      params.activeFacets || {}
+    )
+  }
+
+  helper.browserHistory.push(`?${serializeSearchParams(newParams)}`)
+}
+
 describe("CourseSearchPage", () => {
-  let helper,
-    renderPage,
-    searchResponse,
-    initialState,
-    initialProps,
-    searchCourse,
-    replaceStub
+  let helper, render, searchResponse, initialState, searchCourse, replaceStub
 
   beforeEach(() => {
+    helper = new IntegrationTestHelper()
+
     const channel = makeChannel()
     const numHits = 10
     searchResponse = makeSearchResponse(
@@ -52,12 +53,16 @@ describe("CourseSearchPage", () => {
       true
     )
     // Simulate an upvoted post
-    searchCourse = makeCourseResult()
-    searchCourse.course_id = "course_mitx_1"
+    searchCourse = makeSearchResult(LR_TYPE_COURSE)
     searchResponse.hits.hits[0] = searchCourse
-
-    helper = new IntegrationTestHelper()
     helper.searchStub.returns(Promise.resolve(searchResponse))
+
+    helper.stubComponent(
+      LRCardModule,
+      "LearningResourceCard",
+      "LearningResourceCard"
+    )
+
     initialState = {
       channels: {
         data:   new Map([[channel.name, channel]]),
@@ -70,36 +75,22 @@ describe("CourseSearchPage", () => {
         loaded:     true,
         processing: false,
         data:       {
-          results:     searchResponse.hits.hits,
+          results:     searchResponse.hits.hits.map(hit => hit._source),
           facets:      new Map(Object.entries(searchResponse.aggregations)),
           suggest:     ["test"],
           total:       searchResponse.hits.total,
           incremental: false
         }
       },
-      ui: {
-        facets: new Map(Object.entries({ topics: true }))
-      },
       entities: {
         courses: {}
       }
     }
-    initialProps = {
-      match: {
-        params: {}
-      },
-      location: {
-        search: "q=text"
-      },
-      history:         helper.browserHistory,
-      facetVisibility: new Map(Object.entries({ topics: true }))
-    }
 
-    renderPage = helper.configureHOCRenderer(
-      ConnectedCourseSearchPage,
+    render = helper.configureReduxQueryRenderer(
       CourseSearchPage,
-      initialState,
-      initialProps
+      {},
+      initialState
     )
 
     replaceStub = helper.sandbox.spy(helper.browserHistory, "replace")
@@ -110,26 +101,28 @@ describe("CourseSearchPage", () => {
   })
 
   it("renders search results", async () => {
-    const { inner } = await renderPage()
+    const { wrapper } = await render()
+    wrapper.update()
     searchResponse.hits.hits.forEach((result, i) => {
       assert.deepEqual(
-        inner
+        wrapper
           .find("SearchResult")
           .at(i)
           .prop("result"),
-        result
+        result._source
       )
     })
     assert.include(
-      inner.find(".results-count").text(),
+      wrapper.find(".results-count").text(),
       searchResponse.hits.total
     )
   })
 
-  it("renders the Learning Resource facet", async () => {
-    const { inner } = await renderPage()
+  it("renders the  Resource facet", async () => {
+    const { wrapper } = await render()
+    wrapper.update()
     assert.equal(
-      inner
+      wrapper
         .find(SearchFacet)
         .at(2)
         .prop("title"),
@@ -143,26 +136,17 @@ describe("CourseSearchPage", () => {
     ['"mechical enginr"', '"mechanical engineer"']
   ].forEach(([text, suggestion]) => {
     it(`renders suggestion ${suggestion} for query ${text}`, async () => {
-      const { inner } = await renderPage(
-        {
-          search: {
-            data: {
-              suggest: ["mechanical engineer"]
-            }
-          }
-        },
-        {
-          location: {
-            search: `q=${text}`
-          }
-        }
-      )
-      const suggestDiv = inner.find(".suggestion")
+      initialState.search.data.suggest = ["mechanical engineer"]
+      searchResponse.suggest = ["mechanical engineer"]
+      setLocation(helper, { text })
+      const { wrapper } = await render()
+      wrapper.update()
+      const suggestDiv = wrapper.find(".suggestion")
       assert.isOk(suggestDiv.text().includes("Did you mean"))
       assert.isOk(suggestDiv.text().includes(suggestion))
       suggestDiv.find("a").simulate("click")
       await wait(50)
-      const [[{ search }]] = replaceStub.args
+      const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
       assert.equal(search, `q=${escape(suggestion)}`)
     })
   })
@@ -170,37 +154,22 @@ describe("CourseSearchPage", () => {
   //
   ;["", "a"].forEach(query => {
     it(`still runs a search if initial search text is '${query}'`, async () => {
-      await renderPage({
-        search: {
-          loaded:     false,
-          processing: false
-        },
-        location: {
-          search: `q=${query}`
-        }
-      })
-      sinon.assert.calledOnce(helper.searchStub)
+      setLocation(helper, { text: query })
+      await render()
+      sinon.assert.called(helper.searchStub)
     })
   })
 
   it("loads more results", async () => {
     SETTINGS.search_page_size = 5
-    const { wrapper, inner } = await renderPage({
-      search: {
-        processing: false,
-        loaded:     true
-      },
-      location: {
-        search: `q=text`
-      }
-    })
-    await inner.find("InfiniteScroll").prop("loadMore")()
-    wait(10)
+    const { wrapper } = await render()
+    wrapper.update()
+    await wrapper.find("InfiniteScroll").prop("loadMore")()
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
-      text:        "text",
+      text:        undefined,
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
@@ -215,31 +184,19 @@ describe("CourseSearchPage", () => {
     wrapper.update()
     // from is 5, plus 5 is 10 which is == numHits so no more results
     assert.isFalse(wrapper.find("InfiniteScroll").prop("hasMore"))
-    assert.deepEqual(inner.state(), {
-      // Because this is non-incremental the previous from value of 7 is replaced with 0
-      error:              null,
-      from:               5,
-      incremental:        true,
-      searchResultLayout: SEARCH_LIST_UI
-    })
   })
 
-  //
   it("searches with parameters", async () => {
     SETTINGS.search_page_size = 5
-    await renderPage(
-      {
-        search: {
-          processing: false,
-          loaded:     false
-        }
-      },
-      {
-        location: {
-          search: "q=text&o=OCW&t=Science&t=Engineering"
-        }
+    setLocation(helper, {
+      text:         "text",
+      activeFacets: {
+        topics:     ["Science", "Engineering"],
+        offered_by: ["OCW"]
       }
-    )
+    })
+
+    await render()
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        0,
@@ -258,22 +215,20 @@ describe("CourseSearchPage", () => {
     })
   })
 
-  //
   it("searches for podcast episodes when the type parameter is podcast", async () => {
     SETTINGS.search_page_size = 5
-    await renderPage(
-      {
-        search: {
-          processing: false,
-          loaded:     false
-        }
-      },
-      {
-        location: {
-          search: "q=text&type=podcast"
-        }
+    setLocation(helper, {
+      text:         "text",
+      activeFacets: {
+        audience:      [],
+        certification: [],
+        topics:        [],
+        offered_by:    [],
+        type:          ["podcast"]
       }
-    )
+    })
+
+    await render()
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        0,
@@ -294,20 +249,19 @@ describe("CourseSearchPage", () => {
 
   //
   it("searches for learning path when the type parameter is userlist", async () => {
-    SETTINGS.search_page_size = 5
-    await renderPage(
-      {
-        search: {
-          processing: false,
-          loaded:     false
-        }
-      },
-      {
-        location: {
-          search: "q=text&type=userlist"
-        }
+    setLocation(helper, {
+      text:         "text",
+      activeFacets: {
+        audience:      [],
+        certification: [],
+        topics:        [],
+        offered_by:    [],
+        type:          ["userlist"]
       }
-    )
+    })
+
+    SETTINGS.search_page_size = 5
+    await render()
     sinon.assert.calledWith(helper.searchStub, {
       channelName: null,
       from:        0,
@@ -327,93 +281,71 @@ describe("CourseSearchPage", () => {
   })
 
   //
-  ;[0, 5].forEach(from => {
-    it(`InfiniteScroll initialLoad ${shouldIf(
-      from > 0
-    )} be false when from is ${from}`, async () => {
-      const { wrapper, inner } = await renderPage()
-      inner.setState({ from })
-      const infiniteScroll = wrapper.find("InfiniteScroll")
-      assert.equal(infiniteScroll.prop("initialLoad"), from === 0)
-    })
-  })
-
-  //
-  ;[
-    [true, false, false],
-    [false, true, true],
-    [false, false, true],
-    [true, true, true]
-  ].forEach(([loaded, processing, shouldShowPostloading]) => {
-    it(`shows the UI we expect when processing = ${String(
-      processing
-    )} and loaded = ${String(loaded)}`, async () => {
-      const { inner } = await renderPage(
-        {
-          search: {
-            processing: processing,
-            loaded:     loaded
-          }
-        },
-        {
-          location: {
-            search: "q=text"
-          }
-        }
-      )
-      assert.equal(
-        inner.find("CourseSearchLoading").exists(),
+  ;[[true, false, false], [false, true, true], [true, true, true]].forEach(
+    ([loaded, processing, shouldShowPostloading]) => {
+      it(`${shouldIf(
         shouldShowPostloading
-      )
-      assert.equal(inner.find(".results-count").exists(), !processing)
-    })
-  })
+      )} show the loading UI when processing = ${String(
+        processing
+      )} and loaded = ${String(loaded)}`, async () => {
+        let resolver
+        helper.searchStub.returns(
+          new Promise(resolve => {
+            resolver = () => {
+              resolve(searchResponse)
+            }
+          })
+        )
+        initialState.search.loaded = loaded
+        initialState.search.processing = processing
+        const { wrapper } = await render()
+
+        if (!processing && loaded) {
+          // $FlowFixMe
+          await resolver()
+          await wait(10)
+        }
+        wrapper.update()
+        assert.equal(
+          wrapper.find("CourseSearchLoading").exists(),
+          shouldShowPostloading
+        )
+        assert.equal(wrapper.find(".results-count").exists(), !processing)
+      })
+    }
+  )
 
   it("shows a message saying there are no results", async () => {
-    const { inner } = await renderPage(
-      {
-        search: {
-          data: {
-            results: [],
-            total:   0
-          }
-        }
-      },
-      {
-        location: {
-          search: "q=fghgfh"
-        }
-      }
-    )
+    searchResponse.hits.total = 0
+    const { wrapper } = await render()
+    wrapper.update()
     assert.equal(
-      inner.find(".empty-list-msg").text(),
+      wrapper.find(".empty-list-msg").text(),
       "There are no results to display."
     )
   })
 
   it("uses the query parameter value as a default for the textbox", async () => {
     const text = "xyz"
-    const { inner } = await renderPage(
-      {},
-      {
-        location: {
-          search: `q=${text}`
-        }
-      }
-    )
-    assert.equal(inner.find("CourseSearchbox").prop("value"), text)
+    setLocation(helper, { text })
+    const { wrapper } = await render()
+    assert.equal(wrapper.find("CourseSearchbox").prop("value"), text)
   })
 
-  it("updates the textbox", async () => {
-    const { inner } = await renderPage()
+  it("updates the textbox, and echoes to URL bar on search", async () => {
+    const { wrapper } = await render()
     const text = "newwwww text"
-    inner.find("CourseSearchbox").prop("onChange")({
+    wrapper.find("CourseSearchbox").prop("onChange")({
       target: {
         value: text
       }
     })
-    await wait(10)
-    const [[{ search }]] = replaceStub.args
+    wrapper.update()
+    wrapper.find("CourseSearchbox").prop("onSubmit")({
+      preventDefault: helper.sandbox.stub()
+    })
+    await wait(1)
+    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
     assert.equal(search, `q=${escape(text)}`)
   })
 
@@ -424,39 +356,27 @@ describe("CourseSearchPage", () => {
       topics:     ["Science", "Law"],
       type:       LR_TYPE_ALL
     }
-    const search = serializeSearchParams({ text, activeFacets })
-    const { wrapper } = await renderPage(
-      {},
-      {
-        location: { search }
-      }
-    )
+    setLocation(helper, { text, activeFacets })
+    const { wrapper } = await render()
     wrapper.find(".clear-all-filters").simulate("click")
-    const newSearch = replaceStub.args[0][0].search
-    assert.deepEqual(newSearch, "")
+    await wait(1)
+    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
+    assert.deepEqual(search, "")
   })
 
   it("triggers a non-incremental search from textbox input", async () => {
-    const { inner } = await renderPage(
-      {},
-      {
-        location: {
-          search: "type=course"
-        }
-      }
-    )
+    const { wrapper } = await render()
     const text = "some other text"
-    const searchBox = inner.find("CourseSearchbox")
+    const searchBox = wrapper.find("CourseSearchbox")
     searchBox.prop("onChange")({
       target: { value: text }
     })
-    searchBox.prop("onSubmit")({
+    wrapper.update()
+    wrapper.find("CourseSearchbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
-    await wait(10)
-
-    const search = replaceStub.args[0][0].search
-
+    await wait(1)
+    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
@@ -464,25 +384,16 @@ describe("CourseSearchPage", () => {
         certification: [],
         topics:        [],
         offered_by:    [],
-        type:          ["course"]
+        type:          []
       }
     })
   })
 
   it("triggers a non-incremental search when the facet changes", async () => {
     const text = "new text"
-    const { inner } = await renderPage(
-      {},
-      {
-        location: {
-          search: serializeSearchParams({ text, activeFacets: {} })
-        }
-      }
-    )
-    helper.searchStub.reset()
-    inner.setState({ from: 7 })
-    // inner.find("CourseFilterDrawer").dive()
-    inner
+    setLocation(helper, { text })
+    const { wrapper } = await render()
+    wrapper
       .find(SearchFacet)
       .at(1)
       .props()
@@ -490,7 +401,7 @@ describe("CourseSearchPage", () => {
         target: { name: "topics", value: "Physics", checked: true }
       })
     await wait(10)
-    const search = replaceStub.args[0][0].search
+    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
 
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
@@ -504,95 +415,45 @@ describe("CourseSearchPage", () => {
     })
   })
 
-  it("does not trigger a search if no search parameters were changed", async () => {
-    const { inner } = await renderPage()
-    helper.searchStub.reset()
-    inner.setState({
-      text:         inner.state().text,
-      activeFacets: inner.state().activeFacets
-    })
-    sinon.assert.notCalled(helper.searchStub)
-  })
-
   it("facetOptions adds any selected facets not in results to the group", async () => {
-    const { inner } = await renderPage(
-      {},
-      {
-        location: {
-          search: serializeSearchParams({
-            text:         "some text",
-            activeFacets: {
-              audience:      [],
-              certification: [],
-              offered_by:    [],
-              topics:        ["NewTopic"]
-            }
-          })
+    helper.browserHistory.push({
+      search: serializeSearchParams({
+        text:         "some text",
+        activeFacets: {
+          audience:      [],
+          certification: [],
+          offered_by:    [],
+          topics:        ["NewTopic"]
         }
-      }
-    )
-
-    const mergedFacets = inner.instance().facetOptions("topics")
-    assert.isTrue(
-      _.findIndex(mergedFacets.buckets, { doc_count: 0, key: "NewTopic" }) > -1
-    )
+      })
+    })
+    const { wrapper } = await render()
+    wrapper.update()
+    const { topics } = wrapper.find("CourseFilterDrawer").prop("activeFacets")
+    assert.deepEqual(topics, ["NewTopic"])
   })
 
-  LR_TYPE_ALL.forEach(resourceType => {
-    it(`overrideObject ${resourceType} is null if not in entities`, async () => {
-      const resource = makeLearningResourceResult(resourceType)
-      searchResponse.hits.hits[0] = resource
-      helper.searchStub.returns(Promise.resolve(searchResponse))
-      const { inner } = await renderPage()
-      assert.equal(
-        inner
-          .find("SearchResult")
-          .at(0)
-          .prop("overrideObject"),
-        null
-      )
-    })
-  })
-
-  LR_TYPE_ALL.forEach(resourceType => {
-    it(`overrides ${resourceType} search results for is_favorite and lists with values from entities`, async () => {
-      const resource = makeLearningResourceResult(resourceType)
-      // Conditional to prevent flow from whining about an undefined resource
-      if (resource) {
-        const entity = {
-          [resource.id]: {
-            is_favorite: !resource.is_favorite,
-            lists:       [9121, 9124, 9129]
-          }
+  it("toggleFacet should let you turn off an active facet", async () => {
+    helper.browserHistory.push({
+      search: serializeSearchParams({
+        text:         "some text",
+        activeFacets: {
+          audience:      [],
+          certification: [],
+          offered_by:    [],
+          topics:        ["NewTopic"]
         }
-        searchResponse.hits.hits[0] = resource
-        helper.searchStub.returns(Promise.resolve(searchResponse))
-        const { inner } = await renderPage({
-          entities: {
-            courses:         resourceType === LR_TYPE_COURSE ? entity : {},
-            videos:          resourceType === LR_TYPE_VIDEO ? entity : {},
-            programs:        resourceType === LR_TYPE_PROGRAM ? entity : {},
-            podcasts:        resourceType === LR_TYPE_PODCAST ? entity : {},
-            podcastEpisodes:
-              resourceType === LR_TYPE_PODCAST_EPISODE ? entity : {},
-            userLists: [LR_TYPE_USERLIST, LR_TYPE_LEARNINGPATH].includes(
-              resourceType
-            )
-              ? entity
-              : {}
-          }
-        })
-
-        const overrideObject = inner
-          .find("SearchResult")
-          .at(0)
-          .prop("overrideObject")
-        assert.equal(
-          overrideObject.is_favorite,
-          entity[resource.id].is_favorite
-        )
-        assert.deepEqual(overrideObject.lists, entity[resource.id].lists)
-      }
+      })
     })
+    const { wrapper } = await render()
+    wrapper.update()
+    wrapper.find("CourseFilterDrawer").prop("toggleFacet")(
+      "topics",
+      "NewTopic",
+      false
+    )
+    wrapper.update()
+    const { topics } = wrapper.find("CourseFilterDrawer").prop("activeFacets")
+    assert.deepEqual(topics, [])
   })
 })

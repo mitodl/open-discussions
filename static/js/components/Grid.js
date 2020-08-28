@@ -34,7 +34,7 @@ const ten: 10 = 10
 const eleven: 11 = 11
 const twelve: 12 = 12
 
-type CellWidth =
+export type CellWidth =
   | typeof one
   | typeof two
   | typeof three

@@ -1,6 +1,4 @@
-import React from "react"
 import { assert } from "chai"
-import { shallow } from "enzyme"
 
 import { LearningResourceCard } from "./LearningResourceCard"
 import SearchResult from "./SearchResult"
@@ -11,7 +9,6 @@ import {
   makeProfileResult,
   makeLearningResourceResult
 } from "../factories/search"
-import { makeLearningResource } from "../factories/learning_resources"
 import {
   searchResultToComment,
   searchResultToLearningResource,
@@ -21,22 +18,38 @@ import {
 import { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 import { profileURL } from "../lib/url"
 import { LR_TYPE_COURSE, LR_TYPE_PROGRAM } from "../lib/constants"
+import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("SearchResult", () => {
-  const render = (result, props = {}) =>
-    shallow(<SearchResult result={result} {...props} />)
+  let helper, render
 
-  it("renders a profile card", () => {
+  beforeEach(() => {
+    helper = new IntegrationTestHelper()
+    render = helper.configureReduxQueryRenderer(SearchResult)
+  })
+
+  afterEach(() => {
+    helper.cleanup()
+  })
+
+  it("renders a profile card", async () => {
     const result = makeProfileResult()
-    const wrapper = render(result).dive()
+    const { wrapper } = await render({ result })
     const profile = searchResultToProfile(result)
     const profileImage = wrapper.find("Connect(ProfileImage)")
     assert.deepEqual(profileImage.prop("profile"), profile)
     assert.equal(profileImage.prop("imageSize"), PROFILE_IMAGE_SMALL)
-    assert.equal(wrapper.find(".name").prop("to"), profileURL(profile.username))
     assert.equal(
       wrapper
         .find(".name")
+        .at(0)
+        .prop("to"),
+      profileURL(profile.username)
+    )
+    assert.equal(
+      wrapper
+        .find(".name")
+        .at(0)
         .children()
         .text(),
       profile.name
@@ -50,34 +63,34 @@ describe("SearchResult", () => {
     )
   })
 
-  it("renders a post", () => {
+  it("renders a post", async () => {
     const result = makePostResult()
-    const wrapper = render(result).dive()
+    const { wrapper } = await render({ result })
     const post = searchResultToPost(result)
     const postDisplay = wrapper.find("Connect(CompactPostDisplay)")
     assert.deepEqual(postDisplay.prop("post"), post)
   })
 
-  it("renders an upvoted post", () => {
+  it("renders an upvoted post", async () => {
     const result = makePostResult()
     const post = searchResultToPost(result)
     const upvotedPost = Object.assign({}, post)
     upvotedPost.upvoted = true
     upvotedPost.score += 1
-    const wrapper = render(result, { upvotedPost }).dive()
+    const { wrapper } = await render({ result, upvotedPost })
     const postDisplay = wrapper.find("Connect(CompactPostDisplay)")
     assert.deepEqual(postDisplay.prop("post"), upvotedPost)
   })
 
-  it("renders a comment", () => {
+  it("renders a comment", async () => {
     const result = makeCommentResult()
-    const wrapper = render(result).dive()
+    const { wrapper } = await render({ result })
     const comment = searchResultToComment(result)
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [comment])
   })
 
-  it("renders a comment that has been voted on", () => {
+  it("renders a comment that has been voted on", async () => {
     const result = makeCommentResult()
     const comment = searchResultToComment(result)
     const votedComment = {
@@ -85,31 +98,19 @@ describe("SearchResult", () => {
       upvoted: true,
       score:   (comment.score += 1)
     }
-    const wrapper = render(result, { votedComment }).dive()
+    const { wrapper } = await render({ result, votedComment })
     const commentTree = wrapper.find("CommentTree")
     assert.deepEqual(commentTree.prop("comments"), [votedComment])
   })
 
   //
   ;[LR_TYPE_COURSE, LR_TYPE_PROGRAM].forEach(objectType => {
-    it(`renders a ${objectType}`, () => {
+    it(`renders a ${objectType}`, async () => {
       const result = makeLearningResourceResult(objectType)
       const object = searchResultToLearningResource(result)
-      const wrapper = render(result).dive()
+      const { wrapper } = await render({ result })
       const resourceDisplay = wrapper.find(LearningResourceCard)
       assert.deepEqual(resourceDisplay.prop("object"), object)
-    })
-
-    it(`should pass down an override ${objectType}, if passed one`, () => {
-      const result = makeLearningResourceResult(objectType)
-      const overrideObject = makeLearningResource(objectType)
-      const resourceCard = render(result, { overrideObject })
-        .dive()
-        .find(LearningResourceCard)
-      assert.deepEqual(
-        resourceCard.prop("object"),
-        searchResultToLearningResource(result, overrideObject)
-      )
     })
   })
 })

@@ -10,13 +10,13 @@ import ProfileImage, { PROFILE_IMAGE_SMALL } from "./ProfileImage"
 
 import {
   searchResultToComment,
-  searchResultToLearningResource,
   searchResultToPost,
   searchResultToProfile
 } from "../lib/search"
 import { commentPermalink, profileURL } from "../lib/url"
 import { dropdownMenuFuncs } from "../lib/ui"
 import { LR_TYPE_ALL } from "../lib/constants"
+import { useSearchResultToFavoriteLR } from "../hooks/learning_resources"
 
 import type {
   LearningResourceResult,
@@ -94,14 +94,14 @@ type LearningResourceProps = {
 
 const LearningResourceSearchResult = ({
   result,
-  overrideObject,
   searchResultLayout
 }: LearningResourceProps) => {
   // $FlowFixMe: this should only be used for courses
+  const searchResultToFavoriteLR = useSearchResultToFavoriteLR()
 
   return (
     <LearningResourceCard
-      object={searchResultToLearningResource(result, overrideObject)}
+      object={searchResultToFavoriteLR(result)}
       searchResultLayout={searchResultLayout}
     />
   )
@@ -118,7 +118,6 @@ type Props = {
     objectType: string,
     runId: ?number
   }) => void,
-  overrideObject?: Object,
   searchResultLayout?: string
 }
 export default class SearchResult extends React.Component<Props> {
@@ -130,7 +129,6 @@ export default class SearchResult extends React.Component<Props> {
       commentUpvote,
       commentDownvote,
       setShowResourceDrawer,
-      overrideObject,
       searchResultLayout
     } = this.props
     if (result.object_type === "post") {
@@ -167,7 +165,6 @@ export default class SearchResult extends React.Component<Props> {
         <LearningResourceSearchResult
           result={result}
           setShowResourceDrawer={setShowResourceDrawer}
-          overrideObject={overrideObject}
           searchResultLayout={searchResultLayout}
         />
       )
