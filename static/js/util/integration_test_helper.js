@@ -77,6 +77,7 @@ export default class IntegrationTestHelper {
 
     this.scrollIntoViewStub = this.sandbox.stub()
     this.scrollStub = this.sandbox.stub()
+    // mock debounce to execute without a delay, so that code runs before test completes
     this.debounceStub = this.sandbox
       .stub(_, "debounce")
       .callsFake((func: Function) => () => func())
