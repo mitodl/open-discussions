@@ -52,7 +52,8 @@ def test_mock_response():
     content = "test"
     response = MockResponse(content, 404)
     assert response.status_code == 404
-    assert response.content == content
+    assert response.decoded_content == content
+    assert response.content == content.encode("utf-8")
 
 
 def test_pickleable_mock():

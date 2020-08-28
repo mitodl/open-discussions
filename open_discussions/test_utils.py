@@ -5,6 +5,8 @@ from contextlib import contextmanager
 import traceback
 from unittest.mock import Mock
 
+from django.http.response import HttpResponse
+
 import pytest
 
 
@@ -50,18 +52,25 @@ def assert_not_raises():
         pytest.fail(f"An exception was not raised: {traceback.format_exc()}")
 
 
-class MockResponse:
+class MockResponse(HttpResponse):
     """
-    Mock requests.Response
+    Mocked HTTP response object that can be used as a stand-in for request.Response and
+    django.http.response.HttpResponse objects
     """
 
     def __init__(self, content, status_code):
-        self.content = content
+        """
+        Args:
+            content (str): The response content
+            status_code (int): the response status code
+        """
         self.status_code = status_code
+        self.decoded_content = content
+        super().__init__(content=(content or "").encode("utf-8"), status=status_code)
 
     def json(self):
         """ Return content as json """
-        return json.loads(self.content)
+        return json.loads(self.decoded_content)
 
 
 def drf_datetime(dt):
