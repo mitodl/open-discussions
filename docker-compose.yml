@@ -72,6 +72,7 @@ services:
       python3 manage.py migrate --no-input &&
       python3 manage.py createcachetable &&
       uwsgi uwsgi.ini --honour-stdin'
+    stdin_open: true
     tty: true
     ports:
       - "8061:8061"

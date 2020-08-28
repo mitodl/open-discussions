@@ -686,24 +686,35 @@ def test_login_complete(
         assert settings.OPEN_DISCUSSIONS_COOKIE_NAME not in response.cookies
 
 
-class DjoserViewTests:
+class TestDjoserViews:
     """Tests for views that modify Djoser views"""
 
     # pylint: disable=too-many-arguments
     @pytest.mark.parametrize(
-        "url", ["password-reset-api", "password-reset-confirm-api", "set-password-api"]
+        "url,patch_view_method",
+        [
+            ("password-reset-api", "reset_password"),
+            ("password-reset-confirm-api", "reset_password_confirm"),
+            ("set-password-api", "set_password"),
+        ],
     )
-    def test_password_reset_coerce_204(self, mocker, client, user, url):
+    def test_password_reset_coerce_204(
+        self, mocker, client, user, url, patch_view_method
+    ):
         """
         Verify that password reset views coerce a 204 response to a 200 in order
         to play nice with redux-hammock.
         """
-        mocker.patch(
-            "authentication.views.ActionViewMixin.post",
-            return_value=mocker.Mock(status_code=status.HTTP_400_BAD_REQUEST),
+        mock_response = MockResponse(
+            content=None, status_code=status.HTTP_204_NO_CONTENT
+        )
+        patched_base_method = mocker.patch(
+            "authentication.views.UserViewSet.{}".format(patch_view_method),
+            return_value=mock_response,
         )
         client.force_login(user)
         response = client.post(reverse(url), {})
+        patched_base_method.assert_called_once()
         assert response.status_code == status.HTTP_200_OK
         assert response.json() == {}
 
@@ -722,9 +733,9 @@ class DjoserViewTests:
         Tests that the password change view updates the Django session when the
         request succeeds.
         """
+        mock_response = MockResponse(content=None, status_code=response_status)
         mocker.patch(
-            "authentication.views.ActionViewMixin.post",
-            return_value=mocker.Mock(status_code=response_status),
+            "authentication.views.UserViewSet.set_password", return_value=mock_response
         )
         update_session_patch = mocker.patch(
             "authentication.views.update_session_auth_hash", return_value=mocker.Mock()
