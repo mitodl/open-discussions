@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.141.0
+---------------
+
+- Fixed password reset
+- Fix flaky test (#3122)
+- update to latest version of our eslint config
+
 Version 0.140.1 (Released August 27, 2020)
 ---------------
 
