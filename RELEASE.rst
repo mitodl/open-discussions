@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.141.0
+Version 0.141.0 (Released August 31, 2020)
 ---------------
 
 - Fixed password reset
