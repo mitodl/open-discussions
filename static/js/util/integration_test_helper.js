@@ -9,6 +9,7 @@ import configureStore from "redux-mock-store"
 import thunk from "redux-thunk"
 import { Provider } from "react-redux"
 import { Provider as ReduxQueryProvider } from "redux-query-react"
+import _ from "lodash"
 
 import Router, { routes } from "../Router"
 
@@ -76,6 +77,10 @@ export default class IntegrationTestHelper {
 
     this.scrollIntoViewStub = this.sandbox.stub()
     this.scrollStub = this.sandbox.stub()
+    // mock debounce to execute without a delay, so that code runs before test completes
+    this.debounceStub = this.sandbox
+      .stub(_, "debounce")
+      .callsFake((func: Function) => () => func())
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLFieldSetElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLDivElement.prototype.scroll = this.scrollStub

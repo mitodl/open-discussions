@@ -7,7 +7,6 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import _ from "lodash"
 import { compose } from "redux"
-import debounce from "lodash/debounce"
 
 import CanonicalLink from "../components/CanonicalLink"
 import { Cell, Grid } from "../components/Grid"
@@ -252,7 +251,7 @@ export class CourseSearchPage extends React.Component<Props, State> {
     })
   }
 
-  debouncedRunSearch = debounce(this.runSearch, 500)
+  debouncedRunSearch = _.debounce(this.runSearch, 500)
 
   setSearchUI = (searchResultLayout: string) => {
     this.setState({

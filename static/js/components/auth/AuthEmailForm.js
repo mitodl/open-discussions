@@ -3,7 +3,7 @@
 import React from "react"
 import ReCAPTCHA from "react-google-recaptcha"
 import styled from "styled-components"
-import debounce from "lodash/debounce"
+import _ from "lodash"
 
 import { validationMessage } from "../../lib/validation"
 
@@ -34,7 +34,7 @@ class AuthEmailForm extends React.Component<Props, State> {
     super(props)
     this.recaptcha = null
     // only rescale up to 4x a second to salvage some performance
-    this.scaleRecaptcha = debounce(this.scaleRecaptcha.bind(this), 250)
+    this.scaleRecaptcha = _.debounce(this.scaleRecaptcha.bind(this), 250)
     this.state = {
       recaptchaScale: 1.0
     }

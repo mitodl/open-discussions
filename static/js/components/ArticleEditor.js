@@ -2,7 +2,7 @@
 // @flow
 import React from "react"
 import CustomEditor from "@mitodl/ckeditor-custom-build"
-import debounce from "lodash/debounce"
+import _ from "lodash"
 
 import { getCKEditorJWT } from "../lib/api/ckeditor"
 import { loadEmbedlyPlatform, renderEmbedlyCard } from "../lib/embed"
@@ -57,7 +57,7 @@ export default class ArticleEditor extends React.Component<Props> {
         editor.model.document.on(
           "change:data",
           // editor.getData() is kind of expensive so we debounce
-          debounce(() => {
+          _.debounce(() => {
             if (onChange) {
               onChange(editor.getData())
             }
