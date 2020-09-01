@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.141.1
+---------------
+
+- Mock debounce to try to fix flaky tests (#3129)
+
 Version 0.141.0 (Released August 31, 2020)
 ---------------
 
