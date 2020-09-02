@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.141.2
+---------------
+
+- correct typo in "Mechanical Engineering" (#3126)
+
 Version 0.141.1 (Released September 02, 2020)
 ---------------
 
