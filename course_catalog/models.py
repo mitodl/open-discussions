@@ -288,6 +288,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)
+    department = models.CharField(max_length=256, null=True, blank=True)
 
     runs = GenericRelation(LearningResourceRun)
 

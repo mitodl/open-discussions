@@ -20,6 +20,7 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
+from course_catalog.etl.ocw import OCW_DEPARTMENT_CODE_TO_NAME
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -463,7 +464,18 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
 
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
+    department_name = serializers.SerializerMethodField()
+
     default_search_priority = serializers.SerializerMethodField()
+
+    def get_department_name(self, course):
+        """
+        Convert course number to course name
+        """
+        if course.department in OCW_DEPARTMENT_CODE_TO_NAME.keys():
+            return OCW_DEPARTMENT_CODE_TO_NAME[course.department]
+        else:
+            return None
 
     def get_coursenum(self, course):
         """
@@ -503,6 +515,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "minimum_price",
             "audience",
             "certification",
+            "department_name",
         ]
 
         read_only_fields = fields

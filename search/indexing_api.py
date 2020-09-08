@@ -193,6 +193,7 @@ COURSE_OBJECT_TYPE = {
     "full_description": ENGLISH_TEXT_FIELD,
     "platform": {"type": "keyword"},
     "published": {"type": "boolean"},
+    "department_name": {"type": "keyword"},
 }
 
 

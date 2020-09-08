@@ -333,6 +333,7 @@ class OCWSerializer(CourseSerializer):
             {"name": topic_name}
             for topic_name in get_ocw_topics(data.get("course_collections"))
         ]
+
         course_fields = {
             "course_id": data.get("course_id"),
             "title": data.get("title"),
@@ -344,6 +345,7 @@ class OCWSerializer(CourseSerializer):
             "raw_json": data.get("raw_json"),
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "platform": PlatformType.ocw.value,
+            "department": data.get("department_number"),
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
