@@ -5,9 +5,9 @@ import React, { useState, useEffect, useCallback } from "react"
 import InfiniteScroll from "react-infinite-scroller"
 import { useSelector, useDispatch } from "react-redux"
 import { MetaTags } from "react-meta-tags"
-import _ from "lodash"
-import { useLocation, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { createSelector } from "reselect"
+import { useCourseSearch } from "@mitodl/course-search-utils"
 
 import CanonicalLink from "../components/CanonicalLink"
 import { Cell, Grid } from "../components/Grid"
@@ -25,28 +25,13 @@ import CourseFilterDrawer from "../components/search/CourseFilterDrawer"
 import { actions } from "../actions"
 import { clearSearch } from "../actions/search"
 import {
-  LR_TYPE_ALL,
-  LR_TYPE_LEARNINGPATH,
-  LR_TYPE_USERLIST,
-  LR_TYPE_PODCAST,
-  LR_TYPE_PODCAST_EPISODE
-} from "../lib/constants"
-import {
   emptyOrNil,
   preventDefaultAndInvoke,
   GRID_MOBILE_BREAKPOINT,
   isDoubleQuoted
 } from "../lib/util"
-import {
-  mergeFacetResults,
-  SEARCH_GRID_UI,
-  SEARCH_LIST_UI
-} from "../lib/search"
+import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
-import {
-  deserializeSearchParams,
-  serializeSearchParams
-} from "../lib/course_search"
 import { useResponsive, useWidth } from "../hooks/util"
 
 import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
@@ -65,14 +50,6 @@ export type CourseSearchParams = {
 }
 
 const THREE_CARD_BREAKPOINT = 1100
-
-const INITIAL_FACET_STATE = {
-  audience:      [],
-  certification: [],
-  offered_by:    [],
-  topics:        [],
-  type:          []
-}
 
 const courseSearchSelector = createSelector(
   state => state.search,
@@ -167,11 +144,7 @@ export default function CourseSearchPage(props: Props) {
     error
   } = useSelector(courseSearchSelector)
 
-  const [incremental, setIncremental] = useState(false)
   const [searchResultLayout, setSearchResultLayout] = useState(SEARCH_LIST_UI)
-  const [from, setFrom] = useState(0)
-  const [text, setText] = useState("")
-  const [activeFacets, setActiveFacets] = useState(INITIAL_FACET_STATE)
 
   const dispatch = useDispatch()
 
@@ -184,158 +157,56 @@ export default function CourseSearchPage(props: Props) {
   )
 
   useResponsive()
-  const location = useLocation()
-  const history = useHistory()
-
-  const facetOptions = useCallback(
-    (group: string) => {
-      const emptyFacet = { buckets: [] }
-      const emptyActiveFacets = {
-        buckets: (activeFacets[group] || []).map(facet => ({
-          key:       facet,
-          doc_count: 0
-        }))
-      }
-
-      if (!facets) {
-        return null
-      }
-
-      return mergeFacetResults(
-        facets.get(group) || emptyFacet,
-        emptyActiveFacets
-      )
-    },
-    [facets, activeFacets]
-  )
 
   const runSearch = useCallback(
-    async (text, activeFacets, incremental = false) => {
-      let nextFrom = from + SETTINGS.search_page_size
-
-      if (!incremental) {
-        clearSearchCB()
-        nextFrom = 0
-      }
-      setFrom(nextFrom)
-      setIncremental(incremental)
-
-      const searchFacets = R.clone(activeFacets)
-
-      if (emptyOrNil(searchFacets.type)) {
-        searchFacets.type = LR_TYPE_ALL
-      } else {
-        if (searchFacets.type.includes(LR_TYPE_PODCAST)) {
-          searchFacets.type.push(LR_TYPE_PODCAST_EPISODE)
-        }
-
-        if (searchFacets.type.includes(LR_TYPE_USERLIST)) {
-          searchFacets.type.push(LR_TYPE_LEARNINGPATH)
-        }
-      }
-
+    async (text, searchFacets, from) => {
       await dispatch(
         actions.search.post({
           channelName: null,
           text,
           type:        searchFacets.type,
           facets:      new Map(Object.entries(searchFacets)),
-          from:        nextFrom,
+          from,
           size:        SETTINGS.search_page_size
         })
       )
+    },
+    [dispatch]
+  )
 
-      // search is updated, now echo params to URL bar
+  const history = useHistory()
+
+  const updateURLBar = useCallback(
+    search => {
       history.replace({
-        pathname: location.pathname,
-        search:   serializeSearchParams({
-          text,
-          activeFacets
-        })
+        pathname: window.location.pathname,
+        search
       })
     },
-    [from, location, history, setFrom, setIncremental, clearSearchCB, dispatch]
+    [history]
   )
 
-  const loadMore = useCallback(
-    () => {
-      if (!loaded) {
-        // this function will be triggered repeatedly by <InfiniteScroll />, filter it to just once at a time
-        return
-      }
-
-      runSearch(text, activeFacets, true)
-    },
-    [runSearch, loaded, text, activeFacets]
-  )
-
-  const clearAllFilters = useCallback(
-    () => {
-      setText(null)
-      setActiveFacets(INITIAL_FACET_STATE)
-    },
-    [setText, setActiveFacets]
-  )
-
-  // this effect here basically listens to activeFacets for changes and re-runs
-  // the search whenever it changes. we always want the facet changes to take
-  // effect immediately, so we need to either do this or call runSearch from
-  // our facet-related callbacks. this approach lets us avoid having the
-  // facet-related callbacks (toggleFacet, etc) be dependent on then value of
-  // the runSearch function, which leads to too much needless churn in the
-  // facet callbacks and then causes excessive re-rendering of the facet UI
-  useEffect(
-    () => {
-      runSearch(text, activeFacets)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [activeFacets]
-  )
-
-  const toggleFacet = useCallback(
-    async (name: string, value: string, isEnabled: boolean) => {
-      const newFacets = R.clone(activeFacets)
-
-      if (isEnabled) {
-        newFacets[name] = _.union(newFacets[name] || [], [value])
-      } else {
-        newFacets[name] = _.without(newFacets[name] || [], value)
-      }
-      setActiveFacets(newFacets)
-    },
-    [activeFacets, setActiveFacets]
-  )
-
-  const onUpdateFacets = useCallback(
-    (e: Object) => {
-      toggleFacet(e.target.name, e.target.value, e.target.checked)
-    },
-    [toggleFacet]
-  )
-
-  const updateText = useCallback(
-    (event: Object) => {
-      const text = event ? event.target.value : ""
-      setText(text)
-    },
-    [setText]
-  )
-
-  const clearText = useCallback(
-    (event: Object) => {
-      event.preventDefault()
-      setText("")
-      runSearch("", activeFacets)
-    },
-    [activeFacets, setText, runSearch]
-  )
-
-  const acceptSuggestion = useCallback(
-    (suggestion: string) => {
-      setText(suggestion)
-      runSearch(suggestion, activeFacets)
-    },
-    [setText, activeFacets, runSearch]
+  const {
+    facetOptions,
+    clearAllFilters,
+    toggleFacet,
+    onUpdateFacets,
+    updateText,
+    clearText,
+    acceptSuggestion,
+    loadMore,
+    incremental,
+    text,
+    activeFacets,
+    from,
+    onSubmit
+  } = useCourseSearch(
+    runSearch,
+    clearSearchCB,
+    updateURLBar,
+    facets,
+    loaded,
+    SETTINGS.search_page_size
   )
 
   const deviceWidth = useWidth()
@@ -355,27 +226,6 @@ export default function CourseSearchPage(props: Props) {
       }
     },
     [setSearchResultCellWidth, deviceWidth, searchResultLayout]
-  )
-
-  // this is our 'on startup' useEffect call
-  useEffect(() => {
-    clearSearchCB()
-    const { text, activeFacets } = deserializeSearchParams(location)
-    setText(text)
-    setActiveFacets(activeFacets)
-    runSearch(text, activeFacets)
-    // dependencies intentionally left blank here, because this effect
-    // needs to run only once - it's just to initialize the search state
-    // based on the value of the URL (if any)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const onSubmit = useCallback(
-    e => {
-      e.preventDefault()
-      runSearch(text, activeFacets)
-    },
-    [runSearch, text, activeFacets]
   )
 
   const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4

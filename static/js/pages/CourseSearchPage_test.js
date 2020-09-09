@@ -3,6 +3,14 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
+import {
+  deserializeSearchParams,
+  serializeSearchParams
+} from "@mitodl/course-search-utils/dist/url_utils"
+import {
+  LR_TYPE_ALL,
+  LR_TYPE_COURSE
+} from "@mitodl/course-search-utils/dist/constants"
 
 import CourseSearchPage from "./CourseSearchPage"
 
@@ -13,12 +21,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 import { shouldIf } from "../lib/test_utils"
 import { makeSearchResult, makeSearchResponse } from "../factories/search"
 import { makeChannel } from "../factories/channels"
-import { LR_TYPE_ALL, LR_TYPE_COURSE } from "../lib/constants"
 import { wait } from "../lib/util"
-import {
-  deserializeSearchParams,
-  serializeSearchParams
-} from "../lib/course_search"
 
 const setLocation = (helper, params) => {
   const newParams = {
@@ -35,7 +38,7 @@ const setLocation = (helper, params) => {
     )
   }
 
-  helper.browserHistory.push(`?${serializeSearchParams(newParams)}`)
+  window.location = `/?${serializeSearchParams(newParams)}`
 }
 
 describe("CourseSearchPage", () => {
@@ -136,8 +139,8 @@ describe("CourseSearchPage", () => {
     ['"mechical enginr"', '"mechanical engineer"']
   ].forEach(([text, suggestion]) => {
     it(`renders suggestion ${suggestion} for query ${text}`, async () => {
-      initialState.search.data.suggest = ["mechanical engineer"]
-      searchResponse.suggest = ["mechanical engineer"]
+      initialState.search.data.suggest = [suggestion]
+      searchResponse.suggest = [suggestion]
       setLocation(helper, { text })
       const { wrapper } = await render()
       wrapper.update()
@@ -147,7 +150,7 @@ describe("CourseSearchPage", () => {
       suggestDiv.find("a").simulate("click")
       await wait(50)
       const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
-      assert.equal(search, `q=${escape(suggestion)}`)
+      assert.include(search, escape(suggestion))
     })
   })
 
@@ -416,16 +419,14 @@ describe("CourseSearchPage", () => {
   })
 
   it("facetOptions adds any selected facets not in results to the group", async () => {
-    helper.browserHistory.push({
-      search: serializeSearchParams({
-        text:         "some text",
-        activeFacets: {
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        ["NewTopic"]
-        }
-      })
+    setLocation(helper, {
+      text:         "some text",
+      activeFacets: {
+        audience:      [],
+        certification: [],
+        offered_by:    [],
+        topics:        ["NewTopic"]
+      }
     })
     const { wrapper } = await render()
     wrapper.update()
