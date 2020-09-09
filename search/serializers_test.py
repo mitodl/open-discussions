@@ -327,6 +327,7 @@ def test_es_run_serializer(has_full_name):
             "offered_by": list(
                 learning_resource_run.offered_by.values_list("name", flat=True)
             ),
+            "slug": learning_resource_run.slug,
         },
     )
 
@@ -406,9 +407,12 @@ def test_es_content_file_serializer():
             "object_type": RESOURCE_FILE_TYPE,
             "run_id": content_file.run.run_id,
             "run_title": content_file.run.title,
+            "run_slug": content_file.run.slug,
             "semester": content_file.run.semester,
             "year": int(content_file.run.year),
-            "topics": list(content_file.run.topics.values_list("name", flat=True)),
+            "topics": list(
+                content_file.run.content_object.topics.values_list("name", flat=True)
+            ),
             "key": content_file.key,
             "uid": content_file.uid,
             "resource_relations": {
@@ -423,6 +427,7 @@ def test_es_content_file_serializer():
             "file_type": content_file.file_type,
             "content_type": content_file.content_type,
             "url": content_file.url,
+            "short_url": content_file.short_url,
             "section": content_file.section,
             "content": content_kwargs["content"],
             "content_title": content_kwargs["content_title"],

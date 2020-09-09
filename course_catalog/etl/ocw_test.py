@@ -1,17 +1,17 @@
 """OCW ETL tests"""
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,too-many-function-args
 import json
 import mimetypes
 from os.path import splitext
 from types import SimpleNamespace
-from urllib.parse import urljoin, urlparse
+from urllib.parse import urlparse
 
 import pytest
 
 from course_catalog.constants import (
-    CONTENT_TYPE_FILE,
     CONTENT_TYPE_PAGE,
     VALID_TEXT_FILE_TYPES,
+    CONTENT_TYPE_FILE,
 )
 from course_catalog.etl.ocw import (
     upload_mitx_course_manifest,
@@ -19,6 +19,7 @@ from course_catalog.etl.ocw import (
     get_content_file_url,
     transform_content_file,
     get_content_file_section,
+    get_content_type,
 )
 
 OCW_COURSE_JSON = {
@@ -67,7 +68,7 @@ OCW_COURSE_JSON = {
             "parent_uid": "0b5f9d523e26f2a622f728050421f5a9",
             "title": "testing2.pdf",
             "caption": None,
-            "file_type": "application/octet-stream",
+            "file_type": "application/pdf",
             "description": "A test file 2",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
@@ -79,7 +80,7 @@ OCW_COURSE_JSON = {
             "parent_uid": "aa5f9d523e26f2a622f728050421f5zz",
             "title": "ex7_lz_300k.mp4",
             "caption": None,
-            "file_type": "application/octet-stream",
+            "file_type": "video/mp4",
             "description": "Video",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
@@ -135,12 +136,13 @@ OCW_COURSE_JSON = {
         },
         {
             "uid": "0b5f9d523e26f2a622f728050421f5a9",
-            "title": "Sectionless Page",
-            "text": "<p>The Sectionless Page</p>",
+            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+            "title": "Sub Page",
+            "text": "<p>The Sub Page</p>",
             "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/",
             "short_url": "",
             "description": "Extra Page",
-            "type": "SomethingElse",
+            "type": "DownloadsSection",
             "file_location": (
                 "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
                 + "bb5f9d523e26f2a622f728050421f5a7_extra.html"
@@ -200,8 +202,8 @@ def test_transform_content_files(mock_tika_functions, mocker):
         for input in (file_inputs + COURSE_PAGES)
         if splitext(input["file_location"])[-1] in VALID_TEXT_FILE_TYPES
     ]
-    all_inputs = [(file, CONTENT_TYPE_FILE) for file in file_inputs] + [
-        (page, CONTENT_TYPE_PAGE) for page in COURSE_PAGES
+    all_inputs = [(file, False) for file in file_inputs] + [
+        (page, True) for page in COURSE_PAGES
     ]
 
     transformed_files = transform_content_files(OCW_COURSE_JSON)
@@ -218,8 +220,8 @@ def test_transform_content_files(mock_tika_functions, mocker):
     assert mock_tika_functions.mock_sync_text.call_count == len(text_inputs)
 
     assert transformed_files == [
-        transform_content_file(OCW_COURSE_JSON, file, ftype)
-        for (file, ftype) in all_inputs
+        transform_content_file(OCW_COURSE_JSON, file, is_page=is_page)
+        for (file, is_page) in all_inputs
     ]
     mock_exception_log.assert_not_called()
 
@@ -291,18 +293,16 @@ def test_transform_content_file_course_files(mock_tika_functions):
     """ Test that contents of course_files are transformed correctly """
     for course_file in COURSE_FILES:
         expected_transform = {
-            "content_type": CONTENT_TYPE_FILE,
-            "description": course_file["description"],
             "file_type": course_file["file_type"],
+            "content_type": get_content_type(course_file["file_type"]),
+            "description": course_file["description"],
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
             "section": get_content_file_section(course_file, COURSE_PAGES),
             "title": course_file["title"],
             "uid": course_file.get("uid", None),
-            "url": get_content_file_url(
-                OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE
-            ),
+            "url": get_content_file_url(course_file, is_page=False),
         }
         if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
@@ -326,7 +326,7 @@ def test_transform_content_file_course_files(mock_tika_functions):
                 }
             )
         assert (
-            transform_content_file(OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE)
+            transform_content_file(OCW_COURSE_JSON, course_file, is_page=False)
             == expected_transform
         )
 
@@ -336,15 +336,13 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
     """ Test that contents of course_foreign_files are transformed correctly """
     for course_file in FOREIGN_FILES:
         expected_transform = {
-            "content_type": CONTENT_TYPE_FILE,
             "file_type": None,
+            "content_type": CONTENT_TYPE_FILE,
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
             "section": get_content_file_section(course_file, COURSE_PAGES),
-            "url": get_content_file_url(
-                OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE
-            ),
+            "url": get_content_file_url(course_file, is_page=False),
         }
         if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
@@ -368,7 +366,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
                 }
             )
         assert (
-            transform_content_file(OCW_COURSE_JSON, course_file, CONTENT_TYPE_FILE)
+            transform_content_file(OCW_COURSE_JSON, course_file, is_page=False)
             == expected_transform
         )
 
@@ -387,9 +385,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             "section": get_content_file_section(course_page, COURSE_PAGES),
             "title": course_page["title"],
             "uid": course_page["uid"],
-            "url": get_content_file_url(
-                OCW_COURSE_JSON, course_page, CONTENT_TYPE_PAGE
-            ),
+            "url": get_content_file_url(course_page, is_page=True),
             "short_url": course_page["short_url"],
         }
         if splitext(course_page["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
@@ -414,7 +410,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
                 }
             )
         assert (
-            transform_content_file(OCW_COURSE_JSON, course_page, CONTENT_TYPE_PAGE)
+            transform_content_file(OCW_COURSE_JSON, course_page, is_page=True)
             == expected_transform
         )
 
@@ -426,17 +422,24 @@ def test_get_content_file_section():
         get_content_file_section(COURSE_FILES[0], COURSE_PAGES)
         == COURSE_PAGES[0]["title"]
     )
+    assert (
+        get_content_file_section(COURSE_FILES[3], COURSE_PAGES)
+        == COURSE_PAGES[1]["title"]
+    )
+
     # No parent_uid
     assert get_content_file_section(COURSE_FILES[2], COURSE_PAGES) is None
-    # parent page has no section
-    assert get_content_file_section(COURSE_FILES[3], COURSE_PAGES) is None
+
     # page has section
     assert (
         get_content_file_section(COURSE_PAGES[0], COURSE_PAGES)
         == COURSE_PAGES[0]["title"]
     )
-    # page has no section
-    assert get_content_file_section(COURSE_PAGES[1], COURSE_PAGES) is None
+    # page is a subsection of another page
+    assert (
+        get_content_file_section(COURSE_PAGES[1], COURSE_PAGES)
+        == COURSE_PAGES[0]["title"]
+    )
 
 
 def test_get_content_file_url(settings):
@@ -444,34 +447,28 @@ def test_get_content_file_url(settings):
     settings.OCW_BASE_URL = "http://ocw.mit.edu"
 
     for page in COURSE_PAGES:
-        assert (
-            get_content_file_url(OCW_COURSE_JSON, page, CONTENT_TYPE_PAGE)
-            == f"{settings.OCW_BASE_URL}{page.get('url', '')}"
-        )
+        assert get_content_file_url(page, is_page=True) == page.get("url", "")
 
     # File with a parent page
-    assert get_content_file_url(
-        OCW_COURSE_JSON, COURSE_FILES[0], CONTENT_TYPE_FILE
-    ) == urljoin(
-        settings.OCW_BASE_URL,
-        f"{OCW_COURSE_JSON['url']}/{COURSE_PAGES[0]['short_url']}/MIT4_105F12_ex3-explosion.pdf",
+    assert (
+        get_content_file_url(COURSE_FILES[0], is_page=False)
+        == COURSE_FILES[0]["file_location"]
     )
 
     # File without a parent page
     assert (
-        get_content_file_url(OCW_COURSE_JSON, COURSE_FILES[2], CONTENT_TYPE_FILE)
+        get_content_file_url(COURSE_FILES[2], is_page=False)
         == COURSE_FILES[2]["file_location"]
     )
 
-    # File with a media_info match
     assert (
-        get_content_file_url(OCW_COURSE_JSON, COURSE_FILES[4], CONTENT_TYPE_FILE)
-        == "http://www.archive.org/download/ex7_lz_300k.mp4"
+        get_content_file_url(COURSE_FILES[4], is_page=False)
+        == COURSE_FILES[4]["file_location"]
     )
 
     # Foreign file
     assert (
-        get_content_file_url(OCW_COURSE_JSON, FOREIGN_FILES[0], CONTENT_TYPE_FILE)
+        get_content_file_url(FOREIGN_FILES[0], is_page=False)
         == FOREIGN_FILES[0]["link"]
     )
 

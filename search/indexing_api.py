@@ -167,15 +167,19 @@ LEARNING_RESOURCE_TYPE = {
             "availability": {"type": "keyword"},
             "offered_by": {"type": "keyword"},
             "created": {"type": "date"},
+            "slug": {"type": "keyword"},
         },
     },
 }
 
 COURSE_FILE_OBJECT_TYPE = {
     "run_id": {"type": "keyword"},
+    "run_slug": {"type": "keyword"},
+    "run_title": ENGLISH_TEXT_FIELD,
     "uid": {"type": "keyword"},
     "key": {"type": "keyword"},
     "url": {"type": "keyword"},
+    "short_url": {"type": "keyword"},
     "file_type": {"type": "keyword"},
     "content": ENGLISH_TEXT_FIELD,
     "location": {"type": "keyword"},
