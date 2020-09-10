@@ -21,6 +21,15 @@ const Footer = () => (
     <div className="row">
       <a href={SETTINGS.authenticated_site.tos_url}>Terms & Conditions</a>
     </div>
+    <div className="row">
+      <a
+        href="https://accessibility.mit.edu/"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Accessibility
+      </a>
+    </div>
     <div className="row mit-logo">
       <a href="https://www.mit.edu/" target="_blank" rel="noopener noreferrer">
         <img
