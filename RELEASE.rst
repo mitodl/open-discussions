@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.142.0
+Version 0.142.0 (Released September 10, 2020)
 ---------------
 
 - fix course search textbox behavior
