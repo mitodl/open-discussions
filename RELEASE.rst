@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.142.1
+---------------
+
+- Changes to ContentFile (resource) index (#3137)
+- Bump node-sass from 4.12.0 to 4.13.1
+
 Version 0.142.0 (Released September 10, 2020)
 ---------------
 
