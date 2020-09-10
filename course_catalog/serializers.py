@@ -252,6 +252,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             "url": data.get("url"),
             "availability": data.get("availability"),
             "platform": data.get("platform"),
+            "slug": data.get("slug"),
         }
         is_published = data.get("is_published")
         if is_published is not None:

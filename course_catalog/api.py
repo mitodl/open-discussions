@@ -136,6 +136,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
                 "url": get_course_url(
                     master_json.get("uid"), master_json, PlatformType.ocw.value
                 ),
+                "slug": master_json.get("short_url"),
                 "raw_json": master_json,
             },
             instance=courserun_instance,

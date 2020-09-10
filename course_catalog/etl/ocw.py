@@ -3,7 +3,7 @@ import copy
 import logging
 import mimetypes
 from os.path import splitext
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 
 import boto3
 import rapidjson
@@ -13,10 +13,11 @@ from course_catalog.constants import (
     CONTENT_TYPE_PAGE,
     CONTENT_TYPE_FILE,
     VALID_TEXT_FILE_TYPES,
+    CONTENT_TYPE_VIDEO,
+    CONTENT_TYPE_PDF,
 )
 from course_catalog.etl.utils import extract_text_metadata, sync_s3_text
 from course_catalog.models import ContentFile, get_max_length
-from open_discussions.utils import extract_values
 
 log = logging.getLogger()
 
@@ -55,9 +56,7 @@ def transform_content_files(course_run_json):
     content_files = []
     for course_file in json_course_files:
         try:
-            content_files.append(
-                transform_content_file(course_run_json, course_file, CONTENT_TYPE_FILE)
-            )
+            content_files.append(transform_content_file(course_run_json, course_file))
         except:  # pylint: disable=bare-except
             log.exception(
                 "ERROR syncing course file %s for run %s",
@@ -70,7 +69,7 @@ def transform_content_files(course_run_json):
             continue
         try:
             content_files.append(
-                transform_content_file(course_run_json, course_page, CONTENT_TYPE_PAGE)
+                transform_content_file(course_run_json, course_page, is_page=True)
             )
         except:  # pylint: disable=bare-except
             log.exception(
@@ -82,7 +81,7 @@ def transform_content_files(course_run_json):
 
 
 def transform_content_file(
-    course_run_json, content_file_data, content_type
+    course_run_json, content_file_data, is_page=False
 ):  # pylint: disable=too-many-locals
     """
     Transforms content file json based on parent course run master_json
@@ -90,18 +89,18 @@ def transform_content_file(
     Args:
         course_run_json (dict): course run master_json
         content_file_data (dict): the content_file json
-        content_type (str): file or page
+        is_page (bool): True if page else False
 
     Returns:
         dict: transformed content_file json
     """
     content_json = {}
     content_file = copy.deepcopy(content_file_data)
-    content_file["content_type"] = content_type
     content_file["file_type"] = content_file.get("file_type", content_file.get("type"))
-    content_file["url"] = get_content_file_url(
-        course_run_json, content_file, content_type
+    content_file["content_type"] = (
+        CONTENT_TYPE_PAGE if is_page else get_content_type(content_file["file_type"])
     )
+    content_file["url"] = get_content_file_url(content_file, is_page=is_page)
     content_file["section"] = get_content_file_section(
         content_file, course_run_json.get("course_pages", [])
     )
@@ -167,57 +166,26 @@ def transform_content_file(
     return content_file
 
 
-def get_content_file_url(course_run_json, content_file_data, content_type):
+def get_content_file_url(content_file_data, is_page=False):
     """
     Calculate the best URL for a content file.
-    For a content page, use the url attribute.
-    For a course file, try to use the run url, parent page short_url, and file_location.
-    If there is no parent page, try to construct a URL from a matching uid in the "embedded_media" entities.
-    Foreign files should have a "link" attribute to use.
-    If all else fails, use the S3 URL.
+    Otherwise, use the S3 URL - this should be converted to the appropriate CDN url if needed on the front end.
 
     Args:
-        course_run_json (dict): the course run info
         content_file_data (dict): content file data
-        content_type (str): file or page
+        is_page (bool): True for a page, false for a file
 
     Returns:
         str: url
     """
-    if content_type == CONTENT_TYPE_PAGE:
-        return urljoin(settings.OCW_BASE_URL, content_file_data.get("url", ""))
-
-    # Try reverse-engineering the URL from page info
-    base_url = course_run_json.get("url")
-    parent_page = get_page_by_uid(
-        content_file_data.get("parent_uid"), course_run_json.get("course_pages", [])
-    )
-    if parent_page and base_url:
-        section = parent_page.get("short_url")
-        suffix = (
-            content_file_data.get("file_location", "")
-            .split("/")[-1]
-            .replace(f"{content_file_data.get('uid', '')}_", "")
-        )
-
-        if suffix:
-            return urljoin(settings.OCW_BASE_URL, "/".join([base_url, section, suffix]))
-
-    # Try the media info section next
-    media_info = [
-        media
-        for sublist in extract_values(course_run_json, "embedded_media")
-        for media in sublist
-        if media.get("uid", None) == content_file_data.get("uid", "")
-    ]
-    if media_info:
-        return media_info[0].get("technical_location", media_info[0].get("media_info"))
+    if is_page:
+        return content_file_data.get("url", "")
 
     # Foreign course files should have a non-S3 url
     foreign_link = content_file_data.get("link")
     if foreign_link is not None:
         return foreign_link
-    # If none of the above worked, use the S3 URL as a last resort
+
     return content_file_data.get("file_location")
 
 
@@ -296,3 +264,23 @@ def upload_mitx_course_manifest(courses):
     except:  # pylint: disable=bare-except
         log.exception("Error uploading OCW manifest")
         return False
+
+
+def get_content_type(file_type):
+    """
+    Return the appropriate content type for a file type
+    TODO: add more content types (text? spreadsheet?)
+
+    Args:
+        file_type (str): The file type
+
+    Returns:
+        str: The content type
+    """
+    if not file_type:
+        return CONTENT_TYPE_FILE
+    if file_type.startswith("video/"):
+        return CONTENT_TYPE_VIDEO
+    if file_type == "application/pdf":
+        return CONTENT_TYPE_PDF
+    return CONTENT_TYPE_FILE

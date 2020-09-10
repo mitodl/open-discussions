@@ -354,14 +354,15 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
 
     run_id = serializers.CharField(source="run.run_id")
     run_title = serializers.CharField(source="run.title")
+    run_slug = serializers.CharField(source="run.slug")
     semester = serializers.CharField(source="run.semester")
     year = serializers.IntegerField(source="run.year")
-    topics = ESTopicsField(source="run.topics")
+    topics = ESTopicsField(source="run.content_object.topics")
     short_description = serializers.CharField(source="description")
 
     def get_resource_relations(self, instance):
         """ Get resource_relations properties"""
-        course = Course.objects.get(id=instance.run.object_id)
+        course = instance.run.content_object
         return {
             "name": "resourcefile",
             "parent": gen_course_id(course.platform, course.course_id),
@@ -372,6 +373,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
         fields = [
             "run_id",
             "run_title",
+            "run_slug",
             "semester",
             "year",
             "topics",
@@ -381,6 +383,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "title",
             "short_description",
             "url",
+            "short_url",
             "section",
             "file_type",
             "content_type",
@@ -444,6 +447,7 @@ class ESRunSerializer(LearningResourceSerializer):
             "published",
             "availability",
             "offered_by",
+            "slug",
         ]
         ordering = "-best_start_date"
         read_only_fields = fields

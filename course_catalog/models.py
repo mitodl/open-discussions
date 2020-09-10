@@ -194,6 +194,7 @@ class LearningResourceRun(AbstractCourse):
     semester = models.CharField(max_length=20, null=True, blank=True)
     availability = models.CharField(max_length=128, null=True, blank=True)
     language = models.CharField(max_length=128, null=True, blank=True)
+    slug = models.CharField(max_length=1024, null=True, blank=True)
 
     instructors = models.ManyToManyField(
         CourseInstructor, blank=True, related_name="course_instructors"
