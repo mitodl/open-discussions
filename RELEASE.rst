@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.142.1
+Version 0.142.1 (Released September 11, 2020)
 ---------------
 
 - Changes to ContentFile (resource) index (#3137)
