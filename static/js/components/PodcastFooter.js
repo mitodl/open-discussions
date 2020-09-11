@@ -40,6 +40,8 @@ export default function PodcastFooter() {
           <Link to="/content_policy">Community Guidelines</Link>
           <div className="bar">{" | "}</div>
           <a href={SETTINGS.authenticated_site.tos_url}>Terms & Conditions</a>
+          <div className="bar">{" | "}</div>
+          <a href="https://accessibility.mit.edu/">Accessibility</a>
         </div>
         <div className="cell title">
           <Link className="home-link" to="/">
