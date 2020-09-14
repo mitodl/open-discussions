@@ -9,6 +9,7 @@ from channels.models import (
     ChannelMembershipConfig,
     SpamCheckResult,
 )
+from channels.constants import POST_TYPE
 from open_discussions.utils import get_field_names
 
 
@@ -107,11 +108,39 @@ class SpamCheckResultAdmin(admin.ModelAdmin):
     model = SpamCheckResult
     search_fields = ("object_id", "user_ip")
     list_filter = ("content_type", "is_spam")
-    list_display = ("content_type", "object_id", "user_ip", "is_spam")
-    readonly_fields = get_field_names(SpamCheckResult)
+    list_display = (
+        "content_type",
+        "object_id",
+        "user_ip",
+        "is_spam",
+        "title",
+        "truncated_text",
+        "author",
+    )
+    readonly_fields = get_field_names(SpamCheckResult) + ["title", "text", "author"]
 
     def has_add_permission(self, request):
         return False
+
+    def title(self, spam_check):
+        """Title of spam checked post"""
+        if spam_check.content_type.name == POST_TYPE:
+            return spam_check.content_object.title
+        else:
+            return None
+
+    def text(self, spam_check):
+        """Text of spam checked post or comment"""
+
+        return spam_check.content_object.text
+
+    def truncated_text(self, spam_check):
+        """Truncated text of spam checked post or comment"""
+        return spam_check.content_object.text[0:350]
+
+    def author(self, spam_check):
+        """Email text of spam checked post or comment author"""
+        return spam_check.content_object.author.email
 
 
 admin.site.register(SpamCheckResult, SpamCheckResultAdmin)
