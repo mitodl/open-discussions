@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.143.0
+---------------
+
+- add level and department to search
+- Add accessibility links to footers (#3147)
+
 Version 0.142.1 (Released September 11, 2020)
 ---------------
 
