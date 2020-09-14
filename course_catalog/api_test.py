@@ -32,6 +32,8 @@ from course_catalog.api import (
     parse_bootcamp_json_data,
     sync_ocw_course_files,
     sync_xpro_course_files,
+    ocw_parent_folder,
+    sync_ocw_course,
 )
 
 pytestmark = pytest.mark.django_db
@@ -496,3 +498,43 @@ def test_sync_xpro_course_files(mock_xpro_learning_bucket, mocker):
     assert mock_transform.call_args[0][0].endswith("content-devops-0001.tar.gz") is True
     mock_load_content_files.assert_called_once_with(run, fake_data)
     mock_log.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "prefix, expected",
+    [
+        ["QA/15-872-system-dynamics-ii-fall-2013/", "QA"],
+        [
+            "PROD/15-872-system-dynamics-ii-fall-2013/",
+            "PROD/15-872-system-dynamics-ii-fall-2013",
+        ],
+    ],
+)
+def test_ocw_parent_folder(prefix, expected):
+    """ Test that ocw_parent_folder returns expected result for QA and PROD prefixes"""
+    assert ocw_parent_folder(prefix) == expected
+
+
+@pytest.mark.parametrize(
+    "prefix, skip",
+    [
+        ["PROD/biology", True],
+        ["PROD/biology-seminar", False],
+        ["QA/biology-seminar", True],
+    ],
+)
+def test_sync_ocw_course_skip(mocker, prefix, skip):
+    """Sync_ocw_course should not process non-course prefixes"""
+    mock_log = mocker.patch("course_catalog.api.log.info")
+    mock_bucket = mocker.Mock(objects=mocker.Mock(filter=mocker.Mock(return_value=[])))
+    sync_ocw_course(
+        course_prefix=prefix,
+        raw_data_bucket=mock_bucket,
+        force_overwrite=True,
+        upload_to_s3=True,
+        blocklist=[],
+    )
+    if skip:
+        mock_log.assert_called_once_with("Non-course folder, skipping: %s ...", prefix)
+    else:
+        mock_log.assert_any_call("Syncing: %s ...", prefix)
