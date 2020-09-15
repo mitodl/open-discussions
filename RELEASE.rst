@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.143.0
+Version 0.143.0 (Released September 15, 2020)
 ---------------
 
 - add level and department to search
