@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.143.1
+Version 0.143.1 (Released September 15, 2020)
 ---------------
 
 - add post and comment information to spam check admin
