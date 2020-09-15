@@ -24,10 +24,12 @@ from channels.factories.models import (
     PostFactory,
     CommentFactory,
     ChannelInvitationFactory,
+    SpamCheckResultFactory,
 )
 from channels.models import ChannelSubscription, Channel, Post, SpamCheckResult
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
+from authentication.models import BlockedEmailRegex
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
 
@@ -534,3 +536,101 @@ def test_check_post_for_spam(mocker, is_spam):
         ).count()
         == 1
     )
+
+
+@pytest.mark.parametrize("spam", [True, False])
+@pytest.mark.parametrize("retire_users", [True, False])
+@pytest.mark.parametrize("skip_akismet", [True, False])
+def test_update_spam(mocker, spam, retire_users, skip_akismet):
+    """Test the update_spam task"""
+    comment = CommentFactory.create()
+    post = PostFactory.create()
+
+    comment_spam_check_result = SpamCheckResultFactory.create(
+        content_object=comment, is_spam=(not spam)
+    )
+    post_spam_check_result = SpamCheckResultFactory.create(
+        content_object=post, is_spam=(not spam)
+    )
+
+    post_author_email = post.author.email
+    comment_author_email = comment.author.email
+
+    mock_admin_api = mocker.patch("channels.tasks.get_admin_api").return_value
+    mock_askimet_client = mocker.patch(
+        "channels.tasks.create_akismet_client"
+    ).return_value
+    tasks.update_spam.delay(
+        spam=spam,
+        comment_ids=[comment.id],
+        post_ids=[post.id],
+        retire_users=retire_users,
+        skip_akismet=skip_akismet,
+    )
+    comment_spam_check_result.refresh_from_db()
+    post_spam_check_result.refresh_from_db()
+
+    assert comment_spam_check_result.is_spam == spam
+    assert post_spam_check_result.is_spam == spam
+
+    if spam:
+        mock_admin_api.remove_post.assert_called_once_with(post.post_id)
+        mock_admin_api.remove_comment.assert_called_once_with(comment.comment_id)
+
+        if not skip_akismet:
+            mock_askimet_client.submit_spam.assert_any_call(
+                user_agent=comment_spam_check_result.user_agent,
+                user_ip=comment_spam_check_result.user_ip,
+                comment_content=comment.text,
+                comment_type="reply",
+                comment_author=comment.author.profile.name,
+                comment_author_email=comment.author.email,
+            )
+
+            mock_askimet_client.submit_spam.assert_any_call(
+                user_agent=post_spam_check_result.user_agent,
+                user_ip=post_spam_check_result.user_ip,
+                comment_content=post.plain_text,
+                comment_type="forum-post",
+                comment_author=post.author.profile.name,
+                comment_author_email=post.author.email,
+            )
+
+        if retire_users:
+            blocked_email_regexes = BlockedEmailRegex.objects.all().values_list(
+                "match", flat=True
+            )
+            assert post_author_email in blocked_email_regexes
+            assert comment_author_email in blocked_email_regexes
+
+            comment.refresh_from_db()
+            post.refresh_from_db()
+
+            assert comment.author.email == ""
+            assert post.author.email == ""
+
+            assert not comment.author.is_active
+            assert not post.author.is_active
+
+    else:
+        mock_admin_api.approve_post.assert_called_once_with(post.post_id)
+        mock_admin_api.approve_comment.assert_called_once_with(comment.comment_id)
+
+        if not skip_akismet:
+            mock_askimet_client.submit_ham.assert_any_call(
+                user_agent=comment_spam_check_result.user_agent,
+                user_ip=comment_spam_check_result.user_ip,
+                comment_content=comment.text,
+                comment_type="reply",
+                comment_author=comment.author.profile.name,
+                comment_author_email=comment.author.email,
+            )
+
+            mock_askimet_client.submit_ham.assert_any_call(
+                user_agent=post_spam_check_result.user_agent,
+                user_ip=post_spam_check_result.user_ip,
+                comment_content=post.plain_text,
+                comment_type="forum-post",
+                comment_author=post.author.profile.name,
+                comment_author_email=post.author.email,
+            )

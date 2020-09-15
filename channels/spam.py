@@ -69,7 +69,7 @@ def exempt_from_spamcheck(email):
     )
 
 
-def _create_akismet_client():
+def create_akismet_client():
     """Initialize the akismet client"""
     if not all([settings.AKISMET_API_KEY, settings.AKISMET_BLOG_URL]):
         log.info(
@@ -93,7 +93,7 @@ class SpamChecker:
     """Spam checking for posts and comments"""
 
     def __init__(self):
-        self._client = SimpleLazyObject(_create_akismet_client)
+        self._client = SimpleLazyObject(create_akismet_client)
 
     def _can_spam_check(self):
         """Returns True if the spam checker is properly configured and can operate"""
