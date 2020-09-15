@@ -11,6 +11,7 @@ from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 import pytz
 
+from django.contrib.contenttypes.models import ContentType
 from channels import api
 from channels.constants import (
     VALID_CHANNEL_TYPES,
@@ -31,6 +32,7 @@ from channels.models import (
     Post,
     Comment,
     Article,
+    SpamCheckResult,
 )
 from open_discussions.factories import UserFactory
 
@@ -267,3 +269,17 @@ class SubscriptionFactory(DjangoModelFactory):
 
     class Params:
         is_comment = False
+
+
+class SpamCheckResultFactory(DjangoModelFactory):
+    """Factory for SpamCheckResult"""
+
+    content_object = SubFactory(CommentFactory)
+    object_id = factory.SelfAttribute("content_object.id")
+    content_type = factory.LazyAttribute(
+        lambda o: ContentType.objects.get_for_model(o.content_object)
+    )
+    user_ip = "111.11.111.1"
+
+    class Meta:
+        model = SpamCheckResult

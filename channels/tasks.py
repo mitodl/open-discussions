@@ -22,14 +22,25 @@ from channels.api import (
     get_allowed_post_types_from_link_type,
     allowed_post_types_bitmask,
 )
+from channels.spam import create_akismet_client
 from channels.constants import ROLE_MODERATORS, ROLE_CONTRIBUTORS
-from channels.models import Channel, Post, ChannelGroupRole, ChannelInvitation, Comment
+from channels.models import (
+    Channel,
+    Post,
+    ChannelGroupRole,
+    ChannelInvitation,
+    Comment,
+    SpamCheckResult,
+)
 from channels.spam import SpamChecker, save_spam_result
 from channels.utils import SORT_NEW_LISTING_PARAMS, SORT_HOT_LISTING_PARAMS
+from authentication.models import BlockedEmailRegex
 from mail import api as mail_api
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
+from search import task_helpers
+
 
 User = get_user_model()
 log = logging.getLogger()
@@ -514,3 +525,101 @@ def check_comment_for_spam(*, user_ip, user_agent, comment_id):
     )
     if is_spam:
         admin_api.remove_comment(comment.comment_id)
+
+
+@app.task
+def update_spam(*, spam, comment_ids, post_ids, retire_users, skip_akismet):
+    """
+    Updates the spam check result for comments and posts
+
+    Args:
+        spam (bool): Mark as spam if true and ham if false
+        comment_ids( list of int): list of comment ids in integer form
+        post_ids( list of int): list of post ids in integer for
+        retire_users(bool): retire comment/post authors if true
+        skip_akismet(bool): do not submit reclassification to akismet if true
+
+    """
+    comment_content_type = ContentType.objects.get_for_model(Comment)
+    post_content_type = ContentType.objects.get_for_model(Post)
+    admin_api = get_admin_api()
+
+    akismet_client = create_akismet_client()
+
+    for comment in Comment.objects.filter(id__in=comment_ids).iterator():
+        result = SpamCheckResult.objects.get(
+            content_type=comment_content_type, object_id=comment.id
+        )
+
+        if spam:
+            result.is_spam = True
+            result.save()
+
+            admin_api.remove_comment(comment.comment_id)
+            submit_func = akismet_client.submit_spam
+
+        else:
+            result.is_spam = False
+            result.save()
+
+            admin_api.approve_comment(comment.comment_id)
+            submit_func = akismet_client.submit_ham
+
+        if not skip_akismet:
+            submit_func(
+                user_agent=result.user_agent,
+                user_ip=result.user_ip,
+                comment_content=comment.text,
+                comment_type="reply",
+                comment_author=comment.author.profile.name,
+                comment_author_email=comment.author.email,
+            )
+
+        if spam and retire_users:
+            retire_user(comment.author)
+
+    for post in Post.objects.filter(id__in=post_ids).iterator():
+        result = SpamCheckResult.objects.get(
+            content_type=post_content_type, object_id=post.id
+        )
+
+        if spam:
+            result.is_spam = True
+            result.save()
+
+            admin_api.remove_post(post.post_id)
+            submit_func = akismet_client.submit_spam
+
+        else:
+            result.is_spam = False
+            result.save()
+
+            admin_api.approve_post(post.post_id)
+            submit_func = akismet_client.submit_ham
+
+        if not skip_akismet:
+            submit_func(
+                user_agent=result.user_agent,
+                user_ip=result.user_ip,
+                comment_content=post.plain_text,
+                comment_type="forum-post",
+                comment_author=post.author.profile.name,
+                comment_author_email=post.author.email,
+            )
+
+        if spam and retire_users:
+            retire_user(post.author)
+
+
+def retire_user(user):
+    """Retire a user"""
+    if user.email:
+        BlockedEmailRegex.objects.create(match=user.email)
+        user.email = ""
+        user.is_active = False
+        user.set_unusable_password()
+        user.save()
+        user.social_auth.all().delete()
+        user.received_invitations.all().delete()
+        task_helpers.delete_profile(user)
+        user.content_subscriptions.all().delete()
