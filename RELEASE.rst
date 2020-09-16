@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.143.2
+---------------
+
+- Add attributes for OCW URL components (#3149)
+
 Version 0.143.1 (Released September 15, 2020)
 ---------------
 
