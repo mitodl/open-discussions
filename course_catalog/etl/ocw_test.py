@@ -27,6 +27,7 @@ OCW_COURSE_JSON = {
     "title": "Geometric Disciplines and Architecture Skills: Reciprocal Methodologies",
     "url": "/courses/engineering/4-105-geometric-disciplines-fall-2012",
     "short_url": "4-105-geometric-disciplines-fall-2012",
+    "department_number": "4",
     "course_files": [
         {
             "uid": "e07fcb22fbcf24329fc81b8194329699",
@@ -292,6 +293,7 @@ def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_buc
 def test_transform_content_file_course_files(mock_tika_functions):
     """ Test that contents of course_files are transformed correctly """
     for course_file in COURSE_FILES:
+        (section, section_slug) = get_content_file_section(course_file, COURSE_PAGES)
         expected_transform = {
             "file_type": course_file["file_type"],
             "content_type": get_content_type(course_file["file_type"]),
@@ -299,7 +301,8 @@ def test_transform_content_file_course_files(mock_tika_functions):
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": get_content_file_section(course_file, COURSE_PAGES),
+            "section": section,
+            "section_slug": section_slug,
             "title": course_file["title"],
             "uid": course_file.get("uid", None),
             "url": get_content_file_url(course_file, is_page=False),
@@ -335,13 +338,15 @@ def test_transform_content_file_course_files(mock_tika_functions):
 def test_transform_content_file_course_foreign_files(mock_tika_functions):
     """ Test that contents of course_foreign_files are transformed correctly """
     for course_file in FOREIGN_FILES:
+        (section, section_slug) = get_content_file_section(course_file, COURSE_PAGES)
         expected_transform = {
             "file_type": None,
             "content_type": CONTENT_TYPE_FILE,
             "key": course_file["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": get_content_file_section(course_file, COURSE_PAGES),
+            "section": section,
+            "section_slug": section_slug,
             "url": get_content_file_url(course_file, is_page=False),
         }
         if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
@@ -375,6 +380,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
 def test_transform_content_file_course_pages(mock_tika_functions):
     """ Test that contents of course_pages are transformed correctly """
     for course_page in COURSE_PAGES:
+        (section, section_slug) = get_content_file_section(course_page, COURSE_PAGES)
         expected_transform = {
             "content_type": CONTENT_TYPE_PAGE,
             "description": course_page["description"],
@@ -382,7 +388,8 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             "key": course_page["file_location"].replace(
                 "https://s3.amazonaws.com/", ""
             ),
-            "section": get_content_file_section(course_page, COURSE_PAGES),
+            "section": section,
+            "section_slug": section_slug,
             "title": course_page["title"],
             "uid": course_page["uid"],
             "url": get_content_file_url(course_page, is_page=True),
@@ -418,27 +425,29 @@ def test_transform_content_file_course_pages(mock_tika_functions):
 def test_get_content_file_section():
     """Test that the correct section for a content file is returned"""
     # Matching parent_uid page
-    assert (
-        get_content_file_section(COURSE_FILES[0], COURSE_PAGES)
-        == COURSE_PAGES[0]["title"]
+    assert get_content_file_section(COURSE_FILES[0], COURSE_PAGES) == (
+        COURSE_PAGES[0]["title"],
+        COURSE_PAGES[0]["short_url"],
     )
-    assert (
-        get_content_file_section(COURSE_FILES[3], COURSE_PAGES)
-        == COURSE_PAGES[1]["title"]
+    assert get_content_file_section(COURSE_FILES[3], COURSE_PAGES) == (
+        COURSE_PAGES[1]["title"],
+        COURSE_PAGES[1]["short_url"],
     )
 
     # No parent_uid
-    assert get_content_file_section(COURSE_FILES[2], COURSE_PAGES) is None
+    (section, slug) = get_content_file_section(COURSE_FILES[2], COURSE_PAGES)
+    assert section is None
+    assert slug is None
 
     # page has section
-    assert (
-        get_content_file_section(COURSE_PAGES[0], COURSE_PAGES)
-        == COURSE_PAGES[0]["title"]
+    assert get_content_file_section(COURSE_PAGES[0], COURSE_PAGES) == (
+        COURSE_PAGES[0]["title"],
+        None,
     )
     # page is a subsection of another page
-    assert (
-        get_content_file_section(COURSE_PAGES[1], COURSE_PAGES)
-        == COURSE_PAGES[0]["title"]
+    assert get_content_file_section(COURSE_PAGES[1], COURSE_PAGES) == (
+        COURSE_PAGES[0]["title"],
+        COURSE_PAGES[0]["short_url"],
     )
 
 

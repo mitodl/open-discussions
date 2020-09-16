@@ -174,3 +174,82 @@ VALID_COURSE_CONTENT_TYPES = (
 VALID_COURSE_CONTENT_CHOICES = list(
     zip(VALID_COURSE_CONTENT_TYPES, VALID_COURSE_CONTENT_TYPES)
 )
+
+OCW_DEPARTMENTS = {
+    "1": {
+        "slug": "civil-and-environmental-engineering",
+        "name": "Civil and Environmental Engineering",
+    },
+    "2": {"slug": "mechanical-engineering", "name": "Mechanical Engineering"},
+    "3": {
+        "slug": "materials-science-and-engineering",
+        "name": "Materials Science and Engineering",
+    },
+    "4": {"slug": "architecture", "name": "Architecture"},
+    "5": {"slug": "chemistry", "name": "Chemistry"},
+    "6": {
+        "slug": "electrical-engineering-and-computer-science",
+        "name": "Electrical Engineering and Computer Science",
+    },
+    "7": {"slug": "biology", "name": "Biology"},
+    "8": {"slug": "physics", "name": "Physics"},
+    "9": {
+        "slug": "brain-and-cognitive-sciences",
+        "name": "Brain and Cognitive Sciences",
+    },
+    "10": {"slug": "chemical-engineering", "name": "Chemical Engineering"},
+    "11": {"slug": "urban-studies-and-planning", "name": "Urban Studies and Planning"},
+    "12": {
+        "slug": "earth-atmospheric-and-planetary-sciences",
+        "name": "Earth, Atmospheric, and Planetary Sciences",
+    },
+    "14": {"slug": "economics", "name": "Economics"},
+    "15": {"slug": "sloan-school-of-management", "name": "Sloan School of Management"},
+    "16": {
+        "slug": "aeronautics-and-astronautics",
+        "name": "Aeronautics and Astronautics",
+    },
+    "17": {"slug": "political-science", "name": "Political Science"},
+    "18": {"slug": "mathematics", "name": "Mathematics"},
+    "20": {"slug": "biological-engineering", "name": "Biological Engineering"},
+    "21A": {"slug": "anthropology", "name": "Anthropology"},
+    "21G": {
+        "slug": "global-studies-and-languages",
+        "name": "Global Studies and Languages",
+    },
+    "21H": {"slug": "history", "name": "History"},
+    "21L": {"slug": "literature", "name": "Literature"},
+    "21M": {"slug": "music-and-theater-arts", "name": "Music and Theater Arts"},
+    "22": {"slug": "nuclear-engineering", "name": "Nuclear Science and Engineering"},
+    "24": {"slug": "linguistics-and-philosophy", "name": "Linguistics and Philosophy"},
+    "CC": {"slug": "concourse", "name": "Concourse"},
+    "CMS-W": {
+        "slug": "comparative-media-studies-writing",
+        "name": "Comparative Media Studies/Writing",
+    },
+    "EC": {"slug": "edgerton-center", "name": "Edgerton Center"},
+    "ES": {"slug": "experimental-study-group", "name": "Experimental Study Group"},
+    "ESD": {
+        "slug": "engineering-systems-division",
+        "name": "Engineering Systems Division",
+    },
+    "HST": {
+        "slug": "health-sciences-and-technology",
+        "name": "Health Sciences and Technology",
+    },
+    "IDS": {
+        "slug": "institute-for-data-systems-and-society",
+        "name": "Institute for Data, Systems, and Society",
+    },
+    "MAS": {"slug": "media-arts-and-sciences", "name": "Media Arts and Sciences"},
+    "PE": {
+        "slug": "athletics-physical-education-and-recreation",
+        "name": "Athletics, Physical Education and Recreation",
+    },
+    "RES": {"slug": "supplemental-resources", "name": "Supplemental Resources"},
+    "STS": {
+        "slug": "science-technology-and-society",
+        "name": "Science, Technology, and Society",
+    },
+    "WGS": {"slug": "womens-and-gender-studies", "name": "Women's and Gender Studies"},
+}

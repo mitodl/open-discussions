@@ -17,6 +17,7 @@ from course_catalog.constants import (
     PrivacyLevel,
     CONTENT_TYPE_FILE,
     CONTENT_TYPE_PAGE,
+    OCW_DEPARTMENTS,
 )
 from course_catalog.models import (
     Course,
@@ -172,6 +173,7 @@ class CourseFactory(AbstractCourseFactory):
             PlatformType.bootcamps.value,
         )
     )
+    department = FuzzyChoice(OCW_DEPARTMENTS.keys())
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )

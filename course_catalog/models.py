@@ -11,6 +11,7 @@ from django.contrib.postgres.fields import JSONField
 from course_catalog.constants import (
     VALID_COURSE_CONTENT_CHOICES,
     CONTENT_TYPE_FILE,
+    OCW_DEPARTMENTS,
     PlatformType,
     OfferedBy,
     ResourceType,
@@ -248,6 +249,7 @@ class ContentFile(TimestampedModel):
     short_url = models.TextField(null=True, blank=True)
     file_type = models.CharField(max_length=128, null=True, blank=True)
     section = models.CharField(max_length=512, null=True, blank=True)
+    section_slug = models.CharField(max_length=512, null=True, blank=True)
 
     content = models.TextField(null=True, blank=True)
     content_title = models.CharField(max_length=1024, null=True, blank=True)
@@ -313,6 +315,16 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
             return [CERTIFICATE]
         else:
             return []
+
+    @property
+    def department_name(self):
+        """Returns the name of the department"""
+        return OCW_DEPARTMENTS.get(self.department, {}).get("name")
+
+    @property
+    def department_slug(self):
+        """Returns the department slug"""
+        return OCW_DEPARTMENTS.get(self.department, {}).get("slug")
 
     class Meta:
         unique_together = ("platform", "course_id")
