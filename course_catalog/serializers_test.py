@@ -4,7 +4,7 @@ Test course_catalog serializers
 import pytest
 
 from course_catalog import factories
-from course_catalog.constants import OfferedBy, ListType, PlatformType
+from course_catalog.constants import OfferedBy, ListType, PlatformType, OCW_DEPARTMENTS
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
@@ -62,6 +62,9 @@ def test_serialize_course_related_models(offered_by):
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
     assert len(serializer.data["runs"]) == 3
+    assert (
+        serializer.data["department_slug"] == OCW_DEPARTMENTS[course.department]["slug"]
+    )
 
 
 def test_serialize_courserun_related_models():

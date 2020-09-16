@@ -362,9 +362,9 @@ def test_es_course_serializer(offered_by, platform, department):
         expected_certification = []
 
     if department == "2":
-        expeced_department_name = "Mechanical Engineering"
+        expected_department_name = "Mechanical Engineering"
     else:
-        expeced_department_name = None
+        expected_department_name = None
 
     assert_json_equal(
         serialized,
@@ -391,7 +391,8 @@ def test_es_course_serializer(offered_by, platform, department):
             "resource_relations": {"name": "resource"},
             "audience": expected_audience,
             "certification": expected_certification,
-            "department_name": expeced_department_name,
+            "department_name": expected_department_name,
+            "department_slug": course.department_slug,
         },
         sort=True,
     )
@@ -415,6 +416,7 @@ def test_es_content_file_serializer():
             "run_id": content_file.run.run_id,
             "run_title": content_file.run.title,
             "run_slug": content_file.run.slug,
+            "run_department_slug": content_file.run.content_object.department_slug,
             "semester": content_file.run.semester,
             "year": int(content_file.run.year),
             "topics": list(
@@ -436,6 +438,7 @@ def test_es_content_file_serializer():
             "url": content_file.url,
             "short_url": content_file.short_url,
             "section": content_file.section,
+            "section_slug": content_file.section_slug,
             "content": content_kwargs["content"],
             "content_title": content_kwargs["content_title"],
             "content_author": content_kwargs["content_author"],

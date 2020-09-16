@@ -297,6 +297,7 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
     object_type = serializers.CharField(read_only=True, default="course")
     audience = serializers.ReadOnlyField()
     certification = serializers.ReadOnlyField()
+    department_slug = serializers.ReadOnlyField()
 
     def validate(self, attrs):
         """
@@ -317,6 +318,7 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
         extra_kwargs = {
             "raw_json": {"write_only": True},
             "full_description": {"write_only": True},
+            "department_slug": {"read_only": True},
         }
 
 

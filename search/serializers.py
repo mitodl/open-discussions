@@ -20,7 +20,6 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
-from course_catalog.etl.ocw import OCW_DEPARTMENT_CODE_TO_NAME
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -356,6 +355,9 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     run_id = serializers.CharField(source="run.run_id")
     run_title = serializers.CharField(source="run.title")
     run_slug = serializers.CharField(source="run.slug")
+    run_department_slug = serializers.CharField(
+        source="run.content_object.department_slug"
+    )
     semester = serializers.CharField(source="run.semester")
     year = serializers.IntegerField(source="run.year")
     topics = ESTopicsField(source="run.content_object.topics")
@@ -375,6 +377,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "run_id",
             "run_title",
             "run_slug",
+            "run_department_slug",
             "semester",
             "year",
             "topics",
@@ -386,6 +389,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "url",
             "short_url",
             "section",
+            "section_slug",
             "file_type",
             "content_type",
             "content",
@@ -464,18 +468,8 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
 
     runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
     coursenum = serializers.SerializerMethodField()
-    department_name = serializers.SerializerMethodField()
 
     default_search_priority = serializers.SerializerMethodField()
-
-    def get_department_name(self, course):
-        """
-        Convert course number to course name
-        """
-        if course.department in OCW_DEPARTMENT_CODE_TO_NAME.keys():
-            return OCW_DEPARTMENT_CODE_TO_NAME[course.department]
-        else:
-            return None
 
     def get_coursenum(self, course):
         """
@@ -516,6 +510,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "audience",
             "certification",
             "department_name",
+            "department_slug",
         ]
 
         read_only_fields = fields
