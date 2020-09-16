@@ -35,7 +35,8 @@ The current ETL process for OCW resources will need to be modified to process th
   - If a matching video is found, copy that video's `image_src` and `transcript` values to the resource's `image_src` and `content` fields.
   - If a matching `Video` object is NOT found:
     - Find the `course_embedded_media` object with `id` of "Thumbnail-YouTube-JPG" and use its `media_location` as the `image_src` value.
-    - Find the `course_embedded_media` object with `id` of "<Youtube_video_id>.pdf". Use tika to retrieve (via `technical_location` url) and parse the contents and save to the `content` attribute.
+    - If the `transcript` attribute of the object exists and use that (stripped of HTML via BeautifulSoup) for the `content` value.
+    - If the `content` is still empty/null, find the `course_embedded_media` object with `id` of "<Youtube_video_id>.pdf". Use tika to retrieve (via `technical_location` url) and parse the contents and save to the `content` attribute.
   - The `ContentFile` will have a `content_type` of "video" and a `file_type` of "youtube"
   - If no Youtube video object is found, ignore the section and move on.
 
