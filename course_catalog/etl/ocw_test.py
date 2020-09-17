@@ -26,186 +26,8 @@ from course_catalog.etl.ocw import (
 )
 from course_catalog.factories import VideoFactory
 
-OCW_COURSE_JSON = {
-    "uid": "0007de9b4a0cd7c298d822b4123c2eaf",
-    "title": "Geometric Disciplines and Architecture Skills: Reciprocal Methodologies",
-    "url": "/courses/engineering/4-105-geometric-disciplines-fall-2012",
-    "short_url": "4-105-geometric-disciplines-fall-2012",
-    "department_number": "4",
-    "course_files": [
-        {
-            "uid": "e07fcb22fbcf24329fc81b8194329699",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "Exercise 3: Thickened Plane + the Explosion",
-            "caption": None,
-            "file_type": "application/pdf",
-            "description": "This resource contains information regarding thickened plane + the explosion.",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
-            ),
-        },
-        {
-            "uid": "78a221020dc9604e6608d57f2a6b6fd0",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "ex6-handle.3dm",
-            "caption": None,
-            "file_type": "application/octet-stream",
-            "description": "This resource is related to rhino\u00ae model: handle.",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "78a221020dc9604e6608d57f2a6b6fd0_ex6-handle.3dm"
-            ),
-        },
-        {
-            "uid": "98a221020dc9604e6608d57f2a6b6fd1",
-            "title": "testing.pdf",
-            "caption": None,
-            "file_type": "application/octet-stream",
-            "description": "A test file",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "98a221020dc9604e6608d57f2a6b6fd1_testing.pdf"
-            ),
-        },
-        {
-            "uid": "00a221020dc9604e6608d57f2a6b6f11",
-            "parent_uid": "0b5f9d523e26f2a622f728050421f5a9",
-            "title": "testing2.pdf",
-            "caption": None,
-            "file_type": "application/pdf",
-            "description": "A test file 2",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "00a221020dc9604e6608d57f2a6b6f11_testing2.pdf"
-            ),
-        },
-        {
-            "uid": "450555028099b6c7beac2e1a39e5cede",
-            "parent_uid": "aa5f9d523e26f2a622f728050421f5zz",
-            "title": "ex7_lz_300k.mp4",
-            "caption": None,
-            "file_type": "video/mp4",
-            "description": "Video",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "450555028099b6c7beac2e1a39e5cede_ex7_lz_300k.mp4"
-            ),
-        },
-    ],
-    "course_foreign_files": [
-        {
-            "parent_uid": "zz5f9d523e26f2a622f728050421f5a7",
-            "link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec1-intro.pdf",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "MIT4_105F12_lec1-intro.pdf"
-            ),
-        },
-        {
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec7-discret.pdf",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "MIT4_105F12_lec7-discret.pdf"
-            ),
-        },
-    ],
-    "course_embedded_media": {
-        "21997335lecture81445932": {
-            "uid": "e5501acc33e7f9f384814753f8c22805",
-            "title": "Lecture 8: Our Passion for Entrepreneurship at MIT",
-            "transcript": "<p>This is the <span>video transcript</span></p>",
-            "embedded_media": [
-                {
-                    "id": "Video-YouTube-Stream",
-                    "uid": "44d0bedab30fbef83e08e4ed3e7f6e89",
-                    "type": "Video",
-                    "title": "Video-YouTube-Stream",
-                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
-                    "media_location": "Ma3ANiGPVNU",
-                },
-                {
-                    "id": "Thumbnail-YouTube-JPG",
-                    "uid": "d4fe5673876abb039d32308dae32f57d",
-                    "type": "Thumbnail",
-                    "title": "Thumbnail-YouTube-JPG",
-                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
-                    "media_location": "https://img.youtube.com/vi/Ma3ANiGPVNU/default.jpg",
-                },
-                {
-                    "id": "Ma3ANiGPVNU.pdf",
-                    "uid": "023ec58f4ead6e6c219ed2645e93e3df",
-                    "type": None,
-                    "title": "3play pdf file",
-                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
-                    "technical_location": "https://ocw.mit.edu/courses/15-3/video-tutorials/Ma3ANiGPVNU.pdf",
-                },
-            ],
-        },
-        "31997335lecture81445932": {
-            "uid": "e5501acc33e7f9f384814753f8c22805",
-            "title": "Lecture 9: Our Passion for Tech at MIT",
-            "transcript": "",
-            "embedded_media": [
-                {
-                    "id": "Video-YouTube-Stream",
-                    "uid": "54d0bedab30fbef83e08e4ed3e7f6e89",
-                    "type": "Video",
-                    "title": "Video-YouTube-Stream",
-                    "parent_uid": "f5501acc33e7f9f384814753f8c22805",
-                    "media_location": "MGPVNUa3ANi",
-                },
-                {
-                    "id": "Thumbnail-YouTube-JPG",
-                    "uid": "f4fe5673876abb039d32308dae32f57d",
-                    "type": "Thumbnail",
-                    "title": "Thumbnail-YouTube-JPG",
-                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
-                    "media_location": "https://img.youtube.com/vi/MGPVNUa3ANi/default.jpg",
-                },
-                {
-                    "id": "MGPVNUa3ANi.pdf",
-                    "uid": "123ec58f4ead6e6c219ed2645e93e3df",
-                    "type": None,
-                    "title": "3play pdf file",
-                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
-                    "technical_location": "https://ocw.mit.edu/courses/15-3/MGPVNUa3ANi.pdf",
-                },
-            ],
-        },
-    },
-    "course_pages": [
-        {
-            "uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "parent_uid": "0007de9b4a0cd7c298d822b4123c2eaf",
-            "title": "Assignments",
-            "text": "<p>The following are the assigned exercises",
-            "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/assignments",
-            "short_url": "assignments",
-            "description": "This section provides the assigned exercises for the course",
-            "type": "CourseSection",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "bb5f9d523e26f2a622f728050421f5a7.html"
-            ),
-        },
-        {
-            "uid": "0b5f9d523e26f2a622f728050421f5a9",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "Sub Page",
-            "text": "<p>The Sub Page</p>",
-            "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/",
-            "short_url": "",
-            "description": "Extra Page",
-            "type": "DownloadsSection",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "bb5f9d523e26f2a622f728050421f5a7_extra.html"
-            ),
-        },
-    ],
-}
+with open("./test_json/test_master.json") as f:
+    OCW_COURSE_JSON = json.load(f)
 
 COURSE_PAGES = OCW_COURSE_JSON["course_pages"]
 COURSE_FILES = OCW_COURSE_JSON["course_files"]
@@ -268,7 +90,7 @@ def test_transform_content_files(mock_tika_functions, mocker):
     youtube_inputs = [EMBEDDED_MEDIA[item] for item in EMBEDDED_MEDIA]
 
     transformed_files = transform_content_files(OCW_COURSE_JSON)
-    assert len(transformed_files) == len(all_inputs) + len(youtube_inputs)
+    assert len(transformed_files) == len(all_inputs) + len(youtube_inputs) - 1
     assert mock_tika_functions.mock_extract_text.call_count == len(text_inputs)
     mock_tika_functions.mock_extract_text.assert_any_call(
         mocker.ANY,
@@ -283,7 +105,9 @@ def test_transform_content_files(mock_tika_functions, mocker):
     assert transformed_files == [
         transform_content_file(OCW_COURSE_JSON, file, is_page=is_page)
         for (file, is_page) in all_inputs
-    ] + [transform_embedded_media(EMBEDDED_MEDIA, media) for media in youtube_inputs]
+    ] + [
+        transform_embedded_media(EMBEDDED_MEDIA, media) for media in youtube_inputs[:-1]
+    ]
     mock_exception_log.assert_not_called()
 
 
@@ -501,33 +325,38 @@ def test_transform_embedded_media(mocker, video_exists, url_response):
         "course_catalog.etl.ocw.extract_text_from_url", return_value=url_response
     )
     for item in EMBEDDED_MEDIA:
-        (section, section_slug) = get_content_file_section(
-            EMBEDDED_MEDIA[item], COURSE_PAGES
-        )
-        key = EMBEDDED_MEDIA[item]["embedded_media"][0]["media_location"]
-        video = VideoFactory.create(video_id=key) if video_exists else None
-        if video:
-            expected_content = video.transcript
-        elif EMBEDDED_MEDIA[item]["transcript"]:
-            expected_content = bs(
-                EMBEDDED_MEDIA[item]["transcript"], "html.parser"
-            ).text
+        if EMBEDDED_MEDIA[item]["embedded_media"][0]["id"] == "Video-YouTube-Stream":
+            (section, section_slug) = get_content_file_section(
+                EMBEDDED_MEDIA[item], COURSE_PAGES
+            )
+            key = EMBEDDED_MEDIA[item]["embedded_media"][0]["media_location"]
+            video = VideoFactory.create(video_id=key) if video_exists else None
+            if video:
+                expected_content = video.transcript
+            elif EMBEDDED_MEDIA[item]["transcript"]:
+                expected_content = bs(
+                    EMBEDDED_MEDIA[item]["transcript"], "html.parser"
+                ).text
+            elif len(EMBEDDED_MEDIA[item]["embedded_media"]) >= 3:
+                expected_content = url_response
+            else:
+                expected_content = None
+            expected_transform = {
+                "content_type": CONTENT_TYPE_VIDEO,
+                "file_type": "video/youtube",
+                "key": key,
+                "section": section,
+                "section_slug": section_slug,
+                "title": video.title if video else EMBEDDED_MEDIA[item]["title"],
+                "uid": EMBEDDED_MEDIA[item]["uid"],
+                "url": f"https://www.youtube.com/watch?v={key}",
+                "image_src": video.image_src
+                if video
+                else EMBEDDED_MEDIA[item]["embedded_media"][1]["media_location"],
+                "content": expected_content,
+            }
         else:
-            expected_content = url_response
-        expected_transform = {
-            "content_type": CONTENT_TYPE_VIDEO,
-            "file_type": "video/youtube",
-            "key": key,
-            "section": section,
-            "section_slug": section_slug,
-            "title": video.title if video else EMBEDDED_MEDIA[item]["title"],
-            "uid": EMBEDDED_MEDIA[item]["uid"],
-            "url": f"https://www.youtube.com/watch?v={key}",
-            "image_src": video.image_src
-            if video
-            else EMBEDDED_MEDIA[item]["embedded_media"][1]["media_location"],
-            "content": expected_content,
-        }
+            expected_transform = None
         assert (
             transform_embedded_media(OCW_COURSE_JSON, EMBEDDED_MEDIA[item])
             == expected_transform

@@ -88,21 +88,23 @@ def test_extract_text_metadata(mocker, data, token, settings, headers):
         mock_tika.assert_not_called()
 
 
-def test_extract_text_from_url(mocker):
+@pytest.mark.parametrize("content", ["text", None])
+def test_extract_text_from_url(mocker, content):
     """extract_text_from_url should make appropriate requests and calls to extract_text_metadata"""
     mime_type = "application/pdf"
     url = "http://test.edu/file.pdf"
-    text = "some text"
     mock_request = mocker.patch(
-        "course_catalog.etl.utils.requests.get", return_value=mocker.Mock(content=text)
+        "course_catalog.etl.utils.requests.get",
+        return_value=mocker.Mock(content=content),
     )
     mock_extract = mocker.patch("course_catalog.etl.utils.extract_text_metadata")
     extract_text_from_url(url, mime_type=mime_type)
 
     mock_request.assert_called_once_with(url)
-    mock_extract.assert_called_once_with(
-        text, other_headers={"Content-Type": mime_type}
-    )
+    if content:
+        mock_extract.assert_called_once_with(
+            content, other_headers={"Content-Type": mime_type}
+        )
 
 
 @pytest.mark.parametrize(
