@@ -9,6 +9,7 @@ import uuid
 import rapidjson
 
 import pytz
+import requests
 from django.conf import settings
 from tika import parser as tika_parser
 
@@ -95,6 +96,18 @@ def extract_text_metadata(data, *, other_headers=None):
     request_options = {"headers": headers} if headers else {}
 
     return tika_parser.from_buffer(data, requestOptions=request_options)
+
+
+def extract_text_from_url(url, *, mime_type=None):
+    """Retrieve data from a URL and parse it with tika"""
+    response = requests.get(url)
+    response.raise_for_status()
+    if response.content:
+        return extract_text_metadata(
+            response.content,
+            other_headers={"Content-Type": mime_type} if mime_type else {},
+        )
+    return None
 
 
 def generate_unique_id(text):

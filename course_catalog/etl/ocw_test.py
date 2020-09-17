@@ -7,11 +7,13 @@ from types import SimpleNamespace
 from urllib.parse import urlparse
 
 import pytest
+from bs4 import BeautifulSoup as bs
 
 from course_catalog.constants import (
     CONTENT_TYPE_PAGE,
     VALID_TEXT_FILE_TYPES,
     CONTENT_TYPE_FILE,
+    CONTENT_TYPE_VIDEO,
 )
 from course_catalog.etl.ocw import (
     upload_mitx_course_manifest,
@@ -20,7 +22,9 @@ from course_catalog.etl.ocw import (
     transform_content_file,
     get_content_file_section,
     get_content_type,
+    transform_embedded_media,
 )
+from course_catalog.factories import VideoFactory
 
 OCW_COURSE_JSON = {
     "uid": "0007de9b4a0cd7c298d822b4123c2eaf",
@@ -108,17 +112,68 @@ OCW_COURSE_JSON = {
         },
     ],
     "course_embedded_media": {
-        "20547250exercise7video:inflation": {
+        "21997335lecture81445932": {
+            "uid": "e5501acc33e7f9f384814753f8c22805",
+            "title": "Lecture 8: Our Passion for Entrepreneurship at MIT",
+            "transcript": "<p>This is the <span>video transcript</span></p>",
             "embedded_media": [
                 {
-                    "uid": "450555028099b6c7beac2e1a39e5cede",
-                    "parent_uid": "37930e14299c238ef9667d294207cc33",
                     "id": "Video-YouTube-Stream",
+                    "uid": "44d0bedab30fbef83e08e4ed3e7f6e89",
+                    "type": "Video",
                     "title": "Video-YouTube-Stream",
-                    "media_info": "http://www.archive.org/download/ex7_lz_300k.mp4",
-                }
-            ]
-        }
+                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
+                    "media_location": "Ma3ANiGPVNU",
+                },
+                {
+                    "id": "Thumbnail-YouTube-JPG",
+                    "uid": "d4fe5673876abb039d32308dae32f57d",
+                    "type": "Thumbnail",
+                    "title": "Thumbnail-YouTube-JPG",
+                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
+                    "media_location": "https://img.youtube.com/vi/Ma3ANiGPVNU/default.jpg",
+                },
+                {
+                    "id": "Ma3ANiGPVNU.pdf",
+                    "uid": "023ec58f4ead6e6c219ed2645e93e3df",
+                    "type": None,
+                    "title": "3play pdf file",
+                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
+                    "technical_location": "https://ocw.mit.edu/courses/15-3/video-tutorials/Ma3ANiGPVNU.pdf",
+                },
+            ],
+        },
+        "31997335lecture81445932": {
+            "uid": "e5501acc33e7f9f384814753f8c22805",
+            "title": "Lecture 9: Our Passion for Tech at MIT",
+            "transcript": "",
+            "embedded_media": [
+                {
+                    "id": "Video-YouTube-Stream",
+                    "uid": "54d0bedab30fbef83e08e4ed3e7f6e89",
+                    "type": "Video",
+                    "title": "Video-YouTube-Stream",
+                    "parent_uid": "f5501acc33e7f9f384814753f8c22805",
+                    "media_location": "MGPVNUa3ANi",
+                },
+                {
+                    "id": "Thumbnail-YouTube-JPG",
+                    "uid": "f4fe5673876abb039d32308dae32f57d",
+                    "type": "Thumbnail",
+                    "title": "Thumbnail-YouTube-JPG",
+                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
+                    "media_location": "https://img.youtube.com/vi/MGPVNUa3ANi/default.jpg",
+                },
+                {
+                    "id": "MGPVNUa3ANi.pdf",
+                    "uid": "123ec58f4ead6e6c219ed2645e93e3df",
+                    "type": None,
+                    "title": "3play pdf file",
+                    "parent_uid": "e5501acc33e7f9f384814753f8c22805",
+                    "technical_location": "https://ocw.mit.edu/courses/15-3/MGPVNUa3ANi.pdf",
+                },
+            ],
+        },
     },
     "course_pages": [
         {
@@ -155,6 +210,7 @@ OCW_COURSE_JSON = {
 COURSE_PAGES = OCW_COURSE_JSON["course_pages"]
 COURSE_FILES = OCW_COURSE_JSON["course_files"]
 FOREIGN_FILES = OCW_COURSE_JSON["course_foreign_files"]
+EMBEDDED_MEDIA = OCW_COURSE_JSON["course_embedded_media"]
 
 
 @pytest.fixture
@@ -197,6 +253,9 @@ def mock_s3_content(mock_ocw_learning_bucket):
 def test_transform_content_files(mock_tika_functions, mocker):
     """ Verify that transform_content_files calls tika and returns expected output """
     mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
+    mocker.patch(
+        "course_catalog.etl.ocw.extract_text_from_url", return_value="tika text"
+    )
     file_inputs = COURSE_FILES + FOREIGN_FILES
     text_inputs = [
         input
@@ -206,9 +265,10 @@ def test_transform_content_files(mock_tika_functions, mocker):
     all_inputs = [(file, False) for file in file_inputs] + [
         (page, True) for page in COURSE_PAGES
     ]
+    youtube_inputs = [EMBEDDED_MEDIA[item] for item in EMBEDDED_MEDIA]
 
     transformed_files = transform_content_files(OCW_COURSE_JSON)
-    assert len(transformed_files) == len(all_inputs)
+    assert len(transformed_files) == len(all_inputs) + len(youtube_inputs)
     assert mock_tika_functions.mock_extract_text.call_count == len(text_inputs)
     mock_tika_functions.mock_extract_text.assert_any_call(
         mocker.ANY,
@@ -223,7 +283,7 @@ def test_transform_content_files(mock_tika_functions, mocker):
     assert transformed_files == [
         transform_content_file(OCW_COURSE_JSON, file, is_page=is_page)
         for (file, is_page) in all_inputs
-    ]
+    ] + [transform_embedded_media(EMBEDDED_MEDIA, media) for media in youtube_inputs]
     mock_exception_log.assert_not_called()
 
 
@@ -231,6 +291,9 @@ def test_transform_content_files(mock_tika_functions, mocker):
 def test_transform_content_files_error(mocker):
     """ Verify that errors are logged when transforming content files """
     mocker.patch("course_catalog.etl.ocw.transform_content_file", side_effect=Exception)
+    mocker.patch(
+        "course_catalog.etl.ocw.transform_embedded_media", side_effect=Exception
+    )
     mock_error_log = mocker.patch("course_catalog.etl.ocw.log.error")
     transform_content_files(OCW_COURSE_JSON)
     for course_file in COURSE_FILES:
@@ -245,6 +308,13 @@ def test_transform_content_files_error(mocker):
         mock_error_log.assert_any_call(
             "ERROR syncing course page %s for run %s",
             course_page.get("uid", ""),
+            OCW_COURSE_JSON.get("uid", ""),
+            exc_info=True,
+        )
+    for item in EMBEDDED_MEDIA:
+        mock_error_log.assert_any_call(
+            "ERROR syncing embed item %s for run %s",
+            item,
             OCW_COURSE_JSON.get("uid", ""),
             exc_info=True,
         )
@@ -418,6 +488,48 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             )
         assert (
             transform_content_file(OCW_COURSE_JSON, course_page, is_page=True)
+            == expected_transform
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("video_exists", [True, False])
+@pytest.mark.parametrize("url_response", ["tika text", None])
+def test_transform_embedded_media(mocker, video_exists, url_response):
+    """ Test that contents of embedded media are transformed correctly """
+    mocker.patch(
+        "course_catalog.etl.ocw.extract_text_from_url", return_value=url_response
+    )
+    for item in EMBEDDED_MEDIA:
+        (section, section_slug) = get_content_file_section(
+            EMBEDDED_MEDIA[item], COURSE_PAGES
+        )
+        key = EMBEDDED_MEDIA[item]["embedded_media"][0]["media_location"]
+        video = VideoFactory.create(video_id=key) if video_exists else None
+        if video:
+            expected_content = video.transcript
+        elif EMBEDDED_MEDIA[item]["transcript"]:
+            expected_content = bs(
+                EMBEDDED_MEDIA[item]["transcript"], "html.parser"
+            ).text
+        else:
+            expected_content = url_response
+        expected_transform = {
+            "content_type": CONTENT_TYPE_VIDEO,
+            "file_type": "video/youtube",
+            "key": key,
+            "section": section,
+            "section_slug": section_slug,
+            "title": video.title if video else EMBEDDED_MEDIA[item]["title"],
+            "uid": EMBEDDED_MEDIA[item]["uid"],
+            "url": f"https://www.youtube.com/watch?v={key}",
+            "image_src": video.image_src
+            if video
+            else EMBEDDED_MEDIA[item]["embedded_media"][1]["media_location"],
+            "content": expected_content,
+        }
+        assert (
+            transform_embedded_media(OCW_COURSE_JSON, EMBEDDED_MEDIA[item])
             == expected_transform
         )
 

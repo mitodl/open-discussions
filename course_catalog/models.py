@@ -244,6 +244,7 @@ class ContentFile(TimestampedModel):
     )
     title = models.CharField(max_length=1024, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+    image_src = models.URLField(null=True, blank=True)
 
     url = models.TextField(null=True, blank=True)
     short_url = models.TextField(null=True, blank=True)
