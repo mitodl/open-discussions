@@ -222,12 +222,9 @@ def generate_course_prefix_list(bucket):
     ocw_courses = set()
     log.info("Assembling list of courses...")
     for bucket_file in bucket.objects.all():
-        key_pieces = bucket_file.key.split("/")
-        course_prefix = (
-            "/".join(key_pieces[0:2]) if key_pieces[0] == "PROD" else key_pieces[0]
-        )
         # retrieve courses, skipping non-courses (bootcamps, department topics, etc)
-        if course_prefix not in NON_COURSE_DIRECTORIES:
+        if ocw_parent_folder(bucket_file.key) not in NON_COURSE_DIRECTORIES:
+            key_pieces = bucket_file.key.split("/")
             if "/".join(key_pieces[:-2]) != "":
                 ocw_courses.add("/".join(key_pieces[:-2]) + "/")
     return list(ocw_courses)
@@ -387,8 +384,12 @@ def sync_ocw_course(
     last_modified_dates = []
     uid = None
     is_published = True
-    log.info("Syncing: %s ...", course_prefix)
 
+    if ocw_parent_folder(course_prefix) in NON_COURSE_DIRECTORIES:
+        log.info("Non-course folder, skipping: %s ...", course_prefix)
+        return
+
+    log.info("Syncing: %s ...", course_prefix)
     # Collect last modified timestamps for all course files of the course
     for obj in raw_data_bucket.objects.filter(Prefix=course_prefix):
         # the "1.json" metadata file contains a course's uid
@@ -590,3 +591,17 @@ def sync_xpro_course_files(ids):
                 load_content_files(run, transform_content_files_xpro(course_tarpath))
             except:  # pylint: disable=bare-except
                 log.exception("Error ingesting OLX content data for %s", course_tarfile)
+
+
+def ocw_parent_folder(prefix):
+    """
+    Get the S3 parent folder of an OCW course
+
+    Args:
+        prefix(str): The course prefix
+
+    Returns:
+        str: The parent folder for the course prefix
+    """
+    prefix_parts = prefix.split("/")
+    return "/".join(prefix_parts[0:2]) if prefix_parts[0] == "PROD" else prefix_parts[0]
