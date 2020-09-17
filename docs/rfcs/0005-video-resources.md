@@ -16,7 +16,7 @@ has_toc: true
 
 ### Abstract
 Parse the `course_embedded_media` section of OCW master.json files.  Search for Youtube videos within that section.
-If found, add the video as a resource, including the the thumbnail image and transcript text.
+If found, add the video as a resource, including the thumbnail image and transcript text.
 
 
 ### Acceptance Criteria
