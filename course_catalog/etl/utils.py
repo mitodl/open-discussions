@@ -99,7 +99,16 @@ def extract_text_metadata(data, *, other_headers=None):
 
 
 def extract_text_from_url(url, *, mime_type=None):
-    """Retrieve data from a URL and parse it with tika"""
+    """
+    Retrieve data from a URL and parse it with tika
+
+    Args:
+        url(str): The URL to retrieve content from
+        mime_type(str): The expected mime-type of the content
+
+    Returns:
+        str: The text contained in the URL content.
+    """
     response = requests.get(url)
     response.raise_for_status()
     if response.content:
