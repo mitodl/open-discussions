@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.143.3
+Version 0.143.3 (Released September 18, 2020)
 ---------------
 
 - Skip non-course directories (#3151)
