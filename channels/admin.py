@@ -136,7 +136,10 @@ class SpamCheckResultAdmin(admin.ModelAdmin):
 
     def truncated_text(self, spam_check):
         """Truncated text of spam checked post or comment"""
-        return spam_check.content_object.text[0:350]
+        if spam_check.content_object.text:
+            return spam_check.content_object.text[0:350]
+        else:
+            return ""
 
     def author(self, spam_check):
         """Email text of spam checked post or comment author"""
