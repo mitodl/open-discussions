@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.143.4
+Version 0.143.4 (Released September 21, 2020)
 ---------------
 
 - fix spam check admin
