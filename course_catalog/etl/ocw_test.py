@@ -7,11 +7,13 @@ from types import SimpleNamespace
 from urllib.parse import urlparse
 
 import pytest
+from bs4 import BeautifulSoup as bs
 
 from course_catalog.constants import (
     CONTENT_TYPE_PAGE,
     VALID_TEXT_FILE_TYPES,
     CONTENT_TYPE_FILE,
+    CONTENT_TYPE_VIDEO,
 )
 from course_catalog.etl.ocw import (
     upload_mitx_course_manifest,
@@ -20,141 +22,17 @@ from course_catalog.etl.ocw import (
     transform_content_file,
     get_content_file_section,
     get_content_type,
+    transform_embedded_media,
 )
+from course_catalog.factories import VideoFactory
 
-OCW_COURSE_JSON = {
-    "uid": "0007de9b4a0cd7c298d822b4123c2eaf",
-    "title": "Geometric Disciplines and Architecture Skills: Reciprocal Methodologies",
-    "url": "/courses/engineering/4-105-geometric-disciplines-fall-2012",
-    "short_url": "4-105-geometric-disciplines-fall-2012",
-    "department_number": "4",
-    "course_files": [
-        {
-            "uid": "e07fcb22fbcf24329fc81b8194329699",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "Exercise 3: Thickened Plane + the Explosion",
-            "caption": None,
-            "file_type": "application/pdf",
-            "description": "This resource contains information regarding thickened plane + the explosion.",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
-            ),
-        },
-        {
-            "uid": "78a221020dc9604e6608d57f2a6b6fd0",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "ex6-handle.3dm",
-            "caption": None,
-            "file_type": "application/octet-stream",
-            "description": "This resource is related to rhino\u00ae model: handle.",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "78a221020dc9604e6608d57f2a6b6fd0_ex6-handle.3dm"
-            ),
-        },
-        {
-            "uid": "98a221020dc9604e6608d57f2a6b6fd1",
-            "title": "testing.pdf",
-            "caption": None,
-            "file_type": "application/octet-stream",
-            "description": "A test file",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "98a221020dc9604e6608d57f2a6b6fd1_testing.pdf"
-            ),
-        },
-        {
-            "uid": "00a221020dc9604e6608d57f2a6b6f11",
-            "parent_uid": "0b5f9d523e26f2a622f728050421f5a9",
-            "title": "testing2.pdf",
-            "caption": None,
-            "file_type": "application/pdf",
-            "description": "A test file 2",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "00a221020dc9604e6608d57f2a6b6f11_testing2.pdf"
-            ),
-        },
-        {
-            "uid": "450555028099b6c7beac2e1a39e5cede",
-            "parent_uid": "aa5f9d523e26f2a622f728050421f5zz",
-            "title": "ex7_lz_300k.mp4",
-            "caption": None,
-            "file_type": "video/mp4",
-            "description": "Video",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "450555028099b6c7beac2e1a39e5cede_ex7_lz_300k.mp4"
-            ),
-        },
-    ],
-    "course_foreign_files": [
-        {
-            "parent_uid": "zz5f9d523e26f2a622f728050421f5a7",
-            "link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec1-intro.pdf",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "MIT4_105F12_lec1-intro.pdf"
-            ),
-        },
-        {
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec7-discret.pdf",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "MIT4_105F12_lec7-discret.pdf"
-            ),
-        },
-    ],
-    "course_embedded_media": {
-        "20547250exercise7video:inflation": {
-            "embedded_media": [
-                {
-                    "uid": "450555028099b6c7beac2e1a39e5cede",
-                    "parent_uid": "37930e14299c238ef9667d294207cc33",
-                    "id": "Video-YouTube-Stream",
-                    "title": "Video-YouTube-Stream",
-                    "media_info": "http://www.archive.org/download/ex7_lz_300k.mp4",
-                }
-            ]
-        }
-    },
-    "course_pages": [
-        {
-            "uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "parent_uid": "0007de9b4a0cd7c298d822b4123c2eaf",
-            "title": "Assignments",
-            "text": "<p>The following are the assigned exercises",
-            "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/assignments",
-            "short_url": "assignments",
-            "description": "This section provides the assigned exercises for the course",
-            "type": "CourseSection",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "bb5f9d523e26f2a622f728050421f5a7.html"
-            ),
-        },
-        {
-            "uid": "0b5f9d523e26f2a622f728050421f5a9",
-            "parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
-            "title": "Sub Page",
-            "text": "<p>The Sub Page</p>",
-            "url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/",
-            "short_url": "",
-            "description": "Extra Page",
-            "type": "DownloadsSection",
-            "file_location": (
-                "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/"
-                + "bb5f9d523e26f2a622f728050421f5a7_extra.html"
-            ),
-        },
-    ],
-}
+with open("./test_json/test_master.json") as f:
+    OCW_COURSE_JSON = json.load(f)
 
 COURSE_PAGES = OCW_COURSE_JSON["course_pages"]
 COURSE_FILES = OCW_COURSE_JSON["course_files"]
 FOREIGN_FILES = OCW_COURSE_JSON["course_foreign_files"]
+EMBEDDED_MEDIA = OCW_COURSE_JSON["course_embedded_media"]
 
 
 @pytest.fixture
@@ -197,6 +75,9 @@ def mock_s3_content(mock_ocw_learning_bucket):
 def test_transform_content_files(mock_tika_functions, mocker):
     """ Verify that transform_content_files calls tika and returns expected output """
     mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
+    mocker.patch(
+        "course_catalog.etl.ocw.extract_text_from_url", return_value="tika text"
+    )
     file_inputs = COURSE_FILES + FOREIGN_FILES
     text_inputs = [
         input
@@ -206,9 +87,10 @@ def test_transform_content_files(mock_tika_functions, mocker):
     all_inputs = [(file, False) for file in file_inputs] + [
         (page, True) for page in COURSE_PAGES
     ]
+    youtube_inputs = [EMBEDDED_MEDIA[item] for item in EMBEDDED_MEDIA]
 
     transformed_files = transform_content_files(OCW_COURSE_JSON)
-    assert len(transformed_files) == len(all_inputs)
+    assert len(transformed_files) == len(all_inputs) + len(youtube_inputs) - 1
     assert mock_tika_functions.mock_extract_text.call_count == len(text_inputs)
     mock_tika_functions.mock_extract_text.assert_any_call(
         mocker.ANY,
@@ -223,6 +105,8 @@ def test_transform_content_files(mock_tika_functions, mocker):
     assert transformed_files == [
         transform_content_file(OCW_COURSE_JSON, file, is_page=is_page)
         for (file, is_page) in all_inputs
+    ] + [
+        transform_embedded_media(EMBEDDED_MEDIA, media) for media in youtube_inputs[:-1]
     ]
     mock_exception_log.assert_not_called()
 
@@ -231,6 +115,9 @@ def test_transform_content_files(mock_tika_functions, mocker):
 def test_transform_content_files_error(mocker):
     """ Verify that errors are logged when transforming content files """
     mocker.patch("course_catalog.etl.ocw.transform_content_file", side_effect=Exception)
+    mocker.patch(
+        "course_catalog.etl.ocw.transform_embedded_media", side_effect=Exception
+    )
     mock_error_log = mocker.patch("course_catalog.etl.ocw.log.error")
     transform_content_files(OCW_COURSE_JSON)
     for course_file in COURSE_FILES:
@@ -245,6 +132,13 @@ def test_transform_content_files_error(mocker):
         mock_error_log.assert_any_call(
             "ERROR syncing course page %s for run %s",
             course_page.get("uid", ""),
+            OCW_COURSE_JSON.get("uid", ""),
+            exc_info=True,
+        )
+    for item in EMBEDDED_MEDIA:
+        mock_error_log.assert_any_call(
+            "ERROR syncing embed item %s for run %s",
+            item,
             OCW_COURSE_JSON.get("uid", ""),
             exc_info=True,
         )
@@ -418,6 +312,53 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             )
         assert (
             transform_content_file(OCW_COURSE_JSON, course_page, is_page=True)
+            == expected_transform
+        )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("video_exists", [True, False])
+@pytest.mark.parametrize("url_response", ["tika text", None])
+def test_transform_embedded_media(mocker, video_exists, url_response):
+    """ Test that contents of embedded media are transformed correctly """
+    mocker.patch(
+        "course_catalog.etl.ocw.extract_text_from_url", return_value=url_response
+    )
+    for item in EMBEDDED_MEDIA:
+        if EMBEDDED_MEDIA[item]["embedded_media"][0]["id"] == "Video-YouTube-Stream":
+            (section, section_slug) = get_content_file_section(
+                EMBEDDED_MEDIA[item], COURSE_PAGES
+            )
+            key = EMBEDDED_MEDIA[item]["embedded_media"][0]["media_location"]
+            video = VideoFactory.create(video_id=key) if video_exists else None
+            if video:
+                expected_content = video.transcript
+            elif EMBEDDED_MEDIA[item]["transcript"]:
+                expected_content = bs(
+                    EMBEDDED_MEDIA[item]["transcript"], "html.parser"
+                ).text
+            elif len(EMBEDDED_MEDIA[item]["embedded_media"]) >= 3:
+                expected_content = url_response
+            else:
+                expected_content = None
+            expected_transform = {
+                "content_type": CONTENT_TYPE_VIDEO,
+                "file_type": "video/youtube",
+                "key": key,
+                "section": section,
+                "section_slug": section_slug,
+                "title": video.title if video else EMBEDDED_MEDIA[item]["title"],
+                "uid": EMBEDDED_MEDIA[item]["uid"],
+                "url": f"https://www.youtube.com/watch?v={key}",
+                "image_src": video.image_src
+                if video
+                else EMBEDDED_MEDIA[item]["embedded_media"][1]["media_location"],
+                "content": expected_content,
+            }
+        else:
+            expected_transform = None
+        assert (
+            transform_embedded_media(OCW_COURSE_JSON, EMBEDDED_MEDIA[item])
             == expected_transform
         )
 

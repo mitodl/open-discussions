@@ -1,0 +1,173 @@
+{
+	"uid": "0007de9b4a0cd7c298d822b4123c2eaf",
+	"title": "Geometric Disciplines and Architecture Skills: Reciprocal Methodologies",
+	"url": "/courses/engineering/4-105-geometric-disciplines-fall-2012",
+	"short_url": "4-105-geometric-disciplines-fall-2012",
+	"department_number": "4",
+	"course_files": [{
+		"uid": "e07fcb22fbcf24329fc81b8194329699",
+		"parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+		"title": "Exercise 3: Thickened Plane + the Explosion",
+		"caption": null,
+		"file_type": "application/pdf",
+		"description": "This resource contains information regarding thickened plane + the explosion.",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
+	}, {
+		"uid": "78a221020dc9604e6608d57f2a6b6fd0",
+		"parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+		"title": "ex6-handle.3dm",
+		"caption": null,
+		"file_type": "application/octet-stream",
+		"description": "This resource is related to rhino\\u00ae model: handle.",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/78a221020dc9604e6608d57f2a6b6fd0_ex6-handle.3dm"
+	}, {
+		"uid": "98a221020dc9604e6608d57f2a6b6fd1",
+		"title": "testing.pdf",
+		"caption": null,
+		"file_type": "application/octet-stream",
+		"description": "A test file",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/98a221020dc9604e6608d57f2a6b6fd1_testing.pdf"
+	}, {
+		"uid": "00a221020dc9604e6608d57f2a6b6f11",
+		"parent_uid": "0b5f9d523e26f2a622f728050421f5a9",
+		"title": "testing2.pdf",
+		"caption": null,
+		"file_type": "application/pdf",
+		"description": "A test file 2",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/00a221020dc9604e6608d57f2a6b6f11_testing2.pdf"
+	}, {
+		"uid": "450555028099b6c7beac2e1a39e5cede",
+		"parent_uid": "aa5f9d523e26f2a622f728050421f5zz",
+		"title": "ex7_lz_300k.mp4",
+		"caption": null,
+		"file_type": "video/mp4",
+		"description": "Video",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/450555028099b6c7beac2e1a39e5cede_ex7_lz_300k.mp4"
+	}],
+	"course_foreign_files": [{
+		"parent_uid": "zz5f9d523e26f2a622f728050421f5a7",
+		"link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec1-intro.pdf",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/MIT4_105F12_lec1-intro.pdf"
+	}, {
+		"parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+		"link": "http://ocw.mit.edu/ans7870/4/4.105/f12/MIT4_105F12_lec7-discret.pdf",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/MIT4_105F12_lec7-discret.pdf"
+	}],
+	"course_embedded_media": {
+		"21997335lecture81445932": {
+			"uid": "e5501acc33e7f9f384814753f8c22805",
+			"title": "Lecture 8: Our Passion for Entrepreneurship at MIT",
+			"transcript": "<p>This is the <span>video transcript</span></p>",
+			"embedded_media": [{
+				"id": "Video-YouTube-Stream",
+				"uid": "44d0bedab30fbef83e08e4ed3e7f6e89",
+				"type": "Video",
+				"title": "Video-YouTube-Stream",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"media_location": "Ma3ANiGPVNU"
+			}, {
+				"id": "Thumbnail-YouTube-JPG",
+				"uid": "d4fe5673876abb039d32308dae32f57d",
+				"type": "Thumbnail",
+				"title": "Thumbnail-YouTube-JPG",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"media_location": "https://img.youtube.com/vi/Ma3ANiGPVNU/default.jpg"
+			}, {
+				"id": "Ma3ANiGPVNU.pdf",
+				"uid": "023ec58f4ead6e6c219ed2645e93e3df",
+				"type": null,
+				"title": "3play pdf file",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"technical_location": "https://ocw.mit.edu/courses/15-3/video-tutorials/Ma3ANiGPVNU.pdf"
+			}]
+		},
+		"31997335lecture81445932": {
+			"uid": "e5501acc33e7f9f384814753f8c22805",
+			"title": "Lecture 9: Our Passion for Tech at MIT",
+			"transcript": "",
+			"embedded_media": [{
+				"id": "Video-YouTube-Stream",
+				"uid": "54d0bedab30fbef83e08e4ed3e7f6e89",
+				"type": "Video",
+				"title": "Video-YouTube-Stream",
+				"parent_uid": "f5501acc33e7f9f384814753f8c22805",
+				"media_location": "MGPVNUa3ANi"
+			}, {
+				"id": "Thumbnail-YouTube-JPG",
+				"uid": "f4fe5673876abb039d32308dae32f57d",
+				"type": "Thumbnail",
+				"title": "Thumbnail-YouTube-JPG",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"media_location": "https://img.youtube.com/vi/MGPVNUa3ANi/default.jpg"
+			}, {
+				"id": "MGPVNUa3ANi.pdf",
+				"uid": "123ec58f4ead6e6c219ed2645e93e3df",
+				"type": null,
+				"title": "3play pdf file",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"technical_location": "https://ocw.mit.edu/courses/15-3/MGPVNUa3ANi.pdf"
+			}]
+		},
+		"91997335lecture81445932": {
+			"uid": "g5501acc33e7f9f384814753f8c22805",
+			"title": "Lecture 10: Our Passion for Stuff at MIT",
+			"transcript": "",
+			"embedded_media": [{
+				"id": "Video-YouTube-Stream",
+				"uid": "54d0bedab30fbef83e08e4ed3e7f6e89",
+				"type": "Video",
+				"title": "Video-YouTube-Stream",
+				"parent_uid": "f5501acc33e7f9f384814753f8c22805",
+				"media_location": "ZXMGPVNUa3A"
+			}, {
+				"id": "Thumbnail-YouTube-JPG",
+				"uid": "f4fe5673876abb039d32308dae32f57d",
+				"type": "Thumbnail",
+				"title": "Thumbnail-YouTube-JPG",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"media_location": "https://img.youtube.com/vi/ZXMGPVNUa3A/default.jpg"
+			}]
+		},
+		"92997335lecture81445932": {
+			"uid": "h5501acc33e7f9f384814753f8c22805",
+			"title": "Lecture 11: Our Passion for Everything at MIT",
+			"transcript": "",
+			"embedded_media": [{
+				"id": "Thumbnail-YouTube-JPG",
+				"uid": "d4fe5673876abb039d32308dae32f57d",
+				"type": "Thumbnail",
+				"title": "Thumbnail-YouTube-JPG",
+				"parent_uid": "e5501acc33e7f9f384814753f8c22805",
+				"media_location": "https://img.youtube.com/vi/3ANiGPVNU/default.jpg"
+			}, {
+				"id": "Thumbnail-YouTube-JPG",
+				"uid": "d4fe5673876abb039d32308dae32f57d",
+				"type": "Thumbnail",
+				"title": "Thumbnail-YouTube-JPG",
+				"parent_uid": "f5501acc33e7f9f384814753f8c22805",
+				"media_location": "https://img.youtube.com/vi/3ANiGPVNU/optional.jpg"
+			}]
+		}
+	},
+	"course_pages": [{
+		"uid": "bb5f9d523e26f2a622f728050421f5a7",
+		"parent_uid": "0007de9b4a0cd7c298d822b4123c2eaf",
+		"title": "Assignments",
+		"text": "<p>The following are the assigned exercises",
+		"url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/assignments",
+		"short_url": "assignments",
+		"description": "This section provides the assigned exercises for the course",
+		"type": "CourseSection",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/bb5f9d523e26f2a622f728050421f5a7.html"
+	}, {
+		"uid": "0b5f9d523e26f2a622f728050421f5a9",
+		"parent_uid": "bb5f9d523e26f2a622f728050421f5a7",
+		"title": "Sub Page",
+		"text": "<p>The Sub Page</p>",
+		"url": "/courses/architecture/4-105-geometric-disciplines-fall-2012/",
+		"short_url": "",
+		"description": "Extra Page",
+		"type": "DownloadsSection",
+		"file_location": "https://s3.amazonaws.com/4-105-geometric-disciplines-fall-2012/bb5f9d523e26f2a622f728050421f5a7_extra.html"
+	}]
+}

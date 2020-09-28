@@ -7,6 +7,7 @@ from urllib.parse import urlparse
 
 import boto3
 import rapidjson
+from bs4 import BeautifulSoup as bs
 from django.conf import settings
 
 from course_catalog.constants import (
@@ -16,8 +17,12 @@ from course_catalog.constants import (
     CONTENT_TYPE_VIDEO,
     CONTENT_TYPE_PDF,
 )
-from course_catalog.etl.utils import extract_text_metadata, sync_s3_text
-from course_catalog.models import ContentFile, get_max_length
+from course_catalog.etl.utils import (
+    extract_text_metadata,
+    sync_s3_text,
+    extract_text_from_url,
+)
+from course_catalog.models import ContentFile, get_max_length, Video
 
 log = logging.getLogger()
 
@@ -53,6 +58,8 @@ def transform_content_files(course_run_json):
     )
     json_course_pages = course_run_json.get("course_pages", [])
 
+    json_embedded_media = course_run_json.get("course_embedded_media", {})
+
     content_files = []
     for course_file in json_course_files:
         try:
@@ -75,6 +82,16 @@ def transform_content_files(course_run_json):
             log.exception(
                 "ERROR syncing course page %s for run %s",
                 course_page.get("uid", ""),
+                course_run_json.get("uid", ""),
+            )
+    for embedded_media in json_embedded_media:
+        item = json_embedded_media[embedded_media]
+        try:
+            content_files.append(transform_embedded_media(json_embedded_media, item))
+        except:  # pylint: disable=bare-except
+            log.exception(
+                "ERROR syncing embed item %s for run %s",
+                embedded_media,
                 course_run_json.get("uid", ""),
             )
     return [content_file for content_file in content_files if content_file is not None]
@@ -164,6 +181,100 @@ def transform_content_file(
     content_file.pop("id", None)
 
     return content_file
+
+
+def transform_embedded_media(
+    course_run_json, embedded_media_item
+):  # pylint: disable=too-many-locals
+    """
+    Transforms course_embedded_media json based on parent course run master_json
+
+    Args:
+        course_run_json (dict): course run master_json
+        embedded_media_item (dict): the embedded_media item json
+
+    Returns:
+        dict: transformed content_file json
+    """
+    embedded_media_files = embedded_media_item["embedded_media"]
+    videos = [
+        obj["media_location"]
+        for obj in embedded_media_files
+        if obj["id"] == "Video-YouTube-Stream"
+    ]
+    if videos:
+        video = videos[0]
+        content_file = {
+            "title": embedded_media_item["title"],
+            "key": video,
+            "file_type": "video/youtube",
+            "content_type": CONTENT_TYPE_VIDEO,
+            "url": f"https://www.youtube.com/watch?v={video}",
+            "uid": embedded_media_item["uid"],
+        }
+        video_model_obj = Video.objects.filter(video_id=video).first()
+        if video_model_obj:
+            # Use the same thumbnail and transcript as a matching Video for consistency
+            content_file["image_src"] = video_model_obj.image_src
+            content_file["content"] = video_model_obj.transcript
+            content_file["title"] = video_model_obj.title
+        else:
+            log.debug(
+                "No matching Video object %s found for course_json uid %s",
+                video,
+                course_run_json.get("uid"),
+            )
+            thumbnails = [
+                obj["media_location"]
+                for obj in embedded_media_files
+                if obj["id"] == "Thumbnail-YouTube-JPG"
+            ]
+            if thumbnails:
+                content_file["image_src"] = thumbnails[0]
+
+        # If no matching video or video transcript is empty, try other sources
+        if not content_file.get("content"):
+            log.debug(
+                "No transcript from Video object %s, searching for embedded transcript",
+                video,
+            )
+            embedded_transcript = embedded_media_item.get("transcript")
+            if embedded_transcript:
+                content_file["content"] = bs(embedded_transcript, "html.parser").text
+            else:
+                log.debug(
+                    "No embedded transcript for video %s, searching for transcript pdf",
+                    video,
+                )
+                transcripts = [
+                    obj["technical_location"]
+                    for obj in embedded_media_files
+                    if obj["id"] == f"{video}.pdf"
+                ]
+                if transcripts:
+                    try:
+                        content_file["content"] = extract_text_from_url(
+                            transcripts[0], mime_type="application/pdf"
+                        )
+                    except:  # pylint:disable=bare-except
+                        log.exception(
+                            "Error reading transcript URL for course run %s",
+                            course_run_json.get("uid"),
+                        )
+                else:
+                    log.debug("No transcript pdf found for video %s", video)
+                    content_file["content"] = None
+        content_file["section"], content_file[
+            "section_slug"
+        ] = get_content_file_section(
+            embedded_media_item, course_run_json.get("course_pages", [])
+        )
+
+        return content_file
+    log.debug(
+        "No Youtube videos found for course_run_json %s", course_run_json.get("uid")
+    )
+    return None
 
 
 def get_content_file_url(content_file_data, is_page=False):
