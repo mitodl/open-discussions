@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.145.0
+---------------
+
+- Add embedded youtube videos as course resources (#3159)
+- add spam management commands
+- Upgrade pillow to 7.2.0
+- Youtube video resource RFC (#3154)
+
 Version 0.144.0 (Released September 23, 2020)
 ---------------
 
