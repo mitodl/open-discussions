@@ -1,7 +1,6 @@
 """podcast ETL"""
 
 import logging
-from datetime import datetime
 from urllib.parse import urljoin
 from django.conf import settings
 import github
@@ -9,6 +8,7 @@ import yaml
 from bs4 import BeautifulSoup as bs
 import requests
 from requests.exceptions import HTTPError
+from dateutil.parser import parse
 from open_discussions.utils import now_in_utc
 from course_catalog.etl.utils import generate_unique_id
 from course_catalog.models import PodcastEpisode
@@ -149,7 +149,7 @@ def transform_episode(rss_data, offered_by, topics, parent_image, podcast_id):
         "image_src": rss_data.find("image")["href"]
         if rss_data.find("image")
         else parent_image,
-        "last_modified": datetime.strptime(rss_data.pubDate.text, TIMESTAMP_FORMAT),
+        "last_modified": parse(rss_data.pubDate.text),
         "published": True,
         "duration": rss_data.find("itunes:duration").text
         if rss_data.find("itunes:duration")
