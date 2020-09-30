@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.145.0
+Version 0.145.0 (Released September 30, 2020)
 ---------------
 
 - Add embedded youtube videos as course resources (#3159)
