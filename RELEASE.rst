@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.145.1
+---------------
+
+- fix podcast date farce
+
 Version 0.145.0 (Released September 30, 2020)
 ---------------
 
