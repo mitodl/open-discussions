@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.145.2
+---------------
+
+- add the department_name field to search aggregation transform
+
 Version 0.145.1 (Released October 01, 2020)
 ---------------
 
