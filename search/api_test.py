@@ -693,6 +693,39 @@ def test_transform_results(
 
 
 @pytest.mark.django_db
+def test_transform_department_name_aggregations():
+    """
+    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    """
+    results = {
+        "hits": {"hits": {}, "total": 15},
+        "suggest": {},
+        "aggregations": {
+            "agg_filter_department_name": {
+                "doc_count": 11680,
+                "department_name": {
+                    "buckets": [
+                        {"key": "Professional Cake Decoration", "doc_count": 72},
+                        {"key": "Cat and Dog Studies", "doc_count": 44},
+                        {"key": "Professional Wrestling", "doc_count": 269},
+                    ]
+                },
+            }
+        },
+    }
+
+    expected_transformed_results = results.copy()
+    expected_transformed_results["suggest"] = []
+    expected_transformed_results["aggregations"][
+        "department_name"
+    ] = expected_transformed_results["aggregations"]["agg_filter_department_name"][
+        "department_name"
+    ]
+
+    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+
+
+@pytest.mark.django_db
 def test_transform_nested_aggregations():
     """
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them

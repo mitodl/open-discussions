@@ -367,6 +367,7 @@ def transform_results(search_result, user):
         "offered_by",
         "audience",
         "certification",
+        "department_name",
     ]:
         if f"agg_filter_{aggregation_key}" in search_result.get("aggregations", {}):
             search_result["aggregations"][aggregation_key] = search_result[
