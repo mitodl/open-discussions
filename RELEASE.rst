@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.146.0
+Version 0.146.0 (Released October 07, 2020)
 ---------------
 
 - use course-search-utils for CourseSearchPage logic
