@@ -2289,10 +2289,10 @@
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/@mitodl/ckeditor-custom-build/-/ckeditor-custom-build-0.0.4.tgz#544cab8b1491ee702e99a84800f2c965f95e5474"
 
-"@mitodl/course-search-utils@^1.0.4":
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/@mitodl/course-search-utils/-/course-search-utils-1.0.4.tgz#a70c0253db0beab03d42e0b8a01cb726ae92dca3"
-  integrity sha512-fAfeUM5S5qZRjKhfDXQhstLZkAglY0Ka0TXITTFtz0O5o3QQFoJP6PbMPFcw2JZBHLY4JyTVJaPgyVccgwZaGw==
+"@mitodl/course-search-utils@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@mitodl/course-search-utils/-/course-search-utils-1.0.6.tgz#5a43d40651ca4345d57c1ae19ee52346b704fbe7"
+  integrity sha512-KvND5VHnBpohcvxLQQ1mFBOvXDygSNXcZJBxyrr0jYXTZGYcVL6zlpvE26+gFlkNEiIPWn+KsP77kqNnN/Z6+w==
   dependencies:
     query-string "^6.13.1"
     ramda "^0.27.1"

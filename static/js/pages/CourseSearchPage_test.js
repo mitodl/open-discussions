@@ -28,11 +28,12 @@ const setLocation = (helper, params) => {
     text:         params.text ?? "text",
     activeFacets: R.merge(
       {
-        audience:      [],
-        certification: [],
-        topics:        [],
-        offered_by:    [],
-        type:          []
+        audience:        [],
+        certification:   [],
+        topics:          [],
+        offered_by:      [],
+        department_name: [],
+        type:            []
       },
       params.activeFacets || {}
     )
@@ -176,11 +177,12 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          audience:      [],
-          certification: [],
-          offered_by:    [],
-          topics:        [],
-          type:          LR_TYPE_ALL
+          audience:        [],
+          certification:   [],
+          offered_by:      [],
+          topics:          [],
+          department_name: [],
+          type:            LR_TYPE_ALL
         })
       )
     })
@@ -208,11 +210,12 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          audience:      [],
-          certification: [],
-          type:          LR_TYPE_ALL,
-          offered_by:    ["OCW"],
-          topics:        ["Science", "Engineering"]
+          audience:        [],
+          certification:   [],
+          type:            LR_TYPE_ALL,
+          department_name: [],
+          offered_by:      ["OCW"],
+          topics:          ["Science", "Engineering"]
         })
       )
     })
@@ -240,11 +243,12 @@ describe("CourseSearchPage", () => {
       type:        ["podcast", "podcastepisode"],
       facets:      new Map(
         Object.entries({
-          audience:      [],
-          certification: [],
-          type:          ["podcast", "podcastepisode"],
-          offered_by:    [],
-          topics:        []
+          audience:        [],
+          certification:   [],
+          type:            ["podcast", "podcastepisode"],
+          offered_by:      [],
+          department_name: [],
+          topics:          []
         })
       )
     })
@@ -273,11 +277,12 @@ describe("CourseSearchPage", () => {
       type:        ["userlist", "learningpath"],
       facets:      new Map(
         Object.entries({
-          audience:      [],
-          certification: [],
-          type:          ["userlist", "learningpath"],
-          offered_by:    [],
-          topics:        []
+          audience:        [],
+          certification:   [],
+          type:            ["userlist", "learningpath"],
+          offered_by:      [],
+          department_name: [],
+          topics:          []
         })
       )
     })
@@ -383,11 +388,12 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        audience:      [],
-        certification: [],
-        topics:        [],
-        offered_by:    [],
-        type:          []
+        audience:        [],
+        certification:   [],
+        topics:          [],
+        offered_by:      [],
+        department_name: [],
+        type:            []
       }
     })
   })
@@ -409,11 +415,12 @@ describe("CourseSearchPage", () => {
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        audience:      [],
-        certification: [],
-        topics:        ["Physics"],
-        offered_by:    [],
-        type:          []
+        audience:        [],
+        certification:   [],
+        topics:          ["Physics"],
+        offered_by:      [],
+        department_name: [],
+        type:            []
       }
     })
   })

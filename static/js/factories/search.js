@@ -302,9 +302,10 @@ export const makeSearchFacetResult = () => {
         }
       ]
     },
-    audience:      [OPEN],
-    certification: [],
-    type:          LR_TYPE_ALL
+    audience:        [OPEN],
+    certification:   [],
+    department_name: [],
+    type:            LR_TYPE_ALL
   }
 }
 
