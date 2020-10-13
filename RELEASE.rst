@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.146.1
+Version 0.146.1 (Released October 13, 2020)
 ---------------
 
 - Added mappings for some new MITPE topics
