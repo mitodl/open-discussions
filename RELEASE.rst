@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.146.2
+Version 0.146.2 (Released October 16, 2020)
 ---------------
 
 - upgrade course-search-utils
