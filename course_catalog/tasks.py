@@ -34,8 +34,27 @@ def get_mitx_data():
 
 
 @app.task(acks_late=True)
+def get_ocw_course_with_retry(
+    *, course_prefix, blocklist, force_overwrite, upload_to_s3
+):
+    """
+    Task to sync a batch of OCW courses. We want acks_late=True for tasks launched
+    with the webhook so that there will be a retry if the task fails or the worker is killed
+    """
+    sync_ocw_courses(
+        course_prefixes=[course_prefix],
+        blocklist=blocklist,
+        force_overwrite=force_overwrite,
+        upload_to_s3=upload_to_s3,
+    )
+
+
+@app.task
 def get_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3):
-    """Task to sync a batch of OCW courses"""
+    """
+    Task to sync a batch of OCW courses. We want to set acks_late=False for refreshes
+    launched by the backpopulate command or the scheduled task
+    """
     sync_ocw_courses(
         course_prefixes=course_prefixes,
         blocklist=blocklist,
@@ -208,44 +227,44 @@ def get_bootcamp_data(force_overwrite=False):
             parse_bootcamp_json_data(bootcamp, force_overwrite=force_overwrite)
 
 
-@app.task(acks_late=True)
+@app.task
 def get_micromasters_data():
     """Execute the MicroMasters ETL pipeline"""
     pipelines.micromasters_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_xpro_data():
     """Execute the xPro ETL pipeline"""
     pipelines.xpro_programs_etl()
     pipelines.xpro_courses_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_oll_data():
     """Execute the OLL ETL pipeline"""
     pipelines.oll_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_see_data():
     """Execute the SEE ETL pipeline"""
     pipelines.see_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_mitpe_data():
     """Execute the MITPE ETL pipeline"""
     pipelines.mitpe_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_csail_data():
     """Execute the CSAIL ETL pipeline"""
     pipelines.csail_etl()
 
 
-@app.task(acks_late=True)
+@app.task
 def get_youtube_data(*, channel_ids=None):
     """
     Execute the YouTube ETL pipeline
@@ -289,7 +308,7 @@ def get_youtube_transcripts(
     youtube.get_youtube_transcripts(videos)
 
 
-@app.task(acks_late=True)
+@app.task
 def get_video_topics(*, video_ids=None):
     """
     Execute the video topics pipeline
@@ -301,7 +320,7 @@ def get_video_topics(*, video_ids=None):
     pipelines.video_topics_etl(video_ids=video_ids)
 
 
-@app.task(acks_late=True)
+@app.task
 def get_podcast_data():
     """
     Execute the Podcast ETL pipeline

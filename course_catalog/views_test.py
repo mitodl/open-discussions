@@ -615,7 +615,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
     settings.FEATURES[features.WEBHOOK_OCW] = webhook_enabled
     settings.OCW_WEBHOOK_KEY = "fake_key"
     mock_get_ocw = mocker.patch(
-        "course_catalog.views.get_ocw_courses.apply_async", autospec=True
+        "course_catalog.views.get_ocw_course_with_retry.apply_async", autospec=True
     )
     mock_log = mocker.patch("course_catalog.views.log.error")
     mocker.patch("course_catalog.views.load_course_blocklist", return_value=[])
@@ -628,11 +628,9 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
         mock_get_ocw.assert_called_once_with(
             countdown=settings.OCW_WEBHOOK_DELAY,
             kwargs={
-                "course_prefixes": [
-                    OCW_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"]["key"].split(
-                        "0/1.json"
-                    )[0]
-                ],
+                "course_prefix": OCW_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"][
+                    "key"
+                ].split("0/1.json")[0],
                 "blocklist": [],
                 "force_overwrite": False,
                 "upload_to_s3": True,
