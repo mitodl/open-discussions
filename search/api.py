@@ -368,11 +368,31 @@ def transform_results(search_result, user):
         "audience",
         "certification",
         "department_name",
+        "level",
     ]:
         if f"agg_filter_{aggregation_key}" in search_result.get("aggregations", {}):
-            search_result["aggregations"][aggregation_key] = search_result[
-                "aggregations"
-            ][f"agg_filter_{aggregation_key}"][aggregation_key]
+            if aggregation_key == "level":
+                levels = (
+                    search_result.get("aggregations", {})
+                    .get(f"agg_filter_{aggregation_key}", {})
+                    .get("level", {})
+                    .get("level", {})
+                )
+                if levels:
+                    search_result["aggregations"]["level"] = {
+                        "buckets": [
+                            {
+                                "key": bucket["key"],
+                                "doc_count": bucket["courses"]["doc_count"],
+                            }
+                            for bucket in levels.get("buckets", [])
+                            if bucket["courses"]["doc_count"] > 0
+                        ]
+                    }
+            else:
+                search_result["aggregations"][aggregation_key] = search_result[
+                    "aggregations"
+                ][f"agg_filter_{aggregation_key}"][aggregation_key]
 
     types = search_result.get("aggregations", {}).get("type", {})
 

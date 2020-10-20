@@ -726,6 +726,56 @@ def test_transform_department_name_aggregations():
 
 
 @pytest.mark.django_db
+def test_transform_level_aggregation():
+    """
+    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    """
+    results = {
+        "hits": {"hits": {}, "total": 15},
+        "suggest": {},
+        "aggregations": {
+            "agg_filter_level": {
+                "doc_count": 691,
+                "level": {
+                    "doc_count": 879,
+                    "level": {
+                        "doc_count_error_upper_bound": 0,
+                        "sum_other_doc_count": 0,
+                        "buckets": [
+                            {
+                                "key": "Undergraduate",
+                                "doc_count": 512,
+                                "courses": {"doc_count": 399},
+                            },
+                            {
+                                "key": "Graduate",
+                                "doc_count": 364,
+                                "courses": {"doc_count": 291},
+                            },
+                            {
+                                "key": "Non Credit",
+                                "doc_count": 3,
+                                "courses": {"doc_count": 3},
+                            },
+                        ],
+                    },
+                },
+            }
+        },
+    }
+
+    expected_transformed_results = results.copy()
+    expected_transformed_results["suggest"] = []
+    expected_transformed_results["aggregations"][
+        "level"
+    ] = expected_transformed_results["aggregations"]["agg_filter_level"]["level"][
+        "level"
+    ]
+
+    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+
+
+@pytest.mark.django_db
 def test_transform_nested_aggregations():
     """
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
