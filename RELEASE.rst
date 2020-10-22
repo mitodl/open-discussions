@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.146.3
+---------------
+
+- remove PODCAST_FRONTPAGE feature flag
+
 Version 0.146.2 (Released October 16, 2020)
 ---------------
 
