@@ -105,7 +105,6 @@ def _render_app(request, initial_state=None):
         "course_ui_enabled": features.is_enabled(features.COURSE_UI),
         "file_search_enabled": features.is_enabled(features.COURSE_FILE_SEARCH),
         "livestream_ui_enabled": livestream_ui_enabled,
-        "podcast_frontpage_enabled": features.is_enabled(features.PODCAST_FRONTPAGE),
     }
 
     return render(request, "react.html", context=dict(js_settings=js_settings))

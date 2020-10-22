@@ -340,12 +340,10 @@ class App extends React.Component<Props> {
               <Route path={`${match.url}learn`} component={LearnRouter} />
             </>
           ) : null}
-          {SETTINGS.podcast_frontpage_enabled ? (
-            <Route path={`${match.url}podcasts`}>
-              <PodcastFrontpage />
-              <LearningResourceDrawer hideSimilarLearningResources />
-            </Route>
-          ) : null}
+          <Route path={`${match.url}podcasts`}>
+            <PodcastFrontpage />
+            <LearningResourceDrawer hideSimilarLearningResources />
+          </Route>
         </div>
       </div>
     )

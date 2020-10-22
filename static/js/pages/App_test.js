@@ -161,18 +161,4 @@ describe("App", () => {
       assert.equal(courseUIEnabled, wrapper.find("LearnRouter").exists())
     })
   })
-
-  //
-  ;[true, false].forEach(podcastFrontpageEnabled => {
-    it(`${shouldIf(
-      podcastFrontpageEnabled
-    )} render something at "/podcasts"`, async () => {
-      SETTINGS.podcast_frontpage_enabled = podcastFrontpageEnabled
-      const [wrapper] = await renderComponent("/podcasts/", [])
-      assert.equal(
-        podcastFrontpageEnabled,
-        wrapper.find("PodcastFrontpage").exists()
-      )
-    })
-  })
 })
