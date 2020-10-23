@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.146.4
+Version 0.146.4 (Released October 23, 2020)
 ---------------
 
 - add support for the 'level' facet
