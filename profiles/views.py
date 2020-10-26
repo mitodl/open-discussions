@@ -24,6 +24,7 @@ from profiles.serializers import (
     UserWebsiteSerializer,
 )
 from profiles.utils import generate_svg_avatar, DEFAULT_PROFILE_IMAGE
+from channels.models import Comment
 from channels.proxies import proxy_posts
 from channels.serializers.posts import BasePostSerializer
 from channels.serializers.comments import BaseCommentSerializer
@@ -98,6 +99,7 @@ class UserContributionListView(APIView):
         }
 
     def get(self, request, *args, **kwargs):
+        # pylint:disable=too-many-locals
         """View method for HTTP GET request"""
         with translate_praw_exceptions(request.user):
             api = self.request.channel_api
@@ -117,8 +119,20 @@ class UserContributionListView(APIView):
             pagination, user_objects = get_pagination_and_reddit_obj_list(
                 object_listing, listing_params
             )
+
             if object_type == "posts":
                 user_objects = proxy_posts(user_objects)
+                user_objects = list(
+                    filter(lambda object: not object.removed, user_objects)
+                )
+            else:
+                spam_comments = Comment.objects.filter(
+                    comment_id__in=[object.id for object in user_objects], removed=True
+                ).values_list("comment_id", flat=True)
+
+                user_objects = list(
+                    filter(lambda object: object.id not in spam_comments, user_objects)
+                )
 
             return Response(
                 {
