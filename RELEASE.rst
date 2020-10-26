@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.147.0
+Version 0.147.0 (Released October 26, 2020)
 ---------------
 
 - Update ocw-data-parser (#3193)
