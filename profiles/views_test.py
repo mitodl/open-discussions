@@ -12,9 +12,25 @@ from social_django.models import UserSocialAuth
 from authentication.backends.micromasters import MicroMastersAuth
 from channels.serializers.posts import BasePostSerializer
 from channels.serializers.comments import BaseCommentSerializer
+from channels.constants import LINK_TYPE_SELF
+from channels.proxies import PostProxy
+from channels.factories.models import CommentFactory
 from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
+from fixtures.reddit import PostFactory
 
 pytestmark = [pytest.mark.django_db]
+
+
+@pytest.fixture()
+def removed_post_proxy(reddit_submission_obj):
+    """A dummy removed PostProxy object"""
+    post = PostFactory.create(
+        post_id="removed",
+        channel__name="channel",
+        post_type=LINK_TYPE_SELF,
+        removed=True,
+    )
+    return PostProxy(reddit_submission_obj, post)
 
 
 def test_list_users(staff_client, staff_user):
@@ -341,18 +357,28 @@ class TestUserContributionListView:
     @pytest.mark.usefixtures("mock_req_channel_api")
     @pytest.mark.parametrize("logged_in", [True, False])
     def test_user_posts_view(
-        self, mocker, user_client, user, scenario, post_proxy, logged_in
+        self,
+        mocker,
+        user_client,
+        user,
+        scenario,
+        post_proxy,
+        removed_post_proxy,
+        logged_in,
     ):
         """Test that a request for user posts fetches and serializes a user's posts correctly"""
         mock_get_obj_list = mocker.patch(
             "profiles.views.get_pagination_and_reddit_obj_list",
             return_value=(
                 scenario.fake_pagination,
-                [post_proxy._self_submission],  # pylint: disable=protected-access
+                [
+                    post_proxy._self_submission,  # pylint: disable=protected-access
+                    removed_post_proxy._self_submission,  # pylint: disable=protected-access
+                ],
             ),
         )
         mock_proxy_posts = mocker.patch(
-            "profiles.views.proxy_posts", return_value=[post_proxy]
+            "profiles.views.proxy_posts", return_value=[post_proxy, removed_post_proxy]
         )
         url = reverse(
             "user-contribution-list",
@@ -366,13 +392,22 @@ class TestUserContributionListView:
         resp_data = json.loads(response.content)
         assert resp_data["pagination"] == scenario.fake_pagination
         assert "posts" in resp_data
+        assert len(resp_data["posts"]) == 1
         serialized_post = resp_data["posts"][0]
         assert serialized_post == BasePostSerializer(post_proxy).data
 
     @pytest.mark.usefixtures("mock_req_channel_api")
     @pytest.mark.parametrize("logged_in", [True, False])
+    @pytest.mark.parametrize("removed", [True, False])
     def test_user_comments_view(
-        self, mocker, user_client, user, scenario, reddit_comment_obj, logged_in
+        self,
+        mocker,
+        user_client,
+        user,
+        scenario,
+        reddit_comment_obj,
+        logged_in,
+        removed,
     ):
         """Test that a request for user comments fetches and serializes a user's comments correctly"""
         mock_get_obj_list = mocker.patch(
@@ -383,6 +418,7 @@ class TestUserContributionListView:
             "user-contribution-list",
             kwargs={"username": user.username, "object_type": "comments"},
         )
+        CommentFactory.create(comment_id=reddit_comment_obj.id, removed=removed)
         if not logged_in:
             user_client.logout()
         response = user_client.get(url)
@@ -390,16 +426,20 @@ class TestUserContributionListView:
         resp_data = json.loads(response.content)
         assert resp_data["pagination"] == scenario.fake_pagination
         assert "comments" in resp_data
-        serialized_comment = resp_data["comments"][0]
-        assert (
-            serialized_comment
-            == BaseCommentSerializer(
-                reddit_comment_obj, context={"include_permalink_data": True}
-            ).data
-        )
-        # Channel name is not serialized for a comment by default. Since it's needed for the comment permalink, this
-        # view should include a flag that ensures that value is serialized.
-        assert (
-            serialized_comment["channel_name"]
-            == reddit_comment_obj.submission.subreddit.display_name
-        )
+
+        if removed:
+            assert len(resp_data["comments"]) == 0
+        else:
+            serialized_comment = resp_data["comments"][0]
+            assert (
+                serialized_comment
+                == BaseCommentSerializer(
+                    reddit_comment_obj, context={"include_permalink_data": True}
+                ).data
+            )
+            # Channel name is not serialized for a comment by default. Since it's needed for the comment permalink, this
+            # view should include a flag that ensures that value is serialized.
+            assert (
+                serialized_comment["channel_name"]
+                == reddit_comment_obj.submission.subreddit.display_name
+            )
