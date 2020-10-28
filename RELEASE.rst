@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.147.2
+---------------
+
+- update ocw parser
+- ab/remove-course-catalog-acks-late
+
 Version 0.147.1 (Released October 28, 2020)
 ---------------
 
