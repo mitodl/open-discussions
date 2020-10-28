@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.147.1
+Version 0.147.1 (Released October 28, 2020)
 ---------------
 
 - dont show removed comments and posts in profile
