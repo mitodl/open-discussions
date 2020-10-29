@@ -3,6 +3,7 @@ from django.core.management.base import BaseCommand
 
 from channels import tasks
 from open_discussions.utils import now_in_utc
+from open_discussions.constants import CELERY_HIGH_PRIORITY
 
 
 class Command(BaseCommand):
@@ -65,12 +66,16 @@ class Command(BaseCommand):
             self.stdout.write("Either --spam or --ham flag is required")
             return
 
-        task = tasks.update_spam.delay(
-            spam=is_spam,
-            comment_ids=options["comment_ids"],
-            post_ids=options["post_ids"],
-            retire_users=options["retire_users"],
-            skip_akismet=options["skip_akismet"],
+        task = tasks.update_spam.apply_async(
+            args=[],
+            kwargs=dict(
+                spam=is_spam,
+                comment_ids=options["comment_ids"],
+                post_ids=options["post_ids"],
+                retire_users=options["retire_users"],
+                skip_akismet=options["skip_akismet"],
+            ),
+            priority=CELERY_HIGH_PRIORITY,
         )
 
         self.stdout.write("Waiting on task...")

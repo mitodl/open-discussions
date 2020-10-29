@@ -3,6 +3,7 @@ import pytest
 
 from channels import task_helpers
 from open_discussions.features import HOT_POST_REPAIR
+from open_discussions.constants import CELERY_HIGH_PRIORITY
 
 
 @pytest.mark.parametrize("delay", [200, 100])
@@ -51,6 +52,7 @@ def test_check_post_for_spam(mocker, rf, is_exempt, user):
                 post_id="post-id",
             ),
             countdown=15,
+            priority=CELERY_HIGH_PRIORITY,
         )
     else:
         mock_extract_spam_check_headers.assert_not_called()
@@ -84,6 +86,7 @@ def test_check_comment_for_spam(mocker, rf, user, is_exempt):
                 comment_id="comment-id",
             ),
             countdown=15,
+            priority=CELERY_HIGH_PRIORITY,
         )
     else:
         mock_extract_spam_check_headers.assert_not_called()

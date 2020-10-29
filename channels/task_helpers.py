@@ -3,6 +3,7 @@ from django.conf import settings
 
 from channels.spam import extract_spam_check_headers, exempt_from_spamcheck
 from open_discussions.features import HOT_POST_REPAIR, if_feature_enabled
+from open_discussions.constants import CELERY_HIGH_PRIORITY
 
 
 @if_feature_enabled(HOT_POST_REPAIR)
@@ -42,6 +43,7 @@ def check_post_for_spam(request, post_id):
             user_ip=headers.user_ip, user_agent=headers.user_agent, post_id=post_id
         ),
         countdown=15,
+        priority=CELERY_HIGH_PRIORITY,
     )
 
 
@@ -66,4 +68,5 @@ def check_comment_for_spam(request, comment_id):
             comment_id=comment_id,
         ),
         countdown=15,
+        priority=CELERY_HIGH_PRIORITY,
     )
