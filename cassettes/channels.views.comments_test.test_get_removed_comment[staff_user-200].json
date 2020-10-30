@@ -1,0 +1,934 @@
+{
+  "http_interactions": [
+    {
+      "recorded_at": "2020-11-05T14:44:29",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "User-Agent": [
+            "python-requests/2.24.0"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVBFC808BXDM43QK4JRFK"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA1WNsQrCMBiEX6VkFIWEFGndJA1SrHZwEF1CTH5pUNKQFLUV393GTo73cd/dG0mlIATRtTewaJUggtMFEWynt5UBldEA+aG+Z6ymp4HtSzRPELyc8RCEiQJdYjyyny+63kEcuYD04GM3qHZCs5g8XEex+X+relbkhON1qp9ntSmltZwfB2caHB0ND6NAGB2Hp4A+X0X+FQS4AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:29 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "set-cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 05-Nov-2022 14:44:29 GMT",
+            "loidcreated=2020-11-05T14%3A44%3A29.215Z; Domain=reddit.local; Max-Age=63071999; Path=/; expires=Sat, 05-Nov-2022 14:44:29 GMT"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVBFC808BXDM43QK4JRFK"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:32",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "python-requests/2.24.0"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVERKNH4T0ABBKKPNX2J2"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA6tWSkxOTi0uji/Jz07NU7JSUDI0MNU1izIJTjcLzokydbLQDfEKq3JNN8ixiErxMcpW0lFQSq0oyCxKLY7PBGkwNjMwAIqB9ceXVBakggxJSk0sSi0CqS1OzocIaYF4RalpQI0ZqLblx/ulh5d5uiY7poSXhbqaJMen+Hr6FVQkhnuC9KSklmUmp8ZnpoAMhnCUagGjNkTDuAAAAA==",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:32 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVERKNH4T0ABBKKPNX2J2"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:32",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "allow_top=True&api_type=json&description=Material+treatment+option+where+wind.+Other+end+reality+against+agree.%0AIf+serve+nothing+lose.+Computer+add+risk+media+hit+fine.+Test+dinner+kind+hospital+safe+just+own.%0AYourself+heavy+long+clearly+direction+money+know.+Campaign+source+understand+modern+everybody+design+continue.+Provide+drive+policy+page+decade+reduce+personal+popular.%0AChair+account+rich+key+site+hand.+Window+education+audience+information+nature+edge+agent.+Much+exactly+wall+report.&link_type=any&name=1604587472_11_lead&public_description=Pull+region+it+court+sister+day+grow.+Billion+exactly+attack+imagine.&title=Successful+address+join+memory.&type=public&wikimode=disabled"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 105-6Z4Sg6SlZ5B8-TJVzEg0l8ZdL2k"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "696"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/site_admin/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": []}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "24"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:32 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "328"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/site_admin/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:39",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVMZHJMFA9MTSD3QA3NRJ"
+      },
+      "response": {
+        "body": {
+          "base64_string": "H4sIAAAAAAAAA1WNQQrCMBREr1KyFIXUShF3IipoKZgogptPm/zQKNqYlGAQ725jVy7nMW/mTSoh0Dno2hs+yCIhKc0n6VNd+f4YvC/1Bs6q5Jdizq0s/ImME4Ivoy060FHIckp79vOhCwbjSI2VRRu7TrQDGsVkUfVi8/8WZoe14lvPqrAyd6BZsM1uumSUuehI9FogaBmHh0A+X4P5BDy4AAAA",
+          "encoding": "UTF-8"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Encoding": [
+            "gzip"
+          ],
+          "Content-Type": [
+            "text/html; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:39 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "Transfer-Encoding": [
+            "chunked"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/v1/generate_refresh_token?username=01EPCDVMZHJMFA9MTSD3QA3NRJ"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:39",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&kind=self&resubmit=True&sendreplies=True&sr=1604587472_11_lead&text=Win+similar+music+put.&title=Feel+Mr+begin+tend."
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 104-1_CMdKLiec83se9SOl8CO3YzCNI"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "130"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/submit/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"url\": \"https://reddit.local/r/1604587472_11_lead/comments/1f/feel_mr_begin_tend/\", \"id\": \"1f\", \"name\": \"t3_1f\"}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "147"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:39 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "321"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/submit/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:39",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 104-1_CMdKLiec83se9SOl8CO3YzCNI"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/1f/?limit=2048&sort=best&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1604587472_11_lead\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EWin similar music put.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Win similar music put.\", \"likes\": true, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"1f\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": null, \"author\": \"01EPCDVBFC808BXDM43QK4JRFK\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1604587472_11_lead\", \"hidden\": false, \"num_comments\": 0, \"thumbnail\": \"\", \"subreddit_id\": \"t5_v\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1604587472_11_lead/comments/1f/feel_mr_begin_tend/\", \"locked\": false, \"name\": \"t3_1f\", \"created\": 1604587479.0, \"url\": \"http://reddit.local/r/1604587472_11_lead/comments/1f/feel_mr_begin_tend/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Feel Mr begin tend.\", \"created_utc\": 1604587479.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": null, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1572"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:39 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "321"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=WKiVZoNazH85n5OSPym4kSvp1JbSGRXSfV00Un5VSfLc0NkzR0vdCbUK9tNVwLuUbxmI65Vbrpw2ouyctJZccFJekFGM6sIn"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/1f/?limit=2048&sort=best&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:42",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&text=Yard+address+form+fact+view+him+many.+Three+show+which+thought+billion.&thing_id=t3_1f"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 106-1qfjSKTyvvNiF_WfNSZL8SrdLvU"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "105"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/comment/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"json\": {\"errors\": [], \"data\": {\"things\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_v\", \"banned_by\": null, \"removal_reason\": null, \"link_id\": \"t3_1f\", \"likes\": true, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"10\", \"gilded\": 0, \"archived\": false, \"report_reasons\": null, \"author\": \"01EPCDVMZHJMFA9MTSD3QA3NRJ\", \"parent_id\": \"t3_1f\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Yard address form fact view him many. Three show which thought billion.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EYard address form fact view him many. Three show which thought billion.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1604587472_11_lead\", \"score_hidden\": false, \"name\": \"t1_10\", \"created\": 1604587482.0, \"author_flair_text\": null, \"created_utc\": 1604587482.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": null, \"ups\": 1}}]}}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "945"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:42 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "299.0"
+          ],
+          "x-ratelimit-reset": [
+            "318"
+          ],
+          "x-ratelimit-used": [
+            "1"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/comment/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": "api_type=json&id=t1_10&spam=False"
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 105-6Z4Sg6SlZ5B8-TJVzEg0l8ZdL2k"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "33"
+          ],
+          "Content-Type": [
+            "application/x-www-form-urlencoded"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "POST",
+        "uri": "https://reddit.local/api/remove/?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "298.0"
+          ],
+          "x-ratelimit-reset": [
+            "315"
+          ],
+          "x-ratelimit-used": [
+            "2"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/remove/?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 105-6Z4Sg6SlZ5B8-TJVzEg0l8ZdL2k"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/api/info/?id=t1_10&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_v\", \"banned_by\": \"01EPCDVERKNH4T0ABBKKPNX2J2\", \"removal_reason\": null, \"link_id\": \"t3_1f\", \"likes\": null, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"10\", \"gilded\": 0, \"archived\": false, \"report_reasons\": [], \"author\": \"01EPCDVMZHJMFA9MTSD3QA3NRJ\", \"parent_id\": \"t3_1f\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Yard address form fact view him many. Three show which thought billion.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EYard address form fact view him many. Three show which thought billion.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1604587472_11_lead\", \"score_hidden\": false, \"name\": \"t1_10\", \"created\": 1604587482.0, \"author_flair_text\": null, \"created_utc\": 1604587482.0, \"distinguished\": null, \"mod_reports\": [], \"num_reports\": 0, \"ups\": 1}}], \"after\": null, \"before\": null}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "1009"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "297.0"
+          ],
+          "x-ratelimit-reset": [
+            "315"
+          ],
+          "x-ratelimit-used": [
+            "3"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=NikhI0HYzQHxWWMAMgErPJC%2B2AQ7WZluYCUpQtbtRZEYqH9FDpsXp6i43lc9kDB3611BSXTdWrk%3D"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/api/info/?id=t1_10&raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 105-6Z4Sg6SlZ5B8-TJVzEg0l8ZdL2k"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/comments/1f/_/10?raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "[{\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t3\", \"data\": {\"contest_mode\": false, \"banned_by\": null, \"media_embed\": {}, \"subreddit\": \"1604587472_11_lead\", \"selftext_html\": \"\\u003C!-- SC_OFF --\\u003E\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EWin similar music put.\\u003C/p\\u003E\\n\\u003C/div\\u003E\\u003C!-- SC_ON --\\u003E\", \"selftext\": \"Win similar music put.\", \"likes\": null, \"suggested_sort\": null, \"user_reports\": [], \"secure_media\": null, \"saved\": false, \"id\": \"1f\", \"gilded\": 0, \"secure_media_embed\": {}, \"clicked\": false, \"report_reasons\": [], \"author\": \"01EPCDVBFC808BXDM43QK4JRFK\", \"media\": null, \"score\": 1, \"approved_by\": null, \"over_18\": false, \"domain\": \"self.1604587472_11_lead\", \"hidden\": false, \"num_comments\": 1, \"thumbnail\": \"\", \"subreddit_id\": \"t5_v\", \"edited\": false, \"link_flair_css_class\": null, \"author_flair_css_class\": null, \"downs\": 0, \"archived\": false, \"removal_reason\": null, \"stickied\": false, \"is_self\": true, \"hide_score\": false, \"permalink\": \"/r/1604587472_11_lead/comments/1f/feel_mr_begin_tend/\", \"locked\": false, \"name\": \"t3_1f\", \"created\": 1604587479.0, \"url\": \"http://reddit.local/r/1604587472_11_lead/comments/1f/feel_mr_begin_tend/\", \"author_flair_text\": null, \"quarantine\": false, \"title\": \"Feel Mr begin tend.\", \"created_utc\": 1604587479.0, \"link_flair_text\": null, \"ups\": 1, \"upvote_ratio\": 1.0, \"mod_reports\": [], \"visited\": false, \"num_reports\": 0, \"distinguished\": null}}], \"after\": null, \"before\": null}}, {\"kind\": \"Listing\", \"data\": {\"modhash\": null, \"children\": [{\"kind\": \"t1\", \"data\": {\"subreddit_id\": \"t5_v\", \"banned_by\": \"01EPCDVERKNH4T0ABBKKPNX2J2\", \"removal_reason\": null, \"link_id\": \"t3_1f\", \"likes\": null, \"replies\": \"\", \"user_reports\": [], \"saved\": false, \"id\": \"10\", \"gilded\": 0, \"archived\": false, \"report_reasons\": [], \"author\": \"01EPCDVMZHJMFA9MTSD3QA3NRJ\", \"parent_id\": \"t3_1f\", \"score\": 1, \"approved_by\": null, \"controversiality\": 0, \"body\": \"Yard address form fact view him many. Three show which thought billion.\", \"edited\": false, \"author_flair_css_class\": null, \"downs\": 0, \"body_html\": \"\\u003Cdiv class=\\\"md\\\"\\u003E\\u003Cp\\u003EYard address form fact view him many. Three show which thought billion.\\u003C/p\\u003E\\n\\u003C/div\\u003E\", \"subreddit\": \"1604587472_11_lead\", \"score_hidden\": false, \"name\": \"t1_10\", \"created\": 1604587482.0, \"author_flair_text\": null, \"created_utc\": 1604587482.0, \"ups\": 1, \"mod_reports\": [], \"num_reports\": 0, \"distinguished\": null}}], \"after\": null, \"before\": null}}]"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "2483"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "296.0"
+          ],
+          "x-ratelimit-reset": [
+            "315"
+          ],
+          "x-ratelimit-used": [
+            "4"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=N6owwlNMcBzzZmxhSfRXyHaxjk2P7uxThNeao01oD5IsL0tCmKpDh4kM8ZH8ZbUX95I1WrFmu0N8CbErOeSHQ19G5AhVnFox"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/comments/1f/_/10?raw_json=1"
+      }
+    },
+    {
+      "recorded_at": "2020-11-05T14:44:45",
+      "request": {
+        "body": {
+          "encoding": "utf-8",
+          "string": ""
+        },
+        "headers": {
+          "Accept": [
+            "*/*"
+          ],
+          "Accept-Encoding": [
+            "gzip, deflate"
+          ],
+          "Authorization": [
+            "bearer 105-6Z4Sg6SlZ5B8-TJVzEg0l8ZdL2k"
+          ],
+          "Connection": [
+            "keep-alive"
+          ],
+          "Cookie": [
+            "loid=9fmv4xT8IdTJp6L8on; loidcreated=2020-11-05T14%3A44%3A29.215Z"
+          ],
+          "User-Agent": [
+            "MIT-Open: 0.147.2 PRAW/4.5.1 prawcore/0.10.1"
+          ]
+        },
+        "method": "GET",
+        "uri": "https://reddit.local/r/1604587472_11_lead/about/moderators/?user=01EPCDVERKNH4T0ABBKKPNX2J2&raw_json=1"
+      },
+      "response": {
+        "body": {
+          "encoding": "UTF-8",
+          "string": "{\"kind\": \"UserList\", \"data\": {\"children\": [{\"date\": 1604587472.0, \"mod_permissions\": [\"all\"], \"name\": \"01EPCDVERKNH4T0ABBKKPNX2J2\", \"id\": \"t2_2x\"}]}}"
+        },
+        "headers": {
+          "Connection": [
+            "keep-alive"
+          ],
+          "Content-Length": [
+            "149"
+          ],
+          "Content-Type": [
+            "application/json; charset=UTF-8"
+          ],
+          "Date": [
+            "Thu, 05 Nov 2020 14:44:45 GMT"
+          ],
+          "Server": [
+            "PasteWSGIServer/0.5 Python/2.7.6"
+          ],
+          "cache-control": [
+            "private, s-maxage=0, max-age=0, must-revalidate"
+          ],
+          "expires": [
+            "-1"
+          ],
+          "x-content-type-options": [
+            "nosniff"
+          ],
+          "x-frame-options": [
+            "SAMEORIGIN"
+          ],
+          "x-ratelimit-remaining": [
+            "295.0"
+          ],
+          "x-ratelimit-reset": [
+            "315"
+          ],
+          "x-ratelimit-used": [
+            "5"
+          ],
+          "x-reddit-tracking": [
+            "https://reddit.local/pixel/of_destiny.png?v=%2BRTnamxJm8%2FBbaZhiP5YxmHh014mBUJqYU1LX7i8eDA5QO53zeqtX7I%2BOeXNtYJLAu7lj7HEgEsR%2FotGpbBu5YcvPuCULl7L"
+          ],
+          "x-ua-compatible": [
+            "IE=edge"
+          ],
+          "x-xss-protection": [
+            "1; mode=block"
+          ]
+        },
+        "status": {
+          "code": 200,
+          "message": "OK"
+        },
+        "url": "https://reddit.local/r/1604587472_11_lead/about/moderators/?user=01EPCDVERKNH4T0ABBKKPNX2J2&raw_json=1"
+      }
+    }
+  ],
+  "recorded_with": "betamax/0.8.0"
+}

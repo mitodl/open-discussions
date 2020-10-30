@@ -12,6 +12,7 @@ from channels.api import Api
 from channels.constants import COMMENTS_SORT_BEST
 from channels.serializers.comments import CommentSerializer, GenericCommentSerializer
 from channels.utils import translate_praw_exceptions, lookup_subscriptions_for_comments
+from channels.models import Comment
 from open_discussions.permissions import AnonymousAccessReadonlyPermission
 
 User = get_user_model()
@@ -190,6 +191,18 @@ class CommentDetailView(APIView):
             try:
                 comment.refresh()
             except PRAWException:
+                raise NotFound()
+
+            self_comment = Comment.objects.get(comment_id=comment.id)
+            if self_comment.removed and (
+                request.user.is_anonymous
+                or not (
+                    self.api.is_moderator(
+                        self_comment.post.channel.name, request.user.username
+                    )
+                    or request.user.username == comment.author.name
+                )
+            ):
                 raise NotFound()
 
             users = _lookup_users_for_comments([comment])
