@@ -520,6 +520,46 @@ def test_get_comment_404(
     assert resp.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.parametrize(
+    "client_user_type, expected_status",
+    [
+        [None, status.HTTP_404_NOT_FOUND],
+        ["comment_writer", status.HTTP_200_OK],
+        ["user", status.HTTP_404_NOT_FOUND],
+        ["staff_user", status.HTTP_200_OK],
+    ],
+)
+def test_get_removed_comment(
+    client,
+    user,
+    staff_user,
+    public_channel,
+    reddit_factories,
+    staff_api,
+    client_user_type,
+    expected_status,
+):  # pylint: disable=too-many-arguments
+    """Get for a removed comment should 404 unless the user is a moderator"""
+    comment_user = reddit_factories.user("comment user")
+
+    post = reddit_factories.text_post("my geat post", user, channel=public_channel)
+    comment = reddit_factories.comment("comment", comment_user, post_id=post.id)
+    url = reverse("comment-detail", kwargs={"comment_id": comment.id})
+
+    staff_api.remove_comment(comment.id)
+
+    if client_user_type == "comment_writer":
+        client.force_login(comment_user)
+    elif client_user_type == "user":
+        client.force_login(user)
+    elif client_user_type == "staff_user":
+        client.force_login(staff_user)
+
+    resp = client.get(url)
+
+    assert resp.status_code == expected_status
+
+
 def test_get_comment_anonymous(client, public_channel, reddit_factories):
     """Get a comment as an anonymous user"""
     user = UserFactory.create(username="01CBDBP5F8XRQ1T5GATHDWA99Z")
