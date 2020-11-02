@@ -15,10 +15,8 @@ pylint-django==2.0.2
 pytest==4.6
 pytest-cov>=2.6.1
 pytest-django==3.4.8
-pytest-pep8==1.0.6
 pytest-freezegun==0.4.2
 pytest-mock==1.10.1
-pytest-pylint==0.12.3
 pytest-lazy-fixture==0.4.2
 safety
 semantic-version

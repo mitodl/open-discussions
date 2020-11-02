@@ -222,7 +222,10 @@ def test_load_program(
         run_data["best_start_date"]
     )
 
-    for item, data in zip(result.items.all(), courses):
+    for item, data in zip(
+        sorted(result.items.all(), key=lambda item: item.item.course_id),
+        sorted(courses, key=lambda course: course.course_id),
+    ):
         course = item.item
         assert isinstance(course, Course)
         assert course.course_id == data.course_id
