@@ -1,0 +1,141 @@
+name: CI
+on: [push]
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      # Label used to access the service container
+      db:
+        # Docker Hub image
+        image: postgres:11.6
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:5.0.8
+        ports:
+          - 6379:6379
+
+      elastic:
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+        env:
+          network.host: "0.0.0.0"
+          http.cors.enabled: "true"
+          http.cors.allow-origin: "*"
+          rest.action.multi.allow_explicit_index: "false"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m"
+        ports:
+          - 9200:9200
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Apt install
+        run: cat Aptfile | sudo xargs apt-get install
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.7"
+
+      - id: cache
+        uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/test_requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r test_requirements.txt
+
+      - name: Code formatting
+        run: black --check .
+
+      - name: Lint
+        run: pylint ./**/*.py
+
+      - name: Tests
+        run: |
+          export MEDIA_ROOT="$(mktemp -d)"
+          tox
+        env:
+          DEBUG: 'False'
+          NODE_ENV: 'production'
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
+          OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
+          OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
+          OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
+          OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
+          OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
+          OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
+          OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
+          ELASTICSEARCH_URL: localhost:9200
+          CELERY_TASK_ALWAYS_EAGER: 'True'
+          CELERY_BROKER_URL: redis://localhost:6379/4
+          CELERY_RESULT_BACKEND: redis://localhost:6379/4
+          TIKA_CLIENT_ONLY: 'True'
+          AKISMET_IS_TESTING: 'True'
+
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
+
+  javascript-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up NodeJS
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: 10.15.1
+
+      - name: Setup environment
+        run: sudo apt-get install libelf1
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - uses: actions/cache@v1
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --ignore-engines --prefer-offline
+
+      - name: Lints
+        run: npm run lint
+
+      - name: Tests
+        run: npm run test
+        env:
+          CODECOV: true
+          NODE_ENV: development
+
+      - name: Webpack build
+        run: node node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --bail
+
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v1
+        with:
+          file: coverage/lcov.info
+          fail_ci_if_error: true
