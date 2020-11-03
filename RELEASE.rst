@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.148.1
+---------------
+
+- speparate celery queue for spam check tasks
+
 Version 0.148.0 (Released November 03, 2020)
 ---------------
 
