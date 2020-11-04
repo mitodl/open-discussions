@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.148.1
+Version 0.148.1 (Released November 04, 2020)
 ---------------
 
 - fix procfile for celery queues
