@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.148.2
+Version 0.148.2 (Released November 05, 2020)
 ---------------
 
 - Switch from Travis to Github Actions
