@@ -26,7 +26,7 @@ from course_catalog.etl.ocw import (
 )
 from course_catalog.factories import VideoFactory
 
-with open("./test_json/test_master.json") as f:
+with open("./test_json/test_ocw_parsed.json") as f:
     OCW_COURSE_JSON = json.load(f)
 
 COURSE_PAGES = OCW_COURSE_JSON["course_pages"]

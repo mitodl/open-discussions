@@ -15,7 +15,7 @@ has_toc: true
 {:toc}
 
 ### Abstract
-Parse the `course_embedded_media` section of OCW master.json files.  Search for Youtube videos within that section.
+Parse the `course_embedded_media` section of OCW parsed.json files.  Search for Youtube videos within that section.
 If found, add the video as a resource, including the thumbnail image and transcript text.
 
 

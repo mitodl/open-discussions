@@ -185,7 +185,7 @@ def import_all_xpro_files(self, chunk_size=None):
 
 
 @app.task
-def upload_ocw_master_json():
+def upload_ocw_parsed_json():
     """
     Task to upload all OCW Course master json data to S3
     """
@@ -205,7 +205,7 @@ def upload_ocw_master_json():
         s3_folder = course_url.split("/")[-1]
 
         s3_bucket.put_object(
-            Key=s3_folder + f"/{course.course_id}_master.json",
+            Key=s3_folder + f"/{course.course_id}_parsed.json",
             Body=rapidjson.dumps(course.raw_json),
             ACL="private",
         )

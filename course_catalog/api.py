@@ -350,14 +350,14 @@ def sync_ocw_course_files(ids=None):
         runs = course.runs.exclude(url="").exclude(published=False)
         for run in runs.iterator():
             try:
-                s3_master_json = rapidjson.loads(
+                s3_parsed_json = rapidjson.loads(
                     bucket.Object(
-                        "{}/{}_master.json".format(run.url.split("/")[-1], run.run_id)
+                        "{}/{}_parsed.json".format(run.url.split("/")[-1], run.run_id)
                     )
                     .get()["Body"]
                     .read()
                 )
-                load_content_files(run, transform_content_files(s3_master_json))
+                load_content_files(run, transform_content_files(s3_parsed_json))
             except:  # pylint: disable=bare-except
                 log.exception("Error syncing files for course run %d", run.id)
 
@@ -446,7 +446,7 @@ def sync_ocw_course(
     log.info("Parsing for %s...", course_prefix)
     # pass course contents into parser
     parser = OCWParser(loaded_jsons=loaded_raw_jsons_for_course)
-    course_json = parser.get_master_json()
+    course_json = parser.get_parsed_json()
     course_json["uid"] = uid
     course_json["course_id"] = "{}.{}".format(
         course_json.get("department_number"), course_json.get("master_course_number")
@@ -467,7 +467,7 @@ def sync_ocw_course(
             if settings.OCW_UPLOAD_IMAGE_ONLY:
                 parser.upload_course_image()
             else:
-                parser.upload_all_media_to_s3(upload_master_json=True)
+                parser.upload_all_media_to_s3(upload_parsed_json=True)
         except:  # pylint: disable=bare-except
             log.exception(
                 ("Error encountered uploading OCW files for %s", course_prefix)
