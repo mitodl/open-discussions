@@ -125,6 +125,15 @@ jobs:
       - name: Lints
         run: npm run lint
 
+      - name: Code formatting
+        run: npm run fmt:check
+
+      - name: Scss lint
+        run: npm run scss_lint
+
+      - name: Flow
+        run: npm run flow
+
       - name: Tests
         run: npm run test
         env:
