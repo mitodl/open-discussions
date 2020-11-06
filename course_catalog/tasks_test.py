@@ -174,7 +174,7 @@ def test_get_ocw_courses(
         # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
         obj = s3.Object(
             settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_parsed.json",
+            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
         )
         assert json.loads(obj.get()["Body"].read())
         assert course.image_src.startswith("http")
