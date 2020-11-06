@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.148.3
+---------------
+
+- add back a few things to CI
+
 Version 0.148.2 (Released November 05, 2020)
 ---------------
 
