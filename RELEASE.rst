@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.149.0
+---------------
+
+- 404 for removed comments
+- add back a few things to CI
+
 Version 0.148.2 (Released November 05, 2020)
 ---------------
 
