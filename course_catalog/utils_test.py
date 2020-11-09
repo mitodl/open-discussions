@@ -9,6 +9,7 @@ import pytz
 from course_catalog.constants import PlatformType
 from course_catalog.utils import (
     get_course_url,
+    get_ocw_topics,
     semester_year_to_date,
     load_course_blocklist,
     load_course_duplicates,
@@ -148,3 +149,27 @@ mitx:
                 "course_id": "MITx+1",
             }
         ]
+
+
+def test_get_ocw_topics():
+    """ get_ocw_topics should return the expected list of topics """
+    collection = [
+        {
+            "ocw_feature": "Engineering",
+            "ocw_subfeature": "Mechanical Engineering",
+            "ocw_speciality": "Dynamics and Control",
+        },
+        {
+            "ocw_feature": "Engineering",
+            "ocw_subfeature": "Electrical Engineering",
+            "ocw_speciality": "Signal Processing",
+        },
+    ]
+
+    assert sorted(get_ocw_topics(collection)) == [
+        "Dynamics and Control",
+        "Electrical Engineering",
+        "Engineering",
+        "Mechanical Engineering",
+        "Signal Processing",
+    ]
