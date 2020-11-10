@@ -345,7 +345,7 @@ def test_sync_ocw_course_files(mock_ocw_learning_bucket, mocker, with_error):
     runs = course.runs.all()
     for run in runs:
         mock_ocw_learning_bucket.bucket.put_object(
-            Key="{}/{}_master.json".format(run.url.split("/")[-1], run.run_id),
+            Key="{}/{}_parsed.json".format(run.url.split("/")[-1], run.run_id),
             Body=fake_data,
             ACL="public-read",
         )

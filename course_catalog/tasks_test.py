@@ -16,7 +16,7 @@ from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseT
 from course_catalog.tasks import (
     get_mitx_data,
     get_ocw_data,
-    upload_ocw_master_json,
+    upload_ocw_parsed_json,
     get_bootcamp_data,
     get_micromasters_data,
     get_xpro_data,
@@ -174,7 +174,7 @@ def test_get_ocw_courses(
         # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
         obj = s3.Object(
             settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/16197636c270e1ab179fbc9a56c72787_master.json",
+            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
         )
         assert json.loads(obj.get()["Body"].read())
         assert course.image_src.startswith("http")
@@ -298,9 +298,9 @@ def test_get_ocw_data_upload_all_or_image(settings, mocker, image_only, mocked_c
 
 
 @mock_s3
-def test_upload_ocw_master_json(settings, mocker):
+def test_upload_ocw_parsed_json(settings, mocker):
     """
-    Test that ocw_upload_master_json uploads to S3
+    Test that ocw_upload_parsed_json uploads to S3
     """
     setup_s3(settings)
 
@@ -309,7 +309,7 @@ def test_upload_ocw_master_json(settings, mocker):
     course.raw_json = {"test": "json"}
     course.save()
 
-    upload_ocw_master_json.delay()
+    upload_ocw_parsed_json.delay()
 
     s3 = boto3.resource(
         "s3",
@@ -319,7 +319,7 @@ def test_upload_ocw_master_json(settings, mocker):
     # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
     obj = s3.Object(
         settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-        f"9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/{course.course_id}_master.json",
+        f"9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/{course.course_id}_parsed.json",
     )
     assert json.loads(obj.get()["Body"].read())
 
