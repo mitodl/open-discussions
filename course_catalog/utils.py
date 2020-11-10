@@ -47,6 +47,8 @@ def get_ocw_topics(topics_collection):
             topics.append(topic_object["ocw_feature"])
         if topic_object["ocw_subfeature"]:
             topics.append(topic_object["ocw_subfeature"])
+        if topic_object["ocw_speciality"]:
+            topics.append(topic_object["ocw_speciality"])
 
     return list(set(topics))
 
