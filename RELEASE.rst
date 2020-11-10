@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.149.0
+Version 0.149.0 (Released November 10, 2020)
 ---------------
 
 - 404 for removed comments
