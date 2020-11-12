@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.149.2
+Version 0.149.2 (Released November 12, 2020)
 ---------------
 
 - Import OCW level 3 topics (specialities) (#3218)
