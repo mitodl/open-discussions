@@ -469,10 +469,19 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     object_type = COURSE_TYPE
     resource_relations = {"name": "resource"}
 
-    runs = ESRunSerializer(read_only=True, many=True, allow_null=True)
+    runs = serializers.SerializerMethodField()
     coursenum = serializers.SerializerMethodField()
 
     default_search_priority = serializers.SerializerMethodField()
+
+    def get_runs(self, course):
+        """
+        Get published runs in reverse chronological order by best_start_date
+        """
+        return [
+            ESRunSerializer(run).data
+            for run in course.runs.exclude(published=False).order_by("-best_start_date")
+        ]
 
     def get_coursenum(self, course):
         """

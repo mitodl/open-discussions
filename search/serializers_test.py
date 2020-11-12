@@ -341,6 +341,9 @@ def test_es_course_serializer(offered_by, platform, department):
     Test that ESCourseSerializer correctly serializes a course object
     """
     course = CourseFactory.create(platform=platform, department=department)
+    unpublished_run = course.runs.first()
+    unpublished_run.published = False
+    unpublished_run.save()
     course.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
 
     serialized = ESCourseSerializer(course).data
@@ -381,7 +384,9 @@ def test_es_course_serializer(offered_by, platform, department):
             "topics": list(course.topics.values_list("name", flat=True)),
             "runs": [
                 ESRunSerializer(course_run).data
-                for course_run in course.runs.order_by("-best_start_date")
+                for course_run in course.runs.exclude(published=False).order_by(
+                    "-best_start_date"
+                )
             ],
             "published": True,
             "offered_by": [offered_by],
@@ -396,6 +401,7 @@ def test_es_course_serializer(offered_by, platform, department):
         },
         sort=True,
     )
+    assert len(serialized["runs"]) == 2
 
 
 @pytest.mark.django_db
