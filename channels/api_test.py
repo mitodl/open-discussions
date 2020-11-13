@@ -9,7 +9,7 @@ import pytest
 from praw.models import Comment as RedditComment
 from praw.models.comment_forest import CommentForest
 from praw.models.reddit.redditor import Redditor
-from prawcore.exceptions import ResponseException
+from prawcore.exceptions import ResponseException, Forbidden
 from rest_framework.exceptions import NotFound
 
 from channels import api
@@ -1190,6 +1190,20 @@ def test_is_moderator(mock_client, is_moderator):
         ["username"] if is_moderator else []
     )
     assert client.is_moderator("channel", "username") is is_moderator
+    mock_client.subreddit.return_value.moderator.assert_called_once_with(
+        redditor="username"
+    )
+
+
+def test_is_moderator_forbidden(mock_client):
+    """is_moderator should return False if the user is not allowed to make the API call"""
+    client = api.Api(UserFactory.create())
+    # the actual return value here will be different against a reddit backend
+    # but truthiness of the return iterable is all that matters
+    mock_client.subreddit.return_value.moderator.side_effect = Forbidden(
+        Mock(status_code=403)
+    )
+    assert client.is_moderator("channel", "username") is False
     mock_client.subreddit.return_value.moderator.assert_called_once_with(
         redditor="username"
     )
