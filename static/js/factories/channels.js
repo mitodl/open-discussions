@@ -25,23 +25,24 @@ export const makeChannel = (privateChannel: boolean = false): Channel => {
   const hasAvatar = casual.coin_flip
   return {
     // $FlowFixMe: Flow thinks incr.next().value may be undefined, but it won't ever be
-    name:                  `channel_${incr.next().value}`,
-    title:                 casual.title,
-    channel_type:          privateChannel ? "private" : "public",
-    public_description:    casual.description,
-    num_users:             casual.integer(0, 500),
-    user_is_contributor:   casual.coin_flip,
-    user_is_subscriber:    casual.coin_flip,
-    user_is_moderator:     casual.coin_flip,
-    membership_is_managed: casual.coin_flip,
-    ga_tracking_id:        casual.random_element(["UA-FAKE-01", null]),
-    avatar:                hasAvatar ? "http://avatar.url" : null,
-    avatar_small:          hasAvatar ? "http://avatar.small.url" : null,
-    avatar_medium:         hasAvatar ? "http://avatar.medium.url" : null,
-    banner:                casual.coin_flip ? "http://banner.url" : null,
-    widget_list_id:        casual.integer(4, 99),
-    allowed_post_types:    [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE],
-    about:                 null
+    name:                    `channel_${incr.next().value}`,
+    title:                   casual.title,
+    channel_type:            privateChannel ? "private" : "public",
+    public_description:      casual.description,
+    num_users:               casual.integer(0, 500),
+    user_is_contributor:     casual.coin_flip,
+    user_is_subscriber:      casual.coin_flip,
+    user_is_moderator:       casual.coin_flip,
+    membership_is_managed:   casual.coin_flip,
+    ga_tracking_id:          casual.random_element(["UA-FAKE-01", null]),
+    avatar:                  hasAvatar ? "http://avatar.url" : null,
+    avatar_small:            hasAvatar ? "http://avatar.small.url" : null,
+    avatar_medium:           hasAvatar ? "http://avatar.medium.url" : null,
+    banner:                  casual.coin_flip ? "http://banner.url" : null,
+    widget_list_id:          casual.integer(4, 99),
+    allowed_post_types:      [LINK_TYPE_TEXT, LINK_TYPE_LINK, LINK_TYPE_ARTICLE],
+    about:                   null,
+    moderator_notifications: false
   }
 }
 

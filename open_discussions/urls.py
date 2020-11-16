@@ -68,6 +68,11 @@ urlpatterns = [
         name="channel-post",
     ),
     url(r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"),
+    url(
+        r"^manage/c/edit/(?P<channel_name>[A-Za-z0-9_]+)/basic/$",
+        index,
+        name="manage-channel",
+    ),
     url(r"^settings/(?P<token>[^/]+)/$", index, name="settings-anon"),
     url(r"^c/", index),
     url(r"^channel/", channel_redirect),

@@ -33,11 +33,12 @@ describe("Channel utils", () => {
     const channel = makeChannel()
     // num_users shouldn't be present
     assert.deepEqual(editChannelForm(channel), {
-      title:              channel.title,
-      name:               channel.name,
-      public_description: channel.public_description,
-      channel_type:       channel.channel_type,
-      allowed_post_types: channel.allowed_post_types
+      title:                   channel.title,
+      name:                    channel.name,
+      public_description:      channel.public_description,
+      channel_type:            channel.channel_type,
+      allowed_post_types:      channel.allowed_post_types,
+      moderator_notifications: false
     })
   })
 

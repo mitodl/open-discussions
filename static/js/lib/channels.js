@@ -49,7 +49,8 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
       "title",
       "public_description",
       "channel_type",
-      "allowed_post_types"
+      "allowed_post_types",
+      "moderator_notifications"
     ],
     channel
   )

@@ -41,17 +41,19 @@ export type Channel = {
   widget_list_id:        ?number,
   allowed_post_types:    Array<LinkType>,
   about:                 ?Array<Object>,
+  moderator_notifications?: boolean,
 }
 
 export type ChannelForm = {
-  name:                   string,
-  title:                  string,
-  public_description:     string,
-  channel_type:           ChannelType,
-  allowed_post_types:     Array<LinkType>,
-  membership_is_managed:  boolean,
-  avatar?:                FormImage,
-  banner?:                FormImage
+  name:                     string,
+  title:                    string,
+  public_description:       string,
+  channel_type:             ChannelType,
+  allowed_post_types:       Array<LinkType>,
+  membership_is_managed:    boolean,
+  avatar?:                  FormImage,
+  banner?:                  FormImage,
+  moderator_notifications?: boolean,
 }
 
 export type ChannelAppearanceEditValidation = {

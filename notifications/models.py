@@ -7,9 +7,11 @@ from open_discussions.models import TimestampedModel
 
 NOTIFICATION_TYPE_FRONTPAGE = "frontpage"
 NOTIFICATION_TYPE_COMMENTS = "comments"
+NOTIFICATION_TYPE_MODERATOR = "moderator_posts"
 NOTIFICATION_TYPE_CHOICES = (
     (NOTIFICATION_TYPE_FRONTPAGE, "Frontpage"),
     (NOTIFICATION_TYPE_COMMENTS, "Comments"),
+    (NOTIFICATION_TYPE_MODERATOR, "Moderator"),
 )
 NOTIFICATION_TYPES = [choice[0] for choice in NOTIFICATION_TYPE_CHOICES]
 
@@ -140,3 +142,16 @@ class CommentEvent(TimestampedModel):
 
     class Meta:
         unique_together = (("user", "post_id", "comment_id"),)
+
+
+class PostEvent(TimestampedModel):
+    """Represents a new post in a chennel where the moderators want to see post notifications"""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    post_id = Base36IntegerField()
+    email_notification = models.ForeignKey(
+        EmailNotification, on_delete=models.CASCADE, null=True
+    )
+
+    class Meta:
+        unique_together = (("user", "post_id"),)
