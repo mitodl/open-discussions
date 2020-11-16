@@ -1572,13 +1572,16 @@ class Api:
             # So we have to be explicit here.
             raise ValueError("Missing moderator_name")
         # generators always eval True, so eval as list first and then as bool
-        return bool(
-            list(
-                self._list_moderators(
-                    channel_name=channel_name, moderator_name=moderator_name
+        try:
+            return bool(
+                list(
+                    self._list_moderators(
+                        channel_name=channel_name, moderator_name=moderator_name
+                    )
                 )
             )
-        )
+        except PrawForbidden:
+            return False
 
     def add_subscriber(self, subscriber_name, channel_name):
         """
