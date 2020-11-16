@@ -65,9 +65,19 @@ class EditChannelBasicPage extends React.Component<Props> {
 
   onUpdate = (e: Object) => {
     const { dispatch, channelForm } = this.props
-    const updates = {
-      [e.target.name]: e.target.value
+
+    let updates
+
+    if (e.target.name === "moderator_notifications") {
+      updates = {
+        [e.target.name]: e.target.checked
+      }
+    } else {
+      updates = {
+        [e.target.name]: e.target.value
+      }
     }
+
     if (e.target.name === "allowed_post_types") {
       // $FlowFixMe
       updates.allowed_post_types = updatePostTypes(
@@ -102,7 +112,12 @@ class EditChannelBasicPage extends React.Component<Props> {
       )
     } else {
       const patchValue = R.pickAll(
-        ["name", "channel_type", "allowed_post_types"],
+        [
+          "name",
+          "channel_type",
+          "allowed_post_types",
+          "moderator_notifications"
+        ],
         channelForm.value
       )
       dispatch(actions.channels.patch(patchValue)).then(channel => {

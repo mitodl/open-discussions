@@ -1,0 +1,1 @@
+New Post on Open [{{ post.channel_title|safe }}] {{ post.title|safe }}

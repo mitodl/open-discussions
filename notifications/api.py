@@ -3,8 +3,10 @@ import logging
 
 from django.conf import settings
 from django.db.models import Q
+from django.contrib.auth.models import User
 
 from channels.models import Subscription
+from channels.api import get_admin_api
 from notifications.notifiers.exceptions import (
     UnsupportedNotificationTypeError,
     CancelNotificationError,
@@ -14,11 +16,12 @@ from notifications.models import (
     NotificationSettings,
     NOTIFICATION_TYPE_FRONTPAGE,
     NOTIFICATION_TYPE_COMMENTS,
+    NOTIFICATION_TYPE_MODERATOR,
     FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
 )
-from notifications.notifiers import comments, frontpage
+from notifications.notifiers import comments, frontpage, moderator_posts
 from notifications import tasks
 from open_discussions.utils import chunks
 
@@ -113,6 +116,8 @@ def _get_notifier_for_notification(notification):
         return frontpage.FrontpageDigestNotifier(notification_settings)
     elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
         return comments.CommentNotifier(notification_settings)
+    elif notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
+        return moderator_posts.ModeratorPostsNotifier(notification_settings)
     else:
         raise UnsupportedNotificationTypeError(
             "Notification type '{}' is unsupported".format(
@@ -184,3 +189,25 @@ def send_comment_notifications(post_id, comment_id, new_comment_id):
 
         notifier = comments.CommentNotifier(notification_settings)
         notifier.create_comment_event(subscription, new_comment_id)
+
+
+def send_moderator_notifications(post_id, channel_name):
+    """
+    Sends post notifications to channel moderators
+
+    Args:
+        post_id (str): base36 post id
+        channel_name (str): channel_name
+    """
+
+    channel_api = get_admin_api()
+    for moderator in channel_api.list_moderators(channel_name):
+        self_user = User.objects.get(username=moderator.name)
+        notification_setting, _ = NotificationSettings.objects.get_or_create(
+            user=self_user,
+            trigger_frequency=FREQUENCY_IMMEDIATE,
+            notification_type=NOTIFICATION_TYPE_MODERATOR,
+        )
+
+        notifier = moderator_posts.ModeratorPostsNotifier(notification_setting)
+        notifier.create_moderator_post_event(self_user, post_id)

@@ -36,6 +36,7 @@ def default_channel_response_data(channel):
         ],
         "widget_list_id": channel_record.widget_list_id,
         "about": None,
+        "moderator_notifications": False,
     }
 
 

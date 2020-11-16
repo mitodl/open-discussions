@@ -111,7 +111,8 @@ describe("EditChannelBasicPage", () => {
     assert.deepEqual(Object.keys(channelUpdateArg), [
       "name",
       "channel_type",
-      "allowed_post_types"
+      "allowed_post_types",
+      "moderator_notifications"
     ])
 
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))

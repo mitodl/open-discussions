@@ -51,7 +51,6 @@ type Props = {
 
 export default function EditChannelBasicForm(props: Props) {
   const { onSubmit, onUpdate, form, processing, validation, history } = props
-
   return (
     <form onSubmit={onSubmit} className="form channel-form">
       <Card title="Type">
@@ -105,6 +104,18 @@ export default function EditChannelBasicForm(props: Props) {
         </div>
         <div className="row">
           {validationMessage(validation.allowed_post_types)}
+        </div>
+      </Card>
+      <Card title="Other">
+        <div className="moderator_notifications">
+          <Checkbox
+            name="moderator_notifications"
+            checked={!!form.moderator_notifications}
+            onChange={onUpdate}
+          >
+            Notify channel moderators when new articles are posted in this
+            channel
+          </Checkbox>
         </div>
       </Card>
       <div className="row actions">

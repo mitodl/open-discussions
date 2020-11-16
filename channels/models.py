@@ -157,6 +157,7 @@ class Channel(TimestampedModel):
     channel_type = models.CharField(
         max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
     )
+    moderator_notifications = models.BooleanField(default=False, null=False)
 
     def save(
         self, *args, update_image=False, **kwargs

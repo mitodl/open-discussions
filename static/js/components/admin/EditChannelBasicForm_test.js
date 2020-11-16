@@ -71,7 +71,8 @@ describe("EditChannelBasicForm", () => {
     //
     ;[
       ["channel_type", CHANNEL_TYPE_PUBLIC],
-      ["allowed_post_types", LINK_TYPE_TEXT]
+      ["allowed_post_types", LINK_TYPE_TEXT],
+      ["moderator_notifications", true]
     ].forEach(([name, value]) => {
       describe("onUpdate", () => {
         it(`should be called when ${name} input is modified`, () => {

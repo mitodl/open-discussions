@@ -3,6 +3,7 @@ import pytest
 
 from notifications import tasks
 from notifications.factories import NotificationSettingsFactory
+from channels.factories.models import ChannelFactory
 
 
 @pytest.mark.django_db
@@ -99,3 +100,12 @@ def test_notify_subscribed_users(mocker):
 
     tasks.notify_subscribed_users.delay(1, 2, 3)
     api_mock.assert_called_once_with(1, 2, 3)
+
+
+@pytest.mark.django_db
+def test_notify_moderators(mocker):
+    """Tests that notify_moderators calls the API method"""
+    api_mock = mocker.patch("notifications.api.send_moderator_notifications")
+    channel = ChannelFactory.create(moderator_notifications=True)
+    tasks.notify_moderators.delay("1", channel.name)
+    api_mock.assert_called_once_with("1", channel.name)

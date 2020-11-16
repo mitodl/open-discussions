@@ -111,6 +111,7 @@ class ChannelFactory(DjangoModelFactory):
             factory.Dict({"node": "text", "value": factory.Faker("text")}),
         ]
     )
+    moderator_notifications = False
 
     @factory.post_generation
     def create_roles(

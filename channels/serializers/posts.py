@@ -18,6 +18,7 @@ from open_discussions.settings import SITE_BASE_URL
 from open_discussions.serializers import WriteableSerializerMethodField
 from open_discussions.utils import markdown_to_plain_text
 from profiles.utils import image_uri
+from notifications.tasks import notify_moderators
 
 User = get_user_model()
 
@@ -236,6 +237,8 @@ class PostSerializer(BasePostSerializer):
 
         if changed or cover_image:
             post = api.get_post(post_id=post.id)
+
+        notify_moderators.delay(post.id, channel_name)
 
         if not api.is_moderator(post.subreddit.display_name, post.author.name):
             task_helpers.check_post_for_spam(self.context["request"], post.id)

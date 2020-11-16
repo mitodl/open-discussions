@@ -42,6 +42,7 @@ class ChannelSerializer(serializers.Serializer):
     banner = WriteableSerializerMethodField()
     ga_tracking_id = serializers.CharField(required=False, allow_blank=True)
     about = serializers.JSONField(allow_null=True, default=None)
+    moderator_notifications = WriteableSerializerMethodField()
 
     def get_user_is_contributor(self, channel):
         """
@@ -80,6 +81,12 @@ class ChannelSerializer(serializers.Serializer):
         """Get the banner image URL"""
         return channel.banner.url if channel.banner else None
 
+    def get_moderator_notifications(self, channel):
+        """Get moderator notifications"""
+        return (
+            channel._self_channel.moderator_notifications  # pylint: disable=protected-access
+        )
+
     def validate_avatar(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
         if not hasattr(value, "name"):
@@ -91,6 +98,12 @@ class ChannelSerializer(serializers.Serializer):
         if not hasattr(value, "name"):
             raise ValidationError("Expected banner to be a file")
         return {"banner": value}
+
+    def validate_moderator_notifications(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not isinstance(value, bool):
+            raise ValidationError("Expected moderator_notifications be a boolean")
+        return {"moderator_notifications": value}
 
     def get_allowed_post_types(self, channel):
         """Returns a dictionary of allowed post types"""
@@ -184,6 +197,12 @@ class ChannelSerializer(serializers.Serializer):
         channel = api.update_channel(name=name, **kwargs)
 
         channel_obj = channel._self_channel  # pylint: disable=protected-access
+
+        if "moderator_notifications" in validated_data:
+            channel_obj.moderator_notifications = validated_data.get(
+                "moderator_notifications"
+            )
+            channel_obj.save()
 
         avatar = validated_data.get("avatar")
         if avatar:

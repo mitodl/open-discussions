@@ -1,7 +1,8 @@
 """Tests for notification apis"""
+from unittest.mock import Mock
 import pytest
 
-from channels.factories.models import SubscriptionFactory
+from channels.factories.models import SubscriptionFactory, ChannelFactory
 from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
@@ -10,8 +11,10 @@ from notifications.models import (
     NotificationSettings,
     EmailNotification,
     CommentEvent,
+    PostEvent,
     NOTIFICATION_TYPE_FRONTPAGE,
     NOTIFICATION_TYPE_COMMENTS,
+    NOTIFICATION_TYPE_MODERATOR,
     FREQUENCY_NEVER,
     FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
@@ -155,6 +158,10 @@ def test_send_unsent_email_notifications(mocker, settings):
             NOTIFICATION_TYPE_FRONTPAGE,
             "notifications.notifiers.frontpage.FrontpageDigestNotifier",
         ),
+        (
+            NOTIFICATION_TYPE_MODERATOR,
+            "notifications.notifiers.moderator_posts.ModeratorPostsNotifier",
+        ),
     ],
 )
 def test_send_email_notification_batch(
@@ -216,3 +223,30 @@ def test_send_comment_notifications(post_id, comment_id):
         assert event.post_id == post_id
         assert event.comment_id == "abc"
         assert event.user in users
+
+
+def test_send_moderator_notifications(mocker):
+    """Tests that send_moderator_notifications works correctly"""
+
+    mod_user = UserFactory.create()
+    reddit_user = Mock()
+    reddit_user.name = mod_user.username
+
+    channel = ChannelFactory.create()
+
+    mock_api = Mock()
+    mock_api.list_moderators.return_value = [reddit_user]
+
+    mocker.patch("notifications.api.get_admin_api", return_value=mock_api)
+
+    api.send_moderator_notifications("1", channel.name)
+
+    assert PostEvent.objects.count() == 1
+    event = PostEvent.objects.last()
+    assert event.post_id == "1"
+    assert event.user == mod_user
+
+    assert EmailNotification.objects.count() == 1
+    notification = EmailNotification.objects.last()
+    assert notification.user == mod_user
+    assert notification.notification_type == NOTIFICATION_TYPE_MODERATOR

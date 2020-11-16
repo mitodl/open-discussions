@@ -4,6 +4,7 @@ from django.conf import settings
 
 from open_discussions.celery import app
 from open_discussions.utils import chunks
+from channels.models import Channel
 
 from notifications import api
 
@@ -95,3 +96,17 @@ def notify_subscribed_users(post_id, comment_id, new_comment_id):
         new_comment_id (str): base36 id of the new comment
     """
     api.send_comment_notifications(post_id, comment_id, new_comment_id)
+
+
+@app.task
+def notify_moderators(post_id, channel_name):
+    """
+    Notifies channel moderators of a new post.
+
+    Args:
+        post_id (str): base36 id of the post
+        channel_name (str): channel name
+    """
+    channel = Channel.objects.get(name=channel_name)
+    if channel.moderator_notifications:
+        api.send_moderator_notifications(post_id, channel_name)

@@ -20,6 +20,7 @@ pytestmark = pytest.mark.django_db
 @pytest.mark.parametrize("membership_is_managed", [True, False])
 @pytest.mark.parametrize("allowed_post_types", [{}, {"self": True, "link": False}])
 @pytest.mark.parametrize("link_type", [LINK_TYPE_ANY, LINK_TYPE_LINK, LINK_TYPE_SELF])
+@pytest.mark.parametrize("moderator_notifications", [True, False])
 def test_serialize_channel(
     user,
     has_avatar,
@@ -29,6 +30,7 @@ def test_serialize_channel(
     membership_is_managed,
     allowed_post_types,
     link_type,
+    moderator_notifications,
 ):  # pylint: disable=too-many-arguments
     """
     Test serializing a channel
@@ -50,6 +52,10 @@ def test_serialize_channel(
         widget_list_id=123,
         about=Mock() if has_about else None,
     )
+
+    channel._self_channel.moderator_notifications = (
+        moderator_notifications
+    )  # pylint: disable=protected-access
 
     request = Mock(user=user)
 
@@ -76,6 +82,7 @@ def test_serialize_channel(
         else get_allowed_post_types_from_link_type(link_type),
         "widget_list_id": channel.widget_list_id,
         "about": channel.about,
+        "moderator_notifications": moderator_notifications,
     }
 
 
@@ -180,3 +187,22 @@ def test_update_channel_about(user, about):
     )
     channel.refresh_from_db()
     assert channel.about == about
+
+
+@pytest.mark.parametrize("moderator_notifications", [True, False])
+def test_update_channel_moderator_notifications(user, moderator_notifications):
+    """
+    Test updating the channel moderator_notifications field
+    """
+    channel = ChannelFactory.create(about=None)
+    instance = Mock(display_name=channel.name)
+    request = Mock(user=user)
+    api_mock = Mock()
+    api_mock.update_channel.return_value._self_channel = (  # pylint: disable=protected-access
+        channel
+    )
+    ChannelSerializer(context={"channel_api": api_mock, "request": request}).update(
+        instance, {"moderator_notifications": moderator_notifications}
+    )
+    channel.refresh_from_db()
+    assert channel.moderator_notifications == moderator_notifications
