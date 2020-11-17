@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.150.0
+Version 0.150.0 (Released November 17, 2020)
 ---------------
 
 - Return False if reddit API is_moderator call raises a Forbidden error (#3223)
