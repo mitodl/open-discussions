@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.150.0 (Released November 17, 2020)
+---------------
+
+- Return False if reddit API is_moderator call raises a Forbidden error (#3223)
+- ES Course serializer should exclude unpublished runs and list them in reverse chronological order (#3221)
+
 Version 0.149.2 (Released November 12, 2020)
 ---------------
 
