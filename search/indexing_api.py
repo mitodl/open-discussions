@@ -290,6 +290,9 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
         conn.indices.delete(index_name)
     index_create_data = {
         "settings": {
+            "index": {
+                "number_of_shards": settings.ELASTICSEARCH_SHARD_COUNT
+            },
             "analysis": {
                 "analyzer": {
                     "folding": {
