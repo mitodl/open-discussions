@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.150.1
+---------------
+
+- fix styling for long search filters
+
 Version 0.150.0 (Released November 17, 2020)
 ---------------
 
