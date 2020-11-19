@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.150.2
+---------------
+
+- Add  OWASP ZAP security scan as Github action (#3229)
+
 Version 0.150.1 (Released November 19, 2020)
 ---------------
 
