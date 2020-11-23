@@ -94,6 +94,10 @@
       "description": "Index to use on Elasticsearch",
       "required": true
     },
+    "ELASTICSEARCH_SHARD_COUNT": {
+      "description": "Number of shards to allocate when creating an Elasticsearch index",
+      "required": false
+    },
     "ELASTICSEARCH_INDEXING_CHUNK_SIZE": {
       "description": "Chunk size to use for Elasticsearch indexing tasks",
       "required": false
