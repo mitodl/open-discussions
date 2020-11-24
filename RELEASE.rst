@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.151.0
+---------------
+
+- Revert "Add  OWASP ZAP security scan as Github action (#3229)" (#3234)
+- Add Elasticsearch shard count variable (#3228)
+- Add  OWASP ZAP security scan as Github action (#3229)
+
 Version 0.150.1 (Released November 19, 2020)
 ---------------
 
