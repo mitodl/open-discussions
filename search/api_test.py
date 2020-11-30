@@ -8,7 +8,8 @@ from django.contrib.contenttypes.models import ContentType
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
-from course_catalog.constants import PrivacyLevel
+from course_catalog.api import split_ocw_courses_by_run
+from course_catalog.constants import PrivacyLevel, PlatformType
 from course_catalog.factories import (
     CourseFactory,
     UserListFactory,
@@ -16,7 +17,7 @@ from course_catalog.factories import (
     VideoFactory,
     ProgramFactory,
 )
-from course_catalog.models import FavoriteItem
+from course_catalog.models import FavoriteItem, Course
 from open_discussions import features
 from open_discussions.factories import UserFactory
 from open_discussions.utils import extract_values
@@ -910,3 +911,21 @@ def test_get_similar_topics(settings, elasticsearch):
         doc_type=[],
         index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
     )
+
+
+def test_split_ocw_courses_by_run():
+    """ Test that an OCW course is split into a separate course for each run """
+    original_course = CourseFactory.create(platform=PlatformType.ocw.value)
+    runs = original_course.runs.values_list("run_id", flat=True)
+    assert len(runs) == 3
+    assert Course.objects.count() == 1
+    split_ocw_courses_by_run()
+    courses = Course.objects.all()
+    assert len(courses) == 3
+    for course in courses:
+        assert (
+            course.course_id
+            == f"{course.runs.first().run_id}+{original_course.course_id}"
+        )
+        assert course.runs.count() == 1
+        assert course.runs.first().run_id in runs

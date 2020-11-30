@@ -21,6 +21,7 @@ from course_catalog.constants import (
     NON_COURSE_DIRECTORIES,
     AvailabilityType,
     OfferedBy,
+    ResourceType,
 )
 from course_catalog.etl.loaders import load_offered_bys, load_content_files
 from course_catalog.etl.ocw import (
@@ -38,7 +39,8 @@ from course_catalog.serializers import (
     CourseSerializer,
 )
 from course_catalog.utils import get_course_url
-from search.task_helpers import delete_course, upsert_course
+from search.indexing_api import delete_courses
+from search.task_helpers import delete_course, upsert_course, index_run_content_files
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +65,52 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
+def split_ocw_courses_by_run():
+    """
+    Create a separate course for each OCW run
+    """
+    ocw = PlatformType.ocw.value
+    course_ids = Course.objects.filter(platform=ocw).values_list("id", flat=True)
+    delete_courses(ocw, course_ids)
+    for course_id in course_ids:
+        course = Course.objects.get(platform=ocw, id=course_id)
+        for run in course.runs.filter(published=True).iterator():
+            data = run.raw_json
+            course_url = get_course_url(data.get("uid"), data, ocw)
+            course_prefix = (
+                "PROD/RES"
+                if course.learning_resource_type == ResourceType.ocw_resource.value
+                else ""
+            )
+            new_course_id = f"{data.get('uid')}+{data.get('course_id')}"
+            if course.url != course_url and course.course_id != new_course_id:
+                serialized_course = None
+            else:
+                serialized_course = course
+            ocw_serializer = OCWSerializer(
+                data={
+                    **run.raw_json,
+                    "last_modified": run.last_modified,
+                    "is_published": run.published,
+                    "course_prefix": course_prefix,
+                },
+                instance=(serialized_course),
+            )
+            if not ocw_serializer.is_valid():
+                raise Exception(
+                    "Course %s is not valid: %s %s %s",
+                    run.raw_json.get("uid"),
+                    ocw_serializer.errors,
+                    ocw_serializer.data["course_id"],
+                )
+            serialized_course = ocw_serializer.save()
+            load_offered_bys(serialized_course, [{"name": OfferedBy.ocw.value}])
+            run.object_id = serialized_course.id
+            run.save()
+            upsert_course(serialized_course.id)
+            index_run_content_files(run.id)
+
+
 def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""):
     """
     Takes in OCW course master json to store it in DB
@@ -78,7 +126,8 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
         return
 
     existing_course_instance = Course.objects.filter(
-        platform=PlatformType.ocw.value, course_id=master_json["course_id"]
+        platform=PlatformType.ocw.value,
+        url=get_course_url(master_json.get("uid"), master_json, PlatformType.ocw.value),
     ).first()
 
     ocw_serializer = OCWSerializer(
@@ -101,11 +150,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
 
     # Make changes atomically so we don't end up with partially saved/deleted data
     with transaction.atomic():
-        if existing_course_instance is None:
-            course = ocw_serializer.save()
-        else:
-            course = existing_course_instance
-
+        course = ocw_serializer.save()
         load_offered_bys(course, [{"name": OfferedBy.ocw.value}])
 
         # Try and get the run instance.
@@ -149,17 +194,6 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
             )
             return
         run = run_serializer.save()
-
-        if existing_course_instance is not None:
-            best_run = (
-                existing_course_instance.runs.filter(published=True)
-                .filter(best_start_date__isnull=False)
-                .order_by("-best_start_date")
-                .first()
-            )
-            if best_run is not None and run.id == best_run.id:
-                ocw_serializer.save()
-
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
     return course, run
 

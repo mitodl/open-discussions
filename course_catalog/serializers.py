@@ -303,11 +303,11 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
         """
         Verify the Course doesn't exist if we're creating a new one
         """
-        course_id = attrs["course_id"]
+        url = attrs["url"]
         platform = attrs["platform"]
         if (
             self.instance is None
-            and Course.objects.filter(platform=platform, course_id=course_id).exists()
+            and Course.objects.filter(platform=platform, url=url).exists()
         ):
             raise serializers.ValidationError("Course already exists")
         return attrs
@@ -337,7 +337,7 @@ class OCWSerializer(CourseSerializer):
         ]
 
         course_fields = {
-            "course_id": data.get("course_id"),
+            "course_id": f"{data.get('uid')}+{data.get('course_id')}",
             "title": data.get("title"),
             "short_description": data.get("description"),
             "image_src": data.get("image_src"),

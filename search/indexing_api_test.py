@@ -8,6 +8,7 @@ import pytest
 
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from course_catalog.constants import PlatformType
 from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
@@ -16,7 +17,13 @@ from course_catalog.factories import (
 from open_discussions.utils import chunks
 from search.api import gen_course_id
 from search.connection import get_default_alias_name
-from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
+from search.constants import (
+    POST_TYPE,
+    COMMENT_TYPE,
+    ALIAS_ALL_INDICES,
+    GLOBAL_DOC_TYPE,
+    COURSE_TYPE,
+)
 from search.exceptions import ReindexException
 from search import indexing_api
 from search.indexing_api import (
@@ -33,6 +40,7 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     delete_document,
     index_course_content_files,
+    delete_courses,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -397,6 +405,40 @@ def test_delete_document_not_found(mocked_es, mocker):
     mocked_es.conn.delete.side_effect = NotFoundError
     delete_document(1, "course")
     assert patched_logger.debug.called is True
+
+
+def test_delete_courses(mocked_es, mocker, settings):
+    """ delete_courses should removed specified courses from the index"""
+    courses = sorted(
+        CourseFactory.create_batch(5, platform=PlatformType.ocw.value),
+        key=lambda course: course.id,
+    )
+    mock_get_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
+    )
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, [])
+    )
+    expected_docs = [
+        {
+            "_id": gen_course_id(PlatformType.ocw.value, course.course_id),
+            "_op_type": "delete",
+        }
+        for course in courses
+    ]
+    delete_courses(PlatformType.ocw.value, [course.id for course in courses])
+
+    for alias in mock_get_aliases.return_value:
+        for chunk in chunks(
+            expected_docs, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+        ):
+            bulk_mock.assert_any_call(
+                mocked_es.conn,
+                chunk,
+                index=alias,
+                doc_type=GLOBAL_DOC_TYPE,
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
 
 
 def test_index_content_files(mocker):
