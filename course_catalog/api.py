@@ -95,10 +95,12 @@ def split_ocw_courses_by_run(chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE):
             )
             if not ocw_serializer.is_valid():
                 raise Exception(
-                    "Course %s is not valid: %s %s %s",
-                    run.raw_json.get("uid"),
-                    ocw_serializer.errors,
-                    ocw_serializer.data["course_id"],
+                    "Course %s %s is not valid: %s"
+                    % (
+                        run.raw_json.get("uid"),
+                        ocw_serializer.data["course_id"],
+                        ocw_serializer.errors,
+                    )
                 )
             serialized_course = ocw_serializer.save()
             load_offered_bys(serialized_course, [{"name": OfferedBy.ocw.value}])

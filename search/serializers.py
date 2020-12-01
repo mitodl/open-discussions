@@ -858,17 +858,6 @@ def serialize_course_for_bulk(course_obj):
     }
 
 
-def serialize_course_for_bulk_deletion(platform, course_id):
-    """
-    Serialize a course for bulk API request
-
-    Args:
-        platform (str): A course platform
-        course_id (str): A course id
-    """
-    return {"_id": gen_course_id(platform, course_id), "_op_type": "delete"}
-
-
 def serialize_content_file_for_bulk(content_file_obj):
     """
     Serialize a content file for bulk API request
