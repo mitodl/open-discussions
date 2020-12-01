@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.151.0
+Version 0.151.0 (Released December 01, 2020)
 ---------------
 
 - Revert "Add  OWASP ZAP security scan as Github action (#3229)" (#3234)
