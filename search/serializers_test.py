@@ -82,7 +82,6 @@ from search.serializers import (
     ESPodcastEpisodeSerializer,
     serialize_bulk_podcast_episodes,
     serialize_podcast_episode_for_bulk,
-    serialize_course_for_bulk_deletion,
 )
 
 
@@ -728,18 +727,6 @@ def test_serialize_course_for_bulk():
 
 
 @pytest.mark.django_db
-def test_serialize_course_for_bulk_deletion():
-    """
-    Test that serialize_course_for_bulk_deletion yields a valid ESCourseSerializer
-    """
-    course = CourseFactory.create()
-    assert serialize_course_for_bulk_deletion(course.platform, course.course_id) == {
-        "_id": gen_course_id(course.platform, course.course_id),
-        "_op_type": "delete",
-    }
-
-
-@pytest.mark.django_db
 def test_serialize_bulk_video(mocker):
     """
     Test that serialize_bulk_video calls serialize_video_for_bulk for every existing video
@@ -778,7 +765,7 @@ def test_serialize_content_file_for_bulk():
 @pytest.mark.django_db
 def test_serialize_content_file_for_bulk_deletion():
     """
-    Test that serialize_content_file_for_bulk_deletion yields a valid deletion doc
+    Test that serialize_content_file_for_bulk_deletion yields a valid ESContentFileSerializer
     """
     content_file = ContentFileFactory.create()
     assert serialize_content_file_for_bulk_deletion(content_file) == {

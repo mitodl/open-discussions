@@ -13,7 +13,6 @@ import rapidjson
 from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 from ocw_data_parser import OCWParser
 import pytz
 
@@ -40,8 +39,7 @@ from course_catalog.serializers import (
     CourseSerializer,
 )
 from course_catalog.utils import get_course_url
-from search.indexing_api import delete_courses, delete_run_content_files
-from search.task_helpers import delete_course, upsert_course, index_run_content_files
+from search.task_helpers import delete_course, upsert_course
 
 log = logging.getLogger(__name__)
 
@@ -66,27 +64,14 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
-def split_ocw_courses_by_run():
+def split_ocw_courses_by_run(chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE):
     """
-    Create a separate course for each OCW run
+    Create a separate course for each OCW run.
+    A reindex will be necessary afterward.
     """
     ocw = PlatformType.ocw.value
-    try:
-        # Run synchronously to avoid overlap with subsequent reindexing tasks
-        delete_courses(ocw, Course.objects.filter(
-            Q(platform=ocw) & Q(published=True)
-        ).values_list("id", flat=True))
-    except:
-        log.exception("Error bulk deleting courses")
-    for course_id in Course.objects.filter(platform="ocw").values_list("id", flat=True):
-        course = Course.objects.get(platform=ocw, id=course_id)
+    for course in Course.objects.filter(platform="ocw").iterator(chunk_size):
         for run in course.runs.iterator():
-            if run.published:
-                try:
-                    # Run synchronously to avoid overlap with subsequent reindexing tasks
-                    delete_run_content_files(run.id)
-                except:
-                    log.exception("Error bulk deleting content files")
             data = run.raw_json
             course_url = get_course_url(data.get("uid"), data, ocw)
             course_prefix = (
@@ -119,9 +104,6 @@ def split_ocw_courses_by_run():
             load_offered_bys(serialized_course, [{"name": OfferedBy.ocw.value}])
             run.object_id = serialized_course.id
             run.save()
-            if run.published is True:
-                upsert_course(serialized_course.id)
-                index_run_content_files(run.id)
 
 
 def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""):
@@ -140,7 +122,7 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
 
     existing_course_instance = Course.objects.filter(
         platform=PlatformType.ocw.value,
-        course_id=f"{master_json.get('uid')}+{master_json.get('course_id')}"
+        course_id=f"{master_json.get('uid')}+{master_json.get('course_id')}",
     ).first()
 
     ocw_serializer = OCWSerializer(

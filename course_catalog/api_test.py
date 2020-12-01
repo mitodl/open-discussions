@@ -34,6 +34,7 @@ from course_catalog.api import (
     sync_xpro_course_files,
     ocw_parent_folder,
     sync_ocw_course,
+    split_ocw_courses_by_run,
 )
 
 pytestmark = pytest.mark.django_db
@@ -538,3 +539,31 @@ def test_sync_ocw_course_skip(mocker, prefix, skip):
         mock_log.assert_called_once_with("Non-course folder, skipping: %s ...", prefix)
     else:
         mock_log.assert_any_call("Syncing: %s ...", prefix)
+
+
+@pytest.mark.django_db
+def test_split_ocw_courses_by_run(ocw_valid_data):
+    """ Test that an OCW course is split into a separate course for each run """
+    original_course = CourseFactory.create(platform=PlatformType.ocw.value)
+    runs = original_course.runs.all()
+    run_ids = [run.run_id for run in runs]
+    for idx, run in enumerate(runs):
+        run.raw_json = {
+            **ocw_valid_data,
+            "uid": run.run_id,
+            "course_id": original_course.course_id,
+            "url": (original_course.url if idx == 0 else run.url),
+        }
+        run.save()
+    assert len(runs) == 3
+    assert Course.objects.count() == 1
+    split_ocw_courses_by_run()
+    courses = Course.objects.all()
+    assert len(courses) == 3
+    for course in courses:
+        assert (
+            course.course_id
+            == f"{course.runs.first().run_id}+{original_course.course_id}"
+        )
+        assert course.runs.count() == 1
+        assert course.runs.first().run_id in run_ids

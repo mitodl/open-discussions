@@ -49,7 +49,6 @@ from search.serializers import (
     serialize_content_file_for_bulk_deletion,
     serialize_bulk_podcasts,
     serialize_bulk_podcast_episodes,
-    serialize_course_for_bulk_deletion,
 )
 
 
@@ -574,23 +573,6 @@ def index_courses(ids):
     index_items(serialize_bulk_courses(ids), COURSE_TYPE)
 
 
-def delete_courses(platform, ids):
-    """
-    Delete a list of courses from the index
-
-    Args:
-        platform (str): The platform the course ids belong to
-        ids (list of str): list of course ids
-    """
-    documents = (
-        serialize_course_for_bulk_deletion(platform, course_id)
-        for course_id in Course.objects.filter(id__in=ids).values_list(
-            "course_id", flat=True
-        )
-    )
-    index_items(documents, COURSE_TYPE)
-
-
 def index_course_content_files(course_ids):
     """
     Index a list of content files by course ids
@@ -617,7 +599,7 @@ def index_run_content_files(run_id):
         serialize_content_file_for_bulk(content_file)
         for content_file in run.content_files.select_related("run")
         .prefetch_related("run__content_object")
-        .defer("run__raw_json") if content_file.key
+        .defer("run__raw_json")
     )
     index_items(
         documents,
@@ -638,7 +620,7 @@ def delete_run_content_files(run_id):
     run = LearningResourceRun.objects.get(id=run_id)
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
-        for content_file in ContentFile.objects.filter(run=run) if content_file.key
+        for content_file in ContentFile.objects.filter(run=run)
     )
     course = run.content_object
     index_items(
