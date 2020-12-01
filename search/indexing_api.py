@@ -617,7 +617,7 @@ def index_run_content_files(run_id):
         serialize_content_file_for_bulk(content_file)
         for content_file in run.content_files.select_related("run")
         .prefetch_related("run__content_object")
-        .defer("run__raw_json")
+        .defer("run__raw_json") if content_file.key
     )
     index_items(
         documents,
@@ -638,7 +638,7 @@ def delete_run_content_files(run_id):
     run = LearningResourceRun.objects.get(id=run_id)
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
-        for content_file in ContentFile.objects.filter(run=run)
+        for content_file in ContentFile.objects.filter(run=run) if content_file.key
     )
     course = run.content_object
     index_items(

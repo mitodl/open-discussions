@@ -913,6 +913,7 @@ def test_get_similar_topics(settings, elasticsearch):
     )
 
 
+@pytest.mark.django_db
 def test_split_ocw_courses_by_run():
     """ Test that an OCW course is split into a separate course for each run """
     original_course = CourseFactory.create(platform=PlatformType.ocw.value)

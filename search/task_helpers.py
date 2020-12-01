@@ -360,10 +360,8 @@ def delete_course(course_obj):
     delete_document.delay(
         gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
     )
-    for content_file in ContentFile.objects.filter(run__object_id=course_obj.id).filter(
-        run__content_type=ContentType.objects.get(model=COURSE_TYPE)
-    ):
-        delete_content_file(content_file)
+    for run_id in course_obj.runs.filter(published=True).values_list("id", flat=True):
+        delete_run_content_files(run_id)
 
 
 def upsert_content_file(content_file_id):

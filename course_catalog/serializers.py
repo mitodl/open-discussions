@@ -303,11 +303,11 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
         """
         Verify the Course doesn't exist if we're creating a new one
         """
-        url = attrs["url"]
+        course_id = attrs["course_id"]
         platform = attrs["platform"]
         if (
             self.instance is None
-            and Course.objects.filter(platform=platform, url=url).exists()
+            and Course.objects.filter(platform=platform, course_id=course_id).exists()
         ):
             raise serializers.ValidationError("Course already exists")
         return attrs
