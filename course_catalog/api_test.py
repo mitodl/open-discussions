@@ -567,3 +567,24 @@ def test_split_ocw_courses_by_run(ocw_valid_data):
         )
         assert course.runs.count() == 1
         assert course.runs.first().run_id in run_ids
+
+
+@pytest.mark.django_db
+def test_split_ocw_courses_error(mocker, ocw_valid_data):
+    """ Verify that an expected error message is sent for invalid data"""
+    original_course = CourseFactory.create(platform=PlatformType.ocw.value)
+    runs = original_course.runs.all()
+    for idx, run in enumerate(runs):
+        run.raw_json = {
+            "uid": run.run_id,
+            "course_id": original_course.course_id,
+            "url": (original_course.url if idx == 0 else run.url),
+            "course_collections": [],
+        }
+        run.save()
+    with pytest.raises(Exception) as exc:
+        split_ocw_courses_by_run()
+    assert (
+        f"Course {runs[0].run_id} {original_course.course_id} is not valid"
+        in exc.value.args[0]
+    )
