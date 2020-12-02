@@ -337,7 +337,7 @@ class OCWSerializer(CourseSerializer):
         ]
 
         course_fields = {
-            "course_id": data.get("course_id"),
+            "course_id": f"{data.get('uid')}+{data.get('course_id')}",
             "title": data.get("title"),
             "short_description": data.get("description"),
             "image_src": data.get("image_src"),

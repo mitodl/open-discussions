@@ -327,6 +327,11 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
         """Returns the department slug"""
         return OCW_DEPARTMENTS.get(self.department, {}).get("slug")
 
+    @property
+    def coursenum(self):
+        """ Returns the course number from the course_id"""
+        return self.course_id.split("+")[-1]
+
     class Meta:
         unique_together = ("platform", "course_id")
 

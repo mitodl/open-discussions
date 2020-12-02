@@ -451,6 +451,7 @@ def test_es_content_file_serializer():
             "content_language": content_kwargs["content_language"],
             "image_src": content_file.image_src,
             "course_id": content_file.run.content_object.course_id,
+            "coursenum": content_file.run.content_object.coursenum,
         },
     )
 

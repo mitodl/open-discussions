@@ -363,6 +363,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     topics = ESTopicsField(source="run.content_object.topics")
     short_description = serializers.CharField(source="description")
     course_id = serializers.CharField(source="run.content_object.course_id")
+    coursenum = serializers.CharField(source="run.content_object.coursenum")
 
     def get_resource_relations(self, instance):
         """ Get resource_relations properties"""
@@ -398,6 +399,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "content_author",
             "content_language",
             "course_id",
+            "coursenum",
             "image_src",
         ]
 
@@ -470,7 +472,6 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     resource_relations = {"name": "resource"}
 
     runs = serializers.SerializerMethodField()
-    coursenum = serializers.SerializerMethodField()
 
     default_search_priority = serializers.SerializerMethodField()
 
@@ -482,12 +483,6 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             ESRunSerializer(run).data
             for run in course.runs.exclude(published=False).order_by("-best_start_date")
         ]
-
-    def get_coursenum(self, course):
-        """
-        Extract the course number from the course id
-        """
-        return course.course_id.split("+")[-1]
 
     def get_default_search_priority(self, instance):
         """
