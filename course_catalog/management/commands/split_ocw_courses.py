@@ -1,7 +1,7 @@
 """Management command for splitting OCW courses by run"""
 
 from django.core.management import BaseCommand
-from djoser.conf import settings
+from django.conf import settings
 
 from course_catalog.api import split_ocw_courses_by_run
 from open_discussions.utils import now_in_utc
