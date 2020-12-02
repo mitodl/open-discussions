@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.151.1
+---------------
+
+- Fix flaky test (#3248)
+- Split each OCW run into its own course (#3245)
+- Fix test issues (#3247)
+
 Version 0.151.0 (Released December 01, 2020)
 ---------------
 
