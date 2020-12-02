@@ -584,7 +584,4 @@ def test_split_ocw_courses_error(mocker, ocw_valid_data):
         run.save()
     with pytest.raises(Exception) as exc:
         split_ocw_courses_by_run()
-    assert (
-        f"Course {runs[0].run_id} {original_course.course_id} is not valid"
-        in exc.value.args[0]
-    )
+    assert f"{original_course.course_id} is not valid" in exc.value.args[0]
