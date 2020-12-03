@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.151.1
+Version 0.151.1 (Released December 03, 2020)
 ---------------
 
 - Fix flaky test (#3248)
