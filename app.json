@@ -63,6 +63,10 @@
       "description": "URL to retrieve bootcamps data",
       "required": false
     },
+    "CELERY_WORKER_MAX_MEMORY_PER_CHILD": {
+      "description": "Max memory to be used by celery worker child",
+      "required": false      
+    },
     "CLOUDFRONT_DIST": {
       "description": "Cloudfront distribution",
       "required": false
