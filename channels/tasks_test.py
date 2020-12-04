@@ -26,7 +26,7 @@ from channels.factories.models import (
     ChannelInvitationFactory,
     SpamCheckResultFactory,
 )
-from channels.models import ChannelSubscription, Channel, Post, SpamCheckResult
+from channels.models import ChannelSubscription, Channel, Post, Comment, SpamCheckResult
 from open_discussions.factories import UserFactory
 from search.exceptions import PopulateUserRolesException
 from authentication.models import BlockedEmailRegex
@@ -541,17 +541,22 @@ def test_check_post_for_spam(mocker, is_spam):
 @pytest.mark.parametrize("spam", [True, False])
 @pytest.mark.parametrize("retire_users", [True, False])
 @pytest.mark.parametrize("skip_akismet", [True, False])
-def test_update_spam(mocker, spam, retire_users, skip_akismet):
+@pytest.mark.parametrize("existing_spam_check_result", [True, False])
+def test_update_spam(
+    mocker, spam, retire_users, skip_akismet, existing_spam_check_result
+):
     """Test the update_spam task"""
+    # pylint: disable=too-many-locals
     comment = CommentFactory.create()
     post = PostFactory.create()
 
-    comment_spam_check_result = SpamCheckResultFactory.create(
-        content_object=comment, is_spam=(not spam)
-    )
-    post_spam_check_result = SpamCheckResultFactory.create(
-        content_object=post, is_spam=(not spam)
-    )
+    if existing_spam_check_result:
+        comment_spam_check_result = SpamCheckResultFactory.create(
+            content_object=comment, is_spam=(not spam)
+        )
+        post_spam_check_result = SpamCheckResultFactory.create(
+            content_object=post, is_spam=(not spam)
+        )
 
     post_author_email = post.author.email
     comment_author_email = comment.author.email
@@ -567,8 +572,21 @@ def test_update_spam(mocker, spam, retire_users, skip_akismet):
         retire_users=retire_users,
         skip_akismet=skip_akismet,
     )
-    comment_spam_check_result.refresh_from_db()
-    post_spam_check_result.refresh_from_db()
+
+    if existing_spam_check_result:
+        comment_spam_check_result.refresh_from_db()
+        post_spam_check_result.refresh_from_db()
+    else:
+        comment_content_type = ContentType.objects.get_for_model(Comment)
+        post_content_type = ContentType.objects.get_for_model(Post)
+
+        comment_spam_check_result = SpamCheckResult.objects.get(
+            content_type=comment_content_type, object_id=comment.id
+        )
+
+        post_spam_check_result = SpamCheckResult.objects.get(
+            content_type=post_content_type, object_id=post.id
+        )
 
     assert comment_spam_check_result.is_spam == spam
     assert post_spam_check_result.is_spam == spam

@@ -547,7 +547,7 @@ def update_spam(*, spam, comment_ids, post_ids, retire_users, skip_akismet):
     akismet_client = create_akismet_client()
 
     for comment in Comment.objects.filter(id__in=comment_ids).iterator():
-        result = SpamCheckResult.objects.get(
+        result, _ = SpamCheckResult.objects.get_or_create(
             content_type=comment_content_type, object_id=comment.id
         )
 
@@ -579,7 +579,7 @@ def update_spam(*, spam, comment_ids, post_ids, retire_users, skip_akismet):
             retire_user(comment.author)
 
     for post in Post.objects.filter(id__in=post_ids).iterator():
-        result = SpamCheckResult.objects.get(
+        result, _ = SpamCheckResult.objects.get_or_create(
             content_type=post_content_type, object_id=post.id
         )
 
