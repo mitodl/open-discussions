@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.152.1
+---------------
+
+- fix reclassify spam for moderator comments
+
 Version 0.152.0 (Released December 08, 2020)
 ---------------
 
