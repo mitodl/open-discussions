@@ -126,11 +126,28 @@ def test_send_unsent_email_notifications(mocker, settings):
 
     settings.NOTIFICATION_SEND_CHUNK_SIZE = 75
 
-    notifications_ids = sorted(
-        [note.id for note in EmailNotificationFactory.create_batch(150)]
+    frontpage_notifications_ids = sorted(
+        [
+            note.id
+            for note in EmailNotificationFactory.create_batch(150, frontpage_type=True)
+        ]
     )
 
-    mock_task = mocker.patch("notifications.tasks.send_email_notification_batch").delay
+    other_notifications_ids = sorted(
+        [
+            note.id
+            for note in EmailNotificationFactory.create_batch(150, comments_type=True)
+        ]
+    )
+
+    mock_frontpage_task = mocker.patch(
+        "notifications.tasks.send_frontpage_email_notification_batch"
+    ).delay
+
+    mock_other_notifications_task = mocker.patch(
+        "notifications.tasks.send_email_notification_batch"
+    ).delay
+
     assert (
         EmailNotification.objects.filter(state=EmailNotification.STATE_SENDING).count()
         == 0
@@ -138,12 +155,17 @@ def test_send_unsent_email_notifications(mocker, settings):
 
     api.send_unsent_email_notifications()
 
-    assert mock_task.call_count == 2
-    mock_task.assert_any_call(notifications_ids[:75])
-    mock_task.assert_any_call(notifications_ids[75:])
+    assert mock_frontpage_task.call_count == 2
+    mock_frontpage_task.assert_any_call(frontpage_notifications_ids[:75])
+    mock_frontpage_task.assert_any_call(frontpage_notifications_ids[75:])
+
+    assert mock_other_notifications_task.call_count == 2
+    mock_other_notifications_task.assert_any_call(other_notifications_ids[:75])
+    mock_other_notifications_task.assert_any_call(other_notifications_ids[75:])
+
     assert EmailNotification.objects.filter(
         state=EmailNotification.STATE_SENDING
-    ).count() == len(notifications_ids)
+    ).count() == len(frontpage_notifications_ids) + len(other_notifications_ids)
 
 
 @pytest.mark.parametrize("should_cancel", (True, False))

@@ -94,6 +94,15 @@ def test_send_email_notification_batch(mocker):
     api_mock.assert_called_once_with(ids)
 
 
+def send_frontpage_email_notification_batch(mocker):
+    """Tests that send_frontpage_email_notification_batch calls the API method"""
+    api_mock = mocker.patch("notifications.api.send_email_notification_batch")
+
+    ids = [1, 2, 3]
+    tasks.send_frontpage_email_notification_batch.delay(ids)
+    api_mock.assert_called_once_with(ids)
+
+
 def test_notify_subscribed_users(mocker):
     """Tests that notify_subscribed_users calls the API method"""
     api_mock = mocker.patch("notifications.api.send_comment_notifications")

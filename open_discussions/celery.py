@@ -20,4 +20,11 @@ app.conf.task_routes = {
     "channels.tasks.check_comment_for_spam": {"queue": "spam"},
     "channels.tasks.update_spam": {"queue": "spam"},
     "channels.tasks.retire_user": {"queue": "spam"},
+    "notifications.tasks.send_frontpage_email_notification_batch": {
+        "queue": "digest_emails"
+    },
+    "notifications.tasks.test_send_daily_frontpage_digests": {"queue": "digest_emails"},
+    "notifications.tasks.test_send_weekly_frontpage_digests": {
+        "queue": "digest_emails"
+    },
 }

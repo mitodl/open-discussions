@@ -86,6 +86,18 @@ def send_email_notification_batch(notification_ids):
 
 
 @app.task
+def send_frontpage_email_notification_batch(notification_ids):
+    """
+    Sends a batch of notifications. This is a separate task from send_email_notification_batch so that
+    frontpage notification tasks, which are not time sensitive, can be queued separately from other tasks
+
+    Args:
+        notification_ids (list of int): notification ids to send
+    """
+    api.send_email_notification_batch(notification_ids)
+
+
+@app.task
 def notify_subscribed_users(post_id, comment_id, new_comment_id):
     """
     Notifies subscribed users of a new comment
