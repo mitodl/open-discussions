@@ -130,16 +130,29 @@ def send_unsent_email_notifications():
     """
     Send all notifications that haven't been sent yet
     """
+
     for notification_ids in chunks(
-        EmailNotification.objects.filter(
-            state=EmailNotification.STATE_PENDING
-        ).values_list("id", flat=True),
+        EmailNotification.objects.filter(state=EmailNotification.STATE_PENDING)
+        .exclude(notification_type=NOTIFICATION_TYPE_FRONTPAGE)
+        .values_list("id", flat=True),
         chunk_size=settings.NOTIFICATION_SEND_CHUNK_SIZE,
     ):
         EmailNotification.objects.filter(id__in=notification_ids).update(
             state=EmailNotification.STATE_SENDING
         )
         tasks.send_email_notification_batch.delay(notification_ids)
+
+    for notification_ids in chunks(
+        EmailNotification.objects.filter(
+            state=EmailNotification.STATE_PENDING,
+            notification_type=NOTIFICATION_TYPE_FRONTPAGE,
+        ).values_list("id", flat=True),
+        chunk_size=settings.NOTIFICATION_SEND_CHUNK_SIZE,
+    ):
+        EmailNotification.objects.filter(id__in=notification_ids).update(
+            state=EmailNotification.STATE_SENDING
+        )
+        tasks.send_frontpage_email_notification_batch.delay(notification_ids)
 
 
 def send_email_notification_batch(notification_ids):
