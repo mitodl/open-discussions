@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.152.0 (Released December 08, 2020)
+---------------
+
+- CELERY_WORKER_MAX_MEMORY_PER_CHILD setting (#3250)
+- moderator post notifications
+
 Version 0.151.1 (Released December 03, 2020)
 ---------------
 
