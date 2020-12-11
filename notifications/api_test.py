@@ -3,9 +3,12 @@ from unittest.mock import Mock
 import pytest
 
 from channels.factories.models import SubscriptionFactory, ChannelFactory
+from channels.api import add_user_role
+
 from notifications.factories import (
     EmailNotificationFactory,
     NotificationSettingsFactory,
+    PostEventFactory,
 )
 from notifications.models import (
     NotificationSettings,
@@ -27,11 +30,32 @@ from open_discussions.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-def test_ensure_notification_settings(user):
+@pytest.mark.parametrize("is_moderator", (True, False))
+@pytest.mark.parametrize("skip_moderator_setting", (True, False))
+def test_ensure_notification_settings(user, is_moderator, skip_moderator_setting):
     """Assert that notification settings are created"""
     assert NotificationSettings.objects.filter(user=user).count() == 0
-    api.ensure_notification_settings(user)
-    assert NotificationSettings.objects.filter(user=user).count() == 2
+
+    if is_moderator:
+        channel = ChannelFactory.create()
+        add_user_role(channel, "moderators", user)
+
+    api.ensure_notification_settings(
+        user, skip_moderator_setting=skip_moderator_setting
+    )
+
+    if is_moderator and not skip_moderator_setting:
+        assert NotificationSettings.objects.filter(user=user).count() == 3
+        ns = NotificationSettings.objects.get(
+            user=user, notification_type=NOTIFICATION_TYPE_MODERATOR
+        )
+        assert ns.via_app is False
+        assert ns.via_email is True
+        assert ns.trigger_frequency == FREQUENCY_IMMEDIATE
+
+    else:
+        assert NotificationSettings.objects.filter(user=user).count() == 2
+
     ns = NotificationSettings.objects.get(
         user=user, notification_type=NOTIFICATION_TYPE_FRONTPAGE
     )
@@ -47,22 +71,45 @@ def test_ensure_notification_settings(user):
     assert ns.trigger_frequency == FREQUENCY_IMMEDIATE
 
 
-def test_ensure_notification_settings_existing(user):
+@pytest.mark.parametrize("is_moderator", (True, False))
+def test_ensure_notification_settings_existing(user, is_moderator):
     """Assert that existing notification settings are left alone"""
     settings_for_user = NotificationSettings.objects.filter(user=user)
+
+    if is_moderator:
+        channel = ChannelFactory.create()
+        add_user_role(channel, "moderators", user)
+
     assert settings_for_user.count() == 0
     api.ensure_notification_settings(user)
     settings = list(settings_for_user)
-    assert settings_for_user.count() == 2
+
+    if is_moderator:
+        assert settings_for_user.count() == 3
+    else:
+        assert settings_for_user.count() == 2
+
     frontpage_setting = settings[0]
     frontpage_setting.trigger_frequency = FREQUENCY_WEEKLY
     frontpage_setting.save()
     comments_settings = settings[1]
     comments_settings.trigger_frequency = FREQUENCY_NEVER
     comments_settings.save()
+
+    if is_moderator:
+        moderator_settings = settings[2]
+        moderator_settings.trigger_frequency = FREQUENCY_NEVER
+        moderator_settings.save()
+
     api.ensure_notification_settings(user)
     assert frontpage_setting.trigger_frequency == settings_for_user[0].trigger_frequency
     assert comments_settings.trigger_frequency == settings_for_user[1].trigger_frequency
+
+    if is_moderator:
+        assert (
+            moderator_settings.trigger_frequency
+            == settings_for_user[2].trigger_frequency
+        )
 
 
 def test_get_daily_frontpage_settings_ids():
@@ -190,13 +237,36 @@ def test_send_email_notification_batch(
     mocker, should_cancel, notification_type, notifier_fqn
 ):
     """Verify send_email_notification_batch calls the notifier for each of the notifications it is given"""
+
     notifications = EmailNotificationFactory.create_batch(
         5, notification_type=notification_type
     )
-    for notification in notifications:
-        NotificationSettingsFactory.create(
-            user=notification.user, notification_type=notification_type
+
+    if notification_type == NOTIFICATION_TYPE_MODERATOR:
+        channel = ChannelFactory.create()
+
+        mock_admin_api = Mock()
+
+        mock_admin_api.get_post().subreddit.display_name = channel.name
+        mocker.patch(
+            "notifications.api.get_admin_api",
+            autospec=True,
+            return_value=mock_admin_api,
         )
+
+        for notification in notifications:
+            PostEventFactory.create(email_notification=notification)
+
+            NotificationSettingsFactory.create(
+                user=notification.user,
+                notification_type=notification_type,
+                channel=channel,
+            )
+    else:
+        for notification in notifications:
+            NotificationSettingsFactory.create(
+                user=notification.user, notification_type=notification_type
+            )
 
     mock_notifier = mocker.patch(notifier_fqn).return_value
 
@@ -261,6 +331,9 @@ def test_send_moderator_notifications(mocker):
 
     mocker.patch("notifications.api.get_admin_api", return_value=mock_api)
 
+    NotificationSettingsFactory.create(
+        user=mod_user, channel=channel, notification_type=NOTIFICATION_TYPE_MODERATOR
+    )
     api.send_moderator_notifications("1", channel.name)
 
     assert PostEvent.objects.count() == 1

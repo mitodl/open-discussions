@@ -14,9 +14,6 @@ class ModeratorPostsNotifier(EmailNotifier):
     def __init__(self, notification_settings):
         super().__init__(NOTIFICATION_TYPE_MODERATOR, notification_settings)
 
-    def can_notify(self, last_notification):
-        return True
-
     @praw_error_to_cancelled()
     def _get_notification_data(
         self, current_notification, last_notification

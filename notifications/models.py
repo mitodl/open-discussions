@@ -1,8 +1,10 @@
 """Notification models"""
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
+from django.db.models.constraints import UniqueConstraint
 
-from channels.models import Base36IntegerField
+from channels.models import Base36IntegerField, Channel
 from open_discussions.models import TimestampedModel
 
 NOTIFICATION_TYPE_FRONTPAGE = "frontpage"
@@ -55,6 +57,10 @@ class NotificationSettings(TimestampedModel):
         max_length=10, choices=FREQUENCY_CHOICES, blank=False
     )
 
+    channel = models.ForeignKey(
+        Channel, on_delete=models.CASCADE, default=None, blank=True, null=True
+    )
+
     @classmethod
     def frontpage_settings(cls):
         """Returns a QuerySet filtered to frontpage notification settings"""
@@ -81,7 +87,18 @@ class NotificationSettings(TimestampedModel):
         return self.trigger_frequency == FREQUENCY_NEVER
 
     class Meta:
-        unique_together = (("user", "notification_type"),)
+        constraints = [
+            UniqueConstraint(
+                fields=["user", "notification_type", "channel"],
+                name="unique_with_channel",
+            ),
+            UniqueConstraint(
+                fields=["user", "notification_type"],
+                condition=Q(channel=None),
+                name="unique_without_channel",
+            ),
+        ]
+
         index_together = (("notification_type", "trigger_frequency"),)
 
 
