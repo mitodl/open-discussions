@@ -9,6 +9,7 @@ export const FREQUENCY_NEVER: "never" = "never"
 
 export const FRONTPAGE_NOTIFICATION = "frontpage"
 export const COMMENT_NOTIFICATION = "comments"
+export const MODERATOR_NOTIFICATION = "moderator_posts"
 
 export const FRONTPAGE_FREQUENCY_CHOICES = [
   { value: FREQUENCY_NEVER, label: "Never" },
@@ -22,6 +23,10 @@ export type FrontpageFrequency =
   | typeof FREQUENCY_WEEKLY
 
 export type CommentFrequency =
+  | typeof FREQUENCY_NEVER
+  | typeof FREQUENCY_IMMEDIATE
+
+export type ModeratorFrequency =
   | typeof FREQUENCY_NEVER
   | typeof FREQUENCY_IMMEDIATE
 
@@ -44,5 +49,19 @@ export const settingsEndpoint = {
       },
       token
     )
+    if (object[MODERATOR_NOTIFICATION]) {
+      for (const setting: Object of Object.values(
+        object[MODERATOR_NOTIFICATION]
+      )) {
+        await api.patchModeratorSetting(
+          {
+            notification_type: MODERATOR_NOTIFICATION,
+            trigger_frequency: setting.trigger_frequency,
+            channel_name:      setting.channel_name
+          },
+          token
+        )
+      }
+    }
   }
 }

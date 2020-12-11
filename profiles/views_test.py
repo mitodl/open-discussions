@@ -130,7 +130,7 @@ def test_create_user(
     )
     assert resp.json()["profile"] == payload["profile"]
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
-    ensure_notifications_stub.assert_called_once_with(user)
+    ensure_notifications_stub.assert_called_once_with(user, skip_moderator_setting=True)
     assert user.email == email
     assert user.profile.email_optin is email_optin
     assert user.profile.toc_optin is toc_optin

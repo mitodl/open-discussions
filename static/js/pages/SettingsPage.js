@@ -20,19 +20,21 @@ import {
   FREQUENCY_NEVER,
   FREQUENCY_IMMEDIATE,
   FRONTPAGE_NOTIFICATION,
-  COMMENT_NOTIFICATION
+  COMMENT_NOTIFICATION,
+  MODERATOR_NOTIFICATION
 } from "../reducers/settings"
 import { setSnackbarMessage } from "../actions/ui"
 import { withRouter } from "react-router"
 
 import type { Dispatch } from "redux"
 import type { FormValue } from "../flow/formTypes"
-import type { FrontpageFrequency, CommentFrequency } from "../reducers/settings"
+import type {
+  FrontpageFrequency,
+  CommentFrequency,
+  ModeratorFrequency
+} from "../reducers/settings"
 
 export const SETTINGS_FORM_KEY = "SETTINGS_FORM_KEY"
-
-const FRONTPAGE_INPUT_NAME = "frontpage"
-const COMMENTS_INPUT_NAME = "comments"
 
 const getFrontpageFrequency = R.compose(
   R.prop("trigger_frequency"),
@@ -44,9 +46,20 @@ const getCommentFrequency = R.compose(
   R.find(R.propEq("notification_type", COMMENT_NOTIFICATION))
 )
 
+const filterModeratorSettings = R.compose(
+  R.filter(R.propEq("notification_type", MODERATOR_NOTIFICATION))
+)
+
+type SettingsFormModerator = {
+  channel_name: string,
+  channel_title: string,
+  trigger_frequency: ModeratorFrequency
+}
+
 type SettingsForm = {
   comments: CommentFrequency,
-  frontpage: FrontpageFrequency
+  frontpage: FrontpageFrequency,
+  moderator_posts: { [key: string]: SettingsFormModerator }
 }
 
 type StateProps = {
@@ -69,13 +82,28 @@ class SettingsPage extends React.Component<Props> {
 
     const settings = await dispatch(actions.settings.get(token))
 
+    const formValues: SettingsForm = {
+      [FRONTPAGE_NOTIFICATION]: getFrontpageFrequency(settings),
+      [COMMENT_NOTIFICATION]:   getCommentFrequency(settings),
+      [MODERATOR_NOTIFICATION]: {}
+    }
+
+    for (const setting of filterModeratorSettings(settings)) {
+      const moderatorSettingForChannel: SettingsFormModerator = {
+        channel_name:      setting.channel_name,
+        channel_title:     setting.channel_title,
+        trigger_frequency: setting.trigger_frequency
+      }
+
+      formValues[MODERATOR_NOTIFICATION][
+        setting.channel_name
+      ] = moderatorSettingForChannel
+    }
+
     dispatch(
       actions.forms.formBeginEdit({
         formKey: SETTINGS_FORM_KEY,
-        value:   {
-          [FRONTPAGE_INPUT_NAME]: getFrontpageFrequency(settings),
-          [COMMENTS_INPUT_NAME]:  getCommentFrequency(settings)
-        }
+        value:   formValues
       })
     )
   }
@@ -100,7 +128,7 @@ class SettingsPage extends React.Component<Props> {
         formKey: SETTINGS_FORM_KEY,
         value:   {
           ...form.value,
-          [FRONTPAGE_INPUT_NAME]: e.target.value
+          [FRONTPAGE_NOTIFICATION]: e.target.value
         }
       })
     )
@@ -113,10 +141,32 @@ class SettingsPage extends React.Component<Props> {
         formKey: SETTINGS_FORM_KEY,
         value:   {
           ...form.value,
-          [COMMENTS_INPUT_NAME]:
-            form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
+          [COMMENT_NOTIFICATION]:
+            form.value[COMMENT_NOTIFICATION] === FREQUENCY_IMMEDIATE
               ? FREQUENCY_NEVER
               : FREQUENCY_IMMEDIATE
+        }
+      })
+    )
+  }
+
+  onModeratorChange = channelName => {
+    const { dispatch, form } = this.props
+    const setting = form.value[MODERATOR_NOTIFICATION][channelName]
+    setting.trigger_frequency =
+      setting.trigger_frequency === FREQUENCY_IMMEDIATE
+        ? FREQUENCY_NEVER
+        : FREQUENCY_IMMEDIATE
+
+    dispatch(
+      actions.forms.formUpdate({
+        formKey: SETTINGS_FORM_KEY,
+        value:   {
+          ...form.value,
+          [MODERATOR_NOTIFICATION]: {
+            ...form.value[MODERATOR_NOTIFICATION],
+            [channelName]: setting
+          }
         }
       })
     )
@@ -125,53 +175,86 @@ class SettingsPage extends React.Component<Props> {
   render() {
     const { form, saving } = this.props
 
-    return form ? (
-      <React.Fragment>
-        <MetaTags>
-          <title>{formatTitle("Settings")}</title>
-          <CanonicalLink relativeUrl="settings" />
-        </MetaTags>
-        <div className="main-content settings-page">
-          <SettingsTabs />
-          <form onSubmit={this.onSubmit}>
-            <Card>
-              <label htmlFor="frequency" className="label">
-                How often do you want to receive discussion digest emails?
-              </label>
-              <Radio
-                className="radio"
-                name={FRONTPAGE_INPUT_NAME}
-                value={form.value[FRONTPAGE_INPUT_NAME] || FREQUENCY_DAILY}
-                onChange={this.onFrontpageChange}
-                options={FRONTPAGE_FREQUENCY_CHOICES}
-              />
-            </Card>
-            <Card>
-              <label htmlFor="notifications" className="label">
-                When do you want to receive an email notification?
-              </label>
-              <Checkbox
-                checked={
-                  form.value[COMMENTS_INPUT_NAME] === FREQUENCY_IMMEDIATE
-                }
-                className="settings-checkbox"
-                name="notifications"
-                onChange={this.onCommentsChange}
+    if (form) {
+      const moderatorNotificationCheckboxes = []
+
+      for (const channelSetting of Object.keys(
+        form.value[MODERATOR_NOTIFICATION]
+      ).map(key => form.value[MODERATOR_NOTIFICATION][key])) {
+        moderatorNotificationCheckboxes.push(
+          <Checkbox
+            checked={
+              form.value[MODERATOR_NOTIFICATION][channelSetting.channel_name]
+                .trigger_frequency === FREQUENCY_IMMEDIATE
+            }
+            className="settings-checkbox"
+            name="notifications"
+            key={channelSetting.channel_name}
+            onChange={() => this.onModeratorChange(channelSetting.channel_name)}
+          >
+            {channelSetting.channel_title}
+          </Checkbox>
+        )
+      }
+
+      return (
+        <React.Fragment>
+          <MetaTags>
+            <title>{formatTitle("Settings")}</title>
+            <CanonicalLink relativeUrl="settings" />
+          </MetaTags>
+          <div className="main-content settings-page">
+            <SettingsTabs />
+            <form onSubmit={this.onSubmit}>
+              <Card>
+                <label htmlFor="frequency" className="label">
+                  How often do you want to receive discussion digest emails?
+                </label>
+                <Radio
+                  className="radio"
+                  name={FRONTPAGE_NOTIFICATION}
+                  value={form.value[FRONTPAGE_NOTIFICATION] || FREQUENCY_DAILY}
+                  onChange={this.onFrontpageChange}
+                  options={FRONTPAGE_FREQUENCY_CHOICES}
+                />
+              </Card>
+              <Card>
+                <label htmlFor="notifications" className="label">
+                  When do you want to receive an email notification?
+                </label>
+                <Checkbox
+                  checked={
+                    form.value[COMMENT_NOTIFICATION] === FREQUENCY_IMMEDIATE
+                  }
+                  className="settings-checkbox"
+                  name="notifications"
+                  onChange={this.onCommentsChange}
+                >
+                  When someone responds to one of my posts or comments
+                </Checkbox>
+                {Object.keys(form.value[MODERATOR_NOTIFICATION]).length > 0 ? (
+                  <div>
+                    <div className="moderator-notifications-label">
+                      When someone makes a post in a channel I moderate:
+                    </div>
+                    {moderatorNotificationCheckboxes}
+                  </div>
+                ) : null}
+              </Card>
+              <button
+                type="submit"
+                disabled={saving}
+                className={`blue-button ${saving ? "disabled" : ""}`}
               >
-                When someone responds to one of my posts or comments
-              </Checkbox>
-            </Card>
-            <button
-              type="submit"
-              disabled={saving}
-              className={`blue-button ${saving ? "disabled" : ""}`}
-            >
-              Save
-            </button>
-          </form>
-        </div>
-      </React.Fragment>
-    ) : null
+                Save
+              </button>
+            </form>
+          </div>
+        </React.Fragment>
+      )
+    } else {
+      return null
+    }
   }
 }
 

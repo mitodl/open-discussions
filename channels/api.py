@@ -78,6 +78,11 @@ from channels.utils import (
     num_items_not_none,
 )
 
+from notifications.models import (
+    NotificationSettings,
+    NOTIFICATION_TYPE_MODERATOR,
+    FREQUENCY_IMMEDIATE,
+)
 from open_discussions.utils import now_in_utc
 from search import task_helpers as search_task_helpers
 from search.task_helpers import reddit_object_persist
@@ -1492,14 +1497,23 @@ class Api:
         except User.DoesNotExist:
             raise NotFound("User {} does not exist".format(moderator_name))
         proxied_channel = self.get_channel(channel_name)
+        self_channel = Channel.objects.get(name=channel_name)
         with transaction.atomic():
             add_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
             try:
                 proxied_channel.moderator.add(user)
                 Api(user).accept_invite(channel_name)
+                NotificationSettings.objects.get_or_create(
+                    user=user,
+                    notification_type=NOTIFICATION_TYPE_MODERATOR,
+                    channel=self_channel,
+                    defaults={"trigger_frequency": FREQUENCY_IMMEDIATE},
+                )
+
             except APIException as ex:
                 if ex.error_type != "ALREADY_MODERATOR":
                     raise
+
         search_task_helpers.upsert_profile(user.profile.id)
 
     def accept_invite(self, channel_name):
@@ -1525,10 +1539,16 @@ class Api:
             raise NotFound("User {} does not exist".format(moderator_name))
 
         proxied_channel = self.get_channel(channel_name)
-
+        self_channel = Channel.objects.get(name=channel_name)
         with transaction.atomic():
             remove_user_role(proxied_channel.channel, ROLE_MODERATORS, user)
             proxied_channel.moderator.remove(user)
+            NotificationSettings.objects.filter(
+                user=user,
+                channel=self_channel,
+                notification_type=NOTIFICATION_TYPE_MODERATOR,
+            ).delete()
+
         search_task_helpers.upsert_profile(user.profile.id)
 
     def _list_moderators(self, *, channel_name, moderator_name):

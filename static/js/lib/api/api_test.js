@@ -10,6 +10,7 @@ import {
   getSettings,
   patchFrontpageSetting,
   patchCommentSetting,
+  patchModeratorSetting,
   getProfile,
   patchProfileImage,
   updateProfile,
@@ -399,6 +400,37 @@ describe("api", function() {
         assert.ok(
           fetchAuthFailureStub.calledWith(
             "/api/v0/notification_settings/comments/",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
+    })
+
+    describe("patchModeratorSetting", () => {
+      it("should call fetchJSONWithToken when passed a token", async () => {
+        await patchModeratorSetting(setting, "great token")
+        assert.isNotOk(fetchAuthFailureStub.called)
+        assert.ok(
+          fetchTokenStub.calledWith(
+            "/api/v0/notification_settings/moderator_posts/",
+            "great token",
+            {
+              method: PATCH,
+              body:   JSON.stringify(setting)
+            }
+          )
+        )
+      })
+
+      it("calls fetchJSONWithAuthFailure when not passed a token", async () => {
+        await patchModeratorSetting(setting)
+        assert.isNotOk(fetchTokenStub.called)
+        assert.ok(
+          fetchAuthFailureStub.calledWith(
+            "/api/v0/notification_settings/moderator_posts/",
             {
               method: PATCH,
               body:   JSON.stringify(setting)

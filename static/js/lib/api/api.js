@@ -90,6 +90,27 @@ export const patchCommentSetting = (
       body:   JSON.stringify(setting)
     })
 
+export const patchModeratorSetting = (
+  setting: NotificationSetting,
+  token: ?string = undefined
+) =>
+  token
+    ? fetchJSONWithToken(
+      "/api/v0/notification_settings/moderator_posts/",
+      token,
+      {
+        method: PATCH,
+        body:   JSON.stringify(setting)
+      }
+    )
+    : fetchJSONWithAuthFailure(
+      "/api/v0/notification_settings/moderator_posts/",
+      {
+        method: PATCH,
+        body:   JSON.stringify(setting)
+      }
+    )
+
 export function patchProfileImage(
   username: string,
   image: Blob,
