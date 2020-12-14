@@ -332,6 +332,9 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
         """ Returns the course number from the course_id"""
         return self.course_id.split("+")[-1]
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         unique_together = ("platform", "course_id")
 
