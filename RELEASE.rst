@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.153.0 (Released December 21, 2020)
+---------------
+
+- define __str__ for course
+
 Version 0.152.1 (Released December 09, 2020)
 ---------------
 
