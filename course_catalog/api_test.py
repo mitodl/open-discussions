@@ -556,7 +556,7 @@ def test_sync_ocw_course_skip(mocker, prefix, skip):
         ["", "", False],
         ["2020-12-01 00:00:00 US/Eastern", None, True],
         [None, "2020-12-02 00:00:00 US/Eastern", False],
-    ]  # pylint:disable=too-many-arguments
+    ],  # pylint:disable=too-many-arguments
 )
 def test_sync_ocw_course_published(
     settings, mocker, pub_date, unpub_date, published, blocklisted
