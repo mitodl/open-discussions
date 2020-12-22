@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.154.0
+---------------
+
+- Bump ini from 1.3.5 to 1.3.7 (#3256)
+
 Version 0.153.0 (Released December 21, 2020)
 ---------------
 
