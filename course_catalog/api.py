@@ -482,10 +482,12 @@ def sync_ocw_course(
     course_json["course_id"] = "{}.{}".format(
         course_json.get("department_number"), course_json.get("master_course_number")
     )
-    if course_json["course_id"] in blocklist:
+
+    blocklisted = course_json["course_id"] in blocklist
+    if blocklisted:
         is_published = False
 
-    if upload_to_s3 and is_published:
+    if upload_to_s3 and not blocklisted:
         try:
             parser.setup_s3_uploading(
                 settings.OCW_LEARNING_COURSE_BUCKET_NAME,
@@ -514,7 +516,7 @@ def sync_ocw_course(
         log.info("Course and run not returned, skipping")
         return None
 
-    if upload_to_s3 and is_published:
+    if upload_to_s3 and not blocklisted:
         load_content_files(run, transform_content_files(course_json))
 
     course.published = is_published or (

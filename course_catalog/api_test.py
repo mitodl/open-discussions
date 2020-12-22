@@ -5,11 +5,14 @@ import json
 from datetime import timedelta, datetime
 from subprocess import CalledProcessError
 
+import boto3
 import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from mock import ANY
+from moto import mock_s3
 
+from course_catalog.conftest import setup_s3, TEST_PREFIX
 from course_catalog.constants import (
     PlatformType,
     AvailabilityType,
@@ -35,6 +38,7 @@ from course_catalog.api import (
     ocw_parent_folder,
     sync_ocw_course,
     split_ocw_courses_by_run,
+    format_date,
 )
 
 pytestmark = pytest.mark.django_db
@@ -539,6 +543,51 @@ def test_sync_ocw_course_skip(mocker, prefix, skip):
         mock_log.assert_called_once_with("Non-course folder, skipping: %s ...", prefix)
     else:
         mock_log.assert_any_call("Syncing: %s ...", prefix)
+
+
+@mock_s3
+@pytest.mark.parametrize("blocklisted", [True, False])
+@pytest.mark.parametrize(
+    "pub_date, unpub_date, published",
+    [
+        ["2020-12-01 00:00:00 US/Eastern", "2020-12-02 00:00:00 US/Eastern", False],
+        ["2020-12-02 00:00:00 US/Eastern", "2020-12-01 00:00:00 US/Eastern", True],
+        [None, None, False],
+        ["", "", False],
+        ["2020-12-01 00:00:00 US/Eastern", None, True],
+        [None, "2020-12-02 00:00:00 US/Eastern", False],
+    ]  # pylint:disable=too-many-arguments
+)
+def test_sync_ocw_course_published(
+    settings, mocker, pub_date, unpub_date, published, blocklisted
+):
+    """ The course should be published or not based on dates, and always uploaded """
+    mocker.patch(
+        "course_catalog.api.format_date",
+        side_effect=[format_date(pub_date), format_date(unpub_date)],
+    )
+    mock_upload = mocker.patch("course_catalog.api.OCWParser.upload_all_media_to_s3")
+    mock_load_content = mocker.patch("course_catalog.api.load_content_files")
+    mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    mock_delete = mocker.patch("course_catalog.api.delete_course")
+    setup_s3(settings)
+    bucket = boto3.resource("s3").Bucket(settings.OCW_CONTENT_BUCKET_NAME)
+
+    sync_ocw_course(
+        course_prefix=TEST_PREFIX,
+        raw_data_bucket=bucket,
+        force_overwrite=True,
+        upload_to_s3=True,
+        blocklist=(["9.15"] if blocklisted else []),
+    )
+
+    assert Course.objects.first().published is (published and not blocklisted)
+    if published and not blocklisted:
+        mock_upload.assert_called_once_with(upload_parsed_json=True)
+        mock_load_content.assert_called_once()
+        mock_upsert.assert_called_once()
+    elif not published:
+        mock_delete.assert_called_once()
 
 
 @pytest.mark.django_db
