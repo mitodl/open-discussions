@@ -483,29 +483,34 @@ def sync_ocw_course(
         course_json.get("department_number"), course_json.get("master_course_number")
     )
 
-    blocklisted = course_json["course_id"] in blocklist
-    if blocklisted:
+    if course_json["course_id"] in blocklist:
         is_published = False
 
-    if upload_to_s3 and not blocklisted:
-        try:
-            parser.setup_s3_uploading(
-                settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-                settings.AWS_ACCESS_KEY_ID,
-                settings.AWS_SECRET_ACCESS_KEY,
-                # course_prefix now has trailing slash so [-2] below is the last
-                # actual element and [-1] is an empty string
-                course_prefix.split("/")[-2],
+    if upload_to_s3:
+        parser.setup_s3_uploading(
+            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+            settings.AWS_ACCESS_KEY_ID,
+            settings.AWS_SECRET_ACCESS_KEY,
+            # course_prefix now has trailing slash so [-2] below is the last
+            # actual element and [-1] is an empty string
+            course_prefix.split("/")[-2],
+        )
+        if is_published:
+            try:
+                if settings.OCW_UPLOAD_IMAGE_ONLY:
+                    parser.upload_course_image()
+                else:
+                    parser.upload_all_media_to_s3(upload_parsed_json=True)
+            except:  # pylint: disable=bare-except
+                log.exception(
+                    ("Error encountered uploading OCW files for %s", course_prefix)
+                )
+                raise
+        else:
+            parser.get_s3_base_url()
+            parser.upload_parsed_json_to_s3(
+                boto3.resource("s3").Bucket(settings.OCW_LEARNING_COURSE_BUCKET_NAME)
             )
-            if settings.OCW_UPLOAD_IMAGE_ONLY:
-                parser.upload_course_image()
-            else:
-                parser.upload_all_media_to_s3(upload_parsed_json=True)
-        except:  # pylint: disable=bare-except
-            log.exception(
-                ("Error encountered uploading OCW files for %s", course_prefix)
-            )
-            raise
 
     log.info("Digesting %s...", course_prefix)
     try:
@@ -516,7 +521,7 @@ def sync_ocw_course(
         log.info("Course and run not returned, skipping")
         return None
 
-    if upload_to_s3 and not blocklisted:
+    if upload_to_s3 and is_published:
         load_content_files(run, transform_content_files(course_json))
 
     course.published = is_published or (

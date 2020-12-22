@@ -133,18 +133,19 @@ def test_get_ocw_courses(
     course = Course.objects.first()
     assert course.published is not blocklisted
 
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
+    obj = s3.Object(
+        settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
+    )
+    assert json.loads(obj.get()["Body"].read())
+
     if not blocklisted:
-        s3 = boto3.resource(
-            "s3",
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        )
-        # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
-        obj = s3.Object(
-            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
-        )
-        assert json.loads(obj.get()["Body"].read())
         assert course.image_src.startswith("http")
     else:
         assert course.image_src == ""

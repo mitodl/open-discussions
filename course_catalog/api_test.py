@@ -566,7 +566,12 @@ def test_sync_ocw_course_published(
         "course_catalog.api.format_date",
         side_effect=[format_date(pub_date), format_date(unpub_date)],
     )
-    mock_upload = mocker.patch("course_catalog.api.OCWParser.upload_all_media_to_s3")
+    mock_upload_course = mocker.patch(
+        "course_catalog.api.OCWParser.upload_all_media_to_s3"
+    )
+    mock_upload_json = mocker.patch(
+        "course_catalog.api.OCWParser.upload_parsed_json_to_s3"
+    )
     mock_load_content = mocker.patch("course_catalog.api.load_content_files")
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
     mock_delete = mocker.patch("course_catalog.api.delete_course")
@@ -583,11 +588,12 @@ def test_sync_ocw_course_published(
 
     assert Course.objects.first().published is (published and not blocklisted)
     if published and not blocklisted:
-        mock_upload.assert_called_once_with(upload_parsed_json=True)
+        mock_upload_course.assert_called_once_with(upload_parsed_json=True)
         mock_load_content.assert_called_once()
         mock_upsert.assert_called_once()
-    elif not published:
+    elif blocklisted or not published:
         mock_delete.assert_called_once()
+        mock_upload_json.assert_called_once()
 
 
 @pytest.mark.django_db
