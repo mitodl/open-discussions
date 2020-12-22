@@ -2,14 +2,13 @@
 Test tasks
 """
 import json
-from os import listdir
-from os.path import isfile, join
 from unittest.mock import Mock
 
 import boto3
 import pytest
 from moto import mock_s3
 
+from course_catalog.conftest import setup_s3, TEST_PREFIX
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
 from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
@@ -39,13 +38,6 @@ from course_catalog.tasks import (
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument,too-many-arguments
 
-TEST_PREFIX = "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/"
-
-TEST_JSON_PATH = f"./test_json/{TEST_PREFIX}0"
-TEST_JSON_FILES = [
-    f for f in listdir(TEST_JSON_PATH) if isfile(join(TEST_JSON_PATH, f))
-]
-
 
 @pytest.fixture
 def mock_logger(mocker):
@@ -73,39 +65,6 @@ def mock_get_bootcamps(mocker):
 def mock_blocklist(mocker):
     """Mock the load_course_blocklist function"""
     return mocker.patch("course_catalog.tasks.load_course_blocklist", return_value=[])
-
-
-def setup_s3(settings):
-    """
-    Set up the fake s3 data
-    """
-    # Fake the settings
-    settings.AWS_ACCESS_KEY_ID = "abc"
-    settings.AWS_SECRET_ACCESS_KEY = "abc"
-    settings.OCW_CONTENT_BUCKET_NAME = "test_bucket"
-    settings.OCW_LEARNING_COURSE_BUCKET_NAME = "testbucket2"
-    # Create our fake bucket
-    conn = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    conn.create_bucket(Bucket=settings.OCW_CONTENT_BUCKET_NAME)
-
-    # Add data to the fake bucket
-    test_bucket = conn.Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
-    for file in TEST_JSON_FILES:
-        file_key = TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
-        with open(TEST_JSON_PATH + "/" + file, "r") as f:
-            test_bucket.put_object(Key=file_key, Body=f.read())
-
-    # Create our upload bucket
-    conn = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    conn.create_bucket(Bucket=settings.OCW_LEARNING_COURSE_BUCKET_NAME)
 
 
 def test_get_mitx_data_valid(mocker):
@@ -142,14 +101,23 @@ def test_get_ocw_data(
 @mock_s3
 @pytest.mark.parametrize("blocklisted", [True, False])
 def test_get_ocw_courses(
-    settings, mock_course_index_functions, mocked_celery, mock_blocklist, blocklisted
+    settings,
+    mocker,
+    mock_course_index_functions,
+    mocked_celery,
+    mock_blocklist,
+    blocklisted,
 ):
     """
     Test ocw sync task
     """
     setup_s3(settings)
+
     if blocklisted:
         mock_blocklist.return_value = ["9.15"]
+
+    mocker.patch("course_catalog.api.load_content_files")
+    mocker.patch("course_catalog.api.transform_content_files")
 
     # run ocw sync
     get_ocw_courses.delay(
@@ -165,18 +133,19 @@ def test_get_ocw_courses(
     course = Course.objects.first()
     assert course.published is not blocklisted
 
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
+    obj = s3.Object(
+        settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+        "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
+    )
+    assert json.loads(obj.get()["Body"].read())
+
     if not blocklisted:
-        s3 = boto3.resource(
-            "s3",
-            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        )
-        # The filename was pulled from the uid 1.json in the TEST_JSON_PATH files.
-        obj = s3.Object(
-            settings.OCW_LEARNING_COURSE_BUCKET_NAME,
-            "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007_parsed.json",
-        )
-        assert json.loads(obj.get()["Body"].read())
         assert course.image_src.startswith("http")
     else:
         assert course.image_src == ""
