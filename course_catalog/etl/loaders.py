@@ -193,7 +193,7 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
     topics_data = course_data.pop("topics", None)
     offered_bys_data = course_data.pop("offered_by", [])
 
-    if course_id in blocklist:
+    if course_id in blocklist or not runs_data:
         course_data["published"] = False
 
     deduplicated_course_id = next(

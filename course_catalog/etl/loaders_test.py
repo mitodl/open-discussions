@@ -233,8 +233,9 @@ def test_load_program(
 
 @pytest.mark.parametrize("course_exists", [True, False])
 @pytest.mark.parametrize("is_published", [True, False])
+@pytest.mark.parametrize("is_run_published", [True, False])
 @pytest.mark.parametrize("blocklisted", [True, False])
-def test_load_course(mock_upsert_tasks, course_exists, is_published, blocklisted):
+def test_load_course(mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted):
     """Test that load_course loads the course"""
     course = (
         CourseFactory.create(runs=None, published=is_published)
@@ -250,26 +251,29 @@ def test_load_course(mock_upsert_tasks, course_exists, is_published, blocklisted
         )
     )
     del props["id"]
-    run = model_to_dict(LearningResourceRunFactory.build(platform=course.platform))
-    del run["content_type"]
-    del run["object_id"]
-    del run["id"]
-    props["runs"] = [run]
+    if is_run_published:
+        run = model_to_dict(LearningResourceRunFactory.build(platform=course.platform))
+        del run["content_type"]
+        del run["object_id"]
+        del run["id"]
+        props["runs"] = [run]
+    else:
+        props["runs"] = []
 
     blocklist = [course.course_id] if blocklisted else []
 
     result = load_course(props, blocklist, [])
 
-    if course_exists and not is_published and not blocklisted:
+    if course_exists and (not is_published or not is_run_published) and not blocklisted:
         mock_upsert_tasks.delete_course.assert_called_with(result)
-    elif is_published and not blocklisted:
+    elif is_published and is_run_published and not blocklisted:
         mock_upsert_tasks.upsert_course.assert_called_with(result.id)
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
         mock_upsert_tasks.upsert_course.assert_not_called()
 
     assert Course.objects.count() == 1
-    assert LearningResourceRun.objects.count() == 1
+    assert LearningResourceRun.objects.count() == (1 if is_run_published else 0)
 
     # assert we got a course back
     assert isinstance(result, Course)
