@@ -235,7 +235,9 @@ def test_load_program(
 @pytest.mark.parametrize("is_published", [True, False])
 @pytest.mark.parametrize("is_run_published", [True, False])
 @pytest.mark.parametrize("blocklisted", [True, False])
-def test_load_course(mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted):
+def test_load_course(
+    mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted
+):
     """Test that load_course loads the course"""
     course = (
         CourseFactory.create(runs=None, published=is_published)
