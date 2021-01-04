@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.154.0
+Version 0.154.0 (Released January 04, 2021)
 ---------------
 
 - Upload OCW course JSON to S3 regardless of publish state (#3264)
