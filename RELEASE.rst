@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.154.1
+Version 0.154.1 (Released January 07, 2021)
 ---------------
 
 - Do not publish courses without runs (#3269)
