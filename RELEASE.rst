@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.154.1
+---------------
+
+- Do not publish courses without runs (#3269)
+- Fix insecure nokogiri dependency for github pages
+
 Version 0.154.0 (Released January 04, 2021)
 ---------------
 
