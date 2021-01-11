@@ -78,7 +78,7 @@ isodate==0.6.0            # via python3-saml, zeep
 jedi==0.16.0              # via ipython
 jmespath==0.9.3           # via boto3, botocore
 kombu==4.6.7              # via celery, django-server-status
-lxml==4.5.0               # via -r requirements.in, xbundle, xmlsec, zeep
+lxml==4.6.2               # via -r requirements.in, xbundle, xmlsec, zeep
 markdown2==2.3.9          # via -r requirements.in
 git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4  # via -r requirements.in
 newrelic==4.2.0.100       # via -r requirements.in
