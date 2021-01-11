@@ -18,15 +18,19 @@ def test_url_widget_serialize(
     mocker, raise_exception, timestamp_key, item_count, display_limit
 ):
     """Tests that the rss widget serializes correctly"""
-    entries = [
-        {
-            "title": f"Title {idx}",
-            "description": f"Description {idx}",
-            "link": f"http://example.com/{idx}",
-            timestamp_key: time.gmtime(),
-        }
-        for idx in range(item_count)
-    ]
+    entries = sorted(
+        [
+            {
+                "title": f"Title {idx}",
+                "description": f"Description {idx}",
+                "link": f"http://example.com/{idx}",
+                timestamp_key: time.gmtime(),
+            }
+            for idx in range(item_count)
+        ],
+        reverse=True,
+        key=lambda entry: entry[timestamp_key],
+    )
     mock_parse = mocker.patch("feedparser.parse")
     if raise_exception:
         mock_parse.side_effect = Exception("bad")
