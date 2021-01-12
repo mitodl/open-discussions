@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.155.0
+---------------
+
+- Ensure test_url_widget_serialize sorts entries by reverse date (#3276)
+- Bump lxml from 4.5.0 to 4.6.2 (#3274)
+- Upgrade ocw-data-parser to 0.20.0 (#3270)
+- separate digest email queue
+- Bump cairosvg from 2.1.3 to 2.5.1
+
 Version 0.154.1 (Released January 07, 2021)
 ---------------
 
