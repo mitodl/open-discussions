@@ -476,7 +476,10 @@ def sync_ocw_course(
 
     log.info("Parsing for %s...", course_prefix)
     # pass course contents into parser
-    parser = OCWParser(loaded_jsons=loaded_raw_jsons_for_course)
+    parser = OCWParser(
+        loaded_jsons=loaded_raw_jsons_for_course,
+        s3_bucket_name=settings.OCW_LEARNING_COURSE_BUCKET_NAME,
+    )
     course_json = parser.get_parsed_json()
     course_json["uid"] = uid
     course_json["course_id"] = "{}.{}".format(
