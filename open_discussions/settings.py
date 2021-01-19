@@ -129,7 +129,8 @@ MIDDLEWARE = (
 )
 
 # CORS
-CORS_ORIGIN_WHITELIST = get_list_of_str("OPEN_DISCUSSIONS_CORS_ORIGIN_WHITELIST", [])
+CORS_ALLOWED_ORIGINS = get_list_of_str("CORS_ALLOWED_ORIGINS", [])
+CORS_ALLOWED_ORIGIN_REGEXES = get_list_of_str("CORS_ALLOWED_ORIGIN_REGEXES", [])
 CORS_ALLOW_CREDENTIALS = True
 
 # enable the nplusone profiler only in debug mode

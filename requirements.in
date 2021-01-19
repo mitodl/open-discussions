@@ -1,5 +1,5 @@
 akismet==1.1
-django-cors-headers==2.1.0
+django-cors-headers==3.6.0
 Django==2.2.13
 base36
 beautifulsoup4==4.8.2
