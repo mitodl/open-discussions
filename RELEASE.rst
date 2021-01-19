@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.155.0
+Version 0.155.0 (Released January 19, 2021)
 ---------------
 
 - pass bucket name to ocw parser on initialization (#3282)
