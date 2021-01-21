@@ -41,6 +41,15 @@ class SearchView(ESView):
 
     permission_classes = ()
 
+    def get(self, request, *args, **kwargs):
+        """Execute a search. Despite being POST this should not modify any data."""
+        query = request.GET
+        if is_learning_query(query):
+            response = execute_learn_search(user=request.user, query=request.data)
+        else:
+            response = execute_search(user=request.user, query=request.data)
+        return Response(response)
+
     def post(self, request, *args, **kwargs):
         """Execute a search. Despite being POST this should not modify any data."""
         query = request.data

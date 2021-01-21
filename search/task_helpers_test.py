@@ -11,7 +11,6 @@ from course_catalog.factories import (
     PodcastFactory,
     PodcastEpisodeFactory,
 )
-from open_discussions.features import INDEX_UPDATES
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
@@ -79,12 +78,6 @@ es_profile_serializer_data = {
     "author_headline": "Test headline",
     "author_channel_membership": "channel01,channel02",
 }
-
-
-@pytest.fixture(autouse=True)
-def enable_index_update_feature(settings):
-    """Enables the INDEX_UPDATES feature by default"""
-    settings.FEATURES[INDEX_UPDATES] = True
 
 
 @pytest.fixture()
