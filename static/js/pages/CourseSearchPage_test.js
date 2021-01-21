@@ -157,7 +157,7 @@ describe("CourseSearchPage", () => {
 
   it("should not show suggestion if it is the same as query minus quotes, case", async () => {
     const suggestion = "mathematics basic principles"
-    const text = '"Mathematics: Basic Principles!"'
+    const text = ' "Mathematics: Basic Principles!" '
     initialState.search.data.suggest = [suggestion]
     searchResponse.suggest = [suggestion]
     setLocation(helper, { text })

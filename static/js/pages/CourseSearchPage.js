@@ -236,6 +236,7 @@ export default function CourseSearchPage(props: Props) {
         [
           text
             .toLowerCase()
+            .trim()
             .replace(/^"(.*)"$/, "$1")
             .replace(/[\W]+/g, " ")
             .trim()
