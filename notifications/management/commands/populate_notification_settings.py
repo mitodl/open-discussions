@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--username", nargs="?", action="append")
-        parser.add_argument("--inactive", action="store_false", default=False)
+        parser.add_argument("--inactive", action="store_true", default=False)
 
     def handle(self, *args, **options):
         users = get_user_model().objects.all()
