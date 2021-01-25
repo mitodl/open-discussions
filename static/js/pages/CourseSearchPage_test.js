@@ -155,6 +155,17 @@ describe("CourseSearchPage", () => {
     })
   })
 
+  it("should not show suggestion if it is the same as query minus quotes, case", async () => {
+    const suggestion = "mathematics basic principles"
+    const text = ' "Mathematics: Basic Principles!" '
+    initialState.search.data.suggest = [suggestion]
+    searchResponse.suggest = [suggestion]
+    setLocation(helper, { text })
+    const { wrapper } = await render()
+    wrapper.update()
+    assert.isNotOk(wrapper.find(".suggestions").exists())
+  })
+
   //
   ;["", "a"].forEach(query => {
     it(`still runs a search if initial search text is '${query}'`, async () => {

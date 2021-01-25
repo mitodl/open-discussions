@@ -232,7 +232,17 @@ export default function CourseSearchPage(props: Props) {
   const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
   const suggestions =
     !emptyOrNil(suggest) && !emptyOrNil(text)
-      ? R.without([text], suggest).map(
+      ? R.without(
+        [
+          text
+            .toLowerCase()
+            .trim()
+            .replace(/^"(.*)"$/, "$1")
+            .replace(/[\W]+/g, " ")
+            .trim()
+        ],
+        suggest
+      ).map(
         suggestion => (isDoubleQuoted(text) ? `"${suggestion}"` : suggestion)
       )
       : []
