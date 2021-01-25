@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.156.0
+---------------
+
+- fix inactive setting
+- Don't show suggestion if it is effectively the same as search text (#3287)
+- update django-cors-headers to allow regex
+- moderator notification setting ui
+
 Version 0.155.1 (Released January 21, 2021)
 ---------------
 
