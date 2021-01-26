@@ -345,3 +345,48 @@ def test_send_moderator_notifications(mocker):
     notification = EmailNotification.objects.last()
     assert notification.user == mod_user
     assert notification.notification_type == NOTIFICATION_TYPE_MODERATOR
+
+
+def test_send_moderator_notifications_missing_setting(mocker):
+    """
+    Tests that send_moderator_notifications logs an exception and continues
+    if a moderator is missing a notification setting
+    """
+
+    mod_user = UserFactory.create()
+    reddit_user = Mock()
+    reddit_user.name = mod_user.username
+
+    misconfigured_mod_user = UserFactory.create()
+    misconfigured_reddit_user = Mock()
+    misconfigured_reddit_user.name = misconfigured_mod_user.username
+
+    channel = ChannelFactory.create()
+
+    mock_log = mocker.patch("notifications.api.log.exception")
+
+    mock_api = Mock()
+    mock_api.list_moderators.return_value = [misconfigured_reddit_user, reddit_user]
+
+    mocker.patch("notifications.api.get_admin_api", return_value=mock_api)
+
+    NotificationSettingsFactory.create(
+        user=mod_user, channel=channel, notification_type=NOTIFICATION_TYPE_MODERATOR
+    )
+    api.send_moderator_notifications("1", channel.name)
+
+    mock_log.assert_called_once_with(
+        "Moderator NotificationSetting didn't exist for user %s and channel %s",
+        misconfigured_mod_user.username,
+        channel.name,
+    )
+
+    assert PostEvent.objects.count() == 1
+    event = PostEvent.objects.last()
+    assert event.post_id == "1"
+    assert event.user == mod_user
+
+    assert EmailNotification.objects.count() == 1
+    notification = EmailNotification.objects.last()
+    assert notification.user == mod_user
+    assert notification.notification_type == NOTIFICATION_TYPE_MODERATOR
