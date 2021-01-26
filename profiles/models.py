@@ -79,8 +79,6 @@ class Profile(models.Model):
     email_optin = models.NullBooleanField()
     toc_optin = models.NullBooleanField()
 
-    last_active_on = models.DateTimeField(null=True)
-
     headline = models.CharField(blank=True, null=True, max_length=60)
     bio = models.TextField(blank=True, null=True)
     location = JSONField(null=True, blank=True)
