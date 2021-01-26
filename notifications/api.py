@@ -242,11 +242,19 @@ def send_moderator_notifications(post_id, channel_name):
     channel_api = get_admin_api()
     for moderator in channel_api.list_moderators(channel_name):
         self_user = User.objects.get(username=moderator.name)
-        notification_setting = NotificationSettings.objects.get(
-            user=self_user,
-            notification_type=NOTIFICATION_TYPE_MODERATOR,
-            channel__name=channel_name,
-        )
+        try:
+            notification_setting = NotificationSettings.objects.get(
+                user=self_user,
+                notification_type=NOTIFICATION_TYPE_MODERATOR,
+                channel__name=channel_name,
+            )
+        except NotificationSettings.DoesNotExist:
+            log.exception(
+                "Moderator NotificationSetting didn't exist for user %s and channel %s",
+                moderator.name,
+                channel_name,
+            )
+            continue
 
         notifier = moderator_posts.ModeratorPostsNotifier(notification_setting)
         notifier.create_moderator_post_event(self_user, post_id)
