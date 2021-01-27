@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.156.0
+Version 0.156.0 (Released January 27, 2021)
 ---------------
 
 - add try catch around finding notification setting
