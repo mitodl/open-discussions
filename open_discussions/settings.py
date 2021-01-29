@@ -107,6 +107,7 @@ INSTALLED_APPS = (
     "interactions",
     "moira_lists",
     "discussions",
+    "enrollments",
 )
 
 DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
