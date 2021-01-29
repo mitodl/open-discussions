@@ -15,6 +15,7 @@ from course_catalog.models import (
     CourseTopic,
     Podcast,
     PodcastEpisode,
+    Enrollment,
 )
 
 
@@ -145,6 +146,27 @@ class PodcastEpisodeAdmin(admin.ModelAdmin):
     search_fields = ("full_description",)
 
 
+class EnrollmentAdmin(admin.ModelAdmin):
+    """Enrollment Admin"""
+
+    def run_slug(self, obj):
+        """run slug as string"""
+        return f"{obj.run.slug}"
+
+    run_slug.admin_order_field = "run__slug"
+
+    model = Enrollment
+    search_fields = (
+        "run__run_id",
+        "run__slug",
+        "run__title",
+        "user__email",
+        "user__username",
+    )
+    list_display = ("run_slug", "user", "enrollment_timestamp")
+    autocomplete_fields = ("run", "user")
+
+
 admin.site.register(CourseTopic, CourseTopicAdmin)
 admin.site.register(CoursePrice, CoursePriceAdmin)
 admin.site.register(CourseInstructor, CourseInstructorAdmin)
@@ -154,3 +176,4 @@ admin.site.register(Program, ProgramAdmin)
 admin.site.register(UserList, UserListAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(PodcastEpisode, PodcastEpisodeAdmin)
+admin.site.register(Enrollment, EnrollmentAdmin)
