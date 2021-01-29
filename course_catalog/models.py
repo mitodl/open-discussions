@@ -656,3 +656,19 @@ class PodcastEpisode(LearningResource, LearningResourceGenericRelationsMixin):
         verbose_name = "podcastepisode"
         unique_together = ("podcast", "episode_id")
         ordering = ("id",)
+
+
+class Enrollment(TimestampedModel):
+    """Data model for enrollments"""
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enrollments")
+    run = models.ForeignKey(
+        LearningResourceRun, on_delete=models.CASCADE, related_name="enrollments"
+    )
+    enrollment_timestamp = models.DateTimeField()
+
+    def __str__(self):
+        return f"Enrollment user_id={self.user_id} run_id={self.run_id}"
+
+    class Meta:
+        unique_together = (("user", "run"),)
