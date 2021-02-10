@@ -56,13 +56,13 @@ certifi==2017.4.17
     # via
     #   requests
     #   sentry-sdk
-cffi==1.11.5
+cffi==1.14.4
     # via
     #   cairocffi
     #   cryptography
 chardet==3.0.4
     # via requests
-cryptography==3.2
+cryptography==3.3.2
     # via pyopenssl
 cssselect2==0.2.1
     # via cairosvg
