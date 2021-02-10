@@ -29,7 +29,7 @@ from open_discussions.envs import (
 )
 from open_discussions.sentry import init_sentry
 
-VERSION = "0.157.0"
+VERSION = "0.157.1"
 
 ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
 

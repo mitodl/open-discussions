@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.157.1
+---------------
+
+- Bump cryptography from 3.2 to 3.3.2
+- Bump httplib2 from 0.18.0 to 0.19.0
+- remove read more button
+
 Version 0.157.0 (Released February 10, 2021)
 ---------------
 
