@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.157.0
+Version 0.157.0 (Released February 10, 2021)
 ---------------
 
 - add enrollment models
