@@ -238,10 +238,10 @@ class PostSerializer(BasePostSerializer):
         if changed or cover_image:
             post = api.get_post(post_id=post.id)
 
-        notify_moderators.delay(post.id, channel_name)
-
         if not api.is_moderator(post.subreddit.display_name, post.author.name):
             task_helpers.check_post_for_spam(self.context["request"], post.id)
+        else:
+            notify_moderators.delay(post.id, channel_name)
 
         return post
 
