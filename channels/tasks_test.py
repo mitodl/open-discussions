@@ -513,6 +513,8 @@ def test_check_post_for_spam(mocker, is_spam):
     mock_api = mocker.patch("channels.tasks.get_admin_api").return_value
     mock_spam_checker = mocker.patch("channels.tasks.SPAM_CHECKER")
     mock_spam_checker.is_post_spam.return_value = is_spam
+    mock_moderator_notification = mocker.patch("channels.tasks.notify_moderators.delay")
+
     post = PostFactory.create()
 
     tasks.check_post_for_spam.delay(
@@ -525,8 +527,12 @@ def test_check_post_for_spam(mocker, is_spam):
 
     if is_spam:
         mock_api.remove_post.assert_called_once_with(post.post_id)
+        mock_moderator_notification.assert_not_called()
     else:
         mock_api.remove_post.assert_not_called()
+        mock_moderator_notification.assert_called_once_with(
+            post.post_id, post.channel.name
+        )
 
     assert (
         SpamCheckResult.objects.filter(
