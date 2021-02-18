@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.158.0
+---------------
+
+- update ocw-data-parser (#3310)
+
 Version 0.157.1 (Released February 10, 2021)
 ---------------
 
