@@ -149,21 +149,38 @@ class PodcastEpisodeAdmin(admin.ModelAdmin):
 class EnrollmentAdmin(admin.ModelAdmin):
     """Enrollment Admin"""
 
-    def run_slug(self, obj):
-        """run slug as string"""
-        return f"{obj.run.slug}"
+    def run_id(self, obj):
+        """run_id as string"""
+        if obj.run:
+            return f"{obj.run.run_id}"
+        else:
+            return ""
 
-    run_slug.admin_order_field = "run__slug"
+    def course_id(self, obj):
+        """course_id as string"""
+        if obj.course:
+            return f"{obj.course.course_id}"
+        else:
+            return ""
 
     model = Enrollment
     search_fields = (
+        "course__course_id",
+        "course__title",
+        "enrollments_table_run_id",
         "run__run_id",
         "run__slug",
         "run__title",
         "user__email",
         "user__username",
     )
-    list_display = ("run_slug", "user", "enrollment_timestamp")
+    list_display = (
+        "enrollments_table_run_id",
+        "user",
+        "enrollment_timestamp",
+        "run_id",
+        "course_id",
+    )
     autocomplete_fields = ("run", "user")
 
 

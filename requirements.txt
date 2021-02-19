@@ -29,6 +29,7 @@ billiard==3.6.2.0
 boto3==1.14.37
     # via
     #   ocw-data-parser
+    #   pyathena
     #   smart-open
 boto==2.39.0
     # via
@@ -37,6 +38,7 @@ boto==2.39.0
 botocore==1.17.37
     # via
     #   boto3
+    #   pyathena
     #   s3transfer
 bz2file==0.98
     # via smart-open
@@ -254,6 +256,8 @@ pyasn1==0.4.7
     # via
     #   pyasn1-modules
     #   rsa
+pyathena==2.1.1
+    # via -r requirements.in
 pycparser==2.18
     # via cffi
 pygithub==1.44.1
@@ -347,6 +351,7 @@ six==1.15.0
     #   requests-file
     #   social-auth-app-django
     #   social-auth-core
+    #   tenacity
     #   traitlets
     #   zeep
 smart-open==1.8.0
@@ -363,6 +368,8 @@ static3==0.5.1
     # via
     #   -r requirements.in
     #   dj-static
+tenacity==6.3.1
+    # via pyathena
 text-unidecode==1.2
     # via faker
 tika==1.23.1

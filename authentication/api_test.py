@@ -24,6 +24,10 @@ pytestmark = pytest.mark.django_db
 def test_create_user(mocker, profile_data):
     """Tests that a user and associated objects are created"""
     auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
+    enrollment_job_mock = mocker.patch(
+        "authentication.api.update_enrollments_for_email.delay"
+    )
+
     email = "email@localhost"
     username = "username"
     user = api.create_user(username, email, profile_data, {"first_name": "Bob"})
@@ -35,6 +39,7 @@ def test_create_user(mocker, profile_data):
     assert NotificationSettings.objects.count() == 2
 
     auth_token_mock.assert_called_once()
+    enrollment_job_mock.assert_called_once_with(user.email)
 
     if "name" in profile_data:
         assert user.profile.name == profile_data["name"]

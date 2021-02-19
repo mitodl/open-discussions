@@ -663,12 +663,20 @@ class Enrollment(TimestampedModel):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="enrollments")
     run = models.ForeignKey(
-        LearningResourceRun, on_delete=models.CASCADE, related_name="enrollments"
+        LearningResourceRun,
+        on_delete=models.CASCADE,
+        related_name="enrollments",
+        null=True,
     )
-    enrollment_timestamp = models.DateTimeField()
+    course = models.ForeignKey(
+        Course, on_delete=models.CASCADE, related_name="enrollments", null=True
+    )
+    enrollments_table_run_id = models.CharField(max_length=256, null=True, blank=True)
+    enrollment_timestamp = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f"Enrollment user_id={self.user_id} run_id={self.run_id}"
+        return f"Enrollment user_id={self.user_id} enrollments_table_run_id={self.enrollments_table_run_id}"
 
     class Meta:
         unique_together = (("user", "run"),)
+        unique_together = (("user", "enrollments_table_run_id"),)

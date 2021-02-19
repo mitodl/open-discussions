@@ -31,7 +31,7 @@ services:
   db:
     image: postgres:11.6
     ports:
-      - "5432"
+      - 5432:5432
 
   redis:
     image: redis:5.0.8

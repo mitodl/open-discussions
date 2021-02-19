@@ -942,6 +942,11 @@ SPAM_EXEMPT_EMAILS = get_list_of_str("SPAM_EXEMPT_EMAILS", ["[@\\.]mit\\.edu"])
 RSS_FEED_EPISODE_LIMIT = get_int("RSS_FEED_EPISODE_LIMIT", 100)
 RSS_FEED_CACHE_MINUTES = get_int("RSS_FEED_CACHE_MINUTES", 15)
 
+ATHENA_MITX_DATABASE = get_string("ATHENA_MITX_DATABASE", None)
+ATHENA_MITX_ENROLLMENTS_TABLE = get_string("ATHENA_MITX_ENROLLMENTS_TABLE", None)
+ATHENA_REGION_NAME = get_string("ATHENA_REGION_NAME", "us-east-1")
+ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
+
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing
     IPWARE_PRIVATE_IP_PREFIX = ()
