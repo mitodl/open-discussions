@@ -32,7 +32,9 @@ from course_catalog.tasks import (
     get_mitpe_data,
     get_csail_data,
     get_podcast_data,
+    update_enrollments_for_email,
 )
+from open_discussions.factories import UserFactory
 
 
 pytestmark = pytest.mark.django_db
@@ -479,3 +481,22 @@ def test_get_podcast_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_podcast_data.delay()
     mock_pipelines.podcast_etl.assert_called_once()
+
+
+def test_update_enrollments_for_email(mocker):
+    """Verify that update_enrollments_for_email call update_enrollments_for_user job"""
+    user = UserFactory.create()
+    mock_task = mocker.patch(
+        "course_catalog.etl.enrollments.update_enrollments_for_user"
+    )
+    update_enrollments_for_email.delay(user.email)
+    mock_task.assert_called_once_with(user)
+
+
+def test_update_enrollments_for_email_email_does_not_exist(mocker):
+    """Verify that update_enrollments_for_email call update_enrollments_for_user job"""
+    mock_task = mocker.patch(
+        "course_catalog.etl.enrollments.update_enrollments_for_user"
+    )
+    update_enrollments_for_email.delay("fake_email")
+    mock_task.assert_not_called()

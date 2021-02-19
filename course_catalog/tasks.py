@@ -8,6 +8,7 @@ import rapidjson
 import requests
 import boto3
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from course_catalog.utils import load_course_blocklist
 from course_catalog.constants import PlatformType
@@ -19,7 +20,7 @@ from course_catalog.api import (
     sync_ocw_course_files,
     sync_xpro_course_files,
 )
-from course_catalog.etl import pipelines, youtube
+from course_catalog.etl import pipelines, youtube, enrollments
 from open_discussions import features
 from open_discussions.celery import app
 from open_discussions.utils import chunks
@@ -332,3 +333,18 @@ def get_podcast_data():
     results = pipelines.podcast_etl()
 
     return len(list(results))
+
+
+@app.task
+def update_enrollments_for_email(email):
+    """
+    Update enrollment data for a single email
+
+    Args:
+        email (string): user email
+    """
+    user = User.objects.filter(email=email).last()
+    if not user:
+        return
+
+    enrollments.update_enrollments_for_user(user)
