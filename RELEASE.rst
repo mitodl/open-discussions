@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.159.0
+Version 0.159.0 (Released February 24, 2021)
 ---------------
 
 - do not send moderator notifications for posts marked as spam automatically
