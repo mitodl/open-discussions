@@ -398,6 +398,7 @@ def test_es_course_serializer(offered_by, platform, department):
             "certification": expected_certification,
             "department_name": expected_department_name,
             "department_slug": course.department_slug,
+            "course_feature_tags": course.course_feature_tags,
         },
         sort=True,
     )

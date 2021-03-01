@@ -197,6 +197,7 @@ COURSE_OBJECT_TYPE = {
     "platform": {"type": "keyword"},
     "published": {"type": "boolean"},
     "department_name": {"type": "keyword"},
+    "course_feature_tags": {"type": "keyword"},
 }
 
 

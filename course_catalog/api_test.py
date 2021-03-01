@@ -37,7 +37,6 @@ from course_catalog.api import (
     sync_xpro_course_files,
     ocw_parent_folder,
     sync_ocw_course,
-    split_ocw_courses_by_run,
     format_date,
 )
 
@@ -594,49 +593,3 @@ def test_sync_ocw_course_published(
     elif blocklisted or not published:
         mock_delete.assert_called_once()
         mock_upload_json.assert_called_once()
-
-
-@pytest.mark.django_db
-def test_split_ocw_courses_by_run(ocw_valid_data):
-    """ Test that an OCW course is split into a separate course for each run """
-    original_course = CourseFactory.create(platform=PlatformType.ocw.value)
-    runs = original_course.runs.all()
-    run_ids = [run.run_id for run in runs]
-    for idx, run in enumerate(runs):
-        run.raw_json = {
-            **ocw_valid_data,
-            "uid": run.run_id,
-            "course_id": original_course.course_id,
-            "url": (original_course.url if idx == 0 else run.url),
-        }
-        run.save()
-    assert len(runs) == 3
-    assert Course.objects.count() == 1
-    split_ocw_courses_by_run()
-    courses = Course.objects.all()
-    assert len(courses) == 3
-    for course in courses:
-        assert (
-            course.course_id
-            == f"{course.runs.first().run_id}+{original_course.course_id}"
-        )
-        assert course.runs.count() == 1
-        assert course.runs.first().run_id in run_ids
-
-
-@pytest.mark.django_db
-def test_split_ocw_courses_error(mocker, ocw_valid_data):
-    """ Verify that an expected error message is sent for invalid data"""
-    original_course = CourseFactory.create(platform=PlatformType.ocw.value)
-    runs = original_course.runs.all()
-    for idx, run in enumerate(runs):
-        run.raw_json = {
-            "uid": run.run_id,
-            "course_id": original_course.course_id,
-            "url": (original_course.url if idx == 0 else run.url),
-            "course_collections": [],
-        }
-        run.save()
-    with pytest.raises(Exception) as exc:
-        split_ocw_courses_by_run()
-    assert f"{original_course.course_id} is not valid" in exc.value.args[0]

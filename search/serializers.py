@@ -518,6 +518,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "certification",
             "department_name",
             "department_slug",
+            "course_feature_tags",
         ]
 
         read_only_fields = fields
