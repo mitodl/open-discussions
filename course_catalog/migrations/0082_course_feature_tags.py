@@ -3,6 +3,26 @@
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations
 
+from course_catalog.constants import PlatformType
+
+
+def set_feature_tags(apps, schema_editor):
+    """
+    Save feature tags for every OCW course based on the run's raw_json
+    """
+    Course = apps.get_model("course_catalog", "Course")
+    LearningResourceRun = apps.get_model("course_catalog", "LearningResourceRun")
+    for run in LearningResourceRun.objects.filter(
+        platform=PlatformType.ocw.value
+    ).iterator():
+        course = Course.objects.get(id=run.object_id)
+        if run:
+            course.course_feature_tags = [
+                tag["course_feature_tag"]
+                for tag in run.raw_json.get("course_feature_tags", [])
+            ]
+            course.save()
+
 
 class Migration(migrations.Migration):
 
@@ -13,5 +33,6 @@ class Migration(migrations.Migration):
             model_name="course",
             name="course_feature_tags",
             field=django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True),
-        )
+        ),
+        migrations.RunPython(set_feature_tags, reverse_code=migrations.RunPython.noop),
     ]
