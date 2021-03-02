@@ -673,7 +673,16 @@ def test_transform_results(
         "hits": {"hits": raw_hits, "total": 3},
         "suggest": RAW_SUGGESTIONS,
         "aggregations": {
-            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]}
+            "agg_filter_topics": {
+                "doc_count": 30,
+                "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            },
+            "agg_filter_course_feature_tags": {
+                "doc_count": 20,
+                "course_feature_tags": {
+                    "buckets": [{"key": "Problems with Solutions", "doc_count": 20}]
+                },
+            },
         },
     }
 
@@ -682,7 +691,10 @@ def test_transform_results(
         "hits": {"hits": raw_hits if is_anonymous else expected_hits, "total": 3},
         "suggest": expected_suggest,
         "aggregations": {
-            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]}
+            "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            "course_feature_tags": {
+                "buckets": [{"key": "Problems with Solutions", "doc_count": 20}]
+            },
         },
     }
 

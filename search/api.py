@@ -369,6 +369,7 @@ def transform_results(search_result, user):
         "certification",
         "department_name",
         "level",
+        "course_feature_tags",
     ]:
         if f"agg_filter_{aggregation_key}" in search_result.get("aggregations", {}):
             if aggregation_key == "level":
@@ -393,6 +394,7 @@ def transform_results(search_result, user):
                 search_result["aggregations"][aggregation_key] = search_result[
                     "aggregations"
                 ][f"agg_filter_{aggregation_key}"][aggregation_key]
+            search_result["aggregations"].pop(f"agg_filter_{aggregation_key}")
 
     types = search_result.get("aggregations", {}).get("type", {})
 
