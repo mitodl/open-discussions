@@ -149,6 +149,10 @@
       "description": "Google analytics tracking ID",
       "required": false
     },
+    "GA_G_TRACKING_ID": {
+      "description": "Google analytics GTM tracking ID",
+      "required": false
+    },
     "GITHUB_ACCESS_TOKEN": {
       "description": "Access token for the Github API",
       "required": false

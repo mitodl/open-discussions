@@ -2,6 +2,7 @@
 /* eslint-disable no-unused-vars */
 declare var SETTINGS: {
   gaTrackingID: string,
+  gaGTrackingID: string,
   reactGaDebug: boolean,
   public_path: string,
   site_url: string,
