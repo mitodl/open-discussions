@@ -1,6 +1,5 @@
 // @flow
 import React from "react"
-import ReactGA from "react-ga"
 import R from "ramda"
 
 const shouldLoadData = R.complement(
@@ -20,12 +19,16 @@ export const withChannelTracker = (
 
     loadGA() {
       const { channel, location } = this.props
+
       if (channel && channel.ga_tracking_id) {
-        const trackerName = channel.ga_tracking_id.replace(/-/g, "_")
-        ReactGA.ga("create", channel.ga_tracking_id, "auto", {
-          name: trackerName
+        window.gtag("config", channel.ga_tracking_id, {
+          send_page_view: false
         })
-        ReactGA.ga(`${trackerName}.send`, "pageview", location.pathname)
+
+        window.gtag("event", "page_view", {
+          page_path: location.pathname,
+          send_to:   channel.ga_tracking_id
+        })
       }
     }
 

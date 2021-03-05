@@ -69,6 +69,7 @@ def _render_app(request, initial_state=None):
 
     js_settings = {
         "gaTrackingID": settings.GA_TRACKING_ID,
+        "gaGTrackingID": settings.GA_G_TRACKING_ID,
         "environment": settings.ENVIRONMENT,
         "sentry_dsn": settings.SENTRY_DSN,
         "release_version": settings.VERSION,

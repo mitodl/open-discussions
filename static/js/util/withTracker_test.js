@@ -24,12 +24,27 @@ describe("withTracker", () => {
     sandbox.restore()
   })
 
-  it("should make an initialization and pageview call", () => {
+  it("should make an initialization and pageview call when SETTINGS.gaTrackingID is set ", () => {
     SETTINGS.gaTrackingID = "UA-default-1"
     window.location = `http://fake/c/path`
     WrappedPage = withTracker(TestPage)
     renderPage({ location: window.location })
     assert.ok(gaInitStub.calledOnce)
     assert.ok(gaPageViewStub.calledWith("/c/path"))
+  })
+
+  it("should append gtag.js scripts to the header SETTINGS.gaGTrackingID is set ", () => {
+    SETTINGS.gaGTrackingID = "G-default-1"
+    // $FlowFixMe: it's a test
+    document.head.innerHTML = ""
+    WrappedPage = withTracker(TestPage)
+    renderPage({ location: window.location })
+    // $FlowFixMe: it's a test
+    assert(document.head.childElementCount === 2)
+    assert(
+      // $FlowFixMe: it's a test
+      document.head.firstChild.src ===
+        "https://www.googletagmanager.com/gtag/js?id=G-default-1"
+    )
   })
 })

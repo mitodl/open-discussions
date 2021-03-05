@@ -1,4 +1,3 @@
-import ReactGA from "react-ga"
 import { assert } from "chai"
 import { mount } from "enzyme"
 import React from "react"
@@ -9,7 +8,7 @@ import { shouldIf, TestPage } from "../lib/test_utils"
 import IntegrationTestHelper from "../util/integration_test_helper"
 
 describe("withTracker", () => {
-  let helper, gaGaStub, channel
+  let helper, gTagStub, channel
 
   const WrappedPage = withChannelTracker(TestPage)
 
@@ -21,7 +20,8 @@ describe("withTracker", () => {
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
-    gaGaStub = helper.sandbox.stub(ReactGA, "ga")
+    window.gtag = helper.sandbox.stub()
+    gTagStub = window.gtag
     channel = makeChannel()
   })
 
@@ -29,30 +29,29 @@ describe("withTracker", () => {
     helper.cleanup()
   })
 
-  it("should call GA create and pageview if channel has a tracking id", async () => {
+  it("should call gtag config and event if channel has a tracking id", async () => {
     channel.ga_tracking_id = "UA-FAKE-01"
     window.location = "http://fake/c/path"
 
     await render({}, { location: window.location, channel: channel })
     assert.ok(
-      gaGaStub.calledWith("create", channel.ga_tracking_id, "auto", {
-        name: "UA_FAKE_01"
+      gTagStub.calledWith("config", channel.ga_tracking_id, {
+        send_page_view: false
       })
     )
     assert.ok(
-      gaGaStub.calledWith(
-        "UA_FAKE_01.send",
-        "pageview",
-        window.location.pathname
-      )
+      gTagStub.calledWith("event", "page_view", {
+        page_path: window.location.pathname,
+        send_to:   channel.ga_tracking_id
+      })
     )
   })
 
-  it("should not call GA create and pageview if channel does not have a tracking id", async () => {
+  it("should not call GA config and event if channel does not have a tracking id", async () => {
     channel.ga_tracking_id = null
     window.location = "http://fake/c/path"
     await render({}, { location: window.location, channel: channel })
-    assert.ok(gaGaStub.notCalled)
+    assert.ok(gTagStub.notCalled)
   })
 
   //
@@ -72,7 +71,7 @@ describe("withTracker", () => {
         channel:  prevChannel
       }
       wrapper.instance().componentDidUpdate(prevProps)
-      assert.equal(gaGaStub.callCount, gaCalls)
+      assert.equal(gTagStub.callCount, gaCalls)
     })
   })
 })

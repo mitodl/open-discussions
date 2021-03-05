@@ -27,6 +27,7 @@ def test_webpack_url(
         "open_discussions.templatetags.render_bundle._get_bundle"
     )
     settings.GA_TRACKING_ID = "fake"
+    settings.GA_G_TRACKING_ID = "fake"
     settings.EMBEDLY_KEY = "fake"
     settings.ALGOLIA_APP_ID = "fake"
     settings.ALGOLIA_API_KEY = "fake"
@@ -63,6 +64,7 @@ def test_webpack_url(
     js_settings = response.context["js_settings"]
     assert js_settings == {
         "gaTrackingID": "fake",
+        "gaGTrackingID": "fake",
         "public_path": "/static/bundles/",
         "site_url": settings.SITE_BASE_URL,
         "max_comment_depth": 6,
