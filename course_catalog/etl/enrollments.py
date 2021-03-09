@@ -33,12 +33,10 @@ def update_enrollments_for_user(user):
         FROM "{database}"."{table}" 
         WHERE email = '{email}'
         """.format(
-        database=settings.ATHENA_MITX_DATABASE,
+        database=settings.ATHENA_MITX_DATABASE_NAME,
         table=settings.ATHENA_MITX_ENROLLMENTS_TABLE,
         email=user.email,
     )
-
-    print(query)
 
     cursor = athena_cursor()
     cursor.execute(query)
