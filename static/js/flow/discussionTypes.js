@@ -54,6 +54,7 @@ export type ChannelForm = {
   avatar?:                  FormImage,
   banner?:                  FormImage,
   moderator_notifications?: boolean,
+  ga_tracking_id?:          ?string,
 }
 
 export type ChannelAppearanceEditValidation = {
@@ -62,7 +63,8 @@ export type ChannelAppearanceEditValidation = {
 }
 
 export type ChannelBasicEditValidation = {
-  allowed_post_types: string
+  allowed_post_types: string,
+  ga_tracking_id?:    string
 }
 
 export type AddMemberForm = {

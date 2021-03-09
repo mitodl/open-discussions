@@ -116,7 +116,8 @@ class EditChannelBasicPage extends React.Component<Props> {
           "name",
           "channel_type",
           "allowed_post_types",
-          "moderator_notifications"
+          "moderator_notifications",
+          "ga_tracking_id"
         ],
         channelForm.value
       )

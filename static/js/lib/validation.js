@@ -186,6 +186,14 @@ export const validateChannelBasicEditForm = validate([
     R.isEmpty,
     formLens("allowed_post_types"),
     "At least one of the post type options must be selected"
+  ),
+  validation(
+    R.compose(
+      R.gt(R.__, 30),
+      R.length
+    ),
+    formLens("ga_tracking_id"),
+    "Tracking id length is limited to 30 characters"
   )
 ])
 

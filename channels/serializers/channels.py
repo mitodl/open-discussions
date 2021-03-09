@@ -40,7 +40,7 @@ class ChannelSerializer(serializers.Serializer):
     avatar_small = serializers.SerializerMethodField()
     avatar_medium = serializers.SerializerMethodField()
     banner = WriteableSerializerMethodField()
-    ga_tracking_id = serializers.CharField(required=False, allow_blank=True)
+    ga_tracking_id = WriteableSerializerMethodField()
     about = serializers.JSONField(allow_null=True, default=None)
     moderator_notifications = WriteableSerializerMethodField()
 
@@ -87,6 +87,10 @@ class ChannelSerializer(serializers.Serializer):
             channel._self_channel.moderator_notifications  # pylint: disable=protected-access
         )
 
+    def get_ga_tracking_id(self, channel):
+        """Get google analytics tracking id"""
+        return channel.ga_tracking_id
+
     def validate_avatar(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
         if not hasattr(value, "name"):
@@ -104,6 +108,12 @@ class ChannelSerializer(serializers.Serializer):
         if not isinstance(value, bool):
             raise ValidationError("Expected moderator_notifications be a boolean")
         return {"moderator_notifications": value}
+
+    def validate_ga_tracking_id(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not isinstance(value, str):
+            raise ValidationError("Expected ga_tracking_id to be a string")
+        return {"ga_tracking_id": value}
 
     def get_allowed_post_types(self, channel):
         """Returns a dictionary of allowed post types"""
@@ -202,6 +212,10 @@ class ChannelSerializer(serializers.Serializer):
             channel_obj.moderator_notifications = validated_data.get(
                 "moderator_notifications"
             )
+            channel_obj.save()
+
+        if "ga_tracking_id" in validated_data:
+            channel_obj.ga_tracking_id = validated_data.get("ga_tracking_id")
             channel_obj.save()
 
         avatar = validated_data.get("avatar")

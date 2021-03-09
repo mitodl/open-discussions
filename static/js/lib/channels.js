@@ -50,7 +50,8 @@ export const editChannelForm = (channel: Channel): ChannelForm =>
       "public_description",
       "channel_type",
       "allowed_post_types",
-      "moderator_notifications"
+      "moderator_notifications",
+      "ga_tracking_id"
     ],
     channel
   )

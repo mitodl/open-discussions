@@ -265,6 +265,21 @@ describe("validation library", () => {
       channel.value.allowed_post_types = [LINK_TYPE_LINK]
       assert.deepEqual(validateChannelBasicEditForm(channel), {})
     })
+
+    it("should complain if tracking id is too long", () => {
+      const channel = {
+        value: {
+          ga_tracking_id: "a".repeat(31)
+        }
+      }
+      assert.deepEqual(validateChannelBasicEditForm(channel), {
+        value: {
+          ga_tracking_id: "Tracking id length is limited to 30 characters"
+        }
+      })
+      channel.value.ga_tracking_id = "short"
+      assert.deepEqual(validateChannelBasicEditForm(channel), {})
+    })
   })
 
   describe("validateContentReportForm", () => {

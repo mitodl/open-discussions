@@ -112,7 +112,8 @@ describe("EditChannelBasicPage", () => {
       "name",
       "channel_type",
       "allowed_post_types",
-      "moderator_notifications"
+      "moderator_notifications",
+      "ga_tracking_id"
     ])
 
     assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
