@@ -48,7 +48,6 @@ def test_serialize_channel(
         avatar=Mock() if has_avatar else None,
         avatar_small=Mock() if has_avatar else None,
         avatar_medium=Mock() if has_avatar else None,
-        ga_tracking_id=ga_tracking_id,
         widget_list_id=123,
         about=Mock() if has_about else None,
     )
@@ -206,3 +205,22 @@ def test_update_channel_moderator_notifications(user, moderator_notifications):
     )
     channel.refresh_from_db()
     assert channel.moderator_notifications == moderator_notifications
+
+
+@pytest.mark.parametrize("ga_tracking_id", ["test", ""])
+def test_update_channel_moderator_notifications(user, ga_tracking_id):
+    """
+    Test updating the channel moderator_notifications field
+    """
+    channel = ChannelFactory.create(about=None)
+    instance = Mock(display_name=channel.name)
+    request = Mock(user=user)
+    api_mock = Mock()
+    api_mock.update_channel.return_value._self_channel = (  # pylint: disable=protected-access
+        channel
+    )
+    ChannelSerializer(context={"channel_api": api_mock, "request": request}).update(
+        instance, {"ga_tracking_id": ga_tracking_id}
+    )
+    channel.refresh_from_db()
+    assert channel.ga_tracking_id == ga_tracking_id

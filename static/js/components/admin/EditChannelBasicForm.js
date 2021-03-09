@@ -106,7 +106,7 @@ export default function EditChannelBasicForm(props: Props) {
           {validationMessage(validation.allowed_post_types)}
         </div>
       </Card>
-      <Card title="Other">
+      <Card title="Notifications">
         <div className="moderator_notifications">
           <Checkbox
             name="moderator_notifications"
@@ -116,6 +116,19 @@ export default function EditChannelBasicForm(props: Props) {
             Notify channel moderators when new articles are posted in this
             channel
           </Checkbox>
+        </div>
+      </Card>
+      <Card title="Analytics">
+        <div className="analytics">
+          <input
+            type="text"
+            name="ga_tracking_id"
+            className="input"
+            placeholder="Enter a UTM- or G- code for google analytics"
+            value={form.ga_tracking_id || ""}
+            onChange={onUpdate}
+          />
+          {validationMessage(validation.ga_tracking_id)}
         </div>
       </Card>
       <div className="row actions">

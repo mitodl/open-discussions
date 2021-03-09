@@ -52,7 +52,8 @@ export function updateChannel(channel: Channel): Promise<Channel> {
           "channel_type",
           "allowed_post_types",
           "about",
-          "moderator_notifications"
+          "moderator_notifications",
+          "ga_tracking_id"
         ],
         channel
       )

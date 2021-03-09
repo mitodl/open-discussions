@@ -38,7 +38,8 @@ describe("Channel utils", () => {
       public_description:      channel.public_description,
       channel_type:            channel.channel_type,
       allowed_post_types:      channel.allowed_post_types,
-      moderator_notifications: false
+      moderator_notifications: false,
+      ga_tracking_id:          channel.ga_tracking_id
     })
   })
 
