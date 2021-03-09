@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.160.0
+---------------
+
+- enrollments for single user
+
 Version 0.159.0 (Released February 24, 2021)
 ---------------
 
