@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.160.0
+Version 0.160.0 (Released March 11, 2021)
 ---------------
 
 - ATHENA_MITX_DATABASE -> ATHENA_MITX_DATABASE_NAME
