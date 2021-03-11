@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.160.0 (Released March 11, 2021)
+---------------
+
+- ATHENA_MITX_DATABASE -> ATHENA_MITX_DATABASE_NAME
+- enrollments for single user
+
 Version 0.159.0 (Released February 24, 2021)
 ---------------
 
