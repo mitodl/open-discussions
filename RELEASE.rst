@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.160.1
+---------------
+
+- make tracking with new google analytics g-tags possible
+- Upgrade ocw-data-parser to 0.24 (#3321)
+- Bump elliptic from 6.5.3 to 6.5.4
+
 Version 0.160.0 (Released March 11, 2021)
 ---------------
 
