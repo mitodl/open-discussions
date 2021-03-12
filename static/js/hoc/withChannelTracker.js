@@ -20,7 +20,7 @@ export const withChannelTracker = (
     loadGA() {
       const { channel, location } = this.props
 
-      if (channel && channel.ga_tracking_id) {
+      if (channel && channel.ga_tracking_id && window.gtag) {
         window.gtag("config", channel.ga_tracking_id, {
           send_page_view: false
         })

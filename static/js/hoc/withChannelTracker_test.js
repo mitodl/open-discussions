@@ -54,6 +54,13 @@ describe("withTracker", () => {
     assert.ok(gTagStub.notCalled)
   })
 
+  it("should not call GA config and event if window.gtag is not set", async () => {
+    window.gtag = null
+    window.location = "http://fake/c/path"
+    await render({}, { location: window.location, channel: channel })
+    assert.ok(gTagStub.notCalled)
+  })
+
   //
   ;[[true, 4], [false, 2]].forEach(([missingPrevChannel, gaCalls]) => {
     it(`${shouldIf(
