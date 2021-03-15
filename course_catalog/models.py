@@ -295,6 +295,8 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     runs = GenericRelation(LearningResourceRun)
 
+    course_feature_tags = JSONField(null=True, blank=True)
+
     @property
     def audience(self):
         """Returns the audience for the course"""

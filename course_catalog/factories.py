@@ -177,6 +177,9 @@ class CourseFactory(AbstractCourseFactory):
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )
+    course_feature_tags = factory.List(
+        [factory.Faker("word") for x in range(random.randrange(3))]
+    )
 
     class Meta:
         model = Course

@@ -336,6 +336,10 @@ class OCWSerializer(CourseSerializer):
             for topic_name in get_ocw_topics(data.get("course_collections"))
         ]
 
+        course_feature_tags = [
+            tag["course_feature_tag"] for tag in data.get("course_feature_tags", [])
+        ]
+
         course_fields = {
             "course_id": f"{data.get('uid')}+{data.get('course_id')}",
             "title": data.get("title"),
@@ -344,7 +348,7 @@ class OCWSerializer(CourseSerializer):
             "image_description": data.get("image_description"),
             "last_modified": data.get("last_modified"),
             "published": data.get("is_published"),
-            "raw_json": data.get("raw_json"),
+            "course_feature_tags": course_feature_tags,
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "platform": PlatformType.ocw.value,
             "department": data.get("department_number"),

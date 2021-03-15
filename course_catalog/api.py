@@ -21,7 +21,6 @@ from course_catalog.constants import (
     NON_COURSE_DIRECTORIES,
     AvailabilityType,
     OfferedBy,
-    ResourceType,
 )
 from course_catalog.etl.loaders import load_offered_bys, load_content_files
 from course_catalog.etl.ocw import (
@@ -62,50 +61,6 @@ def safe_load_json(json_string, json_file_key):
     except rapidjson.JSONDecodeError:
         log.exception("%s has a corrupted JSON", json_file_key)
         return {}
-
-
-def split_ocw_courses_by_run(chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE):
-    """
-    Create a separate course for each OCW run.
-    A reindex will be necessary afterward.
-    """
-    ocw = PlatformType.ocw.value
-    for course in Course.objects.filter(platform="ocw").iterator(chunk_size):
-        for run in course.runs.iterator():
-            data = run.raw_json
-            course_url = get_course_url(data.get("uid"), data, ocw)
-            course_prefix = (
-                "PROD/RES"
-                if course.learning_resource_type == ResourceType.ocw_resource.value
-                else ""
-            )
-            new_course_id = f"{data.get('uid')}+{data.get('course_id')}"
-            if course.url != course_url and course.course_id != new_course_id:
-                serialized_course = None
-            else:
-                serialized_course = course
-            ocw_serializer = OCWSerializer(
-                data={
-                    **run.raw_json,
-                    "last_modified": run.last_modified,
-                    "is_published": run.published,
-                    "course_prefix": course_prefix,
-                },
-                instance=serialized_course,
-            )
-            if not ocw_serializer.is_valid():
-                raise Exception(
-                    "Course %s %s is not valid: %s"
-                    % (
-                        run.raw_json.get("uid"),
-                        ocw_serializer.data["course_id"],
-                        ocw_serializer.errors,
-                    )
-                )
-            serialized_course = ocw_serializer.save()
-            load_offered_bys(serialized_course, [{"name": OfferedBy.ocw.value}])
-            run.object_id = serialized_course.id
-            run.save()
 
 
 def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""):
