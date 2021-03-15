@@ -5,6 +5,7 @@
 {% block content %}
 
 <!-- 1 Column Text : BEGIN -->
+{% if posts %}
   <tr>
       <td style="background-color: #ffffff;">
           <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
@@ -45,17 +46,81 @@
 <!-- 1 Column Text + Button : END -->
 
 {% endfor %}
-<tr>
+  <tr>
     <td style="padding: 10px 20px;">
         <!-- Button : BEGIN -->
         <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
             <tr>
                 <td class="button-td button-td-primary" style="border-radius: 4px; background: #a31f34;">
-                     <a class="button-a button-a-primary" href="{{ base_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">Read More</a>
+                     <a class="button-a button-a-primary" href="{{ base_url }}" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">More Stories</a>
                 </td>
             </tr>
         </table>
         <!-- Button : END -->
     </td>
 </tr>
+<tr>
+    <td style="padding: 10px 20px;">
+      <p  style="border-top: thin solid;"></p>
+    </td>
+<tr>
+{% endif %}
+{% if episodes %}
+<!-- 1 Column Text : BEGIN -->
+  <tr>
+      <td style="background-color: #ffffff;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+              <tr>
+                  <td style="padding: 5px 20px 0; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
+                      <h1 style="margin: 0 0 10px; font-size: 25px; line-height: 30px; color: #03152d; font-weight: bold;">Recent Podcast Episodes</h1>
+                  </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+<!-- 1 Column Text : END -->
+
+{% for episode in episodes %}
+<!-- 1 Column Text + Button : BEGIN -->
+<tr>
+   <td style="background-color: #ffffff;">
+       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+           <tr>
+               <td style="padding: 10px 20px; font-family: sans-serif; font-size: 15px; line-height: 20px; color: #555555;">
+
+
+                   <h2 style=" font-family: sans-serif; font-size: 18px; line-height: 22px; color: #03152d; font-weight: bold">
+                    {{ episode.title }}
+                   </h2>
+                   <p style="margin: 0 0 10px;">{# NOTE: this next line is intentionally long so it renders correctly in plaintext #}
+                     <span style="margin: 0 0 10px; color: #b0b0b0;">{{ episode.last_modified|parse_iso|date:"M j, Y" }}</span> - {{ episode.podcast_title }}</a>
+                   </p>
+               </td>
+           </tr>
+       </table>
+   </td>
+</tr>
+<!-- 1 Column Text + Button : END -->
+
+{% endfor %}
+<tr>
+    <td style="padding: 10px 20px;">
+        <!-- Button : BEGIN -->
+        <table align="left" role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin: auto;">
+            <tr>
+                <td class="button-td button-td-primary" style="border-radius: 4px; background: #a31f34;">
+                     <a class="button-a button-a-primary" href="{{ base_url }}/podcasts" style="background: #ffffff; border: 1px solid #a31f34; font-family: sans-serif; font-size: 15px; line-height: 15px; text-decoration: none; padding: 13px 17px; color: #a31f34; display: block; border-radius: 4px;">More Episodes</a>
+                </td>
+            </tr>
+        </table>
+        <!-- Button : END -->
+    </td>
+</tr>
+<tr>
+    <td style="padding: 10px 20px;">
+      <p  style="border-top: thin solid;"></p>
+    </td>
+<tr>
+{% endif %}
 {% endblock %}
+

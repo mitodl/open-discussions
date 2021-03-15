@@ -8,6 +8,8 @@ from channels import api
 from channels.proxies import proxy_posts
 from channels.serializers import posts as post_serializers
 from channels.utils import ListingParams
+from course_catalog.models import PodcastEpisode
+from course_catalog.serializers import PodcastEpisodeSerializer
 from notifications.models import FREQUENCY_DAILY, FREQUENCY_WEEKLY
 from notifications.notifiers.email import EmailNotifier
 from notifications.notifiers.exceptions import (
@@ -91,6 +93,26 @@ def _posts_since_notification(notification_settings, notification):
     return posts
 
 
+def _podcast_episodes_since_notification(notification):
+    """
+    Returns podcast episodes that were created after the given notification
+
+    Args:
+        notification (NotificationBase): notification 
+
+    Returns:
+        list of PodcastEpisode: list of podcast episodes
+    """
+
+    episodes = PodcastEpisode.objects.order_by("-created_on")
+
+    if notification:
+        episodes = episodes.filter(created_on__gt=notification.created_on)
+    else:
+        episodes = episodes.all()
+    return episodes[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_EPISODES]
+
+
 class FrontpageDigestNotifier(EmailNotifier):
     """Notifier for frontpage digests"""
 
@@ -118,7 +140,8 @@ class FrontpageDigestNotifier(EmailNotifier):
             # check if we have posts since the last notification
             return bool(
                 _posts_since_notification(self.notification_settings, last_notification)
-            )
+            ) or bool(_podcast_episodes_since_notification(last_notification))
+
         return False
 
     def _get_notification_data(
@@ -135,8 +158,9 @@ class FrontpageDigestNotifier(EmailNotifier):
             InvalidTriggerFrequencyError: if the frequency is invalid for the frontpage digest
         """
         posts = _posts_since_notification(self.notification_settings, last_notification)
+        podcast_episodes = _podcast_episodes_since_notification(last_notification)
 
-        if not posts:
+        if not (posts or podcast_episodes):
             # edge case, nothing new to send even though we expected some
             raise CancelNotificationError()
 
@@ -146,5 +170,9 @@ class FrontpageDigestNotifier(EmailNotifier):
                     post, context={"current_user": self.user}
                 ).data
                 for post in posts
-            ]
+            ],
+            "episodes": [
+                PodcastEpisodeSerializer(podcast_episode).data
+                for podcast_episode in podcast_episodes
+            ],
         }

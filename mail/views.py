@@ -92,7 +92,19 @@ class EmailDebuggerView(View):
                             channel_name="channel_name",
                             channel_title="Favorite Superheros",
                         ),
-                    ]
+                    ],
+                    "episodes": [
+                        SimpleNamespace(
+                            title="Pasta is tasty!",
+                            last_modified="2018-09-19T18:50:32+00:00",
+                            podcast_title="cooking podcast",
+                        ),
+                        SimpleNamespace(
+                            title="Superman is better",
+                            last_modified="2018-09-19T18:50:32+00:00",
+                            podcast_title="Favorite Superheros",
+                        ),
+                    ],
                 }
             )
 
