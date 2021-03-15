@@ -6,6 +6,7 @@ import pytest
 
 from channels.factories.models import PostFactory
 from channels.proxies import PostProxy
+from course_catalog.factories import PodcastEpisodeFactory
 from notifications.factories import (
     NotificationSettingsFactory,
     EmailNotificationFactory,
@@ -36,6 +37,7 @@ def notifier_settings(settings):
 @pytest.mark.parametrize("trigger_frequency", [FREQUENCY_DAILY, FREQUENCY_WEEKLY])
 @pytest.mark.parametrize("has_last_notification", [True, False])
 @pytest.mark.parametrize("has_posts_after", [True, False])
+@pytest.mark.parametrize("has_episodes_after", [True, False])
 def test_can_notify(
     settings,
     mocker,
@@ -45,6 +47,7 @@ def test_can_notify(
     trigger_frequency,
     has_last_notification,
     has_posts_after,
+    has_episodes_after,
 ):  # pylint: disable=too-many-arguments, too-many-locals
     """Test can_notify"""
     notification_settings = NotificationSettingsFactory.create(
@@ -63,6 +66,14 @@ def test_can_notify(
         return_value=can_notify,
     )
     created_on = notification.created_on if notification is not None else now_in_utc()
+
+    episode = PodcastEpisodeFactory.create()
+    if has_episodes_after:
+        episode.created_on = created_on + timedelta(days=10)
+    else:
+        episode.created_on = created_on + timedelta(days=-10)
+    episode.save()
+
     post = PostFactory.create()
     api_mock = mocker.patch("channels.api.Api")
     api_mock.return_value.front_page.return_value = (
@@ -85,9 +96,11 @@ def test_can_notify(
     expected = (
         is_enabled
         and can_notify
-        and has_posts
-        and (not has_last_notification or has_posts_after)
-        and trigger_frequency in [FREQUENCY_DAILY, FREQUENCY_WEEKLY]
+        and (
+            not has_last_notification
+            or (has_posts and has_posts_after)
+            or has_episodes_after
+        )
     )
     assert notifier.can_notify(notification) is expected
 
@@ -119,9 +132,10 @@ def test_send_notification(mocker, user):
     ns = NotificationSettingsFactory.create(via_email=True, weekly=True)
     notifier = frontpage.FrontpageDigestNotifier(ns)
     post = PostFactory.create()
+    episode = PodcastEpisodeFactory.create()
     send_messages_mock = mocker.patch("mail.api.send_messages")
-    serializer_mock = mocker.patch("channels.serializers.posts.PostSerializer")
-    serializer_mock.return_value.data = {
+    post_serializer_mock = mocker.patch("channels.serializers.posts.PostSerializer")
+    post_serializer_mock.return_value.data = {
         "id": post.post_id,
         "title": "post's title",
         "slug": "a_slug",
@@ -129,6 +143,14 @@ def test_send_notification(mocker, user):
         "channel_title": "MicroMasters",
         "created": now_in_utc().isoformat(),
         "author_id": user.username,
+    }
+    episode_serializer_mock = mocker.patch(
+        "notifications.notifiers.frontpage.PodcastEpisodeSerializer"
+    )
+    episode_serializer_mock.return_value.data = {
+        "title": "episode title",
+        "podcast_title": "podcast title",
+        "last_modified": now_in_utc().isoformat(),
     }
     submission = mocker.Mock(
         id=post.post_id, created=int(now_in_utc().timestamp()), stickied=False
@@ -141,15 +163,17 @@ def test_send_notification(mocker, user):
 
     notifier.send_notification(note)
 
-    serializer_mock.assert_called_once_with(
+    post_serializer_mock.assert_called_once_with(
         PostProxy(submission, post), context={"current_user": note.user}
     )
+
+    episode_serializer_mock.assert_called_once_with(episode)
 
     send_messages_mock.assert_called_once_with([any_instance_of(EmailMessage)])
 
 
-def test_send_notification_no_posts(mocker):
-    """Tests send_notification if there are somehow no posts"""
+def test_send_notification_no_posts_or_episodes(mocker):
+    """Tests send_notification if there are somehow no posts or episodes"""
     ns = NotificationSettingsFactory.create(via_email=True, weekly=True)
     notifier = frontpage.FrontpageDigestNotifier(ns)
     send_messages_mock = mocker.patch("mail.api.send_messages")
