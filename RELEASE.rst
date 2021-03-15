@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.160.1
+Version 0.160.1 (Released March 15, 2021)
 ---------------
 
 - check for gtag in channel tracker
