@@ -2,8 +2,16 @@
 
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations
+from django.core.paginator import Paginator
 
 from course_catalog.constants import PlatformType
+
+
+def chunked_iterator(queryset):
+    paginator = Paginator(queryset, 100)
+    for page in range(1, paginator.num_pages + 1):
+        for obj in paginator.page(page).object_list:
+            yield obj
 
 
 def set_feature_tags(apps, schema_editor):
@@ -12,11 +20,13 @@ def set_feature_tags(apps, schema_editor):
     """
     Course = apps.get_model("course_catalog", "Course")
     LearningResourceRun = apps.get_model("course_catalog", "LearningResourceRun")
-    for run in LearningResourceRun.objects.filter(
-        platform=PlatformType.ocw.value
-    ).iterator():
+    for run in chunked_iterator(
+        LearningResourceRun.objects.filter(platform=PlatformType.ocw.value)
+        .all()
+        .order_by("id")
+    ):
         course = Course.objects.get(id=run.object_id)
-        if run:
+        if run and run.raw_json:
             course.course_feature_tags = [
                 tag["course_feature_tag"]
                 for tag in run.raw_json.get("course_feature_tags", [])
@@ -26,7 +36,7 @@ def set_feature_tags(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    dependencies = [("course_catalog", "0081_enrollment")]
+    dependencies = [("course_catalog", "0082_enrollment_updates")]
 
     operations = [
         migrations.AddField(
