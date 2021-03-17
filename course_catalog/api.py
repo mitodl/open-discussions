@@ -461,7 +461,7 @@ def sync_ocw_course(
                     parser.upload_all_media_to_s3(upload_parsed_json=True)
             except:  # pylint: disable=bare-except
                 log.exception(
-                    ("Error encountered uploading OCW files for %s", course_prefix)
+                    "Error encountered uploading OCW files for %s", course_prefix
                 )
                 raise
         else:
