@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.160.2
+Version 0.160.2 (Released March 19, 2021)
 ---------------
 
 - Fix migration conflict (#3330)
