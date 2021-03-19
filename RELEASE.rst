@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.161.0
+---------------
+
+- Fix test which wasn't running (#3334)
+- Fix typo in logging exception (#3333)
+- podcasts in notifications
+- update ocw data parser
+
 Version 0.160.2 (Released March 19, 2021)
 ---------------
 
