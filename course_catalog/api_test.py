@@ -213,16 +213,15 @@ def test_deserializing_a_valid_ocw_course(
     )
 
 
-def deserializing_a_valid_ocw_course_with_existing_newer_run(
+def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
     mock_course_index_functions, ocw_valid_data
 ):
     """
     Verify that course values are not overwritten if the course already has a newer run
     """
-
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
-        course_id=ocw_valid_data["course_id"],
+        course_id=f'{ocw_valid_data["uid"]}+{ocw_valid_data["course_id"]}',
         title="existing",
     )
 
@@ -234,7 +233,7 @@ def deserializing_a_valid_ocw_course_with_existing_newer_run(
     digest_ocw_course(ocw_valid_data, timezone.now(), True)
     assert Course.objects.count() == 1
     course = Course.objects.last()
-    assert course.title == "existing"
+    assert course.title == "Undergraduate Thesis Tutorial"
     assert course.runs.count() == 4
 
 
