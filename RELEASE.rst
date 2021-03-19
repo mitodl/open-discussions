@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.160.2 (Released March 19, 2021)
+---------------
+
+- Fix migration conflict (#3330)
+- expose ga tracking id to moderators
+- Add "course feature tags" to index for ocw and remove some obsolete code (#3317)
+
 Version 0.160.1 (Released March 15, 2021)
 ---------------
 
