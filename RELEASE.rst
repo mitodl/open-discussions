@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.161.0
+Version 0.161.0 (Released March 22, 2021)
 ---------------
 
 - Fix test which wasn't running (#3334)
