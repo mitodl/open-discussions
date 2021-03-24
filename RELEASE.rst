@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.161.1
+---------------
+
+- manually send gtag events
+
 Version 0.161.0 (Released March 22, 2021)
 ---------------
 
