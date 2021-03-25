@@ -370,6 +370,7 @@ def transform_results(search_result, user):
         "department_name",
         "level",
         "course_feature_tags",
+        "resource_type",
     ]:
         if f"agg_filter_{aggregation_key}" in search_result.get("aggregations", {}):
             if aggregation_key == "level":

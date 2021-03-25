@@ -788,9 +788,9 @@ def test_transform_level_aggregation():
 
 
 @pytest.mark.django_db
-def test_transform_nested_aggregations():
+def test_transform_topics_aggregations():
     """
-    Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
+    Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
     """
     results = {
         "hits": {"hits": {}, "total": 15},
@@ -816,6 +816,42 @@ def test_transform_nested_aggregations():
     ] = expected_transformed_results["aggregations"]["agg_filter_topics"]["topics"]
 
     assert transform_results(results, AnonymousUser()) == expected_transformed_results
+
+
+@pytest.mark.django_db
+def test_transform_resource_type_aggregations():
+    """
+    Resource_type Aggregations with filters are nested under `agg_filter_resource_type`.
+    transform_results should unnest them
+    """
+    results = {
+        "hits": {"hits": {}, "total": 15},
+        "suggest": {},
+        "aggregations": {
+            "agg_filter_resource_type": {
+                "doc_count": 660,
+                "resource_type": {
+                    "doc_count_error_upper_bound": 0,
+                    "sum_other_doc_count": 0,
+                    "buckets": [
+                        {"key": "Assignments", "doc_count": 252},
+                        {"key": "Lecture Notes", "doc_count": 207},
+                        {"key": "Recitations", "doc_count": 75},
+                        {"key": "Readings", "doc_count": 71},
+                        {"key": "Exams", "doc_count": 55},
+                    ],
+                },
+            }
+        },
+    }
+
+    expected_transformed_results = results.copy()
+    expected_transformed_results["suggest"] = []
+    expected_transformed_results["aggregations"][
+        "resource_type"
+    ] = expected_transformed_results["aggregations"]["agg_filter_resource_type"][
+        "resource_type"
+    ]
 
 
 @pytest.mark.parametrize("podcast_present_in_aggregate", [True, False])
