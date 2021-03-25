@@ -45,6 +45,7 @@ from search.constants import (
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
     OCW_SECTION_TYPE_MAPPING,
+    OCW_TYPE_OTHER,
 )
 
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
@@ -379,7 +380,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
         """Get the resource type of the ContentFile"""
         if not instance.section:
             return None
-        return OCW_SECTION_TYPE_MAPPING.get(instance.section, None)
+        return OCW_SECTION_TYPE_MAPPING.get(instance.section, OCW_TYPE_OTHER)
 
     class Meta:
         model = ContentFile

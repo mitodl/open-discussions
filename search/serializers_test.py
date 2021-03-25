@@ -54,6 +54,7 @@ from search.constants import (
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
     OCW_SECTION_TYPE_MAPPING,
+    OCW_TYPE_OTHER,
 )
 from search.serializers import (
     ESPostSerializer,
@@ -454,7 +455,9 @@ def test_es_content_file_serializer():
             "image_src": content_file.image_src,
             "course_id": content_file.run.content_object.course_id,
             "coursenum": content_file.run.content_object.coursenum,
-            "resource_type": OCW_SECTION_TYPE_MAPPING.get(content_file.section, None),
+            "resource_type": OCW_SECTION_TYPE_MAPPING.get(
+                content_file.section, OCW_TYPE_OTHER
+            ),
         },
     )
 
