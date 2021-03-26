@@ -55,7 +55,6 @@ from search.constants import (
     PODCAST_EPISODE_TYPE,
     OCW_TYPE_ASSIGNMENTS,
     OCW_TYPE_LECTURE_NOTES,
-    OCW_TYPE_OTHER,
 )
 from search.serializers import (
     ESPostSerializer,
@@ -414,7 +413,7 @@ def test_es_course_serializer(offered_by, platform, department):
     [
         ["First Paper Assignment", OCW_TYPE_ASSIGNMENTS],
         ["Assignment 1.2", OCW_TYPE_ASSIGNMENTS],
-        ["Assignments and Exams", OCW_TYPE_OTHER],
+        ["Assignments and Exams", None],
         ["Lecture Summaries", OCW_TYPE_LECTURE_NOTES],
         [OCW_TYPE_LECTURE_NOTES, OCW_TYPE_LECTURE_NOTES],
     ],

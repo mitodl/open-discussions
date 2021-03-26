@@ -51,7 +51,6 @@ OCW_TYPE_TEXTBOOKS = "Online Textbooks"
 OCW_TYPE_TOOLS = "Tools"
 OCW_TYPE_TUTORIALS = "Tutorials"
 OCW_TYPE_VIDEOS = "Videos"
-OCW_TYPE_OTHER = "Other"
 
 
 OCW_SECTION_TYPE_MAPPING = {
