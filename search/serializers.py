@@ -1,6 +1,7 @@
 """Serializers for elasticsearch data"""
 # pylint: disable=unused-argument,too-many-lines
 import logging
+import re
 
 from functools import reduce
 from django.db.models import Prefetch
@@ -45,6 +46,7 @@ from search.constants import (
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
     OCW_SECTION_TYPE_MAPPING,
+    OCW_TYPE_ASSIGNMENTS,
     OCW_TYPE_OTHER,
 )
 
@@ -380,6 +382,8 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
         """Get the resource type of the ContentFile"""
         if not instance.section:
             return None
+        if re.search(r"Assignment($|\s)", instance.section):
+            return OCW_TYPE_ASSIGNMENTS
         return OCW_SECTION_TYPE_MAPPING.get(instance.section, OCW_TYPE_OTHER)
 
     class Meta:

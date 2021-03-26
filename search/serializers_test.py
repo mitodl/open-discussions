@@ -53,7 +53,8 @@ from search.constants import (
     RESOURCE_FILE_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
-    OCW_SECTION_TYPE_MAPPING,
+    OCW_TYPE_ASSIGNMENTS,
+    OCW_TYPE_LECTURE_NOTES,
     OCW_TYPE_OTHER,
 )
 from search.serializers import (
@@ -408,13 +409,24 @@ def test_es_course_serializer(offered_by, platform, department):
 
 
 @pytest.mark.django_db
-def test_es_content_file_serializer():
+@pytest.mark.parametrize(
+    "section,resource_type",
+    [
+        ["First Paper Assignment", OCW_TYPE_ASSIGNMENTS],
+        ["Assignment 1.2", OCW_TYPE_ASSIGNMENTS],
+        ["Assignments and Exams", OCW_TYPE_OTHER],
+        ["Lecture Summaries", OCW_TYPE_LECTURE_NOTES],
+        [OCW_TYPE_LECTURE_NOTES, OCW_TYPE_LECTURE_NOTES],
+    ],
+)
+def test_es_content_file_serializer(section, resource_type):
     """ Verify that the ESContentFileSerializer has the correct data"""
     content_kwargs = {
         "content": "Some text",
         "content_author": "MIT",
         "content_language": "en",
         "content_title": "test title",
+        "section": section,
     }
     content_file = ContentFileFactory.create(**content_kwargs)
     serialized = ESContentFileSerializer(content_file).data
@@ -455,9 +467,7 @@ def test_es_content_file_serializer():
             "image_src": content_file.image_src,
             "course_id": content_file.run.content_object.course_id,
             "coursenum": content_file.run.content_object.coursenum,
-            "resource_type": OCW_SECTION_TYPE_MAPPING.get(
-                content_file.section, OCW_TYPE_OTHER
-            ),
+            "resource_type": resource_type,
         },
     )
 
