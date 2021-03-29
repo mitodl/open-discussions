@@ -206,7 +206,7 @@ kombu==4.6.7
     # via
     #   celery
     #   django-server-status
-lxml==4.6.2
+lxml==4.6.3
     # via
     #   -r requirements.in
     #   xbundle
