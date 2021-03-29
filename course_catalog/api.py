@@ -343,11 +343,7 @@ def sync_ocw_course_files(ids=None):
                 )
                 load_content_files(run, transform_content_files(s3_parsed_json))
             except:  # pylint: disable=bare-except
-                log.exception(
-                    "Error syncing files for course run %d: %s",
-                    run.id,
-                    "{}_parsed.json".format(run.slug),
-                )
+                log.exception("Error syncing files for course run %d", run.id)
 
 
 # pylint: disable=too-many-locals, too-many-branches, too-many-statements
