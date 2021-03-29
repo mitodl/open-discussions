@@ -135,9 +135,10 @@ django==2.2.18
     #   django-cors-headers
     #   django-filter
     #   django-redis
+    #   djangorestframework
 djangorestframework-jwt==1.11.0
     # via -r requirements.in
-djangorestframework==3.10.3
+djangorestframework==3.11.2
     # via
     #   -r requirements.in
     #   drf-extensions
