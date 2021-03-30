@@ -348,9 +348,7 @@ def test_sync_ocw_course_files(mock_ocw_learning_bucket, mocker, with_error):
     runs = course.runs.all()
     for run in runs:
         mock_ocw_learning_bucket.bucket.put_object(
-            Key="{}/{}_parsed.json".format(run.url.split("/")[-1], run.run_id),
-            Body=fake_data,
-            ACL="public-read",
+            Key=f"{run.slug}/{run.slug}_parsed.json", Body=fake_data, ACL="public-read"
         )
     sync_ocw_course_files(ids=[course.id])
     assert mock_load_content_files.call_count == len(runs)
@@ -560,6 +558,7 @@ def test_sync_ocw_course_published(
     settings, mocker, pub_date, unpub_date, published, blocklisted
 ):
     """ The course should be published or not based on dates, and always uploaded """
+    mocker.patch("course_catalog.etl.ocw.extract_text_metadata", return_value="")
     mocker.patch(
         "course_catalog.api.format_date",
         side_effect=[format_date(pub_date), format_date(unpub_date)],

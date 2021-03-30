@@ -337,9 +337,7 @@ def sync_ocw_course_files(ids=None):
         for run in runs.iterator():
             try:
                 s3_parsed_json = rapidjson.loads(
-                    bucket.Object(
-                        "{}/{}_parsed.json".format(run.url.split("/")[-1], run.run_id)
-                    )
+                    bucket.Object(f"{run.slug}/{run.slug}_parsed.json")
                     .get()["Body"]
                     .read()
                 )

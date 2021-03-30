@@ -37,6 +37,7 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
+from search.constants import OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES
 
 
 # pylint: disable=unused-argument
@@ -273,6 +274,7 @@ class ContentFileFactory(DjangoModelFactory):
     short_url = factory.Faker("word")
     content_type = FuzzyChoice((CONTENT_TYPE_FILE, CONTENT_TYPE_PAGE))
     file_type = FuzzyChoice(("application/pdf", "video/mp4", "text"))
+    section = FuzzyChoice((OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES, None))
 
     class Meta:
         model = ContentFile

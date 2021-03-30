@@ -1,6 +1,7 @@
 """Serializers for elasticsearch data"""
 # pylint: disable=unused-argument,too-many-lines
 import logging
+import re
 
 from functools import reduce
 from django.db.models import Prefetch
@@ -44,6 +45,8 @@ from search.constants import (
     RESOURCE_FILE_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
+    OCW_SECTION_TYPE_MAPPING,
+    OCW_TYPE_ASSIGNMENTS,
 )
 
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
@@ -364,6 +367,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     short_description = serializers.CharField(source="description")
     course_id = serializers.CharField(source="run.content_object.course_id")
     coursenum = serializers.CharField(source="run.content_object.coursenum")
+    resource_type = serializers.SerializerMethodField()
 
     def get_resource_relations(self, instance):
         """ Get resource_relations properties"""
@@ -372,6 +376,14 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "name": "resourcefile",
             "parent": gen_course_id(course.platform, course.course_id),
         }
+
+    def get_resource_type(self, instance):
+        """Get the resource type of the ContentFile"""
+        if not instance.section:
+            return None
+        if re.search(r"Assignment($|\s)", instance.section):
+            return OCW_TYPE_ASSIGNMENTS
+        return OCW_SECTION_TYPE_MAPPING.get(instance.section, None)
 
     class Meta:
         model = ContentFile
@@ -401,6 +413,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             "course_id",
             "coursenum",
             "image_src",
+            "resource_type",
         ]
 
 
