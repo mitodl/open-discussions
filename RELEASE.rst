@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.162.0
+---------------
+
+- Add resource_type to ES index for ContentFiles (#3347)
+- Bump rsa from 4.0 to 4.1 (#3346)
+- Bump djangorestframework from 3.10.3 to 3.11.2 (#3341)
+- Bump pillow from 7.2.0 to 8.1.1 (#3337)
+- ocw-data-parser version 0.26.0
+
 Version 0.161.2 (Released March 29, 2021)
 ---------------
 
