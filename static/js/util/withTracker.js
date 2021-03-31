@@ -28,7 +28,7 @@ const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
     gaScript2.innerHTML = `window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', '${SETTINGS.gaGTrackingID}', {send_page_view: false});`
+      gtag('config', '${SETTINGS.gaGTrackingID}');`
 
     // $FlowFixMe: document.head is not null
     document.head.appendChild(gaScript2)
@@ -38,10 +38,6 @@ const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
     const page = props.location.pathname
 
     ReactGA.pageview(page)
-
-    if (window.gtag && SETTINGS.gaGTrackingID) {
-      window.gtag("event", "page_view", { page_path: page })
-    }
 
     return <WrappedComponent {...props} />
   }
