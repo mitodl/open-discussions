@@ -2,14 +2,7 @@
 import React from "react"
 import R from "ramda"
 
-const shouldLoadData = R.complement(
-  R.allPass([
-    // if channel name doesn't match
-    R.eqBy(R.path(["channel", "name"])),
-    // if URL path doesn't match
-    R.eqBy(R.path(["location", "search"]))
-  ])
-)
+const channelChanged = R.complement(R.eqBy(R.path(["channel", "name"])))
 
 export const withChannelTracker = (
   WrappedComponent: Class<React.Component<*, *>>
@@ -18,16 +11,17 @@ export const withChannelTracker = (
     static WrappedComponent: Class<React.Component<*, *>>
 
     loadGA() {
-      const { channel, location } = this.props
-
-      if (channel && channel.ga_tracking_id && window.gtag) {
-        window.gtag("config", channel.ga_tracking_id, {
+      const { channel } = this.props
+      if (
+        channel &&
+        channel.ga_tracking_id &&
+        window.gtag &&
+        (window[`ga-disable-${channel.ga_tracking_id}`] ||
+          !window.google_tag_manager[channel.ga_tracking_id])
+      ) {
+        window[`ga-disable-${channel.ga_tracking_id}`] = false
+        window.gtag("config", this.props.channel.ga_tracking_id, {
           send_page_view: false
-        })
-
-        window.gtag("event", "page_view", {
-          page_path: location.pathname,
-          send_to:   channel.ga_tracking_id
         })
       }
     }
@@ -36,8 +30,18 @@ export const withChannelTracker = (
       this.loadGA()
     }
 
+    componentWillUnmount() {
+      const { channel } = this.props
+      if (channel && channel.ga_tracking_id) {
+        window[`ga-disable-${channel.ga_tracking_id}`] = true
+      }
+    }
+
     componentDidUpdate(prevProps: Object) {
-      if (shouldLoadData(prevProps, this.props)) {
+      if (channelChanged(prevProps, this.props)) {
+        if (prevProps.channel && prevProps.channel.ga_tracking_id) {
+          window[`ga-disable-${prevProps.channel.ga_tracking_id}`] = true
+        }
         this.loadGA()
       }
     }
