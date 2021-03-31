@@ -40,7 +40,7 @@ class ChannelSerializer(serializers.Serializer):
     avatar_small = serializers.SerializerMethodField()
     avatar_medium = serializers.SerializerMethodField()
     banner = WriteableSerializerMethodField()
-    ga_tracking_id = WriteableSerializerMethodField()
+    ga_tracking_id = WriteableSerializerMethodField(allow_null=True)
     about = serializers.JSONField(allow_null=True, default=None)
     moderator_notifications = WriteableSerializerMethodField()
 
@@ -111,7 +111,7 @@ class ChannelSerializer(serializers.Serializer):
 
     def validate_ga_tracking_id(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""
-        if not isinstance(value, str):
+        if not (value is None or isinstance(value, str)):
             raise ValidationError("Expected ga_tracking_id to be a string")
         return {"ga_tracking_id": value}
 
