@@ -207,7 +207,7 @@ def test_update_channel_moderator_notifications(user, moderator_notifications):
     assert channel.moderator_notifications == moderator_notifications
 
 
-@pytest.mark.parametrize("ga_tracking_id", ["test", ""])
+@pytest.mark.parametrize("ga_tracking_id", ["test", "", None])
 def test_update_channel_moderator_notifications(user, ga_tracking_id):
     """
     Test updating the channel moderator_notifications field
