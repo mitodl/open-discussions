@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.162.0
+Version 0.162.0 (Released March 31, 2021)
 ---------------
 
 - Add resource_type to ES index for ContentFiles (#3347)
