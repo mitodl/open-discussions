@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.162.1
+---------------
+
+- Bump pygments from 2.5.2 to 2.7.4
+- Bump pyyaml from 5.1.2 to 5.4
+- Bump y18n from 3.2.1 to 3.2.2
+- fix channel settings
+- Bump lxml from 4.6.2 to 4.6.3
+- fix channel tracking
+
 Version 0.162.0 (Released March 31, 2021)
 ---------------
 
