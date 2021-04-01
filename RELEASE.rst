@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.162.1
+Version 0.162.1 (Released April 01, 2021)
 ---------------
 
 - Bump pygments from 2.5.2 to 2.7.4
