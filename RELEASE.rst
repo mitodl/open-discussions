@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.163.0
+---------------
+
+- fix google_tag_manager sentry error
+
 Version 0.162.1 (Released April 01, 2021)
 ---------------
 
