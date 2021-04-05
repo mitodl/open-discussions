@@ -68,6 +68,15 @@ describe("withTracker", () => {
     assert.ok(gTagStub.calledWith("config", channel.ga_tracking_id))
   })
 
+  it("should call GA config if google_tag_manager is not set", async () => {
+    channel.ga_tracking_id = "UA-FAKE-01"
+    window.google_tag_manager = null
+    window[`ga-disable-${channel.ga_tracking_id}`] = true
+
+    await render({}, { location: window.location, channel: channel })
+    assert.ok(gTagStub.calledWith("config", channel.ga_tracking_id))
+  })
+
   it("should disable the previous tracker if the channel changes", async () => {
     channel.ga_tracking_id = "UA-FAKE-01"
 
