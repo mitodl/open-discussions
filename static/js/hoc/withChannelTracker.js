@@ -17,6 +17,7 @@ export const withChannelTracker = (
         channel.ga_tracking_id &&
         window.gtag &&
         (window[`ga-disable-${channel.ga_tracking_id}`] ||
+          !window.google_tag_manager ||
           !window.google_tag_manager[channel.ga_tracking_id])
       ) {
         window[`ga-disable-${channel.ga_tracking_id}`] = false
