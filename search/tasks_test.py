@@ -342,8 +342,18 @@ def test_index_videos(mocker, with_error):  # pylint: disable=unused-argument
     index_videos_mock.assert_called_once_with([1, 2, 3])
 
 
+@pytest.mark.parametrize(
+    "indexes",
+    [
+        ["post", "comment", "profile"],
+        ["course", "program"],
+        ["userlist"],
+        ["video"],
+        ["podcast", "podcastepisode"],
+    ],
+)
 def test_start_recreate_index(
-    mocker, mocked_celery, user
+    mocker, mocked_celery, user, indexes
 ):  # pylint:disable=too-many-locals,too-many-statements
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
@@ -399,81 +409,82 @@ def test_start_recreate_index(
     )
 
     with pytest.raises(mocked_celery.replace_exception_class):
-        start_recreate_index.delay()
+        start_recreate_index.delay(indexes)
+
+    finish_recreate_index_dict = {}
+
     for doctype in VALID_OBJECT_TYPES:
-        create_backing_index_mock.assert_any_call(doctype)
-    finish_recreate_index_mock.s.assert_called_once_with(
-        {
-            "post": backing_index,
-            "comment": backing_index,
-            "profile": backing_index,
-            "course": backing_index,
-            "program": backing_index,
-            "userlist": backing_index,
-            "video": backing_index,
-            "podcast": backing_index,
-            "podcastepisode": backing_index,
-        }
-    )
+        if doctype in indexes:
+            finish_recreate_index_dict[doctype] = backing_index
+            create_backing_index_mock.assert_any_call(doctype)
+
+    finish_recreate_index_mock.s.assert_called_once_with(finish_recreate_index_dict)
     assert mocked_celery.group.call_count == 1
-    mock_blocklist.assert_called_once()
 
     # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
     # in that generator, 'list' is being called to force iteration through all of those items.
     list(mocked_celery.group.call_args[0][0])
 
-    assert index_posts_mock.si.call_count == 2
-    index_posts_mock.si.assert_any_call([posts[0].id, posts[1].id])
-    index_posts_mock.si.assert_any_call([posts[2].id, posts[3].id])
+    if POST_TYPE in indexes:
+        assert index_posts_mock.si.call_count == 2
+        index_posts_mock.si.assert_any_call([posts[0].id, posts[1].id])
+        index_posts_mock.si.assert_any_call([posts[2].id, posts[3].id])
 
-    assert index_comments_mock.si.call_count == 2
-    index_comments_mock.si.assert_any_call([comments[0].id, comments[1].id])
-    index_comments_mock.si.assert_any_call([comments[2].id, comments[3].id])
+    if COMMENT_TYPE in indexes:
+        assert index_comments_mock.si.call_count == 2
+        index_comments_mock.si.assert_any_call([comments[0].id, comments[1].id])
+        index_comments_mock.si.assert_any_call([comments[2].id, comments[3].id])
 
-    assert index_profiles_mock.si.call_count == 4
-    for offset in range(4):
-        index_profiles_mock.si.assert_any_call(
-            [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id]
+    if PROFILE_TYPE in indexes:
+        assert index_profiles_mock.si.call_count == 4
+        for offset in range(4):
+            index_profiles_mock.si.assert_any_call(
+                [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id]
+            )
+
+    if COURSE_TYPE in indexes:
+        mock_blocklist.assert_called_once()
+        assert index_courses_mock.si.call_count == 4
+        index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
+        index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
+        index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id])
+        index_courses_mock.si.assert_any_call([courses[6].id])
+
+        # chunk size is 2 and there is only one course each for ocw and xpro
+        assert index_course_content_mock.si.call_count == 1
+        index_course_content_mock.si.assert_any_call(
+            [
+                *[
+                    course.id
+                    for course in courses
+                    if course.platform == PlatformType.ocw.value
+                ],
+                *[
+                    course.id
+                    for course in courses
+                    if course.platform == PlatformType.xpro.value
+                ],
+            ]
         )
 
-    assert index_courses_mock.si.call_count == 4
-    index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
-    index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
-    index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id])
-    index_courses_mock.si.assert_any_call([courses[6].id])
+    if VIDEO_TYPE in indexes:
+        assert index_videos_mock.si.call_count == 2
+        index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id])
+        index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id])
 
-    # chunk size is 2 and there is only one course each for ocw and xpro
-    assert index_course_content_mock.si.call_count == 1
-    index_course_content_mock.si.assert_any_call(
-        [
-            *[
-                course.id
-                for course in courses
-                if course.platform == PlatformType.ocw.value
-            ],
-            *[
-                course.id
-                for course in courses
-                if course.platform == PlatformType.xpro.value
-            ],
-        ]
-    )
+    if PODCAST_TYPE in indexes:
+        assert index_podcasts_mock.si.call_count == 4
+        index_podcasts_mock.si.assert_any_call([podcasts[0].id, podcasts[1].id])
+        index_podcasts_mock.si.assert_any_call([podcasts[2].id, podcasts[3].id])
 
-    assert index_videos_mock.si.call_count == 2
-    index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id])
-    index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id])
-
-    assert index_podcasts_mock.si.call_count == 4
-    index_podcasts_mock.si.assert_any_call([podcasts[0].id, podcasts[1].id])
-    index_podcasts_mock.si.assert_any_call([podcasts[2].id, podcasts[3].id])
-
-    assert index_podcast_episodes_mock.si.call_count == 2
-    index_podcast_episodes_mock.si.assert_any_call(
-        [podcast_episodes[0].id, podcast_episodes[1].id]
-    )
-    index_podcast_episodes_mock.si.assert_any_call(
-        [podcast_episodes[2].id, podcast_episodes[3].id]
-    )
+    if PODCAST_EPISODE_TYPE in indexes:
+        assert index_podcast_episodes_mock.si.call_count == 2
+        index_podcast_episodes_mock.si.assert_any_call(
+            [podcast_episodes[0].id, podcast_episodes[1].id]
+        )
+        index_podcast_episodes_mock.si.assert_any_call(
+            [podcast_episodes[2].id, podcast_episodes[3].id]
+        )
 
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value

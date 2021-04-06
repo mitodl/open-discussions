@@ -33,7 +33,6 @@ from search.constants import (
     COURSE_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    VALID_OBJECT_TYPES,
     VIDEO_TYPE,
     USER_LIST_TYPE,
     PODCAST_TYPE,
@@ -545,39 +544,40 @@ def index_podcast_episodes(ids):
 
 
 @app.task(bind=True)
-def start_recreate_index(self):
+def start_recreate_index(self, indexes):
     """
     Wipe and recreate index and mapping, and index all items.
     """
     try:
         new_backing_indices = {
-            obj_type: api.create_backing_index(obj_type)
-            for obj_type in VALID_OBJECT_TYPES
+            obj_type: api.create_backing_index(obj_type) for obj_type in indexes
         }
 
         # Do the indexing on the temp index
-        log.info(
-            "starting to index all posts, comments, profiles, and course catalog objects..."
-        )
+        log.info("starting to index %s objects...", ", ".join(indexes))
 
-        blocklisted_ids = load_course_blocklist()
+        index_tasks = []
 
-        index_tasks = celery.group(
-            [
+        if POST_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_posts.si(post_ids)
                 for post_ids in chunks(
                     Post.objects.order_by("id").values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if COMMENT_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_comments.si(comment_ids)
                 for comment_ids in chunks(
                     Comment.objects.order_by("id").values_list("id", flat=True),
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if PROFILE_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_profiles.si(ids)
                 for ids in chunks(
                     User.objects.exclude(username=settings.INDEXING_API_USERNAME)
@@ -588,30 +588,41 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
-                index_courses.si(ids)
-                for ids in chunks(
-                    Course.objects.filter(published=True)
-                    .exclude(course_id__in=blocklisted_ids)
-                    .order_by("id")
-                    .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-            + [
-                index_course_content_files.si(ids)
-                for ids in chunks(
-                    Course.objects.filter(published=True)
-                    .filter(
-                        platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+
+        if COURSE_TYPE in indexes:
+            blocklisted_ids = load_course_blocklist()
+            index_tasks = (
+                index_tasks
+                + [
+                    index_courses.si(ids)
+                    for ids in chunks(
+                        Course.objects.filter(published=True)
+                        .exclude(course_id__in=blocklisted_ids)
+                        .order_by("id")
+                        .values_list("id", flat=True),
+                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                     )
-                    .exclude(course_id__in=blocklisted_ids)
-                    .order_by("id")
-                    .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-            + [
+                ]
+                + [
+                    index_course_content_files.si(ids)
+                    for ids in chunks(
+                        Course.objects.filter(published=True)
+                        .filter(
+                            platform__in=(
+                                PlatformType.ocw.value,
+                                PlatformType.xpro.value,
+                            )
+                        )
+                        .exclude(course_id__in=blocklisted_ids)
+                        .order_by("id")
+                        .values_list("id", flat=True),
+                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    )
+                ]
+            )
+
+        if PROGRAM_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_programs.si(ids)
                 for ids in chunks(
                     Program.objects.filter(published=True)
@@ -620,7 +631,9 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if USER_LIST_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_user_lists.si(ids)
                 for ids in chunks(
                     UserList.objects.order_by("id")
@@ -629,7 +642,9 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if VIDEO_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_videos.si(ids)
                 for ids in chunks(
                     Video.objects.filter(published=True)
@@ -638,7 +653,9 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if PODCAST_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_podcasts.si(ids)
                 for ids in chunks(
                     Podcast.objects.filter(published=True)
@@ -647,7 +664,9 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-            + [
+
+        if PODCAST_EPISODE_TYPE in indexes:
+            index_tasks = index_tasks + [
                 index_podcast_episodes.si(ids)
                 for ids in chunks(
                     PodcastEpisode.objects.filter(published=True)
@@ -656,7 +675,8 @@ def start_recreate_index(self):
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
-        )
+
+        index_tasks = celery.group(index_tasks)
 
     except:  # pylint: disable=bare-except
         error = "start_recreate_index threw an error"
