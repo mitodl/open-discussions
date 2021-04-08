@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.models import User
 
-from channels.models import Subscription, ChannelGroupRole
+from channels.models import Subscription, ChannelGroupRole, Channel
 from channels.api import get_admin_api
 from channels.constants import ROLE_MODERATORS
 
@@ -23,6 +23,7 @@ from notifications.models import (
     FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
+    FREQUENCY_NEVER,
 )
 from notifications.notifiers import comments, frontpage, moderator_posts
 from notifications import tasks
@@ -249,12 +250,13 @@ def send_moderator_notifications(post_id, channel_name):
                 channel__name=channel_name,
             )
         except NotificationSettings.DoesNotExist:
-            log.exception(
-                "Moderator NotificationSetting didn't exist for user %s and channel %s",
-                moderator.name,
-                channel_name,
+            channel = Channel.objects.get(name=channel_name)
+            notification_setting = NotificationSettings.objects.create(
+                user=self_user,
+                notification_type=NOTIFICATION_TYPE_MODERATOR,
+                channel=channel,
+                trigger_frequency=FREQUENCY_NEVER,
             )
-            continue
 
         notifier = moderator_posts.ModeratorPostsNotifier(notification_setting)
         notifier.create_moderator_post_event(self_user, post_id)
