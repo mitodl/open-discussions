@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.163.1
+Version 0.163.1 (Released April 12, 2021)
 ---------------
 
 - add resource filters for recreate index
