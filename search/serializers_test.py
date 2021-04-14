@@ -45,6 +45,9 @@ from search.api import (
     gen_content_file_id,
     gen_podcast_id,
     gen_podcast_episode_id,
+    gen_profile_id,
+    gen_user_list_id,
+    gen_program_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -84,6 +87,13 @@ from search.serializers import (
     ESPodcastEpisodeSerializer,
     serialize_bulk_podcast_episodes,
     serialize_podcast_episode_for_bulk,
+    serialize_bulk_profiles_for_deletion,
+    serialize_bulk_courses_for_deletion,
+    serialize_bulk_programs_for_deletion,
+    serialize_bulk_user_lists_for_deletion,
+    serialize_bulk_videos_for_deletion,
+    serialize_bulk_podcasts_for_deletion,
+    serialize_bulk_podcast_episodes_for_deletion,
 )
 
 
@@ -844,3 +854,79 @@ def test_serialize_podcast_episode_for_bulk():
         "_id": gen_podcast_episode_id(podcast_episode),
         **ESPodcastEpisodeSerializer(podcast_episode).data,
     }
+
+
+@pytest.mark.django_db
+def test_serialize_profiles_file_for_bulk_deletion(user):
+    """
+    Test that serialize_profiles_file_for_bulk_deletion yield correct data
+    """
+    assert list(serialize_bulk_profiles_for_deletion([user.profile.id])) == [
+        {"_id": gen_profile_id(user.username), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_courses_for_deletion():
+    """
+    Test that serialize_bulk_courses_for_deletion yields correct data
+    """
+    course = CourseFactory.create()
+    assert list(serialize_bulk_courses_for_deletion([course.id])) == [
+        {"_id": gen_course_id(course.platform, course.course_id), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_programs_for_deletion():
+    """
+    Test that serialize_bulk_programs_for_deletion yields correct data
+    """
+    program = ProgramFactory.create()
+    assert list(serialize_bulk_programs_for_deletion([program.id])) == [
+        {"_id": gen_program_id(program), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_user_lists_for_deletion():
+    """
+    Test that serialize_bulk_user_lists_for_deletion yields correct data
+    """
+    userlist = UserListFactory.create()
+    assert list(serialize_bulk_user_lists_for_deletion([userlist.id])) == [
+        {"_id": gen_user_list_id(userlist), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_videos_for_deletion():
+    """
+    Test that serialize_bulk_videos_for_deletion yields correct data
+    """
+    video = VideoFactory.create()
+    assert list(serialize_bulk_videos_for_deletion([video.id])) == [
+        {"_id": gen_video_id(video), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_podcasts_for_deletion():
+    """
+    Test that serialize_bulk_podcasts_for_deletion yields correct data
+    """
+    podcast = PodcastFactory.create()
+    assert list(serialize_bulk_podcasts_for_deletion([podcast.id])) == [
+        {"_id": gen_podcast_id(podcast), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_podcast_episodes_for_deletion():
+    """
+    Test that serialize_bulk_podcasts_for_deletion yields correct data
+    """
+    podcast_episode = PodcastEpisodeFactory.create()
+    assert list(serialize_bulk_podcast_episodes_for_deletion([podcast_episode.id])) == [
+        {"_id": gen_podcast_episode_id(podcast_episode), "_op_type": "delete"}
+    ]

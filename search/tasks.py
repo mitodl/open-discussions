@@ -1,4 +1,6 @@
 """Indexing tasks"""
+# pylint: disable=too-many-lines
+
 from contextlib import contextmanager
 import logging
 
@@ -6,6 +8,7 @@ import celery
 from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import PrawcoreException, NotFound
@@ -37,6 +40,7 @@ from search.constants import (
     USER_LIST_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
+    RESOURCE_FILE_TYPE,
 )
 from search.exceptions import RetryException, ReindexException
 from search.serializers import (
@@ -318,16 +322,17 @@ def update_field_values_by_query(query, field_dict, object_types):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_profiles(ids):
+def index_profiles(ids, update_only=False):
     """
     Index user profiles by a list of Profile.id
 
     Args:
         ids(list of int): List of profile id's
+        update_only (bool): update existing index only
 
     """
     try:
-        api.index_profiles(ids)
+        api.index_profiles(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -337,16 +342,37 @@ def index_profiles(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_posts(post_ids):
+def bulk_delete_profiles(ids):
+    """
+    Index user profiles by a list of Profile.id
+
+    Args:
+        ids(list of int): List of profile id's
+
+    """
+    try:
+        api.delete_profiles(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = "bulk_delete_profiles threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_posts(post_ids, update_only=False):
     """
     Index a list of posts by a list of Post.id
 
     Args:
         post_ids (list of int): list of Post.id to index
+        update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
-            api.index_posts(post_ids)
+            api.index_posts(post_ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -356,16 +382,18 @@ def index_posts(post_ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_comments(comment_ids):
+def index_comments(comment_ids, update_only=False):
     """
     Index a list of comments by a list of Comment.id
 
     Args:
         comment_ids (list of int): list of Comment.id to index
+        update_only (bool): update existing index only
+
     """
     try:
         with wrap_retry_exception(PrawcoreException, PRAWException):
-            api.index_comments(comment_ids)
+            api.index_comments(comment_ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -375,16 +403,18 @@ def index_comments(comment_ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_courses(ids):
+def index_courses(ids, update_only=False):
     """
     Index courses
 
     Args:
         ids(list of int): List of course id's
+        update_only (bool): update existing index only
+
 
     """
     try:
-        api.index_courses(ids)
+        api.index_courses(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -394,16 +424,37 @@ def index_courses(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_course_content_files(course_ids):
+def bulk_delete_courses(ids):
+    """
+    Delete courses by a list of course.id
+
+    Args:
+        ids(list of int): List of course id's
+
+    """
+    try:
+        api.delete_courses(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = "bulk_delete_courses threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_course_content_files(course_ids, update_only=False):
     """
     Index content files for a list of course ids
 
     Args:
         course_ids(list of int): List of course id's
+        update_only (bool): update existing index only
+
 
     """
     try:
-        api.index_course_content_files(course_ids)
+        api.index_course_content_files(course_ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -413,16 +464,17 @@ def index_course_content_files(course_ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_run_content_files(run_id):
+def index_run_content_files(run_id, update_only=False):
     """
     Index content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
+        update_only (bool): update existing index only
 
     """
     try:
-        api.index_run_content_files(run_id)
+        api.index_run_content_files(run_id, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -451,16 +503,17 @@ def delete_run_content_files(run_id):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_programs(ids):
+def index_programs(ids, update_only=False):
     """
     Index programs
 
     Args:
         ids(list of int): List of program id's
+        update_only (bool): update existing index only
 
     """
     try:
-        api.index_programs(ids)
+        api.index_programs(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -470,16 +523,36 @@ def index_programs(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_user_lists(ids):
+def bulk_delete_programs(ids):
+    """
+    Delete programs
+
+    Args:
+        ids(list of int): List of program id's
+
+    """
+    try:
+        api.delete_programs(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"bulk_delete_programs threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_user_lists(ids, update_only=False):
     """
     Index UserLists
 
     Args:
         ids(list of int): List of UserList id's
+        update_only (bool): update existing index only
 
     """
     try:
-        api.index_user_lists(ids)
+        api.index_user_lists(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -489,16 +562,36 @@ def index_user_lists(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_videos(ids):
+def bulk_delete_user_lists(ids):
+    """
+    Delete programs
+
+    Args:
+        ids(list of int): List of program id's
+
+    """
+    try:
+        api.delete_user_lists(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"bulk_delete_user_lists threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_videos(ids, update_only=False):
     """
     Index Videos
 
     Args:
         ids(list of int): List of Video id's
+        update_only (bool): update existing index only
 
     """
     try:
-        api.index_videos(ids)
+        api.index_videos(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -508,15 +601,35 @@ def index_videos(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_podcasts(ids):
+def bulk_delete_videos(ids):
+    """
+    Delete videos
+
+    Args:
+        ids(list of int): List of video id's
+
+    """
+    try:
+        api.delete_videos(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"bulk_delete_videos threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_podcasts(ids, update_only=False):
     """
     Index Podcasts
 
     Args:
         ids(list of int): List of Podcast id's
+        update_only (bool): update existing index only
     """
     try:
-        api.index_podcasts(ids)
+        api.index_podcasts(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -526,19 +639,58 @@ def index_podcasts(ids):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_podcast_episodes(ids):
+def bulk_delete_podcasts(ids):
+    """
+    Delete videos
+
+    Args:
+        ids(list of int): List of podcast id's
+
+    """
+    try:
+        api.delete_podcasts(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"bulk_delete_podcasts threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_podcast_episodes(ids, update_only=False):
     """
     Index PodcastEpisodes
 
     Args:
         ids(list of int): List of PodcastEpisode id's
+        update_only (bool): update existing index only
     """
     try:
-        api.index_podcast_episodes(ids)
+        api.index_podcast_episodes(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
         error = f"index_podcast_episodes threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def bulk_delete_podcast_episodes(ids):
+    """
+    Delete podcast_episodes
+
+    Args:
+        ids(list of int): List of podcast_episode id's
+
+    """
+    try:
+        api.delete_podcast_episodes(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = f"bulk_delete_podcast_episodes threw an error"
         log.exception(error)
         return error
 
@@ -687,6 +839,330 @@ def start_recreate_index(self, indexes):
     raise self.replace(
         celery.chain(index_tasks, finish_recreate_index.s(new_backing_indices))
     )
+
+
+@app.task(bind=True)
+def start_update_index(self, indexes, platform):
+    # pylint: disable=too-many-branches
+    """
+    Wipe and recreate index and mapping, and index all items.
+    """
+    try:
+        log.info("starting to index %s objects...", ", ".join(indexes))
+
+        index_tasks = []
+
+        if COURSE_TYPE in indexes or RESOURCE_FILE_TYPE in indexes:
+            blocklisted_ids = load_course_blocklist()
+
+        if POST_TYPE in indexes:
+            index_tasks = index_tasks + get_update_posts_tasks()
+
+        if COMMENT_TYPE in indexes:
+            index_tasks = index_tasks + get_update_comments_tasks()
+
+        if PROFILE_TYPE in indexes:
+            index_tasks = index_tasks + get_update_profiles_tasks()
+
+        if COURSE_TYPE in indexes:
+            index_tasks = index_tasks + get_update_courses_tasks(
+                blocklisted_ids, platform
+            )
+
+        if RESOURCE_FILE_TYPE in indexes:
+            index_tasks = index_tasks + get_update_resource_files_tasks(
+                blocklisted_ids, platform
+            )
+
+        if PROGRAM_TYPE in indexes:
+            index_tasks = index_tasks + get_update_programs_tasks()
+
+        if USER_LIST_TYPE in indexes:
+            index_tasks = index_tasks + get_update_user_lists_tasks()
+
+        if VIDEO_TYPE in indexes:
+            index_tasks = index_tasks + get_update_videos_tasks()
+
+        if PODCAST_TYPE in indexes:
+            index_tasks = index_tasks + get_update_podcasts_tasks()
+
+        if PODCAST_EPISODE_TYPE in indexes:
+            index_tasks = index_tasks + get_update_podcast_episodes_tasks()
+
+        index_tasks = celery.group(index_tasks)
+    except:  # pylint: disable=bare-except
+        error = "start_update_index threw an error"
+        log.exception(error)
+        return [error]
+
+    raise self.replace(index_tasks)
+
+
+def get_update_posts_tasks():
+    """Get list of tasks to update posts"""
+    return [
+        index_posts.si(post_ids, True)
+        for post_ids in chunks(
+            Post.objects.order_by("id").values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+
+def get_update_comments_tasks():
+    """Get list of tasks to update comments"""
+    return [
+        index_comments.si(comment_ids, True)
+        for comment_ids in chunks(
+            Comment.objects.order_by("id").values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+
+def get_update_profiles_tasks():
+    """Get list of tasks to update profiles"""
+    index_tasks = [
+        index_profiles.si(ids, True)
+        for ids in chunks(
+            User.objects.exclude(username=settings.INDEXING_API_USERNAME)
+            .exclude(profile__isnull=True)
+            .filter(is_active=True)
+            .order_by("id")
+            .values_list("profile__id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_profiles.si(ids)
+        for ids in chunks(
+            User.objects.exclude(profile__isnull=True)
+            .filter(is_active=False)
+            .order_by("id")
+            .values_list("profile__id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_courses_tasks(blocklisted_ids, platform):
+    """
+    Get list of tasks to update courses
+    Args:
+        blocklisted_ids(list of int): List of course id's to exclude
+        platform(str): Platform filter for the task
+    """
+
+    course_update_query = (
+        Course.objects.filter(published=True)
+        .exclude(course_id__in=blocklisted_ids)
+        .order_by("id")
+    )
+
+    course_deletion_query = Course.objects.filter(
+        Q(published=False) | Q(course_id__in=blocklisted_ids)
+    ).order_by("id")
+
+    if platform:
+        course_update_query = course_update_query.filter(platform=platform)
+        course_deletion_query = course_deletion_query.filter(platform=platform)
+
+    index_tasks = [
+        index_courses.si(ids, True)
+        for ids in chunks(
+            course_update_query.values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_courses.si(ids)
+        for ids in chunks(
+            course_deletion_query.values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_resource_files_tasks(blocklisted_ids, platform):
+    """
+    Get list of tasks to update course files
+    Args:
+        blocklisted_ids(list of int): List of course id's to exclude
+        platform(str): Platform filter for the task
+    """
+
+    # There arn't seperate RESOURCE_FILE_TYPE deletion taks because
+    # content files are only deleted when courses are deleted
+
+    if platform is None or platform in (
+        PlatformType.ocw.value,
+        PlatformType.xpro.value,
+    ):
+        course_update_query = (
+            Course.objects.filter(published=True)
+            .exclude(course_id__in=blocklisted_ids)
+            .order_by("id")
+        )
+
+        if platform:
+            course_update_query = course_update_query.filter(platform=platform)
+        else:
+            course_update_query = course_update_query.filter(
+                platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+            )
+
+        return [
+            index_course_content_files.si(ids, True)
+            for ids in chunks(
+                course_update_query.values_list("id", flat=True),
+                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            )
+        ]
+    else:
+        return []
+
+
+def get_update_programs_tasks():
+    """
+    Get list of tasks to update programs
+    """
+    index_tasks = [
+        index_programs.si(ids, True)
+        for ids in chunks(
+            Program.objects.filter(published=True)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_programs.si(ids)
+        for ids in chunks(
+            Program.objects.filter(published=False)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_user_lists_tasks():
+    """
+    Get list of tasks to update user lists
+    """
+
+    index_tasks = [
+        index_user_lists.si(ids, True)
+        for ids in chunks(
+            UserList.objects.order_by("id")
+            .exclude(items=None)
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_user_lists.si(ids)
+        for ids in chunks(
+            UserList.objects.order_by("id")
+            .filter(items=None)
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_videos_tasks():
+    """
+    Get list of tasks to update videos
+    """
+
+    index_tasks = [
+        index_videos.si(ids, True)
+        for ids in chunks(
+            Video.objects.filter(published=True)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_videos.si(ids)
+        for ids in chunks(
+            Video.objects.filter(published=False)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_podcasts_tasks():
+    """
+    Get list of tasks to update podcasts
+    """
+    index_tasks = [
+        index_podcasts.si(ids, True)
+        for ids in chunks(
+            Podcast.objects.filter(published=True)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_podcasts.si(ids)
+        for ids in chunks(
+            Podcast.objects.filter(published=False)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_podcast_episodes_tasks():
+    """
+    Get list of tasks to update podcast episodes
+    """
+    index_tasks = [
+        index_podcast_episodes.si(ids, True)
+        for ids in chunks(
+            PodcastEpisode.objects.filter(published=True)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_podcast_episodes.si(ids)
+        for ids in chunks(
+            PodcastEpisode.objects.filter(published=False)
+            .order_by("id")
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
 
 
 @app.task

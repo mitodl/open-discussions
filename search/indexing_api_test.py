@@ -33,6 +33,7 @@ from search.indexing_api import (
     UPDATE_CONFLICT_SETTING,
     delete_document,
     index_course_content_files,
+    delete_courses,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -70,7 +71,7 @@ def test_create_document(mocked_es, mocker, object_type):
         "search.indexing_api.get_active_aliases", return_value=[object_type]
     )
     create_document(doc_id, data)
-    mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
+    mock_get_aliases.assert_called_once_with(mocked_es.conn, object_types=[object_type])
     mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.create.assert_any_call(
         index=object_type, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id
@@ -125,7 +126,7 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     )
     doc_id, data = ("doc_id", {"key1": "value1"})
     update_document_with_partial(doc_id, data, object_type)
-    mock_get_aliases.assert_called_once_with(mocked_es.conn, [object_type])
+    mock_get_aliases.assert_called_once_with(mocked_es.conn, object_types=[object_type])
     mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.update.assert_called_once_with(
         index=object_type,
@@ -323,19 +324,29 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
 @pytest.mark.usefixtures("indexing_user")
 @pytest.mark.parametrize("errors", ([], ["error"]))
 @pytest.mark.parametrize(
-    "indexing_func_name, serializing_func_name",
+    "indexing_func_name, serializing_func_name, object_type",
     [
-        ("index_profiles", "serialize_bulk_profiles"),
-        ("index_comments", "serialize_bulk_comments"),
-        ("index_posts", "serialize_bulk_posts"),
-        ("index_courses", "serialize_bulk_courses"),
-        ("index_programs", "serialize_bulk_programs"),
-        ("index_user_lists", "serialize_bulk_user_lists"),
-        ("index_videos", "serialize_bulk_videos"),
+        ("index_profiles", "serialize_bulk_profiles", "profile"),
+        ("index_comments", "serialize_bulk_comments", "comment"),
+        ("index_posts", "serialize_bulk_posts", "post"),
+        ("index_courses", "serialize_bulk_courses", "course"),
+        ("index_programs", "serialize_bulk_programs", "program"),
+        ("index_user_lists", "serialize_bulk_user_lists", "userlist"),
+        ("index_videos", "serialize_bulk_videos", "video"),
+        ("index_podcasts", "serialize_bulk_podcasts", "podcast"),
+        ("index_podcast_episodes", "serialize_bulk_podcast_episodes", "podcastepisode"),
     ],
 )
+@pytest.mark.parametrize("update_only", (True, False))
 def test_index_functions(
-    mocked_es, mocker, settings, errors, indexing_func_name, serializing_func_name
+    mocked_es,
+    mocker,
+    settings,
+    errors,
+    indexing_func_name,
+    serializing_func_name,
+    object_type,
+    update_only,
 ):  # pylint: disable=too-many-arguments
     """
     index functions should call bulk with correct arguments
@@ -357,9 +368,15 @@ def test_index_functions(
 
     if errors:
         with pytest.raises(ReindexException):
-            index_func([1, 2, 3])
+            index_func([1, 2, 3], update_only)
     else:
-        index_func([1, 2, 3])
+        index_func([1, 2, 3], update_only)
+        mock_get_aliases.assert_called_with(
+            mocked_es.conn,
+            object_types=[object_type],
+            include_reindexing=(not update_only),
+        )
+
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
                 documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
@@ -371,6 +388,90 @@ def test_index_functions(
                     doc_type=GLOBAL_DOC_TYPE,
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
+
+
+@pytest.mark.usefixtures("indexing_user")
+@pytest.mark.parametrize("errors", ([], ["error"]))
+@pytest.mark.parametrize(
+    "indexing_func_name, serializing_func_name, object_type",
+    [
+        ("delete_profiles", "serialize_bulk_profiles_for_deletion", "profile"),
+        ("delete_programs", "serialize_bulk_programs_for_deletion", "program"),
+        ("delete_user_lists", "serialize_bulk_user_lists_for_deletion", "userlist"),
+        ("delete_podcasts", "serialize_bulk_podcasts_for_deletion", "podcast"),
+        (
+            "delete_podcast_episodes",
+            "serialize_bulk_podcast_episodes_for_deletion",
+            "podcastepisode",
+        ),
+        ("delete_videos", "serialize_bulk_videos_for_deletion", "video"),
+        ("delete_courses", "serialize_bulk_courses_for_deletion", "course"),
+    ],
+)
+def test_bulk_deletion_functions(
+    mocked_es,
+    mocker,
+    settings,
+    errors,
+    indexing_func_name,
+    serializing_func_name,
+    object_type,
+):  # pylint: disable=too-many-arguments
+    """
+    index deletion functions should call bulk with correct arguments
+    """
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
+    mock_get_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
+    )
+    mocker.patch(
+        f"search.indexing_api.{serializing_func_name}",
+        autospec=True,
+        return_value=(doc for doc in documents),
+    )
+    bulk_mock = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=(0, errors)
+    )
+    index_func = getattr(indexing_api, indexing_func_name)
+
+    if errors:
+        with pytest.raises(ReindexException):
+            index_func([1, 2, 3])
+    else:
+        index_func([1, 2, 3])
+        mock_get_aliases.assert_called_with(
+            mocked_es.conn, object_types=[object_type], include_reindexing=False
+        )
+
+        for alias in mock_get_aliases.return_value:
+            for chunk in chunks(
+                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+            ):
+                bulk_mock.assert_any_call(
+                    mocked_es.conn,
+                    chunk,
+                    index=alias,
+                    doc_type=GLOBAL_DOC_TYPE,
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+
+
+@pytest.mark.usefixtures("indexing_user")
+def test_bulk_content_file_deletion_on_course_deletion(mocker):
+    """
+    ES should delete content files on bulk  course deletion
+    """
+    mock_delete_run_content_files = mocker.patch(
+        "search.indexing_api.delete_run_content_files", autospec=True
+    )
+    mocker.patch("search.indexing_api.delete_items", autospec=True)
+
+    courses = CourseFactory.create_batch(2)
+    delete_courses([course.id for course in courses])
+    for course in courses:
+        for run in course.runs.all():
+            mock_delete_run_content_files.assert_any_call(run.id)
 
 
 def test_delete_document(mocked_es, mocker):
@@ -399,7 +500,8 @@ def test_delete_document_not_found(mocked_es, mocker):
     assert patched_logger.debug.called is True
 
 
-def test_index_content_files(mocker):
+@pytest.mark.parametrize("update_only", (False, True))
+def test_index_content_files(mocker, update_only):
     """
     ES should try indexing content files for all runs in a course
     """
@@ -407,10 +509,10 @@ def test_index_content_files(mocker):
         "search.indexing_api.index_run_content_files", autospec=True
     )
     courses = CourseFactory.create_batch(2)
-    index_course_content_files([course.id for course in courses])
+    index_course_content_files([course.id for course in courses], update_only)
     for course in courses:
         for run in course.runs.all():
-            mock_index_run_content_files.assert_any_call(run.id)
+            mock_index_run_content_files.assert_any_call(run.id, update_only)
 
 
 @pytest.mark.usefixtures("indexing_user")
