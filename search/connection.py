@@ -80,19 +80,39 @@ get_default_alias_name = partial(make_alias_name, False)
 get_reindexing_alias_name = partial(make_alias_name, True)
 
 
-def get_active_aliases(conn, object_types):
+def get_active_aliases(conn, *, object_types=None, include_reindexing=True):
     """
     Returns aliases which exist for specified object types
 
     Args:
         conn(elasticsearch.client.Elasticsearch): An Elasticsearch client
         object_types(list of str): list of object types (post, comment, etc)
+        include_reindexing(boolean): include reindexing indexes if true
 
     Returns:
         list of str: Aliases which exist
     """
     if not object_types:
         object_types = VALID_OBJECT_TYPES
+    if include_reindexing:
+        return active_aliases_with_reindexing(conn, object_types)
+    else:
+        return [
+            alias
+            for alias in [get_default_alias_name(obj) for obj in object_types]
+            if conn.indices.exists(alias)
+        ]
+
+
+def active_aliases_with_reindexing(conn, object_types):
+    """
+    Returns aliases which exist for specified object types including reindexing aliases
+
+    Args:
+        conn(elasticsearch.client.Elasticsearch): An Elasticsearch client
+        object_types(list of str): list of object types (post, comment, etc)
+    """
+
     return [
         alias
         for alias_tuple in [

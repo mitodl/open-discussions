@@ -3,7 +3,7 @@ Functions and constants for Elasticsearch indexing
 """
 import logging
 
-from elasticsearch.helpers import bulk
+from elasticsearch.helpers import bulk, BulkIndexError
 from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -49,6 +49,13 @@ from search.serializers import (
     serialize_content_file_for_bulk_deletion,
     serialize_bulk_podcasts,
     serialize_bulk_podcast_episodes,
+    serialize_bulk_profiles_for_deletion,
+    serialize_bulk_courses_for_deletion,
+    serialize_bulk_programs_for_deletion,
+    serialize_bulk_user_lists_for_deletion,
+    serialize_bulk_videos_for_deletion,
+    serialize_bulk_podcasts_for_deletion,
+    serialize_bulk_podcast_episodes_for_deletion,
 )
 
 
@@ -336,7 +343,7 @@ def create_document(doc_id, data):
         data (dict): Full ES document data
     """
     conn = get_conn()
-    for alias in get_active_aliases(conn, [data["object_type"]]):
+    for alias in get_active_aliases(conn, object_types=[data["object_type"]]):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
@@ -350,7 +357,7 @@ def delete_document(doc_id, object_type, **kwargs):
         kwargs (dict): optional parameters for the request
     """
     conn = get_conn()
-    for alias in get_active_aliases(conn, [object_type]):
+    for alias in get_active_aliases(conn, object_types=[object_type]):
         try:
             conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id, params=kwargs)
         except NotFoundError:
@@ -378,7 +385,7 @@ def update_field_values_by_query(query, field_dict, object_types=None):
     if not object_types:
         object_types = VALID_OBJECT_TYPES
     conn = get_conn()
-    for alias in get_active_aliases(conn, object_types):
+    for alias in get_active_aliases(conn, object_types=object_types):
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
@@ -416,7 +423,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
         kwargs (dict): Optional kwargs to be passed to ElasticSearch
     """
     conn = get_conn()
-    for alias in get_active_aliases(conn, [object_type]):
+    for alias in get_active_aliases(conn, object_types=[object_type]):
         try:
             conn.update(
                 index=alias,
@@ -506,13 +513,39 @@ def update_post(doc_id, post):
     )
 
 
-def index_items(documents, object_type, **kwargs):
+def delete_items(documents, object_type, update_only, **kwargs):
+    """
+    Calls index_items with error catching around not_found for objects that don't exist
+    in the index
+
+    Args:
+        documents (iterable of dict): An iterable with ElasticSearch documents to index
+        object_type (str): the ES object type
+        update_only (bool): Update existing index only
+
+    """
+
+    try:
+        index_items(documents, object_type, update_only, **kwargs)
+    except BulkIndexError as error:
+        error_messages = error.args[1]
+
+        for message in error_messages:
+            message = list(message.values())[0]
+            if message["result"] != "not_found":
+                log.error("Bulk deletion failed. Error: %s", str(message))
+                raise ReindexException(f"Bulk deletion failed: {message}")
+
+
+def index_items(documents, object_type, update_only, **kwargs):
     """
     Index items based on list of item ids
 
     Args:
         documents (iterable of dict): An iterable with ElasticSearch documents to index
         object_type (str): the ES object type
+        update_only (bool): Update existing index only
+
     """
     conn = get_conn()
     # bulk will also break an iterable into chunks. However we should do this here so that
@@ -520,7 +553,9 @@ def index_items(documents, object_type, **kwargs):
     for chunk in chunks(
         documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
     ):
-        for alias in get_active_aliases(conn, [object_type]):
+        for alias in get_active_aliases(
+            conn, object_types=[object_type], include_reindexing=(not update_only)
+        ):
             _, errors = bulk(
                 conn,
                 chunk,
@@ -535,66 +570,103 @@ def index_items(documents, object_type, **kwargs):
                 )
 
 
-def index_posts(ids):
+def index_posts(ids, update_only=False):
     """
     Index a list of posts by id
 
     Args:
         ids(list of int): List of Post id's
+        update_only (bool): Update existing index only
     """
-    index_items(serialize_bulk_posts(ids), POST_TYPE)
+    index_items(serialize_bulk_posts(ids), POST_TYPE, update_only)
 
 
-def index_comments(ids):
+def index_comments(ids, update_only=False):
     """
     Index a list of comments by id
 
     Args:
         ids(list of int): List of Comment id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_comments(ids), COMMENT_TYPE)
+    index_items(serialize_bulk_comments(ids), COMMENT_TYPE, update_only)
 
 
-def index_profiles(ids):
+def index_profiles(ids, update_only=False):
     """
     Index a list of profiles by id
 
     Args:
         ids(list of int): List of Profile id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_profiles(ids), PROFILE_TYPE)
+    index_items(serialize_bulk_profiles(ids), PROFILE_TYPE, update_only)
 
 
-def index_courses(ids):
+def delete_profiles(ids):
+    """
+    Delete a list of profiles by id
+
+    Args:
+        ids(list of int): List of Profile ids
+    """
+    delete_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
+
+
+def index_courses(ids, update_only=False):
     """
     Index a list of courses by id
 
     Args:
         ids(list of int): List of Course id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_courses(ids), COURSE_TYPE)
+    index_items(serialize_bulk_courses(ids), COURSE_TYPE, update_only)
 
 
-def index_course_content_files(course_ids):
+def delete_courses(ids):
+    """
+    Delete a list of courses by id
+
+    Args:
+        ids(list of int): List of Course id's
+    """
+    delete_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
+
+    course_content_type = ContentType.objects.get_for_model(Course)
+    for run_id in LearningResourceRun.objects.filter(
+        object_id__in=ids, content_type=course_content_type
+    ).values_list("id", flat=True):
+        delete_run_content_files(run_id)
+
+
+def index_course_content_files(course_ids, update_only=False):
     """
     Index a list of content files by course ids
 
     Args:
         course_ids(list of int): List of Course id's
+        update_only (bool): Update existing index only
+
     """
     course_content_type = ContentType.objects.get_for_model(Course)
     for run_id in LearningResourceRun.objects.filter(
         object_id__in=course_ids, content_type=course_content_type
     ).values_list("id", flat=True):
-        index_run_content_files(run_id)
+        index_run_content_files(run_id, update_only)
 
 
-def index_run_content_files(run_id):
+def index_run_content_files(run_id, upate_only=False):
     """
     Index a list of content files by run id
 
     Args:
         run_id(int): Course run id
+        update_only (bool): Update existing index only
+
     """
     run = LearningResourceRun.objects.get(id=run_id)
     documents = (
@@ -606,6 +678,7 @@ def index_run_content_files(run_id):
     index_items(
         documents,
         COURSE_TYPE,
+        upate_only,
         routing=gen_course_id(
             run.content_object.platform, run.content_object.course_id
         ),
@@ -618,6 +691,7 @@ def delete_run_content_files(run_id):
 
     Args:
         run_id(int): Course run id
+
     """
     run = LearningResourceRun.objects.get(id=run_id)
     documents = (
@@ -625,59 +699,125 @@ def delete_run_content_files(run_id):
         for content_file in ContentFile.objects.filter(run=run)
     )
     course = run.content_object
-    index_items(
-        documents, COURSE_TYPE, routing=gen_course_id(course.platform, course.course_id)
+    delete_items(
+        documents,
+        COURSE_TYPE,
+        True,
+        routing=gen_course_id(course.platform, course.course_id),
     )
 
 
-def index_programs(ids):
+def index_programs(ids, update_only=False):
     """
     Index a list of programs by id
 
     Args:
         ids(list of int): List of Program id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_programs(ids), PROGRAM_TYPE)
+    index_items(serialize_bulk_programs(ids), PROGRAM_TYPE, update_only)
 
 
-def index_user_lists(ids):
+def delete_programs(ids):
+    """
+    Delete a list of programs by id
+
+    Args:
+        ids(list of int): List of Program id's
+    """
+    delete_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
+
+
+def index_user_lists(ids, update_only=False):
     """
     Index a list of user lists by id
 
     Args:
         ids(list of int): List of UserList id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_user_lists(ids), USER_LIST_TYPE)
+    index_items(serialize_bulk_user_lists(ids), USER_LIST_TYPE, update_only)
 
 
-def index_videos(ids):
+def delete_user_lists(ids):
+    """
+    Delete a list of user lists by id
+
+    Args:
+        ids(list of int): List of UserList ids
+
+    """
+    delete_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
+
+
+def index_videos(ids, update_only=False):
     """
     Index a list of videos by id
 
     Args:
         ids(list of int): List of Video id's
+        update_only (bool): Update existing index only
+
     """
-    index_items(serialize_bulk_videos(ids), VIDEO_TYPE)
+    index_items(serialize_bulk_videos(ids), VIDEO_TYPE, update_only)
 
 
-def index_podcasts(ids):
+def delete_videos(ids):
+    """
+    Delete a list of videos by id
+
+    Args:
+        ids(list of int): List of video ids
+
+    """
+    delete_items(serialize_bulk_videos_for_deletion(ids), VIDEO_TYPE, True)
+
+
+def index_podcasts(ids, update_only=False):
     """
     Index a list of podcasts by id
 
     Args:
         ids(list of int): List of Podcast id's
+        update_only (bool): Update existing index only
     """
-    index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE)
+    index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE, update_only)
 
 
-def index_podcast_episodes(ids):
+def delete_podcasts(ids):
+    """
+    Delete a list of podcasts by id
+
+    Args:
+        ids(list of int): List of podcast ids
+
+    """
+    delete_items(serialize_bulk_podcasts_for_deletion(ids), PODCAST_TYPE, True)
+
+
+def index_podcast_episodes(ids, update_only=False):
     """
     Index a list of podcast episodes by id
 
     Args:
         ids(list of int): List of PodcastEpisode id's
+        update_only (bool): Update existing index only
     """
-    index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE)
+    index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE, update_only)
+
+
+def delete_podcast_episodes(ids):
+    """
+    Delete a list of podcast episodes by id
+
+    Args:
+        ids(list of int): List of PodcastEpisode ids
+    """
+    delete_items(
+        serialize_bulk_podcast_episodes_for_deletion(ids), PODCAST_EPISODE_TYPE, True
+    )
 
 
 def create_backing_index(object_type):

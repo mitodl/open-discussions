@@ -43,6 +43,7 @@ from search.constants import (
     PROFILE_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
+    RESOURCE_FILE_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
@@ -55,6 +56,7 @@ from search.serializers import (
     ESPodcastSerializer,
     ESPodcastEpisodeSerializer,
 )
+from search import tasks
 from search.tasks import (
     create_document,
     create_post_document,
@@ -81,6 +83,7 @@ from search.tasks import (
     delete_run_content_files,
     upsert_podcast,
     upsert_podcast_episode,
+    start_update_index,
 )
 
 
@@ -301,45 +304,50 @@ def test_wrap_retry_exception_matching(matching):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
+@pytest.mark.parametrize("update_only", [True, False])
 def test_index_posts(
-    mocker, wrap_retry_mock, with_error
+    mocker, wrap_retry_mock, with_error, update_only
 ):  # pylint: disable=unused-argument
     """index_post should call the api function of the same name"""
     index_post_mock = mocker.patch("search.indexing_api.index_posts")
     if with_error:
         index_post_mock.side_effect = TabError
     post_ids = [1, 2, 3]
-    result = index_posts.delay(post_ids).get()
+    result = index_posts.delay(post_ids, update_only).get()
     assert result == ("index_posts threw an error" if with_error else None)
 
-    index_post_mock.assert_called_once_with(post_ids)
+    index_post_mock.assert_called_once_with(post_ids, update_only)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
+@pytest.mark.parametrize("update_only", [True, False])
 def test_index_comments(
-    mocker, wrap_retry_mock, with_error
+    mocker, wrap_retry_mock, with_error, update_only
 ):  # pylint: disable=unused-argument
     """index_comments should call the api function of the same name"""
     index_comments_mock = mocker.patch("search.indexing_api.index_comments")
     if with_error:
         index_comments_mock.side_effect = TabError
     post_ids = [1, 2, 3]
-    result = index_comments.delay(post_ids).get()
+    result = index_comments.delay(post_ids, update_only).get()
     assert result == ("index_comments threw an error" if with_error else None)
 
-    index_comments_mock.assert_called_once_with(post_ids)
+    index_comments_mock.assert_called_once_with(post_ids, update_only)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_videos(mocker, with_error):  # pylint: disable=unused-argument
+@pytest.mark.parametrize("update_only", [True, False])
+def test_index_videos(
+    mocker, with_error, update_only
+):  # pylint: disable=unused-argument
     """index_videos should call the api function of the same name"""
     index_videos_mock = mocker.patch("search.indexing_api.index_videos")
     if with_error:
         index_videos_mock.side_effect = TabError
-    result = index_videos.delay([1, 2, 3]).get()
+    result = index_videos.delay([1, 2, 3], update_only).get()
     assert result == ("index_videos threw an error" if with_error else None)
 
-    index_videos_mock.assert_called_once_with([1, 2, 3])
+    index_videos_mock.assert_called_once_with([1, 2, 3], update_only)
 
 
 @pytest.mark.parametrize(
@@ -512,15 +520,16 @@ def test_finish_recreate_index(mocker, with_error):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_courses(mocker, with_error):
+@pytest.mark.parametrize("update_only", [True, False])
+def test_index_courses(mocker, with_error, update_only):
     """index_courses should call the api function of the same name"""
     index_courses_mock = mocker.patch("search.indexing_api.index_courses")
     if with_error:
         index_courses_mock.side_effect = TabError
-    result = index_courses.delay([1, 2, 3]).get()
+    result = index_courses.delay([1, 2, 3], update_only).get()
     assert result == ("index_courses threw an error" if with_error else None)
 
-    index_courses_mock.assert_called_once_with([1, 2, 3])
+    index_courses_mock.assert_called_once_with([1, 2, 3], update_only)
 
 
 def test_delete_document(mocker):
@@ -569,33 +578,35 @@ def test_upsert_content_file_task(mocked_api):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_course_content_files(mocker, with_error):
+@pytest.mark.parametrize("update_only", [True, False])
+def test_index_course_content_files(mocker, with_error, update_only):
     """index_course_content_files should call the api function of the same name"""
     index_content_files_mock = mocker.patch(
         "search.indexing_api.index_course_content_files"
     )
     if with_error:
         index_content_files_mock.side_effect = TabError
-    result = index_course_content_files.delay([1, 2, 3]).get()
+    result = index_course_content_files.delay([1, 2, 3], update_only).get()
     assert result == (
         "index_course_content_files threw an error" if with_error else None
     )
 
-    index_content_files_mock.assert_called_once_with([1, 2, 3])
+    index_content_files_mock.assert_called_once_with([1, 2, 3], update_only)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_index_run_content_files(mocker, with_error):
+@pytest.mark.parametrize("update_only", [True, False])
+def test_index_run_content_files(mocker, with_error, update_only):
     """index_run_content_files should call the api function of the same name"""
     index_run_content_files_mock = mocker.patch(
         "search.indexing_api.index_run_content_files"
     )
     if with_error:
         index_run_content_files_mock.side_effect = TabError
-    result = index_run_content_files.delay(1).get()
+    result = index_run_content_files.delay(1, update_only).get()
     assert result == ("index_run_content_files threw an error" if with_error else None)
 
-    index_run_content_files_mock.assert_called_once_with(1)
+    index_run_content_files_mock.assert_called_once_with(1, update_only)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
@@ -610,3 +621,261 @@ def test_delete_run_content_files(mocker, with_error):
     assert result == ("delete_run_content_files threw an error" if with_error else None)
 
     delete_run_content_files_mock.assert_called_once_with(1)
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+@pytest.mark.parametrize(
+    "tasks_func_name, indexing_func_name",
+    [
+        ("bulk_delete_profiles", "delete_profiles"),
+        ("bulk_delete_courses", "delete_courses"),
+        ("bulk_delete_programs", "delete_programs"),
+        ("bulk_delete_user_lists", "delete_user_lists"),
+        ("bulk_delete_videos", "delete_videos"),
+        ("bulk_delete_podcasts", "delete_podcasts"),
+        ("bulk_delete_podcast_episodes", "delete_podcast_episodes"),
+    ],
+)
+def test_bulk_deletion_tasks(mocker, with_error, tasks_func_name, indexing_func_name):
+    """bulk deletion tasks should call corresponding indexing api function"""
+    indexing_api_task_mock = mocker.patch(f"search.indexing_api.{indexing_func_name}")
+
+    task = getattr(tasks, tasks_func_name)
+
+    if with_error:
+        indexing_api_task_mock.side_effect = TabError
+    result = task.delay([1]).get()
+    assert result == (f"{tasks_func_name} threw an error" if with_error else None)
+
+    indexing_api_task_mock.assert_called_once_with([1])
+
+
+@pytest.mark.parametrize(
+    "indexes, platform",
+    [
+        (
+            [
+                "post",
+                "comment",
+                "profile",
+                "program",
+                "video",
+                "podcast",
+                "podcastepisode",
+            ],
+            None,
+        ),
+        (["course", "resourcefile"], None),
+        (["course", "resourcefile"], PlatformType.ocw.value),
+        (["course", "resourcefile"], PlatformType.mitx.value),
+        (["course", "resourcefile"], PlatformType.xpro.value),
+    ],
+)
+def test_start_update_index(
+    mocker, mocked_celery, user, indexes, platform
+):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
+    """
+    recreate_index should recreate the elasticsearch index and reindex all data with it
+    """
+    settings.INDEXING_API_USERNAME = user.username
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    mock_blocklist = mocker.patch("search.tasks.load_course_blocklist", return_value=[])
+    inactive_users = UserFactory.create_batch(4, is_active=False)
+    comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)
+
+    posts = sorted([comment.post for comment in comments], key=lambda post: post.id)
+    users = sorted([item.author for item in posts + comments], key=lambda user: user.id)
+
+    platforms = [
+        PlatformType.ocw,
+        PlatformType.mitx,
+        PlatformType.xpro,
+        PlatformType.micromasters,
+        PlatformType.bootcamps,
+        PlatformType.oll,
+        PlatformType.youtube,
+    ]
+    courses = sorted(
+        [CourseFactory.create(platform=platform.value) for platform in platforms],
+        key=lambda course: course.id,
+    )
+
+    unpublished_courses = sorted(
+        [
+            CourseFactory.create(platform=platform.value, published=False)
+            for platform in platforms
+        ],
+        key=lambda course: course.id,
+    )
+
+    videos = sorted(VideoFactory.create_batch(4), key=lambda video: video.id)
+    unpublished_video = VideoFactory.create(published=False)
+
+    podcasts = sorted(PodcastFactory.create_batch(4), key=lambda podcast: podcast.id)
+    unpublished_podcast = PodcastFactory.create(published=False)
+
+    podcast_episodes = sorted(
+        PodcastEpisodeFactory.create_batch(4),
+        key=lambda podcast_episode: podcast_episode.id,
+    )
+
+    unpublished_podcast_episode = PodcastEpisodeFactory.create(published=False)
+
+    index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
+    index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
+
+    index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
+    delete_profiles_mock = mocker.patch(
+        "search.tasks.bulk_delete_profiles", autospec=True
+    )
+
+    index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
+    delete_courses_mock = mocker.patch(
+        "search.tasks.bulk_delete_courses", autospec=True
+    )
+
+    index_videos_mock = mocker.patch("search.tasks.index_videos", autospec=True)
+    delete_videos_mock = mocker.patch("search.tasks.bulk_delete_videos", autospec=True)
+
+    index_podcasts_mock = mocker.patch("search.tasks.index_podcasts", autospec=True)
+    delete_podcasts_mock = mocker.patch(
+        "search.tasks.bulk_delete_podcasts", autospec=True
+    )
+
+    index_podcast_episodes_mock = mocker.patch(
+        "search.tasks.index_podcast_episodes", autospec=True
+    )
+    delete_podcast_episodes_mock = mocker.patch(
+        "search.tasks.bulk_delete_podcast_episodes", autospec=True
+    )
+
+    index_course_content_mock = mocker.patch(
+        "search.tasks.index_course_content_files", autospec=True
+    )
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        start_update_index.delay(indexes, platform)
+
+    assert mocked_celery.group.call_count == 1
+
+    # Celery's 'group' function takes a generator as an argument. In order to make assertions about the items
+    # in that generator, 'list' is being called to force iteration through all of those items.
+    list(mocked_celery.group.call_args[0][0])
+
+    if POST_TYPE in indexes:
+        assert index_posts_mock.si.call_count == 2
+        index_posts_mock.si.assert_any_call([posts[0].id, posts[1].id], True)
+        index_posts_mock.si.assert_any_call([posts[2].id, posts[3].id], True)
+
+    if COMMENT_TYPE in indexes:
+        assert index_comments_mock.si.call_count == 2
+        index_comments_mock.si.assert_any_call([comments[0].id, comments[1].id], True)
+        index_comments_mock.si.assert_any_call([comments[2].id, comments[3].id], True)
+
+    if PROFILE_TYPE in indexes:
+        assert index_profiles_mock.si.call_count == 4
+        for offset in range(4):
+            index_profiles_mock.si.assert_any_call(
+                [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id], True
+            )
+
+        assert delete_profiles_mock.si.call_count == 2
+        for offset in range(2):
+            delete_profiles_mock.si.assert_any_call(
+                [
+                    inactive_users[offset * 2].profile.id,
+                    inactive_users[offset * 2 + 1].profile.id,
+                ]
+            )
+
+    if COURSE_TYPE in indexes:
+        mock_blocklist.assert_called_once()
+
+        if platform:
+            assert index_courses_mock.si.call_count == 1
+            course = next(course for course in courses if course.platform == platform)
+            index_courses_mock.si.assert_any_call([course.id], True)
+
+            assert delete_courses_mock.si.call_count == 1
+            unpublished_course = next(
+                course for course in unpublished_courses if course.platform == platform
+            )
+            delete_courses_mock.si.assert_any_call([unpublished_course.id])
+        else:
+            assert index_courses_mock.si.call_count == 4
+            index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id], True)
+            index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id], True)
+            index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id], True)
+            index_courses_mock.si.assert_any_call([courses[6].id], True)
+
+            assert delete_courses_mock.si.call_count == 4
+            delete_courses_mock.si.assert_any_call(
+                [unpublished_courses[0].id, unpublished_courses[1].id]
+            )
+            delete_courses_mock.si.assert_any_call(
+                [unpublished_courses[2].id, unpublished_courses[3].id]
+            )
+            delete_courses_mock.si.assert_any_call(
+                [unpublished_courses[4].id, unpublished_courses[5].id]
+            )
+            delete_courses_mock.si.assert_any_call([unpublished_courses[6].id])
+
+    if RESOURCE_FILE_TYPE in indexes:
+        if platform in (PlatformType.ocw.value, PlatformType.xpro.value):
+            assert index_course_content_mock.si.call_count == 1
+            course = next(course for course in courses if course.platform == platform)
+
+            index_course_content_mock.si.assert_any_call([course.id], True)
+
+        elif platform:
+            assert index_course_content_mock.si.call_count == 0
+        else:
+            assert index_course_content_mock.si.call_count == 1
+            index_course_content_mock.si.assert_any_call(
+                [
+                    *[
+                        course.id
+                        for course in courses
+                        if course.platform == PlatformType.ocw.value
+                    ],
+                    *[
+                        course.id
+                        for course in courses
+                        if course.platform == PlatformType.xpro.value
+                    ],
+                ],
+                True,
+            )
+
+    if VIDEO_TYPE in indexes:
+        assert index_videos_mock.si.call_count == 2
+        index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id], True)
+        index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id], True)
+
+        assert delete_videos_mock.si.call_count == 1
+        delete_videos_mock.si.assert_any_call([unpublished_video.id])
+
+    if PODCAST_TYPE in indexes:
+        assert index_podcasts_mock.si.call_count == 5
+        index_podcasts_mock.si.assert_any_call([podcasts[0].id, podcasts[1].id], True)
+        index_podcasts_mock.si.assert_any_call([podcasts[2].id, podcasts[3].id], True)
+
+        assert delete_podcasts_mock.si.call_count == 1
+        delete_podcasts_mock.si.assert_any_call([unpublished_podcast.id])
+
+    if PODCAST_EPISODE_TYPE in indexes:
+        assert index_podcast_episodes_mock.si.call_count == 2
+        index_podcast_episodes_mock.si.assert_any_call(
+            [podcast_episodes[0].id, podcast_episodes[1].id], True
+        )
+        index_podcast_episodes_mock.si.assert_any_call(
+            [podcast_episodes[2].id, podcast_episodes[3].id], True
+        )
+
+        assert delete_podcast_episodes_mock.si.call_count == 1
+        delete_podcast_episodes_mock.si.assert_any_call(
+            [unpublished_podcast_episode.id]
+        )
+
+    assert mocked_celery.replace.call_count == 1
+    assert mocked_celery.replace.call_args[0][1] == mocked_celery.group.return_value

@@ -783,6 +783,20 @@ def serialize_bulk_profiles(ids):
         yield serialize_profile_for_bulk(profile)
 
 
+def serialize_bulk_profiles_for_deletion(ids):
+    """
+    Serialize profiles for bulk deletion
+
+    Args:
+        ids(list of int): List of profile id's
+
+    Yields:
+        iter of dict: yields an iterable of serialized profiles
+    """
+    for profile in Profile.objects.filter(id__in=ids).prefetch_related("user"):
+        yield serialize_for_deletion(gen_profile_id(profile.user.username))
+
+
 def serialize_profile_for_bulk(profile_obj):
     """
     Serialize a profile for bulk API request
@@ -797,6 +811,19 @@ def serialize_profile_for_bulk(profile_obj):
         "_id": gen_profile_id(profile_obj.user.username),
         **ESProfileSerializer().serialize(profile_obj),
     }
+
+
+def serialize_for_deletion(elasticsearch_object_id):
+    """
+    Serialize content for bulk deletion API request
+
+    Args:
+        elasticsearch_object_id (string): Elasticsearch object id
+
+    Returns:
+        dict: the object deletion data
+    """
+    return {"_id": elasticsearch_object_id, "_op_type": "delete"}
 
 
 def serialize_post_for_bulk(post_obj):
@@ -859,6 +886,19 @@ def serialize_bulk_courses(ids):
         yield serialize_course_for_bulk(course)
 
 
+def serialize_bulk_courses_for_deletion(ids):
+    """
+    Serialize courses for bulk deletion
+
+    Args:
+        ids(list of int): List of course id's
+    """
+    for course_obj in Course.objects.filter(id__in=ids):
+        yield serialize_for_deletion(
+            gen_course_id(course_obj.platform, course_obj.course_id)
+        )
+
+
 def serialize_course_for_bulk(course_obj):
     """
     Serialize a course for bulk API request
@@ -892,7 +932,7 @@ def serialize_content_file_for_bulk_deletion(content_file_obj):
     Args:
         content_file_obj (ContentFile): A content file for a course
     """
-    return {"_id": gen_content_file_id(content_file_obj.key), "_op_type": "delete"}
+    return serialize_for_deletion(gen_content_file_id(content_file_obj.key))
 
 
 def serialize_bulk_programs(ids):
@@ -906,6 +946,17 @@ def serialize_bulk_programs(ids):
         "topics", "offered_by"
     ):
         yield serialize_program_for_bulk(program)
+
+
+def serialize_bulk_programs_for_deletion(ids):
+    """
+    Serialize programs for bulk deletion
+
+    Args:
+        ids(list of int): List of program id's
+    """
+    for program in Program.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_program_id(program))
 
 
 def serialize_program_for_bulk(program_obj):
@@ -942,6 +993,17 @@ def serialize_user_list_for_bulk(user_list_obj):
     }
 
 
+def serialize_bulk_user_lists_for_deletion(ids):
+    """
+    Serialize programs for bulk deletion
+
+    Args:
+        ids(list of int): List of program id's
+    """
+    for user_list in UserList.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_user_list_id(user_list))
+
+
 def serialize_bulk_videos(ids):
     """
     Serialize Videos for bulk indexing
@@ -953,6 +1015,17 @@ def serialize_bulk_videos(ids):
         "topics", "offered_by"
     ):
         yield serialize_video_for_bulk(video)
+
+
+def serialize_bulk_videos_for_deletion(ids):
+    """
+    Serialize Videos for bulk deletion
+
+    Args:
+        ids(list of int): List of Video id's
+    """
+    for video in Video.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_video_id(video))
 
 
 def serialize_video_for_bulk(video_obj):
@@ -978,6 +1051,17 @@ def serialize_bulk_podcasts(ids):
         yield serialize_podcast_for_bulk(podcast)
 
 
+def serialize_bulk_podcasts_for_deletion(ids):
+    """
+    Serialize Podcasts for bulk deletion
+
+    Args:
+        ids(list of int): List of Podcast id's
+    """
+    for podcast in Podcast.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_podcast_id(podcast))
+
+
 def serialize_podcast_for_bulk(podcast_obj):
     """
     Serialize a Podcast for bulk API request
@@ -999,6 +1083,17 @@ def serialize_bulk_podcast_episodes(ids):
         "podcast", "topics", "offered_by"
     ):
         yield serialize_podcast_episode_for_bulk(podcast_episode)
+
+
+def serialize_bulk_podcast_episodes_for_deletion(ids):
+    """
+    Serialize podcast episodes for bulk deletion
+
+    Args:
+        ids(list of int): List of Podcast episode ids
+    """
+    for podcast_episode in PodcastEpisode.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_podcast_episode_id(podcast_episode))
 
 
 def serialize_podcast_episode_for_bulk(podcast_episode_obj):
