@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.163.2
+---------------
+
+- fix notifications setting error
+- Bump django from 2.2.18 to 2.2.20
+
 Version 0.163.1 (Released April 12, 2021)
 ---------------
 
