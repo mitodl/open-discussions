@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.163.2
+Version 0.163.2 (Released April 15, 2021)
 ---------------
 
 - fix notifications setting error
