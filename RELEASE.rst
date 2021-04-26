@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.164.0
+---------------
+
+- OCW data parser 0.27.0
+- Bump ssri from 6.0.1 to 6.0.2 (#3372)
+
 Version 0.163.2 (Released April 15, 2021)
 ---------------
 
