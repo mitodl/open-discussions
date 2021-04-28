@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.164.0
+Version 0.164.0 (Released April 28, 2021)
 ---------------
 
 - OCW data parser 0.27.0
