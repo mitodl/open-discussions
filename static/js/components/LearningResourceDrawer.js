@@ -119,7 +119,12 @@ export default function LearningResourceDrawer(props: Props) {
 
   const embedly = useSelector(getEmbedlyForObject)
 
-  useRequest(object ? similarResourcesRequest(object) : null)
+  useRequest(
+    object && !hideSimilarLearningResources
+      ? similarResourcesRequest(object)
+      : null
+  )
+
   const similarResources = useSelector(getSimilarResourcesForObject)
 
   const audioPlayerLoaded = useSelector(isAudioPlayerLoadedSelector)

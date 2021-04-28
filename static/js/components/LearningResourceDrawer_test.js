@@ -34,7 +34,7 @@ import { mockHTMLElHeight } from "../lib/test_utils"
 import { makeSearchResult } from "../factories/search"
 
 describe("LearningResourceDrawer", () => {
-  let course, helper, render, similarItems
+  let course, helper, render, similarItems, similarItemsRequest
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -49,10 +49,12 @@ describe("LearningResourceDrawer", () => {
       "LearningResourceRow",
       "LearningResourceRow"
     )
-    helper.handleRequestStub.withArgs(similarResourcesURL).returns({
-      status: 200,
-      body:   similarItems
-    })
+    similarItemsRequest = helper.handleRequestStub
+      .withArgs(similarResourcesURL)
+      .returns({
+        status: 200,
+        body:   similarItems
+      })
     helper.handleRequestStub.withArgs(interactionsApiURL).returns({
       status: 201,
       body:   {} // body is ignored
@@ -232,5 +234,13 @@ describe("LearningResourceDrawer", () => {
         .find(ExpandedLearningResourceDisplay)
         .prop("hideSimilarLearningResources")
     )
+  })
+
+  it("should not make a requst to similarResourcesURL if hideSimilarLearningResources is true", async () => {
+    const url = courseDetailApiURL.param({ courseId: course.id }).toString()
+    await renderWithObject(course, url, {
+      hideSimilarLearningResources: true
+    })
+    sinon.assert.notCalled(similarItemsRequest)
   })
 })

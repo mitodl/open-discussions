@@ -515,9 +515,10 @@ def find_similar_resources(*, user, value_doc):
     objects = []
 
     for hit in response.hits:
-        if hit["id"] != value_doc.get("id", None) or hit[
-            "object_type"
-        ] != value_doc.get("object_type", None):
+        if getattr(hit, "id", False) and (
+            hit["id"] != value_doc.get("id", None)
+            or hit["object_type"] != value_doc.get("object_type", None)
+        ):
             if user.is_anonymous:
                 hit["is_favorite"] = False
                 hit["lists"] = []
