@@ -15,6 +15,7 @@ from course_catalog.factories import (
     UserListItemFactory,
     VideoFactory,
     ProgramFactory,
+    ContentFileFactory,
 )
 from course_catalog.models import FavoriteItem
 from open_discussions import features
@@ -48,6 +49,7 @@ from search.serializers import (
     ESUserListSerializer,
     ESVideoSerializer,
     ESProgramSerializer,
+    ESContentFileSerializer,
 )
 
 
@@ -526,6 +528,7 @@ def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
                 {"_source": ESVideoSerializer(VideoFactory.create()).data},
                 {"_source": ESProgramSerializer(ProgramFactory.create()).data},
                 {"_source": ESUserListSerializer(UserListFactory.create()).data},
+                {"_source": ESContentFileSerializer(ContentFileFactory.create()).data},
             ]
         }
     }
