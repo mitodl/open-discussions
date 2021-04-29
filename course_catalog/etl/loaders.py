@@ -85,6 +85,9 @@ def load_instructors(resource, instructors_data):
     instructors = []
 
     for instructor_data in instructors_data:
+        if "full_name" not in instructor_data:
+            instructor_data["full_name"] = None
+
         instructor, _ = CourseInstructor.objects.get_or_create(**instructor_data)
         instructors.append(instructor)
 
