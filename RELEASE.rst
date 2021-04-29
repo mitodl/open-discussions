@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.164.1
+Version 0.164.1 (Released April 29, 2021)
 ---------------
 
 - update-index command
