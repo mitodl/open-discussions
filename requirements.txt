@@ -324,7 +324,7 @@ requests==2.24.0
     #   tldextract
     #   update-checker
     #   zeep
-rsa==4.1
+rsa==4.7
     # via google-auth
 s3transfer==0.3.3
     # via boto3
