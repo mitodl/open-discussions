@@ -326,7 +326,9 @@ def test_es_run_serializer(has_full_name):
                 (
                     instructor.full_name
                     if has_full_name
-                    else " ".join([instructor.first_name, instructor.last_name])
+                    else " ".join(
+                        ["Prof.", instructor.first_name, instructor.last_name]
+                    )
                 )
                 for instructor in learning_resource_run.instructors.all()
             ],

@@ -433,7 +433,7 @@ class ESRunSerializer(LearningResourceSerializer):
         return [
             (
                 instructor.full_name
-                or " ".join([instructor.first_name, instructor.last_name])
+                or " ".join(["Prof.", instructor.first_name, instructor.last_name])
             )
             for instructor in instance.instructors.all()
         ]
