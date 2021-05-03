@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.165.0
+---------------
+
+- Bump rsa from 4.1 to 4.7
+- fix salutation
+- fix similar items error
+
 Version 0.164.1 (Released April 29, 2021)
 ---------------
 
