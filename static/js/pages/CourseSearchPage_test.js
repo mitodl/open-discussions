@@ -43,7 +43,7 @@ const setLocation = (helper, params) => {
 }
 
 describe("CourseSearchPage", () => {
-  let helper, render, searchResponse, initialState, searchCourse, replaceStub
+  let helper, render, searchResponse, initialState, searchCourse, pushStub
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()
@@ -97,7 +97,7 @@ describe("CourseSearchPage", () => {
       initialState
     )
 
-    replaceStub = helper.sandbox.spy(helper.browserHistory, "replace")
+    pushStub = helper.sandbox.stub(window.history, "pushState")
   })
 
   afterEach(() => {
@@ -150,7 +150,7 @@ describe("CourseSearchPage", () => {
       assert.isOk(suggestDiv.text().includes(suggestion))
       suggestDiv.find("a").simulate("click")
       await wait(50)
-      const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
+      const search = pushStub.args[pushStub.args.length - 1][2]
       assert.include(search, escape(suggestion))
     })
   })
@@ -184,16 +184,19 @@ describe("CourseSearchPage", () => {
       channelName: null,
       from:        SETTINGS.search_page_size,
       size:        SETTINGS.search_page_size,
-      text:        undefined,
+      text:        "",
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          audience:        [],
-          certification:   [],
-          offered_by:      [],
-          topics:          [],
-          department_name: [],
-          type:            LR_TYPE_ALL
+          audience:            [],
+          certification:       [],
+          offered_by:          [],
+          topics:              [],
+          department_name:     [],
+          type:                LR_TYPE_ALL,
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
         })
       )
     })
@@ -221,12 +224,15 @@ describe("CourseSearchPage", () => {
       type:        LR_TYPE_ALL,
       facets:      new Map(
         Object.entries({
-          audience:        [],
-          certification:   [],
-          type:            LR_TYPE_ALL,
-          department_name: [],
-          offered_by:      ["OCW"],
-          topics:          ["Science", "Engineering"]
+          audience:            [],
+          certification:       [],
+          type:                LR_TYPE_ALL,
+          department_name:     [],
+          offered_by:          ["OCW"],
+          topics:              ["Science", "Engineering"],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
         })
       )
     })
@@ -254,12 +260,15 @@ describe("CourseSearchPage", () => {
       type:        ["podcast", "podcastepisode"],
       facets:      new Map(
         Object.entries({
-          audience:        [],
-          certification:   [],
-          type:            ["podcast", "podcastepisode"],
-          offered_by:      [],
-          department_name: [],
-          topics:          []
+          audience:            [],
+          certification:       [],
+          type:                ["podcast", "podcastepisode"],
+          offered_by:          [],
+          department_name:     [],
+          topics:              [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
         })
       )
     })
@@ -288,12 +297,15 @@ describe("CourseSearchPage", () => {
       type:        ["userlist", "learningpath"],
       facets:      new Map(
         Object.entries({
-          audience:        [],
-          certification:   [],
-          type:            ["userlist", "learningpath"],
-          offered_by:      [],
-          department_name: [],
-          topics:          []
+          audience:            [],
+          certification:       [],
+          type:                ["userlist", "learningpath"],
+          offered_by:          [],
+          department_name:     [],
+          topics:              [],
+          level:               [],
+          course_feature_tags: [],
+          resource_type:       []
         })
       )
     })
@@ -364,8 +376,8 @@ describe("CourseSearchPage", () => {
       preventDefault: helper.sandbox.stub()
     })
     await wait(1)
-    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
-    assert.equal(search, `q=${escape(text)}`)
+    const search = pushStub.args[pushStub.args.length - 1][2]
+    assert.equal(search, `/?q=${escape(text)}`)
   })
 
   it("displays filters and clicking 'Clear all filters' removes all active facets", async () => {
@@ -379,8 +391,8 @@ describe("CourseSearchPage", () => {
     const { wrapper } = await render()
     wrapper.find(".clear-all-filters").simulate("click")
     await wait(1)
-    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
-    assert.deepEqual(search, "")
+    const search = pushStub.args[pushStub.args.length - 1][2]
+    assert.deepEqual(search, "/?")
   })
 
   it("triggers a non-incremental search from textbox input", async () => {
@@ -395,16 +407,19 @@ describe("CourseSearchPage", () => {
       preventDefault: helper.sandbox.stub()
     })
     await wait(1)
-    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
+    const search = pushStub.args[pushStub.args.length - 1][2].slice(1) // cut off leading /
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        audience:        [],
-        certification:   [],
-        topics:          [],
-        offered_by:      [],
-        department_name: [],
-        type:            []
+        audience:            [],
+        certification:       [],
+        topics:              [],
+        offered_by:          [],
+        department_name:     [],
+        type:                [],
+        level:               [],
+        course_feature_tags: [],
+        resource_type:       []
       }
     })
   })
@@ -421,17 +436,20 @@ describe("CourseSearchPage", () => {
         target: { name: "topics", value: "Physics", checked: true }
       })
     await wait(10)
-    const [{ search }] = replaceStub.args[replaceStub.args.length - 1]
+    const search = pushStub.args[pushStub.args.length - 1][2].slice(1) // cut off leading /
 
     assert.deepEqual(deserializeSearchParams({ search }), {
       text,
       activeFacets: {
-        audience:        [],
-        certification:   [],
-        topics:          ["Physics"],
-        offered_by:      [],
-        department_name: [],
-        type:            []
+        audience:            [],
+        certification:       [],
+        topics:              ["Physics"],
+        offered_by:          [],
+        department_name:     [],
+        type:                [],
+        level:               [],
+        course_feature_tags: [],
+        resource_type:       []
       }
     })
   })
