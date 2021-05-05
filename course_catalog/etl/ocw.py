@@ -26,6 +26,8 @@ from course_catalog.models import ContentFile, get_max_length, Video
 
 log = logging.getLogger()
 
+EXCLUDED_CONTENT_FILE_TYPES = ["DownloadSection", "CourseHomeSection"]
+
 
 def get_ocw_learning_course_bucket():
     """
@@ -75,9 +77,10 @@ def transform_content_files(course_run_json):
         if course_page.get("text", None) is None:
             continue
         try:
-            content_files.append(
-                transform_content_file(course_run_json, course_page, is_page=True)
-            )
+            if course_page.get("type") not in EXCLUDED_CONTENT_FILE_TYPES:
+                content_files.append(
+                    transform_content_file(course_run_json, course_page, is_page=True)
+                )
         except:  # pylint: disable=bare-except
             log.exception(
                 "ERROR syncing course page %s for run %s",
@@ -113,6 +116,7 @@ def transform_content_file(
     """
     content_json = {}
     content_file = copy.deepcopy(content_file_data)
+
     content_file["file_type"] = content_file.get("file_type", content_file.get("type"))
     content_file["content_type"] = (
         CONTENT_TYPE_PAGE if is_page else get_content_type(content_file["file_type"])

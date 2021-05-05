@@ -23,6 +23,7 @@ from course_catalog.etl.ocw import (
     get_content_file_section,
     get_content_type,
     transform_embedded_media,
+    EXCLUDED_CONTENT_FILE_TYPES,
 )
 from course_catalog.factories import VideoFactory
 
@@ -78,14 +79,21 @@ def test_transform_content_files(mock_tika_functions, mocker):
     mocker.patch(
         "course_catalog.etl.ocw.extract_text_from_url", return_value="tika text"
     )
+
+    included_pages = list(
+        filter(
+            lambda file: file.get("type") not in EXCLUDED_CONTENT_FILE_TYPES,
+            COURSE_PAGES,
+        )
+    )
     file_inputs = COURSE_FILES + FOREIGN_FILES
     text_inputs = [
         input
-        for input in (file_inputs + COURSE_PAGES)
+        for input in (file_inputs + included_pages)
         if splitext(input["file_location"])[-1] in VALID_TEXT_FILE_TYPES
     ]
     all_inputs = [(file, False) for file in file_inputs] + [
-        (page, True) for page in COURSE_PAGES
+        (page, True) for page in included_pages
     ]
     youtube_inputs = [EMBEDDED_MEDIA[item] for item in EMBEDDED_MEDIA]
 
@@ -120,6 +128,7 @@ def test_transform_content_files_error(mocker):
     )
     mock_error_log = mocker.patch("course_catalog.etl.ocw.log.error")
     transform_content_files(OCW_COURSE_JSON)
+
     for course_file in COURSE_FILES:
         mock_error_log.assert_any_call(
             "ERROR syncing course file %s for run %s",
@@ -128,7 +137,10 @@ def test_transform_content_files_error(mocker):
             exc_info=True,
         )
 
-    for course_page in COURSE_PAGES:
+    included_pages = filter(
+        lambda file: file["type"] not in EXCLUDED_CONTENT_FILE_TYPES, COURSE_PAGES
+    )
+    for course_page in included_pages:
         mock_error_log.assert_any_call(
             "ERROR syncing course page %s for run %s",
             course_page.get("uid", ""),
@@ -157,7 +169,11 @@ def test_transform_content_files_generic_s3_error(mocker):
         "0007de9b4a0cd7c298d822b4123c2eaf",
     )
 
-    for course_page in COURSE_PAGES:
+    included_pages = filter(
+        lambda file: file["type"] not in EXCLUDED_CONTENT_FILE_TYPES, COURSE_PAGES
+    )
+
+    for course_page in included_pages:
         mock_exception_log.assert_any_call(
             "Error extracting text from key %s for course run %s",
             urlparse(course_page.get("file_location")).path.lstrip("/"),
