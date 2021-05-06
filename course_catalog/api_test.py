@@ -87,10 +87,10 @@ def ocw_valid_data():
                 "department": "",
                 "directory_title": "",
                 "uid": "d9ca5631c6936252866d63683c0c452e",
-                "salutation": "Dr.",
             },
             {
                 "middle_initial": "",
+                "first_name": "Jane",
                 "last_name": "Kokernak",
                 "suffix": "",
                 "title": "",
@@ -98,7 +98,6 @@ def ocw_valid_data():
                 "department": "",
                 "directory_title": "",
                 "uid": "bb1e26b5f5c9c054ddae8a2988ad7b42",
-                "salutation": "Prof.",
             },
             {
                 "middle_initial": "",
@@ -202,25 +201,8 @@ def test_deserializing_a_valid_ocw_course(
     assert course.runs.first().offered_by.count() == 1
     assert course.runs.first().offered_by.first().name == OfferedBy.ocw.value
 
-    course_instructors = CourseInstructor.objects.order_by("last_name").all()
-    assert len(course_instructors) == 3
-
-    expected_course_instructor_values = [
-        {"first_name": None, "last_name": "Kokernak", "full_name": "Prof. Kokernak"},
-        {"first_name": "Christine", "last_name": "Sherratt", "full_name": None},
-        {
-            "first_name": "Michael",
-            "last_name": "Short",
-            "full_name": "Dr. Michael Short",
-        },
-    ]
-
-    for instructor, expected_values in zip(
-        course_instructors, expected_course_instructor_values
-    ):
-        assert instructor.first_name == expected_values["first_name"]
-        assert instructor.last_name == expected_values["last_name"]
-        assert instructor.full_name == expected_values["full_name"]
+    course_instructors_count = CourseInstructor.objects.count()
+    assert course_instructors_count == len(ocw_valid_data.get("instructors"))
 
     course_prices_count = CoursePrice.objects.count()
     assert course_prices_count == 1
