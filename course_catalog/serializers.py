@@ -258,31 +258,13 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         if is_published is not None:
             course_fields["published"] = is_published
 
-        self.instructors = []
-
-        for person in data.get("staff"):
-            instructor = {
+        self.instructors = [
+            {
                 "first_name": person.get("given_name", person.get("first_name")),
                 "last_name": person.get("family_name", person.get("last_name")),
             }
-
-            if person.get("salutation"):
-                if instructor["first_name"] and instructor["last_name"]:
-                    instructor[
-                        "full_name"
-                    ] = "{salutation} {first_name} {last_name}".format(
-                        salutation=person.get("salutation"),
-                        first_name=instructor["first_name"],
-                        last_name=instructor["last_name"],
-                    )
-                elif instructor["last_name"]:
-                    instructor["full_name"] = "{salutation} {last_name}".format(
-                        salutation=person.get("salutation"),
-                        last_name=instructor["last_name"],
-                    )
-
-            self.instructors.append(instructor)
-
+            for person in data.get("staff")
+        ]
         self.prices = [
             {
                 "price": seat.get("price"),
