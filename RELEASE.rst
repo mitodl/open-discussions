@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.164.2
+---------------
+
+- Revert "fix salutation"
+- Add to history stack on changes to search UI, and support back button (#3385)
+- Bump rsa from 4.1 to 4.7
+- fix salutation
+- fix similar items error
+
 Version 0.164.1 (Released April 29, 2021)
 ---------------
 
