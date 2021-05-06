@@ -5,7 +5,6 @@ import React, { useState, useEffect, useCallback } from "react"
 import InfiniteScroll from "react-infinite-scroller"
 import { useSelector, useDispatch } from "react-redux"
 import { MetaTags } from "react-meta-tags"
-import { useHistory } from "react-router-dom"
 import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
@@ -174,18 +173,6 @@ export default function CourseSearchPage(props: Props) {
     [dispatch]
   )
 
-  const history = useHistory()
-
-  const updateURLBar = useCallback(
-    search => {
-      history.replace({
-        pathname: window.location.pathname,
-        search
-      })
-    },
-    [history]
-  )
-
   const {
     facetOptions,
     clearAllFilters,
@@ -203,7 +190,6 @@ export default function CourseSearchPage(props: Props) {
   } = useCourseSearch(
     runSearch,
     clearSearchCB,
-    updateURLBar,
     facets,
     loaded,
     SETTINGS.search_page_size
