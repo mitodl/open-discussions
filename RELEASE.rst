@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.164.2
+Version 0.164.2 (Released May 07, 2021)
 ---------------
 
 - Revert "fix salutation"
