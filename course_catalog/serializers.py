@@ -264,6 +264,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             instructor = {
                 "first_name": person.get("given_name", person.get("first_name")),
                 "last_name": person.get("family_name", person.get("last_name")),
+                "full_name": None,
             }
 
             if person.get("salutation"):
