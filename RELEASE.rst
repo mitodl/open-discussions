@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.164.3
+---------------
+
+- Revert "Revert "fix salutation""
+- add excluded course files
+- adjust PR template
+- Run apt-get update for ci build (#3392)
+
 Version 0.164.2 (Released May 07, 2021)
 ---------------
 
