@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.164.3
+Version 0.164.3 (Released May 14, 2021)
 ---------------
 
 - fix to salutation pr
