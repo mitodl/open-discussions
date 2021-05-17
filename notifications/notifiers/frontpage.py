@@ -88,7 +88,11 @@ def _posts_since_notification(notification_settings, notification):
         if not post.stickied and _is_post_after_notification(post, notification)
     ]
 
-    posts = proxy_posts(posts[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS])
+    posts = proxy_posts(posts)
+    posts = list(
+        filter(lambda post: not post._self_post.exclude_from_frontpage_emails, posts)
+    )
+    posts = posts[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS]
 
     return posts
 

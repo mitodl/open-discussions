@@ -889,7 +889,7 @@ class Api:
     @reddit_object_persist(
         search_task_helpers.index_new_post,
         channel_task_helpers.maybe_repair_post_in_host_listing,
-    )
+    )  # pylint: disable=too-many-arguments, too-many-locals
     def create_post(
         self,
         channel_name,
@@ -899,7 +899,7 @@ class Api:
         url=None,
         article_content=None,
         cover_image=None,
-    ):  # pylint: disable=too-many-arguments
+    ):
         """
         Create a new post in a channel
 
@@ -937,6 +937,17 @@ class Api:
         if post_type == EXTENDED_POST_TYPE_ARTICLE:
             text = None
 
+        users_first_post = (
+            Post.objects.filter(author=self.user, removed=False, deleted=False)
+            .order_by("created_on")
+            .first()
+        )
+
+        exclude_from_frontpage_emails = bool(
+            users_first_post is None
+            or (datetime.now(pytz.UTC) - users_first_post.created_on).days < 1
+        )
+
         with transaction.atomic():
             # select_for_update so no one else can write to this
             post, created = Post.objects.select_for_update().get_or_create(
@@ -956,6 +967,7 @@ class Api:
                     "created_on": datetime.fromtimestamp(
                         submission.created, tz=timezone.utc
                     ),
+                    "exclude_from_frontpage_emails": exclude_from_frontpage_emails,
                 },
             )
 

@@ -259,6 +259,7 @@ class Post(TimestampedModel):
     edited = models.BooleanField(null=True)
     removed = models.BooleanField(null=True)
     deleted = models.BooleanField(null=True)
+    exclude_from_frontpage_emails = models.BooleanField(null=True)
 
     @property
     def plain_text(self):

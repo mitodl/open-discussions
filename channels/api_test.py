@@ -3,6 +3,8 @@
 from unittest.mock import Mock, MagicMock
 from urllib.parse import urljoin
 from types import SimpleNamespace
+from datetime import datetime, timedelta
+import pytz
 
 from django.contrib.auth.models import AnonymousUser
 import pytest
@@ -553,8 +555,22 @@ class TestCreatePost:
         )
 
     @pytest.mark.parametrize("text", ["Text", None])
-    def test_create_post_text(self, mock_client, contributor_api, scenario, text):
+    @pytest.mark.parametrize("exclude_from_frontpage_emails", [True, False])
+    def test_create_post_text(  # pylint: disable=protected-access,too-many-arguments
+        self,
+        mock_client,
+        contributor_api,
+        scenario,
+        text,
+        exclude_from_frontpage_emails,
+        user,
+    ):
         """Test create_post with text"""
+        if not exclude_from_frontpage_emails:
+            old_post = PostFactory.create(author=user)
+            old_post.created_on = datetime.now(pytz.UTC) - timedelta(days=10)
+            old_post.save()
+
         post = contributor_api.create_post(scenario.channel.name, "Title", text=text)
         assert post.__wrapped__ == scenario.mock_returned_post
         mock_client.subreddit.assert_called_once_with(scenario.channel.name)
@@ -569,12 +585,26 @@ class TestCreatePost:
                 text=text or "",
                 url=None,
                 post_type=LINK_TYPE_SELF,
+                exclude_from_frontpage_emails=exclude_from_frontpage_emails,
                 **DEFAULT_POST_PROPS,
             ),
         )
 
-    def test_create_post_url(self, mock_client, contributor_api, scenario):
+    @pytest.mark.parametrize("exclude_from_frontpage_emails", [True, False])
+    def test_create_post_url(  # pylint: disable=too-many-arguments
+        self,
+        mock_client,
+        contributor_api,
+        scenario,
+        exclude_from_frontpage_emails,
+        user,
+    ):
         """Test create_post with url"""
+        if not exclude_from_frontpage_emails:
+            old_post = PostFactory.create(author=user)
+            old_post.created_on = datetime.now(pytz.UTC) - timedelta(days=10)
+            old_post.save()
+
         post = contributor_api.create_post(
             scenario.channel.name, "Title", url="http://google.com"
         )
@@ -591,12 +621,26 @@ class TestCreatePost:
                 url="http://google.com",
                 text=None,
                 post_type=LINK_TYPE_LINK,
+                exclude_from_frontpage_emails=exclude_from_frontpage_emails,
                 **DEFAULT_POST_PROPS,
             ),
         )
 
-    def test_create_post_article(self, mock_client, contributor_api, scenario):
+    @pytest.mark.parametrize("exclude_from_frontpage_emails", [True, False])
+    def test_create_post_article(  # pylint: disable=too-many-arguments
+        self,
+        mock_client,
+        contributor_api,
+        exclude_from_frontpage_emails,
+        scenario,
+        user,
+    ):
         """Test create_post with article content"""
+        if not exclude_from_frontpage_emails:
+            old_post = PostFactory.create(author=user)
+            old_post.created_on = datetime.now(pytz.UTC) - timedelta(days=10)
+            old_post.save()
+
         post = contributor_api.create_post(
             scenario.channel.name, "Title", article_content=["data"]
         )
@@ -613,6 +657,7 @@ class TestCreatePost:
                 url=None,
                 text=None,
                 post_type=EXTENDED_POST_TYPE_ARTICLE,
+                exclude_from_frontpage_emails=exclude_from_frontpage_emails,
                 **DEFAULT_POST_PROPS,
             ),
         )
