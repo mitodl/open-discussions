@@ -38,6 +38,7 @@ def notifier_settings(settings):
 @pytest.mark.parametrize("has_last_notification", [True, False])
 @pytest.mark.parametrize("has_posts_after", [True, False])
 @pytest.mark.parametrize("has_episodes_after", [True, False])
+@pytest.mark.parametrize("exclude_from_frontpage_emails", [True, False])
 def test_can_notify(
     settings,
     mocker,
@@ -48,6 +49,7 @@ def test_can_notify(
     has_last_notification,
     has_posts_after,
     has_episodes_after,
+    exclude_from_frontpage_emails,
 ):  # pylint: disable=too-many-arguments, too-many-locals
     """Test can_notify"""
     notification_settings = NotificationSettingsFactory.create(
@@ -74,7 +76,9 @@ def test_can_notify(
         episode.created_on = created_on + timedelta(days=-10)
     episode.save()
 
-    post = PostFactory.create()
+    post = PostFactory.create(
+        exclude_from_frontpage_emails=exclude_from_frontpage_emails
+    )
     api_mock = mocker.patch("channels.api.Api")
     api_mock.return_value.front_page.return_value = (
         [
@@ -98,7 +102,7 @@ def test_can_notify(
         and can_notify
         and (
             not has_last_notification
-            or (has_posts and has_posts_after)
+            or (has_posts and has_posts_after and not exclude_from_frontpage_emails)
             or has_episodes_after
         )
     )
