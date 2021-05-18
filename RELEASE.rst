@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.165.0
+Version 0.165.0 (Released May 18, 2021)
 ---------------
 
 - set ocw-data-parser to 0.28.0 in requirements.in and run pip-compile (#3398)
