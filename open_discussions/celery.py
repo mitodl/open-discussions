@@ -23,8 +23,7 @@ app.conf.task_routes = {
     "notifications.tasks.send_frontpage_email_notification_batch": {
         "queue": "digest_emails"
     },
-    "notifications.tasks.test_send_daily_frontpage_digests": {"queue": "digest_emails"},
-    "notifications.tasks.test_send_weekly_frontpage_digests": {
-        "queue": "digest_emails"
-    },
+    "notifications.tasks.send_daily_frontpage_digests": {"queue": "digest_emails"},
+    "notifications.tasks.send_weekly_frontpage_digests": {"queue": "digest_emails"},
+    "notifications.tasks.attempt_send_notification_batch": {"queue": "digest_emails"},
 }
