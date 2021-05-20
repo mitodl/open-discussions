@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.165.1
+---------------
+
+- fix digest task queue
+- avoid new user posts in notification
+
 Version 0.165.0 (Released May 18, 2021)
 ---------------
 
