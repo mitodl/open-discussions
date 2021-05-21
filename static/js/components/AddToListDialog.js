@@ -67,12 +67,9 @@ export default function AddToListDialog() {
   )
 
   const dispatch = useDispatch()
-  const hide = useCallback(
-    () => {
-      dispatch(hideDialog(DIALOG_ADD_TO_LIST))
-    },
-    [dispatch]
-  )
+  const hide = useCallback(() => {
+    dispatch(hideDialog(DIALOG_ADD_TO_LIST))
+  }, [dispatch])
 
   const [, toggleFavorite] = useMutation(resource => {
     switch (resource.object_type) {

@@ -91,9 +91,6 @@ const mapDispatchToProps = {
   startFormEdit: () => actions.forms.formBeginEdit({ formKey: WIDGET_FORM_KEY })
 }
 
-export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(ChannelSettingsLink)
+export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
+  ChannelSettingsLink
+)

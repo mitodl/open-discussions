@@ -238,20 +238,21 @@ describe("CreatePostForm", () => {
       const article = makeArticle()
       const error = makeArticle()
       error.type = "error"
-      ;[[article, true], [error, false]].forEach(
-        ([embedly, shouldRenderComponent]) => {
-          const wrapper = renderPostForm({
-            postForm,
-            embedly
-          })
-          if (shouldRenderComponent) {
-            assert.ok(wrapper.find(Embedly).exists())
-          } else {
-            // $FlowFixMe
-            assert.ok(wrapper.find("input", { name: "url" }).exists())
-          }
+      ;[
+        [article, true],
+        [error, false]
+      ].forEach(([embedly, shouldRenderComponent]) => {
+        const wrapper = renderPostForm({
+          postForm,
+          embedly
+        })
+        if (shouldRenderComponent) {
+          assert.ok(wrapper.find(Embedly).exists())
+        } else {
+          // $FlowFixMe
+          assert.ok(wrapper.find("input", { name: "url" }).exists())
         }
-      )
+      })
     })
 
     it("should show EmbedlyLoader when no embedly and embedlyInFlight", () => {
@@ -276,38 +277,40 @@ describe("CreatePostForm", () => {
   })
 
   //
-  ;[[true, false], [false, true], [true, true]].forEach(
-    ([showLink, showText]) => {
-      it(`shows ${
-        showLink && showText
-          ? "both buttons"
-          : showText
-            ? "the text button"
-            : "the link button"
-      }`, () => {
-        isLinkTypeAllowedStub.callsFake(
-          (_, linkType) => (linkType === LINK_TYPE_TEXT ? showText : showLink)
-        )
-        const form = {
-          postType: null,
-          title:    "",
-          text:     "",
-          url:      ""
-        }
-        const channel = makeChannel()
-        const wrapper = renderPostForm({
-          channel,
-          postForm:        form,
-          channels:        new Map([[channel.name, channel]]),
-          embedlyInFlight: false,
-          embedly:         {}
-        })
-
-        assert.equal(wrapper.find(".write-something").length, showText ? 1 : 0)
-        assert.equal(wrapper.find(".share-a-link").length, showLink ? 1 : 0)
+  ;[
+    [true, false],
+    [false, true],
+    [true, true]
+  ].forEach(([showLink, showText]) => {
+    it(`shows ${
+      showLink && showText
+        ? "both buttons"
+        : showText
+          ? "the text button"
+          : "the link button"
+    }`, () => {
+      isLinkTypeAllowedStub.callsFake((_, linkType) =>
+        linkType === LINK_TYPE_TEXT ? showText : showLink
+      )
+      const form = {
+        postType: null,
+        title:    "",
+        text:     "",
+        url:      ""
+      }
+      const channel = makeChannel()
+      const wrapper = renderPostForm({
+        channel,
+        postForm:        form,
+        channels:        new Map([[channel.name, channel]]),
+        embedlyInFlight: false,
+        embedly:         {}
       })
-    }
-  )
+
+      assert.equal(wrapper.find(".write-something").length, showText ? 1 : 0)
+      assert.equal(wrapper.find(".share-a-link").length, showLink ? 1 : 0)
+    })
+  })
 
   //
   ;[true, false].forEach(uiEnabled => {

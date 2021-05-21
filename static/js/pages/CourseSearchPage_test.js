@@ -312,39 +312,41 @@ describe("CourseSearchPage", () => {
   })
 
   //
-  ;[[true, false, false], [false, true, true], [true, true, true]].forEach(
-    ([loaded, processing, shouldShowPostloading]) => {
-      it(`${shouldIf(
-        shouldShowPostloading
-      )} show the loading UI when processing = ${String(
-        processing
-      )} and loaded = ${String(loaded)}`, async () => {
-        let resolver
-        helper.searchStub.returns(
-          new Promise(resolve => {
-            resolver = () => {
-              resolve(searchResponse)
-            }
-          })
-        )
-        initialState.search.loaded = loaded
-        initialState.search.processing = processing
-        const { wrapper } = await render()
+  ;[
+    [true, false, false],
+    [false, true, true],
+    [true, true, true]
+  ].forEach(([loaded, processing, shouldShowPostloading]) => {
+    it(`${shouldIf(
+      shouldShowPostloading
+    )} show the loading UI when processing = ${String(
+      processing
+    )} and loaded = ${String(loaded)}`, async () => {
+      let resolver
+      helper.searchStub.returns(
+        new Promise(resolve => {
+          resolver = () => {
+            resolve(searchResponse)
+          }
+        })
+      )
+      initialState.search.loaded = loaded
+      initialState.search.processing = processing
+      const { wrapper } = await render()
 
-        if (!processing && loaded) {
-          // $FlowFixMe
-          await resolver()
-          await wait(10)
-        }
-        wrapper.update()
-        assert.equal(
-          wrapper.find("CourseSearchLoading").exists(),
-          shouldShowPostloading
-        )
-        assert.equal(wrapper.find(".results-count").exists(), !processing)
-      })
-    }
-  )
+      if (!processing && loaded) {
+        // $FlowFixMe
+        await resolver()
+        await wait(10)
+      }
+      wrapper.update()
+      assert.equal(
+        wrapper.find("CourseSearchLoading").exists(),
+        shouldShowPostloading
+      )
+      assert.equal(wrapper.find(".results-count").exists(), !processing)
+    })
+  })
 
   it("shows a message saying there are no results", async () => {
     searchResponse.hits.total = 0

@@ -147,13 +147,10 @@ export default function CourseSearchPage(props: Props) {
 
   const dispatch = useDispatch()
 
-  const clearSearchCB = useCallback(
-    () => {
-      dispatch(actions.search.clear())
-      dispatch(clearSearch())
-    },
-    [dispatch]
-  )
+  const clearSearchCB = useCallback(() => {
+    dispatch(actions.search.clear())
+    dispatch(clearSearch())
+  }, [dispatch])
 
   useResponsive()
 
@@ -198,21 +195,18 @@ export default function CourseSearchPage(props: Props) {
   const deviceWidth = useWidth()
   const [searchResultCellWidth, setSearchResultCellWidth] = useState(6)
 
-  useEffect(
-    () => {
-      if (searchResultLayout === SEARCH_LIST_UI) {
-        setSearchResultCellWidth(12)
-      } else if (
-        deviceWidth < THREE_CARD_BREAKPOINT &&
-        deviceWidth >= GRID_MOBILE_BREAKPOINT
-      ) {
-        setSearchResultCellWidth(6)
-      } else {
-        setSearchResultCellWidth(4)
-      }
-    },
-    [setSearchResultCellWidth, deviceWidth, searchResultLayout]
-  )
+  useEffect(() => {
+    if (searchResultLayout === SEARCH_LIST_UI) {
+      setSearchResultCellWidth(12)
+    } else if (
+      deviceWidth < THREE_CARD_BREAKPOINT &&
+      deviceWidth >= GRID_MOBILE_BREAKPOINT
+    ) {
+      setSearchResultCellWidth(6)
+    } else {
+      setSearchResultCellWidth(4)
+    }
+  }, [setSearchResultCellWidth, deviceWidth, searchResultLayout])
 
   const facetColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 3 : 4
   const resultsColumnWidth = searchResultLayout === SEARCH_GRID_UI ? 9 : 8
@@ -228,8 +222,8 @@ export default function CourseSearchPage(props: Props) {
             .trim()
         ],
         suggest
-      ).map(
-        suggestion => (isDoubleQuoted(text) ? `"${suggestion}"` : suggestion)
+      ).map(suggestion =>
+        isDoubleQuoted(text) ? `"${suggestion}"` : suggestion
       )
       : []
 

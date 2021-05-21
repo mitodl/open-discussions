@@ -43,9 +43,7 @@ describe("Embedly", () => {
 
   it("should render generic article-type content sensibly", () => {
     const article = makeArticle()
-    const resizedImageUrl = `http://embedly/resize/?url=${
-      article.thumbnail_url
-    }`
+    const resizedImageUrl = `http://embedly/resize/?url=${article.thumbnail_url}`
     sandbox.stub(urlFuncs, "embedlyResizeImage").returns(resizedImageUrl)
     const wrapper = renderEmbedly(article)
     assert.equal(

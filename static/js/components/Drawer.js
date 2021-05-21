@@ -201,7 +201,4 @@ export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
   channels:           state.channels.data
 })
 
-export default R.compose(
-  connect(mapStateToProps),
-  withRouter
-)(ResponsiveDrawer)
+export default R.compose(connect(mapStateToProps), withRouter)(ResponsiveDrawer)

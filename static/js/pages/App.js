@@ -280,9 +280,7 @@ class App extends React.Component<Props> {
           />
           <Route
             exact
-            path={`${
-              match.url
-            }profile/:userName/:objectType(${POSTS_OBJECT_TYPE}|${COMMENTS_OBJECT_TYPE})?`}
+            path={`${match.url}profile/:userName/:objectType(${POSTS_OBJECT_TYPE}|${COMMENTS_OBJECT_TYPE})?`}
             component={ProfilePage}
           />
           <Route exact path={`${match.url}login/`} component={LoginPage} />

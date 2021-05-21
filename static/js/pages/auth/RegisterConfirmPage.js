@@ -108,9 +108,6 @@ const mapStateToProps = (state: Object): StateProps => {
 }
 
 // $FlowFixMe: just tired of it flow, stop
-export default connect(
-  mapStateToProps,
-  {
-    confirmCode
-  }
-)(RegisterConfirmPage)
+export default connect(mapStateToProps, {
+  confirmCode
+})(RegisterConfirmPage)

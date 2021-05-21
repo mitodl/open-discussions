@@ -126,24 +126,25 @@ describe("CommentTree", () => {
   })
 
   //
-  ;[[true, "Unfollow"], [false, "Follow"]].forEach(
-    ([subscribed, buttonText]) => {
-      it(`should include a ${buttonText} button when subscribed === ${String(
-        subscribed
-      )}`, async () => {
-        comment.subscribed = subscribed
-        const { wrapper } = await render()
-        openMenu(wrapper)
-        const button = wrapper.find(".subscribe-comment").at(0)
-        assert.equal(button.text(), buttonText)
-        button.simulate("click")
-        assert.deepEqual(helper.updateCommentStub.args[0], [
-          comment.id,
-          { subscribed: !subscribed }
-        ])
-      })
-    }
-  )
+  ;[
+    [true, "Unfollow"],
+    [false, "Follow"]
+  ].forEach(([subscribed, buttonText]) => {
+    it(`should include a ${buttonText} button when subscribed === ${String(
+      subscribed
+    )}`, async () => {
+      comment.subscribed = subscribed
+      const { wrapper } = await render()
+      openMenu(wrapper)
+      const button = wrapper.find(".subscribe-comment").at(0)
+      assert.equal(button.text(), buttonText)
+      button.simulate("click")
+      assert.deepEqual(helper.updateCommentStub.args[0], [
+        comment.id,
+        { subscribed: !subscribed }
+      ])
+    })
+  })
 
   it("should include a 'delete' button, if the user wrote the comment", async () => {
     SETTINGS.username = comment.author_id

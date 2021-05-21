@@ -26,9 +26,7 @@ export default function CommentVoteForm(props: Props) {
     gerund => {
       dispatch(
         setBannerMessage(
-          `Something went wrong ${gerund} this comment. Contact us at ${
-            SETTINGS.support_email
-          }`
+          `Something went wrong ${gerund} this comment. Contact us at ${SETTINGS.support_email}`
         )
       )
     },

@@ -160,26 +160,22 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
       ? selectedRun.instructors.map(instructor => getInstructorName(instructor))
       : []
 
-  useEffect(
-    () => {
-      if (
-        object &&
-        !isUserList(object.object_type) &&
-        object.object_type !== LR_TYPE_PROGRAM
-      ) {
-        setShowSimilar(true)
-      }
-    },
-    [object]
-  )
+  useEffect(() => {
+    if (
+      object &&
+      !isUserList(object.object_type) &&
+      object.object_type !== LR_TYPE_PROGRAM
+    ) {
+      setShowSimilar(true)
+    }
+  }, [object])
 
   const shouldHideShareMenu =
     (isUserList(object.object_type) && object.privacy_level === LR_PRIVATE) ||
     isPodcastObject(object)
 
-  const episodePodcastSelector = createSelector(
-    podcastsSelector,
-    podcasts => (podcasts ? podcasts[object.podcast] : null)
+  const episodePodcastSelector = createSelector(podcastsSelector, podcasts =>
+    podcasts ? podcasts[object.podcast] : null
   )
   const episodePodcast = useSelector(episodePodcastSelector)
 

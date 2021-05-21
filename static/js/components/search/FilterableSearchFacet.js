@@ -41,29 +41,23 @@ function FilterableSearchFacet(props: Props) {
 
   const [filterText, setFilterText] = useState("")
 
-  useEffect(
-    () => {
-      if (results && results.buckets) {
-        const searcher = new Fuse(results.buckets, {
-          keys:      ["key"],
-          threshold: 0.4
-        })
-        setSearcher(searcher)
-      }
-    },
-    [results]
-  )
+  useEffect(() => {
+    if (results && results.buckets) {
+      const searcher = new Fuse(results.buckets, {
+        keys:      ["key"],
+        threshold: 0.4
+      })
+      setSearcher(searcher)
+    }
+  }, [results])
 
-  useEffect(
-    () => {
-      if (filterText === "") {
-        setFilteredList(null)
-      } else {
-        setFilteredList(runSearch(searcher, filterText))
-      }
-    },
-    [searcher, filterText]
-  )
+  useEffect(() => {
+    if (filterText === "") {
+      setFilteredList(null)
+    } else {
+      setFilteredList(runSearch(searcher, filterText))
+    }
+  }, [searcher, filterText])
 
   const handleFilterInput = useCallback(e => {
     e.preventDefault()

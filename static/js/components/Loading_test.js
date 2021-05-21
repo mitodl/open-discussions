@@ -57,15 +57,16 @@ describe("Loading component", () => {
   })
 
   //
-  ;[["notFound", NotFound], ["notAuthorized", NotAuthorized]].forEach(
-    ([errorPropName, expectedComponent]) => {
-      it(`should render correct error if '${errorPropName}'=true`, () => {
-        props[errorPropName] = true
-        const wrapper = renderLoading()
-        assert.ok(wrapper.find(expectedComponent).exists())
-      })
-    }
-  )
+  ;[
+    ["notFound", NotFound],
+    ["notAuthorized", NotAuthorized]
+  ].forEach(([errorPropName, expectedComponent]) => {
+    it(`should render correct error if '${errorPropName}'=true`, () => {
+      props[errorPropName] = true
+      const wrapper = renderLoading()
+      assert.ok(wrapper.find(expectedComponent).exists())
+    })
+  })
 
   it("should render the contents if loaded=true and there are no errors", () => {
     const wrapper = renderLoading()

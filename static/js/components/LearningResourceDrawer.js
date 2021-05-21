@@ -99,15 +99,12 @@ export default function LearningResourceDrawer(props: Props) {
 
   const [, logInteraction] = useMutation(interactionMutation)
 
-  useEffect(
-    () => {
-      if (!objectId || !objectType) {
-        return
-      }
-      logInteraction("view", OBJECT_TYPE_MAPPING[objectType], objectId)
-    },
-    [objectId, objectType, logInteraction]
-  )
+  useEffect(() => {
+    if (!objectId || !objectType) {
+      return
+    }
+    logInteraction("view", OBJECT_TYPE_MAPPING[objectType], objectId)
+  }, [objectId, objectType, logInteraction])
 
   useRequest(getResourceRequest(objectId, objectType))
 
@@ -134,16 +131,13 @@ export default function LearningResourceDrawer(props: Props) {
 
   const dispatch = useDispatch()
 
-  const closeDrawer = useCallback(
-    () => {
-      dispatch(clearLRHistory())
-      const { current } = drawerContent
-      if (current) {
-        current.scroll({ top: 0 })
-      }
-    },
-    [dispatch]
-  )
+  const closeDrawer = useCallback(() => {
+    dispatch(clearLRHistory())
+    const { current } = drawerContent
+    if (current) {
+      current.scroll({ top: 0 })
+    }
+  }, [dispatch])
 
   const pushHistory = useCallback(object => dispatch(pushLRHistory(object)), [
     dispatch

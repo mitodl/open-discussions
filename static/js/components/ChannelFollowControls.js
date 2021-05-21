@@ -131,9 +131,6 @@ const mapDispatchToProps = (dispatch: Dispatch<any>, { channel }: Props) => ({
   loadChannels: () => dispatch(actions.subscribedChannels.get())
 })
 
-export default R.compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(ChannelFollowControls)
+export default R.compose(connect(mapStateToProps, mapDispatchToProps))(
+  ChannelFollowControls
+)

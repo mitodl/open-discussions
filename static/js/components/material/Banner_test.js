@@ -30,7 +30,10 @@ describe("Banner", () => {
   })
 
   //
-  ;[[false, false], [true, true]].forEach(([visible, expActive]) => {
+  ;[
+    [false, false],
+    [true, true]
+  ].forEach(([visible, expActive]) => {
     it(`${shouldIf(
       expActive
     )} set an active class on the banner when visible=${String(

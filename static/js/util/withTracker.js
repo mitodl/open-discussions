@@ -15,9 +15,7 @@ const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
   }
 
   if (SETTINGS.gaGTrackingID) {
-    const url = `https://www.googletagmanager.com/gtag/js?id=${
-      SETTINGS.gaGTrackingID
-    }`
+    const url = `https://www.googletagmanager.com/gtag/js?id=${SETTINGS.gaGTrackingID}`
     const gaScript = document.createElement("script")
     gaScript.src = url
     gaScript.async = true

@@ -31,7 +31,10 @@ describe("Select", function() {
     form = {
       setFieldValue: setFieldValueStub
     }
-    options = [{ value: 1, label: "Option A" }, { value: 2, label: "Option B" }]
+    options = [
+      { value: 1, label: "Option A" },
+      { value: 2, label: "Option B" }
+    ]
     field = { name: "TestName", value: [options[0].value] }
   })
 

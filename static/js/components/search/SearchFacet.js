@@ -49,20 +49,19 @@ function SearchFacet(props: Props) {
       {showFacetList ? (
         <React.Fragment>
           {results && results.buckets
-            ? results.buckets.map(
-              (facet, i) =>
-                showAllFacets ||
-                  i < MAX_DISPLAY_COUNT ||
-                  results.buckets.length < FACET_COLLAPSE_THRESHOLD ? (
-                    <SearchFacetItem
-                      key={i}
-                      facet={facet}
-                      isChecked={R.contains(facet.key, currentlySelected || [])}
-                      onUpdate={onUpdate}
-                      labelFunction={labelFunction}
-                      name={name}
-                    />
-                  ) : null
+            ? results.buckets.map((facet, i) =>
+              showAllFacets ||
+                i < MAX_DISPLAY_COUNT ||
+                results.buckets.length < FACET_COLLAPSE_THRESHOLD ? (
+                  <SearchFacetItem
+                    key={i}
+                    facet={facet}
+                    isChecked={R.contains(facet.key, currentlySelected || [])}
+                    onUpdate={onUpdate}
+                    labelFunction={labelFunction}
+                    name={name}
+                  />
+                ) : null
             )
             : null}
           {results && results.buckets.length >= FACET_COLLAPSE_THRESHOLD ? (

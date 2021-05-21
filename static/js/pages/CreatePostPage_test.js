@@ -389,10 +389,10 @@ describe("CreatePostPage", () => {
         ...allowedChannels.map(channel => [channel.name, channel.title])
       ]
     )
-    assert.deepEqual(select.find("option").map(option => option.text()), [
-      "Select a channel",
-      ...allowedChannels.map(channel => channel.title)
-    ])
+    assert.deepEqual(
+      select.find("option").map(option => option.text()),
+      ["Select a channel", ...allowedChannels.map(channel => channel.title)]
+    )
   })
 
   it("should have the subreddit for the current URL selected", async () => {

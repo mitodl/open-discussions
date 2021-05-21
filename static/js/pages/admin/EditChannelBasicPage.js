@@ -168,10 +168,7 @@ const mapStateToProps = (state, ownProps) => {
 }
 
 export default R.compose(
-  connect(
-    mapStateToProps,
-    channelFormDispatchToProps
-  ),
+  connect(mapStateToProps, channelFormDispatchToProps),
   withChannelHeader,
   withSingleColumn("edit-channel")
 )(EditChannelBasicPage)

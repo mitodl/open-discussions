@@ -7,8 +7,8 @@ export const S = create({ checkTypes: false, env: env })
 /*
  * returns Just(items) if all items are Just, else Nothing
  */
-export const allJust = R.curry(
-  (items: S.Maybe[]) => (R.all(S.isJust)(items) ? S.Just(items) : S.Nothing)
+export const allJust = R.curry((items: S.Maybe[]) =>
+  R.all(S.isJust)(items) ? S.Just(items) : S.Nothing
 )
 
 /*

@@ -84,7 +84,10 @@ describe("SearchFacet", () => {
   })
 
   //
-  ;[[2, false], [20, true]].forEach(([numBuckets, shouldShowExpansionUI]) => {
+  ;[
+    [2, false],
+    [20, true]
+  ].forEach(([numBuckets, shouldShowExpansionUI]) => {
     it(`${shouldIf(shouldShowExpansionUI)} show hide/show button when ${String(
       numBuckets
     )} buckets`, () => {

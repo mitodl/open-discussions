@@ -6,10 +6,13 @@ export const pullOutURLs = (htmlString: string): Array<string> => {
   const doc = parser.parseFromString(htmlString, "text/html")
 
   return R.flatten(
-    [["a", "href"], ["img", "src"], ["script", "src"]].map(
-      ([tagName, urlAttribute]) =>
-        // $FlowFixMe
-        [...doc.querySelectorAll(tagName)].map(el => el[urlAttribute])
+    [
+      ["a", "href"],
+      ["img", "src"],
+      ["script", "src"]
+    ].map(([tagName, urlAttribute]) =>
+      // $FlowFixMe
+      [...doc.querySelectorAll(tagName)].map(el => el[urlAttribute])
     )
   )
 }

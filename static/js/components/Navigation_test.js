@@ -89,24 +89,25 @@ describe("Navigation", () => {
   })
 
   //
-  ;[[null, true], ["/not/home", false]].forEach(
-    ([pathnameProp, expHighlighted]) => {
-      it(`${shouldIf(expHighlighted)} highlight the home link if path=${String(
-        pathnameProp
-      )}`, () => {
-        const wrapper = renderComponent(
-          pathnameProp ? { pathname: pathnameProp } : {}
-        )
-        assert.equal(
-          wrapper
-            .find(".location.current-location")
-            .find(".home-link")
-            .exists(),
-          expHighlighted
-        )
-      })
-    }
-  )
+  ;[
+    [null, true],
+    ["/not/home", false]
+  ].forEach(([pathnameProp, expHighlighted]) => {
+    it(`${shouldIf(expHighlighted)} highlight the home link if path=${String(
+      pathnameProp
+    )}`, () => {
+      const wrapper = renderComponent(
+        pathnameProp ? { pathname: pathnameProp } : {}
+      )
+      assert.equal(
+        wrapper
+          .find(".location.current-location")
+          .find(".home-link")
+          .exists(),
+        expHighlighted
+      )
+    })
+  })
 
   it("should show a SubscriptionsList", () => {
     const channels = makeChannelList(10)

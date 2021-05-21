@@ -29,9 +29,7 @@ const withChannelHeader = R.curry(
     }
 
     WithChannelHeader.WrappedComponent = WrappedComponent
-    WithChannelHeader.displayName = `withChannelHeader(${
-      WrappedComponent.name
-    })`
+    WithChannelHeader.displayName = `withChannelHeader(${WrappedComponent.name})`
     return WithChannelHeader
   }
 )

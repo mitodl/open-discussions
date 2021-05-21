@@ -242,7 +242,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         wrapper
           .find(
             objectType === LR_TYPE_PODCAST ||
-            objectType === LR_TYPE_PODCAST_EPISODE
+              objectType === LR_TYPE_PODCAST_EPISODE
               ? ".podcast-main-title"
               : ".title"
           )
@@ -395,7 +395,10 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   //
-  ;[[1, false], [2, true]].forEach(([runs, showDropdown]) => {
+  ;[
+    [1, false],
+    [2, true]
+  ].forEach(([runs, showDropdown]) => {
     it(`${shouldIf(
       showDropdown
     )} display a course run dropdown for a course with ${runs} run(s)`, async () => {
