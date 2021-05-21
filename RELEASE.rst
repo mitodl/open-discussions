@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.165.1
+Version 0.165.1 (Released May 21, 2021)
 ---------------
 
 - fix digest task queue
