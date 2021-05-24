@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.165.2
+---------------
+
+- A few dependency upgrades
+
 Version 0.165.1 (Released May 21, 2021)
 ---------------
 
