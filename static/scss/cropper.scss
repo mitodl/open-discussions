@@ -63,7 +63,7 @@
   height: 100%;
 
   outline: 1px solid var(--blue);
-  outline-color: color(var(--blue) alpha(75%));
+  outline-color: color(var(--blue) 75%);
 
   border-radius: 50%;
 }
