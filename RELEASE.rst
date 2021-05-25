@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.166.0
+Version 0.166.0 (Released May 25, 2021)
 ---------------
 
 - downgrade the react-dotdotdot package
