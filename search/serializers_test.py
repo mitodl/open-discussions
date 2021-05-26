@@ -426,6 +426,8 @@ def test_es_course_serializer(offered_by, platform, department):
         ["Assignments and Exams", None],
         ["Lecture Summaries", OCW_TYPE_LECTURE_NOTES],
         [OCW_TYPE_LECTURE_NOTES, OCW_TYPE_LECTURE_NOTES],
+        ["Resources", None],
+        ["Exercises", None],
     ],
 )
 def test_es_content_file_serializer(section, resource_type):
