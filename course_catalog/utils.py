@@ -112,6 +112,28 @@ def get_course_url(course_id, course_json, platform):
     return None
 
 
+def get_ocw_department_list(course_json):
+    """
+    Get list of OCW department numbers
+    Args:
+        course_json (dict): The raw json for the course
+    Returns:
+        List of string department identifiers
+
+    """
+    departments = [course_json.get("department_number")]
+
+    for extra_course_number_json in course_json.get("extra_course_number") or []:
+        if extra_course_number_json:
+            department_number = extra_course_number_json.get(
+                "linked_course_number_col"
+            ).split(".")[0]
+            if department_number not in departments:
+                departments.append(department_number)
+
+    return departments
+
+
 def semester_year_to_date(semester, year, ending=False):
     """
     Convert semester and year to a rough date

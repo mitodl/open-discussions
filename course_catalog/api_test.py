@@ -129,6 +129,10 @@ def ocw_valid_data():
             },
         ],
         "price": {"price": 0.0, "mode": "audit", "upgrade_deadline": None},
+        "extra_course_number": [
+            {"linked_course_number_col": "3.1"},
+            {"linked_course_number_col": "4.1"},
+        ],
     }
 
 
@@ -197,6 +201,7 @@ def test_deserializing_a_valid_ocw_course(
         assert course.learning_resource_type == ResourceType.ocw_resource.value
 
     assert course.title == ocw_valid_data["title"]
+    assert course.department == ["2", "3", "4"]
     assert course.offered_by.count() == 1
     assert course.offered_by.first().name == OfferedBy.ocw.value
     assert course.runs.first().offered_by.count() == 1

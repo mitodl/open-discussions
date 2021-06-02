@@ -63,7 +63,10 @@ def test_serialize_course_related_models(offered_by):
     assert "name" in serializer.data["topics"][0].keys()
     assert len(serializer.data["runs"]) == 3
     assert (
-        serializer.data["department_slug"] == OCW_DEPARTMENTS[course.department]["slug"]
+        serializer.data["department_slug"]
+        == OCW_DEPARTMENTS[
+            course.department[0]  # pylint:disable=unsubscriptable-object
+        ]["slug"]
     )
 
 

@@ -174,7 +174,7 @@ class CourseFactory(AbstractCourseFactory):
             PlatformType.bootcamps.value,
         )
     )
-    department = FuzzyChoice(OCW_DEPARTMENTS.keys())
+    department = factory.List([FuzzyChoice(OCW_DEPARTMENTS.keys())])
     runs = factory.RelatedFactoryList(
         "course_catalog.factories.LearningResourceRunFactory", "content_object", size=3
     )

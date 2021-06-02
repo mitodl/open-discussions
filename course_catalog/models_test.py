@@ -79,6 +79,37 @@ def test_course_certification(platform, availability):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
+    "department,department_name",
+    [
+        (None, []),
+        ([], []),
+        (["1", "2"], ["Civil and Environmental Engineering", "Mechanical Engineering"]),
+        (["1", "not_found"], ["Civil and Environmental Engineering"]),
+    ],
+)
+def test_course_department_name(department, department_name):
+    """
+    Should return the correct department name array for the course
+    """
+    course = CourseFactory.create(department=department)
+    assert course.department_name == department_name
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "department,department_slug",
+    [(None, None), ([], None), (["1", "2"], "civil-and-environmental-engineering")],
+)
+def test_course_department_slug(department, department_slug):
+    """
+    Should return the correct department name array for the course
+    """
+    course = CourseFactory.create(department=department)
+    assert course.department_slug == department_slug
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
     "offered_by", [OfferedBy.micromasters.value, OfferedBy.xpro.value]
 )
 def test_program_audience(offered_by):

@@ -347,7 +347,7 @@ def test_es_run_serializer(has_full_name):
 @pytest.mark.django_db
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
 @pytest.mark.parametrize("platform", [platform.value for platform in PlatformType])
-@pytest.mark.parametrize("department", [None, "2"])
+@pytest.mark.parametrize("department", [None, ["2"]])
 def test_es_course_serializer(offered_by, platform, department):
     """
     Test that ESCourseSerializer correctly serializes a course object
@@ -376,10 +376,10 @@ def test_es_course_serializer(offered_by, platform, department):
     else:
         expected_certification = []
 
-    if department == "2":
-        expected_department_name = "Mechanical Engineering"
+    if department == ["2"]:
+        expected_department_name = ["Mechanical Engineering"]
     else:
-        expected_department_name = None
+        expected_department_name = []
 
     assert_json_equal(
         serialized,
