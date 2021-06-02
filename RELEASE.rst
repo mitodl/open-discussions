@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.167.0
+Version 0.167.0 (Released June 02, 2021)
 ---------------
 
 - Remove mappings for Resources and Exercises from OCW_SECTION_TYPE_MAPPING (#3415)
