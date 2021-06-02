@@ -13,6 +13,7 @@ from course_catalog.utils import (
     semester_year_to_date,
     load_course_blocklist,
     load_course_duplicates,
+    get_ocw_department_list,
 )
 
 
@@ -173,3 +174,26 @@ def test_get_ocw_topics():
         "Mechanical Engineering",
         "Signal Processing",
     ]
+
+
+@pytest.mark.parametrize(
+    "course_json,expected_departments",
+    [
+        ({"department_number": "22"}, ["22"]),
+        ({"department_number": "22", "extra_course_number": None}, ["22"]),
+        (
+            {
+                "department_number": "22",
+                "extra_course_number": [
+                    {"linked_course_number_col": "3.1"},
+                    {"linked_course_number_col": "4.1"},
+                    {"linked_course_number_col": "4.2"},
+                ],
+            },
+            ["22", "3", "4"],
+        ),
+    ],
+)
+def test_get_ocw_department(course_json, expected_departments):
+    """ test_get_ocw_department should return the expected list of departments """
+    assert get_ocw_department_list(course_json) == expected_departments

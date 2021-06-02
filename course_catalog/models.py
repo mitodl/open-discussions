@@ -6,7 +6,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.db.models import Value, Prefetch, OuterRef, Exists, ExpressionWrapper
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 
 from course_catalog.constants import (
     VALID_COURSE_CONTENT_CHOICES,
@@ -291,7 +291,9 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     program_type = models.CharField(max_length=32, null=True, blank=True)
     program_name = models.CharField(max_length=256, null=True, blank=True)
-    department = models.CharField(max_length=256, null=True, blank=True)
+    department = ArrayField(
+        models.CharField(max_length=256, null=False, blank=False), null=True, blank=True
+    )
 
     runs = GenericRelation(LearningResourceRun)
 
@@ -321,13 +323,26 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     @property
     def department_name(self):
-        """Returns the name of the department"""
-        return OCW_DEPARTMENTS.get(self.department, {}).get("name")
+        """Returns the names of the departments"""
+        names = list(
+            map(
+                lambda department_num: OCW_DEPARTMENTS.get(department_num, {}).get(
+                    "name"
+                ),
+                self.department or [],
+            )
+        )
+
+        return [name for name in names if name]
 
     @property
     def department_slug(self):
         """Returns the department slug"""
-        return OCW_DEPARTMENTS.get(self.department, {}).get("slug")
+        if self.department:
+            first_department = self.department[0]
+        else:
+            first_department = None
+        return OCW_DEPARTMENTS.get(first_department, {}).get("slug")
 
     @property
     def coursenum(self):

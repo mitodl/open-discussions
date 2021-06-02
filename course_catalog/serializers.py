@@ -29,6 +29,7 @@ from course_catalog.utils import (
     get_year_and_semester,
     get_course_url,
     semester_year_to_date,
+    get_ocw_department_list,
 )
 from moira_lists.moira_api import is_list_staff
 from open_discussions.serializers import WriteableSerializerMethodField
@@ -370,7 +371,7 @@ class OCWSerializer(CourseSerializer):
             "course_feature_tags": course_feature_tags,
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "platform": PlatformType.ocw.value,
-            "department": data.get("department_number"),
+            "department": get_ocw_department_list(data),
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
