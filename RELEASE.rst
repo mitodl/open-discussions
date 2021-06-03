@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.167.1
+Version 0.167.1 (Released June 03, 2021)
 ---------------
 
 - Bump nokogiri from 1.11.0 to 1.11.5 in /docs
