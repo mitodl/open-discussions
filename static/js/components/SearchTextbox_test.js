@@ -7,13 +7,15 @@ import { assert } from "chai"
 import SearchTextbox from "./SearchTextbox"
 
 describe("SearchTextbox", () => {
-  let sandbox, onChangeStub, onSubmitStub, onClearStub
+  let sandbox, onChangeStub, onSubmitStub, onClearStub, renderDiv
 
   beforeEach(() => {
     sandbox = sinon.createSandbox()
     onChangeStub = sandbox.stub()
     onSubmitStub = sandbox.stub()
     onClearStub = sandbox.stub()
+    renderDiv = window.document.createElement("div")
+    window.document.body.appendChild(renderDiv)
   })
 
   const render = (props = {}) =>
@@ -37,7 +39,10 @@ describe("SearchTextbox", () => {
         value={""}
         validation={null}
         {...props}
-      />
+      />,
+      {
+        attachTo: renderDiv
+      }
     )
 
   it("focuses on the input element, passes onChange events and the value prop to it", () => {
@@ -67,6 +72,8 @@ describe("SearchTextbox", () => {
     wrapper.find(".search-icon").prop("onClick")(event)
     sinon.assert.calledWith(onSubmitStub, event)
   })
+
+  //
   ;[true, false].forEach(hasText => {
     it(`if there ${hasText ? "is text" : "isn't text"} then there should ${
       hasText ? "" : "not "
