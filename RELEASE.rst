@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.168.0
+Version 0.168.0 (Released June 07, 2021)
 ---------------
 
 - replace node-sass with just sass
