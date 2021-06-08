@@ -83,6 +83,10 @@
       "description": "Max memory to be used by celery worker child",
       "required": false      
     },
+    "CELERY_CELERYD_CONCURRENCY": {
+      "description": "Celery max concurrency per worker",
+      "required": false
+    },
     "CLOUDFRONT_DIST": {
       "description": "Cloudfront distribution",
       "required": false
