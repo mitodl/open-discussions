@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.168.1
+---------------
+
+- upgrade jsdom
+- Allow codecov upload to fail
+- remove environment variables
+- value needs to be a string
+- set extra worker concurrency
+- set celery worker concurrency
+- support multiple departments
+
 Version 0.168.0 (Released June 07, 2021)
 ---------------
 
