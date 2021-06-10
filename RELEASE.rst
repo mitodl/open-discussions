@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.168.1
+Version 0.168.1 (Released June 10, 2021)
 ---------------
 
 - upgrade jsdom
