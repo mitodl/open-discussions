@@ -206,6 +206,7 @@ COURSE_OBJECT_TYPE = {
     "published": {"type": "boolean"},
     "department_name": {"type": "keyword"},
     "course_feature_tags": {"type": "keyword"},
+    "coursenum": {"type": "keyword"},
 }
 
 
