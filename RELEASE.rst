@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.168.2
+Version 0.168.2 (Released June 11, 2021)
 ---------------
 
 - Add coursenum to index (#3437)
