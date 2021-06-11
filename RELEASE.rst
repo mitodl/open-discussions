@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.168.2
+---------------
+
+- Add coursenum to index (#3437)
+- Upgrade ocw-data-parser for archived versions (#3435)
+
 Version 0.168.1 (Released June 10, 2021)
 ---------------
 
