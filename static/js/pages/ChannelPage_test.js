@@ -23,7 +23,9 @@ import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
 import * as embedLib from "../lib/embed"
 
-describe("ChannelPage", () => {
+describe("ChannelPage", function() {
+  this.timeout(10000)
+
   let helper,
     render,
     channels,

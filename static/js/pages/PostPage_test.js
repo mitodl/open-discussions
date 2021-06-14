@@ -42,6 +42,8 @@ import { LINK_TYPE_LINK } from "../lib/channels"
 import { REPORT_FORM_KEY } from "../lib/reports"
 
 describe("PostPage", function() {
+  this.timeout(10000)
+
   let helper,
     render,
     post,
