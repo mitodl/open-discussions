@@ -523,14 +523,25 @@ def test_index_content_files(mocker, update_only):
         ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}],
     ],
 )
+@pytest.mark.parametrize(
+    "indexing_chunk_size, document_indexing_chunk_size", [[2, 3], [3, 2]]
+)
 @pytest.mark.parametrize("errors", ([], ["error"]))
 def test_bulk_index_content_files(
-    mocked_es, mocker, settings, errors, indexing_func_name, doc
-):  # pylint: disable=too-many-arguments
+    mocked_es,
+    mocker,
+    settings,
+    errors,
+    indexing_func_name,
+    doc,
+    indexing_chunk_size,
+    document_indexing_chunk_size,
+):  # pylint: disable=too-many-arguments,too-many-locals
     """
     index functions for content files should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = indexing_chunk_size
+    settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
     content_files = ContentFileFactory.create_batch(5, run=run)
@@ -552,16 +563,19 @@ def test_bulk_index_content_files(
     )
 
     index_func = getattr(indexing_api, indexing_func_name)
+
+    if indexing_func_name == "index_run_content_files":
+        chunk_size = min(indexing_chunk_size, document_indexing_chunk_size)
+    else:
+        chunk_size = indexing_chunk_size
+
     if errors:
         with pytest.raises(ReindexException):
             index_func(run.id)
     else:
         index_func(run.id)
         for alias in mock_get_aliases.return_value:
-            for chunk in chunks(
-                [doc for _ in content_files],
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-            ):
+            for chunk in chunks([doc for _ in content_files], chunk_size=chunk_size):
                 bulk_mock.assert_any_call(
                     mocked_es.conn,
                     chunk,

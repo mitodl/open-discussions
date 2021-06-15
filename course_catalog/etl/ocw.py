@@ -62,10 +62,10 @@ def transform_content_files(course_run_json):
 
     json_embedded_media = course_run_json.get("course_embedded_media", {})
 
-    content_files = []
     for course_file in json_course_files:
         try:
-            content_files.append(transform_content_file(course_run_json, course_file))
+            content_file = transform_content_file(course_run_json, course_file)
+            yield content_file
         except:  # pylint: disable=bare-except
             log.exception(
                 "ERROR syncing course file %s for run %s",
@@ -78,9 +78,10 @@ def transform_content_files(course_run_json):
             continue
         try:
             if course_page.get("type") not in EXCLUDED_CONTENT_FILE_TYPES:
-                content_files.append(
-                    transform_content_file(course_run_json, course_page, is_page=True)
+                content_file = transform_content_file(
+                    course_run_json, course_page, is_page=True
                 )
+                yield content_file
         except:  # pylint: disable=bare-except
             log.exception(
                 "ERROR syncing course page %s for run %s",
@@ -90,14 +91,15 @@ def transform_content_files(course_run_json):
     for embedded_media in json_embedded_media:
         item = json_embedded_media[embedded_media]
         try:
-            content_files.append(transform_embedded_media(json_embedded_media, item))
+            content_file = transform_embedded_media(json_embedded_media, item)
+            if content_file is not None:
+                yield content_file
         except:  # pylint: disable=bare-except
             log.exception(
                 "ERROR syncing embed item %s for run %s",
                 embedded_media,
                 course_run_json.get("uid", ""),
             )
-    return [content_file for content_file in content_files if content_file is not None]
 
 
 def transform_content_file(

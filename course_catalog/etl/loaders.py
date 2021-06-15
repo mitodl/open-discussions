@@ -651,13 +651,13 @@ def load_content_file(course_run, content_file_data):
         content_file_data (dict): File metadata as JSON
 
     Returns:
-        ContentFile: the object that was created or updated
+        Int: the id of the object that was created or updated
     """
     try:
         content_file, _ = ContentFile.objects.update_or_create(
             run=course_run, key=content_file_data.get("key"), defaults=content_file_data
         )
-        return content_file
+        return content_file.id
     except:  # pylint: disable=bare-except
         log.exception(
             "ERROR syncing course file %s for run %d",
@@ -666,28 +666,28 @@ def load_content_file(course_run, content_file_data):
         )
 
 
-def load_content_files(course_run, content_files_json):
+def load_content_files(course_run, content_files_data):
     """
     Sync all content files for a course run to database and S3 if not present in DB
 
     Args:
         course_run (LearningResourceRun): a course run
-        content_files_json (dict): Details about the course run's content files
+        content_files_data (list or generator): Details about the course run's content files
 
     Returns:
-        list of ContentFile: ContentFile objects that were created/updated
+        list of int: Ids of the ContentFile objects that were created/updated
 
     """
     if course_run.content_type and course_run.content_type.name == COURSE_TYPE:
-        content_files = [
+        content_files_ids = [
             load_content_file(course_run, content_file)
-            for content_file in content_files_json
+            for content_file in content_files_data
         ]
         if course_run.published:
             search_task_helpers.index_run_content_files(course_run.id)
         else:
             search_task_helpers.delete_run_content_files(course_run.id)
-        return content_files
+        return content_files_ids
 
 
 def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderConfig()):

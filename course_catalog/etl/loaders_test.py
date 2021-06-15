@@ -894,13 +894,16 @@ def test_load_content_file():
 
     assert ContentFile.objects.count() == 1
 
-    assert result.run == learning_resource_run
+    # assert we got an integer back
+    assert isinstance(result, int)
 
-    # assert we got a content file back
-    assert isinstance(result, ContentFile)
+    loaded_file = ContentFile.objects.get(pk=result)
+    assert loaded_file.run == learning_resource_run
 
     for key, value in props.items():
-        assert getattr(result, key) == value, f"Property {key} should equal {value}"
+        assert (
+            getattr(loaded_file, key) == value
+        ), f"Property {key} should equal {value}"
 
 
 def test_load_content_file_error(mocker):

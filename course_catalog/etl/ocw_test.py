@@ -97,7 +97,7 @@ def test_transform_content_files(mock_tika_functions, mocker):
     ]
     youtube_inputs = [EMBEDDED_MEDIA[item] for item in EMBEDDED_MEDIA]
 
-    transformed_files = transform_content_files(OCW_COURSE_JSON)
+    transformed_files = list(transform_content_files(OCW_COURSE_JSON))
     assert len(transformed_files) == len(all_inputs) + len(youtube_inputs) - 1
     assert mock_tika_functions.mock_extract_text.call_count == len(text_inputs)
     mock_tika_functions.mock_extract_text.assert_any_call(
@@ -109,6 +109,8 @@ def test_transform_content_files(mock_tika_functions, mocker):
         },
     )
     assert mock_tika_functions.mock_sync_text.call_count == len(text_inputs)
+
+    transformed_files = list(transformed_files)
 
     assert transformed_files == [
         transform_content_file(OCW_COURSE_JSON, file, is_page=is_page)
@@ -127,7 +129,7 @@ def test_transform_content_files_error(mocker):
         "course_catalog.etl.ocw.transform_embedded_media", side_effect=Exception
     )
     mock_error_log = mocker.patch("course_catalog.etl.ocw.log.error")
-    transform_content_files(OCW_COURSE_JSON)
+    list(transform_content_files(OCW_COURSE_JSON))
 
     for course_file in COURSE_FILES:
         mock_error_log.assert_any_call(
@@ -161,7 +163,7 @@ def test_transform_content_files_generic_s3_error(mocker):
     """ Verify that ex eptions are logged when extracting text from content files  """
     mocker.patch("course_catalog.etl.ocw.extract_text_metadata", side_effect=Exception)
     mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
-    transform_content_files(OCW_COURSE_JSON)
+    list(transform_content_files(OCW_COURSE_JSON))
 
     mock_exception_log.assert_any_call(
         "Error extracting text from key %s for course run %s",
@@ -190,7 +192,7 @@ def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_buc
     mock_ocw_learning_bucket.bucket.delete_objects(
         Delete={"Objects": [{"Key": bad_key}], "Quiet": True}
     )
-    transform_content_files(OCW_COURSE_JSON)
+    list(transform_content_files(OCW_COURSE_JSON))
 
     mock_warn_log.assert_any_call(
         "No S3 object found for %s in course run %s",
