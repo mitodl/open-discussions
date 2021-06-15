@@ -660,7 +660,7 @@ def index_course_content_files(course_ids, update_only=False):
         index_run_content_files(run_id, update_only)
 
 
-def index_run_content_files(run_id, upate_only=False):
+def index_run_content_files(run_id, update_only=False):
     """
     Index a list of content files by run id
 
@@ -669,21 +669,29 @@ def index_run_content_files(run_id, upate_only=False):
         update_only (bool): Update existing index only
 
     """
-    run = LearningResourceRun.objects.get(id=run_id)
-    documents = (
-        serialize_content_file_for_bulk(content_file)
-        for content_file in run.content_files.select_related("run")
-        .prefetch_related("run__content_object")
-        .defer("run__raw_json")
-    )
-    index_items(
-        documents,
-        COURSE_TYPE,
-        upate_only,
-        routing=gen_course_id(
-            run.content_object.platform, run.content_object.course_id
-        ),
-    )
+    run = LearningResourceRun.objects.get(pk=run_id)
+    content_file_ids = run.content_files.values_list("id", flat=True)
+
+    for ids_chunk in chunks(
+        content_file_ids, chunk_size=settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE
+    ):
+
+        documents = (
+            serialize_content_file_for_bulk(content_file)
+            for content_file in ContentFile.objects.filter(pk__in=ids_chunk)
+            .select_related("run")
+            .prefetch_related("run__content_object")
+            .defer("run__raw_json")
+        )
+
+        index_items(
+            documents,
+            COURSE_TYPE,
+            update_only,
+            routing=gen_course_id(
+                run.content_object.platform, run.content_object.course_id
+            ),
+        )
 
 
 def delete_run_content_files(run_id):
