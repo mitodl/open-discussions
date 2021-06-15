@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.169.0
+Version 0.169.0 (Released June 15, 2021)
 ---------------
 
 - Add timeout to address flaky test (#3441)
