@@ -213,7 +213,7 @@ lxml==4.6.3
     #   xbundle
     #   xmlsec
     #   zeep
-markdown2==2.3.9
+markdown2==2.4.0
     # via -r requirements.in
 git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4
     # via -r requirements.in
