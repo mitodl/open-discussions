@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.170.0
+Version 0.170.0 (Released June 21, 2021)
 ---------------
 
 - Bump django from 2.2.20 to 2.2.24 (#3438)
