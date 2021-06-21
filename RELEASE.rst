@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.170.0
+---------------
+
+- Bump django from 2.2.20 to 2.2.24 (#3438)
+- Bump markdown2 from 2.3.9 to 2.4.0 (#3421)
+- Bump pillow from 8.1.1 to 8.2.0 (#3432)
+- Bump css-what from 5.0.0 to 5.0.1 (#3428)
+
 Version 0.169.0 (Released June 15, 2021)
 ---------------
 
