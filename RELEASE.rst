@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.170.1
+Version 0.170.1 (Released June 29, 2021)
 ---------------
 
 - avoid parsing all documents at once
