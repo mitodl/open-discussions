@@ -21,7 +21,6 @@ from course_catalog.api import (
     sync_xpro_course_files,
 )
 from course_catalog.etl import pipelines, youtube, enrollments
-from open_discussions import features
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 

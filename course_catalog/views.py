@@ -55,7 +55,7 @@ from course_catalog.serializers import (
 from course_catalog.tasks import get_ocw_course_with_retry
 from course_catalog.utils import load_course_blocklist
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
-from open_discussions import features, settings
+from open_discussions import settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
