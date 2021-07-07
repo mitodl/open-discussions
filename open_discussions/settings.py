@@ -574,10 +574,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_mitx_data",
         "schedule": crontab(minute=30, hour=13),  # 9:30am EST
     },
-    "update_ocw-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_ocw_data",
-        "schedule": crontab(minute=30, hour=14),  # 10:30am EST
-    },
     "update_bootcamp-courses-every-1-days": {
         "task": "course_catalog.tasks.get_bootcamp_data",
         "schedule": crontab(minute=30, hour=15),  # 11:30am EST

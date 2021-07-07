@@ -66,7 +66,7 @@ def get_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3
 
 @app.task(bind=True)
 def get_ocw_data(
-    self, force_overwrite=False, upload_to_s3=True, ignore_flag=False
+    self, force_overwrite=False, upload_to_s3=True
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
@@ -78,9 +78,6 @@ def get_ocw_data(
         and settings.OCW_LEARNING_COURSE_BUCKET_NAME
     ):
         log.warning("Required settings missing for get_ocw_data")
-        return
-
-    if features.is_enabled(features.WEBHOOK_OCW) and not ignore_flag:
         return
 
     # get all the courses prefixes we care about

@@ -392,7 +392,7 @@ class WebhookOCWView(APIView):
             raise WebhookException("Incorrect webhook key")
         content = rapidjson.loads(request.body.decode())
         records = content.get("Records")
-        if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
+        if records is not None:
             blocklist = load_course_blocklist()
             for record in content.get("Records"):
                 s3_key = record.get("s3", {}).get("object", {}).get("key")
