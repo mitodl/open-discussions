@@ -196,12 +196,14 @@ def format_date(date_str):
     return None
 
 
-def generate_course_prefix_list(bucket):
+def generate_course_prefix_list(bucket, course_url_substring=None):
     """
     Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
 
     Args:
         bucket (s3.Bucket): Instantiated S3 Bucket object
+        course_url_substring (str or None):
+            If not None, only return course prefixes including this substring
     Returns:
         List of course prefixes
     """
@@ -213,6 +215,14 @@ def generate_course_prefix_list(bucket):
             key_pieces = bucket_file.key.split("/")
             if "/".join(key_pieces[:-2]) != "":
                 ocw_courses.add("/".join(key_pieces[:-2]) + "/")
+
+    if course_url_substring is not None:
+        ocw_courses = [
+            course_path
+            for course_path in ocw_courses
+            if course_url_substring.lower() in course_path.lower()
+        ]
+
     return list(ocw_courses)
 
 

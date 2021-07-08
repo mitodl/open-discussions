@@ -65,10 +65,7 @@ def get_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3
 
 @app.task(bind=True)
 def get_ocw_data(
-    self,
-    force_overwrite=False,
-    upload_to_s3=True,
-    match_courses=None,
+    self, force_overwrite=False, upload_to_s3=True, course_url_substring=None
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
@@ -88,15 +85,11 @@ def get_ocw_data(
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
-    ocw_courses = generate_course_prefix_list(raw_data_bucket)
+    ocw_courses = generate_course_prefix_list(
+        raw_data_bucket, course_url_substring=course_url_substring
+    )
 
     total_course_count = len(ocw_courses)
-    if match_courses is not None:
-        ocw_courses = [
-            course_path
-            for course_path in ocw_courses
-            if match_courses.lower() in course_path.lower()
-        ]
 
     log.info(
         "Backpopulating %d out of %d OCW courses...",

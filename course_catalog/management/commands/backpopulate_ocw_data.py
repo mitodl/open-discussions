@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Run Populate ocw courses"""
-        course_id = options.get("course")
+        course_url_substring = options.get("course")
         if options["delete"]:
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw"):
@@ -51,15 +51,15 @@ class Command(BaseCommand):
             task = get_ocw_data.delay(
                 force_overwrite=options["force_overwrite"],
                 upload_to_s3=options["upload_to_s3"],
-                match_courses=course_id,
+                course_url_substring=course_url_substring,
             )
             self.stdout.write(
                 "Started task {task} to get ocw course data "
-                "w/force_overwrite={overwrite}, upload_to_s3={s3}, course_id={course}".format(
+                "w/force_overwrite={overwrite}, upload_to_s3={s3}, course_url_substring={course_url_substring}".format(
                     task=task,
                     overwrite=options["force_overwrite"],
                     s3=options["upload_to_s3"],
-                    course=course_id,
+                    course_url_substring=course_url_substring,
                 )
             )
             self.stdout.write("Waiting on task...")
