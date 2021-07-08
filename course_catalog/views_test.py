@@ -608,11 +608,9 @@ def test_video_endpoint(client):
     assert resp.data.get("video_id") == video1.video_id
 
 
-@pytest.mark.parametrize("webhook_enabled", [True, False])
 @pytest.mark.parametrize("data", [OCW_WEBHOOK_RESPONSE, {}, {"foo": "bar"}])
-def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
+def test_ocw_webhook_endpoint(client, mocker, settings, data):
     """Test that the OCW webhook endpoint schedules a get_ocw_courses task"""
-    settings.FEATURES[features.WEBHOOK_OCW] = webhook_enabled
     settings.OCW_WEBHOOK_KEY = "fake_key"
     mock_get_ocw = mocker.patch(
         "course_catalog.views.get_ocw_course_with_retry.apply_async", autospec=True
@@ -624,7 +622,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
         data=data,
         headers={"Content-Type": "text/plain"},
     )
-    if webhook_enabled and data == OCW_WEBHOOK_RESPONSE:
+    if data == OCW_WEBHOOK_RESPONSE:
         mock_get_ocw.assert_called_once_with(
             countdown=settings.OCW_WEBHOOK_DELAY,
             kwargs={
@@ -655,7 +653,6 @@ def test_ocw_webhook_endpoint(client, mocker, settings, webhook_enabled, data):
 def test_ocw_webhook_endpoint_bad_data(mocker, settings, client, data):
     """Test that a webhook exception is raised if bad data is sent"""
     mocker.patch("course_catalog.views.load_course_blocklist", return_value=[])
-    settings.FEATURES[features.WEBHOOK_OCW] = True
     settings.OCW_WEBHOOK_KEY = "fake_key"
     with pytest.raises(WebhookException):
         client.post(
@@ -667,7 +664,6 @@ def test_ocw_webhook_endpoint_bad_data(mocker, settings, client, data):
 
 def test_ocw_webhook_endpoint_bad_key(settings, client):
     """Test that a webhook exception is raised if a bad key is sent"""
-    settings.FEATURES[features.WEBHOOK_OCW] = True
     settings.OCW_WEBHOOK_KEY = "fake_key"
     with pytest.raises(WebhookException):
         client.post(

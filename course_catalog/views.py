@@ -55,7 +55,7 @@ from course_catalog.serializers import (
 from course_catalog.tasks import get_ocw_course_with_retry
 from course_catalog.utils import load_course_blocklist
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
-from open_discussions import features, settings
+from open_discussions import settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
@@ -392,7 +392,7 @@ class WebhookOCWView(APIView):
             raise WebhookException("Incorrect webhook key")
         content = rapidjson.loads(request.body.decode())
         records = content.get("Records")
-        if features.is_enabled(features.WEBHOOK_OCW) and records is not None:
+        if records is not None:
             blocklist = load_course_blocklist()
             for record in content.get("Records"):
                 s3_key = record.get("s3", {}).get("object", {}).get("key")
