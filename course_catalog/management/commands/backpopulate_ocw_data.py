@@ -32,8 +32,8 @@ class Command(BaseCommand):
             help="skip uploading course files to s3",
         )
         parser.add_argument(
-            "--course",
-            dest="course",
+            "--course-url-substring",
+            dest="course_url_substring",
             required=False,
             help="If set, backpopulate only this course",
         )
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         """Run Populate ocw courses"""
-        course_url_substring = options.get("course")
+        course_url_substring = options.get("course_url_substring")
         if options["delete"]:
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw"):
