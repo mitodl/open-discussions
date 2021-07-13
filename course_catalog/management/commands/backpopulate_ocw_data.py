@@ -35,7 +35,7 @@ class Command(BaseCommand):
             "--course-url-substring",
             dest="course_url_substring",
             required=False,
-            help="If set, backpopulate only this course",
+            help="If set, backpopulate only courses whose urls match with this substring",
         )
         super().add_arguments(parser)
 
