@@ -298,6 +298,9 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
     runs = GenericRelation(LearningResourceRun)
 
     course_feature_tags = JSONField(null=True, blank=True)
+    extra_course_numbers = ArrayField(
+        models.CharField(max_length=128), null=True, blank=True
+    )
 
     @property
     def audience(self):

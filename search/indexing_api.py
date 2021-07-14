@@ -207,6 +207,15 @@ COURSE_OBJECT_TYPE = {
     "department_name": {"type": "keyword"},
     "course_feature_tags": {"type": "keyword"},
     "coursenum": {"type": "keyword"},
+    "department_course_numbers": {
+        "type": "nested",
+        "properties": {
+            "coursenum": {"type": "keyword"},
+            "sort_coursenum": {"type": "keyword"},
+            "department": {"type": "keyword"},
+            "primary": {"type": "boolean"},
+        },
+    },
 }
 
 

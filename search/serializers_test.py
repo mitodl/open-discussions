@@ -353,6 +353,28 @@ def test_es_course_serializer(offered_by, platform, department):
     Test that ESCourseSerializer correctly serializes a course object
     """
     course = CourseFactory.create(platform=platform, department=department)
+
+    if platform == PlatformType.ocw.value:
+        course.course_id = "sfsdfsdf+2.11"
+        course.extra_course_numbers = ["12.11"]
+        course.save()
+        expected_department_course_numbers = [
+            {
+                "coursenum": "2.11",
+                "department": "Mechanical Engineering",
+                "primary": True,
+                "sort_coursenum": "02.11",
+            },
+            {
+                "coursenum": "12.11",
+                "department": "Earth, Atmospheric, and Planetary Sciences",
+                "primary": False,
+                "sort_coursenum": "12.11",
+            },
+        ]
+    else:
+        expected_department_course_numbers = []
+
     unpublished_run = course.runs.first()
     unpublished_run.published = False
     unpublished_run.save()
@@ -411,6 +433,7 @@ def test_es_course_serializer(offered_by, platform, department):
             "department_name": expected_department_name,
             "department_slug": course.department_slug,
             "course_feature_tags": course.course_feature_tags,
+            "department_course_numbers": expected_department_course_numbers,
         },
         sort=True,
     )

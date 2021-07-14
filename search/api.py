@@ -2,8 +2,10 @@
 from base64 import urlsafe_b64encode
 from collections import Counter, defaultdict
 
+from operator import itemgetter
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
+from nested_lookup import nested_lookup
 
 from django.conf import settings
 from channels.constants import (
@@ -294,6 +296,7 @@ def execute_learn_search(*, user, query):
     """
     Execute a learning resources search based on the query
 
+
     Args:
         user (User): The user executing the search. Used to determine filters to enforce permissions.
         query (dict): The Elasticsearch query constructed in the frontend
@@ -304,8 +307,9 @@ def execute_learn_search(*, user, query):
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)
     search.update_from_dict(query)
+    department_filters = nested_lookup("department_name", query.get("post_filter", {}))
     search = _apply_learning_query_filters(search, user)
-    return transform_results(search.execute().to_dict(), user)
+    return transform_results(search.execute().to_dict(), user, department_filters)
 
 
 def _transform_search_results_suggest(search_result):
@@ -347,8 +351,8 @@ def _transform_search_results_suggest(search_result):
     return search_result
 
 
-# pylint: disable=too-many-branches
-def transform_results(search_result, user):
+# pylint: disable=too-many-branches, too-many-locals
+def transform_results(search_result, user, department_filters):
     """
     Transform podcast and podcast episode, and userlist and learning path in aggregations
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
@@ -449,7 +453,40 @@ def transform_results(search_result, user):
                 )
 
     search_result = _transform_search_results_suggest(search_result)
+
+    if len(department_filters) > 0:
+        _transform_search_results_coursenum(search_result, department_filters)
+
     return search_result
+
+
+def _transform_search_results_coursenum(search_result, department_filters):
+    """
+    Replace coursenum in search results with the smallest coursenum from a department in department_filters
+
+    Args:
+        search_result (dict): The results from ElasticSearch
+        department_filters (list(string)): list of filtered departments
+    """
+
+    for hit in search_result.get("hits", {}).get("hits", []):
+        department_course_numbers = hit.get("_source", {}).get(
+            "department_course_numbers"
+        )
+        if department_course_numbers:
+            filtered_department_course_numbers = [
+                department_course_number
+                for department_course_number in department_course_numbers
+                if department_course_number["department"] in department_filters
+            ]
+
+            filtered_department_course_numbers = sorted(
+                filtered_department_course_numbers, key=itemgetter("sort_coursenum")
+            )
+
+            hit["_source"]["coursenum"] = filtered_department_course_numbers[0][
+                "coursenum"
+            ]
 
 
 def find_related_documents(*, user, post_id):
