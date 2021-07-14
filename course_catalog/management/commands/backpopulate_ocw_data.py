@@ -31,10 +31,17 @@ class Command(BaseCommand):
             action="store_false",
             help="skip uploading course files to s3",
         )
+        parser.add_argument(
+            "--course-url-substring",
+            dest="course_url_substring",
+            required=False,
+            help="If set, backpopulate only courses whose urls match with this substring",
+        )
         super().add_arguments(parser)
 
     def handle(self, *args, **options):
         """Run Populate ocw courses"""
+        course_url_substring = options.get("course_url_substring")
         if options["delete"]:
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw"):
@@ -44,12 +51,15 @@ class Command(BaseCommand):
             task = get_ocw_data.delay(
                 force_overwrite=options["force_overwrite"],
                 upload_to_s3=options["upload_to_s3"],
+                course_url_substring=course_url_substring,
             )
             self.stdout.write(
-                "Started task {task} to get ocw course data w/force_overwrite={overwrite}, upload_to_s3={s3}".format(
+                "Started task {task} to get ocw course data "
+                "w/force_overwrite={overwrite}, upload_to_s3={s3}, course_url_substring={course_url_substring}".format(
                     task=task,
                     overwrite=options["force_overwrite"],
                     s3=options["upload_to_s3"],
+                    course_url_substring=course_url_substring,
                 )
             )
             self.stdout.write("Waiting on task...")
