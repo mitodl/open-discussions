@@ -219,6 +219,8 @@ markdown2==2.4.0
     # via -r requirements.in
 git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4
     # via -r requirements.in
+nested-lookup==0.2.22
+    # via -r requirements.in
 newrelic==4.2.0.100
     # via -r requirements.in
 oauthlib==2.0.7
@@ -348,6 +350,7 @@ six==1.15.0
     #   google-auth
     #   html5lib
     #   isodate
+    #   nested-lookup
     #   pygithub
     #   pyopenssl
     #   python-dateutil

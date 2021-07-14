@@ -360,6 +360,12 @@ class OCWSerializer(CourseSerializer):
             tag["course_feature_tag"] for tag in data.get("course_feature_tags", [])
         ]
 
+        extra_course_numbers = [
+            extra_course_number_json.get("linked_course_number_col")
+            for extra_course_number_json in (data.get("extra_course_number") or [])
+            if extra_course_number_json.get("linked_course_number_col")
+        ]
+
         course_fields = {
             "course_id": f"{data.get('uid')}+{data.get('course_id')}",
             "title": data.get("title"),
@@ -372,6 +378,7 @@ class OCWSerializer(CourseSerializer):
             "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "platform": PlatformType.ocw.value,
             "department": get_ocw_department_list(data),
+            "extra_course_numbers": extra_course_numbers,
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value

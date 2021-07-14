@@ -1,4 +1,4 @@
-# pylint: disable=redefined-outer-name
+# pylint: disable=redefined-outer-name,too-many-lines
 """Search API function tests"""
 
 import pytest
@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
 from channels.factories.models import ChannelFactory
-from course_catalog.constants import PrivacyLevel
+from course_catalog.constants import PrivacyLevel, PlatformType
 from course_catalog.factories import (
     CourseFactory,
     UserListFactory,
@@ -690,7 +690,7 @@ def test_transform_results(
     }
 
     search_user = AnonymousUser() if is_anonymous else user
-    assert transform_results(results, search_user) == {
+    assert transform_results(results, search_user, []) == {
         "hits": {"hits": raw_hits if is_anonymous else expected_hits, "total": 3},
         "suggest": expected_suggest,
         "aggregations": {
@@ -702,8 +702,60 @@ def test_transform_results(
     }
 
     assert (
-        transform_results(results, search_user)["aggregations"]
+        transform_results(results, search_user, [])["aggregations"]
         == results["aggregations"]
+    )
+
+
+@pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], []])
+@pytest.mark.django_db
+def test_transform_department_filter(department_fitler):
+    """
+    transform_results should replace coursenum if there is a department filter
+    """
+
+    course = CourseFactory.create(
+        course_id="HASH+1.1",
+        extra_course_numbers=["5.1", "7.1"],
+        platform=PlatformType.ocw.value,
+    )
+
+    raw_hits = [
+        {
+            "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a0",
+            "_type": "_doc",
+            "_id": "co_mitx_TUlUeCsyLjAxeA",
+            "_score": 1.0,
+            "_source": ESCourseSerializer(course).data,
+        }
+    ]
+
+    results = {
+        "hits": {"hits": raw_hits, "total": 3},
+        "aggregations": {
+            "agg_filter_topics": {
+                "doc_count": 30,
+                "topics": {"buckets": [{"key": "Engineering", "doc_count": 30}]},
+            },
+            "agg_filter_course_feature_tags": {
+                "doc_count": 20,
+                "course_feature_tags": {
+                    "buckets": [{"key": "Problems with Solutions", "doc_count": 20}]
+                },
+            },
+        },
+    }
+
+    transformed_results = transform_results(results, AnonymousUser(), department_fitler)
+
+    if department_fitler:
+        expected_course_num = "5.1"
+    else:
+        expected_course_num = "1.1"
+
+    assert (
+        transformed_results["hits"]["hits"][0]["_source"]["coursenum"]
+        == expected_course_num
     )
 
 
@@ -737,7 +789,9 @@ def test_transform_department_name_aggregations():
         "department_name"
     ]
 
-    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+    assert (
+        transform_results(results, AnonymousUser(), []) == expected_transformed_results
+    )
 
 
 @pytest.mark.django_db
@@ -787,7 +841,9 @@ def test_transform_level_aggregation():
         "level"
     ]
 
-    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+    assert (
+        transform_results(results, AnonymousUser(), []) == expected_transformed_results
+    )
 
 
 @pytest.mark.django_db
@@ -818,7 +874,9 @@ def test_transform_topics_aggregations():
         "topics"
     ] = expected_transformed_results["aggregations"]["agg_filter_topics"]["topics"]
 
-    assert transform_results(results, AnonymousUser()) == expected_transformed_results
+    assert (
+        transform_results(results, AnonymousUser(), []) == expected_transformed_results
+    )
 
 
 @pytest.mark.django_db
@@ -895,7 +953,7 @@ def test_combine_type_buckets_in_aggregates(
         "aggregations": {"type": {"buckets": type_buckets}},
     }
 
-    assert transform_results(results, AnonymousUser()) == {
+    assert transform_results(results, AnonymousUser(), []) == {
         "hits": {"hits": {}, "total": 15},
         "suggest": [],
         "aggregations": {

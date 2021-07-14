@@ -181,6 +181,7 @@ class CourseFactory(AbstractCourseFactory):
     course_feature_tags = factory.List(
         [factory.Faker("word") for x in range(random.randrange(3))]
     )
+    extra_course_numbers = factory.List([])
 
     class Meta:
         model = Course

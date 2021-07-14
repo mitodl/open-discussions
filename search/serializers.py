@@ -21,6 +21,8 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
 )
+
+from course_catalog.constants import PlatformType, OCW_DEPARTMENTS
 from profiles.api import get_channels, get_channel_join_dates
 from profiles.models import Profile
 from profiles.utils import image_uri
@@ -476,6 +478,25 @@ class ESRunSerializer(LearningResourceSerializer):
         read_only_fields = fields
 
 
+def get_ocw_departmet_course_number_dict(coursenum, primary):
+    """
+    Class for generating ocw course number dictionary from a course number
+    """
+    department_num = coursenum.split(".")[0]
+
+    if department_num[0].isdigit() and len(department_num) == 1:
+        sort_coursenum = f"0{coursenum}"
+    else:
+        sort_coursenum = coursenum
+
+    return {
+        "coursenum": coursenum,
+        "department": OCW_DEPARTMENTS.get(department_num, {}).get("name"),
+        "primary": primary,
+        "sort_coursenum": sort_coursenum,
+    }
+
+
 class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for courses
@@ -485,6 +506,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
     resource_relations = {"name": "resource"}
 
     runs = serializers.SerializerMethodField()
+    department_course_numbers = serializers.SerializerMethodField()
 
     default_search_priority = serializers.SerializerMethodField()
 
@@ -496,6 +518,24 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             ESRunSerializer(run).data
             for run in course.runs.exclude(published=False).order_by("-best_start_date")
         ]
+
+    def get_department_course_numbers(self, course):
+        """
+        Get department_course_numbers from course data
+        """
+
+        if course.platform == PlatformType.ocw.value:
+            department_course_numbers = [
+                get_ocw_departmet_course_number_dict(course.coursenum, True)
+            ]
+            if course.extra_course_numbers:
+                for extra_coursenum in course.extra_course_numbers:
+                    department_course_numbers.append(
+                        get_ocw_departmet_course_number_dict(extra_coursenum, False)
+                    )
+            return department_course_numbers
+        else:
+            return []
 
     def get_default_search_priority(self, instance):
         """
@@ -532,6 +572,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
             "department_name",
             "department_slug",
             "course_feature_tags",
+            "department_course_numbers",
         ]
 
         read_only_fields = fields
