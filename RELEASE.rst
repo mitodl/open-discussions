@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.171.1
+---------------
+
+- sort by department coursenum when there is a department filter
+- Add course argument to filter backpopulate_ocw_data (#3450)
+
 Version 0.171.0 (Released July 15, 2021)
 ---------------
 
