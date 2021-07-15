@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.171.1
+Version 0.171.1 (Released July 15, 2021)
 ---------------
 
 - sort by department coursenum when there is a department filter
