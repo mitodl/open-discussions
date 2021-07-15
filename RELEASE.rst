@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.171.0
+Version 0.171.0 (Released July 15, 2021)
 ---------------
 
 - Remove WEBHOOK_OCW flag, get-ocw-data from celery beat (#3451)
