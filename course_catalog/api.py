@@ -63,7 +63,13 @@ def safe_load_json(json_string, json_file_key):
         return {}
 
 
-def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""):
+def digest_ocw_course(
+    master_json,
+    last_modified,
+    is_published,
+    course_prefix="",
+    keep_existing_image_src=False,
+):
     """
     Takes in OCW course master json to store it in DB
 
@@ -72,6 +78,8 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
         last_modified (datetime): timestamp of latest modification of all course files
         is_published (bool): Flags OCW course as published or not
         course_prefix (str): (Optional) String used to query S3 bucket for course raw JSONs
+        keep_existing_image_src (boolean): (Optional) Avoid overwriting image_src if  image_src is
+            blank because the backpopulate is run without uploading to s3
     """
     if "course_id" not in master_json:
         log.error("Course %s is missing 'course_id'", master_json.get("uid"))
@@ -82,15 +90,17 @@ def digest_ocw_course(master_json, last_modified, is_published, course_prefix=""
         course_id=f"{master_json.get('uid')}+{master_json.get('course_id')}",
     ).first()
 
-    ocw_serializer = OCWSerializer(
-        data={
-            **master_json,
-            "last_modified": last_modified,
-            "is_published": True,  # This will be updated after all course runs are serialized
-            "course_prefix": course_prefix,
-        },
-        instance=existing_course_instance,
-    )
+    data = {
+        **master_json,
+        "last_modified": last_modified,
+        "is_published": True,  # This will be updated after all course runs are serialized
+        "course_prefix": course_prefix,
+    }
+
+    if existing_course_instance and keep_existing_image_src:
+        data["image_src"] = existing_course_instance.image_src
+
+    ocw_serializer = OCWSerializer(data=data, instance=existing_course_instance)
     if not ocw_serializer.is_valid():
         log.error(
             "Course %s is not valid: %s %s",
@@ -480,9 +490,16 @@ def sync_ocw_course(
             )
 
     log.info("Digesting %s...", course_prefix)
+
+    keep_existing_image_src = not upload_to_s3
+
     try:
         course, run = digest_ocw_course(
-            course_json, last_modified, is_published, course_prefix
+            course_json,
+            last_modified,
+            is_published,
+            course_prefix,
+            keep_existing_image_src,
         )
     except TypeError:
         log.info("Course and run not returned, skipping")

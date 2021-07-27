@@ -261,6 +261,26 @@ def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
     assert course.runs.count() == 4
 
 
+def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
+    mock_course_index_functions, ocw_valid_data
+):
+    """
+    Verify that image_src is not overwritten if keep_existing_image_src=True
+    """
+    course = CourseFactory.create(
+        platform=PlatformType.ocw.value,
+        course_id=f'{ocw_valid_data["uid"]}+{ocw_valid_data["course_id"]}',
+        image_src="existing",
+    )
+
+    assert Course.objects.last().image_src == "existing"
+
+    digest_ocw_course(ocw_valid_data, timezone.now(), True, "PROD/RES", True)
+    assert Course.objects.count() == 1
+    course = Course.objects.last()
+    assert course.image_src == "existing"
+
+
 def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
     """
     Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
