@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.172.0
+---------------
+
+- Bump addressable from 2.7.0 to 2.8.0 in /docs
+- Bump striptags from 3.1.1 to 3.2.0
+
 Version 0.171.1 (Released July 15, 2021)
 ---------------
 
