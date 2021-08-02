@@ -3,6 +3,7 @@ from django.core.management import BaseCommand
 
 from course_catalog.models import Course
 from course_catalog.tasks import get_ocw_data
+from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc
 from search.task_helpers import delete_course
 
@@ -48,11 +49,15 @@ class Command(BaseCommand):
                 course.delete()
                 delete_course(course)
         else:
+            start = now_in_utc()
+
             task = get_ocw_data.delay(
                 force_overwrite=options["force_overwrite"],
                 upload_to_s3=options["upload_to_s3"],
                 course_url_substring=course_url_substring,
+                utc_start_timestamp=start.strftime(ISOFORMAT),
             )
+
             self.stdout.write(
                 "Started task {task} to get ocw course data "
                 "w/force_overwrite={overwrite}, upload_to_s3={s3}, course_url_substring={course_url_substring}".format(
@@ -63,7 +68,6 @@ class Command(BaseCommand):
                 )
             )
             self.stdout.write("Waiting on task...")
-            start = now_in_utc()
             task.get()
             total_seconds = (now_in_utc() - start).total_seconds()
             self.stdout.write(

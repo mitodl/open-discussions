@@ -4,6 +4,7 @@ Test course_catalog.api
 import json
 from datetime import timedelta, datetime
 from subprocess import CalledProcessError
+import pytz
 
 import boto3
 import pytest
@@ -635,3 +636,60 @@ def test_sync_ocw_course_published(
     elif blocklisted or not published:
         mock_delete.assert_called_once()
         mock_upload_json.assert_called_once()
+
+
+@mock_s3
+@pytest.mark.parametrize("overwrite", [True, False])
+@pytest.mark.parametrize(
+    "start_timestamp",
+    [
+        None,
+        datetime(2020, 11, 15, tzinfo=pytz.utc),
+        datetime(2020, 12, 15, tzinfo=pytz.utc),
+    ],
+)
+def test_sync_ocw_course_already_synched(settings, mocker, overwrite, start_timestamp):
+    """ The course should be published or not based on dates, and always uploaded """
+    mocker.patch("course_catalog.etl.ocw.extract_text_metadata", return_value="")
+
+    mock_upload_course = mocker.patch(
+        "course_catalog.api.OCWParser.upload_all_media_to_s3"
+    )
+    mocker.patch("course_catalog.api.OCWParser.upload_parsed_json_to_s3")
+
+    mock_load_content = mocker.patch("course_catalog.api.load_content_files")
+    mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    setup_s3(settings)
+    bucket = boto3.resource("s3").Bucket(settings.OCW_CONTENT_BUCKET_NAME)
+
+    course = CourseFactory.create(
+        platform=PlatformType.ocw.value,
+        course_id="16197636c270e1ab179fbc9a56c72787+9.15",
+    )
+
+    run = course.runs.last()
+    # Set last_modified far in the future so it's greater then the last_modified of the objects in the fake s3 bucket
+    # which is the current timestamp
+    run.platform = PlatformType.ocw.value
+    run.last_modified = format_date("2040-12-03 00:00:00 US/Eastern")
+    run.run_id = "16197636c270e1ab179fbc9a56c72787"
+    run.save()
+    course.runs.update(updated_on=datetime(2020, 12, 1, tzinfo=pytz.utc))
+
+    sync_ocw_course(
+        course_prefix=TEST_PREFIX,
+        raw_data_bucket=bucket,
+        force_overwrite=overwrite,
+        upload_to_s3=True,
+        blocklist=[],
+        start_timestamp=start_timestamp,
+    )
+
+    if overwrite and start_timestamp != datetime(2020, 11, 15, tzinfo=pytz.utc):
+        mock_upload_course.assert_called_once_with(upload_parsed_json=True)
+        mock_load_content.assert_called_once()
+        mock_upsert.assert_called_once()
+    else:
+        mock_upload_course.assert_not_called()
+        mock_load_content.assert_not_called()
+        mock_upsert.assert_not_called()

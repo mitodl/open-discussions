@@ -97,6 +97,7 @@ def test_get_ocw_data(
         blocklist=mock_blocklist.return_value,
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
+        utc_start_timestamp=None,
     )
 
 
