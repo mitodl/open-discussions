@@ -52,7 +52,7 @@ from course_catalog.serializers import (
     PodcastSerializer,
     PodcastEpisodeSerializer,
 )
-from course_catalog.tasks import get_ocw_course_with_retry
+from course_catalog.tasks import get_ocw_courses
 from course_catalog.utils import load_course_blocklist
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from open_discussions import settings
@@ -397,7 +397,7 @@ class WebhookOCWView(APIView):
             for record in content.get("Records"):
                 s3_key = record.get("s3", {}).get("object", {}).get("key")
                 prefix = s3_key.split("0/1.json")[0]
-                get_ocw_course_with_retry.apply_async(
+                get_ocw_courses.apply_async(
                     countdown=settings.OCW_WEBHOOK_DELAY,
                     kwargs={
                         "course_prefix": prefix,

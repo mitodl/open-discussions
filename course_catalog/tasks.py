@@ -2,13 +2,14 @@
 course_catalog tasks
 """
 import logging
-
+from datetime import datetime
 import celery
 import rapidjson
 import requests
 import boto3
 from django.conf import settings
 from django.contrib.auth.models import User
+import pytz
 
 from course_catalog.utils import load_course_blocklist
 from course_catalog.constants import PlatformType
@@ -23,6 +24,7 @@ from course_catalog.api import (
 from course_catalog.etl import pipelines, youtube, enrollments
 from open_discussions.celery import app
 from open_discussions.utils import chunks
+from open_discussions.constants import ISOFORMAT
 
 log = logging.getLogger(__name__)
 
@@ -34,38 +36,38 @@ def get_mitx_data():
 
 
 @app.task(acks_late=True)
-def get_ocw_course_with_retry(
-    *, course_prefix, blocklist, force_overwrite, upload_to_s3
+def get_ocw_courses(
+    *,
+    course_prefixes,
+    blocklist,
+    force_overwrite,
+    upload_to_s3,
+    utc_start_timestamp=None,
 ):
     """
-    Task to sync a batch of OCW courses. We want acks_late=True for tasks launched
-    with the webhook so that there will be a retry if the task fails or the worker is killed
+    Task to sync a batch of OCW courses
     """
-    sync_ocw_courses(
-        course_prefixes=[course_prefix],
-        blocklist=blocklist,
-        force_overwrite=force_overwrite,
-        upload_to_s3=upload_to_s3,
-    )
 
+    if utc_start_timestamp:
+        utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
+        utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
 
-@app.task
-def get_ocw_courses(*, course_prefixes, blocklist, force_overwrite, upload_to_s3):
-    """
-    Task to sync a batch of OCW courses. We want to set acks_late=False for refreshes
-    launched by the backpopulate command or the scheduled task
-    """
     sync_ocw_courses(
         course_prefixes=course_prefixes,
         blocklist=blocklist,
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
+        start_timestamp=utc_start_timestamp,
     )
 
 
-@app.task(bind=True)
+@app.task(bind=True, acks_late=True)
 def get_ocw_data(
-    self, force_overwrite=False, upload_to_s3=True, course_url_substring=None
+    self,
+    force_overwrite=False,
+    upload_to_s3=True,
+    course_url_substring=None,
+    utc_start_timestamp=None,
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW course data with database
@@ -107,6 +109,7 @@ def get_ocw_data(
                 blocklist=blocklist,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
+                utc_start_timestamp=utc_start_timestamp,
             )
             for prefixes in chunks(
                 ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE

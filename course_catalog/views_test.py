@@ -613,7 +613,7 @@ def test_ocw_webhook_endpoint(client, mocker, settings, data):
     """Test that the OCW webhook endpoint schedules a get_ocw_courses task"""
     settings.OCW_WEBHOOK_KEY = "fake_key"
     mock_get_ocw = mocker.patch(
-        "course_catalog.views.get_ocw_course_with_retry.apply_async", autospec=True
+        "course_catalog.views.get_ocw_courses.apply_async", autospec=True
     )
     mock_log = mocker.patch("course_catalog.views.log.error")
     mocker.patch("course_catalog.views.load_course_blocklist", return_value=[])
