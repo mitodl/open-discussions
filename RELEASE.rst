@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.173.0
+---------------
+
+- dont overwrite image_src when upload_to_s3=False
+
 Version 0.172.0 (Released July 27, 2021)
 ---------------
 
