@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.173.1
+---------------
+
+- make ocw backpopulate restartable
+
 Version 0.173.0 (Released August 04, 2021)
 ---------------
 
