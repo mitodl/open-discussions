@@ -626,9 +626,11 @@ def test_ocw_webhook_endpoint(client, mocker, settings, data):
         mock_get_ocw.assert_called_once_with(
             countdown=settings.OCW_WEBHOOK_DELAY,
             kwargs={
-                "course_prefix": OCW_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"][
-                    "key"
-                ].split("0/1.json")[0],
+                "course_prefixes": [
+                    OCW_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"]["key"].split(
+                        "0/1.json"
+                    )[0]
+                ],
                 "blocklist": [],
                 "force_overwrite": False,
                 "upload_to_s3": True,

@@ -400,7 +400,7 @@ class WebhookOCWView(APIView):
                 get_ocw_courses.apply_async(
                     countdown=settings.OCW_WEBHOOK_DELAY,
                     kwargs={
-                        "course_prefix": prefix,
+                        "course_prefixes": [prefix],
                         "blocklist": blocklist,
                         "force_overwrite": False,
                         "upload_to_s3": True,
