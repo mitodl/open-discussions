@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.174.0
+---------------
+
+- fix ocw webhook
+- Upgrade ocw-data-parser (#3468)
+- make ocw backpopulate restartable
+
 Version 0.173.0 (Released August 04, 2021)
 ---------------
 
