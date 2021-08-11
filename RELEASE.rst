@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.174.0
+Version 0.174.0 (Released August 11, 2021)
 ---------------
 
 - fix ocw webhook
