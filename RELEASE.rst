@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.175.0
+---------------
+
+- Bump path-parse from 1.0.6 to 1.0.7
+
 Version 0.174.0 (Released August 11, 2021)
 ---------------
 
