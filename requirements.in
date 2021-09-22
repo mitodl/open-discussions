@@ -40,7 +40,7 @@ ipython
 lxml==4.6.3
 markdown2==2.4.0
 newrelic
-ocw-data-parser==0.30.0
+ocw-data-parser==0.31.0
 Pillow==8.2.0
 psycopg2==2.8.3
 praw==4.5.1
