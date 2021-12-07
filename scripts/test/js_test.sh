@@ -51,7 +51,9 @@ if [[ $(
     grep -v "Accessing PropTypes" |
     grep -v "Accessing createClass" |
     grep -v "Browserslist: caniuse-lite is outdated" |
-    grep -v "npx browserslist@latest" |
+    grep -v "browserslist" |
+    grep -v "" |
+    grep -v "Why you should do it regularly:" |
     grep -v "ExperimentalWarning: The fs.promises API is experimental" |
     wc -l |
     awk '{print $1}'

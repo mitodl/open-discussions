@@ -19,6 +19,7 @@ pytest-django==3.4.8
 pytest-freezegun==0.4.2
 pytest-mock==1.10.1
 pytest-lazy-fixture==0.4.2
+responses==0.14.0
 safety
 semantic-version
 tox
