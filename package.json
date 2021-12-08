@@ -148,7 +148,7 @@
     "styled-components": "^4.0.2",
     "url-assembler": "^2.1.0",
     "url-loader": "^4.1.0",
-    "validator": "^10.7.1",
+    "validator": "^13.7.0",
     "webpack": "^4.43.0",
     "webpack-bundle-tracker": "^0.4.3",
     "webpack-cli": "^3.3.12",
