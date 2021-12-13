@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.175.2
+---------------
+
+- Bump validator from 10.11.0 to 13.7.0
+- Bump nth-check from 2.0.0 to 2.0.1
+- Bump nokogiri from 1.11.5 to 1.12.5 in /docs
+- change Video model duration column width
+- Bump pillow from 8.2.0 to 8.3.2
+- fix tests
+
 Version 0.175.1 (Released September 28, 2021)
 ---------------
 
