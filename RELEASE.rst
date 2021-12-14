@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.175.2
+Version 0.175.2 (Released December 14, 2021)
 ---------------
 
 - Bump validator from 10.11.0 to 13.7.0
