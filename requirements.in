@@ -7,7 +7,7 @@ betamax
 betamax_serializers
 boto==2.39.0
 cairosvg
-celery==4.3.0
+celery==5.2.2
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.*
