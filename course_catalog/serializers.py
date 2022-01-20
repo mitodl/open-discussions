@@ -1,40 +1,43 @@
 """
 course_catalog serializers
 """
+from urllib.parse import urljoin
+
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError as CoreValidationError
+from django.core.validators import URLValidator
 from django.db import transaction
-from django.db.models import Max, F, prefetch_related_objects
+from django.db.models import F, Max, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import PlatformType, ResourceType, ListType, PrivacyLevel
+from course_catalog.constants import ListType, PlatformType, PrivacyLevel, ResourceType
 from course_catalog.models import (
     Course,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    UserListItem,
-    UserList,
+    FavoriteItem,
+    LearningResourceRun,
     Podcast,
     PodcastEpisode,
     Program,
     ProgramItem,
-    FavoriteItem,
-    LearningResourceRun,
+    UserList,
+    UserListItem,
     Video,
 )
 from course_catalog.utils import (
+    get_course_url,
+    get_ocw_department_list,
     get_ocw_topics,
     get_year_and_semester,
-    get_course_url,
     semester_year_to_date,
-    get_ocw_department_list,
 )
 from moira_lists.moira_api import is_list_staff
 from open_discussions.serializers import WriteableSerializerMethodField
-from search.task_helpers import upsert_user_list, delete_user_list
-
+from search.task_helpers import delete_user_list, upsert_user_list
 
 COMMON_IGNORED_FIELDS = ("created_on", "updated_on")
 
@@ -169,6 +172,23 @@ class BaseCourseSerializer(
             course_topic, _ = CourseTopic.objects.get_or_create(**topic)
             resource.topics.add(course_topic)
 
+    def validate(self, attrs):
+        """
+        Verify that image_src is either a valid url or a valid relative url
+        """
+        if attrs.get("image_src"):
+            url_validator = URLValidator()
+
+            try:
+                url_validator(attrs["image_src"])
+            except CoreValidationError:
+                try:
+                    url_validator(urljoin("http://www.base.com/", attrs["image_src"]))
+                except CoreValidationError:
+                    raise ValidationError(
+                        "image_src is not a valid absolute or relative url"
+                    )
+
 
 class LearningResourceRunSerializer(BaseCourseSerializer):
     """
@@ -182,6 +202,8 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         """
         Verify the run doesn't exist if we're creating a new one
         """
+        super().validate(attrs)
+
         run_id = attrs["run_id"]
         platform = attrs["platform"]
         if (
@@ -323,6 +345,8 @@ class CourseSerializer(BaseCourseSerializer, LearningResourceRunMixin):
         """
         Verify the Course doesn't exist if we're creating a new one
         """
+        super().validate(attrs)
+
         course_id = attrs["course_id"]
         platform = attrs["platform"]
         if (
@@ -382,6 +406,58 @@ class OCWSerializer(CourseSerializer):
         }
         if "PROD/RES" in data.get("course_prefix"):
             course_fields["learning_resource_type"] = ResourceType.ocw_resource.value
+
+        self.topics = topics
+        return super().to_internal_value(course_fields)
+
+
+class OCWNextSerializer(CourseSerializer):
+    """
+    Serializer for creating Course objects from ocw next data
+    """
+
+    def to_internal_value(self, data):
+        """
+        Custom function to parse data out of the raw ocw json
+        """
+
+        topics = [
+            topic for topic_sublist in data.get("topics", []) for topic in topic_sublist
+        ]
+
+        topics = list(set(topics))
+
+        topics = [{"name": topic_name} for topic_name in topics]
+
+        department_numbers = [data.get("primary_course_number", "").split(".")[0]]
+
+        extra_course_numbers = data.get("extra_course_numbers", None)
+
+        if extra_course_numbers:
+            extra_course_numbers = extra_course_numbers.split(", ")
+            for extra_course_number in extra_course_numbers:
+                department_number = extra_course_number.split(".")[0]
+                if department_number not in department_numbers:
+                    department_numbers.append(department_number)
+        else:
+            extra_course_numbers = []
+
+        course_fields = {
+            "course_id": f"{data.get('uid')}+{data.get('primary_course_number')}",
+            "title": data.get("course_title"),
+            "short_description": data.get("course_description"),
+            "image_src": data.get("image_src"),
+            "image_description": data.get("course_image_metadata", {}).get(
+                "description"
+            ),
+            "last_modified": data.get("last_modified"),
+            "published": True,
+            "ocw_next_course": True,
+            "course_feature_tags": data.get("learning_resource_types", []),
+            "platform": PlatformType.ocw.value,
+            "department": department_numbers,
+            "extra_course_numbers": extra_course_numbers,
+        }
 
         self.topics = topics
         return super().to_internal_value(course_fields)

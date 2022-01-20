@@ -2,44 +2,52 @@
 Test course_catalog.api
 """
 import json
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from subprocess import CalledProcessError
-import pytz
 
 import boto3
 import pytest
+import pytz
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from mock import ANY
 from moto import mock_s3
 
-from course_catalog.conftest import setup_s3, TEST_PREFIX
+from course_catalog.api import (
+    digest_ocw_course,
+    digest_ocw_next_course,
+    format_date,
+    get_course_availability,
+    ocw_parent_folder,
+    parse_bootcamp_json_data,
+    safe_load_json,
+    sync_ocw_course,
+    sync_ocw_course_files,
+    sync_ocw_next_course,
+    sync_xpro_course_files,
+    sync_ocw_next_courses,
+)
+from course_catalog.conftest import (
+    OCW_NEXT_TEST_PREFIX,
+    TEST_PREFIX,
+    setup_s3,
+    setup_s3_ocw_next,
+)
 from course_catalog.constants import (
-    PlatformType,
     AvailabilityType,
-    ResourceType,
     OfferedBy,
+    PlatformType,
+    ResourceType,
 )
 from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import (
     Course,
-    LearningResourceRun,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
+    LearningResourceRun,
 )
 from course_catalog.utils import get_ocw_topics
-from course_catalog.api import (
-    digest_ocw_course,
-    safe_load_json,
-    get_course_availability,
-    parse_bootcamp_json_data,
-    sync_ocw_course_files,
-    sync_xpro_course_files,
-    ocw_parent_folder,
-    sync_ocw_course,
-    format_date,
-)
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
@@ -134,6 +142,72 @@ def ocw_valid_data():
             {"linked_course_number_col": "3.1"},
             {"linked_course_number_col": "4.1"},
         ],
+    }
+
+
+@pytest.fixture
+def ocw_next_valid_data():
+    """
+    Return valid bootcamp data
+    """
+    return {
+        "course_title": "Unified Engineering I, II, III, \u0026 IV",
+        "course_description": "The basic objective of Unified Engineering is to give a solid understanding of the fundamental disciplines of aerospace engineering, as well as their interrelationships and applications. These disciplines are Materials and Structures (M); Computers and Programming (C); Fluid Mechanics (F); Thermodynamics (T); Propulsion (P); and Signals and Systems (S). In choosing to teach these subjects in a unified manner, the instructors seek to explain the common intellectual threads in these disciplines, as well as their combined application to solve engineering Systems Problems (SP). Throughout the year, the instructors emphasize the connections among the disciplines",
+        "site_uid": None,
+        "legacy_uid": "97db384e-f340-09a6-4df7-cb86cf701979",
+        "instructors": [
+            {
+                "first_name": "Mark",
+                "last_name": "Drela",
+                "middle_initial": "",
+                "salutation": "Prof.",
+                "title": "Prof. Mark Drela",
+            },
+            {
+                "first_name": "Steven",
+                "last_name": "Hall",
+                "middle_initial": "",
+                "salutation": "Prof.",
+                "title": "Prof. Steven Hall",
+            },
+        ],
+        "department_numbers": ["16"],
+        "learning_resource_types": [
+            "Lecture Videos",
+            "Course Introduction",
+            "Competition Videos",
+            "Problem Sets with Solutions",
+            "Exams with Solutions",
+        ],
+        "topics": [
+            ["Engineering", "Aerospace Engineering", "Materials Selection"],
+            ["Engineering", "Aerospace Engineering", "Propulsion Systems"],
+            ["Science", "Physics", "Thermodynamics"],
+            ["Engineering", "Mechanical Engineering", "Fluid Mechanics"],
+            ["Engineering", "Aerospace Engineering"],
+            ["Business", "Project Management"],
+        ],
+        "primary_course_number": "16.01",
+        "extra_course_numbers": "16.02, 16.03, 16.04",
+        "term": "Fall",
+        "year": "2005",
+        "level": ["Undergraduate"],
+        "image_src": "https://open-learning-course-data-production.s3.amazonaws.com/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/8f56bbb35d0e456dc8b70911bec7cd0d_16-01f05.jpg",
+        "course_image_metadata": {
+            "description": "An abstracted aircraft wing with illustrated systems. (Image by MIT OCW.)",
+            "draft": False,
+            "file": "https://open-learning-course-data-production.s3.amazonaws.com/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/8f56bbb35d0e456dc8b70911bec7cd0d_16-01f05.jpg",
+            "file_type": "image/jpeg",
+            "image_metadata": {
+                "caption": "An abstracted aircraft wing, illustrating the connections between the disciplines of Unified Engineering. (Image by MIT OpenCourseWare.)",
+                "credit": "",
+                "image-alt": "Illustration of an aircraft wing showing connections between the disciplines of the course.",
+            },
+            "iscjklanguage": False,
+            "resourcetype": "Image",
+            "title": "16-01f05.jpg",
+            "uid": "8f56bbb3-5d0e-456d-c8b7-0911bec7cd0d",
+        },
     }
 
 
@@ -236,6 +310,7 @@ def test_deserializing_a_valid_ocw_course(
     assert course_topics_count == len(
         get_ocw_topics(ocw_valid_data.get("course_collections"))
     )
+    assert not course.ocw_next_course
 
 
 def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
@@ -302,6 +377,73 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
     mock_log.assert_called_once_with(
         "OCW LearningResourceRun %s is not valid: %s", ocw_valid_data.get("uid"), ANY
     )
+
+
+def test_deserializing_a_valid_ocw_next_course(
+    mock_course_index_functions, ocw_next_valid_data
+):
+    """
+    Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance
+    """
+
+    uid = "e9387c256bae4ca99cce88fd8b7f8272"
+    course_prefix = "courses/my-course"
+    digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, course_prefix)
+    assert Course.objects.count() == 1
+    digest_ocw_next_course(
+        ocw_next_valid_data, timezone.now() - timedelta(hours=1), uid, course_prefix
+    )
+    assert Course.objects.count() == 1
+
+    course = Course.objects.last()
+
+    assert course.title == ocw_next_valid_data["course_title"]
+    assert course.course_id == f"{uid}+{ocw_next_valid_data['primary_course_number']}"
+    assert course.short_description == ocw_next_valid_data["course_description"]
+    assert course.image_src == ocw_next_valid_data["image_src"]
+    assert (
+        course.image_description
+        == ocw_next_valid_data["course_image_metadata"]["description"]
+    )
+    assert course.department == ["16"]
+    assert course.extra_course_numbers == ["16.02", "16.03", "16.04"]
+    assert course.offered_by.count() == 1
+    assert course.offered_by.first().name == OfferedBy.ocw.value
+    assert course.runs.first().offered_by.count() == 1
+    assert course.runs.first().offered_by.first().name == OfferedBy.ocw.value
+
+    course_instructors = CourseInstructor.objects.order_by("last_name").all()
+    assert len(course_instructors) == 2
+
+    expected_course_instructor_values = [
+        {"first_name": "Mark", "last_name": "Drela", "full_name": "Prof. Mark Drela"},
+        {"first_name": "Steven", "last_name": "Hall", "full_name": "Prof. Steven Hall"},
+    ]
+
+    for instructor, expected_values in zip(
+        course_instructors, expected_course_instructor_values
+    ):
+        assert instructor.first_name == expected_values["first_name"]
+        assert instructor.last_name == expected_values["last_name"]
+        assert instructor.full_name == expected_values["full_name"]
+
+    assert CoursePrice.objects.count() == 1
+
+    assert CourseTopic.objects.count() == 11
+    assert course.ocw_next_course
+    assert course.runs.first().slug == "my-course"
+
+
+def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
+    """
+    Verifies that OCWNextSerializer validation works correctly if the OCW course has invalid values
+    """
+    uid = "e9387c256bae4ca99cce88fd8b7f8272"
+    course_prefix = "courses/my-course"
+
+    ocw_next_valid_data.pop("primary_course_number")
+    digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, course_prefix)
+    assert not Course.objects.count()
 
 
 def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
@@ -640,6 +782,7 @@ def test_sync_ocw_course_published(
 
 @mock_s3
 @pytest.mark.parametrize("overwrite", [True, False])
+@pytest.mark.parametrize("ocw_next_course", [True, False])
 @pytest.mark.parametrize(
     "start_timestamp",
     [
@@ -648,7 +791,9 @@ def test_sync_ocw_course_published(
         datetime(2020, 12, 15, tzinfo=pytz.utc),
     ],
 )
-def test_sync_ocw_course_already_synched(settings, mocker, overwrite, start_timestamp):
+def test_sync_ocw_course_already_synched(
+    settings, mocker, overwrite, start_timestamp, ocw_next_course
+):
     """ The course should be published or not based on dates, and always uploaded """
     mocker.patch("course_catalog.etl.ocw.extract_text_metadata", return_value="")
 
@@ -665,6 +810,7 @@ def test_sync_ocw_course_already_synched(settings, mocker, overwrite, start_time
     course = CourseFactory.create(
         platform=PlatformType.ocw.value,
         course_id="16197636c270e1ab179fbc9a56c72787+9.15",
+        ocw_next_course=ocw_next_course,
     )
 
     run = course.runs.last()
@@ -685,7 +831,11 @@ def test_sync_ocw_course_already_synched(settings, mocker, overwrite, start_time
         start_timestamp=start_timestamp,
     )
 
-    if overwrite and start_timestamp != datetime(2020, 11, 15, tzinfo=pytz.utc):
+    if (
+        overwrite
+        and start_timestamp != datetime(2020, 11, 15, tzinfo=pytz.utc)
+        and not ocw_next_course
+    ):
         mock_upload_course.assert_called_once_with(upload_parsed_json=True)
         mock_load_content.assert_called_once()
         mock_upsert.assert_called_once()
@@ -693,3 +843,96 @@ def test_sync_ocw_course_already_synched(settings, mocker, overwrite, start_time
         mock_upload_course.assert_not_called()
         mock_load_content.assert_not_called()
         mock_upsert.assert_not_called()
+
+
+@mock_s3
+def test_sync_ocw_next_course(settings, mocker):
+    """ Sync ocw next course """
+    mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    setup_s3_ocw_next(settings)
+    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+
+    sync_ocw_next_course(
+        course_prefix=OCW_NEXT_TEST_PREFIX, raw_data_bucket=bucket, force_overwrite=True
+    )
+
+    assert Course.objects.last().title == "Unified Engineering I, II, III, & IV"
+    assert Course.objects.last().course_id == "97db384ef34009a64df7cb86cf701979+16.01"
+    assert Course.objects.last().ocw_next_course
+
+    mock_upsert.assert_called_once()
+
+
+@mock_s3
+@pytest.mark.parametrize("overwrite", [True, False])
+@pytest.mark.parametrize(
+    "start_timestamp",
+    [
+        None,
+        datetime(2020, 11, 15, tzinfo=pytz.utc),
+        datetime(2020, 12, 15, tzinfo=pytz.utc),
+    ],
+)
+def test_sync_ocw_next_course_already_synched(
+    settings, mocker, overwrite, start_timestamp
+):
+    """ The course should be overwritten only if there is new data or overwrite is true """
+
+    mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    setup_s3_ocw_next(settings)
+    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+
+    course = CourseFactory.create(
+        platform=PlatformType.ocw.value,
+        course_id="97db384ef34009a64df7cb86cf701979+16.01",
+        title="Existing",
+    )
+
+    run = course.runs.last()
+    # Set last_modified far in the future so it's greater then the last_modified of the objects in the fake s3 bucket
+    # which is the current timestamp
+    run.platform = PlatformType.ocw.value
+    run.last_modified = format_date("2040-12-03 00:00:00 US/Eastern")
+    run.run_id = "97db384ef34009a64df7cb86cf701979"
+    run.save()
+    course.runs.update(updated_on=datetime(2020, 12, 1, tzinfo=pytz.utc))
+
+    sync_ocw_next_course(
+        course_prefix=OCW_NEXT_TEST_PREFIX,
+        raw_data_bucket=bucket,
+        force_overwrite=overwrite,
+        start_timestamp=start_timestamp,
+    )
+
+    course.refresh_from_db()
+
+    if overwrite and start_timestamp != datetime(2020, 11, 15, tzinfo=pytz.utc):
+        assert Course.objects.last().title == "Unified Engineering I, II, III, & IV"
+        mock_upsert.assert_called_once()
+    else:
+        assert Course.objects.last().title == "Existing"
+        mock_upsert.assert_not_called()
+
+
+@mock_s3
+def test_sync_ocw_next_courses(settings, mocker):
+    """Test sync_ocw_next_courses"""
+
+    setup_s3_ocw_next(settings)
+    overwrite = True
+    start_timestamp = datetime(2020, 12, 15, tzinfo=pytz.utc)
+    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+    mock_sync_course = mocker.patch("course_catalog.api.sync_ocw_next_course")
+
+    sync_ocw_next_courses(
+        course_prefixes=[OCW_NEXT_TEST_PREFIX],
+        force_overwrite=overwrite,
+        start_timestamp=start_timestamp,
+    )
+
+    mock_sync_course.assert_called_once_with(
+        course_prefix=OCW_NEXT_TEST_PREFIX,
+        raw_data_bucket=bucket,
+        force_overwrite=overwrite,
+        start_timestamp=start_timestamp,
+    )

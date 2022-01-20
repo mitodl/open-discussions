@@ -4,21 +4,20 @@ course_catalog models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField, JSONField
 from django.db import models
-from django.db.models import Value, Prefetch, OuterRef, Exists, ExpressionWrapper
-from django.contrib.postgres.fields import JSONField, ArrayField
+from django.db.models import Exists, ExpressionWrapper, OuterRef, Prefetch, Value
 
 from course_catalog.constants import (
-    VALID_COURSE_CONTENT_CHOICES,
     CONTENT_TYPE_FILE,
     OCW_DEPARTMENTS,
-    PlatformType,
-    OfferedBy,
-    ResourceType,
-    PrivacyLevel,
+    VALID_COURSE_CONTENT_CHOICES,
     AvailabilityType,
+    OfferedBy,
+    PlatformType,
+    PrivacyLevel,
+    ResourceType,
 )
-
 from course_catalog.utils import user_list_image_upload_uri
 from open_discussions.models import TimestampedModel, TimestampedModelQuerySet
 
@@ -156,7 +155,7 @@ class AbstractCourse(LearningResource):
     """
 
     full_description = models.TextField(null=True, blank=True)
-    image_src = models.URLField(max_length=2048, null=True, blank=True)
+    image_src = models.TextField(max_length=2048, null=True, blank=True)
     image_description = models.CharField(max_length=1024, null=True, blank=True)
     last_modified = models.DateTimeField(null=True, blank=True)
 
@@ -301,6 +300,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
     extra_course_numbers = ArrayField(
         models.CharField(max_length=128), null=True, blank=True
     )
+    ocw_next_course = models.BooleanField(default=False)
 
     @property
     def audience(self):

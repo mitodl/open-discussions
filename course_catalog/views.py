@@ -3,18 +3,17 @@ course_catalog views
 """
 import logging
 import operator
-
 from hmac import compare_digest
 
 import rapidjson
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
-from django.db.models import Prefetch, Count, Q
+from django.db.models import Count, Prefetch, Q
+from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.http import HttpResponse
 from django.views.decorators.cache import cache_page
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -22,39 +21,39 @@ from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from authentication.decorators import blocked_ip_exempt
-from course_catalog.constants import ResourceType, PlatformType
+from course_catalog.constants import PlatformType, ResourceType
+from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from course_catalog.exceptions import WebhookException
 from course_catalog.models import (
     Course,
-    UserList,
-    Program,
+    CourseTopic,
     FavoriteItem,
     LearningResourceOfferor,
     LearningResourceRun,
-    Video,
-    CourseTopic,
-    UserListItem,
     Podcast,
     PodcastEpisode,
+    Program,
+    UserList,
+    UserListItem,
+    Video,
 )
 from course_catalog.permissions import (
-    HasUserListPermissions,
     HasUserListItemPermissions,
+    HasUserListPermissions,
 )
 from course_catalog.serializers import (
     CourseSerializer,
-    UserListSerializer,
-    ProgramSerializer,
-    FavoriteItemSerializer,
-    VideoSerializer,
     CourseTopicSerializer,
-    UserListItemSerializer,
-    PodcastSerializer,
+    FavoriteItemSerializer,
     PodcastEpisodeSerializer,
+    PodcastSerializer,
+    ProgramSerializer,
+    UserListItemSerializer,
+    UserListSerializer,
+    VideoSerializer,
 )
-from course_catalog.tasks import get_ocw_courses
+from course_catalog.tasks import get_ocw_courses, get_ocw_next_courses
 from course_catalog.utils import load_course_blocklist
-from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from open_discussions import settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
@@ -64,7 +63,6 @@ from open_discussions.permissions import (
 
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
-
 
 log = logging.getLogger()
 
@@ -405,6 +403,43 @@ class WebhookOCWView(APIView):
                         "force_overwrite": False,
                         "upload_to_s3": True,
                     },
+                )
+        else:
+            log.error("No records found in webhook: %s", request.body.decode())
+        return Response({})
+
+
+@method_decorator(blocked_ip_exempt, name="dispatch")
+class WebhookOCWNextView(APIView):
+    """
+    Handle webhooks coming from the OCW Next bucket
+    """
+
+    permission_classes = ()
+    authentication_classes = ()
+
+    def handle_exception(self, exc):
+        """Raise any exception with request info instead of returning response with error status/message"""
+        raise WebhookException(
+            f"REST Error ({exc}). BODY: {(self.request.body or '')}, META: {self.request.META}"
+        ) from exc
+
+    def post(self, request):
+        """Process webhook request"""
+        if not compare_digest(
+            request.GET.get("webhook_key", ""), settings.OCW_WEBHOOK_KEY
+        ):
+            raise WebhookException("Incorrect webhook key")
+
+        content = rapidjson.loads(request.body.decode())
+        records = content.get("Records")
+        if records is not None:
+            for record in content.get("Records"):
+                s3_key = record.get("s3", {}).get("object", {}).get("key")
+                prefix = s3_key.split("index.html")[0]
+                get_ocw_next_courses.apply_async(
+                    countdown=settings.OCW_WEBHOOK_DELAY,
+                    kwargs={"course_prefixes": [prefix], "force_overwrite": False},
                 )
         else:
             log.error("No records found in webhook: %s", request.body.decode())

@@ -1,36 +1,35 @@
 """Tests for course_catalog views"""
-from types import SimpleNamespace
 from datetime import datetime, timedelta
 from operator import itemgetter
-import pytz
+from types import SimpleNamespace
 
 import pytest
+import pytz
 import rapidjson
-
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 
-from course_catalog.constants import PlatformType, ResourceType, PrivacyLevel, ListType
+from course_catalog.constants import ListType, PlatformType, PrivacyLevel, ResourceType
 from course_catalog.exceptions import WebhookException
 from course_catalog.factories import (
     CourseFactory,
     CourseTopicFactory,
+    LearningResourceRunFactory,
+    PodcastEpisodeFactory,
+    PodcastFactory,
     ProgramFactory,
+    ProgramItemCourseFactory,
     UserListFactory,
     UserListItemFactory,
-    ProgramItemCourseFactory,
     VideoFactory,
-    LearningResourceRunFactory,
-    PodcastFactory,
-    PodcastEpisodeFactory,
 )
 from course_catalog.models import UserList
 from course_catalog.serializers import (
     CourseTopicSerializer,
     MicroUserListItemSerializer,
-    PodcastSerializer,
     PodcastEpisodeSerializer,
+    PodcastSerializer,
 )
 from moira_lists.factories import MoiraListFactory
 from open_discussions import features
@@ -54,6 +53,29 @@ OCW_WEBHOOK_RESPONSE = {
                 },
                 "object": {
                     "key": "PROD/15/15.879/Spring_2014/15-879-research-seminar-in-system-dynamics-spring-2014/0/1.json",
+                    "size": 20544,
+                },
+            },
+        }
+    ]
+}
+
+
+OCW_NEXT_WEBHOOK_RESPONSE = {
+    "Records": [
+        {
+            "eventVersion": "2.1",
+            "eventSource": "aws:s3",
+            "s3": {
+                "s3SchemaVersion": "1.0",
+                "configurationId": "OCW_Next_Update",
+                "bucket": {
+                    "name": "test-bucket-1",
+                    "ownerIdentity": {"principalId": "A123456789"},
+                    "arn": "arn:aws:s3:::test-trigger-1",
+                },
+                "object": {
+                    "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/index.html",
                     "size": 20544,
                 },
             },
@@ -670,6 +692,49 @@ def test_ocw_webhook_endpoint_bad_key(settings, client):
     with pytest.raises(WebhookException):
         client.post(
             f"{reverse('ocw-webhook')}?webhook_key=invalid_key",
+            data=OCW_WEBHOOK_RESPONSE,
+            headers={"Content-Type": "text/plain"},
+        )
+
+
+@pytest.mark.parametrize("data", [OCW_NEXT_WEBHOOK_RESPONSE, {}, {"foo": "bar"}])
+def test_ocw_next_webhook_endpoint(client, mocker, settings, data):
+    """Test that the OCW webhook endpoint schedules a get_ocw_next_courses task"""
+    settings.OCW_WEBHOOK_KEY = "fake_key"
+    mock_get_ocw = mocker.patch(
+        "course_catalog.views.get_ocw_next_courses.apply_async", autospec=True
+    )
+    mock_log = mocker.patch("course_catalog.views.log.error")
+    client.post(
+        f"{reverse('ocw-next-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}",
+        data=data,
+        headers={"Content-Type": "text/plain"},
+    )
+    if data == OCW_NEXT_WEBHOOK_RESPONSE:
+        mock_get_ocw.assert_called_once_with(
+            countdown=settings.OCW_WEBHOOK_DELAY,
+            kwargs={
+                "course_prefixes": [
+                    OCW_NEXT_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"][
+                        "key"
+                    ].split("index.html")[0]
+                ],
+                "force_overwrite": False,
+            },
+        )
+    else:
+        mock_get_ocw.assert_not_called()
+        mock_log.assert_called_once_with(
+            "No records found in webhook: %s", rapidjson.dumps(data)
+        )
+
+
+def test_ocw_next_webhook_endpoint_bad_key(settings, client):
+    """Test that a webhook exception is raised if a bad key is sent"""
+    settings.OCW_WEBHOOK_KEY = "fake_key"
+    with pytest.raises(WebhookException):
+        client.post(
+            f"{reverse('ocw-next-webhook')}?webhook_key=invalid_key",
             data=OCW_WEBHOOK_RESPONSE,
             headers={"Content-Type": "text/plain"},
         )

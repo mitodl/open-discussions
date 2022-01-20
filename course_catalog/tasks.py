@@ -3,28 +3,30 @@ course_catalog tasks
 """
 import logging
 from datetime import datetime
+
+import boto3
 import celery
+import pytz
 import rapidjson
 import requests
-import boto3
 from django.conf import settings
 from django.contrib.auth.models import User
-import pytz
 
-from course_catalog.utils import load_course_blocklist
-from course_catalog.constants import PlatformType
-from course_catalog.models import Course
 from course_catalog.api import (
     generate_course_prefix_list,
     parse_bootcamp_json_data,
-    sync_ocw_courses,
     sync_ocw_course_files,
+    sync_ocw_courses,
+    sync_ocw_next_courses,
     sync_xpro_course_files,
 )
-from course_catalog.etl import pipelines, youtube, enrollments
+from course_catalog.constants import PlatformType
+from course_catalog.etl import enrollments, pipelines, youtube
+from course_catalog.models import Course
+from course_catalog.utils import load_course_blocklist
 from open_discussions.celery import app
-from open_discussions.utils import chunks
 from open_discussions.constants import ISOFORMAT
+from open_discussions.utils import chunks
 
 log = logging.getLogger(__name__)
 
@@ -57,6 +59,23 @@ def get_ocw_courses(
         blocklist=blocklist,
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
+        start_timestamp=utc_start_timestamp,
+    )
+
+
+@app.task(acks_late=True)
+def get_ocw_next_courses(*, course_prefixes, force_overwrite, utc_start_timestamp=None):
+    """
+    Task to sync a batch of OCW Next courses
+    """
+
+    if utc_start_timestamp:
+        utc_start_timestamp = datetime.strptime(utc_start_timestamp, ISOFORMAT)
+        utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
+
+    sync_ocw_next_courses(
+        course_prefixes=course_prefixes,
+        force_overwrite=force_overwrite,
         start_timestamp=utc_start_timestamp,
     )
 
@@ -109,6 +128,63 @@ def get_ocw_data(
                 blocklist=blocklist,
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
+                utc_start_timestamp=utc_start_timestamp,
+            )
+            for prefixes in chunks(
+                ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
+            )
+        ]
+    )
+    raise self.replace(ocw_tasks)
+
+
+@app.task(bind=True, acks_late=True)
+def get_ocw_next_data(
+    self, force_overwrite=False, course_url_substring=None, utc_start_timestamp=None
+):  # pylint:disable=too-many-locals,too-many-branches
+    """
+    Task to sync OCW Next course data with database
+    """
+    if not (
+        settings.AWS_ACCESS_KEY_ID
+        and settings.AWS_SECRET_ACCESS_KEY
+        and settings.OCW_NEXT_LIVE_BUCKET
+    ):
+        log.warning("Required settings missing for get_ocw_data")
+        return
+
+    # get all the courses prefixes we care about
+    raw_data_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_NEXT_LIVE_BUCKET)
+
+    ocw_courses = set()
+    log.info("Assembling list of courses...")
+
+    prefix = "courses/"
+
+    if course_url_substring:
+        prefix = prefix + course_url_substring + "/"
+
+    for bucket_file in raw_data_bucket.objects.filter(Prefix=prefix):
+        key_pieces = bucket_file.key.split("/")
+        if "/".join(key_pieces[:2]) != "":
+            path = "/".join(key_pieces[:2]) + "/"
+            ocw_courses.add(path)
+
+    if len(ocw_courses) == 0:
+        log.info("No courses matching url substring")
+        return
+
+    log.info("Backpopulating %d  OCW courses...", len(ocw_courses))
+
+    ocw_tasks = celery.group(
+        [
+            get_ocw_next_courses.si(
+                course_prefixes=prefixes,
+                force_overwrite=force_overwrite,
                 utc_start_timestamp=utc_start_timestamp,
             )
             for prefixes in chunks(
