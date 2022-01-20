@@ -2,43 +2,58 @@
 Test tasks
 """
 import json
+from contextlib import contextmanager
 from unittest.mock import Mock
 
 import boto3
 import pytest
 from moto import mock_s3
 
-from course_catalog.conftest import setup_s3, TEST_PREFIX
+from course_catalog.conftest import (
+    OCW_NEXT_TEST_PREFIX,
+    TEST_PREFIX,
+    setup_s3,
+    setup_s3_ocw_next,
+)
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
-from course_catalog.models import Course, CoursePrice, CourseInstructor, CourseTopic
+from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.tasks import (
-    get_mitx_data,
-    get_ocw_data,
-    upload_ocw_parsed_json,
     get_bootcamp_data,
+    get_csail_data,
     get_micromasters_data,
+    get_mitpe_data,
+    get_mitx_data,
+    get_ocw_courses,
+    get_ocw_data,
+    get_ocw_files,
+    get_ocw_next_courses,
+    get_ocw_next_data,
+    get_oll_data,
+    get_podcast_data,
+    get_see_data,
+    get_video_topics,
     get_xpro_data,
     get_xpro_files,
-    import_all_xpro_files,
-    get_oll_data,
     get_youtube_data,
     get_youtube_transcripts,
-    get_video_topics,
-    get_ocw_courses,
-    get_ocw_files,
     import_all_ocw_files,
-    get_see_data,
-    get_mitpe_data,
-    get_csail_data,
-    get_podcast_data,
+    import_all_xpro_files,
     update_enrollments_for_email,
+    upload_ocw_parsed_json,
 )
 from open_discussions.factories import UserFactory
 
-
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument,too-many-arguments
+
+
+@contextmanager
+def does_not_raise():
+    """
+    Mock expression that does not raise an error
+    """
+    yield
 
 
 @pytest.fixture
@@ -98,6 +113,73 @@ def test_get_ocw_data(
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
         utc_start_timestamp=None,
+    )
+
+
+@mock_s3
+@pytest.mark.parametrize("force_overwrite", [True, False])
+@pytest.mark.parametrize(
+    "url_substring",
+    [
+        None,
+        "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006",
+        "not-a-match",
+    ],
+)
+def test_get_ocw_next_data(
+    settings, mocker, mocked_celery, force_overwrite, url_substring
+):
+    """Test get_ocw_next_data task"""
+    setup_s3_ocw_next(settings)
+    get_ocw_courses_mock = mocker.patch(
+        "course_catalog.tasks.get_ocw_next_courses", autospec=True
+    )
+
+    if url_substring == "not-a-match":
+        error_expectation = does_not_raise()
+    else:
+        error_expectation = pytest.raises(mocked_celery.replace_exception_class)
+
+    with error_expectation:
+        get_ocw_next_data.delay(
+            force_overwrite=force_overwrite, course_url_substring=url_substring
+        )
+
+    if url_substring == "not-a-match":
+        assert mocked_celery.group.call_count == 0
+    else:
+        assert mocked_celery.group.call_count == 1
+        get_ocw_courses_mock.si.assert_called_once_with(
+            course_prefixes=[OCW_NEXT_TEST_PREFIX],
+            force_overwrite=force_overwrite,
+            utc_start_timestamp=None,
+        )
+
+
+@mock_s3
+def test_get_ocw_next_courses(settings, mocker, mocked_celery):
+    """
+    Test get_ocw_next_courses
+    """
+    setup_s3_ocw_next(settings)
+
+    get_ocw_next_courses.delay(
+        course_prefixes=[OCW_NEXT_TEST_PREFIX], force_overwrite=False
+    )
+
+    assert Course.objects.count() == 1
+    assert CoursePrice.objects.count() == 1
+    assert CourseInstructor.objects.count() == 10
+    assert CourseTopic.objects.count() == 11
+
+    course = Course.objects.first()
+    assert course.title == "Unified Engineering I, II, III, & IV"
+    assert course.course_id == "97db384ef34009a64df7cb86cf701979+16.01"
+    assert course.runs.count() == 1
+    assert course.runs.first().run_id == "97db384ef34009a64df7cb86cf701979"
+    assert (
+        course.runs.first().slug
+        == "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"
     )
 
 

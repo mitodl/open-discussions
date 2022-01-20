@@ -442,6 +442,10 @@
       "description": "If false, disables the node_modules cache to fix yarn install",
       "value": "false"
     },
+    "OCW_NEXT_LIVE_BUCKET":{
+      "description": "bucket for ocw-next data",
+      "required": false
+    },
     "PGBOUNCER_DEFAULT_POOL_SIZE": {
       "value": "50"
     },

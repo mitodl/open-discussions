@@ -858,6 +858,7 @@ GITHUB_ACCESS_TOKEN = get_string("GITHUB_ACCESS_TOKEN", None)
 
 # S3 Bucket info for OCW Plone CMS exports
 OCW_CONTENT_BUCKET_NAME = get_string("OCW_CONTENT_BUCKET_NAME", None)
+OCW_NEXT_LIVE_BUCKET = get_string("OCW_NEXT_LIVE_BUCKET", None)
 
 # S3 Bucket info for exporting OCW Plone media files
 OCW_LEARNING_COURSE_BUCKET_NAME = get_string("OCW_LEARNING_COURSE_BUCKET_NAME", None)

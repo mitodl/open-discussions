@@ -4,15 +4,15 @@ course_catalog models tests
 
 import pytest
 
+from course_catalog.constants import AvailabilityType, OfferedBy, PlatformType
 from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceOfferorFactory,
+    LearningResourceRunFactory,
+    ProgramFactory,
     UserListFactory,
     UserListItemFactory,
-    CourseFactory,
-    LearningResourceRunFactory,
-    LearningResourceOfferorFactory,
-    ProgramFactory,
 )
-from course_catalog.constants import PlatformType, AvailabilityType, OfferedBy
 
 
 @pytest.mark.django_db

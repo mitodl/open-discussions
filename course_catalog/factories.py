@@ -6,42 +6,40 @@ import factory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
 import pytz
-
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import (
+    CONTENT_TYPE_FILE,
+    CONTENT_TYPE_PAGE,
+    OCW_DEPARTMENTS,
     AvailabilityType,
     ListType,
     OfferedBy,
     PlatformType,
     PrivacyLevel,
-    CONTENT_TYPE_FILE,
-    CONTENT_TYPE_PAGE,
-    OCW_DEPARTMENTS,
 )
 from course_catalog.models import (
+    ContentFile,
     Course,
     CourseInstructor,
-    CourseTopic,
     CoursePrice,
+    CourseTopic,
+    LearningResourceOfferor,
+    LearningResourceRun,
+    Playlist,
+    Podcast,
+    PodcastEpisode,
     Program,
     ProgramItem,
     UserList,
     UserListItem,
-    LearningResourceRun,
-    LearningResourceOfferor,
     Video,
-    Playlist,
     VideoChannel,
-    ContentFile,
-    Podcast,
-    PodcastEpisode,
 )
-from search.constants import OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES
-
 
 # pylint: disable=unused-argument
 from open_discussions.factories import UserFactory
+from search.constants import OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES
 
 
 def _post_gen_prices(obj, create, extracted, **kwarg):
@@ -182,6 +180,7 @@ class CourseFactory(AbstractCourseFactory):
         [factory.Faker("word") for x in range(random.randrange(3))]
     )
     extra_course_numbers = factory.List([])
+    ocw_next_course = False
 
     class Meta:
         model = Course

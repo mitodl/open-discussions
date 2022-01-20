@@ -1,41 +1,42 @@
 """
 course_catalog api functions
 """
-from datetime import datetime
 import logging
 import os
 import re
-from subprocess import check_call, CalledProcessError
+from datetime import datetime
+from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
 
 import boto3
+import pytz
 import rapidjson
-from django.db import transaction
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
 from ocw_data_parser import OCWParser
-import pytz
 
 from course_catalog.constants import (
-    PlatformType,
     NON_COURSE_DIRECTORIES,
     AvailabilityType,
     OfferedBy,
+    PlatformType,
 )
-from course_catalog.etl.loaders import load_offered_bys, load_content_files
+from course_catalog.etl.loaders import load_content_files, load_offered_bys
 from course_catalog.etl.ocw import (
     get_ocw_learning_course_bucket,
     transform_content_files,
 )
+from course_catalog.etl.xpro import get_xpro_learning_course_bucket
 from course_catalog.etl.xpro import (
-    get_xpro_learning_course_bucket,
     transform_content_files as transform_content_files_xpro,
 )
-from course_catalog.models import LearningResourceRun, Course
+from course_catalog.models import Course, LearningResourceRun
 from course_catalog.serializers import (
-    OCWSerializer,
-    LearningResourceRunSerializer,
     CourseSerializer,
+    LearningResourceRunSerializer,
+    OCWNextSerializer,
+    OCWSerializer,
 )
 from course_catalog.utils import get_course_url
 from search.task_helpers import delete_course, upsert_course
@@ -152,6 +153,89 @@ def digest_ocw_course(
             log.error(
                 "OCW LearningResourceRun %s is not valid: %s",
                 master_json.get("uid"),
+                run_serializer.errors,
+            )
+            return
+        run = run_serializer.save()
+        load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
+    return course, run
+
+
+def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
+    """
+    Takes in OCW next course data.json to store it in DB
+
+    Args:
+        course_json (dict): course data JSON object from s3
+        last_modified (datetime): timestamp of latest modification of all course files
+        uid (str): Course uid
+        course_prefix (str):String used to query S3 bucket for course data JSONs
+    """
+    existing_course_instance = Course.objects.filter(
+        platform=PlatformType.ocw.value,
+        course_id=f"{uid}+{course_json.get('primary_course_number')}",
+    ).first()
+
+    data = {
+        **course_json,
+        "uid": uid,
+        "last_modified": last_modified,
+        "is_published": True,
+        "course_prefix": course_prefix,
+    }
+
+    ocw_serializer = OCWNextSerializer(data=data, instance=existing_course_instance)
+    if not ocw_serializer.is_valid():
+        log.error(
+            "Course %s is not valid: %s",
+            course_json.get("primary_course_number"),
+            ocw_serializer.errors,
+        )
+        return
+
+    # Make changes atomically so we don't end up with partially saved/deleted data
+    with transaction.atomic():
+        course = ocw_serializer.save()
+        load_offered_bys(course, [{"name": OfferedBy.ocw.value}])
+
+        # Try and get the run instance.
+        courserun_instance = course.runs.filter(
+            platform=PlatformType.ocw.value, run_id=uid
+        ).first()
+
+        run_slug = course_prefix.split("/")[1]
+
+        run_serializer = LearningResourceRunSerializer(
+            data={
+                "platform": PlatformType.ocw.value,
+                "key": uid,
+                "is_published": True,
+                "staff": course_json.get("instructors"),
+                "seats": [{"price": "0.00", "mode": "audit", "upgrade_deadline": None}],
+                "short_description": course_json.get("course_description"),
+                "level_type": ", ".join(course_json.get("level", [])),
+                "year": course_json.get("year"),
+                "semester": course_json.get("term"),
+                "availability": AvailabilityType.current.value,
+                "image": {
+                    "src": course_json.get("image_src"),
+                    "description": course_json.get("course_image_metadata", {}).get(
+                        "description"
+                    ),
+                },
+                "max_modified": last_modified,
+                "content_type": ContentType.objects.get(model="course").id,
+                "object_id": course.id,
+                "raw_json": course_json,
+                "title": course_json.get("course_title"),
+                "slug": run_slug,
+            },
+            instance=courserun_instance,
+        )
+        if not run_serializer.is_valid():
+            log.error(
+                "OCW LearningResourceRun %s is not valid: %s",
+                uid,
                 run_serializer.errors,
             )
             return
@@ -435,6 +519,12 @@ def sync_ocw_course(
         platform=PlatformType.ocw.value, run_id=uid
     ).first()
 
+    if courserun_instance and courserun_instance.content_object.ocw_next_course:
+        log.info(
+            "%s is imported into OCW Studio. Skipping sync from Plone", course_prefix
+        )
+        return None
+
     # Make sure that the data we are syncing is newer than what we already have
     if (  # pylint: disable=too-many-boolean-expressions
         courserun_instance
@@ -529,6 +619,85 @@ def sync_ocw_course(
         delete_course(course)
 
 
+def sync_ocw_next_course(
+    *, course_prefix, raw_data_bucket, force_overwrite, start_timestamp=None
+):
+    """
+    Sync an OCW course run
+
+    Args:
+        course_prefix (str): The course prefix
+        raw_data_bucket (boto3.resource): The S3 bucket containing the OCW information
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+        start_timestamp (timestamp): start timestamp of backpoplate. If the updated_on is after this the update already happened
+
+    Returns:
+        str:
+            The UID, or None if the run_id is not found, or if it was found but not synced
+    """
+    course_json = {}
+    last_modified_dates = []
+    uid = None
+
+    log.info("Syncing: %s ...", course_prefix)
+    # Collect last modified timestamps for all course files of the course
+    for obj in raw_data_bucket.objects.filter(Prefix=course_prefix):
+        if obj.key == course_prefix + "data.json":
+            try:
+                course_json = safe_load_json(get_s3_object_and_read(obj), obj.key)
+                uid = course_json.get("legacy_uid")
+
+                if not uid:
+                    uid = course_json.get("site_uid")
+
+            except:  # pylint: disable=bare-except
+                log.exception(
+                    "Error encountered reading data.json for %s", course_prefix
+                )
+        # accessing last_modified from s3 object summary is fast (does not download file contents)
+        last_modified_dates.append(obj.last_modified)
+
+    if not uid:
+        log.info("Skipping %s, both site_uid and legacy_uid missing", course_prefix)
+        return None
+    else:
+        uid = uid.replace("-", "")
+
+    # get the latest modified timestamp of any file in the course
+    last_modified = max(last_modified_dates)
+
+    # if course run synced before, check if modified since then
+    courserun_instance = LearningResourceRun.objects.filter(
+        platform=PlatformType.ocw.value, run_id=uid
+    ).first()
+
+    # Make sure that the data we are syncing is newer than what we already have
+    if (  # pylint: disable=too-many-boolean-expressions
+        courserun_instance
+        and last_modified <= courserun_instance.last_modified
+        and not force_overwrite
+    ) or (
+        start_timestamp
+        and courserun_instance
+        and start_timestamp <= courserun_instance.updated_on
+    ):
+        log.info("Already synced. No changes found for %s", course_prefix)
+        return None
+
+    log.info("Digesting %s...", course_prefix)
+
+    try:
+        course, run = digest_ocw_next_course(  # pylint: disable=unused-variable
+            course_json, last_modified, uid, course_prefix
+        )
+    except TypeError:
+        log.exception("Course and run not returned, skipping")
+        return None
+
+    course.save()
+    upsert_course(course.id)
+
+
 def sync_ocw_courses(
     *, course_prefixes, blocklist, force_overwrite, upload_to_s3, start_timestamp=None
 ):
@@ -559,6 +728,36 @@ def sync_ocw_courses(
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
                 blocklist=blocklist,
+                start_timestamp=start_timestamp,
+            )
+        except:  # pylint: disable=bare-except
+            log.exception("Error encountered parsing OCW json for %s", course_prefix)
+
+
+def sync_ocw_next_courses(*, course_prefixes, force_overwrite, start_timestamp=None):
+    """
+    Sync OCW courses to the database
+
+    Args:
+        course_prefixes (list of str): The course prefixes to process
+        force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
+        start_timestamp (datetime or None): backpopulate start time
+
+    Returns:
+        set[str]: All LearningResourceRun.run_id values for course runs which were synced
+    """
+    raw_data_bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_NEXT_LIVE_BUCKET)
+
+    for course_prefix in course_prefixes:
+        try:
+            sync_ocw_next_course(
+                course_prefix=course_prefix,
+                raw_data_bucket=raw_data_bucket,
+                force_overwrite=force_overwrite,
                 start_timestamp=start_timestamp,
             )
         except:  # pylint: disable=bare-except
