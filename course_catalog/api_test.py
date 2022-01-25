@@ -883,9 +883,7 @@ def test_sync_ocw_next_course_already_synched(
     bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
 
     course = CourseFactory.create(
-        platform=PlatformType.ocw.value,
-        course_id="97db384ef34009a64df7cb86cf701979+16.01",
-        title="Existing",
+        platform=PlatformType.ocw.value, course_id="Existing", title="Existing"
     )
 
     run = course.runs.last()
@@ -908,9 +906,14 @@ def test_sync_ocw_next_course_already_synched(
 
     if overwrite and start_timestamp != datetime(2020, 11, 15, tzinfo=pytz.utc):
         assert Course.objects.last().title == "Unified Engineering I, II, III, & IV"
+        assert (
+            Course.objects.last().course_id == "97db384ef34009a64df7cb86cf701979+16.01"
+        )
         mock_upsert.assert_called_once()
     else:
         assert Course.objects.last().title == "Existing"
+        assert Course.objects.last().course_id == "Existing"
+
         mock_upsert.assert_not_called()
 
 

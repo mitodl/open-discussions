@@ -66,6 +66,13 @@ def get_year_and_semester(course_run):
     """
     year = course_run.get("year")
     semester = course_run.get("semester")
+
+    if year == "":
+        year = None
+
+    if semester == "":
+        semester = None
+
     if not semester and not year:
         match = re.search(
             "[1|2|3]T[0-9]{4}", course_run.get("key")
