@@ -171,10 +171,15 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         uid (str): Course uid
         course_prefix (str):String used to query S3 bucket for course data JSONs
     """
-    existing_course_instance = Course.objects.filter(
-        platform=PlatformType.ocw.value,
-        course_id=f"{uid}+{course_json.get('primary_course_number')}",
+
+    courserun_instance = LearningResourceRun.objects.filter(
+        platform=PlatformType.ocw.value, run_id=uid
     ).first()
+
+    if courserun_instance:
+        existing_course_instance = courserun_instance.content_object
+    else:
+        existing_course_instance = None
 
     data = {
         **course_json,
@@ -238,7 +243,6 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
                 uid,
                 run_serializer.errors,
             )
-            return
         run = run_serializer.save()
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
     return course, run
@@ -691,7 +695,7 @@ def sync_ocw_next_course(
             course_json, last_modified, uid, course_prefix
         )
     except TypeError:
-        log.exception("Course and run not returned, skipping")
+        log.info("Course and run not returned, skipping")
         return None
 
     course.save()
