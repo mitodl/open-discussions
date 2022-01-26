@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.175.3
+---------------
+
+- fixes for sentry errors
+- Import ocw-next courses
+
 Version 0.175.2 (Released December 14, 2021)
 ---------------
 
