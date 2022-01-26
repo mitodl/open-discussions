@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.175.3
+Version 0.175.3 (Released January 26, 2022)
 ---------------
 
 - fixes for sentry errors
