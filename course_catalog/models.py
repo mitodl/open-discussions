@@ -258,6 +258,10 @@ class ContentFile(TimestampedModel):
     content_type = models.CharField(
         choices=VALID_COURSE_CONTENT_CHOICES, default=CONTENT_TYPE_FILE, max_length=10
     )
+    learning_resource_types = ArrayField(
+        models.CharField(max_length=256, null=False, blank=False), null=True, blank=True
+    )
+    published = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (("key", "run"),)

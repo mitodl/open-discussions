@@ -14,6 +14,7 @@ from course_catalog.utils import (
     load_course_blocklist,
     load_course_duplicates,
     get_ocw_department_list,
+    safe_load_json,
 )
 
 
@@ -197,3 +198,10 @@ def test_get_ocw_topics():
 def test_get_ocw_department(course_json, expected_departments):
     """ test_get_ocw_department should return the expected list of departments """
     assert get_ocw_department_list(course_json) == expected_departments
+
+
+def test_safe_load_bad_json(mocker):
+    """ Test that safe_load_json returns an empty dict for invalid JSON"""
+    mock_logger = mocker.patch("course_catalog.utils.log.exception")
+    assert safe_load_json("badjson", "key") == {}
+    mock_logger.assert_called_with("%s has a corrupted JSON", "key")

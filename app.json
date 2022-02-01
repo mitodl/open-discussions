@@ -443,7 +443,11 @@
       "value": "false"
     },
     "OCW_NEXT_LIVE_BUCKET":{
-      "description": "bucket for ocw-next data",
+      "description": "bucket for ocw-next courses data",
+      "required": false
+    },
+    "OCW_NEXT_AWS_STORAGE_BUCKET_NAME":{
+      "description": "bucket for ocw-next storage data",
       "required": false
     },
     "PGBOUNCER_DEFAULT_POOL_SIZE": {

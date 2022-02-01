@@ -381,11 +381,14 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
 
     def get_resource_type(self, instance):
         """Get the resource type of the ContentFile"""
-        if not instance.section:
-            return None
-        if re.search(r"Assignment($|\s)", instance.section):
-            return OCW_TYPE_ASSIGNMENTS
-        return OCW_SECTION_TYPE_MAPPING.get(instance.section, None)
+        if instance.run.content_object.ocw_next_course:
+            return instance.learning_resource_types
+        else:
+            if not instance.section:
+                return None
+            if re.search(r"Assignment($|\s)", instance.section):
+                return OCW_TYPE_ASSIGNMENTS
+            return OCW_SECTION_TYPE_MAPPING.get(instance.section, None)
 
     class Meta:
         model = ContentFile
@@ -427,6 +430,7 @@ class ESRunSerializer(LearningResourceSerializer):
     prices = ESCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
 
     def get_instructors(self, instance):
         """
@@ -446,6 +450,14 @@ class ESRunSerializer(LearningResourceSerializer):
         """
         if instance.availability:
             return instance.availability.title()
+        return None
+
+    def get_level(self, instance):
+        """
+        Get the levels for a course run
+        """
+        if instance.level:
+            return instance.level.split(", ")
         return None
 
     class Meta:

@@ -1,16 +1,20 @@
 """ Utils for course catalog """
 import re
 from datetime import datetime
+import logging
 from urllib.parse import urljoin
 
 import pytz
 import requests
 import yaml
 from django.conf import settings
+import rapidjson
 
 from course_catalog.constants import semester_mapping, PlatformType
 
 from open_discussions.utils import generate_filepath
+
+log = logging.getLogger()
 
 
 def user_list_image_upload_uri(instance, filename):
@@ -226,3 +230,44 @@ def load_course_duplicates(platform):
         if platform in duplicates_for_all_platforms:
             return duplicates_for_all_platforms[platform]
     return []
+
+
+def get_s3_object_and_read(obj, iteration=0):
+    """
+    Attempts to read S3 data, and tries again up to MAX_S3_GET_ITERATIONS if it encounters an error.
+    This helps to prevent read timeout errors from stopping sync.
+
+    Args:
+        obj (s3.ObjectSummary): The S3 ObjectSummary we are trying to read
+        iteration (int): A number tracking how many times this function has been run
+
+    Returns:
+        bytes: The contents of a json file read from S3
+    """
+    try:
+        return obj.get()["Body"].read()
+    except Exception:  # pylint: disable=broad-except
+        if iteration < settings.MAX_S3_GET_ITERATIONS:
+            return get_s3_object_and_read(obj, iteration + 1)
+        else:
+            raise
+
+
+def safe_load_json(json_string, json_file_key):
+    """
+    Loads the passed string as a JSON object with exception handing and logging.
+    Some OCW JSON content may be malformed.
+
+    Args:
+        json_string (str): The JSON contents as a string
+        json_file_key (str or bytes): file ID for the JSON file
+
+    Returns:
+        JSON (dict): the JSON contents as JSON
+    """
+    try:
+        loaded_json = rapidjson.loads(json_string)
+        return loaded_json
+    except rapidjson.JSONDecodeError:
+        log.exception("%s has a corrupted JSON", json_file_key)
+        return {}

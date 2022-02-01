@@ -39,7 +39,21 @@ from course_catalog.models import (
 
 # pylint: disable=unused-argument
 from open_discussions.factories import UserFactory
-from search.constants import OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES
+from search.constants import (
+    OCW_TYPE_ASSIGNMENTS,
+    OCW_TYPE_EXAMS,
+    OCW_TYPE_LABS,
+    OCW_TYPE_LECTURE_AUDIO,
+    OCW_TYPE_LECTURE_NOTES,
+    OCW_TYPE_LECTURE_VIDEOS,
+    OCW_TYPE_PROJECTS,
+    OCW_TYPE_READINGS,
+    OCW_TYPE_RECITATIONS,
+    OCW_TYPE_TEXTBOOKS,
+    OCW_TYPE_TOOLS,
+    OCW_TYPE_TUTORIALS,
+    OCW_TYPE_VIDEOS,
+)
 
 
 def _post_gen_prices(obj, create, extracted, **kwarg):
@@ -275,6 +289,24 @@ class ContentFileFactory(DjangoModelFactory):
     content_type = FuzzyChoice((CONTENT_TYPE_FILE, CONTENT_TYPE_PAGE))
     file_type = FuzzyChoice(("application/pdf", "video/mp4", "text"))
     section = FuzzyChoice((OCW_TYPE_EXAMS, OCW_TYPE_LECTURE_NOTES, None))
+    learning_resource_types = FuzzyChoice(
+        (
+            [OCW_TYPE_ASSIGNMENTS],
+            [OCW_TYPE_EXAMS],
+            [OCW_TYPE_LABS],
+            [OCW_TYPE_LECTURE_AUDIO],
+            [OCW_TYPE_LECTURE_NOTES],
+            [OCW_TYPE_LECTURE_VIDEOS],
+            [OCW_TYPE_PROJECTS],
+            [OCW_TYPE_READINGS],
+            [OCW_TYPE_RECITATIONS],
+            [OCW_TYPE_TEXTBOOKS],
+            [OCW_TYPE_TOOLS],
+            [OCW_TYPE_TUTORIALS],
+            [OCW_TYPE_VIDEOS],
+        )
+    )
+    published = True
 
     class Meta:
         model = ContentFile
