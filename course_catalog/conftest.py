@@ -18,11 +18,6 @@ OCW_NEXT_TEST_PREFIX = (
 )
 
 OCW_NEXT_TEST_JSON_PATH = join("./test_json/", OCW_NEXT_TEST_PREFIX[:-1])
-OCW_NEXT_TEST_JSON_FILES = [
-    file
-    for file in listdir(OCW_NEXT_TEST_JSON_PATH)
-    if isfile(join(OCW_NEXT_TEST_JSON_PATH, file))
-]
 
 
 @pytest.fixture
@@ -74,7 +69,7 @@ def setup_s3_ocw_next(settings):
     settings.AWS_ACCESS_KEY_ID = "abc"
     settings.AWS_SECRET_ACCESS_KEY = "abc"
     settings.OCW_NEXT_LIVE_BUCKET = "test_bucket"
-
+    settings.OCW_NEXT_AWS_STORAGE_BUCKET_NAME = "test_bucket"
     # Create our fake bucket
     conn = boto3.resource(
         "s3",
@@ -85,7 +80,28 @@ def setup_s3_ocw_next(settings):
 
     # Add data to the fake ocw next bucket
     ocw_next_bucket = conn.Bucket(name=settings.OCW_NEXT_LIVE_BUCKET)
-    for file in OCW_NEXT_TEST_JSON_FILES:
-        file_key = OCW_NEXT_TEST_JSON_PATH.replace("./test_json/", "") + "/" + file
-        with open(OCW_NEXT_TEST_JSON_PATH + "/" + file, "r") as f:
-            ocw_next_bucket.put_object(Key=file_key, Body=f.read())
+
+    base_folder = OCW_NEXT_TEST_JSON_PATH.replace("./test_json/", "")
+
+    for file in listdir(OCW_NEXT_TEST_JSON_PATH):
+        add_file_to_bucket_recursive(
+            ocw_next_bucket, OCW_NEXT_TEST_JSON_PATH, base_folder, file
+        )
+
+
+def add_file_to_bucket_recursive(bucket, file_base, s3_base, file_object):
+    """
+    Add file to fake s3 bucket
+    """
+    local_path = file_base + "/" + file_object
+    file_key = s3_base + "/" + file_object
+
+    if file_object[0] == ".":
+        return
+
+    elif isfile(join(file_base, file_object)):
+        with open(local_path, "r") as f:
+            bucket.put_object(Key=file_key, Body=f.read())
+    else:
+        for child in listdir(local_path):
+            add_file_to_bucket_recursive(bucket, local_path, file_key, child)

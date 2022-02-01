@@ -27,6 +27,7 @@ from course_catalog.etl.ocw import (
     get_ocw_learning_course_bucket,
     transform_content_files,
 )
+from course_catalog.etl.ocw_next import transform_ocw_next_content_files
 from course_catalog.etl.xpro import get_xpro_learning_course_bucket
 from course_catalog.etl.xpro import (
     transform_content_files as transform_content_files_xpro,
@@ -38,30 +39,10 @@ from course_catalog.serializers import (
     OCWNextSerializer,
     OCWSerializer,
 )
-from course_catalog.utils import get_course_url
+from course_catalog.utils import get_course_url, get_s3_object_and_read, safe_load_json
 from search.task_helpers import delete_course, upsert_course
 
 log = logging.getLogger(__name__)
-
-
-def safe_load_json(json_string, json_file_key):
-    """
-    Loads the passed string as a JSON object with exception handing and logging.
-    Some OCW JSON content may be malformed.
-
-    Args:
-        json_string (str): The JSON contents as a string
-        json_file_key (str or bytes): file ID for the JSON file
-
-    Returns:
-        JSON (dict): the JSON contents as JSON
-    """
-    try:
-        loaded_json = rapidjson.loads(json_string)
-        return loaded_json
-    except rapidjson.JSONDecodeError:
-        log.exception("%s has a corrupted JSON", json_file_key)
-        return {}
 
 
 def digest_ocw_course(
@@ -246,27 +227,6 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         run = run_serializer.save()
         load_offered_bys(run, [{"name": OfferedBy.ocw.value}])
     return course, run
-
-
-def get_s3_object_and_read(obj, iteration=0):
-    """
-    Attempts to read S3 data, and tries again up to MAX_S3_GET_ITERATIONS if it encounters an error.
-    This helps to prevent read timeout errors from stopping sync.
-
-    Args:
-        obj (s3.ObjectSummary): The S3 ObjectSummary we are trying to read
-        iteration (int): A number tracking how many times this function has been run
-
-    Returns:
-        bytes: The contents of a json file read from S3
-    """
-    try:
-        return obj.get()["Body"].read()
-    except Exception:  # pylint: disable=broad-except
-        if iteration < settings.MAX_S3_GET_ITERATIONS:
-            return get_s3_object_and_read(obj, iteration + 1)
-        else:
-            raise
 
 
 def format_date(date_str):
@@ -624,14 +584,14 @@ def sync_ocw_course(
 
 
 def sync_ocw_next_course(
-    *, course_prefix, raw_data_bucket, force_overwrite, start_timestamp=None
+    *, course_prefix, s3_resource, force_overwrite, start_timestamp=None
 ):
     """
     Sync an OCW course run
 
     Args:
         course_prefix (str): The course prefix
-        raw_data_bucket (boto3.resource): The S3 bucket containing the OCW information
+        s3_resource (boto3.resource): Boto3 s3 resource
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         start_timestamp (timestamp): start timestamp of backpoplate. If the updated_on is after this the update already happened
 
@@ -640,35 +600,32 @@ def sync_ocw_next_course(
             The UID, or None if the run_id is not found, or if it was found but not synced
     """
     course_json = {}
-    last_modified_dates = []
     uid = None
 
     log.info("Syncing: %s ...", course_prefix)
-    # Collect last modified timestamps for all course files of the course
-    for obj in raw_data_bucket.objects.filter(Prefix=course_prefix):
-        if obj.key == course_prefix + "data.json":
-            try:
-                course_json = safe_load_json(get_s3_object_and_read(obj), obj.key)
-                uid = course_json.get("legacy_uid")
 
-                if not uid:
-                    uid = course_json.get("site_uid")
+    s3_data_object = s3_resource.Object(
+        settings.OCW_NEXT_LIVE_BUCKET, course_prefix + "data.json"
+    )
 
-            except:  # pylint: disable=bare-except
-                log.exception(
-                    "Error encountered reading data.json for %s", course_prefix
-                )
-        # accessing last_modified from s3 object summary is fast (does not download file contents)
-        last_modified_dates.append(obj.last_modified)
+    try:
+        course_json = safe_load_json(
+            get_s3_object_and_read(s3_data_object), s3_data_object.key
+        )
+        last_modified = s3_data_object.last_modified
+    except:  # pylint: disable=bare-except
+        log.exception("Error encountered reading data.json for %s", course_prefix)
+
+    uid = course_json.get("legacy_uid")
+
+    if not uid:
+        uid = course_json.get("site_uid")
 
     if not uid:
         log.info("Skipping %s, both site_uid and legacy_uid missing", course_prefix)
         return None
     else:
         uid = uid.replace("-", "")
-
-    # get the latest modified timestamp of any file in the course
-    last_modified = max(last_modified_dates)
 
     # if course run synced before, check if modified since then
     courserun_instance = LearningResourceRun.objects.filter(
@@ -698,8 +655,11 @@ def sync_ocw_next_course(
         log.info("Course and run not returned, skipping")
         return None
 
-    course.save()
     upsert_course(course.id)
+    load_content_files(
+        run,
+        transform_ocw_next_content_files(s3_resource, course_prefix, force_overwrite),
+    )
 
 
 def sync_ocw_courses(
@@ -750,17 +710,17 @@ def sync_ocw_next_courses(*, course_prefixes, force_overwrite, start_timestamp=N
     Returns:
         set[str]: All LearningResourceRun.run_id values for course runs which were synced
     """
-    raw_data_bucket = boto3.resource(
+    s3_resource = boto3.resource(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    ).Bucket(name=settings.OCW_NEXT_LIVE_BUCKET)
+    )
 
     for course_prefix in course_prefixes:
         try:
             sync_ocw_next_course(
                 course_prefix=course_prefix,
-                raw_data_bucket=raw_data_bucket,
+                s3_resource=s3_resource,
                 force_overwrite=force_overwrite,
                 start_timestamp=start_timestamp,
             )

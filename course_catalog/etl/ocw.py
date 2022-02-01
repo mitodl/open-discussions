@@ -127,6 +127,7 @@ def transform_content_file(
     content_file["section"], content_file["section_slug"] = get_content_file_section(
         content_file, course_run_json.get("course_pages", [])
     )
+    content_file["published"] = True
 
     s3_url = content_file.get("file_location", "")
     key = urlparse(s3_url).path.lstrip("/")
@@ -217,6 +218,7 @@ def transform_embedded_media(
             "content_type": CONTENT_TYPE_VIDEO,
             "url": f"https://www.youtube.com/watch?v={video}",
             "uid": embedded_media_item["uid"],
+            "published": True,
         }
         video_model_obj = Video.objects.filter(video_id=video).first()
         if video_model_obj:

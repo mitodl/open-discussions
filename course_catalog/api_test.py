@@ -20,12 +20,11 @@ from course_catalog.api import (
     get_course_availability,
     ocw_parent_folder,
     parse_bootcamp_json_data,
-    safe_load_json,
     sync_ocw_course,
     sync_ocw_course_files,
     sync_ocw_next_course,
-    sync_xpro_course_files,
     sync_ocw_next_courses,
+    sync_xpro_course_files,
 )
 from course_catalog.conftest import (
     OCW_NEXT_TEST_PREFIX,
@@ -484,13 +483,6 @@ def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
     assert LearningResourceRun.objects.count() == 0
 
 
-def test_safe_load_bad_json(mocker):
-    """ Test that safe_load_json returns an empty dict for invalid JSON"""
-    mock_logger = mocker.patch("course_catalog.api.log.exception")
-    assert safe_load_json("badjson", "key") == {}
-    mock_logger.assert_called_with("%s has a corrupted JSON", "key")
-
-
 def test_get_course_availability(mitx_valid_data):
     """ Test that availability is calculated as expected """
     ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
@@ -849,11 +841,14 @@ def test_sync_ocw_course_already_synched(
 def test_sync_ocw_next_course(settings, mocker):
     """ Sync ocw next course """
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    mock_load_content_files = mocker.patch("course_catalog.api.load_content_files")
     setup_s3_ocw_next(settings)
-    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+    s3_resource = boto3.resource("s3")
 
     sync_ocw_next_course(
-        course_prefix=OCW_NEXT_TEST_PREFIX, raw_data_bucket=bucket, force_overwrite=True
+        course_prefix=OCW_NEXT_TEST_PREFIX,
+        s3_resource=s3_resource,
+        force_overwrite=True,
     )
 
     assert Course.objects.last().title == "Unified Engineering I, II, III, & IV"
@@ -861,6 +856,7 @@ def test_sync_ocw_next_course(settings, mocker):
     assert Course.objects.last().ocw_next_course
 
     mock_upsert.assert_called_once()
+    mock_load_content_files.assert_called_once()
 
 
 @mock_s3
@@ -879,8 +875,10 @@ def test_sync_ocw_next_course_already_synched(
     """ The course should be overwritten only if there is new data or overwrite is true """
 
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
+    mocker.patch("course_catalog.api.load_content_files")
+
     setup_s3_ocw_next(settings)
-    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+    resource = boto3.resource("s3")
 
     course = CourseFactory.create(
         platform=PlatformType.ocw.value, course_id="Existing", title="Existing"
@@ -897,7 +895,7 @@ def test_sync_ocw_next_course_already_synched(
 
     sync_ocw_next_course(
         course_prefix=OCW_NEXT_TEST_PREFIX,
-        raw_data_bucket=bucket,
+        s3_resource=resource,
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,
     )
@@ -924,7 +922,7 @@ def test_sync_ocw_next_courses(settings, mocker):
     setup_s3_ocw_next(settings)
     overwrite = True
     start_timestamp = datetime(2020, 12, 15, tzinfo=pytz.utc)
-    bucket = boto3.resource("s3").Bucket(settings.OCW_NEXT_LIVE_BUCKET)
+    resource = boto3.resource("s3")
     mock_sync_course = mocker.patch("course_catalog.api.sync_ocw_next_course")
 
     sync_ocw_next_courses(
@@ -935,7 +933,7 @@ def test_sync_ocw_next_courses(settings, mocker):
 
     mock_sync_course.assert_called_once_with(
         course_prefix=OCW_NEXT_TEST_PREFIX,
-        raw_data_bucket=bucket,
+        s3_resource=resource,
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,
     )

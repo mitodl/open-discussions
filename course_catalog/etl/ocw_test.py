@@ -218,6 +218,7 @@ def test_transform_content_file_course_files(mock_tika_functions):
             "title": course_file["title"],
             "uid": course_file.get("uid", None),
             "url": get_content_file_url(course_file, is_page=False),
+            "published": True,
         }
         if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
@@ -260,6 +261,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
             "section": section,
             "section_slug": section_slug,
             "url": get_content_file_url(course_file, is_page=False),
+            "published": True,
         }
         if splitext(course_file["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
@@ -306,6 +308,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
             "uid": course_page["uid"],
             "url": get_content_file_url(course_page, is_page=True),
             "short_url": course_page["short_url"],
+            "published": True,
         }
         if splitext(course_page["file_location"])[-1] in VALID_TEXT_FILE_TYPES:
             expected_transform.update(
@@ -372,6 +375,7 @@ def test_transform_embedded_media(mocker, video_exists, url_response):
                 if video
                 else EMBEDDED_MEDIA[item]["embedded_media"][1]["media_location"],
                 "content": expected_content,
+                "published": True,
             }
         else:
             expected_transform = None

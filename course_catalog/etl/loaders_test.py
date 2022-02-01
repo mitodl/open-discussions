@@ -62,6 +62,7 @@ from course_catalog.models import (
     ContentFile,
     Podcast,
     PodcastEpisode,
+    ContentFile,
 )
 
 pytestmark = pytest.mark.django_db
@@ -860,13 +861,24 @@ def test_load_programs(mocker, mock_blocklist, mock_duplicates):
     mock_duplicates.assert_called_once_with("mitx")
 
 
+@pytest.mark.parametrize("existing_non_match", [True, False])
 @pytest.mark.parametrize("is_published", [True, False])
-def test_load_content_files(mocker, is_published):
+def test_load_content_files(mocker, is_published, existing_non_match):
     """Test that load_content_files calls the expected functions"""
     course_run = LearningResourceRunFactory.create(published=is_published)
+    if existing_non_match:
+        existing_content_file = ContentFileFactory.create(
+            published=True, run=course_run
+        )
+        returned_content_file_id = existing_content_file.id + 1
+    else:
+        returned_content_file_id = 1
+
     content_data = [{"a": "b"}, {"a": "c"}]
     mock_load_content_file = mocker.patch(
-        "course_catalog.etl.loaders.load_content_file", autospec=True
+        "course_catalog.etl.loaders.load_content_file",
+        return_value=returned_content_file_id,
+        autospec=True,
     )
     mock_bulk_index = mocker.patch(
         "course_catalog.etl.loaders.search_task_helpers.index_run_content_files",
@@ -876,10 +888,21 @@ def test_load_content_files(mocker, is_published):
         "course_catalog.etl.loaders.search_task_helpers.delete_run_content_files",
         autospec=True,
     )
+    mock_delete = mocker.patch(
+        "course_catalog.etl.loaders.search_task_helpers.delete_content_file",
+        autospec=True,
+    )
     load_content_files(course_run, content_data)
     assert mock_load_content_file.call_count == len(content_data)
     assert mock_bulk_index.call_count == (1 if is_published else 0)
     assert mock_bulk_delete.call_count == (0 if is_published else 1)
+
+    if existing_non_match:
+        existing_content_file.refresh_from_db()
+        assert existing_content_file.published == False
+        mock_delete.assert_called_once()
+    else:
+        mock_delete.assert_not_called()
 
 
 def test_load_content_file():

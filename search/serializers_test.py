@@ -290,7 +290,8 @@ def test_es_course_price_serializer():
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("has_full_name", [True, False])
-def test_es_run_serializer(has_full_name):
+@pytest.mark.parametrize("level", ["Undergraduate", "Undergraduate, Graduate"])
+def test_es_run_serializer(has_full_name, level):
     """
     Test that ESRunSerializer correctly serializes a run object
     """
@@ -299,6 +300,8 @@ def test_es_run_serializer(has_full_name):
         if has_full_name
         else LearningResourceRunFactory.create(instructors__full_name=None)
     )
+    learning_resource_run.level = level
+    learning_resource_run.save()
     serialized = ESRunSerializer(learning_resource_run).data
 
     assert_json_equal(
@@ -311,7 +314,7 @@ def test_es_run_serializer(has_full_name):
             "language": learning_resource_run.language,
             "semester": learning_resource_run.semester,
             "year": int(learning_resource_run.year),
-            "level": learning_resource_run.level,
+            "level": level.split(", "),
             "start_date": learning_resource_run.start_date.strftime(ISOFORMAT),
             "end_date": learning_resource_run.end_date.strftime(ISOFORMAT),
             "enrollment_start": learning_resource_run.enrollment_start.strftime(
@@ -442,7 +445,7 @@ def test_es_course_serializer(offered_by, platform, department):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
-    "section,resource_type",
+    "section,section_resource_type",
     [
         ["First Paper Assignment", OCW_TYPE_ASSIGNMENTS],
         ["Assignment 1.2", OCW_TYPE_ASSIGNMENTS],
@@ -453,7 +456,8 @@ def test_es_course_serializer(offered_by, platform, department):
         ["Exercises", None],
     ],
 )
-def test_es_content_file_serializer(section, resource_type):
+@pytest.mark.parametrize("ocw_next_course", [True, False])
+def test_es_content_file_serializer(section, section_resource_type, ocw_next_course):
     """ Verify that the ESContentFileSerializer has the correct data"""
     content_kwargs = {
         "content": "Some text",
@@ -463,7 +467,17 @@ def test_es_content_file_serializer(section, resource_type):
         "section": section,
     }
     content_file = ContentFileFactory.create(**content_kwargs)
+    course = content_file.run.content_object
+    course.ocw_next_course = ocw_next_course
+    course.save()
+
+    if ocw_next_course:
+        resource_type = content_file.learning_resource_types
+    else:
+        resource_type = section_resource_type
+
     serialized = ESContentFileSerializer(content_file).data
+
     assert_json_equal(
         serialized,
         {

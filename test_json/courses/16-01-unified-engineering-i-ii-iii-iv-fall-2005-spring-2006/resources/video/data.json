@@ -1,0 +1,11 @@
+{
+  "description": "Video Description",
+  "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/gdrive_uploads/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26/94force.mp4",
+  "learning_resource_types": ["Competition Videos"],
+  "resource_type": "Video",
+  "file_type": "video/mp4",
+  "youtube_key":  "vKer2U5W5-s",
+  "captions_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript_webvtt",
+  "transcript_file": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/1MTm4cjPnMl0AmnP42tDtBleiQ3Zc2g26_transcript.pdf",
+  "archive_url": null
+}
