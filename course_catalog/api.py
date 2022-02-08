@@ -475,7 +475,7 @@ def sync_ocw_course(
         upload_to_s3 (bool): If True, upload course media to S3
         blocklist (list of str): list of course ids that should not be published
         start_timestamp (timestamp): start timestamp of backpoplate. If the updated_on is after this the update already happened
-        force_s3_upload (bool): If True, overwrite courses imported from OCW-Next
+        force_s3_upload (bool): If True, upload parsed JSON even if course imported from OCW-Next
 
     Returns:
         str:
@@ -731,7 +731,7 @@ def sync_ocw_courses(
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
         start_timestamp (datetime or None): backpopulate start time
-        force_s3_upload (bool): If True, overwrite courses imported from OCW-Next
+        force_s3_upload (bool): If True, upload parsed JSON even if course imported from OCW-Next
     Returns:
         set[str]: All LearningResourceRun.run_id values for course runs which were synced
     """
