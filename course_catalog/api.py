@@ -463,6 +463,7 @@ def sync_ocw_course(
     upload_to_s3,
     blocklist,
     start_timestamp=None,
+    force_s3_upload=False,
 ):
     """
     Sync an OCW course run
@@ -474,6 +475,7 @@ def sync_ocw_course(
         upload_to_s3 (bool): If True, upload course media to S3
         blocklist (list of str): list of course ids that should not be published
         start_timestamp (timestamp): start timestamp of backpoplate. If the updated_on is after this the update already happened
+        force_s3_upload (bool): If True, overwrite courses imported from OCW-Next
 
     Returns:
         str:
@@ -523,9 +525,15 @@ def sync_ocw_course(
         platform=PlatformType.ocw.value, run_id=uid
     ).first()
 
-    if courserun_instance and courserun_instance.content_object.ocw_next_course:
+    is_ocw_next_course = (
+        courserun_instance is not None
+        and courserun_instance.content_object.ocw_next_course
+    )
+
+    if is_ocw_next_course and not force_s3_upload:
         log.info(
-            "%s is imported into OCW Studio. Skipping sync from Plone", course_prefix
+            "%s is imported into OCW Studio. Skipping sync and s3 json upload from Plone",
+            course_prefix,
         )
         return None
 
@@ -568,7 +576,7 @@ def sync_ocw_course(
     if course_json["course_id"] in blocklist:
         is_published = False
 
-    if upload_to_s3:
+    if upload_to_s3 or force_s3_upload:
         parser.setup_s3_uploading(
             settings.OCW_LEARNING_COURSE_BUCKET_NAME,
             settings.AWS_ACCESS_KEY_ID,
@@ -593,6 +601,9 @@ def sync_ocw_course(
             parser.upload_parsed_json_to_s3(
                 boto3.resource("s3").Bucket(settings.OCW_LEARNING_COURSE_BUCKET_NAME)
             )
+
+    if is_ocw_next_course:
+        return None
 
     log.info("Digesting %s...", course_prefix)
 
@@ -703,7 +714,13 @@ def sync_ocw_next_course(
 
 
 def sync_ocw_courses(
-    *, course_prefixes, blocklist, force_overwrite, upload_to_s3, start_timestamp=None
+    *,
+    course_prefixes,
+    blocklist,
+    force_overwrite,
+    upload_to_s3,
+    start_timestamp=None,
+    force_s3_upload=False,
 ):
     """
     Sync OCW courses to the database
@@ -714,7 +731,7 @@ def sync_ocw_courses(
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         upload_to_s3 (bool): If True, upload course media to S3
         start_timestamp (datetime or None): backpopulate start time
-
+        force_s3_upload (bool): If True, overwrite courses imported from OCW-Next
     Returns:
         set[str]: All LearningResourceRun.run_id values for course runs which were synced
     """
@@ -733,6 +750,7 @@ def sync_ocw_courses(
                 upload_to_s3=upload_to_s3,
                 blocklist=blocklist,
                 start_timestamp=start_timestamp,
+                force_s3_upload=force_s3_upload,
             )
         except:  # pylint: disable=bare-except
             log.exception("Error encountered parsing OCW json for %s", course_prefix)

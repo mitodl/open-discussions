@@ -16,7 +16,7 @@ from course_catalog.conftest import (
     setup_s3_ocw_next,
 )
 from course_catalog.constants import PlatformType
-from course_catalog.factories import CourseFactory
+from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.tasks import (
     get_bootcamp_data,
@@ -94,9 +94,16 @@ def test_get_mitx_data_valid(mocker):
 
 @mock_s3
 @pytest.mark.parametrize("force_overwrite", [True, False])
+@pytest.mark.parametrize("force_s3_upload", [True, False])
 @pytest.mark.parametrize("upload_to_s3", [True, False])
 def test_get_ocw_data(
-    settings, mocker, mocked_celery, mock_blocklist, force_overwrite, upload_to_s3
+    settings,
+    mocker,
+    mocked_celery,
+    mock_blocklist,
+    force_overwrite,
+    upload_to_s3,
+    force_s3_upload,
 ):
     """Test get_ocw_data task"""
     setup_s3(settings)
@@ -105,7 +112,11 @@ def test_get_ocw_data(
     )
 
     with pytest.raises(mocked_celery.replace_exception_class):
-        get_ocw_data.delay(force_overwrite=force_overwrite, upload_to_s3=upload_to_s3)
+        get_ocw_data.delay(
+            force_overwrite=force_overwrite,
+            upload_to_s3=upload_to_s3,
+            force_s3_upload=force_s3_upload,
+        )
     assert mocked_celery.group.call_count == 1
     get_ocw_courses_mock.si.assert_called_once_with(
         course_prefixes=[TEST_PREFIX],
@@ -113,6 +124,7 @@ def test_get_ocw_data(
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
         utc_start_timestamp=None,
+        force_s3_upload=force_s3_upload,
     )
 
 
@@ -264,6 +276,40 @@ def test_get_ocw_overwrite(
         upload_to_s3=True,
     )
     assert mock_digest.call_count == (1 if overwrite else 0)
+
+
+@mock_s3
+@pytest.mark.parametrize("force_s3_upload", [True, False])
+def test_get_ocw_force_s3_upload(
+    mocker, settings, mock_course_index_functions, mock_blocklist, force_s3_upload
+):
+    """Test that ocw-next courses are not overridden but parsed json is uploaded to s3 if force_s3_upload=True"""
+    setup_s3(settings)
+
+    lr = LearningResourceRunFactory.create(
+        platform=PlatformType.ocw.value,
+        slug=TEST_PREFIX,
+        run_id="16197636c270e1ab179fbc9a56c72787",
+        content_object=CourseFactory(
+            platform=PlatformType.ocw.value, ocw_next_course=True
+        ),
+    )
+    mock_digest = mocker.patch(
+        "course_catalog.api.digest_ocw_course", return_value=(lr.content_object, lr)
+    )
+    mock_parse_json = mocker.patch("course_catalog.api.OCWParser.get_parsed_json")
+
+    # run ocw sync
+    get_ocw_courses.delay(
+        course_prefixes=[TEST_PREFIX],
+        blocklist=mock_blocklist.return_value,
+        force_overwrite=False,
+        upload_to_s3=True,
+        force_s3_upload=force_s3_upload,
+    )
+
+    assert mock_digest.call_count == 0
+    assert mock_parse_json.call_count == (1 if force_s3_upload else 0)
 
 
 @mock_s3
