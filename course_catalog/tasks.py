@@ -90,7 +90,7 @@ def get_ocw_data(
     course_url_substring=None,
     utc_start_timestamp=None,
     force_s3_upload=False,
-):  # pylint:disable=too-many-locals,too-many-branches
+):  # pylint:disable=too-many-locals,too-many-branches,too-many-arguments
     """
     Task to sync OCW course data with database
     """
