@@ -304,7 +304,7 @@ def test_get_ocw_force_s3_upload(
         course_prefixes=[TEST_PREFIX],
         blocklist=mock_blocklist.return_value,
         force_overwrite=False,
-        upload_to_s3=True,
+        upload_to_s3=False,
         force_s3_upload=force_s3_upload,
     )
 
