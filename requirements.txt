@@ -209,7 +209,7 @@ kombu==4.6.7
     # via
     #   celery
     #   django-server-status
-lxml==4.6.3
+lxml==4.6.5
     # via
     #   -r requirements.in
     #   xbundle
