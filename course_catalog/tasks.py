@@ -45,6 +45,7 @@ def get_ocw_courses(
     force_overwrite,
     upload_to_s3,
     utc_start_timestamp=None,
+    force_s3_upload=False,
 ):
     """
     Task to sync a batch of OCW courses
@@ -60,6 +61,7 @@ def get_ocw_courses(
         force_overwrite=force_overwrite,
         upload_to_s3=upload_to_s3,
         start_timestamp=utc_start_timestamp,
+        force_s3_upload=force_s3_upload,
     )
 
 
@@ -87,7 +89,8 @@ def get_ocw_data(
     upload_to_s3=True,
     course_url_substring=None,
     utc_start_timestamp=None,
-):  # pylint:disable=too-many-locals,too-many-branches
+    force_s3_upload=False,
+):  # pylint:disable=too-many-locals,too-many-branches,too-many-arguments
     """
     Task to sync OCW course data with database
     """
@@ -129,6 +132,7 @@ def get_ocw_data(
                 force_overwrite=force_overwrite,
                 upload_to_s3=upload_to_s3,
                 utc_start_timestamp=utc_start_timestamp,
+                force_s3_upload=force_s3_upload,
             )
             for prefixes in chunks(
                 ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE

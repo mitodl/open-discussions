@@ -21,6 +21,12 @@ class Command(BaseCommand):
             help="Overwrite any existing records",
         )
         parser.add_argument(
+            "--force-s3",
+            dest="force_s3_upload",
+            action="store_true",
+            help="Force all parsed json to be generated/uploaded to S3",
+        )
+        parser.add_argument(
             "--delete",
             dest="delete",
             action="store_true",
@@ -56,15 +62,17 @@ class Command(BaseCommand):
                 upload_to_s3=options["upload_to_s3"],
                 course_url_substring=course_url_substring,
                 utc_start_timestamp=start.strftime(ISOFORMAT),
+                force_s3_upload=options["force_s3_upload"],
             )
 
             self.stdout.write(
                 "Started task {task} to get ocw course data "
-                "w/force_overwrite={overwrite}, upload_to_s3={s3}, course_url_substring={course_url_substring}".format(
+                "w/force_overwrite={overwrite}, force_s3_upload={force_s3}, upload_to_s3={s3}, course_url_substring={course_url_substring}".format(
                     task=task,
                     overwrite=options["force_overwrite"],
                     s3=options["upload_to_s3"],
                     course_url_substring=course_url_substring,
+                    force_s3=options["force_s3_upload"],
                 )
             )
             self.stdout.write("Waiting on task...")
