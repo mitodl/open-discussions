@@ -124,7 +124,7 @@ django-compat==1.0.15
     #   django-hijack-admin
 django-cors-headers==3.6.0
     # via -r requirements.in
-django-filter==2.2.0
+django-filter==2.4.0
     # via -r requirements.in
 django-guardian==1.4.9
     # via -r requirements.in
