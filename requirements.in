@@ -37,7 +37,7 @@ feedparser
 google-api-python-client==1.7.11
 html5lib==0.999999999
 ipython
-lxml==4.6.3
+lxml==4.6.5
 markdown2==2.4.0
 newrelic
 ocw-data-parser==0.32.0
