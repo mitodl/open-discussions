@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.176.0 (Released February 10, 2022)
+---------------
+
+- resource import
+
 Version 0.175.3 (Released January 26, 2022)
 ---------------
 
