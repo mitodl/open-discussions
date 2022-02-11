@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.177.0
+Version 0.177.0 (Released February 11, 2022)
 ---------------
 
 - Option to force S3 uploads of OCW data via ocw-data-parser (#3502)
