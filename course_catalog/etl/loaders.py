@@ -688,10 +688,10 @@ def load_content_files(course_run, content_files_data):
             run=course_run, published=True
         ).exclude(pk__in=content_files_ids)
 
-        for file in deleted_files:
-            search_task_helpers.delete_content_file(file)
-
         deleted_files.update(published=False)
+
+        for file in ContentFile.objects.filter(run=course_run, published=False):
+            search_task_helpers.delete_content_file(file)
 
         if course_run.published:
             search_task_helpers.index_run_content_files(course_run.id)

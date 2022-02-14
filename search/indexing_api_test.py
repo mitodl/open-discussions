@@ -544,7 +544,8 @@ def test_bulk_index_content_files(
     settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
-    content_files = ContentFileFactory.create_batch(5, run=run)
+    content_files = ContentFileFactory.create_batch(5, run=run, published=True)
+    deleted_content_file = ContentFileFactory.create_batch(5, run=run, published=False)
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
     )
@@ -574,6 +575,9 @@ def test_bulk_index_content_files(
             index_func(run.id)
     else:
         index_func(run.id)
+        if indexing_func_name == "delete_run_content_files":
+            content_files = content_files + [deleted_content_file]
+
         for alias in mock_get_aliases.return_value:
             for chunk in chunks([doc for _ in content_files], chunk_size=chunk_size):
                 bulk_mock.assert_any_call(
