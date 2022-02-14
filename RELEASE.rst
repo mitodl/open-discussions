@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.178.0
+---------------
+
+- content file fixes
+
 Version 0.177.0 (Released February 11, 2022)
 ---------------
 
