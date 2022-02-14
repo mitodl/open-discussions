@@ -42,7 +42,8 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/",
         "published": True,
         "title": "Pages",
-        "url": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/",
+        "content_title": "Pages",
+        "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/",
     }
 
     assert content_data[1] == {
@@ -51,7 +52,8 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/syllabus/",
         "published": True,
         "title": "Syllabus",
-        "url": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/syllabus/",
+        "content_title": "Syllabus",
+        "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/pages/syllabus/",
     }
 
     assert content_data[2] == {
@@ -66,7 +68,8 @@ def test_transform_ocw_next_content_files(settings, mocker):
         ],
         "published": True,
         "title": "Resource Title",
-        "url": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/resource/",
+        "content_title": "Resource Title",
+        "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/resource/",
     }
 
     assert content_data[3] == {
@@ -78,7 +81,8 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "learning_resource_types": ["Competition Videos"],
         "published": True,
         "title": None,
-        "url": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/video/",
+        "content_title": None,
+        "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/video/",
     }
 
 

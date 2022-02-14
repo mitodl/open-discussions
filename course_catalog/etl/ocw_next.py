@@ -7,7 +7,11 @@ from urllib.parse import urlparse
 from botocore.exceptions import ClientError
 from django.conf import settings
 
-from course_catalog.constants import CONTENT_TYPE_PAGE, VALID_TEXT_FILE_TYPES
+from course_catalog.constants import (
+    CONTENT_TYPE_PAGE,
+    VALID_TEXT_FILE_TYPES,
+    CONTENT_TYPE_VIDEO,
+)
 from course_catalog.etl.ocw import get_content_type
 from course_catalog.etl.utils import extract_text_metadata
 from course_catalog.models import ContentFile
@@ -74,10 +78,11 @@ def transform_page(s3_key, page_data):
     s3_path = s3_key.split("data.json")[0]
     return {
         "content_type": CONTENT_TYPE_PAGE,
-        "url": s3_path,
+        "url": "../" + urlparse(s3_path).path.lstrip("/"),
         "title": page_data.get("title"),
+        "content_title": page_data.get("title"),
         "content": page_data.get("content"),
-        "key": urlparse(s3_path).path.lstrip("/"),
+        "key": s3_path,
         "published": True,
     }
 
@@ -101,7 +106,10 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
     s3_path = urlparse(s3_path).path.lstrip("/")
 
     file_type = resource_data.get("file_type")
-    content_type = get_content_type(file_type)
+    if resource_data.get("resource_type") == "Video":
+        content_type = CONTENT_TYPE_VIDEO
+    else:
+        content_type = get_content_type(file_type)
 
     if content_type == "video":
         file_s3_path = resource_data.get("transcript_file")
@@ -109,6 +117,11 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
         file_s3_path = resource_data.get("file")
 
     if not file_s3_path:
+        return
+
+    title = resource_data.get("title")
+
+    if title == "3play caption file" or title == "3play pdf file":
         return
 
     if not file_s3_path.startswith("courses"):
@@ -151,8 +164,9 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
         "description": resource_data.get("description"),
         "file_type": file_type,
         "content_type": content_type,
-        "url": s3_path,
-        "title": resource_data.get("title"),
+        "url": "../" + urlparse(s3_path).path.lstrip("/"),
+        "title": title,
+        "content_title": title,
         "key": s3_path,
         "learning_resource_types": resource_data.get("learning_resource_types"),
         "published": True,
