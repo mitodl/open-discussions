@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.178.1
+---------------
+
+- Bump django from 2.2.24 to 2.2.27
+- Bump django-filter from 2.2.0 to 2.4.0
+- Bump ipython from 7.12.0 to 7.16.3
+- Bump pillow from 8.3.2 to 9.0.0
+- Bump celery from 4.3.0 to 5.2.2
+- Bump lxml from 4.6.3 to 4.6.5
+
 Version 0.178.0 (Released February 16, 2022)
 ---------------
 
