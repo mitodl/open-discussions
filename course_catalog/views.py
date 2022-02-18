@@ -6,6 +6,7 @@ import operator
 from hmac import compare_digest
 
 import rapidjson
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db import IntegrityError
 from django.db.models import Count, Prefetch, Q
@@ -54,7 +55,6 @@ from course_catalog.serializers import (
 )
 from course_catalog.tasks import get_ocw_courses, get_ocw_next_courses
 from course_catalog.utils import load_course_blocklist
-from open_discussions import settings
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
@@ -426,23 +426,19 @@ class WebhookOCWNextView(APIView):
 
     def post(self, request):
         """Process webhook request"""
+        content = rapidjson.loads(request.body.decode())
+
         if not compare_digest(
-            request.GET.get("webhook_key", ""), settings.OCW_WEBHOOK_KEY
+            content.get("webhook_key", ""), settings.OCW_NEXT_SEARCH_WEBHOOK_KEY
         ):
             raise WebhookException("Incorrect webhook key")
 
-        content = rapidjson.loads(request.body.decode())
-        records = content.get("Records")
-        if records is not None:
-            for record in content.get("Records"):
-                s3_key = record.get("s3", {}).get("object", {}).get("key")
-                prefix = s3_key.split("index.html")[0]
-                get_ocw_next_courses.apply_async(
-                    countdown=settings.OCW_WEBHOOK_DELAY,
-                    kwargs={"course_prefixes": [prefix], "force_overwrite": False},
-                )
-        else:
-            log.error("No records found in webhook: %s", request.body.decode())
+        version = content.get("version")
+        prefix = content.get("prefix")
+
+        if prefix is not None and version == "live":
+            get_ocw_next_courses.delay(course_prefixes=[prefix], force_overwrite=False)
+
         return Response({})
 
 

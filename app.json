@@ -228,6 +228,10 @@
       "description": "Name of S3 bucket to upload OCW course media",
       "required": false
     },
+    "OCW_NEXT_SEARCH_WEBHOOK_KEY": {
+      "description": "Authentication parameter value that should be passed in a webhook",
+      "required": false
+    },
     "OCW_UPLOAD_IMAGE_ONLY": {
       "description": "Upload course image only instead of all OCW files",
       "required": false
