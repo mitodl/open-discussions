@@ -61,29 +61,6 @@ OCW_WEBHOOK_RESPONSE = {
 }
 
 
-OCW_NEXT_WEBHOOK_RESPONSE = {
-    "Records": [
-        {
-            "eventVersion": "2.1",
-            "eventSource": "aws:s3",
-            "s3": {
-                "s3SchemaVersion": "1.0",
-                "configurationId": "OCW_Next_Update",
-                "bucket": {
-                    "name": "test-bucket-1",
-                    "ownerIdentity": {"principalId": "A123456789"},
-                    "arn": "arn:aws:s3:::test-trigger-1",
-                },
-                "object": {
-                    "key": "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/index.html",
-                    "size": 20544,
-                },
-            },
-        }
-    ]
-}
-
-
 @pytest.fixture()
 def mock_user_list_index(mocker):
     """Mocks index updating functions for user lists"""
@@ -697,45 +674,41 @@ def test_ocw_webhook_endpoint_bad_key(settings, client):
         )
 
 
-@pytest.mark.parametrize("data", [OCW_NEXT_WEBHOOK_RESPONSE, {}, {"foo": "bar"}])
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"webhook_key": "fake_key", "prefix": "prefix", "version": "live"},
+        {"webhook_key": "fake_key", "prefix": "prefix", "version": "draft"},
+        {"webhook_key": "fake_key", "version": "live"},
+    ],
+)
 def test_ocw_next_webhook_endpoint(client, mocker, settings, data):
     """Test that the OCW webhook endpoint schedules a get_ocw_next_courses task"""
-    settings.OCW_WEBHOOK_KEY = "fake_key"
+    settings.OCW_NEXT_SEARCH_WEBHOOK_KEY = "fake_key"
     mock_get_ocw = mocker.patch(
-        "course_catalog.views.get_ocw_next_courses.apply_async", autospec=True
+        "course_catalog.views.get_ocw_next_courses.delay", autospec=True
     )
-    mock_log = mocker.patch("course_catalog.views.log.error")
     client.post(
-        f"{reverse('ocw-next-webhook')}?webhook_key={settings.OCW_WEBHOOK_KEY}",
-        data=data,
-        headers={"Content-Type": "text/plain"},
+        reverse("ocw-next-webhook"), data=data, headers={"Content-Type": "text/plain"}
     )
-    if data == OCW_NEXT_WEBHOOK_RESPONSE:
+
+    prefix = data.get("prefix")
+
+    if prefix is not None and data.get("version") == "live":
         mock_get_ocw.assert_called_once_with(
-            countdown=settings.OCW_WEBHOOK_DELAY,
-            kwargs={
-                "course_prefixes": [
-                    OCW_NEXT_WEBHOOK_RESPONSE["Records"][0]["s3"]["object"][
-                        "key"
-                    ].split("index.html")[0]
-                ],
-                "force_overwrite": False,
-            },
+            course_prefixes=[prefix], force_overwrite=False
         )
     else:
         mock_get_ocw.assert_not_called()
-        mock_log.assert_called_once_with(
-            "No records found in webhook: %s", rapidjson.dumps(data)
-        )
 
 
 def test_ocw_next_webhook_endpoint_bad_key(settings, client):
     """Test that a webhook exception is raised if a bad key is sent"""
-    settings.OCW_WEBHOOK_KEY = "fake_key"
+    settings.OCW_NEXT_SEARCH_WEBHOOK_KEY = "fake_key"
     with pytest.raises(WebhookException):
         client.post(
-            f"{reverse('ocw-next-webhook')}?webhook_key=invalid_key",
-            data=OCW_WEBHOOK_RESPONSE,
+            reverse("ocw-next-webhook"),
+            data={"webhook_key": "bad_key", "prefix": "prefix", "version": "live"},
             headers={"Content-Type": "text/plain"},
         )
 
