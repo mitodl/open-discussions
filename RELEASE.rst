@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.178.1
+Version 0.178.1 (Released February 22, 2022)
 ---------------
 
 - Revert "Bump celery from 4.3.0 to 5.2.2"
