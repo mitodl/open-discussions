@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.178.2
+Version 0.178.2 (Released February 24, 2022)
 ---------------
 
 - OCW Next Webhook Updates
