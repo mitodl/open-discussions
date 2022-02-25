@@ -235,7 +235,7 @@ const _channelField = (type: ?string) => {
 }
 export { _channelField as channelField }
 import { channelField } from "./search"
-import { emptyOrNil, isDoubleQuoted } from "./util"
+import { emptyOrNil, isDoubleQuoted, normalizeDoubleQuotes } from "./util"
 
 const getTypes = (type: ?(string | Array<string>)) => {
   if (type) {
@@ -267,9 +267,10 @@ export const buildSearchQuery = ({
     builder.sort(field, option)
   }
   const types = getTypes(type)
+  const searchText = normalizeDoubleQuotes(text)
   return emptyOrNil(R.intersection(LR_TYPE_ALL, types))
-    ? buildChannelQuery(builder, text, types, channelName)
-    : buildLearnQuery(builder, text, types, facets)
+    ? buildChannelQuery(builder, searchText, types, channelName)
+    : buildLearnQuery(builder, searchText, types, facets)
 }
 
 export const buildFacetSubQuery = (

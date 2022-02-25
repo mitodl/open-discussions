@@ -369,6 +369,102 @@ describe("search functions", () => {
       sinon.assert.calledWith(stub, type)
     })
 
+    it("filters by text phrase", () => {
+      const fieldNames = ["field1", "field2", "field3"]
+      const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
+      const type = "a_type"
+      const text = "\u201Csome text here\u201D"
+      const expectedText = '"some text here"'
+      const textQuery = {
+        should: [
+          {
+            multi_match: {
+              query:  expectedText,
+              fields: fieldNames
+            }
+          }
+        ]
+      }
+
+      const suggestQuery = {
+        suggest_field1: {
+          phrase: {
+            collate: {
+              params: {
+                field_name: "suggest_field1"
+              },
+              prune: true,
+              query: {
+                source: {
+                  match_phrase: {
+                    "{{field_name}}": "{{suggestion}}"
+                  }
+                }
+              }
+            },
+            confidence: 0.0001,
+            field:      "suggest_field1",
+            gram_size:  1,
+            max_errors: 3,
+            size:       5
+          }
+        },
+        suggest_field2: {
+          phrase: {
+            collate: {
+              params: {
+                field_name: "suggest_field2"
+              },
+              prune: true,
+              query: {
+                source: {
+                  match_phrase: {
+                    "{{field_name}}": "{{suggestion}}"
+                  }
+                }
+              }
+            },
+            confidence: 0.0001,
+            field:      "suggest_field2",
+            gram_size:  1,
+            max_errors: 3,
+            size:       5
+          }
+        },
+        text: expectedText
+      }
+
+      assert.deepEqual(buildSearchQuery({ type, text }), {
+        query: {
+          bool: {
+            should: [
+              {
+                bool: {
+                  filter: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            object_type: type
+                          }
+                        },
+                        {
+                          bool: textQuery
+                        }
+                      ]
+                    }
+                  },
+                  ...textQuery
+                }
+              }
+            ]
+          }
+        },
+        suggest: suggestQuery
+      })
+      sinon.assert.calledWith(stub, type)
+    })
+
     it("filters by text", () => {
       const fieldNames = ["field1", "field2", "field3"]
       const stub = sandbox.stub(searchFuncs, "searchFields").returns(fieldNames)
