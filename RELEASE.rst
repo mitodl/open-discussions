@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.178.3
+Version 0.178.3 (Released March 02, 2022)
 ---------------
 
 - fix video thumbnails in search
