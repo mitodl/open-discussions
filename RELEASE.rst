@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.178.3
+---------------
+
+- fix video thumbnails in search
+- Recognize fancy double quotes for phrase search (#3522)
+
 Version 0.178.2 (Released February 24, 2022)
 ---------------
 
