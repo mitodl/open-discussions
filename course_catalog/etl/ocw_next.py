@@ -113,8 +113,10 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
 
     if content_type == "video":
         file_s3_path = resource_data.get("transcript_file")
+        image_src = resource_data.get("thumbnail_file")
     else:
         file_s3_path = resource_data.get("file")
+        image_src = None
 
     if not file_s3_path:
         return
@@ -174,5 +176,8 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
 
     if content_json:
         resource_data["content"] = content_json.get("content")
+
+    if image_src:
+        resource_data["image_src"] = image_src
 
     return resource_data
