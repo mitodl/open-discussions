@@ -83,6 +83,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
         "title": None,
         "content_title": None,
         "url": "../courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/video/",
+        "image_src": "https://img.youtube.com/vi/vKer2U5W5-s/default.jpg",
     }
 
 
