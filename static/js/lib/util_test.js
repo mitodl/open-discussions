@@ -18,7 +18,8 @@ import {
   spaceSeparated,
   isValidUrl,
   flatZip,
-  formatPrice
+  formatPrice,
+  normalizeDoubleQuotes
 } from "./util"
 
 describe("utility functions", () => {
@@ -229,6 +230,21 @@ describe("utility functions", () => {
     it("returns an empty string if null or undefined", () => {
       assert.equal(formatPrice(null), "")
       assert.equal(formatPrice(undefined), "")
+    })
+  })
+
+  describe("normalizeDoubleQuotes", () => {
+    it("returns a string with any fancy double quotes removed", () => {
+      [
+        ['"text phrase"', '"text phrase"'],
+        ["\u201Ctext phrase\u201D", '"text phrase"'],
+        ["some text", "some text"],
+        ["text", "text"],
+        [null, ""],
+        [undefined, ""]
+      ].forEach(([inputStr, expectedStr]) => {
+        assert.equal(normalizeDoubleQuotes(inputStr), expectedStr)
+      })
     })
   })
 })

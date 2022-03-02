@@ -166,5 +166,8 @@ export const formatPrice = (price: ?string | number | Decimal): string => {
 export const sortBy = (property: string) =>
   R.sortWith([R.ascend(R.prop(property))])
 
+export const normalizeDoubleQuotes = (text: ?string) =>
+  (text || "").replace(/[\u201C\u201D]/g, '"')
+
 export const isDoubleQuoted = (text: ?string) =>
-  !emptyOrNil(R.match(/^".+"$/, text || ""))
+  !emptyOrNil(R.match(/^".+"$/, normalizeDoubleQuotes(text)))
