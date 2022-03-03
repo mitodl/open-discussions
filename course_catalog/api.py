@@ -276,7 +276,6 @@ def generate_course_prefix_list(bucket, course_urls=None):
                 and course_prefix not in ocw_courses
                 and (not course_urls or key_pieces[0:-2][-1].lower() in course_urls)
             ):
-                log.info(f"Adding {course_prefix}")
                 ocw_courses.add(course_prefix)
                 if course_urls and len(ocw_courses) == len(course_urls):
                     break
