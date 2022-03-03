@@ -65,7 +65,11 @@ class Command(BaseCommand):
         else:
             course_url_substring = options.get("course_url_substring")
             if course_url_substring:
-                course_urls = course_url_substring.split(",")
+                course_urls = [
+                    course_url.strip()
+                    for course_url in course_url_substring.split(",")
+                    if course_url
+                ]
         if options["delete"]:
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw", ocw_next_course=False):
