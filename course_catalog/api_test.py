@@ -17,6 +17,7 @@ from course_catalog.api import (
     digest_ocw_course,
     digest_ocw_next_course,
     format_date,
+    generate_course_prefix_list,
     get_course_availability,
     ocw_parent_folder,
     parse_bootcamp_json_data,
@@ -936,4 +937,46 @@ def test_sync_ocw_next_courses(settings, mocker):
         s3_resource=resource,
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,
+    )
+
+
+@mock_s3
+@pytest.mark.parametrize(
+    "course_urls, expected_prefixes",
+    [
+        [
+            ["9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007"],
+            [
+                "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/"
+            ],
+        ],
+        [
+            [
+                "9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007",
+                "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006",
+            ],
+            [
+                "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/"
+            ],
+        ],
+        [["16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"], []],
+        [
+            None,
+            [
+                "PROD/9/9.15/Fall_2007/9-15-biochemistry-and-pharmacology-of-synaptic-transmission-fall-2007/"
+            ],
+        ],
+    ],
+)
+def test_generate_course_prefix_list(settings, course_urls, expected_prefixes):
+    """generate_course_prefix_list returns expected prefixes"""
+    setup_s3(settings)
+    bucket = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
+    assert (
+        generate_course_prefix_list(bucket, course_urls=course_urls)
+        == expected_prefixes
     )

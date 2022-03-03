@@ -60,7 +60,6 @@ from open_discussions.permissions import (
     PodcastFeatureFlag,
     ReadOnly,
 )
-
 # pylint:disable=unused-argument
 from search.task_helpers import delete_user_list, upsert_user_list
 

@@ -9,8 +9,8 @@ from django.http import Http404
 from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import UserListFactory, UserListItemFactory
 from course_catalog.permissions import (
-    HasUserListPermissions,
     HasUserListItemPermissions,
+    HasUserListPermissions,
 )
 from open_discussions.factories import UserFactory
 

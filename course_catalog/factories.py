@@ -3,10 +3,10 @@ import random
 from datetime import timedelta
 
 import factory
-from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyChoice, FuzzyText
 import pytz
 from django.contrib.contenttypes.models import ContentType
+from factory.django import DjangoModelFactory
+from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,
@@ -36,7 +36,6 @@ from course_catalog.models import (
     Video,
     VideoChannel,
 )
-
 # pylint: disable=unused-argument
 from open_discussions.factories import UserFactory
 from search.constants import (
