@@ -3,10 +3,10 @@ import random
 from datetime import timedelta
 
 import factory
-import pytz
-from django.contrib.contenttypes.models import ContentType
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice, FuzzyText
+import pytz
+from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,
