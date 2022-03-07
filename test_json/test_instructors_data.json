@@ -1,0 +1,60 @@
+{
+  "instructors": [
+    {
+      "data": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "middle_initial": "Cena",
+        "salutation": "Prof.",
+        "title": "John Cena Smith"
+      },
+      "result": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "full_name": "Prof. John Cena Smith"
+      }
+    },
+    {
+      "data": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "middle_initial": "",
+        "salutation": "",
+        "title": "John Smith"
+      },
+      "result": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "full_name": "John Smith"
+      }
+    },
+    {
+      "data": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "middle_initial": "Cena",
+        "salutation": "",
+        "title": ""
+      },
+      "result": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "full_name": "John Cena Smith"
+      }
+    },
+    {
+      "data": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "middle_initial": "Cena",
+        "salutation": "Dr.",
+        "title": ""
+      },
+      "result": {
+        "first_name": "John",
+        "last_name": "Smith",
+        "full_name": "Dr. John Cena Smith"
+      }
+    }
+  ]
+}

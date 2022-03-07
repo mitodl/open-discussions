@@ -270,3 +270,62 @@ def safe_load_json(json_string, json_file_key):
     except rapidjson.JSONDecodeError:
         log.exception("%s has a corrupted JSON", json_file_key)
         return {}
+
+
+def parse_instructors(staff):
+    """
+    Parses staff/instructors users including their full name, salutation etc
+
+    Args:
+        array (dict): staff/instructors
+
+    Returns:
+        array (dict): parsed instructors
+    """
+    instructors = []
+    for person in staff:
+        instructor = {
+            "first_name": person.get("given_name", person.get("first_name")),
+            "last_name": person.get("family_name", person.get("last_name")),
+            "full_name": person.get("title"),
+        }
+
+        if person.get("salutation"):
+            if instructor.get("full_name"):
+                instructor["full_name"] = "{salutation} {full_name}".format(
+                    salutation=person.get("salutation"),
+                    full_name=instructor.get("full_name"),
+                )
+            elif instructor.get("last_name"):
+                instructor["full_name"] = "{salutation} {full_name}".format(
+                    salutation=person.get("salutation"),
+                    full_name=" ".join(
+                        [
+                            part
+                            for part in [
+                                person.get("first_name"),
+                                person.get("middle_initial"),
+                                person.get("last_name"),
+                            ]
+                            if part
+                        ]
+                    ),
+                )
+        elif not instructor.get("full_name"):
+            instructor["full_name"] = "{full_name}".format(
+                full_name=" ".join(
+                    [
+                        part
+                        for part in [
+                            person.get("first_name"),
+                            person.get("middle_initial"),
+                            person.get("last_name"),
+                        ]
+                        if part
+                    ]
+                )
+            )
+
+        instructors.append(instructor)
+
+    return instructors
