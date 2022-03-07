@@ -291,7 +291,9 @@ def parse_instructors(staff):
         }
 
         if person.get("salutation"):
-            if instructor.get("full_name"):
+            if instructor.get("full_name") and (
+                not instructor.get("full_name").startswith(person.get("salutation"))
+            ):
                 instructor["full_name"] = "{salutation} {full_name}".format(
                     salutation=person.get("salutation"),
                     full_name=instructor.get("full_name"),
