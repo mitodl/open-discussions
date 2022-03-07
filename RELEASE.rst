@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.179.0
+---------------
+
+- Update ocw-data-parser, allow list of course paths to be passed to backpopulate_ocw_data (#3528)
+
 Version 0.178.3 (Released March 02, 2022)
 ---------------
 
