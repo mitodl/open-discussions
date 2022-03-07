@@ -295,12 +295,12 @@ def parse_instructors(staff):
                 not instructor.get("full_name").startswith(person.get("salutation"))
             ):
                 instructor["full_name"] = "{salutation} {full_name}".format(
-                    salutation=person.get("salutation"),
+                    salutation=person.get("salutation").strip(),
                     full_name=instructor.get("full_name"),
                 )
             elif instructor.get("last_name"):
                 instructor["full_name"] = "{salutation} {full_name}".format(
-                    salutation=person.get("salutation"),
+                    salutation=person.get("salutation").strip(),
                     full_name=" ".join(
                         [
                             part
