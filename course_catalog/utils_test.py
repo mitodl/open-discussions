@@ -20,8 +20,8 @@ from course_catalog.utils import (
 )
 
 
-@pytest.fixture
-def test_instructors_data():
+@pytest.fixture(name="test_instructors_data")
+def fixture_test_instructors_data():
     """
     Test instructors data
     """
@@ -222,7 +222,6 @@ def test_parse_instructors(test_instructors_data):
     """
     Verify that instructors assignment is working as expected
     """
-
     for instructor in test_instructors_data:
         parsed_instructors = parse_instructors([instructor["data"]])
         parsed_instructor = parsed_instructors[0]
