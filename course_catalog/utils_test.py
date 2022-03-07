@@ -9,12 +9,12 @@ import pytz
 from course_catalog.constants import PlatformType
 from course_catalog.utils import (
     get_course_url,
+    get_ocw_department_list,
     get_ocw_topics,
-    semester_year_to_date,
     load_course_blocklist,
     load_course_duplicates,
-    get_ocw_department_list,
     safe_load_json,
+    semester_year_to_date,
 )
 
 

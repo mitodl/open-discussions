@@ -254,14 +254,13 @@ def format_date(date_str):
     return None
 
 
-def generate_course_prefix_list(bucket, course_url_substring=None):
+def generate_course_prefix_list(bucket, course_urls=None):
     """
     Assembles a list of OCW course prefixes from an S3 Bucket that contains all the raw jsons files
 
     Args:
         bucket (s3.Bucket): Instantiated S3 Bucket object
-        course_url_substring (str or None):
-            If not None, only return course prefixes including this substring
+        course_urls (List[str] or None): List of site urls to return
     Returns:
         List of course prefixes
     """
@@ -271,16 +270,15 @@ def generate_course_prefix_list(bucket, course_url_substring=None):
         # retrieve courses, skipping non-courses (bootcamps, department topics, etc)
         if ocw_parent_folder(bucket_file.key) not in NON_COURSE_DIRECTORIES:
             key_pieces = bucket_file.key.split("/")
-            if "/".join(key_pieces[:-2]) != "":
-                ocw_courses.add("/".join(key_pieces[:-2]) + "/")
-
-    if course_url_substring is not None:
-        ocw_courses = [
-            course_path
-            for course_path in ocw_courses
-            if course_url_substring.lower() in course_path.lower()
-        ]
-
+            course_prefix = f'{"/".join(key_pieces[:-2])}/'
+            if (
+                course_prefix != "/"
+                and course_prefix not in ocw_courses
+                and (not course_urls or key_pieces[0:-2][-1].lower() in course_urls)
+            ):
+                ocw_courses.add(course_prefix)
+                if course_urls and len(ocw_courses) == len(course_urls):
+                    break
     return list(ocw_courses)
 
 

@@ -87,7 +87,7 @@ def get_ocw_data(
     self,
     force_overwrite=False,
     upload_to_s3=True,
-    course_url_substring=None,
+    course_urls=None,
     utc_start_timestamp=None,
     force_s3_upload=False,
 ):  # pylint:disable=too-many-locals,too-many-branches,too-many-arguments
@@ -109,9 +109,7 @@ def get_ocw_data(
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     ).Bucket(name=settings.OCW_CONTENT_BUCKET_NAME)
-    ocw_courses = generate_course_prefix_list(
-        raw_data_bucket, course_url_substring=course_url_substring
-    )
+    ocw_courses = generate_course_prefix_list(raw_data_bucket, course_urls=course_urls)
 
     total_course_count = len(ocw_courses)
 

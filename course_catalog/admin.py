@@ -5,17 +5,17 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 
 from course_catalog.models import (
     Course,
-    Program,
-    UserList,
-    ProgramItem,
-    UserListItem,
-    LearningResourceRun,
-    CoursePrice,
     CourseInstructor,
+    CoursePrice,
     CourseTopic,
+    Enrollment,
+    LearningResourceRun,
     Podcast,
     PodcastEpisode,
-    Enrollment,
+    Program,
+    ProgramItem,
+    UserList,
+    UserListItem,
 )
 
 

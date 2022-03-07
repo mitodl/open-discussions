@@ -1,4 +1,6 @@
 """Management command for populating ocw course data"""
+import json
+
 from django.core.management import BaseCommand
 
 from course_catalog.models import Course
@@ -42,13 +44,32 @@ class Command(BaseCommand):
             "--course-url-substring",
             dest="course_url_substring",
             required=False,
-            help="If set, backpopulate only courses whose urls match with this substring",
+            help="If set, backpopulate only the course whose urls match with this substring",
+        )
+        parser.add_argument(
+            "--course-url-json",
+            dest="course_url_json",
+            required=False,
+            help="If set, backpopulate only courses whose urls match with the list of strings in this JSON file",
         )
         super().add_arguments(parser)
 
     def handle(self, *args, **options):
         """Run Populate ocw courses"""
-        course_url_substring = options.get("course_url_substring")
+
+        course_url_json = options.get("course_url_json")
+        if course_url_json:
+            with open(course_url_json) as input_file:
+                course_urls = json.load(input_file)
+            course_url_substring = None
+        else:
+            course_url_substring = options.get("course_url_substring")
+            if course_url_substring:
+                course_urls = [
+                    course_url.strip()
+                    for course_url in course_url_substring.split(",")
+                    if course_url
+                ]
         if options["delete"]:
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw", ocw_next_course=False):
@@ -60,7 +81,7 @@ class Command(BaseCommand):
             task = get_ocw_data.delay(
                 force_overwrite=options["force_overwrite"],
                 upload_to_s3=options["upload_to_s3"],
-                course_url_substring=course_url_substring,
+                course_urls=course_urls,
                 utc_start_timestamp=start.strftime(ISOFORMAT),
                 force_s3_upload=options["force_s3_upload"],
             )

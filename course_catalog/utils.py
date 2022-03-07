@@ -1,17 +1,16 @@
 """ Utils for course catalog """
+import logging
 import re
 from datetime import datetime
-import logging
 from urllib.parse import urljoin
 
 import pytz
+import rapidjson
 import requests
 import yaml
 from django.conf import settings
-import rapidjson
 
-from course_catalog.constants import semester_mapping, PlatformType
-
+from course_catalog.constants import PlatformType, semester_mapping
 from open_discussions.utils import generate_filepath
 
 log = logging.getLogger()
