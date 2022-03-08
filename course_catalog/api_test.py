@@ -288,7 +288,11 @@ def test_deserializing_a_valid_ocw_course(
 
     expected_course_instructor_values = [
         {"first_name": None, "last_name": "Kokernak", "full_name": "Prof. Kokernak"},
-        {"first_name": "Christine", "last_name": "Sherratt", "full_name": None},
+        {
+            "first_name": "Christine",
+            "last_name": "Sherratt",
+            "full_name": "Christine Sherratt",
+        },
         {
             "first_name": "Michael",
             "last_name": "Short",

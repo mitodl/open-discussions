@@ -34,6 +34,7 @@ from course_catalog.utils import (
     get_ocw_topics,
     get_year_and_semester,
     semester_year_to_date,
+    parse_instructors,
 )
 from moira_lists.moira_api import is_list_staff
 from open_discussions.serializers import WriteableSerializerMethodField
@@ -281,31 +282,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         if is_published is not None:
             course_fields["published"] = is_published
 
-        self.instructors = []
-
-        for person in data.get("staff"):
-            instructor = {
-                "first_name": person.get("given_name", person.get("first_name")),
-                "last_name": person.get("family_name", person.get("last_name")),
-                "full_name": None,
-            }
-
-            if person.get("salutation"):
-                if instructor["first_name"] and instructor["last_name"]:
-                    instructor[
-                        "full_name"
-                    ] = "{salutation} {first_name} {last_name}".format(
-                        salutation=person.get("salutation"),
-                        first_name=instructor["first_name"],
-                        last_name=instructor["last_name"],
-                    )
-                elif instructor["last_name"]:
-                    instructor["full_name"] = "{salutation} {last_name}".format(
-                        salutation=person.get("salutation"),
-                        last_name=instructor["last_name"],
-                    )
-
-            self.instructors.append(instructor)
+        self.instructors = parse_instructors(data.get("staff"))
 
         self.prices = [
             {

@@ -81,12 +81,12 @@ def load_prices(resource, prices_data):
 
 
 def load_instructors(resource, instructors_data):
-    """Load the prices for a resource into the database"""
+    """Load the instructors for a resource into the database"""
     instructors = []
 
     for instructor_data in instructors_data:
         if "full_name" not in instructor_data:
-            instructor_data["full_name"] = None
+            instructor_data["full_name"] = instructor_data.get("title", None)
 
         instructor, _ = CourseInstructor.objects.get_or_create(**instructor_data)
         instructors.append(instructor)

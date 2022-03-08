@@ -1,6 +1,7 @@
 """
 Test course_catalog utils
 """
+import json
 from datetime import datetime
 
 import pytest
@@ -15,7 +16,17 @@ from course_catalog.utils import (
     load_course_duplicates,
     safe_load_json,
     semester_year_to_date,
+    parse_instructors,
 )
+
+
+@pytest.fixture(name="test_instructors_data")
+def fixture_test_instructors_data():
+    """
+    Test instructors data
+    """
+    with open("./test_json/test_instructors_data.json", "r") as test_data:
+        return json.load(test_data)["instructors"]
 
 
 @pytest.mark.parametrize(
@@ -205,3 +216,15 @@ def test_safe_load_bad_json(mocker):
     mock_logger = mocker.patch("course_catalog.utils.log.exception")
     assert safe_load_json("badjson", "key") == {}
     mock_logger.assert_called_with("%s has a corrupted JSON", "key")
+
+
+def test_parse_instructors(test_instructors_data):
+    """
+    Verify that instructors assignment is working as expected
+    """
+    for instructor in test_instructors_data:
+        parsed_instructors = parse_instructors([instructor["data"]])
+        parsed_instructor = parsed_instructors[0]
+        assert parsed_instructor.get("first_name") == instructor["result"]["first_name"]
+        assert parsed_instructor.get("last_name") == instructor["result"]["last_name"]
+        assert parsed_instructor.get("full_name") == instructor["result"]["full_name"]
