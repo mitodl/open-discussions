@@ -601,12 +601,18 @@ def test_index_run_content_files(mocker, with_error, update_only):
     index_run_content_files_mock = mocker.patch(
         "search.indexing_api.index_run_content_files"
     )
+    delete_run_content_files_mock = mocker.patch(
+        "search.indexing_api.delete_run_content_files"
+    )
     if with_error:
         index_run_content_files_mock.side_effect = TabError
     result = index_run_content_files.delay(1, update_only).get()
     assert result == ("index_run_content_files threw an error" if with_error else None)
 
     index_run_content_files_mock.assert_called_once_with(1, update_only)
+
+    if not with_error:
+        delete_run_content_files_mock.assert_called_once_with(1, True)
 
 
 @pytest.mark.parametrize("with_error", [True, False])

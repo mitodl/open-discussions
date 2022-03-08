@@ -705,18 +705,24 @@ def index_run_content_files(run_id, update_only=False):
         )
 
 
-def delete_run_content_files(run_id):
+def delete_run_content_files(run_id, unpublished_only=False):
     """
     Delete a list of content files by run from the index
 
     Args:
         run_id(int): Course run id
+        unpublished_only(bool): if true only delete  files with published=False
 
     """
     run = LearningResourceRun.objects.get(id=run_id)
+    if unpublished_only:
+        content_files = ContentFile.objects.filter(run=run, published=False)
+    else:
+        content_files = ContentFile.objects.filter(run=run)
+
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
-        for content_file in ContentFile.objects.filter(run=run)
+        for content_file in content_files
     )
     course = run.content_object
     delete_items(
@@ -908,3 +914,27 @@ def switch_indices(backing_index, object_type):
     conn.indices.delete_alias(
         name=get_reindexing_alias_name(object_type), index=backing_index
     )
+
+
+def es_iterate_all_documents(index, query, pagesize=250):
+    """
+    Helper to iterate all values from an index
+
+    index (str): The index
+    query (dict): Elasticsearch query filter
+    pagesize (int): integer
+
+    """
+    conn = get_conn()
+
+    offset = 0
+    while True:
+        result = conn.search(
+            index=index, body={"query": query, "size": pagesize, "from": offset}
+        )
+        hits = result["hits"]["hits"]
+        if not hits:
+            break
+
+        yield from (hit for hit in hits)
+        offset += pagesize

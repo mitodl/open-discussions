@@ -34,6 +34,8 @@ from search.indexing_api import (
     delete_document,
     index_course_content_files,
     delete_courses,
+    index_run_content_files,
+    delete_run_content_files,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
@@ -517,10 +519,11 @@ def test_index_content_files(mocker, update_only):
 
 @pytest.mark.usefixtures("indexing_user")
 @pytest.mark.parametrize(
-    "indexing_func_name, doc",
+    "indexing_func_name, doc, unpublished_only",
     [
-        ["index_run_content_files", {"_id": "doc"}],
-        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}],
+        ["index_run_content_files", {"_id": "doc"}, None],
+        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}, True],
+        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}, False],
     ],
 )
 @pytest.mark.parametrize(
@@ -534,6 +537,7 @@ def test_bulk_index_content_files(
     errors,
     indexing_func_name,
     doc,
+    unpublished_only,
     indexing_chunk_size,
     document_indexing_chunk_size,
 ):  # pylint: disable=too-many-arguments,too-many-locals
@@ -563,19 +567,25 @@ def test_bulk_index_content_files(
         return_value=doc,
     )
 
-    index_func = getattr(indexing_api, indexing_func_name)
-
     if indexing_func_name == "index_run_content_files":
         chunk_size = min(indexing_chunk_size, document_indexing_chunk_size)
     else:
         chunk_size = indexing_chunk_size
 
     if errors:
+        index_func = getattr(indexing_api, indexing_func_name)
+
         with pytest.raises(ReindexException):
             index_func(run.id)
     else:
-        index_func(run.id)
-        if indexing_func_name == "delete_run_content_files":
+        if indexing_func_name == "index_run_content_files":
+            index_run_content_files(run.id)
+        else:
+            delete_run_content_files(run.id, unpublished_only)
+
+        if unpublished_only:
+            content_files = deleted_content_file
+        else:
             content_files = content_files + [deleted_content_file]
 
         for alias in mock_get_aliases.return_value:
