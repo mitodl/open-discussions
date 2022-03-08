@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.179.1
+---------------
+
+- fix: fetching and storing instructor's full name (#3529)
+
 Version 0.179.0 (Released March 07, 2022)
 ---------------
 
