@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.179.2
+Version 0.179.2 (Released March 14, 2022)
 ---------------
 
 - fewer indexing jobs
