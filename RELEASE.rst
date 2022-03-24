@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.180.0
+Version 0.180.0 (Released March 24, 2022)
 ---------------
 
 - Fix command (#3541)
