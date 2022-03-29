@@ -1,7 +1,7 @@
 """Management command for populating ocw course data"""
 from django.core.management import BaseCommand
 
-from course_catalog.models import Course
+from course_catalog.models import Course, LearningResourceRun
 from course_catalog.tasks import get_ocw_data, get_ocw_next_data
 from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc
@@ -38,10 +38,23 @@ class Command(BaseCommand):
         """Run Populate ocw courses"""
         course_url_substring = options.get("course_url_substring")
         if options["delete"]:
-            self.stdout.write("Deleting all existing OCW courses")
-            for course in Course.objects.filter(platform="ocw", ocw_next_course=True):
-                course.delete()
+            if course_url_substring:
+                self.stdout.write(
+                    "Deleting course={course_url_substring}".format(
+                        course_url_substring=course_url_substring
+                    )
+                )
+                course = LearningResourceRun.objects.get(
+                    slug=course_url_substring
+                ).content_object
+                course.published = False
+                course.save()
                 delete_course(course)
+            else:
+                self.stdout.write(
+                    "You must specify a course_url_substring with --delete"
+                )
+
         else:
             start = now_in_utc()
 
