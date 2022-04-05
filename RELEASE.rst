@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.181.0
+Version 0.181.0 (Released April 05, 2022)
 ---------------
 
 - fix backpopulate_ocw_next_data --delete
