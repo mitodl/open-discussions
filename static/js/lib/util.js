@@ -9,6 +9,7 @@ import Decimal from "decimal.js-light"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
+import { platforms } from "./constants"
 
 export const getChannelName = (props: { match: Match }): string =>
   props.match.params.channelName || ""
@@ -160,6 +161,27 @@ export const formatPrice = (price: ?string | number | Decimal): string => {
       formattedPrice = formattedPrice.toFixed(2, Decimal.ROUND_HALF_UP)
     }
     return `$${formattedPrice}`
+  }
+}
+
+export const getImageSrc = (
+  rawImageSrc: ?string,
+  platform: ?string
+): ?string => {
+  if (
+    rawImageSrc &&
+    rawImageSrc.startsWith("/") &&
+    platform === platforms.OCW &&
+    SETTINGS.ocw_next_base_url
+  ) {
+    const ocwNextBaseUrl = SETTINGS.ocw_next_base_url.endsWith("/")
+      ? // $FlowFixMe we check for null  SETTINGS.ocw_next_base_url above
+      SETTINGS.ocw_next_base_url.slice(0, -1)
+      : SETTINGS.ocw_next_base_url
+    // $FlowFixMe we check for null rawImageSrc above
+    return ocwNextBaseUrl + rawImageSrc
+  } else {
+    return rawImageSrc
   }
 }
 

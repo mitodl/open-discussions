@@ -106,6 +106,7 @@ def _render_app(request, initial_state=None):
         "course_ui_enabled": features.is_enabled(features.COURSE_UI),
         "file_search_enabled": features.is_enabled(features.COURSE_FILE_SEARCH),
         "livestream_ui_enabled": livestream_ui_enabled,
+        "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,
     }
 
     return render(request, "react.html", context=dict(js_settings=js_settings))
