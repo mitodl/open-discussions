@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.182.0
+Version 0.182.0 (Released April 11, 2022)
 ---------------
 
 - fix ocw images
