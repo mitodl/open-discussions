@@ -40,6 +40,7 @@ def test_webpack_url(
     settings.ENVIRONMENT = "test"
     settings.VERSION = "1.2.3"
     settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE = 123
+    settings.OCW_NEXT_BASE_URL = "https://ocwnext-rc.odl.mit.edu/"
 
     if test_user:
         expected_user_values = {
@@ -96,6 +97,7 @@ def test_webpack_url(
         "algolia_apiKey": settings.ALGOLIA_API_KEY,
         "course_ui_enabled": settings.FEATURES[features.COURSE_UI],
         "livestream_ui_enabled": settings.FEATURES[features.LIVESTREAM_UI],
+        "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,
         **expected_user_values,
     }
 

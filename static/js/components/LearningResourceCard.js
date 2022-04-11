@@ -21,7 +21,7 @@ import {
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
 import { toQueryString, COURSE_SEARCH_URL } from "../lib/url"
-import { emptyOrNil, userIsAnonymous } from "../lib/util"
+import { emptyOrNil, userIsAnonymous, getImageSrc } from "../lib/util"
 import { pushLRHistory, DIALOG_ADD_TO_LIST } from "../actions/ui"
 
 import type {
@@ -80,7 +80,8 @@ const CoverImage = ({ object, showResourceDrawer }) => (
     <img
       src={embedlyThumbnail(
         SETTINGS.embedlyKey,
-        object.image_src || defaultResourceImageURL(),
+        getImageSrc(object.image_src, object.platform) ||
+          defaultResourceImageURL(),
         CAROUSEL_IMG_HEIGHT,
         CAROUSEL_IMG_WIDTH
       )}

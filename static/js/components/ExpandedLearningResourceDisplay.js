@@ -43,7 +43,7 @@ import {
   embedlyThumbnail,
   learningResourcePermalink
 } from "../lib/url"
-import { capitalize, emptyOrNil, languageName } from "../lib/util"
+import { capitalize, emptyOrNil, languageName, getImageSrc } from "../lib/util"
 import { SEARCH_LIST_UI } from "../lib/search"
 import { useSearchResultToFavoriteLR } from "../hooks/learning_resources"
 
@@ -219,7 +219,8 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               <img
                 src={embedlyThumbnail(
                   SETTINGS.embedlyKey,
-                  object.image_src || defaultResourceImageURL(),
+                  getImageSrc(object.image_src, object.platform) ||
+                    defaultResourceImageURL(),
                   COURSE_IMAGE_DISPLAY_HEIGHT,
                   COURSE_IMAGE_DISPLAY_WIDTH
                 )}

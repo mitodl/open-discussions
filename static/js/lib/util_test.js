@@ -19,7 +19,8 @@ import {
   isValidUrl,
   flatZip,
   formatPrice,
-  normalizeDoubleQuotes
+  normalizeDoubleQuotes,
+  getImageSrc
 } from "./util"
 
 describe("utility functions", () => {
@@ -244,6 +245,52 @@ describe("utility functions", () => {
         [undefined, ""]
       ].forEach(([inputStr, expectedStr]) => {
         assert.equal(normalizeDoubleQuotes(inputStr), expectedStr)
+      })
+    })
+  })
+
+  describe("getImageSrc", () => {
+    it("prepends SETTINGS.ocw_next_base_url to relative urls when platform is ocw", () => {
+      [
+        [
+          "/courses/image_path/image.jpg",
+          "ocw",
+          "ocw_next_url.mit.edu/",
+          "ocw_next_url.mit.edu/courses/image_path/image.jpg"
+        ],
+        [
+          "/courses/image_path/image.jpg",
+          "ocw",
+          "ocw_next_url.mit.edu",
+          "ocw_next_url.mit.edu/courses/image_path/image.jpg"
+        ],
+        [
+          "base.mit.edu/courses/image_path/image.jpg",
+          "ocw",
+          "ocw_next_url.mit.edu/",
+          "base.mit.edu/courses/image_path/image.jpg"
+        ],
+        [
+          "/courses/image_path/image.jpg",
+          "ocw",
+          null,
+          "/courses/image_path/image.jpg"
+        ],
+        [
+          "/courses/image_path/image.jpg",
+          "ocw",
+          "",
+          "/courses/image_path/image.jpg"
+        ],
+        [
+          "/courses/image_path/image.jpg",
+          "xpro",
+          "ocw_next_url.mit.edu/",
+          "/courses/image_path/image.jpg"
+        ]
+      ].forEach(([imageSrc, platform, ocwNextBaseUrl, result]) => {
+        SETTINGS.ocw_next_base_url = ocwNextBaseUrl
+        assert.equal(getImageSrc(imageSrc, platform), result)
       })
     })
   })
