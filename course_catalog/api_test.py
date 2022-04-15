@@ -188,7 +188,7 @@ def ocw_next_valid_data():
             ["Business", "Project Management"],
         ],
         "primary_course_number": "16.01",
-        "extra_course_numbers": "16.02, 16.03, 16.04",
+        "extra_course_numbers": "16.02, 16.03, 16.04, 17.01",
         "term": "Fall",
         "year": "2005",
         "level": ["Undergraduate"],
@@ -410,7 +410,7 @@ def test_deserializing_a_valid_ocw_next_course(
         == ocw_next_valid_data["course_image_metadata"]["description"]
     )
     assert course.department == ["16"]
-    assert course.extra_course_numbers == ["16.02", "16.03", "16.04"]
+    assert course.extra_course_numbers == ["16.02", "16.03", "16.04", "17.01"]
     assert course.offered_by.count() == 1
     assert course.offered_by.first().name == OfferedBy.ocw.value
     assert course.runs.first().offered_by.count() == 1
