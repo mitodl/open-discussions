@@ -406,21 +406,20 @@ class OCWNextSerializer(CourseSerializer):
 
         topics = [{"name": topic_name} for topic_name in topics]
 
-        department_numbers = [data.get("primary_course_number", "").split(".")[0]]
-
         extra_course_numbers = data.get("extra_course_numbers", None)
 
         if extra_course_numbers:
             extra_course_numbers = extra_course_numbers.split(", ")
-            for extra_course_number in extra_course_numbers:
-                department_number = extra_course_number.split(".")[0]
-                if department_number not in department_numbers:
-                    department_numbers.append(department_number)
         else:
             extra_course_numbers = []
 
+        if data.get("primary_course_number"):
+            course_id = f"{data.get('uid')}+{data.get('primary_course_number')}"
+        else:
+            course_id = None
+
         course_fields = {
-            "course_id": f"{data.get('uid')}+{data.get('primary_course_number')}",
+            "course_id": course_id,
             "title": data.get("course_title"),
             "short_description": data.get("course_description"),
             "image_src": data.get("image_src"),
@@ -432,7 +431,7 @@ class OCWNextSerializer(CourseSerializer):
             "ocw_next_course": True,
             "course_feature_tags": data.get("learning_resource_types", []),
             "platform": PlatformType.ocw.value,
-            "department": department_numbers,
+            "department": data.get("department_numbers", []),
             "extra_course_numbers": extra_course_numbers,
         }
 

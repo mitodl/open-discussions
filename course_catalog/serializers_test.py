@@ -359,7 +359,7 @@ def test_ocw_next_serializer(
         ],
         "course_id": "97db384ef34009a64df7cb86cf701970+16.01",
         "department": ["16"],
-        "extra_course_numbers": ["16.02", "16.03", "16.04"],
+        "extra_course_numbers": ["16.02", "16.03", "16.04", "17.01"],
         "image_description": "An abstracted aircraft wing with illustrated systems. (Image by MIT OCW.)",
         "image_src": "https://open-learning-course-data-production.s3.amazonaws.com/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/8f56bbb35d0e456dc8b70911bec7cd0d_16-01f05.jpg",
         "last_modified": None,

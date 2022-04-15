@@ -480,13 +480,14 @@ def _transform_search_results_coursenum(search_result, department_filters):
                 if department_course_number["department"] in department_filters
             ]
 
-            filtered_department_course_numbers = sorted(
-                filtered_department_course_numbers, key=itemgetter("sort_coursenum")
-            )
+            if len(filtered_department_course_numbers) > 0:
+                filtered_department_course_numbers = sorted(
+                    filtered_department_course_numbers, key=itemgetter("sort_coursenum")
+                )
 
-            hit["_source"]["coursenum"] = filtered_department_course_numbers[0][
-                "coursenum"
-            ]
+                hit["_source"]["coursenum"] = filtered_department_course_numbers[0][
+                    "coursenum"
+                ]
 
 
 def find_related_documents(*, user, post_id):

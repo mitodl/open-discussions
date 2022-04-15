@@ -707,7 +707,7 @@ def test_transform_results(
     )
 
 
-@pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], []])
+@pytest.mark.parametrize("department_fitler", [["Chemistry", "Biology"], [], ["Math"]])
 @pytest.mark.django_db
 def test_transform_department_filter(department_fitler):
     """
@@ -748,7 +748,7 @@ def test_transform_department_filter(department_fitler):
 
     transformed_results = transform_results(results, AnonymousUser(), department_fitler)
 
-    if department_fitler:
+    if department_fitler == ["Chemistry", "Biology"]:
         expected_course_num = "5.1"
     else:
         expected_course_num = "1.1"
