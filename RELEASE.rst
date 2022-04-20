@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.182.2
+Version 0.182.2 (Released April 20, 2022)
 ---------------
 
 - fix department import
