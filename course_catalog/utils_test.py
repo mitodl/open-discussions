@@ -14,9 +14,9 @@ from course_catalog.utils import (
     get_ocw_topics,
     load_course_blocklist,
     load_course_duplicates,
+    parse_instructors,
     safe_load_json,
     semester_year_to_date,
-    parse_instructors,
 )
 
 

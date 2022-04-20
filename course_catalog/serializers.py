@@ -33,8 +33,8 @@ from course_catalog.utils import (
     get_ocw_department_list,
     get_ocw_topics,
     get_year_and_semester,
-    semester_year_to_date,
     parse_instructors,
+    semester_year_to_date,
 )
 from moira_lists.moira_api import is_list_staff
 from open_discussions.serializers import WriteableSerializerMethodField

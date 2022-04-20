@@ -2,7 +2,7 @@
 import logging
 import mimetypes
 from os.path import splitext
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
 from botocore.exceptions import ClientError
 from django.conf import settings
@@ -136,11 +136,11 @@ def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
     if ext_lower in VALID_TEXT_FILE_TYPES:
         try:
             s3_obj = s3_resource.Object(
-                settings.OCW_NEXT_AWS_STORAGE_BUCKET_NAME, file_s3_path
+                settings.OCW_NEXT_AWS_STORAGE_BUCKET_NAME, unquote(file_s3_path)
             ).get()
         except ClientError:
             s3_obj = s3_resource.Object(
-                settings.OCW_NEXT_LIVE_BUCKET, file_s3_path
+                settings.OCW_NEXT_LIVE_BUCKET, unquote(file_s3_path)
             ).get()
 
         course_file_obj = ContentFile.objects.filter(key=s3_path).first()
