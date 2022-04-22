@@ -1,6 +1,6 @@
 {  
   "description": "This resource contains problem set 1",
-  "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/0902956aa08f67a954b28efdcbaaa472_MIT6_262S11_assn01.pdf",
+  "file": "https://ol-ocw-studio-app-qa.s3.amazonaws.com/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/0902956aa08f67a954b28efdcbaaa472_MIT6_262S11_assn%2001.pdf",
   "learning_resource_types": ["Activity Assignments","Activity Assignments with Examples"],
   "resource_type": "Document",
   "file_type": "application/pdf",
