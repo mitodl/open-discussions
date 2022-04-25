@@ -60,9 +60,8 @@ from open_discussions.permissions import (
     PodcastFeatureFlag,
     ReadOnly,
 )
-
 # pylint:disable=unused-argument
-from search.task_helpers import delete_user_list, upsert_user_list
+from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
 log = logging.getLogger()
 
@@ -435,9 +434,20 @@ class WebhookOCWNextView(APIView):
 
         version = content.get("version")
         prefix = content.get("prefix")
+        site_uid = content.get("site_uid")
+        unpublished = content.get("unpublished", False)
 
-        if prefix is not None and version == "live":
-            get_ocw_next_courses.delay(course_prefixes=[prefix], force_overwrite=False)
+        if version == "live":
+            if prefix is not None:
+                # Index the course
+                get_ocw_next_courses.delay(
+                    course_prefixes=[prefix], force_overwrite=False
+                )
+            elif site_uid is not None and unpublished is True:
+                # Remove the course from the search index
+                course = Course.objects.filter(runs__run_id__contains=site_uid).first()
+                if course:
+                    delete_course(course)
 
         return Response({})
 
