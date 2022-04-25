@@ -60,6 +60,7 @@ from open_discussions.permissions import (
     PodcastFeatureFlag,
     ReadOnly,
 )
+
 # pylint:disable=unused-argument
 from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
@@ -445,8 +446,13 @@ class WebhookOCWNextView(APIView):
                 )
             elif site_uid is not None and unpublished is True:
                 # Remove the course from the search index
-                course = Course.objects.filter(runs__run_id__contains=site_uid).first()
-                if course:
+                course_run = LearningResourceRun.objects.filter(
+                    run_id=site_uid, platform=PlatformType.ocw.value
+                ).first()
+                if course_run:
+                    course = course_run.content_object
+                    course.published = False
+                    course.save()
                     delete_course(course)
 
         return Response({})
