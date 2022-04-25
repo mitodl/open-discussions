@@ -720,7 +720,7 @@ def test_ocw_next_webhook_endpoint(client, mocker, settings, data):
     ],
 )
 def test_ocw_next_webhook_endpoint_unpublished(client, mocker, settings, data):
-    """Test that the OCW webhook endpoint schedules a get_ocw_next_courses task"""
+    """Test that the OCW webhook endpoint removes an unpublished task from the search index"""
     settings.OCW_NEXT_SEARCH_WEBHOOK_KEY = "fake_key"
     mock_delete_course = mocker.patch(
         "course_catalog.views.delete_course", autospec=True
