@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.184.0
+---------------
+
+- Remove unpublished OCW courses from search index (#3562)
+
 Version 0.183.0 (Released May 02, 2022)
 ---------------
 
