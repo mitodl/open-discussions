@@ -702,6 +702,51 @@ def test_ocw_next_webhook_endpoint(client, mocker, settings, data):
         mock_get_ocw.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"site_uid": "254605fe779d5edd86f55a421e82b544", "version": "live"},
+        {
+            "site_uid": "254605fe779d5edd86f55a421e82b544",
+            "version": "live",
+            "unpublished": True,
+        },
+        {
+            "site_uid": "254605fe779d5edd86f55a421e82b544",
+            "version": "draft",
+            "unpublished": True,
+        },
+        {"site_uid": None, "version": "live", "unpublished": True},
+    ],
+)
+def test_ocw_next_webhook_endpoint_unpublished(client, mocker, settings, data):
+    """Test that the OCW webhook endpoint removes an unpublished task from the search index"""
+    settings.OCW_NEXT_SEARCH_WEBHOOK_KEY = "fake_key"
+    mock_delete_course = mocker.patch(
+        "course_catalog.views.delete_course", autospec=True
+    )
+    run_id = data.get("site_uid")
+    course_run = None
+    if run_id:
+        course_run = LearningResourceRunFactory.create(
+            run_id=run_id, platform=PlatformType.ocw.value
+        )
+    client.post(
+        reverse("ocw-next-webhook"),
+        data={"webhook_key": "fake_key", **data},
+        headers={"Content-Type": "text/plain"},
+    )
+
+    if (
+        data.get("site_uid")
+        and data.get("unpublished") is True
+        and data.get("version") == "live"
+    ):
+        mock_delete_course.assert_called_once_with(course_run.content_object)
+    else:
+        mock_delete_course.assert_not_called()
+
+
 def test_ocw_next_webhook_endpoint_bad_key(settings, client):
     """Test that a webhook exception is raised if a bad key is sent"""
     settings.OCW_NEXT_SEARCH_WEBHOOK_KEY = "fake_key"
