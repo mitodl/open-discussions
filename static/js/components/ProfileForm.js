@@ -6,7 +6,6 @@ import R from "ramda"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
 import Card from "./Card"
-import LocationPicker from "./LocationPicker"
 
 import { validationMessage } from "../lib/validation"
 import { goBackAndHandleEvent } from "../lib/util"
@@ -35,9 +34,7 @@ type Props = {
   onSubmitSocialSite: Function,
   onUpdatePersonalSite: Function,
   onSubmitPersonalSite: Function,
-  onDeleteSite: Function,
-  onUpdateLocation: Function,
-  onClearLocation: Function
+  onDeleteSite: Function
 }
 
 export default class ProfileForm extends React.Component<Props> {
@@ -169,8 +166,6 @@ export default class ProfileForm extends React.Component<Props> {
       profile,
       validation,
       onUpdate,
-      onUpdateLocation,
-      onClearLocation,
       onSubmit,
       processing,
       history
@@ -230,19 +225,6 @@ export default class ProfileForm extends React.Component<Props> {
                 Add a short description about yourself, max 1000 characters
               </label>
             </div>
-            {SETTINGS.algolia_appId && SETTINGS.algolia_apiKey ? (
-              <div className="row location">
-                <LocationPicker
-                  initialLocation={profile.placename || ""}
-                  placeholder="Location (city)"
-                  onChange={onUpdateLocation}
-                  onClear={onClearLocation}
-                />
-                <label className="bottom-label">
-                  Enter the city where you live or work.
-                </label>
-              </div>
-            ) : null}
             {this.renderUserWebsiteSection()}
           </form>
         </Card>

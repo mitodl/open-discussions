@@ -31,14 +31,6 @@
       "description": "Blog urlfor Akismet",
       "required": false
     },
-    "ALGOLIA_APP_ID": {
-      "description": "Algolia Places app ID",
-      "required": false
-    },
-    "ALGOLIA_API_KEY": {
-      "description": "Algolia Places API key",
-      "required": false
-    },
     "ATHENA_MITX_DATABASE_NAME": {
       "description": "Database name for Athena queries",
       "required": true

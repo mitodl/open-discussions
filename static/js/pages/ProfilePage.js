@@ -109,7 +109,6 @@ class ProfilePage extends React.Component<Props> {
             <div className="name-headline-location">
               <div className="name">{profile.name}</div>
               <div className="headline">{profile.headline}</div>
-              <div className="location">{profile.placename || ""}</div>
             </div>
           </div>
           <div className="row bio">

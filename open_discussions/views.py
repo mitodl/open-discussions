@@ -101,8 +101,6 @@ def _render_app(request, initial_state=None):
         "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
         "article_ui_enabled": article_ui_enabled,
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
-        "algolia_appId": settings.ALGOLIA_APP_ID,
-        "algolia_apiKey": settings.ALGOLIA_API_KEY,
         "course_ui_enabled": features.is_enabled(features.COURSE_UI),
         "file_search_enabled": features.is_enabled(features.COURSE_FILE_SEARCH),
         "livestream_ui_enabled": livestream_ui_enabled,

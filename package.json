@@ -82,7 +82,6 @@
     "nuka-carousel": "^4.5.2",
     "nyc": "^15.1.0",
     "object.entries": "^1.0.4",
-    "places.js": "^1.14.0",
     "postcss-loader": "^2.1.5",
     "prettier-eslint-cli": "^5.0.0",
     "prop-types": "^15.6.2",
