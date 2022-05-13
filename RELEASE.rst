@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.184.1
+---------------
+
+- update ocw-data-parser (#3569)
+- Added heroku deployment workflows
+
 Version 0.184.0 (Released May 02, 2022)
 ---------------
 
