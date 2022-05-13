@@ -3,6 +3,7 @@ from django.core.management import BaseCommand
 
 from course_catalog.models import Course, LearningResourceRun
 from course_catalog.tasks import get_ocw_data, get_ocw_next_data
+from course_catalog.constants import PlatformType
 from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc
 from search.task_helpers import delete_course
@@ -44,12 +45,15 @@ class Command(BaseCommand):
                         course_url_substring=course_url_substring
                     )
                 )
-                course = LearningResourceRun.objects.get(
-                    slug=course_url_substring
-                ).content_object
-                course.published = False
-                course.save()
-                delete_course(course)
+                runs = LearningResourceRun.objects.filter(
+                    slug=course_url_substring, platform=PlatformType.ocw.value
+                )
+
+                for run in runs:
+                    course = run.content_object
+                    course.published = False
+                    course.save()
+                    delete_course(course)
             else:
                 self.stdout.write(
                     "You must specify a course_url_substring with --delete"
