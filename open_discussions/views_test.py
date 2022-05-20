@@ -29,8 +29,6 @@ def test_webpack_url(
     settings.GA_TRACKING_ID = "fake"
     settings.GA_G_TRACKING_ID = "fake"
     settings.EMBEDLY_KEY = "fake"
-    settings.ALGOLIA_APP_ID = "fake"
-    settings.ALGOLIA_API_KEY = "fake"
     settings.FEATURES[features.SAML_AUTH] = False
     settings.FEATURES[features.ARTICLE_UI] = False
     settings.FEATURES[features.COURSE_UI] = False
@@ -93,8 +91,6 @@ def test_webpack_url(
         "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
         "file_search_enabled": settings.FEATURES[features.COURSE_FILE_SEARCH],
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
-        "algolia_appId": settings.ALGOLIA_APP_ID,
-        "algolia_apiKey": settings.ALGOLIA_API_KEY,
         "course_ui_enabled": settings.FEATURES[features.COURSE_UI],
         "livestream_ui_enabled": settings.FEATURES[features.LIVESTREAM_UI],
         "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,

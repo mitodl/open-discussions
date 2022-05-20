@@ -44,8 +44,6 @@ const _createSettings = () => ({
   search_page_size:       5,
   search_min_length:      2,
   accepted_social_sites:  [],
-  algolia_appId:          "",
-  algolia_appKey:         "",
   livestream_ui_enabled:  true,
   ckeditor_upload_url:    "/upload/token"
 })

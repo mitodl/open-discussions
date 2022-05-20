@@ -842,10 +842,6 @@ HIJACK_LOGOUT_REDIRECT_URL = "/admin/auth/user"
 # disable the anonymous user creation
 ANONYMOUS_USER_NAME = None
 
-# Algolia Places API
-ALGOLIA_APP_ID = get_string("ALGOLIA_APP_ID", None)
-ALGOLIA_API_KEY = get_string("ALGOLIA_API_KEY", None)
-
 
 # EDX API Credentials
 EDX_API_URL = get_string("EDX_API_URL", None)

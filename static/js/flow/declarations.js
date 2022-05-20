@@ -37,8 +37,6 @@ declare var SETTINGS: {
   accepted_social_sites: Array<string>,
   ckeditor_upload_url: string,
   article_ui_enabled: boolean,
-  algolia_appId: ?string,
-  algolia_apiKey: ?string,
   course_ui_enabled: boolean,
   file_search_enabled: boolean,
   livestream_ui_enabled: boolean,

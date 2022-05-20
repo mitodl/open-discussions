@@ -326,8 +326,7 @@ export type ProfileValidation = {
 export type ProfilePayload = {
   name:     string,
   bio:      ?string,
-  headline: ?string,
-  location: ?Object
+  headline: ?string
 }
 
 export type SocialAuth = {
