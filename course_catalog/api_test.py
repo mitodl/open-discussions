@@ -852,9 +852,7 @@ def test_sync_ocw_next_course(settings, mocker):
     s3_resource = boto3.resource("s3")
 
     sync_ocw_next_course(
-        course_prefix=OCW_NEXT_TEST_PREFIX,
-        s3_resource=s3_resource,
-        force_overwrite=True,
+        url_path=OCW_NEXT_TEST_PREFIX, s3_resource=s3_resource, force_overwrite=True
     )
 
     assert Course.objects.last().title == "Unified Engineering I, II, III, & IV"
@@ -900,7 +898,7 @@ def test_sync_ocw_next_course_already_synched(
     course.runs.update(updated_on=datetime(2020, 12, 1, tzinfo=pytz.utc))
 
     sync_ocw_next_course(
-        course_prefix=OCW_NEXT_TEST_PREFIX,
+        url_path=OCW_NEXT_TEST_PREFIX,
         s3_resource=resource,
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,
@@ -932,13 +930,13 @@ def test_sync_ocw_next_courses(settings, mocker):
     mock_sync_course = mocker.patch("course_catalog.api.sync_ocw_next_course")
 
     sync_ocw_next_courses(
-        course_prefixes=[OCW_NEXT_TEST_PREFIX],
+        url_paths=[OCW_NEXT_TEST_PREFIX],
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,
     )
 
     mock_sync_course.assert_called_once_with(
-        course_prefix=OCW_NEXT_TEST_PREFIX,
+        url_path=OCW_NEXT_TEST_PREFIX,
         s3_resource=resource,
         force_overwrite=overwrite,
         start_timestamp=start_timestamp,

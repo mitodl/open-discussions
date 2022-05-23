@@ -66,7 +66,7 @@ def get_ocw_courses(
 
 
 @app.task(acks_late=True)
-def get_ocw_next_courses(*, course_prefixes, force_overwrite, utc_start_timestamp=None):
+def get_ocw_next_courses(*, url_paths, force_overwrite, utc_start_timestamp=None):
     """
     Task to sync a batch of OCW Next courses
     """
@@ -76,7 +76,7 @@ def get_ocw_next_courses(*, course_prefixes, force_overwrite, utc_start_timestam
         utc_start_timestamp = utc_start_timestamp.replace(tzinfo=pytz.UTC)
 
     sync_ocw_next_courses(
-        course_prefixes=course_prefixes,
+        url_paths=url_paths,
         force_overwrite=force_overwrite,
         start_timestamp=utc_start_timestamp,
     )
@@ -142,7 +142,11 @@ def get_ocw_data(
 
 @app.task(bind=True, acks_late=True)
 def get_ocw_next_data(
-    self, force_overwrite=False, course_url_substring=None, utc_start_timestamp=None
+    self,
+    force_overwrite=False,
+    course_url_substring=None,
+    utc_start_timestamp=None,
+    prefix=None,
 ):  # pylint:disable=too-many-locals,too-many-branches
     """
     Task to sync OCW Next course data with database
@@ -165,7 +169,8 @@ def get_ocw_next_data(
     ocw_courses = set()
     log.info("Assembling list of courses...")
 
-    prefix = "courses/"
+    if not prefix:
+        prefix = "courses/"
 
     if course_url_substring:
         prefix = prefix + course_url_substring + "/"
@@ -185,11 +190,11 @@ def get_ocw_next_data(
     ocw_tasks = celery.group(
         [
             get_ocw_next_courses.si(
-                course_prefixes=prefixes,
+                url_paths=url_path,
                 force_overwrite=force_overwrite,
                 utc_start_timestamp=utc_start_timestamp,
             )
-            for prefixes in chunks(
+            for url_path in chunks(
                 ocw_courses, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
             )
         ]

@@ -162,7 +162,7 @@ def test_get_ocw_next_data(
     else:
         assert mocked_celery.group.call_count == 1
         get_ocw_courses_mock.si.assert_called_once_with(
-            course_prefixes=[OCW_NEXT_TEST_PREFIX],
+            url_paths=[OCW_NEXT_TEST_PREFIX],
             force_overwrite=force_overwrite,
             utc_start_timestamp=None,
         )
@@ -175,9 +175,7 @@ def test_get_ocw_next_courses(settings, mocker, mocked_celery):
     """
     setup_s3_ocw_next(settings)
 
-    get_ocw_next_courses.delay(
-        course_prefixes=[OCW_NEXT_TEST_PREFIX], force_overwrite=False
-    )
+    get_ocw_next_courses.delay(url_paths=[OCW_NEXT_TEST_PREFIX], force_overwrite=False)
 
     assert Course.objects.count() == 1
     assert CoursePrice.objects.count() == 1
