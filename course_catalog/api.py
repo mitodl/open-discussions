@@ -216,7 +216,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, url_path):
                 "raw_json": course_json,
                 "title": course_json.get("course_title"),
                 "slug": run_slug,
-                "url": urljoin(settings.OCW_BASE_URL, run_slug),
+                "url": urljoin(settings.OCW_NEXT_BASE_URL, run_slug),
             },
             instance=courserun_instance,
         )

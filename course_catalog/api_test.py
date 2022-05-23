@@ -389,7 +389,7 @@ def test_deserializing_a_valid_ocw_next_course(
     """
     Verify that OCWNextSerializer successfully de-serialize a JSON object and create Course model instance
     """
-    settings.OCW_BASE_URL = "https://ocw.mit.edu"
+    settings.OCW_NEXT_BASE_URL = "https://ocw-test.mit.edu"
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
     url_path = "courses/my-course"
     digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, url_path)
@@ -436,7 +436,7 @@ def test_deserializing_a_valid_ocw_next_course(
     assert CourseTopic.objects.count() == 11
     assert course.ocw_next_course
     assert course.runs.first().slug == url_path
-    assert course.runs.first().url == f"{settings.OCW_BASE_URL}/{url_path}"
+    assert course.runs.first().url == "https://ocw-test.mit.edu/courses/my-course"
 
 
 def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
