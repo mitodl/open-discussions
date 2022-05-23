@@ -191,7 +191,7 @@ def test_get_ocw_next_courses(settings, mocker, mocked_celery):
     assert course.runs.first().run_id == "97db384ef34009a64df7cb86cf701979"
     assert (
         course.runs.first().slug
-        == "16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"
+        == "courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006"
     )
 
 

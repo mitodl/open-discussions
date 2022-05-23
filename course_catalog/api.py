@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
+from urllib.parse import urljoin
 
 import boto3
 import pytz
@@ -142,7 +143,7 @@ def digest_ocw_course(
     return course, run
 
 
-def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
+def digest_ocw_next_course(course_json, last_modified, uid, url_path):
     """
     Takes in OCW next course data.json to store it in DB
 
@@ -150,7 +151,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         course_json (dict): course data JSON object from s3
         last_modified (datetime): timestamp of latest modification of all course files
         uid (str): Course uid
-        course_prefix (str):String used to query S3 bucket for course data JSONs
+        url_path (str):String used to query S3 bucket for course data JSONs
     """
 
     courserun_instance = LearningResourceRun.objects.filter(
@@ -167,7 +168,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         "uid": uid,
         "last_modified": last_modified,
         "is_published": True,
-        "course_prefix": course_prefix,
+        "course_prefix": url_path,
     }
 
     ocw_serializer = OCWNextSerializer(data=data, instance=existing_course_instance)
@@ -189,7 +190,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
             platform=PlatformType.ocw.value, run_id=uid
         ).first()
 
-        run_slug = course_prefix.split("/")[1]
+        run_slug = url_path.strip("/")
 
         run_serializer = LearningResourceRunSerializer(
             data={
@@ -215,6 +216,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
                 "raw_json": course_json,
                 "title": course_json.get("course_title"),
                 "slug": run_slug,
+                "url": urljoin(settings.OCW_BASE_URL, run_slug),
             },
             instance=courserun_instance,
         )
