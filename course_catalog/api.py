@@ -7,6 +7,7 @@ import re
 from datetime import datetime
 from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
+from urllib.parse import urljoin
 
 import boto3
 import pytz
@@ -142,7 +143,7 @@ def digest_ocw_course(
     return course, run
 
 
-def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
+def digest_ocw_next_course(course_json, last_modified, uid, url_path):
     """
     Takes in OCW next course data.json to store it in DB
 
@@ -150,7 +151,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         course_json (dict): course data JSON object from s3
         last_modified (datetime): timestamp of latest modification of all course files
         uid (str): Course uid
-        course_prefix (str):String used to query S3 bucket for course data JSONs
+        url_path (str):String used to query S3 bucket for course data JSONs
     """
 
     courserun_instance = LearningResourceRun.objects.filter(
@@ -167,7 +168,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
         "uid": uid,
         "last_modified": last_modified,
         "is_published": True,
-        "course_prefix": course_prefix,
+        "course_prefix": url_path,
     }
 
     ocw_serializer = OCWNextSerializer(data=data, instance=existing_course_instance)
@@ -189,7 +190,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
             platform=PlatformType.ocw.value, run_id=uid
         ).first()
 
-        run_slug = course_prefix.split("/")[1]
+        run_slug = url_path.strip("/")
 
         run_serializer = LearningResourceRunSerializer(
             data={
@@ -215,6 +216,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, course_prefix):
                 "raw_json": course_json,
                 "title": course_json.get("course_title"),
                 "slug": run_slug,
+                "url": urljoin(settings.OCW_NEXT_BASE_URL, run_slug),
             },
             instance=courserun_instance,
         )
@@ -279,6 +281,7 @@ def generate_course_prefix_list(bucket, course_urls=None):
                 ocw_courses.add(course_prefix)
                 if course_urls and len(ocw_courses) == len(course_urls):
                     break
+    log.info("Done assembling list of courses...")
     return list(ocw_courses)
 
 
@@ -593,13 +596,13 @@ def sync_ocw_course(
 
 
 def sync_ocw_next_course(
-    *, course_prefix, s3_resource, force_overwrite, start_timestamp=None
+    *, url_path, s3_resource, force_overwrite, start_timestamp=None
 ):
     """
     Sync an OCW course run
 
     Args:
-        course_prefix (str): The course prefix
+        url_path (str): The course url path
         s3_resource (boto3.resource): Boto3 s3 resource
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         start_timestamp (timestamp): start timestamp of backpoplate. If the updated_on is after this the update already happened
@@ -611,10 +614,10 @@ def sync_ocw_next_course(
     course_json = {}
     uid = None
 
-    log.info("Syncing: %s ...", course_prefix)
+    log.info("Syncing: %s ...", url_path)
 
     s3_data_object = s3_resource.Object(
-        settings.OCW_NEXT_LIVE_BUCKET, course_prefix + "data.json"
+        settings.OCW_NEXT_LIVE_BUCKET, url_path + "data.json"
     )
 
     try:
@@ -623,7 +626,7 @@ def sync_ocw_next_course(
         )
         last_modified = s3_data_object.last_modified
     except:  # pylint: disable=bare-except
-        log.exception("Error encountered reading data.json for %s", course_prefix)
+        log.exception("Error encountered reading data.json for %s", url_path)
 
     uid = course_json.get("legacy_uid")
 
@@ -631,7 +634,7 @@ def sync_ocw_next_course(
         uid = course_json.get("site_uid")
 
     if not uid:
-        log.info("Skipping %s, both site_uid and legacy_uid missing", course_prefix)
+        log.info("Skipping %s, both site_uid and legacy_uid missing", url_path)
         return None
     else:
         uid = uid.replace("-", "")
@@ -651,14 +654,14 @@ def sync_ocw_next_course(
         and courserun_instance
         and start_timestamp <= courserun_instance.updated_on
     ):
-        log.info("Already synced. No changes found for %s", course_prefix)
+        log.info("Already synced. No changes found for %s", url_path)
         return None
 
-    log.info("Digesting %s...", course_prefix)
+    log.info("Digesting %s...", url_path)
 
     try:
         course, run = digest_ocw_next_course(  # pylint: disable=unused-variable
-            course_json, last_modified, uid, course_prefix
+            course_json, last_modified, uid, url_path
         )
     except TypeError:
         log.info("Course and run not returned, skipping")
@@ -666,8 +669,7 @@ def sync_ocw_next_course(
 
     upsert_course(course.id)
     load_content_files(
-        run,
-        transform_ocw_next_content_files(s3_resource, course_prefix, force_overwrite),
+        run, transform_ocw_next_content_files(s3_resource, url_path, force_overwrite)
     )
 
 
@@ -714,12 +716,12 @@ def sync_ocw_courses(
             log.exception("Error encountered parsing OCW json for %s", course_prefix)
 
 
-def sync_ocw_next_courses(*, course_prefixes, force_overwrite, start_timestamp=None):
+def sync_ocw_next_courses(*, url_paths, force_overwrite, start_timestamp=None):
     """
     Sync OCW courses to the database
 
     Args:
-        course_prefixes (list of str): The course prefixes to process
+        url_paths (list of str): The course url paths to process
         force_overwrite (bool): A boolean value to force the incoming course data to overwrite existing data
         start_timestamp (datetime or None): backpopulate start time
 
@@ -732,16 +734,16 @@ def sync_ocw_next_courses(*, course_prefixes, force_overwrite, start_timestamp=N
         aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
     )
 
-    for course_prefix in course_prefixes:
+    for url_path in url_paths:
         try:
             sync_ocw_next_course(
-                course_prefix=course_prefix,
+                url_path=url_path,
                 s3_resource=s3_resource,
                 force_overwrite=force_overwrite,
                 start_timestamp=start_timestamp,
             )
         except:  # pylint: disable=bare-except
-            log.exception("Error encountered parsing OCW json for %s", course_prefix)
+            log.exception("Error encountered parsing OCW json for %s", url_path)
 
 
 def sync_xpro_course_files(ids):

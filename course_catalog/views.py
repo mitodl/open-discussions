@@ -441,9 +441,7 @@ class WebhookOCWNextView(APIView):
         if version == "live":
             if prefix is not None:
                 # Index the course
-                get_ocw_next_courses.delay(
-                    course_prefixes=[prefix], force_overwrite=False
-                )
+                get_ocw_next_courses.delay(url_paths=[prefix], force_overwrite=False)
             elif site_uid is not None and unpublished is True:
                 # Remove the course from the search index
                 course_run = LearningResourceRun.objects.filter(

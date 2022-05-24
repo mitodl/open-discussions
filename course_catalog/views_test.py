@@ -695,9 +695,7 @@ def test_ocw_next_webhook_endpoint(client, mocker, settings, data):
     prefix = data.get("prefix")
 
     if prefix is not None and data.get("version") == "live":
-        mock_get_ocw.assert_called_once_with(
-            course_prefixes=[prefix], force_overwrite=False
-        )
+        mock_get_ocw.assert_called_once_with(url_paths=[prefix], force_overwrite=False)
     else:
         mock_get_ocw.assert_not_called()
 
