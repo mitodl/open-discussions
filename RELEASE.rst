@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.185.0
+---------------
+
+- Upgrade feedparser to fix heroku build failure (#3578)
+- Assign url, and save full url path as run_slug, for ocw courses (#3576)
+- Remove algolia places, LocationPicker component, and profile location field (#3566)
+
 Version 0.184.1 (Released May 17, 2022)
 ---------------
 
