@@ -33,7 +33,7 @@ elasticsearch-dsl==6.1.0
 elasticsearch==6.3.0
 factory_boy
 faker
-feedparser
+feedparser>=6.0.10
 google-api-python-client==1.7.11
 html5lib==0.999999999
 ipython
