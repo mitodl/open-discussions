@@ -165,7 +165,7 @@ faker==2.0.0
     # via
     #   -r requirements.in
     #   factory-boy
-feedparser==5.2.1
+feedparser==6.0.10
     # via -r requirements.in
 future==0.18.2
     # via django-json-widget
@@ -334,6 +334,8 @@ s3transfer==0.3.3
     # via boto3
 sentry-sdk==0.14.1
     # via -r requirements.in
+sgmllib3k==1.0.0
+    # via feedparser
 six==1.15.0
     # via
     #   cryptography
