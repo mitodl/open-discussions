@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.185.0
+Version 0.185.0 (Released May 25, 2022)
 ---------------
 
 - Upgrade feedparser to fix heroku build failure (#3578)
