@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.186.0
+Version 0.186.0 (Released June 06, 2022)
 ---------------
 
 - fix ocw-next delete command
