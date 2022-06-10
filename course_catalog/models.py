@@ -422,6 +422,9 @@ class UserList(List, LearningResourceGenericRelationsMixin):
         """Returns the certification for the user list"""
         return []
 
+    def __str__(self):
+        return f"{self.title}"
+
     class Meta:
         verbose_name = "userlist"
 

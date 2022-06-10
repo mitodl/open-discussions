@@ -97,6 +97,7 @@ INSTALLED_APPS = (
     "open_discussions",
     "authentication",
     "channels",
+    "field_channels",
     "profiles",
     "sites",
     "mail",
