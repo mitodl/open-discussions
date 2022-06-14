@@ -1,5 +1,5 @@
 .podcasts {
-  background-image: url("../images/podcasts_bg.png");
+  background-image: url("/static/images/podcasts_bg.png");
   background-size: contain;
   background-repeat: no-repeat;
   width: 100%;
@@ -7,7 +7,7 @@
 
   @include breakpoint(materialmobile) {
     min-height: calc(100vh - #{$toolbar-height-mobile});
-    background-image: url("../images/podcasts_bg_mobile.png");
+    background-image: url("/static/images/podcasts_bg_mobile.png");
   }
 
   h1 {
