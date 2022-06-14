@@ -63,11 +63,8 @@ class FieldChannelSerializer(serializers.ModelSerializer):
         roles = create_field_groups_and_roles(field_channel)
         moderator_group = roles[FIELD_ROLE_MODERATORS].group
         assign_perm(WIDGET_LIST_CHANGE_PERM, moderator_group, widget_list)
-        return field_channel
 
-    def update(self, instance, validated_data):
-        field_channel = super().update(instance, validated_data)
-        return field_channel
+
 
 
 """Serializers for moderator REST APIs"""

@@ -46,7 +46,7 @@ class SubFieldViewSet(
     mixins.UpdateModelMixin,
     viewsets.GenericViewSet,):
     """
-    Viewset for Subfields
+    Viewset for Field Channels
     """
 
     serializer_class = SubFieldSerializer

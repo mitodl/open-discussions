@@ -2,13 +2,9 @@
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
 
-from field_channels.views import FieldChannelViewSet, SubFieldViewSet, SubFieldListViewSet, FieldModeratorListView, \
-    FieldModeratorDetailView
+from field_channels.views import FieldChannelViewSet, FieldModeratorListView, FieldModeratorDetailView
 
 router = DefaultRouter()
-router.register(
-    r"subfields", SubFieldViewSet, basename="subfields_api"
-)
 router.register(
     r"fields", FieldChannelViewSet, basename="fields_api"
 )

@@ -40,7 +40,10 @@ def is_field_moderator(request, view):
         bool: True if user is an admin for the field
     """
     group_names = set(request.user.groups.values_list("name", flat=True))
-    field_name = view.kwargs.get("name", None)
+    field_name = view.kwargs.get("field_name", None)
+    log.info(f"VIEW KWARGS: {view.kwargs}")
+    log.info(f"GROUP NAMES: {group_names}")
+    log.info(f"FIELD NAMES: {field_name}")
     return (
         request.user.is_staff
         or f"field_{field_name}_{FIELD_ROLE_MODERATORS}" in group_names
