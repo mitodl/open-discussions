@@ -1,11 +1,10 @@
 const path = require("path")
-const webpack = require("webpack")
 
 module.exports = {
   config: {
     entry: {
-      root:  ["core-js/stable", "regenerator-runtime/runtime", "./frontends/discussions/src/entry/root"],
-      style: "./frontends/discussions/src/entry/style"
+      root:  ["core-js/stable", "regenerator-runtime/runtime", "./src/entry/root"],
+      style: "./src/entry/style"
     },
     module: {
       rules: [
@@ -16,7 +15,11 @@ module.exports = {
       ]
     },
     resolve: {
-      modules:    [path.join(__dirname, "frontends/discussions/src"), "node_modules"],
+      modules:    [
+        path.resolve(__dirname, "src"),
+        path.resolve(__dirname, "node_modules"),
+        path.resolve(__dirname, "../../node_modules")
+      ],
       extensions: [".js", ".jsx"]
     },
     performance: {

@@ -7,7 +7,8 @@ var minimist = require('minimist');
 
 var { makeDevConfig } = require('./webpack.config.dev');
 
-const { host, port } = minimist(process.argv.slice(2));
+const host = process.env.WEBPACK_HOST;
+const port = process.env.WEBPACK_PORT;
 
 const config = makeDevConfig(host, port);
 
