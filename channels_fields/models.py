@@ -19,7 +19,7 @@ class FieldChannel(BaseChannel, TimestampedModel):
 
 class FieldChannelGroupRole(TimestampedModel):
     """
-    Keep track of field admins
+    Keep track of field moderators
     """
 
     field = models.ForeignKey(FieldChannel, on_delete=models.CASCADE)

@@ -8,10 +8,10 @@ from channels_fields.models import FieldChannelGroupRole
 
 def create_field_groups_and_roles(field_channel):
     """
-    Create a channel's groups and roles
+    Create a field channel's groups and roles
 
     Args:
-        channel(channels.models.Channel): the channel to create groups for
+        field_channel(channels_fields.models.Channel): the channel to create groups for
     """
     roles = {}
     for role in FIELD_ROLE_CHOICES:

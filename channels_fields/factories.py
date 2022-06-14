@@ -7,7 +7,7 @@ from channels_fields.models import FieldChannel
 
 
 class FieldChannelFactory(factory.DjangoModelFactory):
-    """Factory for a channels.models.Channel object"""
+    """Factory for a channels_fields.models.FieldChannel object"""
 
     name = factory.LazyAttributeSequence(channel_name)
     title = factory.Faker("text", max_nb_chars=50)
@@ -23,7 +23,7 @@ class FieldChannelFactory(factory.DjangoModelFactory):
     def create_roles(
         self, create, extracted, **kwargs
     ):  # pylint: disable=unused-argument
-        """Create the channel groups and roles after the channel is created"""
+        """Create the field channel groups and roles after the field channel is created"""
         if not create:
             return
 

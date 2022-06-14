@@ -31,13 +31,6 @@ def field_exists(view):
 def is_field_moderator(request, view):
     """
     Determine if the user is a moderator for a field channel (or a staff user)
-
-    Args:
-        user (users.models.User): The user to check
-        field_channel (FieldChannel): The field to check
-
-    Returns:
-        bool: True if user is an admin for the field
     """
     group_names = set(request.user.groups.values_list("name", flat=True))
     field_name = view.kwargs.get("field_name", None)
