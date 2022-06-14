@@ -181,7 +181,9 @@ class ChannelSerializer(serializers.Serializer):
                 "submission_type": "link_type",
                 "membership_is_managed": "membership_is_managed",
             }
-            kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
+            kwargs = filter_dict_with_renamed_keys(
+                validated_data, lookup, optional=True
+            )
 
             client = get_admin_api()
             channel = client.create_channel(**kwargs)

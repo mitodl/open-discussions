@@ -1,11 +1,11 @@
-"""Permissions for field_channels"""
+"""Permissions for channels_fields"""
 import logging
 
 from django.http import Http404
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
-from field_channels.constants import FIELD_ROLE_MODERATORS
-from field_channels.models import FieldChannel, FieldChannelGroupRole
+from channels_fields.constants import FIELD_ROLE_MODERATORS
+from channels_fields.models import FieldChannel
 from open_discussions.permissions import is_staff_user
 
 log = logging.getLogger()
@@ -13,7 +13,7 @@ log = logging.getLogger()
 
 def field_exists(view):
     """
-    Return True if a FieldChannel object exists for a channel_name in the view, or there is no field name.
+    Return True if a FieldChannel object exists for a field_name in the view, or there is no field name.
     Raises 404 if the FieldChannel does not exist.
 
     Args:
@@ -30,7 +30,7 @@ def field_exists(view):
 
 def is_field_moderator(request, view):
     """
-    Determine if the user is effectively an admin for a field channel
+    Determine if the user is a moderator for a field channel (or a staff user)
 
     Args:
         user (users.models.User): The user to check
@@ -41,9 +41,6 @@ def is_field_moderator(request, view):
     """
     group_names = set(request.user.groups.values_list("name", flat=True))
     field_name = view.kwargs.get("field_name", None)
-    log.info(f"VIEW KWARGS: {view.kwargs}")
-    log.info(f"GROUP NAMES: {group_names}")
-    log.info(f"FIELD NAMES: {field_name}")
     return (
         request.user.is_staff
         or f"field_{field_name}_{FIELD_ROLE_MODERATORS}" in group_names
@@ -56,15 +53,12 @@ class FieldModeratorPermissions(BasePermission):
     """
 
     def has_permission(self, request, view):
-        log.info(f"{field_exists(view)}/{is_staff_user(request)}/{is_field_moderator(request, view)}")
         return field_exists(view) and (
-            is_staff_user(request)
-            or is_field_moderator(request, view)
+            is_staff_user(request) or is_field_moderator(request, view)
         )
 
     def has_object_permission(self, request, view, obj):
-        log.info(f"HSOP {is_field_moderator(request, view)}")
-        return is_field_moderator(request, view)
+        return self.has_permission(request, view)
 
 
 class HasFieldPermission(BasePermission):
@@ -81,6 +75,7 @@ class HasFieldPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in SAFE_METHODS:
             return True
-        elif request.method != "DELETE":
+        elif request.method == "DELETE":
+            return request.user.is_staff
+        else:
             return is_field_moderator(request, view)
-        return False

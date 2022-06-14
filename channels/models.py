@@ -135,9 +135,9 @@ class BaseChannel(models.Model):
     """
     Base channel model
     """
+
     name = models.CharField(unique=True, max_length=100)
     title = models.CharField(max_length=100, null=True)
-    membership_is_managed = models.BooleanField(default=False)
 
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
     avatar_small = models.ImageField(
@@ -146,7 +146,9 @@ class BaseChannel(models.Model):
     avatar_medium = models.ImageField(
         null=True, max_length=2083, upload_to=avatar_uri_medium, blank=True
     )
-    banner = models.ImageField(null=True, max_length=2083, upload_to=banner_uri, blank=True)
+    banner = models.ImageField(
+        null=True, max_length=2083, upload_to=banner_uri, blank=True
+    )
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
     widget_list = models.ForeignKey(WidgetList, on_delete=models.SET_NULL, null=True)
     about = JSONField(blank=True, null=True)
@@ -206,6 +208,7 @@ class Channel(BaseChannel, TimestampedModel):
         max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
     )
     moderator_notifications = models.BooleanField(default=False, null=False)
+    membership_is_managed = models.BooleanField(default=False)
 
 
 class ChannelInvitation(TimestampedModel):
