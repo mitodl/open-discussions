@@ -159,39 +159,35 @@ class ChannelSerializer(serializers.Serializer):
             return Channel.objects.get(name=name)
 
     def create(self, validated_data):
+        from channels.api import get_admin_api
+
+        client = get_admin_api()
         # This is to reduce number of cassettes which need replacing
         validated_data["description"] = validated_data.get("description", "")
         validated_data["public_description"] = validated_data.get(
             "public_description", ""
         )
 
-        if validated_data.get("is_reddit_channel", True):
-            from channels.api import get_admin_api
+        # Set default value for managed to true since this is how micromasters will create channels.
+        validated_data["membership_is_managed"] = validated_data.get(
+            "membership_is_managed", True
+        )
 
-            # Set default value for managed to true since this is how micromasters will create channels.
-            validated_data["membership_is_managed"] = validated_data.get(
-                "membership_is_managed", True
-            )
-            lookup = {
-                "display_name": "name",
-                "title": "title",
-                "subreddit_type": "channel_type",
-                "description": "description",
-                "public_description": "public_description",
-                "submission_type": "link_type",
-                "membership_is_managed": "membership_is_managed",
-            }
-            kwargs = filter_dict_with_renamed_keys(
-                validated_data, lookup, optional=True
-            )
+        lookup = {
+            "display_name": "name",
+            "title": "title",
+            "subreddit_type": "channel_type",
+            "description": "description",
+            "public_description": "public_description",
+            "submission_type": "link_type",
+            "membership_is_managed": "membership_is_managed",
+        }
+        kwargs = filter_dict_with_renamed_keys(validated_data, lookup, optional=True)
 
-            client = get_admin_api()
-            channel = client.create_channel(**kwargs)
-            client.add_moderator(
-                self.context["channel_api"].user.username, channel.display_name
-            )
-        else:
-            channel = Channel.objects.get_or_create()
+        channel = client.create_channel(**kwargs)
+        client.add_moderator(
+            self.context["channel_api"].user.username, channel.display_name
+        )
         return channel
 
     def update(self, instance, validated_data):
