@@ -1,5 +1,5 @@
 """Constants for field channels"""
 
-FIELD_TYPE_FIELD = "field"
-FIELD_TYPE_SUBFIELD = "subfield"
-FIELD_TYPES = (FIELD_TYPE_FIELD, FIELD_TYPE_SUBFIELD)
+FIELD_ROLE_MODERATORS = "moderators"
+FIELD_ROLE_CHOICES = (FIELD_ROLE_MODERATORS, )  # Just moderators for now
+

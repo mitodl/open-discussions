@@ -59,13 +59,15 @@ import {
   isAudioPlayerLoadedSelector
 } from "../lib/redux_selectors"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
-import { channelIndexRoute } from "../lib/routing"
+import {channelIndexRoute, fieldIndexRoute} from "../lib/routing"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
 import "focus-visible"
+import FieldChannelRouter from "./FieldChannelRouter";
+import FieldsRouter from "./FieldsRouter";
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 
@@ -337,6 +339,11 @@ class App extends React.Component<Props> {
               </Route>
               <Route path={`${match.url}learn`} component={LearnRouter} />
             </>
+          ) : null}
+          {true ? (
+            <>
+              <Route path={`${match.url}fields`} component={FieldsRouter} />
+           </>
           ) : null}
           <Route path={`${match.url}podcasts`}>
             <PodcastFrontpage />
