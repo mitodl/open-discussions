@@ -4,8 +4,8 @@ const webpack = require("webpack")
 module.exports = {
   config: {
     entry: {
-      root:  ["core-js/stable", "regenerator-runtime/runtime", "./static/js/entry/root"],
-      style: "./static/js/entry/style"
+      root:  ["core-js/stable", "regenerator-runtime/runtime", "./frontends/discussions/src/entry/root"],
+      style: "./frontends/discussions/src/entry/style"
     },
     module: {
       rules: [
@@ -16,7 +16,7 @@ module.exports = {
       ]
     },
     resolve: {
-      modules:    [path.join(__dirname, "static/js"), "node_modules"],
+      modules:    [path.join(__dirname, "frontends/discussions/src"), "node_modules"],
       extensions: [".js", ".jsx"]
     },
     performance: {

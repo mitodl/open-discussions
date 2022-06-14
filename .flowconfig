@@ -11,10 +11,10 @@
 .*/node_modules/immer/.*.flow
 
 [include]
-./static/js
+./frontends/discussions/src
 
 [libs]
-./static/js/flow/declarations.js
+./frontends/discussions/src/flow/declarations.js
 ./flow-typed/npm/
 
 [options]

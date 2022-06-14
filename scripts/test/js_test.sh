@@ -15,18 +15,18 @@ else
 fi
 
 export FILE_PATTERN=${1:-'"static/**/*/*_test.js"'}
-CMD_ARGS="--require ./static/js/babelhook.js static/js/global_init.js $FILE_PATTERN"
+CMD_ARGS="--require ./frontends/discussions/src/babelhook.js frontends/discussions/src/global_init.js $FILE_PATTERN"
 
 # Second argument (if specified) should be a string that will match specific test case descriptions
 #
 # EXAMPLE:
-#   (./static/js/SomeComponent_test.js)
+#   (./frontends/discussions/src/SomeComponent_test.js)
 #   it('should test basic arithmetic') {
 #     assert.equal(1 + 1, 2);
 #   }
 #
 #   (in command line...)
-#   > ./js_test.sh static/js/SomeComponent_test.js "should test basic arithmetic"
+#   > ./js_test.sh frontends/discussions/src/SomeComponent_test.js "should test basic arithmetic"
 if [[ ! -z "$2" ]]; then
     CMD_ARGS+=" -g \"$2\""
 fi
