@@ -44,17 +44,9 @@ class FieldModeratorSerializer(serializers.Serializer):
     email = WriteableSerializerMethodField()
     full_name = serializers.SerializerMethodField()
 
-    def validate_moderator_name(self, value):
-        """Validate moderator name"""
-        return {"moderator_name": validate_username(value)}
-
     def get_moderator_name(self, instance):
         """Returns the name for the moderator"""
         return instance.username
-
-    def validate_email(self, value):
-        """Validate email"""
-        return {"email": validate_email(value)}
 
     def get_email(self, instance):
         """Get the email from the associated user"""
@@ -71,6 +63,14 @@ class FieldModeratorSerializer(serializers.Serializer):
             .values_list("name", flat=True)
             .first()
         )
+
+    def validate_moderator_name(self, value):
+        """Validate moderator name"""
+        return {"moderator_name": validate_username(value)}
+
+    def validate_email(self, value):
+        """Validate email"""
+        return {"email": validate_email(value)}
 
     def create(self, validated_data):
         field_name = self.context["view"].kwargs["field_name"]

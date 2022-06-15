@@ -7,6 +7,7 @@ from channels_fields.factories import FieldChannelFactory
 from channels_fields.models import FieldChannelGroupRole
 from channels_fields.serializers import FieldChannelSerializer, FieldModeratorSerializer
 from course_catalog.factories import UserListFactory
+from open_discussions.factories import UserFactory
 from widgets.factories import WidgetListFactory
 
 pytestmark = pytest.mark.django_db
@@ -99,8 +100,9 @@ def test_update_field_channel():
 
 
 @pytest.mark.parametrize("use_email", [True, False])
-def test_moderator_serializer(mocker, field_channel, field_user, use_email):
+def test_moderator_serializer(mocker, field_channel, use_email):
     """Test creating moderators with the FieldModeratorSerializer"""
+    field_user = UserFactory.create()
     if use_email:
         data = {"email": field_user.email}
     else:

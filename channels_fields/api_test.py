@@ -4,12 +4,14 @@ import pytest
 from channels_fields.api import add_user_role, remove_user_role
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannelGroupRole
+from open_discussions.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 
 
-def test_add_moderator(field_channel, field_user):
+def test_add_moderator(field_channel):
     """Test add moderator"""
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     assert (
         FieldChannelGroupRole.objects.get(
@@ -19,8 +21,10 @@ def test_add_moderator(field_channel, field_user):
     )
 
 
-def test_remove_moderator(field_channel, field_user):
+def test_remove_moderator(field_channel):
     """Test remove moderator"""
+    field_user = UserFactory.create()
+    add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     remove_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     assert (
         FieldChannelGroupRole.objects.get(

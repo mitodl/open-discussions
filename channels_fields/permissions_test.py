@@ -21,9 +21,9 @@ def test_can_view_field_channels(mocker):
 
 
 @pytest.mark.parametrize("is_staff", [True, False])
-def test_can_create_field_channels(mocker, field_user, is_staff):
+def test_can_create_field_channels(mocker, is_staff):
     """Only staff should be able to create field channels"""
-    field_user.is_staff = is_staff
+    field_user = UserFactory.create(is_staff=is_staff)
     assert (
         permissions.HasFieldPermission().has_permission(
             mocker.Mock(user=field_user, method="POST"), mocker.Mock()
@@ -45,10 +45,9 @@ def test_can_view_field_channel_details(mocker, field_channel):
 
 
 @pytest.mark.parametrize("is_moderator", [True, False])
-def test_can_edit_field_channel_details(
-    mocker, field_channel, field_user, is_moderator
-):
+def test_can_edit_field_channel_details(mocker, field_channel, is_moderator):
     """Only moderators should be able to edit details of a field channel"""
+    field_user = UserFactory.create()
     if is_moderator:
         add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     assert (
@@ -62,10 +61,9 @@ def test_can_edit_field_channel_details(
 
 
 @pytest.mark.parametrize("is_staff", [True, False])
-def test_can_delete_field_channel(mocker, field_channel, field_user, is_staff):
+def test_can_delete_field_channel(mocker, field_channel, is_staff):
     """Only staff should be able to delete a field channel"""
-    if is_staff:
-        field_user.is_staff = True
+    field_user = UserFactory.create(is_staff=is_staff)
     assert (
         permissions.HasFieldPermission().has_object_permission(
             mocker.Mock(user=field_user, method="DELETE"),
@@ -83,11 +81,10 @@ def test_can_view_create_moderators(  # pylint:disable=too-many-arguments
     mocker, field_channel, method, is_moderator, is_staff
 ):
     """Only moderators or staff should be able to view/create/delete moderators"""
-    user = UserFactory.create()
+    user = UserFactory.create(is_staff=is_staff)
     if is_moderator:
         add_user_role(field_channel, FIELD_ROLE_MODERATORS, user)
         user.refresh_from_db()
-    user.is_staff = is_staff
     assert permissions.FieldModeratorPermissions().has_permission(
         mocker.Mock(user=user, method=method),
         mocker.Mock(kwargs={"field_name": field_channel.name}),

@@ -1,17 +1,18 @@
 """API for channels_fields """
-from django.contrib.auth.models import Group
+from typing import Dict
+
+from django.contrib.auth.models import Group, User
 from django.db import transaction
 
 from channels_fields.constants import FIELD_ROLE_CHOICES
-from channels_fields.models import FieldChannelGroupRole
+from channels_fields.models import FieldChannel, FieldChannelGroupRole
 
 
-def create_field_groups_and_roles(field_channel):
+def create_field_groups_and_roles(
+    field_channel: FieldChannel
+) -> Dict[str, FieldChannelGroupRole]:
     """
     Create a field channel's groups and roles
-
-    Args:
-        field_channel(channels_fields.models.Channel): the channel to create groups for
     """
     roles = {}
     for role in FIELD_ROLE_CHOICES:
@@ -26,39 +27,27 @@ def create_field_groups_and_roles(field_channel):
 
 
 @transaction.atomic
-def get_role_model(field_channel, role):
+def get_role_model(field_channel: FieldChannel, role: str) -> FieldChannelGroupRole:
     """
     Get or create a FieldChannelGroupRole object
-
-    Args:
-        field_channel(channels_fields.models.FieldChannel): The field channel
-        role(str): The role name (moderators)
-
-    Returns:
-        FieldChannelGroupRole: the ChannelGroupRole object
     """
     return FieldChannelGroupRole.objects.get(field=field_channel, role=role)
 
 
-def add_user_role(field_channel, role, user):
+def add_user_role(field_channel: FieldChannel, role: str, user: User):
     """
     Add a user to a field channel role's group
-
-    Args:
-        field_channel(channels_fields.models.FieldChannel): The channel
-        role(str): The role name (moderators)
-        user(django.contrib.auth.models.User): The user
     """
     get_role_model(field_channel, role).group.user_set.add(user)
 
 
-def remove_user_role(field_channel, role, user):
+def remove_user_role(field_channel: FieldChannel, role: str, user: User):
     """
     Remove a user from a field channel role's group
-
-    Args:
-        field_channel(channels_fields.models.FieldChannel): The field channel
-        role(str): The role name (moderators,)
-        user(django.contrib.auth.models.User): The user
     """
     get_role_model(field_channel, role).group.user_set.remove(user)
+
+
+def get_group_role_name(field_name: str, role: str) -> str:
+    """Get the group name for a FieldChannel and role"""
+    return f"field_{field_name}_{role}"

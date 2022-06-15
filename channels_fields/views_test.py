@@ -36,12 +36,13 @@ def test_create_field_channel_forbidden(user_client):
     assert FieldChannel.objects.filter(name=data["name"]).exists() is False
 
 
-def test_update_field_channel(field_channel, field_user, client):
+def test_update_field_channel(field_channel, client):
     """A moderator should be able to update a field channel"""
     url = reverse(
         "field_channels_api-detail", kwargs={"field_name": field_channel.name}
     )
     data = {"title": "NEW TITLE", "about": {}}
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     client.force_login(field_user)
     response = client.patch(url, data=data)
@@ -70,22 +71,24 @@ def test_delete_field_channel(field_channel, client):
     assert response.status_code == 204
 
 
-def test_delete_field_channel_forbidden(field_channel, field_user, client):
+def test_delete_field_channel_forbidden(field_channel, client):
     """A moderator should npt be able to delete a field channel"""
     url = reverse(
         "field_channels_api-detail", kwargs={"field_name": field_channel.name}
     )
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     client.force_login(field_user)
     response = client.delete(url)
     assert response.status_code == 403
 
 
-def test_list_moderators(field_channel, field_user, client):
+def test_list_moderators(field_channel, client):
     """A field moderator should be able to view other moderators for the channel"""
     url = reverse(
         "field_moderators_api-list", kwargs={"field_name": field_channel.name}
     )
+    field_user = UserFactory.create()
     other_mod = UserFactory.create()
     for user in [field_user, other_mod]:
         add_user_role(field_channel, FIELD_ROLE_MODERATORS, user)
@@ -105,8 +108,9 @@ def test_list_moderators_forbidden(field_channel, user_client):
     assert user_client.get(url).status_code == 403
 
 
-def test_add_moderator(field_channel, field_user, client):
+def test_add_moderator(field_channel, client):
     """A moderator should be able to add other moderators"""
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     url = reverse(
         "field_moderators_api-list", kwargs={"field_name": field_channel.name}
@@ -132,8 +136,9 @@ def test_add_moderator_forbidden(field_channel, user_client):
     )
 
 
-def test_delete_moderator(field_channel, field_user, client):
+def test_delete_moderator(field_channel, client):
     """A field moderator should be able to delete other moderators for the field channel"""
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     other_mod = UserFactory.create()
     for user in [field_user, other_mod]:
@@ -146,8 +151,9 @@ def test_delete_moderator(field_channel, field_user, client):
     assert client.delete(url).status_code == 204
 
 
-def test_delete_moderator_forbidden(field_channel, field_user, user_client):
+def test_delete_moderator_forbidden(field_channel, user_client):
     """A normal user should not be able to delete other moderators for the field channel"""
+    field_user = UserFactory.create()
     add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
     url = reverse(
         "field_moderators_api-detail",

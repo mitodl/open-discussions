@@ -3,6 +3,8 @@ import logging
 
 from django.http import Http404
 from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework.request import Request
+from rest_framework.views import APIView
 
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel
@@ -11,16 +13,10 @@ from open_discussions.permissions import is_staff_user
 log = logging.getLogger()
 
 
-def field_exists(view):
+def field_exists(view: APIView) -> bool:
     """
     Return True if a FieldChannel object exists for a field_name in the view, or there is no field name.
     Raises 404 if the FieldChannel does not exist.
-
-    Args:
-        view (rest_framework.views.APIView): django DRF view
-
-    Returns:
-        bool: True if FieldChannel exists (or there is no channel name)
     """
     field_name = view.kwargs.get("field_name", None)
     if not field_name or FieldChannel.objects.filter(name=field_name).exists():
@@ -28,7 +24,7 @@ def field_exists(view):
     raise Http404()
 
 
-def is_field_moderator(request, view):
+def is_field_moderator(request: Request, view: APIView) -> bool:
     """
     Determine if the user is a moderator for a field channel (or a staff user)
     """

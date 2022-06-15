@@ -6,12 +6,11 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
-from channels_fields.api import remove_user_role
+from channels_fields.api import get_group_role_name, remove_user_role
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel
 from channels_fields.permissions import FieldModeratorPermissions, HasFieldPermission
 from channels_fields.serializers import FieldChannelSerializer, FieldModeratorSerializer
-from channels_fields.utils import get_group_role_name
 from course_catalog.views import LargePagination
 
 
@@ -38,7 +37,7 @@ class FieldChannelViewSet(
         return FieldChannel.objects.all()
 
     def delete(self, request, *args, **kwargs):
-        """ Remove the user from the moderator groups for this website """
+        """ Remove the user from the moderator groups for this field channel """
         FieldChannel.objects.get_object_or_404(name=kwargs["field_name"]).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -53,8 +52,7 @@ class FieldModeratorListView(ListCreateAPIView):
 
     def get_queryset(self):
         """
-        Builds a queryset of relevant users with permissions for this website, and annotates them by group name/role
-        (owner, administrator, editor, or global administrator)
+        Builds a queryset of relevant users with moderator permissions for this field channel
         """
         field_group_name = get_group_role_name(
             FieldChannel.objects.get(name=self.kwargs["field_name"]),
@@ -66,7 +64,7 @@ class FieldModeratorListView(ListCreateAPIView):
 
 class FieldModeratorDetailView(APIView):
     """
-    View to retrieve and remove field moderators
+    View to retrieve and remove field channel moderators
     """
 
     permission_classes = (FieldModeratorPermissions,)
