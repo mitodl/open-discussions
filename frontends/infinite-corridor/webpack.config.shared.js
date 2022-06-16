@@ -1,7 +1,8 @@
 module.exports = {
   config: {
     entry: {
-      root: "./src/entry/root",
+      root:  "./src/entry/root",
+      style: "./src/entry/style",
     },
     module: {
       rules: [

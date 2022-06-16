@@ -6,7 +6,7 @@ const hotMiddleware = require('webpack-hot-middleware')
 const { makeDevConfig } = require('./webpack.config.dev')
 
 const host = process.env.WEBPACK_HOST
-const port = process.env.WEBPACK_PORT_IC
+const port = process.env.WEBPACK_PORT
 
 const config = makeDevConfig(host, port)
 

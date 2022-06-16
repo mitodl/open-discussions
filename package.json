@@ -5,7 +5,7 @@
         "frontends/*"
     ],
     "scripts": {
-        "start:dev": "yarn workspaces foreach --parallel --interlaced run start:dev",
+        "start:dev": "yarn workspace ${DEV_WORKSPACE:-'open-discussions'} run start:dev",
         "build": "yarn workspaces foreach run build",
         "lint": "yarn workspaces foreach run lint",
         "fmt": "yarn workspaces foreach run fmt",

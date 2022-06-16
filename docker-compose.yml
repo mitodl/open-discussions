@@ -95,7 +95,6 @@ services:
       CONTAINER_NAME: 'watch'
       WEBPACK_HOST: 0.0.0.0
       WEBPACK_PORT: 8062
-      WEBPACK_PORT_IC: 8072
     env_file: .env
     volumes:
       - .:/src

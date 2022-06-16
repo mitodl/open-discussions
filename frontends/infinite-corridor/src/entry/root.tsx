@@ -8,7 +8,7 @@ const App = () => {
   return (
     <div>
       <p>Hello, World. Neato!</p>
-      <p>Back to <a href="/">open discussions</a></p>
+      <img style={{width: 300}} src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/MIT_infinite_corridor_02.jpg/1920px-MIT_infinite_corridor_02.jpg" />
     </div>
   )
 }
