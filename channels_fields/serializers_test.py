@@ -6,7 +6,6 @@ from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.factories import FieldChannelFactory
 from channels_fields.models import FieldChannelGroupRole
 from channels_fields.serializers import FieldChannelSerializer, FieldModeratorSerializer
-from course_catalog.factories import UserListFactory
 from open_discussions.factories import UserFactory
 from widgets.factories import WidgetListFactory
 
@@ -24,12 +23,7 @@ def mock_image_file(filename):
 @pytest.mark.parametrize("has_widget_list", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 def test_serialize_channel(  # pylint: disable=too-many-arguments
-    mocker,
-    has_avatar,
-    has_banner,
-    has_about,
-    has_widget_list,
-    ga_tracking_id,
+    mocker, has_avatar, has_banner, has_about, has_widget_list, ga_tracking_id
 ):
     """
     Test serializing a field channel
@@ -64,11 +58,7 @@ def test_create_field_channel():
     """
     Test creating a field channel
     """
-    data = {
-        "name": "name",
-        "title": "title",
-        "about": {"foo": "bar"},
-    }
+    data = {"name": "name", "title": "title", "about": {"foo": "bar"}}
     serializer = FieldChannelSerializer(data=data)
     serializer.is_valid()
     field_channel = serializer.create(serializer.validated_data)
