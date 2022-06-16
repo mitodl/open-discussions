@@ -104,14 +104,14 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 10.15.1
+          node-version: 16.15.1
 
       - name: Setup environment
         run: sudo apt-get install libelf1
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
 
       - uses: actions/cache@v1
         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
