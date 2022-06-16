@@ -34,7 +34,7 @@ module.exports = Object.assign(prodConfig, {
   context: __dirname,
   mode:    "production",
   output:  {
-    path:               path.resolve("./static/bundles/"),
+    path:               path.resolve(__dirname, `../../static/bundles/`),
     filename:           "[name]-[chunkhash].js",
     chunkFilename:      "[id]-[chunkhash].js",
     crossOriginLoading: "anonymous"
