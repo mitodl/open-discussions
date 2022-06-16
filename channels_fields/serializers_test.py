@@ -21,7 +21,6 @@ def mock_image_file(filename):
 @pytest.mark.parametrize("has_avatar", [True, False])
 @pytest.mark.parametrize("has_banner", [True, False])
 @pytest.mark.parametrize("has_about", [True, False])
-@pytest.mark.parametrize("has_featured_list", [True, False])
 @pytest.mark.parametrize("has_widget_list", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 def test_serialize_channel(  # pylint: disable=too-many-arguments
@@ -29,7 +28,6 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
     has_avatar,
     has_banner,
     has_about,
-    has_featured_list,
     has_widget_list,
     ga_tracking_id,
 ):
@@ -41,7 +39,6 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         avatar=mock_image_file("avatar.jpg") if has_avatar else None,
         avatar_small=mock_image_file("avatar_small.jpg") if has_avatar else None,
         avatar_medium=mock_image_file("avatar_medium.jpg") if has_avatar else None,
-        featured_list=UserListFactory.create() if has_featured_list else None,
         widget_list=WidgetListFactory.create() if has_widget_list else None,
         about={"foo": "bar"} if has_about else None,
         ga_tracking_id=ga_tracking_id,
@@ -56,7 +53,6 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         "banner": field_channel.banner.url if has_banner else None,
         "ga_tracking_id": field_channel.ga_tracking_id,
         "widget_list": field_channel.widget_list.id if has_widget_list else None,
-        "featured_list": field_channel.featured_list.id if has_featured_list else None,
         "about": field_channel.about,
         "updated_on": mocker.ANY,
         "created_on": mocker.ANY,
@@ -68,11 +64,9 @@ def test_create_field_channel():
     """
     Test creating a field channel
     """
-    featured_list = UserListFactory.create()
     data = {
         "name": "name",
         "title": "title",
-        "featured_list": featured_list.id,
         "about": {"foo": "bar"},
     }
     serializer = FieldChannelSerializer(data=data)
@@ -82,7 +76,6 @@ def test_create_field_channel():
     assert field_channel.title == data["title"]
     assert field_channel.about == data["about"]
     assert field_channel.widget_list is not None
-    assert field_channel.featured_list == featured_list
 
 
 def test_update_field_channel():
