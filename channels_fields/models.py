@@ -1,20 +1,17 @@
 """Models for channels_fields"""
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models import deletion
 
 from channels.models import BaseChannel
 from channels_fields.constants import FIELD_ROLE_CHOICES
-from course_catalog.models import UserList
 from open_discussions.models import TimestampedModel
 
 
 class FieldChannel(BaseChannel, TimestampedModel):
     """Field of study"""
 
-    featured_list = models.ForeignKey(
-        UserList, null=True, blank=True, on_delete=deletion.SET_NULL
-    )
+    # Whatever attributes we decide field channels should have,
+    # beyond that shared with discussion Channels, will go here.
 
 
 class FieldChannelGroupRole(TimestampedModel):
