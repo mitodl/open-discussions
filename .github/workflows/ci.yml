@@ -133,8 +133,8 @@ jobs:
       - name: Scss lint
         run: yarn run scss_lint
 
-      - name: Flow
-        run: yarn run flow
+      - name: Typecheck
+        run: yarn run typecheck
 
       - name: Tests
         run: yarn run test
