@@ -13,7 +13,13 @@ module.exports = {
       ]
     },
     resolve: {
-      extensions: [".js", ".jsx"]
+      extensions: [".js", ".jsx"],
+      fallback:   {
+        assert: require.resolve("assert"),
+        os:     require.resolve("os-browserify"),
+        path:   require.resolve("path-browserify"),
+        url:    require.resolve("url")
+      }
     },
     performance: {
       hints: false
@@ -23,7 +29,7 @@ module.exports = {
     test:    /\.jsx?$/,
     exclude: /node_modules/,
     loader:  "babel-loader",
-    query:   {
+    options:   {
       presets: [
         ["@babel/preset-env", { modules: false }],
         "@babel/preset-react",

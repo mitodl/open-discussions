@@ -4,7 +4,7 @@ const idlUtils = require("jsdom/lib/jsdom/living/generated/utils")
 const whatwgURL = require("whatwg-url")
 const uuid = require("uuid/v4")
 
-babelSharedLoader.query.presets = [
+babelSharedLoader.options.presets = [
   "@babel/preset-env",
   "@babel/preset-react",
   "@babel/preset-flow"
@@ -98,4 +98,4 @@ Object.defineProperty(window, "location", {
   }
 })
 
-require("@babel/register")(babelSharedLoader.query)
+require("@babel/register")(babelSharedLoader.options)

@@ -8,7 +8,7 @@ const { config, babelSharedLoader } = require(path.resolve(
 
 const prodBabelConfig = Object.assign({}, babelSharedLoader)
 
-prodBabelConfig.query.plugins.push(
+prodBabelConfig.options.plugins.push(
   "@babel/plugin-transform-react-constant-elements",
   "@babel/plugin-transform-react-inline-elements"
 )
@@ -42,8 +42,8 @@ module.exports = Object.assign(prodConfig, {
 
   plugins: [
     new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: '"production"'
+      process: {
+        env: { NODE_ENV: '"production"' },
       }
     }),
     new BundleTracker({
