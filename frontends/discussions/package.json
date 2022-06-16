@@ -166,9 +166,10 @@
   },
   "scripts": {
     "postinstall": "./webpack_if_prod.sh",
+    "build": "webpack --config webpack.config.prod.js --bail",
     "start:dev": "node ./hot-reload-dev-server.js",
-    "lint": "node ./node_modules/eslint/bin/eslint.js ./frontends/discussions/src",
-    "scss_lint": "node ./node_modules/sass-lint/bin/sass-lint.js --verbose --no-exit",
+    "lint": "eslint ./src",
+    "scss_lint": "sass-lint --verbose --no-exit",
     "test": "NODE_ENV=development ./scripts/test/js_test.sh",
     "coverage": "NODE_ENV=development COVERAGE=1 ./scripts/test/js_test.sh",
     "codecov": "NODE_ENV=development CODECOV=1 ./scripts/test/js_test.sh",

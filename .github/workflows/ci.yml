@@ -122,28 +122,28 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-engines --prefer-offline
+        run: yarn install --immutable --ignore-engines --prefer-offline
 
       - name: Lints
-        run: npm run lint
+        run: yarn run lint
 
       - name: Code formatting
-        run: npm run fmt:check
+        run: yarn run fmt:check
 
       - name: Scss lint
-        run: npm run scss_lint
+        run: yarn run scss_lint
 
       - name: Flow
-        run: npm run flow
+        run: yarn run flow
 
       - name: Tests
-        run: npm run test
+        run: yarn run test
         env:
           CODECOV: true
           NODE_ENV: development
 
       - name: Webpack build
-        run: node node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --bail
+        run: yarn run build
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1

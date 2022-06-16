@@ -6,7 +6,13 @@
     ],
     "scripts": {
         "start:dev": "yarn workspaces foreach --parallel --interlaced run start:dev",
-        "build": "yarn workspaces foreach run build"
+        "build": "yarn workspaces foreach run build",
+        "lint": "yarn workspaces foreach run lint",
+        "fmt": "yarn workspaces foreach run fmt",
+        "fmt:check": "yarn workspaces foreach run fmt:check",
+        "scss_lint": "yarn workspaces foreach run scss_lint",
+        "fmt:flow": "yarn workspaces foreach run flow",
+        "test": "yarn workspaces foreach run test"
     },
     "version": "0.0.0",
     "packageManager": "yarn@3.2.0"
