@@ -1,3 +1,5 @@
+const path = require('path')
+
 module.exports = {
   config: {
     entry: {
@@ -35,7 +37,7 @@ module.exports = {
         "@babel/preset-react",
         "@babel/preset-flow"
       ],
-      ignore:  ["node_modules/**"],
+      ignore:  ["../../node_modules/**", "node_modules/**"],
       plugins: [
         "react-hot-loader/babel",
         "@babel/plugin-proposal-class-properties",
