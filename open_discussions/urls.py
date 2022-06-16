@@ -37,6 +37,7 @@ urlpatterns = [
     url(r"", include("authentication.urls")),
     url(r"", include("social_django.urls", namespace="social")),
     url(r"", include("channels.urls")),
+    url(r"", include("channels_fields.urls")),
     url(r"", include("profiles.urls")),
     url(r"", include("mail.urls")),
     url(r"", include("notifications.urls")),
@@ -95,6 +96,7 @@ urlpatterns = [
     url(r"^search/", index, name="site-search"),
     url(r"^courses/", index, name="courses"),
     url(r"^learn/", index, name="learn"),
+    url(r"^fields/", index, name="fields"),
     url(r"^podcasts/", index, name="podcasts"),
     url(r"^terms-and-conditions/", index, name="terms-and-conditions"),
     # Hijack
