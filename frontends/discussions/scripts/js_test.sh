@@ -3,30 +3,30 @@ export TMP_FILE=$(mktemp)
 
 if [[ ! -z "$COVERAGE" ]]
 then
-    export CMD="npx nyc --reporter=html mocha --exit"
+    export CMD="npx nyc --reporter=html mocha"
 elif [[ ! -z "$CODECOV" ]]
 then
-    export CMD="npx nyc  --reporter=lcovonly -R spec mocha --exit"
+    export CMD="npx nyc --reporter=lcovonly -R spec mocha"
 elif [[ ! -z "$WATCH" ]]
 then
     export CMD="npx mocha --watch"
 else
-    export CMD="npx mocha --exit"
+    export CMD="npx mocha"
 fi
 
 export FILE_PATTERN=${1:-'"src/**/*/*_test.js"'}
-CMD_ARGS="--require ./src/babelhook.js ./src/global_init.js $FILE_PATTERN"
+CMD_ARGS="$FILE_PATTERN --exit"
 
 # Second argument (if specified) should be a string that will match specific test case descriptions
 #
 # EXAMPLE:
-#   (./frontends/discussions/src/SomeComponent_test.js)
+#   (src/SomeComponent_test.js)
 #   it('should test basic arithmetic') {
 #     assert.equal(1 + 1, 2);
 #   }
 #
 #   (in command line...)
-#   > ./js_test.sh frontends/discussions/src/SomeComponent_test.js "should test basic arithmetic"
+#   > ./js_test.sh src/SomeComponent_test.js "should test basic arithmetic"
 if [[ ! -z "$2" ]]; then
     CMD_ARGS+=" -g \"$2\""
 fi
@@ -48,13 +48,11 @@ if [[ $(
     cat "$TMP_FILE" |
     grep -v 'ignored, nothing could be mapped' |
     grep -v "This browser doesn't support the \`onScroll\` event" |
-    grep -v "Accessing PropTypes" |
-    grep -v "Accessing createClass" |
+    grep -v "process.on(SIGPROF) is reserved while debugging" |
     grep -v "Browserslist: caniuse-lite is outdated" |
     grep -v "browserslist" |
     grep -v "" |
     grep -v "Why you should do it regularly:" |
-    grep -v "ExperimentalWarning: The fs.promises API is experimental" |
     wc -l |
     awk '{print $1}'
     ) -ne 0 ]]  # is file empty?
