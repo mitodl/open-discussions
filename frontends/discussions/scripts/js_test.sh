@@ -3,19 +3,19 @@ export TMP_FILE=$(mktemp)
 
 if [[ ! -z "$COVERAGE" ]]
 then
-    export CMD="node ./node_modules/nyc/bin/nyc.js --reporter=html mocha --exit"
+    export CMD="npx nyc --reporter=html mocha --exit"
 elif [[ ! -z "$CODECOV" ]]
 then
-    export CMD="node ./node_modules/nyc/bin/nyc.js --reporter=lcovonly -R spec mocha --exit"
+    export CMD="npx nyc  --reporter=lcovonly -R spec mocha --exit"
 elif [[ ! -z "$WATCH" ]]
 then
-    export CMD="node ./node_modules/mocha/bin/_mocha --watch"
+    export CMD="npx mocha --watch"
 else
-    export CMD="node ./node_modules/mocha/bin/_mocha --exit"
+    export CMD="npx mocha --exit"
 fi
 
-export FILE_PATTERN=${1:-'"static/**/*/*_test.js"'}
-CMD_ARGS="--require ./frontends/discussions/src/babelhook.js frontends/discussions/src/global_init.js $FILE_PATTERN"
+export FILE_PATTERN=${1:-'"src/**/*/*_test.js"'}
+CMD_ARGS="--require ./src/babelhook.js ./src/global_init.js $FILE_PATTERN"
 
 # Second argument (if specified) should be a string that will match specific test case descriptions
 #

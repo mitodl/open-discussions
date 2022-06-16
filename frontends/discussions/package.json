@@ -174,7 +174,7 @@
     "start:dev": "node ./hot-reload-dev-server.js",
     "lint": "eslint ./src",
     "scss_lint": "sass-lint --verbose --no-exit",
-    "test": "NODE_ENV=development ./scripts/test/js_test.sh",
+    "test": "NODE_ENV=development ./scripts/js_test.sh",
     "coverage": "NODE_ENV=development COVERAGE=1 ./scripts/test/js_test.sh",
     "codecov": "NODE_ENV=development CODECOV=1 ./scripts/test/js_test.sh",
     "watch": "WATCH=1 ./scripts/test/js_test.sh",

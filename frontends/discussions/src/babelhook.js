@@ -1,4 +1,4 @@
-const { babelSharedLoader } = require("../../webpack.config.shared")
+const { babelSharedLoader } = require("../webpack.config.shared")
 const sinon = require("sinon")
 const idlUtils = require("jsdom/lib/jsdom/living/generated/utils")
 const whatwgURL = require("whatwg-url")
