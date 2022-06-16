@@ -85,7 +85,7 @@ services:
     image: node:16.15.1
     working_dir: /src
     command: >
-     bash -c "yarn install && yarn run start:dev"
+     bash -c "yarn install --immutable && yarn run start:dev"
     ports:
       - "8062:8062"
       - "8072:8072"
