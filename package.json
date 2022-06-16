@@ -5,6 +5,7 @@
         "frontends/*"
     ],
     "scripts": {
+        "start:dev": "yarn workspaces foreach --parallel --interlaced run start:dev",
         "build": "yarn workspaces foreach run build"
     },
     "version": "0.0.0",

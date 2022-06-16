@@ -85,15 +85,17 @@ services:
     image: node:16.15.1
     working_dir: /src
     command: >
-      /bin/bash -c './frontends/discussions/webpack_dev_server.sh --install'
+     bash -c "yarn install && yarn run start:dev"
     ports:
       - "8062:8062"
+      - "8072:8072"
     environment:
       NODE_ENV: 'production'
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       CONTAINER_NAME: 'watch'
       WEBPACK_HOST: 0.0.0.0
       WEBPACK_PORT: 8062
+      WEBPACK_PORT_IC: 8072
     env_file: .env
     volumes:
       - .:/src

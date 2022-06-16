@@ -166,7 +166,7 @@
   },
   "scripts": {
     "postinstall": "./webpack_if_prod.sh",
-    "dev-server": "node ./hot-reload-dev-server.js",
+    "start:dev": "node ./hot-reload-dev-server.js",
     "lint": "node ./node_modules/eslint/bin/eslint.js ./frontends/discussions/src",
     "scss_lint": "node ./node_modules/sass-lint/bin/sass-lint.js --verbose --no-exit",
     "test": "NODE_ENV=development ./scripts/test/js_test.sh",

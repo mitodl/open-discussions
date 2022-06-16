@@ -1,4 +1,3 @@
-
 const webpack = require('webpack')
 const express = require('express')
 const devMiddleware = require('webpack-dev-middleware')
@@ -7,7 +6,7 @@ const hotMiddleware = require('webpack-hot-middleware')
 const { makeDevConfig } = require('./webpack.config.dev')
 
 const host = process.env.WEBPACK_HOST
-const port = process.env.WEBPACK_PORT
+const port = process.env.WEBPACK_PORT_IC
 
 const config = makeDevConfig(host, port)
 
@@ -26,7 +25,7 @@ app.use(devMiddleware(compiler, {
 
 app.use(hotMiddleware(compiler))
 
-app.listen(port, (err) => {
+app.listen(port, err => {
   if (err) {
     return console.error(err)
   }
