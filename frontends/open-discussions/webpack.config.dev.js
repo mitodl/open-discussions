@@ -27,8 +27,8 @@ const devConfig = Object.assign({}, config, {
   },
   plugins: [
     new webpack.DefinePlugin({
-      "process.env": {
-        NODE_ENV: '"development"'
+      process: {
+        env: { NODE_ENV: '"development"' },
       }
     }),
     new webpack.HotModuleReplacementPlugin(),
@@ -36,7 +36,7 @@ const devConfig = Object.assign({}, config, {
   ],
   devtool:      "source-map",
   optimization: {
-    namedModules: true,
+    moduleIds:   "named",
     splitChunks:  {
       name:      "common",
       minChunks: 2

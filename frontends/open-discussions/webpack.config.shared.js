@@ -1,11 +1,10 @@
-const path = require("path")
-const webpack = require("webpack")
+const path = require('path')
 
 module.exports = {
   config: {
     entry: {
-      root:  ["core-js/stable", "regenerator-runtime/runtime", "./static/js/entry/root"],
-      style: "./static/js/entry/style"
+      root:  ["core-js/stable", "regenerator-runtime/runtime", "./src/entry/root"],
+      style: "./src/entry/style"
     },
     module: {
       rules: [
@@ -16,8 +15,13 @@ module.exports = {
       ]
     },
     resolve: {
-      modules:    [path.join(__dirname, "static/js"), "node_modules"],
-      extensions: [".js", ".jsx"]
+      extensions: [".js", ".jsx"],
+      fallback:   {
+        assert: require.resolve("assert"),
+        os:     require.resolve("os-browserify"),
+        path:   require.resolve("path-browserify"),
+        url:    require.resolve("url")
+      }
     },
     performance: {
       hints: false
@@ -27,13 +31,13 @@ module.exports = {
     test:    /\.jsx?$/,
     exclude: /node_modules/,
     loader:  "babel-loader",
-    query:   {
+    options:   {
       presets: [
         ["@babel/preset-env", { modules: false }],
         "@babel/preset-react",
         "@babel/preset-flow"
       ],
-      ignore:  ["node_modules/**"],
+      ignore:  ["../../node_modules/**", "node_modules/**"],
       plugins: [
         "react-hot-loader/babel",
         "@babel/plugin-proposal-class-properties",
