@@ -98,7 +98,7 @@ staticfiles/
 release-notes-checklist
 
 # Webpack
-webpack-stats.json
+webpack-stats/
 
 # Celery Beat
 celerybeat-schedule
