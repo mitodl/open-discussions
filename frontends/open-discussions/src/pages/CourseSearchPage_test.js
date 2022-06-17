@@ -394,7 +394,7 @@ describe("CourseSearchPage", () => {
     wrapper.find(".clear-all-filters").simulate("click")
     await wait(1)
     const search = pushStub.args[pushStub.args.length - 1][2]
-    assert.deepEqual(search, "/?")
+    assert.deepEqual(search, "/")
   })
 
   it("triggers a non-incremental search from textbox input", async () => {

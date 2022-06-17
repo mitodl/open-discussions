@@ -19,11 +19,8 @@ lazy = pytest.lazy_fixture
 @pytest.mark.parametrize(
     "test_user,expect_auth", [[lazy("logged_in_user"), True], [None, False]]
 )
-def test_webpack_url(settings, mocker, client, test_user, expect_auth):
+def test_webpack_url(settings, client, test_user, expect_auth):
     """Verify that webpack bundle src shows up in production"""
-    get_bundle_mock = mocker.patch(
-        "open_discussions.templatetags.render_bundle._get_bundle"
-    )
     settings.GA_TRACKING_ID = "fake"
     settings.GA_G_TRACKING_ID = "fake"
     settings.EMBEDLY_KEY = "fake"
@@ -56,8 +53,7 @@ def test_webpack_url(settings, mocker, client, test_user, expect_auth):
         }
 
     response = client.get(reverse("open_discussions-index"))
-    bundles = [bundle[0][1] for bundle in get_bundle_mock.call_args_list]
-    assert set(bundles) == {"root", "style"}
+
     js_settings = response.context["js_settings"]
     assert js_settings == {
         "gaTrackingID": "fake",

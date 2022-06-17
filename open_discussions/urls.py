@@ -38,6 +38,7 @@ urlpatterns = [
     url(r"", include("social_django.urls", namespace="social")),
     url(r"", include("channels.urls")),
     url(r"", include("channels_fields.urls")),
+    url(r"", include("infinite_example.urls"), name="infinite_example"),
     url(r"", include("profiles.urls")),
     url(r"", include("mail.urls")),
     url(r"", include("notifications.urls")),

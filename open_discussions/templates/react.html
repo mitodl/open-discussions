@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% load render_bundle %}
+{% load render_bundle from webpack_loader %}
 
 {% block extrahead %}
 {{ js_settings|json_script:'js-settings' }}
 <script type="text/javascript">
 var SETTINGS = JSON.parse(document.getElementById('js-settings').textContent);
 </script>
-{% render_bundle 'style' %}
+{% render_bundle 'style' config='OPEN_DISCUSSIONS'  %}
 {% endblock %}
 
 {% block content %}
 <div id="container"></div>
-{% render_bundle 'root' %}
+{% render_bundle 'root' config='OPEN_DISCUSSIONS' %}
 {% endblock %}

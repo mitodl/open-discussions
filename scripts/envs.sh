@@ -9,9 +9,6 @@ else
   INSIDE_CONTAINER="false"
 fi
 
-# Set WEBPACK_DEV_SERVER_HOST to the IP or hostname which the browser will use to contact the webpack dev server
-WEBPACK_DEV_SERVER_HOST="localhost"
-
 # Set WEBPACK_SELENIUM_DEV_SERVER_HOST to the IP address for the webpack dev server
 # This is different from WEBPACK_DEV_SERVER_HOST because localhost won't suffice here since the request
 # is coming from a docker container, not the browser. If we can't detect this the user must set it via a script.
