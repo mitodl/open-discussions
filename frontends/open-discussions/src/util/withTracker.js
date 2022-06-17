@@ -8,7 +8,7 @@ import ReactGA from "react-ga"
 const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
   const debug = SETTINGS.reactGaDebug === "true"
   // $FlowFixMe: process.browser comes from a polyfill provided by webpack
-  const test = !process.browser && process.env.NODE_ENV === "development"
+  const test = !process.browser && process.env.NODE_ENV !== "production"
 
   if (SETTINGS.gaTrackingID) {
     ReactGA.initialize(SETTINGS.gaTrackingID, { debug: debug, testMode: test })

@@ -1,25 +1,12 @@
-const { babelSharedLoader } = require("../webpack.config.shared")
-const sinon = require("sinon")
-const idlUtils = require("jsdom/lib/jsdom/living/generated/utils")
-const whatwgURL = require("whatwg-url")
-const uuid = require("uuid/v4")
+import sinon from "sinon"
+import idlUtils from "jsdom/lib/jsdom/living/generated/utils"
+import whatwgURL from "whatwg-url"
+import { v4 as uuid } from  "uuid"
+import { polyfill as rafPolyfill } from "raf"
+import globalJsdom from 'jsdom-global'
+import crypto from "@trust/webcrypto"
 
-babelSharedLoader.options.presets = [
-  "@babel/preset-env",
-  "@babel/preset-react",
-  "@babel/preset-flow"
-]
-
-require("core-js/stable")
-require("regenerator-runtime/runtime")
-
-// window and global must be defined here before React is imported
-require("jsdom-global")(undefined, {
-  url: "http://fake/"
-})
-
-require("mutationobserver-shim")
-global.MutationObserver = window.MutationObserver
+globalJsdom(undefined, { url: "http://fake/" })
 
 global.DOMParser = window.DOMParser
 
@@ -67,12 +54,11 @@ global.Audio = class Audio {
 // react got a little more picky about the polyfill for
 // requestAnimaltionFrame, see:
 // https://reactjs.org/docs/javascript-environment-requirements.html
-const { polyfill } = require("raf")
-polyfill(global)
-polyfill(window)
+rafPolyfill(global)
+rafPolyfill(window)
 
 // polyfill for the web crypto module
-window.crypto = require("@trust/webcrypto")
+window.crypto = crypto
 
 const changeURL = (window, urlString) => {
   const doc = idlUtils.implForWrapper(window._document)
@@ -98,4 +84,3 @@ Object.defineProperty(window, "location", {
   }
 })
 
-require("@babel/register")(babelSharedLoader.options)

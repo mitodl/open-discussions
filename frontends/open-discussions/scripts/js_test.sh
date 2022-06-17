@@ -1,5 +1,6 @@
 #!/bin/bash
 export TMP_FILE=$(mktemp)
+export NODE_ENV=test
 
 if [[ ! -z "$COVERAGE" ]]
 then
