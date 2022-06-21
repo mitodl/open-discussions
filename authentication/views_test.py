@@ -18,7 +18,7 @@ from open_discussions.test_utils import any_instance_of, MockResponse
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("authenticated_site", "indexing_user"),
+    pytest.mark.usefixtures("indexing_user",),
 ]
 lazy = pytest.lazy_fixture
 

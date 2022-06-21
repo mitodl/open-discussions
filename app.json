@@ -392,6 +392,14 @@
       "description": "Number of similar resources to return",
       "required": false
     },
+    "OPEN_DISCUSSIONS_TITLE": {
+      "description": "Title of the open discussions site",
+      "required": false
+    },
+    "OPEN_DISCUSSIONS_TOS_URL": {
+      "description": "URL to the Terms of Service",
+      "required": false
+    },
     "OPEN_DISCUSSIONS_SUPPORT_EMAIL": {
       "description": "Email address listed for customer support"
     },

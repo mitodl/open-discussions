@@ -19,7 +19,6 @@ from moira_lists.moira_api import is_list_staff
 from open_discussions import features
 
 from open_discussions.templatetags.render_bundle import public_path
-from sites.api import get_default_site
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
 
@@ -51,8 +50,6 @@ def _render_app(request, initial_state=None):
         user_id = user.id
         user_list_staff = is_list_staff(user)
 
-    site = get_default_site()
-
     article_ui_enabled = (
         features.is_enabled(features.ARTICLE_UI)
         if settings.CKEDITOR_ENVIRONMENT_ID
@@ -83,11 +80,9 @@ def _render_app(request, initial_state=None):
         "is_admin": user_is_superuser,
         "is_list_staff": user_list_staff,
         "authenticated_site": {
-            "title": site.title,
-            "base_url": site.base_url,
-            "login_url": site.login_url,
-            "session_url": site.session_url,
-            "tos_url": site.tos_url,
+            "title": settings.OPEN_DISCUSSIONS_TITLE,
+            "base_url": settings.SITE_BASE_URL,
+            "tos_url": settings.OPEN_DISCUSSIONS_TOS_URL,
         },
         "support_email": settings.EMAIL_SUPPORT,
         "is_authenticated": bool(request.user.is_authenticated),

@@ -9,7 +9,7 @@ from notifications.models import NOTIFICATION_TYPE_MODERATOR, FREQUENCY_IMMEDIAT
 from open_discussions.test_utils import any_instance_of
 
 
-pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
+pytestmark = [pytest.mark.django_db]
 
 
 def test_create_moderator_post_event():

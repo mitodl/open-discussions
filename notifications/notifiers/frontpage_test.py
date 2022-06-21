@@ -20,7 +20,7 @@ from open_discussions.test_utils import any_instance_of
 
 pytestmark = [
     pytest.mark.django_db,
-    pytest.mark.usefixtures("notifier_settings", "authenticated_site"),
+    pytest.mark.usefixtures("notifier_settings",),
 ]
 
 

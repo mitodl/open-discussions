@@ -18,9 +18,7 @@ const _createSettings = () => ({
   max_comment_depth:  6,
   authenticated_site: {
     title:       "MicroMasters",
-    login_url:   "http://fake.micromasters.url/discussions",
     base_url:    "http://fake.micromasters.url/",
-    session_url: "http://fake.session.url",
     tos_url:     "http://fake.tos.url/"
   },
   allow_saml_auth:        false,

@@ -29,7 +29,6 @@ from django.core import mail
 from django.template.loader import render_to_string
 
 from open_discussions.auth_utils import get_encoded_and_signed_subscription_token
-from sites.api import get_default_site
 
 log = logging.getLogger()
 
@@ -86,7 +85,7 @@ def context_for_user(*, user=None, extra_context=None):
 
     context = {
         "base_url": settings.SITE_BASE_URL,
-        "site_name": get_default_site().title,
+        "site_name": settings.OPEN_DISCUSSIONS_TITLE,
     }
 
     if user:
