@@ -52,7 +52,7 @@ import {
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
 import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
-import { isAnonAccessiblePath} from "../lib/auth"
+import { isAnonAccessiblePath } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 import {
   getOwnProfile,

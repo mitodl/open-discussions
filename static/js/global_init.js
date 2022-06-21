@@ -17,9 +17,9 @@ configure({ adapter: new Adapter() })
 const _createSettings = () => ({
   max_comment_depth:  6,
   authenticated_site: {
-    title:       "MicroMasters",
-    base_url:    "http://fake.micromasters.url/",
-    tos_url:     "http://fake.tos.url/"
+    title:    "MicroMasters",
+    base_url: "http://fake.micromasters.url/",
+    tos_url:  "http://fake.tos.url/"
   },
   allow_saml_auth:        false,
   allow_related_posts_ui: false,

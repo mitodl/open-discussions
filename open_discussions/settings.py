@@ -59,7 +59,9 @@ SITE_BASE_URL = get_string("OPEN_DISCUSSIONS_BASE_URL", None)
 if not SITE_BASE_URL:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_BASE_URL is not set")
 OPEN_DISCUSSIONS_TITLE = get_string("OPEN_DISCUSSIONS_TITLE", "MIT Open")
-OPEN_DISCUSSIONS_TOS_URL = get_string("OPEN_DISCUSSIONS_TOS_URL", urljoin(SITE_BASE_URL, "/terms-and-conditions/"))
+OPEN_DISCUSSIONS_TOS_URL = get_string(
+    "OPEN_DISCUSSIONS_TOS_URL", urljoin(SITE_BASE_URL, "/terms-and-conditions/")
+)
 
 WEBPACK_LOADER = {
     "DEFAULT": {

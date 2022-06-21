@@ -19,9 +19,7 @@ lazy = pytest.lazy_fixture
 @pytest.mark.parametrize(
     "test_user,expect_auth", [[lazy("logged_in_user"), True], [None, False]]
 )
-def test_webpack_url(
-    settings, mocker, client, test_user, expect_auth
-):
+def test_webpack_url(settings, mocker, client, test_user, expect_auth):
     """Verify that webpack bundle src shows up in production"""
     get_bundle_mock = mocker.patch(
         "open_discussions.templatetags.render_bundle._get_bundle"

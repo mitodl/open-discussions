@@ -18,10 +18,7 @@ from open_discussions import features
 from open_discussions.utils import now_in_utc
 from open_discussions.test_utils import any_instance_of
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("notifier_settings",),
-]
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("notifier_settings")]
 
 
 @pytest.fixture
