@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.187.0
+---------------
+
+- Field Pages for InfiniteCorridor - backend (#3586)
+- remove UWSGI_THREAD_COUNT from .env.example
+
 Version 0.186.0 (Released June 06, 2022)
 ---------------
 
