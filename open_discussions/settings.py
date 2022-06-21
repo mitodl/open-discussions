@@ -60,15 +60,34 @@ if not SITE_BASE_URL:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_BASE_URL is not set")
 
 
+# WEBPACK_LOADER = {
+#     "DEFAULT": {
+#         "CACHE": not DEBUG,
+#         "BUNDLE_DIR_NAME": "bundles/",
+#         "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats.json"),
+#         "POLL_INTERVAL": 0.1,
+#         "TIMEOUT": None,
+#         "IGNORE": [r".+\.hot-update\.+", r".+\.js\.map"],
+#     }
+# }
+
 WEBPACK_LOADER = {
-    "DEFAULT": {
+    "OPEN_DISCUSSIONS": {
         "CACHE": not DEBUG,
-        "BUNDLE_DIR_NAME": "bundles/",
-        "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats.json"),
+        "BUNDLE_DIR_NAME": "open-discussions/",
+        "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats/open-discussions.json"),
         "POLL_INTERVAL": 0.1,
         "TIMEOUT": None,
         "IGNORE": [r".+\.hot-update\.+", r".+\.js\.map"],
-    }
+    },
+    "INFINITE_CORRIDOR": {
+        "CACHE": not DEBUG,
+        "BUNDLE_DIR_NAME": "infinite-corridor/",
+        "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats/infinite-corridor.json"),
+        "POLL_INTERVAL": 0.1,
+        "TIMEOUT": None,
+        "IGNORE": [r".+\.hot-update\.+", r".+\.js\.map"],
+    },
 }
 
 

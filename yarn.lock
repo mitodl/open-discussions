@@ -11241,13 +11241,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mutationobserver-shim@npm:0.3.2":
-  version: 0.3.2
-  resolution: "mutationobserver-shim@npm:0.3.2"
-  checksum: 609f2c1dcc258f5acd1fb49b25b909f42bcca1b12b1a048164301964399cadc0563c5129cfffcecd6eb04965c0f30f6222b6020712061b77a9473175be89322e
-  languageName: node
-  linkType: hard
-
 "mute-stream@npm:0.0.5":
   version: 0.0.5
   resolution: "mute-stream@npm:0.0.5"
@@ -11825,7 +11818,6 @@ __metadata:
     mini-css-extract-plugin: 0.5.0
     mocha: 9.2.2
     moment: 2.29.1
-    mutationobserver-shim: 0.3.2
     nuka-carousel: 4.5.2
     nyc: 15.1.0
     object.entries: 1.0.4
@@ -11896,6 +11888,7 @@ __metadata:
     styled-components: 4.0.2
     url: 0.11.0
     url-assembler: 2.1.0
+    uuid: ^8.3.2
     validator: 13.7.0
     webpack: 5.73.0
     webpack-bundle-tracker: 1.5.0

@@ -3,11 +3,11 @@ const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
-const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/infinite-corridor.json")
+const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/open-discussions.json")
 
 const getWebpackConfig = mode => {
   const isProduction = mode === "production"
-  const publicPath = process.env.PUBLIC_PATH || "/static/mitx-online/"
+  const publicPath = process.env.PUBLIC_PATH || "/static/open-discussions/"
   return {
     mode,
     context: __dirname,

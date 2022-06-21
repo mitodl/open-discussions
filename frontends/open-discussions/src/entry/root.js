@@ -1,7 +1,6 @@
 // @flow
 require("react-hot-loader/patch")
 /* global SETTINGS:false */
-__webpack_public_path__ = SETTINGS.public_path // eslint-disable-line no-undef, camelcase
 import React from "react"
 import ReactDOM from "react-dom"
 import { AppContainer, setConfig } from "react-hot-loader"

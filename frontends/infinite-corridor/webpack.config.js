@@ -7,7 +7,7 @@ const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/infinite-cor
 
 const getWebpackConfig = mode => {
   const isProduction = mode === "production"
-  const publicPath = process.env.PUBLIC_PATH || "/static/mitx-online/"
+  const publicPath = process.env.PUBLIC_PATH || "/static/infinite-corridor/"
   return {
     mode,
     context: __dirname,
