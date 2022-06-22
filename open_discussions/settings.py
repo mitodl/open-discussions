@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     "server_status",
     "rest_framework",
     "corsheaders",
+    "webpack_loader",
     "anymail",
     "compat",
     "hijack",
@@ -135,10 +136,6 @@ INSTALLED_APPS = (
     "moira_lists",
     "discussions",
 )
-
-DISABLE_WEBPACK_LOADER_STATS = get_bool("DISABLE_WEBPACK_LOADER_STATS", False)
-if not DISABLE_WEBPACK_LOADER_STATS:
-    INSTALLED_APPS += ("webpack_loader",)
 
 MIDDLEWARE = (
     "django.middleware.security.SecurityMiddleware",
