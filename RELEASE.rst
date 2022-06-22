@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.188.0
+---------------
+
+- Remove sites app, add django.contrib.sites app (#3591)
+
 Version 0.187.0 (Released June 22, 2022)
 ---------------
 
