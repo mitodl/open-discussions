@@ -34,7 +34,6 @@ import {
   generateLoginRedirectUrl,
   processAuthResponse,
   isAnonAccessiblePath,
-  needsAuthedSite,
   goToFirstLoginStep
 } from "./auth"
 
@@ -104,25 +103,6 @@ describe("auth lib", () => {
     ].forEach(([pathname, exp]) => {
       it(`returns ${String(exp)} when pathname=${pathname}`, () => {
         assert.equal(isAnonAccessiblePath(pathname), exp)
-      })
-    })
-  })
-
-  describe("needsAuthedSite", () => {
-    [
-      [undefined, true],
-      ["", true],
-      ["some_url", false]
-    ].forEach(([sessionUrl, exp]) => {
-      it(`returns ${String(exp)} when session url=${String(
-        sessionUrl
-      )}`, () => {
-        if (sessionUrl === undefined) {
-          delete SETTINGS.authenticated_site.session_url
-        } else {
-          SETTINGS.authenticated_site.session_url = sessionUrl
-        }
-        assert.equal(needsAuthedSite(), exp)
       })
     })
   })

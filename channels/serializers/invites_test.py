@@ -5,8 +5,6 @@ from channels.factories.models import ChannelFactory
 from channels.models import ChannelInvitation
 from channels.serializers.invites import ChannelInvitationSerializer
 
-pytestmark = [pytest.mark.usefixtures("authenticated_site")]
-
 
 def test_invite_create_email(user, mocker):
     """Invites a user by email"""

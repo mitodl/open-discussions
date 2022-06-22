@@ -16,8 +16,6 @@ declare var SETTINGS: {
   profile_ui_enabled: boolean,
   authenticated_site: {
     title: string,
-    login_url: string,
-    session_url: string,
     base_url: string,
     tos_url: string
   },

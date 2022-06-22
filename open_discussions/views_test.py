@@ -12,16 +12,14 @@ from channels.factories.models import PostFactory, CommentFactory
 from open_discussions import features
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
-pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
+pytestmark = [pytest.mark.django_db]
 lazy = pytest.lazy_fixture
 
 
 @pytest.mark.parametrize(
     "test_user,expect_auth", [[lazy("logged_in_user"), True], [None, False]]
 )
-def test_webpack_url(
-    settings, mocker, client, authenticated_site, test_user, expect_auth
-):
+def test_webpack_url(settings, mocker, client, test_user, expect_auth):
     """Verify that webpack bundle src shows up in production"""
     get_bundle_mock = mocker.patch(
         "open_discussions.templatetags.render_bundle._get_bundle"
@@ -69,11 +67,9 @@ def test_webpack_url(
         "max_comment_depth": 6,
         "profile_ui_enabled": False,
         "authenticated_site": {
-            "title": authenticated_site.title,
-            "login_url": authenticated_site.login_url,
-            "session_url": authenticated_site.session_url,
-            "base_url": authenticated_site.base_url,
-            "tos_url": authenticated_site.tos_url,
+            "title": settings.OPEN_DISCUSSIONS_TITLE,
+            "base_url": settings.SITE_BASE_URL,
+            "tos_url": settings.OPEN_DISCUSSIONS_TOS_URL,
         },
         "is_authenticated": expect_auth,
         "is_list_staff": False,

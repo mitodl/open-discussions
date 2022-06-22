@@ -51,8 +51,8 @@ import {
   hideBanner
 } from "../actions/ui"
 import { setChannelData } from "../actions/channel"
-import { AUTH_REQUIRED_URL, SETTINGS_URL } from "../lib/url"
-import { isAnonAccessiblePath, needsAuthedSite } from "../lib/auth"
+import { SETTINGS_URL } from "../lib/url"
+import { isAnonAccessiblePath } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
 import {
   getOwnProfile,
@@ -122,7 +122,7 @@ class App extends React.Component<Props> {
     const {
       location: { pathname }
     } = this.props
-    if (needsAuthedSite() || isAnonAccessiblePath(pathname)) {
+    if (isAnonAccessiblePath(pathname)) {
       return
     }
 
@@ -183,17 +183,12 @@ class App extends React.Component<Props> {
   render() {
     const {
       match,
-      location: { pathname },
       snackbar,
       banner,
       showUserMenu,
       audioPlayerLoaded,
       profile
     } = this.props
-
-    if (needsAuthedSite() && !isAnonAccessiblePath(pathname)) {
-      return <Redirect to={AUTH_REQUIRED_URL} />
-    }
 
     const audioPlayerPadding = audioPlayerLoaded
       ? " audio-player-padding-bottom"

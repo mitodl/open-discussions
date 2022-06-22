@@ -8,7 +8,6 @@ from rest_framework.test import APIClient
 from rest_framework_jwt.settings import api_settings
 
 from open_discussions.factories import UserFactory
-from sites.factories import AuthenticatedSiteFactory
 
 
 @pytest.fixture
@@ -85,14 +84,6 @@ def staff_client(client, staff_user):
     """Version of the client that is authenticated with the staff_user"""
     client.force_login(staff_user)
     return client
-
-
-@pytest.fixture
-def authenticated_site(db, settings):
-    """The authenticated site"""
-    return AuthenticatedSiteFactory.create(
-        key=settings.OPEN_DISCUSSIONS_DEFAULT_SITE_KEY
-    )
 
 
 @pytest.fixture

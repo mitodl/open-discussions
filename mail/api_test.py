@@ -11,12 +11,8 @@ from mail.api import (
 )
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import any_instance_of
-from sites.api import get_default_site
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("email_settings", "authenticated_site"),
-]
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("email_settings")]
 lazy = pytest.lazy_fixture
 
 
@@ -53,7 +49,7 @@ def test_context_for_user(settings, test_user, extra_context):
 
     assert context_for_user(user=test_user, extra_context=extra_context) == {
         "base_url": settings.SITE_BASE_URL,
-        "site_name": get_default_site().title,
+        "site_name": settings.OPEN_DISCUSSIONS_TITLE,
         **(extra_context or {}),
         **user_ctx,
     }

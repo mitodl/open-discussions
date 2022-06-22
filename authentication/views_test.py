@@ -16,10 +16,7 @@ from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory
 from open_discussions.test_utils import any_instance_of, MockResponse
 
-pytestmark = [
-    pytest.mark.django_db,
-    pytest.mark.usefixtures("authenticated_site", "indexing_user"),
-]
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
 lazy = pytest.lazy_fixture
 
 NEW_EMAIL = "test@example.com"

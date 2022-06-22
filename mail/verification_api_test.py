@@ -10,7 +10,7 @@ from mail import verification_api
 from authentication.models import BlockedEmailRegex
 from open_discussions.test_utils import any_instance_of
 
-pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("authenticated_site")]
+pytestmark = [pytest.mark.django_db]
 
 
 @pytest.mark.parametrize(

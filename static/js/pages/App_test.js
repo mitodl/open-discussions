@@ -21,9 +21,6 @@ import * as PodcastFrontpageModule from "./PodcastFrontpage"
 describe("App", () => {
   let helper, renderComponent, channels, postList
 
-  const isAuthRequiredPage = wrapper =>
-    wrapper.find("AuthRequiredPage").exists()
-
   beforeEach(() => {
     channels = makeChannelList(10)
     postList = makeChannelPostList()
@@ -75,15 +72,11 @@ describe("App", () => {
 
   //
   ;[
-    [true, true, 0, false],
-    [true, false, 0, true],
-    [false, false, 1, false],
-    [false, true, 0, false]
-  ].forEach(([needsSite, isAnonPath, expLoadCalls, expRedirect]) => {
-    describe(`when needsAuthedSite -> ${String(
-      needsSite
-    )} and isAnonAccessiblePath -> ${String(isAnonPath)}`, () => {
-      let isAnonStub, needsAuthStub
+    [true, 0],
+    [false, 1]
+  ].forEach(([isAnonPath, expLoadCalls]) => {
+    describe(`when isAnonAccessiblePath -> ${String(isAnonPath)}`, () => {
+      let isAnonStub
 
       beforeEach(() => {
         isAnonStub = helper.sandbox.stub(authUtils, "isAnonAccessiblePath")
@@ -91,24 +84,16 @@ describe("App", () => {
         // The login page is anonymously accessible, so return true for the 2nd call.
         isAnonStub.onFirstCall().returns(isAnonPath)
         isAnonStub.onSecondCall().returns(true)
-        needsAuthStub = helper.sandbox
-          .stub(authUtils, "needsAuthedSite")
-          .returns(needsSite)
       })
 
       afterEach(() => {
         isAnonStub.reset()
-        needsAuthStub.reset()
       })
 
-      it(`${shouldIfGt0(expLoadCalls)} load requirements and ${shouldIf(
-        expRedirect
-      )} redirect`, async () => {
-        const [wrapper] = await renderComponent(channelURL("channel1"), [])
+      it(`${shouldIfGt0(expLoadCalls)} load requirements`, async () => {
+        await renderComponent(channelURL("channel1"), [])
         sinon.assert.called(isAnonStub)
-        sinon.assert.called(needsAuthStub)
         sinon.assert.callCount(helper.getChannelsStub, expLoadCalls)
-        assert.equal(isAuthRequiredPage(wrapper), expRedirect)
       })
     })
   })

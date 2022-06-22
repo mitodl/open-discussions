@@ -55,10 +55,14 @@ ALLOWED_HOSTS = ["*"]
 
 SECURE_SSL_REDIRECT = get_bool("OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT", True)
 
+SITE_ID = 1
 SITE_BASE_URL = get_string("OPEN_DISCUSSIONS_BASE_URL", None)
 if not SITE_BASE_URL:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_BASE_URL is not set")
-
+OPEN_DISCUSSIONS_TITLE = get_string("OPEN_DISCUSSIONS_TITLE", "MIT Open")
+OPEN_DISCUSSIONS_TOS_URL = get_string(
+    "OPEN_DISCUSSIONS_TOS_URL", urljoin(SITE_BASE_URL, "/terms-and-conditions/")
+)
 
 WEBPACK_LOADER = {
     "DEFAULT": {
@@ -82,6 +86,7 @@ INSTALLED_APPS = (
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.humanize",
+    "django.contrib.sites",
     "social_django",
     "server_status",
     "rest_framework",
@@ -99,7 +104,6 @@ INSTALLED_APPS = (
     "channels",
     "channels_fields",
     "profiles",
-    "sites",
     "mail",
     "notifications",
     "search",
