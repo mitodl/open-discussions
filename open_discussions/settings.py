@@ -55,6 +55,7 @@ ALLOWED_HOSTS = ["*"]
 
 SECURE_SSL_REDIRECT = get_bool("OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT", True)
 
+SITE_ID = 1
 SITE_BASE_URL = get_string("OPEN_DISCUSSIONS_BASE_URL", None)
 if not SITE_BASE_URL:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_BASE_URL is not set")
