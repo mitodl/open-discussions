@@ -1,0 +1,1 @@
+"""infinite_example admin"""
