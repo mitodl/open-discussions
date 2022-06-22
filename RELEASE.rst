@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.187.0
+Version 0.187.0 (Released June 22, 2022)
 ---------------
 
 - Field Pages for InfiniteCorridor - backend (#3586)
