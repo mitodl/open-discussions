@@ -58,7 +58,6 @@ def test_webpack_url(settings, client, test_user, expect_auth):
     assert js_settings == {
         "gaTrackingID": "fake",
         "gaGTrackingID": "fake",
-        "public_path": "/static/bundles/",
         "site_url": settings.SITE_BASE_URL,
         "max_comment_depth": 6,
         "profile_ui_enabled": False,

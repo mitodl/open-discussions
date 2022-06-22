@@ -69,6 +69,9 @@ jobs:
       - name: Lint
         run: pylint ./**/*.py
 
+      - name: Create test local state
+        run: ./scripts/test/stub-data.sh
+
       - name: Tests
         run: |
           export MEDIA_ROOT="$(mktemp -d)"
