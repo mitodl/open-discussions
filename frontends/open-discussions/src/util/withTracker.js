@@ -11,7 +11,8 @@ const withTracker = (WrappedComponent: Class<React.Component<*, *>>) => {
   if (SETTINGS.gaTrackingID) {
     ReactGA.initialize(SETTINGS.gaTrackingID, {
       debug:    debug,
-      testMode: process.env.NODE_ENV === "test"
+      // $FlowFixMe NODE_ENV provided by webpack
+      testMode: window.NODE_ENV === "test"
     })
   }
 

@@ -13,6 +13,8 @@ enableMapSet()
 
 configure({ adapter: new Adapter() })
 
+window.NODE_ENV = process.env.NODE_ENV
+
 // Define globals we would usually get from Django
 const _createSettings = () => ({
   max_comment_depth:  6,

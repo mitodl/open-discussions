@@ -62,10 +62,11 @@ const getWebpackConfig = mode => {
     },
     plugins: [
       new BundleTracker({ filename: STATS_FILEPATH }),
+      new webpack.ProvidePlugin({
+        process: "process/browser",
+      }),
       new webpack.DefinePlugin({
-        "process.env": {
-          env: { NODE_ENV: JSON.stringify(mode) },
-        }
+        NODE_ENV: JSON.stringify(process.env.NODE_ENV)
       }),
     ].concat(isProduction ? [
       new webpack.LoaderOptionsPlugin({ minimize: true }),

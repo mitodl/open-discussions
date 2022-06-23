@@ -21,7 +21,8 @@ const persistConfig = {
 
 export default function configureStore(initialState: Object) {
   let createStoreWithMiddleware
-  if (process.env.NODE_ENV === "production") {
+  // $FlowFixMe NODE_ENV provided by webpack DefinePlugin
+  if (window.NODE_ENV === "production") {
     createStoreWithMiddleware = compose(
       persistState(null, persistConfig),
       applyMiddleware(
