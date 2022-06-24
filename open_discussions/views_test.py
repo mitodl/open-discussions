@@ -10,83 +10,9 @@ from rest_framework import status
 
 from channels.factories.models import PostFactory, CommentFactory
 from open_discussions import features
-from profiles.models import SOCIAL_SITE_NAME_MAP
 
 pytestmark = [pytest.mark.django_db]
 lazy = pytest.lazy_fixture
-
-
-@pytest.mark.parametrize(
-    "test_user,expect_auth", [[lazy("logged_in_user"), True], [None, False]]
-)
-def test_webpack_url(settings, client, test_user, expect_auth):
-    """Verify that webpack bundle src shows up in production"""
-    settings.GA_TRACKING_ID = "fake"
-    settings.GA_G_TRACKING_ID = "fake"
-    settings.EMBEDLY_KEY = "fake"
-    settings.FEATURES[features.SAML_AUTH] = False
-    settings.FEATURES[features.ARTICLE_UI] = False
-    settings.FEATURES[features.COURSE_UI] = False
-    settings.FEATURES[features.LIVESTREAM_UI] = False
-    settings.FEATURES[features.COURSE_FILE_SEARCH] = False
-    settings.CKEDITOR_UPLOAD_URL = "https://foobar.example.com"
-    settings.ENVIRONMENT = "test"
-    settings.VERSION = "1.2.3"
-    settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE = 123
-    settings.OCW_NEXT_BASE_URL = "https://ocwnext-rc.odl.mit.edu/"
-
-    if test_user:
-        expected_user_values = {
-            "user_email": test_user.email,
-            "username": test_user.username,
-            "user_id": test_user.id,
-            "user_full_name": test_user.profile.name,
-            "is_admin": test_user.is_superuser,
-        }
-    else:
-        expected_user_values = {
-            "user_email": None,
-            "username": None,
-            "user_full_name": None,
-            "user_id": None,
-            "is_admin": False,
-        }
-
-    response = client.get(reverse("open_discussions-index"))
-
-    js_settings = response.context["js_settings"]
-    assert js_settings == {
-        "gaTrackingID": "fake",
-        "gaGTrackingID": "fake",
-        "site_url": settings.SITE_BASE_URL,
-        "max_comment_depth": 6,
-        "profile_ui_enabled": False,
-        "authenticated_site": {
-            "title": settings.OPEN_DISCUSSIONS_TITLE,
-            "base_url": settings.SITE_BASE_URL,
-            "tos_url": settings.OPEN_DISCUSSIONS_TOS_URL,
-        },
-        "is_authenticated": expect_auth,
-        "is_list_staff": False,
-        "allow_saml_auth": False,
-        "allow_related_posts_ui": False,
-        "support_email": settings.EMAIL_SUPPORT,
-        "embedlyKey": "fake",
-        "environment": settings.ENVIRONMENT,
-        "sentry_dsn": "",
-        "release_version": settings.VERSION,
-        "recaptchaKey": settings.RECAPTCHA_SITE_KEY,
-        "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
-        "search_min_length": settings.ELASTICSEARCH_MIN_QUERY_SIZE,
-        "accepted_social_sites": list(SOCIAL_SITE_NAME_MAP.values()),
-        "article_ui_enabled": settings.FEATURES[features.ARTICLE_UI],
-        "file_search_enabled": settings.FEATURES[features.COURSE_FILE_SEARCH],
-        "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
-        "course_ui_enabled": settings.FEATURES[features.COURSE_UI],
-        "livestream_ui_enabled": settings.FEATURES[features.LIVESTREAM_UI],
-        "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,
-        **expected_user_values,
-    }
 
 
 @pytest.mark.parametrize(
