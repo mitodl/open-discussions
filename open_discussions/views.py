@@ -18,7 +18,6 @@ from channels.models import Post
 from moira_lists.moira_api import is_list_staff
 from open_discussions import features
 
-from open_discussions.templatetags.render_bundle import public_path
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
 
@@ -70,7 +69,6 @@ def _render_app(request, initial_state=None):
         "environment": settings.ENVIRONMENT,
         "sentry_dsn": settings.SENTRY_DSN,
         "release_version": settings.VERSION,
-        "public_path": public_path(request),
         "site_url": settings.SITE_BASE_URL,
         "max_comment_depth": settings.OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH,
         "username": username,

@@ -9,12 +9,13 @@
 .*/staticfiles/.*
 .*/static/bundles/.*
 .*/node_modules/immer/.*.flow
+.*/node_modules/resolve/.*
 
 [include]
-./static/js
+./frontends/open-discussions/src
 
 [libs]
-./static/js/flow/declarations.js
+./frontends/open-discussions/src/flow/declarations.js
 ./flow-typed/npm/
 
 [options]

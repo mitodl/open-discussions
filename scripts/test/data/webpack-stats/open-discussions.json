@@ -1,0 +1,50 @@
+{
+  "status": "done",
+  "assets": {
+    "root.js": {
+      "name": "root.js",
+      "path": "/src/frontends/open-discussions/build/root.js",
+      "publicPath": "/static/open-discussions/root.js"
+    },
+    "style.js": {
+      "name": "style.js",
+      "path": "/src/frontends/open-discussions/build/style.js",
+      "publicPath": "/static/open-discussions/style.js"
+    },
+    "root.js.LICENSE.txt": {
+      "name": "root.js.LICENSE.txt",
+      "path": "/src/frontends/open-discussions/build/root.js.LICENSE.txt",
+      "publicPath": "/static/open-discussions/root.js.LICENSE.txt"
+    },
+    "root.js.map": {
+      "name": "root.js.map",
+      "path": "/src/frontends/open-discussions/build/root.js.map",
+      "publicPath": "/static/open-discussions/root.js.map"
+    },
+    "style.js.map": {
+      "name": "style.js.map",
+      "path": "/src/frontends/open-discussions/build/style.js.map",
+      "publicPath": "/static/open-discussions/style.js.map"
+    },
+    "style.css": {
+      "name": "style.css",
+      "path": "/src/frontends/open-discussions/build/style.css",
+      "publicPath": "/static/open-discussions/style.css"
+    },
+    "style.css.map": {
+      "name": "style.css.map",
+      "path": "/src/frontends/open-discussions/build/style.css.map",
+      "publicPath": "/static/open-discussions/style.css.map"
+    }
+  },
+  "chunks": {
+    "root": [
+      "root.js"
+    ],
+    "style": [
+      "style.js",
+      "style.css"
+    ]
+  },
+  "publicPath": "/static/open-discussions/"
+}

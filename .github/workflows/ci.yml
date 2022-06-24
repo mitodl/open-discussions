@@ -69,6 +69,9 @@ jobs:
       - name: Lint
         run: pylint ./**/*.py
 
+      - name: Create test local state
+        run: ./scripts/test/stub-data.sh
+
       - name: Tests
         run: |
           export MEDIA_ROOT="$(mktemp -d)"
@@ -104,14 +107,14 @@ jobs:
       - name: Set up NodeJS
         uses: actions/setup-node@v2-beta
         with:
-          node-version: 10.15.1
+          node-version: 16.15.1
 
       - name: Setup environment
         run: sudo apt-get install libelf1
 
       - name: Get yarn cache directory path
         id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
 
       - uses: actions/cache@v1
         id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
@@ -122,28 +125,28 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --ignore-engines --prefer-offline
+        run: yarn install --immutable
 
       - name: Lints
-        run: npm run lint
+        run: yarn run lint
 
       - name: Code formatting
-        run: npm run fmt:check
+        run: yarn run fmt:check
 
       - name: Scss lint
-        run: npm run scss_lint
+        run: yarn run scss_lint
 
-      - name: Flow
-        run: npm run flow
+      - name: Typecheck
+        run: yarn run typecheck
 
       - name: Tests
-        run: npm run test
+        run: yarn run test
         env:
           CODECOV: true
           NODE_ENV: development
 
       - name: Webpack build
-        run: node node_modules/webpack/bin/webpack.js --config webpack.config.prod.js --bail
+        run: yarn run build
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1

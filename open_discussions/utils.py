@@ -29,22 +29,6 @@ class FeatureFlag(Flag):
     EXAMPLE_FEATURE = auto()
 
 
-def webpack_dev_server_host(request):
-    """
-    Get the correct webpack dev server host
-    """
-    return settings.WEBPACK_DEV_SERVER_HOST or request.get_host().split(":")[0]
-
-
-def webpack_dev_server_url(request):
-    """
-    Get the full URL where the webpack dev server should be running
-    """
-    return "http://{}:{}".format(
-        webpack_dev_server_host(request), settings.WEBPACK_DEV_SERVER_PORT
-    )
-
-
 def is_near_now(time):
     """
     Returns true if time is within five seconds or so of now

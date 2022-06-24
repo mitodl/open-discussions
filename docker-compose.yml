@@ -18,7 +18,7 @@ x-environment:
   CELERY_BROKER_URL: redis://redis:6379/4
   CELERY_RESULT_BACKEND: redis://redis:6379/4
   DOCKER_HOST: ${DOCKER_HOST:-missing}
-  WEBPACK_DEV_SERVER_HOST: ${WEBPACK_DEV_SERVER_HOST:-localhost}
+
   TIKA_SERVER_ENDPOINT: ${TIKA_SERVER_ENDPOINT:-http://tika:9998/}
   TIKA_CLIENT_ONLY: 'True'
   AKISMET_IS_TESTING: 'True'
@@ -64,13 +64,7 @@ services:
       << : *py-environment
       PORT: 8061
     env_file: .env
-    command: >
-      /bin/bash -c '
-      sleep 3 &&
-      python3 manage.py collectstatic --noinput &&
-      python3 manage.py migrate --no-input &&
-      python3 manage.py createcachetable &&
-      uwsgi uwsgi.ini --honour-stdin'
+    command: ./scripts/run-django-dev.sh
     stdin_open: true
     tty: true
     ports:
@@ -79,22 +73,25 @@ services:
       - db
       - elastic
       - redis
+      - watch
     extra_hosts: *default-extra-hosts
 
   watch:
-    build:
-      context: .
-      dockerfile: Dockerfile-node
+    image: node:16.15.1
     working_dir: /src
-    command: >
-      /bin/bash -c './webpack_dev_server.sh --install'
+    command: ./scripts/run-watch-dev.sh
     ports:
+      - "8052:8052"
       - "8062:8062"
+      - "8072:8072"
     environment:
-      NODE_ENV: 'production'
       DOCKER_HOST: ${DOCKER_HOST:-missing}
       CONTAINER_NAME: 'watch'
+      WEBPACK_PORT_OPEN_DISCUSSIONS: 8062
+      WEBPACK_PORT_INFINITE_CORRIDOR: 8072
     env_file: .env
+    volumes:
+      - .:/src
 
   celery:
     build:

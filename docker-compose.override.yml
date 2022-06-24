@@ -6,8 +6,7 @@ services:
       - django_media:/var/media
     environment:
       DEBUG: ${DEBUG:-True}
-      NODE_ENV: 'development'
-      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+      NODE_ENV: ${NODE_ENV:-development}
 
   celery:
     volumes:
@@ -15,8 +14,7 @@ services:
       - django_media:/var/media
     environment:
       DEBUG: ${DEBUG:-True}
-      NODE_ENV: 'development'
-      OPEN_DISCUSSIONS_USE_WEBPACK_DEV_SERVER: 'True'
+      NODE_ENV: ${NODE_ENV:-development}
 
   nginx:
     volumes:
@@ -25,7 +23,7 @@ services:
 
   watch:
     environment:
-      NODE_ENV: 'development'
+      NODE_ENV: ${NODE_ENV:-development}
     volumes:
       - .:/src
       - yarn-cache:/home/mitodl/.cache/yarn

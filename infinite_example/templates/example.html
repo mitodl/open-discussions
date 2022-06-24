@@ -1,0 +1,9 @@
+{% load render_bundle from webpack_loader %}
+<!DOCTYPE html>
+<html lang="en">
+  <body>
+    <div id="container"></div>
+    {% render_bundle 'style' config='INFINITE_CORRIDOR'  %}
+    {% render_bundle 'root' config='INFINITE_CORRIDOR'  %}
+  </body>
+</html>
