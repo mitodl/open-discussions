@@ -122,3 +122,6 @@ docs/_site
 
 # Typescript
 .tsbuildinfo
+
+# VS-Code
+.vscode
