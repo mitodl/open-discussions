@@ -8,7 +8,6 @@
       "dom"
     ],
     "jsx": "react",
-    "outDir": "./build/",
     "tsBuildInfoFile": ".tsbuildinfo",
     "strict": true,
     "declaration": true,
@@ -21,7 +20,7 @@
     "resolveJsonModule": true
   },
   "exclude": [
-    "**/*.test.ts",
-    "**/*.test.tsx"
-  ]
+    "frontends/*/**/*.test.ts",
+    "frontends/*/**/*.test.tsx"
+  ],
 }

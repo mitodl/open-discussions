@@ -3,16 +3,16 @@
   "packageManager": "yarn@3.2.0",
   "main": "build/index.js",
   "devDependencies": {
-    "typescript": "^4.7.4"
+    "@types/styled-components": "^5.1.25"
   },
   "peerDependencies": {
-    "react": "*",
-    "styled-components": "*"
+    "react": "^16.10",
+    "styled-components": "5"
   },
   "scripts": {
     "postinstall": "./webpack_if_prod.sh",
-    "start:dev": "tsc --watch",
-    "build": "tsc",
+    "start:dev": "yarn global:start:dev",
+    "build": "yarn global:build",
     "build:flowtypes": "yarn global:build:flowtypes",
     "lint": "echo todo: set up lint",
     "fmt": "echo todo: set up fmt",

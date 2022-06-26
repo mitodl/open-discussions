@@ -16,11 +16,13 @@ const removeTrailingSlash = (str: string): string =>
 const CanonicalLink: React.FC<Props> = ({ relativeUrl, match }) => {
   const partialUrl = relativeUrl ?? match?.url
   if (!partialUrl) return null
+
   const href = removeTrailingSlash(
     String(new URL(partialUrl, window.location.origin))
   )
 
   return <link rel="canonical" href={href} />
 }
+
 
 export default CanonicalLink
