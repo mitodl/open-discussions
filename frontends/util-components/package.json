@@ -6,7 +6,8 @@
     "typescript": "^4.7.4"
   },
   "peerDependencies": {
-    "react": "*"
+    "react": "*",
+    "styled-components": "*"
   },
   "scripts": {
     "postinstall": "./webpack_if_prod.sh",
