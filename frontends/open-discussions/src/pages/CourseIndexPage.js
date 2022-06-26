@@ -11,7 +11,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "../components/PageBanner"
+} from "util-components"
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"
@@ -39,6 +39,13 @@ import { PHONE, TABLET, DESKTOP } from "../lib/constants"
 import { useLearningResourcePermalink } from "../hooks/learning_resources"
 
 import type { LearningResourceSummary } from "../flow/discussionTypes"
+
+console.log({
+  BannerPageWrapper,
+  BannerPageHeader,
+  BannerContainer,
+  BannerImage
+})
 
 type Props = {|
   history: Object

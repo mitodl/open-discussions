@@ -13,6 +13,8 @@
         "scss_lint": "yarn workspaces foreach run scss_lint",
         "test": "yarn workspaces foreach run test",
         "typecheck": "yarn workspaces foreach run typecheck",
+        "global:build": "cd $INIT_CWD && tsc",
+        "global:start:dev": "cd $INIT_CWD && tsc --watch",
         "global:build:flowtypes": "./scripts/ts-to-flow.sh",
         "global:test": "cd $INIT_CWD && jest",
         "global:test:watch": "cd $INIT_CWD && jest --watch"

@@ -1,6 +1,5 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { dog } from "util-components"
 
 const container = document.getElementById('container')!
 const root = createRoot(container)
