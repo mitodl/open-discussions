@@ -38,6 +38,9 @@ export const useDeviceCategory = () => {
   return DESKTOP
 }
 
+/**
+ * Forces a re-render when the window is re-sized.
+ */
 export const useResponsive = () => {
   const [, setState] = useState(null)
 
