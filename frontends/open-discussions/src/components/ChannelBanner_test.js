@@ -6,7 +6,7 @@ import sinon from "sinon"
 import IntegrationTestHelper from "../util/integration_test_helper"
 import ChannelBanner from "./ChannelBanner"
 import * as uiActions from "../actions/ui"
-import { Gradient } from "../components/PageBanner"
+import { Gradient } from "ol-util"
 
 import { makeChannel } from "../factories/channels"
 
