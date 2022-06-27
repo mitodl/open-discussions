@@ -10242,12 +10242,13 @@ __metadata:
     "@swc/core": ^1.2.203
     "@types/react": ^18.0.13
     "@types/react-dom": ^18.0.5
+    ol-util: "workspace:*"
     ramda: ^0.28.0
-    react: ^18.2.0
-    react-dom: ^18.2.0
+    react: 16.13.1
+    react-dom: 16.13.1
+    rmwc: 5.7.1
     swc-loader: ^0.2.3
     typescript: ^4.7.3
-    util-components: "workspace:*"
     webpack: ^5.71.0
     webpack-bundle-tracker: ^1.4.0
     webpack-cli: ^4.9.2
@@ -13366,6 +13367,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ol-util@workspace:*, ol-util@workspace:frontends/ol-util":
+  version: 0.0.0-use.local
+  resolution: "ol-util@workspace:frontends/ol-util"
+  dependencies:
+    "@types/styled-components": ^5.1.25
+  peerDependencies:
+    react: ^16.10 || 17 || 18
+    styled-components: 5
+  languageName: unknown
+  linkType: soft
+
 "on-finished@npm:2.4.1":
   version: 2.4.1
   resolution: "on-finished@npm:2.4.1"
@@ -13523,6 +13535,7 @@ __metadata:
     nuka-carousel: 4.5.2
     nyc: 15.1.0
     object.entries: 1.0.4
+    ol-util: "workspace:*"
     os-browserify: 0.3.0
     path-browserify: 1.0.1
     postcss-loader: 2.1.5
@@ -13591,7 +13604,6 @@ __metadata:
     styled-components: ^5.3.5
     url: 0.11.0
     url-assembler: 2.1.0
-    util-components: "workspace:*"
     uuid: ^8.3.2
     validator: 13.7.0
     webpack: 5.73.0
@@ -15005,18 +15017,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "react-dom@npm:18.2.0"
-  dependencies:
-    loose-envify: ^1.1.0
-    scheduler: ^0.23.0
-  peerDependencies:
-    react: ^18.2.0
-  checksum: 7d323310bea3a91be2965f9468d552f201b1c27891e45ddc2d6b8f717680c95a75ae0bc1e3f5cf41472446a2589a75aed4483aee8169287909fcd59ad149e8cc
-  languageName: node
-  linkType: hard
-
 "react-dotdotdot@npm:1.2.3":
   version: 1.2.3
   resolution: "react-dotdotdot@npm:1.2.3"
@@ -15394,15 +15394,6 @@ __metadata:
     object-assign: ^4.1.1
     prop-types: ^15.6.2
   checksum: 8484f3ecb13414526f2a7412190575fc134da785c02695eb92bb6028c930bfe1c238d7be2a125088fec663cc7cda0a3623373c46807cf2c281f49c34b79881ac
-  languageName: node
-  linkType: hard
-
-"react@npm:^18.2.0":
-  version: 18.2.0
-  resolution: "react@npm:18.2.0"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: 88e38092da8839b830cda6feef2e8505dec8ace60579e46aa5490fc3dc9bba0bd50336507dc166f43e3afc1c42939c09fe33b25fae889d6f402721dcd78fca1b
   languageName: node
   linkType: hard
 
@@ -16375,15 +16366,6 @@ __metadata:
     loose-envify: ^1.1.0
     object-assign: ^4.1.1
   checksum: 73e185a59e2ff5aa3609f5b9cb97ddd376f89e1610579d29939d952411ca6eb7a24907a4ea4556569dacb931467a1a4a56d94fe809ef713aa76748642cd96a6c
-  languageName: node
-  linkType: hard
-
-"scheduler@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "scheduler@npm:0.23.0"
-  dependencies:
-    loose-envify: ^1.1.0
-  checksum: d79192eeaa12abef860c195ea45d37cbf2bbf5f66e3c4dcd16f54a7da53b17788a70d109ee3d3dde1a0fd50e6a8fc171f4300356c5aee4fc0171de526bf35f8a
   languageName: node
   linkType: hard
 
@@ -18228,17 +18210,6 @@ __metadata:
   checksum: a3329faa959fcd9e3e01a03347ca974f7f6b8896e6a634f29c61d8d5b61557d853c6fc5a6dff1a28e2da85b400d0e4490368a28de452ba8c41a2bf3a92cb110a
   languageName: node
   linkType: hard
-
-"util-components@workspace:*, util-components@workspace:frontends/util-components":
-  version: 0.0.0-use.local
-  resolution: "util-components@workspace:frontends/util-components"
-  dependencies:
-    "@types/styled-components": ^5.1.25
-  peerDependencies:
-    react: ^16.10
-    styled-components: 5
-  languageName: unknown
-  linkType: soft
 
 "util-deprecate@npm:^1.0.1, util-deprecate@npm:^1.0.2, util-deprecate@npm:~1.0.1":
   version: 1.0.2

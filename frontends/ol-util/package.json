@@ -1,12 +1,12 @@
 {
-  "name": "util-components",
+  "name": "ol-util",
   "packageManager": "yarn@3.2.0",
   "main": "build/index.js",
   "devDependencies": {
     "@types/styled-components": "^5.1.25"
   },
   "peerDependencies": {
-    "react": "^16.10",
+    "react": "^16.10 || 17 || 18",
     "styled-components": "5"
   },
   "scripts": {

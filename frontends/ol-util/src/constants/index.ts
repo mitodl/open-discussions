@@ -1,0 +1,1 @@
+export const GRID_MOBILE_BREAKPOINT = 840

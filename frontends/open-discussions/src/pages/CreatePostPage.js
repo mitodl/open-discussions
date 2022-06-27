@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
-import { CanonicalLink } from "util-components"
+import { CanonicalLink } from "ol-util"
 import isURL from "validator/lib/isURL"
 
 import CreatePostForm from "../components/CreatePostForm"
