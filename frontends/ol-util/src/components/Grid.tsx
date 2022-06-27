@@ -1,6 +1,6 @@
 import React from "react"
 import { GRID_MOBILE_BREAKPOINT } from "../constants"
-import { useResponsive } from "../hooks"
+import useResponsive from "../hooks/useResponsive"
 
 const isMobileGridWidth = () =>
   window.innerWidth < GRID_MOBILE_BREAKPOINT
@@ -22,7 +22,7 @@ const Grid = ({ children, className }: GridProps) => (
 // these are the cell widths that the material grid supports
 // this is cumbersome, but it lets us have some assurance from Flow
 // that we're always passing a good value
-export type CellWidth = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+export type CellWidth = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13
 
 type CellProps = {
   children?: any,

@@ -10,7 +10,7 @@ import {
   BannerContainer,
   BannerImage,
   Gradient
-} from "../components/PageBanner"
+} from "ol-util"
 
 import { showDialog } from "../actions/ui"
 

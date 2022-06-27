@@ -8,7 +8,7 @@ import {
   BannerPageWrapper,
   BannerPageHeader,
   BannerContainer
-} from "../components/PageBanner"
+} from "ol-util"
 import CourseCarousel from "../components/CourseCarousel"
 
 import {
