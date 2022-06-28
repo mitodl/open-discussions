@@ -4,14 +4,12 @@ type Props = {
   /**
    * TODO: This should be required.
    */
-  relativeUrl?: string,
+  relativeUrl?: string
   match?: { url: string }
 }
 
 const removeTrailingSlash = (str: string): string =>
-  str.length > 0 && str.endsWith("/")
-    ? str.substring(0, str.length - 1)
-    : str
+  str.length > 0 && str.endsWith("/") ? str.substring(0, str.length - 1) : str
 
 const CanonicalLink: React.FC<Props> = ({ relativeUrl, match }) => {
   const partialUrl = relativeUrl ?? match?.url
@@ -23,6 +21,5 @@ const CanonicalLink: React.FC<Props> = ({ relativeUrl, match }) => {
 
   return <link rel="canonical" href={href} />
 }
-
 
 export default CanonicalLink

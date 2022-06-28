@@ -6,17 +6,16 @@ import {
   BannerContainer,
   BannerImage,
   Cell,
-  Grid
+  Grid,
 } from "ol-util"
 import styled from "styled-components"
 
 const Placeholder = styled.div`
-height:150px;
-border: 1pt solid gray;
+  height: 150px;
+  border: 1pt solid gray;
 `
 
 export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"
-
 
 const App = () => {
   return (
@@ -27,10 +26,13 @@ const App = () => {
         </BannerContainer>
       </BannerPageHeader>
       <Grid className="main-content one-column">
-        {Array(6).fill(null).map((_x, i) => (<Cell key={i} width={3}>
-          <Placeholder />
-        </Cell>
-        ))}
+        {Array(6)
+          .fill(null)
+          .map((_x, i) => (
+            <Cell key={i} width={3}>
+              <Placeholder />
+            </Cell>
+          ))}
       </Grid>
     </BannerPageWrapper>
   )

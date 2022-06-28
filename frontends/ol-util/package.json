@@ -10,17 +10,17 @@
     "styled-components": "5"
   },
   "scripts": {
-    "postinstall": "./webpack_if_prod.sh",
+    "postinstall": "yarn build",
     "start:dev": "yarn global:start:dev",
     "build": "yarn global:build",
     "clean": "yarn global:clean",
     "compile": "yarn global:compile",
+    "compile:watch": "yarn global:compile:watch",
     "coverage": "yarn global:coverage",
     "fmt-check": "yarn global:fmt-check",
     "fmt-fix": "yarn global:fmt-fix",
     "lint-check": "yarn global:lint-check",
     "lint-fix": "yarn global:lint-fix",
-    "prepare": "yarn global:prepare",
     "test": "yarn global:test"
   }
 }

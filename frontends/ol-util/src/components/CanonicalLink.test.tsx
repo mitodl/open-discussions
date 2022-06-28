@@ -1,5 +1,5 @@
 import React from "react"
-import { prettyDOM, render, screen } from "@testing-library/react"
+import { render } from "@testing-library/react"
 import CanonicalLink from "./CanonicalLink"
 
 const baseURL = "https://fake.url/"
@@ -9,7 +9,7 @@ const fullUrl = `${baseURL}${partialUrl}`
 const originalLocation = window.location
 
 const getLink = (container: HTMLElement): HTMLLinkElement => {
-  const links = container.getElementsByTagName('link')
+  const links = container.getElementsByTagName("link")
   if (links.length > 1) {
     throw new Error("Too many link tags found.")
   }
@@ -58,20 +58,21 @@ describe("CanonicalLink", () => {
     assignLocation({ origin: baseURL })
     const match = { url: "different/url/stub" }
     expect(match.url).not.toBe(partialUrl)
-    const { container } = render(<CanonicalLink relativeUrl={partialUrl} match={match} />)
+    const { container } = render(
+      <CanonicalLink relativeUrl={partialUrl} match={match} />
+    )
     const link = getLink(container)
     expect(link.href).toBe(fullUrl)
     expect(link.rel).toBe("canonical")
   })
 
-  it.each([
-    {},
-    {relativeUrl: ""},
-    {relativeUrl: undefined}
-  ])("renders nothing when neither a relative URL or a Match object are provided", (props) => {
-    const { container } = render(<CanonicalLink {...props} />)
-    expect(container.getElementsByTagName("link").length).toBe(0)
-  })
+  it.each([{}, { relativeUrl: "" }, { relativeUrl: undefined }])(
+    "renders nothing when neither a relative URL or a Match object are provided",
+    (props) => {
+      const { container } = render(<CanonicalLink {...props} />)
+      expect(container.getElementsByTagName("link").length).toBe(0)
+    }
+  )
 
   it("removes a trailing slash from the link's href value", () => {
     assignLocation({ origin: baseURL })
