@@ -11,7 +11,7 @@ type Props = {
 const removeTrailingSlash = (str: string): string =>
   str.length > 0 && str.endsWith("/") ? str.substring(0, str.length - 1) : str
 
-const CanonicalLink: React.FC<Props> = ({ relativeUrl, match }) => {
+const CanonicalLink = ({ relativeUrl, match }: Props): JSX.Element | null => {
   const partialUrl = relativeUrl ?? match?.url
   if (!partialUrl) return null
 

@@ -12,7 +12,7 @@
   "scripts": {
     "postinstall": "yarn build",
     "start:dev": "yarn global:start:dev",
-    "build": "yarn global:build",
+    "build": "yarn global:build && yarn global:build:flowtypes",
     "clean": "yarn global:clean",
     "compile": "yarn global:compile",
     "compile:watch": "yarn global:compile:watch",
