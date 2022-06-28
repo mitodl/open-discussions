@@ -13,5 +13,5 @@ if [[ $NODE_ENV == "production" ]] ; then
     ./scripts/http-ok.sh
 else
     echo "Starting frontends in dev mode..."
-    yarn run start:dev
+    yarn run start-dev
 fi
