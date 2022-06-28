@@ -26,7 +26,7 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "./webpack_if_prod.sh",
+    "postinstall": "yarn run build",
     "start:dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
     "build": "webpack --config webpack.config.js --bail",
     "lint": "echo todo: set up lint",

@@ -5,7 +5,7 @@
 health_urls=(
     "http://watch:8052/health"
 )
-wait_time=300
+wait_time=600
 
 if [[ $NODE_ENV == "production" ]] ; then
     # kick off healthchecks as background tasks so they can check concurrently
