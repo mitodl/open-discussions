@@ -2,11 +2,10 @@ import React from "react"
 import { GRID_MOBILE_BREAKPOINT } from "../constants"
 import useResponsive from "../hooks/useResponsive"
 
-const isMobileGridWidth = () =>
-  window.innerWidth < GRID_MOBILE_BREAKPOINT
+const isMobileGridWidth = () => window.innerWidth < GRID_MOBILE_BREAKPOINT
 
 type GridProps = {
-  children: any,
+  children: any
   className?: string
 }
 
@@ -25,10 +24,10 @@ const Grid = ({ children, className }: GridProps) => (
 export type CellWidth = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13
 
 type CellProps = {
-  children?: any,
-  width: CellWidth,
-  mobileWidth?: CellWidth,
-  className?: string,
+  children?: any
+  width: CellWidth
+  mobileWidth?: CellWidth
+  className?: string
   tabIndex?: number
 }
 
@@ -40,7 +39,7 @@ const Cell = ({
   width,
   mobileWidth,
   className,
-  tabIndex
+  tabIndex,
 }: CellProps) => {
   useResponsive()
 

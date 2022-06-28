@@ -31,11 +31,14 @@
     "postinstall": "yarn run build",
     "start:dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
     "build": "webpack --config webpack.config.js --bail",
-    "lint": "echo todo: set up lint",
-    "fmt": "echo todo: set up fmt",
-    "fmt:check": "echo todo: set up fmt:check",
-    "scss_lint": "echo todo: set up scss_lint",
-    "test": "echo todo: set up test",
-    "typecheck": "tsc --noEmit"
+    "clean": "yarn global:clean",
+    "compile": "yarn global:compile",
+    "compile:watch": "yarn global:compile:watch",
+    "coverage": "yarn global:coverage",
+    "fmt-check": "yarn global:fmt-check",
+    "fmt-fix": "yarn global:fmt-fix",
+    "lint-check": "yarn global:lint-check",
+    "lint-fix": "yarn global:lint-fix",
+    "test": "yarn global:test"
   }
 }

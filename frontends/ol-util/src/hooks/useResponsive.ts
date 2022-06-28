@@ -5,7 +5,7 @@ import { useEffect, useReducer } from "react"
  * See https://reactjs.org/docs/hooks-faq.html#is-there-something-like-forceupdate
  */
 const useResponsive = () => {
-  const [, forceUpdate] = useReducer(x => x + 1, 0)
+  const [, forceUpdate] = useReducer((x) => x + 1, 0)
 
   useEffect(() => {
     window.addEventListener("resize", forceUpdate)
