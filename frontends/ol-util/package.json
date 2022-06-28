@@ -13,13 +13,14 @@
     "postinstall": "./webpack_if_prod.sh",
     "start:dev": "yarn global:start:dev",
     "build": "yarn global:build",
-    "build:flowtypes": "yarn global:build:flowtypes",
-    "lint": "echo todo: set up lint",
-    "fmt": "echo todo: set up fmt",
-    "fmt:check": "echo todo: set up fmt:check",
-    "scss_lint": "echo todo: set up scss_lint",
-    "test": "yarn global:test",
-    "test:watch": "yarn global:test:watch",
-    "typecheck": "tsc --noEmit"
+    "clean": "yarn global:clean",
+    "compile": "yarn global:compile",
+    "coverage": "yarn global:coverage",
+    "fmt-check": "yarn global:fmt-check",
+    "fmt-fix": "yarn global:fmt-fix",
+    "lint-check": "yarn global:lint-check",
+    "lint-fix": "yarn global:lint-fix",
+    "prepare": "yarn global:prepare",
+    "test": "yarn global:test"
   }
 }
