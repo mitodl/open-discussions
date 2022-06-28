@@ -121,7 +121,7 @@ docs/_site
 !.yarn/versions
 
 # Typescript
-.tsbuildinfo
+tsconfig.tsbuildinfo
 
 # VS-Code
 .vscode
