@@ -37,7 +37,7 @@ const imageWrapperHeight = css<ImgProps>`
   }
 `
 
-export const BannerContainer = styled.div`
+const BannerContainer = styled.div`
   position: absolute;
   width: 100%;
   z-index: -1;
@@ -94,4 +94,10 @@ const Gradient = styled.div`
   ${imageHeight};
 `
 
-export { BannerImage, BannerPageWrapper, BannerPageHeader, Gradient }
+export {
+  BannerImage,
+  BannerPageWrapper,
+  BannerPageHeader,
+  Gradient,
+  BannerContainer,
+}

@@ -14164,6 +14164,7 @@ __metadata:
     eslint-plugin-mocha: 6.0.0
     eslint-plugin-react: 7.14.3
     eslint-plugin-react-hooks: 4.1.0
+    esm: ^3.2.25
     express: 4.16.3
     fetch-mock: 6.4.4
     flow-bin: 0.94.0
