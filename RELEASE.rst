@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+Version 0.188.1
+---------------
+
+- fix yarn postinstall script (#3597)
+- remove test_webpack_url
+- gitignore vscode dir
+- fix prosemirror version
+- remove accidental files
+- address prosemirror and global.process issues
+- add test data for ci
+- remove DISABLE_WEBPACK_LOADER_STATS
+- add new frontend
+- switch to yarn workspaces + update webpack
+- move files
+
 Version 0.188.0 (Released June 22, 2022)
 ---------------
 
