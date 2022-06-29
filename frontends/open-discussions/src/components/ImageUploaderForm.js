@@ -7,6 +7,7 @@ import CropperWrapper from "./CropperWrapper"
 import Dialog from "./Dialog"
 
 import { validationMessage } from "../lib/validation"
+import { ValidationError } from "ol-forms"
 
 import type { FormProps } from "../flow/formTypes"
 import type { FormErrors, FormValue } from "../flow/formTypes"
@@ -169,7 +170,7 @@ export default class ImageUploaderForm extends React.Component<
         }}
         submitText="Save"
       >
-        {validationMessage(validation.image)}
+        {<ValidationError className="text-center" message={validation.image} />}
         {this.dialogContents()}
       </Dialog>
     )

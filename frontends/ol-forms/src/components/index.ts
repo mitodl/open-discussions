@@ -1,1 +1,1 @@
-export {default as CanonicalLink } from "./ValidationError"
+export {default as ValidationError } from "./ValidationError"
