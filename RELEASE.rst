@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.188.1
+Version 0.188.1 (Released June 29, 2022)
 ---------------
 
 - fix yarn postinstall script (#3597)
