@@ -9,7 +9,7 @@ import ImageUploader, { makeDialogKey } from "./ImageUploader"
 import {
   BannerContainer,
   BannerImage,
-  Gradient
+  Gradient,
 } from "ol-util"
 
 import { showDialog } from "../actions/ui"

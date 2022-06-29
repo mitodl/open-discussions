@@ -24,8 +24,11 @@ const ValidationDiv = styled.div`
  */
 const ValidationError = ({ message, className }: Props): JSX.Element | null => {
   if (!message) return null
-  return <ValidationDiv className={className}>{message}</ValidationDiv>
+  return (
+    <ValidationDiv role="alert" className={className}>
+      {message}
+    </ValidationDiv>
+  )
 }
-
 
 export default ValidationError

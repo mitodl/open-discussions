@@ -2,7 +2,7 @@ module.exports = api => {
   const isProduction = api.env("production")
   const isTest = api.env("test")
   return {
-    ignore:  ["../../node_modules/**", "node_modules/**"],
+    ignore:  [/node_modules/],
     presets: isTest ? [
       "@babel/env",
       "@babel/preset-react"
@@ -16,7 +16,7 @@ module.exports = api => {
       ...(isProduction ? [] : ["react-hot-loader/babel"]),
       "@babel/plugin-proposal-object-rest-spread",
       "@babel/plugin-proposal-class-properties",
-      "@babel/plugin-syntax-dynamic-import"
+      "@babel/plugin-syntax-dynamic-import",
     ].concat(isProduction ? [
       "@babel/plugin-transform-react-constant-elements",
       "@babel/plugin-transform-react-inline-elements"
