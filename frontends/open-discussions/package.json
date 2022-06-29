@@ -83,6 +83,7 @@
     "nuka-carousel": "4.5.2",
     "nyc": "15.1.0",
     "object.entries": "1.0.4",
+    "ol-forms": "workspace:*",
     "ol-util": "workspace:*",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",

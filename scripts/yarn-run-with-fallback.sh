@@ -34,5 +34,6 @@ cd $INIT_CWD
 if yarn run 2>/dev/null | grep -q "YN0000: $1 "; then
     yarn run $1
 else
+    echo "Workspace '$npm_package_name' did not provide command '$1', using '$2' instead."
     yarn run $2
 fi
