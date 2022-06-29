@@ -66,17 +66,6 @@ OPEN_DISCUSSIONS_TOS_URL = get_string(
     "OPEN_DISCUSSIONS_TOS_URL", urljoin(SITE_BASE_URL, "/terms-and-conditions/")
 )
 
-# WEBPACK_LOADER = {
-#     "DEFAULT": {
-#         "CACHE": not DEBUG,
-#         "BUNDLE_DIR_NAME": "bundles/",
-#         "STATS_FILE": os.path.join(BASE_DIR, "webpack-stats.json"),
-#         "POLL_INTERVAL": 0.1,
-#         "TIMEOUT": None,
-#         "IGNORE": [r".+\.hot-update\.+", r".+\.js\.map"],
-#     }
-# }
-
 WEBPACK_LOADER = {
     "OPEN_DISCUSSIONS": {
         "CACHE": not DEBUG,
@@ -981,6 +970,8 @@ ATHENA_MITX_DATABASE_NAME = get_string("ATHENA_MITX_DATABASE_NAME", None)
 ATHENA_MITX_ENROLLMENTS_TABLE = get_string("ATHENA_MITX_ENROLLMENTS_TABLE", None)
 ATHENA_REGION_NAME = get_string("ATHENA_REGION_NAME", "us-east-1")
 ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
+
+ENABLE_INFINITE_CORRIDOR = get_bool("ENABLE_INFINITE_CORRIDOR", False)
 
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing
