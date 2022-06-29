@@ -1,12 +1,12 @@
 {
-  "name": "ol-util",
+  "name": "ol-forms",
   "packageManager": "yarn@3.2.0",
   "main": "./build/index.js",
+  "scripts": {
+    "postinstall": "yarn global:build"
+  },
   "peerDependencies": {
     "react": "^16.10 || 17 || 18",
     "styled-components": "5"
-  },
-  "scripts": {
-    "postinstall": "yarn global:build"
   }
 }
