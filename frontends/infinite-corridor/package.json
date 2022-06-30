@@ -37,7 +37,7 @@
     "coverage": "yarn run gloal:coverage",
     "fmt-check": "yarn run global:fmt-check",
     "fmt-fix": "yarn run global:fmt-fix",
-    "lint-check": "yarn run global:link-check",
+    "lint-check": "yarn run global:lint-check",
     "lint-fix": "yarn run global:lint-fix",
     "scss-lint": "yarn run global:scss-lint",
     "build-flowtypes": "yarn run global:build-flowtypes",

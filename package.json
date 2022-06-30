@@ -5,9 +5,9 @@
         "frontends/*"
     ],
     "scripts": {
-        "build": "run foreach-with-fallback build global:build",
+        "build": "yarn workspaces foreach --topological --verbose  run build",
         "clean": "run foreach-with-fallback clean global:clean",
-        "lint-check": "run foreach-with-fallback lint-check global:lint-check",
+        "lint-check": "yarn workspaces foreach run lint-check",
         "lint-fix": "run foreach-with-fallback lint-fix global:lint-fix",
         "fmt-check": "run foreach-with-fallback fmt-check global:fmt-check",
         "fmt-fix": "run foreach-with-fallback fmt-fix global:fmt-fix",
