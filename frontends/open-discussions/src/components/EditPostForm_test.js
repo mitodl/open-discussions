@@ -28,10 +28,7 @@ describe("EditPostForm", () => {
     )
 
   const setEditorText = (wrapper, text) =>
-    wrapper
-      .find("Editor")
-      .props()
-      .onChange(text)
+    wrapper.find("Editor").props().onChange(text)
 
   beforeEach(() => {
     helper = new IntegrationTestHelper()

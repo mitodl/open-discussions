@@ -174,10 +174,7 @@ describe("MembersList", () => {
           memberToRemove,
           setDialogVisibility
         })
-        wrapper
-          .find("OurDialog")
-          .props()
-          .hideDialog()
+        wrapper.find("OurDialog").props().hideDialog()
 
         assert.equal(removeMember.callCount, 0)
         assert.equal(setDialogVisibility.callCount, 1)
@@ -189,18 +186,9 @@ describe("MembersList", () => {
         member.can_remove = false
 
         const wrapper = renderForm({ editable: true })
-        const text = wrapper
-          .find(".row")
-          .first()
-          .find(".cant_remove")
+        const text = wrapper.find(".row").first().find(".cant_remove")
         assert.equal(text.text(), "Can't remove")
-        assert.equal(
-          wrapper
-            .find(".row")
-            .first()
-            .find(".remove").length,
-          0
-        )
+        assert.equal(wrapper.find(".row").first().find(".remove").length, 0)
       })
 
       it("should show a special message in place of the user's own name", () => {
@@ -208,12 +196,7 @@ describe("MembersList", () => {
         SETTINGS.username = usernameGetter(member)
 
         const wrapper = renderForm({ editable: true })
-        const text = wrapper
-          .find(".row")
-          .first()
-          .find("td")
-          .first()
-          .text()
+        const text = wrapper.find(".row").first().find("td").first().text()
         assert.equal(text, `You are a ${memberTypeDescription} of this channel`)
       })
     })

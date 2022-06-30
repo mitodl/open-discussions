@@ -9,7 +9,7 @@ import { FETCH_SUCCESS } from "redux-hammock/constants"
 import Card from "../components/Card"
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -42,12 +42,8 @@ export class PasswordChangePage extends React.Component<Props> {
   }
 
   render() {
-    const {
-      renderForm,
-      successfullySubmitted,
-      invalidPwError,
-      match
-    } = this.props
+    const { renderForm, successfullySubmitted, invalidPwError, match } =
+      this.props
     return (
       <React.Fragment>
         <MetaTags>

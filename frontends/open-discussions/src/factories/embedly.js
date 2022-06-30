@@ -4,10 +4,9 @@ export const makeArticle = () => ({
   provider_url: "https://www.nytimes.com",
   description:
     'The German government said in a statement that Ms. Merkel, President Emmanuel Macron of France and Prime Minister Theresa May of Britain agreed after speaking on the phone that if the tariffs go into force, "The European Union should be ready to decisively defend its interests within the framework of multilateral trade rules."',
-  title:       "U.S. Allies Brace for Trade War as Tariff Negotiations Stall",
-  author_name: "Jack Ewing and Ana Swanson",
-  url:
-    "https://www.nytimes.com/2018/04/29/us/politics/us-allies-trade-war-tariff-negotiations.html",
+  title:         "U.S. Allies Brace for Trade War as Tariff Negotiations Stall",
+  author_name:   "Jack Ewing and Ana Swanson",
+  url:           "https://www.nytimes.com/2018/04/29/us/politics/us-allies-trade-war-tariff-negotiations.html",
   thumbnail_url:
     "https://static01.nyt.com/images/2018/04/30/us/30globaltrade-1/30globaltrade-1-facebookJumbo.jpg",
   thumbnail_width:  1050,
@@ -33,11 +32,10 @@ export const makeTweet = () => ({
   title:           "jack on Twitter",
   author_name:     "jack",
   thumbnail_width: 400,
-  html:
-    '<blockquote class="twitter-tweet"><a href="https://twitter.com/jack/status/20?ref_src=embedly"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>',
-  author_url:    "http://twitter.com/jack",
-  version:       "1.0",
-  provider_name: "Twitter",
+  html:            '<blockquote class="twitter-tweet"><a href="https://twitter.com/jack/status/20?ref_src=embedly"></a></blockquote><script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>',
+  author_url:      "http://twitter.com/jack",
+  version:         "1.0",
+  provider_name:   "Twitter",
   thumbnail_url:
     "https://pbs.twimg.com/profile_images/839863609345794048/mkpdB9Tf_400x400.jpg",
   type:             "rich",

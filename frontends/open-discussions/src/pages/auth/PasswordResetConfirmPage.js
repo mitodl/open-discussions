@@ -8,7 +8,7 @@ import R from "ramda"
 import Card from "../../components/Card"
 import PasswordResetConfirmForm from "../../components/auth/PasswordResetConfirmForm"
 import withForm from "../../hoc/withForm"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"

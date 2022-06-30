@@ -8,7 +8,7 @@ import Card from "../../components/Card"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse, goToFirstLoginStep } from "../../lib/auth"
@@ -52,14 +52,8 @@ export class LoginPasswordPage extends React.Component<Props> {
   }
 
   render() {
-    const {
-      renderForm,
-      email,
-      name,
-      profileImageUrl,
-      history,
-      match
-    } = this.props
+    const { renderForm, email, name, profileImageUrl, history, match } =
+      this.props
 
     const onBackButtonClick = preventDefaultAndInvoke(
       R.partial(goToFirstLoginStep, [history])

@@ -11,7 +11,7 @@ import Card from "../../components/Card"
 import ExternalLogins from "../../components/ExternalLogins"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { setBannerMessage } from "../../actions/ui"

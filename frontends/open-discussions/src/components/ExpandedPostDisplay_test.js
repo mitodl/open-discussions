@@ -80,13 +80,7 @@ describe("ExpandedPostDisplay", () => {
     const { wrapper } = await render()
     const summary = wrapper.find(".summary")
     assert.equal(wrapper.find(".votes").text(), post.score.toString())
-    assert.equal(
-      summary
-        .find(Link)
-        .at(0)
-        .props().children,
-      post.title
-    )
+    assert.equal(summary.find(Link).at(0).props().children, post.title)
     const authoredBy = wrapper.find(".authored-by")
     assert.ok(authoredBy.find(ProfileImage).exists())
     assert.equal(authoredBy.find(".author-name").text(), post.author_name)
@@ -156,10 +150,7 @@ describe("ExpandedPostDisplay", () => {
   it("should include an external link, if a url post", async () => {
     post = makePost(true)
     const { wrapper } = await render({ post })
-    const { href, target, children } = wrapper
-      .find("a")
-      .at(0)
-      .props()
+    const { href, target, children } = wrapper.find("a").at(0).props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
     assert.equal(children[0], post.title)
@@ -176,10 +167,7 @@ describe("ExpandedPostDisplay", () => {
 
   it("should link to the detail view, if a text post", async () => {
     const { wrapper } = await render()
-    const { to, children } = wrapper
-      .find(Link)
-      .at(0)
-      .props()
+    const { to, children } = wrapper.find(Link).at(0).props()
     assert.equal(children, post.title)
     assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
   })
@@ -239,19 +227,13 @@ describe("ExpandedPostDisplay", () => {
   it("should call showPostDeleteDialog when user clicks 'delete'", async () => {
     SETTINGS.username = post.author_id
     const { wrapper } = await render()
-    wrapper
-      .find(".delete-post")
-      .find("a")
-      .simulate("click")
+    wrapper.find(".delete-post").find("a").simulate("click")
     assert.ok(showPostDeleteDialogStub.called)
   })
 
   it("should call showPostReportDialog when user clicks 'report'", async () => {
     const { wrapper } = await render()
-    wrapper
-      .find(".report-post")
-      .find("a")
-      .simulate("click")
+    wrapper.find(".report-post").find("a").simulate("click")
     assert.ok(showPostReportDialogStub.called)
   })
 
@@ -259,10 +241,7 @@ describe("ExpandedPostDisplay", () => {
     post = makePost(false)
     SETTINGS.username = post.author_id
     const { wrapper } = await render({ post })
-    wrapper
-      .find(".edit-post")
-      .at(0)
-      .simulate("click")
+    wrapper.find(".edit-post").at(0).simulate("click")
     assert.ok(beginEditingStub.called)
   })
 
@@ -332,20 +311,14 @@ describe("ExpandedPostDisplay", () => {
   it('should call approvePost when user clicks "approve"', async () => {
     post.removed = true
     const { wrapper } = await render({ isModerator: true })
-    wrapper
-      .find(".approve-post")
-      .find("a")
-      .simulate("click")
+    wrapper.find(".approve-post").find("a").simulate("click")
     assert.ok(approvePostStub.called)
   })
 
   it('should call removePost when user clicks "remove"', async () => {
     post.removed = false
     const { wrapper } = await render({ isModerator: true })
-    wrapper
-      .find(".remove-post")
-      .find("a")
-      .simulate("click")
+    wrapper.find(".remove-post").find("a").simulate("click")
     assert.ok(removePostStub.called)
   })
 

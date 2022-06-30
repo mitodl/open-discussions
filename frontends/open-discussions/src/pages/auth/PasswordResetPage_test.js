@@ -60,13 +60,7 @@ describe("PasswordResetPage", () => {
     })
 
     assert.isFalse(inner.find("PasswordResetForm").exists())
-    assert.include(
-      inner
-        .find("h3")
-        .at(0)
-        .text(),
-      "Thank you!"
-    )
+    assert.include(inner.find("h3").at(0).text(), "Thank you!")
   })
 
   it("form onSubmit prop calls api correctly", async () => {
