@@ -21,7 +21,7 @@ const ValidationDiv = styled.div`
  *  --validation-text
  * ```
  * respectively.
- */
+*/
 const ValidationError = ({ message, className }: Props): JSX.Element | null => {
   if (!message) return null
   return (

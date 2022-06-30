@@ -30,7 +30,6 @@
   "scripts": {
     "start-dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
     "build": "webpack --config webpack.config.js --bail",
-
     "clean": "yarn run global:clean",
     "compile": "yarn run global:compile",
     "compile-watch": "yarn run global:compile-watch",

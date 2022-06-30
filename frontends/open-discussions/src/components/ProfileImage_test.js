@@ -185,7 +185,7 @@ describe("ProfileImage", () => {
         await wait(0)
         image.update()
         assert.equal(
-          image.find("div[role=alert]").text(),
+          image.find('div[role="alert"]').text(),
           "Please select a valid photo"
         )
       })

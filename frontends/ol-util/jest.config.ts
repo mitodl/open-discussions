@@ -1,9 +1,9 @@
-import type {Config} from '@jest/types'
-import rootConfig from "../../jest.config"
+import type { Config } from '@jest/types'
+import baseConfig from "../../jest.jsdom.config"
 
 const config: Config.InitialOptions = {
-  ...rootConfig,
-  rootDir: "../../",
+  ...baseConfig,
+  rootDir: "./src",
 }
 
 export default config

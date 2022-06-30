@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "yarn run global:build",
+    "dog": "echo bowwowwowowow from ol-util",
     "start-dev": "yarn run global:start-dev",
     "clean": "yarn run global:clean",
     "compile": "yarn run global:compile",
