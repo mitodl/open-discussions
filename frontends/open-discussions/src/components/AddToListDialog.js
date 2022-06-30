@@ -48,9 +48,8 @@ const uiDialogSelector = createSelector(
 const listsById = indexBy(prop("list_id"))
 
 export default function AddToListDialog() {
-  const { id: objectId, object_type: objectType } = useSelector(
-    uiDialogSelector
-  )
+  const { id: objectId, object_type: objectType } =
+    useSelector(uiDialogSelector)
 
   const [{ isFinished: isFinishedResource }] = useRequest(
     getResourceRequest(objectId, objectType)

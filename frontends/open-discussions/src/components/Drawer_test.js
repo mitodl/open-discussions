@@ -78,9 +78,7 @@ describe("Drawer", () => {
   })
 
   it("should have an onDrawerClose function to hide the mobile drawer", () => {
-    renderDrawer({ showDrawerMobile: true })
-      .instance()
-      .onDrawerClose()
+    renderDrawer({ showDrawerMobile: true }).instance().onDrawerClose()
     assert.ok(dispatchStub.calledWith(setShowDrawerMobile(false)))
   })
 
@@ -157,17 +155,13 @@ describe("Drawer", () => {
 
     it("should include props that will link to post compose page if the user is not anonymous", () => {
       userIsAnonymousStub.returns(false)
-      const { composeHref } = renderDrawer()
-        .find(Navigation)
-        .props()
+      const { composeHref } = renderDrawer().find(Navigation).props()
       assert.equal(composeHref, newPostURL())
     })
 
     it("should include props that will show a tooltip if the user is anonymous", () => {
       userIsAnonymousStub.returns(true)
-      const { showComposeLink } = renderDrawer()
-        .find(Navigation)
-        .props()
+      const { showComposeLink } = renderDrawer().find(Navigation).props()
       assert.isTrue(showComposeLink)
     })
 
@@ -248,11 +242,8 @@ describe("Drawer", () => {
     })
 
     it("should grab state.ui.showDrawer props", () => {
-      const {
-        showDrawerMobile,
-        showDrawerDesktop,
-        showDrawerHover
-      } = mapStateToProps(state)
+      const { showDrawerMobile, showDrawerDesktop, showDrawerHover } =
+        mapStateToProps(state)
       assert.equal(showDrawerMobile, state.ui.showDrawerMobile)
       assert.equal(showDrawerDesktop, state.ui.showDrawerDesktop)
       assert.equal(showDrawerHover, state.ui.showDrawerHover)

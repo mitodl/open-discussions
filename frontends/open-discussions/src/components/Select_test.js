@@ -60,10 +60,7 @@ describe("Select", function() {
   }
 
   it("passes props to the inner ReactSelect component", () => {
-    const props = render()
-      .find("Select")
-      .at(0)
-      .props()
+    const props = render().find("Select").at(0).props()
     assert.equal(props.options, options)
     assert.equal(props.isMulti, isMulti)
     assert.equal(props.closeMenuOnSelect, closeMenuOnSelect)

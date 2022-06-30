@@ -207,10 +207,7 @@ describe("ChannelModerationPage", () => {
         }
       })
 
-      const props = inner
-        .find("Connect(CompactPostDisplay)")
-        .first()
-        .props()
+      const props = inner.find("Connect(CompactPostDisplay)").first().props()
       const post = postList[0]
       props.removePost(post)
       const actions = store.getActions()
@@ -270,10 +267,7 @@ describe("ChannelModerationPage", () => {
         }
       })
 
-      const props = wrapper
-        .find("Connect(CompactPostDisplay)")
-        .first()
-        .props()
+      const props = wrapper.find("Connect(CompactPostDisplay)").first().props()
 
       await props.ignorePostReports(post)
       sinon.assert.calledWith(helper.editPostStub, post.id, {

@@ -2,11 +2,24 @@
   "name": "ol-forms",
   "packageManager": "yarn@3.2.0",
   "main": "./build/index.js",
-  "scripts": {
-    "postinstall": "yarn global:build"
-  },
   "peerDependencies": {
     "react": "^16.10 || 17 || 18",
     "styled-components": "5"
+  },
+  "scripts": {
+    "build": "yarn run global:build",
+    "start-dev": "yarn run global:start-dev",
+    "clean": "yarn run global:clean",
+    "compile": "yarn run global:compile",
+    "compile-watch": "yarn run global:compile-watch",
+    "coverage": "yarn run gloal:coverage",
+    "fmt-check": "yarn run global:fmt-check",
+    "fmt-fix": "yarn run global:fmt-fix",
+    "lint-check": "yarn run global:lint-check",
+    "lint-fix": "yarn run global:lint-fix",
+    "scss-lint": "yarn run global:scss-lint",
+    "build-flowtypes": "yarn run global:build-flowtypes",
+    "test": "yarn run global:test",
+    "test-watch": "yarn run global:test-watch"
   }
 }

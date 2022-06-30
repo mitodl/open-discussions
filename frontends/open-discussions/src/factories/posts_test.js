@@ -38,9 +38,7 @@ describe("posts factories", () => {
     })
 
     it("should randomly generate upvotes", () => {
-      const upvoteScores = R.range(1, 20)
-        .map(makePost)
-        .map(R.prop("score"))
+      const upvoteScores = R.range(1, 20).map(makePost).map(R.prop("score"))
       assert.isAbove(new Set(upvoteScores).size, 1)
     })
   })

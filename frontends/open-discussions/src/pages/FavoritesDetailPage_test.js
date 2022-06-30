@@ -57,10 +57,7 @@ describe("FavoritesDetailPage tests", () => {
 
     const { wrapper } = await render()
     assert.equal(
-      wrapper
-        .find(".empty-message")
-        .at(0)
-        .text(),
+      wrapper.find(".empty-message").at(0).text(),
       "You don't have any favorites."
     )
   })

@@ -110,10 +110,7 @@ describe("ProfileImage", () => {
             value: { name: "a name" }
           }
         })
-        image
-          .find(".open-photo-dialog")
-          .at(0)
-          .simulate("click")
+        image.find(".open-photo-dialog").at(0).simulate("click")
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
         const saveButton = dialog.find(".submit").at(0)
         saveButton.simulate("click")
@@ -139,10 +136,7 @@ describe("ProfileImage", () => {
           }
         })
         helper.patchProfileImageStub.returns(Promise.reject("abc"))
-        image
-          .find(".open-photo-dialog")
-          .at(0)
-          .simulate("click")
+        image.find(".open-photo-dialog").at(0).simulate("click")
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
         const saveButton = dialog.find(".submit").at(0)
         saveButton.simulate("click")
@@ -164,11 +158,7 @@ describe("ProfileImage", () => {
         const validFile = new Blob(["bytes"], { type: "image/png" })
         // $FlowFixMe: adding a fake name to the Blob to make it more like a File
         validFile.name = "name.png"
-        image
-          .find(".photo-dropzone")
-          .at(0)
-          .props()
-          .onDrop([validFile])
+        image.find(".photo-dropzone").at(0).props().onDrop([validFile])
         // do a cycle for rerender based on promises
         await wait(0)
         image.update()
@@ -190,16 +180,12 @@ describe("ProfileImage", () => {
           editable: true,
           userName: "a username"
         })
-        image
-          .find(".photo-dropzone")
-          .at(0)
-          .props()
-          .onDropRejected()
+        image.find(".photo-dropzone").at(0).props().onDropRejected()
         // do a cycle for rerender based on promises
         await wait(0)
         image.update()
         assert.equal(
-          image.find("div[role=alert]").text(),
+          image.find('div[role="alert"]').text(),
           "Please select a valid photo"
         )
       })
@@ -227,10 +213,7 @@ describe("ProfileImage", () => {
         assert.equal(image.find(".cropper-text").text(), "Crop your image")
 
         const updatedBlob = new Blob(["updated"])
-        image
-          .find("CropperWrapper")
-          .props()
-          .updatePhotoEdit(updatedBlob)
+        image.find("CropperWrapper").props().updatePhotoEdit(updatedBlob)
         assert.deepEqual(
           helper.store.getState().forms["image:upload:profile"],
           {
@@ -248,10 +231,7 @@ describe("ProfileImage", () => {
           editable: true,
           userName: "a username"
         })
-        image
-          .find(".open-photo-dialog")
-          .at(0)
-          .simulate("click")
+        image.find(".open-photo-dialog").at(0).simulate("click")
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
         const cancelButton = dialog.find(".cancel").at(0)
         await listenForActions(
@@ -277,10 +257,7 @@ describe("ProfileImage", () => {
           editable: true,
           userName: "a username"
         })
-        image
-          .find(".open-photo-dialog")
-          .at(0)
-          .simulate("click")
+        image.find(".open-photo-dialog").at(0).simulate("click")
         const dialog = image.find("ImageUploaderForm").find("OurDialog")
         await listenForActions([HIDE_DIALOG, HIDE_DIALOG], () => {
           dialog.props().hideDialog()
@@ -291,10 +268,7 @@ describe("ProfileImage", () => {
         const image = renderProfileImage({
           editable: true
         })
-        image
-          .find(".open-photo-dialog")
-          .at(0)
-          .simulate("click")
+        image.find(".open-photo-dialog").at(0).simulate("click")
         const dialog = image.find("ImageUploaderForm").find("Dialog")
         assert.equal(dialog.find(".edit-button").length, 0)
       })

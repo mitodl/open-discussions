@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 
 import Card from "../../components/Card"
 import { Loading } from "../../components/Loading"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"

@@ -39,34 +39,10 @@ describe("AccountSettingsPage", () => {
 
     const rows = wrapper.find(".account-settings-row")
     assert.equal(rows.length, 3)
-    assert.equal(
-      rows
-        .at(0)
-        .find("Link")
-        .text(),
-      "Change Password"
-    )
-    assert.equal(
-      rows
-        .at(0)
-        .find("h5")
-        .text(),
-      "MIT Open"
-    )
-    assert.equal(
-      rows
-        .at(1)
-        .find("h5")
-        .text(),
-      "MicroMasters"
-    )
-    assert.equal(
-      rows
-        .at(2)
-        .find("h5")
-        .text(),
-      "Touchstone@MIT"
-    )
+    assert.equal(rows.at(0).find("Link").text(), "Change Password")
+    assert.equal(rows.at(0).find("h5").text(), "MIT Open")
+    assert.equal(rows.at(1).find("h5").text(), "MicroMasters")
+    assert.equal(rows.at(2).find("h5").text(), "Touchstone@MIT")
   })
 
   it("renders the email auth type first", async () => {
@@ -77,12 +53,6 @@ describe("AccountSettingsPage", () => {
 
     const rows = wrapper.find(".account-settings-row")
     assert.equal(rows.length, 2)
-    assert.equal(
-      rows
-        .at(0)
-        .find("h5")
-        .text(),
-      "MIT Open"
-    )
+    assert.equal(rows.at(0).find("h5").text(), "MIT Open")
   })
 })

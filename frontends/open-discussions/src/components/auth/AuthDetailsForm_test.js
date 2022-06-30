@@ -63,17 +63,11 @@ describe("AuthDetailsForm component", () => {
     })
 
     assert.equal(
-      wrapper
-        .find(".validation-message")
-        .at(0)
-        .text(),
+      wrapper.find(".validation-message").at(0).text(),
       "Name is required"
     )
     assert.equal(
-      wrapper
-        .find(".validation-message")
-        .at(1)
-        .text(),
+      wrapper.find(".validation-message").at(1).text(),
       "Password is required"
     )
 
@@ -84,10 +78,7 @@ describe("AuthDetailsForm component", () => {
   it("should show a form level error", () => {
     const wrapper = mountForm({ formError: "backend error" })
     assert.equal(
-      wrapper
-        .find(".validation-message")
-        .at(0)
-        .text(),
+      wrapper.find(".validation-message").at(0).text(),
       "backend error"
     )
   })

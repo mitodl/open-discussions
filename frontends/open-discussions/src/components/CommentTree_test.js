@@ -45,9 +45,7 @@ describe("CommentTree", () => {
     )
 
   it("should pass basic props down to comments", () => {
-    const comment = renderCommentTree()
-      .find("Comment")
-      .at(0)
+    const comment = renderCommentTree().find("Comment").at(0)
     assert.deepEqual(comment.prop("post"), post)
     assert.deepEqual(comment.prop("commentPermalink"), permalinkFunc)
     assert.isTrue(comment.prop("isPrivateChannel"))
@@ -56,9 +54,7 @@ describe("CommentTree", () => {
   //
   ;[true, false].forEach(isModerator => {
     it(`should  pass isModerator = ${String(isModerator)} down`, () => {
-      const comment = renderCommentTree({ isModerator })
-        .find("Comment")
-        .at(0)
+      const comment = renderCommentTree({ isModerator }).find("Comment").at(0)
       assert.equal(comment.prop("isModerator"), isModerator)
     })
   })
@@ -111,10 +107,7 @@ describe("CommentTree", () => {
 
     const wrapper = renderCommentTree()
     const topLevelComment = wrapper.find("Comment").first()
-    const reply = topLevelComment
-      .find(".replies")
-      .find("Comment")
-      .first()
+    const reply = topLevelComment.find(".replies").find("Comment").first()
 
     assert.isFalse(topLevelComment.prop("atMaxDepth"))
     assert.isTrue(reply.prop("atMaxDepth"))
@@ -132,10 +125,7 @@ describe("CommentTree", () => {
       )
       assert.ok(moreCommentsDiv.exists())
 
-      await moreCommentsDiv
-        .find("SpinnerButton")
-        .props()
-        .onClickPromise()
+      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
 
@@ -147,10 +137,7 @@ describe("CommentTree", () => {
       const moreCommentsDiv = wrapper.find(".replies > .more-comments")
       assert.lengthOf(moreCommentsDiv, 1)
 
-      await moreCommentsDiv
-        .find("SpinnerButton")
-        .props()
-        .onClickPromise()
+      await moreCommentsDiv.find("SpinnerButton").props().onClickPromise()
       sinon.assert.calledWith(loadMoreCommentsStub, moreComments)
     })
   })

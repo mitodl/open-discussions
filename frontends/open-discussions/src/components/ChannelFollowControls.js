@@ -59,13 +59,8 @@ export class ChannelFollowControls extends React.Component<Props> {
   }
 
   render() {
-    const {
-      channel,
-      showDropdown,
-      hideDropdown,
-      isDropdownOpen,
-      username
-    } = this.props
+    const { channel, showDropdown, hideDropdown, isDropdownOpen, username } =
+      this.props
 
     // Follow/unfollow controls should not be shown if the user is anonymous or if the channel
     // has membership managed externally.

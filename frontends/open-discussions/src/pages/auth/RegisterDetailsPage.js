@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 import Card from "../../components/Card"
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"

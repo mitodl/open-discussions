@@ -133,12 +133,9 @@ describe("HomePage", () => {
     it("should switch the sorting method when an option is selected", async () => {
       const { wrapper } = await render()
       for (const sortType of VALID_POST_SORT_TYPES) {
-        wrapper
-          .find("PostSortPicker")
-          .props()
-          .updatePickerParam(sortType, {
-            preventDefault: helper.sandbox.stub()
-          })
+        wrapper.find("PostSortPicker").props().updatePickerParam(sortType, {
+          preventDefault: helper.sandbox.stub()
+        })
 
         assert.equal(helper.currentLocation.search, `?sort=${sortType}`)
       }

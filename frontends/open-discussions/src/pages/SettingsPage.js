@@ -9,7 +9,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"
 import SettingsTabs from "../components/SettingsTabs"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { formatTitle } from "../lib/title"
 import { getTokenFromUrl } from "../lib/util"
@@ -95,9 +95,8 @@ class SettingsPage extends React.Component<Props> {
         trigger_frequency: setting.trigger_frequency
       }
 
-      formValues[MODERATOR_NOTIFICATION][
-        setting.channel_name
-      ] = moderatorSettingForChannel
+      formValues[MODERATOR_NOTIFICATION][setting.channel_name] =
+        moderatorSettingForChannel
     }
 
     dispatch(
