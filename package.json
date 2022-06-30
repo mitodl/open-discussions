@@ -14,9 +14,9 @@
         "test": "run foreach-with-fallback test global:test",
         "scss-lint": "run foreach-with-fallback scss-lint global:scss-lint",
         "typecheck": "run foreach-with-fallback typecheck global:typecheck",
-        "foreach-with-fallback": "yarn workspaces foreach --topological --verbose exec ${PROJECT_CWD}/scripts/yarn-run-with-fallback.sh $0 $1",
+        "foreach-with-fallback": "yarn workspaces foreach --topological --verbose run $0",
         "start-dev": "yarn workspaces foreach --verbose --parallel --interlaced exec ${PROJECT_CWD}/scripts/yarn-run-with-fallback.sh start-dev global:start-dev",
-        "global:build": "cd $INIT_CWD && yarn global:clean && yarn global:compile && yarn global:build:flowtypes",
+        "global:build": "cd $INIT_CWD && yarn global:clean && yarn global:compile && yarn global:build-flowtypes",
         "global:start-dev": "cd $INIT_CWD && yarn global:clean && yarn global:compile-watch",
         "global:clean": "cd $INIT_CWD && rimraf -rf build/ tsconfig.tsbuildinfo",
         "global:compile": "cd $INIT_CWD && tsc",
@@ -27,9 +27,9 @@
         "global:lint-check": "cd $INIT_CWD && eslint src/ --ext .js,.jsx,.ts,.tsx",
         "global:scss-lint": "echo 'TODO: Set this up.'",
         "global:lint-fix": "cd $INIT_CWD && eslint --fix src/ --ext .js,.jsx,.ts,.tsx",
-        "global:build:flowtypes": "./scripts/ts-to-flow.sh",
+        "global:build-flowtypes": "./scripts/ts-to-flow.sh",
         "global:test": "cd $INIT_CWD && jest",
-        "global:test:watch": "cd $INIT_CWD && jest --watch"
+        "global:test-watch": "cd $INIT_CWD && jest --watch"
     },
     "version": "0.0.0",
     "packageManager": "yarn@3.2.0",

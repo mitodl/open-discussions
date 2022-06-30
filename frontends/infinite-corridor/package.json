@@ -29,6 +29,19 @@
   },
   "scripts": {
     "start-dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
-    "build": "webpack --config webpack.config.js --bail"
+    "build": "webpack --config webpack.config.js --bail",
+
+    "clean": "yarn run global:clean",
+    "compile": "yarn run global:compile",
+    "compile-watch": "yarn run global:compile-watch",
+    "coverage": "yarn run gloal:coverage",
+    "fmt-check": "yarn run global:fmt-check",
+    "fmt-fix": "yarn run global:fmt-fix",
+    "lint-check": "yarn run global:link-check",
+    "lint-fix": "yarn run global:lint-fix",
+    "scss-lint": "yarn run global:scss-lint",
+    "build-flowtypes": "yarn run global:build-flowtypes",
+    "test": "yarn run global:test",
+    "test-watch": "yarn run global:test-watch"
   }
 }
