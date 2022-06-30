@@ -18,9 +18,6 @@
 # INIT_CWD and PROJECT_CWD are two yarn environment variables.
 # See https://yarnpkg.com/advanced/lifecycle-scripts#environment-variables 
 
-
-echo $INIT_CWD ... $PROJECT_CWD
-
 if [[ "$INIT_CWD" == "$PROJECT_CWD" ]]; then
     echo "skipping; this is root"
     exit 0
