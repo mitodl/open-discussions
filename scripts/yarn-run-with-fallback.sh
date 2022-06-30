@@ -25,6 +25,9 @@ fi
 
 cd $INIT_CWD
 
+echo "Commands for workspace $INIT_CWD:"
+yarn run
+
 # `yarn run` by itself lists the available scripts in a workspace. This grep is
 # potentially a bit fragile. A better way to determine if a script exists in a
 # particular workspace would be nice.
