@@ -71,12 +71,8 @@ export default function Comment(props: Props) {
   const [commentDeleteDialogOpen, setCommentDeleteDialogOpen] = useState(false)
   const [commentReportDialogOpen, setCommentReportDialogOpen] = useState(false)
 
-  const {
-    ignoreReports,
-    removeComment,
-    approveComment,
-    deleteComment
-  } = useCommentModeration(shouldGetReports, channelName)
+  const { ignoreReports, removeComment, approveComment, deleteComment } =
+    useCommentModeration(shouldGetReports, channelName)
 
   return (
     <div className={`comment ${comment.removed ? "removed" : ""}`}>

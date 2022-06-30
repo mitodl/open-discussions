@@ -8,7 +8,7 @@ import Card from "../../components/Card"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import { NotFound } from "../../components/ErrorPages"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { formatTitle } from "../../lib/title"
 import { getAuthProviderSelector } from "../../reducers/auth"

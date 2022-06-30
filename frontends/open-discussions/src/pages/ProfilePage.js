@@ -10,7 +10,7 @@ import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../components/ProfileImage"
 import ProfileContributionFeed from "../components/ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
 
 import { actions } from "../actions"

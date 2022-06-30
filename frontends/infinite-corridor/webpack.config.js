@@ -48,7 +48,7 @@ const getWebpackConfig = mode => {
         {
           test:    /\.tsx?$/,
           use:     "swc-loader",
-          exclude: /node_modules(?!\/ol-)/
+          exclude: /node_modules/
         },
         {
           test: /\.css$|\.scss$/,

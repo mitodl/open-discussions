@@ -73,10 +73,7 @@ describe("ProfileEditPage", function() {
     SETTINGS.username = profile.username
     const wrapper = await renderPage()
     assert.equal(
-      wrapper
-        .find(".profile-name")
-        .find(".name")
-        .props().value,
+      wrapper.find(".profile-name").find(".name").props().value,
       profile.name
     )
   })

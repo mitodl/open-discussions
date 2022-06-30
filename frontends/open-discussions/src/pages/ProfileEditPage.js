@@ -8,7 +8,7 @@ import { MetaTags } from "react-meta-tags"
 import ProfileForm from "../components/ProfileForm"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"

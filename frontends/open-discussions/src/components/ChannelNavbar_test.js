@@ -32,11 +32,7 @@ describe("ChannelNavbar", () => {
     const props = homeLink.props()
     assert.equal(props.to, channelURL(channel.name))
     assert.isTrue(
-      wrapper
-        .find(".extra-navbar-items")
-        .childAt(0)
-        .text()
-        .includes(children)
+      wrapper.find(".extra-navbar-items").childAt(0).text().includes(children)
     )
   })
 

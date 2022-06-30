@@ -28,7 +28,6 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "yarn run build",
     "start-dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
     "build": "webpack --config webpack.config.js --bail"
   }

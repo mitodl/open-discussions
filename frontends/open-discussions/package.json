@@ -173,7 +173,6 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "yarn run build",
     "build": "webpack --config webpack.config.js --bail",
     "start-dev": "webpack serve --port ${WEBPACK_PORT_OPEN_DISCUSSIONS}",
     "lint-check": "eslint ./src",
@@ -183,9 +182,9 @@
     "coverage": "COVERAGE=1 ./scripts/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/js_test.sh",
     "watch": "WATCH=1 ./scripts/js_test.sh",
-    "typecheck": "flow check",
-    "fmt-fix": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore $PWD/'frontends/open-discussions/src/flow/**/*.js' $PWD/'frontends/open-discussions/src/**/*.js' $PWD/'frontends/open-discussions/scss/**/*.scss'",
-    "fmt-check": "prettier-eslint --list-different --no-semi --ignore $PWD/'frontends/open-discussions/src/flow/**/*.js' $PWD/'frontends/open-discussions/src/**/*.js' $PWD/'frontends/open-discussions/scss/**/*.scss'",
+    "typecheck": "flow check ./src",
+    "fmt-fix": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
+    "fmt-check": "prettier-eslint --list-different --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
     "repl": "node --require ./scripts/repl.js"
   },
   "devDependencies": {

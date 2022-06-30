@@ -43,11 +43,10 @@ export class TestPage extends React.Component<*, *> {
   }
 }
 
-export const configureShallowRenderer = (
-  Component: Class<React.Component<*, *>> | Function,
-  defaultProps: Object
-) => (extraProps: Object = {}) =>
-  shallow(<Component {...defaultProps} {...extraProps} />)
+export const configureShallowRenderer =
+  (Component: Class<React.Component<*, *>> | Function, defaultProps: Object) =>
+    (extraProps: Object = {}) =>
+      shallow(<Component {...defaultProps} {...extraProps} />)
 
 export const makeEvent = (name: string, value: any) => ({
   target:         { value, name },

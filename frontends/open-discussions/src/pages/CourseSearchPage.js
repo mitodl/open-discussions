@@ -8,7 +8,7 @@ import { MetaTags } from "react-meta-tags"
 import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
-import {CanonicalLink} from "ol-util"
+import { CanonicalLink } from "ol-util"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
 import CourseSearchbox from "../components/CourseSearchbox"
@@ -133,15 +133,8 @@ type Props = {
 export default function CourseSearchPage(props: Props) {
   const { match } = props
 
-  const {
-    results,
-    facets,
-    suggest,
-    total,
-    loaded,
-    processing,
-    error
-  } = useSelector(courseSearchSelector)
+  const { results, facets, suggest, total, loaded, processing, error } =
+    useSelector(courseSearchSelector)
 
   const [searchResultLayout, setSearchResultLayout] = useState(SEARCH_LIST_UI)
 
