@@ -173,7 +173,6 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "yarn run build",
     "build": "webpack --config webpack.config.js --bail",
     "start-dev": "webpack serve --port ${WEBPACK_PORT_OPEN_DISCUSSIONS}",
     "lint-check": "eslint ./src",

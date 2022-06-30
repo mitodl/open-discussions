@@ -5,6 +5,7 @@
         "frontends/*"
     ],
     "scripts": {
+        "postinstall": "yarn run build",
         "build": "run foreach-with-fallback build global:build",
         "lint-check": "run foreach-with-fallback lint-check global:lint-check",
         "lint-fix": "run foreach-with-fallback lint-fix global:lint-fix",
