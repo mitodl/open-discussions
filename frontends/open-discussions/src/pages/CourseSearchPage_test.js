@@ -417,7 +417,9 @@ describe("CourseSearchPage", () => {
         level:               [],
         course_feature_tags: [],
         resource_type:       []
-      }
+      },
+      ui:   null,
+      sort: null
     })
   })
 
@@ -447,7 +449,9 @@ describe("CourseSearchPage", () => {
         level:               [],
         course_feature_tags: [],
         resource_type:       []
-      }
+      },
+      sort: null,
+      ui:   null
     })
   })
 
