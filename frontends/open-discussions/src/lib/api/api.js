@@ -4,7 +4,7 @@
 import { PATCH, POST, DELETE } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
-import { buildSearchQuery } from "../search"
+import { buildSearchQuery } from "@mitodl/course-search-utils/dist/search"
 import {
   fetchJSONWithAuthFailure,
   fetchWithAuthFailure,
@@ -23,8 +23,12 @@ import type {
 } from "../../flow/discussionTypes"
 import type { NotificationSetting } from "../../flow/settingsTypes"
 import type { SearchParams } from "../../flow/searchTypes"
-
 export function search(params: SearchParams): Promise<*> {
+  if(params["facets"]){
+    params["activeFacets"]=Object.fromEntries(params["facets"])
+    params["activeFacets"].type = params['type']
+  }
+  
   const body = buildSearchQuery(params)
 
   return fetchJSONWithAuthFailure("/api/v0/search/", {
