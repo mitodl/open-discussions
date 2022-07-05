@@ -6,11 +6,7 @@ import { bindActionCreators } from "redux"
 
 import ImageUploader, { makeDialogKey } from "./ImageUploader"
 
-import {
-  BannerContainer,
-  BannerImage,
-  Gradient
-} from "../components/PageBanner"
+import { BannerContainer, BannerImage, Gradient } from "ol-util"
 
 import { showDialog } from "../actions/ui"
 

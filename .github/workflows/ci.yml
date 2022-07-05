@@ -128,13 +128,13 @@ jobs:
         run: yarn install --immutable
 
       - name: Lints
-        run: yarn run lint
+        run: yarn run lint-check
 
       - name: Code formatting
-        run: yarn run fmt:check
+        run: yarn run fmt-check
 
       - name: Scss lint
-        run: yarn run scss_lint
+        run: yarn run scss-lint
 
       - name: Typecheck
         run: yarn run typecheck

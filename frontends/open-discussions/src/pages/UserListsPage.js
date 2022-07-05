@@ -10,7 +10,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "../components/PageBanner"
+} from "ol-util"
 import UserListCard from "../components/UserListCard"
 import UserListFormDialog from "../components/UserListFormDialog"
 import LoginTooltip from "../components/LoginTooltip"

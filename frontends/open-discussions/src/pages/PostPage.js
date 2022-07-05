@@ -19,7 +19,7 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import { CommentSortPicker } from "../components/Picker"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"

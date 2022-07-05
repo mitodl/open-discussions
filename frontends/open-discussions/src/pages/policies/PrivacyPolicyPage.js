@@ -4,7 +4,7 @@ import React from "react"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
-import CanonicalLink from "../../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import PoliciesNavBar from "../../components/PoliciesNavBar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 

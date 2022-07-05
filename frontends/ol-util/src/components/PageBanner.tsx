@@ -1,35 +1,42 @@
-// @flow
 import React from "react"
 import styled, { css } from "styled-components"
 
-import { PHONE_WIDTH } from "../lib/constants"
+// TODO: Move contsants somewhere shared
+const PHONE_WIDTH = 580
 
 const bannerHeight = "200px"
 const tallBannerHeight = "252px"
 const shortMobileBannerHeight = "115px"
 const channelBannerBg = "#20316d"
 
-const imageHeight = css`
+type ImgProps = {
+  src?: string | null
+  alt?: string
+  tall?: boolean
+  compactOnMobile?: boolean
+}
+
+const imageHeight = css<ImgProps>`
   @media (max-width: ${PHONE_WIDTH}px) {
     height: ${props =>
-    props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
+      props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
   }
   @media (min-width: ${PHONE_WIDTH + 1}px) {
     height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
   }
 `
 
-const imageWrapperHeight = css`
+const imageWrapperHeight = css<ImgProps>`
   @media (max-width: ${PHONE_WIDTH}px) {
     min-height: ${props =>
-    props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
+      props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
   }
   @media (min-width: ${PHONE_WIDTH + 1}px) {
     min-height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
   }
 `
 
-export const BannerContainer = styled.div`
+const BannerContainer = styled.div`
   position: absolute;
   width: 100%;
   z-index: -1;
@@ -51,14 +58,7 @@ const PlaceholderDiv = styled.div`
   ${imageWrapperHeight}
 `
 
-type ImgProps = {
-  src: ?string,
-  alt?: string,
-  tall?: boolean,
-  compactOnMobile?: boolean
-}
-
-export const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
+const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
   src ? (
     <StyledImage
       src={src}
@@ -70,17 +70,17 @@ export const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
     <PlaceholderDiv />
   )
 
-export const BannerPageWrapper = styled.div`
+const BannerPageWrapper = styled.div`
   position: relative;
   width: 100%;
 `
 
-export const BannerPageHeader = styled.div`
+const BannerPageHeader = styled.div`
   margin-bottom: 20px;
   ${imageWrapperHeight};
 `
 
-export const Gradient = styled.div`
+const Gradient = styled.div`
   background-image: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.19),
@@ -92,3 +92,11 @@ export const Gradient = styled.div`
   top: 0;
   ${imageHeight};
 `
+
+export {
+  BannerImage,
+  BannerPageWrapper,
+  BannerPageHeader,
+  Gradient,
+  BannerContainer
+}

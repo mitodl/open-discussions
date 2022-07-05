@@ -4,11 +4,7 @@ import R from "ramda"
 import sinon from "sinon"
 
 import CourseIndexPage from "./CourseIndexPage"
-import {
-  BannerPageWrapper,
-  BannerPageHeader,
-  BannerContainer
-} from "../components/PageBanner"
+import { BannerPageWrapper, BannerPageHeader, BannerContainer } from "ol-util"
 import CourseCarousel from "../components/CourseCarousel"
 
 import {

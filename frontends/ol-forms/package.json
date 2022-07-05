@@ -1,0 +1,9 @@
+{
+  "name": "ol-forms",
+  "packageManager": "yarn@3.2.0",
+  "main": "./build/index.js",
+  "peerDependencies": {
+    "react": "^16.10 || 17 || 18",
+    "styled-components": "5"
+  }
+}

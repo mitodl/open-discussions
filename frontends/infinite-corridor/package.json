@@ -10,9 +10,11 @@
     "@swc/core": "^1.2.203",
     "@types/react": "^18.0.13",
     "@types/react-dom": "^18.0.5",
+    "ol-util": "workspace:*",
     "ramda": "^0.28.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "rmwc": "5.7.1",
     "swc-loader": "^0.2.3",
     "typescript": "^4.7.3",
     "webpack": "^5.71.0",
@@ -26,14 +28,7 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "yarn run build",
-    "start:dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
-    "build": "webpack --config webpack.config.js --bail",
-    "lint": "echo todo: set up lint",
-    "fmt": "echo todo: set up fmt",
-    "fmt:check": "echo todo: set up fmt:check",
-    "scss_lint": "echo todo: set up scss_lint",
-    "test": "echo todo: set up test",
-    "typecheck": "tsc --noEmit"
+    "start-dev": "webpack serve --port ${WEBPACK_PORT_INFINITE_CORRIDOR}",
+    "build": "webpack --config webpack.config.js --bail"
   }
 }

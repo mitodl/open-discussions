@@ -6,7 +6,7 @@ import qs from "query-string"
 import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"
 import {

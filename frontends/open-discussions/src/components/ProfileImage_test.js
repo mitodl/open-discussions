@@ -150,7 +150,7 @@ describe("ProfileImage", () => {
         await wait(0)
         image.update()
         assert.equal(
-          image.find(".validation-message").text(),
+          image.find('div[role="alert"]').text(),
           "Error uploading image"
         )
         assert.isTrue(helper.patchProfileImageStub.called)
@@ -172,7 +172,7 @@ describe("ProfileImage", () => {
         // do a cycle for rerender based on promises
         await wait(0)
         image.update()
-        assert.equal(image.find(".validation-message").length, 0)
+        assert.equal(image.find('div[role="alert"]').length, 0)
         assert.deepEqual(
           helper.store.getState().forms["image:upload:profile"],
           {
@@ -199,7 +199,7 @@ describe("ProfileImage", () => {
         await wait(0)
         image.update()
         assert.equal(
-          image.find(".validation-message").text(),
+          image.find('div[role="alert"]').text(),
           "Please select a valid photo"
         )
       })

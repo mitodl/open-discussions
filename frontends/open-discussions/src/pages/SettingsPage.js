@@ -9,7 +9,7 @@ import { FETCH_PROCESSING } from "redux-hammock/constants"
 
 import Card from "../components/Card"
 import SettingsTabs from "../components/SettingsTabs"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { formatTitle } from "../lib/title"
 import { getTokenFromUrl } from "../lib/util"

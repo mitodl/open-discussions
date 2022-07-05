@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "composite": true,
+    "target": "es6",
+    "module": "es6",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "jsx": "react",
+    "strict": true,
+    "declaration": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
+  },
+  "exclude": [
+    "frontends/*/**/*.test.ts",
+    "frontends/*/**/*.test.tsx"
+  ],
+}

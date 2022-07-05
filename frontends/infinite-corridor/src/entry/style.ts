@@ -1,1 +1,1 @@
-console.log('TODO: add styles')
+import "../scss/test.scss"

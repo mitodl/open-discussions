@@ -3,7 +3,7 @@ import React from "react"
 import { MetaTags } from "react-meta-tags"
 
 import Card from "../../components/Card"
-import CanonicalLink from "../../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { formatTitle } from "../../lib/title"
 import { MICROMASTERS_URL, getNextParam } from "../../lib/url"

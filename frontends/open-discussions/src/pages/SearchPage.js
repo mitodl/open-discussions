@@ -9,7 +9,7 @@ import { MetaTags } from "react-meta-tags"
 
 import { Loading, PostLoading, withSearchLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import { Cell, Grid } from "../components/Grid"

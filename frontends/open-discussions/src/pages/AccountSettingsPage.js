@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 
 import Card from "../components/Card"
 import SettingsTabs from "../components/SettingsTabs"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"

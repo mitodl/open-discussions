@@ -8,7 +8,7 @@ import { MetaTags } from "react-meta-tags"
 import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
 import CourseSearchbox from "../components/CourseSearchbox"
@@ -18,7 +18,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "../components/PageBanner"
+} from "ol-util"
 import CourseFilterDrawer from "../components/search/CourseFilterDrawer"
 
 import { actions } from "../actions"

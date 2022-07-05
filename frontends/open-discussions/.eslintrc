@@ -1,4 +1,5 @@
 {
+  "root": true,
   "extends": "eslint-config-mitodl",
   "rules": {
       "no-prototype-builtins": [0]

@@ -1,5 +1,6 @@
 // @flow
 /* global SETTINGS:false */
+import { ValidationError } from "ol-forms"
 import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"
@@ -219,6 +220,9 @@ export const validateSearchQuery = (text: ?string): ?string =>
     ? null
     : `Query string must be at least ${SETTINGS.search_min_length} characters`
 
+/**
+ * @deprecated Prefer using `ValidationError` directly.
+ */
 export const validationMessage = (message: ?string) =>
   R.isEmpty(message) || R.isNil(message) ? null : (
     <div className="validation-message">{message}</div>

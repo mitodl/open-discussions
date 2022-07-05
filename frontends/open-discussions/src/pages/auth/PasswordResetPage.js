@@ -9,7 +9,7 @@ import Card from "../../components/Card"
 import PasswordResetForm from "../../components/auth/PasswordResetForm"
 import ExternalLogins from "../../components/ExternalLogins"
 import withForm from "../../hoc/withForm"
-import CanonicalLink from "../../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"

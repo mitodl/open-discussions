@@ -8,7 +8,7 @@ import Card from "../../components/Card"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"
-import CanonicalLink from "../../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse, goToFirstLoginStep } from "../../lib/auth"

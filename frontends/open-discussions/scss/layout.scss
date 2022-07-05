@@ -1,3 +1,6 @@
+// Just the utility classes from bootstrap.
+@import "~bootstrap/dist/css/bootstrap-utilities.css";
+
 @import "~@material/drawer/dist/mdc.drawer";
 @import "~@material/toolbar/dist/mdc.toolbar";
 @import "~@material/list/dist/mdc.list";
@@ -12,7 +15,8 @@
 @import "~prosemirror-example-setup/style/style";
 @import "~prosemirror-view/style/prosemirror";
 @import "~rc-tooltip/assets/bootstrap_white";
-@import "breakpoints";
+@import "~ol-util/assets/breakpoint.scss";
+
 @import "variables";
 @import "extensions";
 @import "card";

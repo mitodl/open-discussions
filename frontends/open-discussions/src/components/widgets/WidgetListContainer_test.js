@@ -141,7 +141,10 @@ describe("WidgetListContainer", () => {
       wrapper
         .find("sortableList")
         .at(0)
-        .prop("onSortEnd")({ oldIndex, newIndex })
+        .prop("onSortEnd")({
+          oldIndex,
+          newIndex
+        })
       const updated = arrayMove(updatedWidgetList, oldIndex, newIndex)
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {

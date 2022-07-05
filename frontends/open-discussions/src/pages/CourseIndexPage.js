@@ -11,7 +11,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "../components/PageBanner"
+} from "ol-util"
 import { Cell, Grid } from "../components/Grid"
 import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"

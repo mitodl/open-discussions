@@ -120,7 +120,7 @@ describe("ProfileEditPage", function() {
     setName(wrapper, "")
     submitProfile(wrapper)
     assert.equal(
-      wrapper.find(".profile-name .validation-message").text(),
+      wrapper.find('.profile-name div[role="alert"]').text(),
       "Name is required"
     )
     sinon.assert.notCalled(helper.updateProfileStub)

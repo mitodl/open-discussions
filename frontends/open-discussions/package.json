@@ -43,6 +43,7 @@
     "babel-plugin-istanbul": "4.1.6",
     "blueimp-canvas-to-blob": "3.14.0",
     "bodybuilder": "2.2.15",
+    "bootstrap": "^5.1.3",
     "casual-browserify": "1.5.12",
     "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
@@ -83,6 +84,8 @@
     "nuka-carousel": "4.5.2",
     "nyc": "15.1.0",
     "object.entries": "1.0.4",
+    "ol-forms": "workspace:*",
+    "ol-util": "workspace:*",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
     "postcss-loader": "2.1.5",
@@ -148,7 +151,7 @@
     "spinkit": "1.2.5",
     "striptags": "3.2.0",
     "style-loader": "3.3.1",
-    "styled-components": "4.0.2",
+    "styled-components": "^5.3.5",
     "url": "0.11.0",
     "url-assembler": "2.1.0",
     "uuid": "^8.3.2",
@@ -170,18 +173,21 @@
     "node": "16"
   },
   "scripts": {
-    "postinstall": "yarn run build",
     "build": "webpack --config webpack.config.js --bail",
-    "start:dev": "webpack serve --port ${WEBPACK_PORT_OPEN_DISCUSSIONS}",
-    "lint": "eslint ./src",
-    "scss_lint": "sass-lint --verbose --no-exit",
+    "start-dev": "webpack serve --port ${WEBPACK_PORT_OPEN_DISCUSSIONS}",
+    "lint-check": "eslint ./src",
+    "lint-fix": "eslint --fix ./src",
+    "scss-lint": "sass-lint --verbose --no-exit",
     "test": "./scripts/js_test.sh",
     "coverage": "COVERAGE=1 ./scripts/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/js_test.sh",
     "watch": "WATCH=1 ./scripts/js_test.sh",
-    "typecheck": "flow check",
-    "fmt": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore $PWD/'frontends/open-discussions/src/flow/**/*.js' $PWD/'frontends/open-discussions/src/**/*.js' $PWD/'frontends/open-discussions/scss/**/*.scss'",
-    "fmt:check": "prettier-eslint --list-different --no-semi --ignore $PWD/'frontends/open-discussions/src/flow/**/*.js' $PWD/'frontends/open-discussions/src/**/*.js' $PWD/'frontends/open-discussions/scss/**/*.scss'",
+    "typecheck": "flow check ./src",
+    "fmt-fix": "LOG_LEVEL= prettier-eslint --write --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
+    "fmt-check": "prettier-eslint --list-different --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
     "repl": "node --require ./scripts/repl.js"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25"
   }
 }

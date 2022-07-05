@@ -1,34 +1,6 @@
 {
-    "compilerOptions": {
-      "incremental": true,
-      "target": "es6",
-      "module": "es6",
-      "lib": [
-        "es2020",
-        "dom"
-      ],
-      "allowJs": true,
-      "checkJs": false,
-      "jsx": "react",
-      "outDir": "./dist/",
-      "tsBuildInfoFile": ".tsbuildinfo",
-      "strict": true,
-      "suppressImplicitAnyIndexErrors": true,
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "resolveJsonModule": true
-    },
-    "include": [
-      "./**/*.ts",
-      "./**/*.tsx"
-    ],
-    "exclude": [
-      "./*.test.ts",
-      "./*.test.tsx"
-    ]
-  }
-  
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./build"
+  },
+}

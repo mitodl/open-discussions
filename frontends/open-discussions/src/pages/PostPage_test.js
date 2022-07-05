@@ -9,7 +9,7 @@ import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
 import CommentForm from "../components/CommentForm"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"

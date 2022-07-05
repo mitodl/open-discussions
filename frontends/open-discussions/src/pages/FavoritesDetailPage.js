@@ -9,7 +9,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "../components/PageBanner"
+} from "ol-util"
 import { LearningResourceCard } from "../components/LearningResourceCard"
 
 import { SEARCH_LIST_UI } from "../lib/search"

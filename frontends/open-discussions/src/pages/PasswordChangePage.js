@@ -9,7 +9,7 @@ import { FETCH_SUCCESS } from "redux-hammock/constants"
 import Card from "../components/Card"
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"

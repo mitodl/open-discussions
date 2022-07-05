@@ -2,12 +2,12 @@
 /* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
+import { ValidationError } from "ol-forms"
 
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
 import Card from "./Card"
 
-import { validationMessage } from "../lib/validation"
 import { goBackAndHandleEvent } from "../lib/util"
 import { getSocialSites, getPersonalSite } from "../lib/profile"
 import { emptyOrNil } from "../lib/util"
@@ -86,7 +86,12 @@ export default class ProfileForm extends React.Component<Props> {
             </button>
           </div>
           {acceptedSocialSites}
-          {validationMessage(socialSiteFormErrors.url)}
+          {
+            <ValidationError
+              className="validation-message-extra-padding"
+              message={socialSiteFormErrors.url}
+            />
+          }
           {socialSites.map((site, i) => (
             <div key={i} className="site-row">
               <div className="site-link">
@@ -152,7 +157,12 @@ export default class ProfileForm extends React.Component<Props> {
                   Submit
                 </button>
               </div>
-              {validationMessage(personalSiteFormErrors.url)}
+              {
+                <ValidationError
+                  className="validation-message-extra-padding"
+                  message={personalSiteFormErrors.url}
+                />
+              }
             </React.Fragment>
           )}
         </div>
@@ -197,7 +207,12 @@ export default class ProfileForm extends React.Component<Props> {
                     name="name"
                     onChange={onUpdate}
                   />
-                  {validationMessage(validation.name)}
+                  {
+                    <ValidationError
+                      className="validation-message-extra-padding"
+                      message={validation.name}
+                    />
+                  }
                 </div>
               </div>
             </div>

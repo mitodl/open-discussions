@@ -8,7 +8,7 @@ import { MetaTags } from "react-meta-tags"
 
 import NewCoursesWidget from "../components/NewCoursesWidget"
 import LiveStream from "../components/LiveStream"
-import CanonicalLink from "../components/CanonicalLink"
+import { CanonicalLink } from "ol-util"
 import IntroCard from "../components/IntroCard"
 import { withPostLoading } from "../components/Loading"
 import { withSidebar } from "../hoc/withSidebar"

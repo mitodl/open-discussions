@@ -5,11 +5,11 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
+import { CanonicalLink } from "ol-util"
 import isURL from "validator/lib/isURL"
 
 import CreatePostForm from "../components/CreatePostForm"
 import withSingleColumn from "../hoc/withSingleColumn"
-import CanonicalLink from "../components/CanonicalLink"
 import IntraPageNav from "../components/IntraPageNav"
 import Dialog from "../components/Dialog"
 
