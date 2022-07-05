@@ -5,7 +5,7 @@
         "frontends/*"
     ],
     "scripts": {
-        "foreach-with-fallback": "yarn workspaces foreach --verbose --topological exec ${PROJECT_CWD}/scripts/yarn-run-with-fallback.sh $0 $1",
+        "foreach-with-fallback": "yarn workspaces foreach --verbose --topological exec node ${PROJECT_CWD}/scripts/yarn-run-with-fallback.js $0 $1",
         "postinstall": "yarn run build",
         "start-dev": "yarn workspaces foreach --verbose --parallel --interlaced run start-dev",
         "build": "run foreach-with-fallback build global:build",
@@ -48,7 +48,7 @@
         "flowgen": "^1.20.0",
         "jest": "^28.1.1",
         "jest-environment-jsdom": "^28.1.1",
-        "prettier": "^2.7.1",
+        "prettier": "1",
         "rimraf": "^3.0.2",
         "ts-jest": "^28.0.5",
         "ts-node": "^10.8.1",

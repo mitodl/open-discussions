@@ -14103,7 +14103,7 @@ __metadata:
     flowgen: ^1.20.0
     jest: ^28.1.1
     jest-environment-jsdom: ^28.1.1
-    prettier: ^2.7.1
+    prettier: 1
     rimraf: ^3.0.2
     ts-jest: ^28.0.5
     ts-node: ^10.8.1
@@ -15005,7 +15005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^1.19.1, prettier@npm:^1.7.0":
+"prettier@npm:1, prettier@npm:^1.19.1, prettier@npm:^1.7.0":
   version: 1.19.1
   resolution: "prettier@npm:1.19.1"
   bin:
@@ -15014,7 +15014,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.5.1, prettier@npm:^2.7.1":
+"prettier@npm:^2.5.1":
   version: 2.7.1
   resolution: "prettier@npm:2.7.1"
   bin:
