@@ -27,6 +27,13 @@
   margin: 10px 10px 24px 0;
 }
 
+.validation-message {
+  background-color: $validation-bg;
+  color: $validation-text;
+  font-size: 14px;
+  padding: 5px;
+}
+
 .form-field {
   margin: 0 0 28px 0;
   color: rgba(0, 0, 0, 0.87);

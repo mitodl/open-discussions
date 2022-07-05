@@ -223,13 +223,10 @@ export const validateSearchQuery = (text: ?string): ?string =>
 /**
  * @deprecated Prefer using `ValidationError` directly.
  */
-export const validationMessage = (message: ?string) => {
-  /**
-   * The classname here is because some old enzyme tests rely on it.
-   * The `validation-message` class should have no associated styling.
-   */
-  return <ValidationError className="validation-message" message={message} />
-}
+export const validationMessage = (message: ?string) =>
+  R.isEmpty(message) || R.isNil(message) ? null : (
+    <div className="validation-message">{message}</div>
+  )
 
 const emailValidators = [
   validation(
