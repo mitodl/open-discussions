@@ -248,10 +248,10 @@ To enable channel widgets, run through these steps:
 To enable searching the course catalog on elasticsearch, run through these steps:
 1. Start the services with `docker-compose up`
 2. With the above running, run this management command, which kicks off a celery task, to create an elasticsearch index:
-```
-docker-compose  run web python manage.py recreate_index --all
-```
-If there is an error running the above command, observe what traceback gets logged in the celery service.
+    ```
+    docker-compose  run web python manage.py recreate_index --all
+    ```
+    If there is an error running the above command, observe what traceback gets logged in the celery service.
 3. Once created and with `docker-compose up`  running, hit this endpoint in your browser to see if the index exists: `http://localhost:9101/discussions_local_all_default/_search`
 4. If yes, to run a specific query, make a `POST` request (using `curl`, [Postman](https://www.getpostman.com/downloads/), Python `requests`, etc.) to the above endpoint with a `json` payload. For example, to search for all courses, run a query with Content-Type as `application/json` and with a body `{"query":{"term":{"object_type":"course"}}}`
 
