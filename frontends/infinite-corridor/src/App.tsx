@@ -6,7 +6,7 @@ import {
   BannerContainer,
   BannerImage,
   Cell,
-  Grid,
+  Grid
 } from "ol-util"
 import styled from "styled-components"
 
