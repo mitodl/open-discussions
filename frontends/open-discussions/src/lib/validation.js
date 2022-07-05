@@ -1,5 +1,6 @@
 // @flow
 /* global SETTINGS:false */
+import { ValidationError } from "ol-forms"
 import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"
@@ -219,10 +220,16 @@ export const validateSearchQuery = (text: ?string): ?string =>
     ? null
     : `Query string must be at least ${SETTINGS.search_min_length} characters`
 
-export const validationMessage = (message: ?string) =>
-  R.isEmpty(message) || R.isNil(message) ? null : (
-    <div className="validation-message">{message}</div>
-  )
+/**
+ * @deprecated Prefer using `ValidationError` directly.
+ */
+export const validationMessage = (message: ?string) => {
+  /**
+   * The classname here is because some old enzyme tests rely on it.
+   * The `validation-message` class should have no associated styling.
+   */
+  return <ValidationError className="validation-message" message={message} />
+}
 
 const emailValidators = [
   validation(
