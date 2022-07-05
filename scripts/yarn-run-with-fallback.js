@@ -1,13 +1,13 @@
 /**
  Goal here is to not copy-paste many package.json scripts.
 
- `./yarn-run-with-fallback.sh script1 script2` will run script 1 if it exists
+ `node yarn-run-with-fallback.js script1 script2` will run script 1 if it exists
  and script 2 if it does not. This is useful when combined with foreach and
  global yarn commands (See https://yarnpkg.com/getting-started/qa#how-to-share-scripts-between-workspaces).
 
  For example
 
-   yarn workspaces foreach exec ${PROJECT_CWD}/scripts/yarn-run-with-fallback.sh some-script global:some-script
+   yarn workspaces foreach exec node ${PROJECT_CWD}/scripts/yarn-run-with-fallback.js some-script global:some-script
 
  will run `some-script` in every workspace in which it exists, and will
  fallback to `globa:some-script` if it does not exist in that workspace.
