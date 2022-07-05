@@ -20,52 +20,51 @@ type Props = {
   editing: boolean
 }
 
-const SortableWidgetList: StatelessFunctionalComponent<Props> =
-  SortableContainer(
-    ({
-      widgetInstances,
-      expanded,
-      deleteInstance,
-      editing,
-      setExpanded,
-      startAddInstance,
-      startEditInstance
-    }: Props) => {
-      const widgetKeys = widgetInstances.map(getWidgetKey)
-      const anyCollapsed = widgetKeys.filter(key => !expanded[key]).length > 0
-      return (
-        <div className="widget-list">
-          {editing ? (
-            <div className="manage-widgets">
-              <span className="add-widget" onClick={() => startAddInstance()}>
-                + Add widget
-              </span>
-              <span
-                className="toggle-collapse-all"
-                onClick={() => setExpanded(widgetKeys, anyCollapsed)}
-              >
-                {anyCollapsed ? "Expand" : "Collapse"} all
-              </span>
-            </div>
-          ) : null}
-          {widgetInstances.map((widgetInstance, i) => {
-            const key = getWidgetKey(widgetInstance)
-            const instanceIsExpanded = !!expanded[key]
-            return (
-              <WidgetInstance
-                startEditInstance={startEditInstance}
-                widgetInstance={widgetInstance}
-                key={key}
-                index={i}
-                editing={editing}
-                deleteInstance={deleteInstance}
-                expanded={!editing || instanceIsExpanded}
-                toggleExpanded={() => setExpanded([key], !instanceIsExpanded)}
-              />
-            )
-          })}
-        </div>
-      )
-    }
-  )
+const SortableWidgetList: StatelessFunctionalComponent<Props> = SortableContainer(
+  ({
+    widgetInstances,
+    expanded,
+    deleteInstance,
+    editing,
+    setExpanded,
+    startAddInstance,
+    startEditInstance
+  }: Props) => {
+    const widgetKeys = widgetInstances.map(getWidgetKey)
+    const anyCollapsed = widgetKeys.filter(key => !expanded[key]).length > 0
+    return (
+      <div className="widget-list">
+        {editing ? (
+          <div className="manage-widgets">
+            <span className="add-widget" onClick={() => startAddInstance()}>
+              + Add widget
+            </span>
+            <span
+              className="toggle-collapse-all"
+              onClick={() => setExpanded(widgetKeys, anyCollapsed)}
+            >
+              {anyCollapsed ? "Expand" : "Collapse"} all
+            </span>
+          </div>
+        ) : null}
+        {widgetInstances.map((widgetInstance, i) => {
+          const key = getWidgetKey(widgetInstance)
+          const instanceIsExpanded = !!expanded[key]
+          return (
+            <WidgetInstance
+              startEditInstance={startEditInstance}
+              widgetInstance={widgetInstance}
+              key={key}
+              index={i}
+              editing={editing}
+              deleteInstance={deleteInstance}
+              expanded={!editing || instanceIsExpanded}
+              toggleExpanded={() => setExpanded([key], !instanceIsExpanded)}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+)
 export default SortableWidgetList

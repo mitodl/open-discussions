@@ -145,10 +145,19 @@ describe("UserMenu", () => {
         SETTINGS.profile_ui_enabled = uiEnabled
         SETTINGS.username = profile.username
         const wrapper = shallow(<LoggedInMenu {...menuProps} />)
-        assert.equal(wrapper.find("Link").at(1).exists(), uiEnabled)
+        assert.equal(
+          wrapper
+            .find("Link")
+            .at(1)
+            .exists(),
+          uiEnabled
+        )
         if (uiEnabled) {
           assert.equal(
-            wrapper.find("Link").at(1).props().to,
+            wrapper
+              .find("Link")
+              .at(1)
+              .props().to,
             profileURL(profile.username)
           )
         }

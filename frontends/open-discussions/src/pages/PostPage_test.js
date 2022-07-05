@@ -259,7 +259,10 @@ describe("PostPage", function() {
     const card = inner.find(".comment-detail-card")
     assert(card.exists())
     assert.include(
-      card.find("div").at(0).text(),
+      card
+        .find("div")
+        .at(0)
+        .text(),
       "You are viewing a single comment's thread."
     )
     assert.equal(
@@ -352,7 +355,10 @@ describe("PostPage", function() {
         }
       })
 
-      const props = inner.find("OurDialog").at(0).props()
+      const props = inner
+        .find("OurDialog")
+        .at(0)
+        .props()
 
       assert.equal(props.title, "Delete Post")
       await props.onAccept()
@@ -419,7 +425,10 @@ describe("PostPage", function() {
               post
             }
           })
-          const dialogProps = wrapper.find("OurDialog").at(1).props()
+          const dialogProps = wrapper
+            .find("OurDialog")
+            .at(1)
+            .props()
           assert.equal(dialogProps.title, "Remove Post")
           await dialogProps.onAccept({ preventDefault: helper.sandbox.stub() })
 

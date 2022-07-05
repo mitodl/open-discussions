@@ -75,7 +75,11 @@ describe("PostList", () => {
     const wrapper = renderPostList({
       reportPost: reportStub
     })
-    wrapper.find(CompactPostDisplay).first().props().reportPost()
+    wrapper
+      .find(CompactPostDisplay)
+      .first()
+      .props()
+      .reportPost()
     assert.ok(reportStub.called)
   })
 
@@ -84,7 +88,11 @@ describe("PostList", () => {
     const wrapper = renderPostList({
       removePost: removeStub
     })
-    wrapper.find(CompactPostDisplay).first().props().removePost()
+    wrapper
+      .find(CompactPostDisplay)
+      .first()
+      .props()
+      .removePost()
     assert.ok(removeStub.called)
   })
 })

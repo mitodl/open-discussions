@@ -126,13 +126,11 @@ export default class MembersList extends React.Component<Props> {
           onAccept={this.removeMember}
           hideDialog={() => setDialogVisibility(false)}
           submitText="Remove"
-          title={`Remove ${
-            (memberToRemove &&
-              (usernameGetter(memberToRemove) === SETTINGS.username
-                ? "yourself"
-                : memberToRemove.full_name)) ||
-            "member"
-          }?`}
+          title={`Remove ${(memberToRemove &&
+            (usernameGetter(memberToRemove) === SETTINGS.username
+              ? "yourself"
+              : memberToRemove.full_name)) ||
+            "member"}?`}
         />
       </div>
     )

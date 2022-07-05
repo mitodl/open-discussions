@@ -77,11 +77,19 @@ describe("ChannelSettingsLink", () => {
       const wrapper = render()
       assert.equal(wrapper.find("li").length, 2)
       assert.equal(
-        wrapper.find("li").at(0).find("Link").prop("to"),
+        wrapper
+          .find("li")
+          .at(0)
+          .find("Link")
+          .prop("to"),
         editChannelBasicURL(channel.name)
       )
 
-      wrapper.find("li").at(1).find("a").prop("onClick")()
+      wrapper
+        .find("li")
+        .at(1)
+        .find("a")
+        .prop("onClick")()
       assert.equal(helper.currentLocation.pathname, channelURL(channel.name))
       assert.deepEqual(store.getActions(), [
         {
@@ -99,7 +107,11 @@ describe("ChannelSettingsLink", () => {
       const wrapper = render()
       assert.equal(wrapper.find("li").length, 1)
       assert.equal(
-        wrapper.find("li").at(0).find("Link").prop("to"),
+        wrapper
+          .find("li")
+          .at(0)
+          .find("Link")
+          .prop("to"),
         editChannelBasicURL(channel.name)
       )
     })

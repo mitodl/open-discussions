@@ -59,7 +59,10 @@ describe("CommentTree", () => {
 
   it('should include a "reply" button', async () => {
     const { wrapper } = await render()
-    wrapper.find(".comment-action-button.reply-button").at(0).simulate("click")
+    wrapper
+      .find(".comment-action-button.reply-button")
+      .at(0)
+      .simulate("click")
     const form = wrapper.find(CommentForm)
     assert.deepEqual(comment, form.prop("comment"))
   })
@@ -174,17 +177,30 @@ describe("CommentTree", () => {
 
   it("should link to the author's profile", async () => {
     const { wrapper } = await render()
-    const link = wrapper.find(".author-info").at(0).find("Link").at(0)
+    const link = wrapper
+      .find(".author-info")
+      .at(0)
+      .find("Link")
+      .at(0)
     assert.equal(link.text(), comment.author_name)
     assert.equal(link.props().to, profileURL(comment.author_id))
-    const secondLink = wrapper.find(".comment").at(0).find("Link").at(0)
+    const secondLink = wrapper
+      .find(".comment")
+      .at(0)
+      .find("Link")
+      .at(0)
     assert.equal(secondLink.props().to, profileURL(comment.author_id))
     assert(secondLink.find("ProfileImage").exists())
   })
 
   it("should link to the comment URL", async () => {
     const { wrapper } = await render()
-    const link = wrapper.find(".author-info").at(0).find("Link").at(1).props()
+    const link = wrapper
+      .find(".author-info")
+      .at(0)
+      .find("Link")
+      .at(1)
+      .props()
     assert.equal(link.to, permalinkFunc(comment.id))
   })
 
@@ -214,7 +230,10 @@ describe("CommentTree", () => {
 
   it("should render a profile image", async () => {
     const { wrapper } = await render()
-    const { src } = wrapper.find(".profile-image").at(0).props()
+    const { src } = wrapper
+      .find(".profile-image")
+      .at(0)
+      .props()
     assert.equal(src, comment.profile_image)
   })
 
@@ -282,7 +301,10 @@ describe("CommentTree", () => {
       const { wrapper } = await render({ isModerator: true })
       openMenu(wrapper)
       wrapper.find(".remove-button").simulate("click")
-      wrapper.find("#remove-comment-dialog").at(0).prop("onAccept")()
+      wrapper
+        .find("#remove-comment-dialog")
+        .at(0)
+        .prop("onAccept")()
       assert.deepEqual(helper.updateCommentStub.args[0], [
         comment.id,
         { removed: true }

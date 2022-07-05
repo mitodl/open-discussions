@@ -74,7 +74,10 @@ describe("CompactPostDisplay", () => {
     assert.deepEqual(titleDisplay.props().post, post)
 
     assert.include(
-      wrapper.find(".comment-link").at(0).text(),
+      wrapper
+        .find(".comment-link")
+        .at(0)
+        .text(),
       `${post.num_comments}`
     )
 
@@ -127,7 +130,12 @@ describe("CompactPostDisplay", () => {
 
   it("should link to the post detail page via post date", () => {
     const wrapper = renderPostDisplay({ post })
-    const linkProps = wrapper.find(".date").at(0).find(Link).at(0).props()
+    const linkProps = wrapper
+      .find(".date")
+      .at(0)
+      .find(Link)
+      .at(0)
+      .props()
     assert.equal(
       linkProps.to,
       postDetailURL(post.channel_name, post.id, post.slug)
@@ -137,7 +145,12 @@ describe("CompactPostDisplay", () => {
   it("should link to the subreddit, if told to", () => {
     post.channel_name = "channel_name"
     const wrapper = renderPostDisplay({ post, showChannelLink: true })
-    const linkProps = wrapper.find(".date").at(0).find(Link).at(1).props()
+    const linkProps = wrapper
+      .find(".date")
+      .at(0)
+      .find(Link)
+      .at(1)
+      .props()
     assert.equal(linkProps.to, channelURL("channel_name"))
     assert.equal(linkProps.children, post.channel_title)
   })
@@ -145,7 +158,10 @@ describe("CompactPostDisplay", () => {
   it("should include an external link, if a url post", () => {
     post = makePost(true)
     const wrapper = renderPostDisplay({ post })
-    const { href, target } = wrapper.find(".external-link a").at(0).props()
+    const { href, target } = wrapper
+      .find(".external-link a")
+      .at(0)
+      .props()
     assert.equal(href, post.url)
     assert.equal(target, "_blank")
   })
@@ -202,7 +218,10 @@ describe("CompactPostDisplay", () => {
       post.stickied = stickied
       const wrapper = renderPostDisplay({ post, showPinUI })
       assert.equal(
-        wrapper.find(".compact-post-summary").at(0).props().className,
+        wrapper
+          .find(".compact-post-summary")
+          .at(0)
+          .props().className,
         showPinUI && stickied
           ? "compact-post-summary sticky"
           : "compact-post-summary "
@@ -218,7 +237,9 @@ describe("CompactPostDisplay", () => {
   })
 
   it("should link to the detail view", () => {
-    const detailLink = renderPostDisplay({ post }).find(Link).at(0)
+    const detailLink = renderPostDisplay({ post })
+      .find(Link)
+      .at(0)
     const { to } = detailLink.props()
     assert.equal(to, postDetailURL(post.channel_name, post.id, post.slug))
     assert.ok(detailLink.find(PostTitleAndHostname).exists())
@@ -261,7 +282,11 @@ describe("CompactPostDisplay", () => {
         togglePinPost: togglePinPostStub
       })
 
-      wrapper.find(DropdownMenu).find("a").at(0).simulate("click")
+      wrapper
+        .find(DropdownMenu)
+        .find("a")
+        .at(0)
+        .simulate("click")
       assert.ok(togglePinPostStub.calledWith(post))
     })
 
@@ -279,7 +304,11 @@ describe("CompactPostDisplay", () => {
         })
         assert.equal(
           linkText,
-          wrapper.find(DropdownMenu).find("a").at(0).text()
+          wrapper
+            .find(DropdownMenu)
+            .find("a")
+            .at(0)
+            .text()
         )
       })
     })

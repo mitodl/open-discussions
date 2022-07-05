@@ -100,7 +100,10 @@ describe("Navigation", () => {
         pathnameProp ? { pathname: pathnameProp } : {}
       )
       assert.equal(
-        wrapper.find(".location.current-location").find(".home-link").exists(),
+        wrapper
+          .find(".location.current-location")
+          .find(".home-link")
+          .exists(),
         expHighlighted
       )
     })

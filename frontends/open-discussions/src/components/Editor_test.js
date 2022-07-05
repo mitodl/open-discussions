@@ -161,7 +161,9 @@ describe("Editor component", () => {
   describe("menuClickHandlerCreator", () => {
     it("menuClickHandlerCreator should return a function", () => {
       assert.isFunction(
-        renderEditor().instance().menuClickHandlerCreator(helper.sandbox.stub())
+        renderEditor()
+          .instance()
+          .menuClickHandlerCreator(helper.sandbox.stub())
       )
     })
 
@@ -347,7 +349,13 @@ describe("Editor component", () => {
           .stub(pmLib, "markIsActive")
           .returns(linkActive)
         wrapper.instance().forceUpdate()
-        assert.equal(wrapper.find(".menu-button").last().text(), linkNameExp)
+        assert.equal(
+          wrapper
+            .find(".menu-button")
+            .last()
+            .text(),
+          linkNameExp
+        )
         sinon.assert.calledWith(markIsActiveStub, schema.marks.link)
       })
     })

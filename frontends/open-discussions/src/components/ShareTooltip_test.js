@@ -44,7 +44,12 @@ describe("ShareTooltip", () => {
   })
 
   it("should populate the input field with the value of the url prop", () => {
-    assert.equal(url, renderShareTooltipHelper().find("input").props().value)
+    assert.equal(
+      url,
+      renderShareTooltipHelper()
+        .find("input")
+        .props().value
+    )
   })
 
   it("should select text in the input field", () => {
@@ -93,8 +98,10 @@ describe("ShareTooltip", () => {
 
   it("should hide buttons, if hideSocialButtons === true", () => {
     const wrapper = renderShareTooltipHelper({ hideSocialButtons: true })
-    ;[FacebookShareButton, LinkedinShareButton, TwitterShareButton].forEach(
-      button => assert.isNotOk(wrapper.find(button).exists())
-    )
+    ;[
+      FacebookShareButton,
+      LinkedinShareButton,
+      TwitterShareButton
+    ].forEach(button => assert.isNotOk(wrapper.find(button).exists()))
   })
 })

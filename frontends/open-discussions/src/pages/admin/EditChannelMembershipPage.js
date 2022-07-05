@@ -68,8 +68,11 @@ const editChannelMembershipPage = (
     }
 
     removeMember = async (channel: Channel, member: Member) => {
-      const { removeMember, setSnackbarMessage, setDialogVisibility } =
-        this.props
+      const {
+        removeMember,
+        setSnackbarMessage,
+        setDialogVisibility
+      } = this.props
       await removeMember(channel.name, usernameGetter(member))
 
       if (redirectAfterSelfRemoval) {

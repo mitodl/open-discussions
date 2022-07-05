@@ -10,13 +10,14 @@ import type {
 } from "../flow/formTypes"
 import type { AuthResponse } from "../flow/authTypes"
 
-export const formBeginEditForKey =
-  <T>(formKey: string, getNewFormValues: NewFormFunc<T>) =>
-    () =>
-      actions.forms.formBeginEdit({
-        formKey,
-        value: getNewFormValues()
-      })
+export const formBeginEditForKey = <T>(
+  formKey: string,
+  getNewFormValues: NewFormFunc<T>
+) => () =>
+    actions.forms.formBeginEdit({
+      formKey,
+      value: getNewFormValues()
+    })
 
 export const formEndEditForKey = (formKey: string) => () =>
   actions.forms.formEndEdit({ formKey })

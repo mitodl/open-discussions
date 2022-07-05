@@ -64,7 +64,10 @@ describe("CommentVoteForm", () => {
         clickedVoteClass
       )
       assert.equal(
-        wrapper.find(clickedButtonSelector).find("img").props().src,
+        wrapper
+          .find(clickedButtonSelector)
+          .find("img")
+          .props().src,
         `${imgPrefix}.png`
       )
     } else {
@@ -73,7 +76,10 @@ describe("CommentVoteForm", () => {
         clickedVoteClass
       )
       assert.equal(
-        wrapper.find(clickedButtonSelector).find("img").props().src,
+        wrapper
+          .find(clickedButtonSelector)
+          .find("img")
+          .props().src,
         `${imgPrefix}_on.png`
       )
     }

@@ -20,8 +20,14 @@ const MAX_DISPLAY_COUNT = 5
 const FACET_COLLAPSE_THRESHOLD = 15
 
 function SearchFacet(props: Props) {
-  const { name, title, results, currentlySelected, labelFunction, onUpdate } =
-    props
+  const {
+    name,
+    title,
+    results,
+    currentlySelected,
+    labelFunction,
+    onUpdate
+  } = props
   const [showFacetList, setShowFacetList] = useState(true)
   const [showAllFacets, setShowAllFacets] = useState(false)
 

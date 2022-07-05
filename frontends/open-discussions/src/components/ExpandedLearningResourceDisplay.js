@@ -190,12 +190,10 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               <div className="col-1">
                 <i className="material-icons school">school</i>
                 <div className="info-label">
-                  {
-                    // $FlowFixMe: only courses will access platform
+                  {// $FlowFixMe: only courses will access platform
                     object.platform === platforms.OCW
                       ? "As Taught In"
-                      : "Start Date"
-                  }
+                      : "Start Date"}
                   :
                 </div>
               </div>
@@ -333,16 +331,14 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
                 : null}
               {object.object_type === LR_TYPE_VIDEO ? (
                 <React.Fragment>
-                  {
-                    // $FlowFixMe: only videos will get to this code
+                  {// $FlowFixMe: only videos will get to this code
                     object.duration
                       ? lrInfoRow(
                         "restore",
                         "Duration:",
                         formatDurationClockTime(object.duration)
                       )
-                      : null
-                  }
+                      : null}
                   {offeredBy
                     ? lrInfoRow("local_offer", "Offered By:", offeredBy)
                     : null}

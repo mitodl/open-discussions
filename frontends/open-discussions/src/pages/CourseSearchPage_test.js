@@ -109,7 +109,10 @@ describe("CourseSearchPage", () => {
     wrapper.update()
     searchResponse.hits.hits.forEach((result, i) => {
       assert.deepEqual(
-        wrapper.find("SearchResult").at(i).prop("result"),
+        wrapper
+          .find("SearchResult")
+          .at(i)
+          .prop("result"),
         result._source
       )
     })
@@ -123,7 +126,10 @@ describe("CourseSearchPage", () => {
     const { wrapper } = await render()
     wrapper.update()
     assert.equal(
-      wrapper.find(SearchFacet).at(2).prop("title"),
+      wrapper
+        .find(SearchFacet)
+        .at(2)
+        .prop("title"),
       "Learning Resource"
     )
   })

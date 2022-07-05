@@ -85,7 +85,10 @@ describe("WidgetList", () => {
     )
 
     listResponse.widgets.forEach((widgetInstance, i) => {
-      const props = wrapper.find(WidgetInstance).at(i).props()
+      const props = wrapper
+        .find(WidgetInstance)
+        .at(i)
+        .props()
       assert.deepEqual(props.widgetInstance, widgetInstance)
       assert.equal(props.index, i)
       assert.isTrue(props.editing)
@@ -113,7 +116,10 @@ describe("WidgetList", () => {
 
       listResponse.widgets.forEach((widgetInstance, i) => {
         assert.equal(
-          wrapper.find(WidgetInstance).at(i).prop("expanded"),
+          wrapper
+            .find(WidgetInstance)
+            .at(i)
+            .prop("expanded"),
           expected
         )
       })
@@ -124,7 +130,10 @@ describe("WidgetList", () => {
     const wrapper = render()
     listResponse.widgets.forEach((widgetInstance, i) => {
       setExpandedStub.reset()
-      wrapper.find(WidgetInstance).at(i).prop("toggleExpanded")()
+      wrapper
+        .find(WidgetInstance)
+        .at(i)
+        .prop("toggleExpanded")()
       const key = getWidgetKey(widgetInstance)
       sinon.assert.calledWith(setExpandedStub, [key], !expanded[key])
     })

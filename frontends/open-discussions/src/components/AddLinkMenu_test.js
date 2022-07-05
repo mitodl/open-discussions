@@ -32,7 +32,10 @@ describe("AddLinkMenu", () => {
   ].forEach(([name, index]) => {
     it(`has the input for ${name} that we expect`, () => {
       const wrapper = renderLinkMenu()
-      const { onChange, name, value } = wrapper.find("input").at(index).props()
+      const { onChange, name, value } = wrapper
+        .find("input")
+        .at(index)
+        .props()
       onChange()
       sinon.assert.called(onChange)
       assert.equal(name, name)
@@ -50,7 +53,10 @@ describe("AddLinkMenu", () => {
 
   it("has a close button with the closeMenu function passed in", () => {
     const wrapper = renderLinkMenu()
-    wrapper.find(CloseButton).props().onClick()
+    wrapper
+      .find(CloseButton)
+      .props()
+      .onClick()
     sinon.assert.called(closeMenu)
   })
 })

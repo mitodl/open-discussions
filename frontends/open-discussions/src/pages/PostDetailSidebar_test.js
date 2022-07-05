@@ -93,7 +93,10 @@ describe("PostDetailSidebar", () => {
     assert.lengthOf(allRelated, relatedPostData.length)
     const firstRelated = allRelated.at(0)
     assert.equal(
-      firstRelated.find("Link").at(0).prop("children"),
+      firstRelated
+        .find("Link")
+        .at(0)
+        .prop("children"),
       relatedPostData[0].post_title
     )
   })

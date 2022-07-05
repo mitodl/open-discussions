@@ -42,8 +42,14 @@ class ChannelAvatar extends React.Component<Props> {
   }
 
   render() {
-    const { channel, editable, formImageUrl, onUpdate, name, imageSize } =
-      this.props
+    const {
+      channel,
+      editable,
+      formImageUrl,
+      onUpdate,
+      name,
+      imageSize
+    } = this.props
 
     const imageUrl = formImageUrl || getImage(channel, imageSize)
     const isDefault = !imageUrl

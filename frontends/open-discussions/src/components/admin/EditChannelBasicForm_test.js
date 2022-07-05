@@ -79,7 +79,10 @@ describe("EditChannelBasicForm", () => {
         it(`should be called when ${name} input is modified`, () => {
           const event = { target: { name: { name }, value: { value } } }
           assert.isNotOk(onSubmit.called)
-          wrapper.find(`[name="${name}"]`).at(0).simulate("change", event)
+          wrapper
+            .find(`[name="${name}"]`)
+            .at(0)
+            .simulate("change", event)
           assert.isOk(onUpdate.calledWith(event))
         })
       })

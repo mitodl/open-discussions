@@ -36,7 +36,11 @@ describe("UserListCard tests", () => {
   const getDialog = R.curry((index, Component, wrapper) => {
     wrapper.find(".more_vert").simulate("click")
     wrapper.update()
-    wrapper.find(DropdownMenu).find("div").at(index).simulate("click")
+    wrapper
+      .find(DropdownMenu)
+      .find("div")
+      .at(index)
+      .simulate("click")
     return wrapper.find(Component)
   })
 
@@ -53,7 +57,13 @@ describe("UserListCard tests", () => {
 
   it("should put the title", async () => {
     const { wrapper } = await renderUserListCard()
-    assert.equal(wrapper.find(".ul-title").at(0).text(), userList.title)
+    assert.equal(
+      wrapper
+        .find(".ul-title")
+        .at(0)
+        .text(),
+      userList.title
+    )
   })
 
   //

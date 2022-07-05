@@ -50,13 +50,19 @@ describe("FilterableSearchFacet", () => {
   it("checkbox should call onUpdate when clicked", async () => {
     const { wrapper } = await render()
     const event = { target: { checked: true, name: name, value: facet["key"] } }
-    wrapper.find("input").at(1).prop("onChange")(event)
+    wrapper
+      .find("input")
+      .at(1)
+      .prop("onChange")(event)
     sinon.assert.calledWith(onUpdateStub, event)
   })
 
   it("whole thing should call onUpdate when clicked", async () => {
     const { wrapper } = await render()
-    wrapper.find(".facet-visible").at(0).simulate("click")
+    wrapper
+      .find(".facet-visible")
+      .at(0)
+      .simulate("click")
     sinon.assert.calledWith(onUpdateStub, {
       target: { checked: true, name: name, value: facet["key"] }
     })
@@ -74,7 +80,13 @@ describe("FilterableSearchFacet", () => {
     it(`checkbox ${shouldIf(isSelected)} be checked`, async () => {
       const currentlySelected = isSelected ? [facet["key"]] : []
       const { wrapper } = await render({ currentlySelected })
-      assert.equal(wrapper.find("input").at(1).prop("checked"), isSelected)
+      assert.equal(
+        wrapper
+          .find("input")
+          .at(1)
+          .prop("checked"),
+        isSelected
+      )
     })
   })
 

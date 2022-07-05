@@ -46,7 +46,13 @@ describe("Embedly", () => {
     const resizedImageUrl = `http://embedly/resize/?url=${article.thumbnail_url}`
     sandbox.stub(urlFuncs, "embedlyResizeImage").returns(resizedImageUrl)
     const wrapper = renderEmbedly(article)
-    assert.equal(wrapper.find("a").at(0).props().href, article.url)
+    assert.equal(
+      wrapper
+        .find("a")
+        .at(0)
+        .props().href,
+      article.url
+    )
     assert.equal(wrapper.find(".thumbnail img").props().src, resizedImageUrl)
     assert.equal(wrapper.find(".link-summary h2").text(), article.title)
     assert.equal(

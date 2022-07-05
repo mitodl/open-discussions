@@ -77,8 +77,13 @@ export class ChannelModerationPage extends React.Component<Props> {
   }
 
   renderReport = (report: ReportRecord) => {
-    const { isModerator, removePost, channel, channelName, ignorePostReports } =
-      this.props
+    const {
+      isModerator,
+      removePost,
+      channel,
+      channelName,
+      ignorePostReports
+    } = this.props
 
     if (report.post) {
       return (
@@ -111,8 +116,14 @@ export class ChannelModerationPage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, errored, loaded, notAuthorized, notFound, isModerator } =
-      this.props
+    const {
+      channel,
+      errored,
+      loaded,
+      notAuthorized,
+      notFound,
+      isModerator
+    } = this.props
 
     if (!channel) {
       return null

@@ -42,8 +42,12 @@ export class PasswordChangePage extends React.Component<Props> {
   }
 
   render() {
-    const { renderForm, successfullySubmitted, invalidPwError, match } =
-      this.props
+    const {
+      renderForm,
+      successfullySubmitted,
+      invalidPwError,
+      match
+    } = this.props
     return (
       <React.Fragment>
         <MetaTags>

@@ -104,7 +104,13 @@ describe("AddToListDialog", () => {
         })
       }
       const { wrapper } = await render(course)
-      assert.equal(wrapper.find(Checkbox).at(1).prop("checked"), inList)
+      assert.equal(
+        wrapper
+          .find(Checkbox)
+          .at(1)
+          .prop("checked"),
+        inList
+      )
     })
   })
 
@@ -130,14 +136,26 @@ describe("AddToListDialog", () => {
 
     const { wrapper } = await render(course)
     ;[1, 2, 3].forEach(idx => {
-      assert.equal(wrapper.find(Checkbox).at(idx).prop("checked"), true)
+      assert.equal(
+        wrapper
+          .find(Checkbox)
+          .at(idx)
+          .prop("checked"),
+        true
+      )
     })
     wrapper
       .find(Checkbox)
       .at(2)
       .find("input")
       .simulate("change", { target: { checked: false } })
-    assert.equal(wrapper.find(Checkbox).at(2).prop("checked"), false)
+    assert.equal(
+      wrapper
+        .find(Checkbox)
+        .at(2)
+        .prop("checked"),
+      false
+    )
   })
 
   it("should have a button for making a new list", async () => {

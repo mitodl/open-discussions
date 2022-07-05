@@ -48,7 +48,10 @@ describe("PeopleList", () => {
       assert.equal(wrapper.find(PeopleItem).length, profiles.length)
 
       profiles.forEach((profile, i) => {
-        const props = wrapper.find(PeopleItem).at(i).props()
+        const props = wrapper
+          .find(PeopleItem)
+          .at(i)
+          .props()
         assert.deepEqual(props.profile, profile)
         assert.equal(props.index, i)
         assert.equal(props.editing, editing)
@@ -74,7 +77,10 @@ describe("PeopleList", () => {
 
         if (!editing && showAllMembersLink) {
           assert.equal(wrapper.find("Link").length, profiles.length + 1)
-          const { to, children } = wrapper.find("Link").last().props()
+          const { to, children } = wrapper
+            .find("Link")
+            .last()
+            .props()
           assert.equal(children, "See all members")
           assert.equal(to, "Boop")
           sinon.assert.called(channelNameStub)

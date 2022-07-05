@@ -18,7 +18,10 @@ const getClassName = (className, borderless, persistentShadow) => {
     persistentShadow ? "persistent-shadow" : ""
   ]
 
-  return classes.join(" ").trim().replace(/\s+/g, " ")
+  return classes
+    .join(" ")
+    .trim()
+    .replace(/\s+/g, " ")
 }
 
 const Card = ({

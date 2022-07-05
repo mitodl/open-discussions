@@ -93,8 +93,9 @@ export default function LearningResourceDrawer(props: Props) {
 
   useResponsive()
 
-  const { objectId, objectType, runId, numHistoryEntries } =
-    useSelector(getLRHistory)
+  const { objectId, objectType, runId, numHistoryEntries } = useSelector(
+    getLRHistory
+  )
 
   const [, logInteraction] = useMutation(interactionMutation)
 
@@ -138,10 +139,9 @@ export default function LearningResourceDrawer(props: Props) {
     }
   }, [dispatch])
 
-  const pushHistory = useCallback(
-    object => dispatch(pushLRHistory(object)),
-    [dispatch]
-  )
+  const pushHistory = useCallback(object => dispatch(pushLRHistory(object)), [
+    dispatch
+  ])
   const popHistory = useCallback(() => dispatch(popLRHistory()), [dispatch])
 
   return (

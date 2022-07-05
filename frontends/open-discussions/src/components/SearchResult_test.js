@@ -40,11 +40,27 @@ describe("SearchResult", () => {
     assert.deepEqual(profileImage.prop("profile"), profile)
     assert.equal(profileImage.prop("imageSize"), PROFILE_IMAGE_SMALL)
     assert.equal(
-      wrapper.find(".name").at(0).prop("to"),
+      wrapper
+        .find(".name")
+        .at(0)
+        .prop("to"),
       profileURL(profile.username)
     )
-    assert.equal(wrapper.find(".name").at(0).children().text(), profile.name)
-    assert.equal(wrapper.find(".headline").children().text(), profile.headline)
+    assert.equal(
+      wrapper
+        .find(".name")
+        .at(0)
+        .children()
+        .text(),
+      profile.name
+    )
+    assert.equal(
+      wrapper
+        .find(".headline")
+        .children()
+        .text(),
+      profile.headline
+    )
   })
 
   it("renders a post", async () => {

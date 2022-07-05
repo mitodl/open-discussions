@@ -226,8 +226,11 @@ describe("withPostModeration", () => {
           mockStoreState.channels.loaded = channelsLoaded
           mockStoreState.reports.loaded = reportsLoaded
 
-          const { loaded, notAuthorized, notFound } =
-            getPostModerationSelector()
+          const {
+            loaded,
+            notAuthorized,
+            notFound
+          } = getPostModerationSelector()
           assert.equal(shouldBeLoaded, loaded)
           assert.equal(shouldBeNotFound, !!notFound)
           assert.equal(shouldBeNotAuthorized, !!notAuthorized)

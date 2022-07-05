@@ -32,8 +32,14 @@ describe("CourseSearchbox", () => {
 
   it("should have an input", () => {
     const input = renderSearchbox({ value: "value!" }).find("input")
-    const { type, className, name, placeholder, onChange, value } =
-      input.props()
+    const {
+      type,
+      className,
+      name,
+      placeholder,
+      onChange,
+      value
+    } = input.props()
     assert.equal(type, "text")
     assert.equal(className, "search-input")
     assert.equal(name, "query")
@@ -43,14 +49,18 @@ describe("CourseSearchbox", () => {
   })
 
   it("should have an onKeyDown handler on the input", () => {
-    renderSearchbox().find("input").prop("onKeyDown")({
-      key: "Enter"
-    })
+    renderSearchbox()
+      .find("input")
+      .prop("onKeyDown")({
+        key: "Enter"
+      })
     sinon.assert.called(onSubmitStub)
   })
 
   it("should have a little icon", () => {
-    renderSearchbox().find(".search-icon").simulate("click")
+    renderSearchbox()
+      .find(".search-icon")
+      .simulate("click")
     sinon.assert.called(onSubmitStub)
   })
 

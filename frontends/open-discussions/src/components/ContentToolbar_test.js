@@ -33,15 +33,31 @@ describe("ContentToolbar", () => {
   })
 
   it("should include UserMenu", () => {
-    assert.isTrue(renderToolbar().find("UserMenu").exists())
+    assert.isTrue(
+      renderToolbar()
+        .find("UserMenu")
+        .exists()
+    )
   })
 
   it("should include a link to courses", () => {
-    assert.equal(renderToolbar().find("Link").at(1).prop("to"), COURSE_URL)
+    assert.equal(
+      renderToolbar()
+        .find("Link")
+        .at(1)
+        .prop("to"),
+      COURSE_URL
+    )
   })
 
   it("should include a link to podcasts", () => {
-    assert.equal(renderToolbar().find("Link").at(2).prop("to"), PODCAST_URL)
+    assert.equal(
+      renderToolbar()
+        .find("Link")
+        .at(2)
+        .prop("to"),
+      PODCAST_URL
+    )
   })
 
   //
@@ -61,6 +77,10 @@ describe("ContentToolbar", () => {
 
   it("should hide the my lists link when you're anonymous", () => {
     sandbox.stub(util, "userIsAnonymous").returns(true)
-    assert.isNotOk(renderToolbar().find(".user-list-link").exists())
+    assert.isNotOk(
+      renderToolbar()
+        .find(".user-list-link")
+        .exists()
+    )
   })
 })

@@ -55,7 +55,10 @@ describe("EditChannelAppearanceForm", () => {
     history.listen(newUrl => {
       currentUrl = newUrl
     })
-    wrapper.find(".cancel").props().onClick()
+    wrapper
+      .find(".cancel")
+      .props()
+      .onClick()
     assert.equal(currentUrl.pathname, channelURL(channel.name))
   })
 

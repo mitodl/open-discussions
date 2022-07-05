@@ -76,35 +76,59 @@ describe("ProfileForm", () => {
   it("displays the name, headline and bio", () => {
     const wrapper = renderForm()
     assert.equal(
-      wrapper.find(".profile-name").find(".name").props().value,
+      wrapper
+        .find(".profile-name")
+        .find(".name")
+        .props().value,
       profile.name
     )
     assert.equal(
-      wrapper.find(".profile-name").find(".name").props().placeholder,
+      wrapper
+        .find(".profile-name")
+        .find(".name")
+        .props().placeholder,
       "Full name"
     )
     assert.equal(
-      wrapper.find(".bio").find("textarea").props().value,
+      wrapper
+        .find(".bio")
+        .find("textarea")
+        .props().value,
       profile.bio
     )
     assert.equal(
-      wrapper.find(".bio").find("textarea").props().placeholder,
+      wrapper
+        .find(".bio")
+        .find("textarea")
+        .props().placeholder,
       "Description"
     )
     assert.equal(
-      wrapper.find(".bio").find("label").text(),
+      wrapper
+        .find(".bio")
+        .find("label")
+        .text(),
       "Add a short description about yourself, max 1000 characters"
     )
     assert.equal(
-      wrapper.find(".headline").find("input").props().value,
+      wrapper
+        .find(".headline")
+        .find("input")
+        .props().value,
       profile.headline
     )
     assert.equal(
-      wrapper.find(".headline").find("input").props().placeholder,
+      wrapper
+        .find(".headline")
+        .find("input")
+        .props().placeholder,
       "Headline"
     )
     assert.equal(
-      wrapper.find(".headline").find("label").text(),
+      wrapper
+        .find(".headline")
+        .find("label")
+        .text(),
       "For example: 'Post Doc, Photonics MIT', max 60 characters"
     )
   })
@@ -130,13 +154,19 @@ describe("ProfileForm", () => {
         value: "Test User"
       }
     }
-    wrapper.find("input").at(0).simulate("change", event)
+    wrapper
+      .find("input")
+      .at(0)
+      .simulate("change", event)
     assert.ok(onUpdateStub.called)
   })
 
   it("calls onSubmit", () => {
     const wrapper = renderForm({ processing: false })
-    wrapper.find(".save-profile").at(0).simulate("click")
+    wrapper
+      .find(".save-profile")
+      .at(0)
+      .simulate("click")
     assert.ok(onSubmitStub.called)
   })
 
@@ -220,7 +250,10 @@ describe("ProfileForm", () => {
             url: "example.com"
           }
         })
-        wrapper.find(`${sectionSel} button`).at(0).simulate("click")
+        wrapper
+          .find(`${sectionSel} button`)
+          .at(0)
+          .simulate("click")
         assert.isTrue(submitStub.called)
       })
     })
@@ -231,11 +264,17 @@ describe("ProfileForm", () => {
       getPersonalSiteStub.returns(personalSite)
 
       wrapper = renderForm()
-      wrapper.find(".social-site-links button.remove").at(0).simulate("click")
+      wrapper
+        .find(".social-site-links button.remove")
+        .at(0)
+        .simulate("click")
       assert.isTrue(onDeleteSiteStub.calledWith(socialSites[0].id))
 
       wrapper = renderForm()
-      wrapper.find(".personal-site-link button.remove").at(0).simulate("click")
+      wrapper
+        .find(".personal-site-link button.remove")
+        .at(0)
+        .simulate("click")
       assert.isTrue(onDeleteSiteStub.calledWith(personalSite.id))
     })
   })

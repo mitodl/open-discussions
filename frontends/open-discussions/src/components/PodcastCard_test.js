@@ -27,11 +27,17 @@ describe("PodcastCard", () => {
   it("should render basic stuff", async () => {
     const { wrapper } = await render()
     assert.equal(
-      wrapper.find("Dotdotdot").at(0).props().children,
+      wrapper
+        .find("Dotdotdot")
+        .at(0)
+        .props().children,
       podcast.title
     )
     assert.equal(
-      wrapper.find("Dotdotdot").at(1).props().children,
+      wrapper
+        .find("Dotdotdot")
+        .at(1)
+        .props().children,
       podcast.offered_by
     )
     assert.equal(

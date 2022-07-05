@@ -23,20 +23,20 @@ const redirectAndReject = async () => {
   return Promise.reject("You were logged out, please login again")
 }
 
-export const withAuthFailure =
-  (fetchFunc: Function) =>
-    async (...args: any) => {
-      try {
-        return await fetchFunc(...args)
-      } catch (fetchError) {
-        if (!fetchError || !isNotAuthenticatedErrorType(fetchError)) {
-        // not an authentication failure, rethrow
-          throw fetchError
-        }
-
-        return redirectAndReject()
-      }
+export const withAuthFailure = (fetchFunc: Function) => async (
+  ...args: any
+) => {
+  try {
+    return await fetchFunc(...args)
+  } catch (fetchError) {
+    if (!fetchError || !isNotAuthenticatedErrorType(fetchError)) {
+      // not an authentication failure, rethrow
+      throw fetchError
     }
+
+    return redirectAndReject()
+  }
+}
 
 export const fetchJSONWithAuthFailure = withAuthFailure((...args) =>
   fetchJSONWithCSRF(...args)

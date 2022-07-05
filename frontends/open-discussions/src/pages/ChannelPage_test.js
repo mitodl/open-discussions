@@ -178,9 +178,12 @@ describe("ChannelPage", function() {
     it("should switch the sorting method when an option is selected", async () => {
       const { inner } = await render()
       for (const sortType of VALID_POST_SORT_TYPES) {
-        inner.find("PostSortPicker").props().updatePickerParam(sortType, {
-          preventDefault: helper.sandbox.stub()
-        })
+        inner
+          .find("PostSortPicker")
+          .props()
+          .updatePickerParam(sortType, {
+            preventDefault: helper.sandbox.stub()
+          })
 
         assert.equal(helper.currentLocation.search, `?sort=${sortType}`)
       }

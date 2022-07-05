@@ -19,53 +19,52 @@ type Props = {
   toggleExpanded: () => void
 }
 
-const SortableWidgetInstance: StatelessFunctionalComponent<Props> =
-  SortableElement(
-    ({
-      expanded,
-      widgetInstance,
-      editing,
-      deleteInstance,
-      toggleExpanded,
-      startEditInstance
-    }: Props) => {
-      const WidgetClass = validWidgetRenderers[widgetInstance.widget_type]
-      return (
-        <Card className="widget">
-          <div className="title-row">
-            <span className="title">{widgetInstance.title}</span>
-            {editing ? (
-              <span
-                className="toggle-collapse material-icons"
-                onClick={toggleExpanded}
-              >
-                {expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
-              </span>
-            ) : null}
-          </div>
-          {expanded ? <WidgetClass widgetInstance={widgetInstance} /> : null}
+const SortableWidgetInstance: StatelessFunctionalComponent<Props> = SortableElement(
+  ({
+    expanded,
+    widgetInstance,
+    editing,
+    deleteInstance,
+    toggleExpanded,
+    startEditInstance
+  }: Props) => {
+    const WidgetClass = validWidgetRenderers[widgetInstance.widget_type]
+    return (
+      <Card className="widget">
+        <div className="title-row">
+          <span className="title">{widgetInstance.title}</span>
           {editing ? (
-            <React.Fragment>
-              <hr />
-              <div className="edit-buttons">
-                <i
-                  className="material-icons edit widget-button"
-                  onClick={() => startEditInstance(widgetInstance)}
-                >
-                  edit
-                </i>
-                <i
-                  className="material-icons delete widget-button"
-                  onClick={() => deleteInstance(widgetInstance)}
-                >
-                  delete
-                </i>
-                <DragHandle />
-              </div>
-            </React.Fragment>
+            <span
+              className="toggle-collapse material-icons"
+              onClick={toggleExpanded}
+            >
+              {expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            </span>
           ) : null}
-        </Card>
-      )
-    }
-  )
+        </div>
+        {expanded ? <WidgetClass widgetInstance={widgetInstance} /> : null}
+        {editing ? (
+          <React.Fragment>
+            <hr />
+            <div className="edit-buttons">
+              <i
+                className="material-icons edit widget-button"
+                onClick={() => startEditInstance(widgetInstance)}
+              >
+                edit
+              </i>
+              <i
+                className="material-icons delete widget-button"
+                onClick={() => deleteInstance(widgetInstance)}
+              >
+                delete
+              </i>
+              <DragHandle />
+            </div>
+          </React.Fragment>
+        ) : null}
+      </Card>
+    )
+  }
+)
 export default SortableWidgetInstance

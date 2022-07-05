@@ -118,6 +118,10 @@ describe("CommentForm", () => {
   })
 
   it("should not render cancel button, if not passed closeReply", () => {
-    assert.isNotOk(renderCommentForm().find(".cancel").exists())
+    assert.isNotOk(
+      renderCommentForm()
+        .find(".cancel")
+        .exists()
+    )
   })
 })

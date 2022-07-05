@@ -23,7 +23,10 @@ describe("RssWidget", () => {
       assert.equal(entryWrapper.find(".entry-title a").prop("href"), entry.link)
       assert.equal(entryWrapper.find(".entry-title").text(), entry.title)
       assert.equal(
-        entryWrapper.find(".description").childAt(0).text(),
+        entryWrapper
+          .find(".description")
+          .childAt(0)
+          .text(),
         entry.description
       )
     })

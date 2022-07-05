@@ -95,8 +95,9 @@ class SettingsPage extends React.Component<Props> {
         trigger_frequency: setting.trigger_frequency
       }
 
-      formValues[MODERATOR_NOTIFICATION][setting.channel_name] =
-        moderatorSettingForChannel
+      formValues[MODERATOR_NOTIFICATION][
+        setting.channel_name
+      ] = moderatorSettingForChannel
     }
 
     dispatch(

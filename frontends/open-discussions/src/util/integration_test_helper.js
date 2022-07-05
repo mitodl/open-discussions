@@ -82,8 +82,7 @@ export default class IntegrationTestHelper {
       .stub(_, "debounce")
       .callsFake((func: Function) => () => func())
     window.HTMLDivElement.prototype.scrollIntoView = this.scrollIntoViewStub
-    window.HTMLFieldSetElement.prototype.scrollIntoView =
-      this.scrollIntoViewStub
+    window.HTMLFieldSetElement.prototype.scrollIntoView = this.scrollIntoViewStub
     window.HTMLDivElement.prototype.scroll = this.scrollStub
     this.browserHistory = createMemoryHistory()
     this.currentLocation = null

@@ -53,7 +53,10 @@ describe("RegisterConfirmPage", () => {
     )
 
     assert.include(
-      inner.find("p").at(0).text(),
+      inner
+        .find("p")
+        .at(0)
+        .text(),
       "No confirmation code was provided or it has expired"
     )
     assert.equal(inner.find("Link").props().to, REGISTER_URL)

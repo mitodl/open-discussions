@@ -44,7 +44,13 @@ describe("TruncatedText", () => {
     assert.isTrue(dotdotdot.exists())
     assert.equal(dotdotdot.prop("clamp"), props.lines)
     assert.equal(dotdotdot.prop("className"), props.className)
-    assert.equal(dotdotdot.children().children().html(), "normal<br>text")
+    assert.equal(
+      dotdotdot
+        .children()
+        .children()
+        .html(),
+      "normal<br>text"
+    )
   })
 
   it("limits text that is passed into Dotdotdot if necessary", () => {

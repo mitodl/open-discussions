@@ -66,21 +66,22 @@ export const formLensSetter = (key: string, msg: string) =>
 // POST CREATE VALIDATION
 
 // run a validator only if the post create form has a specific post type
-const validateIfPostType =
-  (postType: PostFormType, validator: Function) =>
-    (postForm: { value: PostForm }) => {
-      if (R.isEmpty(postForm)) {
-        return S.Nothing
-      }
+const validateIfPostType = (
+  postType: PostFormType,
+  validator: Function
+) => (postForm: { value: PostForm }) => {
+  if (R.isEmpty(postForm)) {
+    return S.Nothing
+  }
 
-      const formPostType = postForm.value.postType || postForm.value.post_type
+  const formPostType = postForm.value.postType || postForm.value.post_type
 
-      if (formPostType !== postType) {
-        return S.Nothing
-      } else {
-        return validator(postForm)
-      }
-    }
+  if (formPostType !== postType) {
+    return S.Nothing
+  } else {
+    return validator(postForm)
+  }
+}
 
 export const postURLValidation = validateIfPostType(
   LINK_TYPE_LINK,

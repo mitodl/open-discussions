@@ -62,7 +62,10 @@ describe("PasswordResetConfirmPage", () => {
 
     assert.isFalse(inner.find("PasswordResetConfirmForm").exists())
     assert.include(
-      inner.find("h3").at(0).text(),
+      inner
+        .find("h3")
+        .at(0)
+        .text(),
       "Your password has been reset"
     )
   })

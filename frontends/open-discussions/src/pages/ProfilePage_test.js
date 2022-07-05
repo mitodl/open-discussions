@@ -50,20 +50,36 @@ describe("ProfilePage", function() {
   it("should display profile name, bio, and headline", async () => {
     const wrapper = await renderPage()
     assert.deepEqual(
-      wrapper.find(".name-headline-location .name").at(0).text(),
+      wrapper
+        .find(".name-headline-location .name")
+        .at(0)
+        .text(),
       profile.name
     )
     assert.deepEqual(
-      wrapper.find(".name-headline-location .headline").at(0).text(),
+      wrapper
+        .find(".name-headline-location .headline")
+        .at(0)
+        .text(),
       profile.headline
     )
-    assert.deepEqual(wrapper.find(".row.bio").at(0).text(), profile.bio)
+    assert.deepEqual(
+      wrapper
+        .find(".row.bio")
+        .at(0)
+        .text(),
+      profile.bio
+    )
   })
 
   it("should include a ProfileImage equal to profile.profile_image_medium", async () => {
     const wrapper = await renderPage()
     assert.equal(
-      wrapper.find(ProfileImage).find("img").at(1).props().src,
+      wrapper
+        .find(ProfileImage)
+        .find("img")
+        .at(1)
+        .props().src,
       profile.profile_image_medium
     )
   })
@@ -90,7 +106,12 @@ describe("ProfilePage", function() {
     } for the logged in user`, async () => {
       SETTINGS.username = sameUser ? profile.username : "other_user"
       const wrapper = await renderPage()
-      assert.isNotOk(wrapper.find("ProfileImage").at(1).props().editable)
+      assert.isNotOk(
+        wrapper
+          .find("ProfileImage")
+          .at(1)
+          .props().editable
+      )
     })
   })
 })

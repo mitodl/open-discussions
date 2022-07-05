@@ -52,8 +52,14 @@ export class LoginPasswordPage extends React.Component<Props> {
   }
 
   render() {
-    const { renderForm, email, name, profileImageUrl, history, match } =
-      this.props
+    const {
+      renderForm,
+      email,
+      name,
+      profileImageUrl,
+      history,
+      match
+    } = this.props
 
     const onBackButtonClick = preventDefaultAndInvoke(
       R.partial(goToFirstLoginStep, [history])

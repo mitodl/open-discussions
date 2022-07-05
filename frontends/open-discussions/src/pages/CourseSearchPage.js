@@ -133,8 +133,15 @@ type Props = {
 export default function CourseSearchPage(props: Props) {
   const { match } = props
 
-  const { results, facets, suggest, total, loaded, processing, error } =
-    useSelector(courseSearchSelector)
+  const {
+    results,
+    facets,
+    suggest,
+    total,
+    loaded,
+    processing,
+    error
+  } = useSelector(courseSearchSelector)
 
   const [searchResultLayout, setSearchResultLayout] = useState(SEARCH_LIST_UI)
 

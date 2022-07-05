@@ -53,6 +53,7 @@ export const PeopleItem: StatelessFunctionalComponent<Props> = ({
   </div>
 )
 
-const SortablePeopleItem: StatelessFunctionalComponent<Props> =
-  SortableElement(PeopleItem)
+const SortablePeopleItem: StatelessFunctionalComponent<Props> = SortableElement(
+  PeopleItem
+)
 export default SortablePeopleItem

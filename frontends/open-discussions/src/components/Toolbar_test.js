@@ -32,14 +32,21 @@ describe("Toolbar", () => {
   })
 
   it("should pass toggleShowDrawer to menu component", () => {
-    renderToolbar().find("HamburgerAndLogo").props().onHamburgerClick({
-      preventDefault: sandbox.stub()
-    })
+    renderToolbar()
+      .find("HamburgerAndLogo")
+      .props()
+      .onHamburgerClick({
+        preventDefault: sandbox.stub()
+      })
     assert.ok(toggleShowDrawerStub.called)
   })
 
   it("should include UserMenu", () => {
-    assert.isTrue(renderToolbar().find("UserMenu").exists())
+    assert.isTrue(
+      renderToolbar()
+        .find("UserMenu")
+        .exists()
+    )
   })
 
   it("has a search icon", () => {

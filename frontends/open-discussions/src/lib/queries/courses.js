@@ -62,12 +62,16 @@ export const courseListRequestFactory = (
 ]
 
 const featuredCoursesKey = "featuredCourses"
-export const [featuredCoursesRequest, featuredCoursesSelector] =
-  courseListRequestFactory(featuredCoursesURL, featuredCoursesKey)
+export const [
+  featuredCoursesRequest,
+  featuredCoursesSelector
+] = courseListRequestFactory(featuredCoursesURL, featuredCoursesKey)
 
 const upcomingCoursesKey = "upcomingCourses"
-export const [upcomingCoursesRequest, upcomingCoursesSelector] =
-  courseListRequestFactory(upcomingCoursesURL, upcomingCoursesKey)
+export const [
+  upcomingCoursesRequest,
+  upcomingCoursesSelector
+] = courseListRequestFactory(upcomingCoursesURL, upcomingCoursesKey)
 
 const newCoursesKey = "newCourses"
 export const [newCoursesRequest, newCoursesSelector] = courseListRequestFactory(

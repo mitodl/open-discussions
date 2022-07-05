@@ -72,9 +72,10 @@ export const makeCommentsResponse = (
 
   topLevelComments.forEach((comment, index) => {
     if (casual.coin_flip || index === 0) {
-      for (const midComment of arrayN(minComments, maxMidLevelComments).map(
-        () => makeComment(post, comment.id)
-      )) {
+      for (const midComment of arrayN(
+        minComments,
+        maxMidLevelComments
+      ).map(() => makeComment(post, comment.id))) {
         comments.push(midComment)
 
         if (casual.coin_flip || index === 0) {

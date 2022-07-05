@@ -66,8 +66,14 @@ type Props = {|
 |}
 
 function ChannelMembersPage(props: Props) {
-  const { runSearch, results, total, searchLoaded, channelName, clearSearch } =
-    props
+  const {
+    runSearch,
+    results,
+    total,
+    searchLoaded,
+    channelName,
+    clearSearch
+  } = props
 
   const [from, setFrom] = useState(0)
   const [sortField, setSortField] = useState(MEMBERS_SORT_AUTHOR_NAME)

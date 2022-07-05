@@ -58,7 +58,10 @@ describe("SubscriptionsList", function() {
     assert.lengthOf(currentLocation, 1)
     assert.equal(currentLocation.props().className, "location current-location")
     assert.equal(
-      currentLocation.find(".channel-link").at(0).props().to,
+      currentLocation
+        .find(".channel-link")
+        .at(0)
+        .props().to,
       channelURL(channels[0].name)
     )
   })

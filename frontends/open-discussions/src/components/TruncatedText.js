@@ -21,8 +21,13 @@ const RenderedNewlines = React.memo(({ text }) =>
 )
 
 export default function TruncatedText(props: Props) {
-  const { text, lines, estCharsPerLine, className, showExpansionControls } =
-    props
+  const {
+    text,
+    lines,
+    estCharsPerLine,
+    className,
+    showExpansionControls
+  } = props
   const [expanded, setExpanded] = useState(false)
   const [hasOverflow, setHasOverflow] = useState(false)
   const [, forceReRender] = useState(0)

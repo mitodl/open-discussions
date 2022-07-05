@@ -117,8 +117,13 @@ export class EditChannelAppearancePage extends React.Component<Props> {
   }
 
   render() {
-    const { channel, channelForm, processing, history, updateChannelForm } =
-      this.props
+    const {
+      channel,
+      channelForm,
+      processing,
+      history,
+      updateChannelForm
+    } = this.props
 
     if (!channel) {
       return null

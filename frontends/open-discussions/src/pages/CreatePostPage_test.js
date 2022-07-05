@@ -54,7 +54,10 @@ describe("CreatePostPage", () => {
       .simulate("change", makeEvent("title", title))
 
   const setText = (wrapper, text) => {
-    wrapper.find("Editor").props().onChange(text)
+    wrapper
+      .find("Editor")
+      .props()
+      .onChange(text)
   }
 
   const setUrl = (wrapper, url) =>
@@ -316,7 +319,10 @@ describe("CreatePostPage", () => {
   it("should let us set a validation error for invalid cover image", async () => {
     const wrapper = await renderPage("/create_post/")
     const state = await listenForActions([actions.forms.FORM_VALIDATE], () => {
-      wrapper.find("CreatePostPage").instance().setPhotoError("my error")
+      wrapper
+        .find("CreatePostPage")
+        .instance()
+        .setPhotoError("my error")
     })
     const { errors } = state.forms[CREATE_POST_KEY]
     assert.equal(errors.coverImage, "my error")
@@ -353,7 +359,10 @@ describe("CreatePostPage", () => {
       helper.currentLocation.pathname,
       newPostURL(currentChannel.name)
     )
-    wrapper.find(".new-post-form .cancel").at(0).simulate("click")
+    wrapper
+      .find(".new-post-form .cancel")
+      .at(0)
+      .simulate("click")
     assert.equal(helper.currentLocation.pathname, "/")
   })
 
@@ -459,7 +468,10 @@ describe("CreatePostPage", () => {
 
   it("should show the dialog when the right action is dispatched", async () => {
     const wrapper = await renderPage("/create_post")
-    wrapper.find("CreatePostPage").instance().openClearPostTypeDialog()
+    wrapper
+      .find("CreatePostPage")
+      .instance()
+      .openClearPostTypeDialog()
     wrapper.update()
     const dialog = wrapper.find(Dialog)
     assert.isTrue(dialog.props().open)
