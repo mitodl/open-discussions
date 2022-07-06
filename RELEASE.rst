@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.189.0
+---------------
+
+- fix some formatting in the readme (#3604)
+- Begin sharing (some) frontend code + styling between open-discussions and infinite-corridor (#3601)
+
 Version 0.188.1 (Released June 29, 2022)
 ---------------
 
