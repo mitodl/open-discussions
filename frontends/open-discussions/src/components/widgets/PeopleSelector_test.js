@@ -90,9 +90,7 @@ describe("PeopleSelector", () => {
         [propKey]: propValue
       })
       assert.deepEqual(
-        shallow(component)
-          .find("input")
-          .prop(propKey),
+        shallow(component).find("input").prop(propKey),
         propValue
       )
     })

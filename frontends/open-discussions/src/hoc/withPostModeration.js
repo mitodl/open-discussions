@@ -75,12 +75,8 @@ export const withPostModeration = (
     }
 
     removePost = async (event: Event) => {
-      const {
-        dispatch,
-        focusedPost,
-        channelName,
-        shouldGetReports
-      } = this.props
+      const { dispatch, focusedPost, channelName, shouldGetReports } =
+        this.props
 
       event.preventDefault()
       await removePost(dispatch, focusedPost)
@@ -112,12 +108,8 @@ export const withPostModeration = (
 
     deletePost = async (event: Event) => {
       // ⚠️  this is a destructive action! ⚠️
-      const {
-        dispatch,
-        shouldGetReports,
-        focusedPost,
-        channelName
-      } = this.props
+      const { dispatch, shouldGetReports, focusedPost, channelName } =
+        this.props
 
       event.preventDefault()
       await dispatch(actions.posts["delete"](focusedPost.id))

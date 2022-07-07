@@ -68,7 +68,7 @@ describe("CanonicalLink", () => {
 
   it.each([{}, { relativeUrl: "" }, { relativeUrl: undefined }])(
     "renders nothing when neither a relative URL or a Match object are provided",
-    props => {
+    (props) => {
       const { container } = render(<CanonicalLink {...props} />)
       expect(container.getElementsByTagName("link").length).toBe(0)
     }

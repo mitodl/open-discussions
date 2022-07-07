@@ -166,10 +166,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     const { wrapper } = await render({}, { object })
 
     assert.equal(
-      wrapper
-        .find(".podcast-subtitle")
-        .at(0)
-        .text(),
+      wrapper.find(".podcast-subtitle").at(0).text(),
       object.podcast_title
     )
   })
@@ -323,10 +320,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         ? 1
         : 0
       assert.isNotOk(
-        wrapper
-          .find(".expanded-learning-resource-list")
-          .at(listIdx)
-          .exists()
+        wrapper.find(".expanded-learning-resource-list").at(listIdx).exists()
       )
     })
 
@@ -374,11 +368,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const selectOptions = wrapper.find("option")
       assert.equal(selectOptions.length, course.runs.length)
       assert.equal(selectOptions.at(0).text(), expectedValue)
-      const dateLabel = wrapper
-        .find(".form")
-        .at(0)
-        .find(".info-label")
-        .text()
+      const dateLabel = wrapper.find(".form").at(0).find(".info-label").text()
       assert.equal(dateLabel, expectedLabel)
     })
   })
@@ -472,11 +462,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       // $FlowFixMe: course run won't be null here
       const { wrapper } = await render({}, { runId: bestRun(course.runs).id })
       assert.equal(
-        wrapper
-          .find(".language")
-          .closest(".info-row")
-          .find(".value")
-          .text(),
+        wrapper.find(".language").closest(".info-row").find(".value").text(),
         langName
       )
     })
@@ -545,11 +531,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         }
       )
       assert.equal(
-        wrapper
-          .find(".local_offer")
-          .closest(".info-row")
-          .find(".value")
-          .text(),
+        wrapper.find(".local_offer").closest(".info-row").find(".value").text(),
         object.author_name
       )
     })
@@ -563,11 +545,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         }
       )
       assert.equal(
-        wrapper
-          .find(".lock")
-          .closest(".info-row")
-          .find(".value")
-          .text(),
+        wrapper.find(".lock").closest(".info-row").find(".value").text(),
         capitalize(object.privacy_level)
       )
     })
@@ -581,11 +559,7 @@ describe("ExpandedLearningResourceDisplay", () => {
         }
       )
       assert.equal(
-        wrapper
-          .find(".view_list")
-          .closest(".info-row")
-          .find(".value")
-          .text(),
+        wrapper.find(".view_list").closest(".info-row").find(".value").text(),
         object.item_count
       )
     })
@@ -681,24 +655,10 @@ describe("ExpandedLearningResourceDisplay", () => {
   it(`should still display without errors in case of a bad course with no runs`, async () => {
     course.runs = []
     const { wrapper } = await render()
-    assert.isNotOk(
-      wrapper
-        .find(".bar_chart")
-        .at(0)
-        .exists()
-    )
-    assert.isNotOk(
-      wrapper
-        .find(".school")
-        .at(1)
-        .exists()
-    )
+    assert.isNotOk(wrapper.find(".bar_chart").at(0).exists())
+    assert.isNotOk(wrapper.find(".school").at(1).exists())
     assert.equal(
-      wrapper
-        .find(".language")
-        .closest(".info-row")
-        .find(".value")
-        .text(),
+      wrapper.find(".language").closest(".info-row").find(".value").text(),
       "English"
     )
   })
@@ -717,13 +677,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const { wrapper } = await render({}, { object })
       assert.equal(wrapper.find("Embedly").exists(), hasEmbedly)
       if (hasEmbedly) {
-        assert.equal(
-          wrapper
-            .find("Embedly")
-            .at(0)
-            .prop("embedly"),
-          embedly
-        )
+        assert.equal(wrapper.find("Embedly").at(0).prop("embedly"), embedly)
       }
     })
   })

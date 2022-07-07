@@ -90,18 +90,9 @@ describe("SearchPage", () => {
       upvotedPost
     )
     searchResponse.hits.hits.forEach((result, i) => {
+      assert.deepEqual(inner.find("SearchResult").at(i).prop("result"), result)
       assert.deepEqual(
-        inner
-          .find("SearchResult")
-          .at(i)
-          .prop("result"),
-        result
-      )
-      assert.deepEqual(
-        inner
-          .find("SearchResult")
-          .at(i)
-          .prop("upvotedPost"),
+        inner.find("SearchResult").at(i).prop("upvotedPost"),
         result.post_id === upvotedPost.id ? upvotedPost : null
       )
     })
@@ -399,11 +390,7 @@ describe("SearchPage", () => {
     const { inner } = await renderPage()
     const comments = [makeComment(makePost()), makeComment(makePost())]
     helper.updateCommentStub.returns(Promise.resolve(comments[0]))
-    await inner
-      .find("SearchResult")
-      .at(0)
-      .props()
-      .commentUpvote(comments[0])
+    await inner.find("SearchResult").at(0).props().commentUpvote(comments[0])
     assert.deepEqual(
       inner.state().votedComments.get(comments[0].id),
       comments[0]
