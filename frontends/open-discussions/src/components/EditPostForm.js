@@ -58,8 +58,8 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-const cancelReply = R.curry((dispatch, formKey) => () =>
-  dispatch(actions.forms.formEndEdit({ formKey }))
+const cancelReply = R.curry(
+  (dispatch, formKey) => () => dispatch(actions.forms.formEndEdit({ formKey }))
 )
 
 export const beginEditing = R.curry((dispatch, formKey, initialValue, e) => {
@@ -126,13 +126,8 @@ const EditPostForm: Class<React$Component<*, *>> = connect(
     }
 
     onSubmit = async e => {
-      const {
-        formKey,
-        forms,
-        patchPost,
-        post,
-        setValidationErrors
-      } = this.props
+      const { formKey, forms, patchPost, post, setValidationErrors } =
+        this.props
       e.preventDefault()
       const form = R.prop(formKey, forms)
       // eslint-disable-next-line camelcase

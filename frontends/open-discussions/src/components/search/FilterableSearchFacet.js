@@ -25,14 +25,8 @@ const runSearch = (searcher, text) =>
   searcher.search(text).map(({ item }) => item)
 
 function FilterableSearchFacet(props: Props) {
-  const {
-    name,
-    title,
-    results,
-    currentlySelected,
-    labelFunction,
-    onUpdate
-  } = props
+  const { name, title, results, currentlySelected, labelFunction, onUpdate } =
+    props
   const [showFacetList, setShowFacetList] = useState(true)
 
   // null is signal for no input yet or cleared input

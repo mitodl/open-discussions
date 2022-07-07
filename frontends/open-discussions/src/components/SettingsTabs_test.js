@@ -25,12 +25,6 @@ describe("SettingsTabs", function() {
   it("should set a default active tab with an unhandled url", () => {
     const mockLocation = generateLocation("/unhandled/url")
     const wrapper = shallow(<SettingsTabs location={mockLocation} />)
-    assert.include(
-      wrapper
-        .find("NavLink")
-        .at(0)
-        .prop("className"),
-      "active"
-    )
+    assert.include(wrapper.find("NavLink").at(0).prop("className"), "active")
   })
 })

@@ -18,21 +18,21 @@ type ImgProps = {
 
 const imageHeight = css<ImgProps>`
   @media (max-width: ${PHONE_WIDTH}px) {
-    height: ${props =>
+    height: ${(props) =>
       props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
   }
   @media (min-width: ${PHONE_WIDTH + 1}px) {
-    height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
+    height: ${(props) => (props.tall ? tallBannerHeight : bannerHeight)};
   }
 `
 
 const imageWrapperHeight = css<ImgProps>`
   @media (max-width: ${PHONE_WIDTH}px) {
-    min-height: ${props =>
+    min-height: ${(props) =>
       props.compactOnMobile ? shortMobileBannerHeight : bannerHeight};
   }
   @media (min-width: ${PHONE_WIDTH + 1}px) {
-    min-height: ${props => (props.tall ? tallBannerHeight : bannerHeight)};
+    min-height: ${(props) => (props.tall ? tallBannerHeight : bannerHeight)};
   }
 `
 
@@ -98,5 +98,5 @@ export {
   BannerPageWrapper,
   BannerPageHeader,
   Gradient,
-  BannerContainer
+  BannerContainer,
 }

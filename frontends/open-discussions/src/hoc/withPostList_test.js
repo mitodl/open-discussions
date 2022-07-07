@@ -193,10 +193,7 @@ describe("withPostList", () => {
         )
         const post = postList[0]
 
-        await inner
-          .find("PostList")
-          .props()
-          .togglePinPost(post)
+        await inner.find("PostList").props().togglePinPost(post)
         assert.equal(helper.editPostStub.callCount, 1)
         sinon.assert.calledWith(helper.editPostStub, post.id, {
           stickied: !post.stickied
