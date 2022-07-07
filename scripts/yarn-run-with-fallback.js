@@ -43,7 +43,11 @@ const run = () => {
   }
   const command = `yarn run ${getScriptName()}`;
   console.log(`Running "${command}" in ${process.cwd()}.`)
-  execSh(command)
+  execSh(command, err => {
+    if (err) {
+      process.exit(err.code)
+    }
+  })
 }
 
 run()
