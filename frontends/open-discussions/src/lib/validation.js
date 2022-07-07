@@ -1,6 +1,5 @@
 // @flow
 /* global SETTINGS:false */
-import { ValidationError } from "ol-forms"
 import React from "react"
 import R from "ramda"
 import isURL from "validator/lib/isURL"

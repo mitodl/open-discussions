@@ -5,7 +5,7 @@ import useResponsive from "../hooks/useResponsive"
 const isMobileGridWidth = () => window.innerWidth < GRID_MOBILE_BREAKPOINT
 
 type GridProps = {
-  children: React.ReactNode,
+  children: React.ReactNode
   className?: string
 }
 
@@ -24,7 +24,7 @@ const Grid = ({ children, className }: GridProps) => (
 export type CellWidth = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 13
 
 type CellProps = {
-  children?: React.ReactNode,
+  children?: React.ReactNode
   width: CellWidth
   mobileWidth?: CellWidth
   className?: string
