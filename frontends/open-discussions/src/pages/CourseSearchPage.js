@@ -9,9 +9,10 @@ import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
 import { CanonicalLink } from "ol-util"
+import { Searchbox } from "ol-search-ui"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
-import CourseSearchbox from "../components/CourseSearchbox"
+
 import SearchResult from "../components/SearchResult"
 import {
   BannerPageWrapper,
@@ -229,7 +230,7 @@ export default function CourseSearchPage(props: Props) {
         <BannerContainer tall compactOnMobile>
           <BannerImage src={COURSE_SEARCH_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
-        <CourseSearchbox
+        <Searchbox
           onChange={updateText}
           value={text || ""}
           onClear={clearText}
