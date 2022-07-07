@@ -112,22 +112,14 @@ describe("LearningResourceCard", () => {
   it("should render a single topic", async () => {
     course.topics = [course.topics[0]]
     const { wrapper } = await render()
-    const { label } = wrapper
-      .find("Subtitle")
-      .at(1)
-      .props()
+    const { label } = wrapper.find("Subtitle").at(1).props()
     assert.equal(label, "Subject - ")
   })
 
   it("should not render topics if they aren't present", async () => {
     course.topics = []
     const { wrapper } = await render()
-    assert.notOk(
-      wrapper
-        .find("Subtitle")
-        .at(1)
-        .exists()
-    )
+    assert.notOk(wrapper.find("Subtitle").at(1).exists())
   })
 
   //
@@ -251,12 +243,7 @@ describe("LearningResourceCard", () => {
     const object = makeLearningResource(LR_TYPE_COURSE)
     object.certification = []
     const { wrapper } = await render({ object })
-    assert.isNotOk(
-      wrapper
-        .find(".audience-certificates")
-        .find("img")
-        .exists()
-    )
+    assert.isNotOk(wrapper.find(".audience-certificates").find("img").exists())
     assert.isNotOk(wrapper.find(".start-date").exists())
   })
 

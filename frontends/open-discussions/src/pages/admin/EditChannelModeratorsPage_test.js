@@ -298,10 +298,7 @@ describe("EditChannelModeratorsPage", () => {
         channel.user_is_moderator = false
         helper.getChannelStub.returns(Promise.resolve(channel))
       }
-      inner
-        .find("MembersList")
-        .props()
-        .removeMember(channel, moderators[0])
+      inner.find("MembersList").props().removeMember(channel, moderators[0])
 
       // wait for promise to resolve
       await wait(0)
@@ -350,10 +347,7 @@ describe("EditChannelModeratorsPage", () => {
   ;[true, false].forEach(dialogVisibility => {
     it(`sets dialog visibility to ${String(dialogVisibility)}`, async () => {
       const { inner, store } = await render()
-      inner
-        .find("MembersList")
-        .props()
-        .setDialogVisibility(dialogVisibility)
+      inner.find("MembersList").props().setDialogVisibility(dialogVisibility)
 
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 1], {
@@ -366,10 +360,7 @@ describe("EditChannelModeratorsPage", () => {
   it("sets dialog data", async () => {
     const { inner, store } = await render()
     const data = { a: "data" }
-    inner
-      .find("MembersList")
-      .props()
-      .setDialogData(data)
+    inner.find("MembersList").props().setDialogData(data)
     const actions = store.getActions()
     assert.deepEqual(actions[actions.length - 1], {
       type:    SET_DIALOG_DATA,

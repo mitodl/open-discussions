@@ -121,10 +121,7 @@ describe("WidgetListContainer", () => {
             [WIDGET_FORM_KEY]: form
           }
         })
-        const props = wrapper
-          .find("sortableList")
-          .at(0)
-          .props()
+        const props = wrapper.find("sortableList").at(0).props()
         assert.deepEqual(
           props.widgetInstances,
           expected ? updatedWidgetList : listResponse.widgets
@@ -138,13 +135,10 @@ describe("WidgetListContainer", () => {
       const { wrapper, store } = await render()
       const oldIndex = 1
       const newIndex = 0
-      wrapper
-        .find("sortableList")
-        .at(0)
-        .prop("onSortEnd")({
-          oldIndex,
-          newIndex
-        })
+      wrapper.find("sortableList").at(0).prop("onSortEnd")({
+        oldIndex,
+        newIndex
+      })
       const updated = arrayMove(updatedWidgetList, oldIndex, newIndex)
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {
@@ -160,10 +154,7 @@ describe("WidgetListContainer", () => {
 
     it("clears the form", async () => {
       const { wrapper, store } = await render()
-      wrapper
-        .find("sortableList")
-        .at(0)
-        .prop("clearForm")()
+      wrapper.find("sortableList").at(0).prop("clearForm")()
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {
         type:    FORM_END_EDIT,
@@ -174,10 +165,7 @@ describe("WidgetListContainer", () => {
     it("deletes a widget instance", async () => {
       const { wrapper, store } = await render()
       const deletedInstance = updatedWidgetList[0]
-      wrapper
-        .find("sortableList")
-        .at(0)
-        .prop("deleteInstance")(deletedInstance)
+      wrapper.find("sortableList").at(0).prop("deleteInstance")(deletedInstance)
       const lastAction = store.getActions()[store.getActions().length - 1]
       assert.deepEqual(lastAction, {
         type:    FORM_UPDATE,
@@ -196,10 +184,7 @@ describe("WidgetListContainer", () => {
         .stub(widgetFuncs, "newWidgetInstance")
         .returns(aNewWidgetInstance)
       const { wrapper, store } = await render()
-      wrapper
-        .find("sortableList")
-        .at(0)
-        .prop("startAddInstance")()
+      wrapper.find("sortableList").at(0).prop("startAddInstance")()
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 2], {
         type:    SHOW_DIALOG,
@@ -222,10 +207,7 @@ describe("WidgetListContainer", () => {
     it("opens a dialog to edit a widget", async () => {
       const { wrapper, store } = await render()
       const instance = updatedWidgetList[0]
-      wrapper
-        .find("sortableList")
-        .at(0)
-        .prop("startEditInstance")(instance)
+      wrapper.find("sortableList").at(0).prop("startEditInstance")(instance)
       const actions = store.getActions()
       assert.deepEqual(actions[actions.length - 2], {
         type:    SHOW_DIALOG,
@@ -263,10 +245,7 @@ describe("WidgetListContainer", () => {
               [WIDGET_FORM_KEY]: form
             }
           })
-          const props = wrapper
-            .find("sortableList")
-            .at(0)
-            .props()
+          const props = wrapper.find("sortableList").at(0).props()
           assert.deepEqual(props.expanded, expected ? updatedExpanded : {})
           assert.deepEqual(props.editing, !!form)
           assert.isTrue(props.useDragHandle)
@@ -277,10 +256,7 @@ describe("WidgetListContainer", () => {
         const { wrapper, store } = await render()
         const keys = ["key1", "key2", "key3"]
         const value = "value"
-        wrapper
-          .find("sortableList")
-          .at(0)
-          .prop("setExpanded")(keys, value)
+        wrapper.find("sortableList").at(0).prop("setExpanded")(keys, value)
         const actions = store.getActions()
         assert.deepEqual(actions[actions.length - 1], {
           type:    FORM_UPDATE,
@@ -396,10 +372,7 @@ describe("WidgetListContainer", () => {
             dialogs: new Map(isOpen ? [[DIALOG_EDIT_WIDGET, data]] : [])
           }
         })
-        const props = wrapper
-          .find("WidgetEditDialog")
-          .at(0)
-          .props()
+        const props = wrapper.find("WidgetEditDialog").at(0).props()
         assert.equal(props.dialogData, isOpen ? data : undefined)
         assert.equal(props.dialogOpen, isOpen)
         assert.deepEqual(props.specs, listResponse.available_widgets)

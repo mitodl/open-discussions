@@ -39,7 +39,7 @@ const Cell = ({
   width,
   mobileWidth,
   className,
-  tabIndex
+  tabIndex,
 }: CellProps) => {
   useResponsive()
 
