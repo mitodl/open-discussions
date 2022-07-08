@@ -16,20 +16,21 @@ const SearchboxContainer = styled.div`
   padding: 0 20px;
 `
 
-const InputWrapper = styled.div`
-  position: relative;
-  height: 55px;
+const SearchboxContents = styled.div`
   max-width: 500px;
   width: 100%;
 `
 
+/**
+ * Wrapper for input to help absolute positioning of icon buttons.
+ */
+const InputWrapper = styled.div`
+  position: relative;
+`
+
 const SearchInput = styled.input`
-  &&& {
-    height: 100%;
-    padding-left: 50px;
-    font-size: 20px;
-    border-radius: 7px;
-    border: none;
+  && {
+    padding-left: 2.5em;
   }
 `
 
@@ -39,9 +40,9 @@ const PositionedButton = styled.button<{ rightAlign?: boolean }>`
     color: ${({ theme }) => theme.color.fontGreyMid};
     padding: 0px;
     margin: 0px;
-    display: inline-flex;
-    align-items: center;
   }
+  display: inline-flex;
+  align-items: center;
   /* centered vertically */
   position: absolute;
   top: 50%;
@@ -50,22 +51,22 @@ const PositionedButton = styled.button<{ rightAlign?: boolean }>`
   ${({ rightAlign }) =>
     rightAlign &&
     css`
-      right: 10px;
+      right: 0.5em;
     `}
   ${({ rightAlign }) =>
     !rightAlign &&
     css`
-      left: 10px;
-      width: 50px;
+      left: 0.5em;
+      width: 2.5em;
     `}
 `
 
-const SearchboxIcon = styled.i<{ verticalOffset?: number }>`
-  font-size: 33px;
-  ${({ verticalOffset }) =>
-    verticalOffset &&
+const SearchboxIcon = styled.i<{ verticalEmOffset?: number }>`
+  font-size: 1.65em;
+  ${({ verticalEmOffset }) =>
+    verticalEmOffset &&
     css`
-      transform: translateY(${verticalOffset}px);
+      transform: translateY(${verticalEmOffset}em);
     `}
 `
 
@@ -85,6 +86,10 @@ type SearchboxCommon = {
   validation?: string | null
   autoFocus?: boolean
   children?: React.ReactNode
+  /**
+   * Classname applied to the content div surrounding containing input and children.
+   */
+  className?: string
 }
 
 export type SearchboxUncontrolled = {
@@ -159,30 +164,37 @@ const Searchbox = (props: SearchboxProps): JSX.Element => {
 
   return (
     <SearchboxContainer>
-      <InputWrapper>
-        <SearchInput
-          type="text"
-          aria-label="Search for"
-          name="query"
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          placeholder="Search Learning Offerings"
-          value={value ?? text}
-        />
-        <PositionedButton onClick={onClickSubmit}>
-          <SearchboxIcon verticalOffset={2} className="material-icons">
-            search
-          </SearchboxIcon>
-        </PositionedButton>
-        {(value || text) && (
-          <PositionedButton onClick={onClear} rightAlign>
-            <SearchboxIcon className="material-icons clear-icon">
-              clear
+      <SearchboxContents className={props.className}>
+        <InputWrapper>
+          <SearchInput
+            type="text"
+            aria-label="Search for"
+            name="query"
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            placeholder="Search Learning Offerings"
+            value={value ?? text}
+          />
+          <PositionedButton onClick={onClickSubmit}>
+            <SearchboxIcon
+              verticalEmOffset={
+                0.1 /** So the circle of search magnifying class is baseline-aligned */
+              }
+              className="material-icons"
+            >
+              search
             </SearchboxIcon>
           </PositionedButton>
-        )}
+          {(value || text) && (
+            <PositionedButton onClick={onClear} rightAlign>
+              <SearchboxIcon className="material-icons clear-icon">
+                clear
+              </SearchboxIcon>
+            </PositionedButton>
+          )}
+        </InputWrapper>
         {children}
-      </InputWrapper>
+      </SearchboxContents>
       {<ValidationError message={validation} />}
     </SearchboxContainer>
   )

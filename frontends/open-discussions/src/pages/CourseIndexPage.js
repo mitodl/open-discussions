@@ -94,6 +94,7 @@ export default function CourseIndexPage({ history }: Props) {
           <BannerImage src={COURSE_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
         <Searchbox
+          className="course-searchbox"
           onSubmit={e => {
             const { value } = e.target
             const newLocation = `${COURSE_SEARCH_URL}${toQueryString({

@@ -231,6 +231,7 @@ export default function CourseSearchPage(props: Props) {
           <BannerImage src={COURSE_SEARCH_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
         <Searchbox
+          className="course-searchbox"
           onChange={updateText}
           value={text || ""}
           onClear={clearText}
