@@ -30,16 +30,34 @@ const InputWrapper = styled.div`
 
 const SearchInput = styled.input`
   && {
+    /**
+    The relative font size within this component should not be configurable
+    from the outside. I.e., the ratio of icon to input text should always be the
+    same.
+
+    To facilitate this, explicitly set the font size as 1em ("use parent font size")
+    with high specificity.
+
+    The overall font size can be controlled by setting font-size on SearchboxContents,
+    e.g., by passing a class to Searchbox.
+    */
+    font-size: 1em;
     padding-left: 2.5em;
+    padding-right: 2.5em;
+    /* Box sizes should include the padding used to accomodate
+    the icons. */
+    box-sizing: border-box;
   }
 `
 
 const PositionedButton = styled.button<{ rightAlign?: boolean }>`
   && {
+    font-size: 1em;
     background-color: rgba(0, 0, 0, 0);
     color: ${({ theme }) => theme.color.fontGreyMid};
     padding: 0px;
     margin: 0px;
+    border: none;
   }
   display: inline-flex;
   align-items: center;

@@ -1,16 +1,7 @@
-/*
-Repeating the class for extra specificity, since we apply global un-classed styles
-to inputs and buttons.
-*/
-.course-searchbox.course-searchbox {
+.course-searchbox {
   font-size: 20px;
   input[type="text"] {
     border-radius: 7px;
     border: none;
-  }
-  div,
-  button,
-  input {
-    font-size: 1em;
   }
 }
