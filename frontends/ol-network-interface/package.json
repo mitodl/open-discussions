@@ -1,0 +1,5 @@
+{
+  "name": "ol-network-interface",
+  "packageManager": "yarn@3.2.0",
+  "main": "./build/index.js"
+}
