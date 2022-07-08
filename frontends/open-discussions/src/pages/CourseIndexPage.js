@@ -3,6 +3,7 @@ import React from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
+import { Searchbox } from "ol-search-ui"
 
 import CourseCarousel from "../components/CourseCarousel"
 
@@ -13,7 +14,6 @@ import {
   BannerImage
 } from "ol-util"
 import { Cell, Grid } from "../components/Grid"
-import CourseSearchbox from "../components/CourseSearchbox"
 import { CarouselLoading } from "../components/Loading"
 import ResponsiveWrapper from "../components/ResponsiveWrapper"
 
@@ -93,7 +93,8 @@ export default function CourseIndexPage({ history }: Props) {
         <BannerContainer tall compactOnMobile>
           <BannerImage src={COURSE_BANNER_URL} tall compactOnMobile />
         </BannerContainer>
-        <CourseSearchbox
+        <Searchbox
+          className="course-searchbox"
           onSubmit={e => {
             const { value } = e.target
             const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
@@ -103,13 +104,13 @@ export default function CourseIndexPage({ history }: Props) {
           }}
         >
           <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
-            <div className="link-wrapper">
-              <Link className="link-button" to={COURSE_SEARCH_URL}>
+            <div className="link-wrapper d-flex justify-content-end mt-3">
+              <Link className="link-button me-0" to={COURSE_SEARCH_URL}>
                 Explore
               </Link>
             </div>
           </ResponsiveWrapper>
-        </CourseSearchbox>
+        </Searchbox>
       </BannerPageHeader>
       <ResponsiveWrapper onlyOn={[PHONE]}>
         <div className="wide-view-more">

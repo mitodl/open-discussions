@@ -2,6 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
+import { Searchbox } from "ol-search-ui"
 
 import CourseIndexPage from "./CourseIndexPage"
 import { BannerPageWrapper, BannerPageHeader, BannerContainer } from "ol-util"
@@ -198,7 +199,7 @@ describe("CourseIndexPage", () => {
 
   it("should have a search textbox which redirects you", async () => {
     const { wrapper } = await render()
-    const searchBox = wrapper.find("CourseSearchbox")
+    const searchBox = wrapper.find(Searchbox)
     searchBox.prop("onSubmit")({ target: { value: "search term" } })
     const { pathname, search } = helper.currentLocation
     assert.equal(pathname, "/learn/search")

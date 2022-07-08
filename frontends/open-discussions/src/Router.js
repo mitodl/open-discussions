@@ -3,6 +3,8 @@ import React from "react"
 import { Provider } from "react-redux"
 import { Route, Router as ReactRouter } from "react-router-dom"
 import { Provider as ReduxQueryProvider } from "redux-query-react"
+import { ThemeProvider } from "styled-components"
+import { combinedTheme } from "ol-util"
 
 import App from "./pages/App"
 import withTracker from "./util/withTracker"
@@ -27,7 +29,9 @@ export default class Router extends React.Component<Props> {
         <Provider store={store}>
           <ReduxQueryProvider queriesSelector={getQueries}>
             <ReactRouter history={history}>
-              <ScrollToTop>{children}</ScrollToTop>
+              <ThemeProvider theme={combinedTheme}>
+                <ScrollToTop>{children}</ScrollToTop>
+              </ThemeProvider>
             </ReactRouter>
           </ReduxQueryProvider>
         </Provider>

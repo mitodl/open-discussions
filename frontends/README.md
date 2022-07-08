@@ -31,8 +31,3 @@ Most workspaces are shared dependencies built using typescript and tested with j
 > docker compose run --rm watch yarn workspace ol-utils run globa:lint-fix
 ```
 Again, `globa:lint-fix` is defined at the root workspace, not within `ol-utils`. This works because [yarn commands containing a colon can be run from any workspace](https://yarnpkg.com/getting-started/qa#how-to-share-scripts-between-workspaces). 
-
-## Flow-compatible Typescript via `global:build-flowtypes`
-Because we are in the process of converting this codebase to Typescript, shared dependencies like `ol-utils` need to be compiled to regular javascript so that they can be used in the `open-discussions` workspace. Additionally, it is useful to provide FlowType declarations for the converted code. We can do this automatically via the yarn script `global:build-flowtypes`, which compiles FlowType declarations from Typescript declarations. The conversion from TS to Flow is not always perfect, but it is good enough. (For example: function components declared with `React.FC` do not compile property, resulting in `any(implicit)` as the Flowtype definition.)
-
-Additionally, it is not run in watch mode because it is somewhat slow, but does run during builds.
