@@ -3,3 +3,4 @@ export * from "./constants"
 export * from "./styles"
 
 export * from "./predicates"
+export * from "./hooks"

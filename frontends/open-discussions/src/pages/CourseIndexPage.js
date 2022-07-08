@@ -104,7 +104,7 @@ export default function CourseIndexPage({ history }: Props) {
           }}
         >
           <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
-            <div className="link-wrapper d-flex justify-content-end mt-3">
+            <div className="d-flex justify-content-end mt-3">
               <Link className="link-button me-0" to={COURSE_SEARCH_URL}>
                 Explore
               </Link>

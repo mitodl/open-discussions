@@ -1,6 +1,15 @@
 {% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    {% spaceless %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,700" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    {% endspaceless %}
+  </head>
   <body>
     <div id="container"></div>
     {% render_bundle 'style' config='INFINITE_CORRIDOR'  %}

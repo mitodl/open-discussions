@@ -1,4 +1,6 @@
+@import "~material-components-web/dist/material-components-web.css";
 @import "~ol-util/assets/variables.scss";
+@import "button";
 
 body { 
   font-family: $body-font;
@@ -6,4 +8,13 @@ body {
   margin: 0;
   padding: 0;
   color: $font-black;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid $input-border-grey;
 }

@@ -44,6 +44,7 @@ const SearchInput = styled.input`
     font-size: 1em;
     padding-left: 2.5em;
     padding-right: 2.5em;
+    width: 100%;
     /* Box sizes should include the padding used to accomodate
     the icons. */
     box-sizing: border-box;
@@ -196,7 +197,7 @@ const Searchbox = (props: SearchboxProps): JSX.Element => {
           <PositionedButton onClick={onClickSubmit}>
             <SearchboxIcon
               verticalEmOffset={
-                0.1 /** So the circle of search magnifying class is baseline-aligned */
+                0.035 /** So the circle of search magnifying class is baseline-aligned */
               }
               className="material-icons"
             >
