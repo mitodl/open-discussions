@@ -2,8 +2,8 @@ import React from "react"
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/FieldPage"
-import { Route } from "react-router"
-import { BrowserRouter } from "react-router-dom"
+import { Route, Router } from "react-router"
+import { History } from "history"
 import { ThemeProvider } from "styled-components"
 import { combinedTheme } from "ol-util"
 import { QueryClientProvider, QueryClient } from 'react-query';
@@ -16,25 +16,33 @@ const queryClient = new QueryClient({
   } 
 })
 
-const baseUrl = '/infinite'
+export const BASE_URL = '/infinite'
 
+interface AppProps {
+  /**
+   * App [history](https://v5.reactrouter.com/web/api/history) object.
+   *  - Use BrowserHistory for the real app
+   *  - Use MemoryHistory for tests.
+   */
+  history: History
+}
 
-const App = () => {
+const App: React.FC<AppProps> = ({ history }) => {
   return (
     <div className="app-container">
       <ThemeProvider theme={combinedTheme}>
         <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <Route path={baseUrl} exact>
+          <Router history={history}>
+            <Route path={BASE_URL} exact>
               <HomePage />
             </Route>
-            <Route path={`${baseUrl}/search`}>
+            <Route path={`${BASE_URL}/search`}>
               <SearchPage />
             </Route>
-            <Route path={`${baseUrl}/fields/:name`}>
+            <Route path={`${BASE_URL}/fields/:name`}>
               <FieldPage />
             </Route>
-          </BrowserRouter>
+          </Router>
         </QueryClientProvider>
       </ThemeProvider>
     </div>

@@ -1,15 +1,10 @@
 import networkInterface from "ol-network-interface"
-import type { PaginatedResult } from "ol-util"
 import { useQuery } from "react-query"
-
-export interface Field {
-  title: string
-  name: string
-}
-export type FieldList = PaginatedResult<Field>
+import type { FieldList } from "./interfaces"
+import * as urls from "./urls"
 
 const fetchFieldsList = async (): Promise<FieldList> => {
-  const response = await networkInterface.get<FieldList>("/api/v0/fields")
+  const response = await networkInterface.get<FieldList>(urls.fieldsList)
   return response.body
 }
 

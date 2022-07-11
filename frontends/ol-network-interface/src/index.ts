@@ -7,7 +7,7 @@ interface NetworkResponse<T=unknown> {
   body: T
 }
 
-export interface NetworkInterface {
+interface NetworkInterface {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   makeRequest: <T = unknown>(method: Method, url: string, body?: any, headers?: NetworkHeaders) => Promise<NetworkResponse<T>>
   get: <T = unknown>(url: string, headers?: NetworkHeaders) => Promise<NetworkResponse<T>>
@@ -44,12 +44,16 @@ const makeRequest: NetworkInterface["makeRequest"] = async (method, url, body, h
   throw new NetworkError(response.status, errMsg)
 }
 
-const networkInterface: NetworkInterface = {
-  makeRequest,
-  get: (url, headers) => makeRequest('GET', url, undefined, headers),
-  delete: (url, headers) => makeRequest('DELETE', url, undefined, headers),
-  patch: (url, body, headers) => makeRequest('PATCH', url, body, headers),
-  post: (url, body, headers) => makeRequest('POST', url, body, headers)
-}
+const makeNetworkInterface = (makeRequestImplementation: NetworkInterface["makeRequest"]): NetworkInterface => ({
+  makeRequest: makeRequestImplementation,
+  get: (url, headers) => makeRequestImplementation('GET', url, undefined, headers),
+  delete: (url, headers) => makeRequestImplementation('DELETE', url, undefined, headers),
+  patch: (url, body, headers) => makeRequestImplementation('PATCH', url, body, headers),
+  post: (url, body, headers) => makeRequestImplementation('POST', url, body, headers)
+})
+
+const networkInterface = makeNetworkInterface(makeRequest)
 
 export default networkInterface
+export { makeNetworkInterface }
+export type { NetworkInterface, NetworkError, NetworkResponse }

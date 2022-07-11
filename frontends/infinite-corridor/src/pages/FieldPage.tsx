@@ -10,7 +10,8 @@ const FieldPage: React.FC = () => {
   
   return (
     <div>
-      Welcome to the field page for: <code>{name}</code>
+      <h2>{name}</h2>
+      Welcome to the field page for: <code>{name}</code>!
     </div>
   )
 }
