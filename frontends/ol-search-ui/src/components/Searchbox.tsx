@@ -117,7 +117,7 @@ export type SearchboxUncontrolled = {
   value?: undefined
 } & SearchboxCommon
 export type SearchboxControlled = {
-  onChange: React.ChangeEventHandler
+  onChange: React.ChangeEventHandler<HTMLInputElement>
   onClear: React.MouseEventHandler
   value: string
 } & SearchboxCommon
