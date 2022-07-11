@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.189.0 (Released July 11, 2022)
+---------------
+
+- Use prettier v2 for better typescript support (#3612)
+- fix ci commands; remove flowgen (#3610)
+- no devdeps, only dependencies (#3611)
+- fix some formatting in the readme (#3604)
+- Begin sharing (some) frontend code + styling between open-discussions and infinite-corridor (#3601)
+
 Version 0.188.1 (Released June 29, 2022)
 ---------------
 
