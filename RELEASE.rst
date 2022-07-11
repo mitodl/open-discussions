@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.189.0
+Version 0.189.0 (Released July 11, 2022)
 ---------------
 
 - Use prettier v2 for better typescript support (#3612)
