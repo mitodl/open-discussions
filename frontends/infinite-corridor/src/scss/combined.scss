@@ -1,6 +1,8 @@
 @import "~material-components-web/dist/material-components-web.css";
 @import "~ol-util/assets/variables.scss";
+@import "~ol-util/assets/breakpoint.scss";
 @import "button";
+@import "columns";
 
 body { 
   font-family: $body-font;
@@ -17,4 +19,8 @@ body {
 input[type="text"] {
   padding: 10px;
   border: 1px solid $input-border-grey;
+}
+
+.app-container {
+  height: 100vh;
 }

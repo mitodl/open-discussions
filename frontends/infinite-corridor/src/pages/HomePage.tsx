@@ -5,17 +5,13 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage,
-  Cell,
-  Grid,
 } from "ol-util"
 import styled from "styled-components"
 import { Searchbox, SearchboxControlled } from "ol-search-ui"
 import { useHistory } from "react-router"
+import { Link } from "react-router-dom"
+import { useFieldsList  } from "../api/fields" 
 
-const Placeholder = styled.div`
-  height: 150px;
-  border: 1pt solid gray;
-`
 
 export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"
 
@@ -29,6 +25,7 @@ const LearningResourceSearchbox = styled(Searchbox)`
 const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
+  const currentPath = history.location.pathname
   const onSearchClear = useCallback(() => setSearchText(""), [])
   const onSearchChange: SearchboxControlled["onChange"] = useCallback(e => {
     setSearchText(e.target.value)
@@ -36,6 +33,9 @@ const HomePage: React.FC = () => {
   const onSearchSubmit = useCallback(() => {
     history.push(`/infinite/search?q=${searchText}`)
   }, [searchText, history])
+
+  const fieldsList = useFieldsList()
+
   return (
     <BannerPageWrapper>
       <BannerPageHeader tall compactOnMobile>
@@ -55,15 +55,16 @@ const HomePage: React.FC = () => {
           </div>
         </LearningResourceSearchbox>
       </BannerPageHeader>
-      <Grid className="main-content one-column">
-        {Array(6)
-          .fill(null)
-          .map((_x, i) => (
-            <Cell key={i} width={3}>
-              <Placeholder />
-            </Cell>
-          ))}
-      </Grid>
+      <div className="mdc-layout-grid one-column">
+        <h2>MIT Fields</h2>
+        <ul>
+          { fieldsList.data?.results.map(field => (
+            <li key={field.name}>
+              <Link to={`${currentPath}/fields/${field.name}`}>{field.title}</Link>
+            </li>
+          ) ) }
+        </ul>
+      </div>
     </BannerPageWrapper>
   )
 }
