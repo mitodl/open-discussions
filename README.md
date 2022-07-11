@@ -22,36 +22,10 @@ Open Discussions needs a running reddit instance as a backing store. Go to the
 [reddit-config](https://github.com/mitodl/reddit-config) repo for setup
 instructions.
 
-### Set up an authenticated site
-
-The app requires at least one authenticated site record to run the app. The site that will be
-created in the code block below is for MicroMasters integration, but following through with the
-[full set of MicroMasters integration steps](#integration-with-micromasters) is not
-strictly needed to get the app working.
-
-Run this in a Django Shell:
-```python
-from sites.models import AuthenticatedSite
-mm_base_url = 'http://od.odl.local:8079'
-AuthenticatedSite.objects.create(
-  key='micromasters',
-  title='MicroMasters',
-  base_url='{}/'.format(mm_base_url),
-  login_url='{}/discussions/'.format(mm_base_url),
-  session_url='{}/api/v0/discussions_token/'.format(mm_base_url),
-  tos_url='{}/terms-of-service'.format(mm_base_url),
-)
-```
-
-The key value printed above will be used as a value in `.env` settings.
 
 ### Configure required `.env` settings
 
 The following settings must be configured before running the app:
-
-- `OPEN_DISCUSSIONS_DEFAULT_SITE_KEY`
-
-    Set this to `micromasters` (see authenticated site code block above)
 
 - `INDEXING_API_USERNAME`
 
