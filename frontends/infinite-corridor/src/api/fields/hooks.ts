@@ -9,5 +9,5 @@ const fetchFieldsList = async (): Promise<FieldList> => {
 }
 
 export const useFieldsList = () => {
-  return useQuery('fields', fetchFieldsList)
+  return useQuery("fields", fetchFieldsList)
 }

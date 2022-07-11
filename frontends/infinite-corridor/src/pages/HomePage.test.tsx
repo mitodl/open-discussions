@@ -9,6 +9,8 @@ describe("HomePage", () => {
     renderTestApp()
     const links = await screen.findAllByRole("link")
     expect(links).toHaveLength(4)
-    expect(links.map(el => el.textContent)).toStrictEqual(fieldsList.results.map(f => f.title))
+    expect(links.map((el) => el.textContent)).toStrictEqual(
+      fieldsList.results.map((f) => f.title)
+    )
   })
 })

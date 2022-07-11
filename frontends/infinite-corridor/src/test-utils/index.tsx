@@ -1,7 +1,7 @@
 import React from "react"
 import App, { BASE_URL } from "../App"
 import { render } from "@testing-library/react"
-import { createMemoryHistory} from "history"
+import { createMemoryHistory } from "history"
 import { setMockResponse } from "./mockNetworkInterface"
 
 interface TestAppOptions {
@@ -10,7 +10,7 @@ interface TestAppOptions {
 }
 
 const defaultTestAppOptions = {
-  url: '/'
+  url: "/",
 }
 
 /**
@@ -19,9 +19,8 @@ const defaultTestAppOptions = {
 const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
   const { url } = { ...defaultTestAppOptions, ...options }
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
-  render(<App history={history} />) 
+  render(<App history={history} />)
 }
-
 
 export { renderTestApp }
 

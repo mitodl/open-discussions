@@ -10,14 +10,13 @@ import styled from "styled-components"
 import { Searchbox, SearchboxControlled } from "ol-search-ui"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
-import { useFieldsList  } from "../api/fields" 
-
+import { useFieldsList } from "../api/fields"
 
 export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"
 
 const LearningResourceSearchbox = styled(Searchbox)`
   font-size: 20px;
-  input[type=text] {
+  input[type="text"] {
     border-radius: 7px;
   }
 `
@@ -27,7 +26,7 @@ const HomePage: React.FC = () => {
   const history = useHistory()
   const currentPath = history.location.pathname
   const onSearchClear = useCallback(() => setSearchText(""), [])
-  const onSearchChange: SearchboxControlled["onChange"] = useCallback(e => {
+  const onSearchChange: SearchboxControlled["onChange"] = useCallback((e) => {
     setSearchText(e.target.value)
   }, [])
   const onSearchSubmit = useCallback(() => {
@@ -58,11 +57,13 @@ const HomePage: React.FC = () => {
       <div className="mdc-layout-grid one-column">
         <h2>MIT Fields</h2>
         <ul>
-          { fieldsList.data?.results.map(field => (
+          {fieldsList.data?.results.map((field) => (
             <li key={field.name}>
-              <Link to={`${currentPath}/fields/${field.name}`}>{field.title}</Link>
+              <Link to={`${currentPath}/fields/${field.name}`}>
+                {field.title}
+              </Link>
             </li>
-          ) ) }
+          ))}
         </ul>
       </div>
     </BannerPageWrapper>

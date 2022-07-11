@@ -7,7 +7,7 @@ type RouteParams = {
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
-  
+
   return (
     <div>
       <h2>{name}</h2>

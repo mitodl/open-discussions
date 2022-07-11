@@ -6,17 +6,17 @@ import { Route, Router } from "react-router"
 import { History } from "history"
 import { ThemeProvider } from "styled-components"
 import { combinedTheme } from "ol-util"
-import { QueryClientProvider, QueryClient } from 'react-query';
+import { QueryClientProvider, QueryClient } from "react-query"
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 30 * 1000,
-    }
-  } 
+    },
+  },
 })
 
-export const BASE_URL = '/infinite'
+export const BASE_URL = "/infinite"
 
 interface AppProps {
   /**
