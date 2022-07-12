@@ -7,11 +7,22 @@ import { History } from "history"
 import { ThemeProvider } from "styled-components"
 import { combinedTheme } from "ol-util"
 import { QueryClientProvider, QueryClient } from "react-query"
+import axios from "./libs/axios"
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 30 * 1000,
+      queryFn: async ({ queryKey }) => {
+        const url = queryKey[0]
+        if (typeof url !== "string" || queryKey.length !== 1) {
+          throw new Error(
+            `Query key must be a single string for use with default queryFn`
+          )
+        }
+        const { data } = await axios.get(url)
+        return data
+      },
     },
   },
 })

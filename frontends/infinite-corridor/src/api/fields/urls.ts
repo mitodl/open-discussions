@@ -1,1 +1,1 @@
-export const fieldsList = "/api/v0/fields"
+export const fieldsList = "/fields"

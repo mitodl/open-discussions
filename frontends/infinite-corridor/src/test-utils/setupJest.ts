@@ -1,11 +1,11 @@
-import { makeRequest } from "./mockNetworkInterface"
+import { mockAxiosInstance } from "./mockAxios"
 
-jest.mock("ol-network-interface", () => {
-  const { makeNetworkInterface } = jest.requireActual("ol-network-interface")
-
+jest.mock("axios", () => {
   return {
     __esModule: true,
-    default: makeNetworkInterface(makeRequest),
+    default: {
+      create: () => mockAxiosInstance,
+    },
   }
 })
 

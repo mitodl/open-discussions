@@ -2,7 +2,7 @@ import React from "react"
 import App, { BASE_URL } from "../App"
 import { render } from "@testing-library/react"
 import { createMemoryHistory } from "history"
-import { setMockResponse } from "./mockNetworkInterface"
+import { setMockResponse } from "./mockAxios"
 
 interface TestAppOptions {
   /** This will be prefixed with the baseUrl */
