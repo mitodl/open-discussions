@@ -3102,16 +3102,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mitodl/course-search-utils@npm:1.2.1":
-  version: 1.2.1
-  resolution: "@mitodl/course-search-utils@npm:1.2.1"
+"@mitodl/course-search-utils@npm:^1.8.0":
+  version: 1.8.0
+  resolution: "@mitodl/course-search-utils@npm:1.8.0"
   dependencies:
+    bodybuilder: ^2.5.0
     history: ^5.0.0
     query-string: ^6.13.1
     ramda: ^0.27.1
   peerDependencies:
     react: ^16.13.1
-  checksum: c0c36e21fd43ecd2b11a551643e7e71a13767afcfac82c398a0933ec91c304fedcbb4bf43bc33ed8fedca120a3c294171771a28971c70e7d009619d1f6e7203c
+  checksum: f20a26dc63f5934a11ba77f30624fa7b77f4e6f9bc93fa5640117b166e0016bdc3d3eaa71fad3fde634cd02cb155ef1db81b95091cde7d6478e94905f2e2f233
   languageName: node
   linkType: hard
 
@@ -6301,6 +6302,20 @@ __metadata:
   dependencies:
     lodash: ^4.9.0
   checksum: fb122c4c607e5f27496cb28fb7a3ff2ce3cc380ca43dcd34f9116b7d6e0908327a756aa68b7c39f5551be3fc2f6ebe1aa1e0e1fe2c248d7692343fe2b06a594e
+  languageName: node
+  linkType: hard
+
+"bodybuilder@npm:^2.5.0":
+  version: 2.5.0
+  resolution: "bodybuilder@npm:2.5.0"
+  dependencies:
+    lodash.clonedeep: 4.5.0
+    lodash.isobject: 3.0.2
+    lodash.isplainobject: 4.0.6
+    lodash.merge: 4.6.2
+    lodash.set: 4.3.2
+    lodash.unset: 4.5.2
+  checksum: 1c39eb5d54cbb5f94e9788701416cb2d8bc072d10e8a85f9d112e626e8df100c78f7877993e40cbef9e2cd2bcc79ce6c3b010c41182e6bd2017f7fde6ce2b574
   languageName: node
   linkType: hard
 
@@ -12494,6 +12509,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.clonedeep@npm:4.5.0":
+  version: 4.5.0
+  resolution: "lodash.clonedeep@npm:4.5.0"
+  checksum: 92c46f094b064e876a23c97f57f81fbffd5d760bf2d8a1c61d85db6d1e488c66b0384c943abee4f6af7debf5ad4e4282e74ff83177c9e63d8ff081a4837c3489
+  languageName: node
+  linkType: hard
+
 "lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
@@ -12543,7 +12565,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.isplainobject@npm:^4.0.6":
+"lodash.isobject@npm:3.0.2":
+  version: 3.0.2
+  resolution: "lodash.isobject@npm:3.0.2"
+  checksum: 6c1667cbc4494d0a13a3617a4b23278d6d02dac520311f2bbb43f16f2cf71d2e6eb9dec8057315b77459df4890c756a256a087d3f4baa44a79ab5d6c968b060e
+  languageName: node
+  linkType: hard
+
+"lodash.isplainobject@npm:4.0.6, lodash.isplainobject@npm:^4.0.6":
   version: 4.0.6
   resolution: "lodash.isplainobject@npm:4.0.6"
   checksum: 29c6351f281e0d9a1d58f1a4c8f4400924b4c79f18dfc4613624d7d54784df07efaff97c1ff2659f3e085ecf4fff493300adc4837553104cef2634110b0d5337
@@ -12564,10 +12593,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.merge@npm:^4.6.0, lodash.merge@npm:^4.6.2":
+"lodash.merge@npm:4.6.2, lodash.merge@npm:^4.6.0, lodash.merge@npm:^4.6.2":
   version: 4.6.2
   resolution: "lodash.merge@npm:4.6.2"
   checksum: ad580b4bdbb7ca1f7abf7e1bce63a9a0b98e370cf40194b03380a46b4ed799c9573029599caebc1b14e3f24b111aef72b96674a56cfa105e0f5ac70546cdc005
+  languageName: node
+  linkType: hard
+
+"lodash.set@npm:4.3.2":
+  version: 4.3.2
+  resolution: "lodash.set@npm:4.3.2"
+  checksum: a9122f49eef9f2d0fc9061a33d87f8e5b8c6b23d46e8b9e9ce1529d3588d79741bd1145a3abdfa3b13082703e65af27ff18d8a07bfc22b9be32f3fc36f763f70
   languageName: node
   linkType: hard
 
@@ -12589,6 +12625,13 @@ __metadata:
   version: 4.0.1
   resolution: "lodash.unescape@npm:4.0.1"
   checksum: 7a9c2133f534619f18e415ea5ae61f654b4d8837a76f31128a8484c1e429357335c8a159d0d79b0f545fd7833d4633194314fa09bfc8be3fff033a07ba6884d8
+  languageName: node
+  linkType: hard
+
+"lodash.unset@npm:4.5.2":
+  version: 4.5.2
+  resolution: "lodash.unset@npm:4.5.2"
+  checksum: 53b2a79c20e7c8c604ccfd82c7ad5caa28876171a323c5dc4d6d745d42bc43f4827c24526d877484bf64284104dffa4dd34e0c363d49fd84bd398c259001ac3f
   languageName: node
   linkType: hard
 
@@ -13899,6 +13942,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "open-discussions-root@workspace:."
   dependencies:
+    "@mitodl/course-search-utils": ^1.8.0
     "@swc/core": ^1.2.207
     "@swc/jest": ^0.2.21
     "@testing-library/jest-dom": ^5.16.4
@@ -13948,7 +13992,7 @@ __metadata:
     "@material/snackbar": 0.44.0
     "@material/toolbar": 0.4.4
     "@mitodl/ckeditor-custom-build": 0.0.4
-    "@mitodl/course-search-utils": 1.2.1
+    "@mitodl/course-search-utils": ^1.8.0
     "@mitodl/mdl-react-components": 0.0.3
     "@reduxjs/toolkit": 1.4.0
     "@sentry/browser": 5.5.0

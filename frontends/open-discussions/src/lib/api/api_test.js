@@ -28,7 +28,6 @@ import {
 import { makePost, makeChannelPostList } from "../../factories/posts"
 import { makeCommentsResponse } from "../../factories/comments"
 import * as authFuncs from "./fetch_auth"
-import * as searchFuncs from "../search"
 import { makeProfile } from "../../factories/profiles"
 
 describe("api", function() {
@@ -291,12 +290,26 @@ describe("api", function() {
     describe("search", () => {
       it("should execute a search and return results", async () => {
         const body = { a: "body" }
-        const buildStub = sandbox
-          .stub(searchFuncs, "buildSearchQuery")
+
+        const courseSearchUtils = require("@mitodl/course-search-utils/dist/search")
+        const buildStub = sinon
+          .stub(courseSearchUtils, "buildSearchQuery")
           .returns(body)
-        const params = { some: "params" }
+        const params = {
+          text:   "text",
+          type:   "course",
+          facets: new Map([["offered_by", "OCW"]])
+        }
+        const standardizedParams = {
+          text:         "text",
+          activeFacets: {
+            offered_by: "OCW",
+            type:       "course"
+          }
+        }
+
         await search(params)
-        sinon.assert.calledWith(buildStub, params)
+        sinon.assert.calledWith(buildStub, standardizedParams)
         sinon.assert.calledWith(fetchJSONStub, "/api/v0/search/", {
           method: POST,
           body:   JSON.stringify(body)
