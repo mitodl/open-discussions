@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.190.0
+---------------
+
+- discussions search uses new course-search-utils (#3616)
+- Extract CourseSearchbox (as Searchbox) (#3614)
+
 Version 0.189.0 (Released July 11, 2022)
 ---------------
 
