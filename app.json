@@ -292,9 +292,6 @@
       "description": "Number of related posts to fetch",
       "required": false
     },
-    "OPEN_DISCUSSIONS_DEFAULT_SITE_KEY": {
-      "description": "The default site key to use for JWT tokens missing one"
-    },
     "OPEN_DISCUSSIONS_DB_CONN_MAX_AGE": {
       "value": "0"
     },
