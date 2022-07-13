@@ -149,7 +149,10 @@ def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderCon
     content_files = run_data.pop("content_files", [])
 
     with transaction.atomic():
-        learning_resource_run, _ = LearningResourceRun.objects.select_for_update().update_or_create(
+        (
+            learning_resource_run,
+            _,
+        ) = LearningResourceRun.objects.select_for_update().update_or_create(
             run_id=run_id,
             platform=platform,
             defaults={

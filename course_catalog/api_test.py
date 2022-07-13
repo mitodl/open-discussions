@@ -490,7 +490,7 @@ def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
 
 
 def test_get_course_availability(mitx_valid_data):
-    """ Test that availability is calculated as expected """
+    """Test that availability is calculated as expected"""
     ocw_course = CourseFactory.create(platform=PlatformType.ocw.value)
     # test mitx course with raw_json
     assert get_course_availability(ocw_course) == AvailabilityType.current.value
@@ -697,7 +697,7 @@ def test_sync_xpro_course_files(mock_xpro_learning_bucket, mocker):
     ],
 )
 def test_ocw_parent_folder(prefix, expected):
-    """ Test that ocw_parent_folder returns expected result for QA and PROD prefixes"""
+    """Test that ocw_parent_folder returns expected result for QA and PROD prefixes"""
     assert ocw_parent_folder(prefix) == expected
 
 
@@ -742,7 +742,7 @@ def test_sync_ocw_course_skip(mocker, prefix, skip):
 def test_sync_ocw_course_published(
     settings, mocker, pub_date, unpub_date, published, blocklisted
 ):
-    """ The course should be published or not based on dates, and always uploaded """
+    """The course should be published or not based on dates, and always uploaded"""
     mocker.patch("course_catalog.etl.ocw.extract_text_metadata", return_value="")
     mocker.patch(
         "course_catalog.api.format_date",
@@ -792,7 +792,7 @@ def test_sync_ocw_course_published(
 def test_sync_ocw_course_already_synched(
     settings, mocker, overwrite, start_timestamp, ocw_next_course
 ):
-    """ The course should be published or not based on dates, and always uploaded """
+    """The course should be published or not based on dates, and always uploaded"""
     mocker.patch("course_catalog.etl.ocw.extract_text_metadata", return_value="")
 
     mock_upload_course = mocker.patch(
@@ -845,7 +845,7 @@ def test_sync_ocw_course_already_synched(
 
 @mock_s3
 def test_sync_ocw_next_course(settings, mocker):
-    """ Sync ocw next course """
+    """Sync ocw next course"""
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
     mock_load_content_files = mocker.patch("course_catalog.api.load_content_files")
     setup_s3_ocw_next(settings)
@@ -876,7 +876,7 @@ def test_sync_ocw_next_course(settings, mocker):
 def test_sync_ocw_next_course_already_synched(
     settings, mocker, overwrite, start_timestamp
 ):
-    """ The course should be overwritten only if there is new data or overwrite is true """
+    """The course should be overwritten only if there is new data or overwrite is true"""
 
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
     mocker.patch("course_catalog.api.load_content_files")

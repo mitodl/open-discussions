@@ -89,7 +89,7 @@ def mock_email_send(mocker):
 
 @pytest.fixture()
 def mock_recaptcha_success(mocker):
-    """ Mock Google recaptcha request"""
+    """Mock Google recaptcha request"""
     yield mocker.patch(
         "authentication.views.requests.post",
         return_value=MockResponse(
@@ -100,7 +100,7 @@ def mock_recaptcha_success(mocker):
 
 @pytest.fixture()
 def mock_recaptcha_failure(mocker):
-    """ Mock Google recaptcha request"""
+    """Mock Google recaptcha request"""
     yield mocker.patch(
         "authentication.views.requests.post",
         return_value=MockResponse(
@@ -646,7 +646,7 @@ def test_login_email_error(client, mocker):
 
 
 def test_login_email_hijacked(client, user, admin_user):
-    """ Test that a 403 response is returned for email login view if user is hijacked"""
+    """Test that a 403 response is returned for email login view if user is hijacked"""
     client.force_login(admin_user)
     client.post("/hijack/{}/".format(user.id))
     response = client.post(
@@ -657,7 +657,7 @@ def test_login_email_hijacked(client, user, admin_user):
 
 
 def test_register_email_hijacked(client, user, admin_user):
-    """ Test that a 403 response is returned for email register view if user is hijacked"""
+    """Test that a 403 response is returned for email register view if user is hijacked"""
     client.force_login(admin_user)
     client.post("/hijack/{}/".format(user.id))
     response = client.post(

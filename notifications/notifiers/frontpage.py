@@ -102,7 +102,7 @@ def _podcast_episodes_since_notification(notification):
     Returns podcast episodes that were created after the given notification
 
     Args:
-        notification (NotificationBase): notification 
+        notification (NotificationBase): notification
 
     Returns:
         list of PodcastEpisode: list of podcast episodes

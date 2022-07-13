@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = "Remove courses with no database record from the elasticsearch index"
 
     def handle(self, *args, **options):
-        """Delete es course records that don't have a database object """
+        """Delete es course records that don't have a database object"""
         index = get_default_alias_name(COURSE_TYPE)
 
         es_course_ids = set()

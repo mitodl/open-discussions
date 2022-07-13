@@ -91,7 +91,7 @@ def test_create_url_post_existing_meta(
 def test_post_create_post_new_meta(
     user_client, private_channel_and_contributor, mocker, settings
 ):
-    """ Tests that a new LinkMeta object is created for the URL if none exists"""
+    """Tests that a new LinkMeta object is created for the URL if none exists"""
     settings.EMBEDLY_KEY = "FAKE"
     channel, _ = private_channel_and_contributor
     link_url = "http://fake"
@@ -112,7 +112,7 @@ def test_post_create_post_new_meta(
 def test_post_create_post_no_thumbnail(
     user_client, private_channel_and_contributor, mocker, settings
 ):
-    """ Tests that no LinkMeta object is created if embedly does not return a thumbnail """
+    """Tests that no LinkMeta object is created if embedly does not return a thumbnail"""
     settings.EMBEDLY_KEY = "FAKE"
     channel, _ = private_channel_and_contributor
     link_url = "http://fake"

@@ -124,7 +124,7 @@ def test_moira_user_emails():
 
 
 def test_update_user_moira_lists(mock_moira_client):
-    """Test that update_user_moira_lists updates the user's related moira lists """
+    """Test that update_user_moira_lists updates the user's related moira lists"""
     moira_user = UserFactory.create()
     user_lists = ["test.list.1", "test.list.2", "", None]
     mock_moira_client.return_value.user_list_membership.return_value = [

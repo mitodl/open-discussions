@@ -70,7 +70,7 @@ def test_process_exception_non_auth_error(rf, settings):
 def test_process_view_blocked_ip_middleware(  # pylint:disable=too-many-arguments
     mocker, rf, is_blocked, is_super, exempt_view, is_routable
 ):
-    """ Check that `process_view` raises a PermissionDenied error when appropriate"""
+    """Check that `process_view` raises a PermissionDenied error when appropriate"""
     user = UserFactory.create(is_superuser=is_super)
     view = "search" if exempt_view else "channel-list"
     request = rf.post(reverse(view))

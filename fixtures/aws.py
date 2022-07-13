@@ -26,8 +26,8 @@ def aws_settings(settings):
 def ocw_aws_settings(aws_settings):
     """Default OCW test settings"""
     aws_settings.OCW_LEARNING_COURSE_BUCKET_NAME = (
-        "test-bucket"
-    )  # impossible bucket name
+        "test-bucket"  # impossible bucket name
+    )
     return aws_settings
 
 
@@ -49,8 +49,8 @@ def mock_ocw_learning_bucket(
 def xpro_aws_settings(aws_settings):
     """Default xPRO test settings"""
     aws_settings.XPRO_LEARNING_COURSE_BUCKET_NAME = (
-        "test-xpro-bucket"
-    )  # impossible bucket name
+        "test-xpro-bucket"  # impossible bucket name
+    )
     return aws_settings
 
 

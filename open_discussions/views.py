@@ -148,7 +148,7 @@ def handle_404(request, exception=None):
 
 
 def saml_metadata(request):
-    """ Display SAML configuration metadata as XML """
+    """Display SAML configuration metadata as XML"""
     if not features.is_enabled(features.SAML_AUTH):
         raise Http404("Page not found")
     complete_url = reverse("social:complete", args=("saml",))
@@ -160,5 +160,5 @@ def saml_metadata(request):
 
 
 def channel_redirect(request):
-    """ Redirect all URL's starting with `channel/` to `c/` """
+    """Redirect all URL's starting with `channel/` to `c/`"""
     return HttpResponsePermanentRedirect(request.path.replace("channel/", "c/", 1))

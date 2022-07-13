@@ -490,7 +490,7 @@ def test_get_xpro_files_missing_settings(mocker, settings):
 
 @mock_s3
 def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
-    """import_all_xpro_files should start chunked tasks which """
+    """import_all_xpro_files should start chunked tasks which"""
     setup_s3(settings)
     get_xpro_files_mock = mocker.patch(
         "course_catalog.tasks.get_xpro_files", autospec=True

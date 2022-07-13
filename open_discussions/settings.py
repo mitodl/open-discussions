@@ -972,7 +972,7 @@ if DEBUG:
 
 
 def setup_x509():
-    """ write the moira x509 certification & key to files"""
+    """write the moira x509 certification & key to files"""
     from open_discussions.utils import write_x509_files
 
     write_x509_files()

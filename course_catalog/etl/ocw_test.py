@@ -38,7 +38,7 @@ EMBEDDED_MEDIA = OCW_COURSE_JSON["course_embedded_media"]
 
 @pytest.fixture
 def mock_tika_functions(mocker):
-    """ Mock tika-related functions"""
+    """Mock tika-related functions"""
     mock_extract_text = mocker.patch(
         "course_catalog.etl.ocw.extract_text_metadata",
         return_value={
@@ -74,7 +74,7 @@ def mock_s3_content(mock_ocw_learning_bucket):
 
 @pytest.mark.django_db
 def test_transform_content_files(mock_tika_functions, mocker):
-    """ Verify that transform_content_files calls tika and returns expected output """
+    """Verify that transform_content_files calls tika and returns expected output"""
     mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
     mocker.patch(
         "course_catalog.etl.ocw.extract_text_from_url", return_value="tika text"
@@ -123,7 +123,7 @@ def test_transform_content_files(mock_tika_functions, mocker):
 
 @pytest.mark.django_db
 def test_transform_content_files_error(mocker):
-    """ Verify that errors are logged when transforming content files """
+    """Verify that errors are logged when transforming content files"""
     mocker.patch("course_catalog.etl.ocw.transform_content_file", side_effect=Exception)
     mocker.patch(
         "course_catalog.etl.ocw.transform_embedded_media", side_effect=Exception
@@ -160,7 +160,7 @@ def test_transform_content_files_error(mocker):
 
 @pytest.mark.django_db
 def test_transform_content_files_generic_s3_error(mocker):
-    """ Verify that ex eptions are logged when extracting text from content files  """
+    """Verify that ex eptions are logged when extracting text from content files"""
     mocker.patch("course_catalog.etl.ocw.extract_text_metadata", side_effect=Exception)
     mock_exception_log = mocker.patch("course_catalog.etl.ocw.log.exception")
     list(transform_content_files(OCW_COURSE_JSON))
@@ -185,7 +185,7 @@ def test_transform_content_files_generic_s3_error(mocker):
 
 @pytest.mark.django_db
 def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_bucket):
-    """ Verify that transform_content_files calls tika and returns expected output """
+    """Verify that transform_content_files calls tika and returns expected output"""
     mock_warn_log = mocker.patch("course_catalog.etl.ocw.log.warning")
     bad_key = "4-105-geometric-disciplines-fall-2012/e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
 
@@ -203,7 +203,7 @@ def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_buc
 
 @pytest.mark.django_db
 def test_transform_content_file_course_files(mock_tika_functions):
-    """ Test that contents of course_files are transformed correctly """
+    """Test that contents of course_files are transformed correctly"""
     for course_file in COURSE_FILES:
         (section, section_slug) = get_content_file_section(course_file, COURSE_PAGES)
         expected_transform = {
@@ -249,7 +249,7 @@ def test_transform_content_file_course_files(mock_tika_functions):
 
 @pytest.mark.django_db
 def test_transform_content_file_course_foreign_files(mock_tika_functions):
-    """ Test that contents of course_foreign_files are transformed correctly """
+    """Test that contents of course_foreign_files are transformed correctly"""
     for course_file in FOREIGN_FILES:
         (section, section_slug) = get_content_file_section(course_file, COURSE_PAGES)
         expected_transform = {
@@ -292,7 +292,7 @@ def test_transform_content_file_course_foreign_files(mock_tika_functions):
 
 @pytest.mark.django_db
 def test_transform_content_file_course_pages(mock_tika_functions):
-    """ Test that contents of course_pages are transformed correctly """
+    """Test that contents of course_pages are transformed correctly"""
     for course_page in COURSE_PAGES:
         (section, section_slug) = get_content_file_section(course_page, COURSE_PAGES)
         expected_transform = {
@@ -341,7 +341,7 @@ def test_transform_content_file_course_pages(mock_tika_functions):
 @pytest.mark.parametrize("video_exists", [True, False])
 @pytest.mark.parametrize("url_response", ["tika text", None])
 def test_transform_embedded_media(mocker, video_exists, url_response):
-    """ Test that contents of embedded media are transformed correctly """
+    """Test that contents of embedded media are transformed correctly"""
     mocker.patch(
         "course_catalog.etl.ocw.extract_text_from_url", return_value=url_response
     )
@@ -415,7 +415,7 @@ def test_get_content_file_section():
 
 
 def test_get_content_file_url(settings):
-    """ Test that correct URL's are returned """
+    """Test that correct URL's are returned"""
     settings.OCW_BASE_URL = "http://ocw.mit.edu"
 
     for page in COURSE_PAGES:

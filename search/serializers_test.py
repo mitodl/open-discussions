@@ -458,7 +458,7 @@ def test_es_course_serializer(offered_by, platform, department):
 )
 @pytest.mark.parametrize("ocw_next_course", [True, False])
 def test_es_content_file_serializer(section, section_resource_type, ocw_next_course):
-    """ Verify that the ESContentFileSerializer has the correct data"""
+    """Verify that the ESContentFileSerializer has the correct data"""
     content_kwargs = {
         "content": "Some text",
         "content_author": "MIT",

@@ -84,7 +84,7 @@ def generate_gravatar_image(user, image_field=None):
 
 
 def image_uri(profile, image_field=IMAGE_SMALL):
-    """ Return the correctly formatted profile image URI for a user """
+    """Return the correctly formatted profile image URI for a user"""
     if profile:
         image_file = getattr(profile, "{}_file".format(image_field))
         if not image_file.name:

@@ -917,7 +917,7 @@ def test_load_content_file():
 
 
 def test_load_content_file_error(mocker):
-    """ Test that an exception in load_content_file is logged """
+    """Test that an exception in load_content_file is logged"""
     learning_resource_run = LearningResourceRunFactory.create()
     mock_log = mocker.patch("course_catalog.etl.loaders.log.exception")
     load_content_file(learning_resource_run, {"uid": "badfile", "bad": "data"})

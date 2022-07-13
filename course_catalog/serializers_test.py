@@ -340,7 +340,7 @@ def test_podcast_episode_serializer():
 
 
 def test_ocw_next_serializer(
-    ocw_next_valid_data
+    ocw_next_valid_data,
 ):  # pylint:disable=redefined-outer-name
     """OCWNextSerializer should generate a course with the correct data"""
     ocw_next_valid_data["uid"] = "97db384ef34009a64df7cb86cf701970"

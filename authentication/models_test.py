@@ -18,7 +18,7 @@ from authentication.models import BlockedIPRange
     ],
 )
 def test_blocked_ip_range_validation(ip_start, ip_end, error, settings):
-    """ Test that validation for BlockedIPRange works as expected """
+    """Test that validation for BlockedIPRange works as expected"""
     settings.IPWARE_PRIVATE_IP_PREFIX = ("10.", "192.168.")
     ip_range = BlockedIPRange(ip_start=ip_start, ip_end=ip_end)
     if error:

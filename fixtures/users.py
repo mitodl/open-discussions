@@ -88,7 +88,7 @@ def staff_client(client, staff_user):
 
 @pytest.fixture
 def profile_image():
-    """ Create a PNG image """
+    """Create a PNG image"""
     image_file = BytesIO()
     image = Image.new("RGBA", size=(250, 250), color=(256, 0, 0))
     image.save(image_file, "png")

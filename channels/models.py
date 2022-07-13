@@ -378,7 +378,7 @@ class ChannelMembershipConfig(TimestampedModel):
 
 
 class SpamCheckResult(TimestampedModel):
-    """ Data model for spam checks """
+    """Data model for spam checks"""
 
     content_type = models.ForeignKey(
         ContentType,

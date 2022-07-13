@@ -200,7 +200,7 @@ def test_is_text_post_spam(mock_akismet, post_checker, user_request_args, user):
 @pytest.mark.parametrize("is_spam", [True, False])
 @pytest.mark.parametrize("ip_address", ["10.1.1.18", "fake", None, ""])
 def test_save_spam_result(*, model, is_spam, ip_address):
-    """ Test that a SpamCheckResult object is created with correct values """
+    """Test that a SpamCheckResult object is created with correct values"""
     user_ip = ip_address
     user_agent = "Fake"
     object_type = ContentType.objects.get(model=model)
@@ -236,7 +236,7 @@ def test_save_spam_result(*, model, is_spam, ip_address):
     ],
 )
 def test_exempt_from_spamcheck(settings, email, is_exempt, feature_enabled):
-    """ Test that emails are correctly determined to be exempt or not from span checks"""
+    """Test that emails are correctly determined to be exempt or not from span checks"""
     settings.FEATURES[features.SPAM_EXEMPTIONS] = feature_enabled
     settings.SPAM_EXEMPT_EMAILS = [
         "[@\\.]mit\\.edu",

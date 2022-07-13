@@ -252,7 +252,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
 
 @pytest.mark.parametrize("has_metadata", [True, False])
 def test_transform_content_files(mocker, has_metadata):
-    """transform_content_files """
+    """transform_content_files"""
     document = "some text in the document"
     key = "a key here"
     content_type = "course"

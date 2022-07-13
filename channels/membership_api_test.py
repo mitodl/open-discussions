@@ -52,7 +52,7 @@ def test_update_memberships_for_managed_channels(mocker):
 @pytest.mark.parametrize("is_managed", [True, False])
 @pytest.mark.parametrize("has_configs", [True, False])
 def test_update_memberships_for_managed_channel(mocker, is_managed, has_configs):
-    """"Verifies that update_memberships_for_managed_channel() adds matching users as members to a channel"""
+    """ "Verifies that update_memberships_for_managed_channel() adds matching users as members to a channel"""
     mock_api = mocker.patch("channels.api.Api", autospec=True).return_value
     channel = ChannelFactory.create(membership_is_managed=is_managed)
     if has_configs:

@@ -13,7 +13,7 @@ class MoiraListFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def channels(self, create, extracted, **kwargs):
-        """ Create associated channels"""
+        """Create associated channels"""
         if not create:
             # Simple build, do nothing.
             return
@@ -25,7 +25,7 @@ class MoiraListFactory(factory.django.DjangoModelFactory):
 
     @factory.post_generation
     def users(self, create, extracted, **kwargs):
-        """ Create associated users"""
+        """Create associated users"""
         if not create:
             # Simple build, do nothing.
             return

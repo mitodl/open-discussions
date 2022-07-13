@@ -10,7 +10,7 @@ from widgets.serializers.widget_list import WidgetListSerializer
 class WidgetListViewSet(
     mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet
 ):
-    """API for managing widget lists """
+    """API for managing widget lists"""
 
     queryset = WidgetList.objects.prefetch_related("widgets").all()
     serializer_class = WidgetListSerializer

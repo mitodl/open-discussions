@@ -53,8 +53,8 @@ def test_serialize_channel(
     )
 
     channel._self_channel.moderator_notifications = (
-        moderator_notifications
-    )  # pylint: disable=protected-access
+        moderator_notifications  # pylint: disable=protected-access
+    )
 
     request = Mock(user=user)
 

@@ -353,7 +353,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     @property
     def coursenum(self):
-        """ Returns the course number from the course_id"""
+        """Returns the course number from the course_id"""
         return self.course_id.split("+")[-1]
 
     def __str__(self):

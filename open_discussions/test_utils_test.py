@@ -48,7 +48,7 @@ def test_assert_not_raises_failure():
 
 
 def test_mock_response():
-    """ assert MockResponse returns correct values """
+    """assert MockResponse returns correct values"""
     content = "test"
     response = MockResponse(content, 404)
     assert response.status_code == 404
