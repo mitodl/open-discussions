@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.190.0
+Version 0.190.0 (Released July 13, 2022)
 ---------------
 
 - discussions search uses new course-search-utils (#3616)
