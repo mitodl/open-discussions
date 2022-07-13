@@ -24,7 +24,10 @@ def test_create_moderator_post_event():
 
 @pytest.mark.betamax
 def test_send_notification(
-    mocker, reddit_factories, private_channel_and_contributor, staff_api
+    mocker,
+    reddit_factories,
+    private_channel_and_contributor,
+    staff_api,  # pylint:disable=unused-argument
 ):
     """Tests send_notification"""
     channel, user = private_channel_and_contributor

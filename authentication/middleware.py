@@ -47,7 +47,9 @@ class BlockedIPMiddleware(MiddlewareMixin):
     Only allow GET/HEAD requests for blocked ips, unless exempt or a superuser
     """
 
-    def process_view(self, request, callback, callback_args, callback_kwargs):
+    def process_view(
+        self, request, callback, callback_args, callback_kwargs
+    ):  # pylint:disable=unused-argument
         """
         Blocks an individual request if: it is from a blocked ip range, routable, not a safe request
         and not from a superuser (don't want admins accidentally locking themselves out).

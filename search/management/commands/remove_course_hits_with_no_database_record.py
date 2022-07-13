@@ -1,4 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+"""Delete es course records that don't have a database object"""
+from django.core.management.base import BaseCommand
 
 from course_catalog.models import Course
 from search.connection import get_default_alias_name

@@ -38,7 +38,7 @@ class BlockedIPRange(TimestampedModel):
     def clean(self):
         for ip in (self.ip_start, self.ip_end):
             if ip is None:
-                raise ValidationError(f"IP cannot be null", code="invalid")
+                raise ValidationError("IP cannot be null", code="invalid")
             if is_private_ip(ip):
                 raise ValidationError(f"IP {ip} is not routable", code="invalid")
         if ip_address(self.ip_start) > ip_address(self.ip_end):

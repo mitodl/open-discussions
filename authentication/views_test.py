@@ -589,7 +589,9 @@ def register_profile_details(client):
     ],
     ids=lambda arg: "->".join(arg) if isinstance(arg, list) else None,
 )
-def test_login_register_flows(request, steps, enrollment_job_mock):
+def test_login_register_flows(
+    request, steps, enrollment_job_mock
+):  # pylint:disable=unused-argument
     """Walk the steps and assert expected results"""
     last_result = None
     for fixture_name in steps:

@@ -62,7 +62,6 @@ from course_catalog.models import (
     ContentFile,
     Podcast,
     PodcastEpisode,
-    ContentFile,
 )
 
 pytestmark = pytest.mark.django_db
@@ -882,7 +881,7 @@ def test_load_content_files(mocker, is_published):
         "course_catalog.etl.loaders.search_task_helpers.delete_run_content_files",
         autospec=True,
     )
-    mock_delete = mocker.patch(
+    mocker.patch(
         "course_catalog.etl.loaders.search_task_helpers.delete_content_file",
         autospec=True,
     )

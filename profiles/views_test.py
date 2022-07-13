@@ -328,7 +328,10 @@ def test_initialized_avatar(client, user):
     )
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.__getitem__("Content-Type") == "image/png"
+    assert (
+        resp.__getitem__("Content-Type")  # pylint:disable=unnecessary-dunder-call
+        == "image/png"
+    )
 
 
 def test_initials_avatar_fake_user(client):

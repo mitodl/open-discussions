@@ -21,7 +21,7 @@ from open_discussions import features
 from profiles.models import SOCIAL_SITE_NAME_MAP
 
 
-def _render_app(request, initial_state=None):
+def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
     """Render the app with settings"""
     if request.META.get("HTTP_USER_AGENT", "").startswith("facebookexternalhit"):
         return render(
@@ -126,21 +126,21 @@ def channel_post(request, **kwargs):
     return _render_app(request)
 
 
-def handle_400(request, exception=None):
+def handle_400(request, exception=None):  # pylint:disable=unused-argument
     """400 error handler"""
     return HttpResponseBadRequest(
         _render_app(request, initial_state={"server": {"statusCode": 400}})
     )
 
 
-def handle_403(request, exception=None):
+def handle_403(request, exception=None):  # pylint:disable=unused-argument
     """403 error handler"""
     return HttpResponseForbidden(
         _render_app(request, initial_state={"server": {"statusCode": 403}})
     )
 
 
-def handle_404(request, exception=None):
+def handle_404(request, exception=None):  # pylint:disable=unused-argument
     """404 error handler"""
     return HttpResponseNotFound(
         _render_app(request, initial_state={"server": {"statusCode": 404}})

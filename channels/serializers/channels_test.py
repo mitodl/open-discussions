@@ -73,7 +73,7 @@ def test_serialize_channel(
         "avatar_small": channel.avatar_small.url if has_avatar else None,
         "avatar_medium": channel.avatar_medium.url if has_avatar else None,
         "banner": channel.banner.url if has_banner else None,
-        "ga_tracking_id": channel.ga_tracking_id,
+        "ga_tracking_id": ga_tracking_id,
         "allowed_post_types": [
             key for key, enabled in allowed_post_types.items() if enabled
         ]
@@ -208,7 +208,7 @@ def test_update_channel_moderator_notifications(user, moderator_notifications):
 
 
 @pytest.mark.parametrize("ga_tracking_id", ["test", "", None])
-def test_update_channel_moderator_notifications(user, ga_tracking_id):
+def test_update_channel_moderator_notifications_tracking(user, ga_tracking_id):
     """
     Test updating the channel moderator_notifications field
     """

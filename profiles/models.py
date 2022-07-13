@@ -107,7 +107,9 @@ class Profile(models.Model):
             else:
                 self.image_small_file = None
                 self.image_medium_file = None
-        super(Profile, self).save(*args, **kwargs)
+        super(Profile, self).save(  # pylint:disable=super-with-arguments
+            *args, **kwargs
+        )
 
     def __str__(self):
         return "{}".format(self.name)

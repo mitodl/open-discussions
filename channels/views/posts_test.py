@@ -292,7 +292,7 @@ def test_patch_article_validate_cover_image(
     assert resp.status_code == status.HTTP_400_BAD_REQUEST
     assert resp.json() == {
         "error_type": "ValidationError",
-        "cover_image": [f"Expected cover image to be a file or url"],
+        "cover_image": ["Expected cover image to be a file or url"],
     }
 
 

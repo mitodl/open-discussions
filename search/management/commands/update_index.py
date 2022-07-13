@@ -41,7 +41,7 @@ class Command(BaseCommand):
             dest="platform",
             default=None,
             choices=allowed_course_platforms,
-            help=f"Filter courses and course files update by platform.",
+            help="Filter courses and course files update by platform.",
         )
 
         super().add_arguments(parser)

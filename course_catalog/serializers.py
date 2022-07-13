@@ -639,7 +639,7 @@ class UserListSerializer(
                     )
                 )
             except ValueError:
-                raise ValidationError(f"Topic ids must be integers")
+                raise ValidationError("Topic ids must be integers")
             missing = set(topics).difference(valid_topic_ids)
             if missing:
                 raise ValidationError(f"Invalid topic ids: {missing}")

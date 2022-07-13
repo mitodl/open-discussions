@@ -418,7 +418,7 @@ def index_courses(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_courses threw an error"
+        error = "index_courses threw an error"
         log.exception(error)
         return error
 
@@ -458,7 +458,7 @@ def index_course_content_files(course_ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_course_content_files threw an error"
+        error = "index_course_content_files threw an error"
         log.exception(error)
         return error
 
@@ -479,7 +479,7 @@ def index_run_content_files(run_id, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_run_content_files threw an error"
+        error = "index_run_content_files threw an error"
         log.exception(error)
         return error
 
@@ -498,7 +498,7 @@ def delete_run_content_files(run_id):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"delete_run_content_files threw an error"
+        error = "delete_run_content_files threw an error"
         log.exception(error)
         return error
 
@@ -518,7 +518,7 @@ def index_programs(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_programs threw an error"
+        error = "index_programs threw an error"
         log.exception(error)
         return error
 
@@ -537,7 +537,7 @@ def bulk_delete_programs(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"bulk_delete_programs threw an error"
+        error = "bulk_delete_programs threw an error"
         log.exception(error)
         return error
 
@@ -557,7 +557,7 @@ def index_user_lists(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_user_lists threw an error"
+        error = "index_user_lists threw an error"
         log.exception(error)
         return error
 
@@ -576,7 +576,7 @@ def bulk_delete_user_lists(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"bulk_delete_user_lists threw an error"
+        error = "bulk_delete_user_lists threw an error"
         log.exception(error)
         return error
 
@@ -596,7 +596,7 @@ def index_videos(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_videos threw an error"
+        error = "index_videos threw an error"
         log.exception(error)
         return error
 
@@ -615,7 +615,7 @@ def bulk_delete_videos(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"bulk_delete_videos threw an error"
+        error = "bulk_delete_videos threw an error"
         log.exception(error)
         return error
 
@@ -634,7 +634,7 @@ def index_podcasts(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_podcasts threw an error"
+        error = "index_podcasts threw an error"
         log.exception(error)
         return error
 
@@ -653,7 +653,7 @@ def bulk_delete_podcasts(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"bulk_delete_podcasts threw an error"
+        error = "bulk_delete_podcasts threw an error"
         log.exception(error)
         return error
 
@@ -672,7 +672,7 @@ def index_podcast_episodes(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"index_podcast_episodes threw an error"
+        error = "index_podcast_episodes threw an error"
         log.exception(error)
         return error
 
@@ -691,7 +691,7 @@ def bulk_delete_podcast_episodes(ids):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = f"bulk_delete_podcast_episodes threw an error"
+        error = "bulk_delete_podcast_episodes threw an error"
         log.exception(error)
         return error
 

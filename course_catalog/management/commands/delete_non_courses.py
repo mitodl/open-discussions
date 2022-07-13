@@ -12,11 +12,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         bucket = get_ocw_learning_course_bucket()
-        prefixes = [prefix.split("/")[-1] for prefix in NON_COURSE_DIRECTORIES]
+        prefixes = [
+            prefix.split("/")[-1]  # pylint:disable=use-maxsplit-arg
+            for prefix in NON_COURSE_DIRECTORIES
+        ]
 
-        self.stdout.write(f"Searching for non-courses")
+        self.stdout.write("Searching for non-courses")
         for bucket_file in bucket.objects.all():
             if bucket_file.key.split("/")[0] in prefixes:
                 self.stdout.write(f"Deleting {bucket_file.key}")
                 bucket.delete_objects(Delete={"Objects": [{"Key": bucket_file.key}]})
-        self.stdout.write(f"Finished")
+        self.stdout.write("Finished")

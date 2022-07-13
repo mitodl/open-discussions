@@ -739,7 +739,7 @@ def test_sync_ocw_course_skip(mocker, prefix, skip):
         [None, "2020-12-02 00:00:00 US/Eastern", False],
     ],  # pylint:disable=too-many-arguments
 )
-def test_sync_ocw_course_published(
+def test_sync_ocw_course_published(  # pylint:disable=too-many-arguments
     settings, mocker, pub_date, unpub_date, published, blocklisted
 ):
     """The course should be published or not based on dates, and always uploaded"""

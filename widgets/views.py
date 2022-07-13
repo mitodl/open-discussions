@@ -14,4 +14,6 @@ class WidgetListViewSet(
 
     queryset = WidgetList.objects.prefetch_related("widgets").all()
     serializer_class = WidgetListSerializer
-    permission_classes = [ReadOnly | ObjectOnlyPermissions]
+    permission_classes = [
+        ReadOnly | ObjectOnlyPermissions  # pylint:disable=unsupported-binary-operation
+    ]
