@@ -62,7 +62,7 @@ toolz==0.10.0
 ulid-py
 urllib3>=1.25.10
 uwsgi
-wrapt==1.10.11
+wrapt==1.14.1
 xbundle==0.3.1
 git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4
 pyathena==2.1.1

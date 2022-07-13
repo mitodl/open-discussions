@@ -417,7 +417,7 @@ webencodings==0.5.1
     #   tinycss2
 webvtt-py==0.4.6
     # via ocw-data-parser
-wrapt==1.10.11
+wrapt==1.14.1
     # via
     #   -r requirements.in
     #   deprecated

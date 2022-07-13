@@ -1,5 +1,5 @@
 [tool.black]
-py36 = true
+py39 = true
 include = '\.pyi?$'
 exclude = '''
 /(
