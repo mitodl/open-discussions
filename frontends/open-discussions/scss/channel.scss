@@ -194,37 +194,6 @@
   }
 }
 
-.channel-about {
-  position: relative;
-  max-width: 400px;
-
-  .mod-link-wrapper {
-    margin: 15px 0;
-  }
-
-  .card-contents {
-    padding: 15px 26px;
-  }
-
-  .title {
-    margin-left: 0;
-    font-size: 16px;
-    font-weight: bold;
-  }
-
-  .description {
-    font-size: 15px;
-    line-height: 1.4;
-    color: $font-darkgrey;
-  }
-
-  .edit-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-  }
-}
-
 $avatar-dimension-medium: 57px;
 $avatar-dimension-small: 22px;
 
