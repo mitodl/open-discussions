@@ -3,7 +3,7 @@ import React from "react"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util" 
+import { Card } from "ol-util"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"
 import MembersNavbar from "../../components/admin/MembersNavbar"
 import MembersList from "../../components/admin/MembersList"

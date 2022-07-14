@@ -3,7 +3,7 @@
 import React from "react"
 import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util" 
+import { Card } from "ol-util"
 import { CanonicalLink } from "ol-util"
 import { formatTitle } from "../../lib/title"
 

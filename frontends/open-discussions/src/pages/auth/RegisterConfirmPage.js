@@ -6,7 +6,7 @@ import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
 import { Link } from "react-router-dom"
 
-import { Card } from "ol-util" 
+import { Card } from "ol-util"
 import { Loading } from "../../components/Loading"
 import { CanonicalLink } from "ol-util"
 

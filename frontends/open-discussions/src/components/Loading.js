@@ -4,7 +4,7 @@ import R from "ramda"
 import ContentLoader from "react-content-loader"
 
 import { NotFound, NotAuthorized } from "./ErrorPages"
-import { Card } from "ol-util" 
+import { Card } from "ol-util"
 import { Cell, Grid } from "./Grid"
 
 import { contentLoaderSpeed } from "../lib/constants"

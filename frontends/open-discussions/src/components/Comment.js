@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 
 import Dialog from "./Dialog"
 import ReportCount from "./ReportCount"
-import { Card } from "ol-util" 
+import { Card } from "ol-util"
 import CommentForm from "./CommentForm"
 import CommentVoteForm from "./CommentVoteForm"
 import CommentRemovalForm from "./CommentRemovalForm"

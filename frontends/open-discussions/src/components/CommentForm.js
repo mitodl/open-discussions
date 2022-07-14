@@ -4,7 +4,6 @@ import React from "react"
 import { connect } from "react-redux"
 import { Formik, Form, Field } from "formik"
 
-import { Card } from "ol-util" 
 import LoginTooltip from "./LoginTooltip"
 import ProfileImage, { PROFILE_IMAGE_MICRO } from "./ProfileImage"
 
