@@ -1,17 +1,16 @@
 @use "material-components-web/dist/material-components-web";
-@use "ol-util/assets/variables.scss";
-
 @use "ol-util/assets/card";
 
-@use "button";
+@use "theme";
+@use "button" with ( $color: theme.$color-primary );
 @use "columns";
 
 body { 
-  font-family: variables.$body-font;
+  font-family: theme.$font-family-default;
+  color: theme.$font-color-default;
   background-image: linear-gradient(123deg, #e5e9f4, #ffffff);
   margin: 0;
   padding: 0;
-  color: variables.$font-black;
 }
 
 * {
@@ -20,7 +19,7 @@ body {
 
 input[type="text"] {
   padding: 10px;
-  border: 1px solid variables.$input-border-grey;
+  border: 1px solid theme.$color-gray-2;
 }
 
 .app-container {

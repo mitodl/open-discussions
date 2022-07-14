@@ -1,8 +1,9 @@
-@use "variables";
+$background: #fff !default;
+$shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36) !default;
 
 %card {
     width: 100%;
-    background-color: variables.$card-background;
+    background-color: $background;
     border-radius: 5px;
     margin: 0 0 20px 0;
   
@@ -32,7 +33,7 @@
     }
   
     &.persistent-shadow {
-      box-shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36);
+      box-shadow: $shadow;
     }
   
     &.low-padding {
