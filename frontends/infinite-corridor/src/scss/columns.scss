@@ -1,0 +1,12 @@
+.one-column {
+    width: 80%;
+    max-width: 950px;
+
+    @include breakpoint(mobile) {
+      width: 90%;
+    }
+
+    @include breakpoint(phone) {
+      width: 95%;
+    }
+  }

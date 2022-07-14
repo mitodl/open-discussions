@@ -1,0 +1,26 @@
+@import "~material-components-web/dist/material-components-web.css";
+@import "~ol-util/assets/variables.scss";
+@import "~ol-util/assets/breakpoint.scss";
+@import "button";
+@import "columns";
+
+body { 
+  font-family: $body-font;
+  background-image: linear-gradient(123deg, #e5e9f4, #ffffff);
+  margin: 0;
+  padding: 0;
+  color: $font-black;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input[type="text"] {
+  padding: 10px;
+  border: 1px solid $input-border-grey;
+}
+
+.app-container {
+  height: 100vh;
+}

@@ -76,7 +76,6 @@ const BannerPageWrapper = styled.div`
 `
 
 const BannerPageHeader = styled.div`
-  margin-bottom: 20px;
   ${imageWrapperHeight};
 `
 
