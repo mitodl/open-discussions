@@ -1,12 +1,14 @@
+@use "ol-util/assets/breakpoint";
+
 .one-column {
     width: 80%;
     max-width: 950px;
 
-    @include breakpoint(mobile) {
+    @include breakpoint.breakpoint(mobile) {
       width: 90%;
     }
 
-    @include breakpoint(phone) {
+    @include breakpoint.breakpoint(phone) {
       width: 95%;
     }
   }
