@@ -2,6 +2,7 @@ import React from "react"
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/FieldPage"
+import * as urls from "./pages/urls"
 import { Route, Router } from "react-router"
 import { History } from "history"
 import { ThemeProvider } from "styled-components"
@@ -44,13 +45,13 @@ const App: React.FC<AppProps> = ({ history }) => {
       <ThemeProvider theme={combinedTheme}>
         <QueryClientProvider client={queryClient}>
           <Router history={history}>
-            <Route path={BASE_URL} exact>
+            <Route path={urls.HOME} exact>
               <HomePage />
             </Route>
-            <Route path={`${BASE_URL}/search`}>
+            <Route path={urls.SEARCH}>
               <SearchPage />
             </Route>
-            <Route path={`${BASE_URL}/fields/:name`}>
+            <Route path={urls.FIELD_VIEW}>
               <FieldPage />
             </Route>
           </Router>

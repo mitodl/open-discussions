@@ -11,6 +11,7 @@ import { Searchbox, SearchboxControlled } from "ol-search-ui"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
+import * as urls from "./urls"
 
 export const COURSE_BANNER_URL = "/static/images/lawn_and_river_banner.png"
 
@@ -24,7 +25,6 @@ const LearningResourceSearchbox = styled(Searchbox)`
 const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
-  const currentPath = history.location.pathname
   const onSearchClear = useCallback(() => setSearchText(""), [])
   const onSearchChange: SearchboxControlled["onChange"] = useCallback((e) => {
     setSearchText(e.target.value)
@@ -59,7 +59,7 @@ const HomePage: React.FC = () => {
         <ul>
           {fieldsList.data?.results.map((field) => (
             <li key={field.name}>
-              <Link to={`${currentPath}/fields/${field.name}`}>
+              <Link to={urls.makeFieldViewPath(field.name)}>
                 {field.title}
               </Link>
             </li>
