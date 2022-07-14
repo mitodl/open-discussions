@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.190.1 (Released July 14, 2022)
+---------------
+
+- Remove OPEN_DISCUSSIONS_DEFAULT_SITE_KEY and authenticated site section of README (#3617)
+
 Version 0.190.0 (Released July 13, 2022)
 ---------------
 
