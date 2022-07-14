@@ -6,7 +6,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 
-import Card from "../components/Card"
+import { Card } from "ol-util"
 import SettingsTabs from "../components/SettingsTabs"
 import { CanonicalLink } from "ol-util"
 

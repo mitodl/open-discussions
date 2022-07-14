@@ -6,7 +6,7 @@ import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 
-import Card from "../components/Card"
+import { Card } from "ol-util"
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
 import { CanonicalLink } from "ol-util"

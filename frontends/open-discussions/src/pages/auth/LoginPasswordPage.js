@@ -4,7 +4,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"

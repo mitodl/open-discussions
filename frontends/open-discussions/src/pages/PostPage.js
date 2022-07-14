@@ -7,7 +7,7 @@ import { Link } from "react-router-dom"
 import qs from "query-string"
 import { MetaTags } from "react-meta-tags"
 
-import Card from "../components/Card"
+import { Card } from "ol-util"
 import { withSpinnerLoading } from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"

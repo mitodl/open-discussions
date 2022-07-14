@@ -4,7 +4,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import R from "ramda"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import { NotFound } from "../../components/ErrorPages"

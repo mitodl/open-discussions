@@ -2,7 +2,7 @@
 /* global SETTINGS */
 import React from "react"
 
-import Card from "../Card"
+import { Card } from "ol-util"
 import ChannelAvatar from "../ChannelAvatar"
 import ChannelBanner from "../ChannelBanner"
 

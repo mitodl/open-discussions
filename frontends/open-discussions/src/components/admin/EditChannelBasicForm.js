@@ -4,7 +4,7 @@ import React from "react"
 import { Checkbox } from "@rmwc/checkbox"
 import R from "ramda"
 
-import Card from "../Card"
+import { Card } from "ol-util"
 
 import { channelURL } from "../../lib/url"
 import {

@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 
-import Card from "../components/Card"
+import { Card } from "ol-util"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../components/ProfileImage"
 import ProfileContributionFeed from "../components/ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"

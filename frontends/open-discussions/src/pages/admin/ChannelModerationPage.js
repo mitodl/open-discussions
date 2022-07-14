@@ -6,7 +6,7 @@ import { connect } from "react-redux"
 import { MetaTags } from "react-meta-tags"
 import { Redirect } from "react-router"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util"
 import {
   withPostModeration,
   postModerationSelector

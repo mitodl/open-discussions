@@ -1,7 +1,8 @@
 @use "sass:color";
+@use "ol-util/assets/variables.scss";
 
 .ol-btn {
-    background-color: $rouge;
+    background-color: variables.$rouge;
     color: white;
     margin: 0 10px 5px 0;
     padding: 9px 36px;
@@ -12,9 +13,9 @@
     text-decoration: none;
     cursor: pointer;
     &:hover {
-        background-color: color.adjust($rouge, $lightness: -10%);
+        background-color: color.adjust(variables.$rouge, $lightness: -10%);
     }
     &:active {
-        background-color: color.adjust($rouge, $saturation: -20%);
+        background-color: color.adjust(variables.$rouge, $saturation: -20%);
     }
 }

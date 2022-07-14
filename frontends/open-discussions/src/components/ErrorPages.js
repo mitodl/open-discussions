@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 
-import Card from "../components/Card"
+import { Card } from "ol-util"
 
 const ErrorPage = (header: string, detail: string) => () =>
   (

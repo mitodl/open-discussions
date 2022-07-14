@@ -7,3 +7,5 @@ export {
   BannerPageWrapper,
 } from "./PageBanner"
 export { Grid, Cell } from "./Grid"
+
+export { default as Card } from "./Card"

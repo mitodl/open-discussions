@@ -7,7 +7,7 @@ import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 import qs from "query-string"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util"
 import ExternalLogins from "../../components/ExternalLogins"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
