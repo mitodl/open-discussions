@@ -5,7 +5,7 @@ import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 import R from "ramda"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util" 
 import PasswordResetConfirmForm from "../../components/auth/PasswordResetConfirmForm"
 import withForm from "../../hoc/withForm"
 import { CanonicalLink } from "ol-util"

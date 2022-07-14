@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import Card from "../components/Card"
+import { Card } from "ol-util" 
 
 import { userIsAnonymous } from "../lib/util"
 import { REGISTER_URL, newPostURL, MIT_LOGO_URL } from "../lib/url"

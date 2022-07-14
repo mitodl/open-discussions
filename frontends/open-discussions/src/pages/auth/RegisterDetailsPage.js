@@ -4,7 +4,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { MetaTags } from "react-meta-tags"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util" 
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
 import { CanonicalLink } from "ol-util"

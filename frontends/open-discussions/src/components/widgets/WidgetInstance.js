@@ -2,7 +2,7 @@
 import React from "react"
 import { SortableElement } from "react-sortable-hoc"
 
-import Card from "../Card"
+import { Card } from "ol-util" 
 import DragHandle from "./DragHandle"
 
 import { validWidgetRenderers } from "../../lib/widgets"

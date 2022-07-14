@@ -1,0 +1,44 @@
+@use "variables";
+
+%card {
+    width: 100%;
+    background-color: variables.$card-background;
+    border-radius: 5px;
+    margin: 0 0 20px 0;
+  
+    &:hover {
+      box-shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36);
+    }
+  
+    .card-contents {
+      margin: 0;
+      padding: 20px;
+    }
+  
+    .card-title {
+      font-size: 18px;
+      font-weight: 400;
+      margin: 10px 0 7px 10px;
+    }
+}
+  
+.card {
+    @extend %card;
+  
+    &.borderless {
+      .card-contents {
+        padding: 0;
+      }
+    }
+  
+    &.persistent-shadow {
+      box-shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36);
+    }
+  
+    &.low-padding {
+      .card-contents {
+        padding: 10px;
+      }
+    }
+}
+  

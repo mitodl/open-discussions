@@ -4,7 +4,7 @@ import React from "react"
 import Dotdotdot from "react-dotdotdot"
 import moment from "moment"
 
-import Card from "./Card"
+import { Card } from "ol-util" 
 import PodcastPlayButton from "./PodcastPlayButton"
 
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"

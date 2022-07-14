@@ -6922,7 +6922,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.2.5, classnames@npm:^2.2.6":
+"classnames@npm:^2.2.5, classnames@npm:^2.2.6, classnames@npm:^2.3.1":
   version: 2.3.1
   resolution: "classnames@npm:2.3.1"
   checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
@@ -14021,6 +14021,8 @@ __metadata:
 "ol-util@workspace:*, ol-util@workspace:frontends/ol-util":
   version: 0.0.0-use.local
   resolution: "ol-util@workspace:frontends/ol-util"
+  dependencies:
+    classnames: ^2.3.1
   peerDependencies:
     react: ^16.10 || 17 || 18
     react-router: ^5 || ^6
@@ -14164,6 +14166,7 @@ __metadata:
     chai: 4.2.0
     chai-as-promised: 7.1.1
     cheerio: 1.0.0-rc.9
+    classnames: ^2.3.1
     codecov: 3.7.1
     core-js: 3.2.0
     css-loader: 3.6.0

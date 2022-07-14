@@ -5,7 +5,7 @@ import moment from "moment"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 
-import Card from "./Card"
+import { Card } from "ol-util"
 import DropdownMenu from "./DropdownMenu"
 import ReportCount from "./ReportCount"
 import PostUpvoteButton from "./PostUpvoteButton"

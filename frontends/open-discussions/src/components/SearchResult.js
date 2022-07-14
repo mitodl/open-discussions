@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import Card from "./Card"
+import { Card } from "ol-util" 
 import CompactPostDisplay from "./CompactPostDisplay"
 import { LearningResourceCard } from "./LearningResourceCard"
 import CommentTree from "./CommentTree"

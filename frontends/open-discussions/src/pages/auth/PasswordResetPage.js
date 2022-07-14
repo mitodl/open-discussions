@@ -5,7 +5,7 @@ import { MetaTags } from "react-meta-tags"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 import R from "ramda"
 
-import Card from "../../components/Card"
+import { Card } from "ol-util" 
 import PasswordResetForm from "../../components/auth/PasswordResetForm"
 import ExternalLogins from "../../components/ExternalLogins"
 import withForm from "../../hoc/withForm"

@@ -3,7 +3,7 @@
 import React from "react"
 import Dotdotdot from "react-dotdotdot"
 
-import Card from "./Card"
+import { Card } from "ol-util" 
 
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import { CAROUSEL_IMG_WIDTH } from "../lib/constants"
