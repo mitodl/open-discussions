@@ -59,9 +59,7 @@ const HomePage: React.FC = () => {
         <ul>
           {fieldsList.data?.results.map((field) => (
             <li key={field.name}>
-              <Link to={urls.makeFieldViewPath(field.name)}>
-                {field.title}
-              </Link>
+              <Link to={urls.makeFieldViewPath(field.name)}>{field.title}</Link>
             </li>
           ))}
         </ul>
