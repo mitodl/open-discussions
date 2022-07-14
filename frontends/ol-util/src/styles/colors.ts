@@ -1,4 +1,4 @@
-type Color = "fontGreyMid" | "cardBackground"
+type Color = "fontGreyMid"
 
 type ColorTheme = {
   color: Record<Color, string>
@@ -7,7 +7,6 @@ type ColorTheme = {
 const colorTheme: ColorTheme = {
   color: {
     fontGreyMid: "var(--font-grey-mid)",
-    cardBackground: "var(--card-background)",
   },
 }
 
