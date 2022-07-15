@@ -1,8 +1,7 @@
 // @flow
-import React from "react"
+import React, { useState, useCallback } from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
-import { Link } from "react-router-dom"
 import { Searchbox } from "ol-search-ui"
 
 import CourseCarousel from "../components/CourseCarousel"
@@ -87,6 +86,18 @@ export default function CourseIndexPage({ history }: Props) {
 
   useLearningResourcePermalink()
 
+  const [searchText, setSearchText] = useState("")
+  const onSearchClear = useCallback(() => setSearchText(""), [])
+  const onSearchChange = useCallback(e => {
+    setSearchText(e.target.value)
+  }, [])
+  const onSearchSubmit = useCallback(() => {
+    const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
+      q: searchText
+    })}`
+    history.push(newLocation)
+  }, [searchText, history])
+
   return (
     <BannerPageWrapper>
       <BannerPageHeader tall compactOnMobile>
@@ -95,28 +106,25 @@ export default function CourseIndexPage({ history }: Props) {
         </BannerContainer>
         <Searchbox
           className="course-searchbox"
-          onSubmit={e => {
-            const { value } = e.target
-            const newLocation = `${COURSE_SEARCH_URL}${toQueryString({
-              q: value
-            })}`
-            history.push(newLocation)
-          }}
+          value={searchText}
+          onSubmit={onSearchSubmit}
+          onClear={onSearchClear}
+          onChange={onSearchChange}
         >
           <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
             <div className="d-flex justify-content-end mt-3">
-              <Link className="link-button me-0" to={COURSE_SEARCH_URL}>
+              <button className="me-0" onClick={onSearchSubmit}>
                 Explore
-              </Link>
+              </button>
             </div>
           </ResponsiveWrapper>
         </Searchbox>
       </BannerPageHeader>
       <ResponsiveWrapper onlyOn={[PHONE]}>
         <div className="wide-view-more">
-          <Link className="link-button" to={COURSE_SEARCH_URL}>
+          <a className="link-button" onClick={onSearchSubmit}>
             Explore
-          </Link>
+          </a>
         </div>
       </ResponsiveWrapper>
       <Grid className="main-content one-column">
