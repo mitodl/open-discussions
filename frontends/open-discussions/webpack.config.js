@@ -17,6 +17,7 @@ const getPublicPath = isProduction => {
 
 
 const getWebpackConfig = mode => {
+  console.log(`Building for ${mode}`)
   const isProduction = mode === "production"
   const publicPath = getPublicPath(isProduction)
   return {

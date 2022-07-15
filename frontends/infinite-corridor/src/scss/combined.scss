@@ -4,22 +4,21 @@
 @use "theme";
 @use "button" with ( $color: theme.$color-primary );
 @use "columns";
+@use "main-search";
 
-body { 
+html {
   font-family: theme.$font-family-default;
   color: theme.$font-color-default;
-  background-image: linear-gradient(123deg, #e5e9f4, #ffffff);
+}
+
+body { 
+  background-color: theme.$color-background;
   margin: 0;
   padding: 0;
 }
 
 * {
   box-sizing: border-box;
-}
-
-input[type="text"] {
-  padding: 10px;
-  border: 1px solid theme.$color-gray-2;
 }
 
 .app-container {

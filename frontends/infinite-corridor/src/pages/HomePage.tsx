@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react"
 
 import styled from "styled-components"
-import { Searchbox, SearchboxControlled } from "ol-search-ui"
+import { Searchbox, SearchboxControlled, SearchInput } from "ol-search-ui"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
@@ -29,14 +29,17 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-        <LearningResourceSearchbox
+      <div className="mdc-layout-grid one-column">
+        <h2>MIT Fields</h2>
+        <SearchInput
           value={searchText}
+          placeholder="Search for online courses or programs at MIT"
           onSubmit={onSearchSubmit}
           onClear={onSearchClear}
           onChange={onSearchChange}
+          className="main-search"
+          classNameSubmit="primary bordered"
         />
-      <div className="mdc-layout-grid one-column">
-        <h2>MIT Fields</h2>
         <ul>
           {fieldsList.data?.results.map((field) => (
             <li key={field.name}>

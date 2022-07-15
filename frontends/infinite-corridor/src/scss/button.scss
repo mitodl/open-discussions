@@ -2,21 +2,21 @@
 
 $color: magenta !default;
 
-.ol-btn {
-    background-color: $color;
-    color: white;
-    margin: 0 10px 5px 0;
-    padding: 9px 36px;
-    border: none;
-    border-radius: 4px;
-    font-weight: 400;
-    font-size: 16px;
-    text-decoration: none;
-    cursor: pointer;
-    &:hover {
-        background-color: color.adjust($color, $lightness: -10%);
+.MuiButtonBase-root {
+  &.primary {
+    color: $color;
+    &.bordered {
+      border: 1pt solid $color;
     }
-    &:active {
-        background-color: color.adjust($color, $saturation: -20%);
-    }
+    &.filled {
+      background-color: $color;
+      color: white;
+      &:hover {
+          background-color: color.adjust($color, $lightness: -10%);
+      }
+      &:active {
+          background-color: color.adjust($color, $saturation: -20%);
+      }
+  }
+  }
 }
