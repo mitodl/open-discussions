@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.190.2
+---------------
+
+- Upgrade python to 3.9 (#3624)
+- Cc/cards (#3629)
+- Infinite Corridor front page (#3619)
+
 Version 0.190.1 (Released July 14, 2022)
 ---------------
 
