@@ -53,5 +53,5 @@ class Command(BaseCommand):
                     )
                     self.stdout.write(f"Permission added: {WIDGET_LIST_CHANGE_PERM}")
                 else:
-                    self.stderr.write(f"\tNo moderator group found")
+                    self.stderr.write("\tNo moderator group found")
         self.stdout.write("Done")

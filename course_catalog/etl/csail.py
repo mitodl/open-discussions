@@ -97,7 +97,7 @@ def _parse_run_dates(details):
         end_date = None
         start_date = datetime.strptime(
             f"{start_match.group('start_m')} {start_match.group('start_d')} {start_match.group('year')}",
-            f"%B %d %Y",
+            "%B %d %Y",
         ).replace(hour=12, tzinfo=pytz.utc)
 
         if duration_match:

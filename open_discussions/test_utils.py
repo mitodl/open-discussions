@@ -69,7 +69,7 @@ class MockResponse(HttpResponse):
         super().__init__(content=(content or "").encode("utf-8"), status=status_code)
 
     def json(self):
-        """ Return content as json """
+        """Return content as json"""
         return json.loads(self.decoded_content)
 
 

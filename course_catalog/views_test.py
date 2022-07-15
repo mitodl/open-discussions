@@ -35,7 +35,7 @@ from moira_lists.factories import MoiraListFactory
 from open_discussions import features
 from open_discussions.factories import UserFactory
 
-# pylint:disable=redefined-outer-name
+# pylint:disable=redefined-outer-name, use-maxsplit-arg
 
 
 OCW_WEBHOOK_RESPONSE = {

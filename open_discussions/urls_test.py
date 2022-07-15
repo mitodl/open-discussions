@@ -13,7 +13,13 @@ def test_index():
 
 @pytest.mark.parametrize(
     "post_slug",
-    ["dash-slug", "underscore_slug" "CAP-SLUG", "12345", "ünícôdę-chärâctêrs_123"],
+    [
+        "dash-slug",
+        "underscore_slug",
+        "CAP-SLUG",
+        "12345",
+        "ünícôdę-chärâctêrs_123",
+    ],
 )
 def test_post_slug_match(post_slug):
     """Test that our post slug regex correctly matches valid values"""

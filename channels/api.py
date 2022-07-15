@@ -1435,8 +1435,10 @@ class Api:
         )
         more_comments.submission.comment_sort = sort
 
-        more_comments._load_comment = replace_load_comment(  # pylint: disable=protected-access
-            more_comments._load_comment  # pylint: disable=protected-access
+        more_comments._load_comment = (
+            replace_load_comment(  # pylint: disable=protected-access
+                more_comments._load_comment  # pylint: disable=protected-access
+            )
         )
         more_comments.comments()  # load the comments
         return more_comments

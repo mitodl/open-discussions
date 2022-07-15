@@ -75,7 +75,7 @@ class UserWebsiteViewSet(
 def name_initials_avatar_view(
     request, username, size, color, bgcolor
 ):  # pylint:disable=unused-argument
-    """ View for initial avatar """
+    """View for initial avatar"""
     user = User.objects.filter(username=username).first()
     if not user:
         return redirect(DEFAULT_PROFILE_IMAGE)

@@ -1,8 +1,8 @@
 """Management command for populating ocw course data"""
 from django.core.management import BaseCommand
 
-from course_catalog.models import Course, LearningResourceRun
-from course_catalog.tasks import get_ocw_data, get_ocw_next_data
+from course_catalog.models import LearningResourceRun
+from course_catalog.tasks import get_ocw_next_data
 from course_catalog.constants import PlatformType
 from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc

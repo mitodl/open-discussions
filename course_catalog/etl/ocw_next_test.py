@@ -110,7 +110,7 @@ def test_transform_resource_needs_text_update(
         get_s3_object_and_read(s3_resource_object), s3_resource_object.key
     )
 
-    existing_content_file = ContentFileFactory.create(
+    ContentFileFactory.create(
         key="courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/resources/resource/"
     )
 

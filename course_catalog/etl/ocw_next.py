@@ -87,7 +87,9 @@ def transform_page(s3_key, page_data):
     }
 
 
-def transform_resource(s3_key, resource_data, s3_resource, force_overwrite):
+def transform_resource(
+    s3_key, resource_data, s3_resource, force_overwrite
+):  # pylint:disable=too-many-locals,too-many-branches
     """
     Transforms the data from data.json for a resource into content_file data
 

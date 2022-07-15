@@ -44,11 +44,11 @@ def test_assert_not_raises_failure():
     """assert_not_raises should reraise an AssertionError"""
     with pytest.raises(AssertionError):
         with assert_not_raises():
-            assert 1 == 2
+            assert 1 == 2  # pylint:disable=comparison-of-constants
 
 
 def test_mock_response():
-    """ assert MockResponse returns correct values """
+    """assert MockResponse returns correct values"""
     content = "test"
     response = MockResponse(content, 404)
     assert response.status_code == 404
@@ -58,7 +58,7 @@ def test_mock_response():
 
 def test_pickleable_mock():
     """Tests that a mock can be pickled"""
-    pickle.dumps(PickleableMock(field_name=dict()))
+    pickle.dumps(PickleableMock(field_name=dict()))  # pylint:disable=use-dict-literal
 
 
 def test_assert_json_equal():

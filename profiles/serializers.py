@@ -39,15 +39,15 @@ class ProfileSerializer(serializers.ModelSerializer):
         return str(obj.user.username)
 
     def get_profile_image_medium(self, obj):
-        """ Custom getter for medium profile image """
+        """Custom getter for medium profile image"""
         return image_uri(obj, IMAGE_MEDIUM)
 
     def get_profile_image_small(self, obj):
-        """ Custom getter for small profile image """
+        """Custom getter for small profile image"""
         return image_uri(obj, IMAGE_SMALL)
 
     def get_placename(self, obj):
-        """ Custom getter for location text"""
+        """Custom getter for location text"""
         if obj.location:
             return obj.location.get("value", "")
         return ""

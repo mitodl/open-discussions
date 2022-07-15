@@ -348,7 +348,7 @@ class ESResourceFileSerializerMixin(serializers.Serializer):
     resource_relations = serializers.SerializerMethodField()
 
     def get_resource_relations(self, instance):  # pylint: disable=unused-argument
-        """ Get resource_relations properties"""
+        """Get resource_relations properties"""
         raise NotImplementedError
 
 
@@ -372,7 +372,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
     resource_type = serializers.SerializerMethodField()
 
     def get_resource_relations(self, instance):
-        """ Get resource_relations properties"""
+        """Get resource_relations properties"""
         course = instance.run.content_object
         return {
             "name": "resourcefile",

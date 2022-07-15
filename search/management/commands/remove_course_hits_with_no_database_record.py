@@ -1,4 +1,5 @@
-from django.core.management.base import BaseCommand, CommandError
+"""Delete es course records that don't have a database object"""
+from django.core.management.base import BaseCommand
 
 from course_catalog.models import Course
 from search.connection import get_default_alias_name
@@ -13,7 +14,7 @@ class Command(BaseCommand):
     help = "Remove courses with no database record from the elasticsearch index"
 
     def handle(self, *args, **options):
-        """Delete es course records that don't have a database object """
+        """Delete es course records that don't have a database object"""
         index = get_default_alias_name(COURSE_TYPE)
 
         es_course_ids = set()

@@ -93,7 +93,7 @@ def test_saml_metadata(settings, client, user, is_enabled):
     ],
 )
 def test_channel_redirect(client, url, redirect):
-    """ Test that old channel URL's are redirected to new ones"""
+    """Test that old channel URL's are redirected to new ones"""
     response = client.get(url, follow=True)
     last_url, _ = response.redirect_chain[-1]
     assert last_url == redirect

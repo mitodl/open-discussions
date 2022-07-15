@@ -114,7 +114,7 @@ def test_profile_img_url_micromaster_image():
 
 @pytest.mark.django_db
 def test_profile_img_url_gravatar_fullname():
-    """ Test that the correct profile gravatar image URL is returned for a profile with a name """
+    """Test that the correct profile gravatar image URL is returned for a profile with a name"""
     profile = UserFactory.create().profile
     profile.image = profile.image_small = profile.image_medium = None
     profile.image_file = profile.image_medium_file = profile.image_small_file = None
@@ -129,7 +129,7 @@ def test_profile_img_url_gravatar_fullname():
 
 @pytest.mark.django_db
 def test_profile_img_url_gravatar_nameless():
-    """ Test that the correct profile gravatar image URL is returned for a profile with no name """
+    """Test that the correct profile gravatar image URL is returned for a profile with no name"""
     profile = UserFactory.create().profile
     profile.image = profile.image_small = profile.image_medium = None
     profile.image_file = profile.image_medium_file = profile.image_small_file = None
@@ -151,7 +151,7 @@ def test_profile_img_url_gravatar_nameless():
     ],
 )
 def test_update_full_name(first_name, last_name):
-    """ Tests that user names are updated correctly """
+    """Tests that user names are updated correctly"""
     user = UserFactory.create()
     update_full_name(user, " ".join([first_name, last_name]))
     assert user.first_name == first_name[:30]
@@ -187,13 +187,13 @@ def test_get_svg_avatar():
     ],
 )
 def test_generate_initials(text, initials):
-    """ Test that expected initials are returned from text"""
+    """Test that expected initials are returned from text"""
     assert generate_initials(text) == initials
 
 
 @pytest.mark.django_db
 def test_article_image_uri():
-    """ Test that article_image_uri provides the right URI for a post"""
+    """Test that article_image_uri provides the right URI for a post"""
     article = ArticleFactory.create()
     assert (
         re.match(

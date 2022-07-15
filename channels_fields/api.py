@@ -9,7 +9,7 @@ from channels_fields.models import FieldChannel, FieldChannelGroupRole
 
 
 def create_field_groups_and_roles(
-    field_channel: FieldChannel
+    field_channel: FieldChannel,
 ) -> Dict[str, FieldChannelGroupRole]:
     """
     Create a field channel's groups and roles

@@ -83,7 +83,7 @@ def test_user_filter_filter_combos(email, social_auth_provider, moira_list):
     if social_auth_provider is None and email is None:
         pytest.skip("Invalid combination")
 
-    matching_user = UserFactory.create(email=f"user@matching.domain")
+    matching_user = UserFactory.create(email="user@matching.domain")
     nonmatching_user = UserFactory.create()
 
     params = {}

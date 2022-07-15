@@ -11,4 +11,4 @@ class ChannelsConfig(AppConfig):
         """
         Ready handler. Import signals.
         """
-        import channels.signals  # pylint: disable=unused-variable
+        import channels.signals  # pylint: disable=unused-import

@@ -73,7 +73,7 @@ def fixture_test_instructors_data():
     ],
 )
 def test_get_course_url(course_id, course_json, platform, expected):
-    """ Test that url's are calculated as expected """
+    """Test that url's are calculated as expected"""
     actual_url = get_course_url(course_id, course_json, platform)
     if expected is None:
         assert actual_url is expected
@@ -165,7 +165,7 @@ mitx:
 
 
 def test_get_ocw_topics():
-    """ get_ocw_topics should return the expected list of topics """
+    """get_ocw_topics should return the expected list of topics"""
     collection = [
         {
             "ocw_feature": "Engineering",
@@ -207,12 +207,12 @@ def test_get_ocw_topics():
     ],
 )
 def test_get_ocw_department(course_json, expected_departments):
-    """ test_get_ocw_department should return the expected list of departments """
+    """test_get_ocw_department should return the expected list of departments"""
     assert get_ocw_department_list(course_json) == expected_departments
 
 
 def test_safe_load_bad_json(mocker):
-    """ Test that safe_load_json returns an empty dict for invalid JSON"""
+    """Test that safe_load_json returns an empty dict for invalid JSON"""
     mock_logger = mocker.patch("course_catalog.utils.log.exception")
     assert safe_load_json("badjson", "key") == {}
     mock_logger.assert_called_with("%s has a corrupted JSON", "key")

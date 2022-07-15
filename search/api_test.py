@@ -443,7 +443,7 @@ def test_execute_learn_search_anonymous(elasticsearch):
 
 
 def test_execute_learn_search_podcasts(settings, user, elasticsearch):
-    """execute_learn_search should execute an Elasticsearch search """
+    """execute_learn_search should execute an Elasticsearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
     elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     query = {"a": "query"}

@@ -557,12 +557,12 @@ def test_bulk_index_content_files(
         "search.indexing_api.bulk", autospec=True, return_value=(0, errors)
     )
     mocker.patch(
-        f"search.indexing_api.serialize_content_file_for_bulk",
+        "search.indexing_api.serialize_content_file_for_bulk",
         autospec=True,
         return_value=doc,
     )
     mocker.patch(
-        f"search.indexing_api.serialize_content_file_for_bulk_deletion",
+        "search.indexing_api.serialize_content_file_for_bulk_deletion",
         autospec=True,
         return_value=doc,
     )

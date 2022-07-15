@@ -29,8 +29,6 @@ def test_invalid_notification_cls():
     class _NotANotification:
         """Dummy class that doesn't subclass NotificationBase"""
 
-        pass
-
     with pytest.raises(AttributeError):
         BaseNotifier(_NotANotification, None)
 

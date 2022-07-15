@@ -299,7 +299,7 @@ def test_contributor_permission_self_delete(mocker):
         [False, False, False, False, False],
     ],
 )  # pylint: disable=too-many-arguments
-def test_contributor_permission(
+def test_contributor_permission(  # pylint:disable=unused-argument,too-many-arguments
     mocker, is_staff, moderator, mod_editable, readonly, expected
 ):
     """
@@ -355,7 +355,7 @@ def test_contributor_permission(
         [False, False, False, False, False],
     ],
 )  # pylint: disable=too-many-arguments
-def test_moderator_permission(
+def test_moderator_permission(  # pylint:disable=unused-argument,too-many-arguments
     mocker, readonly, is_staff, mod_editable, moderator, expected
 ):
     """

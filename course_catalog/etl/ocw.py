@@ -272,9 +272,10 @@ def transform_embedded_media(
                 else:
                     log.debug("No transcript pdf found for video %s", video)
                     content_file["content"] = None
-        content_file["section"], content_file[
-            "section_slug"
-        ] = get_content_file_section(
+        (
+            content_file["section"],
+            content_file["section_slug"],
+        ) = get_content_file_section(
             embedded_media_item, course_run_json.get("course_pages", [])
         )
 

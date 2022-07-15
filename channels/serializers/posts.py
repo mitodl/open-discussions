@@ -81,7 +81,7 @@ class BasePostSerializer(RedditObjectSerializer):
         return "[deleted]"
 
     def get_author_headline(self, instance):
-        """ get the author's headline"""
+        """get the author's headline"""
         profile = self._get_profile(instance)
         if profile:
             return profile.headline

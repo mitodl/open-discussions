@@ -353,8 +353,8 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
 
     @property
     def coursenum(self):
-        """ Returns the course number from the course_id"""
-        return self.course_id.split("+")[-1]
+        """Returns the course number from the course_id"""
+        return self.course_id.split("+")[-1]  # pylint:disable=use-maxsplit-arg
 
     def __str__(self):
         return self.title

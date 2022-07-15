@@ -31,7 +31,7 @@ class RedditObjectSerializer(serializers.Serializer):
             )
 
     def _get_profile(self, instance):
-        """ Return a user profile if it exists, else None
+        """Return a user profile if it exists, else None
         Args:
             instance (praw.models.Submission):
                 The post to look up the user for

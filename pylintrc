@@ -1,5 +1,6 @@
 [MASTER]
-ignore=migrations,.git
+ignore=.git
+ignore-paths=^.*/migrations/.*$, ^node_modules
 load-plugins = pylint_django
 
 [BASIC]
@@ -19,4 +20,4 @@ ignored-modules=
 	six.moves,
 
 [MESSAGES CONTROL]
-disable = no-member, old-style-class, no-init, too-few-public-methods, abstract-method, invalid-name, too-many-ancestors, line-too-long, no-self-use, len-as-condition, no-else-return, cyclic-import, duplicate-code, inconsistent-return-statements, bad-continuation, c-extension-no-member
+disable = no-member, too-few-public-methods, abstract-method, invalid-name, too-many-ancestors, line-too-long, len-as-condition, no-else-return, cyclic-import, duplicate-code, inconsistent-return-statements, c-extension-no-member, raise-missing-from, imported-auth-user, import-outside-toplevel, unnecessary-comprehension, consider-using-with, consider-using-generator, consider-using-f-string, consider-using-in, use-implicit-booleaness-not-comparison, unspecified-encoding, django-not-configured, protected-access, use-a-generator, no-else-raise

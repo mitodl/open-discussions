@@ -37,7 +37,7 @@ class FieldChannelViewSet(
         return FieldChannel.objects.all()
 
     def delete(self, request, *args, **kwargs):
-        """ Remove the user from the moderator groups for this field channel """
+        """Remove the user from the moderator groups for this field channel"""
         FieldChannel.objects.get_object_or_404(name=kwargs["field_name"]).delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -71,7 +71,7 @@ class FieldModeratorDetailView(APIView):
     serializer_class = FieldModeratorSerializer
 
     def delete(self, request, *args, **kwargs):
-        """ Remove the user from the moderator groups for this website """
+        """Remove the user from the moderator groups for this website"""
         user = User.objects.get(username=self.kwargs["moderator_name"])
         field_name = self.kwargs["field_name"]
         remove_user_role(
