@@ -7,13 +7,6 @@ import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
 import * as urls from "./urls"
 
-const LearningResourceSearchbox = styled(Searchbox)`
-  font-size: 20px;
-  input[type="text"] {
-    border-radius: 7px;
-  }
-`
-
 const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
