@@ -9,6 +9,8 @@ COPY apt.txt /tmp/apt.txt
 RUN apt-get update
 RUN apt-get install -y $(grep -vE "^\s*#" apt.txt  | tr "\n" " ")
 RUN apt-get update && apt-get install libpq-dev postgresql-client -y
+# The following is required for moira requests to work within docker
+RUN sed -i -E 's/MinProtocol[=\ ]+.*/MinProtocol = TLSv1.0/g' /etc/ssl/openssl.cnf
 
 # pip
 RUN curl --silent --location https://bootstrap.pypa.io/get-pip.py | python3 -
