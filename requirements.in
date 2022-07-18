@@ -7,7 +7,7 @@ betamax
 betamax_serializers
 boto==2.39.0
 cairosvg
-celery==4.3.0
+celery==5.2.1
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.*
@@ -51,7 +51,7 @@ python3-saml==1.9.0
 pygithub==1.44.1
 pyopenssl==17.5.0
 pytube==9.5.2
-redis==3.2.1
+redis>=3.5.2.3
 requests==2.24.0
 sentry-sdk==0.14.1
 social-auth-app-django==2.1.0
