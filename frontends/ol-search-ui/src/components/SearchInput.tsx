@@ -57,7 +57,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       },
       [onSubmit]
     )
-  const muiInputProps = useMemo(() => ({"aria-label": "Search for"}), [])
+  const muiInputProps = useMemo(() => ({ "aria-label": "Search for" }), [])
   return (
     <OutlinedInput
       inputProps={muiInputProps}
@@ -69,7 +69,11 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       onKeyDown={onInputKeyDown}
       startAdornment={
         <InputAdornment position="start">
-          <IconButton aria-label="Search" className={props.classNameSearch} onClick={onSubmit}>
+          <IconButton
+            aria-label="Search"
+            className={props.classNameSearch}
+            onClick={onSubmit}
+          >
             <SearchIcon sx={searchIconAdjustments} />
           </IconButton>
         </InputAdornment>
