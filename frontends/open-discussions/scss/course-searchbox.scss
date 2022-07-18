@@ -1,6 +1,18 @@
 .course-searchbox {
-  font-size: 20px;
-  input[type="text"] {
+  .course-searchbox-input {
+    font-size: 20px;
+    width: 100%;
+    padding: 12px 0px;
+    background-color: #fff;
     border-radius: 7px;
+    input[type="text"] {
+      border: none;
+      font-size: 20px;
+      padding-left: 0px;
+      padding-right: 0px;
+    }
+  }
+  .course-searcbhox-submit {
+    display: none;
   }
 }
