@@ -1,7 +1,5 @@
 import React, { useCallback, useState } from "react"
-
-import styled from "styled-components"
-import { Searchbox, SearchboxControlled, SearchInput } from "ol-search-ui"
+import { SearchInput, SearchInputProps } from "ol-search-ui"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
@@ -11,7 +9,7 @@ const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
   const onSearchClear = useCallback(() => setSearchText(""), [])
-  const onSearchChange: SearchboxControlled["onChange"] = useCallback((e) => {
+  const onSearchChange: SearchInputProps["onChange"] = useCallback((e) => {
     setSearchText(e.target.value)
   }, [])
   const onSearchSubmit = useCallback(() => {
