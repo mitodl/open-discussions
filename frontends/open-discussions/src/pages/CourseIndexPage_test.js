@@ -197,7 +197,7 @@ describe("CourseIndexPage", () => {
     assert.equal(src, COURSE_BANNER_URL)
   })
 
-  it.only("should have a search textbox which redirects you", async () => {
+  it("should have a search textbox which redirects you", async () => {
     const { wrapper } = await render()
     wrapper.find(Searchbox).prop("onChange")({
       target: { value: "search term" }
