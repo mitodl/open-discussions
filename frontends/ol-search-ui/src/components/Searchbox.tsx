@@ -40,15 +40,18 @@ type SearchboxProps = Omit<SearchInputProps, "className"> & {
  * A container holding SearchInput; accepts children and a validation message.
  */
 const Searchbox = (props: SearchboxProps): JSX.Element => {
-  const { validation, children, className, classNameInput, ...searchInputProps } = props
+  const {
+    validation,
+    children,
+    className,
+    classNameInput,
+    ...searchInputProps
+  } = props
 
   return (
     <SearchboxContainer>
       <SearchboxContents className={className}>
-        <SearchInput
-          className={classNameInput}
-          {...searchInputProps}
-        />
+        <SearchInput className={classNameInput} {...searchInputProps} />
         {children}
       </SearchboxContents>
       {<ValidationError message={validation} />}

@@ -1,33 +1,24 @@
 import React from "react"
 import { ThemeProvider } from "styled-components"
-import { render, screen, prettyDOM } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import Searchbox, { SearchboxProps } from "./Searchbox"
-import { combinedTheme, assertInstanceOf } from "ol-util"
+import { combinedTheme } from "ol-util"
+import SearchInput, { SearchInputProps } from "./SearchInput"
 
-const getSearchInput = () => {
-  const element = screen.getByLabelText("Search for")
-  assertInstanceOf(element, HTMLInputElement)
-  return element
-}
+const SearchInputSpy = SearchInput as jest.Mock<
+  ReturnType<typeof SearchInput>,
+  Parameters<typeof SearchInput>
+>
 
-const getSearchButton = (): HTMLButtonElement  => {
-  const button = screen.getAllByLabelText("Search")[0]
-  assertInstanceOf(button, HTMLButtonElement)
-  return button
-}
-
-/**
- * This actually returns an icon (inside a button)
- */
- const getClearButton = (): HTMLButtonElement  => {
-  const button = screen.getByLabelText("Clear")
-  assertInstanceOf(button, HTMLButtonElement)
-  return button
-}
-
-const searchEvent = (value: string) =>
-  expect.objectContaining({ target: { value } })
+jest.mock("./SearchInput", () => {
+  const actual = jest.requireActual("./SearchInput")
+  return {
+    ...actual,
+    __esModule: true,
+    default: jest.fn(actual.default),
+  }
+})
 
 describe("Searchbox", () => {
   const renderSearchbox = (props: Partial<SearchboxProps> = {}) => {
@@ -51,30 +42,29 @@ describe("Searchbox", () => {
     return { user, spies }
   }
 
-  it("Renders the given value in input", () => {
-    renderSearchbox({value: "math"})
-    expect(getSearchInput().value).toBe("math")
-  })
-
-  it("Calls onChange when text is typed", async () => {
-    const { user, spies } = renderSearchbox({ value: "math" })
-    const input = getSearchInput()
-    await user.type(getSearchInput(), "s")
-    expect(spies.onChange).toHaveBeenCalledWith(
-      expect.objectContaining({ target: input })
+  it("Passes the appropriate props to SearchInput", () => {
+    const searchInputProps: SearchInputProps = {
+      onSubmit: jest.fn(),
+      onClear: jest.fn(),
+      onChange: jest.fn(),
+      className: "some-classname",
+      classNameSubmit: "some-classname-submit",
+      classNameClear: "some-classname-clear",
+      classNameSearch: "some-classname-search",
+      value: "some-value",
+      placeholder: "some-placeholder",
+      autoFocus: true,
+    }
+    /**
+     * Need to rename className to classNameInput for Searchbox
+     */
+    const { className, ...others } = searchInputProps
+    const searchboxProps = { ...others, classNameInput: className }
+    renderSearchbox(searchboxProps)
+    expect(SearchInputSpy).toHaveBeenCalledWith(
+      expect.objectContaining(searchInputProps),
+      expect.anything() // Functional components second arg is Context
     )
-  })
-
-  it("Calls onSubmit when search is clicked", async () => {
-    const { user, spies } = renderSearchbox({ value: "chemistry" })
-    await user.click(getSearchButton())
-    expect(spies.onSubmit).toHaveBeenCalledWith(searchEvent("chemistry"))
-  })
-
-  it("Calls onClear clear is clicked", async () => {
-    const { user, spies } = renderSearchbox({ value: "biology" })
-    await user.click(getClearButton())
-    expect(spies.onClear).toHaveBeenCalled()
   })
 
   it("does not show an alert if no validation message", () => {
