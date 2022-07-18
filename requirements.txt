@@ -6,10 +6,12 @@
 #
 akismet==1.1
     # via -r requirements.in
-amqp==2.5.2
+amqp==5.1.1
     # via kombu
 appdirs==1.4.3
     # via zeep
+async-timeout==4.0.2
+    # via redis
 attrs==19.3.0
     # via zeep
 backcall==0.1.0
@@ -24,7 +26,7 @@ betamax==0.8.0
     #   betamax-serializers
 betamax-serializers==0.2.0
     # via -r requirements.in
-billiard==3.6.2.0
+billiard==3.6.4.0
     # via celery
 boto==2.39.0
     # via
@@ -50,7 +52,7 @@ cairocffi==0.8.1
     # via cairosvg
 cairosvg==2.5.1
     # via -r requirements.in
-celery==4.3.0
+celery==5.2.1
     # via
     #   -r requirements.in
     #   django-server-status
@@ -64,6 +66,18 @@ cffi==1.14.4
     #   cryptography
 chardet==3.0.4
     # via requests
+click==8.1.3
+    # via
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
+click-didyoumean==0.3.0
+    # via celery
+click-plugins==1.1.1
+    # via celery
+click-repl==0.2.0
+    # via celery
 cryptography==3.3.2
     # via pyopenssl
 cssselect2==0.2.1
@@ -80,7 +94,9 @@ defusedxml==0.6.0
     #   social-auth-core
     #   zeep
 deprecated==1.2.7
-    # via pygithub
+    # via
+    #   pygithub
+    #   redis
 dj-database-url==0.3.0
     # via -r requirements.in
 dj-static==0.0.6
@@ -203,7 +219,7 @@ jmespath==0.9.3
     # via
     #   boto3
     #   botocore
-kombu==4.6.7
+kombu==5.2.4
     # via
     #   celery
     #   django-server-status
@@ -227,6 +243,8 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
+packaging==21.3
+    # via redis
 parso==0.6.1
     # via jedi
 pexpect==4.8.0
@@ -246,7 +264,9 @@ praw==4.5.1
 prawcore==0.10.1
     # via praw
 prompt-toolkit==3.0.3
-    # via ipython
+    # via
+    #   click-repl
+    #   ipython
 psycopg2==2.8.3
     # via
     #   -r requirements.in
@@ -275,7 +295,9 @@ pyjwt==1.5.2
 pyopenssl==17.5.0
     # via -r requirements.in
 pyparsing==2.4.7
-    # via httplib2
+    # via
+    #   httplib2
+    #   packaging
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
@@ -290,14 +312,14 @@ python3-saml==1.9.0
     # via -r requirements.in
 pytube==9.5.2
     # via -r requirements.in
-pytz==2018.9
+pytz==2022.1
     # via
     #   celery
     #   django
     #   zeep
 pyyaml==5.4
     # via -r requirements.in
-redis==3.2.1
+redis==4.3.4
     # via
     #   -r requirements.in
     #   django-redis
@@ -336,6 +358,7 @@ sgmllib3k==1.0.0
     # via feedparser
 six==1.15.0
     # via
+    #   click-repl
     #   cryptography
     #   django-anymail
     #   django-appconf
@@ -405,10 +428,11 @@ urllib3==1.25.10
     #   sentry-sdk
 uwsgi==2.0.20
     # via -r requirements.in
-vine==1.3.0
+vine==5.0.0
     # via
     #   amqp
     #   celery
+    #   kombu
 wcwidth==0.1.8
     # via prompt-toolkit
 webencodings==0.5.1
