@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 
 import SearchIcon from "@mui/icons-material/Search"
 import EastIcon from "@mui/icons-material/East"
@@ -26,6 +26,7 @@ interface SearchInputProps {
   classNameSearch?: string
   value: string
   placeholder?: string
+  autoFocus?: boolean
   onChange: React.ChangeEventHandler<HTMLInputElement>
   onClear: React.MouseEventHandler
   onSubmit: SearchSubmitHandler
@@ -56,8 +57,11 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       },
       [onSubmit]
     )
+  const muiInputProps = useMemo(() => ({"aria-label": "Search for"}), [])
   return (
     <OutlinedInput
+      inputProps={muiInputProps}
+      autoFocus={props.autoFocus}
       className={props.className}
       placeholder={props.placeholder}
       value={props.value}
@@ -65,7 +69,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
       onKeyDown={onInputKeyDown}
       startAdornment={
         <InputAdornment position="start">
-          <IconButton className={props.classNameSearch} onClick={onSubmit}>
+          <IconButton aria-label="Search" className={props.classNameSearch} onClick={onSubmit}>
             <SearchIcon sx={searchIconAdjustments} />
           </IconButton>
         </InputAdornment>
@@ -85,7 +89,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           </InputAdornment>
           <InputAdornment position="end">
             <IconButton
-              aria-label="Submit Search"
+              aria-label="Search"
               className={props.classNameSubmit}
               onClick={onSubmit}
             >
@@ -99,3 +103,4 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 }
 
 export default SearchInput
+export type { SearchInputProps }

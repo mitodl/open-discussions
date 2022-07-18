@@ -3354,21 +3354,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mui/styled-engine-sc@npm:^5.8.0":
-  version: 5.8.0
-  resolution: "@mui/styled-engine-sc@npm:5.8.0"
-  dependencies:
-    prop-types: ^15.8.1
-  peerDependencies:
-    "@types/styled-components": ^5.1.14
-    styled-components: ^5.3.1
-  peerDependenciesMeta:
-    "@types/styled-components":
-      optional: true
-  checksum: 7667fd36e2eeb7eba6a6d8c65aea7e1f83b911fb013cd13ccaf82f97c1a35d1f305d944cef785f0415d051b097fd5da90084815054d20c08354c489f4ddbdefa
-  languageName: node
-  linkType: hard
-
 "@mui/styled-engine@npm:^5.8.7":
   version: 5.8.7
   resolution: "@mui/styled-engine@npm:5.8.7"
@@ -11106,7 +11091,6 @@ __metadata:
     "@emotion/styled": ^11.9.3
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
-    "@mui/styled-engine-sc": ^5.8.0
     "@swc/core": ^1.2.203
     "@types/react": ^18.0.13
     "@types/react-dom": ^18.0.5

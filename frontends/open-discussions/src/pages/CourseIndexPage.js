@@ -106,6 +106,9 @@ export default function CourseIndexPage({ history }: Props) {
         </BannerContainer>
         <Searchbox
           className="course-searchbox"
+          classNameInput="course-searchbox-input"
+          classNameSubmit="course-searcbhox-submit"
+          placeholder="Search Learning Offerings"
           value={searchText}
           onSubmit={onSearchSubmit}
           onClear={onSearchClear}
