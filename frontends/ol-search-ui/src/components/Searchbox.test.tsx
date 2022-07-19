@@ -95,7 +95,7 @@ describe("Uncontrolled Searchbox", () => {
 describe("Controlled searchbox", () => {
   const renderControlledSearchbox = (value: string) => {
     const onSubmit = jest.fn()
-    const onChange = jest.fn((e) => e.persist())
+    const onChange = jest.fn(e => e.persist())
     const onClear = jest.fn()
     render(
       <ThemeProvider theme={combinedTheme}>

@@ -14,10 +14,10 @@ const mockMakeRequest = jest.fn(
 )
 
 const mockAxiosInstance = {
-  get: (url: string) => mockMakeRequest("get", url),
-  post: (url: string) => mockMakeRequest("post", url),
-  patch: (url: string) => mockMakeRequest("patch", url),
-  delete: (url: string) => mockMakeRequest("delete", url),
+  get:    (url: string) => mockMakeRequest("get", url),
+  post:   (url: string) => mockMakeRequest("post", url),
+  patch:  (url: string) => mockMakeRequest("patch", url),
+  delete: (url: string) => mockMakeRequest("delete", url)
 }
 
 const mockRequest = (
@@ -36,8 +36,8 @@ const mockRequest = (
       })
     )
     .mockResolvedValue({
-      data: responseBody,
-      status: code,
+      data:   responseBody,
+      status: code
     })
 }
 
@@ -49,7 +49,7 @@ const setMockResponse = {
   patch: (url: string, responseBody: unknown, code = 200) =>
     mockRequest("patch", url, responseBody, code),
   delete: (url: string, responseBody: unknown, code = 204) =>
-    mockRequest("delete", url, responseBody, code),
+    mockRequest("delete", url, responseBody, code)
 }
 
 export { setMockResponse, mockAxiosInstance }

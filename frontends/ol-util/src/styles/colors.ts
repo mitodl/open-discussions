@@ -6,8 +6,8 @@ type ColorTheme = {
 
 const colorTheme: ColorTheme = {
   color: {
-    fontGreyMid: "var(--font-grey-mid)",
-  },
+    fontGreyMid: "var(--font-grey-mid)"
+  }
 }
 
 export default colorTheme

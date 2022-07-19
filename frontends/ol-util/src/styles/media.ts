@@ -27,13 +27,13 @@ type MediaTheme = {
 
 const mediaTheme: MediaTheme = {
   media: {
-    desktop: "@media (min-width: 801px)",
-    desktopWide: "@media (min-width: 1000px)",
-    extraWide: "@media (min-width: 1150px)",
-    mobile: "@media (max-width: 800px)",
-    phone: "@media (max-width: 580px)",
-    materialMobile: "@media (max-width: 599px)",
-  },
+    desktop:        "@media (min-width: 801px)",
+    desktopWide:    "@media (min-width: 1000px)",
+    extraWide:      "@media (min-width: 1150px)",
+    mobile:         "@media (max-width: 800px)",
+    phone:          "@media (max-width: 580px)",
+    materialMobile: "@media (max-width: 599px)"
+  }
 }
 
 export default mediaTheme

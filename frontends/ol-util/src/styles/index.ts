@@ -7,7 +7,7 @@ interface CombinedTheme extends ColorTheme, MediaTheme {}
 
 const combinedTheme: CombinedTheme = {
   ...colorTheme,
-  ...mediaTheme,
+  ...mediaTheme
 }
 
 export { combinedTheme }
