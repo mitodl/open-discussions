@@ -39,7 +39,7 @@ html5lib==0.999999999
 ipython
 lxml==4.6.5
 markdown2==2.4.0
-newrelic
+newrelic>=7.14.0.177
 ocw-data-parser==0.35.1
 Pillow==9.0.0
 psycopg2==2.8.3
