@@ -27,7 +27,6 @@ const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
   return { history }
 }
 
-
 /**
  * Sample a random element of an array.
  */

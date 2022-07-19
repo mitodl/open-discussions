@@ -8,4 +8,7 @@ const container = document.getElementById("container")
 
 const browserHistory = createBrowserHistory()
 const queryClient = createQueryClient()
-ReactDOM.render(<App queryClient={queryClient} history={browserHistory} />, container)
+ReactDOM.render(
+  <App queryClient={queryClient} history={browserHistory} />,
+  container
+)

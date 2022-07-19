@@ -26,12 +26,10 @@ const mockRequest = (
   responseBody: unknown,
   code: number
 ) => {
-  when(mockMakeRequest)
-    .calledWith(method, url)
-    .mockResolvedValue({
-      data: responseBody,
-      status: code,
-    })
+  when(mockMakeRequest).calledWith(method, url).mockResolvedValue({
+    data: responseBody,
+    status: code,
+  })
 }
 
 const setMockResponse = {

@@ -1,25 +1,25 @@
-import React, { useCallback, useState } from "react";
-import { SearchInput, SearchInputProps } from "ol-search-ui";
+import React, { useCallback, useState } from "react"
+import { SearchInput, SearchInputProps } from "ol-search-ui"
 import { useId } from "ol-util"
-import { useHistory } from "react-router";
-import { Link } from "react-router-dom";
-import { useFieldsList } from "../api/fields";
-import * as urls from "./urls";
+import { useHistory } from "react-router"
+import { Link } from "react-router-dom"
+import { useFieldsList } from "../api/fields"
+import * as urls from "./urls"
 
 const HomePage: React.FC = () => {
   const elementId = useId()
-  const [searchText, setSearchText] = useState("");
-  const history = useHistory();
-  const onSearchClear = useCallback(() => setSearchText(""), []);
+  const [searchText, setSearchText] = useState("")
+  const history = useHistory()
+  const onSearchClear = useCallback(() => setSearchText(""), [])
   const onSearchChange: SearchInputProps["onChange"] = useCallback((e) => {
-    setSearchText(e.target.value);
-  }, []);
+    setSearchText(e.target.value)
+  }, [])
   const onSearchSubmit = useCallback(() => {
     const params = new URLSearchParams([["q", searchText]]).toString()
-    history.push(`/infinite/search?${params}`);
-  }, [searchText, history]);
+    history.push(`/infinite/search?${params}`)
+  }, [searchText, history])
 
-  const fieldsList = useFieldsList();
+  const fieldsList = useFieldsList()
 
   return (
     <div className="page-content one-column homepage">
@@ -37,9 +37,12 @@ const HomePage: React.FC = () => {
       <ul aria-labelledby={elementId} className="field-list">
         {fieldsList.data?.results.map((field) => (
           <li key={field.name}>
-            <Link className="field-link" to={urls.makeFieldViewPath(field.name)}>
+            <Link
+              className="field-link"
+              to={urls.makeFieldViewPath(field.name)}
+            >
               <figure>
-                <img src={field.avatar_small ?? ''} />
+                <img src={field.avatar_small ?? ""} />
                 <figcaption className="field-title">{field.title}</figcaption>
               </figure>
             </Link>
@@ -47,7 +50,7 @@ const HomePage: React.FC = () => {
         ))}
       </ul>
     </div>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage
