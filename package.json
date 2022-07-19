@@ -23,7 +23,7 @@
         "global:compile": "cd $INIT_CWD && tsc",
         "global:compile-watch": "cd $INIT_CWD && tsc --watch",
         "global:coverage": "cd $INIT_CWD && yarn test --coverage",
-        "global:fmt-check": "cd $INIT_CWD && prettier-eslint --no-semi --check --with-node-modules src/**/*.{ts,tsx}",
+        "global:fmt-check": "cd $INIT_CWD && prettier-eslint --no-semi --list-different --with-node-modules src/**/*.{ts,tsx}",
         "global:fmt-fix": "cd $INIT_CWD && prettier-eslint --no-semi --with-node-modules --write src/**/*.{ts,tsx}",
         "global:lint-check": "cd $INIT_CWD && eslint src/ --ext .js,.jsx,.ts,.tsx",
         "global:scss-lint": "echo 'TODO: Set this up.'",
