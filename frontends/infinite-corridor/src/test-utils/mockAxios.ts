@@ -27,14 +27,7 @@ const mockRequest = (
   code: number
 ) => {
   when(mockMakeRequest)
-    .calledWith(
-      when.allArgs((allArgs, equals) => {
-        /**
-         * Skip matching on headers / request body.
-         */
-        return equals(allArgs[0], method) && equals(allArgs[1], url)
-      })
-    )
+    .calledWith(method, url)
     .mockResolvedValue({
       data: responseBody,
       status: code,

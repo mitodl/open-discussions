@@ -1,6 +1,6 @@
 import type { PaginatedResult } from "./interfaces"
 
-type Factory<T> = (overrides?: Partial<T>) => T
+type Factory<T> = <K extends keyof T>(overrides?: Pick<T, K>) => T
 
 const makePaginatedFactory =
   <T>(makeResult: Factory<T>) =>
