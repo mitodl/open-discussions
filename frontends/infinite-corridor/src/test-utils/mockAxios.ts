@@ -5,13 +5,15 @@ type Method = "get" | "post" | "patch" | "delete"
 
 type PartialAxiosResponse = Pick<AxiosResponse, "data" | "status">
 
-const mockMakeRequest = jest.fn(
-  (method: string, url: string): Promise<PartialAxiosResponse> => {
-    const msg = `No response specified for ${method} ${url}`
-    console.error(msg)
-    throw new Error(msg)
-  }
-)
+const alwaysError = (
+  method: string,
+  url: string
+): Promise<PartialAxiosResponse> => {
+  const msg = `No response specified for ${method} ${url}`
+  console.error(msg)
+  throw new Error(msg)
+}
+const mockMakeRequest = jest.fn(alwaysError)
 
 const mockAxiosInstance = {
   get: (url: string) => mockMakeRequest("get", url),
@@ -43,4 +45,8 @@ const setMockResponse = {
     mockRequest("delete", url, responseBody, code),
 }
 
-export { setMockResponse, mockAxiosInstance }
+const resetApi = () => {
+  mockMakeRequest.mockImplementation(alwaysError)
+}
+
+export { setMockResponse, mockAxiosInstance, resetApi }

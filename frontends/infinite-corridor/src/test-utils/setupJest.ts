@@ -1,4 +1,4 @@
-import { mockAxiosInstance } from "./mockAxios"
+import { mockAxiosInstance, resetApi } from "./mockAxios"
 
 jest.mock("axios", () => {
   return {
@@ -11,4 +11,5 @@ jest.mock("axios", () => {
 
 afterEach(() => {
   jest.resetAllMocks()
+  resetApi()
 })
