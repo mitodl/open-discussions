@@ -9,3 +9,5 @@ export {
 export { Grid, Cell } from "./Grid"
 
 export { default as Card } from "./Card"
+
+export { default as MITLogoLink } from "./MITLogoLink"
