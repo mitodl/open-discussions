@@ -9,6 +9,7 @@ import { ThemeProvider } from "styled-components"
 import { combinedTheme } from "ol-util"
 import { QueryClientProvider, QueryClient } from "react-query"
 import axios from "./libs/axios"
+import Header from "./components/Header"
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +46,7 @@ const App: React.FC<AppProps> = ({ history }) => {
       <ThemeProvider theme={combinedTheme}>
         <QueryClientProvider client={queryClient}>
           <Router history={history}>
+            <Header />
             <Route path={urls.HOME} exact>
               <HomePage />
             </Route>

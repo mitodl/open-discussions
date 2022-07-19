@@ -1,0 +1,12 @@
+.one-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+  
+.page-content {
+  @extend .one-column;
+  > * {
+    max-width: 950px;
+  }
+}

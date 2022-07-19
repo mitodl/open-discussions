@@ -3,8 +3,10 @@
 
 @use "theme";
 @use "button" with ( $color: theme.$color-primary );
-@use "columns";
 @use "main-search";
+@use "header";
+@use "homepage";
+@use "grids-and-columns";
 
 html {
   font-family: theme.$font-family-default;
