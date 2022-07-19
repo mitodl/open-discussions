@@ -6,7 +6,7 @@ describe("Header", () => {
   it("Includes a link to MIT Homepage", async () => {
     const fieldsList = factories.makeFieldList(0)
     setMockResponse.get(urls.fieldsList, fieldsList)
-    
+
     renderTestApp()
     const header = screen.getByRole("banner")
     within(header).getByTitle("MIT Homepage", { exact: false })

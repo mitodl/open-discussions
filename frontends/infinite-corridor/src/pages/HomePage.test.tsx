@@ -2,14 +2,22 @@ import { assertInstanceOf, assertNotNil } from "ol-util"
 import { zip } from "lodash"
 import { urls } from "../api/fields"
 import * as factories from "../api/fields/factories"
-import { screen, renderTestApp, setMockResponse, within, sample, user } from "../test-utils"
+import {
+  screen,
+  renderTestApp,
+  setMockResponse,
+  within,
+  sample,
+  user,
+} from "../test-utils"
 import { makeFieldViewPath } from "./urls"
 
 const findFieldList = () => screen.findByLabelText("Fields of Study")
-const findAllFieldLinks = async () => within(await findFieldList()).findAllByRole("link")
+const findAllFieldLinks = async () =>
+  within(await findFieldList()).findAllByRole("link")
 const findFieldLink = async (title: string): Promise<HTMLElement> => {
-  const links = await findAllFieldLinks();
-  const link = links.find(el => el.textContent === title)
+  const links = await findAllFieldLinks()
+  const link = links.find((el) => el.textContent === title)
   assertNotNil(link, `Could not find link with title "${title}".`)
   return link
 }
@@ -57,9 +65,11 @@ describe("HomePage", () => {
 
     const textInput = getSearchTextInput()
     await user.type(textInput, "Physics or math{Enter}")
-    expect(history.location).toStrictEqual(expect.objectContaining({
-      pathname: "/infinite/search",
-      search: "?q=Physics+or+math"
-    }))
+    expect(history.location).toStrictEqual(
+      expect.objectContaining({
+        pathname: "/infinite/search",
+        search: "?q=Physics+or+math",
+      })
+    )
   })
 })

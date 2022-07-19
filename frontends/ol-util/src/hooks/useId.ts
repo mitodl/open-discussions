@@ -1,11 +1,11 @@
 import { useRef } from "react"
 
-const getId = () => Math.random().toString(16).replace('.', ':')
+const getId = () => Math.random().toString(16).replace(".", ":")
 
 /**
  * Returns an ID that is stable across renders, similar to the [`useId`](https://reactjs.org/docs/hooks-reference.html#useid)
  * hook in React 18+.
- * 
+ *
  * Useful, e.g., for generating unique element ids.
  */
 const useId = (): string => {
