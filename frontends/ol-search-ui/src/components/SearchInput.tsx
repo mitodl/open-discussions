@@ -33,29 +33,30 @@ interface SearchInputProps {
 }
 
 const searchIconAdjustments = {
-  fontSize: "150%",
+  fontSize:  "150%",
   /**
    * We want the icon to have its circle a bit closer to the baseline, which
    * this accounts for.
    */
-  transform: "translateY(+5%)",
+  transform: "translateY(+5%)"
 }
 
-const SearchInput: React.FC<SearchInputProps> = (props) => {
-  const onSubmit = useCallback(() => {
+const SearchInput: React.FC<SearchInputProps> = props => {
+  const { onSubmit, value } = props
+  const handleSubmit = useCallback(() => {
     const event = {
-      target: { value: props.value },
-      preventDefault: () => null,
+      target:         { value },
+      preventDefault: () => null
     }
-    props.onSubmit(event)
-  }, [props.value, props.onSubmit])
+    onSubmit(event)
+  }, [onSubmit, value])
   const onInputKeyDown: React.KeyboardEventHandler<HTMLInputElement> =
     useCallback(
-      (e) => {
+      e => {
         if (e.key !== "Enter") return
-        onSubmit()
+        handleSubmit()
       },
-      [onSubmit]
+      [handleSubmit]
     )
   const muiInputProps = useMemo(() => ({ "aria-label": "Search for" }), [])
   return (
@@ -72,7 +73,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
           <IconButton
             aria-label="Search"
             className={props.classNameSearch}
-            onClick={onSubmit}
+            onClick={handleSubmit}
           >
             <SearchIcon sx={searchIconAdjustments} />
           </IconButton>
@@ -95,7 +96,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
             <IconButton
               aria-label="Search"
               className={props.classNameSubmit}
-              onClick={onSubmit}
+              onClick={handleSubmit}
             >
               <EastIcon />
             </IconButton>

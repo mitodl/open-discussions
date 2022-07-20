@@ -6,7 +6,7 @@ const createQueryClient = (): QueryClient =>
     defaultOptions: {
       queries: {
         staleTime: 30 * 1000,
-        queryFn: async ({ queryKey }) => {
+        queryFn:   async ({ queryKey }) => {
           const url = queryKey[0]
           if (typeof url !== "string" || queryKey.length !== 1) {
             throw new Error(
@@ -15,9 +15,9 @@ const createQueryClient = (): QueryClient =>
           }
           const { data } = await axios.get(url)
           return data
-        },
-      },
-    },
+        }
+      }
+    }
   })
 
 export { createQueryClient }

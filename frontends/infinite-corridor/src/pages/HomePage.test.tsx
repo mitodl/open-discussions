@@ -8,7 +8,7 @@ import {
   setMockResponse,
   within,
   sample,
-  user,
+  user
 } from "../test-utils"
 import { makeFieldViewPath } from "./urls"
 
@@ -17,7 +17,7 @@ const findAllFieldLinks = async () =>
   within(await findFieldList()).findAllByRole("link")
 const findFieldLink = async (title: string): Promise<HTMLElement> => {
   const links = await findAllFieldLinks()
-  const link = links.find((el) => el.textContent === title)
+  const link = links.find(el => el.textContent === title)
   assertNotNil(link, `Could not find link with title "${title}".`)
   return link
 }
@@ -68,7 +68,7 @@ describe("HomePage", () => {
     expect(history.location).toStrictEqual(
       expect.objectContaining({
         pathname: "/infinite/search",
-        search: "?q=Physics+or+math",
+        search:   "?q=Physics+or+math"
       })
     )
   })

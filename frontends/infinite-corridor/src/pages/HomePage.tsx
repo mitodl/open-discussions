@@ -11,7 +11,7 @@ const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
   const onSearchClear = useCallback(() => setSearchText(""), [])
-  const onSearchChange: SearchInputProps["onChange"] = useCallback((e) => {
+  const onSearchChange: SearchInputProps["onChange"] = useCallback(e => {
     setSearchText(e.target.value)
   }, [])
   const onSearchSubmit = useCallback(() => {
@@ -35,7 +35,7 @@ const HomePage: React.FC = () => {
       />
       <h2 id={elementId}>Fields of Study</h2>
       <ul aria-labelledby={elementId} className="field-list">
-        {fieldsList.data?.results.map((field) => (
+        {fieldsList.data?.results.map(field => (
           <li key={field.name}>
             <Link
               className="field-link"

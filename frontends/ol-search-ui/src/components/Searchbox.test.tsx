@@ -16,7 +16,7 @@ jest.mock("./SearchInput", () => {
   return {
     ...actual,
     __esModule: true,
-    default: jest.fn(actual.default),
+    default:    jest.fn(actual.default)
   }
 })
 
@@ -44,16 +44,16 @@ describe("Searchbox", () => {
 
   it("Passes the appropriate props to SearchInput", () => {
     const searchInputProps: SearchInputProps = {
-      onSubmit: jest.fn(),
-      onClear: jest.fn(),
-      onChange: jest.fn(),
-      className: "some-classname",
+      onSubmit:        jest.fn(),
+      onClear:         jest.fn(),
+      onChange:        jest.fn(),
+      className:       "some-classname",
       classNameSubmit: "some-classname-submit",
-      classNameClear: "some-classname-clear",
+      classNameClear:  "some-classname-clear",
       classNameSearch: "some-classname-search",
-      value: "some-value",
-      placeholder: "some-placeholder",
-      autoFocus: true,
+      value:           "some-value",
+      placeholder:     "some-placeholder",
+      autoFocus:       true
     }
     /**
      * Need to rename className to classNameInput for Searchbox

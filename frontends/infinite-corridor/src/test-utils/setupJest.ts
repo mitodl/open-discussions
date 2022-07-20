@@ -9,6 +9,8 @@ jest.mock("axios", () => {
   }
 })
 
+// This should be the only top-level hook.
+// eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
   jest.resetAllMocks()
   resetApi()

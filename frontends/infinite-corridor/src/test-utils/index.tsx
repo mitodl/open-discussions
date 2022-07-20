@@ -30,7 +30,7 @@ const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
 /**
  * Sample a random element of an array.
  */
-const sample = <T,>(array: T[]): T => {
+const sample = <T, >(array: T[]): T => {
   const item = lodashSample(array)
   assertNotNil(item)
   return item

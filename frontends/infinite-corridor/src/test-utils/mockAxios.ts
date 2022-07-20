@@ -29,8 +29,8 @@ const mockRequest = (
   code: number
 ) => {
   when(mockMakeRequest).calledWith(method, url).mockResolvedValue({
-    data: responseBody,
-    status: code,
+    data:   responseBody,
+    status: code
   })
 }
 
