@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.191.0
+Version 0.191.0 (Released July 20, 2022)
 ---------------
 
 - Update newrelic (#3640)
