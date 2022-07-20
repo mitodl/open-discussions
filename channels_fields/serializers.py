@@ -94,7 +94,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
                 lists = [list["field_list"]["id"] for list in lists]
             try:
                 valid_list_ids = set(
-                    UserList.objects.filter(id__in=lists).values_list("id", flat=True)
+                    UserList.objects.filter(id__in=lists, privacy_level=PrivacyLevel.public.value).values_list("id", flat=True)
                 )
             except ValueError:
                 raise ValidationError("List ids must be integers")
