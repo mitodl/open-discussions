@@ -4,7 +4,8 @@ export {
   BannerImage,
   Gradient,
   BannerPageHeader,
-  BannerPageWrapper
+  BannerPageWrapper,
+  BannerPage
 } from "./PageBanner"
 export { Grid, Cell } from "./Grid"
 

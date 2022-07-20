@@ -48,7 +48,8 @@ const imageStylesheet = `
 `
 
 const StyledImage = styled.img`
-  ${imageStylesheet} object-fit: cover;
+  ${imageStylesheet}
+  object-fit: cover;
   ${imageHeight};
 `
 
@@ -92,10 +93,18 @@ const Gradient = styled.div`
   ${imageHeight};
 `
 
+const BannerPage = {
+  Wrapper:     BannerPageWrapper,
+  Header:      BannerPageHeader,
+  Container:   BannerContainer,
+  BannerImage,
+}
+
 export {
   BannerImage,
   BannerPageWrapper,
   BannerPageHeader,
   Gradient,
-  BannerContainer
+  BannerContainer,
+  BannerPage
 }
