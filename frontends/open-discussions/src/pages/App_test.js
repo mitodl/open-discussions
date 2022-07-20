@@ -141,12 +141,10 @@ describe("App", () => {
 
   //
   ;[true, false].forEach(courseUIEnabled => {
-    it(`${shouldIf(
-      courseUIEnabled
-    )} render something at "/learn"`, async () => {
+    it(`should render something at "/learn regardless of course_ui_enabled setting"`, async () => {
       SETTINGS.course_ui_enabled = courseUIEnabled
       const [wrapper] = await renderComponent("/learn/", [])
-      assert.equal(courseUIEnabled, wrapper.find("LearnRouter").exists())
+      assert.equal(true, wrapper.find("LearnRouter").exists())
     })
   })
 })

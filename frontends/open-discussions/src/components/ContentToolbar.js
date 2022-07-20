@@ -69,7 +69,7 @@ export default class ContentToolbar extends React.Component<Props> {
             </section>
             <section className="mdc-toolbar__section mdc-toolbar__section--align-end user-menu-section">
               <ResponsiveWrapper onlyOn={[TABLET, DESKTOP]}>
-                {userIsAnonymous() || !SETTINGS.course_ui_enabled ? (
+                {userIsAnonymous() ? (
                   <div />
                 ) : (
                   <Link className="user-list-link" to={userListIndexURL}>
