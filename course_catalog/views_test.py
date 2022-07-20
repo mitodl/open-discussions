@@ -216,6 +216,21 @@ def test_user_list_endpoint_get(client, is_public, is_author, user):
         assert resp.data.get("title") == another_user_list.title
 
 
+def test_user_list_endpoint_get_all_public_lists(user_client):
+    """If public=True, return all public user lists"""
+    public_lists = UserListFactory.create_batch(
+        4, privacy_level=PrivacyLevel.public.value
+    )
+    private_list = UserListFactory.create(privacy_level=PrivacyLevel.private.value)
+    resp = user_client.get(reverse("userlists-list"), {"public": True})
+    assert resp.status_code == 200
+    response_list_ids = [user_list["id"] for user_list in resp.data.get("results")]
+    assert len(response_list_ids) == 4
+    assert private_list.id not in response_list_ids
+    for user_list in public_lists:
+        assert user_list.id in response_list_ids
+
+
 @pytest.mark.parametrize("is_public", [True, False])
 @pytest.mark.parametrize("is_staff", [True, False])
 @pytest.mark.parametrize("is_super", [True, False])

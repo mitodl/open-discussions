@@ -27,6 +27,15 @@ def test_create_field_channel(admin_client):
     assert FieldChannel.objects.filter(name=data["name"]).exists()
 
 
+def test_create_field_channel_missing_name(admin_client):
+    """Name is required for creating a field channel"""
+    url = reverse("field_channels_api-list")
+    data = {"title": "Biology", "about": {}}
+    response = admin_client.post(url, data=data)
+    assert response.status_code == 400
+    assert response.json() == {"error_type": "ValidationError", "name": ["This field is required."]}
+
+
 def test_create_field_channel_forbidden(user_client):
     """A normal user should not be able to create a new field channel"""
     url = reverse("field_channels_api-list")
