@@ -10,7 +10,7 @@ interface TestAppOptions {
 }
 
 const defaultTestAppOptions = {
-  url: "/",
+  url: "/"
 }
 
 /**

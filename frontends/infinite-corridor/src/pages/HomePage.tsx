@@ -4,7 +4,7 @@ import {
   BannerPageWrapper,
   BannerPageHeader,
   BannerContainer,
-  BannerImage,
+  BannerImage
 } from "ol-util"
 import styled from "styled-components"
 import { Searchbox, SearchboxControlled } from "ol-search-ui"
@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
   const onSearchClear = useCallback(() => setSearchText(""), [])
-  const onSearchChange: SearchboxControlled["onChange"] = useCallback((e) => {
+  const onSearchChange: SearchboxControlled["onChange"] = useCallback(e => {
     setSearchText(e.target.value)
   }, [])
   const onSearchSubmit = useCallback(() => {
@@ -57,7 +57,7 @@ const HomePage: React.FC = () => {
       <div className="mdc-layout-grid one-column">
         <h2>MIT Fields</h2>
         <ul>
-          {fieldsList.data?.results.map((field) => (
+          {fieldsList.data?.results.map(field => (
             <li key={field.name}>
               <Link to={urls.makeFieldViewPath(field.name)}>{field.title}</Link>
             </li>

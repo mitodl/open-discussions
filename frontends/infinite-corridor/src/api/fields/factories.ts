@@ -2,10 +2,10 @@ import casual from "casual"
 import { makePaginatedFactory, Factory } from "ol-util"
 import type { Field } from "./interfaces"
 
-const makeField: Factory<Field> = (overrides) => ({
-  name: casual.name,
+const makeField: Factory<Field> = overrides => ({
+  name:  casual.name,
   title: casual.title,
-  ...overrides,
+  ...overrides
 })
 
 const makeFieldList = makePaginatedFactory(makeField)

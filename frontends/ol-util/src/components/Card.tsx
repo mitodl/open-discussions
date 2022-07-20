@@ -18,13 +18,13 @@ const Card: React.FC<CardProps> = ({
   persistentShadow,
   borderless,
   title,
-  children,
+  children
 }) => {
   return (
     <div
       className={classnames("card", className, {
         borderless,
-        "persistent-shadow": persistentShadow,
+        "persistent-shadow": persistentShadow
       })}
     >
       <div className="card-contents">

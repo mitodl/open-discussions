@@ -1,31 +1,31 @@
 module.exports = {
-    env: {
-        browser: true,
-        es2021: true
+  parser:   "@typescript-eslint/parser",
+  plugins:  ["@typescript-eslint"],
+  extends:  ["eslint-config-mitodl", "plugin:@typescript-eslint/recommended"],
+  settings: {
+    react: {
+      version: "16.14.0",
     },
-    extends: [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
+  },
+  env: {
+    browser: true,
+  },
+  rules: {
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "_" }],
+    camelcase:                           [
+      "error",
+      {
+        properties: "never",
+      },
     ],
-    parser: "@typescript-eslint/parser",
-    parserOptions: {
-        ecmaFeatures: {
-            jsx: true
-        },
-        ecmaVersion: "latest",
-        sourceType: "module"
+  },
+  overrides: [
+    {
+      files:   ['**/?(*.)+(test).[jt]s?(x)'],
+      extends: ['plugin:testing-library/react'],
+      env:     {
+        jest: true,
+      },
     },
-    plugins: [
-        "react",
-        "@typescript-eslint"
-    ],
-    rules: {
-    },
-    settings: {
-        react: {
-            version: "detect"
-        },
-    }
+  ],
 }

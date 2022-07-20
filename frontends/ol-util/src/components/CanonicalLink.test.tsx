@@ -1,3 +1,9 @@
+/**
+ * Testing-library's methods are designed for accessible element access,
+ * which <link /> very much is not.
+ */
+/* eslint-disable testing-library/no-container */
+/* eslint-disable testing-library/no-node-access */
 import React from "react"
 import { render } from "@testing-library/react"
 import CanonicalLink from "./CanonicalLink"
@@ -68,7 +74,7 @@ describe("CanonicalLink", () => {
 
   it.each([{}, { relativeUrl: "" }, { relativeUrl: undefined }])(
     "renders nothing when neither a relative URL or a Match object are provided",
-    (props) => {
+    props => {
       const { container } = render(<CanonicalLink {...props} />)
       expect(container.getElementsByTagName("link").length).toBe(0)
     }

@@ -9,7 +9,7 @@ const SearchboxContainer = styled.div`
   align-items: center;
 
   height: 252px;
-  ${(props) => props.theme.media.phone} {
+  ${props => props.theme.media.phone} {
     height: 115px;
   }
 
@@ -128,58 +128,59 @@ export type SearchboxProps = SearchboxUncontrolled | SearchboxControlled
  * Can be used as a controlled or uncontrolled input.
  */
 const Searchbox = (props: SearchboxProps): JSX.Element => {
-  const { children, onSubmit, validation, value } = props
+  const { children, onSubmit, validation, value, onChange, onClear } = props
 
   const [text, setText] = useState("")
 
   /**
    * Delegates to props.onChange if provided, otherwise syncs the internal state.
    */
-  const onChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
-    (e) => {
-      if (props.onChange) {
-        props.onChange(e)
+  const handleChange: React.ChangeEventHandler<HTMLInputElement> = useCallback(
+    e => {
+      if (onChange) {
+        onChange(e)
       } else {
         const { value } = e.target
         setText(value)
       }
     },
-    [props.onChange]
+    [onChange]
   )
 
-  const onClear: React.MouseEventHandler = useCallback(
-    (e) => {
-      if (props.onClear) {
-        props.onClear(e)
+  const handleClear: React.MouseEventHandler = useCallback(
+    e => {
+      if (onClear) {
+        onClear(e)
       } else {
         setText("")
       }
     },
-    [props.onClear]
+    [onClear]
   )
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = useCallback(
-    (e) => {
-      if (e.key !== "Enter") return
-      const target = e.target as HTMLInputElement // why is this necessary?
-      onSubmit({
-        target: { value: target.value },
-        preventDefault: () => {
-          /** fake */
-        },
-      })
-    },
-    [onSubmit]
-  )
-  const onClickSubmit = useCallback(() => {
-    const targetValue = props.onChange ? props.value : text
+  const handleKeyDown: React.KeyboardEventHandler<HTMLInputElement> =
+    useCallback(
+      e => {
+        if (e.key !== "Enter") return
+        const target = e.target as HTMLInputElement // why is this necessary?
+        onSubmit({
+          target:         { value: target.value },
+          preventDefault: () => {
+            /** fake */
+          }
+        })
+      },
+      [onSubmit]
+    )
+  const handleClickSubmit = useCallback(() => {
+    const targetValue = onChange ? value : text
     onSubmit({
-      target: { value: targetValue },
+      target:         { value: targetValue },
       preventDefault: () => {
         /** fake */
-      },
+      }
     })
-  }, [text, props.onChange, props.value])
+  }, [text, onChange, value, onSubmit])
 
   return (
     <SearchboxContainer>
@@ -189,12 +190,12 @@ const Searchbox = (props: SearchboxProps): JSX.Element => {
             type="text"
             aria-label="Search for"
             name="query"
-            onChange={onChange}
-            onKeyDown={onKeyDown}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
             placeholder="Search Learning Offerings"
             value={value ?? text}
           />
-          <PositionedButton onClick={onClickSubmit}>
+          <PositionedButton onClick={handleClickSubmit}>
             <SearchboxIcon
               verticalEmOffset={
                 0.035 /** So the circle of search magnifying class is baseline-aligned */
@@ -205,7 +206,7 @@ const Searchbox = (props: SearchboxProps): JSX.Element => {
             </SearchboxIcon>
           </PositionedButton>
           {(value || text) && (
-            <PositionedButton onClick={onClear} rightAlign>
+            <PositionedButton onClick={handleClear} rightAlign>
               <SearchboxIcon className="material-icons clear-icon">
                 clear
               </SearchboxIcon>
