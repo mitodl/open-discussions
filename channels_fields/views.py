@@ -1,4 +1,6 @@
 """Views for channels_fields"""
+import logging
+
 from django.contrib.auth.models import User
 from rest_framework import mixins, viewsets
 from rest_framework.generics import ListCreateAPIView
@@ -10,8 +12,15 @@ from channels_fields.api import get_group_role_name, remove_user_role
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel
 from channels_fields.permissions import FieldModeratorPermissions, HasFieldPermission
-from channels_fields.serializers import FieldChannelSerializer, FieldModeratorSerializer
+from channels_fields.serializers import (
+    FieldChannelCreateSerializer,
+    FieldChannelSerializer,
+    FieldChannelWriteSerializer,
+    FieldModeratorSerializer,
+)
 from course_catalog.views import LargePagination
+
+log = logging.getLogger(__name__)
 
 
 class FieldChannelViewSet(
@@ -26,7 +35,6 @@ class FieldChannelViewSet(
     Viewset for Field Channels
     """
 
-    serializer_class = FieldChannelSerializer
     pagination_class = LargePagination
     permission_classes = (HasFieldPermission,)
     lookup_field = "name"
@@ -34,7 +42,16 @@ class FieldChannelViewSet(
 
     def get_queryset(self):
         """Return a queryset"""
-        return FieldChannel.objects.all()
+        return FieldChannel.objects.all().prefetch_related(
+            "subfields", "subfields__field_channel", "lists", "featured_list"
+        )
+
+    def get_serializer_class(self):
+        if self.action in ("retrieve", 'list'):
+            return FieldChannelSerializer
+        elif self.action == "create":
+            return FieldChannelCreateSerializer
+        return FieldChannelWriteSerializer
 
     def delete(self, request, *args, **kwargs):
         """Remove the user from the moderator groups for this field channel"""
