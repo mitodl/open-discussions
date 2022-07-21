@@ -13,6 +13,8 @@ class FieldChannelFactory(factory.DjangoModelFactory):
 
     name = factory.LazyAttributeSequence(channel_name)
     title = factory.Faker("text", max_nb_chars=50)
+    public_description = factory.Faker("text", max_nb_chars=50)
+
     about = factory.List(
         [
             factory.Dict({"node": "text", "value": factory.Faker("text")}),

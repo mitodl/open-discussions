@@ -72,7 +72,7 @@ class FieldModeratorListView(ListCreateAPIView):
         Builds a queryset of relevant users with moderator permissions for this field channel
         """
         field_group_name = get_group_role_name(
-            FieldChannel.objects.get(name=self.kwargs["field_name"]),
+            self.kwargs["field_name"],
             FIELD_ROLE_MODERATORS,
         )
 

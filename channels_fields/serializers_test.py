@@ -24,9 +24,16 @@ from widgets.factories import WidgetListFactory
 pytestmark = pytest.mark.django_db
 
 
+small_gif = (
+    b"\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x00\x00\x00\x21\xf9\x04"
+    b"\x01\x0a\x00\x01\x00\x2c\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02"
+    b"\x02\x4c\x01\x00\x3b"
+)
+
+
 def mock_image_file(filename):
     """Return a File object with a given name"""
-    return SimpleUploadedFile(filename, b"", content_type="image/jpeg")
+    return SimpleUploadedFile(filename, small_gif, content_type="image/gif")
 
 
 @pytest.fixture
@@ -36,7 +43,7 @@ def base_field_data():
         "name": "my_field_name",
         "title": "my_title",
         "about": {"foo": "bar"},
-        "description": "my desc",
+        "public_description": "my desc",
     }
 
 
@@ -51,11 +58,10 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
     """
     Test serializing a field channel
     """
+    mocker.patch("discussions.models.ResizeToFit", autospec=True)
     field_channel = FieldChannelFactory.create(
         banner=mock_image_file("banner.jpg") if has_banner else None,
         avatar=mock_image_file("avatar.jpg") if has_avatar else None,
-        avatar_small=mock_image_file("avatar_small.jpg") if has_avatar else None,
-        avatar_medium=mock_image_file("avatar_medium.jpg") if has_avatar else None,
         widget_list=WidgetListFactory.create() if has_widget_list else None,
         about={"foo": "bar"} if has_about else None,
         ga_tracking_id=ga_tracking_id,
@@ -77,7 +83,7 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         "lists": [],
         "subfields": [],
         "featured_list": None,
-        "description": None,
+        "public_description": field_channel.public_description,
     }
 
 
@@ -102,7 +108,7 @@ def test_create_field_channel(base_field_data):
     assert field_channel.name == data["name"]
     assert field_channel.title == data["title"]
     assert field_channel.about == data["about"]
-    assert field_channel.description == data["description"]
+    assert field_channel.public_description == data["public_description"]
     assert field_channel.featured_list == user_lists[0]
     assert [
         field_list.field_list.id

@@ -3,18 +3,25 @@ from django.contrib.auth.models import Group
 from django.db import models
 from django.db.models import deletion
 
-from channels.models import BaseChannel
 from channels_fields.constants import FIELD_ROLE_CHOICES
 from course_catalog.models import UserList
+from discussions.models import BaseChannel
 from open_discussions.models import TimestampedModel
+from widgets.models import WidgetList
 
 
 class FieldChannel(BaseChannel, TimestampedModel):
     """Field of study"""
 
-    description = models.TextField(null=True, blank=True)
     featured_list = models.ForeignKey(
         UserList, null=True, blank=True, on_delete=deletion.SET_NULL
+    )
+
+    widget_list = models.ForeignKey(
+        WidgetList,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="field_channel",
     )
 
 

@@ -2,6 +2,7 @@
 import os
 
 import pytest
+from django.contrib.auth.models import Group, User
 from django.urls import reverse
 
 from channels_fields.api import add_user_role
@@ -87,13 +88,12 @@ def test_patch_field_channel_image(client, field_channel, attribute):
     field_channel.refresh_from_db()
     image = getattr(field_channel, attribute)
 
-    assert f"{field_channel.name}/field_channel_{attribute}_" in image.name
+    assert f"{field_channel.name}/field_channel_{attribute}_" in image.url
     assert len(image.read()) == os.path.getsize(png_file)
 
     if attribute == "avatar":
         for size_field in ("avatar_small", "avatar_medium"):
             size_image = getattr(field_channel, size_field)
-            assert f"_{size_field}" in size_image.name
             assert len(size_image.read()) > 0
 
 
@@ -135,8 +135,13 @@ def test_list_moderators(field_channel, client):
     )
     field_user = UserFactory.create()
     other_mod = UserFactory.create()
+    group = Group.objects.get(name=f"field_{field_channel.name}_moderators")
     for user in [field_user, other_mod]:
         add_user_role(field_channel, FIELD_ROLE_MODERATORS, user)
+        assert user in group.user_set.all()
+        assert user in User.objects.filter(
+            groups__name=f"field_{field_channel.name}_moderators"
+        )
     client.force_login(field_user)
     mods_list = sorted(client.get(url).json(), key=lambda user: user["moderator_name"])
     for idx, user in enumerate(

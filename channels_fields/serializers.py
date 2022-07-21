@@ -53,7 +53,7 @@ class SubfieldSerializer(serializers.ModelSerializer):
         fields = ("parent_field", "field_channel", "position")
 
 
-class FieldChannelSerializer(serializers.ModelSerializer):
+class FieldChannelSerializer(ChannelAppearanceMixin, serializers.ModelSerializer):
     """Serializer for FieldChannel"""
 
     lists = FieldListSerializer(many=True, read_only=True)
@@ -62,13 +62,26 @@ class FieldChannelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FieldChannel
-        fields = "__all__"
-        read_only_fields = ("widget_list",)
-
-        class Meta:
-            model = FieldChannel
-            fields = "__all__"
-            read_only_fields = ("widget_list",)
+        fields = (
+            "name",
+            "title",
+            "about",
+            "public_description",
+            "subfields",
+            "featured_list",
+            "lists",
+            "about",
+            "avatar",
+            "avatar_medium",
+            "avatar_small",
+            "banner",
+            "widget_list",
+            "updated_on",
+            "created_on",
+            "id",
+            "ga_tracking_id",
+        )
+        read_only_fields = fields
 
 
 class FieldChannelCreateSerializer(serializers.ModelSerializer):
@@ -89,7 +102,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         fields = (
             "name",
             "title",
-            "description",
+            "public_description",
             "subfields",
             "featured_list",
             "lists",
@@ -223,7 +236,7 @@ class FieldChannelWriteSerializer(FieldChannelCreateSerializer, ChannelAppearanc
         fields = (
             "name",
             "title",
-            "description",
+            "public_description",
             "subfields",
             "featured_list",
             "lists",
@@ -243,14 +256,14 @@ class FieldChannelWriteSerializer(FieldChannelCreateSerializer, ChannelAppearanc
             instance.avatar.save(
                 f"field_channel_avatar_{instance.name}.jpg", avatar, save=False
             )
-            instance.save(update_fields=["avatar"], update_image=True)
+            instance.save(update_fields=["avatar"])
 
         banner = validated_data.pop("banner", None)
         if banner:
             instance.banner.save(
                 f"field_channel_banner_{instance.name}.jpg", banner, save=False
             )
-            instance.save(update_fields=["banner"], update_image=True)
+            instance.save(update_fields=["banner"])
 
         return super().update(instance, validated_data)
 
