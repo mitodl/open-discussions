@@ -50,6 +50,7 @@ def test_serialize_channel(
         avatar_medium=Mock() if has_avatar else None,
         widget_list_id=123,
         about=Mock() if has_about else None,
+        ga_tracking_id=ga_tracking_id,
     )
 
     channel._self_channel.moderator_notifications = (
