@@ -1,4 +1,7 @@
 """ Tests for channels_fields.views"""
+import os
+
+import pytest
 from django.urls import reverse
 
 from channels_fields.api import add_user_role
@@ -62,6 +65,36 @@ def test_update_field_channel(field_channel, client):
     field_channel.refresh_from_db()
     assert field_channel.title == data["title"]
     assert field_channel.about == data["about"]
+
+
+@pytest.mark.parametrize("attribute", ["avatar", "banner"])
+def test_patch_field_channel_image(client, field_channel, attribute):
+    """
+    Update a channel's image
+    """
+    url = reverse(
+        "field_channels_api-detail", kwargs={"field_name": field_channel.name}
+    )
+    png_file = os.path.join(
+        os.path.dirname(__file__), "..", "static", "images", "blank.png"
+    )
+    field_user = UserFactory.create()
+    add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
+    client.force_login(field_user)
+    with open(png_file, "rb") as f:
+        resp = client.patch(url, {attribute: f}, format="multipart")
+    assert resp.status_code == 200
+    field_channel.refresh_from_db()
+    image = getattr(field_channel, attribute)
+
+    assert f"{field_channel.name}/field_channel_{attribute}_" in image.name
+    assert len(image.read()) == os.path.getsize(png_file)
+
+    if attribute == "avatar":
+        for size_field in ("avatar_small", "avatar_medium"):
+            size_image = getattr(field_channel, size_field)
+            assert f"_{size_field}" in size_image.name
+            assert len(size_image.read()) > 0
 
 
 def test_update_field_channel_forbidden(field_channel, user_client):

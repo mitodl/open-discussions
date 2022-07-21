@@ -235,10 +235,24 @@ class FieldChannelWriteSerializer(FieldChannelCreateSerializer, ChannelAppearanc
 
     def update(self, instance, validated_data):
         """Update an existing field channel"""
-        with transaction.atomic():
-            self.upsert_field_lists(instance, validated_data)
-            self.upsert_subfields(instance, validated_data)
-            return super().update(instance, validated_data)
+        self.upsert_field_lists(instance, validated_data)
+        self.upsert_subfields(instance, validated_data)
+
+        avatar = validated_data.pop("avatar", None)
+        if avatar:
+            instance.avatar.save(
+                f"field_channel_avatar_{instance.name}.jpg", avatar, save=False
+            )
+            instance.save(update_fields=["avatar"], update_image=True)
+
+        banner = validated_data.pop("banner", None)
+        if banner:
+            instance.banner.save(
+                f"field_channel_banner_{instance.name}.jpg", banner, save=False
+            )
+            instance.save(update_fields=["banner"], update_image=True)
+
+        return super().update(instance, validated_data)
 
 
 class FieldModeratorSerializer(serializers.Serializer):
