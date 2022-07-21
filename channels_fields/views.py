@@ -47,7 +47,7 @@ class FieldChannelViewSet(
         )
 
     def get_serializer_class(self):
-        if self.action in ("retrieve", 'list'):
+        if self.action in ("retrieve", "list"):
             return FieldChannelSerializer
         elif self.action == "create":
             return FieldChannelCreateSerializer

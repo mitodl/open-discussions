@@ -33,7 +33,10 @@ def test_create_field_channel_missing_name(admin_client):
     data = {"title": "Biology", "about": {}}
     response = admin_client.post(url, data=data)
     assert response.status_code == 400
-    assert response.json() == {"error_type": "ValidationError", "name": ["This field is required."]}
+    assert response.json() == {
+        "error_type": "ValidationError",
+        "name": ["This field is required."],
+    }
 
 
 def test_create_field_channel_forbidden(user_client):

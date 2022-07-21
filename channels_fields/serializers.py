@@ -22,7 +22,7 @@ from widgets.models import WidgetList
 
 User = get_user_model()
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 class FieldListSerializer(serializers.ModelSerializer):
@@ -85,7 +85,15 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FieldChannel
-        fields = ("name", "title", "description", "subfields", "featured_list", "lists", "about")
+        fields = (
+            "name",
+            "title",
+            "description",
+            "subfields",
+            "featured_list",
+            "lists",
+            "about",
+        )
 
     def validate_lists(self, lists):
         """Validator for lists"""
@@ -94,7 +102,9 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
                 lists = [list["field_list"]["id"] for list in lists]
             try:
                 valid_list_ids = set(
-                    UserList.objects.filter(id__in=lists, privacy_level=PrivacyLevel.public.value).values_list("id", flat=True)
+                    UserList.objects.filter(
+                        id__in=lists, privacy_level=PrivacyLevel.public.value
+                    ).values_list("id", flat=True)
                 )
             except ValueError:
                 raise ValidationError("List ids must be integers")
@@ -107,7 +117,9 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         """Returns the list of topics"""
         return [
             FieldListSerializer(list).data
-            for list in instance.lists.all().prefetch_related("field_list", "field_channel").order_by("position")
+            for list in instance.lists.all()
+            .prefetch_related("field_list", "field_channel")
+            .order_by("position")
         ]
 
     def validate_subfields(self, subfields):
@@ -132,7 +144,9 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         """Returns the list of topics"""
         return [
             SubfieldSerializer(subfield).data
-            for subfield in instance.subfields.all().prefetch_related("field_channel").order_by("position")
+            for subfield in instance.subfields.all()
+            .prefetch_related("field_channel")
+            .order_by("position")
         ]
 
     def upsert_field_lists(self, instance, validated_data):
@@ -151,7 +165,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
                     defaults={"position": idx},
                 )
                 new_lists.add(field_list)
-        removed_lists = list(set(former_lists) - set([list.id for list in new_lists]))
+        removed_lists = list(set(former_lists) - {list.id for list in new_lists})
         with transaction.atomic():
             instance.lists.set(new_lists)
             instance.lists.filter(id__in=removed_lists).delete()
@@ -168,7 +182,6 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         for (idx, field_name) in enumerate(subfields):
             field_channel = FieldChannel.objects.filter(name=field_name).first()
             if field_channel and field_channel.pk != instance.pk:
-                log.error(f"Creating subfield {field_name} for {instance.name}")
                 subfield, _ = Subfield.objects.update_or_create(
                     parent_channel=instance,
                     field_channel=field_channel,
@@ -177,7 +190,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
                 new_subfields.add(subfield)
         removed_subfields = list(
             set(former_subfields)
-            - set([subfield.field_channel.name for subfield in new_subfields])
+            - {[subfield.field_channel.name for subfield in new_subfields]}
         )
         with transaction.atomic():
             instance.subfields.set(new_subfields)
@@ -206,7 +219,15 @@ class FieldChannelWriteSerializer(FieldChannelCreateSerializer):
 
     class Meta:
         model = FieldChannel
-        fields = ("name", "title", "description", "subfields", "featured_list", "lists", "about")
+        fields = (
+            "name",
+            "title",
+            "description",
+            "subfields",
+            "featured_list",
+            "lists",
+            "about",
+        )
         read_only_fields = ("name",)
 
     def update(self, instance, validated_data):

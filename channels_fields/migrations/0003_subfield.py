@@ -6,9 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-        ("channels_fields", "0002_field_channel_lists"),
-    ]
+    dependencies = [("channels_fields", "0002_field_channel_lists")]
 
     operations = [
         migrations.CreateModel(
@@ -42,8 +40,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "unique_together": {("field_channel", "parent_channel")},
-            },
-        ),
+            options={"unique_together": {("field_channel", "parent_channel")}},
+        )
     ]

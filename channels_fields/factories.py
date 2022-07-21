@@ -21,7 +21,6 @@ class FieldChannelFactory(factory.DjangoModelFactory):
         ]
     )
 
-
     @factory.post_generation
     def create_roles(
         self, create, extracted, **kwargs
@@ -38,6 +37,7 @@ class FieldChannelFactory(factory.DjangoModelFactory):
 
 class SubfieldFactory(factory.DjangoModelFactory):
     """Factory for channels_fields.models.Subfield object"""
+
     position = factory.Sequence(lambda n: n)
     parent_channel = factory.SubFactory(FieldChannelFactory)
     field_channel = factory.SubFactory(FieldChannelFactory)
@@ -48,8 +48,11 @@ class SubfieldFactory(factory.DjangoModelFactory):
 
 class FieldListFactory(factory.DjangoModelFactory):
     """Factory for channels_fields.models.FieldList object"""
+
     position = factory.Sequence(lambda n: n)
-    field_list = factory.SubFactory(UserListFactory, privacy_level=PrivacyLevel.public.value)
+    field_list = factory.SubFactory(
+        UserListFactory, privacy_level=PrivacyLevel.public.value
+    )
     field_channel = factory.SubFactory(FieldChannelFactory)
 
     class Meta:

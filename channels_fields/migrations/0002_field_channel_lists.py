@@ -58,8 +58,6 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={
-                "unique_together": {("field_list", "field_channel")},
-            },
+            options={"unique_together": {("field_list", "field_channel")}},
         ),
     ]

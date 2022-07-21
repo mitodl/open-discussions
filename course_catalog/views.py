@@ -60,6 +60,7 @@ from open_discussions.permissions import (
     PodcastFeatureFlag,
     ReadOnly,
 )
+
 # pylint:disable=unused-argument
 from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
@@ -242,11 +243,10 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
 
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""
-        public = self.request.query_params.get("public", False)
 
         if request.user.is_anonymous:
             queryset = UserList.objects.none()
-        elif public:
+        elif self.request.query_params.get("public", False):
             queryset = (
                 self.get_queryset()
                 .filter(privacy_level=PrivacyLevel.public.value)
