@@ -9,6 +9,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from channels.constants import WIDGET_LIST_CHANGE_PERM
+from channels.serializers.channels import ChannelAppearanceMixin
 from channels.serializers.validators import validate_email, validate_username
 from channels_fields.api import add_user_role, create_field_groups_and_roles
 from channels_fields.constants import FIELD_ROLE_MODERATORS
@@ -190,7 +191,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
                 new_subfields.add(subfield)
         removed_subfields = list(
             set(former_subfields)
-            - {[subfield.field_channel.name for subfield in new_subfields]}
+            - {subfield.field_channel.name for subfield in new_subfields}
         )
         with transaction.atomic():
             instance.subfields.set(new_subfields)
@@ -214,7 +215,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
             return field_channel
 
 
-class FieldChannelWriteSerializer(FieldChannelCreateSerializer):
+class FieldChannelWriteSerializer(FieldChannelCreateSerializer, ChannelAppearanceMixin):
     """Similar to FieldChannelCreateSerializer, with read-only name"""
 
     class Meta:
@@ -227,6 +228,8 @@ class FieldChannelWriteSerializer(FieldChannelCreateSerializer):
             "featured_list",
             "lists",
             "about",
+            "avatar",
+            "banner",
         )
         read_only_fields = ("name",)
 
