@@ -104,7 +104,7 @@ def test_mitx_etl():
     """Verify that mitx etl pipeline executes correctly"""
     with reload_mocked_pipeline(
         patch("course_catalog.etl.mitx.extract", autospec=True),
-        patch("course_catalog.etl.mitx.transform", autospec=True),
+        patch("course_catalog.etl.mitx.transform", autospec=False),
         patch("course_catalog.etl.loaders.load_courses", autospec=True),
         patch("course_catalog.etl.ocw.upload_mitx_course_manifest", autospec=True),
     ) as patches:
@@ -136,7 +136,7 @@ def test_oll_etl():
     """Verify that OLL etl pipeline executes correctly"""
     with reload_mocked_pipeline(
         patch("course_catalog.etl.oll.extract", autospec=True),
-        patch("course_catalog.etl.oll.transform", autospec=True),
+        patch("course_catalog.etl.oll.transform", autospec=False),
         patch("course_catalog.etl.loaders.load_courses", autospec=True),
     ) as patches:
         mock_extract, mock_transform, mock_load_courses = patches
