@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.191.1
+---------------
+
+- Infinite Corridor Front Page Round 2 (#3647)
+- Fix tox (#3649)
+- Stricter ts linting, in-line with ocw-studio (#3644)
+- Change behavior of course_ui_enabled flag (#3634)
+
 Version 0.191.0 (Released July 20, 2022)
 ---------------
 
