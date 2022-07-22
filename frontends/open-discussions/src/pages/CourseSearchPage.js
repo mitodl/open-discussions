@@ -232,6 +232,9 @@ export default function CourseSearchPage(props: Props) {
         </BannerContainer>
         <Searchbox
           className="course-searchbox"
+          classNameInput="course-searchbox-input"
+          classNameSubmit="course-searcbhox-submit"
+          placeholder="Search Learning Offerings"
           onChange={updateText}
           value={text || ""}
           onClear={clearText}

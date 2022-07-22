@@ -199,8 +199,11 @@ describe("CourseIndexPage", () => {
 
   it("should have a search textbox which redirects you", async () => {
     const { wrapper } = await render()
-    const searchBox = wrapper.find(Searchbox)
-    searchBox.prop("onSubmit")({ target: { value: "search term" } })
+    wrapper.find(Searchbox).prop("onChange")({
+      target: { value: "search term" }
+    })
+    wrapper.update()
+    wrapper.find(Searchbox).prop("onSubmit")()
     const { pathname, search } = helper.currentLocation
     assert.equal(pathname, "/learn/search")
     assert.equal(search, "?q=search%20term")

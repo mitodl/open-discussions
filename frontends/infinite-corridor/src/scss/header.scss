@@ -1,0 +1,21 @@
+@use "theme";
+
+
+header.ic-header {
+  background-color: theme.$color-background-light;
+  color: theme.$font-color-default;
+  
+  .ic-divider {
+    margin: 0.5em 1em;
+  }
+
+  h2 {
+    font-size: 1.25em;
+    margin-block-start: 0.25em;
+    margin-block-end: 0.25em;
+  }
+
+  .ic-mit-logo img {
+    height: 1.5em;
+  }
+}

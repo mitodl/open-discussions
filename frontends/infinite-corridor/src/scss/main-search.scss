@@ -1,0 +1,19 @@
+@use "theme";
+
+.main-search {
+  background-color: theme.$color-background-light;
+  &.MuiInputBase-root {
+    width: 100%;
+    border-radius: 100vh;
+    font-size: 1.25rem;
+    &.Mui-focused fieldset {
+      border-color: theme.$color-gray-4;
+    }
+  }
+  
+  .MuiInputBase-input {
+    &::placeholder {
+      font-size: 1rem;
+    }
+  }
+}

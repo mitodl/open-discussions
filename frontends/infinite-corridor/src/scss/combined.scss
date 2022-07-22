@@ -1,26 +1,26 @@
 @use "material-components-web/dist/material-components-web";
-@use "ol-util/assets/variables.scss";
-
 @use "ol-util/assets/card";
 
-@use "button";
-@use "columns";
+@use "theme";
+@use "button" with ( $color: theme.$color-primary );
+@use "main-search";
+@use "header";
+@use "homepage";
+@use "grids-and-columns";
+
+html {
+  font-family: theme.$font-family-default;
+  color: theme.$font-color-default;
+}
 
 body { 
-  font-family: variables.$body-font;
-  background-image: linear-gradient(123deg, #e5e9f4, #ffffff);
+  background-color: theme.$color-background;
   margin: 0;
   padding: 0;
-  color: variables.$font-black;
 }
 
 * {
   box-sizing: border-box;
-}
-
-input[type="text"] {
-  padding: 10px;
-  border: 1px solid variables.$input-border-grey;
 }
 
 .app-container {

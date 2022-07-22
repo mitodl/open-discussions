@@ -5,13 +5,15 @@ type Method = "get" | "post" | "patch" | "delete"
 
 type PartialAxiosResponse = Pick<AxiosResponse, "data" | "status">
 
-const mockMakeRequest = jest.fn(
-  (method: string, url: string): Promise<PartialAxiosResponse> => {
-    const msg = `No response specified for ${method} ${url}`
-    console.error(msg)
-    throw new Error(msg)
-  }
-)
+const alwaysError = (
+  method: string,
+  url: string
+): Promise<PartialAxiosResponse> => {
+  const msg = `No response specified for ${method} ${url}`
+  console.error(msg)
+  throw new Error(msg)
+}
+const mockMakeRequest = jest.fn(alwaysError)
 
 const mockAxiosInstance = {
   get:    (url: string) => mockMakeRequest("get", url),
@@ -26,19 +28,10 @@ const mockRequest = (
   responseBody: unknown,
   code: number
 ) => {
-  when(mockMakeRequest)
-    .calledWith(
-      when.allArgs((allArgs, equals) => {
-        /**
-         * Skip matching on headers / request body.
-         */
-        return equals(allArgs[0], method) && equals(allArgs[1], url)
-      })
-    )
-    .mockResolvedValue({
-      data:   responseBody,
-      status: code
-    })
+  when(mockMakeRequest).calledWith(method, url).mockResolvedValue({
+    data:   responseBody,
+    status: code
+  })
 }
 
 const setMockResponse = {
@@ -52,4 +45,8 @@ const setMockResponse = {
     mockRequest("delete", url, responseBody, code)
 }
 
-export { setMockResponse, mockAxiosInstance }
+const resetApi = () => {
+  mockMakeRequest.mockImplementation(alwaysError)
+}
+
+export { setMockResponse, mockAxiosInstance, resetApi }
