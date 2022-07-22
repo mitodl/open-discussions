@@ -9,10 +9,22 @@ const tallBannerHeight = "252px"
 const shortMobileBannerHeight = "115px"
 const channelBannerBg = "#20316d"
 
-type ImgProps = {
+interface ImgProps {
+  /**
+   * The `src` attribute for the banner image.
+   */
   src?: string | null
+  /**
+   * The `alt` attribute for the banner image.
+   */
   alt?: string
+  /**
+   * If `true`, the banner will be a bit taller on non-mobile screens.
+   */
   tall?: boolean
+  /**
+   * If `true`, the banner will be a bit shorter on mobile screens.
+   */
   compactOnMobile?: boolean
 }
 
@@ -93,11 +105,25 @@ const Gradient = styled.div`
   ${imageHeight};
 `
 
-const BannerPage = {
-  Wrapper:     BannerPageWrapper,
-  Header:      BannerPageHeader,
-  Container:   BannerContainer,
-  BannerImage,
+interface BannerPageProps extends ImgProps {
+  className?: string;
+  /**
+   * Child elements placed below the banner.
+   */
+  children?: React.ReactNode;
+}
+
+const BannerPage: React.FC<BannerPageProps> = ({ className, src, tall, compactOnMobile, alt, children }) => {
+  return (
+    <BannerPageWrapper className={className}>
+      <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
+        <BannerContainer>
+          <BannerImage src={src} alt={alt} tall={tall} compactOnMobile={compactOnMobile} />
+        </BannerContainer>
+      </BannerPageHeader>
+      {children}
+    </BannerPageWrapper>
+  )
 }
 
 export {
