@@ -159,6 +159,14 @@ def test_create_field_channel_bad_subfields(base_field_data):
     assert "subfields" in serializer.errors.keys()
 
 
+def test_create_field_channel_bad_subfield_values(base_field_data):
+    """Validation should fail if subfield data is not a list of strings"""
+    data = {**base_field_data, "subfields": [{"name": "fake"}]}
+    serializer = FieldChannelCreateSerializer(data=data)
+    assert serializer.is_valid() is False
+    assert "subfields" in serializer.errors.keys()
+
+
 def test_update_field_channel():
     """
     Test updating a field_channel

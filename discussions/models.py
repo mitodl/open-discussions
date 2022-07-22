@@ -47,6 +47,7 @@ class BaseChannel(models.Model):
     # Channel configuration
     name = models.CharField(
         max_length=100,
+        unique=True,
         validators=[
             RegexValidator(
                 regex=r"^[A-Za-z0-9_]+$",

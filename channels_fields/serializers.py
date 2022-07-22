@@ -1,6 +1,7 @@
 """Serializers for channels_fields"""
 import copy
 import logging
+from typing import List
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
@@ -109,18 +110,16 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
             "about",
         )
 
-    def validate_lists(self, lists):
+    def validate_lists(self, lists: List[int]):
         """Validator for lists"""
         if len(lists) > 0:
-            if isinstance(lists[0], dict):
-                lists = [list["field_list"]["id"] for list in lists]
             try:
                 valid_list_ids = set(
                     UserList.objects.filter(
                         id__in=lists, privacy_level=PrivacyLevel.public.value
                     ).values_list("id", flat=True)
                 )
-            except ValueError:
+            except (ValueError, TypeError):
                 raise ValidationError("List ids must be integers")
             missing = set(lists).difference(valid_list_ids)
             if missing:
@@ -136,22 +135,20 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
             .order_by("position")
         ]
 
-    def validate_subfields(self, subfields):
+    def validate_subfields(self, subfields: List[str]):
         """Validator for subfields"""
         if len(subfields) > 0:
-            if isinstance(subfields[0], dict):
-                subfields = [subfield["field_channel"] for subfield in subfields]
             try:
                 valid_subfield_names = set(
                     FieldChannel.objects.filter(name__in=subfields).values_list(
                         "name", flat=True
                     )
                 )
-            except ValueError:
-                raise ValidationError("Subfield names must be strings")
-            missing = set(subfields).difference(valid_subfield_names)
-            if missing:
-                raise ValidationError(f"Invalid subfield names: {missing}")
+                missing = set(subfields).difference(valid_subfield_names)
+                if missing:
+                    raise ValidationError(f"Invalid subfield names: {missing}")
+            except (ValueError, TypeError):
+                raise ValidationError("Subfields must be strings")
         return {"subfields": subfields}
 
     def get_subfields(self, instance):
