@@ -10,7 +10,44 @@ from open_discussions.utils import filter_dict_with_renamed_keys
 from open_discussions.serializers import WriteableSerializerMethodField
 
 
-class ChannelSerializer(serializers.Serializer):
+class ChannelAppearanceMixin(serializers.Serializer):
+    """Serializer mixin for channel appearance"""
+
+    avatar = WriteableSerializerMethodField()
+    avatar_small = serializers.SerializerMethodField()
+    avatar_medium = serializers.SerializerMethodField()
+    banner = WriteableSerializerMethodField()
+
+    def get_avatar(self, channel):
+        """Get the avatar image URL"""
+        return channel.avatar.url if channel.avatar else None
+
+    def get_avatar_small(self, channel):
+        """Get the avatar image small URL"""
+        return channel.avatar_small.url if channel.avatar_small else None
+
+    def get_avatar_medium(self, channel):
+        """Get the avatar image medium URL"""
+        return channel.avatar_medium.url if channel.avatar_medium else None
+
+    def get_banner(self, channel):
+        """Get the banner image URL"""
+        return channel.banner.url if channel.banner else None
+
+    def validate_avatar(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not hasattr(value, "name"):
+            raise ValidationError("Expected avatar to be a file")
+        return {"avatar": value}
+
+    def validate_banner(self, value):
+        """Empty validation function, but this is required for WriteableSerializerMethodField"""
+        if not hasattr(value, "name"):
+            raise ValidationError("Expected banner to be a file")
+        return {"banner": value}
+
+
+class ChannelSerializer(ChannelAppearanceMixin, serializers.Serializer):
     """Serializer for channels"""
 
     title = serializers.CharField()
@@ -36,10 +73,6 @@ class ChannelSerializer(serializers.Serializer):
         required=False, allow_null=True, read_only=True
     )
     membership_is_managed = serializers.BooleanField(required=False)
-    avatar = WriteableSerializerMethodField()
-    avatar_small = serializers.SerializerMethodField()
-    avatar_medium = serializers.SerializerMethodField()
-    banner = WriteableSerializerMethodField()
     ga_tracking_id = WriteableSerializerMethodField(allow_null=True)
     about = serializers.JSONField(allow_null=True, default=None)
     moderator_notifications = WriteableSerializerMethodField()
@@ -65,22 +98,6 @@ class ChannelSerializer(serializers.Serializer):
         """
         return bool(channel.user_is_subscriber)
 
-    def get_avatar(self, channel):
-        """Get the avatar image URL"""
-        return channel.avatar.url if channel.avatar else None
-
-    def get_avatar_small(self, channel):
-        """Get the avatar image small URL"""
-        return channel.avatar_small.url if channel.avatar_small else None
-
-    def get_avatar_medium(self, channel):
-        """Get the avatar image medium URL"""
-        return channel.avatar_medium.url if channel.avatar_medium else None
-
-    def get_banner(self, channel):
-        """Get the banner image URL"""
-        return channel.banner.url if channel.banner else None
-
     def get_moderator_notifications(self, channel):
         """Get moderator notifications"""
         return (
@@ -90,18 +107,6 @@ class ChannelSerializer(serializers.Serializer):
     def get_ga_tracking_id(self, channel):
         """Get google analytics tracking id"""
         return channel.ga_tracking_id
-
-    def validate_avatar(self, value):
-        """Empty validation function, but this is required for WriteableSerializerMethodField"""
-        if not hasattr(value, "name"):
-            raise ValidationError("Expected avatar to be a file")
-        return {"avatar": value}
-
-    def validate_banner(self, value):
-        """Empty validation function, but this is required for WriteableSerializerMethodField"""
-        if not hasattr(value, "name"):
-            raise ValidationError("Expected banner to be a file")
-        return {"banner": value}
 
     def validate_moderator_notifications(self, value):
         """Empty validation function, but this is required for WriteableSerializerMethodField"""

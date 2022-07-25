@@ -1,6 +1,7 @@
 """Tests for discussions models"""
 import pytest
 from django.contrib.auth.models import AnonymousUser
+from django.db import IntegrityError
 
 from discussions.constants import ChannelTypes
 from discussions.factories import ChannelFactory
@@ -25,6 +26,12 @@ def test_channel_channel_type(channel_type):
     assert channel.is_public is (channel_type == ChannelTypes.PUBLIC)
     assert channel.is_restricted is (channel_type == ChannelTypes.RESTRICTED)
     assert channel.is_private is (channel_type == ChannelTypes.PRIVATE)
+
+
+def test_channel_no_dupe_names():
+    """Duplicate channel names should not be allowed"""
+    with pytest.raises(IntegrityError):
+        ChannelFactory.create_batch(2, name="dupe")
 
 
 def test_channel_contributor_group():

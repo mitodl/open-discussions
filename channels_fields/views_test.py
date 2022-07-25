@@ -1,4 +1,8 @@
 """ Tests for channels_fields.views"""
+import os
+
+import pytest
+from django.contrib.auth.models import Group, User
 from django.urls import reverse
 
 from channels_fields.api import add_user_role
@@ -27,6 +31,18 @@ def test_create_field_channel(admin_client):
     assert FieldChannel.objects.filter(name=data["name"]).exists()
 
 
+def test_create_field_channel_missing_name(admin_client):
+    """Name is required for creating a field channel"""
+    url = reverse("field_channels_api-list")
+    data = {"title": "Biology", "about": {}}
+    response = admin_client.post(url, data=data)
+    assert response.status_code == 400
+    assert response.json() == {
+        "error_type": "ValidationError",
+        "name": ["This field is required."],
+    }
+
+
 def test_create_field_channel_forbidden(user_client):
     """A normal user should not be able to create a new field channel"""
     url = reverse("field_channels_api-list")
@@ -50,6 +66,35 @@ def test_update_field_channel(field_channel, client):
     field_channel.refresh_from_db()
     assert field_channel.title == data["title"]
     assert field_channel.about == data["about"]
+
+
+@pytest.mark.parametrize("attribute", ["avatar", "banner"])
+def test_patch_field_channel_image(client, field_channel, attribute):
+    """
+    Update a channel's image
+    """
+    url = reverse(
+        "field_channels_api-detail", kwargs={"field_name": field_channel.name}
+    )
+    png_file = os.path.join(
+        os.path.dirname(__file__), "..", "static", "images", "blank.png"
+    )
+    field_user = UserFactory.create()
+    add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
+    client.force_login(field_user)
+    with open(png_file, "rb") as f:
+        resp = client.patch(url, {attribute: f}, format="multipart")
+    assert resp.status_code == 200
+    field_channel.refresh_from_db()
+    image = getattr(field_channel, attribute)
+
+    assert f"{field_channel.name}/field_channel_{attribute}_" in image.url
+    assert len(image.read()) == os.path.getsize(png_file)
+
+    if attribute == "avatar":
+        for size_field in ("avatar_small", "avatar_medium"):
+            size_image = getattr(field_channel, size_field)
+            assert len(size_image.read()) > 0
 
 
 def test_update_field_channel_forbidden(field_channel, user_client):
@@ -90,8 +135,13 @@ def test_list_moderators(field_channel, client):
     )
     field_user = UserFactory.create()
     other_mod = UserFactory.create()
+    group = Group.objects.get(name=f"field_{field_channel.name}_moderators")
     for user in [field_user, other_mod]:
         add_user_role(field_channel, FIELD_ROLE_MODERATORS, user)
+        assert user in group.user_set.all()
+        assert user in User.objects.filter(
+            groups__name=f"field_{field_channel.name}_moderators"
+        )
     client.force_login(field_user)
     mods_list = sorted(client.get(url).json(), key=lambda user: user["moderator_name"])
     for idx, user in enumerate(

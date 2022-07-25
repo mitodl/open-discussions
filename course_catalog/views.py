@@ -22,7 +22,7 @@ from rest_framework.views import APIView
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from authentication.decorators import blocked_ip_exempt
-from course_catalog.constants import PlatformType, ResourceType
+from course_catalog.constants import PlatformType, PrivacyLevel, ResourceType
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from course_catalog.exceptions import WebhookException
 from course_catalog.models import (
@@ -243,10 +243,17 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
 
     def list(self, request, *args, **kwargs):
         """Override default list to only get lists authored by user"""
-        if request.user and not request.user.is_anonymous:
-            queryset = self.get_queryset().filter(author=request.user)
-        else:
+
+        if request.user.is_anonymous:
             queryset = UserList.objects.none()
+        elif self.request.query_params.get("public", False):
+            queryset = (
+                self.get_queryset()
+                .filter(privacy_level=PrivacyLevel.public.value)
+                .order_by("title")
+            )
+        else:
+            queryset = self.get_queryset().filter(author=request.user)
 
         page = self.paginate_queryset(queryset)
         if page is not None:

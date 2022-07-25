@@ -41,14 +41,13 @@ class ChannelQuerySet(TimestampedModelQuerySet):
         return qs
 
 
-class Channel(NoDefaultTimestampedModel):
-    """Data model for channels"""
-
-    objects = ChannelQuerySet.as_manager()
+class BaseChannel(models.Model):
+    """Base abstract model for channels"""
 
     # Channel configuration
     name = models.CharField(
         max_length=100,
+        unique=True,
         validators=[
             RegexValidator(
                 regex=r"^[A-Za-z0-9_]+$",
@@ -58,17 +57,6 @@ class Channel(NoDefaultTimestampedModel):
     )
     title = models.CharField(max_length=100)
     public_description = models.CharField(max_length=80, default="")
-
-    moderator_group = models.ForeignKey(
-        Group, on_delete=models.PROTECT, related_name="moderators_of"
-    )
-    contributor_group = models.ForeignKey(
-        Group, on_delete=models.PROTECT, related_name="contributors_of"
-    )
-    membership_is_managed = models.BooleanField(default=False)
-
-    allowed_post_types = BitField(flags=PostTypes.choices())
-    channel_type = models.CharField(max_length=20, choices=ChannelTypes.choices())
 
     # Branding fields
     avatar = ProcessedImageField(null=True, max_length=2083, upload_to=avatar_uri)
@@ -96,27 +84,39 @@ class Channel(NoDefaultTimestampedModel):
     about = JSONField(blank=True, null=True)
 
     # Miscellaneous fields
-    widget_list = models.ForeignKey(
-        WidgetList,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name="discussions_channel",
-    )
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
 
     def __str__(self):
         """str representation of channel"""
         return self.title
 
-    @property
-    def moderators(self):
-        """
-        Get a list of moderators
+    class Meta:
+        abstract = True
 
-        Returns:
-            list of User: list of contributor users
-        """
-        return self.moderator_group.user_set.all()
+
+class Channel(NoDefaultTimestampedModel, BaseChannel):
+    """Data model for channels"""
+
+    objects = ChannelQuerySet.as_manager()
+
+    # Channel configuration
+    moderator_group = models.ForeignKey(
+        Group, on_delete=models.PROTECT, related_name="moderators_of"
+    )
+    contributor_group = models.ForeignKey(
+        Group, on_delete=models.PROTECT, related_name="contributors_of"
+    )
+    membership_is_managed = models.BooleanField(default=False)
+
+    allowed_post_types = BitField(flags=PostTypes.choices())
+    channel_type = models.CharField(max_length=20, choices=ChannelTypes.choices())
+
+    widget_list = models.ForeignKey(
+        WidgetList,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="discussions_channel",
+    )
 
     @property
     def contributors(self):
@@ -127,6 +127,16 @@ class Channel(NoDefaultTimestampedModel):
             list of User: list of contributor users
         """
         return self.contributor_group.user_set.all()
+
+    @property
+    def moderators(self):
+        """
+        Get a list of moderators
+
+        Returns:
+            list of User: list of contributor users
+        """
+        return self.moderator_group.user_set.all()
 
     @property
     def is_public(self):

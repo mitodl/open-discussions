@@ -131,13 +131,14 @@ class Subscription(TimestampedModel):
         index_together = (("post_id", "comment_id"),)
 
 
-class BaseChannel(models.Model):
+class Channel(TimestampedModel):
     """
-    Base channel model
+    Keep track of channels which are stored in reddit
     """
 
     name = models.CharField(unique=True, max_length=100)
     title = models.CharField(max_length=100, null=True)
+    membership_is_managed = models.BooleanField(default=False)
 
     avatar = models.ImageField(null=True, max_length=2083, upload_to=avatar_uri)
     avatar_small = models.ImageField(
@@ -152,6 +153,13 @@ class BaseChannel(models.Model):
     ga_tracking_id = models.CharField(max_length=24, blank=True, null=True)
     widget_list = models.ForeignKey(WidgetList, on_delete=models.SET_NULL, null=True)
     about = JSONField(blank=True, null=True)
+
+    # Bitfield mutates the list passed to
+    allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)
+    channel_type = models.CharField(
+        max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
+    )
+    moderator_notifications = models.BooleanField(default=False, null=False)
 
     def save(
         self, *args, update_image=False, **kwargs
@@ -192,23 +200,6 @@ class BaseChannel(models.Model):
 
     def __str__(self):
         return f"{self.name}"
-
-    class Meta:
-        abstract = True
-
-
-class Channel(BaseChannel, TimestampedModel):
-    """
-    Keep track of channels which are stored in reddit
-    """
-
-    # Bitfield mutates the list passed to
-    allowed_post_types = BitField(flags=VALID_EXTENDED_POST_CHOICES, null=True)
-    channel_type = models.CharField(
-        max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
-    )
-    moderator_notifications = models.BooleanField(default=False, null=False)
-    membership_is_managed = models.BooleanField(default=False)
 
 
 class ChannelInvitation(TimestampedModel):
