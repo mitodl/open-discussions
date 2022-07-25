@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.191.1
+Version 0.191.1 (Released July 25, 2022)
 ---------------
 
 - Infinite Corridor Front Page Round 2 (#3647)
