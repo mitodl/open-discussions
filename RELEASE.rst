@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.191.3
+---------------
+
+- Improve jest request mocking/spying (#3653)
+
 Version 0.191.2 (Released July 26, 2022)
 ---------------
 
