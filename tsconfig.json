@@ -22,5 +22,5 @@
   "exclude": [
     "frontends/*/**/*.test.ts",
     "frontends/*/**/*.test.tsx"
-  ],
+  ]
 }
