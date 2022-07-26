@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.191.2
+Version 0.191.2 (Released July 26, 2022)
 ---------------
 
 - Featured list, lists and subfields for FieldChannel (#3648)
