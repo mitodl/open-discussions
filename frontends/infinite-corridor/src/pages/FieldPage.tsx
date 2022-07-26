@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { useParams } from "react-router"
 import { BannerPage } from "ol-util"
 import Tab from '@mui/material/Tab'
@@ -8,6 +8,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
+import { useFieldDetails } from "../api/fields"
 
 type RouteParams = {
   name: string
@@ -28,30 +29,36 @@ Aliquam eleifend mi in nulla posuere sollicitudin aliquam. Massa eget egestas pu
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
 
-  const [value, setValue] = React.useState('1')
+  const [value, setValue] = React.useState("home")
+  const field = useFieldDetails(name)
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = useCallback((event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
-  }
-
-  const background = (r, g, b) => ({
-    sx: { backgroundColor: `rgba(${r},${g}, ${b}, 0.25)` }
-  })
-
+  }, [])
 
   return (
-    <BannerPage src="/static/images/lawn_and_river_banner.png" compactOnMobile>
+    <BannerPage
+      compactOnMobile
+      bannerContent={
+        <Container className="field-title-container">
+          <div className="field-title-row">
+            <img src={field.data?.avatar_small ?? ""}/>
+            <h2>{field.data?.title}</h2>
+          </div>
+        </Container>
+      }
+    >
       <TabContext value={value}>
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={8} {...background(255, 0, 0)}>
-              <TabList onChange={handleChange} aria-label="lab API tabs example">
-                <Tab label="Item One" value="1" />
-                <Tab label="Item Two" value="2" />
-                <Tab label="Item Three" value="3" />
+            <Grid item xs={8}>
+              <TabList className="page-nav" onChange={handleChange} aria-label="lab API tabs example">
+                <Tab label="Home" value="home" />
+                <Tab label="About" value="about" />
+
               </TabList>
             </Grid>
-            <Grid item xs={4} {...background(0, 255, 0)}>
+            <Grid item xs={4}>
               More Stufff
             </Grid>
           </Grid>
@@ -59,19 +66,19 @@ const FieldPage: React.FC = () => {
         <Divider />
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={8} {...background(255, 255, 0)}>
-              <TabPanel value="1">AAAAAA {lipsum}</TabPanel>
-              <TabPanel value="2">BBBBBB {lipsum}</TabPanel>
-              <TabPanel value="3">CCCCC {lipsum}</TabPanel>
+            <Grid item xs={8}>
+              <TabPanel value="home">AAAAAA {lipsum}</TabPanel>
+              <TabPanel value="about">BBBBBB {lipsum}</TabPanel>
             </Grid>
-            <Grid item xs={4} {...background(0, 255, 255)}>
-              <ul>
-                {Array(20).fill(0).map((a, i) => <li key={i}>Hi</li>)}
-              </ul>
+            <Grid item xs={4}>
+              The quick brown fox jumps over the lazy dog.
             </Grid>
           </Grid>
         </Container>
       </TabContext>
+      <Container>
+          Hello!
+      </Container>
     </BannerPage>
   )
 }

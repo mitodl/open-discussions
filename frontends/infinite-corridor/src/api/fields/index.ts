@@ -6,5 +6,9 @@ const useFieldsList = () => {
   return useQuery<FieldList>(urls.fieldsList)
 }
 
-export { useFieldsList, urls }
+const useFieldDetails = (name: string) => {
+  return useQuery<Field>(urls.fieldDetails(name))
+}
+
+export { useFieldsList, useFieldDetails, urls }
 export type { Field, FieldList }

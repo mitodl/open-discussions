@@ -5,6 +5,7 @@ import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
 import * as urls from "./urls"
+import Container from "@mui/material/Container"
 
 const HomePage: React.FC = () => {
   const elementId = useId()
@@ -22,7 +23,7 @@ const HomePage: React.FC = () => {
   const fieldsList = useFieldsList()
 
   return (
-    <div className="page-content one-column homepage">
+    <Container className="homepage">
       <h1 className="page-title">Lorem ipsum dolor sit amet</h1>
       <SearchInput
         value={searchText}
@@ -49,7 +50,7 @@ const HomePage: React.FC = () => {
           </li>
         ))}
       </ul>
-    </div>
+  </Container>
   )
 }
 

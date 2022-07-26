@@ -111,14 +111,31 @@ interface BannerPageProps extends ImgProps {
    * Child elements placed below the banner.
    */
   children?: React.ReactNode;
+  bannerContent?: React.ReactNode;
 }
 
-const BannerPage: React.FC<BannerPageProps> = ({ className, src, tall, compactOnMobile, alt, children }) => {
+const BannerContent = styled.div`
+  /*
+  The goal here is to provide a container in which to insert extra content into
+  the banner area. The container should be full width and height of the banner,
+  which makes controlling styling on the consumer side easy.
+  */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height:100%;
+`
+
+const BannerPage: React.FC<BannerPageProps> = ({ className, src, tall, compactOnMobile, bannerContent, alt, children }) => {
   return (
     <BannerPageWrapper className={className}>
       <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
         <BannerContainer>
           <BannerImage src={src} alt={alt} tall={tall} compactOnMobile={compactOnMobile} />
+          <BannerContent>
+            {bannerContent}
+          </BannerContent>
         </BannerContainer>
       </BannerPageHeader>
       {children}

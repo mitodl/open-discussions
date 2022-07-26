@@ -5,10 +5,11 @@ import FieldPage from "./pages/FieldPage"
 import * as urls from "./pages/urls"
 import { Route, Router } from "react-router"
 import { History } from "history"
-import { ThemeProvider } from "styled-components"
 import { combinedTheme } from "ol-util"
 import { QueryClientProvider, QueryClient } from "react-query"
 import Header from "./components/Header"
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import { muiTheme } from "./libs/mui"
 
 export const BASE_URL = "/infinite"
 
@@ -25,7 +26,7 @@ interface AppProps {
 const App: React.FC<AppProps> = ({ history, queryClient }) => {
   return (
     <div className="app-container">
-      <ThemeProvider theme={combinedTheme}>
+      <MuiThemeProvider theme={muiTheme}>
         <QueryClientProvider client={queryClient}>
           <Router history={history}>
             <Header />
@@ -40,7 +41,7 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
             </Route>
           </Router>
         </QueryClientProvider>
-      </ThemeProvider>
+      </MuiThemeProvider>
     </div>
   )
 }
