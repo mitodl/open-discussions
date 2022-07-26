@@ -1,9 +1,9 @@
 import type { Config } from '@jest/types'
 
 const config: Config.InitialOptions = {
-  collectCoverage: true,
+  collectCoverage:   true,
   coverageDirectory: "coverage",
-  projects: ["<rootDir>/frontends/*/"]
+  projects:          ["<rootDir>/frontends/*/"],
 }
 
 export default config

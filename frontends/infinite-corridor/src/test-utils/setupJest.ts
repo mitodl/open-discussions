@@ -1,3 +1,6 @@
+import "jest-extended"
+import "jest-extended/all"
+
 import { mockAxiosInstance, resetApi } from "./mockAxios"
 
 jest.mock("axios", () => {
