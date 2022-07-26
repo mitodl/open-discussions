@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react"
 import { SearchInput, SearchInputProps } from "ol-search-ui"
-import { useId } from "ol-util"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
@@ -8,7 +7,6 @@ import * as urls from "./urls"
 import Container from "@mui/material/Container"
 
 const HomePage: React.FC = () => {
-  const elementId = useId()
   const [searchText, setSearchText] = useState("")
   const history = useHistory()
   const onSearchClear = useCallback(() => setSearchText(""), [])
@@ -34,23 +32,25 @@ const HomePage: React.FC = () => {
         className="homepage-search main-search"
         classNameSubmit="primary bordered"
       />
-      <h2 id={elementId}>Fields of Study</h2>
-      <ul aria-labelledby={elementId} className="field-list">
-        {fieldsList.data?.results.map(field => (
-          <li key={field.name}>
-            <Link
-              className="field-link"
-              to={urls.makeFieldViewPath(field.name)}
-            >
-              <figure>
-                <img src={field.avatar_small ?? ""} />
-                <figcaption className="field-title">{field.title}</figcaption>
-              </figure>
-            </Link>
-          </li>
-        ))}
-      </ul>
-  </Container>
+      <section>
+        <h2>Fields of Study</h2>
+        <ul className="field-list">
+          {fieldsList.data?.results.map(field => (
+            <li key={field.name}>
+              <Link
+                className="field-link"
+                to={urls.makeFieldViewPath(field.name)}
+              >
+                <figure>
+                  <img src={field.avatar_small ?? ""} />
+                  <figcaption className="field-title">{field.title}</figcaption>
+                </figure>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Container>
   )
 }
 

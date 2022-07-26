@@ -1,10 +1,14 @@
-import { renderTestApp, screen } from "../test-utils"
+import { urls } from "../api/fields"
+import * as factory from "../api/fields/factories"
+import { renderTestApp, screen, setMockResponse } from "../test-utils"
+
 
 describe("FieldPage", () => {
   it("Displays the field name", async () => {
-    renderTestApp({ url: "/fields/physics" })
-    // When we make a real field landing page, change this to field.title
-    // and use getByText instead of getAll...
-    screen.getAllByText("physics")
+    const field = factory.makeField()
+    setMockResponse.get(urls.fieldDetails(field.name), field)
+    renderTestApp({ url: `/fields/${field.name}` })
+
+    await screen.findByText(field.title)
   })
 })
