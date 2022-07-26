@@ -1,6 +1,5 @@
 import React, { useCallback } from "react"
 import { useParams, useLocation } from "react-router"
-import { BannerPage } from "ol-util"
 import Tab from '@mui/material/Tab'
 import TabContext from '@mui/lab/TabContext'
 import TabList from '@mui/lab/TabList'
@@ -8,8 +7,9 @@ import TabPanel from '@mui/lab/TabPanel'
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
-import { useFieldDetails } from "../../api/fields"
+import { useFieldDetails } from "../api/fields"
 import { Link } from "react-router-dom"
+import FieldPageSkeleton from "./FieldPageSkeleton"
 
 type RouteParams = {
   name: string
@@ -32,17 +32,7 @@ const FieldPage: React.FC = () => {
   }, [])
 
   return (
-    <BannerPage
-      compactOnMobile
-      bannerContent={
-        <Container className="field-title-container">
-          <div className="field-title-row">
-            <img src={field.data?.avatar_small ?? ""}/>
-            <h2>{field.data?.title}</h2>
-          </div>
-        </Container>
-      }
-    >
+    <FieldPageSkeleton name={name}>
       <TabContext value={value}>
         <Container>
           <Grid container spacing={1}>
@@ -51,9 +41,6 @@ const FieldPage: React.FC = () => {
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />
               </TabList>
-            </Grid>
-            <Grid item xs={4}>
-              Search Icon
             </Grid>
           </Grid>
         </Container>
@@ -75,7 +62,7 @@ const FieldPage: React.FC = () => {
           </Grid>
         </Container>
       </TabContext>
-    </BannerPage>
+    </FieldPageSkeleton>
   )
 }
 
