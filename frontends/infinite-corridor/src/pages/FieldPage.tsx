@@ -43,7 +43,6 @@ const FieldPage: React.FC = () => {
               <TabList
                 className="page-nav"
                 onChange={handleChange}
-                aria-label="lab API tabs example"
               >
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />

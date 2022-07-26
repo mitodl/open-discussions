@@ -88,7 +88,7 @@ const BannerPageWrapper = styled.div`
   width: 100%;
 `
 
-const BannerPageHeader = styled.div`
+const BannerPageHeader = styled.header`
   ${imageWrapperHeight};
 `
 

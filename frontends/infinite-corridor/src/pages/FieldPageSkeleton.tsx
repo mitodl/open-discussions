@@ -21,11 +21,13 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
 
   return (
     <BannerPage
+      src={field.data?.banner ?? ""}
+      alt=""
       compactOnMobile
       bannerContent={
         <Container className="field-title-container">
           <div className="field-title-row">
-            <img alt={field.data?.title} src={field.data?.avatar_small ?? ""} />
+            <img alt="" src={field.data?.avatar_medium ?? ""} />
             <h2>{field.data?.title}</h2>
           </div>
         </Container>

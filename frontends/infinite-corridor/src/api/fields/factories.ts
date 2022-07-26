@@ -18,7 +18,9 @@ const makeField: Factory<Field> = overrides => ({
    * This makes testing with hostnames containing capitals annoying.
    * So let's standardize the hostnames here like a browser would.
    */
+  banner:             new URL(casual.url).href,
   avatar_small:       new URL(casual.url).href,
+  avatar_medium:      new URL(casual.url).href,
   ...overrides
 })
 
