@@ -106,12 +106,12 @@ const Gradient = styled.div`
 `
 
 interface BannerPageProps extends ImgProps {
-  className?: string;
+  className?: string
   /**
    * Child elements placed below the banner.
    */
-  children?: React.ReactNode;
-  bannerContent?: React.ReactNode;
+  children?: React.ReactNode
+  bannerContent?: React.ReactNode
 }
 
 const BannerContent = styled.div`
@@ -124,18 +124,29 @@ const BannerContent = styled.div`
   top: 0;
   left: 0;
   width: 100%;
-  height:100%;
+  height: 100%;
 `
 
-const BannerPage: React.FC<BannerPageProps> = ({ className, src, tall, compactOnMobile, bannerContent, alt, children }) => {
+const BannerPage: React.FC<BannerPageProps> = ({
+  className,
+  src,
+  tall,
+  compactOnMobile,
+  bannerContent,
+  alt,
+  children
+}) => {
   return (
     <BannerPageWrapper className={className}>
       <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
         <BannerContainer>
-          <BannerImage src={src} alt={alt} tall={tall} compactOnMobile={compactOnMobile} />
-          <BannerContent>
-            {bannerContent}
-          </BannerContent>
+          <BannerImage
+            src={src}
+            alt={alt}
+            tall={tall}
+            compactOnMobile={compactOnMobile}
+          />
+          <BannerContent>{bannerContent}</BannerContent>
         </BannerContainer>
       </BannerPageHeader>
       {children}

@@ -1,9 +1,9 @@
 import React, { useCallback } from "react"
 import { useParams, useLocation } from "react-router"
-import Tab from '@mui/material/Tab'
-import TabContext from '@mui/lab/TabContext'
-import TabList from '@mui/lab/TabList'
-import TabPanel from '@mui/lab/TabPanel'
+import Tab from "@mui/material/Tab"
+import TabContext from "@mui/lab/TabContext"
+import TabList from "@mui/lab/TabList"
+import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
@@ -16,9 +16,9 @@ type RouteParams = {
 }
 
 const keyFromHash = (hash: string) => {
-  const keys = ['home', 'about']
+  const keys = ["home", "about"]
   const match = keys.find(key => `#${key}` === hash)
-  return match ?? 'home'
+  return match ?? "home"
 }
 
 const FieldPage: React.FC = () => {
@@ -27,9 +27,12 @@ const FieldPage: React.FC = () => {
 
   const [value, setValue] = React.useState(keyFromHash(hash))
   const field = useFieldDetails(name)
-  const handleChange = useCallback((event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue)
-  }, [])
+  const handleChange = useCallback(
+    (event: React.SyntheticEvent, newValue: string) => {
+      setValue(newValue)
+    },
+    []
+  )
 
   return (
     <FieldPageSkeleton name={name}>
@@ -37,7 +40,11 @@ const FieldPage: React.FC = () => {
         <Container>
           <Grid container spacing={1}>
             <Grid item xs={8}>
-              <TabList className="page-nav" onChange={handleChange} aria-label="lab API tabs example">
+              <TabList
+                className="page-nav"
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+              >
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />
               </TabList>
@@ -50,9 +57,7 @@ const FieldPage: React.FC = () => {
             <Grid item xs={8}>
               <TabPanel value="home">
                 <p>{field.data?.public_description}</p>
-                <section>
-                  Featured Courses
-                </section>
+                <section>Featured Courses</section>
               </TabPanel>
               <TabPanel value="about">BBBBBB</TabPanel>
             </Grid>

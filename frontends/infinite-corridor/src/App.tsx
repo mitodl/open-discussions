@@ -8,7 +8,7 @@ import { History } from "history"
 import { combinedTheme } from "ol-util"
 import { QueryClientProvider, QueryClient } from "react-query"
 import Header from "./components/Header"
-import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 
 export const BASE_URL = "/infinite"

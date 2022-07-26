@@ -8,13 +8,13 @@ import {
   setMockResponse,
   within,
   sample,
-  user,
+  user
 } from "../test-utils"
 import { makeFieldViewPath } from "./urls"
 
 const findFieldList = async (): Promise<HTMLElement> => {
   const text = await screen.findByText("Fields of Study")
-  const section = text.closest('section')
+  const section = text.closest("section")
   assertInstanceOf(section, HTMLElement)
   return section
 }
