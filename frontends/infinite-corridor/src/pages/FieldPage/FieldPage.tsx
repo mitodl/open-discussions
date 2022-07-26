@@ -8,7 +8,7 @@ import TabPanel from '@mui/lab/TabPanel'
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
-import { useFieldDetails } from "../api/fields"
+import { useFieldDetails } from "../../api/fields"
 import { Link } from "react-router-dom"
 
 type RouteParams = {
@@ -62,7 +62,10 @@ const FieldPage: React.FC = () => {
           <Grid container spacing={1}>
             <Grid item xs={8}>
               <TabPanel value="home">
-                {field.data?.public_description}
+                <p>{field.data?.public_description}</p>
+                <section>
+                  Featured Courses
+                </section>
               </TabPanel>
               <TabPanel value="about">BBBBBB</TabPanel>
             </Grid>
