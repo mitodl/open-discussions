@@ -128,3 +128,37 @@ export const searchResultToLearningResource = (
   certification: result.certification,
   ...overrideObject
 })
+
+export type LearningResource = Pick<
+  LearningResourceResult,
+  | "id"
+  | "image_src"
+  | "is_favorite"
+  | "lists"
+  | "object_type"
+  | "offered_by"
+  | "short_description"
+  | "title"
+> & { topics: CourseTopic[] }
+
+export type UserList = LearningResource & {
+  image_src: string | null | undefined
+  image_description: string | null | undefined
+  topics: CourseTopic[]
+  list_type: string
+  object_type: typeof LR_TYPE_USERLIST | typeof LR_TYPE_LEARNINGPATH
+  privacy_level: string
+  author: number
+  author_name: string
+  item_count: number
+}
+
+export type UserListItem = {
+  id: number
+  is_favorite: boolean
+  object_id: number
+  position: number
+  program: number
+  content_type: string
+  content_data: LearningResourceSummary
+}

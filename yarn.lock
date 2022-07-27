@@ -14526,6 +14526,7 @@ __metadata:
   resolution: "ol-util@workspace:frontends/ol-util"
   dependencies:
     classnames: ^2.3.1
+    qs: ^6.11.0
   peerDependencies:
     react: ^16.10 || 17 || 18
     react-router: ^5 || ^6
@@ -15857,6 +15858,15 @@ __metadata:
   version: 6.5.1
   resolution: "qs@npm:6.5.1"
   checksum: 40967af240d04138b0cc6a70231270871c4a627834cae3e529dab9ee01fb95730bd80299cded185c409a24b03f890831d41ee37e8431372540d62f60f4011fbd
+  languageName: node
+  linkType: hard
+
+"qs@npm:^6.11.0":
+  version: 6.11.0
+  resolution: "qs@npm:6.11.0"
+  dependencies:
+    side-channel: ^1.0.4
+  checksum: 6e1f29dd5385f7488ec74ac7b6c92f4d09a90408882d0c208414a34dd33badc1a621019d4c799a3df15ab9b1d0292f97c1dd71dc7c045e69f81a8064e5af7297
   languageName: node
   linkType: hard
 

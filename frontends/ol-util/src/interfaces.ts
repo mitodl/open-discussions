@@ -1,6 +1,13 @@
-export interface PaginatedResult<T> {
+interface PaginatedResult<T> {
   count: number
   next: null | string
   previous: null | string
   results: T[]
 }
+
+interface PaginationSearchParams {
+  offset?: number
+  limit?: number
+}
+
+export { PaginationSearchParams, PaginatedResult }
