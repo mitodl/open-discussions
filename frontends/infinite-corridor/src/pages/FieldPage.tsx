@@ -40,10 +40,7 @@ const FieldPage: React.FC = () => {
         <Container>
           <Grid container spacing={1}>
             <Grid item xs={8}>
-              <TabList
-                className="page-nav"
-                onChange={handleChange}
-              >
+              <TabList className="page-nav" onChange={handleChange}>
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />
               </TabList>

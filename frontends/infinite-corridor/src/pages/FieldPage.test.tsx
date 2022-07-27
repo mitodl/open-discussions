@@ -10,9 +10,9 @@ describe("FieldPage", () => {
     renderTestApp({ url: `/fields/${field.name}` })
 
     const title = await screen.findByText(field.title)
-    const header = title.closest('header')
+    const header = title.closest("header")
     assertInstanceOf(header, HTMLElement)
-    const images = within(header).getAllByRole('img') as HTMLImageElement[]
+    const images = within(header).getAllByRole("img") as HTMLImageElement[]
 
     expect(images).toEqual([
       /**
