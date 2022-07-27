@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.191.4
+---------------
+
+- infinite search (#3645)
+- For field channel API serializer, return "lists" attribute as ordered list of UserLists (#3656)
+- Cc/field pages v0 (#3654)
+
 Version 0.191.3 (Released July 27, 2022)
 ---------------
 
