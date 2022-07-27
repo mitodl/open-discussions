@@ -28,9 +28,9 @@
         "global:lint-check": "cd $INIT_CWD && eslint src/ --ext .js,.jsx,.ts,.tsx",
         "global:scss-lint": "echo 'TODO: Set this up.'",
         "global:lint-fix": "cd $INIT_CWD && eslint --fix src/ --ext .js,.jsx,.ts,.tsx",
-        "global:test": "cd $INIT_CWD && jest",
+        "global:test": "cd $INIT_CWD && NODE_ENV=test jest",
         "global:typecheck": "cd $INIT_CWD && tsc --noEmit",
-        "global:test-watch": "cd $INIT_CWD && jest --watch"
+        "global:test-watch": "cd $INIT_CWD && NODE_ENV=test jest --watch"
     },
     "version": "0.0.0",
     "packageManager": "yarn@3.2.0",

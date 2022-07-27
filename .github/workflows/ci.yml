@@ -143,7 +143,7 @@ jobs:
         run: yarn run test
         env:
           CODECOV: true
-          NODE_ENV: development
+          NODE_ENV: test
 
       - name: Webpack build
         run: yarn run build

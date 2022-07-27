@@ -12,7 +12,12 @@ import {
 } from "../test-utils"
 import { makeFieldViewPath } from "./urls"
 
-const findFieldList = () => screen.findByLabelText("Fields of Study")
+const findFieldList = async (): Promise<HTMLElement> => {
+  const text = await screen.findByText("Fields of Study")
+  const section = text.closest("section")
+  assertInstanceOf(section, HTMLElement)
+  return section
+}
 const findAllFieldLinks = async () =>
   within(await findFieldList()).findAllByRole("link")
 const findFieldLink = async (title: string): Promise<HTMLElement> => {
@@ -50,9 +55,10 @@ describe("HomePage", () => {
   test("Clicking on a link goes to the field page", async () => {
     const fieldsList = factories.makeFieldList(3)
     setMockResponse.get(urls.fieldsList, fieldsList)
-    const { history } = renderTestApp()
-
     const field = sample(fieldsList.results)
+    setMockResponse.get(urls.fieldDetails(field.name), field)
+
+    const { history } = renderTestApp()
     const link = await findFieldLink(field.title)
     await user.click(link)
     expect(history.location.pathname).toBe(makeFieldViewPath(field.name))

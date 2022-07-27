@@ -9,10 +9,22 @@ const tallBannerHeight = "252px"
 const shortMobileBannerHeight = "115px"
 const channelBannerBg = "#20316d"
 
-type ImgProps = {
+interface ImgProps {
+  /**
+   * The `src` attribute for the banner image.
+   */
   src?: string | null
+  /**
+   * The `alt` attribute for the banner image.
+   */
   alt?: string
+  /**
+   * If `true`, the banner will be a bit taller on non-mobile screens.
+   */
   tall?: boolean
+  /**
+   * If `true`, the banner will be a bit shorter on mobile screens.
+   */
   compactOnMobile?: boolean
 }
 
@@ -48,7 +60,8 @@ const imageStylesheet = `
 `
 
 const StyledImage = styled.img`
-  ${imageStylesheet} object-fit: cover;
+  ${imageStylesheet}
+  object-fit: cover;
   ${imageHeight};
 `
 
@@ -75,7 +88,7 @@ const BannerPageWrapper = styled.div`
   width: 100%;
 `
 
-const BannerPageHeader = styled.div`
+const BannerPageHeader = styled.header`
   ${imageWrapperHeight};
 `
 
@@ -92,10 +105,60 @@ const Gradient = styled.div`
   ${imageHeight};
 `
 
+interface BannerPageProps extends ImgProps {
+  className?: string
+  /**
+   * Child elements placed below the banner.
+   */
+  children?: React.ReactNode
+  bannerContent?: React.ReactNode
+}
+
+const BannerContent = styled.div`
+  /*
+  The goal here is to provide a container in which to insert extra content into
+  the banner area. The container should be full width and height of the banner,
+  which makes controlling styling on the consumer side easy.
+  */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+`
+
+const BannerPage: React.FC<BannerPageProps> = ({
+  className,
+  src,
+  tall,
+  compactOnMobile,
+  bannerContent,
+  alt,
+  children
+}) => {
+  return (
+    <BannerPageWrapper className={className}>
+      <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
+        <BannerContainer>
+          <BannerImage
+            src={src}
+            alt={alt}
+            tall={tall}
+            compactOnMobile={compactOnMobile}
+          />
+          <BannerContent>{bannerContent}</BannerContent>
+        </BannerContainer>
+      </BannerPageHeader>
+      {children}
+    </BannerPageWrapper>
+  )
+}
+
 export {
   BannerImage,
   BannerPageWrapper,
   BannerPageHeader,
   Gradient,
-  BannerContainer
+  BannerContainer,
+  BannerPage
 }

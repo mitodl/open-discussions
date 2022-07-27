@@ -3,8 +3,9 @@ import { makePaginatedFactory, Factory } from "ol-util"
 import type { Field } from "./interfaces"
 
 const makeField: Factory<Field> = overrides => ({
-  name:         casual.word,
-  title:        casual.title,
+  name:               casual.word,
+  title:              casual.title,
+  public_description: casual.text,
   /**
    * The URLs that `casual` makes contain capital letters in their hostnames.
    * But hostnames are case-insensitive, so browsers and JSDOM both standardize
@@ -17,7 +18,9 @@ const makeField: Factory<Field> = overrides => ({
    * This makes testing with hostnames containing capitals annoying.
    * So let's standardize the hostnames here like a browser would.
    */
-  avatar_small: new URL(casual.url).href,
+  banner:             new URL(casual.url).href,
+  avatar_small:       new URL(casual.url).href,
+  avatar_medium:      new URL(casual.url).href,
   ...overrides
 })
 

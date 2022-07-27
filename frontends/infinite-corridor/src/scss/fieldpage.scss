@@ -1,0 +1,32 @@
+@use "theme";
+
+$avatarSize: 60px;
+
+.field-title-container.MuiContainer-root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%; // full height of the banner
+}
+
+.field-title-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  img {
+    height: $avatarSize;
+    width: $avatarSize;
+  }
+
+  h2 {
+    color: theme.$color-gray-1;
+    margin-left: 1em; 
+  }
+}
+
+.page-nav.MuiTabs-root {
+  button {
+    text-transform: none;
+  }
+}
