@@ -11,7 +11,7 @@ const SearchboxContainer = styled.div`
   align-items: center;
 
   height: 252px;
-  ${props => props.theme.media.phone} {
+  ${props => props.theme.media?.phone} {
     height: 115px;
   }
 

@@ -6,11 +6,11 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.4",
-    "@mui/material": "^5.9.0"
+    "@mui/material": "^5.9.0",
+    "ol-util": "workspace:*"
   },
   "peerDependencies": {
     "ol-forms": "workspace:*",
-    "ol-util": "workspace:*",
     "react": "^16.10 || 17 || 18",
     "styled-components": "5"
   }

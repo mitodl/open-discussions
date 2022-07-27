@@ -32,6 +32,10 @@ const getSearchTextInput = (): HTMLInputElement => {
   return textInput
 }
 
+jest.mock("redux-hammock/django_csrf_fetch", () => ({
+  fetchJSONWithCSRF: jest.fn()
+}))
+
 describe("HomePage", () => {
   test("Displays the field titles and thumbnails in links", async () => {
     const fieldsList = factories.makeFieldList(3)
