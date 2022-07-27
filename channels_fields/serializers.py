@@ -27,17 +27,6 @@ User = get_user_model()
 log = logging.getLogger(__name__)
 
 
-class FieldListSerializer(serializers.ModelSerializer):
-    """Serializer for FieldList"""
-
-    field_list = UserListSerializer(many=False, read_only=True)
-
-    class Meta:
-        model = FieldList
-        fields = "__all__"
-        read_only_fields = ("field_channel",)
-
-
 class SubfieldSerializer(serializers.ModelSerializer):
     """Serializer for Subfields"""
 
@@ -57,9 +46,16 @@ class SubfieldSerializer(serializers.ModelSerializer):
 class FieldChannelSerializer(ChannelAppearanceMixin, serializers.ModelSerializer):
     """Serializer for FieldChannel"""
 
-    lists = FieldListSerializer(many=True, read_only=True)
+    lists = serializers.SerializerMethodField()
     featured_list = UserListSerializer(many=False, read_only=True)
     subfields = SubfieldSerializer(many=True, read_only=True)
+
+    def get_lists(self, instance):
+        """Returns the field's list of UserLists"""
+        return [
+            UserListSerializer(field_list.field_list).data
+            for field_list in instance.lists.all().order_by("position")
+        ]
 
     class Meta:
         model = FieldChannel
@@ -127,10 +123,10 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         return {"lists": lists}
 
     def get_lists(self, instance):
-        """Returns the list of topics"""
+        """Returns the field's list of UserLists"""
         return [
-            FieldListSerializer(list).data
-            for list in instance.lists.all()
+            UserListSerializer(field_list.field_list).data
+            for field_list in instance.lists.all()
             .prefetch_related("field_list", "field_channel")
             .order_by("position")
         ]

@@ -17,6 +17,7 @@ from channels_fields.serializers import (
 )
 from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import UserListFactory
+from course_catalog.serializers import UserListSerializer
 from open_discussions.factories import UserFactory
 from widgets.factories import WidgetListFactory
 
@@ -58,6 +59,7 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
     """
     Test serializing a field channel
     """
+
     mocker.patch("discussions.models.ResizeToFit", autospec=True)
     field_channel = FieldChannelFactory.create(
         banner=mock_image_file("banner.jpg") if has_banner else None,
@@ -66,6 +68,8 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         about={"foo": "bar"} if has_about else None,
         ga_tracking_id=ga_tracking_id,
     )
+
+    field_lists = FieldListFactory.create_batch(3, field_channel=field_channel)
 
     assert FieldChannelSerializer(field_channel).data == {
         "name": field_channel.name,
@@ -80,7 +84,10 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         "updated_on": mocker.ANY,
         "created_on": mocker.ANY,
         "id": field_channel.id,
-        "lists": [],
+        "lists": [
+            UserListSerializer(field_list.field_list).data
+            for field_list in sorted(field_lists, key=lambda l: l.position)
+        ],
         "subfields": [],
         "featured_list": None,
         "public_description": field_channel.public_description,

@@ -36,6 +36,7 @@ class FieldList(TimestampedModel):
 
     class Meta:
         unique_together = (("field_list", "field_channel"),)
+        ordering = ["position"]
 
 
 class Subfield(TimestampedModel):
