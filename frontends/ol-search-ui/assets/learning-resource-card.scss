@@ -3,9 +3,17 @@ $spacer: 0.75rem !default;
 $boldWeight: 500 !default;
 $smallFontSize: 0.75em !default;
 
-.ol-lrc {
+.ol-lrc-col {
   display:flex;
   flex-direction: column;
+}
+.ol-lrc-row {
+  display:flex;
+  flex-direction: row;
+}
+.ol-lrc-row-reverse {
+  display:flex;
+  flex-direction: row-reverse;
 }
 
 .ol-lrc-content.MuiCardContent-root {

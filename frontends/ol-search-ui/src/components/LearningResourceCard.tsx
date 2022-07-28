@@ -1,5 +1,5 @@
 import moment from "moment"
-import React from "react"
+import React, { useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
 import type { PartialBy } from "ol-util"
@@ -12,23 +12,37 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 
 import CardMedia from "@mui/material/CardMedia"
 import { LearningResourceSummary } from "../interfaces"
-import { bestRun, getReadableResourceType, resourceThumbnailSrc, EmbedlyConfig } from "../util"
+import {
+  bestRun,
+  getReadableResourceType,
+  resourceThumbnailSrc,
+  EmbedlyConfig
+} from "../util"
 
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
-type LearningResource = PartialBy<Pick<
-  LearningResourceSummary,
-  | "runs"
-  | "certification"
-  | "title"
-  | "offered_by"
-  | "object_type"
-  | "image_src"
-  | "platform"
->, 'offered_by'>
+type CardMinimalResource = PartialBy<
+  Pick<
+    LearningResourceSummary,
+    | "runs"
+    | "certification"
+    | "title"
+    | "offered_by"
+    | "object_type"
+    | "image_src"
+    | "platform"
+  >,
+  "offered_by" | "certification"
+>
 
+type CardVariant = "column" | "row" | "row-reverse"
 type LearningResourceCardProps = {
-  resource: LearningResource
+  /**
+   * Whether the course picture and info display as a column or row.
+   * Defaults to `'column'`.
+   */
+  variant?: CardVariant
+  resource: CardMinimalResource
   searchResultLayout?: string
   reordering?: boolean
   className?: string
@@ -57,7 +71,7 @@ const Offerers: React.FC<OffererProps> = ({ offerers }) => {
         const isLast = i === offerers.length - 1
         return (
           <React.Fragment key={`${offerer}-${i}`}>
-            <a href={`/infinite/search${toQueryString({o: offerer})}`}>
+            <a href={`/infinite/search${toQueryString({ o: offerer })}`}>
               {offerer}
             </a>
             {!isLast && ", "}
@@ -68,10 +82,17 @@ const Offerers: React.FC<OffererProps> = ({ offerers }) => {
   )
 }
 
+const variantClasses: Record<CardVariant, string> = {
+  column:        "ol-lrc-col",
+  row:           "ol-lrc-row",
+  "row-reverse": "ol-lrc-row-reverse"
+}
+
 const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
+  variant = "column",
   resource,
   imgConfig,
-  className,
+  className
 }) => {
   const bestAvailableRun = bestRun(resource.runs)
   const hasCertificate =
@@ -81,14 +102,22 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
       moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
       null
   const offerers = resource.offered_by ?? []
-  return (
-    <Card className={classNames(className, 'ol-lrc')}>
+
+  const isRow = variant === "row" || variant === "row-reverse"
+  const cardImg = useMemo(
+    () => (
       <CardMedia
         component="img"
         height={imgConfig.height}
         src={resourceThumbnailSrc(resource, imgConfig)}
         alt=""
       />
+    ),
+    [resource, imgConfig]
+  )
+  return (
+    <Card className={classNames(className, variantClasses[variant])}>
+      {isRow ? <CardContent>{cardImg}</CardContent> : cardImg}
       <CardContent className="ol-lrc-content">
         <div className="ol-lrc-flex-row">
           <span className="ol-lrc-type">
@@ -102,13 +131,17 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           </Dotdotdot>
         </div>
         <div>
-          <span className="ol-lrc-offered-by">
-            Offered By &ndash;
-          </span>
+          <span className="ol-lrc-offered-by">Offered By &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}
         </div>
         <div>
-          {startDate && <Chip className="ol-lrc-chip " avatar={<CalendarTodayIcon />} label={startDate} />}
+          {startDate && (
+            <Chip
+              className="ol-lrc-chip "
+              avatar={<CalendarTodayIcon />}
+              label={startDate}
+            />
+          )}
         </div>
       </CardContent>
     </Card>
@@ -116,4 +149,4 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }
 
 export default LearningResourceCard
-export type { LearningResourceCardProps }
+export type { LearningResourceCardProps, CardMinimalResource }

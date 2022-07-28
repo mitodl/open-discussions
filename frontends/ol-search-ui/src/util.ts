@@ -32,7 +32,6 @@ const defaultResourceImageURL = () =>
     window.location.origin
   ).toString()
 
-
 type EmbedlyConfig = {
   embedlyKey: string
   ocwBaseUrl: string
@@ -89,14 +88,14 @@ const bestRun = (runs: LearningResourceRun[]): LearningResourceRun | null => {
 }
 
 const readableLearningResources: Record<LR, string> = {
-  [LR.Course]:               "Course",
-  [LR.Program]:              "Program",
-  [LR.Userlist]:             "Learning List",
-  [LR.LearningPath]:         "Learning Path",
-  [LR.Video]:                "Video",
-  [LR.Favorites]:            "Favorites",
-  [LR.Podcast]:              "Podcast",
-  [LR.PodcastEpisode]:       "Podcast Episode"
+  [LR.Course]:         "Course",
+  [LR.Program]:        "Program",
+  [LR.Userlist]:       "Learning List",
+  [LR.LearningPath]:   "Learning Path",
+  [LR.Video]:          "Video",
+  [LR.Favorites]:      "Favorites",
+  [LR.Podcast]:        "Podcast",
+  [LR.PodcastEpisode]: "Podcast Episode"
 }
 const LR_TYPES: string[] = Object.values(LR)
 

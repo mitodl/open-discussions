@@ -1,12 +1,9 @@
-// @ts-expect-error foo
+//@ts-expect-error casual-browserify does not have typescript types
 import casual from "casual-browserify"
 import R from "ramda"
 import { DATE_FORMAT } from "./util"
 import { Factory } from "ol-util"
-import {
-  LearningResourceResult,
-  LearningResourceRun
-} from "./interfaces"
+import { LearningResourceResult, LearningResourceRun } from "./interfaces"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -57,7 +54,9 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   ...overrides
 })
 
-export const makeProgramResult: Factory<LearningResourceResult> = overrides => ({
+export const makeProgramResult: Factory<
+  LearningResourceResult
+> = overrides => ({
   id:                casual.integer(1, 1000),
   title:             casual.title,
   url:               casual.url,

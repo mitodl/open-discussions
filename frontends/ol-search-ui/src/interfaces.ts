@@ -2,7 +2,7 @@ export type LearningResourceSummary = {
   id: number
   title: string
   image_src: string | null
-  platform: string | null | undefined
+  platform?: string | null
   topics: CourseTopic[]
   offered_by: string[]
   object_type: string
