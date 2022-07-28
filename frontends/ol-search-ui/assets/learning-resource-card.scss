@@ -1,0 +1,67 @@
+$lightText: #8c8c8c !default;
+$spacer: 0.75rem !default;
+$boldWeight: 500 !default;
+$smallFontSize: 0.75em !default;
+
+.ol-lrc {
+  display:flex;
+  flex-direction: column;
+}
+
+.ol-lrc-content.MuiCardContent-root {
+  /*
+  Make content flexbox so that we can control which child fills remaining space.
+  */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  > * {
+    /*
+    Flexbox doesn't have collapsing margins, so we need to avoid double spacing.
+    The column-gap property would be a nicer solution, but it doesn't have the
+    best browser support yet.
+    */
+    margin-top: $spacer / 2;
+    margin-bottom: $spacer / 2;
+    &:first-child {
+      margin-top: 0; 
+    }
+    &:last-child {
+      margin-bottom: 0; 
+    }
+  }
+}
+
+.ol-lrc-flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.ol-lrc-type {
+  text-transform: uppercase;
+  color: $lightText;
+}
+
+.ol-lrc-offered-by {
+  color: $lightText;
+  padding-right: 0.25em;
+}
+
+.ol-lrc-title-box {
+  flex: 1;
+}
+.ol-lrc-title {
+  font-weight: $boldWeight;
+  margin:0;
+}
+
+.ol-lrc-chip.MuiChip-root {
+  height: 2.5*$smallFontSize;
+  font-size: $smallFontSize;
+
+  .MuiSvgIcon-root {
+    height: 1.25*$smallFontSize;
+    width: 1.25*$smallFontSize;
+  }
+}
