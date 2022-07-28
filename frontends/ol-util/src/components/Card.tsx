@@ -12,6 +12,8 @@ interface CardProps {
 /**
  * Renders child content into some styled divs. Optionally specify whether the
  * card has border and permanent shadow.
+ *
+ * @deprecated Use MUI cards instead.
  */
 const Card: React.FC<CardProps> = ({
   className,
