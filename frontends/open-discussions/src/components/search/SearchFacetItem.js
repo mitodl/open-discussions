@@ -1,6 +1,5 @@
 // @flow
 import React from "react"
-import Dotdotdot from "react-dotdotdot"
 import LearningResourceIcon from "../LearningResourceIcon"
 
 type Props = {
@@ -54,7 +53,7 @@ export default function SearchFacetItem(props: Props) {
               : "facet-key"
           }
         >
-          <Dotdotdot clamp={1}>{labelText}</Dotdotdot>
+          {labelText}
         </div>
         {featuredFacetNames.includes(name) ? (
           <div>

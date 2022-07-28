@@ -155,10 +155,14 @@
         flex-direction: row;
         justify-content: space-between;
         width: 100%;
+        overflow: hidden;
       }
 
       .facet-key {
         color: black;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       .facet-key-large {
