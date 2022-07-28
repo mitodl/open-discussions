@@ -51,7 +51,6 @@ const imageWrapperHeight = css<ImgProps>`
 const BannerContainer = styled.div`
   position: absolute;
   width: 100%;
-  z-index: -1;
 `
 
 const imageStylesheet = `
@@ -106,6 +105,7 @@ const Gradient = styled.div`
 `
 
 interface BannerPageProps extends ImgProps {
+  omitBackground?: boolean
   className?: string
   /**
    * Child elements placed below the banner.
@@ -134,18 +134,21 @@ const BannerPage: React.FC<BannerPageProps> = ({
   compactOnMobile,
   bannerContent,
   alt,
-  children
+  children,
+  omitBackground
 }) => {
   return (
     <BannerPageWrapper className={className}>
       <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
         <BannerContainer>
-          <BannerImage
-            src={src}
-            alt={alt}
-            tall={tall}
-            compactOnMobile={compactOnMobile}
-          />
+          {!omitBackground && (
+            <BannerImage
+              src={src}
+              alt={alt}
+              tall={tall}
+              compactOnMobile={compactOnMobile}
+            />
+          )}
           <BannerContent>{bannerContent}</BannerContent>
         </BannerContainer>
       </BannerPageHeader>
