@@ -14,7 +14,7 @@
         "lint-fix": "run foreach-with-fallback lint-fix global:lint-fix",
         "fmt-check": "run foreach-with-fallback fmt-check global:fmt-check",
         "fmt-fix": "run foreach-with-fallback fmt-fix global:fmt-fix",
-        "test": "jest && yarn workspace open-discussions run test",
+        "test": "NODE_ENV=test jest && yarn workspace open-discussions run test",
         "scss-lint": "run foreach-with-fallback scss-lint global:scss-lint",
         "typecheck": "run foreach-with-fallback typecheck global:typecheck",
         "global:build": "cd $INIT_CWD && yarn global:clean && yarn global:compile",
