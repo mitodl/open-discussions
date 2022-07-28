@@ -33,7 +33,9 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
     <section>
       <h3>{list.title}</h3>
       <ul>
-        {items.map(item => <li key={item.id}>{item.title}</li>)}
+        {items.map(item => (
+          <li key={item.id}>{item.title}</li>
+        ))}
       </ul>
     </section>
   )
@@ -75,7 +77,9 @@ const FieldPage: React.FC = () => {
               <TabPanel value="home">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && <FieldList list={featuredList} />}
-                {fieldLists.map(list => <FieldList key={list.id} list={list} />)}
+                {fieldLists.map(list => (
+                  <FieldList key={list.id} list={list} />
+                ))}
               </TabPanel>
               <TabPanel value="about">BBBBBB</TabPanel>
             </Grid>
