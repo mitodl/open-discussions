@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.191.4
+Version 0.191.4 (Released July 29, 2022)
 ---------------
 
 - infinite search (#3645)
