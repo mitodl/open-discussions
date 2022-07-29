@@ -71,7 +71,7 @@ const Offerers: React.FC<OffererProps> = ({ offerers }) => {
         const isLast = i === offerers.length - 1
         return (
           <React.Fragment key={`${offerer}-${i}`}>
-            <a href={`/infinite/search${toQueryString({ o: offerer })}`}>
+            <a href={`/infinite/search?${toQueryString({ o: offerer })}`}>
               {offerer}
             </a>
             {!isLast && ", "}
