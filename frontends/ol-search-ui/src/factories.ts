@@ -1,11 +1,9 @@
 //@ts-expect-error casual-browserify does not have typescript types
 import casual from "casual-browserify"
 import R from "ramda"
-import {
-  DATE_FORMAT,
-  LearningResourceResult,
-  LearningResourceRun
-} from "ol-search-ui"
+import { DATE_FORMAT } from "./util"
+import { Factory } from "ol-util"
+import { LearningResourceResult, LearningResourceRun } from "./interfaces"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -33,7 +31,7 @@ export const makeSearchResult = (type: string | null) => {
   }
 }
 
-export const makeCourseResult = (): LearningResourceResult => ({
+export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   id:                casual.integer(1, 1000),
   title:             casual.title,
   url:               casual.url,
@@ -43,7 +41,7 @@ export const makeCourseResult = (): LearningResourceResult => ({
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
   object_type:       "course",
-  runs:              R.times(makeRun, 3),
+  runs:              R.times(() => makeRun(), 3),
   is_favorite:       casual.coin_flip,
   lists:             casual.random_element([[], [100, 200]]),
   audience:          casual.random_element([
@@ -52,10 +50,13 @@ export const makeCourseResult = (): LearningResourceResult => ({
     [PROFESSIONAL],
     [OPEN_CONTENT, PROFESSIONAL]
   ]),
-  certification: casual.random_element([[], [CERTIFICATE]])
+  certification: casual.random_element([[], [CERTIFICATE]]),
+  ...overrides
 })
 
-export const makeProgramResult = (): LearningResourceResult => ({
+export const makeProgramResult: Factory<
+  LearningResourceResult
+> = overrides => ({
   id:                casual.integer(1, 1000),
   title:             casual.title,
   url:               casual.url,
@@ -73,10 +74,11 @@ export const makeProgramResult = (): LearningResourceResult => ({
     [PROFESSIONAL],
     [OPEN_CONTENT, PROFESSIONAL]
   ]),
-  certification: casual.random_element([[], [CERTIFICATE]])
+  certification: casual.random_element([[], [CERTIFICATE]]),
+  ...overrides
 })
 
-export const makeRun = (): LearningResourceRun => {
+export const makeRun: Factory<LearningResourceRun> = overrides => {
   return {
     id:               casual.integer(1, 1000),
     url:              casual.url,
@@ -103,17 +105,19 @@ export const makeRun = (): LearningResourceRun => {
         full_name:  casual.name
       }
     ],
-    prices: [{ mode: "audit", price: casual.integer(1, 1000) }]
+    prices: [{ mode: "audit", price: casual.integer(1, 1000) }],
+    ...overrides
   }
 }
 
+const TEST_SEARCH_PAGE_SIZE = 4
 export const makeSearchResponse = (
-  pageSize: number = SETTINGS.search_page_size,
-  total: number = SETTINGS.search_page_size * 2,
+  pageSize: number = TEST_SEARCH_PAGE_SIZE,
+  total: number = 2 * TEST_SEARCH_PAGE_SIZE,
   type: string | null,
   withFacets = false
 ) => {
-  const hits = R.range(0, pageSize).map(() => makeSearchResult(type))
+  const hits = R.times(() => makeSearchResult(type), pageSize)
   return {
     hits: {
       total,

@@ -12,6 +12,10 @@ type GridProps = {
 const gridClassName = (className?: string) =>
   `mdc-layout-grid ${className || ""}`.trim()
 
+/**
+ *
+ * @deprecated Use [MUI `<Grid container />`](https://mui.com/material-ui/react-grid/) instead.
+ */
 const Grid = ({ children, className }: GridProps) => (
   <div className={gridClassName(className)}>
     <div className="mdc-layout-grid__inner">{children}</div>
@@ -34,6 +38,10 @@ type CellProps = {
 const cellClassName = (width: number, className?: string) =>
   `mdc-layout-grid__cell--span-${width} ${className ?? ""}`.trim()
 
+/**
+ *
+ * @deprecated Use [MUI `<Grid item />`](https://mui.com/material-ui/react-grid/) instead.
+ */
 const Cell = ({
   children,
   width,

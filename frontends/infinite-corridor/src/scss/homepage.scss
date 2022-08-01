@@ -61,8 +61,9 @@ $linkMaxSize: 120px;
     text-align: center;
   }
 
-  transition-property: background-color;
+  transition-property: background-color border;
   transition-duration: theme.$transition-duration;
+  border: 1px solid transparent;
 
   border-radius: theme.$border-radius;
   &:hover {

@@ -7,10 +7,12 @@ import { times } from "ramda"
 
 import SearchPage from "./SearchPage"
 
-import { makeSearchResult } from "../factories/search"
+import { factories } from "ol-search-ui"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 import { createMemoryHistory } from "history"
+
+const { makeSearchResult } = factories
 
 jest.mock("react-router", () => ({
   useHistory: () => createMemoryHistory()

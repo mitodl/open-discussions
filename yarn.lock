@@ -1743,6 +1743,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@faker-js/faker@npm:^7.3.0":
+  version: 7.3.0
+  resolution: "@faker-js/faker@npm:7.3.0"
+  checksum: ef5b64af30ce0ec76cb22798fbbe50184946fac389b4d81235f9d8d9eaaa77d67a80f46954fa993996b7c774bae23314529a95a42a6b68794f0795976c9be82b
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -7230,16 +7237,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"casual@npm:^1.6.2":
-  version: 1.6.2
-  resolution: "casual@npm:1.6.2"
-  dependencies:
-    mersenne-twister: ^1.0.1
-    moment: ^2.15.2
-  checksum: e9df662950412735ca0622d7891463805239943fe76db50ec8a8fb3abaefb0bc1bbd08a48bcd6faf20a4227c9cd3ef8dc1c743fa21af0917ac9e820d89feb838
-  languageName: node
-  linkType: hard
-
 "chai-as-promised@npm:7.1.1":
   version: 7.1.1
   resolution: "chai-as-promised@npm:7.1.1"
@@ -11273,6 +11270,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
+    "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
@@ -14511,11 +14509,12 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
+    "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
+    ol-forms: "workspace:*"
     ol-util: "workspace:*"
   peerDependencies:
-    ol-forms: "workspace:*"
     react: ^16.10 || 17 || 18
     styled-components: 5
   languageName: unknown
@@ -14526,6 +14525,7 @@ __metadata:
   resolution: "ol-util@workspace:frontends/ol-util"
   dependencies:
     classnames: ^2.3.1
+    qs: ^6.11.0
   peerDependencies:
     react: ^16.10 || 17 || 18
     react-router: ^5 || ^6
@@ -14603,7 +14603,6 @@ __metadata:
     "@types/styled-components": ^5.1.25
     "@typescript-eslint/eslint-plugin": ^5.30.0
     "@typescript-eslint/parser": ^5.30.0
-    casual: ^1.6.2
     casual-browserify: ^1.5.19-2
     eslint: ^8.18.0
     eslint-config-google: ^0.14.0
@@ -15857,6 +15856,15 @@ __metadata:
   version: 6.5.1
   resolution: "qs@npm:6.5.1"
   checksum: 40967af240d04138b0cc6a70231270871c4a627834cae3e529dab9ee01fb95730bd80299cded185c409a24b03f890831d41ee37e8431372540d62f60f4011fbd
+  languageName: node
+  linkType: hard
+
+"qs@npm:^6.11.0":
+  version: 6.11.0
+  resolution: "qs@npm:6.11.0"
+  dependencies:
+    side-channel: ^1.0.4
+  checksum: 6e1f29dd5385f7488ec74ac7b6c92f4d09a90408882d0c208414a34dd33badc1a621019d4c799a3df15ab9b1d0292f97c1dd71dc7c045e69f81a8064e5af7297
   languageName: node
   linkType: hard
 

@@ -1,0 +1,7 @@
+$resultsSpacer: 1rem;
+
+.ic-searchpage-list {
+  > * {
+    margin: $resultsSpacer;
+  }
+}
