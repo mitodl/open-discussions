@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "classnames": "^2.3.1",
+    "nuka-carousel": "^5.2.0",
     "qs": "^6.11.0"
   }
 }
