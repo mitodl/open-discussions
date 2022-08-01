@@ -1,26 +1,15 @@
-import casual from "casual"
+import { faker } from "@faker-js/faker"
 import { makePaginatedFactory, Factory } from "ol-util"
 import type { Field } from "./interfaces"
 
 const makeField: Factory<Field> = overrides => ({
-  name:               casual.word,
-  title:              casual.title,
-  public_description: casual.text,
-  /**
-   * The URLs that `casual` makes contain capital letters in their hostnames.
-   * But hostnames are case-insensitive, so browsers and JSDOM both standardize
-   * the hostname portion of URLs on HTML elements to be lowercase, e.g.,
-   *
-   * src code contains:       `<img src="http://WOOF.com/DOG.png" />`
-   * browser renders:         `<img src="http://woof.com/DOG.png" />`
-   *
-   *
-   * This makes testing with hostnames containing capitals annoying.
-   * So let's standardize the hostnames here like a browser would.
-   */
-  banner:             new URL(casual.url).href,
-  avatar_small:       new URL(casual.url).href,
-  avatar_medium:      new URL(casual.url).href,
+  name:               faker.unique(faker.lorem.slug),
+  title:              faker.lorem.words(faker.datatype.number({ min: 1, max: 4 })),
+  public_description: faker.lorem.paragraph(),
+  // standardize the url strings to match what browser puts on elements.
+  banner:             new URL(faker.internet.url()).toString(),
+  avatar_small:       new URL(faker.internet.url()).toString(),
+  avatar_medium:      new URL(faker.internet.url()).toString(),
   ...overrides
 })
 

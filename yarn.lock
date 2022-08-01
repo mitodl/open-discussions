@@ -7237,16 +7237,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"casual@npm:^1.6.2":
-  version: 1.6.2
-  resolution: "casual@npm:1.6.2"
-  dependencies:
-    mersenne-twister: ^1.0.1
-    moment: ^2.15.2
-  checksum: e9df662950412735ca0622d7891463805239943fe76db50ec8a8fb3abaefb0bc1bbd08a48bcd6faf20a4227c9cd3ef8dc1c743fa21af0917ac9e820d89feb838
-  languageName: node
-  linkType: hard
-
 "chai-as-promised@npm:7.1.1":
   version: 7.1.1
   resolution: "chai-as-promised@npm:7.1.1"
@@ -11280,6 +11270,7 @@ __metadata:
   dependencies:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
+    "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
@@ -14612,7 +14603,6 @@ __metadata:
     "@types/styled-components": ^5.1.25
     "@typescript-eslint/eslint-plugin": ^5.30.0
     "@typescript-eslint/parser": ^5.30.0
-    casual: ^1.6.2
     casual-browserify: ^1.5.19-2
     eslint: ^8.18.0
     eslint-config-google: ^0.14.0
