@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.192.0
+---------------
+
+- Learning Resource Cards (#3659)
+- fix facet label (#3658)
+
 Version 0.191.4 (Released July 29, 2022)
 ---------------
 
