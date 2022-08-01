@@ -14298,6 +14298,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nuka-carousel@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "nuka-carousel@npm:5.2.0"
+  peerDependencies:
+    react: ^15.3.0 || ^16.0.0 || ^17.0.1 || ^18.0.0
+    react-dom: ^15.3.0 || ^16.0.0 || ^17.0.1 || ^18.0.0
+  checksum: 083a4c8993dea1e827fc2bf5875c85184654d57ea1e2d5ab79fa4b53cfd5915e857e3aa5b2080a51b7ac24143cbd9a012aa4f59d5d5d9306a0eefb862dccac69
+  languageName: node
+  linkType: hard
+
 "num2fraction@npm:^1.2.2":
   version: 1.2.2
   resolution: "num2fraction@npm:1.2.2"
@@ -14525,6 +14535,7 @@ __metadata:
   resolution: "ol-util@workspace:frontends/ol-util"
   dependencies:
     classnames: ^2.3.1
+    nuka-carousel: ^5.2.0
     qs: ^6.11.0
   peerDependencies:
     react: ^16.10 || 17 || 18

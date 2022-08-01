@@ -1,6 +1,48 @@
 import { faker } from "@faker-js/faker"
+import * as R from "ramda"
 import { makePaginatedFactory, Factory } from "ol-util"
-import type { Field } from "./interfaces"
+import { LearningResourceType, factories } from "ol-search-ui"
+import type { Field, UserList, UserListItem } from "./interfaces"
+
+export const makeUserList: Factory<UserList> = overrides => {
+  const userList: UserList = {
+    id:                faker.unique(faker.datatype.number),
+    short_description: faker.lorem.paragraph(),
+    offered_by:        [],
+    title:             faker.lorem.words(),
+    topics:            R.times(() => factories.makeTopic(), 2),
+    is_favorite:       faker.datatype.boolean(),
+    image_src:         new URL(faker.internet.url()).toString(),
+    image_description: faker.helpers.arrayElement([
+      null,
+      faker.lorem.sentence()
+    ]),
+    item_count:    faker.datatype.number({ min: 2, max: 5 }),
+    object_type:   LearningResourceType.Userlist,
+    list_type:     "userlist",
+    privacy_level: faker.helpers.arrayElement(["public", "private"]),
+    author:        faker.datatype.number({ min: 1, max: 1000 }),
+    lists:         [],
+    author_name:   faker.name.findName(),
+    ...overrides
+  }
+  return userList
+}
+
+export const makeUserListItem: Factory<UserListItem> = overrides => {
+  const content = factories.makeLearningResource()
+  const item: UserListItem = {
+    id:           faker.unique(faker.datatype.number),
+    is_favorite:  faker.datatype.boolean(),
+    object_id:    content.id,
+    position:     faker.datatype.number(),
+    program:      faker.datatype.number(),
+    content_type: content.object_type,
+    content_data: content,
+    ...overrides
+  }
+  return item
+}
 
 const makeField: Factory<Field> = overrides => ({
   name:               faker.unique(faker.lorem.slug),
@@ -10,9 +52,13 @@ const makeField: Factory<Field> = overrides => ({
   banner:             new URL(faker.internet.url()).toString(),
   avatar_small:       new URL(faker.internet.url()).toString(),
   avatar_medium:      new URL(faker.internet.url()).toString(),
+  featured_list:      makeUserList(),
+  lists:              [makeUserList(), makeUserList()],
   ...overrides
 })
 
-const makeFieldList = makePaginatedFactory(makeField)
+const makeFieldsPaginated = makePaginatedFactory(makeField)
 
-export { makeField, makeFieldList }
+const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
+
+export { makeField, makeFieldsPaginated, makeUserListItemsPaginated }

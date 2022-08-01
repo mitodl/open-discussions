@@ -15,6 +15,11 @@ jest.mock("axios", () => {
 // This should be the only top-level hook.
 // eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
-  jest.resetAllMocks()
+  /**
+   * Clear all mock call counts between tests.
+   * This does NOT clear mock implementations.
+   * Mock implementations are always cleared between test files.
+   */
+  jest.clearAllMocks()
   resetApi()
 })

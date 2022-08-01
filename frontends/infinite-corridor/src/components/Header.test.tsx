@@ -4,7 +4,7 @@ import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
 
 describe("Header", () => {
   it("Includes a link to MIT Homepage", async () => {
-    const fieldsList = factories.makeFieldList(0)
+    const fieldsList = factories.makeFieldsPaginated(0)
     setMockResponse.get(urls.fieldsList, fieldsList)
 
     renderTestApp()
