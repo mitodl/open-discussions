@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.192.0
+Version 0.192.0 (Released August 01, 2022)
 ---------------
 
 - Learning Resource Cards (#3659)
