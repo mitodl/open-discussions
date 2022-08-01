@@ -2,7 +2,6 @@ import moment from "moment"
 import React, { useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
-import type { PartialBy } from "ol-util"
 import classNames from "classnames"
 
 import Card from "@mui/material/Card"
@@ -11,7 +10,7 @@ import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 
 import CardMedia from "@mui/material/CardMedia"
-import { LearningResourceSummary } from "../interfaces"
+import { LearningResource } from "../interfaces"
 import {
   bestRun,
   getReadableResourceType,
@@ -21,18 +20,15 @@ import {
 
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
-type CardMinimalResource = PartialBy<
-  Pick<
-    LearningResourceSummary,
-    | "runs"
-    | "certification"
-    | "title"
-    | "offered_by"
-    | "object_type"
-    | "image_src"
-    | "platform"
-  >,
-  "offered_by" | "certification"
+type CardMinimalResource = Pick<
+  LearningResource,
+  | "runs"
+  | "certification"
+  | "title"
+  | "offered_by"
+  | "object_type"
+  | "image_src"
+  | "platform"
 >
 
 type CardVariant = "column" | "row" | "row-reverse"
