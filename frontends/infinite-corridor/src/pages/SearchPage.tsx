@@ -111,7 +111,11 @@ const SearchPage: React.FC = () => {
         hasMore={from + pageSize < total}
         loadMore={loadMore}
         initialLoad={from === 0}
-        loader={<div key="loading" className="loader">Loading ...</div>}
+        loader={
+          <div key="loading" className="loader">
+            Loading ...
+          </div>
+        }
       >
         <section aria-label="Search Results">
           {searchApiFailed ? (

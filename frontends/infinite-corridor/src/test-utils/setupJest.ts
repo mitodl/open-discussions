@@ -19,7 +19,6 @@ afterEach(() => {
   resetApi()
 })
 
-
 const _createSettings = () => ({
   embedlyKey:        "fake",
   ocw_next_base_url: "fake-ocw.com",
