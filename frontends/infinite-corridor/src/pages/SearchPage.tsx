@@ -11,8 +11,7 @@ import {
   SearchQueryParams,
   Facets
 } from "@mitodl/course-search-utils"
-//@ts-expect-error redux-hammock does not have typescript types
-import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
+import axios from "../libs/axios"
 import { LearningResourceCard } from "../components/LearningResourceCard"
 import { LearningResourceResult } from "ol-search-ui"
 const ALLOWED_TYPES = ["program", "course"]
@@ -26,10 +25,12 @@ interface Result {
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
 
-  return fetchJSONWithCSRF("/api/v0/search/", {
-    method: "post",
-    body:   JSON.stringify(body)
-  })
+  try {
+    const { data } = await axios.post("/search", body)
+    return data
+  } catch (err) {
+    return null
+  }
 }
 
 const SearchPage: React.FC = () => {
@@ -110,9 +111,9 @@ const SearchPage: React.FC = () => {
         hasMore={from + pageSize < total}
         loadMore={loadMore}
         initialLoad={from === 0}
-        loader={<div className="loader">Loading ...</div>}
+        loader={<div key="loading" className="loader">Loading ...</div>}
       >
-        <section>
+        <section aria-label="Search Results">
           {searchApiFailed ? (
             <div className="no-results-found">
               <span>Oops! Something went wrong.</span>

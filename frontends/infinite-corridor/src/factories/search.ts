@@ -110,7 +110,7 @@ export const makeRun = (): LearningResourceRun => {
 export const makeSearchResponse = (
   pageSize: number = SETTINGS.search_page_size,
   total: number = SETTINGS.search_page_size * 2,
-  type: string | null,
+  type: string | null = null,
   withFacets = false
 ) => {
   const hits = R.range(0, pageSize).map(() => makeSearchResult(type))

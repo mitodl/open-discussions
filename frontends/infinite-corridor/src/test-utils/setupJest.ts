@@ -18,3 +18,12 @@ afterEach(() => {
   jest.resetAllMocks()
   resetApi()
 })
+
+
+const _createSettings = () => ({
+  embedlyKey:        "fake",
+  ocw_next_base_url: "fake-ocw.com",
+  search_page_size:  20
+})
+
+global.SETTINGS = _createSettings()
