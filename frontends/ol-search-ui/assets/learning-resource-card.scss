@@ -3,6 +3,14 @@ $spacer: 0.75rem !default;
 $boldWeight: 500 !default;
 $smallFontSize: 0.75em !default;
 
+.ol-lrc-root {
+
+  // Ensure the resource image borders match card borders
+  .MuiCardMedia-root, > .MuiCardContent-root {
+    border-radius: inherit
+  }
+}
+
 .ol-lrc-col {
   display:flex;
   flex-direction: column;
