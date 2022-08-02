@@ -14534,6 +14534,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ol-util@workspace:frontends/ol-util"
   dependencies:
+    "@faker-js/faker": ^7.3.0
     classnames: ^2.3.1
     nuka-carousel: ^5.2.0
     qs: ^6.11.0
