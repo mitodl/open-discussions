@@ -113,7 +113,9 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     [resource, imgConfig]
   )
   return (
-    <Card className={classNames(className, variantClasses[variant], 'ol-lrc-root')}>
+    <Card
+      className={classNames(className, variantClasses[variant], "ol-lrc-root")}
+    >
       {isRow ? <CardContent>{cardImg}</CardContent> : cardImg}
       <CardContent className="ol-lrc-content">
         <div className="ol-lrc-flex-row">
@@ -146,4 +148,9 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }
 
 export default LearningResourceCard
-export type { LearningResourceCardProps, CardMinimalResource, CardImgConfig, CardVariant }
+export type {
+  LearningResourceCardProps,
+  CardMinimalResource,
+  CardImgConfig,
+  CardVariant
+}

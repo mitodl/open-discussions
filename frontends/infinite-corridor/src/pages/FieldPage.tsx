@@ -109,7 +109,7 @@ const FieldPage: React.FC = () => {
       <TabContext value={value}>
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={8}>
+            <Grid item xs={9}>
               <TabList className="page-nav" onChange={handleChange}>
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />
@@ -120,7 +120,7 @@ const FieldPage: React.FC = () => {
         <Divider />
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={8}>
+            <Grid item xs={9}>
               <TabPanel value="home">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && <FieldCarousel list={featuredList} />}
@@ -130,7 +130,7 @@ const FieldPage: React.FC = () => {
               </TabPanel>
               <TabPanel value="about">BBBBBB</TabPanel>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={3}>
               Featured Video
             </Grid>
           </Grid>

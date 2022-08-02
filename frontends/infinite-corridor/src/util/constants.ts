@@ -1,6 +1,5 @@
 import type { CardVariant, CardImgConfig } from "ol-search-ui"
 
-
 const imgConfigs: Record<CardVariant, CardImgConfig> = {
   row: {
     ocwBaseUrl: SETTINGS.ocw_next_base_url,
