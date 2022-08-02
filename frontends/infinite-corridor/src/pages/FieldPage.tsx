@@ -7,6 +7,8 @@ import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import type { Theme } from "@mui/material/styles"
 import { LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import { useFieldDetails, useFieldListItems, UserList } from "../api/fields"
@@ -55,11 +57,13 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
 const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
+  const matches = useMediaQuery<Theme>(theme => theme.breakpoints.up("sm"))
+  const pageSize = matches ? 3 : 1
   return (
     <TitledCarousel
       as="section"
       carouselClassName="ic-carousel"
-      pageSize={3}
+      pageSize={pageSize}
       cellSpacing={22}
       title={<h3>{list.title}</h3>}
       previous={
@@ -109,7 +113,7 @@ const FieldPage: React.FC = () => {
       <TabContext value={value}>
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={9}>
+            <Grid item xs={12} sm={9}>
               <TabList className="page-nav" onChange={handleChange}>
                 <Tab component={Link} to="#" label="Home" value="home" />
                 <Tab component={Link} to="#about" label="About" value="about" />
@@ -120,7 +124,7 @@ const FieldPage: React.FC = () => {
         <Divider />
         <Container>
           <Grid container spacing={1}>
-            <Grid item xs={9}>
+            <Grid item xs={12} sm={9}>
               <TabPanel value="home">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && <FieldCarousel list={featuredList} />}
@@ -130,7 +134,7 @@ const FieldPage: React.FC = () => {
               </TabPanel>
               <TabPanel value="about">BBBBBB</TabPanel>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={12} sm={3}>
               Featured Video
             </Grid>
           </Grid>
