@@ -48,15 +48,19 @@ $smallFontSize: 0.75em !default;
   }
 }
 
-.ol-lrc-flex-row {
+.ol-lrc-type-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  min-height: 1.5em; // ensure consistent height even if no certificate
 }
 .ol-lrc-type {
   text-transform: uppercase;
   color: $lightText;
+}
+.ol-lrc-cert {
+  height: 1.5em;
 }
 
 .ol-lrc-offered-by {
@@ -72,6 +76,9 @@ $smallFontSize: 0.75em !default;
   margin:0;
 }
 
+.ol-lrc-date-row {
+  min-height: 2.5*$smallFontSize; // ensure consistent spacing even if no date
+}
 .ol-lrc-chip.MuiChip-root {
   height: 2.5*$smallFontSize;
   font-size: $smallFontSize;

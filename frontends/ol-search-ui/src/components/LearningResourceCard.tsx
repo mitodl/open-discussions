@@ -51,7 +51,7 @@ type LearningResourceCardProps = {
 
 const CertificateIcon = () => (
   <img
-    style={{ height: "1.5rem" }}
+    className="ol-lrc-cert"
     alt="Receive a certificate upon completion"
     src="/static/images/certificate_icon_infinite.png"
   />
@@ -118,7 +118,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     >
       {isRow ? <CardContent>{cardImg}</CardContent> : cardImg}
       <CardContent className="ol-lrc-content">
-        <div className="ol-lrc-flex-row">
+        <div className="ol-lrc-type-row">
           <span className="ol-lrc-type">
             {getReadableResourceType(resource.object_type)}
           </span>
@@ -133,10 +133,10 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           <span className="ol-lrc-offered-by">Offered By &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}
         </div>
-        <div>
+        <div className="ol-lrc-date-row">
           {startDate && (
             <Chip
-              className="ol-lrc-chip "
+              className="ol-lrc-chip"
               avatar={<CalendarTodayIcon />}
               label={startDate}
             />
