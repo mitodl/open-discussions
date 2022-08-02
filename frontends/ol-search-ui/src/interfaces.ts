@@ -30,7 +30,7 @@ export type LearningResourceResult = {
   url?: string
   title: string
   image_src: string | null
-  object_type: string
+  object_type: LearningResourceType
   offered_by?: string[]
   short_description?: string | null
   full_description?: string | null

@@ -47,7 +47,7 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   platform:          casual.random_element(["edx", "ocw"]),
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
-  object_type:       "course",
+  object_type:       LearningResourceType.Course,
   runs:              R.times(() => makeRun(), 3),
   is_favorite:       casual.coin_flip,
   lists:             casual.random_element([[], [100, 200]]),
@@ -70,7 +70,7 @@ export const makeProgramResult: Factory<
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   topics:            [casual.word, casual.word],
-  object_type:       "program",
+  object_type:       LearningResourceType.Program,
   offered_by:        [casual.random_element(["xpro", "micromasters"])],
   runs:              [makeRun()],
   is_favorite:       casual.coin_flip,
@@ -177,7 +177,8 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
     object_type: makeLearningResourceType(),
     platform:    faker.lorem.word(),
     runs:        R.times(() => makeRun(), 3),
-    lists:       []
+    lists:       [],
+    ...overrides
   }
   return resource
 }

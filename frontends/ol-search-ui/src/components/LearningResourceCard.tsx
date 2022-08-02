@@ -90,7 +90,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   imgConfig,
   className
 }) => {
-  const bestAvailableRun = bestRun(resource.runs)
+  const bestAvailableRun = bestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
   const startDate =
