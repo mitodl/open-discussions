@@ -8,7 +8,6 @@ import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import { LearningResourceCard } from "ol-search-ui"
-import type { LearningResourceCardProps } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import { useFieldDetails, useFieldListItems, UserList } from "../api/fields"
 import { Link } from "react-router-dom"
@@ -16,6 +15,7 @@ import FieldPageSkeleton from "./FieldPageSkeleton"
 import IconButton from "@mui/material/IconButton"
 import NavigateNextIcon from "@mui/icons-material/NavigateNext"
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
+import { imgConfigs } from "../util/constants"
 
 type RouteParams = {
   name: string
@@ -26,14 +26,6 @@ const keyFromHash = (hash: string) => {
   const match = keys.find(key => `#${key}` === hash)
   return match ?? "home"
 }
-
-const imgConfig: LearningResourceCardProps["imgConfig"] = {
-  ocwBaseUrl: SETTINGS.ocw_next_base_url,
-  embedlyKey: SETTINGS.embedlyKey,
-  width:      220,
-  height:     170
-}
-
 interface FieldListProps {
   list: UserList
 }
@@ -51,7 +43,7 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
               variant="row-reverse"
               className="ic-resource-card"
               resource={item}
-              imgConfig={imgConfig}
+              imgConfig={imgConfigs["row-reverse"]}
             />
           </li>
         ))}
@@ -89,7 +81,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
           key={item.id}
           className="ic-resource-card ic-carousel-card"
           resource={item}
-          imgConfig={imgConfig}
+          imgConfig={imgConfigs["column"]}
         />
       ))}
     </TitledCarousel>
