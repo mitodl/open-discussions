@@ -36,7 +36,7 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
   return (
     <section>
       <h3>{list.title}</h3>
-      <ul className="ic-field-list">
+      <ul className="ic-card-row-list">
         {items.map(item => (
           <li key={item.id}>
             <LearningResourceCard

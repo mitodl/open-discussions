@@ -3,6 +3,8 @@
   $lightText: theme.$font-color-light
 );
 
+$cardListSpacer: 1em;
+
 .ic-resource-card {
   &.MuiCard-root {
     color: theme.$font-color-default;
@@ -12,5 +14,14 @@
     &:hover {
       box-shadow: theme.$shadow;
     }
+  }
+}
+
+.ic-card-row-list {
+  padding-left: 0;
+  > li {
+    list-style: none;
+    margin-top: $cardListSpacer / 2;
+    margin-bottom: $cardListSpacer / 2;
   }
 }
