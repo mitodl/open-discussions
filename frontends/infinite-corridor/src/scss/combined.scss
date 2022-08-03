@@ -1,5 +1,3 @@
-@use "material-components-web/dist/material-components-web";
-
 @use "theme";
 @use "button" with ( $color: theme.$color-primary );
 @use "main-search";
