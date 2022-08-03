@@ -39,5 +39,5 @@ const sample = <T, >(array: T[]): T => {
 export { renderTestApp, sample }
 // Conveniences
 export { setMockResponse }
-export { screen, prettyDOM, within } from "@testing-library/react"
+export { screen, prettyDOM, within, fireEvent } from "@testing-library/react"
 export { default as user } from "@testing-library/user-event"

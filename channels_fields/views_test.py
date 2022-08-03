@@ -23,6 +23,19 @@ def test_list_field_channels(user_client):
         assert field_list[idx] == FieldChannelSerializer(instance=field_channel).data
 
 
+@pytest.mark.parametrize("is_moderator", [True, False])
+def test_field_channel_is_moderator(field_channel, client, is_moderator):
+    """Test that the field channel details are correct"""
+    field_user = UserFactory.create()
+    if is_moderator:
+        add_user_role(field_channel, FIELD_ROLE_MODERATORS, field_user)
+    client.force_login(field_user)
+    url = reverse(
+        "field_channels_api-detail", kwargs={"field_name": field_channel.name}
+    )
+    assert client.get(url).json()["is_moderator"] == is_moderator
+
+
 def test_create_field_channel(admin_client):
     """An admin should be able to create a new field channel"""
     url = reverse("field_channels_api-list")

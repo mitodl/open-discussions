@@ -2,6 +2,7 @@ import React from "react"
 import { BannerPage } from "ol-util"
 import Container from "@mui/material/Container"
 import { useFieldDetails } from "../api/fields"
+import FieldAvatar from "../components/FieldAvatar"
 
 interface FieldSkeletonProps {
   children: React.ReactNode
@@ -27,8 +28,12 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
       bannerContent={
         <Container className="field-title-container">
           <div className="field-title-row">
-            <img alt="" src={field.data?.avatar_medium ?? ""} />
-            <h2>{field.data?.title}</h2>
+            {field.data && (
+              <>
+                <FieldAvatar field={field.data} imageSize="medium" />
+                <h2>{field.data.title}</h2>
+              </>
+            )}
           </div>
         </Container>
       }

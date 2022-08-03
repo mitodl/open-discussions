@@ -2,6 +2,7 @@ import React from "react"
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/FieldPage"
+import FieldAdminApp from "./pages/admin/FieldAdminApp"
 import * as urls from "./pages/urls"
 import { Route, Router } from "react-router"
 import { History } from "history"
@@ -35,8 +36,11 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
             <Route path={urls.SEARCH}>
               <SearchPage />
             </Route>
-            <Route path={urls.FIELD_VIEW}>
+            <Route path={urls.FIELD_VIEW} exact>
               <FieldPage />
+            </Route>
+            <Route path={urls.FIELD_EDIT}>
+              <FieldAdminApp />
             </Route>
           </Router>
         </QueryClientProvider>
