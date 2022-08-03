@@ -1,26 +1,15 @@
-/* global SETTINGS:false */
-import React from "react"
-import sinon from "sinon"
-import { mount } from "enzyme"
-import { act } from "react-dom/test-utils"
-import { times } from "ramda"
-
-import SearchPage from "./SearchPage"
+import { when } from "jest-when"
 
 import { factories } from "ol-search-ui"
-import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
-import { createMemoryHistory } from "history"
 
-const { makeSearchResult } = factories
+import { assertInstanceOf } from "ol-util"
+import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
-jest.mock("react-router", () => ({
-  useHistory: () => createMemoryHistory()
-}))
+import { fireEvent, waitFor } from "@testing-library/react"
+import { makeRequest } from "../test-utils/mockAxios"
 
-SETTINGS.search_page_size = 20
-
-let resolver
+const { makeSearchResponse } = factories
 
 const expectedFacets = {
   audience:            [],
@@ -34,162 +23,114 @@ const expectedFacets = {
   resource_type:       []
 }
 
-jest.mock("redux-hammock/django_csrf_fetch", () => ({
-  fetchJSONWithCSRF: jest.fn(async () => {
-    return new Promise(resolve => {
-      resolver = (extraData = {}) => {
-        const results = mockGetResults()
-        resolve({
-          hits: { hits: results, total: results.length },
-          ...extraData
-        })
-      }
-    })
+const getSearchTextInput = (): HTMLInputElement => {
+  const textInput = screen.getByPlaceholderText("Search for", { exact: false })
+  assertInstanceOf(textInput, HTMLInputElement)
+  return textInput
+}
+/**
+ * This is a bit of a hack to enable `react-infinite-scroller` to respond to
+ * scroll events in jsdom. This will be somewhat fragile as it relies on the
+ * current implementation of scrolling in `react-infinite-scroller`.
+ *
+ * - `react-infinite-scroller` does not respond to scroll events on an element
+ *    if the element does not have an `[offset parent](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent)`
+ * - JSDOM does not implement `offsetParent` property (it is always null).
+ *
+ * So this patches `offsetParent` to return `document.body`
+ */
+const enableInfiniteScrollerScrolling = async () => {
+  const results = await screen.findByLabelText("Search Results", {
+    exact: false
   })
-}))
-
-const mockGetResults = () => {
-  const results = []
-
-  for (let i = 0; i < times; i++) {
-    const type = casual.random_element(["course", "program"])
-    results.append({
-      _source: makeSearchResult(type)
-    })
-  }
-
-  return results
+  // eslint-disable-next-line testing-library/no-node-access
+  const scroller = results.parentNode
+  assertInstanceOf(scroller, HTMLElement)
+  jest.spyOn(scroller, "offsetParent", "get").mockReturnValue(document.body)
 }
 
-describe("SearchPage component", () => {
-  let wrapper
-
-  afterEach(() => {
-    sinon.restore()
-    wrapper.unmount()
-    jest.clearAllMocks()
-  })
-
+describe("SearchPage", () => {
   test("should support InfiniteScroll-ing", async () => {
-    await act(async () => {
-      wrapper = mount(<SearchPage />)
+    const firstResponse = makeSearchResponse()
+    const secondResponse = makeSearchResponse()
+
+    when(makeRequest)
+      .calledWith("post", "search/", expect.anything())
+      .mockResolvedValueOnce({
+        data:   firstResponse,
+        status: 200
+      })
+      .mockResolvedValueOnce({
+        data:   secondResponse,
+        status: 200
+      })
+
+    await renderTestApp({ url: "/search" })
+
+    await enableInfiniteScrollerScrolling()
+    fireEvent.scroll(window)
+
+    await waitFor(async () => {
+      const results = await screen.findAllByText("Offered by", { exact: false })
+      expect(results).toHaveLength(8)
     })
 
-    wrapper.update()
+    expect(makeRequest.mock.calls[0][0]).toEqual("post")
+    expect(makeRequest.mock.calls[0][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[0][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         0,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
 
-    await act(async () => {
-      wrapper.find("InfiniteScroll").prop("loadMore")()
-      resolver()
-    })
-    wrapper.update()
-    await act(async () => {
-      wrapper.find("InfiniteScroll").prop("loadMore")()
-      resolver()
-    })
-    wrapper.update()
-    await act(async () => {
-      wrapper.find("InfiniteScroll").prop("loadMore")()
-      resolver()
-    })
-    wrapper.update()
-
-    expect(fetchJSONWithCSRF.mock.calls).toEqual([
-      [
-        "/api/v0/search/",
-        {
-          body: JSON.stringify(
-            buildSearchQuery({
-              text:         "",
-              from:         0,
-              activeFacets: expectedFacets,
-              sort:         null,
-              size:         20
-            })
-          ),
-          method: "post"
-        }
-      ],
-      [
-        "/api/v0/search/",
-        {
-          body: JSON.stringify(
-            buildSearchQuery({
-              text:         "",
-              from:         20,
-              activeFacets: expectedFacets,
-              sort:         null,
-              size:         20
-            })
-          ),
-          method: "post"
-        }
-      ],
-      [
-        "/api/v0/search/",
-        {
-          body: JSON.stringify(
-            buildSearchQuery({
-              text:         "",
-              from:         40,
-              activeFacets: expectedFacets,
-              sort:         null,
-              size:         20
-            })
-          ),
-          method: "post"
-        }
-      ]
-    ])
+    expect(makeRequest.mock.calls[1][0]).toEqual("post")
+    expect(makeRequest.mock.calls[1][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[1][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         4,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
   })
 
-  test("the user can update the search text and submit", async () => {
-    await act(async () => {
-      wrapper = mount(<SearchPage />)
+  test("the user should be able to update the search text and submit", async () => {
+    setMockResponse.post("search/", {
+      hits: { hits: [], total: 0 }
     })
+    await renderTestApp({ url: "/search" })
 
-    wrapper.update()
+    const textInput = getSearchTextInput()
+    await user.type(textInput, "New Search Text{Enter}")
 
-    wrapper
-      .find("input")
-      .at(0)
-      .simulate("change", { target: { value: "New Search Text" } })
+    expect(makeRequest.mock.calls[0][0]).toEqual("post")
+    expect(makeRequest.mock.calls[0][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[0][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         0,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
 
-    await act(async () => {
-      wrapper.find("Searchbox").prop("onSubmit")({ preventDefault: jest.fn() })
-      resolver()
-    })
-
-    expect(fetchJSONWithCSRF.mock.calls).toEqual([
-      [
-        "/api/v0/search/",
-        {
-          body: JSON.stringify(
-            buildSearchQuery({
-              text:         "",
-              from:         0,
-              activeFacets: expectedFacets,
-              sort:         null,
-              size:         20
-            })
-          ),
-          method: "post"
-        }
-      ],
-      [
-        "/api/v0/search/",
-        {
-          body: JSON.stringify(
-            buildSearchQuery({
-              text:         "New Search Text",
-              from:         0,
-              activeFacets: expectedFacets,
-              sort:         null,
-              size:         20
-            })
-          ),
-          method: "post"
-        }
-      ]
-    ])
+    expect(makeRequest.mock.calls[1][0]).toEqual("post")
+    expect(makeRequest.mock.calls[1][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[1][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "New Search Text",
+        from:         0,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
   })
 })

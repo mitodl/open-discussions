@@ -12,14 +12,14 @@ import {
   SearchQueryParams,
   Facets
 } from "@mitodl/course-search-utils"
-//@ts-expect-error redux-hammock does not have typescript types
-import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 import {
   LearningResourceResult,
   LearningResourceCard,
   LearningResourceCardProps,
   Searchbox
 } from "ol-search-ui"
+
+import axios from "../libs/axios"
 
 const ALLOWED_TYPES = ["program", "course"]
 const pageSize = SETTINGS.search_page_size
@@ -40,11 +40,12 @@ const imgConfig: LearningResourceCardProps["imgConfig"] = {
 
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
-
-  return fetchJSONWithCSRF("/api/v0/search/", {
-    method: "post",
-    body:   JSON.stringify(body)
-  })
+  try {
+    const { data } = await axios.post("search/", body)
+    return data
+  } catch (err) {
+    return null
+  }
 }
 
 const SearchPage: React.FC = () => {
@@ -112,6 +113,7 @@ const SearchPage: React.FC = () => {
       bannerContent={
         <Searchbox
           className="course-searchbox"
+          placeholder="Search for online courses or programs at MIT"
           onChange={updateText}
           value={text || ""}
           onClear={clearText}
@@ -149,15 +151,19 @@ const SearchPage: React.FC = () => {
                     <span>No results found for your query</span>
                   </div>
                 ) : (
-                  results.map(hit => (
-                    <LearningResourceCard
-                      key={hit._source.id}
-                      className="ic-resource-card"
-                      variant="row-reverse"
-                      imgConfig={imgConfig}
-                      resource={hit._source}
-                    />
-                  ))
+                  <span aria-label="Search Results">
+                    {results.map(hit => (
+                      <LearningResourceCard
+                        key={hit._source.object_type.concat(
+                          hit._source.id.toString()
+                        )}
+                        className="ic-resource-card"
+                        variant="row-reverse"
+                        imgConfig={imgConfig}
+                        resource={hit._source}
+                      />
+                    ))}
+                  </span>
                 )
               ) : (
                 <span>Loading...</span>
