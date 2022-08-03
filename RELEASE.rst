@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.192.1
+---------------
+
+- Cc/field pages v1 (#3665)
+- rtl tests for search (#3669)
+- fix useSearchParams (#3670)
+- Preliminary field edit page with appearance form tab (#3661)
+
 Version 0.192.0 (Released August 01, 2022)
 ---------------
 
