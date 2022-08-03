@@ -57,6 +57,7 @@ const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
                 </label>
                 <Field
                   id="field-title"
+                  className="form-field"
                   name="title"
                   type="text"
                   value={values.title}
@@ -74,6 +75,7 @@ const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
               <Field
                 id="field-description"
                 name="public_description"
+                className="form-field"
                 as="textarea"
                 value={values.public_description}
               />
