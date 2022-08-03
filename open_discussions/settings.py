@@ -556,6 +556,7 @@ if OPEN_DISCUSSIONS_USE_S3:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto.S3BotoStorage"
 
 IMAGEKIT_SPEC_CACHEFILE_NAMER = "imagekit.cachefiles.namers.source_name_dot_hash"
+IMAGEKIT_CACHEFILE_DIR = get_string("IMAGEKIT_CACHEFILE_DIR", "")
 
 # Celery
 USE_CELERY = True
