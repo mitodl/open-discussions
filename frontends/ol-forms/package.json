@@ -5,5 +5,9 @@
   "peerDependencies": {
     "react": "^16.10 || 17 || 18",
     "styled-components": "5"
+  },
+  "dependencies": {
+    "formik": "^2.2.9",
+    "yup": "^0.32.11"
   }
 }

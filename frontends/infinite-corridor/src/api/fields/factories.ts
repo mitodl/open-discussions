@@ -43,8 +43,9 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
   }
   return item
 }
+import type { FieldChannel } from "./interfaces"
 
-const makeField: Factory<Field> = overrides => ({
+const makeField: Factory<FieldChannel> = overrides => ({
   name:               faker.unique(faker.lorem.slug),
   title:              faker.lorem.words(faker.datatype.number({ min: 1, max: 4 })),
   public_description: faker.lorem.paragraph(),
@@ -52,8 +53,10 @@ const makeField: Factory<Field> = overrides => ({
   banner:             new URL(faker.internet.url()).toString(),
   avatar_small:       new URL(faker.internet.url()).toString(),
   avatar_medium:      new URL(faker.internet.url()).toString(),
+  avatar:             new URL(faker.internet.url()).toString(),
   featured_list:      makeUserList(),
   lists:              [makeUserList(), makeUserList()],
+  is_moderator:       faker.datatype.boolean(),
   ...overrides
 })
 

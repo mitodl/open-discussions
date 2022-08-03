@@ -53,7 +53,7 @@ def base_field_data():
 @pytest.mark.parametrize("has_about", [True, False])
 @pytest.mark.parametrize("has_widget_list", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
-def test_serialize_channel(  # pylint: disable=too-many-arguments
+def test_serialize_field_channel(  # pylint: disable=too-many-arguments
     mocker, has_avatar, has_banner, has_about, has_widget_list, ga_tracking_id
 ):
     """
@@ -91,6 +91,7 @@ def test_serialize_channel(  # pylint: disable=too-many-arguments
         "subfields": [],
         "featured_list": None,
         "public_description": field_channel.public_description,
+        "is_moderator": False,
     }
 
 

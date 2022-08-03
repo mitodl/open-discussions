@@ -22,18 +22,48 @@ type UserListItem = {
   content_data: LearningResource
 }
 
-interface Field {
-  title: string
-  name: string
+interface FieldChannel {
   banner: string | null
   featured_list: UserList | null
   lists: UserList[]
+  title: string
+  name: string
+  avatar: string | null
   avatar_small: string | null
   avatar_medium: string | null
   public_description: string
+  is_moderator: boolean
+}
+export type FieldList = PaginatedResult<FieldChannel>
+
+export interface FieldChannelForm {
+  title: string
+  public_description: string
+  name?: string
+  banner?: string | null
+  avatar?: string | null
+  lists?: Array<number>
+  featured_list?: number
 }
 
-type PaginatedFields = PaginatedResult<Field>
+export type FormImage = {
+  edit: Blob
+  image: File
+}
+
+export type FieldChannelAppearanceForm = {
+  title: string
+  public_description: string
+  avatar?: FormImage
+  banner?: FormImage
+}
+
+export type FieldAppearanceEditValidation = {
+  title: string
+  public_description: string
+}
+
+type PaginatedFields = PaginatedResult<FieldChannel>
 
 type PaginatedUserListItems = PaginatedResult<UserListItem>
 
@@ -41,7 +71,7 @@ type PaginatedFieldListItems = PaginatedResult<UserListItem["content_data"]>
 
 export type {
   UserList,
-  Field,
+  FieldChannel,
   PaginatedFields,
   UserListItem,
   PaginatedUserListItems,

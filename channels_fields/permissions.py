@@ -6,7 +6,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from channels_fields.constants import FIELD_ROLE_MODERATORS
+from channels_fields.api import is_moderator
 from channels_fields.models import FieldChannel
 from open_discussions.permissions import is_staff_user
 
@@ -28,12 +28,7 @@ def is_field_moderator(request: Request, view: APIView) -> bool:
     """
     Determine if the user is a moderator for a field channel (or a staff user)
     """
-    group_names = set(request.user.groups.values_list("name", flat=True))
-    field_name = view.kwargs.get("field_name", None)
-    return (
-        request.user.is_staff
-        or f"field_{field_name}_{FIELD_ROLE_MODERATORS}" in group_names
-    )
+    return is_moderator(request.user, view.kwargs.get("field_name", None))
 
 
 class FieldModeratorPermissions(BasePermission):

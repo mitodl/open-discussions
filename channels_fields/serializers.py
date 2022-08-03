@@ -12,7 +12,11 @@ from rest_framework.exceptions import ValidationError
 from channels.constants import WIDGET_LIST_CHANGE_PERM
 from channels.serializers.channels import ChannelAppearanceMixin
 from channels.serializers.validators import validate_email, validate_username
-from channels_fields.api import add_user_role, create_field_groups_and_roles
+from channels_fields.api import (
+    add_user_role,
+    create_field_groups_and_roles,
+    is_moderator,
+)
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel, FieldList, Subfield
 from course_catalog.constants import PrivacyLevel
@@ -49,6 +53,14 @@ class FieldChannelSerializer(ChannelAppearanceMixin, serializers.ModelSerializer
     lists = serializers.SerializerMethodField()
     featured_list = UserListSerializer(many=False, read_only=True)
     subfields = SubfieldSerializer(many=True, read_only=True)
+    is_moderator = serializers.SerializerMethodField()
+
+    def get_is_moderator(self, instance):
+        """Return true if user is a moderator for the channel"""
+        request = self.context.get("request")
+        if request and is_moderator(request.user, instance.name):
+            return True
+        return False
 
     def get_lists(self, instance):
         """Returns the field's list of UserLists"""
@@ -77,6 +89,7 @@ class FieldChannelSerializer(ChannelAppearanceMixin, serializers.ModelSerializer
             "created_on",
             "id",
             "ga_tracking_id",
+            "is_moderator",
         )
         read_only_fields = fields
 

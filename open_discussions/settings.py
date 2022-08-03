@@ -29,7 +29,7 @@ from open_discussions.envs import (
 )
 from open_discussions.sentry import init_sentry
 
-VERSION = "0.191.4"
+VERSION = "0.192.0"
 
 log = logging.getLogger()
 
@@ -824,6 +824,10 @@ REST_FRAMEWORK = {
     ),
     "EXCEPTION_HANDLER": "open_discussions.exceptions.api_exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "TEST_REQUEST_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.MultiPartRenderer",
+    ],
 }
 
 USE_X_FORWARDED_PORT = get_bool("USE_X_FORWARDED_PORT", False)

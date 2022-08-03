@@ -47,3 +47,53 @@ $avatarSize: 60px;
   margin-left: 0.5em;
   margin-right: 0.5em;
 }
+
+$avatar-dimension-medium: 57px;
+$avatar-dimension-small: 22px;
+
+.avatar-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .avatar {
+    display: table;
+    margin-right: 22px;
+  }
+
+  .avatar-image {
+    display: table;
+    overflow: hidden;
+  }
+
+  .avatar-initials {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    color: #fff;
+    background-color: theme.$channel-avatar-bg;
+    font-weight: 600;
+  }
+
+  &.small-size {
+    img,
+    .avatar,
+    .avatar-initials {
+      width: $avatar-dimension-small;
+      height: $avatar-dimension-small;
+      font-size: 15px;
+      border-radius: 4px;
+    }
+  }
+
+  &.medium-size {
+    img,
+    .avatar,
+    .avatar-initials {
+      width: $avatar-dimension-medium;
+      height: $avatar-dimension-medium;
+      font-size: 32px;
+      border-radius: 8px;
+    }
+  }
+}

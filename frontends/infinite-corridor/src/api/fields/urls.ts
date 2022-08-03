@@ -3,8 +3,6 @@ import { toQueryString } from "ol-util"
 
 export const fieldsList = "/fields"
 
-export const fieldDetails = (name: string) => `/fields/${name}`
-
 const DEFAULT_PAGE_SIZE = 50
 
 export const userListItems = (
@@ -14,3 +12,4 @@ export const userListItems = (
   const searchParams = toQueryString({ limit, offset })
   return `/userlists/${id}/items?${searchParams}`
 }
+export const fieldDetails = (name: string) => `/fields/${name}/`

@@ -1,21 +1,45 @@
-import { useQuery } from "react-query"
-import type { UseQueryResult } from "react-query"
-import type {
-  Field,
-  PaginatedFields,
-  PaginatedUserListItems,
-  PaginatedFieldListItems
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from "react-query"
+import {
+  FieldChannel,
+  FieldChannelAppearanceForm,
+  FieldList,
+  PaginatedFieldListItems,
+  PaginatedUserListItems
 } from "./interfaces"
 import * as urls from "./urls"
+import axios from "../../libs/axios"
+import { fieldDetails } from "./urls"
+import { PaginationSearchParams } from "ol-util"
 import { useMemo } from "react"
-import type { PaginationSearchParams } from "ol-util"
 
 const useFieldsList = () => {
-  return useQuery<PaginatedFields>(urls.fieldsList)
+  return useQuery<FieldList>(urls.fieldsList)
 }
 
 const useFieldDetails = (name: string) => {
-  return useQuery<Field>(urls.fieldDetails(name))
+  return useQuery<FieldChannel>(urls.fieldDetails(name))
+}
+
+const editFieldChannelAppearance = async (
+  name: string,
+  data: FieldChannelAppearanceForm
+) => {
+  const { data: response } = await axios.patch(`${fieldDetails(name)}`, data)
+  return response
+}
+
+const useMutateFieldAppearance = (field: FieldChannel) => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    (data: FieldChannelAppearanceForm) => {
+      return editFieldChannelAppearance(field.name, data)
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries(fieldDetails(field.name))
+      }
+    }
+  )
 }
 
 const useFieldListItems = (
@@ -38,4 +62,4 @@ const useFieldListItems = (
   }, [userListItems])
 }
 
-export { useFieldsList, useFieldDetails, useFieldListItems }
+export { useFieldsList, useFieldDetails, useMutateFieldAppearance, useFieldListItems }

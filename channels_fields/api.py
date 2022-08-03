@@ -4,7 +4,7 @@ from typing import Dict
 from django.contrib.auth.models import Group, User
 from django.db import transaction
 
-from channels_fields.constants import FIELD_ROLE_CHOICES
+from channels_fields.constants import FIELD_ROLE_CHOICES, FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel, FieldChannelGroupRole
 
 
@@ -51,3 +51,16 @@ def remove_user_role(field_channel: FieldChannel, role: str, user: User):
 def get_group_role_name(field_name: str, role: str) -> str:
     """Get the group name for a FieldChannel and role"""
     return f"field_{field_name}_{role}"
+
+
+def is_moderator(user: User, field_name: str) -> bool:
+    """
+    Determine if the user is a moderator for a field channel (or a staff user)
+    """
+    if not user or not field_name:
+        return False
+    group_names = set(user.groups.values_list("name", flat=True))
+    return (
+        user.is_staff
+        or get_group_role_name(field_name, FIELD_ROLE_MODERATORS) in group_names
+    )

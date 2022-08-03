@@ -11,6 +11,7 @@
     "@faker-js/faker": "^7.3.0",
     "classnames": "^2.3.1",
     "nuka-carousel": "^5.2.0",
-    "qs": "^6.11.0"
+    "qs": "^6.11.0",
+    "ramda": "^0.28.0"
   }
 }
