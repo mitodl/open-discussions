@@ -1,4 +1,9 @@
-import { useMutation, useQuery, useQueryClient, UseQueryResult } from "react-query"
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult
+} from "react-query"
 import {
   FieldChannel,
   FieldChannelAppearanceForm,
@@ -62,4 +67,9 @@ const useFieldListItems = (
   }, [userListItems])
 }
 
-export { useFieldsList, useFieldDetails, useMutateFieldAppearance, useFieldListItems }
+export {
+  useFieldsList,
+  useFieldDetails,
+  useMutateFieldAppearance,
+  useFieldListItems
+}

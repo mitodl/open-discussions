@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import * as R from "ramda"
 import { makePaginatedFactory, Factory } from "ol-util"
 import { LearningResourceType, factories } from "ol-search-ui"
-import type { Field, UserList, UserListItem } from "./interfaces"
+import type { FieldChannel, UserList, UserListItem } from "./interfaces"
 
 export const makeUserList: Factory<UserList> = overrides => {
   const userList: UserList = {
@@ -43,7 +43,6 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
   }
   return item
 }
-import type { FieldChannel } from "./interfaces"
 
 const makeField: Factory<FieldChannel> = overrides => ({
   name:               faker.unique(faker.lorem.slug),

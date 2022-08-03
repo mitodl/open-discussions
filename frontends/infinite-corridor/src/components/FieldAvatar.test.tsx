@@ -9,12 +9,14 @@ describe("Avatar", () => {
     const field = makeField()
     render(<FieldAvatar field={field} imageSize="small" />)
     const img = screen.getByRole("img")
+    expect(img.getAttribute("alt")).toBe("") // should be empty unless meaningful
     expect(img.getAttribute("src")).toEqual(field.avatar_small)
   })
   it("Displays a medium avatar image by default", async () => {
     const field = makeField()
     render(<FieldAvatar field={field} />)
     const img = screen.getByRole("img")
+    expect(img.getAttribute("alt")).toBe("") // should be empty unless meaningful
     expect(img.getAttribute("src")).toEqual(field.avatar_medium)
   })
   it("Displays initials if no avatar image exists", async () => {
