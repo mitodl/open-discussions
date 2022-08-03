@@ -1,0 +1,163 @@
+@use "theme";
+
+.form {
+  .form-item {
+    margin: 0 0 28px 0;
+    color: theme.$font-black;
+
+    .label,
+    .input {
+      display: block;
+    }
+  }
+
+  select {
+    background: #f8f8f8;
+    border: 1px solid #bbb;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.87);
+    border-radius: theme.$std-border-radius;
+    height: 39px;
+    /* If you add too much padding here, the options won't show in IE */
+    padding: 8px 20px;
+    width: 100%;
+  }
+}
+
+.form .row,
+.form-header .row {
+  margin: 10px 10px 24px 0;
+}
+
+.validation-message {
+  background-color: theme.$validation-bg;
+  color: theme.$validation-text;
+  font-size: 14px;
+  padding: 5px;
+}
+
+.form-field {
+  margin: 0 0 28px 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.profile-name {
+  height: 110px;
+  width: 100%;
+  margin: 20px 0px 0px 30px;
+  vertical-align: middle;
+}
+
+.bottom-label {
+  margin: 5px 0px 0px 10px;
+  font-size: 11px;
+  color: theme.$font-grey-light;
+}
+
+input[type="email"],
+input[type="text"],
+input[type="url"],
+input[type="password"] {
+  width: 100%;
+  padding: 10px 10px;
+  font-size: 15px;
+  border-radius: theme.$std-border-radius;
+  border: 1px solid theme.$input-border-grey;
+  transition: width 0.4s ease-in-out;
+  box-sizing: border-box;
+
+  &:disabled {
+    background: #f7f7f7;
+    border-color: #ccc;
+  }
+}
+
+textarea,
+input[type="text"] {
+  width: 100%;
+  padding: 12px 10px;
+  box-sizing: border-box;
+  border-radius: theme.$std-border-radius;
+  border: 1px solid theme.$input-border-grey;
+  background-color: #fff;
+  resize: auto;
+  font-size: 15px;
+  font-family: inherit;
+
+  &.no-height {
+    height: auto;
+  }
+
+  &.underlined {
+    border-radius: 6.5px 6.5px 0 0;
+    border-bottom: 2px solid black;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  &.h1 {
+    font-size: 24px;
+    font-weight: bold;
+    border: none;
+    outline: none;
+  }
+}
+
+textarea {
+  height: 110px;
+}
+
+label {
+  display: block;
+  margin: 0 0 6px 0;
+  font-family: roboto, helvetica, arial, sans-serif;
+  font-weight: 400;
+  font-size: 15px;
+  color: #777;
+
+  .highlight {
+    color: #000;
+  }
+}
+
+label.radiolabel {
+  display: inline-block;
+  margin: 0 15px 6px 0;
+  font-family: roboto, helvetica, arial, sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.mdc-checkbox::before,
+.mdc-checkbox::after {
+  background-color: theme.$navy;
+}
+
+.mdc-checkbox__background {
+  background-color: theme.$navy !important;
+  border-color: theme.$navy !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #bbb;
+}
+
+.validationerror {
+  display: none;
+  background: #ffe8ec;
+  color: #f15a74;
+  padding: 8px;
+  font-size: 15px;
+}
+
+.actions {
+  margin-top: 20px;
+}

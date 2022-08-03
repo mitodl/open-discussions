@@ -56,7 +56,6 @@ class BaseChannel(models.Model):
         ],
     )
     title = models.CharField(max_length=100)
-    public_description = models.CharField(max_length=80, default="")
 
     # Branding fields
     avatar = ProcessedImageField(null=True, max_length=2083, upload_to=avatar_uri)
@@ -110,6 +109,7 @@ class Channel(NoDefaultTimestampedModel, BaseChannel):
 
     allowed_post_types = BitField(flags=PostTypes.choices())
     channel_type = models.CharField(max_length=20, choices=ChannelTypes.choices())
+    public_description = models.CharField(max_length=80, default="")
 
     widget_list = models.ForeignKey(
         WidgetList,

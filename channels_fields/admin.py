@@ -8,7 +8,7 @@ class FieldChannelAdmin(admin.ModelAdmin):
     """FieldChannel admin model"""
 
     model = FieldChannel
-    exclude = ("banner", "avatar", "widget_list")
+    exclude = ("widget_list",)
     search_fields = ("name", "title")
 
 

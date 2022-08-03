@@ -8,6 +8,8 @@
 @use "fieldpage";
 @use "learning-resources";
 @use "searchpage";
+@use "form";
+@use "admin";
 
 html {
   font-family: theme.$font-family-default;

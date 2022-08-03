@@ -13,6 +13,8 @@ from widgets.models import WidgetList
 class FieldChannel(BaseChannel, TimestampedModel):
     """Field of study"""
 
+    public_description = models.TextField(blank=True, default="")
+
     featured_list = models.ForeignKey(
         UserList, null=True, blank=True, on_delete=deletion.SET_NULL
     )

@@ -7,5 +7,9 @@
   "include": [
     "./src/**/*.ts",
     "./src/**/*.tsx"
+  ],
+  "typeRoots": [
+    "./src/typings",
+    "./node_modules/@types/"
   ]
 }
