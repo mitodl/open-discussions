@@ -3,7 +3,7 @@
   $lightText: theme.$font-color-light
 );
 
-$shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36);
+$cardListSpacer: 1em;
 
 .ic-resource-card {
   &.MuiCard-root {
@@ -12,7 +12,16 @@ $shadow: 3px 4px 12px 0 rgba(0, 0, 0, 0.36);
     transition-duration: theme.$transition-duration;
     transition-property: box-shadow;
     &:hover {
-      box-shadow: $shadow;
+      box-shadow: theme.$shadow;
     }
+  }
+}
+
+.ic-card-row-list {
+  padding-left: 0;
+  > li {
+    list-style: none;
+    margin-top: $cardListSpacer / 2;
+    margin-bottom: $cardListSpacer / 2;
   }
 }

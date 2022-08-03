@@ -23,7 +23,12 @@ global.SETTINGS = _createSettings()
 // This should be the only top-level hook.
 // eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
+  /**
+   * Clear all mock call counts between tests.
+   * This does NOT clear mock implementations.
+   * Mock implementations are always cleared between test files.
+   */
+  jest.clearAllMocks()
   global.SETTINGS = _createSettings()
-  jest.resetAllMocks()
   resetApi()
 })

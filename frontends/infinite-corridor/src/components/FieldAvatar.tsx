@@ -44,11 +44,7 @@ const FieldAvatar: React.FC<AvatarProps> = props => {
         {isDefault ? (
           <div className="avatar-initials">{initials(field.title)}</div>
         ) : (
-          <img
-            src={imageUrl}
-            alt={`Channel avatar for ${field.title}`}
-            className={`avatar-image`}
-          />
+          <img src={imageUrl} alt="" className={`avatar-image`} />
         )}
       </div>
     </div>

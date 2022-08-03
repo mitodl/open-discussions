@@ -1,6 +1,6 @@
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { zip } from "lodash"
-import { urls } from "../api/fields"
+import { Field, urls } from "../api/fields"
 import * as factories from "../api/fields/factories"
 import {
   screen,
@@ -34,7 +34,7 @@ const getSearchTextInput = (): HTMLInputElement => {
 
 describe("HomePage", () => {
   test("Displays the field titles and thumbnails in links", async () => {
-    const fieldsList = factories.makeFieldList(3)
+    const fieldsList = factories.makeFieldsPaginated(3)
     setMockResponse.get(urls.fieldsList, fieldsList)
 
     renderTestApp()
@@ -54,9 +54,13 @@ describe("HomePage", () => {
   })
 
   test("Clicking on a link goes to the field page", async () => {
-    const fieldsList = factories.makeFieldList(3)
+    const fieldsList = factories.makeFieldsPaginated(3)
     setMockResponse.get(urls.fieldsList, fieldsList)
-    const field = sample(fieldsList.results)
+    const field: Field = {
+      ...sample(fieldsList.results),
+      featured_list: null,
+      lists:         []
+    }
     setMockResponse.get(urls.fieldDetails(field.name), field)
 
     const { history } = renderTestApp()
@@ -66,7 +70,7 @@ describe("HomePage", () => {
   })
 
   test("Submitting search goes to search page", async () => {
-    const fieldsList = factories.makeFieldList(0)
+    const fieldsList = factories.makeFieldsPaginated(0)
     setMockResponse.get(urls.fieldsList, fieldsList)
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 

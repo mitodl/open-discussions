@@ -1,12 +1,21 @@
-import { useMutation, useQuery, useQueryClient } from "react-query"
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryResult
+} from "react-query"
 import {
   FieldChannel,
   FieldChannelAppearanceForm,
-  FieldList
+  FieldList,
+  PaginatedFieldListItems,
+  PaginatedUserListItems
 } from "./interfaces"
 import * as urls from "./urls"
 import axios from "../../libs/axios"
 import { fieldDetails } from "./urls"
+import { PaginationSearchParams } from "ol-util"
+import { useMemo } from "react"
 
 const useFieldsList = () => {
   return useQuery<FieldList>(urls.fieldsList)
@@ -38,4 +47,29 @@ const useMutateFieldAppearance = (field: FieldChannel) => {
   )
 }
 
-export { useFieldsList, useFieldDetails, useMutateFieldAppearance, urls }
+const useFieldListItems = (
+  listId: number,
+  options?: PaginationSearchParams
+) => {
+  const userListItems = useQuery<PaginatedUserListItems>(
+    urls.userListItems(listId, options)
+  )
+  return useMemo(() => {
+    const { data, ...others } = userListItems
+    const lrData = data && {
+      ...data,
+      results: data.results.map(d => d.content_data)
+    }
+    return {
+      data: lrData,
+      ...others
+    } as UseQueryResult<PaginatedFieldListItems>
+  }, [userListItems])
+}
+
+export {
+  useFieldsList,
+  useFieldDetails,
+  useMutateFieldAppearance,
+  useFieldListItems
+}

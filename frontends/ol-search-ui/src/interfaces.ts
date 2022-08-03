@@ -1,16 +1,27 @@
-export type LearningResourceSummary = {
+export enum LearningResourceType {
+  Course = "course",
+  Program = "program",
+  Userlist = "userlist",
+  LearningPath = "learningpath",
+  Video = "video",
+  Podcast = "podcast",
+  PodcastEpisode = "podcastepisode",
+  Favorites = "favorites"
+}
+
+export type LearningResource = {
   id: number
   title: string
-  image_src: string | null
-  platform?: string | null
   topics: CourseTopic[]
-  offered_by: string[]
-  object_type: string
-  runs: LearningResourceRun[]
+  object_type: LearningResourceType
   lists: ListItemMember[]
+  image_src: string | null
+  runs?: LearningResourceRun[]
+  offered_by?: string[]
+  platform?: string | null
   is_favorite?: boolean
-  audience: string[]
-  certification: string[]
+  audience?: string[]
+  certification?: string[]
 }
 
 export type LearningResourceResult = {
@@ -19,13 +30,13 @@ export type LearningResourceResult = {
   url?: string
   title: string
   image_src: string | null
-  object_type: string
+  object_type: LearningResourceType
   offered_by?: string[]
   short_description?: string | null
   full_description?: string | null
   platform?: string
   topics: string[]
-  runs: LearningResourceRun[]
+  runs?: LearningResourceRun[]
   lists: ListItemMember[]
   is_favorite: boolean
   certification: string[]
@@ -74,15 +85,4 @@ export type CourseInstructor = {
   first_name: string | null
   last_name: string | null
   full_name: string | null
-}
-
-export enum LearningResourceType {
-  Course = "course",
-  Program = "program",
-  Userlist = "userlist",
-  LearningPath = "learningpath",
-  Video = "video",
-  Podcast = "podcast",
-  PodcastEpisode = "podcastepisode",
-  Favorites = "favorites"
 }

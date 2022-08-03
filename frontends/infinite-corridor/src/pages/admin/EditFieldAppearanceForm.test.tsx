@@ -7,6 +7,8 @@ import {
 } from "../../test-utils"
 import * as factory from "../../api/fields/factories"
 import { urls } from "../../api/fields"
+import { waitFor } from "@testing-library/react"
+import { makeFieldViewPath } from "../urls"
 
 describe("EditFieldAppearanceForm", () => {
   it("Displays the field title, appearance inputs with current field values", async () => {
@@ -41,7 +43,11 @@ describe("EditFieldAppearanceForm", () => {
   })
 
   it("updates field values on form submission", async () => {
-    const field = factory.makeField({ is_moderator: true })
+    const field = factory.makeField({
+      is_moderator:  true,
+      featured_list: null, // so we don't have to mock userList responses
+      lists:         []
+    })
     const newTitle = "New Title"
     const newDesc = "New Description"
     // Initial field values
@@ -52,7 +58,9 @@ describe("EditFieldAppearanceForm", () => {
       public_description: newDesc
     }
     setMockResponse.patch(urls.fieldDetails(field.name), updatedValues)
-    renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#appearance` })
+    const { history } = renderTestApp({
+      url: `${urls.fieldDetails(field.name)}manage/#appearance`
+    })
     const titleInput = (await screen.findByLabelText(
       "Title"
     )) as HTMLInputElement
@@ -67,6 +75,10 @@ describe("EditFieldAppearanceForm", () => {
     // Expected field values after submit
     setMockResponse.get(urls.fieldDetails(field.name), updatedValues)
     await user.click(submitBtn)
+
+    await waitFor(() => {
+      expect(history.location.pathname).toBe(makeFieldViewPath(field.name))
+    })
     await screen.findByText(newTitle)
     await screen.findByText(newDesc)
   })

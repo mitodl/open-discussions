@@ -1,9 +1,16 @@
 //@ts-expect-error casual-browserify does not have typescript types
 import casual from "casual-browserify"
+import { faker } from "@faker-js/faker"
 import R from "ramda"
 import { DATE_FORMAT } from "./util"
 import { Factory } from "ol-util"
-import { LearningResourceResult, LearningResourceRun } from "./interfaces"
+import {
+  CourseTopic,
+  LearningResourceResult,
+  LearningResourceRun,
+  LearningResource,
+  LearningResourceType
+} from "./interfaces"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -40,7 +47,7 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   platform:          casual.random_element(["edx", "ocw"]),
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
-  object_type:       "course",
+  object_type:       LearningResourceType.Course,
   runs:              R.times(() => makeRun(), 3),
   is_favorite:       casual.coin_flip,
   lists:             casual.random_element([[], [100, 200]]),
@@ -63,7 +70,7 @@ export const makeProgramResult: Factory<
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   topics:            [casual.word, casual.word],
-  object_type:       "program",
+  object_type:       LearningResourceType.Program,
   offered_by:        [casual.random_element(["xpro", "micromasters"])],
   runs:              [makeRun()],
   is_favorite:       casual.coin_flip,
@@ -147,4 +154,31 @@ export const makeSearchFacetResult = () => {
     department_name: [],
     type:            ["course"]
   }
+}
+
+const makeLearningResourceType = () =>
+  faker.helpers.arrayElement(Object.values(LearningResourceType))
+
+export const makeTopic: Factory<CourseTopic> = overrides => {
+  const topic: CourseTopic = {
+    id:   faker.unique(faker.datatype.number),
+    name: faker.lorem.words(),
+    ...overrides
+  }
+  return topic
+}
+
+export const makeLearningResource: Factory<LearningResource> = overrides => {
+  const resource: LearningResource = {
+    id:          faker.unique(faker.datatype.number),
+    title:       faker.lorem.words(),
+    image_src:   new URL(faker.internet.url()).toString(),
+    topics:      R.times(() => makeTopic(), 2),
+    object_type: makeLearningResourceType(),
+    platform:    faker.lorem.word(),
+    runs:        R.times(() => makeRun(), 3),
+    lists:       [],
+    ...overrides
+  }
+  return resource
 }

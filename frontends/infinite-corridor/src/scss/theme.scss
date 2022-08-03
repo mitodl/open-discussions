@@ -22,6 +22,16 @@ $transition-duration: 300ms;
 
 $border-radius: 5px;
 
+$shadowOffsetX: 3px;
+$shadowOffsetY: 4px;
+$shadowColor: rgba(0, 0, 0, 0.36);
+$shadowBlurRadius: 12px;
+$shadow: $shadowOffsetX $shadowOffsetY $shadowBlurRadius $shadowColor;
+/*
+  Useful when needing to add padding to a container to ensure shadow is visible.
+*/
+$shadowOverflowTop: $shadowBlurRadius - $shadowOffsetX;
+$shadowOverflowBottom: $shadowBlurRadius + $shadowOffsetY;
 $channel-avatar-bg: #2aab8b;
 
 // Forms

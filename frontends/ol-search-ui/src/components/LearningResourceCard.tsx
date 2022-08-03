@@ -2,7 +2,6 @@ import moment from "moment"
 import React, { useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
-import type { PartialBy } from "ol-util"
 import classNames from "classnames"
 
 import Card from "@mui/material/Card"
@@ -11,7 +10,7 @@ import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 
 import CardMedia from "@mui/material/CardMedia"
-import { LearningResourceSummary } from "../interfaces"
+import { LearningResource } from "../interfaces"
 import {
   bestRun,
   getReadableResourceType,
@@ -21,21 +20,19 @@ import {
 
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
-type CardMinimalResource = PartialBy<
-  Pick<
-    LearningResourceSummary,
-    | "runs"
-    | "certification"
-    | "title"
-    | "offered_by"
-    | "object_type"
-    | "image_src"
-    | "platform"
-  >,
-  "offered_by" | "certification"
+type CardMinimalResource = Pick<
+  LearningResource,
+  | "runs"
+  | "certification"
+  | "title"
+  | "offered_by"
+  | "object_type"
+  | "image_src"
+  | "platform"
 >
 
 type CardVariant = "column" | "row" | "row-reverse"
+type CardImgConfig = EmbedlyConfig
 type LearningResourceCardProps = {
   /**
    * Whether the course picture and info display as a column or row.
@@ -49,12 +46,12 @@ type LearningResourceCardProps = {
   /**
    * Config used to generate embedly urls.
    */
-  imgConfig: EmbedlyConfig
+  imgConfig: CardImgConfig
 }
 
 const CertificateIcon = () => (
   <img
-    style={{ height: "1.5rem" }}
+    className="ol-lrc-cert"
     alt="Receive a certificate upon completion"
     src="/static/images/certificate_icon_infinite.png"
   />
@@ -94,7 +91,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   imgConfig,
   className
 }) => {
-  const bestAvailableRun = bestRun(resource.runs)
+  const bestAvailableRun = bestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
   const startDate =
@@ -116,10 +113,12 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     [resource, imgConfig]
   )
   return (
-    <Card className={classNames(className, variantClasses[variant])}>
+    <Card
+      className={classNames(className, variantClasses[variant], "ol-lrc-root")}
+    >
       {isRow ? <CardContent>{cardImg}</CardContent> : cardImg}
       <CardContent className="ol-lrc-content">
-        <div className="ol-lrc-flex-row">
+        <div className="ol-lrc-type-row">
           <span className="ol-lrc-type">
             {getReadableResourceType(resource.object_type)}
           </span>
@@ -134,10 +133,10 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           <span className="ol-lrc-offered-by">Offered By &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}
         </div>
-        <div>
+        <div className="ol-lrc-date-row">
           {startDate && (
             <Chip
-              className="ol-lrc-chip "
+              className="ol-lrc-chip"
               avatar={<CalendarTodayIcon />}
               label={startDate}
             />
@@ -149,4 +148,9 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }
 
 export default LearningResourceCard
-export type { LearningResourceCardProps, CardMinimalResource }
+export type {
+  LearningResourceCardProps,
+  CardMinimalResource,
+  CardImgConfig,
+  CardVariant
+}
