@@ -12,6 +12,14 @@ jest.mock("axios", () => {
   }
 })
 
+const _createSettings = () => ({
+  embedlyKey:        "fake",
+  ocw_next_base_url: "fake-ocw.com",
+  search_page_size:  4
+})
+
+global.SETTINGS = _createSettings()
+
 // This should be the only top-level hook.
 // eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
@@ -21,5 +29,6 @@ afterEach(() => {
    * Mock implementations are always cleared between test files.
    */
   jest.clearAllMocks()
+  global.SETTINGS = _createSettings()
   resetApi()
 })
