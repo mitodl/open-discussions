@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react"
-import { useHistory } from "react-router"
+import { useHistory, useLocation } from "react-router"
 
 /**
  * A hook for getting/setting search parameters of the CURRENT location. The API is a
@@ -10,7 +10,12 @@ const useSearchParams = (): [
   (newSearchParams: URLSearchParams) => void
 ] => {
   const history = useHistory()
-  const { search } = history.location
+  /**
+   * Do not get location directly from `useHistory`... The return value of
+   * `useHistory` is mutable: if we just get location off of it, changes to
+   * location will not trigger a re-render.
+   */
+  const { search } = useLocation()
   const searchParams = useMemo(() => new URLSearchParams(search), [search])
   const setSearchParams = useCallback(
     (newParams: URLSearchParams) => {
