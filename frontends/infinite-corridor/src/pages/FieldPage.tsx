@@ -5,7 +5,6 @@ import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
-import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme } from "@mui/material/styles"
@@ -111,17 +110,18 @@ const FieldPage: React.FC = () => {
   return (
     <FieldPageSkeleton name={name}>
       <TabContext value={value}>
-        <Container>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={9}>
-              <TabList className="page-nav" onChange={handleChange}>
-                <Tab component={Link} to="#" label="Home" value="home" />
-                <Tab component={Link} to="#about" label="About" value="about" />
-              </TabList>
+        <div className="page-subbanner">
+          <Container>
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={9}>
+                <TabList className="page-nav" onChange={handleChange}>
+                  <Tab component={Link} to="#" label="Home" value="home" />
+                  <Tab component={Link} to="#about" label="About" value="about" />
+                </TabList>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
-        <Divider />
+          </Container>
+        </div>
         <Container>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={9}>

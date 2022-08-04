@@ -25,12 +25,6 @@ $avatarSize: 60px;
   }
 }
 
-.page-nav.MuiTabs-root {
-  button {
-    text-transform: none;
-  }
-}
-
 .ic-carousel-card {
   height:100%;
 }
@@ -95,5 +89,34 @@ $avatar-dimension-small: 22px;
       font-size: 32px;
       border-radius: 8px;
     }
+  }
+}
+
+
+$minTabHeigt: 44px;
+.page-nav  {
+
+  .MuiTabs-indicator {
+    height:4px;
+  }
+  &.MuiTabs-root {
+    min-height: $minTabHeigt;
+  }
+
+  .MuiTab-root {
+    min-height: $minTabHeigt;
+    font-size: theme.$font-size-h2;
+    padding: 10px 16px;
+
+    &.Mui-selected {
+      font-weight: bold;
+    }
+  }
+}
+
+.page-subbanner {
+  background-color: theme.$color-background-light;
+  .MuiGrid-root > .MuiGrid-item  {
+    padding-top: 0px;
   }
 }

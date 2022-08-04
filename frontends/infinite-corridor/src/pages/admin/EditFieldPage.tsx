@@ -6,7 +6,6 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import TabList from "@mui/lab/TabList"
 import Tab from "@mui/material/Tab"
-import Divider from "@mui/material/Divider"
 import { TabContext } from "@mui/lab"
 import TabPanel from "@mui/lab/TabPanel"
 
@@ -45,31 +44,32 @@ const EditFieldPage: React.FC = () => {
       </HelmetProvider>
       {field.data.is_moderator ? (
         <TabContext value={value}>
-          <Container>
-            <Grid container spacing={1}>
-              <Grid item xs={8}>
-                <TabList className="page-nav" onChange={handleChange}>
-                  <Tab component={Link} to="#" label="Basic" value="basic" />
-                  <Tab
-                    component={Link}
-                    to="#appearance"
-                    label="Appearance"
-                    value="appearance"
-                  />
-                  <Tab
-                    component={Link}
-                    to="#moderators"
-                    label="Moderators"
-                    value="moderators"
-                  />
-                </TabList>
+          <div className="page-subbanner">
+            <Container className="page-nav-container">
+              <Grid container spacing={1}>
+                <Grid item xs={9}>
+                  <TabList className="page-nav" onChange={handleChange}>
+                    <Tab component={Link} to="#" label="Basic" value="basic" />
+                    <Tab
+                      component={Link}
+                      to="#appearance"
+                      label="Appearance"
+                      value="appearance"
+                    />
+                    <Tab
+                      component={Link}
+                      to="#moderators"
+                      label="Moderators"
+                      value="moderators"
+                    />
+                  </TabList>
+                </Grid>
               </Grid>
-            </Grid>
-          </Container>
-          <Divider />
+            </Container>
+          </div>
           <Container>
             <Grid container spacing={1} className="edit-channel">
-              <Grid item xs={8}>
+              <Grid item xs={9}>
                 <TabPanel value="basic">Basic placeholder</TabPanel>
                 <TabPanel value="appearance">
                   <EditFieldAppearanceForm field={field.data} />
