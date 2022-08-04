@@ -3,7 +3,7 @@
   $lightText: theme.$font-color-light
 );
 
-$cardListSpacer: 1em;
+$cardListSpacer: 1.5em;
 
 .ic-resource-card {
   &.MuiCard-root {
@@ -21,7 +21,7 @@ $cardListSpacer: 1em;
   padding-left: 0;
   > li {
     list-style: none;
-    margin-top: $cardListSpacer / 2;
-    margin-bottom: $cardListSpacer / 2;
+    margin-top: $cardListSpacer;
+    margin-bottom: $cardListSpacer;
   }
 }

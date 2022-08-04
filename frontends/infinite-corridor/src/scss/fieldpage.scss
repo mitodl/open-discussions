@@ -117,6 +117,16 @@ $avatar-dimension-small: 22px;
 
 
 $minTabHeigt: 44px;
+.page-nav-content.MuiTabPanel-root {
+  /*
+  page-nav is meant for the main content of a page.
+  We don't need extra padding beyond that of Container, and removing this
+  padding makes alignment with titles easier.
+  */
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .page-nav  {
 
   .MuiTabs-indicator {
