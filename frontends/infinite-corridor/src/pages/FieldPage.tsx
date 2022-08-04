@@ -63,7 +63,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
       as="section"
       carouselClassName="ic-carousel"
       pageSize={pageSize}
-      cellSpacing={22}
+      cellSpacing={0} // we'll handle it with css
       title={<h3>{list.title}</h3>}
       previous={
         <IconButton

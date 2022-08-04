@@ -25,14 +25,37 @@ $avatarSize: 60px;
   }
 }
 
+$carouselSpacing: 24px;
 .ic-carousel-card {
   height:100%;
+  margin-left: $carouselSpacing/2;
+  margin-right: $carouselSpacing/2;
 }
 
 .ic-carousel {
   padding-top: theme.$shadowOverflowTop;
   padding-bottom: theme.$shadowOverflowBottom;
+
+  /*
+  We want the carousel cards to be:
+    1. spaced
+    2. cast a shadow when hovered
+    3. left-aligned (left edge of left-most card aligned with rest of page content)
+  
+  The card container has `overflow: hidden` to prevent seeing the offscreen
+  cards. Consequently, if the leftmost card is at the left edge of the carousel
+  container, then its shadow gets cut off and looks weird.
+
+  So instead: keep a margin on the left-most card, but translate the whole
+  carousel leftwards by the same margin. This keeps stuff spaced and makes the
+  shadows look nice.
+
+  Caveat: This is not a good solution if there is content within $carouselSpacing
+  of the carousel's left edge. But...there's not.
+  */
+  transform: translateX(-$carouselSpacing/2)
 }
+
 .ic-carousel-button.MuiButtonBase-root {
   border: 0.125em solid currentcolor;
   color: theme.$font-color-default;
