@@ -24,6 +24,7 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
     <BannerPage
       src={field.data?.banner ?? ""}
       alt=""
+      omitBackground={field.isLoading}
       compactOnMobile
       bannerContent={
         <Container className="field-title-container">
