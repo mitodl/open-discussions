@@ -21,6 +21,7 @@ describe("Header", () => {
     const header = screen.getByRole("banner")
     const title = within(header).getByText("Infinite Corridor")
     assertInstanceOf(title, HTMLAnchorElement)
-    expect(title.href).toBe("/infinite")
+    const url = new URL(title.href)
+    expect(url.pathname).toBe("/infinite")
   })
 })
