@@ -48,9 +48,13 @@ const imageWrapperHeight = css<ImgProps>`
   }
 `
 
+/**
+ * Prefer direct use of `BannerPage` component.
+ */
 const BannerContainer = styled.div`
   position: absolute;
   width: 100%;
+  z-index: -1;
 `
 
 const imageStylesheet = `
@@ -70,6 +74,9 @@ const PlaceholderDiv = styled.div`
   ${imageWrapperHeight}
 `
 
+/**
+ * Prefer direct use of `BannerPage` component.
+ */
 const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
   src ? (
     <StyledImage
@@ -82,11 +89,17 @@ const BannerImage = ({ src, alt, tall, compactOnMobile }: ImgProps) =>
     <PlaceholderDiv />
   )
 
+/**
+ * Prefer direct use of `BannerPage` component.
+ */
 const BannerPageWrapper = styled.div`
   position: relative;
   width: 100%;
 `
 
+/**
+ * Prefer direct use of `BannerPage` component.
+ */
 const BannerPageHeader = styled.header`
   ${imageWrapperHeight};
 `
@@ -111,35 +124,45 @@ interface BannerPageProps extends ImgProps {
    * Child elements placed below the banner.
    */
   children?: React.ReactNode
+  /**
+   * Child elements within the banner.
+   *
+   * By default, the banner content will be vertically centered. Customize this
+   * behavior with `bannerContainerClass`.
+   */
   bannerContent?: React.ReactNode
+  bannerContainerClass?: string
 }
 
-const BannerContent = styled.div`
-  /*
-  The goal here is to provide a container in which to insert extra content into
-  the banner area. The container should be full width and height of the banner,
-  which makes controlling styling on the consumer side easy.
-  */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+const BannerPageHeaderFlex = styled.header`
+  ${imageWrapperHeight};
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 `
 
+/**
+ * Layout a page with a banner at top and content below. Supports optional
+ * content with the banner.
+ */
 const BannerPage: React.FC<BannerPageProps> = ({
   className,
   src,
   tall,
   compactOnMobile,
   bannerContent,
+  bannerContainerClass,
   alt,
   children,
   omitBackground
 }) => {
   return (
     <BannerPageWrapper className={className}>
-      <BannerPageHeader tall={tall} compactOnMobile={compactOnMobile}>
+      <BannerPageHeaderFlex
+        tall={tall}
+        compactOnMobile={compactOnMobile}
+        className={bannerContainerClass}
+      >
         <BannerContainer>
           {!omitBackground && (
             <BannerImage
@@ -149,9 +172,9 @@ const BannerPage: React.FC<BannerPageProps> = ({
               compactOnMobile={compactOnMobile}
             />
           )}
-          <BannerContent>{bannerContent}</BannerContent>
         </BannerContainer>
-      </BannerPageHeader>
+        {bannerContent}
+      </BannerPageHeaderFlex>
       {children}
     </BannerPageWrapper>
   )
