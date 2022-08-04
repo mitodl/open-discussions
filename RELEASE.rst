@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.192.1
+Version 0.192.1 (Released August 04, 2022)
 ---------------
 
 - Cc/field pages v1 (#3665)
