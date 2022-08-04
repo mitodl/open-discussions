@@ -1,7 +1,7 @@
 $color-gray-1: #ffffff;
 $color-gray-2: #f2f2f2;
-$color-gray-3: #8c8c8c;
-$color-gray-4: #262626;
+$color-gray-3: #b0b0b0;
+$color-gray-4: #787878;
 $color-gray-5: #000000;
 
 $color-red-1: #e3d5d5;
@@ -10,13 +10,28 @@ $color-red-3: #a31f34;
 $color-red-4: #57081a;
 $color-red-5: #30020e;
 
-$color-primary:  #a31f34;
-$color-background: $color-gray-2;
+$color-blue-1: #edeff5;
+$color-blue-5: #03152d;
+
+$color-primary: $color-red-3;
+
+$color-secondary-light: $color-blue-1;
+$color-secondary: $color-blue-5;
+
+$color-background: $color-blue-1;
 $color-background-light: $color-gray-1;
 
 $font-color-light: $color-gray-3;
-$font-color-default: $color-gray-4;
+$font-color-default: $color-blue-5;
 $font-family-default: "Source Sans Pro", helvetica, arial, sans-serif !important;
+
+$font-size-small: 12px;
+$font-size-normal: 16px;
+$font-size-h1: 24px;
+$font-size-h2: 18px;
+
+$font-weight-bold: bold;
+$font-weight-semi-bold: 500;
 
 $transition-duration: 300ms;
 
