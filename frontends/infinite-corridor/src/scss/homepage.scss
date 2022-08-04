@@ -1,8 +1,20 @@
 @use "theme";
 
-$spacer: 1em;
+$spacer: 1.75rem;
+$maxWidth: 600px;
+$thumnailSize: 60px;
+$linkMinSize: 100px;
+$linkMaxSize: 120px;
 
 .homepage {
+
+  h1 {
+    font-size: 32px;
+  }
+
+  &.MuiContainer-root {
+    max-width: $maxWidth;
+  }
 
   .page-title {
     margin-top: 2*$spacer;
@@ -16,30 +28,27 @@ $spacer: 1em;
   }
 
   h2 {
+    margin-top: $spacer;
     color: theme.$color-primary;
     text-align: center;
   }
+}
 
-  .field-list {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    li {
-      list-style-type: none;
-    }
+.field-list {
+  padding: 0;
+  li {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
   }
 }
 
-$thumnailSize: 60px;
-$linkMaxSize: 120px;
-
 .field-link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-around;
+  color: theme.$color-primary;
 
-  aspect-ratio: 1 / 1;
-  max-height: $linkMaxSize;
+  .field-title {
+    text-align: center;
+  }
 
   img {
     width: $thumnailSize;
@@ -47,30 +56,23 @@ $linkMaxSize: 120px;
   }
 
   figure {
+    min-width: $linkMinSize;
+    max-width: $linkMaxSize;
     margin: 0;
-    flex: 1;
+    padding: 0.5em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-around;
-  }
-  padding: 0.5em;
 
-  color: theme.$color-primary;
-  text-decoration: none; /* No link underline */
-
-  .field-title {
-    text-align: center;
-  }
-
-  transition-property: background-color border;
-  transition-duration: theme.$transition-duration;
-  border: 1px solid transparent;
-
-  border-radius: theme.$border-radius;
-  &:hover {
-    background-color: theme.$color-background-light;
-    margin: -1px;
-    border: 1px solid theme.$color-primary;
+    transition-property: background-color border;
+    transition-duration: theme.$transition-duration;
+    border: 1px solid transparent;
+  
+    border-radius: theme.$border-radius;
+    &:hover {
+      background-color: theme.$color-background-light;
+      margin: -1px;
+      border: 1px solid currentcolor;
+    }
   }
 }
