@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.192.2
+---------------
+
+- fix channel header z-index issue (#3676)
+- Set imagekit prefix to "" (#3674)
+- Fix styling conflicts: remove some classless tag selectors (#3673)
+
 Version 0.192.1 (Released August 04, 2022)
 ---------------
 
