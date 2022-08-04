@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.192.2
+Version 0.192.2 (Released August 04, 2022)
 ---------------
 
 - fix channel header z-index issue (#3676)
