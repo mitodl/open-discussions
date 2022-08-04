@@ -33,7 +33,7 @@ const HomePage: React.FC = () => {
         classNameSubmit="primary bordered"
       />
       <section>
-        <h2>Fields of Study</h2>
+        <h2 className="page-subtitle">Lorem ipsum dolor sit amet consectetur adipiscing</h2>
         <ul className="field-list">
           {fieldsList.data?.results.map(field => (
             <li key={field.name}>

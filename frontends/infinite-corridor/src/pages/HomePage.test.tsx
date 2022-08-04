@@ -13,8 +13,8 @@ import {
 import { makeFieldViewPath } from "./urls"
 
 const findFieldList = async (): Promise<HTMLElement> => {
-  const text = await screen.findByText("Fields of Study")
-  const section = text.closest("section")
+  const list = await screen.findByRole("list")
+  const section = list.closest("section")
   assertInstanceOf(section, HTMLElement)
   return section
 }
