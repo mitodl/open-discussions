@@ -16,7 +16,7 @@ import {
   LearningResourceResult,
   LearningResourceCard,
   LearningResourceCardProps,
-  Searchbox
+  SearchInput
 } from "ol-search-ui"
 
 import axios from "../libs/axios"
@@ -111,16 +111,24 @@ const SearchPage: React.FC = () => {
     <BannerPage
       omitBackground
       bannerContent={
-        <Searchbox
-          className="course-searchbox"
-          placeholder="Search for online courses or programs at MIT"
-          onChange={updateText}
-          value={text || ""}
-          onClear={clearText}
-          //@ts-expect-error - types need to be fixed in course-search-utils
-          onSubmit={onSubmit}
-          autoFocus
-        />
+        <Container>
+          <Grid container>
+            <Grid item xs={3}>
+            </Grid>
+            <Grid item xs={9} component="section">
+              <SearchInput
+                className="main-search"
+                placeholder="Search for online courses or programs at MIT"
+                onChange={updateText}
+                value={text || ""}
+                onClear={clearText}
+                //@ts-expect-error - types need to be fixed in course-search-utils
+                onSubmit={onSubmit}
+                autoFocus
+              />
+            </Grid>
+          </Grid>
+        </Container>
       }
     >
       <Container disableGutters>

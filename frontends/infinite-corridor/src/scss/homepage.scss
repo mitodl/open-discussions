@@ -1,7 +1,7 @@
 @use "theme";
 
 $spacer: 1.75rem;
-$maxWidth: 600px;
+$maxWidth: 520px;
 $thumnailSize: 60px;
 $linkMinSize: 100px;
 $linkMaxSize: 120px;
@@ -14,6 +14,7 @@ $linkMaxSize: 120px;
 
   &.MuiContainer-root {
     max-width: $maxWidth;
+    padding: 0;
   }
 
   .page-title {
