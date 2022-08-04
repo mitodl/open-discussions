@@ -34,8 +34,16 @@ const HomePage: React.FC = () => {
         classNameSubmit="primary bordered"
       />
       <section>
-        <h2 className="page-subtitle">Lorem ipsum dolor sit amet consectetur adipiscing</h2>
-        <Grid columns={10} container justifyContent="center" component="ul" className="field-list">
+        <h2 className="page-subtitle">
+          Lorem ipsum dolor sit amet consectetur adipiscing
+        </h2>
+        <Grid
+          columns={10}
+          container
+          justifyContent="center"
+          component="ul"
+          className="field-list"
+        >
           {fieldsList.data?.results.map(field => (
             <Grid item xs={3} md={2} component="li" key={field.name}>
               <Link

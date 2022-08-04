@@ -113,8 +113,7 @@ const SearchPage: React.FC = () => {
       bannerContent={
         <Container>
           <Grid container>
-            <Grid item xs={3}>
-            </Grid>
+            <Grid item xs={3}></Grid>
             <Grid item xs={9} component="section">
               <SearchInput
                 className="main-search"

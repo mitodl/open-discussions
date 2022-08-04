@@ -70,11 +70,15 @@ const EditFieldPage: React.FC = () => {
           <Container>
             <Grid container spacing={1} className="edit-channel">
               <Grid item xs={9}>
-                <TabPanel value="basic" className="page-nav-content">Basic placeholder</TabPanel>
+                <TabPanel value="basic" className="page-nav-content">
+                  Basic placeholder
+                </TabPanel>
                 <TabPanel value="appearance" className="page-nav-content">
                   <EditFieldAppearanceForm field={field.data} />
                 </TabPanel>
-                <TabPanel value="moderators" className="page-nav-content">Moderators placeholder</TabPanel>
+                <TabPanel value="moderators" className="page-nav-content">
+                  Moderators placeholder
+                </TabPanel>
               </Grid>
             </Grid>
           </Container>
