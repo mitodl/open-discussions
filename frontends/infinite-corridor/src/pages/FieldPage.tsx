@@ -65,18 +65,12 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
       cellSpacing={0} // we'll handle it with css
       title={<h3>{list.title}</h3>}
       previous={
-        <button
-          type="button"
-          className="ic-carousel-button outlined-button"
-        >
+        <button type="button" className="ic-carousel-button outlined-button">
           <ArrowBack fontSize="inherit" /> Previous
         </button>
       }
       next={
-        <button
-          type="button"
-          className="ic-carousel-button outlined-button"
-        >
+        <button type="button" className="ic-carousel-button outlined-button">
           Next <ArrowForward fontSize="inherit" />
         </button>
       }
