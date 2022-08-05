@@ -61,11 +61,13 @@ $carouselSpacing: 24px;
 
 .ic-carousel-button.MuiButtonBase-root {
   border: 0.125em solid currentcolor;
-  color: theme.$font-color-default;
   height: 1.25em;
   width: 1.25em;
   margin-left: 0.5em;
   margin-right: 0.5em;
+  &:not([disabled]) {
+    color: theme.$font-color-default;
+  }
 }
 
 $avatar-dimension-medium: 57px;
