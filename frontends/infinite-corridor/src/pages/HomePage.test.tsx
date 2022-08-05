@@ -48,7 +48,7 @@ describe("HomePage", () => {
       expect(link).toHaveTextContent(field.title)
       const image = within(link).getByRole("img")
       assertInstanceOf(image, HTMLImageElement)
-      expect(image.src).toBe(field.avatar_small)
+      expect(image.src).toBe(field.avatar_medium)
     })
     expect.assertions(6) // double check loop assertions ran
   })
