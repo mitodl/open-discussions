@@ -32,7 +32,7 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
             {field.data && (
               <>
                 <FieldAvatar field={field.data} imageSize="medium" />
-                <h2>{field.data.title}</h2>
+                <h1>{field.data.title}</h1>
               </>
             )}
           </div>
