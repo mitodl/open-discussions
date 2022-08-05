@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.192.3
+---------------
+
+- Cc/styling tweaks (#3679)
+
 Version 0.192.2 (Released August 04, 2022)
 ---------------
 
