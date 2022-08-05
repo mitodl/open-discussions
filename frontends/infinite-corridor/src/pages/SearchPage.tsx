@@ -114,7 +114,12 @@ const SearchPage: React.FC = () => {
         <Container>
           <Grid container>
             <Grid item xs={3}></Grid>
-            <Grid item xs={9} component="section">
+            <Grid
+              item
+              xs={9}
+              component="section"
+              className="searchbar-container"
+            >
               <SearchInput
                 className="main-search"
                 placeholder="Search for online courses or programs at MIT"
@@ -133,12 +138,11 @@ const SearchPage: React.FC = () => {
       <Container disableGutters>
         <Grid container>
           <Grid item xs={3}>
-            <h3>Facets!!!</h3>
+            <h3>Facets</h3>
             {lipsum}
           </Grid>
           <Grid item xs={9} component="section">
             <InfiniteScroll
-              className="ic-searchpage-list"
               hasMore={from + pageSize < total}
               loadMore={loadMore}
               initialLoad={from === 0}
@@ -158,19 +162,22 @@ const SearchPage: React.FC = () => {
                     <span>No results found for your query</span>
                   </div>
                 ) : (
-                  <span aria-label="Search Results">
+                  <ul aria-label="Search Results" className="ic-card-row-list">
                     {results.map(hit => (
-                      <LearningResourceCard
+                      <li
                         key={hit._source.object_type.concat(
                           hit._source.id.toString()
                         )}
-                        className="ic-resource-card"
-                        variant="row-reverse"
-                        imgConfig={imgConfig}
-                        resource={hit._source}
-                      />
+                      >
+                        <LearningResourceCard
+                          className="ic-resource-card"
+                          variant="row-reverse"
+                          imgConfig={imgConfig}
+                          resource={hit._source}
+                        />
+                      </li>
                     ))}
-                  </span>
+                  </ul>
                 )
               ) : (
                 <span>Loading...</span>
