@@ -1,11 +1,10 @@
 import React, { useCallback } from "react"
-import { useParams, useLocation } from "react-router"
+import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
-import Divider from "@mui/material/Divider"
 import Grid from "@mui/material/Grid"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme } from "@mui/material/styles"
@@ -64,7 +63,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
       as="section"
       carouselClassName="ic-carousel"
       pageSize={pageSize}
-      cellSpacing={22}
+      cellSpacing={0} // we'll handle it with css
       title={<h3>{list.title}</h3>}
       previous={
         <IconButton
@@ -94,15 +93,15 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
+  const history = useHistory()
   const { hash } = useLocation()
-
-  const [value, setValue] = React.useState(keyFromHash(hash))
+  const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue)
+      history.replace({ hash: newValue })
     },
-    []
+    [history]
   )
 
   const featuredList = fieldQuery.data?.featured_list
@@ -110,32 +109,35 @@ const FieldPage: React.FC = () => {
 
   return (
     <FieldPageSkeleton name={name}>
-      <TabContext value={value}>
-        <Container>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={9}>
-              <TabList className="page-nav" onChange={handleChange}>
-                <Tab component={Link} to="#" label="Home" value="home" />
-                <Tab component={Link} to="#about" label="About" value="about" />
-              </TabList>
+      <TabContext value={tabValue}>
+        <div className="page-subbanner">
+          <Container>
+            <Grid container spacing={1}>
+              <Grid item xs={12} sm={9}>
+                <TabList className="page-nav" onChange={handleChange}>
+                  <Tab component={Link} to="#" label="Home" value="home" />
+                  <Tab
+                    component={Link}
+                    to="#about"
+                    label="About"
+                    value="about"
+                  />
+                </TabList>
+              </Grid>
             </Grid>
-          </Grid>
-        </Container>
-        <Divider />
+          </Container>
+        </div>
         <Container>
           <Grid container spacing={1}>
             <Grid item xs={12} sm={9}>
-              <TabPanel value="home">
+              <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && <FieldCarousel list={featuredList} />}
                 {fieldLists.map(list => (
                   <FieldList key={list.id} list={list} />
                 ))}
               </TabPanel>
-              <TabPanel value="about">BBBBBB</TabPanel>
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              Featured Video
+              <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
           </Grid>
         </Container>

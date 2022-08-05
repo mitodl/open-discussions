@@ -1,7 +1,7 @@
 @use "theme";
 
-$fontColor: theme.$font-black;
-$fontColorLight: theme.$font-grey-light;
+$fontColor: theme.$font-color-default;
+$fontColorLight: theme.$font-color-light;
 
 $radius: theme.$std-border-radius;
 $borderColor: theme.$input-border-grey;

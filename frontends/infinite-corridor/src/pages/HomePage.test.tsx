@@ -13,8 +13,8 @@ import {
 import { makeFieldViewPath } from "./urls"
 
 const findFieldList = async (): Promise<HTMLElement> => {
-  const text = await screen.findByText("Fields of Study")
-  const section = text.closest("section")
+  const list = await screen.findByRole("list")
+  const section = list.closest("section")
   assertInstanceOf(section, HTMLElement)
   return section
 }
@@ -48,7 +48,7 @@ describe("HomePage", () => {
       expect(link).toHaveTextContent(field.title)
       const image = within(link).getByRole("img")
       assertInstanceOf(image, HTMLImageElement)
-      expect(image.src).toBe(field.avatar_small)
+      expect(image.src).toBe(field.avatar_medium)
     })
     expect.assertions(6) // double check loop assertions ran
   })

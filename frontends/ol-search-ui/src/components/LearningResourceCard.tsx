@@ -130,7 +130,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           </Dotdotdot>
         </div>
         <div>
-          <span className="ol-lrc-offered-by">Offered By &ndash;</span>
+          <span className="ol-lrc-offered-by">Offered by &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}
         </div>
         <div className="ol-lrc-date-row">

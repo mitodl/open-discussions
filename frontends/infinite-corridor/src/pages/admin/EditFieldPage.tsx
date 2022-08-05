@@ -1,12 +1,11 @@
 import React, { useCallback } from "react"
-import { useLocation, useParams } from "react-router"
+import { useHistory, useLocation, useParams } from "react-router"
 import { Link } from "react-router-dom"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import TabList from "@mui/lab/TabList"
 import Tab from "@mui/material/Tab"
-import Divider from "@mui/material/Divider"
 import { TabContext } from "@mui/lab"
 import TabPanel from "@mui/lab/TabPanel"
 
@@ -26,14 +25,15 @@ const keyFromHash = (hash: string) => {
 
 const EditFieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
+  const history = useHistory()
   const { hash } = useLocation()
+  const tabValue = keyFromHash(hash)
   const field = useFieldDetails(name)
-  const [value, setValue] = React.useState(keyFromHash(hash))
   const handleChange = useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue)
+      history.replace({ hash: newValue })
     },
-    []
+    [history]
   )
 
   return field.data ? (
@@ -44,37 +44,42 @@ const EditFieldPage: React.FC = () => {
         </Helmet>
       </HelmetProvider>
       {field.data.is_moderator ? (
-        <TabContext value={value}>
-          <Container>
-            <Grid container spacing={1}>
-              <Grid item xs={8}>
-                <TabList className="page-nav" onChange={handleChange}>
-                  <Tab component={Link} to="#" label="Basic" value="basic" />
-                  <Tab
-                    component={Link}
-                    to="#appearance"
-                    label="Appearance"
-                    value="appearance"
-                  />
-                  <Tab
-                    component={Link}
-                    to="#moderators"
-                    label="Moderators"
-                    value="moderators"
-                  />
-                </TabList>
+        <TabContext value={tabValue}>
+          <div className="page-subbanner">
+            <Container className="page-nav-container">
+              <Grid container spacing={1}>
+                <Grid item xs={9}>
+                  <TabList className="page-nav" onChange={handleChange}>
+                    <Tab component={Link} to="#" label="Basic" value="basic" />
+                    <Tab
+                      component={Link}
+                      to="#appearance"
+                      label="Appearance"
+                      value="appearance"
+                    />
+                    <Tab
+                      component={Link}
+                      to="#moderators"
+                      label="Moderators"
+                      value="moderators"
+                    />
+                  </TabList>
+                </Grid>
               </Grid>
-            </Grid>
-          </Container>
-          <Divider />
+            </Container>
+          </div>
           <Container>
             <Grid container spacing={1} className="edit-channel">
-              <Grid item xs={8}>
-                <TabPanel value="basic">Basic placeholder</TabPanel>
-                <TabPanel value="appearance">
+              <Grid item xs={9}>
+                <TabPanel value="basic" className="page-nav-content">
+                  Basic placeholder
+                </TabPanel>
+                <TabPanel value="appearance" className="page-nav-content">
                   <EditFieldAppearanceForm field={field.data} />
                 </TabPanel>
-                <TabPanel value="moderators">Moderators placeholder</TabPanel>
+                <TabPanel value="moderators" className="page-nav-content">
+                  Moderators placeholder
+                </TabPanel>
               </Grid>
             </Grid>
           </Container>

@@ -3,11 +3,11 @@
   $lightText: theme.$font-color-light
 );
 
-$cardListSpacer: 1em;
+$cardListSpacer: 1.5em;
 
 .ic-resource-card {
   &.MuiCard-root {
-    color: theme.$font-color-default;
+    color: theme.$color-gray-5;
 
     transition-duration: theme.$transition-duration;
     transition-property: box-shadow;
@@ -15,13 +15,16 @@ $cardListSpacer: 1em;
       box-shadow: theme.$shadow;
     }
   }
+  .MuiCardContent-root:last-child {
+    padding: 16px;
+  }
 }
 
 .ic-card-row-list {
   padding-left: 0;
   > li {
     list-style: none;
-    margin-top: $cardListSpacer / 2;
-    margin-bottom: $cardListSpacer / 2;
+    margin-top: $cardListSpacer;
+    margin-bottom: $cardListSpacer;
   }
 }

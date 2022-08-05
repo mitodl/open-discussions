@@ -1,6 +1,7 @@
 @use "sass:color";
+@use "theme";
 
-$color: magenta !default;
+$color: theme.$color-primary;
 
 .MuiButtonBase-root {
   &.primary {
@@ -17,6 +18,14 @@ $color: magenta !default;
       &:active {
           background-color: color.adjust($color, $saturation: -20%);
       }
+    }
   }
-  }
+}
+
+.MuiButtonBase-root.MuiTab-root {
+  text-transform: none;
+}
+
+.MuiChip-root.MuiChip-filled {
+  background-color: theme.$color-background;
 }

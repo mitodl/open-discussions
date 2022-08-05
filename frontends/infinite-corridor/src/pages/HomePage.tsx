@@ -5,6 +5,7 @@ import { Link } from "react-router-dom"
 import { useFieldsList } from "../api/fields"
 import * as urls from "./urls"
 import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
 
 const HomePage: React.FC = () => {
   const [searchText, setSearchText] = useState("")
@@ -33,22 +34,30 @@ const HomePage: React.FC = () => {
         classNameSubmit="primary bordered"
       />
       <section>
-        <h2>Fields of Study</h2>
-        <ul className="field-list">
+        <h2 className="page-subtitle">
+          Lorem ipsum dolor sit amet consectetur adipiscing
+        </h2>
+        <Grid
+          columns={10}
+          container
+          justifyContent="center"
+          component="ul"
+          className="field-list"
+        >
           {fieldsList.data?.results.map(field => (
-            <li key={field.name}>
+            <Grid item xs={3} md={2} component="li" key={field.name}>
               <Link
                 className="field-link"
                 to={urls.makeFieldViewPath(field.name)}
               >
                 <figure>
-                  <img src={field.avatar_small ?? ""} />
+                  <img src={field.avatar_medium ?? ""} />
                   <figcaption className="field-title">{field.title}</figcaption>
                 </figure>
               </Link>
-            </li>
+            </Grid>
           ))}
-        </ul>
+        </Grid>
       </section>
     </Container>
   )

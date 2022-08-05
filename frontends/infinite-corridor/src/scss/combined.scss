@@ -1,5 +1,5 @@
 @use "theme";
-@use "button" with ( $color: theme.$color-primary );
+@use "mui";
 @use "main-search";
 @use "header";
 @use "homepage";
@@ -33,5 +33,13 @@ a {
   &:hover {
     text-decoration: underline;
   }
-  color: theme.$font-color-default
+  color: inherit
+}
+
+h1 {
+  font-size: theme.$font-size-h1;
+}
+
+h2 {
+  font-size: theme.$font-size-h2;
 }
