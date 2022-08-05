@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
                 to={urls.makeFieldViewPath(field.name)}
               >
                 <figure>
-                  <img src={field.avatar_small ?? ""} />
+                  <img src={field.avatar_medium ?? ""} />
                   <figcaption className="field-title">{field.title}</figcaption>
                 </figure>
               </Link>
