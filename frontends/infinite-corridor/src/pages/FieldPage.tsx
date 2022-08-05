@@ -137,8 +137,7 @@ const FieldPage: React.FC = () => {
                   <FieldList key={list.id} list={list} />
                 ))}
               </TabPanel>
-              <TabPanel value="about" className="page-nav-content">
-              </TabPanel>
+              <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
           </Grid>
         </Container>
