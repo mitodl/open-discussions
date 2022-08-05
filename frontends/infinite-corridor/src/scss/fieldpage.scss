@@ -19,9 +19,12 @@ $avatarSize: 60px;
     width: $avatarSize;
   }
 
-  h1 {
+  h1 a {
     color: theme.$color-gray-1;
-    margin-left: 1em; 
+    margin-left: 1em;
+    &:hover {
+      text-decoration: none;
+    }
   }
 }
 

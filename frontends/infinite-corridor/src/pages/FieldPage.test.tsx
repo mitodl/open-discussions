@@ -2,7 +2,7 @@ import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../api/fields"
 import { LearningResource, LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem, Field } from "../api/fields"
+import type { UserList, UserListItem, FieldChannel } from "../api/fields"
 import * as factory from "../api/fields/factories"
 import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
 
@@ -42,7 +42,7 @@ type SubfieldData = {
   items: LearningResource[]
 }
 
-const setupApis = (fieldPatch?: Partial<Field>) => {
+const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   const list1 = factory.makeUserList()
   const list2 = factory.makeUserList()
   const list3 = factory.makeUserList()

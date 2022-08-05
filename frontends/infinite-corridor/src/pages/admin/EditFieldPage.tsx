@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { useLocation, useParams } from "react-router"
+import { useHistory, useLocation, useParams } from "react-router"
 import { Link } from "react-router-dom"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import Container from "@mui/material/Container"
@@ -25,14 +25,15 @@ const keyFromHash = (hash: string) => {
 
 const EditFieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
+  const history = useHistory()
   const { hash } = useLocation()
+  const tabValue = keyFromHash(hash)
   const field = useFieldDetails(name)
-  const [value, setValue] = React.useState(keyFromHash(hash))
   const handleChange = useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue)
+      history.replace({ hash: newValue })
     },
-    []
+    [history]
   )
 
   return field.data ? (
@@ -43,7 +44,7 @@ const EditFieldPage: React.FC = () => {
         </Helmet>
       </HelmetProvider>
       {field.data.is_moderator ? (
-        <TabContext value={value}>
+        <TabContext value={tabValue}>
           <div className="page-subbanner">
             <Container className="page-nav-container">
               <Grid container spacing={1}>

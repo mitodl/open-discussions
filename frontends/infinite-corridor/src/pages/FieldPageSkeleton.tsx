@@ -1,4 +1,6 @@
 import React from "react"
+import { Link } from "react-router-dom"
+import * as routes from "./urls"
 import { BannerPage } from "ol-util"
 import Container from "@mui/material/Container"
 import { useFieldDetails } from "../api/fields"
@@ -32,7 +34,11 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
             {field.data && (
               <>
                 <FieldAvatar field={field.data} imageSize="medium" />
-                <h1>{field.data.title}</h1>
+                <h1>
+                  <Link to={routes.makeFieldViewPath(field.data.name)}>
+                    {field.data.title}
+                  </Link>
+                </h1>
               </>
             )}
           </div>

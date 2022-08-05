@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { useParams, useLocation } from "react-router"
+import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
@@ -93,15 +93,15 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
+  const history = useHistory()
   const { hash } = useLocation()
-
-  const [value, setValue] = React.useState(keyFromHash(hash))
+  const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
     (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue)
+      history.replace({ hash: newValue })
     },
-    []
+    [history]
   )
 
   const featuredList = fieldQuery.data?.featured_list
@@ -109,7 +109,7 @@ const FieldPage: React.FC = () => {
 
   return (
     <FieldPageSkeleton name={name}>
-      <TabContext value={value}>
+      <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
             <Grid container spacing={1}>
