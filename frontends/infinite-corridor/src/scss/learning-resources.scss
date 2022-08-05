@@ -9,7 +9,7 @@ $cardListSpacer: 1.5em;
 
 .ic-resource-card {
   &.MuiCard-root {
-    color: theme.$color-gray-5;
+    color: theme.$font-color-default;
 
     transition-duration: theme.$transition-duration;
     transition-property: box-shadow;

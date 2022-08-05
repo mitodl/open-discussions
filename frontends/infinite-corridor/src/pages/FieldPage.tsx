@@ -13,9 +13,8 @@ import { TitledCarousel } from "ol-util"
 import { useFieldDetails, useFieldListItems, UserList } from "../api/fields"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
-import IconButton from "@mui/material/IconButton"
-import NavigateNextIcon from "@mui/icons-material/NavigateNext"
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore"
+import ArrowForward from "@mui/icons-material/ArrowForward"
+import ArrowBack from "@mui/icons-material/ArrowBack"
 import { imgConfigs } from "../util/constants"
 
 type RouteParams = {
@@ -66,17 +65,20 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
       cellSpacing={0} // we'll handle it with css
       title={<h3>{list.title}</h3>}
       previous={
-        <IconButton
-          title="Show previous courses"
-          className="ic-carousel-button"
+        <button
+          type="button"
+          className="ic-carousel-button outlined-button"
         >
-          <NavigateBeforeIcon />
-        </IconButton>
+          <ArrowBack fontSize="inherit" /> Previous
+        </button>
       }
       next={
-        <IconButton title="Show next courses" className="ic-carousel-button">
-          <NavigateNextIcon />
-        </IconButton>
+        <button
+          type="button"
+          className="ic-carousel-button outlined-button"
+        >
+          Next <ArrowForward fontSize="inherit" />
+        </button>
       }
     >
       {items.map(item => (

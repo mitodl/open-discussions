@@ -1,0 +1,22 @@
+@use "sass:color";
+@use "theme";
+
+.outlined-button {
+  border-radius: theme.$border-radius;
+  border-width: 1px;
+  background-color: rgba(0,0,0,0);
+  display: flex;
+  flex-direction:row;
+  justify-content: center;
+  align-items: center;
+  &:not([disabled]) {
+    color: theme.$font-color-default;
+    border-color: theme.$font-color-default;
+    &:hover {
+      background-color: color.adjust(theme.$font-color-default, $alpha: -0.9);
+    }
+    &:active {
+      background-color: color.adjust(theme.$font-color-default, $alpha: -0.95);
+    }
+  }
+}

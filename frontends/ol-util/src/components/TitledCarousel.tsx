@@ -39,6 +39,12 @@ const HeaderContainer = styled.div`
   align-items: center;
 `
 
+const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 const defaultAnimationDuration = 800
 
 const TitledCarousel: React.FC<TitledCarouselProps> = ({
@@ -82,7 +88,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
     <ContainerComponent className={className}>
       <HeaderContainer>
         {title}
-        <div>
+        <ButtonsContainer>
           {React.cloneElement(previous, {
             disabled: !canPageDown,
             onClick:  pageDown
@@ -91,7 +97,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
             disabled: !canPageUp,
             onClick:  pageUp
           })}
-        </div>
+        </ButtonsContainer>
       </HeaderContainer>
       <Carousel
         slideIndex={index}
