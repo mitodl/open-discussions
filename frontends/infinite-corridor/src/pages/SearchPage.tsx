@@ -16,7 +16,9 @@ import {
   LearningResourceResult,
   LearningResourceCard,
   LearningResourceCardProps,
-  SearchInput
+  SearchInput,
+  SearchFilterDrawer,
+  FacetManifest
 } from "ol-search-ui"
 
 import axios from "../libs/axios"
@@ -24,8 +26,11 @@ import axios from "../libs/axios"
 const ALLOWED_TYPES = ["program", "course"]
 const pageSize = SETTINGS.search_page_size
 
-const lipsum =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum"
+const facetMap: FacetManifest = [
+  ["certification", "Certificates"],
+  ["type", "Learning Resource"],
+  ["offered_by", "Offered By"]
+]
 
 interface Result {
   _source: LearningResourceResult
@@ -96,16 +101,27 @@ const SearchPage: React.FC = () => {
     []
   )
 
-  const { updateText, loadMore, text, onSubmit, from, clearText } =
-    useCourseSearch(
-      runSearch,
-      clearSearch,
-      aggregations,
-      // this is the 'loaded' value, which is what useCourseSearch uses
-      // to determine whether to fire off a request or not.
-      completedInitialLoad && !requestInFlight,
-      pageSize
-    )
+  const {
+    updateText,
+    loadMore,
+    text,
+    onSubmit,
+    from,
+    clearText,
+    facetOptions,
+    onUpdateFacets,
+    clearAllFilters,
+    toggleFacet,
+    activeFacets
+  } = useCourseSearch(
+    runSearch,
+    clearSearch,
+    aggregations,
+    // this is the 'loaded' value, which is what useCourseSearch uses
+    // to determine whether to fire off a request or not.
+    completedInitialLoad && !requestInFlight,
+    pageSize
+  )
 
   return (
     <BannerPage
@@ -139,7 +155,15 @@ const SearchPage: React.FC = () => {
         <Grid container>
           <Grid item xs={3}>
             <h3>Facets</h3>
-            {lipsum}
+            <SearchFilterDrawer
+              facetMap={facetMap}
+              facetOptions={facetOptions}
+              activeFacets={activeFacets}
+              //@ts-expect-error - types need to be fixed in course-search-utils
+              onUpdateFacets={onUpdateFacets}
+              clearAllFilters={clearAllFilters}
+              toggleFacet={toggleFacet}
+            />
           </Grid>
           <Grid item xs={9} component="section">
             <InfiniteScroll

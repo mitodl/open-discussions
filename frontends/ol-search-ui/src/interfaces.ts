@@ -1,3 +1,5 @@
+import { Facets } from "@mitodl/course-search-utils"
+
 export enum LearningResourceType {
   Course = "course",
   Program = "program",
@@ -86,3 +88,6 @@ export type CourseInstructor = {
   last_name: string | null
   full_name: string | null
 }
+
+export type FacetKey = keyof Facets
+export type FacetManifest = [FacetKey, string][]

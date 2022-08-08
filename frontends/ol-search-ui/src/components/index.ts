@@ -10,3 +10,5 @@ export type {
   CardImgConfig,
   CardVariant
 } from "./LearningResourceCard"
+
+export { default as SearchFilterDrawer } from "./SearchFilterDrawer"

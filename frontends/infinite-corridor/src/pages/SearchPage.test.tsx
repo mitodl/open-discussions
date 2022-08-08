@@ -72,7 +72,7 @@ describe("SearchPage", () => {
 
     await waitFor(async () => {
       const results = await screen.findAllByText("Offered by", { exact: false })
-      expect(results).toHaveLength(8)
+      expect(results).toHaveLength(9)
     })
 
     expect(makeRequest.mock.calls[0][0]).toEqual("post")
@@ -93,6 +93,76 @@ describe("SearchPage", () => {
       buildSearchQuery({
         text:         "",
         from:         4,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
+  })
+
+  test("should render a facet filters for certification, resource type and  offeror", async () => {
+    setMockResponse.post("search/", makeSearchResponse())
+    await renderTestApp({ url: "/search" })
+
+    await waitFor(async () => {
+      expect(screen.getByText("Offered By")).toBeInTheDocument()
+    })
+    expect(screen.getByText("Learning Resource")).toBeInTheDocument()
+    expect(screen.getByText("Certificates")).toBeInTheDocument()
+  })
+
+  test("should filter by facets", async () => {
+    setMockResponse.post("search/", makeSearchResponse())
+    await renderTestApp({ url: "/search" })
+
+    await waitFor(async () => {
+      await fireEvent.click(screen.getByDisplayValue("MITx"))
+    })
+
+    await waitFor(async () => {
+      await fireEvent.click(screen.getByText("Clear All"))
+    })
+    expect(makeRequest.mock.calls[0][0]).toEqual("post")
+    expect(makeRequest.mock.calls[0][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[0][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         0,
+        activeFacets: expectedFacets,
+        sort:         null,
+        size:         4
+      })
+    )
+
+    const filteredFacets = {
+      audience:            [],
+      certification:       [],
+      type:                ["program", "course"],
+      offered_by:          ["MITx"],
+      topics:              [],
+      department_name:     [],
+      level:               [],
+      course_feature_tags: [],
+      resource_type:       []
+    }
+    expect(makeRequest.mock.calls[1][0]).toEqual("post")
+    expect(makeRequest.mock.calls[1][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[1][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         0,
+        activeFacets: filteredFacets,
+        sort:         null,
+        size:         4
+      })
+    )
+
+    expect(makeRequest.mock.calls[2][0]).toEqual("post")
+    expect(makeRequest.mock.calls[2][1]).toEqual("search/")
+    expect(makeRequest.mock.calls[2][2]).toMatchObject(
+      buildSearchQuery({
+        text:         "",
+        from:         0,
         activeFacets: expectedFacets,
         sort:         null,
         size:         4
