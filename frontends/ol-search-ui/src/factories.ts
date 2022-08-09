@@ -122,7 +122,7 @@ export const makeSearchResponse = (
   pageSize: number = TEST_SEARCH_PAGE_SIZE,
   total: number = 2 * TEST_SEARCH_PAGE_SIZE,
   type: string | null,
-  withFacets = false
+  withFacets = true
 ) => {
   const hits = R.times(() => makeSearchResult(type), pageSize)
   return {
@@ -143,16 +143,15 @@ export const makeSearchFacetResult = () => {
         { key: "OCW", doc_count: 102 }
       ]
     },
-    topics: {
-      buckets: [
-        { key: "Science", doc_count: 172 },
-        { key: "Physics", doc_count: 32 }
-      ]
+    certification: {
+      buckets: [{ key: "certificates", doc_count: 10 }]
     },
-    audience:        [OPEN_CONTENT],
-    certification:   [],
-    department_name: [],
-    type:            ["course"]
+    type: {
+      buckets: [
+        { key: "course", doc_count: 180 },
+        { key: "program", doc_count: 9 }
+      ]
+    }
   }
 }
 
