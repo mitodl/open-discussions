@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.193.0
+---------------
+
+- facets (#3683)
+- Cc/styling tweaks (#3679)
+
 Version 0.192.2 (Released August 04, 2022)
 ---------------
 
