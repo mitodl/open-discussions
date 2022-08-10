@@ -144,7 +144,7 @@ export const makeSearchFacetResult = () => {
       ]
     },
     certification: {
-      buckets: [{ key: "certificates", doc_count: 10 }]
+      buckets: [{ key: "Certificates", doc_count: 10 }]
     },
     type: {
       buckets: [

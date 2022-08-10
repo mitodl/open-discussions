@@ -15,7 +15,8 @@ import {
   bestRun,
   getReadableResourceType,
   resourceThumbnailSrc,
-  EmbedlyConfig
+  EmbedlyConfig,
+  CertificateIcon
 } from "../util"
 
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
@@ -48,14 +49,6 @@ type LearningResourceCardProps = {
    */
   imgConfig: CardImgConfig
 }
-
-const CertificateIcon = () => (
-  <img
-    className="ol-lrc-cert"
-    alt="Receive a certificate upon completion"
-    src="/static/images/certificate_icon_infinite.png"
-  />
-)
 
 type OffererProps = {
   offerers: string[]
@@ -116,7 +109,11 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     <Card
       className={classNames(className, variantClasses[variant], "ol-lrc-root")}
     >
-      {isRow ? <CardContent>{cardImg}</CardContent> : cardImg}
+      {isRow ? (
+        <CardContent className="ol-lrc-image">{cardImg}</CardContent>
+      ) : (
+        cardImg
+      )}
       <CardContent className="ol-lrc-content">
         <div className="ol-lrc-type-row">
           <span className="ol-lrc-type">

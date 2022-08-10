@@ -34,6 +34,5 @@ describe("FacetDisplay", () => {
     expect(screen.getByText("Topics")).toBeInTheDocument()
     expect(screen.getByText("Types")).toBeInTheDocument()
     expect(screen.getByText("Departments")).toBeInTheDocument()
-    expect(screen.getByText("Clear All")).toBeInTheDocument()
   })
 })

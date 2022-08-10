@@ -3,7 +3,7 @@ import React, { useState, useCallback } from "react"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import { intersection } from "ramda"
-import { BannerPage } from "ol-util"
+import { BannerPage, useDeviceCategory, DESKTOP } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {
   useCourseSearch,
@@ -101,6 +101,8 @@ const SearchPage: React.FC = () => {
     []
   )
 
+  const deviceCategory = useDeviceCategory()
+
   const {
     updateText,
     loadMore,
@@ -126,18 +128,19 @@ const SearchPage: React.FC = () => {
   return (
     <BannerPage
       omitBackground
+      className="search-page-banner"
       bannerContent={
         <Container>
           <Grid container>
-            <Grid item xs={3}></Grid>
+            {deviceCategory === DESKTOP ? <Grid item xs={3}></Grid> : null}
             <Grid
               item
-              xs={9}
+              xs={deviceCategory === DESKTOP ? 9 : 12}
               component="section"
-              className="searchbar-container"
             >
               <SearchInput
                 className="main-search"
+                classNameSubmit="search-icon-button"
                 placeholder="Search for online courses or programs at MIT"
                 onChange={updateText}
                 value={text || ""}
@@ -153,8 +156,7 @@ const SearchPage: React.FC = () => {
     >
       <Container disableGutters>
         <Grid container>
-          <Grid item xs={3}>
-            <h3>Facets</h3>
+          <Grid item xs={deviceCategory === DESKTOP ? 3 : 12}>
             <SearchFilterDrawer
               facetMap={facetMap}
               facetOptions={facetOptions}
@@ -165,7 +167,11 @@ const SearchPage: React.FC = () => {
               toggleFacet={toggleFacet}
             />
           </Grid>
-          <Grid item xs={9} component="section">
+          <Grid
+            item
+            xs={deviceCategory === DESKTOP ? 8 : 12}
+            component="section"
+          >
             <InfiniteScroll
               hasMore={from + pageSize < total}
               loadMore={loadMore}
@@ -186,7 +192,10 @@ const SearchPage: React.FC = () => {
                     <span>No results found for your query</span>
                   </div>
                 ) : (
-                  <ul aria-label="Search Results" className="ic-card-row-list">
+                  <ul
+                    aria-label="Search Results"
+                    className="ic-searchpage-list ic-card-row-list"
+                  >
                     {results.map(hit => (
                       <li
                         key={hit._source.object_type.concat(
