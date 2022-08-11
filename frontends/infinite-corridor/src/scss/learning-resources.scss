@@ -3,6 +3,8 @@
   $lightText: theme.$font-color-light
 );
 
+@import "./breakpoints";
+
 $cardListSpacer: 1.5em;
 
 .ic-resource-card {
@@ -17,6 +19,12 @@ $cardListSpacer: 1.5em;
   }
   .MuiCardContent-root:last-child {
     padding: 16px;
+  }
+
+  @include breakpoint(phone) {
+    .ol-lrc-image{
+      display: none;
+    }
   }
 }
 

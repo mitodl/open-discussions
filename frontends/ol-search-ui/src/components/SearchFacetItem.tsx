@@ -1,7 +1,8 @@
 import React from "react"
 import { Bucket } from "@mitodl/course-search-utils"
+import { CertificateIcon } from "../util"
 
-const featuredFacetNames = ["audience", "certification"]
+const featuredFacetNames = ["certification"]
 
 interface Props {
   facet: Bucket
@@ -43,7 +44,13 @@ export default function SearchFacetItem(props: Props) {
         >
           {facet.key}
         </label>
-        <div className="facet-count">{facet.doc_count}</div>
+        {featuredFacetNames.includes(name) ? (
+          <div>
+            <CertificateIcon />
+          </div>
+        ) : (
+          <div className="facet-count">{facet.doc_count}</div>
+        )}
       </div>
     </div>
   )

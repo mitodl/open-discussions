@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react"
 
 import FacetDisplay from "./FacetDisplay"
-import { useDeviceCategory, DESKTOP } from "../util"
+import { useDeviceCategory, DESKTOP } from "ol-util"
 import { FacetManifest } from "../interfaces"
 
 import { Aggregation, Facets } from "@mitodl/course-search-utils"
@@ -60,7 +60,7 @@ export default function SearchFilterDrawer(props: Props) {
       </div>
     </div>
   ) : (
-    <div className="controls-outer">
+    <div className="col-12 col-lg-3 mt-3 mt-lg-0">
       <div className="controls">
         <div onClick={openDrawer} className="filter-controls">
           Filter

@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
         onClear={onSearchClear}
         onChange={onSearchChange}
         className="homepage-search main-search"
-        classNameSubmit="primary bordered"
+        classNameSubmit="primary bordered search-icon-button"
       />
       <section>
         <h2 className="page-subtitle">

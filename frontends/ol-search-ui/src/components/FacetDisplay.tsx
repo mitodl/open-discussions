@@ -27,34 +27,36 @@ const FacetDisplay = React.memo(
 
     return (
       <React.Fragment>
-        <div className="active-search-filters">
-          <div className="filter-section-main-title">
-            Filters
-            <span
-              className="clear-all-filters"
-              onClick={clearAllFilters}
-              onKeyPress={e => {
-                if (e.key === "Enter") {
-                  clearAllFilters()
-                }
-              }}
-              tabIndex={0}
-            >
-              Clear All
-            </span>
+        {Object.values(activeFacets).some(filters => filters.length > 0) ? (
+          <div className="active-search-filters">
+            <div className="filter-section-main-title">
+              Filters
+              <span
+                className="clear-all-filters"
+                onClick={clearAllFilters}
+                onKeyPress={e => {
+                  if (e.key === "Enter") {
+                    clearAllFilters()
+                  }
+                }}
+                tabIndex={0}
+              >
+                Clear All
+              </span>
+            </div>
+            {facetMap.map(([name]) =>
+              (activeFacets[name as FacetKey] || []).map((activeFacet, i) => (
+                <SearchFilter
+                  key={i}
+                  value={activeFacet}
+                  clearFacet={() =>
+                    toggleFacet(name as string, activeFacet, false)
+                  }
+                />
+              ))
+            )}
           </div>
-          {facetMap.map(([name]) =>
-            (activeFacets[name as FacetKey] || []).map((activeFacet, i) => (
-              <SearchFilter
-                key={i}
-                value={activeFacet}
-                clearFacet={() =>
-                  toggleFacet(name as string, activeFacet, false)
-                }
-              />
-            ))
-          )}
-        </div>
+        ) : null}
         {facetMap.map(([name, title], key) => (
           <Facet
             key={key}

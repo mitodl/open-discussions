@@ -1,1 +1,8 @@
-export { initials, capitalize } from "./utils"
+export {
+  initials,
+  capitalize,
+  useDeviceCategory,
+  PHONE,
+  TABLET,
+  DESKTOP
+} from "./utils"
