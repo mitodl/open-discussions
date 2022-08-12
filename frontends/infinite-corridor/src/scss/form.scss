@@ -28,6 +28,11 @@ $borderColor: theme.$input-border-grey;
     padding: 8px 20px;
     width: 100%;
   }
+
+  .divider {
+    padding-top: 10px;
+  }
+
 }
 
 .form .row,
@@ -120,6 +125,7 @@ textarea.form-field {
   height: 110px;
 }
 
+
 label.form-label {
   display: block;
   margin: 0 0 6px 0;
@@ -132,6 +138,14 @@ label.form-label {
     color: #000;
   }
 }
+
+label {
+  .header-padded {
+    margin: 10px;
+  }
+}
+
+
 
 label.radiolabel {
   display: inline-block;

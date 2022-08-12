@@ -76,7 +76,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
           <Form onSubmit={handleSubmit} className="form channel-form">
             <div className="row form-item">
               <label htmlFor="field-featured_list">
-                <span className="header">Featured List</span>
+                <div className="header-padded">Featured learning resources</div>
               </label>
               <Autocomplete
                 disablePortal
@@ -92,15 +92,21 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
                   )
                 }}
                 onBlur={() => setTouched({ ["featured_list"]: true })}
-                renderInput={props => <TextField {...props} />}
+                renderInput={props => (
+                  <TextField
+                    {...props}
+                    helperText="Select a list of learning resources"
+                    className="help-bottom"
+                  />
+                )}
               />
               {errors.featured_list ? (
                 <div className="validation-message">{errors.featured_list}</div>
               ) : null}
             </div>
-            <div className="row form-item">
+            <div className="row form-item divider">
               <label htmlFor="field-lists-sorted">
-                <span className="header">Lists</span>
+                <div className="header-padded">Subfields</div>
               </label>
               <SortableSelect
                 name="field-lists-sorted"

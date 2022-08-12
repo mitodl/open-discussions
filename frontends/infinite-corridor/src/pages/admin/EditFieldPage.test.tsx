@@ -37,6 +37,6 @@ describe("EditFieldPage", () => {
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#basic` })
     const activeTab = await screen.findByRole("tab", { selected: true })
     expect(activeTab?.textContent).toEqual("Basic")
-    await screen.findByLabelText("Featured List")
+    await screen.findByLabelText("Featured learning resources")
   })
 })

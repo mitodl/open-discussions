@@ -44,7 +44,7 @@ describe("EditFieldBasicForm", () => {
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#basic` })
 
     const featuredListSelector = (await screen.findByLabelText(
-      "Featured List"
+      "Featured learning resources"
     )) as HTMLInputElement
     expect(featuredListSelector.value).toEqual(field.featured_list.title)
     await user.click(featuredListSelector)
@@ -81,7 +81,7 @@ describe("EditFieldBasicForm", () => {
       url: `${urls.fieldDetails(field.name)}manage/#basic`
     })
     const featuredListSelector = (await screen.findByLabelText(
-      "Featured List"
+      "Featured learning resources"
     )) as HTMLInputElement
     expect(featuredListSelector.value).toEqual(field.featured_list.title)
     await user.click(featuredListSelector)
