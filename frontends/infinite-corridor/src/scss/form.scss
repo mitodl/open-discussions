@@ -28,6 +28,11 @@ $borderColor: theme.$input-border-grey;
     padding: 8px 20px;
     width: 100%;
   }
+
+  .divider {
+    padding-top: 10px;
+  }
+
 }
 
 .form .row,
@@ -120,6 +125,7 @@ textarea.form-field {
   height: 110px;
 }
 
+
 label.form-label {
   display: block;
   margin: 0 0 6px 0;
@@ -133,6 +139,14 @@ label.form-label {
   }
 }
 
+label {
+  .header-padded {
+    margin: 10px;
+  }
+}
+
+
+
 label.radiolabel {
   display: inline-block;
   margin: 0 15px 6px 0;
@@ -144,3 +158,18 @@ label.radiolabel {
 .actions {
   margin-top: 20px;
 }
+
+.ml-auto {
+  margin-left: auto !important;
+}
+
+.drag-delete-btn {
+    cursor: pointer;
+    color: #000000;
+}
+
+.drag-handle {
+    cursor: pointer;
+}
+
+

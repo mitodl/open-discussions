@@ -4,6 +4,7 @@ import type { LearningResource, LearningResourceType } from "ol-search-ui"
 type UserList = LearningResource & {
   image_description: string | null | undefined
   list_type: string
+  title: string
   short_description?: string
   object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
   privacy_level: string
@@ -58,6 +59,11 @@ export type FieldChannelAppearanceForm = {
   banner?: FormImage
 }
 
+export type FieldChannelBasicForm = {
+  featured_list: number | null
+  lists: Array<number>
+}
+
 export type FieldAppearanceEditValidation = {
   title: string
   public_description: string
@@ -67,6 +73,8 @@ type PaginatedFields = PaginatedResult<FieldChannel>
 
 type PaginatedUserListItems = PaginatedResult<UserListItem>
 
+type PaginatedUserLists = PaginatedResult<UserList>
+
 type PaginatedFieldListItems = PaginatedResult<UserListItem["content_data"]>
 
 export type {
@@ -75,5 +83,6 @@ export type {
   PaginatedFields,
   UserListItem,
   PaginatedUserListItems,
+  PaginatedUserLists,
   PaginatedFieldListItems
 }

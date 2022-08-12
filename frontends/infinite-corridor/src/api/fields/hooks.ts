@@ -7,9 +7,11 @@ import {
 import {
   FieldChannel,
   FieldChannelAppearanceForm,
+  FieldChannelBasicForm,
   FieldList,
   PaginatedFieldListItems,
-  PaginatedUserListItems
+  PaginatedUserListItems,
+  PaginatedUserLists
 } from "./interfaces"
 import * as urls from "./urls"
 import axios from "../../libs/axios"
@@ -25,19 +27,34 @@ const useFieldDetails = (name: string) => {
   return useQuery<FieldChannel>(urls.fieldDetails(name))
 }
 
-const editFieldChannelAppearance = async (
+const usePublicLists = (options?: PaginationSearchParams) => {
+  const userLists = useQuery<PaginatedUserLists>(urls.userLists(options))
+  return useMemo(() => {
+    const { data, ...others } = userLists
+    const lrData = data && {
+      ...data,
+      results: data.results
+    }
+    return {
+      data: lrData,
+      ...others
+    } as UseQueryResult<PaginatedUserLists>
+  }, [userLists])
+}
+
+const editFieldChannel = async (
   name: string,
-  data: FieldChannelAppearanceForm
+  data: FieldChannelBasicForm | FieldChannelAppearanceForm
 ) => {
   const { data: response } = await axios.patch(`${fieldDetails(name)}`, data)
   return response
 }
 
-const useMutateFieldAppearance = (field: FieldChannel) => {
+const useMutateField = (field: FieldChannel) => {
   const queryClient = useQueryClient()
   return useMutation(
-    (data: FieldChannelAppearanceForm) => {
-      return editFieldChannelAppearance(field.name, data)
+    (data: FieldChannelBasicForm | FieldChannelAppearanceForm) => {
+      return editFieldChannel(field.name, data)
     },
     {
       onSuccess: () => {
@@ -70,6 +87,7 @@ const useFieldListItems = (
 export {
   useFieldsList,
   useFieldDetails,
-  useMutateFieldAppearance,
-  useFieldListItems
+  useFieldListItems,
+  usePublicLists,
+  useMutateField
 }
