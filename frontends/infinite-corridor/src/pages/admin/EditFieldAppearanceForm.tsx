@@ -4,10 +4,7 @@ import { Formik, Form, Field } from "formik"
 import { Button } from "@mui/material"
 import * as Yup from "yup"
 
-import {
-  FieldChannelAppearanceForm,
-  useMutateFieldAppearance
-} from "../../api/fields"
+import { FieldChannelAppearanceForm, useMutateField } from "../../api/fields"
 import type { FieldChannel } from "../../api/fields/interfaces"
 import FieldAvatar from "../../components/FieldAvatar"
 import { makeFieldViewPath } from "../../pages/urls"
@@ -22,7 +19,7 @@ const appearanceSchema = Yup.object().shape({
 
 const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
   const { field } = props
-  const mutation = useMutateFieldAppearance(field)
+  const mutation = useMutateField(field)
   const history = useHistory()
 
   return (

@@ -20,7 +20,7 @@ export const makeUserList: Factory<UserList> = overrides => {
     item_count:    faker.datatype.number({ min: 2, max: 5 }),
     object_type:   LearningResourceType.Userlist,
     list_type:     "userlist",
-    privacy_level: faker.helpers.arrayElement(["public", "private"]),
+    privacy_level: "public",
     author:        faker.datatype.number({ min: 1, max: 1000 }),
     lists:         [],
     author_name:   faker.name.findName(),
@@ -63,4 +63,11 @@ const makeFieldsPaginated = makePaginatedFactory(makeField)
 
 const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
 
-export { makeField, makeFieldsPaginated, makeUserListItemsPaginated }
+const makeUserListsPaginated = makePaginatedFactory(makeUserList)
+
+export {
+  makeField,
+  makeFieldsPaginated,
+  makeUserListItemsPaginated,
+  makeUserListsPaginated
+}

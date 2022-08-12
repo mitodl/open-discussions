@@ -38,7 +38,9 @@ export const makeSearchResult = (type: string | null) => {
   }
 }
 
-export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
+export const makeCourseResult: Factory<LearningResourceResult> = (
+  overrides: any
+) => ({
   id:                casual.integer(1, 1000),
   title:             casual.title,
   url:               casual.url,
@@ -61,9 +63,9 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   ...overrides
 })
 
-export const makeProgramResult: Factory<
-  LearningResourceResult
-> = overrides => ({
+export const makeProgramResult: Factory<LearningResourceResult> = (
+  overrides: any
+) => ({
   id:                casual.integer(1, 1000),
   title:             casual.title,
   url:               casual.url,
@@ -85,7 +87,7 @@ export const makeProgramResult: Factory<
   ...overrides
 })
 
-export const makeRun: Factory<LearningResourceRun> = overrides => {
+export const makeRun: Factory<LearningResourceRun> = (overrides: any) => {
   return {
     id:               casual.integer(1, 1000),
     url:              casual.url,
@@ -158,7 +160,7 @@ export const makeSearchFacetResult = () => {
 const makeLearningResourceType = () =>
   faker.helpers.arrayElement(Object.values(LearningResourceType))
 
-export const makeTopic: Factory<CourseTopic> = overrides => {
+export const makeTopic: Factory<CourseTopic> = (overrides: any) => {
   const topic: CourseTopic = {
     id:   faker.unique(faker.datatype.number),
     name: faker.lorem.words(),
@@ -167,7 +169,9 @@ export const makeTopic: Factory<CourseTopic> = overrides => {
   return topic
 }
 
-export const makeLearningResource: Factory<LearningResource> = overrides => {
+export const makeLearningResource: Factory<LearningResource> = (
+  overrides: any
+) => {
   const resource: LearningResource = {
     id:          faker.unique(faker.datatype.number),
     title:       faker.lorem.words(),

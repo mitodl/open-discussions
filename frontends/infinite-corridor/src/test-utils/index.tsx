@@ -23,8 +23,10 @@ const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
   const { url } = { ...defaultTestAppOptions, ...options }
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
   const queryClient = createQueryClient()
-  render(<App queryClient={queryClient} history={history} />)
-  return { history }
+  const { container } = render(
+    <App queryClient={queryClient} history={history} />
+  )
+  return { history, container }
 }
 
 /**

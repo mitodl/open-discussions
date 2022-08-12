@@ -11,6 +11,7 @@ import TabPanel from "@mui/lab/TabPanel"
 
 import { useFieldDetails } from "../../api/fields"
 import EditFieldAppearanceForm from "./EditFieldAppearanceForm"
+import EditFieldBasicForm from "./EditFieldBasicForm"
 import FieldPageSkeleton from "../FieldPageSkeleton"
 
 type RouteParams = {
@@ -50,7 +51,12 @@ const EditFieldPage: React.FC = () => {
               <Grid container spacing={1}>
                 <Grid item xs={9}>
                   <TabList className="page-nav" onChange={handleChange}>
-                    <Tab component={Link} to="#" label="Basic" value="basic" />
+                    <Tab
+                      component={Link}
+                      to="#basic"
+                      label="Basic"
+                      value="basic"
+                    />
                     <Tab
                       component={Link}
                       to="#appearance"
@@ -72,10 +78,12 @@ const EditFieldPage: React.FC = () => {
             <Grid container spacing={1} className="edit-channel">
               <Grid item xs={9}>
                 <TabPanel value="basic" className="page-nav-content">
-                  Basic placeholder
+                  <EditFieldBasicForm field={field.data} />
                 </TabPanel>
                 <TabPanel value="appearance" className="page-nav-content">
-                  <EditFieldAppearanceForm field={field.data} />
+                  <div>
+                    <EditFieldAppearanceForm field={field.data} />
+                  </div>
                 </TabPanel>
                 <TabPanel value="moderators" className="page-nav-content">
                   Moderators placeholder
