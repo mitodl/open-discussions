@@ -1,13 +1,14 @@
 import { waitFor } from "@testing-library/react"
 
-import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
-import { urls } from "../../api/fields"
+import { PaginatedResult } from "ol-util"
+import { FieldChannel, UserList, urls } from "../../api/fields"
 import * as factory from "../../api/fields/factories"
 import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
+import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
 
 describe("EditFieldBasicForm", () => {
-  let field, publicLists
+  let field: FieldChannel, publicLists: PaginatedResult<UserList>
 
   beforeEach(() => {
     publicLists = factory.makeUserListsPaginated(5)
