@@ -43,7 +43,16 @@ $smallFontSize: 0.75em !default;
       margin-top: 0; 
     }
     &:last-child {
-      margin-bottom: 0; 
+      margin-bottom: 0;
+      /*
+      Last child of ol-lrc-content will take up any extra space (flex: 1) but
+      with its contents at the bottom of its box.
+      */
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start; // The default is stretch, we we do not want.
     }
   }
 }
@@ -68,9 +77,6 @@ $smallFontSize: 0.75em !default;
   padding-right: 0.25em;
 }
 
-.ol-lrc-title-box {
-  flex: 1;
-}
 .ol-lrc-title {
   font-weight: $boldWeight;
   margin:0;
