@@ -156,3 +156,23 @@ $minTabHeigt: 44px;
     padding-top: 0px;
   }
 }
+
+
+.field-controls {
+    position: relative;
+    flex-grow: 0.95;
+    justify-content: flex-end;
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+
+    .field-edit-button {
+      cursor: pointer;
+      color: #fff;
+    }
+}
+
+.field-edit-button {
+  z-index: 2000;
+  color: #fff;
+}

@@ -5,6 +5,7 @@ import { BannerPage } from "ol-util"
 import Container from "@mui/material/Container"
 import { useFieldDetails } from "../api/fields"
 import FieldAvatar from "../components/FieldAvatar"
+import FieldMenu from "../components/FieldMenu"
 
 interface FieldSkeletonProps {
   children: React.ReactNode
@@ -39,6 +40,11 @@ const FieldSkeletonProps: React.FC<FieldSkeletonProps> = ({
                     {field.data.title}
                   </Link>
                 </h1>
+                <div className="field-controls">
+                  {field.data?.is_moderator ? (
+                    <FieldMenu field={field.data} />
+                  ) : null}
+                </div>
               </>
             )}
           </div>
