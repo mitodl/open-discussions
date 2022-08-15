@@ -5,18 +5,12 @@ from typing import List
 
 from django.contrib.auth import get_user_model
 from django.db import transaction
-from guardian.shortcuts import assign_perm
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.constants import WIDGET_LIST_CHANGE_PERM
 from channels.serializers.channels import ChannelAppearanceMixin
 from channels.serializers.validators import validate_email, validate_username
-from channels_fields.api import (
-    add_user_role,
-    create_field_groups_and_roles,
-    is_moderator,
-)
+from channels_fields.api import add_user_role, is_moderator
 from channels_fields.constants import FIELD_ROLE_MODERATORS
 from channels_fields.models import FieldChannel, FieldList, Subfield
 from course_catalog.constants import PrivacyLevel
@@ -24,7 +18,6 @@ from course_catalog.models import UserList
 from course_catalog.serializers import UserListSerializer
 from open_discussions.serializers import WriteableSerializerMethodField
 from profiles.models import Profile
-from widgets.models import WidgetList
 
 User = get_user_model()
 
@@ -223,12 +216,7 @@ class FieldChannelCreateSerializer(serializers.ModelSerializer):
         for key in ("subfields", "lists"):
             base_field_data.pop(key, None)
         with transaction.atomic():
-            widget_list = WidgetList.objects.create()
-            base_field_data["widget_list"] = widget_list
             field_channel = super().create(base_field_data)
-            roles = create_field_groups_and_roles(field_channel)
-            moderator_group = roles[FIELD_ROLE_MODERATORS].group
-            assign_perm(WIDGET_LIST_CHANGE_PERM, moderator_group, widget_list)
             self.upsert_field_lists(field_channel, validated_data)
             self.upsert_subfields(field_channel, validated_data)
             return field_channel

@@ -19,7 +19,7 @@ def create_field_groups_and_roles(
         group, _ = Group.objects.get_or_create(
             name=f"field_{field_channel.name}_{role}"
         )
-        roles[role] = FieldChannelGroupRole.objects.create(
+        roles[role], _ = FieldChannelGroupRole.objects.get_or_create(
             field=field_channel, group=group, role=role
         )
 

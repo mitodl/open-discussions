@@ -58,7 +58,9 @@ class BaseChannel(models.Model):
     title = models.CharField(max_length=100)
 
     # Branding fields
-    avatar = ProcessedImageField(null=True, max_length=2083, upload_to=avatar_uri)
+    avatar = ProcessedImageField(
+        null=True, blank=True, max_length=2083, upload_to=avatar_uri
+    )
     avatar_small = ImageSpecField(
         source="avatar",
         processors=[
@@ -79,7 +81,9 @@ class BaseChannel(models.Model):
             )
         ],
     )
-    banner = ProcessedImageField(null=True, max_length=2083, upload_to=banner_uri)
+    banner = ProcessedImageField(
+        null=True, blank=True, max_length=2083, upload_to=banner_uri
+    )
     about = JSONField(blank=True, null=True)
 
     # Miscellaneous fields

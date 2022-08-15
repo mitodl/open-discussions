@@ -19,7 +19,6 @@ from course_catalog.constants import PrivacyLevel
 from course_catalog.factories import UserListFactory
 from course_catalog.serializers import UserListSerializer
 from open_discussions.factories import UserFactory
-from widgets.factories import WidgetListFactory
 
 # pylint:disable=redefined-outer-name
 pytestmark = pytest.mark.django_db
@@ -51,10 +50,9 @@ def base_field_data():
 @pytest.mark.parametrize("has_avatar", [True, False])
 @pytest.mark.parametrize("has_banner", [True, False])
 @pytest.mark.parametrize("has_about", [True, False])
-@pytest.mark.parametrize("has_widget_list", [True, False])
 @pytest.mark.parametrize("ga_tracking_id", [None, "abc123"])
 def test_serialize_field_channel(  # pylint: disable=too-many-arguments
-    mocker, has_avatar, has_banner, has_about, has_widget_list, ga_tracking_id
+    mocker, has_avatar, has_banner, has_about, ga_tracking_id
 ):
     """
     Test serializing a field channel
@@ -64,7 +62,6 @@ def test_serialize_field_channel(  # pylint: disable=too-many-arguments
     field_channel = FieldChannelFactory.create(
         banner=mock_image_file("banner.jpg") if has_banner else None,
         avatar=mock_image_file("avatar.jpg") if has_avatar else None,
-        widget_list=WidgetListFactory.create() if has_widget_list else None,
         about={"foo": "bar"} if has_about else None,
         ga_tracking_id=ga_tracking_id,
     )
@@ -79,7 +76,7 @@ def test_serialize_field_channel(  # pylint: disable=too-many-arguments
         "avatar_medium": field_channel.avatar_medium.url if has_avatar else None,
         "banner": field_channel.banner.url if has_banner else None,
         "ga_tracking_id": field_channel.ga_tracking_id,
-        "widget_list": field_channel.widget_list.id if has_widget_list else None,
+        "widget_list": field_channel.widget_list.id,
         "about": field_channel.about,
         "updated_on": mocker.ANY,
         "created_on": mocker.ANY,
