@@ -10,6 +10,7 @@ type TitledCarouselProps = {
   as?: ElementType
   className?: string
   carouselClassName?: string
+  headerClassName?: string
   pageSize: number
   /**
    * Animation duration in milliseconds.
@@ -52,6 +53,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
   title,
   className,
   carouselClassName,
+  headerClassName,
   pageSize,
   cellSpacing,
   animationDuration = defaultAnimationDuration,
@@ -86,7 +88,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
 
   return (
     <ContainerComponent className={className}>
-      <HeaderContainer>
+      <HeaderContainer className={headerClassName}>
         {title}
         <ButtonsContainer>
           {React.cloneElement(previous, {
