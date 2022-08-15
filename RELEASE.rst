@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.193.0
+Version 0.193.0 (Released August 15, 2022)
 ---------------
 
 - search styles (#3685)
