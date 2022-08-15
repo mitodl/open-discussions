@@ -1,5 +1,6 @@
 import React from "react"
-import { BrowserRouter } from "react-router-dom"
+import { Router } from "react-router"
+import { createMemoryHistory } from "history"
 import { render, screen } from "@testing-library/react"
 
 import { urls } from "../api/fields"
@@ -11,10 +12,11 @@ describe("FieldMenu", () => {
   it("Includes a link to the FieldChannel edit page", async () => {
     const field = factories.makeField()
     setMockResponse.get(urls.fieldDetails(field.name), field)
+    const history = createMemoryHistory()
     render(
-      <BrowserRouter>
+      <Router history={history}>
         <FieldMenu field={field} />
-      </BrowserRouter>
+      </Router>
     )
     const dropdown = await screen.findByText("settings")
     await user.click(dropdown)
