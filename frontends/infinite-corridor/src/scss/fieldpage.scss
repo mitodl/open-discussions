@@ -131,7 +131,13 @@ $avatar-dimension-small: 22px;
 
 
 $minTabHeigt: 44px;
+.page-nav-content {
+  > *:first-child {
+    margin-top: 0px; // subbanner bottom-margin handles this
+  }
+}
 .page-nav-content.MuiTabPanel-root {
+  padding-top: 0px; // subbanner bottom-margin handles this
   /*
   page-nav is meant for the main content of a page.
   We don't need extra padding beyond that of Container, and removing this
@@ -166,6 +172,7 @@ $minTabHeigt: 44px;
   .MuiGrid-root > .MuiGrid-item  {
     padding-top: 0px;
   }
+  margin-bottom: 40px;
 }
 
 

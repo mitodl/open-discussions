@@ -16,7 +16,7 @@ import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
 import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
-import WidgetSidebar from "./WidgetSidebar"
+import WidgetsList from "./WidgetsList"
 
 type RouteParams = {
   name: string
@@ -116,7 +116,7 @@ const FieldPage: React.FC = () => {
       <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
-            <Grid container spacing={1}>
+            <Grid container spacing={4}>
               <Grid item xs={12} sm={9}>
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
@@ -132,7 +132,7 @@ const FieldPage: React.FC = () => {
           </Container>
         </div>
         <Container>
-          <Grid container spacing={1}>
+          <Grid container spacing={4}>
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
@@ -143,8 +143,8 @@ const FieldPage: React.FC = () => {
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
-            <Grid item xs={12} sm={3}>
-              <WidgetSidebar widgetListId={fieldQuery.data?.widget_list} isEditing={isEditingWidgets} />
+            <Grid item xs={12} sm={3} className="ic-sidebar">
+              <WidgetsList widgetListId={fieldQuery.data?.widget_list} isEditing={isEditingWidgets} />
             </Grid>
           </Grid>
         </Container>

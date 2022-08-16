@@ -5,14 +5,17 @@ import { useWidgetList } from "../../api/widgets"
 interface WidgetsSidebarProps {
   isEditing: boolean
   widgetListId?: number
+  className?: string
 }
 
-const WidgetList: React.FC<WidgetsSidebarProps> = ({ widgetListId }) => {
+const WidgetList: React.FC<WidgetsSidebarProps> = ({ widgetListId, className }) => {
   const widgetsQuery = useWidgetList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
-  return <section>
-    {widgets.map(widget => <Widget className="ic-widget" key={widget.id} widget={widget} />)}
-  </section>
+  return (
+    <section className={className}>
+      {widgets.map(widget => <Widget className="ic-widget" key={widget.id} widget={widget} />)}
+    </section>
+  )
 }
 
 export default WidgetList
