@@ -3,29 +3,53 @@
 
 $color: theme.$color-primary;
 
-.MuiButtonBase-root {
-  &.primary {
-    color: $color;
-    &.bordered {
-      border: 1pt solid $color;
-    }
-    &.filled {
-      background-color: $color;
-      color: white;
-      &:hover {
-          background-color: color.adjust($color, $lightness: -10%);
+.app-container {
+  .MuiTab-root {
+    text-transform: none;
+  }
+  
+  .MuiChip-root.MuiChip-filled {
+    background-color: theme.$color-background;
+  }
+
+  .MuiButtonBase-root {
+    &.primary {
+      color: $color;
+      &.bordered {
+        border: 1pt solid $color;
       }
-      &:active {
-          background-color: color.adjust($color, $saturation: -20%);
+      &.filled {
+        background-color: $color;
+        color: white;
+        &:hover {
+            background-color: color.adjust($color, $lightness: -10%);
+        }
+        &:active {
+            background-color: color.adjust($color, $saturation: -20%);
+        }
       }
     }
   }
 }
 
-.MuiButtonBase-root.MuiTab-root {
-  text-transform: none;
-}
+.app-container {
+  .MuiCardContent-root {
+    padding-bottom: 16px;
+    &:last-child {
+      padding-bottom: 16px; // MUI puts extra padding on the last child by default. We don't want it.
+    }
+    h2:first-child {
+      margin-top: 0px;
+    }
+  }
 
-.MuiChip-root.MuiChip-filled {
-  background-color: theme.$color-background;
+  .MuiCard-root {
+    color: theme.$font-color-default;
+
+    transition-duration: theme.$transition-duration;
+    transition-property: box-shadow;
+    &:hover {
+      box-shadow: theme.$shadow;
+    }
+  }
 }
