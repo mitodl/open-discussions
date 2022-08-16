@@ -144,4 +144,9 @@ describe("FieldPage", () => {
     await screen.findByText(lists[1].list.title)
     expect(spyTitledCarousel).not.toHaveBeenCalled()
   })
+
+  // TODO @CHRIS
+  it("Passes the right stuff to WidgetsList", () => {
+
+  })
 })
