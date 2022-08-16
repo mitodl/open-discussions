@@ -16,6 +16,7 @@ import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
 import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
+import WidgetSidebar from "./WidgetSidebar"
 
 type RouteParams = {
   name: string
@@ -97,7 +98,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
   const history = useHistory()
-  const { hash } = useLocation()
+  const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
@@ -109,6 +110,7 @@ const FieldPage: React.FC = () => {
 
   const featuredList = fieldQuery.data?.featured_list
   const fieldLists = fieldQuery.data?.lists ?? []
+  const isEditingWidgets = pathname.endsWith("manage/widgets")
   return (
     <FieldPageSkeleton name={name}>
       <TabContext value={tabValue}>
@@ -140,6 +142,9 @@ const FieldPage: React.FC = () => {
                 ))}
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <WidgetSidebar isEditing={isEditingWidgets} />
             </Grid>
           </Grid>
         </Container>

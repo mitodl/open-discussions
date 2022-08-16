@@ -36,10 +36,10 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
             <Route path={urls.SEARCH}>
               <SearchPage />
             </Route>
-            <Route path={urls.FIELD_VIEW} exact>
+            <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
               <FieldPage />
             </Route>
-            <Route path={urls.FIELD_EDIT}>
+            <Route path={urls.FIELD_EDIT} exact>
               <FieldAdminApp />
             </Route>
           </Router>
