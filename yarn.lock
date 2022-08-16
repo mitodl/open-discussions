@@ -14778,6 +14778,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ol-widgets@workspace:frontends/ol-widgets"
   dependencies:
+    "@emotion/react": ^11.9.3
+    "@emotion/styled": ^11.9.3
+    "@faker-js/faker": ^7.3.0
+    "@mui/icons-material": ^5.8.4
+    "@mui/material": ^5.9.0
     ol-util: "workspace:*"
   peerDependencies:
     react: ^16.10 || 17 || 18

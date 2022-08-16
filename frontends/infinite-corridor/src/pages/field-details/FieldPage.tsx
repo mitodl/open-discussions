@@ -144,7 +144,7 @@ const FieldPage: React.FC = () => {
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
             <Grid item xs={12} sm={3}>
-              <WidgetSidebar isEditing={isEditingWidgets} />
+              <WidgetSidebar widgetListId={fieldQuery.data?.widget_list} isEditing={isEditingWidgets} />
             </Grid>
           </Grid>
         </Container>

@@ -5,6 +5,11 @@ export type WidgetInstance<T = unknown> = {
   configuration: T
 }
 
+export type WidgetProps<T = unknown> = {
+  className?: string
+  widget: WidgetInstance<T>
+}
+
 /**
  * Represents an input field for configuring a widget's behavior.
  */
@@ -33,4 +38,12 @@ export type WidgetListResponse = {
   id: number,
   widgets: WidgetInstance[],
   available_widgets: WidgetSpec[]
+}
+
+export interface MarkdownWidgetConfig {
+  source: string
+}
+
+export enum WidgetTypes {
+  Markdown = 'Markdown'
 }

@@ -38,8 +38,9 @@ $color: theme.$color-primary;
     &:last-child {
       padding-bottom: 16px; // MUI puts extra padding on the last child by default. We don't want it.
     }
-    h2:first-child {
-      margin-top: 0px;
+
+    > *:first-child {
+      margin-top: 0px; // No extra space for the first child, beyond the card content's padding.
     }
   }
 
