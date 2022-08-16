@@ -112,8 +112,8 @@ describe("FieldPage", () => {
 
     // Basic carousel check
     expect(spyTitledCarousel).toHaveBeenCalled()
-    const prev = within(section).getByTitle("Show previous courses")
-    const next = within(section).getByTitle("Show next courses")
+    const prev = within(section).getByText("Previous")
+    const next = within(section).getByText("Next")
     expect(prev).toBeInstanceOf(HTMLButtonElement)
     expect(next).toBeInstanceOf(HTMLButtonElement)
   })

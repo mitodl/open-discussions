@@ -8,6 +8,7 @@
 @use "searchpage";
 @use "form";
 @use "admin";
+@use "buttons";
 
 html {
   font-family: theme.$font-family-default;

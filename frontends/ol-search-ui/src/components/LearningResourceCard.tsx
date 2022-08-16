@@ -121,11 +121,9 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           </span>
           {hasCertificate && <CertificateIcon />}
         </div>
-        <div className="ol-lrc-title-box">
-          <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
-            {resource.title}
-          </Dotdotdot>
-        </div>
+        <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
+          {resource.title}
+        </Dotdotdot>
         <div>
           <span className="ol-lrc-offered-by">Offered by &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}

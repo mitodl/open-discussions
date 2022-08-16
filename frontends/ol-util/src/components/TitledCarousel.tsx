@@ -10,6 +10,7 @@ type TitledCarouselProps = {
   as?: ElementType
   className?: string
   carouselClassName?: string
+  headerClassName?: string
   pageSize: number
   /**
    * Animation duration in milliseconds.
@@ -39,6 +40,12 @@ const HeaderContainer = styled.div`
   align-items: center;
 `
 
+const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 const defaultAnimationDuration = 800
 
 const TitledCarousel: React.FC<TitledCarouselProps> = ({
@@ -46,6 +53,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
   title,
   className,
   carouselClassName,
+  headerClassName,
   pageSize,
   cellSpacing,
   animationDuration = defaultAnimationDuration,
@@ -80,9 +88,9 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
 
   return (
     <ContainerComponent className={className}>
-      <HeaderContainer>
+      <HeaderContainer className={headerClassName}>
         {title}
-        <div>
+        <ButtonsContainer>
           {React.cloneElement(previous, {
             disabled: !canPageDown,
             onClick:  pageDown
@@ -91,7 +99,7 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
             disabled: !canPageUp,
             onClick:  pageUp
           })}
-        </div>
+        </ButtonsContainer>
       </HeaderContainer>
       <Carousel
         slideIndex={index}
