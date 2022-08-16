@@ -1,11 +1,11 @@
 import React from "react"
 import { Link } from "react-router-dom"
-import * as routes from "./urls"
+import * as routes from "../urls"
 import { BannerPage } from "ol-util"
 import Container from "@mui/material/Container"
-import { useFieldDetails } from "../api/fields"
-import FieldAvatar from "../components/FieldAvatar"
-import FieldMenu from "../components/FieldMenu"
+import { useFieldDetails } from "../../api/fields"
+import FieldAvatar from "./components/FieldAvatar"
+import FieldMenu from "./components/FieldMenu"
 
 interface FieldSkeletonProps {
   children: React.ReactNode

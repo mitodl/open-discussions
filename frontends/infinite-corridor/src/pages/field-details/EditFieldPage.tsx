@@ -12,7 +12,7 @@ import TabPanel from "@mui/lab/TabPanel"
 import { useFieldDetails } from "../../api/fields"
 import EditFieldAppearanceForm from "./EditFieldAppearanceForm"
 import EditFieldBasicForm from "./EditFieldBasicForm"
-import FieldPageSkeleton from "../FieldPageSkeleton"
+import FieldPageSkeleton from "./FieldPageSkeleton"
 
 type RouteParams = {
   name: string

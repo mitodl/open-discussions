@@ -10,12 +10,12 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme } from "@mui/material/styles"
 import { LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import { useFieldDetails, useFieldListItems, UserList } from "../api/fields"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
 import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
-import { imgConfigs } from "../util/constants"
+import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
+import { imgConfigs } from "../../util/constants"
 
 type RouteParams = {
   name: string
@@ -109,7 +109,6 @@ const FieldPage: React.FC = () => {
 
   const featuredList = fieldQuery.data?.featured_list
   const fieldLists = fieldQuery.data?.lists ?? []
-
   return (
     <FieldPageSkeleton name={name}>
       <TabContext value={tabValue}>

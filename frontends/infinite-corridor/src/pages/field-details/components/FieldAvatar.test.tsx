@@ -1,7 +1,7 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
 
-import { makeField } from "../api/fields/factories"
+import { makeField } from "../../../api/fields/factories"
 import FieldAvatar from "./FieldAvatar"
 
 describe("Avatar", () => {

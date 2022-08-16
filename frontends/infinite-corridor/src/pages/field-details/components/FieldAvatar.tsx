@@ -2,7 +2,7 @@ import React from "react"
 
 import { initials } from "ol-util"
 
-import type { FieldChannel } from "../api/fields/interfaces"
+import type { FieldChannel } from "../../../api/fields/interfaces"
 
 export const AVATAR_SMALL = "small" as const
 export const AVATAR_MEDIUM = "medium" as const

@@ -1,10 +1,10 @@
 import { assertInstanceOf, assertNotNil } from "ol-util"
-import { urls } from "../api/fields"
+import { urls } from "../../api/fields"
 import { LearningResource, LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem, FieldChannel } from "../api/fields"
-import * as factory from "../api/fields/factories"
-import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
+import type { UserList, UserListItem, FieldChannel } from "../../api/fields"
+import * as factory from "../../api/fields/factories"
+import { renderTestApp, screen, setMockResponse, within } from "../../test-utils"
 
 jest.mock("ol-search-ui", () => {
   const actual = jest.requireActual("ol-search-ui")
