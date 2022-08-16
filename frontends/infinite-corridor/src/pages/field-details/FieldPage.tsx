@@ -116,7 +116,7 @@ const FieldPage: React.FC = () => {
       <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
-            <Grid container spacing={4}>
+            <Grid container>
               <Grid item xs={12} sm={9}>
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
@@ -132,7 +132,7 @@ const FieldPage: React.FC = () => {
           </Container>
         </div>
         <Container>
-          <Grid container spacing={4}>
+          <Grid container>
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
