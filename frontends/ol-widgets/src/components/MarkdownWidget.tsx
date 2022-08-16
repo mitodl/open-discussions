@@ -1,10 +1,10 @@
 import React from "react"
-import type { WidgetProps, MarkdownWidgetConfig } from "../interfaces"
+import type { WidgetProps, MarkdownWidgetInstance } from "../interfaces"
 
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 
-type MarkdownWidgetProps = WidgetProps<MarkdownWidgetConfig>
+type MarkdownWidgetProps = WidgetProps<MarkdownWidgetInstance>
 
 const MarkdownWidget: React.FC<MarkdownWidgetProps> = ({widget, className}) => {
   return <Card className={className}>

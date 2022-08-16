@@ -5,9 +5,9 @@ export type WidgetInstance<T = unknown> = {
   configuration: T
 }
 
-export type WidgetProps<T = unknown> = {
+export type WidgetProps<T extends WidgetInstance> = {
   className?: string
-  widget: WidgetInstance<T>
+  widget: T
 }
 
 /**
@@ -40,9 +40,10 @@ export type WidgetListResponse = {
   available_widgets: WidgetSpec[]
 }
 
-export interface MarkdownWidgetConfig {
+interface MarkdownWidgetConfig {
   source: string
 }
+export type MarkdownWidgetInstance = WidgetInstance<MarkdownWidgetConfig>
 
 export enum WidgetTypes {
   Markdown = 'Markdown'
