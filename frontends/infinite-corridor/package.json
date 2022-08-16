@@ -24,6 +24,7 @@
     "ol-forms": "workspace:*",
     "ol-search-ui": "workspace:*",
     "ol-util": "workspace:*",
+    "ol-widgets": "workspace:*",
     "ramda": "^0.28.0",
     "react": "^16.14",
     "react-dom": "^16.14",

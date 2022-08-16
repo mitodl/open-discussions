@@ -1,0 +1,11 @@
+{
+  "name": "ol-widgets",
+  "packageManager": "yarn@3.2.0",
+  "main": "./build/index.js",
+  "dependencies": {
+    "ol-util": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^16.10 || 17 || 18"
+  }
+}

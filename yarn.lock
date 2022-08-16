@@ -11497,6 +11497,7 @@ __metadata:
     ol-forms: "workspace:*"
     ol-search-ui: "workspace:*"
     ol-util: "workspace:*"
+    ol-widgets: "workspace:*"
     ramda: ^0.28.0
     react: ^16.14
     react-dom: ^16.14
@@ -14770,6 +14771,16 @@ __metadata:
     react: ^16.10 || 17 || 18
     react-router: ^5 || ^6
     styled-components: 5
+  languageName: unknown
+  linkType: soft
+
+"ol-widgets@workspace:*, ol-widgets@workspace:frontends/ol-widgets":
+  version: 0.0.0-use.local
+  resolution: "ol-widgets@workspace:frontends/ol-widgets"
+  dependencies:
+    ol-util: "workspace:*"
+  peerDependencies:
+    react: ^16.10 || 17 || 18
   languageName: unknown
   linkType: soft
 
