@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.194.0
+Version 0.194.0 (Released August 17, 2022)
 ---------------
 
 - FieldChannel banner menu dropdown (#3693)
