@@ -145,6 +145,7 @@ const FieldPage: React.FC = () => {
             </Grid>
             <Grid item xs={12} sm={3}>
               <WidgetsList
+                className="ic-widget-list"
                 widgetListId={fieldQuery.data?.widget_list}
                 isEditing={isEditingWidgets}
               />
