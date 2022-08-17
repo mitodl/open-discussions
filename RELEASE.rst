@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.194.0 (Released August 17, 2022)
+---------------
+
+- FieldChannel banner menu dropdown (#3693)
+- Move widget/group creation for fields to signal (#3689)
+- Basic field edit form (add/remove/sort lists) (#3682)
+
 Version 0.193.0 (Released August 15, 2022)
 ---------------
 
