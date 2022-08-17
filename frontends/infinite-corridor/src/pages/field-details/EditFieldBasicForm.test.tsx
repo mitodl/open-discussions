@@ -2,10 +2,12 @@ import { waitFor } from "@testing-library/react"
 
 import { PaginatedResult } from "ol-util"
 import { FieldChannel, UserList, urls } from "../../api/fields"
+import { urls as widgetUrls } from "../../api/widgets"
 import * as factory from "../../api/fields/factories"
 import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
 import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
+import { makeWidgetListResponse } from "ol-widgets"
 
 describe("EditFieldBasicForm", () => {
   let field: FieldChannel, publicLists: PaginatedResult<UserList>
@@ -38,6 +40,10 @@ describe("EditFieldBasicForm", () => {
       factory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(urls.fieldDetails(field.name), field)
+    setMockResponse.get(
+      widgetUrls.widgetList(field.widget_list),
+      makeWidgetListResponse({}, { count: 0 })
+    )
   })
 
   it("Displays a 'featured list' autocomplete form field and draggable list widgets", async () => {
@@ -83,7 +89,7 @@ describe("EditFieldBasicForm", () => {
     const featuredListSelector = (await screen.findByLabelText(
       "Featured learning resources"
     )) as HTMLInputElement
-    expect(featuredListSelector.value).toEqual(field.featured_list.title)
+    expect(featuredListSelector.value).toEqual(field.featured_list?.title)
     await user.click(featuredListSelector)
     await user.click(screen.getByText(publicLists.results[4].title))
     expect(featuredListSelector.value).toEqual(publicLists.results[4].title)
