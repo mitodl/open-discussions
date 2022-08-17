@@ -23,30 +23,44 @@ interface AppProps {
   queryClient: QueryClient
 }
 
+/**
+ * Renders child with Router, QueryClientProvider, and other such context provides.
+ */
+const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
+  history,
+  queryClient,
+  children
+}) => {
+  return (
+    <MuiThemeProvider theme={muiTheme}>
+      <QueryClientProvider client={queryClient}>
+        <Router history={history}>{children}</Router>
+      </QueryClientProvider>
+    </MuiThemeProvider>
+  )
+}
+
 const App: React.FC<AppProps> = ({ history, queryClient }) => {
   return (
     <div className="app-container">
-      <MuiThemeProvider theme={muiTheme}>
-        <QueryClientProvider client={queryClient}>
-          <Router history={history}>
-            <Header />
-            <Route path={urls.HOME} exact>
-              <HomePage />
-            </Route>
-            <Route path={urls.SEARCH}>
-              <SearchPage />
-            </Route>
-            <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
-              <FieldPage />
-            </Route>
-            <Route path={urls.FIELD_EDIT} exact>
-              <FieldAdminApp />
-            </Route>
-          </Router>
-        </QueryClientProvider>
-      </MuiThemeProvider>
+      <AppProviders history={history} queryClient={queryClient}>
+        <Header />
+        <Route path={urls.HOME} exact>
+          <HomePage />
+        </Route>
+        <Route path={urls.SEARCH}>
+          <SearchPage />
+        </Route>
+        <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
+          <FieldPage />
+        </Route>
+        <Route path={urls.FIELD_EDIT} exact>
+          <FieldAdminApp />
+        </Route>
+      </AppProviders>
     </div>
   )
 }
 
 export default App
+export { AppProviders }

@@ -8,12 +8,17 @@ interface WidgetsSidebarProps {
   className?: string
 }
 
-const WidgetList: React.FC<WidgetsSidebarProps> = ({ widgetListId, className }) => {
+const WidgetList: React.FC<WidgetsSidebarProps> = ({
+  widgetListId,
+  className
+}) => {
   const widgetsQuery = useWidgetList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
   return (
     <section className={className}>
-      {widgets.map(widget => <Widget className="ic-widget" key={widget.id} widget={widget} />)}
+      {widgets.map(widget => (
+        <Widget className="ic-widget" key={widget.id} widget={widget} />
+      ))}
     </section>
   )
 }

@@ -1,6 +1,6 @@
 import type { PaginatedResult } from "./interfaces"
 
-type Factory<T> = (overrides?: Partial<T>) => T
+type Factory<T, U = never> = (overrides?: Partial<T>, options?: U) => T
 
 const makePaginatedFactory =
   <T>(makeResult: Factory<T>) =>

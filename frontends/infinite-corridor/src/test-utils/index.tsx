@@ -1,5 +1,5 @@
 import React from "react"
-import App, { BASE_URL } from "../App"
+import App, { AppProviders, BASE_URL } from "../App"
 import { render } from "@testing-library/react"
 import { createMemoryHistory } from "history"
 import { sample as lodashSample } from "lodash"
@@ -28,6 +28,26 @@ const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
 }
 
 /**
+ * Render a component with the same providers app uses.
+ *
+ * Good for more isolated testing.
+ */
+const renderWithProviders = (
+  component: React.ReactNode,
+  options: Partial<TestAppOptions> = {}
+) => {
+  const { url } = { ...defaultTestAppOptions, ...options }
+  const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
+  const queryClient = createQueryClient()
+  render(
+    <AppProviders queryClient={queryClient} history={history}>
+      {component}
+    </AppProviders>
+  )
+  return { history }
+}
+
+/**
  * Sample a random element of an array.
  */
 const sample = <T, >(array: T[]): T => {
@@ -36,8 +56,33 @@ const sample = <T, >(array: T[]): T => {
   return item
 }
 
-export { renderTestApp, sample }
+/**
+ * Assert that a functional component was called with the given props.
+ * @param fc the mock or spied upon functional component
+ * @param partialProps an object of props
+ * @param call The call count. Defaults to -1 (the last call). Especially when
+ *  rendering a list of items, other values may be useful.
+ */
+const expectProps = (
+  fc: jest.Mock<any, any>,
+  partialProps: unknown,
+  call = -1
+) => {
+  const callArgs = fc.mock.calls.at(call)
+  expect(callArgs).toEqual([
+    expect.objectContaining(partialProps),
+    expect.anything()
+  ])
+}
+
+export { renderTestApp, renderWithProviders, sample, expectProps }
 // Conveniences
 export { setMockResponse }
-export { screen, prettyDOM, within, fireEvent } from "@testing-library/react"
+export {
+  screen,
+  prettyDOM,
+  within,
+  fireEvent,
+  waitFor
+} from "@testing-library/react"
 export { default as user } from "@testing-library/user-event"
