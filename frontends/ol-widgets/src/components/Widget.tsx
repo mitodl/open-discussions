@@ -1,7 +1,7 @@
 import React from "react"
-import type { WidgetInstance, MarkdownWidgetConfig } from "../interfaces"
+import type { WidgetInstance, RichTextWidgetInstance } from "../interfaces"
 import { WidgetTypes } from "../interfaces"
-import MarkdownWidget from "./MarkdownWidget"
+import RichTextWdiget from "./RichTextWidget"
 
 interface WidgetProps {
   widget: WidgetInstance
@@ -9,8 +9,8 @@ interface WidgetProps {
 }
 
 const Widget: React.FC<WidgetProps> = ({ widget, className }) => {
-  if (widget.widget_type === WidgetTypes.Markdown) {
-    return <MarkdownWidget className={className} widget={widget as WidgetInstance<MarkdownWidgetConfig>} />
+  if (widget.widget_type === WidgetTypes.RichText) {
+    return <RichTextWdiget className={className} widget={widget as RichTextWidgetInstance} />
   }
   throw new Error(`Unrecognized Widget Type: ${widget.widget_type}`)
 }

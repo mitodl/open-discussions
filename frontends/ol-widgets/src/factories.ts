@@ -1,12 +1,12 @@
 import {  faker } from "@faker-js/faker"
 import type { Factory } from "ol-util"
-import type { WidgetInstance, MarkdownWidgetInstance } from "./interfaces"
+import type { WidgetInstance, RichTextWidgetInstance } from "./interfaces"
 import { WidgetTypes } from "./interfaces"
 
-const makeMarkdownWidget: Factory<MarkdownWidgetInstance> = overrides => ({
+const makeRichTextWidget: Factory<RichTextWidgetInstance> = overrides => ({
   id:            faker.datatype.number(),
   title:         faker.lorem.sentence(3),
-  widget_type:   WidgetTypes.Markdown,
+  widget_type:   WidgetTypes.RichText,
   configuration: {
     source: faker.lorem.paragraph()
   },
@@ -14,7 +14,7 @@ const makeMarkdownWidget: Factory<MarkdownWidgetInstance> = overrides => ({
 })
 
 const widgetMakers = {
-  [WidgetTypes.Markdown]: makeMarkdownWidget
+  [WidgetTypes.RichText]: makeRichTextWidget
 }
 
 const makeWidget = (type?: WidgetTypes): WidgetInstance => {
@@ -22,4 +22,4 @@ const makeWidget = (type?: WidgetTypes): WidgetInstance => {
   return maker()
 }
 
-export { makeWidget, makeMarkdownWidget }
+export { makeWidget, makeRichTextWidget }

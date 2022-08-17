@@ -40,11 +40,11 @@ export type WidgetListResponse = {
   available_widgets: WidgetSpec[]
 }
 
-interface MarkdownWidgetConfig {
+interface RichTextWidgetConfig  {
   source: string
 }
-export type MarkdownWidgetInstance = WidgetInstance<MarkdownWidgetConfig>
+export type RichTextWidgetInstance = WidgetInstance<RichTextWidgetConfig>
 
 export enum WidgetTypes {
-  Markdown = 'Markdown'
+  RichText = 'Markdown'
 }
