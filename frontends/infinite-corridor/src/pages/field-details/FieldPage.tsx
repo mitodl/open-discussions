@@ -132,7 +132,7 @@ const FieldPage: React.FC = () => {
           </Container>
         </div>
         <Container>
-          <Grid container>
+          <Grid container spacing={3}>
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
@@ -143,7 +143,7 @@ const FieldPage: React.FC = () => {
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
-            <Grid item xs={12} sm={3} className="ic-sidebar">
+            <Grid item xs={12} sm={3}>
               <WidgetsList
                 widgetListId={fieldQuery.data?.widget_list}
                 isEditing={isEditingWidgets}
