@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.194.1
+Version 0.194.1 (Released August 17, 2022)
 ---------------
 
 - Cc/styling 2 (#3692)
