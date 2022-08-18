@@ -3,7 +3,8 @@ import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
-import { Formik, Form, Field } from "formik"
+import Button from "@mui/material/Button"
+import { Formik, Form, Field, ErrorMessage } from "formik"
 import type { WidgetInstance, WidgetSpec } from "../../interfaces"
 import { getWidgetFieldComponent } from "./getWidgetFieldComponent"
 import { useMemo } from "react"
@@ -14,8 +15,10 @@ interface MuiEditWidgetDialogProps {
   spec: WidgetSpec
   isOpen: boolean
   onClose: () => void
-  className?: string
   onSubmit: (widget: WidgetInstance) => void
+  className?: string
+  errorClassName?: string
+  fieldClassName?: string
 }
 
 /**
@@ -27,14 +30,17 @@ const MuiEditWidgetDialog: React.FC<MuiEditWidgetDialogProps> = ({
   spec,
   onSubmit,
   isOpen,
-  onClose
+  onClose,
+  className,
+  fieldClassName,
+  errorClassName
 }) => {
   const validationSchema = useMemo(
     () => getWidgetSchema(widget.widget_type),
     [widget.widget_type]
   )
   return (
-    <Dialog open={isOpen} onClose={onClose}>
+    <Dialog className={className} open={isOpen} onClose={onClose}>
       <DialogTitle>Edit Widget</DialogTitle>
       <Formik
         initialValues={widget as WidgetInstance<Record<string, unknown>>}
@@ -42,19 +48,21 @@ const MuiEditWidgetDialog: React.FC<MuiEditWidgetDialogProps> = ({
         validateOnChange={false}
         onSubmit={onSubmit}
       >
-        {({ handleSubmit, values, errors }) => (
+        {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
               <label htmlFor="title">Title</label>
               <Field
-                className="form-field"
+                className={fieldClassName}
                 name="title"
                 type="text"
                 value={values.title}
               />
-              {errors.title ? (
-                <div className="validation-message">{errors.title}</div>
-              ) : null}
+              <ErrorMessage
+                className={errorClassName}
+                component="div"
+                name="title"
+              />
               {spec.form_spec.map(fieldSpec => {
                 const fieldName = fieldSpec.field_name
                 // Formik uses dot notation for nested objects as name attrs
@@ -64,22 +72,27 @@ const MuiEditWidgetDialog: React.FC<MuiEditWidgetDialogProps> = ({
                   <React.Fragment key={fieldName}>
                     <label htmlFor={attrName}>{fieldSpec.label}</label>
                     <Field
-                      className="form-field"
+                      className={fieldClassName}
                       as={getWidgetFieldComponent(fieldSpec)}
                       name={attrName}
                       value={values.configuration[fieldSpec.field_name]}
                     />
-                    {errors?.configuration?.[fieldName] ? (
-                      <div className="validation-message">
-                        {errors.configuration[fieldName]}
-                      </div>
-                    ) : null}
+                    <ErrorMessage
+                      className={errorClassName}
+                      component="div"
+                      name={attrName}
+                    />
                   </React.Fragment>
                 )
               })}
             </DialogContent>
             <DialogActions>
-              <button type="submit">Submit</button>
+              <Button type="submit" variant="outlined">
+                Cancel
+              </Button>
+              <Button type="submit" variant="contained">
+                Submit
+              </Button>
             </DialogActions>
           </Form>
         )}

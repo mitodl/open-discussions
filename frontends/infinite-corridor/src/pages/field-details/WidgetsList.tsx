@@ -108,6 +108,8 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
       ))}
       {editing && (
         <MuiEditWidgetDialog
+          fieldClassName="form-field"
+          errorClassName="validation-message"
           onSubmit={handleSubmitEdit}
           widget={editing.widget}
           spec={editing.spec}
