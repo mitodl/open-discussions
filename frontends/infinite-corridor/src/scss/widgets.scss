@@ -12,3 +12,8 @@
     @extend .background-button;
   }
 }
+
+.ol-widget-editing-header {
+  display: flex;
+  justify-content: space-between;
+}

@@ -8,11 +8,13 @@ $color: theme.$color-primary;
     text-transform: none;
   }
   
+  
   .MuiChip-root.MuiChip-filled {
     background-color: theme.$color-background;
   }
 
   .MuiButtonBase-root {
+    text-transform: none;
     &.primary {
       color: $color;
       &.bordered {

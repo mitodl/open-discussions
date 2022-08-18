@@ -32,7 +32,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   className,
   actionsClassName,
   isEditing = false,
-  isOpen,
+  isOpen = true,
   onEdit,
   onDelete,
   onVisibilityChange
@@ -50,7 +50,9 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
     onDelete(widget)
   }, [widget, onDelete])
   return (
-    <Card className={classNames("ol-widget", className)}>
+    <Card className={classNames("ol-widget", className, {
+      'ol-widget-collapsed': !isOpen
+    })}>
       <CardContent>
         <h2 className="ol-widget-header">
           {widget.title}
@@ -71,7 +73,9 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
               </button>
             ))}
         </h2>
-        <div className="ol-widget-content">{children}</div>
+        {
+          isOpen && <div className="ol-widget-content">{children}</div>
+        }
       </CardContent>
       {isEditing && (
         <>

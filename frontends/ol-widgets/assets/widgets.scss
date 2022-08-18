@@ -6,6 +6,11 @@ $iconSize: 20px !default;
     font-size: $iconSize;
     display: inline-flex;
   }
+  &.ol-widget-collapsed {
+    .ol-widget-header {
+      margin: 0;
+    }
+  }
 }
 
 .ol-widget-header {

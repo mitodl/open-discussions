@@ -1,4 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
+import Button from "@mui/material/Button"
+import AddIcon from '@mui/icons-material/Add'
+import { keyBy } from "lodash"
 import {
   Widget,
   WidgetInstance,
@@ -6,7 +9,7 @@ import {
   MuiEditWidgetDialog
 } from "ol-widgets"
 import { useWidgetList } from "../../api/widgets"
-import { keyBy } from "lodash"
+
 
 interface WidgetsListProps {
   isEditing: boolean
@@ -64,13 +67,22 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   const [widgetsOpen, setWidgetsOpen] = useState<Map<number, boolean>>(
     new Map()
   )
-  const handleOpenWidget = useCallback((widget: WidgetInstance) => {
+  const allOpen = useMemo(() => widgets.every(w => widgetsOpen.get(w.id)), [widgets, widgetsOpen])
+  const handleToggleWidgetDetails = useCallback((widget: WidgetInstance) => {
     setWidgetsOpen(value => {
       const clone = new Map(value)
       clone.set(widget.id, !clone.get(widget.id))
       return clone
     })
   }, [])
+  const handleToggleAll = useCallback(() => {
+    if (allOpen) {
+      setWidgetsOpen(new Map())
+    } else {
+      setWidgetsOpen(new Map(widgets.map(w => [w.id, true])))
+    }
+  }, [allOpen, widgets])
+
   const [editingWidgetId, setEditingWidgetId] = useState<number | null>(null)
   const editing = useMemo(() => {
     if (editingWidgetId === null) return null
@@ -93,6 +105,14 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   }, [])
   return (
     <>
+      <div className="ol-widget-editing-header">
+        <Button size="small" color="secondary" startIcon={<AddIcon/>}>
+          Add Widget
+        </Button>
+        <Button size="small" color="secondary" onClick={handleToggleAll}>
+          {allOpen ? 'Collapse all' : 'Expand all'}
+        </Button>
+      </div>
       {widgets.map(widget => (
         <Widget
           key={widget.id}
@@ -101,7 +121,7 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
           isOpen={!!widgetsOpen.get(widget.id)}
           className="ic-widget"
           actionsClassName="ic-widget-actions"
-          onVisibilityChange={handleOpenWidget}
+          onVisibilityChange={handleToggleWidgetDetails}
           onEdit={handleBeginEdit}
           onDelete={handleDelete}
         />
