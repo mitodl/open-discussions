@@ -7,6 +7,8 @@ export type WidgetInstance<T = unknown> = {
 
 export type WidgetProps<T extends WidgetInstance> = {
   className?: string
+  isEditing: boolean
+  isOpen: boolean
   widget: T
 }
 

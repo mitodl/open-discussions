@@ -1,4 +1,5 @@
 import React from "react"
+
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import CardActions from "@mui/material/CardActions"
@@ -9,30 +10,26 @@ import IconDrag from "@mui/icons-material/DragHandle"
 import IconExpand from "@mui/icons-material/ExpandMore"
 import IconCollapse from "@mui/icons-material/ExpandMore"
 
-import type { WidgetInstance, RichTextWidgetInstance } from "../interfaces"
-import { WidgetTypes } from "../interfaces"
-import RichTextWdigetContent from "./RichTextWidgetContent"
-
-
 type WidgetTemplateProps = {
-  widget: WidgetInstance
-  isEditing: boolean
+  title:    string
+  children: React.ReactNode
   className?: string
-  children?: React.ReactNode
+  isOpen:   boolean
+  isEditing: boolean
 }
 
 const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
-  widget,
+  title,
   children,
   className,
+  isOpen = true,
   isEditing = false
 }) => {
-  const isOpen = true
   return (
     <Card className={className}>
       <CardContent>
         <div className="ol-widget-header">
-          <h2>{widget.title}</h2>
+          <h2>{title}</h2>
           {isEditing && (
             isOpen ?
               <button type="button"><IconCollapse fontSize="inherit"/></button> :
@@ -55,27 +52,4 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   )
 }
 
-
-const WidgetContent: React.FC<{ widget: WidgetInstance }> = ({ widget }) => {
-  if (widget.widget_type === WidgetTypes.RichText) {
-    return (
-      <RichTextWdigetContent
-        widget={widget as RichTextWidgetInstance}
-      />
-    )
-  }
-  throw new Error(`Unrecognized Widget Type: ${widget.widget_type}`)
-}
-
-type WidgetProps = Pick<WidgetTemplateProps, 'isEditing' | 'className' | 'widget' >
-
-const Widget: React.FC<WidgetProps> = props => {
-  return (
-    <WidgetTemplate widget={props.widget} isEditing={props.isEditing} className={props.className}>
-      <WidgetContent widget={props.widget} />
-    </WidgetTemplate>
-  )
-}
-
-export default Widget
-export type { WidgetProps }
+export default WidgetTemplate

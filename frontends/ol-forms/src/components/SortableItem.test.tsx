@@ -25,7 +25,7 @@ describe("SortableItem", () => {
     renderItem()
     const sortableItem = await screen.findByText("drag_indicator")
     // eslint-disable-next-line testing-library/no-node-access
-    expect(sortableItem.closest("div").innerHTML).toContain("A TITLE")
+    expect(sortableItem.closest("div")?.innerHTML).toContain("A TITLE")
   })
 
   it("should include a delete button", async () => {

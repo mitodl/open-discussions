@@ -10,15 +10,15 @@ interface WidgetsSidebarProps {
 
 const WidgetList: React.FC<WidgetsSidebarProps> = ({
   widgetListId,
+  isEditing,
   className
 }) => {
   const widgetsQuery = useWidgetList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
+
   return (
     <section className={className}>
-      {widgets.map(widget => (
-        <Widget key={widget.id} widget={widget} />
-      ))}
+      {widgets.map(widget => <Widget key={widget.id} widget={widget} isEditing={isEditing}/>)}
     </section>
   )
 }

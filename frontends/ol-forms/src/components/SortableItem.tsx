@@ -31,8 +31,6 @@ export default function SortableItem<T>(props: Props<T>): JSX.Element {
     <div
       className="d-flex my-3"
       ref={setNodeRef}
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore unfortunately unavoidable because of library types :/
       style={style}
       {...attributes}
     >

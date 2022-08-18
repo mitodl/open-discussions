@@ -102,7 +102,7 @@ const FieldPage: React.FC = () => {
   const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
-    (event: React.SyntheticEvent, newValue: string) => {
+    (_event: React.SyntheticEvent, newValue: string) => {
       history.replace({ hash: newValue })
     },
     [history]
