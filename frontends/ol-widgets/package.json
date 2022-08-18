@@ -9,7 +9,9 @@
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.0",
     "classnames": "^2.3.1",
-    "ol-util": "workspace:*"
+    "formik": "^2.2.9",
+    "ol-util": "workspace:*",
+    "yup": "^0.32.11"
   },
   "peerDependencies": {
     "react": "^16.10 || 17 || 18"

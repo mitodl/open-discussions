@@ -41,7 +41,8 @@
     "webpack-cli": "^4.9.2",
     "webpack-dev-middleware": "^5.3.1",
     "webpack-dev-server": "^4.9.2",
-    "webpack-hot-middleware": "^2.25.1"
+    "webpack-hot-middleware": "^2.25.1",
+    "yup": "^0.32.11"
   },
   "engines": {
     "node": "16"

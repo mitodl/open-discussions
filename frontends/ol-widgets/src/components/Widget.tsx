@@ -16,14 +16,14 @@ import RichTextWdigetContent from "./RichTextWidgetContent"
 
 type WidgetTemplateProps = {
   widget: WidgetInstance
-  isEditing: boolean
+  isEditing?: boolean
   isOpen?: boolean
   className?: string
   actionsClassName?: string
   children?: React.ReactNode
-  onEdit?: () => void // placeholder
-  onDelete?: () => void // placeholder
-  onVisibilityChange?: (open: boolean) => void // placeholder
+  onEdit?: (widget: WidgetInstance) => void
+  onDelete?: (widget: WidgetInstance) => void
+  onVisibilityChange?: (widget: WidgetInstance) => void
 }
 
 const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
@@ -39,32 +39,54 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
 }) => {
   const handleVisibilityChange = useCallback(() => {
     if (!onVisibilityChange) return
-    onVisibilityChange(!isOpen)
-  }, [isOpen, onVisibilityChange])
+    onVisibilityChange(widget)
+  }, [widget, onVisibilityChange])
+  const handleEdit = useCallback(() => {
+    if (!onEdit) return
+    onEdit(widget)
+  }, [widget, onEdit])
+  const handleDelete = useCallback(() => {
+    if (!onDelete) return
+    onDelete(widget)
+  }, [widget, onDelete])
   return (
-    <Card className={classNames('ol-widget', className)}>
+    <Card className={classNames("ol-widget", className)}>
       <CardContent>
-        <h2 className='ol-widget-header'>{widget.title}
+        <h2 className="ol-widget-header">
+          {widget.title}
           {isEditing &&
-            (isOpen ?
-              <button aria-label="Hide widget content" onClick={handleVisibilityChange}>
+            (isOpen ? (
+              <button
+                aria-label="Hide widget content"
+                onClick={handleVisibilityChange}
+              >
                 <IconCollapse fontSize="inherit" />
-              </button> :
-              <button aria-label="Show widget content" onClick={handleVisibilityChange}>
+              </button>
+            ) : (
+              <button
+                aria-label="Show widget content"
+                onClick={handleVisibilityChange}
+              >
                 <IconExpand fontSize="inherit" />
               </button>
-            )}
+            ))}
         </h2>
-        <div className='ol-widget-content'>{children}</div>
+        <div className="ol-widget-content">{children}</div>
       </CardContent>
       {isEditing && (
         <>
           <Divider />
-          <CardActions className={classNames("ol-widget-actions", actionsClassName)}>
-            <button aria-label="Edit widget" type="button" onClick={onEdit}>
+          <CardActions
+            className={classNames("ol-widget-actions", actionsClassName)}
+          >
+            <button aria-label="Edit widget" type="button" onClick={handleEdit}>
               <IconEdit fontSize="inherit" />
             </button>
-            <button aria-label="Delete widget" type="button" onClick={onDelete}>
+            <button
+              aria-label="Delete widget"
+              type="button"
+              onClick={handleDelete}
+            >
               <IconDelete fontSize="inherit" />
             </button>
             <button aria-label="Move widget" type="button">
