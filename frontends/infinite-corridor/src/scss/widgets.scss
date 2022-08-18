@@ -1,0 +1,14 @@
+@use "ol-widgets/assets/widgets";
+@use "buttons";
+
+.ic-widget {
+  button {
+    @extend %button-base;
+  }
+}
+
+.ic-widget-actions {
+  button {
+    @extend .background-button;
+  }
+}

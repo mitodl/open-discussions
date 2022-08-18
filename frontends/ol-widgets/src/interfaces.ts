@@ -5,13 +5,6 @@ export type WidgetInstance<T = unknown> = {
   configuration: T
 }
 
-export type WidgetProps<T extends WidgetInstance> = {
-  className?: string
-  isEditing: boolean
-  isOpen: boolean
-  widget: T
-}
-
 /**
  * Represents an input field for configuring a widget's behavior.
  */

@@ -18,7 +18,9 @@ const WidgetList: React.FC<WidgetsSidebarProps> = ({
 
   return (
     <section className={className}>
-      {widgets.map(widget => <Widget key={widget.id} widget={widget} isEditing={isEditing}/>)}
+      {widgets.map(widget => (
+        <Widget key={widget.id} widget={widget} isEditing={isEditing} isOpen={true} className="ic-widget" actionsClassName="ic-widget-actions" />
+      ))}
     </section>
   )
 }

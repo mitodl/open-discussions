@@ -28,12 +28,7 @@ export default function SortableItem<T>(props: Props<T>): JSX.Element {
   }, [deleteItem, item])
 
   return (
-    <div
-      className="d-flex my-3"
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-    >
+    <div className="d-flex my-3" ref={setNodeRef} style={style} {...attributes}>
       <span {...listeners} className="material-icons drag-handle">
         drag_indicator
       </span>

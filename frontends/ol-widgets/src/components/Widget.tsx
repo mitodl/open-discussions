@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useCallback } from "react"
+import classNames from "classnames"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import CardActions from "@mui/material/CardActions"
@@ -7,71 +8,97 @@ import IconEdit from "@mui/icons-material/Edit"
 import IconDelete from "@mui/icons-material/Delete"
 import IconDrag from "@mui/icons-material/DragHandle"
 import IconExpand from "@mui/icons-material/ExpandMore"
-import IconCollapse from "@mui/icons-material/ExpandMore"
+import IconCollapse from "@mui/icons-material/ExpandLess"
 
 import type { WidgetInstance, RichTextWidgetInstance } from "../interfaces"
 import { WidgetTypes } from "../interfaces"
 import RichTextWdigetContent from "./RichTextWidgetContent"
 
-
 type WidgetTemplateProps = {
   widget: WidgetInstance
   isEditing: boolean
+  isOpen?: boolean
   className?: string
+  actionsClassName?: string
   children?: React.ReactNode
+  onEdit?: () => void // placeholder
+  onDelete?: () => void // placeholder
+  onVisibilityChange?: (open: boolean) => void // placeholder
 }
 
 const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   widget,
   children,
   className,
-  isEditing = false
+  actionsClassName,
+  isEditing = false,
+  isOpen,
+  onEdit,
+  onDelete,
+  onVisibilityChange
 }) => {
-  const isOpen = true
+  const handleVisibilityChange = useCallback(() => {
+    if (!onVisibilityChange) return
+    onVisibilityChange(!isOpen)
+  }, [isOpen, onVisibilityChange])
   return (
-    <Card className={className}>
+    <Card className={classNames('ol-widget', className)}>
       <CardContent>
-        <div className="ol-widget-header">
-          <h2>{widget.title}</h2>
-          {isEditing && (
-            isOpen ?
-              <button type="button"><IconCollapse fontSize="inherit"/></button> :
-              <button type="button"><IconExpand fontSize="inherit"/></button>
-          )}
-        </div>
-        <div>
-          {children}
-        </div>
+        <h2 className='ol-widget-header'>{widget.title}
+          {isEditing &&
+            (isOpen ?
+              <button aria-label="Hide widget content" onClick={handleVisibilityChange}>
+                <IconCollapse fontSize="inherit" />
+              </button> :
+              <button aria-label="Show widget content" onClick={handleVisibilityChange}>
+                <IconExpand fontSize="inherit" />
+              </button>
+            )}
+        </h2>
+        <div className='ol-widget-content'>{children}</div>
       </CardContent>
-      {isEditing && <>
-        <Divider />
-        <CardActions className="ol-widget-actions">
-          <button type="button"><IconEdit fontSize="inherit"/></button>
-          <button type="button"><IconDelete fontSize="inherit"/></button>
-          <button type="button"><IconDrag fontSize="inherit"/></button>
-        </CardActions>
-      </>}
+      {isEditing && (
+        <>
+          <Divider />
+          <CardActions className={classNames("ol-widget-actions", actionsClassName)}>
+            <button aria-label="Edit widget" type="button" onClick={onEdit}>
+              <IconEdit fontSize="inherit" />
+            </button>
+            <button aria-label="Delete widget" type="button" onClick={onDelete}>
+              <IconDelete fontSize="inherit" />
+            </button>
+            <button aria-label="Move widget" type="button">
+              <IconDrag fontSize="inherit" />
+            </button>
+          </CardActions>
+        </>
+      )}
     </Card>
   )
 }
 
-
 const WidgetContent: React.FC<{ widget: WidgetInstance }> = ({ widget }) => {
   if (widget.widget_type === WidgetTypes.RichText) {
-    return (
-      <RichTextWdigetContent
-        widget={widget as RichTextWidgetInstance}
-      />
-    )
+    return <RichTextWdigetContent widget={widget as RichTextWidgetInstance} />
   }
   throw new Error(`Unrecognized Widget Type: ${widget.widget_type}`)
 }
 
-type WidgetProps = Pick<WidgetTemplateProps, 'isEditing' | 'className' | 'widget' >
+type WidgetProps = Pick<
+  WidgetTemplateProps,
+  | "isEditing"
+  | "isOpen"
+  | "className"
+  | "actionsClassName"
+  | "widget"
+  | "onEdit"
+  | "onDelete"
+  | "onVisibilityChange"
+>
 
 const Widget: React.FC<WidgetProps> = props => {
   return (
-    <WidgetTemplate widget={props.widget} isEditing={props.isEditing} className={props.className}>
+    <WidgetTemplate {...props}>
       <WidgetContent widget={props.widget} />
     </WidgetTemplate>
   )

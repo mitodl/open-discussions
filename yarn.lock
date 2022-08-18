@@ -14783,6 +14783,7 @@ __metadata:
     "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
+    classnames: ^2.3.1
     ol-util: "workspace:*"
   peerDependencies:
     react: ^16.10 || 17 || 18
