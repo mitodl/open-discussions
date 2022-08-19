@@ -32,7 +32,6 @@ type WidgetTemplateProps = {
   isEditing?: boolean
   isOpen?: boolean
   className?: string
-  actionsClassName?: string
   children?: React.ReactNode
   onEdit?: (widget: AnonymousWidget) => void
   onDelete?: (widget: AnonymousWidget) => void
@@ -43,7 +42,6 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   widget,
   children,
   className,
-  actionsClassName,
   isEditing = false,
   isOpen = true,
   onEdit,
@@ -98,9 +96,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
       {isEditing && (
         <>
           <Divider />
-          <CardActions
-            className={classNames("ol-widget-actions", actionsClassName)}
-          >
+          <CardActions className="ol-widget-actions">
             <button
               aria-label={btnLabel.edit}
               type="button"
@@ -137,7 +133,6 @@ type WidgetProps = Pick<
   | "isEditing"
   | "isOpen"
   | "className"
-  | "actionsClassName"
   | "widget"
   | "onEdit"
   | "onDelete"

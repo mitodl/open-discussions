@@ -3,3 +3,6 @@ export type {
   MuiManageWidgetDialogProps,
   WidgetSubmitHandler
 } from "./MuiManageWidgetDialog"
+
+export { default as WidgetsListEditable } from "./WidgetsListEditable"
+export type { WidgetsListEditableProps } from "./WidgetsListEditable"

@@ -1,5 +1,4 @@
 import React from "react"
-import { WidgetTypes } from "../../interfaces"
 import type { WidgetFieldSpec } from "../../interfaces"
 
 /**

@@ -47,7 +47,7 @@ export type WidgetListResponse = {
 interface RichTextWidgetConfig {
   source: string
 }
-export type RichTextWidgetInstance = AnonymousWidget<RichTextWidgetConfig>
+export type RichTextWidgetInstance = WidgetInstance<RichTextWidgetConfig>
 
 export enum WidgetTypes {
   RichText = "Markdown"

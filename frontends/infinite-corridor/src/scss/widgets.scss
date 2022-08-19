@@ -19,20 +19,16 @@
   button {
     @extend %button-base;
   }
-}
 
-.ic-widget-actions {
-  button {
+  .MuiCardActions-root button {
     @extend .background-button;
   }
 }
 
-.ol-widget-editing-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.ol-widget-button-group {
+.ic-widget-editing-header {
+  h4 {
+    margin-top: 0px;
+  }
   button:not(:first-child) {
     margin-left: 8px;
   }

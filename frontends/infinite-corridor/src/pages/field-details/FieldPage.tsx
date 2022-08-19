@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback } from "react"
 import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
@@ -113,13 +113,10 @@ const FieldPage: React.FC = () => {
   const fieldLists = fieldQuery.data?.lists ?? []
   const isEditingWidgets = pathname.endsWith("manage/widgets")
 
-  const leaveWidgetManagement = useCallback(
-    (_event: React.SyntheticEvent) => {
-      const { pathname } = history.location
-      history.replace({ pathname: pathname.slice(0, -"manage/widgets".length) })
-    },
-    [history]
-  )
+  const leaveWidgetManagement = useCallback(() => {
+    const { pathname } = history.location
+    history.replace({ pathname: pathname.slice(0, -"manage/widgets".length) })
+  }, [history])
 
   return (
     <FieldPageSkeleton name={name}>

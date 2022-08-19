@@ -34,3 +34,9 @@ $iconSize: 20px !default;
     }
   }
 }
+
+.ol-widget-editing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
