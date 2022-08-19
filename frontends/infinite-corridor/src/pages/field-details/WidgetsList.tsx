@@ -8,34 +8,38 @@ import {
   WidgetSubmitHandler,
   AnonymousWidget
 } from "ol-widgets"
-import { useWidgetList } from "../../api/widgets"
+import { useMutateWidgetsList, useWidgetList } from "../../api/widgets"
 
 interface WidgetsListProps {
   isEditing: boolean
-  widgetListId?: number
+  widgetListId: number
   className?: string
   onFinishEditing?: () => void
 }
 
-const WidgetList: React.FC<WidgetsListProps> = ({
+const WidgetsList: React.FC<WidgetsListProps> = ({
   widgetListId,
   isEditing,
   onFinishEditing,
   className
 }) => {
   const widgetsQuery = useWidgetList(widgetListId)
+  const mutation = useMutateWidgetsList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
   const onSubmit: EditingWidgetsListProps["onSubmit"] = useCallback(
     event => {
-      if (onFinishEditing) onFinishEditing()
-      console.log("submitting")
-      console.log(event)
+      if (event.touched) {
+        mutation.mutate(event.widgets, {
+          onSuccess: () => {
+            if (onFinishEditing) onFinishEditing()
+          }
+        })
+      }
     },
-    [onFinishEditing]
+    [onFinishEditing, mutation]
   )
   const onCancel: EditingWidgetsListProps["onCancel"] = useCallback(() => {
     if (onFinishEditing) onFinishEditing()
-    console.log("cancelling")
   }, [onFinishEditing])
   return (
     <section className={className}>
@@ -131,20 +135,21 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
     setEditingWidget(null)
     setAddingWidget(false)
   }, [])
-  const handleSubmitEdit: WidgetSubmitHandler = useCallback(e => {
-    setAddingWidget(false)
-    setEditingWidget(currentEditingWidget => {
+  const handleSubmitEdit: WidgetSubmitHandler = useCallback(
+    e => {
+      setAddingWidget(false)
+      setEditingWidget(null)
       if (e.type === "edit") {
-        if (currentEditingWidget === null) {
+        if (editingWidget === null) {
           throw new Error("An edit is underway, this should not be null.")
         }
         setWidgets(current =>
-          current.map(w => (w === currentEditingWidget ? e.widget : w))
+          current.map(w => (w === editingWidget ? e.widget : w))
         )
         setWidgetsOpen(currentlyOpen => {
-          if (!currentlyOpen.has(currentEditingWidget)) return currentlyOpen
+          if (!currentlyOpen.has(editingWidget)) return currentlyOpen
           const clone = new Set(currentlyOpen)
-          clone.delete(currentEditingWidget)
+          clone.delete(editingWidget)
           clone.add(e.widget)
           return clone
         })
@@ -152,8 +157,9 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
         setWidgets(current => [e.widget, ...current])
       }
       return null
-    })
-  }, [])
+    },
+    [editingWidget]
+  )
   const handleDelete = useCallback((deleted: AnonymousWidget) => {
     setWidgets(current => current.filter(w => w !== deleted))
   }, [])
@@ -220,4 +226,4 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   )
 }
 
-export default WidgetList
+export default WidgetsList

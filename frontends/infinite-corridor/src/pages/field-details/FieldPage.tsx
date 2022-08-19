@@ -155,12 +155,14 @@ const FieldPage: React.FC = () => {
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
             <Grid item xs={12} sm={3}>
-              <WidgetsList
-                className="ic-widget-list"
-                widgetListId={fieldQuery.data?.widget_list}
-                isEditing={isEditingWidgets}
-                onFinishEditing={leaveWidgetManagement}
-              />
+              {fieldQuery.data?.widget_list && (
+                <WidgetsList
+                  className="ic-widget-list"
+                  widgetListId={fieldQuery.data.widget_list}
+                  isEditing={isEditingWidgets}
+                  onFinishEditing={leaveWidgetManagement}
+                />
+              )}
             </Grid>
           </Grid>
         </Container>
