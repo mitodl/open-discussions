@@ -6,7 +6,8 @@ import {
   Widget,
   WidgetInstance,
   WidgetListResponse,
-  MuiEditWidgetDialog
+  MuiManageWidgetDialog,
+  WidgetSubmitHandler
 } from "ol-widgets"
 import { useWidgetList } from "../../api/widgets"
 
@@ -24,7 +25,6 @@ const WidgetList: React.FC<WidgetsListProps> = ({
 }) => {
   const widgetsQuery = useWidgetList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
-  console.log(widgetsQuery)
   return (
     <section className={className}>
       {isEditing ?
@@ -60,9 +60,9 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   useEffect(() => {
     setWidgets(savedWidgets)
   }, [savedWidgets])
+  const [addingWidget, setAddingWidget] = useState(false)
 
   const widgetsById = useMemo(() => keyBy(widgets, w => w.id), [widgets])
-  const specsByType = useMemo(() => keyBy(specs, s => s.widget_type), [specs])
 
   const [widgetsOpen, setWidgetsOpen] = useState<Map<number, boolean>>(
     new Map()
@@ -84,29 +84,31 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   }, [allOpen, widgets])
 
   const [editingWidgetId, setEditingWidgetId] = useState<number | null>(null)
-  const editing = useMemo(() => {
-    if (editingWidgetId === null) return null
-    const widget = widgetsById[editingWidgetId]
-    return { widget, spec: specsByType[widget.widget_type] }
-  }, [editingWidgetId, widgetsById, specsByType])
+  const editingWidget = editingWidgetId === null ? null : widgetsById[editingWidgetId]
   const handleBeginEdit = useCallback((widget: WidgetInstance) => {
     setEditingWidgetId(widget.id)
   }, [])
   const handleCancelEditing = useCallback(() => {
     setEditingWidgetId(null)
+    setAddingWidget(false)
   }, [])
-  const handleSubmitEdit = useCallback((edited: WidgetInstance) => {
+  const handleSubmitEdit: WidgetSubmitHandler = useCallback(e => {
+    setAddingWidget(false)
     setEditingWidgetId(null)
-    setWidgets(current => current.map(w => (w.id === edited.id ? edited : w)))
+    if (e.type === 'edit') {
+      setWidgets(current => current.map(w => (w.id === e.widget.id ? e.widget : w)))
+    } else {
+      setWidgets(current => [e.widget, ...current])
+    }
   }, [])
   const handleDelete = useCallback((deleted: WidgetInstance) => {
-    console.log("DELETED!")
     setWidgets(current => current.filter(w => w.id !== deleted.id))
   }, [])
+  const handleAdd = useCallback(() => setAddingWidget(true), [])
   return (
     <>
       <div className="ol-widget-editing-header">
-        <Button size="small" color="secondary" startIcon={<AddIcon/>}>
+        <Button size="small" color="secondary" startIcon={<AddIcon/>} onClick={handleAdd}>
           Add Widget
         </Button>
         <Button size="small" color="secondary" onClick={handleToggleAll}>
@@ -126,17 +128,16 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
           onDelete={handleDelete}
         />
       ))}
-      {editing && (
-        <MuiEditWidgetDialog
-          fieldClassName="form-field"
-          errorClassName="validation-message"
-          onSubmit={handleSubmitEdit}
-          widget={editing.widget}
-          spec={editing.spec}
-          isOpen={!!editing.widget}
-          onClose={handleCancelEditing}
-        />
-      )}
+      <MuiManageWidgetDialog
+        isOpen={!!editingWidget || addingWidget}
+        className="ic-widget-editing-dialog"
+        fieldClassName="form-field"
+        errorClassName="validation-message"
+        onSubmit={handleSubmitEdit}
+        widget={editingWidget}
+        specs={specs}
+        onClose={handleCancelEditing}
+      />
     </>
   )
 }
