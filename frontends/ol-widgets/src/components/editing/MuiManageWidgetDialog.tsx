@@ -46,6 +46,7 @@ interface WidgetEditingProps {
   onCancel: () => void
   errorClassName?: string
   fieldClassName?: string
+  isNew: boolean
 }
 
 const DialogContentEditing: React.FC<WidgetEditingProps> = ({
@@ -54,22 +55,29 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   onSubmit,
   onCancel,
   fieldClassName,
-  errorClassName
+  errorClassName,
+  isNew
 }) => {
   const validationSchema = useMemo(
     () => getWidgetSchema(widget.widget_type),
     [widget.widget_type]
   )
+  const title = useMemo(() => {
+    if (isNew) {
+      return `Add new ${spec.description} widget`
+    }
+    return "Edit widget"
+  }, [isNew, spec])
   const onSubmitForm = useCallback(
-    (widget: AnonymousWidget) => {
-      const event: WidgetSubmitEvent = isNil((widget as any).id) ?
+    (value: AnonymousWidget) => {
+      const event: WidgetSubmitEvent = isNil((value as any).id) ?
         {
           type:   "add",
-          widget: { ...widget, id: null }
+          widget: { ...value, id: null }
         } :
         {
-          type: "edit",
-          widget
+          type:   "edit",
+          widget: value
         }
       onSubmit(event)
     },
@@ -77,7 +85,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   )
   return (
     <>
-      <DialogTitle>Edit Widget</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <Formik
         initialValues={widget as AnonymousWidget<Record<string, unknown>>}
         validationSchema={validationSchema}
@@ -239,6 +247,7 @@ const MuiManageWidgetDialog: React.FC<MuiManageWidgetDialogProps> = ({
   errorClassName
 }) => {
   const [widget, setWidget] = useState<AnonymousWidget | null>(null)
+  const isNew = !initialWidget
   useEffect(() => {
     setWidget(initialWidget)
   }, [
@@ -259,6 +268,7 @@ const MuiManageWidgetDialog: React.FC<MuiManageWidgetDialogProps> = ({
           onCancel={onCancel}
           fieldClassName={fieldClassName}
           errorClassName={errorClassName}
+          isNew={isNew}
         />
       ) : (
         <DialogContentAdding
