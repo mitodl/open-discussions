@@ -1,4 +1,5 @@
 import React from "react"
+import { WIDGET_FIELD_TYPES } from "../../constants"
 import type { WidgetFieldSpec } from "../../interfaces"
 
 /**
@@ -19,7 +20,7 @@ type WidgetFieldComponent = React.FC<WidgetEditingFieldProps>
 const getWidgetFieldComponent = (
   spec: WidgetFieldSpec
 ): WidgetFieldComponent | string => {
-  if (spec.input_type === "markdown_wysiwyg") {
+  if (spec.input_type === WIDGET_FIELD_TYPES.markdown) {
     return "textarea"
   }
   throw new Error("Unrecognized field input type.")
