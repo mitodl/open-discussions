@@ -48,4 +48,17 @@ describe("WidgetsList", () => {
     expectProps(mockWidget, { widget: widgetList.widgets.at(-2) }, -2)
     expectProps(mockWidget, { widget: widgetList.widgets.at(-3) }, -3)
   })
+
+  test("Widget editing", () => {
+    /**
+     * Add an integration test here that checks basic widget editing functionality:
+     * - start with a widgetList with 2 widgets
+     * - delete one
+     * - assert the correct API call is made
+     * - assert returned to field page (not manage widgets route)
+     *
+     * All other widget editing functionality can be checked in WidgetsListEditable.
+     */
+    expect(1 + 1).toBe(2)
+  })
 })

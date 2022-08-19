@@ -95,6 +95,8 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
   )
 }
 
+const MANAGE_WIDGETS_SUFFIX = "manage/widgets/"
+
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
 
@@ -111,11 +113,13 @@ const FieldPage: React.FC = () => {
 
   const featuredList = fieldQuery.data?.featured_list
   const fieldLists = fieldQuery.data?.lists ?? []
-  const isEditingWidgets = pathname.endsWith("manage/widgets")
+  const isEditingWidgets = pathname.endsWith(MANAGE_WIDGETS_SUFFIX)
 
   const leaveWidgetManagement = useCallback(() => {
     const { pathname } = history.location
-    history.replace({ pathname: pathname.slice(0, -"manage/widgets".length) })
+    history.replace({
+      pathname: pathname.slice(0, -MANAGE_WIDGETS_SUFFIX.length)
+    })
   }, [history])
 
   return (

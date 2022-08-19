@@ -20,7 +20,6 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
   className
 }) => {
   const widgetsQuery = useWidgetList(widgetListId)
-  console.log(widgetsQuery)
   const mutation = useMutateWidgetsList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
   const onSubmit: WidgetsListEditableProps["onSubmit"] = useCallback(
