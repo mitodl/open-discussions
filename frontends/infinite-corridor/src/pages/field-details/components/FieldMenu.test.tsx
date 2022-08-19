@@ -3,9 +3,9 @@ import { Router } from "react-router"
 import { createMemoryHistory } from "history"
 import { render, screen } from "@testing-library/react"
 
-import { urls } from "../api/fields"
-import * as factories from "../api/fields/factories"
-import { setMockResponse, user } from "../test-utils"
+import { urls } from "../../../api/fields"
+import * as factories from "../../../api/fields/factories"
+import { setMockResponse, user } from "../../../test-utils"
 import FieldMenu from "./FieldMenu"
 
 describe("FieldMenu", () => {

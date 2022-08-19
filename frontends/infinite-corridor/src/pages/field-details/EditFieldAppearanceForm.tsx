@@ -6,7 +6,7 @@ import * as Yup from "yup"
 
 import { FieldChannelAppearanceForm, useMutateField } from "../../api/fields"
 import type { FieldChannel } from "../../api/fields/interfaces"
-import FieldAvatar from "../../components/FieldAvatar"
+import FieldAvatar from "./components/FieldAvatar"
 import { makeFieldViewPath } from "../../pages/urls"
 
 type FormProps = {

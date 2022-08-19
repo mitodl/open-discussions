@@ -34,6 +34,7 @@ interface FieldChannel {
   avatar_medium: string | null
   public_description: string
   is_moderator: boolean
+  widget_list: number
 }
 export type FieldList = PaginatedResult<FieldChannel>
 

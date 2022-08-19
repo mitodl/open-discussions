@@ -8,18 +8,6 @@
 $cardListSpacer: 1.5em;
 
 .ic-resource-card {
-  &.MuiCard-root {
-    color: theme.$font-color-default;
-
-    transition-duration: theme.$transition-duration;
-    transition-property: box-shadow;
-    &:hover {
-      box-shadow: theme.$shadow;
-    }
-  }
-  .MuiCardContent-root:last-child {
-    padding: 16px;
-  }
 
   @include breakpoint(phone) {
     .ol-lrc-image{

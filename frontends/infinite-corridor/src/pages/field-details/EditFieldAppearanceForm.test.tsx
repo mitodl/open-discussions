@@ -6,20 +6,26 @@ import {
   user
 } from "../../test-utils"
 import * as factory from "../../api/fields/factories"
-import { urls } from "../../api/fields"
+import { FieldChannel, urls } from "../../api/fields"
+import { urls as widgetUrls } from "../../api/widgets"
 import { waitFor } from "@testing-library/react"
 import { makeFieldViewPath } from "../urls"
+import { makeWidgetListResponse } from "ol-widgets"
+
+const setupApis = (fieldOverrides?: Partial<FieldChannel>) => {
+  const field = factory.makeField({ is_moderator: true, ...fieldOverrides })
+  setMockResponse.get(urls.fieldDetails(field.name), field)
+  setMockResponse.get(urls.userLists(), [field])
+  setMockResponse.get(
+    widgetUrls.widgetList(field.widget_list),
+    makeWidgetListResponse({}, { count: 0 })
+  )
+  return field
+}
 
 describe("EditFieldAppearanceForm", () => {
-  let field
-
-  beforeEach(() => {
-    field = factory.makeField({ is_moderator: true })
-    setMockResponse.get(urls.fieldDetails(field.name), field)
-    setMockResponse.get(urls.userLists(), [field])
-  })
-
   it("Displays the field title, appearance inputs with current field values", async () => {
+    const field = setupApis()
     expect(field.is_moderator).toBeTruthy()
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#appearance` })
     const descInput = (await screen.findByLabelText(
@@ -33,6 +39,7 @@ describe("EditFieldAppearanceForm", () => {
   })
 
   it("Shows an error if a required field is blank", async () => {
+    const field = setupApis()
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#appearance` })
     const titleInput = (await screen.findByLabelText(
       "Title"
@@ -47,12 +54,10 @@ describe("EditFieldAppearanceForm", () => {
   })
 
   it("updates field values on form submission", async () => {
-    const field = factory.makeField({
-      is_moderator:  true,
+    const field = setupApis({
       featured_list: null, // so we don't have to mock userList responses
       lists:         []
     })
-    setMockResponse.get(urls.fieldDetails(field.name), field)
     const newTitle = "New Title"
     const newDesc = "New Description"
     // Initial field values

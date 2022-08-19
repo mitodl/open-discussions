@@ -3,8 +3,8 @@ import { Link } from "react-router-dom"
 import { Menu } from "@mui/material"
 import MenuItem from "@mui/material/MenuItem"
 
-import { FieldChannel } from "../api/fields"
-import { makeFieldEditPath } from "../pages/urls"
+import { FieldChannel } from "../../../api/fields"
+import { makeFieldEditPath } from "../../../pages/urls"
 
 type SettingsMenuProps = {
   field: FieldChannel

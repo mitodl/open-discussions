@@ -10,12 +10,13 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme } from "@mui/material/styles"
 import { LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import { useFieldDetails, useFieldListItems, UserList } from "../api/fields"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
 import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
-import { imgConfigs } from "../util/constants"
+import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
+import { imgConfigs } from "../../util/constants"
+import WidgetsList from "./WidgetsList"
 
 type RouteParams = {
   name: string
@@ -97,7 +98,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
   const history = useHistory()
-  const { hash } = useLocation()
+  const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
@@ -109,13 +110,13 @@ const FieldPage: React.FC = () => {
 
   const featuredList = fieldQuery.data?.featured_list
   const fieldLists = fieldQuery.data?.lists ?? []
-
+  const isEditingWidgets = pathname.endsWith("manage/widgets")
   return (
     <FieldPageSkeleton name={name}>
       <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
-            <Grid container spacing={1}>
+            <Grid container>
               <Grid item xs={12} sm={9}>
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
@@ -131,7 +132,7 @@ const FieldPage: React.FC = () => {
           </Container>
         </div>
         <Container>
-          <Grid container spacing={1}>
+          <Grid container spacing={3}>
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
@@ -141,6 +142,13 @@ const FieldPage: React.FC = () => {
                 ))}
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <WidgetsList
+                className="ic-widget-list"
+                widgetListId={fieldQuery.data?.widget_list}
+                isEditing={isEditingWidgets}
+              />
             </Grid>
           </Grid>
         </Container>

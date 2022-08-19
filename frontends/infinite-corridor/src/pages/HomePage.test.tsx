@@ -1,6 +1,8 @@
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { zip } from "lodash"
-import { Field, urls } from "../api/fields"
+import { FieldChannel, urls } from "../api/fields"
+import { urls as widgetUrls } from "../api/widgets"
+import { makeWidgetListResponse } from "ol-widgets"
 import * as factories from "../api/fields/factories"
 import {
   screen,
@@ -55,13 +57,17 @@ describe("HomePage", () => {
 
   test("Clicking on a link goes to the field page", async () => {
     const fieldsList = factories.makeFieldsPaginated(3)
-    setMockResponse.get(urls.fieldsList, fieldsList)
-    const field: Field = {
+    const field: FieldChannel = {
       ...sample(fieldsList.results),
       featured_list: null,
       lists:         []
     }
+    setMockResponse.get(urls.fieldsList, fieldsList)
     setMockResponse.get(urls.fieldDetails(field.name), field)
+    setMockResponse.get(
+      widgetUrls.widgetList(field.widget_list),
+      makeWidgetListResponse({}, { count: 0 })
+    )
 
     const { history } = renderTestApp()
     const link = await findFieldLink(field.title)

@@ -56,6 +56,7 @@ const makeField: Factory<FieldChannel> = overrides => ({
   featured_list:      makeUserList(),
   lists:              [makeUserList(), makeUserList()],
   is_moderator:       faker.datatype.boolean(),
+  widget_list:        faker.datatype.number(),
   ...overrides
 })
 

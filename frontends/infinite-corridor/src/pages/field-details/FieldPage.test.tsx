@@ -1,10 +1,23 @@
+import React from "react"
 import { assertInstanceOf, assertNotNil } from "ol-util"
-import { urls } from "../api/fields"
+import { urls } from "../../api/fields"
 import { LearningResource, LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem, FieldChannel } from "../api/fields"
-import * as factory from "../api/fields/factories"
-import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
+import type { UserList, UserListItem, FieldChannel } from "../../api/fields"
+import * as factory from "../../api/fields/factories"
+import WidgetList from "./WidgetsList"
+import {
+  renderTestApp,
+  screen,
+  setMockResponse,
+  within
+} from "../../test-utils"
+
+jest.mock("./WidgetsList", () => ({
+  __esModule: true,
+  default:    jest.fn(() => <div>WidgetList</div>)
+}))
+const mockWidgetList = jest.mocked(WidgetList)
 
 jest.mock("ol-search-ui", () => {
   const actual = jest.requireActual("ol-search-ui")
@@ -143,5 +156,19 @@ describe("FieldPage", () => {
     await screen.findByText(lists[0].list.title)
     await screen.findByText(lists[1].list.title)
     expect(spyTitledCarousel).not.toHaveBeenCalled()
+  })
+
+  it("Renders WidgetList with the expected Props", async () => {
+    const { field } = setupApis()
+    renderTestApp({ url: `/fields/${field.name}` })
+    await screen.findByText("WidgetList")
+    expect(field.widget_list).toEqual(expect.any(Number))
+
+    const expectedProps = expect.objectContaining({
+      widgetListId: field.widget_list,
+      isEditing:    false
+    })
+    const expectedContext = expect.anything()
+    expect(mockWidgetList).lastCalledWith(expectedProps, expectedContext)
   })
 })
