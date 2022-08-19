@@ -14,6 +14,19 @@ import type { AnonymousWidget, RichTextWidgetInstance } from "../interfaces"
 import { WidgetTypes } from "../interfaces"
 import RichTextWdigetContent from "./RichTextWidgetContent"
 
+/**
+ * Button labels for Widgets.
+ *
+ * Useful for tests.
+ */
+const btnLabel = {
+  expand:   "Show widget content",
+  collapse: "Hide widget content",
+  edit:     "Edit widget",
+  delete:   "Delete widget",
+  move:     "Move widget"
+}
+
 type WidgetTemplateProps = {
   widget: AnonymousWidget
   isEditing?: boolean
@@ -49,6 +62,11 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
     if (!onDelete) return
     onDelete(widget)
   }, [widget, onDelete])
+
+  if (!isEditing && !isOpen) {
+    throw new Error("Collapsed widgets outside of editing mode not supported")
+  }
+
   return (
     <Card
       className={classNames("ol-widget", className, {
@@ -61,14 +79,14 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
           {isEditing &&
             (isOpen ? (
               <button
-                aria-label="Hide widget content"
+                aria-label={btnLabel.collapse}
                 onClick={handleVisibilityChange}
               >
                 <IconCollapse fontSize="inherit" />
               </button>
             ) : (
               <button
-                aria-label="Show widget content"
+                aria-label={btnLabel.expand}
                 onClick={handleVisibilityChange}
               >
                 <IconExpand fontSize="inherit" />
@@ -83,17 +101,21 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
           <CardActions
             className={classNames("ol-widget-actions", actionsClassName)}
           >
-            <button aria-label="Edit widget" type="button" onClick={handleEdit}>
+            <button
+              aria-label={btnLabel.edit}
+              type="button"
+              onClick={handleEdit}
+            >
               <IconEdit fontSize="inherit" />
             </button>
             <button
-              aria-label="Delete widget"
+              aria-label={btnLabel.delete}
               type="button"
               onClick={handleDelete}
             >
               <IconDelete fontSize="inherit" />
             </button>
-            <button aria-label="Move widget" type="button">
+            <button aria-label={btnLabel.move} type="button">
               <IconDrag fontSize="inherit" />
             </button>
           </CardActions>
@@ -132,3 +154,4 @@ const Widget: React.FC<WidgetProps> = props => {
 
 export default Widget
 export type { WidgetProps }
+export { btnLabel }
