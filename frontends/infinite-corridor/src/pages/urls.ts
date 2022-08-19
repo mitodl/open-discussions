@@ -11,6 +11,6 @@ export const makeFieldViewPath = (name: string) =>
   generatePath(FIELD_VIEW, { name })
 export const makeFieldEditPath = (name: string) =>
   generatePath(FIELD_EDIT, { name })
-export const makeFieldEditWidgetsPath = (name: string) =>
+export const makeFieldManageWidgetsPath = (name: string) =>
   generatePath(FIELD_EDIT_WIDGETS, { name })
 export const SEARCH = `${BASE}/search`

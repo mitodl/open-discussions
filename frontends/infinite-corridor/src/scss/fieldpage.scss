@@ -194,14 +194,3 @@ $minTabHeigt: 44px;
   z-index: 2000;
   color: #fff;
 }
-
-.ic-widget-list {
-  > * {
-    &:not(:first-child) {
-      margin-top: 1em;
-    }
-    &:not(:last-child) {
-      margin-bottom: 1em;
-    }
-  }
-}

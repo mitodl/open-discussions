@@ -14,20 +14,38 @@ interface WidgetsListProps {
   isEditing: boolean
   widgetListId?: number
   className?: string
+  onFinishEditing?: () => void
 }
 
 const WidgetList: React.FC<WidgetsListProps> = ({
   widgetListId,
   isEditing,
+  onFinishEditing,
   className
 }) => {
   const widgetsQuery = useWidgetList(widgetListId)
   const widgets = widgetsQuery.data?.widgets ?? []
+  const onSubmit: EditingWidgetsListProps["onSubmit"] = useCallback(
+    event => {
+      if (onFinishEditing) onFinishEditing()
+      console.log("submitting")
+      console.log(event)
+    },
+    [onFinishEditing]
+  )
+  const onCancel: EditingWidgetsListProps["onCancel"] = useCallback(() => {
+    if (onFinishEditing) onFinishEditing()
+    console.log("cancelling")
+  }, [onFinishEditing])
   return (
     <section className={className}>
       {isEditing ?
         widgetsQuery.data && (
-          <EditingWidgetsList widgetsList={widgetsQuery.data} />
+          <EditingWidgetsList
+            widgetsList={widgetsQuery.data}
+            onSubmit={onSubmit}
+            onCancel={onCancel}
+          />
         ) :
         widgets.map(widget => (
           <Widget
@@ -42,8 +60,15 @@ const WidgetList: React.FC<WidgetsListProps> = ({
   )
 }
 
+type SubmitWidgetsEvent = {
+  touched: boolean
+  widgets: AnonymousWidget[]
+}
+
 interface EditingWidgetsListProps {
   widgetsList: WidgetListResponse
+  onSubmit: (event: SubmitWidgetsEvent) => void
+  onCancel: () => void
 }
 
 /**
@@ -51,7 +76,9 @@ interface EditingWidgetsListProps {
  * This component does NOT make API calls itself.
  */
 const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
-  widgetsList
+  widgetsList,
+  onSubmit,
+  onCancel
 }) => {
   const { widgets: savedWidgets, available_widgets: specs } = widgetsList
   const [widgets, setWidgets] = useState<AnonymousWidget[]>([])
@@ -131,8 +158,28 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
     setWidgets(current => current.filter(w => w !== deleted))
   }, [])
   const handleAdd = useCallback(() => setAddingWidget(true), [])
+
+  const handleDone = useCallback(() => {
+    if (widgets !== savedWidgets) {
+      onSubmit({ touched: true, widgets })
+    } else {
+      onSubmit({ touched: false, widgets })
+    }
+  }, [onSubmit, widgets, savedWidgets])
+
   return (
     <>
+      <h4 className="ol-widget-editing-header">
+        Manage Widgets
+        <div className="ol-widget-button-group">
+          <Button size="small" variant="outlined" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button size="small" variant="contained" onClick={handleDone}>
+            Done
+          </Button>
+        </div>
+      </h4>
       <div className="ol-widget-editing-header">
         <Button
           size="small"

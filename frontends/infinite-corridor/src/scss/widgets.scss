@@ -1,6 +1,20 @@
 @use "ol-widgets/assets/widgets";
 @use "buttons";
 
+.ic-widget-list {
+  > * {
+    &:first-child {
+      margin-top: 0;
+    }
+    &:not(:first-child) {
+      margin-top: 1em;
+    }
+    &:not(:last-child) {
+      margin-bottom: 1em;
+    }
+  }
+}
+
 .ic-widget {
   button {
     @extend %button-base;
@@ -16,4 +30,10 @@
 .ol-widget-editing-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.ol-widget-button-group {
+  button:not(:first-child) {
+    margin-left: 8px;
+  }
 }
