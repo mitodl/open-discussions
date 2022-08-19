@@ -8,25 +8,28 @@ import RadioGroup from "@mui/material/RadioGroup"
 import Radio from "@mui/material/Radio"
 import FormControlLabel from "@mui/material/FormControlLabel"
 import { Formik, Form, Field, ErrorMessage } from "formik"
-import type { WidgetInstance, WidgetSpec } from "../../interfaces"
+import { isNil } from "lodash"
+import { AnonymousWidget, WidgetSpec, WidgetTypes } from "../../interfaces"
 import { getWidgetFieldComponent } from "./getWidgetFieldComponent"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { getWidgetSchema } from "./schemas"
 
-type NascentWidget = Omit<WidgetInstance, 'id'> & { id: null }
+type NascentWidget = AnonymousWidget & { id: null }
 
-type WidgetSubmitEvent = {
-  widget: WidgetInstance
-  type: 'edit'
-} | {
-  widget: NascentWidget
-  type: 'add'
-}
+type WidgetSubmitEvent =
+  | {
+      type: "edit"
+      widget: AnonymousWidget
+    }
+  | {
+      type: "add"
+      widget: NascentWidget
+    }
 
 type WidgetSubmitHandler = (event: WidgetSubmitEvent) => void
 
 interface MuiManageWidgetDialogProps {
-  widget?: WidgetInstance | null
+  widget?: AnonymousWidget | null
   specs: WidgetSpec[]
   isOpen: boolean
   onCancel: () => void
@@ -37,9 +40,9 @@ interface MuiManageWidgetDialogProps {
 }
 
 interface WidgetEditingProps {
-  widget: WidgetInstance | NascentWidget
+  widget: AnonymousWidget
   spec: WidgetSpec
-  onSubmit: (event: WidgetSubmitEvent) => void
+  onSubmit: WidgetSubmitHandler
   onCancel: () => void
   errorClassName?: string
   fieldClassName?: string
@@ -57,21 +60,26 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
     () => getWidgetSchema(widget.widget_type),
     [widget.widget_type]
   )
-  const onSubmitForm = useCallback((widget: WidgetInstance | NascentWidget) => {
-    const event: WidgetSubmitEvent = widget.id === null ? {
-      widget,
-      type: 'add'
-    } : {
-      widget,
-      type: 'edit'
-    }
-    onSubmit(event)
-  }, [onSubmit])
+  const onSubmitForm = useCallback(
+    (widget: AnonymousWidget) => {
+      const event: WidgetSubmitEvent = isNil((widget as any).id) ?
+        {
+          type:   "add",
+          widget: { ...widget, id: null }
+        } :
+        {
+          type: "edit",
+          widget
+        }
+      onSubmit(event)
+    },
+    [onSubmit]
+  )
   return (
     <>
       <DialogTitle>Edit Widget</DialogTitle>
       <Formik
-        initialValues={widget as WidgetInstance<Record<string, unknown>>}
+        initialValues={widget as AnonymousWidget<Record<string, unknown>>}
         validationSchema={validationSchema}
         validateOnChange={false}
         onSubmit={onSubmitForm}
@@ -115,11 +123,11 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
               })}
             </DialogContent>
             <DialogActions>
-              <Button type="submit" variant="outlined" onClick={onCancel}>
-              Cancel
+              <Button variant="outlined" onClick={onCancel}>
+                Cancel
               </Button>
               <Button type="submit" variant="contained">
-              Submit
+                Submit
               </Button>
             </DialogActions>
           </Form>
@@ -139,45 +147,66 @@ type AddWidgetFormValues = {
   widget_type: string
 }
 
-const DialogContentAdding: React.FC<WidgetAddingProps> = ({specs, onCancel, onSubmit}) => {
-  const initialValues = useMemo(() => ({ widget_type: specs[0].widget_type }), [specs])
-  const onSubmitType = useCallback((values: AddWidgetFormValues) => {
-    const spec = mustFindSpec(specs, values.widget_type)
-    const widget: NascentWidget = {
-      title:         'New Widget',
-      configuration: Object.fromEntries(spec.form_spec.map(fieldSpec => [fieldSpec.field_name, fieldSpec.default])),
-      widget_type:   spec.widget_type,
-      id:            null
-    }
-    onSubmit(widget)
-  }, [specs, onSubmit])
+const DialogContentAdding: React.FC<WidgetAddingProps> = ({
+  specs,
+  onCancel,
+  onSubmit
+}) => {
+  const supportedSpecs = useMemo(
+    () =>
+      specs.filter(spec => {
+        return Object.values(WidgetTypes).includes(
+          spec.widget_type as WidgetTypes
+        )
+      }),
+    [specs]
+  )
+  const initialValues = useMemo(
+    () => ({ widget_type: supportedSpecs[0]?.widget_type }),
+    [supportedSpecs]
+  )
+  const onSubmitType = useCallback(
+    (values: AddWidgetFormValues) => {
+      const spec = mustFindSpec(specs, values.widget_type)
+      const widget: NascentWidget = {
+        id:            null,
+        title:         "New Widget",
+        configuration: Object.fromEntries(
+          spec.form_spec.map(fieldSpec => [
+            fieldSpec.field_name,
+            fieldSpec.default
+          ])
+        ),
+        widget_type: spec.widget_type
+      }
+      onSubmit(widget)
+    },
+    [specs, onSubmit]
+  )
   return (
     <>
       <DialogTitle>New Widget</DialogTitle>
-      <Formik
-        initialValues={initialValues}
-        onSubmit={onSubmitType}
-      >
-        {({ handleSubmit }) => (
+      <Formik initialValues={initialValues} onSubmit={onSubmitType}>
+        {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
-              <RadioGroup name='spec'>
-                {specs.map(spec => (
+              <RadioGroup name="widget_type" value={values.widget_type}>
+                {supportedSpecs.map(spec => (
                   <FormControlLabel
                     key={spec.widget_type}
                     value={spec.widget_type}
                     control={<Radio />}
-                    label={spec.widget_type}
+                    label={spec.description}
                   />
                 ))}
               </RadioGroup>
             </DialogContent>
             <DialogActions>
-              <Button type="submit" variant="outlined" onClick={onCancel}>
-              Cancel
+              <Button variant="outlined" onClick={onCancel}>
+                Cancel
               </Button>
               <Button type="submit" variant="contained">
-              Submit
+                Submit
               </Button>
             </DialogActions>
           </Form>
@@ -209,21 +238,38 @@ const MuiManageWidgetDialog: React.FC<MuiManageWidgetDialogProps> = ({
   fieldClassName,
   errorClassName
 }) => {
-  const [widget, setWidget] = useState<WidgetInstance | NascentWidget | null>(initialWidget)
-  const handlePickNewWidget: WidgetAddingProps["onSubmit"] = useCallback(nascentWidget => setWidget(nascentWidget), [])
+  const [widget, setWidget] = useState<AnonymousWidget | null>(null)
+  useEffect(() => {
+    setWidget(initialWidget)
+  }, [
+    initialWidget,
+    isOpen // clear the editing widget whenever modal opens/closes
+  ])
+  const handlePickNewWidget: WidgetAddingProps["onSubmit"] = useCallback(
+    nascentWidget => setWidget(nascentWidget),
+    []
+  )
   return (
     <Dialog fullWidth className={className} open={isOpen} onClose={onCancel}>
-      {widget ? <DialogContentEditing
-        widget={widget}
-        spec={mustFindSpec(specs, widget.widget_type)}
-        onSubmit={onSubmit}
-        onCancel={onCancel}
-        fieldClassName={fieldClassName}
-        errorClassName={errorClassName}
-      /> : <DialogContentAdding specs={specs} onSubmit={handlePickNewWidget}  onCancel={onCancel} /> }
+      {widget ? (
+        <DialogContentEditing
+          widget={widget}
+          spec={mustFindSpec(specs, widget.widget_type)}
+          onSubmit={onSubmit}
+          onCancel={onCancel}
+          fieldClassName={fieldClassName}
+          errorClassName={errorClassName}
+        />
+      ) : (
+        <DialogContentAdding
+          specs={specs}
+          onSubmit={handlePickNewWidget}
+          onCancel={onCancel}
+        />
+      )}
     </Dialog>
   )
 }
 
 export default MuiManageWidgetDialog
-export type { MuiManageWidgetDialogProps, WidgetSubmitEvent, WidgetSubmitHandler }
+export type { MuiManageWidgetDialogProps, WidgetSubmitHandler }

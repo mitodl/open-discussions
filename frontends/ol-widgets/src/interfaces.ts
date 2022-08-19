@@ -1,9 +1,18 @@
-export type WidgetInstance<T = unknown> = {
-  id: number
+/**
+ * Many widget-oriented components accept either a "full" widget instance that
+ * has been saved to the database and therefore has an id, or a nascent widget
+ * instance that has no id. Both the "full" and "nascent" versions implement
+ * AnonymousWidget interface.
+ */
+export type AnonymousWidget<T = unknown> = {
   widget_type: string
   title: string
   configuration: T
 }
+
+export type WidgetInstance<T = unknown> = {
+  id: number
+} & AnonymousWidget<T>
 
 /**
  * Represents an input field for configuring a widget's behavior.
@@ -38,7 +47,7 @@ export type WidgetListResponse = {
 interface RichTextWidgetConfig {
   source: string
 }
-export type RichTextWidgetInstance = WidgetInstance<RichTextWidgetConfig>
+export type RichTextWidgetInstance = AnonymousWidget<RichTextWidgetConfig>
 
 export enum WidgetTypes {
   RichText = "Markdown"

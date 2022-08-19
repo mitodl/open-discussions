@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import Button from "@mui/material/Button"
-import AddIcon from '@mui/icons-material/Add'
-import { keyBy } from "lodash"
+import AddIcon from "@mui/icons-material/Add"
 import {
   Widget,
-  WidgetInstance,
   WidgetListResponse,
   MuiManageWidgetDialog,
-  WidgetSubmitHandler
+  WidgetSubmitHandler,
+  AnonymousWidget
 } from "ol-widgets"
 import { useWidgetList } from "../../api/widgets"
-
 
 interface WidgetsListProps {
   isEditing: boolean
@@ -56,76 +54,109 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
   widgetsList
 }) => {
   const { widgets: savedWidgets, available_widgets: specs } = widgetsList
-  const [widgets, setWidgets] = useState<WidgetInstance[]>([])
+  const [widgets, setWidgets] = useState<AnonymousWidget[]>([])
   useEffect(() => {
     setWidgets(savedWidgets)
   }, [savedWidgets])
+
   const [addingWidget, setAddingWidget] = useState(false)
 
-  const widgetsById = useMemo(() => keyBy(widgets, w => w.id), [widgets])
-
-  const [widgetsOpen, setWidgetsOpen] = useState<Map<number, boolean>>(
-    new Map()
+  /**
+   * This tracks the widget objects themselves rather than ids. This is nice
+   * since not all widgets have ids. But editing a widget produces a shallow
+   * clone, so when edits happen we'll need to manually persist the expanded-or-
+   * collapsed state.
+   */
+  const [widgetsOpen, setWidgetsOpen] = useState<Set<AnonymousWidget>>(
+    new Set()
   )
-  const allOpen = useMemo(() => widgets.every(w => widgetsOpen.get(w.id)), [widgets, widgetsOpen])
-  const handleToggleWidgetDetails = useCallback((widget: WidgetInstance) => {
-    setWidgetsOpen(value => {
-      const clone = new Map(value)
-      clone.set(widget.id, !clone.get(widget.id))
+
+  const allOpen = useMemo(
+    () => widgets.every(w => widgetsOpen.has(w)),
+    [widgets, widgetsOpen]
+  )
+  const handleToggleWidgetDetails = useCallback((widget: AnonymousWidget) => {
+    setWidgetsOpen(current => {
+      const clone = new Set(current)
+      if (clone.has(widget)) {
+        clone.delete(widget)
+      } else {
+        clone.add(widget)
+      }
       return clone
     })
   }, [])
   const handleToggleAll = useCallback(() => {
     if (allOpen) {
-      setWidgetsOpen(new Map())
+      setWidgetsOpen(new Set())
     } else {
-      setWidgetsOpen(new Map(widgets.map(w => [w.id, true])))
+      setWidgetsOpen(new Set(widgets))
     }
   }, [allOpen, widgets])
 
-  const [editingWidgetId, setEditingWidgetId] = useState<number | null>(null)
-  const editingWidget = editingWidgetId === null ? null : widgetsById[editingWidgetId]
-  const handleBeginEdit = useCallback((widget: WidgetInstance) => {
-    setEditingWidgetId(widget.id)
+  const [editingWidget, setEditingWidget] = useState<AnonymousWidget | null>(
+    null
+  )
+  const handleBeginEdit = useCallback((widget: AnonymousWidget) => {
+    setEditingWidget(widget)
   }, [])
   const handleCancelEditing = useCallback(() => {
-    setEditingWidgetId(null)
+    setEditingWidget(null)
     setAddingWidget(false)
   }, [])
   const handleSubmitEdit: WidgetSubmitHandler = useCallback(e => {
     setAddingWidget(false)
-    setEditingWidgetId(null)
-    if (e.type === 'edit') {
-      setWidgets(current => current.map(w => (w.id === e.widget.id ? e.widget : w)))
-    } else {
-      setWidgets(current => [e.widget, ...current])
-    }
+    setEditingWidget(currentEditingWidget => {
+      if (e.type === "edit") {
+        if (currentEditingWidget === null) {
+          throw new Error("An edit is underway, this should not be null.")
+        }
+        setWidgets(current =>
+          current.map(w => (w === currentEditingWidget ? e.widget : w))
+        )
+        setWidgetsOpen(currentlyOpen => {
+          if (!currentlyOpen.has(currentEditingWidget)) return currentlyOpen
+          const clone = new Set(currentlyOpen)
+          clone.delete(currentEditingWidget)
+          clone.add(e.widget)
+          return clone
+        })
+      } else {
+        setWidgets(current => [e.widget, ...current])
+      }
+      return null
+    })
   }, [])
-  const handleDelete = useCallback((deleted: WidgetInstance) => {
-    setWidgets(current => current.filter(w => w.id !== deleted.id))
+  const handleDelete = useCallback((deleted: AnonymousWidget) => {
+    setWidgets(current => current.filter(w => w !== deleted))
   }, [])
   const handleAdd = useCallback(() => setAddingWidget(true), [])
   return (
     <>
       <div className="ol-widget-editing-header">
-        <Button size="small" color="secondary" startIcon={<AddIcon/>} onClick={handleAdd}>
+        <Button
+          size="small"
+          color="secondary"
+          startIcon={<AddIcon />}
+          onClick={handleAdd}
+        >
           Add Widget
         </Button>
         <Button size="small" color="secondary" onClick={handleToggleAll}>
-          {allOpen ? 'Collapse all' : 'Expand all'}
+          {allOpen ? "Collapse all" : "Expand all"}
         </Button>
       </div>
-      {widgets.map(widget => (
+      {widgets.map((widget, index) => (
         <Widget
-          key={widget.id}
           widget={widget}
           isEditing={true}
-          isOpen={!!widgetsOpen.get(widget.id)}
+          isOpen={widgetsOpen.has(widget)}
           className="ic-widget"
           actionsClassName="ic-widget-actions"
           onVisibilityChange={handleToggleWidgetDetails}
           onEdit={handleBeginEdit}
           onDelete={handleDelete}
+          key={index} // not a good key, but these do not all have ids
         />
       ))}
       <MuiManageWidgetDialog
@@ -136,7 +167,7 @@ const EditingWidgetsList: React.FC<EditingWidgetsListProps> = ({
         onSubmit={handleSubmitEdit}
         widget={editingWidget}
         specs={specs}
-        onClose={handleCancelEditing}
+        onCancel={handleCancelEditing}
       />
     </>
   )

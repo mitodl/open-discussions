@@ -10,20 +10,20 @@ import IconDrag from "@mui/icons-material/DragHandle"
 import IconExpand from "@mui/icons-material/ExpandMore"
 import IconCollapse from "@mui/icons-material/ExpandLess"
 
-import type { WidgetInstance, RichTextWidgetInstance } from "../interfaces"
+import type { AnonymousWidget, RichTextWidgetInstance } from "../interfaces"
 import { WidgetTypes } from "../interfaces"
 import RichTextWdigetContent from "./RichTextWidgetContent"
 
 type WidgetTemplateProps = {
-  widget: WidgetInstance
+  widget: AnonymousWidget
   isEditing?: boolean
   isOpen?: boolean
   className?: string
   actionsClassName?: string
   children?: React.ReactNode
-  onEdit?: (widget: WidgetInstance) => void
-  onDelete?: (widget: WidgetInstance) => void
-  onVisibilityChange?: (widget: WidgetInstance) => void
+  onEdit?: (widget: AnonymousWidget) => void
+  onDelete?: (widget: AnonymousWidget) => void
+  onVisibilityChange?: (widget: AnonymousWidget) => void
 }
 
 const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
@@ -50,9 +50,11 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
     onDelete(widget)
   }, [widget, onDelete])
   return (
-    <Card className={classNames("ol-widget", className, {
-      'ol-widget-collapsed': !isOpen
-    })}>
+    <Card
+      className={classNames("ol-widget", className, {
+        "ol-widget-collapsed": !isOpen
+      })}
+    >
       <CardContent>
         <h2 className="ol-widget-header">
           {widget.title}
@@ -73,9 +75,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
               </button>
             ))}
         </h2>
-        {
-          isOpen && <div className="ol-widget-content">{children}</div>
-        }
+        {isOpen && <div className="ol-widget-content">{children}</div>}
       </CardContent>
       {isEditing && (
         <>
@@ -103,7 +103,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   )
 }
 
-const WidgetContent: React.FC<{ widget: WidgetInstance }> = ({ widget }) => {
+const WidgetContent: React.FC<{ widget: AnonymousWidget }> = ({ widget }) => {
   if (widget.widget_type === WidgetTypes.RichText) {
     return <RichTextWdigetContent widget={widget as RichTextWidgetInstance} />
   }
