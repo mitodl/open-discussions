@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.195.0
+---------------
+
+- Viewing (plaintext) widgets (#3699)
+
 Version 0.194.1 (Released August 17, 2022)
 ---------------
 
