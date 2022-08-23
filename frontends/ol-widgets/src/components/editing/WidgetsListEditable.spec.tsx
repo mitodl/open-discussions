@@ -148,9 +148,6 @@ describe("WidgetsListEditable", () => {
       expect(label).toHaveTextContent(spec.description)
     })
 
-    // The first widget choice is checked by default
-    expect(radios[0]).toBeChecked()
-
     // Click Next
     await user.click(getBtn("Next", dialog))
 

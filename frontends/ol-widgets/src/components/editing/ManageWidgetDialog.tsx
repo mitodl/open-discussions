@@ -122,9 +122,10 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                     <Field
                       id={fieldId}
                       className={fieldClassName}
-                      as={getWidgetFieldComponent(fieldSpec)}
                       name={attrName}
                       value={values.configuration[fieldSpec.field_name]}
+                      component={getWidgetFieldComponent(fieldSpec)}
+                      {...fieldSpec.props}
                     />
                     <ErrorMessage
                       className={errorClassName}
