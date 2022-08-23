@@ -84,18 +84,26 @@ def related_posts_view(settings):
     )
 
 
-def test_search_es_exception(mocker, client, search_view):
+@pytest.mark.parametrize(
+    "status_code, raise_error", [[418, False], [503, True], ["N/A", True]]
+)
+def test_search_es_exception(mocker, client, search_view, status_code, raise_error):
     """If a 4xx status is returned from Elasticsearch it should be returned from the API"""
-    status_code = 418
+    log_mock = mocker.patch("search.views.log.exception")
     search_mock = mocker.patch(
         "search.views.execute_search",
         autospec=True,
-        side_effect=TransportError(status_code),
+        side_effect=TransportError(status_code, "error", {}),
     )
     query = {"query": {"match": {"title": "Search"}}}
-    resp = client.post(search_view.url, query)
-    assert resp.status_code == status_code
-    search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
+    if not raise_error:
+        resp = client.post(search_view.url, query)
+        assert resp.status_code == status_code
+        search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
+        log_mock.assert_called_once_with("Received a 4xx error from Elasticsearch")
+    else:
+        with pytest.raises(TransportError):
+            client.post(search_view.url, query)
 
 
 def test_related_posts_es_exception(mocker, client, related_posts_view):
