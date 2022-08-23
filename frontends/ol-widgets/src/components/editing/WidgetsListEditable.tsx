@@ -11,6 +11,12 @@ type SubmitWidgetsEvent = {
   widgets: AnonymousWidget[]
 }
 
+enum DialogMode {
+  Closed = "closed",
+  Editing = "editing",
+  Adding = "adding"
+}
+
 interface WidgetsListEditableProps {
   widgetsList: WidgetListResponse
   onSubmit: (event: SubmitWidgetsEvent) => void
@@ -42,7 +48,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
     setWidgets(savedWidgets)
   }, [savedWidgets])
 
-  const [addingWidget, setAddingWidget] = useState(false)
+  const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Closed)
 
   /**
    * This tracks the widget objects themselves rather than ids. This is nice
@@ -82,14 +88,14 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   )
   const handleBeginEdit = useCallback((widget: AnonymousWidget) => {
     setEditingWidget(widget)
+    setDialogMode(DialogMode.Editing)
   }, [])
   const handleCancelEditing = useCallback(() => {
-    setEditingWidget(null)
-    setAddingWidget(false)
+    setDialogMode(DialogMode.Closed)
   }, [])
   const handleSubmitEdit: WidgetSubmitHandler = useCallback(
     e => {
-      setAddingWidget(false)
+      setDialogMode(DialogMode.Closed)
       setEditingWidget(null)
       if (e.type === "edit") {
         if (editingWidget === null) {
@@ -115,7 +121,10 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   const handleDelete = useCallback((deleted: AnonymousWidget) => {
     setWidgets(current => current.filter(w => w !== deleted))
   }, [])
-  const handleAdd = useCallback(() => setAddingWidget(true), [])
+  const handleAdd = useCallback(() => {
+    setEditingWidget(null)
+    setDialogMode(DialogMode.Adding)
+  }, [])
 
   const handleDone = useCallback(() => {
     if (widgets !== savedWidgets) {
@@ -166,7 +175,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
         />
       ))}
       <ManageWidgetDialog
-        isOpen={!!editingWidget || addingWidget}
+        isOpen={dialogMode !== DialogMode.Closed}
         className={dialogClassName}
         fieldClassName={fieldClassName}
         errorClassName={errorClassName}
