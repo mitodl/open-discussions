@@ -29,6 +29,26 @@ interface WidgetsListEditableProps {
 }
 
 /**
+ * Get a unique key identifying the widget.
+ *
+ * The intent here is a key function for React lists that works for widgets that
+ * have been saved to the database (and therefore have their own id) as well as
+ * widgets that have not been saved to the database (and so do not have an id yet).
+ */
+const getWidgetKey = (widget: AnonymousWidget): string => {
+  const withId = widget as AnonymousWidget & { id: unknown }
+  if (typeof withId.id === "string") {
+    return withId.id
+  }
+  /**
+   * This is not particularly efficient for a React list. However, it should be
+   * fine. Our widget lists seem to be quite small (dozens of widgets, not thousands)
+   * and each widget is fairly.
+   */
+  return JSON.stringify(widget)
+}
+
+/**
  * Handles frontend widget editing.
  * This component does NOT make API calls itself.
  */
@@ -162,7 +182,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           </Button>
         </div>
       </div>
-      {widgets.map((widget, index) => (
+      {widgets.map(widget => (
         <Widget
           widget={widget}
           isEditing={true}
@@ -171,7 +191,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           onVisibilityChange={handleToggleWidgetDetails}
           onEdit={handleBeginEdit}
           onDelete={handleDelete}
-          key={index} // not a good key, but these do not all have ids
+          key={getWidgetKey(widget)}
         />
       ))}
       <ManageWidgetDialog
