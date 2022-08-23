@@ -7,6 +7,7 @@ import Button from "@mui/material/Button"
 import RadioGroup from "@mui/material/RadioGroup"
 import Radio from "@mui/material/Radio"
 import FormControlLabel from "@mui/material/FormControlLabel"
+import { useId } from "ol-util"
 import { Formik, Form, Field, ErrorMessage } from "formik"
 import { isNil } from "lodash"
 import { AnonymousWidget, WidgetSpec, WidgetTypes } from "../../interfaces"
@@ -58,6 +59,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   errorClassName,
   isNew
 }) => {
+  const formId = useId()
   const validationSchema = useMemo(
     () => getWidgetSchema(widget.widget_type),
     [widget.widget_type]
@@ -95,8 +97,9 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
         {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
-              <label htmlFor="title">Title</label>
+              <label htmlFor={`${formId}:${title}`}>Title</label>
               <Field
+                id={`${formId}:${title}`}
                 className={fieldClassName}
                 name="title"
                 type="text"
@@ -112,10 +115,12 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                 // Formik uses dot notation for nested objects as name attrs
                 // https://formik.org/docs/guides/arrays#nested-objects
                 const attrName = `configuration.${fieldName}`
+                const fieldId = `${formId}:${attrName}`
                 return (
                   <React.Fragment key={fieldName}>
-                    <label htmlFor={attrName}>{fieldSpec.label}</label>
+                    <label htmlFor={fieldId}>{fieldSpec.label}</label>
                     <Field
+                      id={fieldId}
                       className={fieldClassName}
                       as={getWidgetFieldComponent(fieldSpec)}
                       name={attrName}
@@ -178,7 +183,7 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
       const spec = mustFindSpec(specs, values.widget_type)
       const widget: NascentWidget = {
         id:            null,
-        title:         "New Widget",
+        title:         "New widget",
         configuration: Object.fromEntries(
           spec.form_spec.map(fieldSpec => [
             fieldSpec.field_name,
@@ -193,7 +198,7 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
   )
   return (
     <>
-      <DialogTitle>New Widget</DialogTitle>
+      <DialogTitle>New widget</DialogTitle>
       <Formik initialValues={initialValues} onSubmit={onSubmitType}>
         {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
@@ -214,7 +219,7 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
                 Cancel
               </Button>
               <Button type="submit" variant="contained">
-                Submit
+                Next
               </Button>
             </DialogActions>
           </Form>

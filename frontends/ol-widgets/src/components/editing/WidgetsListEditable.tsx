@@ -128,7 +128,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   return (
     <>
       <div className={headerClassName}>
-        <h4 className="ol-widget-editing-header">
+        <h4 className="ol-widget-editing-header-row">
           Manage Widgets
           <div>
             <Button size="small" variant="outlined" onClick={onCancel}>
@@ -139,14 +139,14 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
             </Button>
           </div>
         </h4>
-        <div className="ol-widget-editing-header">
+        <div className="ol-widget-editing-header-row">
           <Button
             size="small"
             color="secondary"
             startIcon={<AddIcon />}
             onClick={handleAdd}
           >
-            Add Widget
+            Add widget
           </Button>
           <Button size="small" color="secondary" onClick={handleToggleAll}>
             {allOpen ? "Collapse all" : "Expand all"}

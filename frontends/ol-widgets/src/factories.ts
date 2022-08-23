@@ -67,9 +67,10 @@ const makeWidgetListResponse: Factory<
   { count?: number }
 > = (overrides, options = {}) => {
   const count = options.count ?? faker.datatype.number({ min: 2, max: 4 })
+  const specMakers = Object.values(widgetSpecMakers)
   return {
     id:                faker.datatype.number(),
-    available_widgets: [],
+    available_widgets: specMakers.map(f => f()),
     widgets:           Array(count)
       .fill(null)
       .map(() => makeWidget()),
