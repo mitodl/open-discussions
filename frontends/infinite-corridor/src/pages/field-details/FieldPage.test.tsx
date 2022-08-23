@@ -1,6 +1,6 @@
-import React from "react"
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../../api/fields"
+import { urls as widgetUrls } from "../../api/widgets"
 import { LearningResource, LearningResourceCard } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import type { UserList, UserListItem, FieldChannel } from "../../api/fields"
@@ -10,13 +10,19 @@ import {
   renderTestApp,
   screen,
   setMockResponse,
-  within
+  within,
+  user,
+  waitFor
 } from "../../test-utils"
+import { makeWidgetListResponse } from "ol-widgets"
 
-jest.mock("./WidgetsList", () => ({
-  __esModule: true,
-  default:    jest.fn(() => <div>WidgetList</div>)
-}))
+jest.mock("./WidgetsList", () => {
+  const actual = jest.requireActual("./WidgetsList")
+  return {
+    __esModule: true,
+    default:    jest.fn(actual.default)
+  }
+})
 const mockWidgetList = jest.mocked(WidgetList)
 
 jest.mock("ol-search-ui", () => {
@@ -73,6 +79,10 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   setMockResponse.get(urls.userListItems(list1.id), items1)
   setMockResponse.get(urls.userListItems(list2.id), items2)
   setMockResponse.get(urls.userListItems(list3.id), items3)
+
+  const widgetsList = makeWidgetListResponse()
+  setMockResponse.get(widgetUrls.widgetList(field.widget_list), widgetsList)
+
   const toLearningResources = (items: UserListItem[]) =>
     items.map(item => item.content_data)
   const featured: SubfieldData = {
@@ -83,7 +93,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
     { list: list2, items: toLearningResources(items2.results) },
     { list: list3, items: toLearningResources(items3.results) }
   ]
-  return { field, featured, lists }
+  return { field, featured, lists, widgets: widgetsList.widgets }
 }
 
 describe("FieldPage", () => {
@@ -158,17 +168,50 @@ describe("FieldPage", () => {
     expect(spyTitledCarousel).not.toHaveBeenCalled()
   })
 
-  it("Renders WidgetList with the expected Props", async () => {
-    const { field } = setupApis()
-    renderTestApp({ url: `/fields/${field.name}` })
-    await screen.findByText("WidgetList")
-    expect(field.widget_list).toEqual(expect.any(Number))
+  it.each([
+    {
+      getUrl:    (field: FieldChannel) => `/fields/${field.name}`,
+      isEditing: false,
+      urlDesc:   "/fields/:name/"
+    },
+    {
+      getUrl:    (field: FieldChannel) => `/fields/${field.name}/manage/widgets/`,
+      isEditing: true,
+      urlDesc:   "/fields/:name/manage/widgets/"
+    }
+  ])(
+    "Renders readonly WidgetList at $urlDesc",
+    async ({ getUrl, isEditing }) => {
+      const { field, widgets } = setupApis()
+      const url = getUrl(field)
+      renderTestApp({ url })
 
-    const expectedProps = expect.objectContaining({
-      widgetListId: field.widget_list,
-      isEditing:    false
-    })
-    const expectedContext = expect.anything()
-    expect(mockWidgetList).lastCalledWith(expectedProps, expectedContext)
-  })
+      // below we check the FC was called correctly
+      // but let's check that it is still visible, too.
+      await screen.findByText(widgets[0].title)
+      expect(field.widget_list).toEqual(expect.any(Number))
+
+      const expectedProps = expect.objectContaining({
+        widgetListId: field.widget_list,
+        isEditing:    isEditing
+      })
+      const expectedContext = expect.anything()
+      expect(mockWidgetList).lastCalledWith(expectedProps, expectedContext)
+    }
+  )
+
+  it.each([{ btnName: "Done" }, { btnName: "Cancel" }])(
+    "When managing widgets, $text returns to field page",
+    async ({ btnName }) => {
+      const { field } = setupApis()
+      const url = `/fields/${field.name}/manage/widgets/`
+      const { history } = renderTestApp({ url })
+      // click done without an edit
+      await user.click(await screen.findByRole("button", { name: btnName }))
+
+      await waitFor(() => {
+        expect(history.location.pathname).toEndWith(`/fields/${field.name}/`)
+      })
+    }
+  )
 })

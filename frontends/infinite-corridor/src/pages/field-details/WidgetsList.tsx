@@ -30,6 +30,8 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
             if (onFinishEditing) onFinishEditing()
           }
         })
+      } else {
+        if (onFinishEditing) onFinishEditing()
       }
     },
     [onFinishEditing, mutation]
