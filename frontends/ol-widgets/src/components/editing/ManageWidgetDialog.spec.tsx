@@ -2,7 +2,7 @@
 // import { render, screen } from "@testing-library/react"
 // import Widget from "./Widget"
 
-describe("MuiEditWidgetDialog", () => {
+describe("ManageWidgetDialog", () => {
   test("placeholder", () => {
     expect(1 + 1).toBe(2)
   })

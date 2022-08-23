@@ -1,8 +1,8 @@
-export { default as MuiManageWidgetDialog } from "./MuiManageWidgetDialog"
+export { default as ManageWidgetDialog } from "./ManageWidgetDialog"
 export type {
-  MuiManageWidgetDialogProps,
+  ManageWidgetDialogProps,
   WidgetSubmitHandler
-} from "./MuiManageWidgetDialog"
+} from "./ManageWidgetDialog"
 
 export { default as WidgetsListEditable } from "./WidgetsListEditable"
 export type { WidgetsListEditableProps } from "./WidgetsListEditable"

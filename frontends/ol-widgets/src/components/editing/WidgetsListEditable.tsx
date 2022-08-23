@@ -3,8 +3,8 @@ import Button from "@mui/material/Button"
 import AddIcon from "@mui/icons-material/Add"
 import Widget from "../Widget"
 import type { WidgetListResponse, AnonymousWidget } from "../../interfaces"
-import type { WidgetSubmitHandler } from "./MuiManageWidgetDialog"
-import MuiManageWidgetDialog from "./MuiManageWidgetDialog"
+import type { WidgetSubmitHandler } from "./ManageWidgetDialog"
+import ManageWidgetDialog from "./ManageWidgetDialog"
 
 type SubmitWidgetsEvent = {
   touched: boolean
@@ -165,7 +165,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           key={index} // not a good key, but these do not all have ids
         />
       ))}
-      <MuiManageWidgetDialog
+      <ManageWidgetDialog
         isOpen={!!editingWidget || addingWidget}
         className={dialogClassName}
         fieldClassName={fieldClassName}

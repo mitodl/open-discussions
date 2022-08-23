@@ -29,7 +29,7 @@ type WidgetSubmitEvent =
 
 type WidgetSubmitHandler = (event: WidgetSubmitEvent) => void
 
-interface MuiManageWidgetDialogProps {
+interface ManageWidgetDialogProps {
   widget?: AnonymousWidget | null
   specs: WidgetSpec[]
   isOpen: boolean
@@ -241,7 +241,7 @@ const mustFindSpec = (specs: WidgetSpec[], widgetType: string): WidgetSpec => {
  * A dialog for editing the widget. If you need to style it, pass a classname
  * and use normal MUI classes.
  */
-const MuiManageWidgetDialog: React.FC<MuiManageWidgetDialogProps> = ({
+const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
   widget: initialWidget = null,
   specs,
   onSubmit,
@@ -286,5 +286,5 @@ const MuiManageWidgetDialog: React.FC<MuiManageWidgetDialogProps> = ({
   )
 }
 
-export default MuiManageWidgetDialog
-export type { MuiManageWidgetDialogProps, WidgetSubmitHandler }
+export default ManageWidgetDialog
+export type { ManageWidgetDialogProps, WidgetSubmitHandler }
