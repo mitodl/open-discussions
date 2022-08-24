@@ -8,6 +8,7 @@ export type AnonymousWidget<T = unknown> = {
   widget_type: string
   title: string
   configuration: T
+  id?: number | null
 }
 
 export type WidgetInstance<T = unknown> = {

@@ -36,9 +36,8 @@ interface WidgetsListEditableProps {
  * widgets that have not been saved to the database (and so do not have an id yet).
  */
 const getWidgetKey = (widget: AnonymousWidget): string => {
-  const withId = widget as AnonymousWidget & { id: unknown }
-  if (typeof withId.id === "string") {
-    return withId.id
+  if (typeof widget.id === "string" || typeof widget.id === "number") {
+    return String(widget.id)
   }
   /**
    * This is not particularly efficient for a React list. However, it should be
@@ -116,7 +115,6 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   const handleSubmitEdit: WidgetSubmitHandler = useCallback(
     e => {
       setDialogMode(DialogMode.Closed)
-      setEditingWidget(null)
       if (e.type === "edit") {
         if (editingWidget === null) {
           throw new Error("An edit is underway, this should not be null.")

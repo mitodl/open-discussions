@@ -15,8 +15,6 @@ import { getWidgetFieldComponent } from "./getWidgetFieldComponent"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { getWidgetSchema } from "./schemas"
 
-type NascentWidget = AnonymousWidget & { id: null }
-
 type WidgetSubmitEvent =
   | {
       type: "edit"
@@ -24,7 +22,7 @@ type WidgetSubmitEvent =
     }
   | {
       type: "add"
-      widget: NascentWidget
+      widget: AnonymousWidget
     }
 
 type WidgetSubmitHandler = (event: WidgetSubmitEvent) => void
@@ -154,7 +152,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
 interface WidgetAddingProps {
   specs: WidgetSpec[]
   onCancel: () => void
-  onSubmit: (widget: NascentWidget) => void
+  onSubmit: (widget: AnonymousWidget) => void
 }
 
 type AddWidgetFormValues = {
@@ -182,7 +180,7 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
   const onSubmitType = useCallback(
     (values: AddWidgetFormValues) => {
       const spec = mustFindSpec(specs, values.widget_type)
-      const widget: NascentWidget = {
+      const widget: AnonymousWidget = {
         id:            null,
         title:         "New widget",
         configuration: Object.fromEntries(
