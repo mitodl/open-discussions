@@ -52,6 +52,45 @@ const mustFindWrapper = <T, >(wrappers: Wrapped<T>[], item: T) => {
   return wrapped
 }
 
+const useWidgetVisibilities = (wrappers: Wrapped<AnonymousWidget>[]) => {
+  const [widgetsOpen, setWidgetsOpen] = useState<Set<string>>(new Set())
+
+  const allOpen = useMemo(
+    () => wrappers.every(w => widgetsOpen.has(w.id)),
+    [wrappers, widgetsOpen]
+  )
+  const toggle = useCallback(
+    (widget: AnonymousWidget) => {
+      const wrapper = mustFindWrapper(wrappers, widget)
+      setWidgetsOpen(current => {
+        const clone = new Set(current)
+        if (clone.has(wrapper.id)) {
+          clone.delete(wrapper.id)
+        } else {
+          clone.add(wrapper.id)
+        }
+        return clone
+      })
+    },
+    [wrappers]
+  )
+  const toggleAll = useCallback(() => {
+    if (allOpen) {
+      setWidgetsOpen(new Set())
+    } else {
+      setWidgetsOpen(new Set(wrappers.map(w => w.id)))
+    }
+  }, [allOpen, wrappers])
+
+  const visibility = { open: widgetsOpen, allOpen }
+  const modifyVisibility = {
+    set: setWidgetsOpen,
+    toggle,
+    toggleAll
+  }
+  return [visibility, modifyVisibility] as const
+}
+
 /**
  * Handles frontend widget editing.
  * This component does NOT make API calls itself.
@@ -73,41 +112,14 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
    */
   const [wrappedWidgets, setWrapped] = useState<Wrapped<AnonymousWidget>[]>([])
 
+  const [visibility, modifyVisibility] = useWidgetVisibilities(wrappedWidgets)
+
   useEffect(() => {
     const wrapped = savedWidgets.map(w => ({ wraps: w, id: mustGetId(w) }))
     setWrapped(wrapped)
   }, [savedWidgets])
 
   const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Closed)
-
-  const [widgetsOpen, setWidgetsOpen] = useState<Set<string>>(new Set())
-
-  const allOpen = useMemo(
-    () => wrappedWidgets.every(w => widgetsOpen.has(w.id)),
-    [wrappedWidgets, widgetsOpen]
-  )
-  const handleToggleWidgetDetails = useCallback(
-    (widget: AnonymousWidget) => {
-      const wrapper = mustFindWrapper(wrappedWidgets, widget)
-      setWidgetsOpen(current => {
-        const clone = new Set(current)
-        if (clone.has(wrapper.id)) {
-          clone.delete(wrapper.id)
-        } else {
-          clone.add(wrapper.id)
-        }
-        return clone
-      })
-    },
-    [wrappedWidgets]
-  )
-  const handleToggleAll = useCallback(() => {
-    if (allOpen) {
-      setWidgetsOpen(new Set())
-    } else {
-      setWidgetsOpen(new Set(wrappedWidgets.map(w => w.id)))
-    }
-  }, [allOpen, wrappedWidgets])
 
   const [editingWidget, setEditingWidget] =
     useState<Wrapped<AnonymousWidget> | null>(null)
@@ -183,8 +195,12 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           >
             Add widget
           </Button>
-          <Button size="small" color="secondary" onClick={handleToggleAll}>
-            {allOpen ? "Collapse all" : "Expand all"}
+          <Button
+            size="small"
+            color="secondary"
+            onClick={modifyVisibility.toggleAll}
+          >
+            {visibility.allOpen ? "Collapse all" : "Expand all"}
           </Button>
         </div>
       </div>
@@ -192,9 +208,9 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
         <Widget
           widget={wrapper.wraps}
           isEditing={true}
-          isOpen={widgetsOpen.has(wrapper.id)}
+          isOpen={visibility.open.has(wrapper.id)}
           className={widgetClassName}
-          onVisibilityChange={handleToggleWidgetDetails}
+          onVisibilityChange={modifyVisibility.toggle}
           onEdit={handleBeginEdit}
           onDelete={handleDelete}
           key={wrapper.id}
