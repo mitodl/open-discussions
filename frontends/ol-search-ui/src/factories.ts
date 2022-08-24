@@ -9,8 +9,11 @@ import {
   LearningResourceResult,
   LearningResourceRun,
   LearningResource,
-  LearningResourceType
+  LearningResourceType,
+  CardMinimalResource,
+  EmbedlyConfig
 } from "./interfaces"
+import { pick } from "lodash"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -180,4 +183,33 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
     ...overrides
   }
   return resource
+}
+
+export const makeMinimalResoure: Factory<CardMinimalResource> = overrides => {
+  const keys = [
+    "runs",
+    "certification",
+    "title",
+    "offered_by",
+    "object_type",
+    "image_src",
+    "platform"
+  ] as const
+  return {
+    ...pick(makeCourseResult(), keys),
+    ...overrides
+  } as CardMinimalResource
+}
+
+export const makeImgConfig: Factory<EmbedlyConfig> = overrides => {
+  const imgConfig = {
+    width:      faker.datatype.number(),
+    height:     faker.datatype.number(),
+    embedlyKey: faker.datatype.uuid(),
+    ocwBaseUrl: faker.internet.url()
+  }
+  return {
+    ...imgConfig,
+    ...overrides
+  }
 }

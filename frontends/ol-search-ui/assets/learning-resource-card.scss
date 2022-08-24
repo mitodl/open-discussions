@@ -1,3 +1,4 @@
+
 $lightText: #8c8c8c !default;
 $spacer: 0.75rem !default;
 $boldWeight: bold !default;
@@ -24,6 +25,20 @@ $smallFontSize: 0.75em !default;
   flex-direction: row-reverse;
 }
 
+.ol-lrc-content .clickable-title {
+  border: none;
+  background-color: white;
+  display: block;
+  text-align: left;
+  padding: 0px;
+  margin: 0px;
+}
+
+.ol-lrc-content .clickable-title:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .ol-lrc-content.MuiCardContent-root {
   /*
   Make content flexbox so that we can control which child fills remaining space.
@@ -37,8 +52,8 @@ $smallFontSize: 0.75em !default;
     The column-gap property would be a nicer solution, but it doesn't have the
     best browser support yet.
     */
-    margin-top: $spacer / 2;
-    margin-bottom: $spacer / 2;
+    margin-top: $spacer/2;
+    margin-bottom: $spacer/2;
     &:first-child {
       margin-top: 0; 
     }

@@ -64,6 +64,7 @@ const sample = <T, >(array: T[]): T => {
  *  rendering a list of items, other values may be useful.
  */
 const expectProps = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fc: jest.Mock<any, any>,
   partialProps: unknown,
   call = -1

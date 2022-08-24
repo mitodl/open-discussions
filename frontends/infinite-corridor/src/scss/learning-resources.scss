@@ -3,6 +3,8 @@
   $lightText: theme.$font-color-light
 );
 
+@use "ol-search-ui/assets/learning-resource-drawer";
+
 @import "./breakpoints";
 
 $cardListSpacer: 1.5em;

@@ -1,0 +1,278 @@
+@use "ol-util/assets/breakpoint" as *;
+
+.expanded-lr-summary {
+  flex-direction: column;
+  font-size:  16px;
+  line-height: 1.3;
+  padding: 30px;
+
+  select {
+    background: #f8f8f8;
+    border: 1px solid #bbb;
+  }
+
+  .run-selector {
+    display: inline-flex;
+    font-size: 13px;
+
+    .info-label {
+      color: #B0B0B0;
+      padding-right: 6px;
+    }
+  }
+
+  .ol-lrc-cert {
+     float: right
+  }
+
+  .image-div {
+    width: 100%;
+    margin-bottom: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    img {
+      display: block;
+      margin: auto;
+      width: 100%;
+    }
+  }
+
+  .link-share-offered-by {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .object-type {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 19px;
+    text-transform: uppercase;
+    color: #b0b0b0;
+  }
+
+  .external-links {
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 37px;
+    border-radius: 4px;
+    background-color: #A32034;
+    padding-right: 10px;
+    padding-left: 10px;
+    color: white;
+    text-transform: capitalize;
+    margin: auto;
+    width: 128px;
+    cursor: pointer;
+    float: left;
+    margin-right: 20px;
+
+    a.link-button {
+      margin: auto;
+      font-size: 18px;
+      line-height: 37px
+    }
+  }
+
+  .section-label {
+    color: black;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  .offered-by{
+    display: inline-flex;
+    font-size: 15px;
+    height: 37px;
+    align-items: center;
+    .label {
+      font-color:  #B0B0B0;
+    }
+
+    .offeror {
+      font-weight: bold;
+    }
+
+    @include breakpoint(desktop) {
+      float: right;
+    }
+
+  }
+
+  .title {
+    font-size: 20px;
+    color: black;
+    font-weight: bold;
+    margin: 5px 0;
+  }
+
+  .description {
+    font-size: 16px;
+    color: black;
+
+    .tt-expansion-control {
+      @include breakpoint(materialmobile) {
+        text-align: right;
+        padding-right: 25px;
+        padding-top: 5px;
+        display: block;
+        color: #202020;
+        font-weight: bold;
+      }
+    }
+
+    @include breakpoint(materialmobile) {
+      font-size: 14px;
+    }
+  }
+
+  .lr-metadata {
+    margin: 25px 0;
+  }
+
+  .info-row {
+    display: flex;
+    cursor: default;
+    margin-bottom: 15px;
+
+    .col-1 {
+      min-width: 33%;
+      display: flex;
+
+      i {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+.elr-share {
+  display: inline-block;
+  border: 1px solid #D8D8D8;
+  border-radius: 4px;
+  background-color: #FAFAFA;
+  height: 37px;
+  align-items: center;
+  margin: auto;
+  width: 128px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 20px;
+
+  .share-contents {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 37px;
+
+    i {
+      transform: scaleX(-1);
+      font-size: 30px;
+      margin-left: 23px;
+    }
+  }
+}
+
+
+$red-link-color: #9a2a33;
+$link-padding: 11px 20px 11px 11px;
+$footer-height: 172px;
+
+$drawer-trans: width 500ms;
+
+.lr-drawer {
+  .MuiDrawer-paper {
+    width: 100%;
+    max-width: 600px;
+  }
+}
+
+.lr-drawer.MuiDrawer-root .drawer-close{
+  float: right;
+  padding: 20px;
+  padding-bottom: 0px;
+  .material-icons {
+    font-size: 35px;
+    float: right;
+  }
+  border: none;
+  background-color: white;
+}
+
+.drawer-mobile-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  height: 60px;
+}
+
+
+.tooltip {
+  background: white;
+  padding: 12px;
+  min-width: 250px;
+  max-width: 250px;
+  opacity: 1 !important;
+  z-index: 5000;
+
+  .tooltip-text,
+  h4 {
+    width: 90%;
+  }
+
+  h4 {
+    padding: 0 0 10px 0;
+    margin: 0;
+    font-size: inherit;
+  }
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .bottom-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 15px;
+
+    .tooltip-buttons {
+      display: flex;
+
+      > div {
+        margin-right: 3px;
+      }
+    }
+
+    .copy-url {
+      font-size: 12px;
+    }
+  }
+}
+
+.rc-tooltip {
+  opacity: 1;
+  box-shadow: 0 0 20px 0;
+
+  .rc-tooltip-inner {
+    border: none;
+    padding: 0;
+  }
+
+  .rc-tooltip-arrow {
+    border-top-color: white;
+  }
+
+  position: absolute;
+  z-index: 5000;
+  display: block;
+  line-height: 1.5;
+  font-size: 12px;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 1px;
+}
