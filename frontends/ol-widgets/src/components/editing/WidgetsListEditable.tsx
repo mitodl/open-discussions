@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
+import type { Dispatch, SetStateAction } from "react"
 import Button from "@mui/material/Button"
 import AddIcon from "@mui/icons-material/Add"
 import Widget from "../Widget"
@@ -91,6 +92,65 @@ const useWidgetVisibilities = (wrappers: Wrapped<AnonymousWidget>[]) => {
   return [visibility, modifyVisibility] as const
 }
 
+const useWidgetEditingDialog = (
+  wrappedWidgets: Wrapped<AnonymousWidget>[],
+  setWrappers: Dispatch<SetStateAction<Wrapped<AnonymousWidget>[]>>
+) => {
+  const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Closed)
+
+  const [editingWidget, setEditingWidget] =
+    useState<Wrapped<AnonymousWidget> | null>(null)
+
+  const handleBeginEdit = useCallback(
+    (widget: AnonymousWidget) => {
+      const wrapper = mustFindWrapper(wrappedWidgets, widget)
+      setEditingWidget(wrapper)
+      setDialogMode(DialogMode.Editing)
+    },
+    [wrappedWidgets]
+  )
+  const handleCancelEditing = useCallback(() => {
+    setDialogMode(DialogMode.Closed)
+  }, [])
+  const handleSubmitEdit: WidgetSubmitHandler = useCallback(
+    e => {
+      setDialogMode(DialogMode.Closed)
+      if (e.type === "edit") {
+        if (editingWidget === null) {
+          throw new Error("An edit is underway, this should not be null.")
+        }
+        setWrappers(current =>
+          current.map(w =>
+            w === editingWidget ? { id: editingWidget.id, wraps: e.widget } : w
+          )
+        )
+      } else {
+        const newId = uniqueId("new_widget")
+        setWrappers(current => [{ id: newId, wraps: e.widget }, ...current])
+      }
+      return null
+    },
+    [editingWidget, setWrappers]
+  )
+
+  const handleAdd = useCallback(() => {
+    setEditingWidget(null)
+    setDialogMode(DialogMode.Adding)
+  }, [])
+
+  const dialog = {
+    mode:   dialogMode,
+    widget: editingWidget?.wraps
+  }
+  const handlers = {
+    beginEdit: handleBeginEdit,
+    beginAdd:  handleAdd,
+    cancel:    handleCancelEditing,
+    submit:    handleSubmitEdit
+  }
+  return [dialog, handlers] as const
+}
+
 /**
  * Handles frontend widget editing.
  * This component does NOT make API calls itself.
@@ -110,67 +170,29 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
    * Newly created widgets do not have ids until they are saved to the database.
    * So instead let's work with wrappers that always have ids.
    */
-  const [wrappedWidgets, setWrapped] = useState<Wrapped<AnonymousWidget>[]>([])
+  const [wrappers, setWrappers] = useState<Wrapped<AnonymousWidget>[]>([])
 
-  const [visibility, modifyVisibility] = useWidgetVisibilities(wrappedWidgets)
+  const [visibility, modifyVisibility] = useWidgetVisibilities(wrappers)
+  const [dialog, dialogHandlers] = useWidgetEditingDialog(wrappers, setWrappers)
 
   useEffect(() => {
     const wrapped = savedWidgets.map(w => ({ wraps: w, id: mustGetId(w) }))
-    setWrapped(wrapped)
+    setWrappers(wrapped)
   }, [savedWidgets])
 
-  const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Closed)
-
-  const [editingWidget, setEditingWidget] =
-    useState<Wrapped<AnonymousWidget> | null>(null)
-  const handleBeginEdit = useCallback(
-    (widget: AnonymousWidget) => {
-      const wrapper = mustFindWrapper(wrappedWidgets, widget)
-      setEditingWidget(wrapper)
-      setDialogMode(DialogMode.Editing)
-    },
-    [wrappedWidgets]
-  )
-  const handleCancelEditing = useCallback(() => {
-    setDialogMode(DialogMode.Closed)
-  }, [])
-  const handleSubmitEdit: WidgetSubmitHandler = useCallback(
-    e => {
-      setDialogMode(DialogMode.Closed)
-      if (e.type === "edit") {
-        if (editingWidget === null) {
-          throw new Error("An edit is underway, this should not be null.")
-        }
-        setWrapped(current =>
-          current.map(w =>
-            w === editingWidget ? { id: editingWidget.id, wraps: e.widget } : w
-          )
-        )
-      } else {
-        const newId = uniqueId("new_widget")
-        setWrapped(current => [{ id: newId, wraps: e.widget }, ...current])
-      }
-      return null
-    },
-    [editingWidget]
-  )
   const handleDelete = useCallback(
     (deleted: AnonymousWidget) => {
-      const wrapper = mustFindWrapper(wrappedWidgets, deleted)
-      setWrapped(current => current.filter(w => w !== wrapper))
+      const wrapper = mustFindWrapper(wrappers, deleted)
+      setWrappers(current => current.filter(w => w !== wrapper))
     },
-    [wrappedWidgets]
+    [wrappers, setWrappers]
   )
-  const handleAdd = useCallback(() => {
-    setEditingWidget(null)
-    setDialogMode(DialogMode.Adding)
-  }, [])
 
   const handleDone = useCallback(() => {
-    const widgets = wrappedWidgets.map(w => w.wraps)
+    const widgets = wrappers.map(w => w.wraps)
     const touched = zip(widgets, savedWidgets).some(([w1, w2]) => w1 !== w2)
     onSubmit({ touched, widgets })
-  }, [onSubmit, wrappedWidgets, savedWidgets])
+  }, [onSubmit, wrappers, savedWidgets])
 
   return (
     <>
@@ -191,7 +213,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
             size="small"
             color="secondary"
             startIcon={<AddIcon />}
-            onClick={handleAdd}
+            onClick={dialogHandlers.beginAdd}
           >
             Add widget
           </Button>
@@ -204,27 +226,27 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           </Button>
         </div>
       </div>
-      {wrappedWidgets.map(wrapper => (
+      {wrappers.map(wrapper => (
         <Widget
           widget={wrapper.wraps}
           isEditing={true}
           isOpen={visibility.open.has(wrapper.id)}
           className={widgetClassName}
           onVisibilityChange={modifyVisibility.toggle}
-          onEdit={handleBeginEdit}
+          onEdit={dialogHandlers.beginEdit}
           onDelete={handleDelete}
           key={wrapper.id}
         />
       ))}
       <ManageWidgetDialog
-        isOpen={dialogMode !== DialogMode.Closed}
+        isOpen={dialog.mode !== DialogMode.Closed}
         className={dialogClassName}
         fieldClassName={fieldClassName}
         errorClassName={errorClassName}
-        onSubmit={handleSubmitEdit}
-        widget={editingWidget?.wraps}
+        onSubmit={dialogHandlers.submit}
+        widget={dialog.widget}
         specs={specs}
-        onCancel={handleCancelEditing}
+        onCancel={dialogHandlers.cancel}
       />
     </>
   )
