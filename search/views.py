@@ -27,7 +27,7 @@ class ESView(APIView):
 
     def handle_exception(self, exc):
         if isinstance(exc, TransportError):
-            if 400 <= exc.status_code < 500:
+            if isinstance(exc.status_code, int) and 400 <= exc.status_code < 500:
                 log.exception("Received a 4xx error from Elasticsearch")
                 return Response(status=exc.status_code)
         raise exc
