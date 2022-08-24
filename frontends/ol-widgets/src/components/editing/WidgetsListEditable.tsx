@@ -5,6 +5,7 @@ import Widget from "../Widget"
 import type { WidgetListResponse, AnonymousWidget } from "../../interfaces"
 import type { WidgetSubmitHandler } from "./ManageWidgetDialog"
 import ManageWidgetDialog from "./ManageWidgetDialog"
+import { uniqueId, zip } from "lodash"
 
 type SubmitWidgetsEvent = {
   touched: boolean
@@ -29,22 +30,26 @@ interface WidgetsListEditableProps {
 }
 
 /**
- * Get a unique key identifying the widget.
- *
- * The intent here is a key function for React lists that works for widgets that
- * have been saved to the database (and therefore have their own id) as well as
- * widgets that have not been saved to the database (and so do not have an id yet).
+ * An wrapper with an id for objects that might not have ids.
  */
-const getWidgetKey = (widget: AnonymousWidget): string => {
-  if (typeof widget.id === "string" || typeof widget.id === "number") {
-    return String(widget.id)
+interface Wrapped<T> {
+  id: string
+  wraps: T
+}
+
+const mustGetId = (widget: AnonymousWidget) => {
+  const { id } = widget as AnonymousWidget & { id?: unknown }
+  if (typeof id === "string" || typeof id === "number") {
+    return String(id)
   }
-  /**
-   * This is not particularly efficient for a React list. However, it should be
-   * fine. Our widget lists seem to be quite small (dozens of widgets, not thousands)
-   * and each widget is fairly.
-   */
-  return JSON.stringify(widget)
+  throw new Error("Expected widget to have an id but it did not.")
+}
+const mustFindWrapper = <T, >(wrappers: Wrapped<T>[], item: T) => {
+  const wrapped = wrappers.find(w => w.wraps === item)
+  if (!wrapped) {
+    throw new Error("Could not find item.")
+  }
+  return wrapped
 }
 
 /**
@@ -62,53 +67,58 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   errorClassName
 }) => {
   const { widgets: savedWidgets, available_widgets: specs } = widgetsList
-  const [widgets, setWidgets] = useState<AnonymousWidget[]>([])
+  /**
+   * Newly created widgets do not have ids until they are saved to the database.
+   * So instead let's work with wrappers that always have ids.
+   */
+  const [wrappedWidgets, setWrapped] = useState<Wrapped<AnonymousWidget>[]>([])
+
   useEffect(() => {
-    setWidgets(savedWidgets)
+    const wrapped = savedWidgets.map(w => ({ wraps: w, id: mustGetId(w) }))
+    setWrapped(wrapped)
   }, [savedWidgets])
 
   const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Closed)
 
-  /**
-   * This tracks the widget objects themselves rather than ids. This is nice
-   * since not all widgets have ids. But editing a widget produces a shallow
-   * clone, so when edits happen we'll need to manually persist the expanded-or-
-   * collapsed state.
-   */
-  const [widgetsOpen, setWidgetsOpen] = useState<Set<AnonymousWidget>>(
-    new Set()
-  )
+  const [widgetsOpen, setWidgetsOpen] = useState<Set<string>>(new Set())
 
   const allOpen = useMemo(
-    () => widgets.every(w => widgetsOpen.has(w)),
-    [widgets, widgetsOpen]
+    () => wrappedWidgets.every(w => widgetsOpen.has(w.id)),
+    [wrappedWidgets, widgetsOpen]
   )
-  const handleToggleWidgetDetails = useCallback((widget: AnonymousWidget) => {
-    setWidgetsOpen(current => {
-      const clone = new Set(current)
-      if (clone.has(widget)) {
-        clone.delete(widget)
-      } else {
-        clone.add(widget)
-      }
-      return clone
-    })
-  }, [])
+  const handleToggleWidgetDetails = useCallback(
+    (widget: AnonymousWidget) => {
+      const wrapper = mustFindWrapper(wrappedWidgets, widget)
+      setWidgetsOpen(current => {
+        const clone = new Set(current)
+        if (clone.has(wrapper.id)) {
+          clone.delete(wrapper.id)
+        } else {
+          clone.add(wrapper.id)
+        }
+        return clone
+      })
+    },
+    [wrappedWidgets]
+  )
   const handleToggleAll = useCallback(() => {
     if (allOpen) {
       setWidgetsOpen(new Set())
     } else {
-      setWidgetsOpen(new Set(widgets))
+      setWidgetsOpen(new Set(wrappedWidgets.map(w => w.id)))
     }
-  }, [allOpen, widgets])
+  }, [allOpen, wrappedWidgets])
 
-  const [editingWidget, setEditingWidget] = useState<AnonymousWidget | null>(
-    null
+  const [editingWidget, setEditingWidget] =
+    useState<Wrapped<AnonymousWidget> | null>(null)
+  const handleBeginEdit = useCallback(
+    (widget: AnonymousWidget) => {
+      const wrapper = mustFindWrapper(wrappedWidgets, widget)
+      setEditingWidget(wrapper)
+      setDialogMode(DialogMode.Editing)
+    },
+    [wrappedWidgets]
   )
-  const handleBeginEdit = useCallback((widget: AnonymousWidget) => {
-    setEditingWidget(widget)
-    setDialogMode(DialogMode.Editing)
-  }, [])
   const handleCancelEditing = useCallback(() => {
     setDialogMode(DialogMode.Closed)
   }, [])
@@ -119,38 +129,36 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
         if (editingWidget === null) {
           throw new Error("An edit is underway, this should not be null.")
         }
-        setWidgets(current =>
-          current.map(w => (w === editingWidget ? e.widget : w))
+        setWrapped(current =>
+          current.map(w =>
+            w === editingWidget ? { id: editingWidget.id, wraps: e.widget } : w
+          )
         )
-        setWidgetsOpen(currentlyOpen => {
-          if (!currentlyOpen.has(editingWidget)) return currentlyOpen
-          const clone = new Set(currentlyOpen)
-          clone.delete(editingWidget)
-          clone.add(e.widget)
-          return clone
-        })
       } else {
-        setWidgets(current => [e.widget, ...current])
+        const newId = uniqueId("new_widget")
+        setWrapped(current => [{ id: newId, wraps: e.widget }, ...current])
       }
       return null
     },
     [editingWidget]
   )
-  const handleDelete = useCallback((deleted: AnonymousWidget) => {
-    setWidgets(current => current.filter(w => w !== deleted))
-  }, [])
+  const handleDelete = useCallback(
+    (deleted: AnonymousWidget) => {
+      const wrapper = mustFindWrapper(wrappedWidgets, deleted)
+      setWrapped(current => current.filter(w => w !== wrapper))
+    },
+    [wrappedWidgets]
+  )
   const handleAdd = useCallback(() => {
     setEditingWidget(null)
     setDialogMode(DialogMode.Adding)
   }, [])
 
   const handleDone = useCallback(() => {
-    if (widgets !== savedWidgets) {
-      onSubmit({ touched: true, widgets })
-    } else {
-      onSubmit({ touched: false, widgets })
-    }
-  }, [onSubmit, widgets, savedWidgets])
+    const widgets = wrappedWidgets.map(w => w.wraps)
+    const touched = zip(widgets, savedWidgets).some(([w1, w2]) => w1 !== w2)
+    onSubmit({ touched, widgets })
+  }, [onSubmit, wrappedWidgets, savedWidgets])
 
   return (
     <>
@@ -180,16 +188,16 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           </Button>
         </div>
       </div>
-      {widgets.map(widget => (
+      {wrappedWidgets.map(wrapper => (
         <Widget
-          widget={widget}
+          widget={wrapper.wraps}
           isEditing={true}
-          isOpen={widgetsOpen.has(widget)}
+          isOpen={widgetsOpen.has(wrapper.id)}
           className={widgetClassName}
           onVisibilityChange={handleToggleWidgetDetails}
           onEdit={handleBeginEdit}
           onDelete={handleDelete}
-          key={getWidgetKey(widget)}
+          key={wrapper.id}
         />
       ))}
       <ManageWidgetDialog
@@ -198,7 +206,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
         fieldClassName={fieldClassName}
         errorClassName={errorClassName}
         onSubmit={handleSubmitEdit}
-        widget={editingWidget}
+        widget={editingWidget?.wraps}
         specs={specs}
         onCancel={handleCancelEditing}
       />
