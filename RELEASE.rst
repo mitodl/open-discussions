@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.195.1
+Version 0.195.1 (Released August 24, 2022)
 ---------------
 
 - upgrade python-saml3, add aptfile packages for heroku-22 (#3704)
