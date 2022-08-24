@@ -47,7 +47,7 @@ praw==4.5.1
 pyyaml==5.4
 python-dateutil
 python-rapidjson==1.8
-python3-saml==1.9.0
+python3-saml==1.14.0
 pygithub==1.44.1
 pyopenssl==17.5.0
 pytube==9.5.2

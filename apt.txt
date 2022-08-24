@@ -4,4 +4,6 @@ curl
 libjpeg-dev
 zlib1g-dev
 net-tools
+pkg-config
+libffi-dev
 libxmlsec1-dev
