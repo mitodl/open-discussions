@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.195.1
+---------------
+
+- upgrade python-saml3, add aptfile packages for heroku-22 (#3704)
+- Handle non-numerical status codes from elasticsearch (#3705)
+
 Version 0.195.0 (Released August 23, 2022)
 ---------------
 
