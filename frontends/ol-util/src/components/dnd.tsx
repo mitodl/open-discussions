@@ -31,6 +31,8 @@ type HandleProps = React.HTMLAttributes<HTMLElement> & {
   ref: (el: HTMLElement | null) => void
 }
 
+const DRAG_UNDERLAY_OPACITY = "0.4"
+
 const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
   props: SortableItemProps<I>
 ): React.ReactElement => {
@@ -46,7 +48,7 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
-    ...(isDragging && { opacity: 0.5 })
+    ...(isDragging && { opacity: DRAG_UNDERLAY_OPACITY })
   }
   const handleProps: HandleProps = useMemo(
     () => ({
@@ -65,6 +67,9 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
 
 type RenderActive = (active: Active) => React.ReactElement
 type SortEndEvent<I extends UniqueIdentifier = UniqueIdentifier> = {
+  /**
+   * The item order post-sort
+   */
   itemIds: I[]
 }
 
@@ -78,7 +83,7 @@ const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
     styles: {
       active: {
-        opacity: "0.5"
+        opacity: DRAG_UNDERLAY_OPACITY
       }
     }
   })
