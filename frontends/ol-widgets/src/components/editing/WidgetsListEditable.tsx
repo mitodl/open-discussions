@@ -3,11 +3,11 @@ import type { Dispatch, SetStateAction } from "react"
 import Button from "@mui/material/Button"
 import AddIcon from "@mui/icons-material/Add"
 import { uniqueId, zip } from "lodash"
+import { RenderActive, SortableItem, SortableList, SortEndEvent } from "ol-util"
 import Widget from "../Widget"
 import type { WidgetListResponse, AnonymousWidget } from "../../interfaces"
 import type { WidgetSubmitHandler } from "./ManageWidgetDialog"
 import ManageWidgetDialog from "./ManageWidgetDialog"
-import { RenderActive, SortableItem, SortableList } from "./dnd"
 
 type SubmitWidgetsEvent = {
   touched: boolean
@@ -197,15 +197,27 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
 
   const itemIds = useMemo(() => wrappers.map(w => w.id), [wrappers])
 
-  const renderDragging: RenderActive = useCallback(active => {
-    const wrapper = active.data.current as Wrapped<AnonymousWidget>
-    return <Widget
-      widget={wrapper.wraps}
-      isEditing={true}
-      isOpen={visibility.open.has(wrapper.id)}
-      className={widgetClassName}
-    />
-  }, [visibility, widgetClassName])
+  const renderDragging: RenderActive = useCallback(
+    active => {
+      const wrapper = active.data.current as Wrapped<AnonymousWidget>
+      return (
+        <Widget
+          widget={wrapper.wraps}
+          isEditing={true}
+          isOpen={visibility.open.has(wrapper.id)}
+          className={widgetClassName}
+        />
+      )
+    },
+    [visibility, widgetClassName]
+  )
+
+  const onSortEnd = useCallback((e: SortEndEvent<string>) => {
+    setWrappers(current => {
+      const lookup = Object.fromEntries(current.map(w => [w.id, w]))
+      return e.itemIds.map(id => lookup[id])
+    })
+  }, [])
 
   return (
     <>
@@ -239,23 +251,25 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
           </Button>
         </div>
       </div>
-      <SortableList itemIds={itemIds} renderActive={renderDragging}>
+      <SortableList
+        itemIds={itemIds}
+        renderActive={renderDragging}
+        onSortEnd={onSortEnd}
+      >
         {wrappers.map(wrapper => (
-          <SortableItem
-            key={wrapper.id}
-            id={wrapper.id}
-            data={wrapper}
-          >
-            {handleProps => <Widget
-              widget={wrapper.wraps}
-              isEditing={true}
-              isOpen={visibility.open.has(wrapper.id)}
-              className={widgetClassName}
-              onVisibilityChange={modifyVisibility.toggle}
-              onEdit={dialogHandlers.beginEdit}
-              onDelete={handleDelete}
-              handleProps={handleProps}
-            />}
+          <SortableItem key={wrapper.id} id={wrapper.id} data={wrapper}>
+            {handleProps => (
+              <Widget
+                widget={wrapper.wraps}
+                isEditing={true}
+                isOpen={visibility.open.has(wrapper.id)}
+                className={widgetClassName}
+                onVisibilityChange={modifyVisibility.toggle}
+                onEdit={dialogHandlers.beginEdit}
+                onDelete={handleDelete}
+                handleProps={handleProps}
+              />
+            )}
           </SortableItem>
         ))}
       </SortableList>
@@ -276,4 +290,3 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
 export default WidgetsListEditable
 
 export type { WidgetsListEditableProps }
-
