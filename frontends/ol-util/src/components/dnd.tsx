@@ -90,15 +90,18 @@ const dropAnimationConfig: DropAnimation = {
 }
 
 /**
- * Create a sortable list of items! Just wrap your list and items in
- * `SortableList` and `SortableItem`.
+ * Create a sortable list of items. Wrap your list and items in SortableList
+ * and `SortableItem`.
+ *
+ * Items must have ids. `SortableList` will emit an event with the **new** sort
+ * order when sorting ends.
  *
  *  Notes:
- *  - emits `onSortEnd` events with the new item order
- *  - itemIds passed to `SortableList` **must** be in same order as the items
- *    appear in the DOM. (This is a requirement of @dnd-kit)
+ *  - does not support sorting between lists.
  *  - SortableItem's child is a render function called with props that should be
  *    passed to drag handle.
+ *  - itemIds passed to `SortableList` **must** be in same order as the items
+ *    appear in the DOM. (This is a requirement of @dnd-kit)
  *
  * @example
  * ```tsx
