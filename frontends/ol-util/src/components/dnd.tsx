@@ -83,6 +83,43 @@ const dropAnimationConfig: DropAnimation = {
     }
   })
 }
+
+/**
+ * Create a sortable list of items! Just wrap your list and items in
+ * `SortableList` and `SortableItem`.
+ *
+ *  Notes:
+ *  - emits `onSortEnd` events with the new item order
+ *  - itemIds passed to `SortableList` **must** be in same order as the items
+ *    appear in the DOM. (This is a requirement of @dnd-kit)
+ *  - SortableItem's child is a render function called with props that should be
+ *    passed to drag handle.
+ *
+ * @example
+ * ```tsx
+ * const ExampleUsage = () => {
+ *   const [itemIds, setItemIds] = useState(["A", "B", "C", "D"])
+ *   return (
+ *     <SortableList
+ *       itemIds={itemIds}
+ *       onSortEnd={e => setItemIds(e.itemIds)}
+ *       renderActive={active => <div>Active Item: {active.id}</div>}
+ *     >
+ *       {itemIds.map(id => (
+ *         <SortableItem key={id} id={id}>
+ *           {handleProps => (
+ *             <div>
+ *               My item {id} so cool.
+ *               <div {...handleProps}>Drag Handle</div>
+ *             </div>
+ *           )}
+ *         </SortableItem>
+ *       ))}
+ *     </SortableList>
+ *   )
+ * }
+ * ```
+ */
 const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   children,
   itemIds,
