@@ -28,8 +28,8 @@ jest.mock("@dnd-kit/core", () => {
 jest.mock("./SortableList", () => {
   const actual = jest.requireActual("./SortableList")
   return {
-    __esModule:   true,
-    default:      jest.fn(actual.SortableList)
+    __esModule: true,
+    default:    jest.fn(actual.SortableList)
   }
 })
 
