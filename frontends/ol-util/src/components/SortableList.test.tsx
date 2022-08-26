@@ -8,7 +8,7 @@ import type {
   UniqueIdentifier as Id
 } from "@dnd-kit/core"
 import type { SortableData } from "@dnd-kit/sortable"
-import { SortableList } from "./dnd"
+import SortableList from "./SortableList"
 
 jest.mock("@dnd-kit/core", () => {
   const actual = jest.requireActual("@dnd-kit/core")

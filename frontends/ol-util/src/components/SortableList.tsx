@@ -182,5 +182,6 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   )
 }
 
-export { SortableItem, SortableList }
+export default SortableList
+export { SortableItem }
 export type { RenderActive, SortEndEvent, SortableItemProps, SortableListProps }
