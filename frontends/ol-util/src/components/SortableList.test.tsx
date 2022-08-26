@@ -29,7 +29,7 @@ jest.mock("./SortableList", () => {
   const actual = jest.requireActual("./SortableList")
   return {
     __esModule: true,
-    default:    jest.fn(actual.SortableList)
+    default:    jest.fn(actual.default)
   }
 })
 
