@@ -4,7 +4,10 @@ import { Menu } from "@mui/material"
 import MenuItem from "@mui/material/MenuItem"
 
 import { FieldChannel } from "../../../api/fields"
-import { makeFieldEditPath } from "../../../pages/urls"
+import {
+  makeFieldEditPath,
+  makeFieldManageWidgetsPath
+} from "../../../pages/urls"
 
 type SettingsMenuProps = {
   field: FieldChannel
@@ -29,6 +32,11 @@ const FieldMenu: React.FC<SettingsMenuProps> = props => {
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         <MenuItem onClick={handleClose} disableRipple>
           <Link to={makeFieldEditPath(field.name)}>Field Settings</Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose} disableRipple>
+          <Link to={makeFieldManageWidgetsPath(field.name)}>
+            Manage Widgets
+          </Link>
         </MenuItem>
       </Menu>
     </div>

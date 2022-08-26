@@ -48,7 +48,7 @@ const EditFieldPage: React.FC = () => {
         <TabContext value={tabValue}>
           <div className="page-subbanner">
             <Container className="page-nav-container">
-              <Grid container spacing={1}>
+              <Grid container>
                 <Grid item xs={9}>
                   <TabList className="page-nav" onChange={handleChange}>
                     <Tab
@@ -75,7 +75,7 @@ const EditFieldPage: React.FC = () => {
             </Container>
           </div>
           <Container>
-            <Grid container spacing={1} className="edit-channel">
+            <Grid container className="edit-channel">
               <Grid item xs={9}>
                 <TabPanel value="basic" className="page-nav-content">
                   <EditFieldBasicForm field={field.data} />

@@ -11515,6 +11515,7 @@ __metadata:
     webpack-dev-middleware: ^5.3.1
     webpack-dev-server: ^4.9.2
     webpack-hot-middleware: ^2.25.1
+    yup: ^0.32.11
   languageName: unknown
   linkType: soft
 
@@ -14783,7 +14784,10 @@ __metadata:
     "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
+    classnames: ^2.3.1
+    formik: ^2.2.9
     ol-util: "workspace:*"
+    yup: ^0.32.11
   peerDependencies:
     react: ^16.10 || 17 || 18
   languageName: unknown

@@ -95,14 +95,17 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
   )
 }
 
+const MANAGE_WIDGETS_SUFFIX = "manage/widgets/"
+
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
+
   const history = useHistory()
   const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
   const fieldQuery = useFieldDetails(name)
   const handleChange = useCallback(
-    (event: React.SyntheticEvent, newValue: string) => {
+    (_event: React.SyntheticEvent, newValue: string) => {
       history.replace({ hash: newValue })
     },
     [history]
@@ -110,13 +113,21 @@ const FieldPage: React.FC = () => {
 
   const featuredList = fieldQuery.data?.featured_list
   const fieldLists = fieldQuery.data?.lists ?? []
-  const isEditingWidgets = pathname.endsWith("manage/widgets")
+  const isEditingWidgets = pathname.endsWith(MANAGE_WIDGETS_SUFFIX)
+
+  const leaveWidgetManagement = useCallback(() => {
+    const { pathname } = history.location
+    history.replace({
+      pathname: pathname.slice(0, -MANAGE_WIDGETS_SUFFIX.length)
+    })
+  }, [history])
+
   return (
     <FieldPageSkeleton name={name}>
       <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
-            <Grid container>
+            <Grid container columnSpacing={3}>
               <Grid item xs={12} sm={9}>
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
@@ -128,11 +139,12 @@ const FieldPage: React.FC = () => {
                   />
                 </TabList>
               </Grid>
+              <Grid item xs={12} sm={3} />
             </Grid>
           </Container>
         </div>
         <Container>
-          <Grid container spacing={3}>
+          <Grid container columnSpacing={3}>
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
@@ -144,11 +156,14 @@ const FieldPage: React.FC = () => {
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </Grid>
             <Grid item xs={12} sm={3}>
-              <WidgetsList
-                className="ic-widget-list"
-                widgetListId={fieldQuery.data?.widget_list}
-                isEditing={isEditingWidgets}
-              />
+              {fieldQuery.data?.widget_list && (
+                <WidgetsList
+                  className="ic-widget-list"
+                  widgetListId={fieldQuery.data.widget_list}
+                  isEditing={isEditingWidgets}
+                  onFinishEditing={leaveWidgetManagement}
+                />
+              )}
             </Grid>
           </Grid>
         </Container>

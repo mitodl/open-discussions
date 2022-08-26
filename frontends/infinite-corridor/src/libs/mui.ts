@@ -7,6 +7,9 @@ const muiTheme = createTheme({
   palette: {
     primary: {
       main: "#a31f34"
+    },
+    secondary: {
+      main: "#03152d"
     }
   }
 })

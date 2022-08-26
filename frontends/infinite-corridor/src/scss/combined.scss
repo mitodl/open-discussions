@@ -9,6 +9,7 @@
 @use "form";
 @use "admin";
 @use "buttons";
+@use "widgets";
 
 html {
   font-family: theme.$font-family-default;
@@ -43,4 +44,8 @@ h1 {
 
 h2 {
   font-size: theme.$font-size-h2;
+}
+
+h4 {
+  font-size: theme.$font-size-h4;
 }

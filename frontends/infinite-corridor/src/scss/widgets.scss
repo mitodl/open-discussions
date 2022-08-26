@@ -1,0 +1,35 @@
+@use "ol-widgets/assets/widgets";
+@use "buttons";
+
+.ic-widget-list {
+  > * {
+    &:first-child {
+      margin-top: 0;
+    }
+    &:not(:first-child) {
+      margin-top: 1em;
+    }
+    &:not(:last-child) {
+      margin-bottom: 1em;
+    }
+  }
+}
+
+.ic-widget {
+  button {
+    @extend %button-base;
+  }
+
+  .MuiCardActions-root button {
+    @extend .background-button;
+  }
+}
+
+.ic-widget-editing-header {
+  h4 {
+    margin-top: 0px;
+  }
+  button:not(:first-child) {
+    margin-left: 8px;
+  }
+}

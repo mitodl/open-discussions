@@ -39,7 +39,7 @@ export const makeSearchResult = (type: string | null) => {
 }
 
 export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
-  id:                casual.integer(1, 1000),
+  id:                faker.unique(faker.datatype.number),
   title:             casual.title,
   url:               casual.url,
   image_src:         "http://image.medium.url",
@@ -64,7 +64,7 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
 export const makeProgramResult: Factory<
   LearningResourceResult
 > = overrides => ({
-  id:                casual.integer(1, 1000),
+  id:                faker.unique(faker.datatype.number),
   title:             casual.title,
   url:               casual.url,
   image_src:         "http://image.medium.url",
@@ -87,7 +87,7 @@ export const makeProgramResult: Factory<
 
 export const makeRun: Factory<LearningResourceRun> = overrides => {
   return {
-    id:               casual.integer(1, 1000),
+    id:               faker.unique(faker.datatype.number),
     url:              casual.url,
     language:         casual.random_element(["en-US", "fr", null]),
     semester:         casual.random_element(["Fall", "Spring", null]),
@@ -121,7 +121,7 @@ const TEST_SEARCH_PAGE_SIZE = 4
 export const makeSearchResponse = (
   pageSize: number = TEST_SEARCH_PAGE_SIZE,
   total: number = 2 * TEST_SEARCH_PAGE_SIZE,
-  type: string | null,
+  type: string | null = null,
   withFacets = true
 ) => {
   const hits = R.times(() => makeSearchResult(type), pageSize)

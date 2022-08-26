@@ -8,11 +8,13 @@ $color: theme.$color-primary;
     text-transform: none;
   }
   
+  
   .MuiChip-root.MuiChip-filled {
     background-color: theme.$color-background;
   }
 
   .MuiButtonBase-root {
+    text-transform: none;
     &.primary {
       color: $color;
       &.bordered {
@@ -42,6 +44,10 @@ $color: theme.$color-primary;
     > *:first-child {
       margin-top: 0px; // No extra space for the first child, beyond the card content's padding.
     }
+  }
+  .MuiCardActions-root {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .MuiCard-root {
