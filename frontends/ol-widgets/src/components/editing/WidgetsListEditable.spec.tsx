@@ -1,12 +1,21 @@
 import React from "react"
-import { screen, render, within } from "@testing-library/react"
+import { screen, render, within, act } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import { faker } from "@faker-js/faker"
 import { makeWidgetListResponse, makeWidget } from "../../factories"
 import WidgetsListEditable from "./WidgetsListEditable"
 import { btnLabel } from "../Widget"
 import { WidgetTypes } from "../../interfaces"
-import { assertInstanceOf } from "ol-util"
+import { assertInstanceOf, SortableList } from "ol-util"
+
+jest.mock("ol-util", () => {
+  const actual = jest.requireActual("ol-util")
+  return {
+    __esModule:   true,
+    ...actual,
+    SortableList: jest.fn(actual.SortableList)
+  }
+})
 
 const queryBtn = (name: string, container: HTMLElement) =>
   within(container).queryByRole("button", { name })
@@ -210,6 +219,24 @@ describe("WidgetsListEditable", () => {
     expect(spies.onSubmit).toHaveBeenCalledWith({
       touched: true,
       widgets: expectedWidgets
+    })
+  })
+
+  test("Updating a widget's order", async () => {
+    const spySortableList = jest.mocked(SortableList)
+    const { widgets, getHeader, spies } = renderWidgetsList()
+    const [w1, w2, w3] = widgets
+
+    const { onSortEnd, itemIds } = spySortableList.mock.lastCall[0]
+    // Note that these are the wrapper ids not the widget ids
+    const [id1, id2, id3] = itemIds
+    const newOrder = [id2, id1, id3]
+    act(() => onSortEnd({ itemIds: newOrder }))
+
+    await user.click(await findBtn("Done", getHeader()))
+    expect(spies.onSubmit).toHaveBeenCalledWith({
+      touched: true,
+      widgets: [w2, w1, w3]
     })
   })
 })

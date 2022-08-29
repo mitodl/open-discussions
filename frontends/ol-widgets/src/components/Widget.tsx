@@ -36,6 +36,7 @@ type WidgetTemplateProps = {
   onEdit?: (widget: AnonymousWidget) => void
   onDelete?: (widget: AnonymousWidget) => void
   onVisibilityChange?: (widget: AnonymousWidget) => void
+  handleProps?: React.HTMLAttributes<HTMLButtonElement>
 }
 
 const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
@@ -46,7 +47,8 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   isOpen = true,
   onEdit,
   onDelete,
-  onVisibilityChange
+  onVisibilityChange,
+  handleProps
 }) => {
   const handleVisibilityChange = useCallback(() => {
     if (!onVisibilityChange) return
@@ -111,7 +113,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
             >
               <IconDelete fontSize="inherit" />
             </button>
-            <button aria-label={btnLabel.move} type="button">
+            <button aria-label={btnLabel.move} type="button" {...handleProps}>
               <IconDrag fontSize="inherit" />
             </button>
           </CardActions>
@@ -137,6 +139,7 @@ type WidgetProps = Pick<
   | "onEdit"
   | "onDelete"
   | "onVisibilityChange"
+  | "handleProps"
 >
 
 const Widget: React.FC<WidgetProps> = props => {
