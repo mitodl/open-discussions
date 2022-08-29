@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.195.2
+Version 0.195.2 (Released August 29, 2022)
 ---------------
 
 - Widget Editing in Infinite Corridor (#3702)
