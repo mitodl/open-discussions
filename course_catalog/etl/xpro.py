@@ -1,32 +1,26 @@
 """xPro course catalog ETL"""
 import copy
-import csv
-from datetime import datetime
-from itertools import chain
 import logging
-import mimetypes
 import os
-from subprocess import check_call
+import re
+from datetime import datetime
+from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
-import glob
 
-import boto3
-from django.conf import settings
-from django.utils.functional import SimpleLazyObject
-import requests
 import pytz
-from xbundle import XBundle
+import requests
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.constants import (
-    CONTENT_TYPE_FILE,
-    CONTENT_TYPE_VERTICAL,
-    OfferedBy,
-    PlatformType,
-    VALID_TEXT_FILE_TYPES,
+from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.etl.loaders import load_content_files
+from course_catalog.etl.utils import (
+    get_learning_course_bucket,
+    transform_content_files,
+    transform_topics,
 )
-from course_catalog.etl.utils import extract_text_metadata
-from course_catalog.models import get_max_length
-
+from course_catalog.models import Course, LearningResourceRun
+from course_catalog.utils import get_s3_object_and_read
 
 log = logging.getLogger(__name__)
 
@@ -34,43 +28,6 @@ log = logging.getLogger(__name__)
 XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 OFFERED_BY = [{"name": OfferedBy.xpro.value}]
-
-
-def _load_ucc_topic_mappings():
-    """
-    Loads the topic mappings from the crosswalk CSV file
-
-    Returns:
-        dict:
-            the mapping dictionary
-    """
-    with open("course_catalog/data/ucc-topic-mappings.csv", "r") as mapping_file:
-        rows = list(csv.reader(mapping_file))
-        # drop the column headers (first row)
-        rows = rows[1:]
-        mapping = {
-            f"{row[0]}:{row[1]}": list(filter(lambda item: item, row[2:]))
-            for row in rows
-        }
-        return mapping
-
-
-UCC_TOPIC_MAPPINGS = SimpleLazyObject(_load_ucc_topic_mappings)
-
-
-def get_xpro_learning_course_bucket():
-    """
-    Get the xPRO S3 Bucket
-
-    Returns:
-        boto3.Bucket: the OCW S3 Bucket or None
-    """
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    return s3.Bucket(name=settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
 
 
 def _parse_datetime(value):
@@ -102,25 +59,6 @@ def extract_courses():
     if settings.XPRO_COURSES_API_URL:
         return requests.get(settings.XPRO_COURSES_API_URL).json()
     return []
-
-
-def _transform_topics(topics):
-    """
-    Transform the topics by using our crosswalk mapping
-
-    Args:
-        topics (list of dict):
-            the topics to transform
-
-    Return:
-        list of dict: the transformed topics
-    """
-    return [
-        {"name": topic_name}
-        for topic_name in chain.from_iterable(
-            [UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]]) for topic in topics]
-        )
-    ]
 
 
 def _transform_run(course_run):
@@ -179,7 +117,7 @@ def _transform_course(course):
                 course["courseruns"],
             )
         ),
-        "topics": _transform_topics(course.get("topics", [])),
+        "topics": transform_topics(course.get("topics", [])),
         "runs": [_transform_run(course_run) for course_run in course["courseruns"]],
     }
 
@@ -211,7 +149,7 @@ def transform_programs(programs):
                 program["current_price"]
             ),  # a program is only considered published if it has a product/price
             "url": program["url"],
-            "topics": _transform_topics(program.get("topics", [])),
+            "topics": transform_topics(program.get("topics", [])),
             "runs": [
                 {
                     "prices": [{"price": program["current_price"], "mode": ""}]
@@ -240,139 +178,68 @@ def transform_programs(programs):
     ]
 
 
-def transform_content_files(course_tarpath):
+def sync_xpro_course_files(ids):
     """
-    Pass content to tika, then return a JSON document with the transformed content inside it
+    Sync all xPRO course run files for a list of course ids to database
 
     Args:
-        course_tarpath (str): The path to the tarball which contains the OLX
+        ids(list of int): list of course ids to process
+        bucket_name (str): The name of the bucket containing course file data
+        platform (str): The platform of the course files
     """
-    content = []
-    with TemporaryDirectory() as inner_tempdir:
-        check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
-        olx_path = glob.glob(inner_tempdir + "/*")[0]
-        for document, metadata in documents_from_olx(olx_path):
-            key = metadata["key"]
-            content_type = metadata["content_type"]
-            mime_type = metadata.get("mime_type")
-            tika_output = extract_text_metadata(
-                document, other_headers={"Content-Type": mime_type} if mime_type else {}
-            )
+    bucket = get_learning_course_bucket(settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
 
-            if tika_output is None:
-                log.info("No tika response for %s", key)
-                continue
-
-            tika_content = tika_output.get("content") or ""
-            tika_metadata = tika_output.get("metadata") or {}
-            content.append(
-                {
-                    "content": tika_content.strip(),
-                    "key": key,
-                    "content_title": (
-                        metadata.get("title") or tika_metadata.get("title") or ""
-                    )[: get_max_length("content_title")],
-                    "content_author": (tika_metadata.get("Author") or "")[
-                        : get_max_length("content_author")
+    try:
+        most_recent_export = next(
+            reversed(
+                sorted(
+                    [
+                        obj
+                        for obj in bucket.objects.all()
+                        if re.search(r"/exported_courses_\d+\.tar\.gz$", obj.key)
                     ],
-                    "content_language": (tika_metadata.get("language") or "")[
-                        : get_max_length("content_language")
-                    ],
-                    "content_type": content_type,
-                }
-            )
-    return content
-
-
-def _infinite_counter():
-    """Infinite counter"""
-    count = 0
-    while True:
-        yield count
-        count += 1
-
-
-def _get_text_from_element(element, content):
-    """
-    Helper method to recurse through XML elements
-
-    Args:
-        element (Element): An XML element
-        content (list): A list of strings, to be modified with any new material
-    """
-    if element.tag not in ("style", "script"):
-        if element.text:
-            content.append(element.text)
-
-        for child in element.getchildren():
-            _get_text_from_element(child, content)
-
-        if element.tail:
-            content.append(element.tail)
-
-
-def get_text_from_element(element):
-    """
-    Get relevant text for ingestion from XML element
-
-    Args:
-        element (Element): A XML element representing a vertical
-    """
-    content = []
-    _get_text_from_element(element, content)
-    return " ".join(content)
-
-
-def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
-    """
-    Extract text from OLX directory
-
-    Args:
-        olx_path (str): The path to the directory with the OLX data
-
-    Returns:
-        list of tuple:
-            A list of (bytes of content, metadata)
-    """
-    documents = []
-    bundle = XBundle()
-    bundle.import_from_directory(olx_path)
-    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
-        content = get_text_from_element(vertical)
-
-        documents.append(
-            (
-                content,
-                {
-                    "key": f"vertical_{index + 1}",
-                    "content_type": CONTENT_TYPE_VERTICAL,
-                    "title": vertical.attrib.get("display_name") or "",
-                    "mime_type": "application/xml",
-                },
+                    key=lambda obj: obj.last_modified,
+                )
             )
         )
+    except StopIteration:
+        log.warning("No xPRO exported courses found in xPRO S3 bucket")
+        return
 
-    counter = _infinite_counter()
+    course_content_type = ContentType.objects.get_for_model(Course)
+    with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
+        tarbytes = get_s3_object_and_read(most_recent_export)
+        tarpath = os.path.join(export_tempdir, "temp.tar.gz")
+        with open(tarpath, "wb") as f:
+            f.write(tarbytes)
 
-    for root, _, files in os.walk(olx_path):
-        for filename in files:
-            _, extension = os.path.splitext(filename)
-            extension_lower = extension.lower()
-            if extension_lower in VALID_TEXT_FILE_TYPES:
-                with open(os.path.join(root, filename), "rb") as f:
-                    filebytes = f.read()
+        try:
+            check_call(["tar", "xf", tarpath], cwd=tar_tempdir)
+        except CalledProcessError:
+            log.exception("Unable to untar %s", most_recent_export)
+            return
 
-                mimetype = mimetypes.types_map.get(extension_lower)
-
-                documents.append(
-                    (
-                        filebytes,
-                        {
-                            "key": f"document_{next(counter)}_{filename}",
-                            "content_type": CONTENT_TYPE_FILE,
-                            "mime_type": mimetype,
-                        },
-                    )
+        for course_tarfile in os.listdir(tar_tempdir):
+            matches = re.search(r"(.+)\.tar\.gz$", course_tarfile)
+            if not matches:
+                log.error(
+                    "Expected a tar file in exported courses tarball but found %s",
+                    course_tarfile,
                 )
+                continue
+            run_id = matches.group(1)
+            run = LearningResourceRun.objects.filter(
+                platform=PlatformType.xpro.value,
+                run_id=run_id,
+                content_type=course_content_type,
+                object_id__in=ids,
+            ).first()
+            if not run:
+                log.info("No xPRO courses matched course tarfile %s", course_tarfile)
+                continue
 
-    return documents
+            course_tarpath = os.path.join(tar_tempdir, course_tarfile)
+            try:
+                load_content_files(run, transform_content_files(course_tarpath))
+            except:  # pylint: disable=bare-except
+                log.exception("Error ingesting OLX content data for %s", course_tarfile)

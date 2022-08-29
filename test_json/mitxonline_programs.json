@@ -1,0 +1,223 @@
+[
+    {
+        "title": "Data, Economics and Development Policy",
+        "readable_id": "program-v1:MITx+DEDP",
+        "id": 1,
+        "courses": [
+            {
+                "id": 1,
+                "title": "Microeconomics",
+                "readable_id": "course-v1:MITxT+14.100x",
+                "courseruns": [
+                    {
+                        "title": "Microeconomics",
+                        "start_date": "2022-09-06T15:00:00Z",
+                        "end_date": "2022-11-22T23:30:00Z",
+                        "enrollment_start": "2022-07-06T23:59:00Z",
+                        "enrollment_end": "2022-10-11T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.100x+3T2022/course/",
+                        "courseware_id": "course-v1:MITxT+14.100x+3T2022",
+                        "run_tag": "3T2022",
+                        "id": 35,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.100x.jpg?v=8fe621cc0d80ebe4e57fd1b240e9f95d8c2b31db",
+                            "page_url": "/courses/course-v1:MITxT+14.100x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 35,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.100x.jpg?v=8fe621cc0d80ebe4e57fd1b240e9f95d8c2b31db",
+                "page_url": "/courses/course-v1:MITxT+14.100x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 2,
+                "title": "Designing and Running Randomized Evaluations",
+                "readable_id": "course-v1:MITxT+JPAL102x",
+                "courseruns": [
+                    {
+                        "title": "Designing and Running Randomized Evaluations",
+                        "start_date": "2022-09-06T15:00:00Z",
+                        "end_date": "2022-11-22T15:00:00Z",
+                        "enrollment_start": "2022-03-08T23:59:00Z",
+                        "enrollment_end": "2022-10-11T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+JPAL102x+3T2022/course/",
+                        "courseware_id": "course-v1:MITxT+JPAL102x+3T2022",
+                        "run_tag": "3T2022",
+                        "id": 22,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/JPAL102x.jpg?v=bf1f606cd8105828ceb9529ba5592d507d3b8d58",
+                            "page_url": "/courses/course-v1:MITxT+JPAL102x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 22,
+                "topics": [],
+                "feature_image_src": "/media/original_images/JPAL102x.jpg?v=bf1f606cd8105828ceb9529ba5592d507d3b8d58",
+                "page_url": "/courses/course-v1:MITxT+JPAL102x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 3,
+                "title": "Data Analysis for Social Scientists",
+                "readable_id": "course-v1:MITxT+14.310x",
+                "courseruns": [
+                    {
+                        "title": "Data Analysis for Social Scientists",
+                        "start_date": "2022-09-06T15:00:00Z",
+                        "end_date": "2022-11-22T15:00:00Z",
+                        "enrollment_start": "2022-07-06T23:59:00Z",
+                        "enrollment_end": "2022-10-11T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.310x+3T2022/course/",
+                        "courseware_id": "course-v1:MITxT+14.310x+3T2022",
+                        "run_tag": "3T2022",
+                        "id": 36,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.310x.max-800x600.jpg?v=9db950769510bfdc810f3a84699f139c26d0ffb4",
+                            "page_url": "/courses/course-v1:MITxT+14.310x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 36,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.310x.max-800x600.jpg?v=9db950769510bfdc810f3a84699f139c26d0ffb4",
+                "page_url": "/courses/course-v1:MITxT+14.310x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 4,
+                "title": "The Challenges of Global Poverty",
+                "readable_id": "course-v1:MITxT+14.73x",
+                "courseruns": [
+                    {
+                        "title": "The Challenges of Global Poverty",
+                        "start_date": "2022-09-06T15:00:00Z",
+                        "end_date": "2022-11-22T15:00:00Z",
+                        "enrollment_start": "2022-03-08T23:59:00Z",
+                        "enrollment_end": "2022-10-11T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.73x+3T2022/course/",
+                        "courseware_id": "course-v1:MITxT+14.73x+3T2022",
+                        "run_tag": "3T2022",
+                        "id": 21,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.73x.jpg?v=b7ce961774d5d79edb9b0e22135f5b5b8ca006dc",
+                            "page_url": "/courses/course-v1:MITxT+14.73x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 21,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.73x.jpg?v=b7ce961774d5d79edb9b0e22135f5b5b8ca006dc",
+                "page_url": "/courses/course-v1:MITxT+14.73x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 5,
+                "title": "Foundations of Development Policy",
+                "readable_id": "course-v1:MITxT+14.740x",
+                "courseruns": [
+                    {
+                        "title": "Foundations of Development Policy",
+                        "start_date": "2023-01-31T15:00:00Z",
+                        "end_date": "2023-04-19T15:00:00Z",
+                        "enrollment_start": "2022-07-06T23:59:00Z",
+                        "enrollment_end": "2023-03-07T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.740x+1T2023/course/",
+                        "courseware_id": "course-v1:MITxT+14.740x+1T2023",
+                        "run_tag": "1T2023",
+                        "id": 37,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.740x.jpg?v=ce04d2d27a6d4b2f20d60f48e3c437726d02dc08",
+                            "page_url": "/courses/course-v1:MITxT+14.740x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 37,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.740x.jpg?v=ce04d2d27a6d4b2f20d60f48e3c437726d02dc08",
+                "page_url": "/courses/course-v1:MITxT+14.740x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 6,
+                "title": "Political Economy and Economic Development",
+                "readable_id": "course-v1:MITxT+14.750x",
+                "courseruns": [
+                    {
+                        "title": "Political Economy and Economic Development",
+                        "start_date": "2022-09-06T15:00:00Z",
+                        "end_date": "2022-11-22T15:00:00Z",
+                        "enrollment_start": "2021-11-02T23:59:00Z",
+                        "enrollment_end": "2022-10-11T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.750x+3T2022/course/",
+                        "courseware_id": "course-v1:MITxT+14.750x+3T2022",
+                        "run_tag": "3T2022",
+                        "id": 10,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.750x.jpg?v=444c4611e9d1bccef38b160d01d2015d4a601d72",
+                            "page_url": "/courses/course-v1:MITxT+14.750x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 10,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.750x.jpg?v=444c4611e9d1bccef38b160d01d2015d4a601d72",
+                "page_url": "/courses/course-v1:MITxT+14.750x/",
+                "financial_assistance_form_url": ""
+            },
+            {
+                "id": 16,
+                "title": "Good Economics for Hard Times",
+                "readable_id": "course-v1:MITxT+14.009x",
+                "courseruns": [
+                    {
+                        "title": "Good Economics for Hard Times",
+                        "start_date": "2023-05-30T15:00:00Z",
+                        "end_date": "2023-08-16T15:00:00Z",
+                        "enrollment_start": "2022-07-06T23:59:00Z",
+                        "enrollment_end": "2023-07-04T23:59:00Z",
+                        "expiration_date": null,
+                        "courseware_url": "https://courses.mitxonline.mit.edu/courses/course-v1:MITxT+14.009x+2T2023/course/",
+                        "courseware_id": "course-v1:MITxT+14.009x+2T2023",
+                        "run_tag": "2T2023",
+                        "id": 38,
+                        "products": [],
+                        "page": {
+                            "feature_image_src": "/media/original_images/14.009x_-_course_image_-_SMALL.jpg?v=52e6adb90be9d738874676756fe22cd1ad9e1965",
+                            "page_url": "/courses/course-v1:MITxT+14.009x/",
+                            "financial_assistance_form_url": ""
+                        }
+                    }
+                ],
+                "next_run_id": 38,
+                "topics": [],
+                "feature_image_src": "/media/original_images/14.009x_-_course_image_-_SMALL.jpg?v=52e6adb90be9d738874676756fe22cd1ad9e1965",
+                "page_url": "/courses/course-v1:MITxT+14.009x/",
+                "financial_assistance_form_url": ""
+            }
+        ],
+        "start_date": "2021-10-05T15:00:00Z",
+        "end_date": "2023-08-16T15:00:00Z",
+        "enrollment_start": "2021-10-05T15:00:00Z",
+        "topics": []
+    }
+]

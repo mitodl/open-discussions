@@ -1,17 +1,33 @@
 """Utility functions for ETL processes"""
+import csv
+import glob
 import json
+import logging
+import mimetypes
+import os
 import re
+import uuid
 from datetime import datetime
 from functools import wraps
-import logging
-import uuid
+from itertools import chain
+from subprocess import check_call
+from tempfile import TemporaryDirectory
 
-import rapidjson
-
+import boto3
 import pytz
+import rapidjson
 import requests
 from django.conf import settings
+from django.utils.functional import SimpleLazyObject
 from tika import parser as tika_parser
+from xbundle import XBundle
+
+from course_catalog.constants import (
+    CONTENT_TYPE_FILE,
+    CONTENT_TYPE_VERTICAL,
+    VALID_TEXT_FILE_TYPES,
+)
+from course_catalog.models import get_max_length
 
 log = logging.getLogger()
 
@@ -228,3 +244,197 @@ def map_topics(raw_topics, mapping):
             )
             continue
     return sorted(topics)
+
+
+def _infinite_counter():
+    """Infinite counter"""
+    count = 0
+    while True:
+        yield count
+        count += 1
+
+
+def _get_text_from_element(element, content):
+    """
+    Helper method to recurse through XML elements
+
+    Args:
+        element (Element): An XML element
+        content (list): A list of strings, to be modified with any new material
+    """
+    if element.tag not in ("style", "script"):
+        if element.text:
+            content.append(element.text)
+
+        for child in element.getchildren():
+            _get_text_from_element(child, content)
+
+        if element.tail:
+            content.append(element.tail)
+
+
+def get_text_from_element(element):
+    """
+    Get relevant text for ingestion from XML element
+
+    Args:
+        element (Element): A XML element representing a vertical
+    """
+    content = []
+    _get_text_from_element(element, content)
+    return " ".join(content)
+
+
+def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
+    """
+    Extract text from OLX directory
+
+    Args:
+        olx_path (str): The path to the directory with the OLX data
+
+    Returns:
+        list of tuple:
+            A list of (bytes of content, metadata)
+    """
+    documents = []
+    bundle = XBundle()
+    bundle.import_from_directory(olx_path)
+    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+        content = get_text_from_element(vertical)
+
+        documents.append(
+            (
+                content,
+                {
+                    "key": f"vertical_{index + 1}",
+                    "content_type": CONTENT_TYPE_VERTICAL,
+                    "title": vertical.attrib.get("display_name") or "",
+                    "mime_type": "application/xml",
+                },
+            )
+        )
+
+    counter = _infinite_counter()
+
+    for root, _, files in os.walk(olx_path):
+        for filename in files:
+            _, extension = os.path.splitext(filename)
+            extension_lower = extension.lower()
+            if extension_lower in VALID_TEXT_FILE_TYPES:
+                with open(os.path.join(root, filename), "rb") as f:
+                    filebytes = f.read()
+
+                mimetype = mimetypes.types_map.get(extension_lower)
+
+                documents.append(
+                    (
+                        filebytes,
+                        {
+                            "key": f"document_{next(counter)}_{filename}",
+                            "content_type": CONTENT_TYPE_FILE,
+                            "mime_type": mimetype,
+                        },
+                    )
+                )
+
+    return documents
+
+
+def transform_content_files(course_tarpath):
+    """
+    Pass content to tika, then return a JSON document with the transformed content inside it
+
+    Args:
+        course_tarpath (str): The path to the tarball which contains the OLX
+    """
+    content = []
+    with TemporaryDirectory() as inner_tempdir:
+        check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
+        olx_path = glob.glob(inner_tempdir + "/*")[0]
+        for document, metadata in documents_from_olx(olx_path):
+            key = metadata["key"]
+            content_type = metadata["content_type"]
+            mime_type = metadata.get("mime_type")
+            tika_output = extract_text_metadata(
+                document, other_headers={"Content-Type": mime_type} if mime_type else {}
+            )
+
+            if tika_output is None:
+                log.info("No tika response for %s", key)
+                continue
+
+            tika_content = tika_output.get("content") or ""
+            tika_metadata = tika_output.get("metadata") or {}
+            content.append(
+                {
+                    "content": tika_content.strip(),
+                    "key": key,
+                    "content_title": (
+                        metadata.get("title") or tika_metadata.get("title") or ""
+                    )[: get_max_length("content_title")],
+                    "content_author": (tika_metadata.get("Author") or "")[
+                        : get_max_length("content_author")
+                    ],
+                    "content_language": (tika_metadata.get("language") or "")[
+                        : get_max_length("content_language")
+                    ],
+                    "content_type": content_type,
+                }
+            )
+    return content
+
+
+def get_learning_course_bucket(bucket_name):
+    """
+    Get the learning course S3 Bucket holding content file data
+
+    Returns:
+        boto3.Bucket: the OCW S3 Bucket or None
+    """
+    s3 = boto3.resource(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+    )
+    return s3.Bucket(bucket_name)
+
+
+def _load_ucc_topic_mappings():
+    """
+    Loads the topic mappings from the crosswalk CSV file
+
+    Returns:
+        dict:
+            the mapping dictionary
+    """
+    with open("course_catalog/data/ucc-topic-mappings.csv", "r") as mapping_file:
+        rows = list(csv.reader(mapping_file))
+        # drop the column headers (first row)
+        rows = rows[1:]
+        mapping = {
+            f"{row[0]}:{row[1]}": list(filter(lambda item: item, row[2:]))
+            for row in rows
+        }
+        return mapping
+
+
+UCC_TOPIC_MAPPINGS = SimpleLazyObject(_load_ucc_topic_mappings)
+
+
+def transform_topics(topics):
+    """
+    Transform topics by using our crosswalk mapping
+
+    Args:
+        topics (list of dict):
+            the topics to transform
+
+    Return:
+        list of dict: the transformed topics
+    """
+    return [
+        {"name": topic_name}
+        for topic_name in chain.from_iterable(
+            [UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]]) for topic in topics]
+        )
+    ]

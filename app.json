@@ -168,6 +168,10 @@
       "description": "Number of times to retry an indexing operation on failure",
       "required": false
     },
+    "LEARNING_COURSE_ITERATOR_CHUNK_SIZE": {
+      "description": "Chunk size for iterating over xPRO/MITx Online courses for master json",
+      "required": false
+    },
     "MAILGUN_URL": {
       "description": "The URL for communicating with Mailgun"
     },
@@ -201,7 +205,23 @@
       "required": false
     },
     "MITX_BASE_URL": {
-      "description": "Base default URL for MITx courses",
+      "description": "Base default URL for MITx courses hosted on edX",
+      "required": false
+    },
+    "MITX_ONLINE_BASE_URL": {
+      "description": "Base default URL for MITx Online courses",
+      "required": false
+    },
+    "MITX_ONLINE_PROGRAMS_API_URL": {
+      "description": "The catalog url for MITx Online programs",
+      "required": false
+    },
+    "MITX_ONLINE_COURSES_API_URL": {
+      "description": "The api url for MITx Online courses",
+      "required": false
+    },
+    "MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME": {
+      "description": "Name of S3 bucket to upload MITx Online course media",
       "required": false
     },
     "MIT_WS_CERTIFICATE": {
@@ -605,10 +625,6 @@
     },
     "XPRO_COURSES_API_URL": {
       "description": "The api url for xpro courses",
-      "required": false
-    },
-    "XPRO_ITERATOR_CHUNK_SIZE": {
-      "description": "Chunk size for iterating over xPRO courses for master json",
       "required": false
     },
     "XPRO_LEARNING_COURSE_BUCKET_NAME": {

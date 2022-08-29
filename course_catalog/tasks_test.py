@@ -24,6 +24,8 @@ from course_catalog.tasks import (
     get_micromasters_data,
     get_mitpe_data,
     get_mitx_data,
+    get_mitxonline_data,
+    get_mitxonline_files,
     get_ocw_courses,
     get_ocw_data,
     get_ocw_files,
@@ -37,6 +39,7 @@ from course_catalog.tasks import (
     get_xpro_files,
     get_youtube_data,
     get_youtube_transcripts,
+    import_all_mitxonline_files,
     import_all_ocw_files,
     import_all_xpro_files,
     update_enrollments_for_email,
@@ -506,6 +509,53 @@ def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
     get_xpro_files_mock.si.assert_called_once_with([course.id for course in courses])
 
 
+def test_get_mitxonline_files(mocker, settings):
+    """Test that get_mitxonline_files calls api.sync_mitxonline_course_files with the correct ids"""
+    mock_sync_mitxonline_course_files = mocker.patch(
+        "course_catalog.tasks.sync_mitxonline_course_files"
+    )
+    setup_s3(settings)
+    ids = [1, 2, 3]
+    get_mitxonline_files(ids)
+    mock_sync_mitxonline_course_files.assert_called_with(ids)
+
+
+def test_get_mitxonline_files_missing_settings(mocker, settings):
+    """Test that get_mitxonline_files does nothing without required settings"""
+    mock_sync_mitxonline_course_files = mocker.patch(
+        "course_catalog.tasks.sync_mitxonline_course_files"
+    )
+    mock_log = mocker.patch("course_catalog.tasks.log.warning")
+    settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = None
+    get_mitxonline_files([1, 2])
+    mock_sync_mitxonline_course_files.assert_not_called()
+    mock_log.assert_called_once_with(
+        "Required settings missing for get_mitxonline_files"
+    )
+
+
+@mock_s3
+def test_import_all_mitxonline_files(settings, mocker, mocked_celery, mock_blocklist):
+    """import_all_mitxonline_files should start chunked get_mitxonline_files tasks"""
+    setup_s3(settings)
+    get_mitxonline_files_mock = mocker.patch(
+        "course_catalog.tasks.get_mitxonline_files", autospec=True
+    )
+    courses = CourseFactory.create_batch(
+        3, platform=PlatformType.mitxonline.value, published=True
+    )
+    CourseFactory.create_batch(
+        3, platform=PlatformType.mitxonline.value, published=False
+    )
+
+    with pytest.raises(mocked_celery.replace_exception_class):
+        import_all_mitxonline_files.delay(3)
+    assert mocked_celery.group.call_count == 1
+    get_mitxonline_files_mock.si.assert_called_once_with(
+        [course.id for course in courses]
+    )
+
+
 def test_process_bootcamps(mock_get_bootcamps):
     """
     Test that bootcamp json data is properly parsed
@@ -541,6 +591,14 @@ def test_get_xpro_data(mocker):
     get_xpro_data.delay()
     mock_pipelines.xpro_programs_etl.assert_called_once_with()
     mock_pipelines.xpro_courses_etl.assert_called_once_with()
+
+
+def test_get_mitxonline_data(mocker):
+    """Verify that the get_mitxonline_data invokes the MITx Online ETL pipeline"""
+    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
+    get_mitxonline_data.delay()
+    mock_pipelines.mitxonline_programs_etl.assert_called_once_with()
+    mock_pipelines.mitxonline_courses_etl.assert_called_once_with()
 
 
 def test_get_oll_data(mocker):

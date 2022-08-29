@@ -2,11 +2,7 @@
 course_catalog api functions
 """
 import logging
-import os
-import re
 from datetime import datetime
-from subprocess import CalledProcessError, check_call
-from tempfile import TemporaryDirectory
 from urllib.parse import urljoin
 
 import boto3
@@ -29,10 +25,6 @@ from course_catalog.etl.ocw import (
     transform_content_files,
 )
 from course_catalog.etl.ocw_next import transform_ocw_next_content_files
-from course_catalog.etl.xpro import get_xpro_learning_course_bucket
-from course_catalog.etl.xpro import (
-    transform_content_files as transform_content_files_xpro,
-)
 from course_catalog.models import Course, LearningResourceRun
 from course_catalog.serializers import (
     CourseSerializer,
@@ -744,71 +736,6 @@ def sync_ocw_next_courses(*, url_paths, force_overwrite, start_timestamp=None):
             )
         except:  # pylint: disable=bare-except
             log.exception("Error encountered parsing OCW json for %s", url_path)
-
-
-def sync_xpro_course_files(ids):
-    """
-    Sync all xPRO course run files for a list of course ids to database
-
-    Args:
-        ids(list of int): list of course ids to process
-    """
-    bucket = get_xpro_learning_course_bucket()
-
-    try:
-        most_recent_export = next(
-            reversed(
-                sorted(
-                    [
-                        obj
-                        for obj in bucket.objects.all()
-                        if re.search(r"/exported_courses_\d+\.tar\.gz$", obj.key)
-                    ],
-                    key=lambda obj: obj.last_modified,
-                )
-            )
-        )
-    except StopIteration:
-        log.warning("No xPRO exported courses found in xPRO S3 bucket")
-        return
-
-    course_content_type = ContentType.objects.get_for_model(Course)
-    with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-        tarbytes = get_s3_object_and_read(most_recent_export)
-        tarpath = os.path.join(export_tempdir, "temp.tar.gz")
-        with open(tarpath, "wb") as f:
-            f.write(tarbytes)
-
-        try:
-            check_call(["tar", "xf", tarpath], cwd=tar_tempdir)
-        except CalledProcessError:
-            log.exception("Unable to untar %s", most_recent_export)
-            return
-
-        for course_tarfile in os.listdir(tar_tempdir):
-            matches = re.search(r"(.+)\.tar\.gz$", course_tarfile)
-            if not matches:
-                log.error(
-                    "Expected a tar file in exported courses tarball but found %s",
-                    course_tarfile,
-                )
-                continue
-            run_id = matches.group(1)
-            run = LearningResourceRun.objects.filter(
-                platform=PlatformType.xpro.value,
-                run_id=run_id,
-                content_type=course_content_type,
-                object_id__in=ids,
-            ).first()
-            if not run:
-                log.info("No xPRO courses matched course tarfile %s", course_tarfile)
-                continue
-
-            course_tarpath = os.path.join(tar_tempdir, course_tarfile)
-            try:
-                load_content_files(run, transform_content_files_xpro(course_tarpath))
-            except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)
 
 
 def ocw_parent_folder(prefix):

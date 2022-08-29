@@ -613,6 +613,14 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.import_all_xpro_files",
         "schedule": crontab(minute=0, hour=18),  # 2:00pm EST
     },
+    "update-mitxonline-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_mitxonline_data",
+        "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
+    },
+    "update-mitxonline-files-every-1-days": {
+        "task": "course_catalog.tasks.import_all_mitxonline_files",
+        "schedule": crontab(minute=30, hour=20),  # 4:30pm EST
+    },
     "update-oll-courses-every-1-days": {
         "task": "course_catalog.tasks.get_oll_data",
         "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
@@ -724,7 +732,6 @@ OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH = get_int("OPEN_DISCUSSIONS_MAX_COMMENT_DEPTH
 OPEN_DISCUSSIONS_COOKIE_NAME = get_string("OPEN_DISCUSSIONS_COOKIE_NAME", None)
 if not OPEN_DISCUSSIONS_COOKIE_NAME:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_COOKIE_NAME is not set")
-
 OPEN_DISCUSSIONS_COOKIE_DOMAIN = get_string("OPEN_DISCUSSIONS_COOKIE_DOMAIN", None)
 if not OPEN_DISCUSSIONS_COOKIE_DOMAIN:
     raise ImproperlyConfigured("OPEN_DISCUSSIONS_COOKIE_DOMAIN is not set")
@@ -746,11 +753,9 @@ JWT_AUTH = {
     "JWT_PAYLOAD_GET_USERNAME_HANDLER": "authentication.utils.jwt_get_username_from_payload_handler",
 }
 
-
 OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS = get_int(
     "OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_POSTS", 5
 )
-
 OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_EPISODES = get_int(
     "OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_EPISODES", 5
 )
@@ -758,7 +763,6 @@ OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_EPISODES = get_int(
 OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE = get_int(
     "OPEN_DISCUSSIONS_DEFAULT_CHANNEL_BACKPOPULATE_BATCH_SIZE", 1000
 )
-
 OPEN_DISCUSSIONS_RELATED_POST_COUNT = get_int("OPEN_DISCUSSIONS_RELATED_POST_COUNT", 4)
 
 # Similar resources settings
@@ -809,13 +813,11 @@ if MIDDLEWARE_FEATURE_FLAG_QS_PREFIX:
         "open_discussions.middleware.feature_flags.CookieFeatureFlagMiddleware",
     )
 
-
 # django debug toolbar only in debug mode
 if DEBUG:
     INSTALLED_APPS += ("debug_toolbar",)
     # it needs to be enabled before other middlewares
     MIDDLEWARE = ("debug_toolbar.middleware.DebugToolbarMiddleware",) + MIDDLEWARE
-
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
@@ -856,7 +858,6 @@ HIJACK_LOGOUT_REDIRECT_URL = "/admin/auth/user"
 # disable the anonymous user creation
 ANONYMOUS_USER_NAME = None
 
-
 # EDX API Credentials
 EDX_API_URL = get_string("EDX_API_URL", None)
 EDX_API_ACCESS_TOKEN_URL = get_string("EDX_API_ACCESS_TOKEN_URL", None)
@@ -883,10 +884,6 @@ OCW_NEXT_SEARCH_WEBHOOK_KEY = get_string("OCW_NEXT_SEARCH_WEBHOOK_KEY", None)
 MAX_S3_GET_ITERATIONS = get_int("MAX_S3_GET_ITERATIONS", 3)
 OCW_NEXT_BASE_URL = get_string("OCW_NEXT_BASE_URL", "http://ocw.mit.edu/")
 
-# S3 Bucket info for exporting xPRO OLX
-XPRO_LEARNING_COURSE_BUCKET_NAME = get_string("XPRO_LEARNING_COURSE_BUCKET_NAME", None)
-XPRO_ITERATOR_CHUNK_SIZE = get_int("XPRO_ITERATOR_CHUNK_SIZE", 20)
-
 # Base URL's for courses
 OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
 MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
@@ -905,9 +902,23 @@ BOOTCAMPS_URL = get_string(
 )
 MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
 
+# Iterator chunk size for MITx and xPRO courses
+LEARNING_COURSE_ITERATOR_CHUNK_SIZE = get_int("LEARNING_COURSE_ITERATOR_CHUNK_SIZE", 20)
+
+# xPRO settings for course/resource ingestion
+XPRO_LEARNING_COURSE_BUCKET_NAME = get_string("XPRO_LEARNING_COURSE_BUCKET_NAME", None)
 XPRO_CATALOG_API_URL = get_string("XPRO_CATALOG_API_URL", None)
 XPRO_COURSES_API_URL = get_string("XPRO_COURSES_API_URL", None)
 
+# MITx Online settings for course/resource ingestion
+MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = get_string(
+    "MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME", None
+)
+MITX_ONLINE_BASE_URL = get_string("MITX_ONLINE_BASE_URL", None)
+MITX_ONLINE_PROGRAMS_API_URL = get_string("MITX_ONLINE_PROGRAMS_API_URL", None)
+MITX_ONLINE_COURSES_API_URL = get_string("MITX_ONLINE_COURSES_API_URL", None)
+
+# Open Learning Library settings
 OLL_API_URL = get_string("OLL_API_URL", None)
 OLL_API_ACCESS_TOKEN_URL = get_string("OLL_API_ACCESS_TOKEN_URL", None)
 OLL_API_CLIENT_ID = get_string("OLL_API_CLIENT_ID", None)
@@ -915,10 +926,10 @@ OLL_API_CLIENT_SECRET = get_string("OLL_API_CLIENT_SECRET", None)
 OLL_BASE_URL = get_string("OLL_BASE_URL", None)
 OLL_ALT_URL = get_string("OLL_ALT_URL", None)
 
+# More MIT URLs
 SEE_BASE_URL = get_string("SEE_BASE_URL", None)
 MITPE_BASE_URL = get_string("MITPE_BASE_URL", None)
 CSAIL_BASE_URL = get_string("CSAIL_BASE_URL", None)
-
 
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)
@@ -944,7 +955,6 @@ OPEN_PODCAST_DATA_BRANCH = get_string("OPEN_PODCAST_DATA_BRANCH", "master")
 
 # Tika security
 TIKA_ACCESS_TOKEN = get_string("TIKA_ACCESS_TOKEN", None)
-
 
 # x509 certificate for moira
 MIT_WS_CERTIFICATE = get_key("MIT_WS_CERTIFICATE", "")
