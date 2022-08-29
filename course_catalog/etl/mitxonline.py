@@ -35,7 +35,7 @@ OFFERED_BY = [{"name": OfferedBy.mitx.value}]
 
 def _parse_datetime(value):
     """
-    Parses an xPro datetime string
+    Parses an MITx Online datetime string
 
     Args:
         value(str): the datetime in string format
@@ -74,14 +74,14 @@ def parse_page_attribute(mitx_json, attribute, is_url=False, is_list=False):
 
 
 def extract_programs():
-    """Loads the xPro catalog data"""
+    """Loads the MITx Online catalog data"""
     if settings.MITX_ONLINE_PROGRAMS_API_URL:
         return requests.get(settings.MITX_ONLINE_PROGRAMS_API_URL).json()
     return []
 
 
 def extract_courses():
-    """Loads the xPro catalog data"""
+    """Loads the MITx Online catalog data"""
     if settings.MITX_ONLINE_COURSES_API_URL:
         return requests.get(settings.MITX_ONLINE_COURSES_API_URL).json()
     return []
