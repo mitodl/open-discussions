@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.196.0
+---------------
+
+- Reordering widgets (#3710)
+
 Version 0.195.2 (Released August 29, 2022)
 ---------------
 
