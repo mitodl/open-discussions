@@ -160,7 +160,10 @@ type WidgetProps = Pick<
 const Widget: React.FC<WidgetProps> = props => {
   return (
     <WidgetTemplate {...props}>
-      <WidgetContent className="ol-widget-content" widget={props.widget} />
+      <WidgetContent
+        className={classNames("ol-widget-content", props.contentClassName)}
+        widget={props.widget}
+      />
     </WidgetTemplate>
   )
 }

@@ -16524,8 +16524,8 @@ __metadata:
     formik: ^2.2.9
     js-beautify: ^1.14.6
     ol-util: "workspace:*"
-    react-markdown: 6
-    remark-gfm: 1
+    react-markdown: ^6.0.3
+    remark-gfm: ^1.0.0
     yup: ^0.32.11
   peerDependencies:
     react: ^16.10 || 17 || 18
@@ -18893,7 +18893,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-markdown@npm:6":
+"react-markdown@npm:^6.0.3":
   version: 6.0.3
   resolution: "react-markdown@npm:6.0.3"
   dependencies:
@@ -19614,7 +19614,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"remark-gfm@npm:1":
+"remark-gfm@npm:^1.0.0":
   version: 1.0.0
   resolution: "remark-gfm@npm:1.0.0"
   dependencies:
