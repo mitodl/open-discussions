@@ -39,7 +39,12 @@ const makeRichTextWidgetSpec: Factory<WidgetSpec> = overrides => {
   return {
     description: faker.lorem.words(),
     widget_type: WidgetTypes.RichText,
-    form_spec:   [makeWidgetFieldSpec({ field_name: "source" })],
+    form_spec:   [
+      makeWidgetFieldSpec({
+        field_name: "source",
+        input_type: WIDGET_FIELD_TYPES.markdown
+      })
+    ],
     ...overrides
   }
 }
