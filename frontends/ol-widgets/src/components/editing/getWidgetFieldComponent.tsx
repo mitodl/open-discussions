@@ -2,6 +2,7 @@ import { WIDGET_FIELD_TYPES } from "../../constants"
 import type { WidgetFieldSpec } from "../../interfaces"
 import type { WidgetFieldComponent } from "./interfaces"
 import MarkdownEditor from "./MarkdownEditor"
+import UrlField from "./UrlField"
 
 const getWidgetFieldComponent = (
   spec: WidgetFieldSpec
@@ -9,7 +10,13 @@ const getWidgetFieldComponent = (
   if (spec.input_type === WIDGET_FIELD_TYPES.markdown) {
     return MarkdownEditor
   }
-  throw new Error("Unrecognized field input type.")
+  if (spec.input_type === WIDGET_FIELD_TYPES.url) {
+    return UrlField
+  }
+  if (spec.input_type === WIDGET_FIELD_TYPES.textarea) {
+    return 'textarea'
+  }
+  throw new Error(`Unrecognized field input type: '${spec.input_type}'`)
 }
 
 export { getWidgetFieldComponent }
