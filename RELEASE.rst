@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.197.0
+---------------
+
+- Import and index MITX Online courses and content (#3700)
+
 Version 0.196.0 (Released August 29, 2022)
 ---------------
 
