@@ -6,7 +6,7 @@ from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from toolz import compose, curried
 
-from course_catalog.constants import OfferedBy, PlatformType, MIT_OWNER_KEYS
+from course_catalog.constants import MIT_OWNER_KEYS, OfferedBy, PlatformType
 from course_catalog.etl.openedx import (
     OpenEdxConfiguration,
     openedx_extract_transform_factory,

@@ -1,22 +1,29 @@
 """Common config for pytest and friends"""
 # pylint: disable=unused-argument, redefined-outer-name
 import importlib
+import logging
 import warnings
 from functools import wraps
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from django.utils.deprecation import RemovedInDjango30Warning
 import factory
 import pytest
 import responses
 from _pytest.deprecated import RemovedInPytest4Warning
+from django.utils.deprecation import RemovedInDjango30Warning
 from urllib3.exceptions import InsecureRequestWarning
 
 import channels.api
 import channels.factories
 import channels.serializers
 from open_discussions.factories import UserFactory
+
+
+@pytest.fixture(autouse=True)
+def silence_factory_logging():
+    """Only show factory errors"""
+    logging.getLogger("factory").setLevel(logging.ERROR)
 
 
 @pytest.fixture(autouse=True)

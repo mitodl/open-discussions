@@ -1,19 +1,28 @@
 """ETL utils test"""
 import datetime
 import json
+import os
+import pathlib
+from subprocess import check_call
+from tempfile import TemporaryDirectory
 
 import pytest
 import pytz
+from lxml import etree
 
+from course_catalog.constants import CONTENT_TYPE_FILE, CONTENT_TYPE_VERTICAL
 from course_catalog.etl.utils import (
-    log_exceptions,
-    sync_s3_text,
+    documents_from_olx,
+    extract_text_from_url,
     extract_text_metadata,
     generate_unique_id,
-    strip_extra_whitespace,
-    parse_dates,
+    get_text_from_element,
+    log_exceptions,
     map_topics,
-    extract_text_from_url,
+    parse_dates,
+    strip_extra_whitespace,
+    sync_s3_text,
+    transform_content_files,
 )
 
 
@@ -171,3 +180,119 @@ def test_map_topics(mocker):
     mock_log.assert_called_once_with(
         "No topic mapping found for %s in %s", "Biology", json.dumps(mapping)
     )
+
+
+def test_get_text_from_element():
+    """
+    get_text_from_element should walk through elements, extracting text, and ignoring script and style tags completely.
+    """
+    input_xml = """
+    <vertical display_name="name">
+    pre-text
+    <style attr="ibute">
+    style stuff here
+    </style>
+    <script>
+    scripty script
+    </script>
+    <other>
+    some
+    <inner>
+    important
+    </inner>
+    text here
+    </other>
+    post-text
+    </vertical>
+    """
+
+    ret = get_text_from_element(etree.fromstring(input_xml))
+    assert ret == (
+        "\n    pre-text\n     \n    some\n     \n    important"
+        "\n     \n    text here\n     \n    post-text\n    "
+    )
+
+
+@pytest.mark.parametrize("has_metadata", [True, False])
+def test_transform_content_files(mocker, has_metadata):
+    """transform_content_files"""
+    document = "some text in the document"
+    key = "a key here"
+    content_type = "course"
+    metadata = (
+        {"Author": "author", "language": "French", "title": "the title of the course"}
+        if has_metadata
+        else None
+    )
+    tika_output = {"content": "tika'ed text", "metadata": metadata}
+    documents_mock = mocker.patch(
+        "course_catalog.etl.utils.documents_from_olx",
+        return_value=[(document, {"key": key, "content_type": content_type})],
+    )
+    extract_mock = mocker.patch(
+        "course_catalog.etl.utils.extract_text_metadata", return_value=tika_output
+    )
+
+    script_dir = os.path.dirname(
+        os.path.dirname(pathlib.Path(__file__).parent.absolute())
+    )
+    content = transform_content_files(
+        os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
+    )
+    assert content == [
+        {
+            "content": tika_output["content"],
+            "key": key,
+            "content_author": metadata["Author"] if has_metadata else "",
+            "content_title": metadata["title"] if has_metadata else "",
+            "content_language": metadata["language"] if has_metadata else "",
+            "content_type": content_type,
+        }
+    ]
+    extract_mock.assert_called_once_with(document, other_headers={})
+    assert documents_mock.called is True
+
+
+def test_documents_from_olx():
+    """test for documents_from_olx"""
+    script_dir = os.path.dirname(
+        os.path.dirname(pathlib.Path(__file__).parent.absolute())
+    )
+    with TemporaryDirectory() as temp:
+        check_call(
+            [
+                "tar",
+                "xf",
+                os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz"),
+            ],
+            cwd=temp,
+        )
+        check_call(["tar", "xf", "content-devops-0001.tar.gz"], cwd=temp)
+
+        olx_path = os.path.join(temp, "content-devops-0001")
+        parsed_documents = documents_from_olx(olx_path)
+    assert len(parsed_documents) == 106
+
+    expected_parsed_vertical = (
+        "\n    Where all of the tests are defined  Jasmine tests: HTML module edition \n"
+        " Did it break? Dunno; let's find out. \n Some of the libraries tested are only served "
+        "by the LMS for courseware, therefore, some tests can be expected to fail if executed in Studio."
+        " \n\n  Where Jasmine will inject its output (dictated in boot.js)"
+        "  \n Test output will generate here when viewing in LMS."
+    )
+    assert parsed_documents[0] == (
+        expected_parsed_vertical,
+        {
+            "key": "vertical_1",
+            "title": "HTML",
+            "content_type": CONTENT_TYPE_VERTICAL,
+            "mime_type": "application/xml",
+        },
+    )
+    formula2do = [
+        doc for doc in parsed_documents if doc[1]["key"].endswith("formula2do.xml")
+    ][0]
+    assert formula2do[0] == b'<html filename="formula2do" display_name="To do list"/>\n'
+    assert formula2do[1]["key"].endswith("formula2do.xml")
+    assert formula2do[1]["content_type"] == CONTENT_TYPE_FILE
+    assert formula2do[1]["mime_type"] == "application/xml"

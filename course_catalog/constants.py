@@ -30,6 +30,7 @@ class PlatformType(Enum):
 
     ocw = "ocw"
     mitx = "mitx"
+    mitxonline = "mitxonline"
     micromasters = "micromasters"
     bootcamps = "bootcamps"
     xpro = "xpro"

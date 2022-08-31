@@ -9,6 +9,7 @@ from course_catalog.etl import (
     csail,
     mitx,
     xpro,
+    mitxonline,
     ocw,
     oll,
     video,
@@ -58,6 +59,17 @@ xpro_programs_etl = compose(
 )
 xpro_courses_etl = compose(
     load_courses(PlatformType.xpro.value), xpro.transform_courses, xpro.extract_courses
+)
+
+mitxonline_programs_etl = compose(
+    load_programs(PlatformType.mitxonline.value),
+    mitxonline.transform_programs,
+    mitxonline.extract_programs,
+)
+mitxonline_courses_etl = compose(
+    load_courses(PlatformType.mitxonline.value),
+    mitxonline.transform_courses,
+    mitxonline.extract_courses,
 )
 
 mitx_etl = compose(

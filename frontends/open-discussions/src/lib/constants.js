@@ -17,6 +17,7 @@ export const CERTIFICATE = "Certificates"
 
 const ocwPlatform = "ocw"
 const edxPlatform = "mitx"
+const mitxPlatform = "mitxonline"
 const bootcampsPlatform = "bootcamps"
 const micromastersPlatform = "micromasters"
 const xproPlatform = "xpro"
@@ -29,6 +30,7 @@ const csailPlatform = "csail"
 export const platforms = {
   OCW:          ocwPlatform,
   edX:          edxPlatform,
+  mitx:         mitxPlatform,
   bootcamps:    bootcampsPlatform,
   micromasters: micromastersPlatform,
   xpro:         xproPlatform,
@@ -48,7 +50,8 @@ export const platformLogos = {
   [ollPlatform]:          "/static/images/oll_logo.png",
   [seePlatform]:          "/static/images/sloan-logo.png",
   [mitpePlatform]:        "/static/images/mitpe-logo.png",
-  [csailPlatform]:        "/static/images/csail-logo.png"
+  [csailPlatform]:        "/static/images/csail-logo.png",
+  [mitxPlatform]:         "/static/images/mitx-online-logo.png"
 }
 
 export const offeredBys = {
