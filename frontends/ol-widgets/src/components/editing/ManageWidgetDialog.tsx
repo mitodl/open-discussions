@@ -8,12 +8,13 @@ import RadioGroup from "@mui/material/RadioGroup"
 import Radio from "@mui/material/Radio"
 import FormControlLabel from "@mui/material/FormControlLabel"
 import { useId } from "ol-util"
-import { Formik, Form, Field, ErrorMessage } from "formik"
+import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"
 import { isNil } from "lodash"
 import { AnonymousWidget, WidgetSpec, WidgetTypes } from "../../interfaces"
 import { getWidgetFieldComponent } from "./getWidgetFieldComponent"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { getWidgetSchema } from "./schemas"
+import classNames from "classnames"
 
 type WidgetSubmitEvent =
   | {
@@ -114,17 +115,28 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                 // https://formik.org/docs/guides/arrays#nested-objects
                 const attrName = `configuration.${fieldName}`
                 const fieldId = `${formId}:${attrName}`
+                const FieldComponent = getWidgetFieldComponent(fieldSpec)
                 return (
                   <React.Fragment key={fieldName}>
                     <label htmlFor={fieldId}>{fieldSpec.label}</label>
                     <Field
-                      id={fieldId}
-                      className={fieldClassName}
-                      name={attrName}
                       value={values.configuration[fieldSpec.field_name]}
-                      component={getWidgetFieldComponent(fieldSpec)}
-                      {...fieldSpec.props}
-                    />
+                      name={attrName}
+                    >
+                      {({ field }: FieldProps) => {
+                        return (
+                          <FieldComponent
+                            id={fieldId}
+                            className={fieldClassName}
+                            name={field.name}
+                            value={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            {...fieldSpec.props}
+                          />
+                        )
+                      }}
+                    </Field>
                     <ErrorMessage
                       className={errorClassName}
                       component="div"
@@ -263,7 +275,20 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
     []
   )
   return (
-    <Dialog fullWidth className={className} open={isOpen} onClose={onCancel}>
+    <Dialog
+      fullWidth
+      className={classNames("ol-widget-dialog", className)}
+      open={isOpen}
+      onClose={onCancel}
+      /**
+       * Normally MUI Dialogs trap focus, but CKEditor renders tooltips outside
+       * of the modal element. We need to disable focus-trapping else the
+       * tooltips are not focusable.
+       *
+       * See also https://ckeditor.com/docs/ckeditor5/latest/installation/getting-started/frameworks/css.html#bootstrap-modals
+       */
+      disableEnforceFocus
+    >
       {widget ? (
         <DialogContentEditing
           widget={widget}

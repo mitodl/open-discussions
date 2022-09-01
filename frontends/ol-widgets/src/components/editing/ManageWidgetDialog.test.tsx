@@ -95,6 +95,7 @@ describe("Adding new widgets", () => {
     const { specs } = setupAddingWidget()
     // The dialog has radio buttons for each available widget
     const radios = screen.getAllByRole("radio")
+    // eslint-disable-next-line testing-library/no-node-access
     const labels = radios.map(r => r.closest("label"))
     labels.forEach((label, i) => {
       expect(label).toHaveTextContent(specs[i].description)

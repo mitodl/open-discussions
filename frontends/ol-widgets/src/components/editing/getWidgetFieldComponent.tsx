@@ -1,27 +1,13 @@
-import React from "react"
 import { WIDGET_FIELD_TYPES } from "../../constants"
 import type { WidgetFieldSpec } from "../../interfaces"
-
-/**
- * These are the fields formik will pass to our component when used via
- * `<Field as={SomeComponent} />`.
- *
- * See https://formik.org/docs/api/field#rendering
- */
-interface WidgetEditingFieldProps {
-  onChange: React.ChangeEventHandler
-  onBlur: React.FocusEventHandler
-  value: string
-  name: string
-}
-
-type WidgetFieldComponent = React.FC<WidgetEditingFieldProps>
+import type { WidgetFieldComponent } from "./interfaces"
+import MarkdownEditor from "./MarkdownEditor"
 
 const getWidgetFieldComponent = (
   spec: WidgetFieldSpec
 ): WidgetFieldComponent | string => {
   if (spec.input_type === WIDGET_FIELD_TYPES.markdown) {
-    return "textarea"
+    return MarkdownEditor
   }
   throw new Error("Unrecognized field input type.")
 }

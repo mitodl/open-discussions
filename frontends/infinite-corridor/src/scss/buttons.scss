@@ -2,13 +2,13 @@
 @use "theme";
 
 %button-base {
-  cursor: pointer;
   border-radius: theme.$border-radius;
   flex-direction:row;
   justify-content: center;
   align-items: center;
   &:not([disabled]) {
     color: inherit;
+    cursor: pointer;
   }
 }
 

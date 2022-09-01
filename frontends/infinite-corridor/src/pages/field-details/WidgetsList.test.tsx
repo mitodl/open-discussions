@@ -42,9 +42,9 @@ describe("Viewing widgets with WidgetsList", () => {
      */
     const { widgets } = widgetsList
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: widgets[0].title }))
-      expect(screen.getByRole("heading", { name: widgets[1].title }))
-      expect(screen.getByRole("heading", { name: widgets[2].title }))
+      screen.getByRole("heading", { name: widgets[0].title })
+      screen.getByRole("heading", { name: widgets[1].title })
+      screen.getByRole("heading", { name: widgets[2].title })
     })
 
     /**
@@ -68,9 +68,9 @@ describe("Editing widgets with WidgetsList", () => {
      */
     const { widgets } = widgetsList
     await waitFor(() => {
-      expect(screen.getByRole("heading", { name: widgets[0].title }))
-      expect(screen.getByRole("heading", { name: widgets[1].title }))
-      expect(screen.getByRole("heading", { name: widgets[2].title }))
+      screen.getByRole("heading", { name: widgets[0].title })
+      screen.getByRole("heading", { name: widgets[1].title })
+      screen.getByRole("heading", { name: widgets[2].title })
     })
     expectProps(spyWidgetsListEditable, { widgetsList })
   })

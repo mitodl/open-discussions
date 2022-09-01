@@ -32,7 +32,8 @@ type WidgetTemplateProps = {
   isEditing?: boolean
   isOpen?: boolean
   className?: string
-  children?: React.ReactNode
+  contentClassName?: string
+  children: React.ReactNode
   onEdit?: (widget: AnonymousWidget) => void
   onDelete?: (widget: AnonymousWidget) => void
   onVisibilityChange?: (widget: AnonymousWidget) => void
@@ -93,7 +94,7 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
               </button>
             ))}
         </h2>
-        {isOpen && <div className="ol-widget-content">{children}</div>}
+        {isOpen && children}
       </CardContent>
       {isEditing && (
         <>
@@ -123,11 +124,24 @@ const WidgetTemplate: React.FC<WidgetTemplateProps> = ({
   )
 }
 
-const WidgetContent: React.FC<{ widget: AnonymousWidget }> = ({ widget }) => {
-  if (widget.widget_type === WidgetTypes.RichText) {
-    return <RichTextWdigetContent widget={widget as RichTextWidgetInstance} />
+interface WidgetContentProps<W extends AnonymousWidget = AnonymousWidget> {
+  className?: string
+  widget: W
+}
+const WidgetContent: React.FC<WidgetContentProps> = ({ className, widget }) => {
+  const props = {
+    widget,
+    className: classNames("ol-widget-content", className)
   }
-  throw new Error(`Unrecognized Widget Type: ${widget.widget_type}`)
+
+  if (widget.widget_type === WidgetTypes.RichText) {
+    return (
+      <RichTextWdigetContent
+        {...(props as WidgetContentProps<RichTextWidgetInstance>)}
+      />
+    )
+  }
+  throw new Error(`Unrecognized Widget Type: ${props.widget.widget_type}`)
 }
 
 type WidgetProps = Pick<
@@ -135,6 +149,7 @@ type WidgetProps = Pick<
   | "isEditing"
   | "isOpen"
   | "className"
+  | "contentClassName"
   | "widget"
   | "onEdit"
   | "onDelete"
@@ -145,7 +160,10 @@ type WidgetProps = Pick<
 const Widget: React.FC<WidgetProps> = props => {
   return (
     <WidgetTemplate {...props}>
-      <WidgetContent widget={props.widget} />
+      <WidgetContent
+        className={classNames("ol-widget-content", props.contentClassName)}
+        widget={props.widget}
+      />
     </WidgetTemplate>
   )
 }

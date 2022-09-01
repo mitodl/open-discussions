@@ -1,7 +1,10 @@
 import "jest-extended"
 import "jest-extended/all"
 
+import { setupMockMarkdownEditor } from "ol-widgets/build/test-utils"
 import { mockAxiosInstance, resetApi } from "./mockAxios"
+
+setupMockMarkdownEditor()
 
 jest.mock("axios", () => {
   return {

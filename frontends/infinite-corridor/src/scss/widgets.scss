@@ -1,5 +1,6 @@
 @use "ol-widgets/assets/widgets";
 @use "buttons";
+@use "theme";
 
 .ic-widget-list {
   > * {
@@ -22,6 +23,17 @@
 
   .MuiCardActions-root button {
     @extend .background-button;
+  }
+
+  .ol-markdown {
+    a {
+      word-break: break-word;
+      color: theme.$link-blue;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
   }
 }
 

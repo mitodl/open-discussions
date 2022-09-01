@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path")
 const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin')
+const { styles } = require('@ckeditor/ckeditor5-dev-utils')
 
 const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/infinite-corridor.json")
 
@@ -14,6 +17,47 @@ const getPublicPath = isProduction => {
   }
   return `http://${hostname}:${port}/`
 }
+
+/**
+ * CKEditor (which we are including via ol-widgets) distributes its npm packages
+ * as pre-bundled, ready-to-use modules, or as un-built modules for greater
+ * customization. This takes care of building CKEditor. See for more:
+ * https://ckeditor.com/docs/ckeditor5/latest/installation/advanced/alternative-setups/integrating-from-source.html
+ */
+const ckeditorRules = [
+  {
+    test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+    use:  ["raw-loader"]
+  },
+  {
+    test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+    use:  [
+      {
+        loader:  "style-loader",
+        options: {
+          injectType: "singletonStyleTag",
+          attributes: {
+            "data-cke": true
+          }
+        }
+      },
+      'css-loader',
+      {
+        loader:  "postcss-loader",
+        options: {
+          postcssOptions: styles.getPostCssConfig({
+            themeImporter: {
+              themePath: require.resolve(
+                "@ckeditor/ckeditor5-theme-lark"
+              )
+            },
+            minify: true
+          })
+        }
+      }
+    ]
+  }
+]
 
 
 const getWebpackConfig = mode => {
@@ -42,17 +86,20 @@ const getWebpackConfig = mode => {
     module: {
       rules: [
         {
-          test: /\.(svg|ttf|woff|woff2|eot|gif|png)$/,
-          type: "asset/inline"
+          test:    /\.(svg|ttf|woff|woff2|eot|gif|png)$/,
+          exclude: /@ckeditor/,
+          type:    "asset/inline"
         },
         {
           test:    /\.tsx?$/,
           use:     "swc-loader",
           exclude: /node_modules/
         },
+        ...ckeditorRules,
         {
-          test: /\.css$|\.scss$/,
-          use:  [
+          test:    /\.css$|\.scss$/,
+          exclude: /@ckeditor/,
+          use:     [
             { loader: isProduction ? MiniCssExtractPlugin.loader : "style-loader" },
             "css-loader",
             "postcss-loader",
@@ -71,7 +118,11 @@ const getWebpackConfig = mode => {
     ].concat(isProduction ? [
       new webpack.LoaderOptionsPlugin({ minimize: true }),
       new webpack.optimize.AggressiveMergingPlugin(),
-      new MiniCssExtractPlugin({ filename: "[name]-[contenthash].css" })
+      new MiniCssExtractPlugin({ filename: "[name]-[contenthash].css" }),
+      new CKEditorWebpackPlugin({
+        language:                               "en",
+        addMainLanguageTranslationsToAllAssets: true
+      })
     ] : []),
     resolve: {
       extensions: [".js", ".jsx", ".ts", ".tsx"]

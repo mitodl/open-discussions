@@ -40,3 +40,22 @@ $iconSize: 20px !default;
   justify-content: space-between;
   align-items: center;
 }
+
+$dialogZIndex: 1300;
+.ol-widget-dialog.MuiDialog-root {
+  /*
+  This is the default z-index for MUI anyway.
+  Setting it explicitly for use below.
+  */
+  z-index: $dialogZIndex;
+}
+
+.ol-widget-ckeditor {
+  --ck-z-modal: #{$dialogZIndex + 1};
+}
+
+.ol-widget-content {
+  > *:last-child {
+    margin-bottom: 0; // no extra space beyond the card padding.
+  }
+}
