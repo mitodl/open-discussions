@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.197.0
+---------------
+
+- infinite drawer (#3708)
+- support richtext editing/display in ol-widgets (#3713)
+- Import and index MITX Online courses and content (#3700)
+
 Version 0.196.0 (Released August 29, 2022)
 ---------------
 
