@@ -92,7 +92,7 @@ class CourseInstructor(TimestampedModel):
 
     first_name = models.CharField(max_length=128, null=True, blank=True)
     last_name = models.CharField(max_length=128, null=True, blank=True)
-    full_name = models.CharField(max_length=256, null=True, blank=True)
+    full_name = models.CharField(max_length=256, null=True, blank=True, unique=True)
 
     class Meta:
         ordering = ["last_name"]
@@ -197,7 +197,7 @@ class LearningResourceRun(AbstractCourse):
     slug = models.CharField(max_length=1024, null=True, blank=True)
 
     instructors = models.ManyToManyField(
-        CourseInstructor, blank=True, related_name="course_instructors"
+        CourseInstructor, blank=True, related_name="runs"
     )
     prices = models.ManyToManyField(CoursePrice, blank=True)
     course = models.ForeignKey(
