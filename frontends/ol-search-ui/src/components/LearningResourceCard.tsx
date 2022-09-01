@@ -10,27 +10,17 @@ import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 
 import CardMedia from "@mui/material/CardMedia"
-import { LearningResource } from "../interfaces"
+import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
 import {
   bestRun,
   getReadableResourceType,
   resourceThumbnailSrc,
-  EmbedlyConfig,
   CertificateIcon
 } from "../util"
 
-const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
+import { ResourceIdentifiers } from "./LearningResourceDrawer"
 
-type CardMinimalResource = Pick<
-  LearningResource,
-  | "runs"
-  | "certification"
-  | "title"
-  | "offered_by"
-  | "object_type"
-  | "image_src"
-  | "platform"
->
+const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
 type CardVariant = "column" | "row" | "row-reverse"
 type CardImgConfig = EmbedlyConfig
@@ -48,6 +38,7 @@ type LearningResourceCardProps = {
    * Config used to generate embedly urls.
    */
   imgConfig: CardImgConfig
+  toggleDrawer?: (params: ResourceIdentifiers | null) => void
 }
 
 type OffererProps = {
@@ -82,7 +73,8 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   variant = "column",
   resource,
   imgConfig,
-  className
+  className,
+  toggleDrawer
 }) => {
   const bestAvailableRun = bestRun(resource.runs ?? [])
   const hasCertificate =
@@ -105,6 +97,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     ),
     [resource, imgConfig]
   )
+
   return (
     <Card
       className={classNames(className, variantClasses[variant], "ol-lrc-root")}
@@ -121,9 +114,26 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           </span>
           {hasCertificate && <CertificateIcon />}
         </div>
-        <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
-          {resource.title}
-        </Dotdotdot>
+        {toggleDrawer ? (
+          <button
+            className="clickable-title"
+            onClick={() =>
+              toggleDrawer({
+                type:  resource.object_type,
+                id:    resource.id,
+                runId: bestAvailableRun?.id
+              })
+            }
+          >
+            <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
+              {resource.title}
+            </Dotdotdot>
+          </button>
+        ) : (
+          <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
+            {resource.title}
+          </Dotdotdot>
+        )}
         <div>
           <span className="ol-lrc-offered-by">Offered by &ndash;</span>
           {offerers.length && <Offerers offerers={offerers} />}
@@ -143,6 +153,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }
 
 export default LearningResourceCard
+
 export type {
   LearningResourceCardProps,
   CardMinimalResource,

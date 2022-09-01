@@ -43,6 +43,7 @@ export type LearningResourceResult = {
   is_favorite: boolean
   certification: string[]
   audience: string[]
+  item_count?: number
 }
 
 export type CourseTopic = {
@@ -91,3 +92,22 @@ export type CourseInstructor = {
 
 export type FacetKey = keyof Facets
 export type FacetManifest = [FacetKey, string][]
+
+export type CardMinimalResource = Pick<
+  LearningResource,
+  | "runs"
+  | "certification"
+  | "title"
+  | "offered_by"
+  | "object_type"
+  | "image_src"
+  | "platform"
+  | "id"
+>
+
+export type EmbedlyConfig = {
+  embedlyKey: string
+  ocwBaseUrl: string
+  width: number
+  height: number
+}

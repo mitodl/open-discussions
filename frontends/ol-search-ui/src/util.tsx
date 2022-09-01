@@ -1,8 +1,18 @@
 import moment from "moment"
-import { LearningResourceRun, LearningResourceType as LR } from "./interfaces"
+import {
+  LearningResourceRun,
+  CoursePrice,
+  CourseInstructor,
+  LearningResourceResult,
+  LearningResourceType as LR
+} from "./interfaces"
 import React, { useState, useEffect } from "react"
+import R from "ramda"
+import LocaleCode from "locale-code"
+import Decimal from "decimal.js-light"
+import { F } from "ts-toolbelt"
 
-const getImageSrc = (
+export const getImageSrc = (
   resource: { image_src?: string | null; platform?: string | null },
   ocwBaseUrl: string
 ): string | null => {
@@ -27,7 +37,7 @@ const embedlyThumbnail = (
     url
   )}&height=${height}&width=${width}&grow=true&animate=false&errorurl=${blankThumbnailUrl()}`
 
-const defaultResourceImageURL = () =>
+export const defaultResourceImageURL = () =>
   new URL(
     "/static/images/default_resource_thumb.jpg",
     window.location.origin
@@ -144,3 +154,76 @@ export const CertificateIcon = () => (
     src="/static/images/certificate_icon_infinite.png"
   />
 )
+
+export const minPrice = (
+  prices: Array<CoursePrice>,
+  includeDollarSign = false
+) => {
+  if (emptyOrNil(prices)) {
+    return null
+  }
+  const price = Math.min(...prices.map(price => price.price))
+
+  if (price > 0 && price !== Infinity) {
+    return includeDollarSign ? `${formatPrice(price)}` : price
+  } else {
+    return "Free"
+  }
+}
+
+export const getStartDate = (
+  object: LearningResourceResult,
+  objectRun: LearningResourceRun
+): string => {
+  if (object.platform === "ocw") {
+    return `${capitalize(objectRun.semester || "")} ${objectRun.year || ""}`
+  } else if (objectRun.start_date) {
+    return moment(objectRun.start_date).format("MMMM DD, YYYY")
+  } else if (objectRun.best_start_date) {
+    return moment(objectRun.best_start_date).format("MMMM DD, YYYY")
+  }
+  return "Ongoing"
+}
+
+export const getInstructorName = (instructor: CourseInstructor) => {
+  if (instructor.full_name) {
+    return instructor.full_name
+  } else if (instructor.first_name && instructor.last_name) {
+    return `${instructor.first_name} ${instructor.last_name}`
+  } else if (instructor.last_name) {
+    return `Prof. ${instructor.last_name}`
+  }
+  return ""
+}
+
+export const emptyOrNil = R.either(R.isEmpty, R.isNil)
+
+export const languageName = (langCode: string | null): string =>
+  LocaleCode.getLanguageName(
+    `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
+  )
+
+const formatPrice = (price: number | null | undefined): string => {
+  if (price === null || price === undefined) {
+    return ""
+  } else {
+    const decimalPrice = new Decimal(price)
+    let formattedPrice
+
+    if (decimalPrice.isInteger()) {
+      formattedPrice = decimalPrice.toFixed(0)
+    } else {
+      formattedPrice = decimalPrice.toFixed(2, Decimal.ROUND_HALF_UP)
+    }
+    return `$${formattedPrice}`
+  }
+}
+
+export const absolutizeURL = (url: string) =>
+  new URL(url, window.location.origin).toString()
+
+// @ts-expect-error typescript complains about getting 0 arguments
+export const capitalize = R.converge(R.concat(), [
+  R.compose(R.toUpper, R.head),
+  R.tail
+]) as F.Curry<(text: string) => string>

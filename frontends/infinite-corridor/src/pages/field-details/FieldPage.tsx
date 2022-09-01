@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
@@ -8,7 +8,12 @@ import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme } from "@mui/material/styles"
-import { LearningResourceCard } from "ol-search-ui"
+import {
+  LearningResourceCard,
+  LearningResourceDrawer,
+  useGetResourceIdentifiersFromUrl,
+  ResourceIdentifiers
+} from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
@@ -29,9 +34,10 @@ const keyFromHash = (hash: string) => {
 }
 interface FieldListProps {
   list: UserList
+  setDrawerObject: (params: ResourceIdentifiers | null) => void
 }
 
-const FieldList: React.FC<FieldListProps> = ({ list }) => {
+const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
   return (
@@ -45,6 +51,7 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
               className="ic-resource-card"
               resource={item}
               imgConfig={imgConfigs["row-reverse"]}
+              toggleDrawer={setDrawerObject}
             />
           </li>
         ))}
@@ -53,7 +60,7 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
   )
 }
 
-const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
+const FieldCarousel: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
   const matches = useMediaQuery<Theme>(theme => theme.breakpoints.up("sm"))
@@ -89,6 +96,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
           className="ic-resource-card ic-carousel-card"
           resource={item}
           imgConfig={imgConfigs["column"]}
+          toggleDrawer={setDrawerObject}
         />
       ))}
     </TitledCarousel>
@@ -121,6 +129,9 @@ const FieldPage: React.FC = () => {
       pathname: pathname.slice(0, -MANAGE_WIDGETS_SUFFIX.length)
     })
   }, [history])
+  const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
+    useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
+  )
 
   return (
     <FieldPageSkeleton name={name}>
@@ -148,9 +159,18 @@ const FieldPage: React.FC = () => {
             <Grid item xs={12} sm={9}>
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
-                {featuredList && <FieldCarousel list={featuredList} />}
+                {featuredList && (
+                  <FieldCarousel
+                    list={featuredList}
+                    setDrawerObject={setDrawerObject}
+                  />
+                )}
                 {fieldLists.map(list => (
-                  <FieldList key={list.id} list={list} />
+                  <FieldList
+                    key={list.id}
+                    list={list}
+                    setDrawerObject={setDrawerObject}
+                  />
                 ))}
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
@@ -168,6 +188,10 @@ const FieldPage: React.FC = () => {
           </Grid>
         </Container>
       </TabContext>
+      <LearningResourceDrawer
+        drawerObject={drawerObject}
+        setDrawerObject={setDrawerObject}
+      />
     </FieldPageSkeleton>
   )
 }

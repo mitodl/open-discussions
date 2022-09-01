@@ -12,3 +12,9 @@ export type {
 } from "./LearningResourceCard"
 
 export { default as SearchFilterDrawer } from "./SearchFilterDrawer"
+
+export {
+  LearningResourceDrawer,
+  useGetResourceIdentifiersFromUrl,
+  ResourceIdentifiers
+} from "./LearningResourceDrawer"

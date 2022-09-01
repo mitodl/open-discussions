@@ -18,7 +18,10 @@ import {
   LearningResourceCardProps,
   SearchInput,
   SearchFilterDrawer,
-  FacetManifest
+  FacetManifest,
+  LearningResourceDrawer,
+  useGetResourceIdentifiersFromUrl,
+  ResourceIdentifiers
 } from "ol-search-ui"
 
 import axios from "../libs/axios"
@@ -60,6 +63,9 @@ const SearchPage: React.FC = () => {
   const [requestInFlight, setRequestInFlight] = useState(false)
   const [searchApiFailed, setSearchApiFailed] = useState(false)
   const [aggregations, setAggregations] = useState<Aggregations>(new Map())
+  const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
+    useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
+  )
 
   const clearSearch = useCallback(() => {
     setSearchResults([])
@@ -207,6 +213,7 @@ const SearchPage: React.FC = () => {
                           variant="row-reverse"
                           imgConfig={imgConfig}
                           resource={hit._source}
+                          toggleDrawer={setDrawerObject}
                         />
                       </li>
                     ))}
@@ -219,6 +226,10 @@ const SearchPage: React.FC = () => {
           </Grid>
         </Grid>
       </Container>
+      <LearningResourceDrawer
+        drawerObject={drawerObject}
+        setDrawerObject={setDrawerObject}
+      />
     </BannerPage>
   )
 }
