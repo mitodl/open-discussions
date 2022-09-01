@@ -10,7 +10,11 @@ import IconDrag from "@mui/icons-material/DragHandle"
 import IconExpand from "@mui/icons-material/ExpandMore"
 import IconCollapse from "@mui/icons-material/ExpandLess"
 
-import type { AnonymousWidget, EmbeddedUrlWidgetInstance, RichTextWidgetInstance } from "../interfaces"
+import type {
+  AnonymousWidget,
+  EmbeddedUrlWidgetInstance,
+  RichTextWidgetInstance
+} from "../interfaces"
 import { WidgetTypes } from "../interfaces"
 import RichTextWdigetContent from "./RichTextWidgetContent"
 import EmbeddedUrlWidgetContent from "./EmbeddedUrlWidgetContent"

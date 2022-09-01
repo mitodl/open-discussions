@@ -20,12 +20,14 @@
     "@types/ckeditor__ckeditor5-core": "^33.0.3",
     "@types/ckeditor__ckeditor5-editor-classic": "^27.1.2",
     "@types/js-beautify": "^1.13.3",
+    "@types/validator": "^13.7.6",
     "classnames": "^2.3.1",
     "formik": "^2.2.9",
     "js-beautify": "^1.14.6",
     "ol-util": "workspace:*",
     "react-markdown": "^6.0.3",
     "remark-gfm": "^1.0.0",
+    "validator": "^13.7.0",
     "yup": "^0.32.11"
   },
   "peerDependencies": {

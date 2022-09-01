@@ -2,12 +2,37 @@ import React from "react"
 import { render, screen } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import Widget, { btnLabel } from "./Widget"
-import { makeRichTextWidget, makeWidget } from "../factories"
+import {
+  makeEmbeddedUrlWidget,
+  makeRichTextWidget,
+  makeWidget
+} from "../factories"
 
 const queryBtn = (name: string) => screen.queryByRole("button", { name })
 const getBtn = (name: string) => screen.getByRole("button", { name })
 
 describe("Widgets", () => {
+  test.each([
+    { widget: makeEmbeddedUrlWidget() },
+    { widget: makeRichTextWidget() }
+  ])("the widgets accept classes", ({ widget }) => {
+    const { container } = render(
+      <Widget className="some-class other-class" widget={widget} />
+    )
+    // eslint-disable-next-line testing-library/no-node-access
+    const widgetEl = container.firstChild
+    expect(widgetEl).toHaveClass("some-class")
+    expect(widgetEl).toHaveClass("other-class")
+  })
+
+  test.each([
+    { widget: makeEmbeddedUrlWidget() },
+    { widget: makeRichTextWidget() }
+  ])("the widgets render their titles", ({ widget }) => {
+    render(<Widget widget={widget} />)
+    expect(screen.getByRole("heading")).toHaveTextContent(widget.title)
+  })
+
   test.each([
     { isEditing: false },
     { isEditing: undefined },

@@ -1,17 +1,12 @@
-import classNames from "classnames"
 import React from "react"
 import type { EmbeddedUrlWidgetInstance } from "../interfaces"
-
+import { EmbedlyCard } from "./embedly"
 
 const RichTextWdigetContent: React.FC<{
   className?: string
   widget: Omit<EmbeddedUrlWidgetInstance, "id">
 }> = ({ widget, className }) => {
-  return (
-    <div className={className}>
-      {widget.configuration.url}
-    </div>
-  )
+  return <EmbedlyCard url={widget.configuration.url} className={className} />
 }
 
 export default RichTextWdigetContent

@@ -11,7 +11,7 @@ import { useId } from "ol-util"
 import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"
 import { isNil } from "lodash"
 import { AnonymousWidget, WidgetSpec, WidgetTypes } from "../../interfaces"
-import { getWidgetFieldComponent } from "./getWidgetFieldComponent"
+import { getWidgetFieldComponent, renameFieldProps } from "./widgetFields"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { getWidgetSchema } from "./schemas"
 import classNames from "classnames"
@@ -123,16 +123,16 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                       value={values.configuration[fieldSpec.field_name]}
                       name={attrName}
                     >
-                      {({ field }: FieldProps) => {
+                      {({ field }: FieldProps<string | null>) => {
                         return (
                           <FieldComponent
                             id={fieldId}
                             className={fieldClassName}
                             name={field.name}
-                            value={field.value}
+                            value={field.value ?? ""}
                             onChange={field.onChange}
                             onBlur={field.onBlur}
-                            {...fieldSpec.props}
+                            {...renameFieldProps(fieldSpec)}
                           />
                         )
                       }}
@@ -214,16 +214,20 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
         {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
-              <RadioGroup name="widget_type" value={values.widget_type}>
-                {supportedSpecs.map(spec => (
-                  <FormControlLabel
-                    key={spec.widget_type}
-                    value={spec.widget_type}
-                    control={<Radio />}
-                    label={spec.description}
-                  />
-                ))}
-              </RadioGroup>
+              <Field name="widget_type" value={values.widget_type}>
+                {({ field }: FieldProps) => (
+                  <RadioGroup {...field}>
+                    {supportedSpecs.map(spec => (
+                      <FormControlLabel
+                        key={spec.widget_type}
+                        value={spec.widget_type}
+                        control={<Radio />}
+                        label={spec.description}
+                      />
+                    ))}
+                  </RadioGroup>
+                )}
+              </Field>
             </DialogContent>
             <DialogActions>
               <Button variant="outlined" onClick={onCancel}>

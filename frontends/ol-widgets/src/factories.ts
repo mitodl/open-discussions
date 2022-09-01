@@ -5,7 +5,8 @@ import type {
   RichTextWidgetInstance,
   WidgetListResponse,
   WidgetSpec,
-  WidgetFieldSpec
+  WidgetFieldSpec,
+  EmbeddedUrlWidgetInstance
 } from "./interfaces"
 import { WidgetTypes } from "./interfaces"
 import { WIDGET_FIELD_TYPES } from "./constants"
@@ -49,8 +50,23 @@ const makeRichTextWidgetSpec: Factory<WidgetSpec> = overrides => {
   }
 }
 
+const makeEmbeddedUrlWidgetSpec: Factory<WidgetSpec> = overrides => {
+  return {
+    description: faker.lorem.words(),
+    widget_type: WidgetTypes.EmbeddedUrl,
+    form_spec:   [
+      makeWidgetFieldSpec({
+        field_name: "url",
+        input_type: WIDGET_FIELD_TYPES.url
+      })
+    ],
+    ...overrides
+  }
+}
+
 const widgetSpecMakers = {
-  [WidgetTypes.RichText]: makeRichTextWidgetSpec
+  [WidgetTypes.RichText]:    makeRichTextWidgetSpec,
+  [WidgetTypes.EmbeddedUrl]: makeEmbeddedUrlWidgetSpec
 }
 
 const makeRichTextWidget: Factory<RichTextWidgetInstance> = overrides => ({
@@ -63,8 +79,22 @@ const makeRichTextWidget: Factory<RichTextWidgetInstance> = overrides => ({
   ...overrides
 })
 
+const makeEmbeddedUrlWidget: Factory<
+  EmbeddedUrlWidgetInstance
+> = overrides => ({
+  id:            faker.datatype.number(),
+  title:         faker.lorem.sentence(3),
+  widget_type:   WidgetTypes.EmbeddedUrl,
+  configuration: {
+    url:         new URL(faker.internet.url()).toString(),
+    custom_html: null
+  },
+  ...overrides
+})
+
 const widgetMakers = {
-  [WidgetTypes.RichText]: makeRichTextWidget
+  [WidgetTypes.RichText]:    makeRichTextWidget,
+  [WidgetTypes.EmbeddedUrl]: makeEmbeddedUrlWidget
 }
 
 const makeWidgetListResponse: Factory<
@@ -101,6 +131,8 @@ export {
   makeWidget,
   makeWidgetSpec,
   makeRichTextWidgetSpec,
+  makeEmbeddedUrlWidgetSpec,
   makeRichTextWidget,
+  makeEmbeddedUrlWidget,
   makeWidgetListResponse
 }
