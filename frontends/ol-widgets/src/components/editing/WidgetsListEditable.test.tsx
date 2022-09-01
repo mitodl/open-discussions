@@ -1,3 +1,6 @@
+// disabling... to allow direct access to get widget elements
+/* eslint-disable testing-library/no-container */
+/* eslint-disable testing-library/no-node-access */
 import React from "react"
 import { screen, render, within, act } from "@testing-library/react"
 import user from "@testing-library/user-event"

@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import React from "react"
 import { render, screen } from "@testing-library/react"
 import Widget from "./Widget"
@@ -67,6 +68,7 @@ This is [not] a link. Also [[not]] a link.
     const { container } = render(
       <Widget contentClassName="widget-content" widget={widget} />
     )
+    // eslint-disable-next-line testing-library/no-container
     const widgetContent = container.querySelector(".widget-content")
     assertInstanceOf(widgetContent, HTMLElement)
     expect(htmlBeautify(widgetContent.innerHTML)).toBe(expectedHtml)
