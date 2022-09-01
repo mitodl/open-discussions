@@ -15,7 +15,12 @@ def remove_dupes(apps, schema_editor):
     delete the other(s), update affected LearningResourceRuns
     """
     CourseInstructor = apps.get_model("course_catalog", "CourseInstructor")
-    dupes = CourseInstructor.objects.values("full_name").annotate(dcount=Count("full_name")).filter(dcount__gte=2).order_by("full_name")
+    dupes = (
+        CourseInstructor.objects.values("full_name")
+        .annotate(dcount=Count("full_name"))
+        .filter(dcount__gte=2)
+        .order_by("full_name")
+    )
     for dupe in dupes:
         best_dupe = None
         dupe_instructors = CourseInstructor.objects.filter(full_name=dupe["full_name"])
@@ -28,24 +33,25 @@ def remove_dupes(apps, schema_editor):
         for instructor in dupe_instructors.exclude(id=best_dupe.id):
             with transaction.atomic():
                 for run in instructor.runs.all():
-                    run.instructors.set(CourseInstructor.objects.filter(
-                        Q(id__in=run.instructors.values_list("id")) |
-                        Q(id=best_dupe.id)
-                    ).exclude(id=instructor.id))
-                    log.error(f"RUN {run.id}:{run.instructors.values_list('id', flat=True)}")
+                    run.instructors.set(
+                        CourseInstructor.objects.filter(
+                            Q(id__in=run.instructors.values_list("id"))
+                            | Q(id=best_dupe.id)
+                        ).exclude(id=instructor.id)
+                    )
+                    log.error(
+                        f"RUN {run.id}:{run.instructors.values_list('id', flat=True)}"
+                    )
                     upsert_course(run.object_id)
                 instructor.delete()
-
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('course_catalog', '0091_instructor_runs'),
+        ("course_catalog", "0091_instructor_runs"),
     ]
 
     operations = [
-        migrations.RunPython(
-            remove_dupes, reverse_code=migrations.RunPython.noop
-        )
+        migrations.RunPython(remove_dupes, reverse_code=migrations.RunPython.noop)
     ]

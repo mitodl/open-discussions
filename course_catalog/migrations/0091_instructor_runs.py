@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('course_catalog', '0090_contentfile_published'),
+        ("course_catalog", "0090_contentfile_published"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='learningresourcerun',
-            name='instructors',
-            field=models.ManyToManyField(blank=True, related_name='runs', to='course_catalog.CourseInstructor'),
+            model_name="learningresourcerun",
+            name="instructors",
+            field=models.ManyToManyField(
+                blank=True, related_name="runs", to="course_catalog.CourseInstructor"
+            ),
         ),
     ]
