@@ -61,14 +61,44 @@ describe("ManageWidgetDialog (Editing)", () => {
   })
 
   it("Displays an error with supplied class if title is empty", async () => {
-    const errorClassName = faker.lorem.word()
-    const { spies } = setupEditingDialog({ errorClassName })
+    const classes = { error: faker.lorem.word() }
+    const { spies } = setupEditingDialog({ classes })
     const title = screen.getByLabelText("Title")
     await user.clear(title)
     await user.click(screen.getByRole("button", { name: "Submit" }))
     expect(spies.onSubmit).toHaveBeenCalledTimes(0)
     const errMsg = screen.getByText("Title is required")
-    expect(errMsg).toHaveClass(errorClassName)
+    expect(errMsg).toHaveClass(classes.error)
+  })
+
+  it("passes classes to relevant elements", () => {
+    const classes = {
+      label:      faker.lorem.word(),
+      field:      faker.lorem.word(),
+      fieldGroup: faker.lorem.word(),
+      dialog:     faker.lorem.word()
+    }
+    setupEditingDialog({ classes })
+    // eslint-disable-next-line testing-library/no-node-access
+    const dialog = document.querySelector(`.${classes.dialog}`) as HTMLElement
+    // eslint-disable-next-line testing-library/no-node-access
+    const labels = dialog.querySelectorAll("label")
+    // eslint-disable-next-line testing-library/no-node-access
+    const inputs = dialog.querySelectorAll("input, textarea")
+    // eslint-disable-next-line testing-library/no-node-access
+    const groups = dialog.querySelectorAll(`.${classes.fieldGroup}`)
+
+    expect(dialog).toHaveClass(classes.dialog)
+
+    expect(labels).toHaveLength(2)
+    expect(labels[0]).toHaveClass(classes.label)
+    expect(labels[1]).toHaveClass(classes.label)
+
+    expect(inputs).toHaveLength(2)
+    expect(inputs[0]).toHaveClass(classes.field)
+    expect(inputs[1]).toHaveClass(classes.field)
+
+    expect(groups).toHaveLength(2)
   })
 
   test.each(Object.values(WidgetTypes))(

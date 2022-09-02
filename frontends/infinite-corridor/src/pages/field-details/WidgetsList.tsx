@@ -2,7 +2,8 @@ import React, { useCallback } from "react"
 import {
   Widget,
   WidgetsListEditable,
-  WidgetsListEditableProps
+  WidgetsListEditableProps,
+  WidgetDialogClasses
 } from "ol-widgets"
 import { useMutateWidgetsList, useWidgetList } from "../../api/widgets"
 
@@ -11,6 +12,15 @@ interface WidgetsListProps {
   widgetListId: number
   className?: string
   onFinishEditing?: () => void
+}
+
+const dialogClasses: WidgetDialogClasses = {
+  dialog:     "ic-widget-editing-dialog",
+  field:      "form-field",
+  error:      "validation-message",
+  label:      "field-label",
+  detail:     "field-detail",
+  fieldGroup: "form-item"
 }
 
 const WidgetsList: React.FC<WidgetsListProps> = ({
@@ -49,9 +59,7 @@ const WidgetsList: React.FC<WidgetsListProps> = ({
             onCancel={onCancel}
             headerClassName="ic-widget-editing-header"
             widgetClassName="ic-widget"
-            dialogClassName="ic-widget-editing-dialog"
-            fieldClassName="form-field"
-            errorClassName="validation-message"
+            dialogClasses={dialogClasses}
           />
         ) :
         widgets.map(widget => (

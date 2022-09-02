@@ -6420,6 +6420,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/validator@npm:^13.7.6":
+  version: 13.7.6
+  resolution: "@types/validator@npm:13.7.6"
+  checksum: f860dd87bc5f90cc33d2802cf2a4da307ddac63c86d86b858a85dd62d457c8fa42fc8756e05b5d24e741376debc13d46ed14bc700006bf7d0cb910118022492b
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.1":
   version: 8.5.3
   resolution: "@types/ws@npm:8.5.3"
@@ -16530,12 +16537,14 @@ __metadata:
     "@types/ckeditor__ckeditor5-core": ^33.0.3
     "@types/ckeditor__ckeditor5-editor-classic": ^27.1.2
     "@types/js-beautify": ^1.13.3
+    "@types/validator": ^13.7.6
     classnames: ^2.3.1
     formik: ^2.2.9
     js-beautify: ^1.14.6
     ol-util: "workspace:*"
     react-markdown: ^6.0.3
     remark-gfm: ^1.0.0
+    validator: ^13.7.0
     yup: ^0.32.11
   peerDependencies:
     react: ^16.10 || 17 || 18
@@ -22539,7 +22548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"validator@npm:13.7.0":
+"validator@npm:13.7.0, validator@npm:^13.7.0":
   version: 13.7.0
   resolution: "validator@npm:13.7.0"
   checksum: 2b83283de1222ca549a7ef57f46e8d49c6669213348db78b7045bce36a3b5843ff1e9f709ebf74574e06223461ee1f264f8cc9a26a0060a79a27de079d8286ef

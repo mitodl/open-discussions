@@ -34,9 +34,16 @@ interface ManageWidgetDialogProps {
   isOpen: boolean
   onCancel: () => void
   onSubmit: WidgetSubmitHandler
-  className?: string
-  errorClassName?: string
-  fieldClassName?: string
+  classes?: WidgetDialogClasses
+}
+
+type WidgetDialogClasses = {
+  dialog?: string
+  error?: string
+  fieldGroup?: string
+  field?: string
+  label?: string
+  detail?: string
 }
 
 interface WidgetEditingProps {
@@ -44,9 +51,8 @@ interface WidgetEditingProps {
   spec: WidgetSpec
   onSubmit: WidgetSubmitHandler
   onCancel: () => void
-  errorClassName?: string
-  fieldClassName?: string
   isNew: boolean
+  classes?: WidgetDialogClasses
 }
 
 const DialogContentEditing: React.FC<WidgetEditingProps> = ({
@@ -54,8 +60,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   spec,
   onSubmit,
   onCancel,
-  fieldClassName,
-  errorClassName,
+  classes,
   isNew
 }) => {
   const formId = useId()
@@ -96,19 +101,26 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
         {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
-              <label htmlFor={`${formId}:${title}`}>Title</label>
-              <Field
-                id={`${formId}:${title}`}
-                className={fieldClassName}
-                name="title"
-                type="text"
-                value={values.title}
-              />
-              <ErrorMessage
-                className={errorClassName}
-                component="div"
-                name="title"
-              />
+              <div className={classes?.fieldGroup}>
+                <label
+                  className={classes?.label}
+                  htmlFor={`${formId}:${title}`}
+                >
+                  Title
+                </label>
+                <Field
+                  id={`${formId}:${title}`}
+                  className={classes?.field}
+                  name="title"
+                  type="text"
+                  value={values.title}
+                />
+                <ErrorMessage
+                  className={classes?.error}
+                  component="div"
+                  name="title"
+                />
+              </div>
               {spec.form_spec.map(fieldSpec => {
                 const fieldName = fieldSpec.field_name
                 // Formik uses dot notation for nested objects as name attrs
@@ -117,8 +129,10 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                 const fieldId = `${formId}:${attrName}`
                 const FieldComponent = getWidgetFieldComponent(fieldSpec)
                 return (
-                  <React.Fragment key={fieldName}>
-                    <label htmlFor={fieldId}>{fieldSpec.label}</label>
+                  <div className={classes?.fieldGroup} key={fieldName}>
+                    <label className={classes?.label} htmlFor={fieldId}>
+                      {fieldSpec.label}
+                    </label>
                     <Field
                       value={values.configuration[fieldSpec.field_name]}
                       name={attrName}
@@ -127,7 +141,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                         return (
                           <FieldComponent
                             id={fieldId}
-                            className={fieldClassName}
+                            className={classes?.field}
                             name={field.name}
                             value={field.value ?? ""}
                             onChange={field.onChange}
@@ -137,12 +151,17 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
                         )
                       }}
                     </Field>
+                    {fieldSpec.under_text && (
+                      <small className={classes?.detail}>
+                        {fieldSpec.under_text}
+                      </small>
+                    )}
                     <ErrorMessage
-                      className={errorClassName}
+                      className={classes?.error}
                       component="div"
                       name={attrName}
                     />
-                  </React.Fragment>
+                  </div>
                 )
               })}
             </DialogContent>
@@ -165,6 +184,7 @@ interface WidgetAddingProps {
   specs: WidgetSpec[]
   onCancel: () => void
   onSubmit: (widget: AnonymousWidget) => void
+  classes?: WidgetDialogClasses
 }
 
 type AddWidgetFormValues = {
@@ -174,7 +194,8 @@ type AddWidgetFormValues = {
 const DialogContentAdding: React.FC<WidgetAddingProps> = ({
   specs,
   onCancel,
-  onSubmit
+  onSubmit,
+  classes
 }) => {
   const supportedSpecs = useMemo(
     () =>
@@ -214,7 +235,11 @@ const DialogContentAdding: React.FC<WidgetAddingProps> = ({
         {({ handleSubmit, values }) => (
           <Form onSubmit={handleSubmit}>
             <DialogContent>
-              <Field name="widget_type" value={values.widget_type}>
+              <Field
+                className={classes?.field}
+                name="widget_type"
+                value={values.widget_type}
+              >
                 {({ field }: FieldProps) => (
                   <RadioGroup {...field}>
                     {supportedSpecs.map(spec => (
@@ -262,9 +287,7 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
   onSubmit,
   isOpen,
   onCancel,
-  className,
-  fieldClassName,
-  errorClassName
+  classes
 }) => {
   const [widget, setWidget] = useState<AnonymousWidget | null>(null)
   const isNew = !initialWidget
@@ -281,7 +304,7 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
   return (
     <Dialog
       fullWidth
-      className={classNames("ol-widget-dialog", className)}
+      className={classNames("ol-widget-dialog", classes?.dialog)}
       open={isOpen}
       onClose={onCancel}
       /**
@@ -299,8 +322,7 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
           spec={mustFindSpec(specs, widget.widget_type)}
           onSubmit={onSubmit}
           onCancel={onCancel}
-          fieldClassName={fieldClassName}
-          errorClassName={errorClassName}
+          classes={classes}
           isNew={isNew}
         />
       ) : (
@@ -308,6 +330,7 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
           specs={specs}
           onSubmit={handlePickNewWidget}
           onCancel={onCancel}
+          classes={classes}
         />
       )}
     </Dialog>
@@ -315,4 +338,8 @@ const ManageWidgetDialog: React.FC<ManageWidgetDialogProps> = ({
 }
 
 export default ManageWidgetDialog
-export type { ManageWidgetDialogProps, WidgetSubmitHandler }
+export type {
+  ManageWidgetDialogProps,
+  WidgetSubmitHandler,
+  WidgetDialogClasses
+}

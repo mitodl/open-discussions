@@ -1,7 +1,8 @@
 export { default as ManageWidgetDialog } from "./ManageWidgetDialog"
 export type {
   ManageWidgetDialogProps,
-  WidgetSubmitHandler
+  WidgetSubmitHandler,
+  WidgetDialogClasses
 } from "./ManageWidgetDialog"
 
 export { default as WidgetsListEditable } from "./WidgetsListEditable"

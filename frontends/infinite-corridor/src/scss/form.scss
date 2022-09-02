@@ -6,7 +6,7 @@ $fontColorLight: theme.$font-color-light;
 $radius: theme.$std-border-radius;
 $borderColor: theme.$input-border-grey;
 
-.form {
+form, .form {
   .form-item {
     margin: 0 0 28px 0;
     color: $fontColor;
@@ -35,12 +35,13 @@ $borderColor: theme.$input-border-grey;
 
 }
 
-.form .row,
+form .row,
 .form-header .row {
   margin: 10px 10px 24px 0;
 }
 
 .validation-message {
+  margin-top: 6px;
   background-color: theme.$validation-bg;
   color: theme.$validation-text;
   font-size: 14px;
@@ -48,9 +49,17 @@ $borderColor: theme.$input-border-grey;
 }
 
 .form-field {
-  margin: 0 0 28px 0;
   color: $fontColor;
 }
+
+.field-label {
+  color: theme.$color-gray-4;
+}
+.field-detail {
+  color: theme.$color-gray-4;
+  font-size: theme.$font-size-small;
+}
+
 
 input[type="email"],
 input[type="text"],

@@ -48,7 +48,6 @@ const EmbedlyCard: React.FC<EmbedlyCardProps> = ({ className, url }) => {
   }, [])
 
   useEffect(() => {
-    console.log(`Hello!: url is... ${url}`)
     if (!container) return
     container.innerHTML = ""
     if (!isURL(url)) return

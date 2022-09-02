@@ -10,7 +10,10 @@ const richTextSchema = Yup.object().shape({
 const embeddedUrlSchema = Yup.object().shape({
   title,
   configuration: Yup.object().shape({
-    url: Yup.string().required("Url is required")
+    url:         Yup.string().required("Url is required"),
+    custom_html: Yup.string()
+      .nullable()
+      .oneOf([null], "custom_html is not allowed.")
   })
 })
 

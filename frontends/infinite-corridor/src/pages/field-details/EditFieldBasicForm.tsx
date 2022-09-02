@@ -73,7 +73,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
         setFieldValue
       }) => (
         <>
-          <Form onSubmit={handleSubmit} className="form channel-form">
+          <Form onSubmit={handleSubmit} className="channel-form">
             <div className="row form-item">
               <label htmlFor="field-featured_list">
                 <div className="header-padded">Featured learning resources</div>
