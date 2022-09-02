@@ -55,6 +55,17 @@ interface WidgetEditingProps {
   classes?: WidgetDialogClasses
 }
 
+const formFieldAttrs = (fieldId: string, errMsg?: string) => {
+  const errorId = `${fieldId}:error`
+  const fieldErrorAttrs = errMsg ?
+    { "aria-invalid": true, "aria-errormessage": errorId } :
+    {}
+  const field = { id: fieldId, ...fieldErrorAttrs }
+  const label = { htmlFor: fieldId }
+  const error = { id: errorId }
+  return { field, label, error }
+}
+
 const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   widget,
   spec,
@@ -98,83 +109,92 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
         validateOnChange={false}
         onSubmit={onSubmitForm}
       >
-        {({ handleSubmit, values }) => (
-          <Form onSubmit={handleSubmit}>
-            <DialogContent>
-              <div className={classes?.fieldGroup}>
-                <label
-                  className={classes?.label}
-                  htmlFor={`${formId}:${title}`}
-                >
-                  Title
-                </label>
-                <Field
-                  id={`${formId}:${title}`}
-                  className={classes?.field}
-                  name="title"
-                  type="text"
-                  value={values.title}
-                />
-                <ErrorMessage
-                  className={classes?.error}
-                  component="div"
-                  name="title"
-                />
-              </div>
-              {spec.form_spec.map(fieldSpec => {
-                const fieldName = fieldSpec.field_name
-                // Formik uses dot notation for nested objects as name attrs
-                // https://formik.org/docs/guides/arrays#nested-objects
-                const attrName = `configuration.${fieldName}`
-                const fieldId = `${formId}:${attrName}`
-                const FieldComponent = getWidgetFieldComponent(fieldSpec)
-                return (
-                  <div className={classes?.fieldGroup} key={fieldName}>
-                    <label className={classes?.label} htmlFor={fieldId}>
-                      {fieldSpec.label}
-                    </label>
-                    <Field
-                      value={values.configuration[fieldSpec.field_name]}
-                      name={attrName}
-                    >
-                      {({ field }: FieldProps<string | null>) => {
-                        return (
-                          <FieldComponent
-                            id={fieldId}
-                            className={classes?.field}
-                            name={field.name}
-                            value={field.value ?? ""}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
-                            {...renameFieldProps(fieldSpec)}
-                          />
-                        )
-                      }}
-                    </Field>
-                    {fieldSpec.under_text && (
-                      <small className={classes?.detail}>
-                        {fieldSpec.under_text}
-                      </small>
+        {({ handleSubmit, values, errors }) => {
+          const titleFieldId = `${formId}:${title}`
+          const titleAttrs = formFieldAttrs(titleFieldId, errors.title)
+          return (
+            <Form onSubmit={handleSubmit}>
+              <DialogContent>
+                <div className={classes?.fieldGroup}>
+                  <label className={classes?.label} {...titleAttrs.label}>
+                    Title
+                  </label>
+                  <Field
+                    {...titleAttrs.field}
+                    className={classes?.field}
+                    name="title"
+                    type="text"
+                    value={values.title}
+                  />
+                  <ErrorMessage name="title">
+                    {message => (
+                      <div className={classes?.error} {...titleAttrs}>
+                        {message}
+                      </div>
                     )}
-                    <ErrorMessage
-                      className={classes?.error}
-                      component="div"
-                      name={attrName}
-                    />
-                  </div>
-                )
-              })}
-            </DialogContent>
-            <DialogActions>
-              <Button variant="outlined" onClick={onCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained">
-                Submit
-              </Button>
-            </DialogActions>
-          </Form>
-        )}
+                  </ErrorMessage>
+                </div>
+                {spec.form_spec.map(fieldSpec => {
+                  const fieldName = fieldSpec.field_name
+                  // Formik uses dot notation for nested objects as name attrs
+                  // https://formik.org/docs/guides/arrays#nested-objects
+                  const attrName = `configuration.${fieldName}`
+                  const fieldId = `${formId}:${attrName}`
+                  const attrs = formFieldAttrs(
+                    fieldId,
+                    errors.configuration?.[fieldName]
+                  )
+                  const FieldComponent = getWidgetFieldComponent(fieldSpec)
+                  return (
+                    <div className={classes?.fieldGroup} key={fieldName}>
+                      <label className={classes?.label} {...attrs.label}>
+                        {fieldSpec.label}
+                      </label>
+                      <Field
+                        value={values.configuration[fieldSpec.field_name]}
+                        name={attrName}
+                      >
+                        {({ field }: FieldProps<string | null>) => {
+                          return (
+                            <FieldComponent
+                              {...attrs.field}
+                              className={classes?.field}
+                              name={field.name}
+                              value={field.value ?? ""}
+                              onChange={field.onChange}
+                              onBlur={field.onBlur}
+                              {...renameFieldProps(fieldSpec)}
+                            />
+                          )
+                        }}
+                      </Field>
+                      {fieldSpec.under_text && (
+                        <small className={classes?.detail}>
+                          {fieldSpec.under_text}
+                        </small>
+                      )}
+                      <ErrorMessage name={attrName}>
+                        {errMsg => (
+                          <div className={classes?.error} {...attrs.error}>
+                            {errMsg}
+                          </div>
+                        )}
+                      </ErrorMessage>
+                    </div>
+                  )
+                })}
+              </DialogContent>
+              <DialogActions>
+                <Button variant="outlined" onClick={onCancel}>
+                  Cancel
+                </Button>
+                <Button type="submit" variant="contained">
+                  Submit
+                </Button>
+              </DialogActions>
+            </Form>
+          )
+        }}
       </Formik>
     </>
   )
