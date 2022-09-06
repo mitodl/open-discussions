@@ -33,10 +33,17 @@ const insertCardStylesheet = (e: Event) => {
   createStylesheet(e.target.contentDocument, stylesheet)
 }
 
+/**
+ * Renders the given URL as an [embedly card](https://embed.ly/cards).
+ *
+ * @notes
+ *  - If the URL is invalid, nothing is rendered.
+ *
+ */
 const EmbedlyCard: React.FC<EmbedlyCardProps> = ({ className, url }) => {
   const embedlyKey = getEmbedlyKey()
   const [container, setContainer] = useState<HTMLElement | null>(null)
-  // TODO: Validate url
+
   const renderCard = useCallback((div: HTMLElement | null) => {
     if (!div) return
     div.addEventListener(EmbedlyEventTypes.CardCreated, insertCardStylesheet)
@@ -48,6 +55,18 @@ const EmbedlyCard: React.FC<EmbedlyCardProps> = ({ className, url }) => {
   }, [])
 
   useEffect(() => {
+    /**
+     * Embedly cards are generally created via:
+     *  1. Author places an `<a class="embedly-card" href="some-url" />` tag in
+     *     the document.
+     *  2. Author loads Embedly's platform.js script
+     *  3. Platform.js monitors the document and replaces anchors like the above
+     *     with IFrames.
+     *
+     * Since Embedly is manipulating the DOM itself, it's a little bit of a pain
+     * to integrate with React: When the URL changes, we need to manually remove
+     * the IFrame and insert a new anchor, which Embedly can then manipulate.
+     */
     if (!container) return
     container.innerHTML = ""
     if (!isURL(url)) return
