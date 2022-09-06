@@ -76,7 +76,7 @@ const SearchPage: React.FC = () => {
   const runSearch = useCallback(
     async (text: string, activeFacets: Facets, from: number) => {
       if (activeFacets["type"]) {
-        activeFacets["type"] = intersection(activeFacets["type"], ALLOWED_TYPES)
+        activeFacets["type"] = intersection(ALLOWED_TYPES, activeFacets["type"])
       } else {
         activeFacets["type"] = ALLOWED_TYPES
       }
