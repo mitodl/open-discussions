@@ -1,27 +1,12 @@
 /* eslint-disable testing-library/no-node-access */
 import React from "react"
-import { render, screen } from "@testing-library/react"
+import { render } from "@testing-library/react"
 import Widget from "./Widget"
 import { makeRichTextWidget } from "../factories"
 import { html_beautify as htmlBeautify } from "js-beautify"
 import { assertInstanceOf } from "ol-util"
 
 describe("Widget-RichText", () => {
-  test("it accepts classes", () => {
-    const widget = makeRichTextWidget()
-    const { container } = render(
-      <Widget className="some-class other-class" widget={widget} />
-    )
-    expect(container.firstChild).toHaveClass("some-class")
-    expect(container.firstChild).toHaveClass("other-class")
-  })
-
-  test("it renders title classes", () => {
-    const widget = makeRichTextWidget()
-    render(<Widget widget={widget} />)
-    expect(screen.getByRole("heading")).toHaveTextContent(widget.title)
-  })
-
   test("it renders markdown as expected", () => {
     const md = `
 Let's try some markdown. Here is an unordered list:

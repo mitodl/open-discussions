@@ -50,6 +50,13 @@ interface RichTextWidgetConfig {
 }
 export type RichTextWidgetInstance = WidgetInstance<RichTextWidgetConfig>
 
+interface EmbeddedUrlWidgetConfig {
+  url: string
+  custom_html?: null | string
+}
+export type EmbeddedUrlWidgetInstance = WidgetInstance<EmbeddedUrlWidgetConfig>
+
 export enum WidgetTypes {
-  RichText = "Markdown"
+  RichText = "Markdown",
+  EmbeddedUrl = "URL"
 }

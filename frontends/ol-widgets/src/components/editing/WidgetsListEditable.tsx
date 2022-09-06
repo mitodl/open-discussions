@@ -6,7 +6,10 @@ import { uniqueId, zip } from "lodash"
 import { RenderActive, SortableItem, SortableList, SortEndEvent } from "ol-util"
 import Widget from "../Widget"
 import type { WidgetListResponse, AnonymousWidget } from "../../interfaces"
-import type { WidgetSubmitHandler } from "./ManageWidgetDialog"
+import type {
+  WidgetSubmitHandler,
+  WidgetDialogClasses
+} from "./ManageWidgetDialog"
 import ManageWidgetDialog from "./ManageWidgetDialog"
 
 type SubmitWidgetsEvent = {
@@ -26,9 +29,7 @@ interface WidgetsListEditableProps {
   onCancel: () => void
   headerClassName?: string
   widgetClassName?: string
-  errorClassName?: string
-  fieldClassName?: string
-  dialogClassName?: string
+  dialogClasses?: WidgetDialogClasses
 }
 
 /**
@@ -162,9 +163,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
   onCancel,
   headerClassName,
   widgetClassName,
-  dialogClassName,
-  fieldClassName,
-  errorClassName
+  dialogClasses
 }) => {
   const { widgets: savedWidgets, available_widgets: specs } = widgetsList
   /**
@@ -275,9 +274,7 @@ const WidgetsListEditable: React.FC<WidgetsListEditableProps> = ({
       </SortableList>
       <ManageWidgetDialog
         isOpen={dialog.mode !== DialogMode.Closed}
-        className={dialogClassName}
-        fieldClassName={fieldClassName}
-        errorClassName={errorClassName}
+        classes={dialogClasses}
         onSubmit={dialogHandlers.submit}
         widget={dialog.widget}
         specs={specs}

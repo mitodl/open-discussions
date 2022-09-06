@@ -10,9 +10,14 @@ import IconDrag from "@mui/icons-material/DragHandle"
 import IconExpand from "@mui/icons-material/ExpandMore"
 import IconCollapse from "@mui/icons-material/ExpandLess"
 
-import type { AnonymousWidget, RichTextWidgetInstance } from "../interfaces"
+import type {
+  AnonymousWidget,
+  EmbeddedUrlWidgetInstance,
+  RichTextWidgetInstance
+} from "../interfaces"
 import { WidgetTypes } from "../interfaces"
 import RichTextWdigetContent from "./RichTextWidgetContent"
+import EmbeddedUrlWidgetContent from "./EmbeddedUrlWidgetContent"
 
 /**
  * Button labels for Widgets.
@@ -138,6 +143,14 @@ const WidgetContent: React.FC<WidgetContentProps> = ({ className, widget }) => {
     return (
       <RichTextWdigetContent
         {...(props as WidgetContentProps<RichTextWidgetInstance>)}
+      />
+    )
+  }
+
+  if (widget.widget_type === WidgetTypes.EmbeddedUrl) {
+    return (
+      <EmbeddedUrlWidgetContent
+        {...(props as WidgetContentProps<EmbeddedUrlWidgetInstance>)}
       />
     )
   }
