@@ -6262,15 +6262,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ramda@npm:^0.28.15":
-  version: 0.28.15
-  resolution: "@types/ramda@npm:0.28.15"
-  dependencies:
-    ts-toolbelt: ^6.15.1
-  checksum: f96576c78a3bfdc8d0675a7c5fb237a56fe76b1d380578f63e59185bd1938c38729d7051d92750e6773bc2ea9c64e5d63bdbd7b95c92f5d400d3d5ce850a6dbd
-  languageName: node
-  linkType: hard
-
 "@types/range-parser@npm:*":
   version: 1.2.4
   resolution: "@types/range-parser@npm:1.2.4"
@@ -12882,7 +12873,6 @@ __metadata:
     ol-util: "workspace:*"
     ol-widgets: "workspace:*"
     postcss-loader: ^7.0.1
-    ramda: ^0.28.0
     react: ^16.14
     react-dom: ^16.14
     react-helmet-async: ^1.3.0
@@ -16632,6 +16622,7 @@ __metadata:
     "@dnd-kit/sortable": ^7.0.1
     "@dnd-kit/utilities": ^3.2.0
     formik: ^2.2.9
+    lodash: ^4.17.21
     react-select: ^5.4.0
     yup: ^0.32.11
   peerDependencies:
@@ -16666,9 +16657,9 @@ __metadata:
     "@dnd-kit/utilities": ^3.2.0
     "@faker-js/faker": ^7.3.0
     classnames: ^2.3.1
+    lodash: ^4.17.21
     nuka-carousel: ^5.2.0
     qs: ^6.11.0
-    ramda: ^0.28.0
   peerDependencies:
     react: ^16.10 || 17 || 18
     react-router: ^5 || ^6
@@ -16773,7 +16764,6 @@ __metadata:
     "@types/enzyme-adapter-react-16": ^1.0.6
     "@types/jest": ^28.1.3
     "@types/jest-when": ^3.5.2
-    "@types/ramda": ^0.28.15
     "@types/react-dotdotdot": ^1.2.5
     "@types/react-infinite-scroller": ^1.2.3
     "@types/styled-components": ^5.1.25
@@ -18690,13 +18680,6 @@ __metadata:
   version: 0.27.2
   resolution: "ramda@npm:0.27.2"
   checksum: 28d6735dd1eea1a796c56cf6111f3673c6105bbd736e521cdd7826c46a18eeff337c2dba4668f6eed990d539b9961fd6db19aa46ccc1530ba67a396c0a9f580d
-  languageName: node
-  linkType: hard
-
-"ramda@npm:^0.28.0":
-  version: 0.28.0
-  resolution: "ramda@npm:0.28.0"
-  checksum: 44ea6e5010bba70151b6a92d8114a91915e8b5a16105cce65fae58c9d7386b812c429645e35f21141d7087568550ce383bc10ee1a65cdec951f4b69ea457e6a4
   languageName: node
   linkType: hard
 
@@ -22165,13 +22148,6 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 7d1aa7aa3ae1c0459c4922ed0dbfbade442cfe0c25aebaf620cdf1774f112c8d7a9b14934cb6719274917f35b2c503ba87bcaf5e16a0d39ba0f68ce3e7728363
-  languageName: node
-  linkType: hard
-
-"ts-toolbelt@npm:^6.15.1":
-  version: 6.15.5
-  resolution: "ts-toolbelt@npm:6.15.5"
-  checksum: 24ad00cfd9ce735c76c873a9b1347eac475b94e39ebbdf100c9019dce88dd5f4babed52884cf82bb456a38c28edd0099ab6f704b84b2e5e034852b618472c1f3
   languageName: node
   linkType: hard
 

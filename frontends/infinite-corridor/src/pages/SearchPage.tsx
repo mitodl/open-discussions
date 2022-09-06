@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
-import { intersection } from "ramda"
+import { intersection } from "lodash"
 import { BannerPage, useDeviceCategory, DESKTOP } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {

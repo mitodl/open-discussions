@@ -1,17 +1,17 @@
-import * as R from "ramda"
 import { useState, useEffect } from "react"
+import isEmpty from "lodash/isEmpty"
+import isNil from "lodash/isNil"
 
-export const initials: (title: string) => string = R.pipe(
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  R.split(/\s+/),
-  R.slice(0, 2),
-  R.map((item: string) => (item ? item[0].toUpperCase() : "")),
-  R.join("")
-)
+export const initials = (title: string): string => {
+  return title
+    .split(/s+/)
+    .slice(0, 2)
+    .map(item => (item[0] ?? "").toUpperCase())
+    .join("")
+}
 
 export const capitalize = (txt: string) =>
-  txt[0].toUpperCase() + txt.slice(1).toLowerCase()
+  (txt[0] ?? "").toUpperCase() + txt.slice(1).toLowerCase()
 
 export const PHONE = "PHONE"
 export const TABLET = "TABLET"
@@ -49,3 +49,5 @@ export const useDeviceCategory = () => {
   }
   return DESKTOP
 }
+
+export const emptyOrNil = (x: unknown): boolean => isNil(x) || isEmpty(x)

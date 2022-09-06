@@ -11,6 +11,7 @@
     "@dnd-kit/sortable": "^7.0.1",
     "@dnd-kit/utilities": "^3.2.0",
     "formik": "^2.2.9",
+    "lodash": "^4.17.21",
     "react-select": "^5.4.0",
     "yup": "^0.32.11"
   }

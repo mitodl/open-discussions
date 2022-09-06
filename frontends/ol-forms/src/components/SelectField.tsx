@@ -5,7 +5,7 @@ import Select, {
   SingleValue
 } from "react-select"
 import AsyncSelect from "react-select/async"
-import { isNil } from "ramda"
+import { isNil } from "lodash"
 
 export interface Option {
   label: string

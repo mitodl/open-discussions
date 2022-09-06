@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker"
-import * as R from "ramda"
 import { makePaginatedFactory, Factory } from "ol-util/build/factories"
 import { LearningResourceType } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
@@ -11,7 +10,9 @@ export const makeUserList: Factory<UserList> = overrides => {
     short_description: faker.lorem.paragraph(),
     offered_by:        [],
     title:             faker.lorem.words(),
-    topics:            R.times(() => factories.makeTopic(), 2),
+    topics:            Array(2)
+      .fill(null)
+      .map(() => factories.makeTopic()),
     is_favorite:       faker.datatype.boolean(),
     image_src:         new URL(faker.internet.url()).toString(),
     image_description: faker.helpers.arrayElement([

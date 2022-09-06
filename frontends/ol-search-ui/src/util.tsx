@@ -7,10 +7,9 @@ import {
   LearningResourceType as LR
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
-import R from "ramda"
+import { capitalize, emptyOrNil } from "ol-util"
 import LocaleCode from "locale-code"
 import Decimal from "decimal.js-light"
-import { F } from "ts-toolbelt"
 
 export const getImageSrc = (
   resource: { image_src?: string | null; platform?: string | null },
@@ -196,8 +195,6 @@ export const getInstructorName = (instructor: CourseInstructor) => {
   return ""
 }
 
-export const emptyOrNil = R.either(R.isEmpty, R.isNil)
-
 export const languageName = (langCode: string | null): string =>
   LocaleCode.getLanguageName(
     `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
@@ -221,9 +218,3 @@ const formatPrice = (price: number | null | undefined): string => {
 
 export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()
-
-// @ts-expect-error typescript complains about getting 0 arguments
-export const capitalize = R.converge(R.concat(), [
-  R.compose(R.toUpper, R.head),
-  R.tail
-]) as F.Curry<(text: string) => string>

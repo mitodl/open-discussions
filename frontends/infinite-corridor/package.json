@@ -31,7 +31,6 @@
     "ol-util": "workspace:*",
     "ol-widgets": "workspace:*",
     "postcss-loader": "^7.0.1",
-    "ramda": "^0.28.0",
     "react": "^16.14",
     "react-dom": "^16.14",
     "react-helmet-async": "^1.3.0",

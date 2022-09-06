@@ -1,7 +1,6 @@
 //@ts-expect-error casual-browserify does not have typescript types
 import casual from "casual-browserify"
 import { faker } from "@faker-js/faker"
-import R from "ramda"
 import { DATE_FORMAT } from "./util"
 import { Factory } from "ol-util/build/factories"
 import {
@@ -51,10 +50,12 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
   object_type:       LearningResourceType.Course,
-  runs:              R.times(() => makeRun(), 3),
-  is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]]),
-  audience:          casual.random_element([
+  runs:              Array(3)
+    .fill(null)
+    .map(() => makeRun()),
+  is_favorite: casual.coin_flip,
+  lists:       casual.random_element([[], [100, 200]]),
+  audience:    casual.random_element([
     [],
     [OPEN_CONTENT],
     [PROFESSIONAL],
@@ -127,7 +128,9 @@ export const makeSearchResponse = (
   type: string | null = null,
   withFacets = true
 ) => {
-  const hits = R.times(() => makeSearchResult(type), pageSize)
+  const hits = Array(pageSize)
+    .fill(null)
+    .map(() => makeSearchResult(type))
   return {
     hits: {
       total,
@@ -172,14 +175,18 @@ export const makeTopic: Factory<CourseTopic> = overrides => {
 
 export const makeLearningResource: Factory<LearningResource> = overrides => {
   const resource: LearningResource = {
-    id:          faker.unique(faker.datatype.number),
-    title:       faker.lorem.words(),
-    image_src:   new URL(faker.internet.url()).toString(),
-    topics:      R.times(() => makeTopic(), 2),
+    id:        faker.unique(faker.datatype.number),
+    title:     faker.lorem.words(),
+    image_src: new URL(faker.internet.url()).toString(),
+    topics:    Array(2)
+      .fill(null)
+      .map(() => makeTopic()),
     object_type: makeLearningResourceType(),
     platform:    faker.lorem.word(),
-    runs:        R.times(() => makeRun(), 3),
-    lists:       [],
+    runs:        Array(3)
+      .fill(null)
+      .map(() => makeRun()),
+    lists: [],
     ...overrides
   }
   return resource
