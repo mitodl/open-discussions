@@ -55,7 +55,29 @@ interface WidgetEditingProps {
   classes?: WidgetDialogClasses
 }
 
-const formFieldAttrs = (fieldId: string, errMsg?: string) => {
+interface FormFieldAttrs {
+  field: {
+    id: string
+    "aria-invalid"?: boolean
+    "aria-errormessage"?: string
+   },
+   label: {
+    htmlFor: string
+   },
+   error: {
+    id: string
+   }
+}
+
+/**
+ * Returns React-style HTML attributes to associate form field labels and error
+ * messages with the field input.
+ *
+ * @param fieldId The id of the form field input
+ * @param errMsg An error message for the form field, if there is one
+ * @returns
+ */
+const formFieldAttrs = (fieldId: string, errMsg?: string): FormFieldAttrs => {
   const errorId = `${fieldId}:error`
   const fieldErrorAttrs = errMsg ?
     { "aria-invalid": true, "aria-errormessage": errorId } :
