@@ -4,6 +4,8 @@ const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+
 const { styles } = require('@ckeditor/ckeditor5-dev-utils')
 
 const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/infinite-corridor.json")
@@ -60,7 +62,7 @@ const ckeditorRules = [
 ]
 
 
-const getWebpackConfig = mode => {
+const getWebpackConfig = ({mode, analyzeBundle}) => {
   const isProduction = mode === "production"
   const publicPath = getPublicPath(isProduction)
   return {
@@ -123,7 +125,11 @@ const getWebpackConfig = mode => {
         language:                               "en",
         addMainLanguageTranslationsToAllAssets: true
       })
-    ] : []),
+    ] : []).concat(
+      analyzeBundle ? [new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+      })] : []
+    ),
     resolve: {
       extensions: [".js", ".jsx", ".ts", ".tsx"]
     },
@@ -160,5 +166,7 @@ const getWebpackConfig = mode => {
 
 module.exports = (_env, argv) => {
   const mode = argv.mode || process.env.NODE_ENV || "production"
-  return getWebpackConfig(mode)
+  const analyzeBundle = process.env.WEBPACK_ANALYZE === "True"
+  const settings = { mode, analyzeBundle }
+  return getWebpackConfig(settings)
 }

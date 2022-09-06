@@ -54,7 +54,7 @@ $smallFontSize: 0.75em !default;
     best browser support yet.
     */
     margin-top: math.div($spacer, 2);
-    margin-bottom: math.div(spacer, 2);
+    margin-bottom: math.div($spacer, 2);
     &:first-child {
       margin-top: 0; 
     }
