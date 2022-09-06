@@ -12,7 +12,7 @@ import {
   CardMinimalResource,
   EmbedlyConfig
 } from "./interfaces"
-import { pick } from "lodash"
+import { pick, times } from "lodash"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -50,12 +50,10 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
   object_type:       LearningResourceType.Course,
-  runs:              Array(3)
-    .fill(null)
-    .map(() => makeRun()),
-  is_favorite: casual.coin_flip,
-  lists:       casual.random_element([[], [100, 200]]),
-  audience:    casual.random_element([
+  runs:              times(3, () => makeRun()),
+  is_favorite:       casual.coin_flip,
+  lists:             casual.random_element([[], [100, 200]]),
+  audience:          casual.random_element([
     [],
     [OPEN_CONTENT],
     [PROFESSIONAL],
@@ -128,9 +126,7 @@ export const makeSearchResponse = (
   type: string | null = null,
   withFacets = true
 ) => {
-  const hits = Array(pageSize)
-    .fill(null)
-    .map(() => makeSearchResult(type))
+  const hits = times(pageSize, () => makeSearchResult(type))
   return {
     hits: {
       total,
@@ -175,18 +171,14 @@ export const makeTopic: Factory<CourseTopic> = overrides => {
 
 export const makeLearningResource: Factory<LearningResource> = overrides => {
   const resource: LearningResource = {
-    id:        faker.unique(faker.datatype.number),
-    title:     faker.lorem.words(),
-    image_src: new URL(faker.internet.url()).toString(),
-    topics:    Array(2)
-      .fill(null)
-      .map(() => makeTopic()),
+    id:          faker.unique(faker.datatype.number),
+    title:       faker.lorem.words(),
+    image_src:   new URL(faker.internet.url()).toString(),
+    topics:      times(2, () => makeTopic()),
     object_type: makeLearningResourceType(),
     platform:    faker.lorem.word(),
-    runs:        Array(3)
-      .fill(null)
-      .map(() => makeRun()),
-    lists: [],
+    runs:        times(3, () => makeRun()),
+    lists:       [],
     ...overrides
   }
   return resource

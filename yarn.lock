@@ -16640,6 +16640,7 @@ __metadata:
     "@faker-js/faker": ^7.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
+    lodash: ^4.17.21
     ol-forms: "workspace:*"
     ol-util: "workspace:*"
   peerDependencies:

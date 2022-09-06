@@ -2,6 +2,7 @@ import { faker } from "@faker-js/faker"
 import { makePaginatedFactory, Factory } from "ol-util/build/factories"
 import { LearningResourceType } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
+import { times } from "lodash"
 import type { FieldChannel, UserList, UserListItem } from "./interfaces"
 
 export const makeUserList: Factory<UserList> = overrides => {
@@ -10,9 +11,7 @@ export const makeUserList: Factory<UserList> = overrides => {
     short_description: faker.lorem.paragraph(),
     offered_by:        [],
     title:             faker.lorem.words(),
-    topics:            Array(2)
-      .fill(null)
-      .map(() => factories.makeTopic()),
+    topics:            times(2, () => factories.makeTopic()),
     is_favorite:       faker.datatype.boolean(),
     image_src:         new URL(faker.internet.url()).toString(),
     image_description: faker.helpers.arrayElement([

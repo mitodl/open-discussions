@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker"
 import { Factory } from "ol-util/build/factories"
+import { times } from "lodash"
 import type {
   WidgetInstance,
   RichTextWidgetInstance,
@@ -76,9 +77,7 @@ const makeWidgetListResponse: Factory<
   return {
     id:                faker.datatype.number(),
     available_widgets: specMakers.map(f => f()),
-    widgets:           Array(count)
-      .fill(null)
-      .map(() => makeWidget()),
+    widgets:           times(count, () => makeWidget()),
     ...overrides
   }
 }
