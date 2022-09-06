@@ -60,13 +60,13 @@ interface FormFieldAttrs {
     id: string
     "aria-invalid"?: boolean
     "aria-errormessage"?: string
-   },
-   label: {
+  }
+  label: {
     htmlFor: string
-   },
-   error: {
+  }
+  error: {
     id: string
-   }
+  }
 }
 
 /**

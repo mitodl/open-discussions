@@ -12,7 +12,9 @@ const UrlField: React.FC<WidgetEditingFieldProps & ExtraProps> = props => {
   return (
     <>
       <input type="text" {...others} />
-      {showEmbed && <EmbedlyCard className="ol-widget-url-preview" url={props.value} />}
+      {showEmbed && (
+        <EmbedlyCard className="ol-widget-url-preview" url={props.value} />
+      )}
     </>
   )
 }
