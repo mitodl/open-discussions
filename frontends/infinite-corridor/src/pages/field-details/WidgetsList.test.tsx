@@ -6,7 +6,8 @@ import {
   expectProps,
   user
 } from "../../test-utils"
-import { Widget, makeWidgetListResponse, WidgetsListEditable } from "ol-widgets"
+import { Widget, WidgetsListEditable } from "ol-widgets"
+import { makeWidgetListResponse } from "ol-widgets/build/factories"
 import WidgetsList from "./WidgetsList"
 import { setMockResponse } from "../../test-utils"
 import { urls } from "../../api/widgets"

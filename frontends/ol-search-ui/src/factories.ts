@@ -3,7 +3,7 @@ import casual from "casual-browserify"
 import { faker } from "@faker-js/faker"
 import R from "ramda"
 import { DATE_FORMAT } from "./util"
-import { Factory } from "ol-util"
+import { Factory } from "ol-util/build/factories"
 import {
   CourseTopic,
   LearningResourceResult,

@@ -1,7 +1,8 @@
 import { faker } from "@faker-js/faker"
 import * as R from "ramda"
-import { makePaginatedFactory, Factory } from "ol-util"
-import { LearningResourceType, factories } from "ol-search-ui"
+import { makePaginatedFactory, Factory } from "ol-util/build/factories"
+import { LearningResourceType } from "ol-search-ui"
+import * as factories from "ol-search-ui/build/factories"
 import type { FieldChannel, UserList, UserListItem } from "./interfaces"
 
 export const makeUserList: Factory<UserList> = overrides => {

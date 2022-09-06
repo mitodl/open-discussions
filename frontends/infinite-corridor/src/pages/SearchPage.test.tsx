@@ -1,6 +1,6 @@
 import { when } from "jest-when"
 
-import { factories } from "ol-search-ui"
+import * as factories from "ol-search-ui/build/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"

@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import type { Factory } from "ol-util"
+import { Factory } from "ol-util/build/factories"
 import type {
   WidgetInstance,
   RichTextWidgetInstance,
