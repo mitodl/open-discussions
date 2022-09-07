@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.197.0
+Version 0.197.0 (Released September 07, 2022)
 ---------------
 
 - Enforce uniqueness for instructor full name, get rid of existing dupes (#3717)
