@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.198.0
+Version 0.198.0 (Released September 07, 2022)
 ---------------
 
 - Cc/url widget (#3721)
