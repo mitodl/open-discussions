@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.197.0 (Released September 07, 2022)
+---------------
+
+- Enforce uniqueness for instructor full name, get rid of existing dupes (#3717)
+- infinite drawer (#3708)
+- support richtext editing/display in ol-widgets (#3713)
+- Import and index MITX Online courses and content (#3700)
+
 Version 0.196.0 (Released August 29, 2022)
 ---------------
 
