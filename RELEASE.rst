@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.198.0
+---------------
+
+- Cc/url widget (#3721)
+- add jest-watch-typeahead (#3723)
+
 Version 0.197.0 (Released September 07, 2022)
 ---------------
 
