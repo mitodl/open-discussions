@@ -23,3 +23,5 @@ export type {
   SortableItemProps,
   SortableListProps
 } from "./SortableList"
+
+export { EmbedlyCard } from "./embedly"

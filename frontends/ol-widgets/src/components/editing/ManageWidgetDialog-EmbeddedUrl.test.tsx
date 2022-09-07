@@ -1,14 +1,13 @@
 import React from "react"
 import { screen, render } from "@testing-library/react"
 import user from "@testing-library/user-event"
-import { assertInstanceOf, assertNotNil } from "ol-util"
+import { assertInstanceOf, assertNotNil, EmbedlyCard } from "ol-util"
 import {
   makeEmbeddedUrlWidgetSpec,
   makeEmbeddedUrlWidget
 } from "../../factories"
 import ManageWidgetDialog from "./ManageWidgetDialog"
 import { WIDGET_FIELD_TYPES } from "../../constants"
-import { EmbedlyCard } from "../embedly"
 import { EmbeddedUrlWidgetInstance } from "../../interfaces"
 
 const getErrorFor = (el: HTMLElement) => {
@@ -24,8 +23,8 @@ const getErrorFor = (el: HTMLElement) => {
   return errEl
 }
 
-jest.mock("../embedly", () => {
-  const actual = jest.requireActual("../embedly")
+jest.mock("ol-util", () => {
+  const actual = jest.requireActual("ol-util")
   return {
     __esModule:  true,
     ...actual,

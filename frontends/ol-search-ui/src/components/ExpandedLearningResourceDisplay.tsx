@@ -20,6 +20,8 @@ import {
 } from "../util"
 
 import { ResourceIdentifiers } from "./LearningResourceDrawer"
+import { EmbedlyCard, formatDurationClockTime } from "ol-util"
+import moment from "moment"
 
 const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
@@ -105,10 +107,14 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
         {hasCertificate && <CertificateIcon />}
       </div>
       <div className="image-div">
-        <img src={resourceThumbnailSrc(object, imageEmbedlyConfig)} alt="" />
+        {object.object_type === "video" && object.url ? (
+          <EmbedlyCard url={object.url} className="watch-video" />
+        ) : (
+          <img src={resourceThumbnailSrc(object, imageEmbedlyConfig)} alt="" />
+        )}
       </div>
       <div className="link-share-offered-by">
-        {url ? (
+        {url && object.object_type !== "video" ? (
           <div className="external-links">
             <a
               className="link-button blue-btn"
@@ -151,18 +157,31 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           showExpansionControls
         />
       </div>
-
       <div className="lr-metadata">
         <div className="section-label">Info</div>
-        {cost ? lrInfoRow("Cost:", cost) : lrInfoRow("Cost:", "Free")}
-        {selectedRun?.level ? lrInfoRow("Level:", selectedRun.level) : null}
-        {!emptyOrNil(instructors) ?
-          lrInfoRow("Instructors:", instructors.join(", ")) :
-          null}
-        {object.object_type === LearningResourceType.Program &&
-        object.item_count ?
-          lrInfoRow("Number of Courses:", object.item_count) :
-          null}
+        {object.object_type === "video" ? (
+          <>
+            {object.duration ?
+              lrInfoRow("Duration:", formatDurationClockTime(object.duration)) :
+              null}
+            {lrInfoRow(
+              "Date Posted:",
+              moment(object.last_modified).format("MMM D, YYYY")
+            )}
+          </>
+        ) : (
+          <>
+            {cost ? lrInfoRow("Cost:", cost) : lrInfoRow("Cost:", "Free")}
+            {selectedRun?.level ? lrInfoRow("Level:", selectedRun.level) : null}
+            {!emptyOrNil(instructors) ?
+              lrInfoRow("Instructors:", instructors.join(", ")) :
+              null}
+            {object.object_type === LearningResourceType.Program &&
+            object.item_count ?
+              lrInfoRow("Number of Courses:", object.item_count) :
+              null}
+          </>
+        )}
         {lrInfoRow(
           "Language:",
           languageName(selectedRun ? selectedRun.language : "en")

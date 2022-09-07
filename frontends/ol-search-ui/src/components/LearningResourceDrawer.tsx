@@ -39,7 +39,8 @@ export const LearningResourceDrawer: React.FC<LearningResourceDrawerProps> = ({
   setDrawerObject
 }) => {
   const isOpen =
-    drawerObject !== null && ["course", "program"].includes(drawerObject.type)
+    drawerObject !== null &&
+    ["course", "program", "video"].includes(drawerObject.type)
 
   return (
     <Drawer
