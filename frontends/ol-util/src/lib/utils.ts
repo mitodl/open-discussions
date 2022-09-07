@@ -4,7 +4,8 @@ import isNil from "lodash/isNil"
 
 export const initials = (title: string): string => {
   return title
-    .split(/s+/)
+    .trim()
+    .split(/\s+/)
     .slice(0, 2)
     .map(item => (item[0] ?? "").toUpperCase())
     .join("")
