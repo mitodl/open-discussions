@@ -35,7 +35,7 @@ import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { useResponsive, useWidth } from "../hooks/util"
 
 import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
-import type { Match } from "react-router"
+import { Match, useHistory } from "react-router"
 import type { CellWidth } from "../components/Grid"
 
 export type CourseSearchParams = {
@@ -164,6 +164,8 @@ export default function CourseSearchPage(props: Props) {
     [dispatch]
   )
 
+  const history = useHistory()
+
   const {
     facetOptions,
     clearAllFilters,
@@ -183,7 +185,8 @@ export default function CourseSearchPage(props: Props) {
     clearSearchCB,
     facets,
     loaded,
-    SETTINGS.search_page_size
+    SETTINGS.search_page_size,
+    history
   )
 
   const deviceWidth = useWidth()
