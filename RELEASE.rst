@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.198.1 (Released September 08, 2022)
+---------------
+
+- Cc/smaller bundle (#3725)
+
 Version 0.198.0 (Released September 07, 2022)
 ---------------
 
