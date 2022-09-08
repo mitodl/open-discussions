@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { contains } from "ramda"
 
 import SearchFacetItem from "./SearchFacetItem"
 import { Aggregation } from "@mitodl/course-search-utils"
@@ -34,7 +33,7 @@ function SearchFacet(props: Props) {
                 <SearchFacetItem
                   key={i}
                   facet={facet}
-                  isChecked={contains(facet.key, currentlySelected || [])}
+                  isChecked={currentlySelected.includes(facet.key)}
                   onUpdate={onUpdate}
                   name={name}
                 />

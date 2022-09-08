@@ -1,6 +1,6 @@
 import { when } from "jest-when"
 
-import { factories } from "ol-search-ui"
+import { makeSearchResponse } from "ol-search-ui/build/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
@@ -8,8 +8,6 @@ import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
 import { fireEvent, waitFor } from "@testing-library/react"
 import { makeRequest } from "../test-utils/mockAxios"
-
-const { makeSearchResponse } = factories
 
 const expectedFacets = {
   audience:            [],

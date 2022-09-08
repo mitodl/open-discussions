@@ -1,4 +1,5 @@
 import type { PaginatedResult } from "./interfaces"
+import { times } from "lodash"
 
 type Factory<T, U = never> = (overrides?: Partial<T>, options?: U) => T
 
@@ -14,9 +15,7 @@ const makePaginatedFactory =
       previous?: string | null
     } = {}
     ): PaginatedResult<T> => {
-      const results = Array(count)
-        .fill(null)
-        .map(() => makeResult())
+      const results = times(count, () => makeResult())
       return {
         results,
         count,

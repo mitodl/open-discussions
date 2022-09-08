@@ -7,7 +7,7 @@ import * as factory from "../../api/fields/factories"
 import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
 import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
-import { makeWidgetListResponse } from "ol-widgets"
+import { makeWidgetListResponse } from "ol-widgets/build/factories"
 
 describe("EditFieldBasicForm", () => {
   let field: FieldChannel, publicLists: PaginatedResult<UserList>

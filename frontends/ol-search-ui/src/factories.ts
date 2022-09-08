@@ -1,9 +1,8 @@
 //@ts-expect-error casual-browserify does not have typescript types
 import casual from "casual-browserify"
 import { faker } from "@faker-js/faker"
-import R from "ramda"
 import { DATE_FORMAT } from "./util"
-import { Factory } from "ol-util"
+import { Factory } from "ol-util/build/factories"
 import {
   CourseTopic,
   LearningResourceResult,
@@ -13,7 +12,7 @@ import {
   CardMinimalResource,
   EmbedlyConfig
 } from "./interfaces"
-import { pick } from "lodash"
+import { pick, times } from "lodash"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -51,7 +50,7 @@ export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
   offered_by:        [casual.random_element(["edx", "ocw"])],
   topics:            [casual.word, casual.word],
   object_type:       LearningResourceType.Course,
-  runs:              R.times(() => makeRun(), 3),
+  runs:              times(3, () => makeRun()),
   is_favorite:       casual.coin_flip,
   lists:             casual.random_element([[], [100, 200]]),
   audience:          casual.random_element([
@@ -127,7 +126,7 @@ export const makeSearchResponse = (
   type: string | null = null,
   withFacets = true
 ) => {
-  const hits = R.times(() => makeSearchResult(type), pageSize)
+  const hits = times(pageSize, () => makeSearchResult(type))
   return {
     hits: {
       total,
@@ -175,10 +174,10 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
     id:          faker.unique(faker.datatype.number),
     title:       faker.lorem.words(),
     image_src:   new URL(faker.internet.url()).toString(),
-    topics:      R.times(() => makeTopic(), 2),
+    topics:      times(2, () => makeTopic()),
     object_type: makeLearningResourceType(),
     platform:    faker.lorem.word(),
-    runs:        R.times(() => makeRun(), 3),
+    runs:        times(3, () => makeRun()),
     lists:       [],
     ...overrides
   }

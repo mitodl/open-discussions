@@ -1,9 +1,9 @@
 import React from "react"
 import striptags from "striptags"
 import { decode } from "html-entities"
+import { emptyOrNil } from "ol-util"
 
 import TruncatedText from "./TruncatedText"
-import R from "ramda"
 
 import ShareTooltip from "./ShareTooltip"
 
@@ -13,7 +13,6 @@ import {
   minPrice,
   getStartDate,
   getInstructorName,
-  emptyOrNil,
   languageName,
   resourceThumbnailSrc,
   CertificateIcon,
@@ -158,7 +157,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
         {cost ? lrInfoRow("Cost:", cost) : lrInfoRow("Cost:", "Free")}
         {selectedRun?.level ? lrInfoRow("Level:", selectedRun.level) : null}
         {!emptyOrNil(instructors) ?
-          lrInfoRow("Instructors:", R.join(", ", instructors)) :
+          lrInfoRow("Instructors:", instructors.join(", ")) :
           null}
         {object.object_type === LearningResourceType.Program &&
         object.item_count ?

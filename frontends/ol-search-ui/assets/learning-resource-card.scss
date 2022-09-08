@@ -1,3 +1,4 @@
+@use "sass:math";
 
 $lightText: #8c8c8c !default;
 $spacer: 0.75rem !default;
@@ -52,8 +53,8 @@ $smallFontSize: 0.75em !default;
     The column-gap property would be a nicer solution, but it doesn't have the
     best browser support yet.
     */
-    margin-top: $spacer/2;
-    margin-bottom: $spacer/2;
+    margin-top: math.div($spacer, 2);
+    margin-bottom: math.div($spacer, 2);
     &:first-child {
       margin-top: 0; 
     }

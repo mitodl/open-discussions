@@ -14,7 +14,7 @@ import {
   user,
   waitFor
 } from "../../test-utils"
-import { makeWidgetListResponse } from "ol-widgets"
+import { makeWidgetListResponse } from "ol-widgets/build/factories"
 
 jest.mock("./WidgetsList", () => {
   const actual = jest.requireActual("./WidgetsList")

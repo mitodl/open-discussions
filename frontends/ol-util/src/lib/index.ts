@@ -4,5 +4,6 @@ export {
   useDeviceCategory,
   PHONE,
   TABLET,
-  DESKTOP
+  DESKTOP,
+  emptyOrNil
 } from "./utils"

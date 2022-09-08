@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react"
 import Container from "@mui/material/Container"
 import Grid from "@mui/material/Grid"
-import { intersection } from "ramda"
+import { intersection } from "lodash"
 import { BannerPage, useDeviceCategory, DESKTOP } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {
@@ -76,7 +76,7 @@ const SearchPage: React.FC = () => {
   const runSearch = useCallback(
     async (text: string, activeFacets: Facets, from: number) => {
       if (activeFacets["type"]) {
-        activeFacets["type"] = intersection(activeFacets["type"], ALLOWED_TYPES)
+        activeFacets["type"] = intersection(ALLOWED_TYPES, activeFacets["type"])
       } else {
         activeFacets["type"] = ALLOWED_TYPES
       }

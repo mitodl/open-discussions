@@ -31,8 +31,8 @@ $avatarSize: 60px;
 $carouselSpacing: 24px;
 .ic-carousel-card {
   height:100%;
-  margin-left: $carouselSpacing/2;
-  margin-right: $carouselSpacing/2;
+  margin-left: $carouselSpacing*0.5;
+  margin-right: $carouselSpacing*0.5;
 }
 
 .ic-carousel {
@@ -56,7 +56,7 @@ $carouselSpacing: 24px;
   Caveat: This is not a good solution if there is content within $carouselSpacing
   of the carousel's left edge. But...there's not.
   */
-  transform: translateX(-$carouselSpacing/2);
+  transform: translateX(-$carouselSpacing*0.5);
   /*
   We also want the carousel contents (cards) to appear as if they are full
   width. By default, the width is 100% and since there's cell-spacing, the

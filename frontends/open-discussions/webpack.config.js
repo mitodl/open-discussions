@@ -2,6 +2,7 @@ const path = require("path")
 const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 
 const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/open-discussions.json")
 
@@ -16,7 +17,7 @@ const getPublicPath = isProduction => {
 }
 
 
-const getWebpackConfig = mode => {
+const getWebpackConfig = ({mode, analyzeBundle}) => {
   console.log(`Building for ${mode}`)
   const isProduction = mode === "production"
   const publicPath = getPublicPath(isProduction)
@@ -73,7 +74,11 @@ const getWebpackConfig = mode => {
       new webpack.LoaderOptionsPlugin({ minimize: true }),
       new webpack.optimize.AggressiveMergingPlugin(),
       new MiniCssExtractPlugin({ filename: "[name]-[contenthash].css" })
-    ] : []),
+    ] : []).concat(
+      analyzeBundle ? [new BundleAnalyzerPlugin({
+        analyzerMode: "static",
+      })] : []
+    ),
     resolve: {
       extensions: [".js", ".jsx"],
       fallback:   {
@@ -122,5 +127,6 @@ const getWebpackConfig = mode => {
 
 module.exports = (_env, argv) => {
   const mode = argv.mode || process.env.NODE_ENV || "production"
-  return getWebpackConfig(mode)
+  const analyzeBundle = process.env.WEBPACK_ANALYZE === "True"
+  return getWebpackConfig({mode, analyzeBundle})
 }
