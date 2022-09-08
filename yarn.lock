@@ -3887,9 +3887,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mitodl/course-search-utils@npm:^1.8.0":
+"@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor":
   version: 1.8.0
-  resolution: "@mitodl/course-search-utils@npm:1.8.0"
+  resolution: "@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor"
   dependencies:
     bodybuilder: ^2.5.0
     history: ^5.0.0
@@ -3897,7 +3897,35 @@ __metadata:
     ramda: ^0.27.1
   peerDependencies:
     react: ^16.13.1
-  checksum: f20a26dc63f5934a11ba77f30624fa7b77f4e6f9bc93fa5640117b166e0016bdc3d3eaa71fad3fde634cd02cb155ef1db81b95091cde7d6478e94905f2e2f233
+  checksum: e1d4999acbedeb7b4df7710e747eb0894181423981d531f15cc397ddbd459221a8dc5300c288f902200f4e635c6533c69281a35a14ec9239ccba24ddeda6284b
+  languageName: node
+  linkType: hard
+
+"@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=ol-search-ui%40workspace%3Afrontends%2Fol-search-ui":
+  version: 1.8.0
+  resolution: "@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=ol-search-ui%40workspace%3Afrontends%2Fol-search-ui"
+  dependencies:
+    bodybuilder: ^2.5.0
+    history: ^5.0.0
+    query-string: ^6.13.1
+    ramda: ^0.27.1
+  peerDependencies:
+    react: ^16.13.1
+  checksum: e1d4999acbedeb7b4df7710e747eb0894181423981d531f15cc397ddbd459221a8dc5300c288f902200f4e635c6533c69281a35a14ec9239ccba24ddeda6284b
+  languageName: node
+  linkType: hard
+
+"@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=open-discussions%40workspace%3Afrontends%2Fopen-discussions":
+  version: 1.8.0
+  resolution: "@mitodl/course-search-utils@file:../../mitodl-course-search-utils-v1.8.0.tgz::locator=open-discussions%40workspace%3Afrontends%2Fopen-discussions"
+  dependencies:
+    bodybuilder: ^2.5.0
+    history: ^5.0.0
+    query-string: ^6.13.1
+    ramda: ^0.27.1
+  peerDependencies:
+    react: ^16.13.1
+  checksum: e1d4999acbedeb7b4df7710e747eb0894181423981d531f15cc397ddbd459221a8dc5300c288f902200f4e635c6533c69281a35a14ec9239ccba24ddeda6284b
   languageName: node
   linkType: hard
 
@@ -12876,6 +12904,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
+    "@mitodl/course-search-utils": ../../mitodl-course-search-utils-v1.8.0.tgz
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
@@ -16659,6 +16688,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
+    "@mitodl/course-search-utils": ../../mitodl-course-search-utils-v1.8.0.tgz
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
     lodash: ^4.17.21
@@ -16778,7 +16808,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "open-discussions-root@workspace:."
   dependencies:
-    "@mitodl/course-search-utils": ^1.8.0
     "@swc/core": ^1.2.207
     "@swc/jest": ^0.2.21
     "@testing-library/jest-dom": ^5.16.4
@@ -16852,7 +16881,7 @@ __metadata:
     "@material/snackbar": 0.44.0
     "@material/toolbar": 0.4.4
     "@mitodl/ckeditor-custom-build": 0.0.4
-    "@mitodl/course-search-utils": ^1.8.0
+    "@mitodl/course-search-utils": ../../mitodl-course-search-utils-v1.8.0.tgz
     "@mitodl/mdl-react-components": 0.0.3
     "@reduxjs/toolkit": 1.4.0
     "@sentry/browser": 5.5.0
