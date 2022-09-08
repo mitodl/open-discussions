@@ -12,7 +12,9 @@ import {
   CardMinimalResource,
   EmbedlyConfig
 } from "./interfaces"
+
 import { pick, times } from "lodash"
+import moment from "moment"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
@@ -84,6 +86,25 @@ export const makeProgramResult: Factory<
     [OPEN_CONTENT, PROFESSIONAL]
   ]),
   certification: casual.random_element([[], [CERTIFICATE]]),
+  ...overrides
+})
+
+export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
+  id:                faker.unique(faker.datatype.number),
+  video_id:          `video_${String(casual.random)}`,
+  title:             casual.title,
+  url:               casual.url,
+  is_favorite:       casual.boolean,
+  last_modified:     casual.date(DATE_FORMAT),
+  image_src:         "http://image.medium.url",
+  short_description: casual.description,
+  duration:          moment.duration(casual.integer(30, 60 * 90) * 1000).toISOString(),
+  object_type:       LearningResourceType.Video,
+  offered_by:        [casual.random_element(["mitc", "ocw"])],
+  runs:              [],
+  lists:             [],
+  audience:          [],
+  certification:     [],
   ...overrides
 })
 

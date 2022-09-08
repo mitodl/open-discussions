@@ -2,7 +2,11 @@ import React from "react"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react"
 import { assertInstanceOf } from "ol-util"
 import ExpandedLearningResourceDisplay from "./ExpandedLearningResourceDisplay"
-import { makeMinimalResoure, makeImgConfig } from "../factories"
+import {
+  makeMinimalResoure,
+  makeImgConfig,
+  makeVideoResult
+} from "../factories"
 import { resourceThumbnailSrc, getInstructorName } from "../util"
 
 describe("ExpandedLearningResourceDisplay", () => {
@@ -14,7 +18,6 @@ describe("ExpandedLearningResourceDisplay", () => {
       width:      440,
       height:     239
     })
-
     render(
       <ExpandedLearningResourceDisplay
         object={resource}
@@ -43,6 +46,34 @@ describe("ExpandedLearningResourceDisplay", () => {
 
     assertInstanceOf(coverImg, HTMLImageElement)
     expect(coverImg.src).toBe(resourceThumbnailSrc(resource, imgConfig))
+  })
+
+  it("renders the expected fields for a video", () => {
+    const resource = makeVideoResult()
+
+    render(
+      <ExpandedLearningResourceDisplay
+        object={resource}
+        runId={null}
+        setShowResourceDrawer={null}
+      />
+    )
+
+    expect(screen.getByText(resource.title)).toBeInTheDocument()
+
+    expect(screen.getByText(resource.offered_by)).toBeInTheDocument()
+
+    expect(screen.queryByText("Level:")).toBe(null)
+    expect(screen.getByText("Duration:")).toBeInTheDocument()
+    expect(screen.getByText("Date Posted:")).toBeInTheDocument()
+
+    const a = screen.getByRole("link")
+    assertInstanceOf(a, HTMLAnchorElement)
+    expect(a.href).toBe(resource.url.toLowerCase())
+    expect(a.dataset.cardChrome).toBe("0")
+    expect(a.dataset.cardControls).toBe("0")
+    expect(a.dataset.cardKey).toBe("fake")
+    expect(a).toHaveClass("embedly-card")
   })
 
   it.each([

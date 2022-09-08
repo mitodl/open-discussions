@@ -5,5 +5,6 @@ export {
   PHONE,
   TABLET,
   DESKTOP,
-  emptyOrNil
+  emptyOrNil,
+  formatDurationClockTime
 } from "./utils"

@@ -29,6 +29,7 @@ export type LearningResource = {
 export type LearningResourceResult = {
   id: number
   course_id?: string
+  video_id?: string
   url?: string
   title: string
   image_src: string | null
@@ -37,13 +38,15 @@ export type LearningResourceResult = {
   short_description?: string | null
   full_description?: string | null
   platform?: string
-  topics: string[]
+  topics?: string[]
   runs?: LearningResourceRun[]
   lists: ListItemMember[]
   is_favorite: boolean
   certification: string[]
   audience: string[]
   item_count?: number
+  last_modified?: string | null
+  duration?: string | null
 }
 
 export type CourseTopic = {
