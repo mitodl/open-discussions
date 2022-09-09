@@ -5,16 +5,13 @@ import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
-import useMediaQuery from "@mui/material/useMediaQuery"
-import type { Theme } from "@mui/material/styles"
 import {
   LearningResourceCard,
   LearningResourceDrawer,
   useGetResourceIdentifiersFromUrl,
   ResourceIdentifiers
 } from "ol-search-ui"
-import { TitledCarousel } from "ol-util"
+import { TitledCarousel, useMuiBreakpoint } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
 import ArrowForward from "@mui/icons-material/ArrowForward"
@@ -22,6 +19,7 @@ import ArrowBack from "@mui/icons-material/ArrowBack"
 import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
+import { GridColumn, GridContainer } from "../../components/layout"
 
 type RouteParams = {
   name: string
@@ -63,8 +61,9 @@ const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
 const FieldCarousel: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
-  const matches = useMediaQuery<Theme>(theme => theme.breakpoints.up("sm"))
-  const pageSize = matches ? 3 : 1
+  const isMd = useMuiBreakpoint("md")
+  const isLg = useMuiBreakpoint("lg")
+  const pageSize = isLg ? 3 : isMd ? 2 : 1
   return (
     <TitledCarousel
       as="section"
@@ -138,8 +137,8 @@ const FieldPage: React.FC = () => {
       <TabContext value={tabValue}>
         <div className="page-subbanner">
           <Container>
-            <Grid container columnSpacing={3}>
-              <Grid item xs={12} sm={9}>
+            <GridContainer>
+              <GridColumn variant="main-2">
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
                   <Tab
@@ -149,14 +148,14 @@ const FieldPage: React.FC = () => {
                     value="about"
                   />
                 </TabList>
-              </Grid>
-              <Grid item xs={12} sm={3} />
-            </Grid>
+              </GridColumn>
+              <GridColumn variant="sidebar-2" />
+            </GridContainer>
           </Container>
         </div>
         <Container>
-          <Grid container columnSpacing={3}>
-            <Grid item xs={12} sm={9}>
+          <GridContainer>
+            <GridColumn variant="main-2">
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && (
@@ -174,8 +173,8 @@ const FieldPage: React.FC = () => {
                 ))}
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
-            </Grid>
-            <Grid item xs={12} sm={3}>
+            </GridColumn>
+            <GridColumn variant="sidebar-2">
               {fieldQuery.data?.widget_list && (
                 <WidgetsList
                   className="ic-widget-list"
@@ -184,8 +183,8 @@ const FieldPage: React.FC = () => {
                   onFinishEditing={leaveWidgetManagement}
                 />
               )}
-            </Grid>
-          </Grid>
+            </GridColumn>
+          </GridContainer>
         </Container>
       </TabContext>
       <LearningResourceDrawer

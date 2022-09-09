@@ -11,6 +11,15 @@ const muiTheme = createTheme({
     secondary: {
       main: "#03152d"
     }
+  },
+  breakpoints: {
+    values: {
+      xs: 0, // mui default
+      sm: 600, // mui defailt
+      md: 840, // custom
+      lg: 1200, // mui default
+      xl: 1536 // mui default
+    }
   }
 })
 

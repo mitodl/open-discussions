@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import useMediaQuery from "@mui/material/useMediaQuery"
+import type { Theme, Breakpoint } from "@mui/material/styles"
 
 import isEmpty from "lodash/isEmpty"
 import isNil from "lodash/isNil"
@@ -52,6 +54,14 @@ export const useDeviceCategory = () => {
     return TABLET
   }
   return DESKTOP
+}
+
+/**
+ * Returns true if the screen width is at least as wide as the given MUI
+ * breakpoint width.
+ */
+export const useMuiBreakpoint = (breakpoint: Breakpoint): boolean => {
+  return useMediaQuery<Theme>(theme => theme.breakpoints.up(breakpoint))
 }
 
 export const emptyOrNil = (x: unknown): boolean => isNil(x) || isEmpty(x)

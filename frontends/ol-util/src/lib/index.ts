@@ -6,5 +6,6 @@ export {
   TABLET,
   DESKTOP,
   emptyOrNil,
-  formatDurationClockTime
+  formatDurationClockTime,
+  useMuiBreakpoint
 } from "./utils"

@@ -3,12 +3,12 @@ import { useHistory, useLocation, useParams } from "react-router"
 import { Link } from "react-router-dom"
 import { Helmet, HelmetProvider } from "react-helmet-async"
 import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
 import TabList from "@mui/lab/TabList"
 import Tab from "@mui/material/Tab"
 import { TabContext } from "@mui/lab"
 import TabPanel from "@mui/lab/TabPanel"
 
+import { GridColumn, GridContainer } from "../../components/layout"
 import { useFieldDetails } from "../../api/fields"
 import EditFieldAppearanceForm from "./EditFieldAppearanceForm"
 import EditFieldBasicForm from "./EditFieldBasicForm"
@@ -48,8 +48,8 @@ const EditFieldPage: React.FC = () => {
         <TabContext value={tabValue}>
           <div className="page-subbanner">
             <Container className="page-nav-container">
-              <Grid container>
-                <Grid item xs={9}>
+              <GridContainer>
+                <GridColumn variant="main-2">
                   <TabList className="page-nav" onChange={handleChange}>
                     <Tab
                       component={Link}
@@ -70,13 +70,13 @@ const EditFieldPage: React.FC = () => {
                       value="moderators"
                     />
                   </TabList>
-                </Grid>
-              </Grid>
+                </GridColumn>
+              </GridContainer>
             </Container>
           </div>
           <Container>
-            <Grid container className="edit-channel">
-              <Grid item xs={9}>
+            <GridContainer className="edit-channel">
+              <GridColumn variant="main-2">
                 <TabPanel value="basic" className="page-nav-content">
                   <EditFieldBasicForm field={field.data} />
                 </TabPanel>
@@ -88,17 +88,19 @@ const EditFieldPage: React.FC = () => {
                 <TabPanel value="moderators" className="page-nav-content">
                   Moderators placeholder
                 </TabPanel>
-              </Grid>
-            </Grid>
+              </GridColumn>
+            </GridContainer>
           </Container>
         </TabContext>
       ) : (
         <Container>
-          <Grid item xs={8}>
-            <div className="row">
-              You do not have permission to access this page.
-            </div>
-          </Grid>
+          <GridContainer>
+            <GridColumn variant="main-2">
+              <div className="row">
+                You do not have permission to access this page.
+              </div>
+            </GridColumn>
+          </GridContainer>
         </Container>
       )}
     </FieldPageSkeleton>
