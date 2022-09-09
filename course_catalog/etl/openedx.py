@@ -186,6 +186,7 @@ def _transform_course_run(config, course_run, course_last_modified, marketing_ur
         "start_date": course_run.get("start"),
         "end_date": course_run.get("end"),
         "last_modified": last_modified,
+        "published": course_run.get("status", "") == "published",
         "enrollment_start": course_run.get("enrollment_start"),
         "enrollment_end": course_run.get("enrollment_end"),
         "best_start_date": course_run.get("enrollment_start")
@@ -251,6 +252,9 @@ def _transform_course(config, course):
             for course_run in course.get("course_runs", [])
             if _filter_course_run(course_run)
         ],
+        "published": True
+        if "published" in set([run["status"] for run in course.get("course_runs", [])])
+        else False,
         "raw_json": course,
     }
 
