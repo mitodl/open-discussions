@@ -138,13 +138,20 @@ describe("App", () => {
       assert.equal(wrapper.find("Drawer").exists(), !isLearnUrl)
     })
   })
-
-  //
-  ;[true, false].forEach(courseUIEnabled => {
-    it(`should render something at "/learn regardless of course_ui_enabled setting"`, async () => {
-      SETTINGS.course_ui_enabled = courseUIEnabled
+  ;[
+    [true, true],
+    [false, true],
+    [true, false],
+    [false, false]
+  ].forEach(([isUIEnabled, isListStaff]) => {
+    it(`should render something at "/learn if the UI is enabled or the user is list staff"`, async () => {
+      SETTINGS.course_ui_enabled = isUIEnabled
+      SETTINGS.is_list_staff = isListStaff
       const [wrapper] = await renderComponent("/learn/", [])
-      assert.equal(true, wrapper.find("LearnRouter").exists())
+      assert.equal(
+        isUIEnabled || isListStaff,
+        wrapper.find("LearnRouter").exists()
+      )
     })
   })
 })

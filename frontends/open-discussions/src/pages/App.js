@@ -325,10 +325,14 @@ class App extends React.Component<Props> {
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
           />
-          <Route path={`${match.url}courses`}>
-            <CourseLearnRedirect />
-          </Route>
-          <Route path={`${match.url}learn`} component={LearnRouter} />
+          {SETTINGS.course_ui_enabled || SETTINGS.is_list_staff ? (
+            <>
+              <Route path={`${match.url}courses`}>
+                <CourseLearnRedirect />
+              </Route>
+              <Route path={`${match.url}learn`} component={LearnRouter} />
+            </>
+          ) : null}
           <Route path={`${match.url}podcasts`}>
             <PodcastFrontpage />
             <LearningResourceDrawer hideSimilarLearningResources />
