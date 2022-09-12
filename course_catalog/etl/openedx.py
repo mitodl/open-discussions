@@ -252,9 +252,9 @@ def _transform_course(config, course):
             for course_run in course.get("course_runs", [])
             if _filter_course_run(course_run)
         ],
-        "published": True
-        if "published" in set([run["status"] for run in course.get("course_runs", [])])
-        else False,
+        "published": any(
+            run["status"] == "published" for run in course.get("course_runs", [])
+        ),
         "raw_json": course,
     }
 
