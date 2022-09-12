@@ -3,7 +3,7 @@
 # This script runs the react devserver, or runs a build, dependent on NODE_ENV
 set -e
 
-yarn install --immutable
+yarn install --immutable --inline-builds
 
 if [[ $NODE_ENV == "production" ]] ; then
     echo "Building frontends for production..."
