@@ -61,9 +61,9 @@ const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
 const FieldCarousel: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
-  const isMd = useMuiBreakpoint("md")
+  const isSm = useMuiBreakpoint("sm")
   const isLg = useMuiBreakpoint("lg")
-  const pageSize = isLg ? 3 : isMd ? 2 : 1
+  const pageSize = isLg ? 3 : isSm ? 2 : 1
   return (
     <TitledCarousel
       as="section"
