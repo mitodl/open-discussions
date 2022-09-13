@@ -132,7 +132,6 @@ const SearchPage: React.FC = () => {
     // to determine whether to fire off a request or not.
     completedInitialLoad && !requestInFlight,
     pageSize,
-    // @ts-expect-error TS is getting confused by the history package's History type vs global History type
     history
   )
 
@@ -152,7 +151,6 @@ const SearchPage: React.FC = () => {
                 onChange={updateText}
                 value={text || ""}
                 onClear={clearText}
-                //@ts-expect-error - types need to be fixed in course-search-utils
                 onSubmit={onSubmit}
                 autoFocus
               />
