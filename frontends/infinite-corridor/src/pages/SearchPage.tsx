@@ -140,7 +140,7 @@ const SearchPage: React.FC = () => {
         <Container>
           <GridContainer>
             <GridColumn variant="sidebar-2" />
-            <GridColumn variant="main-2" component="section" >
+            <GridColumn variant="main-2" component="section">
               <SearchInput
                 className="main-search"
                 classNameSubmit="search-icon-button"

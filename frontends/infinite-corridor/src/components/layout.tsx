@@ -7,11 +7,15 @@ type GridContainerProps = Omit<
   "item" | "container" | "columnSpacing"
 > & { component?: React.ElementType }
 
-type ColumnVariant = "main-2" | "sidebar-2" | "main-2-wide-main" | "sidebar-2-wide-main"
+type ColumnVariant =
+  | "main-2"
+  | "sidebar-2"
+  | "main-2-wide-main"
+  | "sidebar-2-wide-main"
 type GridItemProps = Omit<
   GridProps,
   "item" | "container" | "xs" | "sm" | "md" | "lg" | "xl"
-> & { variant: ColumnVariant, component?: React.ElementType }
+> & { variant: ColumnVariant; component?: React.ElementType }
 
 const columnVariants: Record<ColumnVariant, GridProps> = {
   "main-2": {
