@@ -46,7 +46,7 @@ const imgConfig: LearningResourceCardProps["imgConfig"] = {
   height:     130
 }
 
-const SEARCH_API_URL = "/search"
+const SEARCH_API_URL = "search/"
 
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
