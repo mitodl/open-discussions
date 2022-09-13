@@ -5,20 +5,28 @@ import type { GridProps } from "@mui/material/Grid"
 type GridContainerProps = Omit<
   GridProps,
   "item" | "container" | "columnSpacing"
->
+> & { component?: React.ElementType }
 
-type ColumnVariant = "main-2" | "sidebar-2"
+type ColumnVariant = "main-2" | "sidebar-2" | "main-2-wide-main" | "sidebar-2-wide-main"
 type GridItemProps = Omit<
   GridProps,
   "item" | "container" | "xs" | "sm" | "md" | "lg" | "xl"
-> & { variant: ColumnVariant }
+> & { variant: ColumnVariant, component?: React.ElementType }
 
 const columnVariants: Record<ColumnVariant, GridProps> = {
   "main-2": {
     xs: 12,
-    md: 8
+    md: 9
   },
   "sidebar-2": {
+    xs: 12,
+    md: 3
+  },
+  "main-2-wide-main": {
+    xs: 12,
+    md: 8
+  },
+  "sidebar-2-wide-main": {
     xs: 12,
     md: 4
   }
@@ -35,10 +43,6 @@ const GridContainer: React.FC<GridContainerProps> = props => (
 /**
  * Represents a grid column and accepts a `variant` prop that determines the
  * column width.
- *
- * Supported Variants:
- *  - `main-2`, `side-2`: The main and sidebar columns in an asymetric two-column
- *    column layout. The layout collapses to a single column on small screens.
  *
  * This is a thin wrapper around MUI's [Grid](https://mui.com/material-ui/react-grid/)
  * component. This is a `<Grid item />` with breakpoint widths specified by `variant`.

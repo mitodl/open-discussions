@@ -1,9 +1,8 @@
 /* global SETTINGS:false */
 import React, { useState, useCallback } from "react"
 import Container from "@mui/material/Container"
-import Grid from "@mui/material/Grid"
 import { intersection } from "lodash"
-import { BannerPage, useDeviceCategory, DESKTOP } from "ol-util"
+import { BannerPage } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {
   useCourseSearch,
@@ -23,6 +22,7 @@ import {
   useGetResourceIdentifiersFromUrl,
   ResourceIdentifiers
 } from "ol-search-ui"
+import { GridColumn, GridContainer } from "../components/layout"
 
 import axios from "../libs/axios"
 
@@ -46,10 +46,12 @@ const imgConfig: LearningResourceCardProps["imgConfig"] = {
   height:     130
 }
 
+const SEARCH_API_URL = "https://discussions-rc.odl.mit.edu/api/v0/search/"
+
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
   try {
-    const { data } = await axios.post("search/", body)
+    const { data } = await axios.post(SEARCH_API_URL, body)
     return data
   } catch (err) {
     return null
@@ -107,8 +109,6 @@ const SearchPage: React.FC = () => {
     []
   )
 
-  const deviceCategory = useDeviceCategory()
-
   const {
     updateText,
     loadMore,
@@ -137,13 +137,9 @@ const SearchPage: React.FC = () => {
       className="search-page-banner"
       bannerContent={
         <Container>
-          <Grid container>
-            {deviceCategory === DESKTOP ? <Grid item xs={3}></Grid> : null}
-            <Grid
-              item
-              xs={deviceCategory === DESKTOP ? 9 : 12}
-              component="section"
-            >
+          <GridContainer>
+            <GridColumn variant="sidebar-2" />
+            <GridColumn variant="main-2" component="section" >
               <SearchInput
                 className="main-search"
                 classNameSubmit="search-icon-button"
@@ -155,14 +151,14 @@ const SearchPage: React.FC = () => {
                 onSubmit={onSubmit}
                 autoFocus
               />
-            </Grid>
-          </Grid>
+            </GridColumn>
+          </GridContainer>
         </Container>
       }
     >
       <Container disableGutters>
-        <Grid container>
-          <Grid item xs={deviceCategory === DESKTOP ? 3 : 12}>
+        <GridContainer>
+          <GridColumn variant="sidebar-2">
             <SearchFilterDrawer
               facetMap={facetMap}
               facetOptions={facetOptions}
@@ -172,12 +168,8 @@ const SearchPage: React.FC = () => {
               clearAllFilters={clearAllFilters}
               toggleFacet={toggleFacet}
             />
-          </Grid>
-          <Grid
-            item
-            xs={deviceCategory === DESKTOP ? 8 : 12}
-            component="section"
-          >
+          </GridColumn>
+          <GridColumn variant="main-2" component="section">
             <InfiniteScroll
               hasMore={from + pageSize < total}
               loadMore={loadMore}
@@ -223,8 +215,8 @@ const SearchPage: React.FC = () => {
                 <span>Loading...</span>
               )}
             </InfiniteScroll>
-          </Grid>
-        </Grid>
+          </GridColumn>
+        </GridContainer>
       </Container>
       <LearningResourceDrawer
         drawerObject={drawerObject}

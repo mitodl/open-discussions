@@ -138,7 +138,7 @@ const FieldPage: React.FC = () => {
         <div className="page-subbanner">
           <Container>
             <GridContainer>
-              <GridColumn variant="main-2">
+              <GridColumn variant="main-2-wide-main">
                 <TabList className="page-nav" onChange={handleChange}>
                   <Tab component={Link} to="#" label="Home" value="home" />
                   <Tab
@@ -149,13 +149,13 @@ const FieldPage: React.FC = () => {
                   />
                 </TabList>
               </GridColumn>
-              <GridColumn variant="sidebar-2" />
+              <GridColumn variant="sidebar-2-wide-main" />
             </GridContainer>
           </Container>
         </div>
         <Container>
           <GridContainer>
-            <GridColumn variant="main-2">
+            <GridColumn variant="main-2-wide-main">
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
                 {featuredList && (
@@ -174,7 +174,7 @@ const FieldPage: React.FC = () => {
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>
             </GridColumn>
-            <GridColumn variant="sidebar-2">
+            <GridColumn variant="sidebar-2-wide-main">
               {fieldQuery.data?.widget_list && (
                 <WidgetsList
                   className="ic-widget-list"
