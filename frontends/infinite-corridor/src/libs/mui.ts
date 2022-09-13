@@ -14,6 +14,7 @@ const muiTheme = createTheme({
   },
   breakpoints: {
     values: {
+      // These match our theme breakpoints in breakpoints.scss
       xs: 0, // mui default
       sm: 600, // mui defailt
       md: 840, // custom
