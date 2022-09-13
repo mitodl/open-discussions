@@ -1,11 +1,11 @@
 @use "theme";
-@import "./breakpoints";
+@use "ol-util/assets/breakpoint";
 
 $resultsSpacer: 1rem;
 
 .searchbar-container {
   display: flex;
-  justify-content: center;;
+  justify-content: center;
 }
 
 .ic-searchpage-list {
@@ -13,7 +13,7 @@ $resultsSpacer: 1rem;
     margin: $resultsSpacer;
   }
 
-  @include breakpoint(phone) {
+  @include breakpoint.breakpoint(phone) {
     .ic-resource-card {
       margin: 10px;
     }
@@ -73,7 +73,7 @@ $resultsSpacer: 1rem;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
-  @include breakpoint(desktop) {
+  @include breakpoint.breakpoint(desktop) {
     margin-right: 25px
   }
 }
@@ -127,7 +127,7 @@ $resultsSpacer: 1rem;
         margin-bottom: 0;
       }
 
-      @include breakpoint(desktop) {
+      @include breakpoint.breakpoint(desktop) {
           margin-right: 20px;
       }
 
@@ -192,7 +192,7 @@ $resultsSpacer: 1rem;
   background: white;
   width: 100%;
   overflow: scroll;
-  z-index: 1;
+  z-index: theme.$muiAppBarZIndex + 1;
 
   .contents {
     margin: 0 20px;

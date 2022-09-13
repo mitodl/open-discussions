@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react"
 import Container from "@mui/material/Container"
 import { intersection } from "lodash"
-import { BannerPage } from "ol-util"
+import { BannerPage, useMuiBreakpoint } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {
   useCourseSearch,
@@ -68,6 +68,7 @@ const SearchPage: React.FC = () => {
   const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
     useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
   )
+  const isMd = useMuiBreakpoint("md")
 
   const clearSearch = useCallback(() => {
     setSearchResults([])
@@ -160,6 +161,7 @@ const SearchPage: React.FC = () => {
         <GridContainer>
           <GridColumn variant="sidebar-2">
             <SearchFilterDrawer
+              alwaysOpen={isMd}
               facetMap={facetMap}
               facetOptions={facetOptions}
               activeFacets={activeFacets}

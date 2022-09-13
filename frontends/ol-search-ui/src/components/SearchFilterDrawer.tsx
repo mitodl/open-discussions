@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react"
 
 import FacetDisplay from "./FacetDisplay"
-import { useDeviceCategory, DESKTOP } from "ol-util"
 import { FacetManifest } from "../interfaces"
 
 import { Aggregation, Facets } from "@mitodl/course-search-utils"
@@ -13,10 +12,13 @@ interface Props {
   onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
   clearAllFilters: () => void
   toggleFacet: (name: string, value: string, isEnabled: boolean) => void
+  /**
+   * Whether the drawer is always open. Useful in some wider-screen layouts.
+   */
+  alwaysOpen?: boolean
 }
 
 export default function SearchFilterDrawer(props: Props) {
-  const deviceCategory = useDeviceCategory()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   const openDrawer = useCallback(
@@ -35,7 +37,7 @@ export default function SearchFilterDrawer(props: Props) {
     [setDrawerOpen]
   )
 
-  if (deviceCategory === DESKTOP) {
+  if (props.alwaysOpen) {
     return (
       <div className="mt-0 pt-3">
         <FacetDisplay {...props} />
@@ -60,7 +62,7 @@ export default function SearchFilterDrawer(props: Props) {
       </div>
     </div>
   ) : (
-    <div className="col-12 col-lg-3 mt-3 mt-lg-0">
+    <div className="mt-3">
       <div className="controls">
         <div onClick={openDrawer} className="filter-controls">
           Filter
