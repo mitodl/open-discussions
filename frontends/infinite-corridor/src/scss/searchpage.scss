@@ -127,10 +127,6 @@ $resultsSpacer: 1rem;
         margin-bottom: 0;
       }
 
-      @include breakpoint.breakpoint(desktop) {
-          margin-right: 20px;
-      }
-
     }
 
     .facet-key {
