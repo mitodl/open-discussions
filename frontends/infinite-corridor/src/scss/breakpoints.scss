@@ -13,6 +13,9 @@ $mdDown: $md - $spacer;
 $lgDown: $lg - $spacer;
 $xlDown: $xl - $spacer;
 
+/*
+Generate a media query that matches screens ABOVE the given breakpoint.
+*/
 @mixin up($name) {
   @if $name == xs {
     @media (min-width: $xs) {
@@ -37,6 +40,9 @@ $xlDown: $xl - $spacer;
   }
 }
 
+/*
+Generate a media query that matches screens BELOW the given breakpoint.
+*/
 @mixin down($name) {
   @if $name == xs {
     @media (max-width: $xsDown) {
