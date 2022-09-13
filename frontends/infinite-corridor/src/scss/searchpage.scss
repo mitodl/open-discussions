@@ -1,5 +1,4 @@
 @use "theme";
-@use "ol-util/assets/breakpoint";
 
 $resultsSpacer: 1rem;
 
@@ -11,12 +10,6 @@ $resultsSpacer: 1rem;
 .ic-searchpage-list {
   > * {
     margin: $resultsSpacer;
-  }
-
-  @include breakpoint.breakpoint(phone) {
-    .ic-resource-card {
-      margin: 10px;
-    }
   }
 }
 
@@ -73,9 +66,6 @@ $resultsSpacer: 1rem;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
-  @include breakpoint.breakpoint(desktop) {
-    margin-right: 25px
-  }
 }
 
 .facets {
