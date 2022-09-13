@@ -11,7 +11,7 @@ def test_mitx_transform_non_mit_owner(non_mitx_course_data):
 
 def test_mitx_transform_mit_owner(mitx_course_data):
     """Verify that courses with MIT owners show up"""
-    assert len(list(transform(mitx_course_data["results"]))) == 1
+    assert len(list(transform(mitx_course_data["results"]))) == 2
 
 
 def test_mitx_transform_remap_topics(mocker, mitx_course_data):
