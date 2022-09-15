@@ -1,27 +1,16 @@
 """MITX Online course catalog ETL"""
 import copy
 import logging
-import os
 import re
 from datetime import datetime
-from subprocess import CalledProcessError, check_call
-from tempfile import TemporaryDirectory
 from urllib.parse import urljoin
 
 import pytz
 import requests
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.loaders import load_content_files
-from course_catalog.etl.utils import (
-    get_learning_course_bucket,
-    transform_content_files,
-    transform_topics,
-)
-from course_catalog.models import Course, LearningResourceRun
-from course_catalog.utils import get_s3_object_and_read
+from course_catalog.etl.utils import transform_topics
 
 log = logging.getLogger(__name__)
 
@@ -218,68 +207,3 @@ def transform_programs(programs):
         }
         for program in programs
     ]
-
-
-def sync_mitxonline_course_files(ids):
-    """
-    Sync all MITX Online course run files for a list of course ids to database
-
-    Args:
-        ids(list of int): list of course ids to process
-    """
-    bucket = get_learning_course_bucket(
-        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME
-    )
-
-    try:
-        course_tar_regex = r".*/courses/.*\.tar\.gz$"
-        most_recent_export_date = next(
-            reversed(
-                sorted(
-                    [
-                        obj
-                        for obj in bucket.objects.filter(Prefix="20")
-                        if re.search(course_tar_regex, obj.key)
-                    ],
-                    key=lambda obj: obj.last_modified,
-                )
-            )
-        ).key.split("/")[0]
-        most_recent_course_zips = [
-            obj
-            for obj in bucket.objects.filter(Prefix=most_recent_export_date)
-            if re.search(course_tar_regex, obj.key)
-        ]
-    except (StopIteration, IndexError):
-        log.warning("No MITX Online exported courses found in S3 bucket")
-        return
-
-    course_content_type = ContentType.objects.get_for_model(Course)
-    for course_tarfile in most_recent_course_zips:
-        matches = re.search(r"courses/(.+)\.tar\.gz$", course_tarfile.key)
-        run_id = matches.group(1)
-        run = LearningResourceRun.objects.filter(
-            platform=PlatformType.mitxonline.value,
-            run_id=run_id,
-            content_type=course_content_type,
-            object_id__in=ids,
-        ).first()
-        if not run:
-            log.info("No MITX Online courses matched course tarfile %s", course_tarfile)
-            continue
-        with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-            tarbytes = get_s3_object_and_read(course_tarfile)
-            course_tarpath = os.path.join(
-                export_tempdir, course_tarfile.key.split("/")[-1]
-            )
-            with open(course_tarpath, "wb") as f:
-                f.write(tarbytes)
-            try:
-                check_call(["tar", "xf", course_tarpath], cwd=tar_tempdir)
-            except CalledProcessError:
-                log.exception("Unable to untar %s", course_tarfile)
-                continue
-            try:
-                load_content_files(run, transform_content_files(course_tarpath))
-            except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)

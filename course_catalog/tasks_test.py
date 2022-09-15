@@ -469,25 +469,27 @@ def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blocklist):
 
 @mock_s3
 def test_get_xpro_files(mocker, settings):
-    """Test that get_xpro_files calls api.sync_xpro_course_files with the correct ids"""
-    mock_sync_xpro_course_files = mocker.patch(
-        "course_catalog.tasks.sync_xpro_course_files"
+    """Test that get_xpro_files calls api.sync_olx_course_files with the correct ids"""
+    mock_sync_olx_course_files = mocker.patch(
+        "course_catalog.tasks.sync_olx_course_files"
     )
     setup_s3(settings)
     ids = [1, 2, 3]
     get_xpro_files(ids)
-    mock_sync_xpro_course_files.assert_called_with(ids)
+    mock_sync_olx_course_files.assert_called_with(
+        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, "xpro", ids
+    )
 
 
 def test_get_xpro_files_missing_settings(mocker, settings):
     """Test that get_xpro_files does nothing without required settings"""
-    mock_sync_xpro_course_files = mocker.patch(
-        "course_catalog.tasks.sync_xpro_course_files"
+    mock_sync_olx_course_files = mocker.patch(
+        "course_catalog.tasks.sync_olx_course_files"
     )
     mock_log = mocker.patch("course_catalog.tasks.log.warning")
     settings.XPRO_LEARNING_COURSE_BUCKET_NAME = None
     get_xpro_files([1, 2])
-    mock_sync_xpro_course_files.assert_not_called()
+    mock_sync_olx_course_files.assert_not_called()
     mock_log.assert_called_once_with("Required settings missing for get_xpro_files")
 
 
@@ -511,24 +513,26 @@ def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
 
 def test_get_mitxonline_files(mocker, settings):
     """Test that get_mitxonline_files calls api.sync_mitxonline_course_files with the correct ids"""
-    mock_sync_mitxonline_course_files = mocker.patch(
-        "course_catalog.tasks.sync_mitxonline_course_files"
+    mock_sync_olx_course_files = mocker.patch(
+        "course_catalog.tasks.sync_olx_course_files"
     )
     setup_s3(settings)
     ids = [1, 2, 3]
     get_mitxonline_files(ids)
-    mock_sync_mitxonline_course_files.assert_called_with(ids)
+    mock_sync_olx_course_files.assert_called_with(
+        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME, "mitxonline", ids
+    )
 
 
 def test_get_mitxonline_files_missing_settings(mocker, settings):
     """Test that get_mitxonline_files does nothing without required settings"""
-    mock_sync_mitxonline_course_files = mocker.patch(
-        "course_catalog.tasks.sync_mitxonline_course_files"
+    mock_sync_olx_course_files = mocker.patch(
+        "course_catalog.tasks.sync_olx_course_files"
     )
     mock_log = mocker.patch("course_catalog.tasks.log.warning")
     settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = None
     get_mitxonline_files([1, 2])
-    mock_sync_mitxonline_course_files.assert_not_called()
+    mock_sync_olx_course_files.assert_not_called()
     mock_log.assert_called_once_with(
         "Required settings missing for get_mitxonline_files"
     )

@@ -21,8 +21,7 @@ from course_catalog.api import (
 )
 from course_catalog.constants import PlatformType
 from course_catalog.etl import enrollments, pipelines, youtube
-from course_catalog.etl.mitxonline import sync_mitxonline_course_files
-from course_catalog.etl.xpro import sync_xpro_course_files
+from course_catalog.etl.utils import sync_olx_course_files
 from course_catalog.models import Course
 from course_catalog.utils import load_course_blocklist
 from open_discussions.celery import app
@@ -250,7 +249,9 @@ def get_xpro_files(ids):
     ):
         log.warning("Required settings missing for get_xpro_files")
         return
-    sync_xpro_course_files(ids)
+    sync_olx_course_files(
+        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, ids
+    )
 
 
 @app.task(bind=True)
@@ -290,7 +291,11 @@ def get_mitxonline_files(ids):
     ):
         log.warning("Required settings missing for get_mitxonline_files")
         return
-    sync_mitxonline_course_files(ids)
+    sync_olx_course_files(
+        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
+        PlatformType.mitxonline.value,
+        ids,
+    )
 
 
 @app.task(bind=True)
@@ -370,8 +375,8 @@ def get_micromasters_data():
 @app.task
 def get_xpro_data():
     """Execute the xPro ETL pipeline"""
-    pipelines.xpro_programs_etl()
     pipelines.xpro_courses_etl()
+    pipelines.xpro_programs_etl()
 
 
 @app.task

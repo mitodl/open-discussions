@@ -1,26 +1,14 @@
 """xPro course catalog ETL"""
 import copy
 import logging
-import os
-import re
 from datetime import datetime
-from subprocess import CalledProcessError, check_call
-from tempfile import TemporaryDirectory
 
 import pytz
 import requests
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.etl.loaders import load_content_files
-from course_catalog.etl.utils import (
-    get_learning_course_bucket,
-    transform_content_files,
-    transform_topics,
-)
-from course_catalog.models import Course, LearningResourceRun
-from course_catalog.utils import get_s3_object_and_read
+from course_catalog.etl.utils import transform_topics
 
 log = logging.getLogger(__name__)
 
@@ -176,70 +164,3 @@ def transform_programs(programs):
         }
         for program in programs
     ]
-
-
-def sync_xpro_course_files(ids):
-    """
-    Sync all xPRO course run files for a list of course ids to database
-
-    Args:
-        ids(list of int): list of course ids to process
-        bucket_name (str): The name of the bucket containing course file data
-        platform (str): The platform of the course files
-    """
-    bucket = get_learning_course_bucket(settings.XPRO_LEARNING_COURSE_BUCKET_NAME)
-
-    try:
-        most_recent_export = next(
-            reversed(
-                sorted(
-                    [
-                        obj
-                        for obj in bucket.objects.all()
-                        if re.search(r"/exported_courses_\d+\.tar\.gz$", obj.key)
-                    ],
-                    key=lambda obj: obj.last_modified,
-                )
-            )
-        )
-    except StopIteration:
-        log.warning("No xPRO exported courses found in xPRO S3 bucket")
-        return
-
-    course_content_type = ContentType.objects.get_for_model(Course)
-    with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-        tarbytes = get_s3_object_and_read(most_recent_export)
-        tarpath = os.path.join(export_tempdir, "temp.tar.gz")
-        with open(tarpath, "wb") as f:
-            f.write(tarbytes)
-
-        try:
-            check_call(["tar", "xf", tarpath], cwd=tar_tempdir)
-        except CalledProcessError:
-            log.exception("Unable to untar %s", most_recent_export)
-            return
-
-        for course_tarfile in os.listdir(tar_tempdir):
-            matches = re.search(r"(.+)\.tar\.gz$", course_tarfile)
-            if not matches:
-                log.error(
-                    "Expected a tar file in exported courses tarball but found %s",
-                    course_tarfile,
-                )
-                continue
-            run_id = matches.group(1)
-            run = LearningResourceRun.objects.filter(
-                platform=PlatformType.xpro.value,
-                run_id=run_id,
-                content_type=course_content_type,
-                object_id__in=ids,
-            ).first()
-            if not run:
-                log.info("No xPRO courses matched course tarfile %s", course_tarfile)
-                continue
-
-            course_tarpath = os.path.join(tar_tempdir, course_tarfile)
-            try:
-                load_content_files(run, transform_content_files(course_tarpath))
-            except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)
