@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import type { Theme, Breakpoint } from "@mui/material/styles"
 
