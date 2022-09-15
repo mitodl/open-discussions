@@ -180,37 +180,30 @@ $resultsSpacer: 1rem;
   overflow: scroll;
   z-index: theme.$muiAppBarZIndex + 1;
 
-  .contents {
-    margin: 0 20px;
-  }
-
-  .controls {
+  .search-filter-header {
     display: flex;
     justify-content: flex-end;
-
     i {
-      margin-right: 18px;
-      margin-top: 18px;
-      font-size: 2rem;
-      cursor: pointer;
+      font-size: 2rem
     }
   }
 
-  .apply-filters {
-    margin: 25px;
-
-    button {
+  .search-filter-contents { 
+    padding: 0 20px;
+    > button {
       width: 100%;
       font-size: theme.$font-lg;
     }
   }
 }
 
-.filter-controls i.material-icons {
-    font-size: 2.25rem;
-    display: inline;
-    vertical-align: bottom;
-}
+.search-filter-toggle {
+  margin: 0 $resultsSpacer;
+
+  .MuiButton-endIcon svg {
+    font-size: 2rem;
+  }
+} 
 
 .search-page-banner header{
   min-height: 150px;

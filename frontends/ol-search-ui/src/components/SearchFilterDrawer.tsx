@@ -1,4 +1,7 @@
 import React, { useCallback, useState } from "react"
+import Button from "@mui/material/Button"
+import IconButton from "@mui/material/IconButton"
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 
 import FacetDisplay from "./FacetDisplay"
 import { FacetManifest } from "../interfaces"
@@ -21,21 +24,9 @@ interface Props {
 export default function SearchFilterDrawer(props: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const openDrawer = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      setDrawerOpen(true)
-    },
-    [setDrawerOpen]
-  )
+  const openDrawer = useCallback(() => setDrawerOpen(true), [setDrawerOpen])
 
-  const closeDrawer = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault()
-      setDrawerOpen(false)
-    },
-    [setDrawerOpen]
-  )
+  const closeDrawer = useCallback(() => setDrawerOpen(false), [setDrawerOpen])
 
   if (props.alwaysOpen) {
     return (
@@ -47,28 +38,30 @@ export default function SearchFilterDrawer(props: Props) {
 
   return drawerOpen ? (
     <div className="search-filter-drawer-open">
-      <div className="controls">
-        <i className="material-icons" onClick={closeDrawer}>
-          close
-        </i>
+      <div className="search-filter-header">
+        <IconButton className="close-button">
+          <i className="material-icons" onClick={closeDrawer}>
+            close
+          </i>
+        </IconButton>
       </div>
-      <div className="apply-filters">
-        <button onClick={closeDrawer} className="blue-btn">
+      <div className="search-filter-contents">
+        <Button onClick={closeDrawer} variant="contained">
           Apply Filters
-        </button>
-      </div>
-      <div className="contents">
+        </Button>
+
         <FacetDisplay {...props} />
       </div>
     </div>
   ) : (
-    <div className="mt-3">
-      <div className="controls">
-        <div onClick={openDrawer} className="filter-controls">
-          Filter
-          <i className="material-icons">arrow_drop_down</i>
-        </div>
-      </div>
+    <div className="search-filter-toggle">
+      <Button
+        onClick={openDrawer}
+        color="secondary"
+        endIcon={<ArrowDropDownIcon fontSize="inherit" />}
+      >
+        Filter
+      </Button>
     </div>
   )
 }
