@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 from functools import wraps
 from itertools import chain
-from subprocess import CalledProcessError, check_call
+from subprocess import check_call
 from tempfile import TemporaryDirectory
 
 import boto3
@@ -18,7 +18,6 @@ import pytz
 import rapidjson
 import requests
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
 from tika import parser as tika_parser
 from xbundle import XBundle
@@ -28,9 +27,7 @@ from course_catalog.constants import (
     CONTENT_TYPE_VERTICAL,
     VALID_TEXT_FILE_TYPES,
 )
-from course_catalog.etl.loaders import load_content_files
-from course_catalog.models import Course, LearningResourceRun, get_max_length
-from course_catalog.utils import get_s3_object_and_read
+from course_catalog.models import get_max_length
 
 log = logging.getLogger()
 
@@ -441,70 +438,3 @@ def transform_topics(topics):
             [UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]]) for topic in topics]
         )
     ]
-
-
-def sync_olx_course_files(bucket_name, platform, ids):
-    """
-    Sync all edx course run files for a list of course ids to database
-
-    Args:
-        ids(list of int): list of course ids to process
-    """
-    bucket = get_learning_course_bucket(bucket_name)
-
-    try:
-        course_tar_regex = r".*/courses/.*\.tar\.gz$"
-        most_recent_export_date = next(
-            reversed(
-                sorted(
-                    [
-                        obj
-                        for obj in bucket.objects.filter(Prefix="20")
-                        if re.search(course_tar_regex, obj.key)
-                    ],
-                    key=lambda obj: obj.last_modified,
-                )
-            )
-        ).key.split("/")[0]
-        most_recent_course_zips = [
-            obj
-            for obj in bucket.objects.filter(Prefix=most_recent_export_date)
-            if re.search(course_tar_regex, obj.key)
-        ]
-    except (StopIteration, IndexError):
-        log.warning(
-            "No %s exported courses found in S3 bucket %s", platform, bucket_name
-        )
-        return
-
-    course_content_type = ContentType.objects.get_for_model(Course)
-    for course_tarfile in most_recent_course_zips:
-        matches = re.search(r"courses/(.+)\.tar\.gz$", course_tarfile.key)
-        run_id = matches.group(1)
-        run = LearningResourceRun.objects.filter(
-            platform=platform,
-            run_id=run_id,
-            content_type=course_content_type,
-            object_id__in=ids,
-        ).first()
-        if not run:
-            log.info(
-                "No %s courses matched course tarfile %s", platform, course_tarfile
-            )
-            continue
-        with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-            tarbytes = get_s3_object_and_read(course_tarfile)
-            course_tarpath = os.path.join(
-                export_tempdir, course_tarfile.key.split("/")[-1]
-            )
-            with open(course_tarpath, "wb") as f:
-                f.write(tarbytes)
-            try:
-                check_call(["tar", "xf", course_tarpath], cwd=tar_tempdir)
-            except CalledProcessError:
-                log.exception("Unable to untar %s", course_tarfile)
-                continue
-            try:
-                load_content_files(run, transform_content_files(course_tarpath))
-            except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)

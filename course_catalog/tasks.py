@@ -21,7 +21,7 @@ from course_catalog.api import (
 )
 from course_catalog.constants import PlatformType
 from course_catalog.etl import enrollments, pipelines, youtube
-from course_catalog.etl.utils import sync_olx_course_files
+from course_catalog.etl.edx_shared import sync_edx_course_files
 from course_catalog.models import Course
 from course_catalog.utils import load_course_blocklist
 from open_discussions.celery import app
@@ -249,7 +249,7 @@ def get_xpro_files(ids):
     ):
         log.warning("Required settings missing for get_xpro_files")
         return
-    sync_olx_course_files(
+    sync_edx_course_files(
         settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, ids
     )
 
@@ -291,7 +291,7 @@ def get_mitxonline_files(ids):
     ):
         log.warning("Required settings missing for get_mitxonline_files")
         return
-    sync_olx_course_files(
+    sync_edx_course_files(
         settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
         PlatformType.mitxonline.value,
         ids,
