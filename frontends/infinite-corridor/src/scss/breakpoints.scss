@@ -1,5 +1,13 @@
+/*
 
-// These match our MUI breakpoints. If you change them, change them in mui.ts, too.
+This file adds SASS breakpoint mixins. The breakpoint values match our MUI
+breakpoints in mui.ts.
+
+See also https://mui.com/material-ui/customization/breakpoints/
+*/
+
+
+// Alert! If you change these values, change them in mui.ts, too.
 $xs: 0px;
 $sm: 600px;
 $md: 840px;
