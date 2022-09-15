@@ -39,8 +39,8 @@ export default function SearchFilterDrawer(props: Props) {
   return drawerOpen ? (
     <div className="search-filter-drawer-open">
       <div className="search-filter-header">
-        <IconButton className="close-button">
-          <i className="material-icons" onClick={closeDrawer}>
+        <IconButton className="close-button" onClick={closeDrawer}>
+          <i className="material-icons">
             close
           </i>
         </IconButton>
