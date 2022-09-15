@@ -1,7 +1,9 @@
+/* eslint-disable mocha/no-top-level-hooks */
 import "jest-extended"
 import "jest-extended/all"
 
 import { setupMockMarkdownEditor } from "ol-widgets/build/test-utils"
+import { createMatchMediaForJsDom } from "ol-util/build/test-utils"
 import { mockAxiosInstance, resetApi } from "./mockAxios"
 
 setupMockMarkdownEditor()
@@ -23,8 +25,6 @@ const _createSettings = () => ({
 
 global.SETTINGS = _createSettings()
 
-// This should be the only top-level hook.
-// eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
   /**
    * Clear all mock call counts between tests.
@@ -34,4 +34,9 @@ afterEach(() => {
   jest.clearAllMocks()
   global.SETTINGS = _createSettings()
   resetApi()
+})
+
+const DEFAULT_DEVICE_WIDTH = "1200px"
+beforeAll(() => {
+  window.matchMedia = createMatchMediaForJsDom({ width: DEFAULT_DEVICE_WIDTH })
 })
