@@ -40,9 +40,7 @@ export default function SearchFilterDrawer(props: Props) {
     <div className="search-filter-drawer-open">
       <div className="search-filter-header">
         <IconButton className="close-button" onClick={closeDrawer}>
-          <i className="material-icons">
-            close
-          </i>
+          <i className="material-icons">close</i>
         </IconButton>
       </div>
       <div className="search-filter-contents">
