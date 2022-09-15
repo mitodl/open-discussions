@@ -105,7 +105,6 @@ describe("SearchPage", () => {
   ])(
     "should render a facet filters for certification, resource type and  offeror",
     async ({ width, filtersExpanded, showsFilterButton }) => {
-      const originalMatchMedia = window.matchMedia
       window.matchMedia = createMatchMediaForJsDom({ width })
 
       setMockResponse.post("search/", makeSearchResponse())
@@ -120,8 +119,6 @@ describe("SearchPage", () => {
       expect(!!screen.queryByRole("button", { name: "Filter" })).toBe(
         showsFilterButton
       )
-
-      window.matchMedia = originalMatchMedia
     }
   )
 
