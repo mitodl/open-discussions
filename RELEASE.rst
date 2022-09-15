@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.199.1
+Version 0.199.1 (Released September 15, 2022)
 ---------------
 
 - Set published=False for openedx courses if no runs are published (#3735)
