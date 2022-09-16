@@ -4,6 +4,7 @@ import { makeSearchResponse } from "ol-search-ui/build/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
+import { createMatchMediaForJsDom } from "ol-util/build/test-utils"
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
 import { fireEvent, waitFor } from "@testing-library/react"
@@ -98,16 +99,28 @@ describe("SearchPage", () => {
     )
   })
 
-  test("should render a facet filters for certification, resource type and  offeror", async () => {
-    setMockResponse.post("search/", makeSearchResponse())
-    await renderTestApp({ url: "/search" })
+  test.each([
+    { width: 200, filtersExpanded: false, showsFilterButton: true },
+    { width: 1200, filtersExpanded: true, showsFilterButton: false }
+  ])(
+    "should render a facet filters for certification, resource type and  offeror",
+    async ({ width, filtersExpanded, showsFilterButton }) => {
+      window.matchMedia = createMatchMediaForJsDom({ width })
 
-    await waitFor(async () => {
-      expect(screen.getByText("Offered By")).toBeInTheDocument()
-    })
-    expect(screen.getByText("Learning Resource")).toBeInTheDocument()
-    expect(screen.getByText("Certificates")).toBeInTheDocument()
-  })
+      setMockResponse.post("search/", makeSearchResponse())
+      await renderTestApp({ url: "/search" })
+
+      await screen.findByRole("list", { name: "Search Results" })
+
+      expect(!!screen.queryByText("Offered By")).toBe(filtersExpanded)
+      expect(!!screen.queryByText("Learning Resource")).toBe(filtersExpanded)
+      expect(!!screen.queryByText("Certificates")).toBe(filtersExpanded)
+
+      expect(!!screen.queryByRole("button", { name: "Filter" })).toBe(
+        showsFilterButton
+      )
+    }
+  )
 
   test("should filter by facets", async () => {
     setMockResponse.post("search/", makeSearchResponse())

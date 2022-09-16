@@ -1,0 +1,76 @@
+/*
+
+This file adds SASS breakpoint mixins. The breakpoint values match our MUI
+breakpoints in mui.ts.
+
+See also https://mui.com/material-ui/customization/breakpoints/
+*/
+
+
+// Alert! If you change these values, change them in mui.ts, too.
+$xs: 0px;
+$sm: 600px;
+$md: 840px;
+$lg: 1200px;
+$xl: 1536px;
+
+$spacer: 0.05px;
+$xsDown: $xs - $spacer;
+$smDown: $sm - $spacer;
+$mdDown: $md - $spacer;
+$lgDown: $lg - $spacer;
+$xlDown: $xl - $spacer;
+
+/*
+Generate a media query that matches screens ABOVE the given breakpoint.
+*/
+@mixin up($name) {
+  @if $name == xs {
+    @media (min-width: $xs) {
+      @content;
+    }
+  } @else if $name == sm {
+    @media (min-width: $sm) {
+      @content;
+    }
+  } @else if $name == md {
+    @media (min-width: $md) {
+      @content;
+    }
+  } @else if $name == lg {
+    @media (min-width: $lg) {
+      @content;
+    }
+  } @else if $name == xl {
+    @media (min-width: $xl) {
+      @content;
+    }
+  }
+}
+
+/*
+Generate a media query that matches screens BELOW the given breakpoint.
+*/
+@mixin down($name) {
+  @if $name == xs {
+    @media (max-width: $xsDown) {
+      @content;
+    }
+  } @else if $name == sm {
+    @media (max-width: $smDown) {
+      @content;
+    }
+  } @else if $name == md {
+    @media (max-width: $mdDown) {
+      @content;
+    }
+  } @else if $name == lg {
+    @media (max-width: $lgDown) {
+      @content;
+    }
+  } @else if $name == xl {
+    @media (max-width: $xlDown) {
+      @content;
+    }
+  }
+}

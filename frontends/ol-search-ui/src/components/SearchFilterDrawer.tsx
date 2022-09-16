@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from "react"
+import Button from "@mui/material/Button"
+import IconButton from "@mui/material/IconButton"
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 
 import FacetDisplay from "./FacetDisplay"
-import { useDeviceCategory, DESKTOP } from "ol-util"
 import { FacetManifest } from "../interfaces"
 
 import { Aggregation, Facets } from "@mitodl/course-search-utils"
@@ -13,31 +15,22 @@ interface Props {
   onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
   clearAllFilters: () => void
   toggleFacet: (name: string, value: string, isEnabled: boolean) => void
+  /**
+   * Whether the drawer is always open. Useful in some wider-screen layouts.
+   */
+  alwaysOpen?: boolean
 }
 
 export default function SearchFilterDrawer(props: Props) {
-  const deviceCategory = useDeviceCategory()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const openDrawer = useCallback(
-    (event: React.MouseEvent<HTMLDivElement>) => {
-      event.preventDefault()
-      setDrawerOpen(true)
-    },
-    [setDrawerOpen]
-  )
+  const openDrawer = useCallback(() => setDrawerOpen(true), [setDrawerOpen])
 
-  const closeDrawer = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault()
-      setDrawerOpen(false)
-    },
-    [setDrawerOpen]
-  )
+  const closeDrawer = useCallback(() => setDrawerOpen(false), [setDrawerOpen])
 
-  if (deviceCategory === DESKTOP) {
+  if (props.alwaysOpen) {
     return (
-      <div className="col-12 col-lg-3 mt-3 mt-lg-0 facet-display-wrapper pt-3">
+      <div className="mt-0 pt-3">
         <FacetDisplay {...props} />
       </div>
     )
@@ -45,28 +38,28 @@ export default function SearchFilterDrawer(props: Props) {
 
   return drawerOpen ? (
     <div className="search-filter-drawer-open">
-      <div className="controls">
-        <i className="material-icons" onClick={closeDrawer}>
-          close
-        </i>
+      <div className="search-filter-header">
+        <IconButton className="close-button" onClick={closeDrawer}>
+          <i className="material-icons">close</i>
+        </IconButton>
       </div>
-      <div className="apply-filters">
-        <button onClick={closeDrawer} className="blue-btn">
+      <div className="search-filter-contents">
+        <Button onClick={closeDrawer} variant="contained">
           Apply Filters
-        </button>
-      </div>
-      <div className="contents">
+        </Button>
+
         <FacetDisplay {...props} />
       </div>
     </div>
   ) : (
-    <div className="col-12 col-lg-3 mt-3 mt-lg-0">
-      <div className="controls">
-        <div onClick={openDrawer} className="filter-controls">
-          Filter
-          <i className="material-icons">arrow_drop_down</i>
-        </div>
-      </div>
+    <div className="search-filter-toggle">
+      <Button
+        onClick={openDrawer}
+        color="secondary"
+        endIcon={<ArrowDropDownIcon fontSize="inherit" />}
+      >
+        Filter
+      </Button>
     </div>
   )
 }

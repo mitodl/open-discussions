@@ -4,6 +4,13 @@
 header.ic-header {
   background-color: theme.$color-background-light;
   color: theme.$font-color-default;
+
+  min-height: 55px;
+  display: flex;
+  flex-direction: column;
+  > * {
+    flex: 1
+  }
   
   .ic-divider {
     margin: 0.5em 1em;
@@ -21,8 +28,10 @@ header.ic-header {
     }
   }
 
-  .ic-mit-logo img {
+  .ic-mit-logo {
     height: 1.5em;
+    img {
+      height: 100%
+    }
   }
-  min-height: 55px;
 }

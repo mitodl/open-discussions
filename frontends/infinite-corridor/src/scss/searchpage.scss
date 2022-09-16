@@ -1,22 +1,15 @@
 @use "theme";
-@import "./breakpoints";
 
 $resultsSpacer: 1rem;
 
 .searchbar-container {
   display: flex;
-  justify-content: center;;
+  justify-content: center;
 }
 
 .ic-searchpage-list {
   > * {
     margin: $resultsSpacer;
-  }
-
-  @include breakpoint(phone) {
-    .ic-resource-card {
-      margin: 10px;
-    }
   }
 }
 
@@ -73,9 +66,6 @@ $resultsSpacer: 1rem;
   margin-bottom: 10px;
   display: flex;
   justify-content: space-between;
-  @include breakpoint(desktop) {
-    margin-right: 25px
-  }
 }
 
 .facets {
@@ -125,10 +115,6 @@ $resultsSpacer: 1rem;
       label {
         cursor: pointer;
         margin-bottom: 0;
-      }
-
-      @include breakpoint(desktop) {
-          margin-right: 20px;
       }
 
     }
@@ -192,39 +178,33 @@ $resultsSpacer: 1rem;
   background: white;
   width: 100%;
   overflow: scroll;
-  z-index: 1;
+  z-index: theme.$muiAppBarZIndex + 1;
 
-  .contents {
-    margin: 0 20px;
-  }
-
-  .controls {
+  .search-filter-header {
     display: flex;
     justify-content: flex-end;
-
     i {
-      margin-right: 18px;
-      margin-top: 18px;
-      font-size: 2rem;
-      cursor: pointer;
+      font-size: 2rem
     }
   }
 
-  .apply-filters {
-    margin: 25px;
-
-    button {
+  .search-filter-contents { 
+    padding: 0 20px;
+    > button {
       width: 100%;
       font-size: theme.$font-lg;
+      margin-bottom: 20px;
     }
   }
 }
 
-.filter-controls i.material-icons {
-    font-size: 2.25rem;
-    display: inline;
-    vertical-align: bottom;
-}
+.search-filter-toggle {
+  margin: 0 $resultsSpacer;
+
+  .MuiButton-endIcon svg {
+    font-size: 2rem;
+  }
+} 
 
 .search-page-banner header{
   min-height: 150px;
