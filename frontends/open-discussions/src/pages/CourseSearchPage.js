@@ -128,7 +128,7 @@ export function Results(props: ResultProps) {
 }
 
 type Props = {
-  match: Match
+  match: Match,
   history: History
 }
 
