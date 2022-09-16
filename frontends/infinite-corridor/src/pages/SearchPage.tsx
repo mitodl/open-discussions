@@ -89,7 +89,10 @@ const SearchPage: React.FC = () => {
         activeFacets["type"] = ALLOWED_TYPES
       }
 
-      if (activeFacets["offered_by"]?.length && activeFacets["offered_by"].length > 0) {
+      if (
+        activeFacets["offered_by"]?.length &&
+        activeFacets["offered_by"].length > 0
+      ) {
         activeFacets["offered_by"] = intersection(
           ALLOWED_OFFERORS,
           activeFacets["offered_by"]
