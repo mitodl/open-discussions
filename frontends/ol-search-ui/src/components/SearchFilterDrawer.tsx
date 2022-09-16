@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react"
 
 import FacetDisplay from "./FacetDisplay"
 import { useDeviceCategory, DESKTOP } from "ol-util"
-import { FacetManifest } from "../interfaces"
+import { FacetManifest, FacetKey } from "../interfaces"
 
 import { Aggregation, Facets } from "@mitodl/course-search-utils"
 
@@ -13,6 +13,7 @@ interface Props {
   onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
   clearAllFilters: () => void
   toggleFacet: (name: string, value: string, isEnabled: boolean) => void
+  facetOptionsFilter: { [key: string | FacetKey]: string[] }
 }
 
 export default function SearchFilterDrawer(props: Props) {

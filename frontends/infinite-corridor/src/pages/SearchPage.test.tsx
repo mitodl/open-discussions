@@ -13,7 +13,7 @@ const expectedFacets = {
   audience:            [],
   certification:       [],
   type:                ["program", "course"],
-  offered_by:          [],
+  offered_by:          ["OCW", "MITx", "Open Learning Library", "MicroMasters", "xPRO"],
   topics:              [],
   department_name:     [],
   level:               [],
@@ -143,6 +143,25 @@ describe("SearchPage", () => {
       course_feature_tags: [],
       resource_type:       []
     }
+
+    const expectedFacetsAfterClear = {
+      audience:      [],
+      certification: [],
+      offered_by:    [
+        "OCW",
+        "MITx",
+        "Open Learning Library",
+        "MicroMasters",
+        "xPRO"
+      ],
+      type:                ["program", "course"],
+      topics:              [],
+      department_name:     [],
+      level:               [],
+      course_feature_tags: [],
+      resource_type:       []
+    }
+
     expect(makeRequest.mock.calls[1][0]).toEqual("post")
     expect(makeRequest.mock.calls[1][1]).toEqual("search/")
     expect(makeRequest.mock.calls[1][2]).toMatchObject(
@@ -161,7 +180,7 @@ describe("SearchPage", () => {
       buildSearchQuery({
         text:         "",
         from:         0,
-        activeFacets: expectedFacets,
+        activeFacets: expectedFacetsAfterClear,
         sort:         null,
         size:         4
       })

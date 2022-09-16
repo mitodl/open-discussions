@@ -27,6 +27,14 @@ import {
 import axios from "../libs/axios"
 
 const ALLOWED_TYPES = ["program", "course"]
+const ALLOWED_OFFERORS = [
+  "OCW",
+  "MITx",
+  "Open Learning Library",
+  "MicroMasters",
+  "xPRO"
+]
+
 const pageSize = SETTINGS.search_page_size
 
 const facetMap: FacetManifest = [
@@ -80,6 +88,16 @@ const SearchPage: React.FC = () => {
       } else {
         activeFacets["type"] = ALLOWED_TYPES
       }
+
+      if (activeFacets["offered_by"]?.length && activeFacets["offered_by"].length > 0) {
+        activeFacets["offered_by"] = intersection(
+          ALLOWED_OFFERORS,
+          activeFacets["offered_by"]
+        )
+      } else {
+        activeFacets["offered_by"] = ALLOWED_OFFERORS
+      }
+
       setRequestInFlight(true)
       const newResults = await search({
         text,
@@ -171,6 +189,7 @@ const SearchPage: React.FC = () => {
               onUpdateFacets={onUpdateFacets}
               clearAllFilters={clearAllFilters}
               toggleFacet={toggleFacet}
+              facetOptionsFilter={{ offered_by: ALLOWED_OFFERORS }}
             />
           </Grid>
           <Grid

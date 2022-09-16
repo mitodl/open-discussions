@@ -12,6 +12,7 @@ interface Props {
   onUpdateFacets: React.ChangeEventHandler<HTMLInputElement>
   clearAllFilters: () => void
   toggleFacet: (name: string, value: string, isEnabled: boolean) => void
+  facetOptionsFilter?: { [key: string | FacetKey]: string[] }
 }
 
 const FacetDisplay = React.memo(
@@ -22,8 +23,24 @@ const FacetDisplay = React.memo(
       activeFacets,
       onUpdateFacets,
       clearAllFilters,
-      toggleFacet
+      toggleFacet,
+      facetOptionsFilter
     } = props
+
+    function filterFacetOptions(
+      results: Aggregation | null,
+      allowedOptions: (string | FacetKey)[]
+    ) {
+      if (results?.buckets) {
+        return {
+          buckets: results.buckets.filter(
+            item => item.key && allowedOptions.includes(item.key)
+          )
+        }
+      } else {
+        return results
+      }
+    }
 
     return (
       <React.Fragment>
@@ -62,7 +79,14 @@ const FacetDisplay = React.memo(
             key={key}
             title={title}
             name={name as string}
-            results={facetOptions(name)}
+            results={
+              facetOptionsFilter && name in facetOptionsFilter ?
+                filterFacetOptions(
+                  facetOptions(name),
+                  facetOptionsFilter[name]
+                ) :
+                facetOptions(name)
+            }
             onUpdate={onUpdateFacets}
             currentlySelected={activeFacets[name] || []}
           />
