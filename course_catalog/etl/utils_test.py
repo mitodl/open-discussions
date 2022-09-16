@@ -25,6 +25,8 @@ from course_catalog.etl.utils import (
     transform_content_files,
 )
 
+pytestmark = pytest.mark.django_db
+
 
 @pytest.mark.parametrize("side_effect", ["One", Exception("error")])
 def test_log_exceptions(mocker, side_effect):

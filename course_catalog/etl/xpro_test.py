@@ -4,17 +4,13 @@ import json
 # pylint: disable=redefined-outer-name
 from datetime import datetime
 from itertools import chain
-from subprocess import CalledProcessError
 
 import pytest
-from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl import xpro
 from course_catalog.etl.utils import UCC_TOPIC_MAPPINGS
-from course_catalog.etl.xpro import _parse_datetime, sync_xpro_course_files
-from course_catalog.factories import LearningResourceRunFactory
-from course_catalog.models import Course
+from course_catalog.etl.xpro import _parse_datetime
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = pytest.mark.django_db
@@ -241,150 +237,3 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
         for course_data in mock_xpro_courses_data
     ]
     assert expected == result
-
-
-def test_sync_xpro_course_files_empty(mock_xpro_learning_bucket, mocker):
-    """a tarball which doesn't contain other course tarballs should be skipped"""
-
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=open("test_json/empty.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    sync_xpro_course_files(ids=[123])
-    mock_load_content_files.assert_not_called()
-
-
-def test_sync_xpro_course_files_invalid_tarfile(mock_xpro_learning_bucket, mocker):
-    """an invalid tarball should be skipped"""
-
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=b"".join([b"x" for _ in range(100)]),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    mocker.patch(
-        "course_catalog.etl.xpro.check_call", side_effect=CalledProcessError(0, "")
-    )
-    mock_log = mocker.patch("course_catalog.etl.xpro.log.exception")
-    sync_xpro_course_files(ids=[123])
-    mock_load_content_files.assert_not_called()
-    assert mock_log.call_args[0][0].startswith("Unable to untar ") is True
-
-
-def test_sync_xpro_course_files_empty_bucket(mock_xpro_learning_bucket, mocker):
-    """If the bucket has no tarballs, it should be skipped"""
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/not.a.tarball",
-        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    sync_xpro_course_files(ids=[123])
-    mock_load_content_files.assert_not_called()
-
-
-def test_sync_xpro_course_files_no_runs(mock_xpro_learning_bucket, mocker):
-    """If there are no matching runs for the given courses, it should be skipped"""
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    mock_log = mocker.patch("course_catalog.etl.xpro.log.info")
-    sync_xpro_course_files(ids=[123])
-    mock_load_content_files.assert_not_called()
-    assert mock_log.call_args[0][0].startswith(
-        "No xPRO courses matched course tarfile "
-    )
-
-
-def test_sync_xpro_course_files_no_courses(mock_xpro_learning_bucket, mocker):
-    """If there are no matching runs for the given courses, it should be skipped"""
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    course_content_type = ContentType.objects.get_for_model(Course)
-    LearningResourceRunFactory.create(
-        platform=PlatformType.xpro.value,
-        run_id="content-devops-0001",
-        content_type=course_content_type,
-    )
-    sync_xpro_course_files(ids=[])
-    mock_load_content_files.assert_not_called()
-
-
-def test_sync_xpro_course_files_error(mock_xpro_learning_bucket, mocker):
-    """Exceptions raised during sync_xpro_course_files should be logged"""
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files",
-        autospec=True,
-        side_effect=Exception,
-    )
-    course_content_type = ContentType.objects.get_for_model(Course)
-    run = LearningResourceRunFactory.create(
-        platform=PlatformType.xpro.value,
-        run_id="content-devops-0001",
-        content_type=course_content_type,
-    )
-    course_id = run.object_id
-    fake_data = '{"key": "data"}'
-    mock_log = mocker.patch("course_catalog.etl.xpro.log.exception")
-    mock_transform = mocker.patch(
-        "course_catalog.etl.xpro.transform_content_files", return_value=fake_data
-    )
-    sync_xpro_course_files(ids=[course_id])
-    assert mock_transform.call_count == 1
-    assert mock_transform.call_args[0][0].endswith("content-devops-0001.tar.gz") is True
-    mock_load_content_files.assert_called_once_with(run, fake_data)
-    assert mock_log.call_args[0][0].startswith("Error ingesting OLX content data for ")
-
-
-def test_sync_xpro_course_files(mock_xpro_learning_bucket, mocker):
-    """sync xpro courses from a tarball stored in S3"""
-    mock_xpro_learning_bucket.bucket.put_object(
-        Key="path/to/exported_courses_123.tar.gz",
-        Body=open("test_json/exported_courses_12345.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
-    mock_load_content_files = mocker.patch(
-        "course_catalog.etl.xpro.load_content_files", autospec=True, return_value=[]
-    )
-    course_content_type = ContentType.objects.get_for_model(Course)
-    run = LearningResourceRunFactory.create(
-        platform=PlatformType.xpro.value,
-        run_id="content-devops-0001",
-        content_type=course_content_type,
-    )
-    course_id = run.object_id
-    fake_data = '{"key": "data"}'
-    mock_log = mocker.patch("course_catalog.etl.xpro.log.exception")
-    mock_transform = mocker.patch(
-        "course_catalog.etl.xpro.transform_content_files", return_value=fake_data
-    )
-    sync_xpro_course_files(ids=[course_id])
-    assert mock_transform.call_count == 1
-    assert mock_transform.call_args[0][0].endswith("content-devops-0001.tar.gz") is True
-    mock_load_content_files.assert_called_once_with(run, fake_data)
-    mock_log.assert_not_called()
