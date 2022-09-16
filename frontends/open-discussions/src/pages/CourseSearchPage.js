@@ -35,7 +35,7 @@ import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { useResponsive, useWidth } from "../hooks/util"
 
 import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
-import { Match, useHistory } from "react-router"
+import { Match, History } from "react-router"
 import type { CellWidth } from "../components/Grid"
 
 export type CourseSearchParams = {
@@ -129,10 +129,11 @@ export function Results(props: ResultProps) {
 
 type Props = {
   match: Match
+  history: History
 }
 
 export default function CourseSearchPage(props: Props) {
-  const { match } = props
+  const { match, history } = props
 
   const { results, facets, suggest, total, loaded, processing, error } =
     useSelector(courseSearchSelector)
@@ -163,8 +164,6 @@ export default function CourseSearchPage(props: Props) {
     },
     [dispatch]
   )
-
-  const history = useHistory()
 
   const {
     facetOptions,
