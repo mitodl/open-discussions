@@ -35,7 +35,7 @@ import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { useResponsive, useWidth } from "../hooks/util"
 
 import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
-import { Match, History } from "react-router"
+import { Match } from "react-router"
 import type { CellWidth } from "../components/Grid"
 
 export type CourseSearchParams = {
@@ -129,7 +129,7 @@ export function Results(props: ResultProps) {
 
 type Props = {
   match: Match,
-  history: History
+  history: Object
 }
 
 export default function CourseSearchPage(props: Props) {
