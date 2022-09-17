@@ -35,7 +35,7 @@ import { COURSE_SEARCH_BANNER_URL } from "../lib/url"
 import { useResponsive, useWidth } from "../hooks/util"
 
 import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
-import { Match } from "react-router"
+import type { Match } from "react-router"
 import type { CellWidth } from "../components/Grid"
 
 export type CourseSearchParams = {
