@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.199.2
+Version 0.199.2 (Released September 19, 2022)
 ---------------
 
 - Refactor xpro course file sync (#3743)
