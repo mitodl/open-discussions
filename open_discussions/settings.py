@@ -591,10 +591,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_mitx_data",
         "schedule": crontab(minute=30, hour=13),  # 9:30am EST
     },
-    "update_bootcamp-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_bootcamp_data",
-        "schedule": crontab(minute=30, hour=15),  # 11:30am EST
-    },
     "update-micromasters-courses-every-1-days": {
         "task": "course_catalog.tasks.get_micromasters_data",
         "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
@@ -624,18 +620,6 @@ CELERY_BEAT_SCHEDULE = {
     "update-oll-courses-every-1-days": {
         "task": "course_catalog.tasks.get_oll_data",
         "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
-    },
-    "update-see-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_see_data",
-        "schedule": crontab(minute=00, hour=19),  # 3:00pm EST
-    },
-    "update-mitpe-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_mitpe_data",
-        "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
-    },
-    "update-csail-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_csail_data",
-        "schedule": crontab(minute=00, hour=20),  # 4:00pm EST
     },
     "update-youtube-videos": {
         "task": "course_catalog.tasks.get_youtube_data",
@@ -895,11 +879,7 @@ BLOCKLISTED_COURSES_URL = get_string(
 
 DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
 
-# Base URL for bootcamps data
-BOOTCAMPS_URL = get_string(
-    "BOOTCAMPS_URL",
-    "https://raw.githubusercontent.com/mitodl/bootcamps.json/master/bootcamps.json",
-)
+# Base URL for Micromasters data
 MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
 
 # Iterator chunk size for MITx and xPRO courses

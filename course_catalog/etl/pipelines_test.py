@@ -151,69 +151,6 @@ def test_oll_etl():
     assert result == mock_load_courses.return_value
 
 
-def test_see_etl():
-    """Verify that SEE etl pipeline executes correctly"""
-    with reload_mocked_pipeline(
-        patch("course_catalog.etl.see.extract", autospec=True),
-        patch("course_catalog.etl.see.transform", autospec=True),
-        patch("course_catalog.etl.loaders.load_courses", autospec=True),
-    ) as patches:
-        mock_extract, mock_transform, mock_load_courses = patches
-        result = pipelines.see_etl()
-
-    mock_extract.assert_called_once_with()
-    mock_transform.assert_called_once_with(mock_extract.return_value)
-    mock_load_courses.assert_called_once_with(
-        PlatformType.see.value,
-        mock_transform.return_value,
-        config=CourseLoaderConfig(prune=False),
-    )
-
-    assert result == mock_load_courses.return_value
-
-
-def test_mitpe_etl():
-    """Verify that MITPE etl pipeline executes correctly"""
-    with reload_mocked_pipeline(
-        patch("course_catalog.etl.mitpe.extract", autospec=True),
-        patch("course_catalog.etl.mitpe.transform", autospec=True),
-        patch("course_catalog.etl.loaders.load_courses", autospec=True),
-    ) as patches:
-        mock_extract, mock_transform, mock_load_courses = patches
-        result = pipelines.mitpe_etl()
-
-    mock_extract.assert_called_once_with()
-    mock_transform.assert_called_once_with(mock_extract.return_value)
-    mock_load_courses.assert_called_once_with(
-        PlatformType.mitpe.value,
-        mock_transform.return_value,
-        config=CourseLoaderConfig(prune=False),
-    )
-
-    assert result == mock_load_courses.return_value
-
-
-def test_csail_etl():
-    """Verify that CSAIL etl pipeline executes correctly"""
-    with reload_mocked_pipeline(
-        patch("course_catalog.etl.csail.extract", autospec=True),
-        patch("course_catalog.etl.csail.transform", autospec=True),
-        patch("course_catalog.etl.loaders.load_courses", autospec=True),
-    ) as patches:
-        mock_extract, mock_transform, mock_load_courses = patches
-        result = pipelines.csail_etl()
-
-    mock_extract.assert_called_once_with()
-    mock_transform.assert_called_once_with(mock_extract.return_value)
-    mock_load_courses.assert_called_once_with(
-        PlatformType.csail.value,
-        mock_transform.return_value,
-        config=CourseLoaderConfig(prune=False),
-    )
-
-    assert result == mock_load_courses.return_value
-
-
 def test_youtube_etl():
     """Verify that youtube etl pipeline executes correctly"""
     with reload_mocked_pipeline(

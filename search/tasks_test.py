@@ -380,7 +380,6 @@ def test_start_recreate_index(
         PlatformType.mitx,
         PlatformType.xpro,
         PlatformType.micromasters,
-        PlatformType.bootcamps,
         PlatformType.oll,
         PlatformType.youtube,
     ]
@@ -452,11 +451,10 @@ def test_start_recreate_index(
 
     if COURSE_TYPE in indexes:
         mock_blocklist.assert_called_once()
-        assert index_courses_mock.si.call_count == 4
+        assert index_courses_mock.si.call_count == 3
         index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id])
         index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
         index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id])
-        index_courses_mock.si.assert_any_call([courses[6].id])
 
         # chunk size is 2 and there is only one course each for ocw and xpro
         assert index_course_content_mock.si.call_count == 1
@@ -697,7 +695,6 @@ def test_start_update_index(
         PlatformType.mitx,
         PlatformType.xpro,
         PlatformType.micromasters,
-        PlatformType.bootcamps,
         PlatformType.oll,
         PlatformType.youtube,
     ]
@@ -808,13 +805,12 @@ def test_start_update_index(
             )
             delete_courses_mock.si.assert_any_call([unpublished_course.id])
         else:
-            assert index_courses_mock.si.call_count == 4
+            assert index_courses_mock.si.call_count == 3
             index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id], True)
             index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id], True)
             index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id], True)
-            index_courses_mock.si.assert_any_call([courses[6].id], True)
 
-            assert delete_courses_mock.si.call_count == 4
+            assert delete_courses_mock.si.call_count == 3
             delete_courses_mock.si.assert_any_call(
                 [unpublished_courses[0].id, unpublished_courses[1].id]
             )
@@ -824,7 +820,6 @@ def test_start_update_index(
             delete_courses_mock.si.assert_any_call(
                 [unpublished_courses[4].id, unpublished_courses[5].id]
             )
-            delete_courses_mock.si.assert_any_call([unpublished_courses[6].id])
 
     if RESOURCE_FILE_TYPE in indexes:
         if platform in (PlatformType.ocw.value, PlatformType.xpro.value):

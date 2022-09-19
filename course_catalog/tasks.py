@@ -14,7 +14,6 @@ from django.contrib.auth.models import User
 
 from course_catalog.api import (
     generate_course_prefix_list,
-    parse_bootcamp_json_data,
     sync_ocw_course_files,
     sync_ocw_courses,
     sync_ocw_next_courses,
@@ -346,22 +345,6 @@ def upload_ocw_parsed_json():
 
 
 @app.task
-def get_bootcamp_data(force_overwrite=False):
-    """
-    Task to create/update courses from bootcamp.json
-    """
-    if not settings.BOOTCAMPS_URL:
-        log.warning("Required settings missing for get_bootcamp_data")
-        return
-
-    response = requests.get(settings.BOOTCAMPS_URL)
-    if response.status_code == 200:
-        bootcamp_json = response.json()
-        for bootcamp in bootcamp_json:
-            parse_bootcamp_json_data(bootcamp, force_overwrite=force_overwrite)
-
-
-@app.task
 def get_micromasters_data():
     """Execute the MicroMasters ETL pipeline"""
     pipelines.micromasters_etl()
@@ -385,24 +368,6 @@ def get_mitxonline_data():
 def get_oll_data():
     """Execute the OLL ETL pipeline"""
     pipelines.oll_etl()
-
-
-@app.task
-def get_see_data():
-    """Execute the SEE ETL pipeline"""
-    pipelines.see_etl()
-
-
-@app.task
-def get_mitpe_data():
-    """Execute the MITPE ETL pipeline"""
-    pipelines.mitpe_etl()
-
-
-@app.task
-def get_csail_data():
-    """Execute the CSAIL ETL pipeline"""
-    pipelines.csail_etl()
 
 
 @app.task

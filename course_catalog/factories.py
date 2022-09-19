@@ -183,7 +183,6 @@ class CourseFactory(AbstractCourseFactory):
             PlatformType.micromasters.value,
             PlatformType.xpro.value,
             PlatformType.oll.value,
-            PlatformType.bootcamps.value,
         )
     )
     department = factory.List([FuzzyChoice(OCW_DEPARTMENTS.keys())])
@@ -211,7 +210,6 @@ class LearningResourceRunFactory(AbstractCourseFactory):
             PlatformType.micromasters.value,
             PlatformType.xpro.value,
             PlatformType.oll.value,
-            PlatformType.bootcamps.value,
         )
     )
     content_object = factory.SubFactory(CourseFactory)

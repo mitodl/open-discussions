@@ -19,10 +19,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.tasks import (
-    get_bootcamp_data,
-    get_csail_data,
     get_micromasters_data,
-    get_mitpe_data,
     get_mitx_data,
     get_mitxonline_data,
     get_mitxonline_files,
@@ -33,7 +30,6 @@ from course_catalog.tasks import (
     get_ocw_next_data,
     get_oll_data,
     get_podcast_data,
-    get_see_data,
     get_video_topics,
     get_xpro_data,
     get_xpro_files,
@@ -65,20 +61,6 @@ def mock_logger(mocker):
     Mock log exception
     """
     return mocker.patch("course_catalog.api.log.exception")
-
-
-@pytest.fixture
-def mock_get_bootcamps(mocker):
-    """
-    Mock the call to get bootcamps json
-    """
-    with open("test_json/bootcamps.json", "r") as bootcamp_file:
-        bootcamp_json = json.load(bootcamp_file)
-
-    mocker.patch(
-        "requests.get",
-        return_value=Mock(status_code=200, json=Mock(return_value=bootcamp_json)),
-    )
 
 
 @pytest.fixture
@@ -556,27 +538,6 @@ def test_import_all_mitxonline_files(settings, mocker, mocked_celery, mock_block
     )
 
 
-def test_process_bootcamps(mock_get_bootcamps):
-    """
-    Test that bootcamp json data is properly parsed
-    """
-    get_bootcamp_data.delay()
-    assert Course.objects.filter(platform=PlatformType.bootcamps.value).count() == 3
-
-    bootcamp = Course.objects.get(course_id="Bootcamp1")
-    assert bootcamp.title == "MIT HMS Healthcare Innovation Bootcamp"
-
-    bootcamp = Course.objects.get(course_id="Bootcamp2")
-    assert bootcamp.title == "MIT Deep Technology Bootcamp"
-
-    bootcamp = Course.objects.get(course_id="Bootcamp3")
-    assert bootcamp.title == "MIT Sports Entrepreneurship Bootcamp"
-
-    get_bootcamp_data.delay()
-
-    assert Course.objects.filter(platform=PlatformType.bootcamps.value).count() == 3
-
-
 def test_get_micromasters_data(mocker):
     """Verify that the get_micromasters_data invokes the MicroMasters ETL pipeline"""
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
@@ -606,27 +567,6 @@ def test_get_oll_data(mocker):
     mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
     get_oll_data.delay()
     mock_pipelines.oll_etl.assert_called_once_with()
-
-
-def test_get_see_data(mocker):
-    """Verify that get_see_data invokes the SEE ETL pipeline"""
-    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
-    get_see_data.delay()
-    mock_pipelines.see_etl.assert_called_once_with()
-
-
-def test_get_mitpe_data(mocker):
-    """Verify that get_mitpe_data invokes the MITPE ETL pipeline"""
-    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
-    get_mitpe_data.delay()
-    mock_pipelines.mitpe_etl.assert_called_once_with()
-
-
-def test_get_csail_data(mocker):
-    """Verify that get_mitpe_data invokes the CSAIL ETL pipeline"""
-    mock_pipelines = mocker.patch("course_catalog.tasks.pipelines")
-    get_csail_data.delay()
-    mock_pipelines.csail_etl.assert_called_once_with()
 
 
 @pytest.mark.parametrize("channel_ids", [["abc", "123"], None])
