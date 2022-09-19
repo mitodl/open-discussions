@@ -27,7 +27,6 @@ from course_catalog.etl.ocw import (
 from course_catalog.etl.ocw_next import transform_ocw_next_content_files
 from course_catalog.models import Course, LearningResourceRun
 from course_catalog.serializers import (
-    CourseSerializer,
     LearningResourceRunSerializer,
     OCWNextSerializer,
     OCWSerializer,

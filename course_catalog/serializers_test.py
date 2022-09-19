@@ -5,7 +5,7 @@ import pytest
 
 from course_catalog import factories
 from course_catalog.api_test import ocw_next_valid_data  # pylint:disable=unused-import
-from course_catalog.constants import OCW_DEPARTMENTS, ListType, OfferedBy, PlatformType
+from course_catalog.constants import OCW_DEPARTMENTS, ListType, OfferedBy
 from course_catalog.factories import (
     CourseFactory,
     CourseInstructorFactory,

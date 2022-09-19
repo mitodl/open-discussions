@@ -8,7 +8,6 @@ import boto3
 import celery
 import pytz
 import rapidjson
-import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 

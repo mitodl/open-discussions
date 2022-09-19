@@ -3,7 +3,6 @@ Test tasks
 """
 import json
 from contextlib import contextmanager
-from unittest.mock import Mock
 
 import boto3
 import pytest
