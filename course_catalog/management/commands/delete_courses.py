@@ -8,7 +8,7 @@ from search.task_helpers import delete_course, delete_video
 
 
 class Command(BaseCommand):
-    """Delete objects of a specific platform from database"""
+    """Delete courses of a specific platform from database"""
 
     help = """Delete courses from database"""
 
@@ -17,7 +17,7 @@ class Command(BaseCommand):
             "platform",
             nargs="+",
             type=str,
-            help="Delete all courses from this platform",
+            help="Delete all courses from the specified platform(s)",
         )
 
     def handle(self, *args, **options):
@@ -28,9 +28,3 @@ class Command(BaseCommand):
                 course.delete()
                 idx += 1
             sys.stdout.write(f"Removed {idx} courses from platform {platform}\n")
-            idx = 0
-            for video in Video.objects.filter(platform=platform):
-                delete_video(video)
-                video.delete()
-                idx += 1
-            sys.stdout.write(f"Removed {idx} videos from platform {platform}\n")
