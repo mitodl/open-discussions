@@ -25,6 +25,7 @@ import {
 import { GridColumn, GridContainer } from "../components/layout"
 
 import axios from "../libs/axios"
+import { useHistory } from "react-router"
 
 const ALLOWED_TYPES = ["program", "course"]
 const pageSize = SETTINGS.search_page_size
@@ -110,6 +111,7 @@ const SearchPage: React.FC = () => {
     []
   )
 
+  const history = useHistory()
   const {
     updateText,
     loadMore,
@@ -129,7 +131,8 @@ const SearchPage: React.FC = () => {
     // this is the 'loaded' value, which is what useCourseSearch uses
     // to determine whether to fire off a request or not.
     completedInitialLoad && !requestInFlight,
-    pageSize
+    pageSize,
+    history
   )
 
   return (
@@ -148,7 +151,6 @@ const SearchPage: React.FC = () => {
                 onChange={updateText}
                 value={text || ""}
                 onClear={clearText}
-                //@ts-expect-error - types need to be fixed in course-search-utils
                 onSubmit={onSubmit}
                 autoFocus
               />
@@ -165,7 +167,6 @@ const SearchPage: React.FC = () => {
               facetMap={facetMap}
               facetOptions={facetOptions}
               activeFacets={activeFacets}
-              //@ts-expect-error - types need to be fixed in course-search-utils
               onUpdateFacets={onUpdateFacets}
               clearAllFilters={clearAllFilters}
               toggleFacet={toggleFacet}

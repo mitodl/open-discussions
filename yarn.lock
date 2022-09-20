@@ -1511,7 +1511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:7.18.3, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.3.4, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.4.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.7.6, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
+"@babel/runtime@npm:7.18.3, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.12.1, @babel/runtime@npm:^7.12.5, @babel/runtime@npm:^7.2.0, @babel/runtime@npm:^7.3.4, @babel/runtime@npm:^7.4.4, @babel/runtime@npm:^7.4.5, @babel/runtime@npm:^7.5.5, @babel/runtime@npm:^7.7.2, @babel/runtime@npm:^7.8.4, @babel/runtime@npm:^7.9.2":
   version: 7.18.3
   resolution: "@babel/runtime@npm:7.18.3"
   dependencies:
@@ -3887,17 +3887,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mitodl/course-search-utils@npm:^1.8.0":
-  version: 1.8.0
-  resolution: "@mitodl/course-search-utils@npm:1.8.0"
+"@mitodl/course-search-utils@npm:^2.0.1":
+  version: 2.0.2
+  resolution: "@mitodl/course-search-utils@npm:2.0.2"
   dependencies:
     bodybuilder: ^2.5.0
-    history: ^5.0.0
+    history: ^4.9 || ^5.0.0
     query-string: ^6.13.1
     ramda: ^0.27.1
   peerDependencies:
     react: ^16.13.1
-  checksum: f20a26dc63f5934a11ba77f30624fa7b77f4e6f9bc93fa5640117b166e0016bdc3d3eaa71fad3fde634cd02cb155ef1db81b95091cde7d6478e94905f2e2f233
+  checksum: 79735b608cce70bc7b8307b0239177c120b1ad952380605f3cdd4f466fcacfd2d824697f96de6efecc6aaddd0c0ae6d0dca3542ea39da71a73e9f5e25874e084
   languageName: node
   linkType: hard
 
@@ -12441,20 +12441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:4.7.2":
-  version: 4.7.2
-  resolution: "history@npm:4.7.2"
-  dependencies:
-    invariant: ^2.2.1
-    loose-envify: ^1.2.0
-    resolve-pathname: ^2.2.0
-    value-equal: ^0.4.0
-    warning: ^3.0.0
-  checksum: 66ffc537ceb9ed8e092ea31e2090d1888abba67e830549aa669cecb4cf0f06a234ae7d616f92904bdcb5cbf428acefe6fc3451d8e5edcb05172b61f1567e0061
-  languageName: node
-  linkType: hard
-
-"history@npm:^4.9.0":
+"history@npm:^4.10, history@npm:^4.9 || ^5.0.0, history@npm:^4.9.0":
   version: 4.10.1
   resolution: "history@npm:4.10.1"
   dependencies:
@@ -12465,15 +12452,6 @@ __metadata:
     tiny-warning: ^1.0.0
     value-equal: ^1.0.1
   checksum: addd84bc4683929bae4400419b5af132ff4e4e9b311a0d4e224579ea8e184a6b80d7f72c55927e4fa117f69076a9e47ce082d8d0b422f1a9ddac7991490ca1d0
-  languageName: node
-  linkType: hard
-
-"history@npm:^5.0.0":
-  version: 5.3.0
-  resolution: "history@npm:5.3.0"
-  dependencies:
-    "@babel/runtime": ^7.7.6
-  checksum: d73c35df49d19ac172f9547d30a21a26793e83f16a78386d99583b5bf1429cc980799fcf1827eb215d31816a6600684fba9686ce78104e23bd89ec239e7c726f
   languageName: node
   linkType: hard
 
@@ -12876,6 +12854,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
+    "@mitodl/course-search-utils": ^2.0.1
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
@@ -12898,7 +12877,7 @@ __metadata:
     react-dom: ^16.14
     react-helmet-async: ^1.3.0
     react-query: ^3.39.1
-    react-router: ^5.1.2
+    react-router: ^5.3.3
     react-router-dom: ^5.1.2
     rmwc: 5.7.1
     style-loader: ^3.3.1
@@ -13000,7 +12979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"invariant@npm:^2.2.0, invariant@npm:^2.2.1, invariant@npm:^2.2.2, invariant@npm:^2.2.4":
+"invariant@npm:^2.2.0, invariant@npm:^2.2.2, invariant@npm:^2.2.4":
   version: 2.2.4
   resolution: "invariant@npm:2.2.4"
   dependencies:
@@ -16659,6 +16638,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
+    "@mitodl/course-search-utils": ^2.0.1
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
     lodash: ^4.17.21
@@ -16684,7 +16664,7 @@ __metadata:
     qs: ^6.11.0
   peerDependencies:
     react: ^16.10 || 17 || 18
-    react-router: ^5 || ^6
+    react-router: ^5.3.3
     styled-components: 5
   languageName: unknown
   linkType: soft
@@ -16778,7 +16758,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "open-discussions-root@workspace:."
   dependencies:
-    "@mitodl/course-search-utils": ^1.8.0
     "@swc/core": ^1.2.207
     "@swc/jest": ^0.2.21
     "@testing-library/jest-dom": ^5.16.4
@@ -16852,7 +16831,7 @@ __metadata:
     "@material/snackbar": 0.44.0
     "@material/toolbar": 0.4.4
     "@mitodl/ckeditor-custom-build": 0.0.4
-    "@mitodl/course-search-utils": ^1.8.0
+    "@mitodl/course-search-utils": ^2.0.1
     "@mitodl/mdl-react-components": 0.0.3
     "@reduxjs/toolkit": 1.4.0
     "@sentry/browser": 5.5.0
@@ -16895,7 +16874,7 @@ __metadata:
     focus-visible: 5.1.0
     formik: 2.0.3
     fuse.js: 6.0.0
-    history: 4.7.2
+    history: ^4.10
     html-entities: 1.2.1
     isomorphic-fetch: 2.2.1
     jsdom: 16.6.0
@@ -16945,7 +16924,7 @@ __metadata:
     react-meta-tags: 0.4.1
     react-onclickoutside: 6.7.1
     react-redux: 7.1.0
-    react-router: ^5.1.2
+    react-router: ^5.3.3
     react-router-dom: ^5.1.2
     react-scrollbar: 0.5.4
     react-select: 3.0.8
@@ -19296,7 +19275,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-router@npm:5.3.3, react-router@npm:^5.1.2":
+"react-router@npm:5.3.3, react-router@npm:^5.3.3":
   version: 5.3.3
   resolution: "react-router@npm:5.3.3"
   dependencies:
@@ -20105,13 +20084,6 @@ __metadata:
   version: 5.0.0
   resolution: "resolve-from@npm:5.0.0"
   checksum: 4ceeb9113e1b1372d0cd969f3468fa042daa1dd9527b1b6bb88acb6ab55d8b9cd65dbf18819f9f9ddf0db804990901dcdaade80a215e7b2c23daae38e64f5bdf
-  languageName: node
-  linkType: hard
-
-"resolve-pathname@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "resolve-pathname@npm:2.2.0"
-  checksum: c12eb87f04d6a6101aa44080c4c2f25b8fab49db8c43823a142614e1f5fb359f7c511a02b0f1089919778da79af99b3a11b8991556b51b494f30be4b2ee3748b
   languageName: node
   linkType: hard
 
@@ -22777,13 +22749,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"value-equal@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "value-equal@npm:0.4.0"
-  checksum: 8a9b4b866705470d4d6a2e01bda24a75dd435fe0ea3a8bef003f67780a58116e65e795db4d018caf2e4b8bee336ee7787c338322325fc3a7dac8cbb8064ebca8
-  languageName: node
-  linkType: hard
-
 "value-equal@npm:^1.0.1":
   version: 1.0.1
   resolution: "value-equal@npm:1.0.1"
@@ -22905,15 +22870,6 @@ __metadata:
   dependencies:
     makeerror: 1.0.12
   checksum: ad7a257ea1e662e57ef2e018f97b3c02a7240ad5093c392186ce0bcf1f1a60bbadd520d073b9beb921ed99f64f065efb63dfc8eec689a80e569f93c1c5d5e16c
-  languageName: node
-  linkType: hard
-
-"warning@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "warning@npm:3.0.0"
-  dependencies:
-    loose-envify: ^1.0.0
-  checksum: c9f99a12803aab81b29858e7dc3415bf98b41baee3a4c3acdeb680d98c47b6e17490f1087dccc54432deed5711a5ce0ebcda2b27e9b5eb054c32ae50acb4419c
   languageName: node
   linkType: hard
 

@@ -124,15 +124,18 @@ describe("SearchPage", () => {
 
   test("should filter by facets", async () => {
     setMockResponse.post("search/", makeSearchResponse())
-    await renderTestApp({ url: "/search" })
+    const { history } = await renderTestApp({ url: "/search" })
 
-    await waitFor(async () => {
-      await fireEvent.click(screen.getByDisplayValue("MITx"))
+    await fireEvent.click(await screen.findByDisplayValue("MITx"))
+
+    await waitFor(() => {
+      expect(history.location.search).toBe("?o=MITx")
     })
 
     await waitFor(async () => {
       await fireEvent.click(screen.getByText("Clear All"))
     })
+
     expect(makeRequest.mock.calls[0][0]).toEqual("post")
     expect(makeRequest.mock.calls[0][1]).toEqual("search/")
     expect(makeRequest.mock.calls[0][2]).toMatchObject(

@@ -128,11 +128,12 @@ export function Results(props: ResultProps) {
 }
 
 type Props = {
-  match: Match
+  match: Match,
+  history: Object
 }
 
 export default function CourseSearchPage(props: Props) {
-  const { match } = props
+  const { match, history } = props
 
   const { results, facets, suggest, total, loaded, processing, error } =
     useSelector(courseSearchSelector)
@@ -183,7 +184,8 @@ export default function CourseSearchPage(props: Props) {
     clearSearchCB,
     facets,
     loaded,
-    SETTINGS.search_page_size
+    SETTINGS.search_page_size,
+    history
   )
 
   const deviceWidth = useWidth()
