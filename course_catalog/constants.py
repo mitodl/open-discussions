@@ -18,8 +18,6 @@ class OfferedBy(Enum):
     bootcamps = "Bootcamps"
     xpro = "xPRO"
     oll = "Open Learning Library"
-    see = "Sloan Executive Education"
-    mitpe = "Professional Education"
     csail = "CSAIL"
 
 
@@ -36,8 +34,6 @@ class PlatformType(Enum):
     xpro = "xpro"
     oll = "oll"
     youtube = "youtube"
-    see = "see"
-    mitpe = "mitpe"
     podcast = "podcast"
     csail = "csail"
 
@@ -111,39 +107,6 @@ OFFERED_BY_MAPPINGS = {
 }
 
 semester_mapping = {"1T": "spring", "2T": "summer", "3T": "fall"}
-
-mitpe_edx_mapping = {
-    "Biotechnology & Pharmaceutical": ["Biological Engineering"],
-    "Computer Science": ["Computer Science"],
-    "Crisis Management": ["Management"],
-    "Data Modeling & Analytics": ["Computer Science"],
-    "Digital Transformation": ["Information Technology"],
-    "Design & Manufacturing": ["Systems Engineering"],
-    "Energy & Sustainability": ["Energy", "Earth Science"],
-    "Imaging": ["Computer Science", "Electrical Engineering"],
-    "Innovation": ["Innovation"],
-    "Leadership & Communication": ["Leadership", "Communication"],
-    "Legal Tech": ["Information Technology", "Legal Studies"],
-    "Radar": ["Electrical Engineering"],
-    "Real Estate": ["Real Estate"],
-    "Systems Engineering": ["Systems Engineering"],
-}
-
-see_edx_mapping = {
-    "Business Analytics": ["Management"],
-    "Digital Business & IT": ["Management", "Information Technology"],
-    "Entrepreneurship": ["Entrepreneurship"],
-    "Family Enterprise": ["Management"],
-    "Financial Management": ["Management", "Finance"],
-    "Global Economics & Markets": ["Economics", "Globalization"],
-    "Marketing": ["Marketing"],
-    "Negotiation & Communication": ["Management", "Leadership", "Business Ethics"],
-    "Operations": ["Operations Management"],
-    "Organizations & Leadership": ["Organizational Behavior", "Leadership"],
-    "Strategy & Innovation": ["Innovation"],
-    "Systems Thinking": ["Management"],
-    "Business & Management": ["Management"],
-}
 
 VALID_TEXT_FILE_TYPES = [
     ".pdf",

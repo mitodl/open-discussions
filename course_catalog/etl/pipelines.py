@@ -4,9 +4,6 @@ from toolz import compose, curry, curried
 from course_catalog.etl import (
     micromasters,
     loaders,
-    see,
-    mitpe,
-    csail,
     mitx,
     xpro,
     mitxonline,
@@ -93,24 +90,6 @@ mitx_etl = compose(
 )
 
 oll_etl = compose(load_courses(PlatformType.oll.value), oll.transform, oll.extract)
-
-see_etl = compose(
-    load_courses(PlatformType.see.value, config=CourseLoaderConfig(prune=False)),
-    see.transform,
-    see.extract,
-)
-
-mitpe_etl = compose(
-    load_courses(PlatformType.mitpe.value, config=CourseLoaderConfig(prune=False)),
-    mitpe.transform,
-    mitpe.extract,
-)
-
-csail_etl = compose(
-    load_courses(PlatformType.csail.value, config=CourseLoaderConfig(prune=False)),
-    csail.transform,
-    csail.extract,
-)
 
 youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)
 

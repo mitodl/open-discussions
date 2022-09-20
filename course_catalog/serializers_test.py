@@ -5,7 +5,7 @@ import pytest
 
 from course_catalog import factories
 from course_catalog.api_test import ocw_next_valid_data  # pylint:disable=unused-import
-from course_catalog.constants import OCW_DEPARTMENTS, ListType, OfferedBy, PlatformType
+from course_catalog.constants import OCW_DEPARTMENTS, ListType, OfferedBy
 from course_catalog.factories import (
     CourseFactory,
     CourseInstructorFactory,
@@ -50,7 +50,6 @@ datetime_millis_format = "%Y-%m-%dT%H:%M:%S.%fZ"
         OfferedBy.xpro.value,
         OfferedBy.micromasters.value,
         OfferedBy.ocw.value,
-        OfferedBy.bootcamps.value,
     ],
 )
 def test_serialize_course_related_models(offered_by):
@@ -88,19 +87,6 @@ def test_serialize_courserun_related_models():
     assert len(serializer.data["instructors"]) == 2
     for attr in ("first_name", "last_name", "full_name"):
         assert attr in serializer.data["instructors"][0].keys()
-
-
-def test_serialize_bootcamp_related_models():
-    """
-    Verify that a serialized bootcamp course contains attributes for related objects
-    """
-    bootcamp = CourseFactory.create(
-        topics=CourseTopicFactory.create_batch(3), platform=PlatformType.bootcamps.value
-    )
-    serializer = CourseSerializer(bootcamp)
-    assert len(serializer.data["topics"]) == 3
-    assert "name" in serializer.data["topics"][0].keys()
-    assert len(serializer.data["runs"]) == 3
 
 
 def test_serialize_program_related_models():

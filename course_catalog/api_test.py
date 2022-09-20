@@ -18,7 +18,6 @@ from course_catalog.api import (
     generate_course_prefix_list,
     get_course_availability,
     ocw_parent_folder,
-    parse_bootcamp_json_data,
     sync_ocw_course,
     sync_ocw_course_files,
     sync_ocw_next_course,
@@ -145,7 +144,7 @@ def ocw_valid_data():
 @pytest.fixture
 def ocw_next_valid_data():
     """
-    Return valid bootcamp data
+    Return valid ocw-next data
     """
     return {
         "course_title": "Unified Engineering I, II, III, \u0026 IV",
@@ -205,49 +204,6 @@ def ocw_next_valid_data():
             "title": "16-01f05.jpg",
             "uid": "8f56bbb3-5d0e-456d-c8b7-0911bec7cd0d",
         },
-    }
-
-
-@pytest.fixture
-def bootcamp_valid_data():
-    """
-    Return valid bootcamp data
-    """
-    return {
-        "course_id": "BootcampTest1",
-        "title": "Test Bootcamp",
-        "short_description": "The MIT Test Bootcamp",
-        "level": None,
-        "semester": None,
-        "language": None,
-        "platform": "Bootcamps",
-        "year": 2019,
-        "full_description": "<p>The Test Bootcamp is now open.</p>",
-        "start_date": "2019-06-15T00:00:01Z",
-        "end_date": "2019-06-21T23:59:59Z",
-        "enrollment_start": None,
-        "enrollment_end": "2019-04-15T23:59:59Z",
-        "image_src": "https://bootcamp.mit.edu/wp-content/uploads/2019/01/healthcare-600x231.png",
-        "image_description": None,
-        "featured": False,
-        "published": True,
-        "availability": "starting soon",
-        "url": "https://bootcamp.mit.edu/entrepreneurship/healthcare-innovation/",
-        "last_modified": "2019-05-08T13:18:17.507967Z",
-        "program_type": None,
-        "program_name": None,
-        "location": None,
-        "instructors": [],
-        "learning_resource_type": "course",
-        "topics": [
-            {"name": "Business & Management"},
-            {"name": "Entrepreneurship"},
-            {"name": "Innovation"},
-        ],
-        "prices": [
-            {"price": 8500, "mode": "Early Bird"},
-            {"price": 9500, "mode": "Standard"},
-        ],
     }
 
 
@@ -446,44 +402,6 @@ def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
     ocw_next_valid_data.pop("primary_course_number")
     digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, course_prefix)
     assert not Course.objects.count()
-
-
-def test_deserializing_a_valid_bootcamp(bootcamp_valid_data):
-    """
-    Verify that parse_bootcamp_json_data successfully creates a Bootcamp model instance
-    """
-    parse_bootcamp_json_data(bootcamp_valid_data)
-    bootcamp = Course.objects.filter(platform=PlatformType.bootcamps.value).first()
-    assert bootcamp.offered_by.count() == 1
-    assert bootcamp.offered_by.first().name == OfferedBy.bootcamps.value
-    assert bootcamp.runs.count() == 1
-    assert bootcamp.runs.first().offered_by.count() == 1
-    assert bootcamp.runs.first().offered_by.first().name == OfferedBy.bootcamps.value
-
-
-def test_deserializing_an_invalid_bootcamp_run(bootcamp_valid_data, mocker):
-    """
-    Verifies that parse_bootcamp_json_data does not create a new Course run if the serializer is invalid
-    """
-    mocker.patch(
-        "course_catalog.api.LearningResourceRunSerializer.is_valid", return_value=False
-    )
-    mocker.patch(
-        "course_catalog.api.LearningResourceRunSerializer.errors",
-        return_value={"error": "Bad data"},
-    )
-    parse_bootcamp_json_data(bootcamp_valid_data)
-    assert LearningResourceRun.objects.count() == 0
-
-
-def test_deserialzing_an_invalid_bootcamp(bootcamp_valid_data):
-    """
-    Verifies that parse_bootcamp_json_data does not create a new Course if the serializer is invalid
-    """
-    bootcamp_valid_data.pop("course_id")
-    parse_bootcamp_json_data(bootcamp_valid_data)
-    assert Course.objects.count() == 0
-    assert LearningResourceRun.objects.count() == 0
 
 
 def test_get_course_availability(mitx_valid_data):

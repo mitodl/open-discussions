@@ -38,15 +38,13 @@ def test_cascade_delete_listitems(kwargs):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize(
-    "platform", [PlatformType.bootcamps.value, PlatformType.ocw.value]
-)
+@pytest.mark.parametrize("platform", [PlatformType.xpro.value, PlatformType.ocw.value])
 def test_course_audience(platform):
     """
     Should return the correct audience for the course
     """
     course = CourseFactory.create(platform=platform)
-    if platform == PlatformType.bootcamps.value:
+    if platform == PlatformType.xpro.value:
         assert course.audience == ["Professional Offerings"]
     else:
         assert course.audience == ["Open Content"]
@@ -55,7 +53,7 @@ def test_course_audience(platform):
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     "platform",
-    [PlatformType.bootcamps.value, PlatformType.ocw.value, PlatformType.mitx.value],
+    [PlatformType.xpro.value, PlatformType.ocw.value, PlatformType.mitx.value],
 )
 @pytest.mark.parametrize(
     "availability", [availability_type.value for availability_type in AvailabilityType]
@@ -67,7 +65,7 @@ def test_course_certification(platform, availability):
     course = CourseFactory.create(platform=platform)
     course.runs.set([LearningResourceRunFactory(availability=availability)])
 
-    if platform == PlatformType.bootcamps.value:
+    if platform == PlatformType.xpro.value:
         assert course.certification == ["Certificates"]
     elif platform == PlatformType.ocw.value:
         assert course.certification == []
@@ -132,9 +130,7 @@ def test_userlist_audience():
     """
     user_list = UserListFactory.create()
     open_learning_resource = CourseFactory.create(platform=PlatformType.ocw.value)
-    not_open_learning_resource = CourseFactory.create(
-        platform=PlatformType.bootcamps.value
-    )
+    not_open_learning_resource = CourseFactory.create(platform=PlatformType.xpro.value)
 
     UserListItemFactory.create(
         user_list=user_list, content_object=open_learning_resource

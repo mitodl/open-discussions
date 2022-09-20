@@ -26,11 +26,7 @@ PROFESSIONAL = "Professional Offerings"
 CERTIFICATE = "Certificates"
 
 PROFESSIONAL_COURSE_PLATFORMS = [
-    PlatformType.bootcamps.value,
     PlatformType.xpro.value,
-    PlatformType.see.value,
-    PlatformType.mitpe.value,
-    PlatformType.csail.value,
 ]
 
 

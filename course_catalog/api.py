@@ -27,7 +27,6 @@ from course_catalog.etl.ocw import (
 from course_catalog.etl.ocw_next import transform_ocw_next_content_files
 from course_catalog.models import Course, LearningResourceRun
 from course_catalog.serializers import (
-    CourseSerializer,
     LearningResourceRunSerializer,
     OCWNextSerializer,
     OCWSerializer,
@@ -300,86 +299,6 @@ def get_course_availability(course):
         for run in runs:
             if run.get("key") == course.course_id:
                 return run.get("availability")
-
-
-def parse_bootcamp_json_data(bootcamp_data, force_overwrite=False):
-    """
-    Main function to parse bootcamp json data for one bootcamp
-
-    Args:
-        bootcamp_data (dict): The JSON object representing the bootcamp
-        force_overwrite (bool): A boolean value to force the incoming bootcamp data to overwrite existing data
-    """
-    # Get the last modified date from the bootcamp
-    bootcamp_modified = bootcamp_data.get("last_modified")
-
-    # Try and get the bootcamp instance. If it exists check to see if it needs updating
-    try:
-        bootcamp_instance = Course.objects.get(course_id=bootcamp_data.get("course_id"))
-        compare_datetime = datetime.strptime(
-            bootcamp_modified, "%Y-%m-%dT%H:%M:%S.%fZ"
-        ).astimezone(pytz.utc)
-        if compare_datetime <= bootcamp_instance.last_modified and not force_overwrite:
-            log.debug(
-                "(%s, %s) skipped",
-                bootcamp_data.get("key"),
-                bootcamp_data.get("course_id"),
-            )
-            return
-    except Course.DoesNotExist:
-        bootcamp_instance = None
-
-    # Overwrite platform with our own enum value
-    bootcamp_data["platform"] = PlatformType.bootcamps.value
-    bootcamp_serializer = CourseSerializer(
-        data=bootcamp_data, instance=bootcamp_instance
-    )
-    if not bootcamp_serializer.is_valid():
-        log.error(
-            "Bootcamp %s is not valid: %s",
-            bootcamp_data.get("course_id"),
-            bootcamp_serializer.errors,
-        )
-        return
-
-    # Make changes atomically so we don't end up with partially saved/deleted data
-    with transaction.atomic():
-        bootcamp = bootcamp_serializer.save()
-        load_offered_bys(bootcamp, [{"name": OfferedBy.bootcamps.value}])
-
-        # Try and get the LearningResourceRun instance.
-        try:
-            run_instance = bootcamp.runs.get(run_id=bootcamp.course_id)
-        except LearningResourceRun.DoesNotExist:
-            run_instance = None
-        run_serializer = LearningResourceRunSerializer(
-            data={
-                **bootcamp_data,
-                "key": bootcamp_data.get("course_id"),
-                "staff": bootcamp_data.get("instructors"),
-                "seats": bootcamp_data.get("prices"),
-                "start": bootcamp_data.get("start_date"),
-                "end": bootcamp_data.get("end_date"),
-                "run_id": bootcamp.course_id,
-                "max_modified": bootcamp_modified,
-                "content_type": ContentType.objects.get(model="course").id,
-                "object_id": bootcamp.id,
-                "url": bootcamp.url,
-            },
-            instance=run_instance,
-        )
-        if not run_serializer.is_valid():
-            log.error(
-                "Bootcamp LearningResourceRun %s is not valid: %s",
-                bootcamp_data.get("key"),
-                run_serializer.errors,
-            )
-            return
-        run = run_serializer.save()
-
-        load_offered_bys(run, [{"name": OfferedBy.bootcamps.value}])
-
-    upsert_course(bootcamp.id)
 
 
 def sync_ocw_course_files(ids=None):
