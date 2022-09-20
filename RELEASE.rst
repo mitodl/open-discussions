@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.199.3
+Version 0.199.3 (Released September 20, 2022)
 ---------------
 
 - Wider widget sidebar; more consistent breakpoints (#3742)
