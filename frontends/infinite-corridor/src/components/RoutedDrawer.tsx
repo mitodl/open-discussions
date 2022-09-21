@@ -31,6 +31,9 @@ type RoutedDrawerProps<K extends string, R extends K> = {
  *
  * The drawer content is a render function called with the URL parameters as
  * props.
+ *
+ * The goal here is twofold:
+ *  1. Make route-controlled drawers easy
  */
 const RoutedDrawer = <K extends string, R extends K>(
   props: RoutedDrawerProps<K, R>
