@@ -18,13 +18,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       width:      440,
       height:     239
     })
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
 
     expect(screen.getByText(resource.title)).toBeInTheDocument()
 
@@ -51,13 +45,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   it("renders the expected fields for a video", () => {
     const resource = makeVideoResult()
 
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={null}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
 
     expect(screen.getByText(resource.title)).toBeInTheDocument()
 
@@ -85,13 +73,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     ({ certification, hasCertificate }) => {
       const resource = makeMinimalResoure({ certification })
 
-      render(
-        <ExpandedLearningResourceDisplay
-          object={resource}
-          runId={resource.runs[0].id}
-          setShowResourceDrawer={null}
-        />
-      )
+      render(<ExpandedLearningResourceDisplay resource={resource} />)
       const certIcon = screen.queryByAltText("Receive a certificate", {
         exact: false
       })
@@ -101,13 +83,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("renders the default cover image if none exists", () => {
     const resource = makeMinimalResoure({ image_src: null })
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
 
     const coverImg = screen.getByAltText("")
     expect(coverImg.src).toContain("default_resource_thumb.jpg")
@@ -115,13 +91,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("renders the run url if it is set", () => {
     const resource = makeMinimalResoure()
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
     const link = screen.getByRole("link")
     expect(link.href).toBe(resource.runs[0].url.toLowerCase())
   })
@@ -131,13 +101,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     resource.runs[0].url = null
     resource.url = "www.aurl.com"
 
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
     const link = screen.getByRole("link")
     expect(link.href).toContain(resource.url)
   })
@@ -150,13 +114,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     ({ numRuns, hasDropdown }) => {
       const resource = makeMinimalResoure()
       resource.runs = resource.runs.slice(0, numRuns)
-      render(
-        <ExpandedLearningResourceDisplay
-          object={resource}
-          runId={resource.runs[0].id}
-          setShowResourceDrawer={null}
-        />
-      )
+      render(<ExpandedLearningResourceDisplay resource={resource} />)
       const runDropdown = screen.queryByRole("combobox")
       expect(runDropdown === null).not.toBe(hasDropdown)
     }
@@ -171,38 +129,20 @@ describe("ExpandedLearningResourceDisplay", () => {
   ])("should render the course language", ({ languageCode, language }) => {
     const resource = makeMinimalResoure()
     resource.runs[0].language = languageCode
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
     expect(screen.getByText(language)).toBeInTheDocument()
   })
 
   it("formats and renders the cost", () => {
     const resource = makeMinimalResoure()
     resource.runs[0].prices = [{ price: 25.5, mode: "" }]
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
     expect(screen.getByText("$25.50")).toBeInTheDocument()
   })
 
   it("has a share button with the direct url for the resource", async () => {
     const resource = makeMinimalResoure()
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    render(<ExpandedLearningResourceDisplay resource={resource} />)
 
     const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
 

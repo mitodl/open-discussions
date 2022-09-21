@@ -86,6 +86,7 @@ export const makeProgramResult: Factory<
     [OPEN_CONTENT, PROFESSIONAL]
   ]),
   certification: casual.random_element([[], [CERTIFICATE]]),
+  platform:      faker.word.noun(),
   ...overrides
 })
 
@@ -105,6 +106,7 @@ export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
   lists:             [],
   audience:          [],
   certification:     [],
+  platform:          faker.word.noun(),
   ...overrides
 })
 
@@ -192,14 +194,15 @@ export const makeTopic: Factory<CourseTopic> = overrides => {
 
 export const makeLearningResource: Factory<LearningResource> = overrides => {
   const resource: LearningResource = {
-    id:          faker.unique(faker.datatype.number),
-    title:       faker.lorem.words(),
-    image_src:   new URL(faker.internet.url()).toString(),
-    topics:      times(2, () => makeTopic()),
-    object_type: makeLearningResourceType(),
-    platform:    faker.lorem.word(),
-    runs:        times(3, () => makeRun()),
-    lists:       [],
+    id:            faker.unique(faker.datatype.number),
+    title:         faker.lorem.words(),
+    image_src:     new URL(faker.internet.url()).toString(),
+    topics:        times(2, () => makeTopic()),
+    object_type:   makeLearningResourceType(),
+    platform:      faker.lorem.word(),
+    runs:          times(3, () => makeRun()),
+    lists:         [],
+    certification: [],
     ...overrides
   }
   return resource

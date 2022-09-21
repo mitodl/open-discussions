@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useState } from "react"
 import striptags from "striptags"
 import { decode } from "html-entities"
 import { emptyOrNil } from "ol-util"
@@ -19,7 +19,6 @@ import {
   getReadableResourceType
 } from "../util"
 
-import { ResourceIdentifiers } from "./LearningResourceDrawer"
 import { EmbedlyCard, formatDurationClockTime } from "ol-util"
 import moment from "moment"
 
@@ -27,9 +26,7 @@ const COURSE_IMAGE_DISPLAY_HEIGHT = 239
 const COURSE_IMAGE_DISPLAY_WIDTH = 440
 
 type Props = {
-  object: LearningResourceResult
-  runId: string | number | undefined
-  setShowResourceDrawer: (params: ResourceIdentifiers | null) => void
+  resource: Omit<LearningResourceResult, "is_favorite" | "audience" | "lists">
 }
 
 const lrInfoRow = (label: string, value: string | number) => (
@@ -42,31 +39,33 @@ const lrInfoRow = (label: string, value: string | number) => (
 )
 
 export default function ExpandedLearningResourceDisplay(props: Props) {
-  const { object, runId, setShowResourceDrawer } = props
+  const { resource } = props
+  const [runId, setRunId] = useState<number | undefined>()
 
-  const hasCertificate = object.certification?.length > 0
+  const hasCertificate = resource.certification?.length > 0
 
-  const updateRun = (event: React.ChangeEvent<HTMLSelectElement>) =>
-    setShowResourceDrawer({
-      id:    object.id,
-      type:  object.object_type,
-      runId: parseInt(event.target.value)
-    })
+  const updateRun: React.ChangeEventHandler<HTMLSelectElement> = useCallback(
+    e => {
+      setRunId(Number(e.target.value))
+    },
+    []
+  )
 
-  const objectRuns = object.runs ?? []
+  const objectRuns = resource.runs ?? []
 
-  const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${object.id}&resourceType=${object.object_type}`
+  const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
 
   const selectedRun =
-    bestRun(runId ? objectRuns.filter(run => run.id === runId) : objectRuns) ||
+    bestRun(runId ? objectRuns.filter(run => run.id === runId) : objectRuns) ??
     objectRuns[0]
 
-  const url = selectedRun?.url ? selectedRun.url : object.url
+  const url = selectedRun?.url ?? resource.url
   const cost = selectedRun ? minPrice(selectedRun.prices, true) : null
 
-  const instructors = selectedRun?.instructors ?
-    selectedRun.instructors.map(instructor => getInstructorName(instructor)) :
-    []
+  const instructors =
+    selectedRun?.instructors?.map(instructor =>
+      getInstructorName(instructor)
+    ) ?? []
 
   const imageEmbedlyConfig = {
     embedlyKey: SETTINGS.embedlyKey,
@@ -78,15 +77,15 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
   return (
     <div className="expanded-lr-summary">
       <div className="object-type">
-        {getReadableResourceType(object.object_type)}
+        {getReadableResourceType(resource.object_type)}
       </div>
-      <h3 className="title">{object.title}</h3>
+      <h3 className="title">{resource.title}</h3>
       <div className="run-certification-container">
         {selectedRun ? (
           <div className="run-selector">
             <div>
               <div className="info-label">
-                {object.platform === "ocw" ? "As Taught In" : "Start Date"}
+                {resource.platform === "ocw" ? "As Taught In" : "Start Date"}
               </div>
             </div>
             <div className="select-semester-div">
@@ -94,12 +93,12 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
                 <select value={runId} onChange={updateRun}>
                   {objectRuns.map(run => (
                     <option value={run.id} key={run.id}>
-                      {getStartDate(object, run)}
+                      {getStartDate(resource.platform, run)}
                     </option>
                   ))}
                 </select>
               ) : (
-                <div>{getStartDate(object, selectedRun)}</div>
+                <div>{getStartDate(resource.platform, selectedRun)}</div>
               )}
             </div>
           </div>
@@ -107,14 +106,17 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
         {hasCertificate && <CertificateIcon />}
       </div>
       <div className="image-div">
-        {object.object_type === "video" && object.url ? (
-          <EmbedlyCard url={object.url} className="watch-video" />
+        {resource.object_type === "video" && resource.url ? (
+          <EmbedlyCard url={resource.url} className="watch-video" />
         ) : (
-          <img src={resourceThumbnailSrc(object, imageEmbedlyConfig)} alt="" />
+          <img
+            src={resourceThumbnailSrc(resource, imageEmbedlyConfig)}
+            alt=""
+          />
         )}
       </div>
       <div className="link-share-offered-by">
-        {url && object.object_type !== "video" ? (
+        {url && resource.object_type !== "video" ? (
           <div className="external-links">
             <a
               className="link-button blue-btn"
@@ -122,7 +124,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {`Take ${object.object_type}`}
+              {`Take ${resource.object_type}`}
             </a>
           </div>
         ) : null}
@@ -130,7 +132,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           <ShareTooltip
             url={learningResourcePermalink}
             placement="topLeft"
-            objectType={object.object_type}
+            objectType={resource.object_type}
           >
             <div className="share-contents">
               <i className="material-icons reply">reply</i>
@@ -141,15 +143,15 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
         <div className="offered-by">
           <span className="label">Offered by -&nbsp;</span>
           <span className="offeror">
-            {object.offered_by?.length && object.offered_by.join(", ")}
+            {resource.offered_by?.length && resource.offered_by.join(", ")}
           </span>
         </div>
       </div>
       <div className="description">
         <TruncatedText
           text={
-            object.short_description ?
-              decode(striptags(object.short_description)) :
+            resource.short_description ?
+              decode(striptags(resource.short_description)) :
               ""
           }
           lines={5}
@@ -159,14 +161,17 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
       </div>
       <div className="lr-metadata">
         <div className="section-label">Info</div>
-        {object.object_type === "video" ? (
+        {resource.object_type === "video" ? (
           <>
-            {object.duration ?
-              lrInfoRow("Duration:", formatDurationClockTime(object.duration)) :
+            {resource.duration ?
+              lrInfoRow(
+                "Duration:",
+                formatDurationClockTime(resource.duration)
+              ) :
               null}
             {lrInfoRow(
               "Date Posted:",
-              moment(object.last_modified).format("MMM D, YYYY")
+              moment(resource.last_modified).format("MMM D, YYYY")
             )}
           </>
         ) : (
@@ -176,9 +181,9 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
             {!emptyOrNil(instructors) ?
               lrInfoRow("Instructors:", instructors.join(", ")) :
               null}
-            {object.object_type === LearningResourceType.Program &&
-            object.item_count ?
-              lrInfoRow("Number of Courses:", object.item_count) :
+            {resource.object_type === LearningResourceType.Program &&
+            resource.item_count ?
+              lrInfoRow("Number of Courses:", resource.item_count) :
               null}
           </>
         )}

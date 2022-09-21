@@ -17,12 +17,10 @@ import {
   LearningResourceCardProps,
   SearchInput,
   SearchFilterDrawer,
-  FacetManifest,
-  LearningResourceDrawer,
-  useGetResourceIdentifiersFromUrl,
-  ResourceIdentifiers
+  FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
+import { useActivateResource } from "../components/LearningResourceDrawer"
 
 import axios from "../libs/axios"
 import { useHistory } from "react-router"
@@ -47,7 +45,7 @@ const imgConfig: LearningResourceCardProps["imgConfig"] = {
   height:     130
 }
 
-const SEARCH_API_URL = "search/"
+const SEARCH_API_URL = "https://discussions-rc.odl.mit.edu/api/v0/search/"
 
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
@@ -66,10 +64,8 @@ const SearchPage: React.FC = () => {
   const [requestInFlight, setRequestInFlight] = useState(false)
   const [searchApiFailed, setSearchApiFailed] = useState(false)
   const [aggregations, setAggregations] = useState<Aggregations>(new Map())
-  const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
-    useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
-  )
   const isMd = useMuiBreakpoint("md")
+  const activateResource = useActivateResource()
 
   const clearSearch = useCallback(() => {
     setSearchResults([])
@@ -208,7 +204,7 @@ const SearchPage: React.FC = () => {
                           variant="row-reverse"
                           imgConfig={imgConfig}
                           resource={hit._source}
-                          toggleDrawer={setDrawerObject}
+                          onActivate={activateResource}
                         />
                       </li>
                     ))}
@@ -221,10 +217,6 @@ const SearchPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <LearningResourceDrawer
-        drawerObject={drawerObject}
-        setDrawerObject={setDrawerObject}
-      />
     </BannerPage>
   )
 }

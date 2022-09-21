@@ -171,10 +171,10 @@ export const minPrice = (
 }
 
 export const getStartDate = (
-  object: LearningResourceResult,
+  platform: string,
   objectRun: LearningResourceRun
 ): string => {
-  if (object.platform === "ocw") {
+  if (platform === "ocw") {
     return `${capitalize(objectRun.semester || "")} ${objectRun.year || ""}`
   } else if (objectRun.start_date) {
     return moment(objectRun.start_date).format("MMMM DD, YYYY")

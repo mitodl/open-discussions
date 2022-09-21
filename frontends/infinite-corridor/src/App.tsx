@@ -10,6 +10,7 @@ import { QueryClientProvider, QueryClient } from "react-query"
 import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
+import LearningResourceDrawer from "./components/LearningResourceDrawer"
 
 export const BASE_URL = "/infinite"
 
@@ -57,6 +58,7 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
         <Route path={urls.FIELD_EDIT} exact>
           <FieldAdminApp />
         </Route>
+        <LearningResourceDrawer />
       </AppProviders>
     </div>
   )
