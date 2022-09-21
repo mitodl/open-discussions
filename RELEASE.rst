@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.199.4
+---------------
+
+- Update course-search-utils to fix routing issue (#3732)
+- Remove bootcamps, csail, mitpe, see platform courses (#3749)
+
 Version 0.199.3 (Released September 20, 2022)
 ---------------
 
