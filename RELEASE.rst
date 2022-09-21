@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.199.4
+Version 0.199.4 (Released September 21, 2022)
 ---------------
 
 - Update course-search-utils to fix routing issue (#3732)
