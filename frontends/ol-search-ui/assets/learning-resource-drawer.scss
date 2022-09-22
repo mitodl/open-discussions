@@ -129,23 +129,13 @@
     }
   }
 
-  .lr-metadata {
-    margin: 25px 0;
-  }
+}
 
-  .info-row {
-    display: flex;
-    cursor: default;
-    margin-bottom: 15px;
-
-    .col-1 {
-      min-width: 33%;
-      display: flex;
-
-      i {
-        margin-right: 8px;
-      }
-    }
+.ol-lr-info {
+  dl {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    row-gap: 15px;
   }
 }
 

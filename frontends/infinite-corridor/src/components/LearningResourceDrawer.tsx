@@ -8,6 +8,13 @@ const RESOURCE_ID_PARAM = "resource_id"
 const RESOURCE_TYPE_PARAM = "resource_type"
 const RESOURCE_PARAMS = [RESOURCE_ID_PARAM, RESOURCE_TYPE_PARAM] as const
 
+const drawerImg = {
+  ocwBaseUrl: SETTINGS.ocw_next_base_url,
+  embedlyKey: SETTINGS.embedlyKey,
+  width:      440,
+  height:     239
+}
+
 export type ResourceIdentifiers = {
   type: string
   id: number
@@ -26,7 +33,12 @@ const DrawerContent: React.FC<DrawerContentProps> = ({
   const resource = resourceQuery.data
   return (
     <div className="ic-lr-drawer">
-      {resource && <ExpandedLearningResourceDisplay resource={resource} />}
+      {resource && (
+        <ExpandedLearningResourceDisplay
+          imgConfig={drawerImg}
+          resource={resource}
+        />
+      )}
     </div>
   )
 }

@@ -21,7 +21,6 @@ import {
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
 type CardVariant = "column" | "row" | "row-reverse"
-type CardImgConfig = EmbedlyConfig
 type OnActivateCard<R extends CardMinimalResource = CardMinimalResource> = (
   resource: R
 ) => void
@@ -40,7 +39,7 @@ type LearningResourceCardProps<
   /**
    * Config used to generate embedly urls.
    */
-  imgConfig: CardImgConfig
+  imgConfig: EmbedlyConfig
   onActivate?: OnActivateCard
 }
 
@@ -155,7 +154,6 @@ export default LearningResourceCard
 export type {
   LearningResourceCardProps,
   CardMinimalResource,
-  CardImgConfig,
   CardVariant,
   OnActivateCard
 }

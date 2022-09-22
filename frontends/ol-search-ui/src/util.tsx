@@ -3,7 +3,6 @@ import {
   LearningResourceRun,
   CoursePrice,
   CourseInstructor,
-  LearningResourceResult,
   LearningResourceType as LR
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
@@ -155,16 +154,16 @@ export const CertificateIcon = () => (
 )
 
 export const minPrice = (
-  prices: Array<CoursePrice>,
+  prices: CoursePrice[],
   includeDollarSign = false
-) => {
+): string | null => {
   if (emptyOrNil(prices)) {
     return null
   }
   const price = Math.min(...prices.map(price => price.price))
 
   if (price > 0 && price !== Infinity) {
-    return includeDollarSign ? `${formatPrice(price)}` : price
+    return includeDollarSign ? `${formatPrice(price)}` : String(price)
   } else {
     return "Free"
   }

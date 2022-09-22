@@ -8,7 +8,6 @@ export { default as LearningResourceCard } from "./LearningResourceCard"
 export type {
   LearningResourceCardProps,
   OnActivateCard,
-  CardImgConfig,
   CardVariant
 } from "./LearningResourceCard"
 

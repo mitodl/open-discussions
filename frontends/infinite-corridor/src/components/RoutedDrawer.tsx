@@ -34,6 +34,8 @@ type RoutedDrawerProps<K extends string, R extends K> = {
  *
  * The goal here is twofold:
  *  1. Make route-controlled drawers easy
+ *  2. Help avoid issues where drawer content disappears before the drawer
+ *     animations are finished.
  */
 const RoutedDrawer = <K extends string, R extends K>(
   props: RoutedDrawerProps<K, R>

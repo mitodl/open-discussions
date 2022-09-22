@@ -1,13 +1,17 @@
 import React, { useCallback, useState } from "react"
 import striptags from "striptags"
 import { decode } from "html-entities"
-import { emptyOrNil } from "ol-util"
+import { propsNotNil } from "ol-util"
 
 import TruncatedText from "./TruncatedText"
 
 import ShareTooltip from "./ShareTooltip"
 
-import { LearningResourceType, LearningResourceResult } from "../interfaces"
+import {
+  LearningResourceType,
+  LearningResourceResult,
+  LearningResourceRun
+} from "../interfaces"
 import {
   bestRun,
   minPrice,
@@ -16,30 +20,25 @@ import {
   languageName,
   resourceThumbnailSrc,
   CertificateIcon,
-  getReadableResourceType
+  getReadableResourceType,
+  EmbedlyConfig
 } from "../util"
 
 import { EmbedlyCard, formatDurationClockTime } from "ol-util"
 import moment from "moment"
 
-const COURSE_IMAGE_DISPLAY_HEIGHT = 239
-const COURSE_IMAGE_DISPLAY_WIDTH = 440
-
-type Props = {
-  resource: Omit<LearningResourceResult, "is_favorite" | "audience" | "lists">
+type LearningResourceDetailsProps = {
+  resource: LearningResourceResult
+  /**
+   * Config used to generate embedly urls.
+   */
+  imgConfig: EmbedlyConfig
 }
 
-const lrInfoRow = (label: string, value: string | number) => (
-  <div className="info-row">
-    <div className="col-1">
-      <div className="label">{label}</div>
-    </div>
-    {value ? <div className="col-2 value">{value}</div> : null}
-  </div>
-)
-
-export default function ExpandedLearningResourceDisplay(props: Props) {
-  const { resource } = props
+const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
+  resource,
+  imgConfig
+}) => {
   const [runId, setRunId] = useState<number | undefined>()
 
   const hasCertificate = resource.certification?.length > 0
@@ -60,19 +59,6 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
     objectRuns[0]
 
   const url = selectedRun?.url ?? resource.url
-  const cost = selectedRun ? minPrice(selectedRun.prices, true) : null
-
-  const instructors =
-    selectedRun?.instructors?.map(instructor =>
-      getInstructorName(instructor)
-    ) ?? []
-
-  const imageEmbedlyConfig = {
-    embedlyKey: SETTINGS.embedlyKey,
-    ocwBaseUrl: SETTINGS.ocw_next_base_url,
-    width:      COURSE_IMAGE_DISPLAY_WIDTH,
-    height:     COURSE_IMAGE_DISPLAY_HEIGHT
-  }
 
   return (
     <div className="expanded-lr-summary">
@@ -109,10 +95,7 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
         {resource.object_type === "video" && resource.url ? (
           <EmbedlyCard url={resource.url} className="watch-video" />
         ) : (
-          <img
-            src={resourceThumbnailSrc(resource, imageEmbedlyConfig)}
-            alt=""
-          />
+          <img src={resourceThumbnailSrc(resource, imgConfig)} alt="" />
         )}
       </div>
       <div className="link-share-offered-by">
@@ -159,39 +142,82 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
           showExpansionControls
         />
       </div>
-      <div className="lr-metadata">
-        <div className="section-label">Info</div>
-        {resource.object_type === "video" ? (
-          <>
-            {resource.duration ?
-              lrInfoRow(
-                "Duration:",
-                formatDurationClockTime(resource.duration)
-              ) :
-              null}
-            {lrInfoRow(
-              "Date Posted:",
-              moment(resource.last_modified).format("MMM D, YYYY")
-            )}
-          </>
-        ) : (
-          <>
-            {cost ? lrInfoRow("Cost:", cost) : lrInfoRow("Cost:", "Free")}
-            {selectedRun?.level ? lrInfoRow("Level:", selectedRun.level) : null}
-            {!emptyOrNil(instructors) ?
-              lrInfoRow("Instructors:", instructors.join(", ")) :
-              null}
-            {resource.object_type === LearningResourceType.Program &&
-            resource.item_count ?
-              lrInfoRow("Number of Courses:", resource.item_count) :
-              null}
-          </>
-        )}
-        {lrInfoRow(
-          "Language:",
-          languageName(selectedRun ? selectedRun.language : "en")
-        )}
-      </div>
+      <LearningResourceInfo resource={resource} run={selectedRun} />
     </div>
   )
 }
+
+type LearningResourceInfoProps = {
+  resource: LearningResourceResult
+  run?: LearningResourceRun
+}
+const LearningResourceInfo: React.FC<LearningResourceInfoProps> = ({
+  resource,
+  run
+}) => {
+  const rows = getInfoRows(resource, run)
+  return (
+    <section className="ol-lr-info">
+      <h3>Info:</h3>
+      <dl>
+        {rows.map(row => (
+          <React.Fragment key={row.label}>
+            <dt>{row.label}:</dt>
+            <dd>{row.value}</dd>
+          </React.Fragment>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+type ResourceInfoRow = { label: string; value: string }
+const getInfoRows = (
+  resource: LearningResourceResult,
+  run?: LearningResourceRun
+): ResourceInfoRow[] => {
+  const rows: { label: string; value?: string | null }[] = [
+    {
+      label: "Duration",
+      value: resource.duration && formatDurationClockTime(resource.duration)
+    },
+    {
+      label: "Date Posted",
+      value:
+        resource.last_modified &&
+        moment(resource.last_modified).format("MMM D, YYYY")
+    },
+    {
+      label: "Cost",
+      // @chris document this Logic change here... previously, no run => free
+      value: run ? minPrice(run.prices, true) : null
+    },
+    {
+      label: "Level",
+      value: run?.level
+    },
+    {
+      label: "Instructors",
+      value:
+        run?.instructors
+          ?.map(instructor => getInstructorName(instructor))
+          .join(", ") ?? ""
+    },
+    {
+      label: "Number of Courses",
+      value:
+        resource.object_type === LearningResourceType.Program ?
+          String(resource.item_count) :
+          null
+    },
+    {
+      label: "Language",
+      value: languageName(run?.language ?? "en")
+    }
+  ]
+
+  return rows.filter(propsNotNil(["value"])).filter(r => r.value.length > 0)
+}
+
+export default LearningResourceDetails
+export type { LearningResourceDetailsProps }

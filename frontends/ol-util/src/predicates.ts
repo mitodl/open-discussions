@@ -24,6 +24,28 @@ export const isNotNil = <T>(x: T): x is NonNullable<T> => {
   return true
 }
 
+type MaybeHasKeys<K extends string> = Partial<Record<K, unknown>>
+/**
+ * A curried predicate `propNames => obj => boolean`. Primarily useful because
+ * the returned function `obj => boolean` is a Typescript Predicate that can
+ * be used to filter arrays. For example:
+ *
+ * ```ts
+ * type A = { a: number }
+ * const maybes = [{ a: 1 }, {}, { a: undefined }]
+ * const definitelies: A[] = maybes.filter(propsNotNil(["a"]))
+ * ```
+ */
+export const propsNotNil =
+  <P extends string>(propNames: P[]) =>
+  <T extends MaybeHasKeys<P>>(
+      obj: NonNullable<T>
+    ): obj is T & {
+    [k in P]: NonNullable<T[k]>
+  } => {
+    return propNames.every(prop => isNotNil(obj[prop]))
+  }
+
 /**
  * Assert value is not `null` or `undefined`. Optionally, provide an error message.
  */
