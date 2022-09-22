@@ -79,12 +79,12 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
                 <select value={runId} onChange={updateRun}>
                   {objectRuns.map(run => (
                     <option value={run.id} key={run.id}>
-                      {getStartDate(resource.platform, run)}
+                      {getStartDate(resource.platform ?? "", run)}
                     </option>
                   ))}
                 </select>
               ) : (
-                <div>{getStartDate(resource.platform, selectedRun)}</div>
+                <div>{getStartDate(resource.platform ?? "", selectedRun)}</div>
               )}
             </div>
           </div>

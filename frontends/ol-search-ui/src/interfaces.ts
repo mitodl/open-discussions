@@ -20,7 +20,7 @@ export type LearningResource = {
   image_src: string | null
   runs?: LearningResourceRun[]
   offered_by?: string[]
-  platform: string
+  platform?: string
   is_favorite?: boolean
   audience?: string[]
   certification: string[]
@@ -37,7 +37,7 @@ export interface LearningResourceResult {
   offered_by?: string[]
   short_description?: string | null
   full_description?: string | null
-  platform: string
+  platform?: string
   topics?: string[]
   runs?: LearningResourceRun[]
   lists: ListItemMember[]

@@ -1,8 +1,10 @@
 import React from "react"
-import { render, screen, fireEvent } from "@testing-library/react"
+import { render, screen, fireEvent, within } from "@testing-library/react"
+import user from "@testing-library/user-event"
 import { faker } from "@faker-js/faker"
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { getByTerm, queryByTerm } from "ol-util/build/test-utils"
+import { makeUrl } from "ol-util/build/factories"
 import LearningResourceDetails, {
   LearningResourceDetailsProps
 } from "./ExpandedLearningResourceDisplay"
@@ -130,22 +132,6 @@ describe("ExpandedLearningResourceDisplay", () => {
   })
 
   it.each([
-    { numRuns: 1, hasDropdown: false },
-    { numRuns: 2, hasDropdown: true }
-  ])(
-    "should render an drop down to select runs if there are at least two runs",
-    ({ numRuns, hasDropdown }) => {
-      const runs = Array(numRuns)
-        .fill(null)
-        .map(() => makeRun())
-      const resource = makeCourseResult({ runs })
-      renderLearningResourceDetails({ resource })
-      const runDropdown = screen.queryByRole("combobox")
-      expect(runDropdown === null).not.toBe(hasDropdown)
-    }
-  )
-
-  it.each([
     { languageCode: "en-us", language: "English" },
     { languageCode: "fr", language: "French" },
     { languageCode: "zh-CN", language: "Chinese" },
@@ -173,5 +159,66 @@ describe("ExpandedLearningResourceDisplay", () => {
 
     await fireEvent.click(screen.getByText("Share"))
     screen.getByDisplayValue(learningResourcePermalink)
+  })
+
+  it.each([
+    { numRuns: 1, hasDropdown: false },
+    { numRuns: 2, hasDropdown: true }
+  ])(
+    "should render an drop down to select runs if there are at least two runs",
+    ({ numRuns, hasDropdown }) => {
+      const runs = Array(numRuns)
+        .fill(null)
+        .map(() => makeRun())
+      const resource = makeCourseResult({ runs })
+      renderLearningResourceDetails({ resource })
+      const runDropdown = screen.queryByRole("combobox")
+      expect(runDropdown === null).not.toBe(hasDropdown)
+    }
+  )
+
+  it("should update the info when course run changes", async () => {
+    /**
+     * This test is slightly annoying to write because the initially selected
+     * could be any of the `resource.runs`.
+     */
+
+    const url0 = makeUrl()
+    const url1 = makeUrl()
+    const run0 = makeRun({ url: url0 })
+    const run1 = makeRun({ url: url1 })
+    const runs = [run0, run1]
+    const resource = makeCourseResult({ runs: [run0, run1] })
+    renderLearningResourceDetails({ resource })
+
+    const dropdown = screen.getByRole("combobox")
+    const options = within(dropdown).getAllByRole(
+      "option"
+    ) as HTMLOptionElement[]
+
+    /**
+     * The initially selected option
+     */
+    const optA = options.find(e => e.selected)
+    /**
+     * The initially unspected option
+     */
+    const optB = options.find(e => !e.selected)
+    assertNotNil(optA)
+    assertNotNil(optB)
+
+    const runA = runs.find(r => r.id === +optA.value)
+    const runB = runs.find(r => r.id === +optB.value)
+    assertNotNil(runA)
+    assertNotNil(runB)
+
+    const link = screen.getByRole("link")
+    assertInstanceOf(link, HTMLAnchorElement)
+
+    expect(link.href).toBe(runA.url)
+
+    await user.selectOptions(dropdown, optB)
+
+    expect(link.href).toBe(runB.url)
   })
 })

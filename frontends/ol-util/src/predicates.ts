@@ -36,15 +36,13 @@ type MaybeHasKeys<K extends string> = Partial<Record<K, unknown>>
  * const definitelies: A[] = maybes.filter(propsNotNil(["a"]))
  * ```
  */
-export const propsNotNil =
-  <P extends string>(propNames: P[]) =>
-  <T extends MaybeHasKeys<P>>(
-      obj: NonNullable<T>
-    ): obj is T & {
-    [k in P]: NonNullable<T[k]>
-  } => {
+export const propsNotNil = <P extends string>(propNames: P[]) => {
+  return <T extends MaybeHasKeys<P>>(
+    obj: NonNullable<T>
+  ): obj is T & { [k in P]: NonNullable<T[k]> } => {
     return propNames.every(prop => isNotNil(obj[prop]))
   }
+}
 
 /**
  * Assert value is not `null` or `undefined`. Optionally, provide an error message.
