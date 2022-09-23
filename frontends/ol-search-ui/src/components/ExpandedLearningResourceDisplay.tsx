@@ -170,51 +170,62 @@ const LearningResourceInfo: React.FC<LearningResourceInfoProps> = ({
 }
 
 type ResourceInfoRow = { label: string; value: string }
+type FlexibleInfoRow = {
+  label: string
+  value?: string | null | number
+  include: boolean
+}
 const getInfoRows = (
   resource: LearningResourceResult,
   run?: LearningResourceRun
 ): ResourceInfoRow[] => {
-  const rows: { label: string; value?: string | null }[] = [
+  const rows: FlexibleInfoRow[] = [
     {
-      label: "Duration",
-      value: resource.duration && formatDurationClockTime(resource.duration)
+      label:   "Duration",
+      include: resource.object_type === LearningResourceType.Video,
+      value:   resource.duration && formatDurationClockTime(resource.duration)
     },
     {
-      label: "Date Posted",
+      label:   "Date Posted",
+      include: resource.object_type === LearningResourceType.Video,
       value:
         resource.last_modified &&
         moment(resource.last_modified).format("MMM D, YYYY")
     },
     {
-      label: "Cost",
-      // @chris document this Logic change here... previously, no run => free
-      value: run ? minPrice(run.prices, true) : null
+      label:   "Cost",
+      include: resource.object_type !== LearningResourceType.Video,
+      value:   run ? minPrice(run.prices, true) : null
     },
     {
-      label: "Level",
-      value: run?.level
+      label:   "Level",
+      include: resource.object_type !== LearningResourceType.Video,
+      value:   run?.level
     },
     {
-      label: "Instructors",
+      label:   "Instructors",
+      include: resource.object_type !== LearningResourceType.Video,
       value:
         run?.instructors
           ?.map(instructor => getInstructorName(instructor))
           .join(", ") ?? ""
     },
     {
-      label: "Number of Courses",
-      value:
-        resource.object_type === LearningResourceType.Program ?
-          String(resource.item_count) :
-          null
+      label:   "Number of Courses",
+      include: resource.object_type === LearningResourceType.Program,
+      value:   resource.item_count
     },
     {
-      label: "Language",
-      value: languageName(run?.language ?? "en")
+      label:   "Language",
+      include: true,
+      value:   languageName(run?.language ?? "en")
     }
   ]
 
-  return rows.filter(propsNotNil(["value"])).filter(r => r.value.length > 0)
+  return rows
+    .filter(propsNotNil(["value"]))
+    .filter(r => r.value !== "" && r.include)
+    .map(r => ({ label: r.label, value: String(r.value) }))
 }
 
 export default LearningResourceDetails

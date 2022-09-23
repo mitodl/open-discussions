@@ -71,7 +71,7 @@ const RoutedDrawer = <K extends string, R extends K>(
         <>
           {children?.({ params: childParams, closeDrawer: removeUrlParams })}
           <IconButton sx={closeSx} onClick={removeUrlParams} aria-label="Close">
-            <CloseIcon />
+            <CloseIcon fontSize="large" />
           </IconButton>
         </>
       )}

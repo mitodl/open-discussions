@@ -49,6 +49,8 @@ describe("ExpandedLearningResourceDisplay", () => {
     assertInstanceOf(coverImg, HTMLImageElement)
     expect(coverImg).toHaveAccessibleName("")
     expect(coverImg.src).toBe(resourceThumbnailSrc(resource, imgConfig))
+
+    expect(queryByTerm(document.body, "Date Posted:")).toBe(null)
   })
 
   it.each([
