@@ -20,7 +20,7 @@ import {
   FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
-import { useActivateResource } from "./LearningResourceDrawer"
+import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 
 import axios from "../libs/axios"
 import { useHistory } from "react-router"
@@ -65,7 +65,7 @@ const SearchPage: React.FC = () => {
   const [searchApiFailed, setSearchApiFailed] = useState(false)
   const [aggregations, setAggregations] = useState<Aggregations>(new Map())
   const isMd = useMuiBreakpoint("md")
-  const activateResource = useActivateResource()
+  const activateResource = useActivateResourceDrawer()
 
   const clearSearch = useCallback(() => {
     setSearchResults([])

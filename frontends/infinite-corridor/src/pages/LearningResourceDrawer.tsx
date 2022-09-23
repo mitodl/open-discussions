@@ -72,10 +72,16 @@ const LearningResourceDrawer: React.FC = () => {
   )
 }
 
-type ActivateResource = (
+type ActivateResourceDrawer = (
   e: Pick<LearningResource, "id" | "object_type">
 ) => void
-const useActivateResource = (): ActivateResource => {
+/**
+ * Returns a callback that that updates the URL to activate the
+ * LearningResourceDrawer.
+ *
+ * The callback is stable between re-renders.
+ */
+const useActivateResourceDrawer = (): ActivateResourceDrawer => {
   const [searchParams, setSearchParams] = useSearchParams()
   return useCallback(
     resource => {
@@ -90,4 +96,4 @@ const useActivateResource = (): ActivateResource => {
 
 export default LearningResourceDrawer
 
-export { useActivateResource }
+export { useActivateResourceDrawer }

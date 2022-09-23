@@ -195,7 +195,7 @@ const getInfoRows = (
     {
       label:   "Cost",
       include: resource.object_type !== LearningResourceType.Video,
-      value:   run ? minPrice(run.prices, true) : null
+      value:   (run && minPrice(run.prices, true)) ?? "Free"
     },
     {
       label:   "Level",

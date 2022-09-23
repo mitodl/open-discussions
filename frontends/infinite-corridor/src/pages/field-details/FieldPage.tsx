@@ -16,7 +16,7 @@ import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useActivateResource } from "../LearningResourceDrawer"
+import { useActivateResourceDrawer } from "../LearningResourceDrawer"
 
 type RouteParams = {
   name: string
@@ -103,7 +103,7 @@ const MANAGE_WIDGETS_SUFFIX = "manage/widgets/"
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
-  const activateResource = useActivateResource()
+  const activateResource = useActivateResourceDrawer()
   const history = useHistory()
   const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
