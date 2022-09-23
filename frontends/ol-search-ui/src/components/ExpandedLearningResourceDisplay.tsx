@@ -29,6 +29,7 @@ import moment from "moment"
 
 type LearningResourceDetailsProps = {
   resource: LearningResourceResult
+  formatShareLink: (resource: LearningResourceResult) => string
   /**
    * Config used to generate embedly urls.
    */
@@ -37,6 +38,7 @@ type LearningResourceDetailsProps = {
 
 const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
   resource,
+  formatShareLink,
   imgConfig
 }) => {
   const objectRuns = resource.runs ?? []
@@ -53,8 +55,6 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
     },
     []
   )
-
-  const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
 
   const url = selectedRun?.url ?? resource.url
 
@@ -111,7 +111,7 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
         ) : null}
         <button className="elr-share">
           <ShareTooltip
-            url={learningResourcePermalink}
+            url={formatShareLink(resource)}
             placement="topLeft"
             objectType={resource.object_type}
           >

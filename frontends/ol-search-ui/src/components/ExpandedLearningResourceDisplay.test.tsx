@@ -16,12 +16,15 @@ import {
 } from "../factories"
 import { resourceThumbnailSrc, getInstructorName, findBestRun } from "../util"
 
+const formatShareLink: LearningResourceDetailsProps["formatShareLink"] = r =>
+  `www.tests.org?resource_id=${r.id}&resource_type=${r.object_type}`
+
 const renderLearningResourceDetails = (
   overrides: Partial<LearningResourceDetailsProps> = {}
 ): LearningResourceDetailsProps => {
   const resource = makeCourseResult()
   const imgConfig = makeImgConfig()
-  const props = { resource, imgConfig, ...overrides }
+  const props = { resource, imgConfig, formatShareLink, ...overrides }
   render(<LearningResourceDetails {...props} />)
   return props
 }
@@ -155,10 +158,10 @@ describe("ExpandedLearningResourceDisplay", () => {
     const resource = makeCourseResult()
     renderLearningResourceDetails({ resource })
 
-    const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
+    const expectedLink = formatShareLink(resource)
 
     await fireEvent.click(screen.getByText("Share"))
-    screen.getByDisplayValue(learningResourcePermalink)
+    screen.getByDisplayValue(expectedLink)
   })
 
   it.each([

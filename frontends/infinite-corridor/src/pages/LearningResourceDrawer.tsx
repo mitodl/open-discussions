@@ -1,12 +1,23 @@
 import React, { useCallback } from "react"
 import { useResource } from "../api/learning-resources"
 import RoutedDrawer from "../components/RoutedDrawer"
-import { ExpandedLearningResourceDisplay, LearningResource } from "ol-search-ui"
+import {
+  ExpandedLearningResourceDisplay,
+  ExpandedLearningResourceDisplayProps as LRDisplayProps,
+  LearningResource
+} from "ol-search-ui"
 import { useSearchParams } from "ol-util"
 
 const RESOURCE_ID_PARAM = "resource_id"
 const RESOURCE_TYPE_PARAM = "resource_type"
 const RESOURCE_PARAMS = [RESOURCE_ID_PARAM, RESOURCE_TYPE_PARAM] as const
+
+const formatShareLink: LRDisplayProps["formatShareLink"] = resource => {
+  const search = new URLSearchParams()
+  search.set(RESOURCE_ID_PARAM, String(resource.id))
+  search.set(RESOURCE_TYPE_PARAM, resource.object_type)
+  return `${window.location.origin}${window.location.pathname}?${search}`
+}
 
 const drawerImg = {
   ocwBaseUrl: SETTINGS.ocw_next_base_url,
@@ -37,6 +48,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({
         <ExpandedLearningResourceDisplay
           imgConfig={drawerImg}
           resource={resource}
+          formatShareLink={formatShareLink}
         />
       )}
     </section>

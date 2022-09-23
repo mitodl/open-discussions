@@ -13,4 +13,7 @@ export type {
 
 export { default as SearchFilterDrawer } from "./SearchFilterDrawer"
 
-export { default as ExpandedLearningResourceDisplay } from "./ExpandedLearningResourceDisplay"
+export {
+  default as ExpandedLearningResourceDisplay,
+  LearningResourceDetailsProps as ExpandedLearningResourceDisplayProps
+} from "./ExpandedLearningResourceDisplay"
