@@ -16,7 +16,7 @@ import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useActivateResource } from "../../components/LearningResourceDrawer"
+import { useActivateResource } from "../LearningResourceDrawer"
 
 type RouteParams = {
   name: string

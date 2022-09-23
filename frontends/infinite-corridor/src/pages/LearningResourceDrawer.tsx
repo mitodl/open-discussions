@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import { useResource } from "../api/learning-resources"
-import RoutedDrawer from "./RoutedDrawer"
+import RoutedDrawer from "../components/RoutedDrawer"
 import { ExpandedLearningResourceDisplay, LearningResource } from "ol-search-ui"
 import { useSearchParams } from "ol-util"
 
@@ -32,14 +32,14 @@ const DrawerContent: React.FC<DrawerContentProps> = ({
   const resourceQuery = useResource(resourceType, resourceId)
   const resource = resourceQuery.data
   return (
-    <div className="ic-lr-drawer">
+    <section className="ic-lr-drawer" aria-label="Detailed description">
       {resource && (
         <ExpandedLearningResourceDisplay
           imgConfig={drawerImg}
           resource={resource}
         />
       )}
-    </div>
+    </section>
   )
 }
 

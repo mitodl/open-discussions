@@ -81,7 +81,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -93,7 +92,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         4,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -143,7 +141,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -166,7 +163,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: filteredFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -178,7 +174,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -200,7 +195,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -212,7 +206,6 @@ describe("SearchPage", () => {
         text:         "New Search Text",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )

@@ -20,7 +20,7 @@ import {
   FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
-import { useActivateResource } from "../components/LearningResourceDrawer"
+import { useActivateResource } from "./LearningResourceDrawer"
 
 import axios from "../libs/axios"
 import { useHistory } from "react-router"
