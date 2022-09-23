@@ -70,7 +70,7 @@ const RoutedDrawer = <K extends string, R extends K>(
       {childParams && (
         <>
           {children?.({ params: childParams, closeDrawer: removeUrlParams })}
-          <IconButton sx={closeSx} onClick={removeUrlParams}>
+          <IconButton sx={closeSx} onClick={removeUrlParams} aria-label="Close">
             <CloseIcon />
           </IconButton>
         </>
