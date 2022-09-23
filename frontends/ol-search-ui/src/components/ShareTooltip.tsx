@@ -1,17 +1,27 @@
-import React, { useRef } from "react"
+import React, { useCallback, useRef, useState } from "react"
 import {
   FacebookShareButton,
   LinkedinShareButton,
   TwitterShareButton
 } from "react-share"
 import { FacebookIcon, TwitterIcon, LinkedinIcon } from "react-share"
-import Tooltip from "rc-tooltip"
+import Tooltip from "@mui/material/Tooltip"
+import type { TooltipProps } from "@mui/material/Tooltip"
+import ClickAwayListener from "@mui/material/ClickAwayListener"
+import { Button } from "@mui/material"
+import type { ButtonProps } from "@mui/material"
 
 type HelperProps = {
   url: string
   hideSocialButtons?: boolean | null | undefined
   objectType?: string | null | undefined
 }
+
+const muiCopyButtonSx: ButtonProps["sx"] = {
+  padding:  "2px",
+  fontSize: "100%"
+}
+
 
 export const ShareTooltipHelper: React.FC<HelperProps> = ({
   url,
@@ -28,14 +38,14 @@ export const ShareTooltipHelper: React.FC<HelperProps> = ({
   }
 
   return (
-    <div className="tooltip">
-      <div className="tooltip-text">
-        {`Share a link to this ${objectType}:`}
-      </div>
-      <input ref={inputRef} readOnly value={url} />
-      <div className="bottom-row">
+    <div>
+      <label>
+        Share a link to this {objectType}
+        <input ref={inputRef} readOnly value={url} />
+      </label>
+      <div className="ol-tooltip-row">
         {hideSocialButtons ? null : (
-          <div className="tooltip-buttons">
+          <div>
             <FacebookShareButton url={url}>
               <FacebookIcon round size={28} />
             </FacebookShareButton>
@@ -47,9 +57,9 @@ export const ShareTooltipHelper: React.FC<HelperProps> = ({
             </TwitterShareButton>
           </div>
         )}
-        <a href="#" className="copy-url" onClick={selectAndCopyLinkText}>
+        <Button size="small" sx={muiCopyButtonSx} onClick={selectAndCopyLinkText}>
           Copy URL to clipboard
-        </a>
+        </Button>
       </div>
     </div>
   )
@@ -58,20 +68,52 @@ export const ShareTooltipHelper: React.FC<HelperProps> = ({
 type Props = {
   url: string
   hideSocialButtons?: boolean
-  children?: React.ReactElement<string>
-  placement?: string
+  placement?: TooltipProps["placement"]
   objectType?: string | null
+  children: React.ReactElement
 }
 
-export default function ShareTooltip({ children, placement, ...props }: Props) {
+const muiTooltipProps: TooltipProps["componentsProps"] = {
+  tooltip: {
+    sx: {
+      color:           "secondary.main",
+      backgroundColor: "white",
+      padding:         "12px"
+    }
+  },
+  popper: {
+    sx: {
+      overflow: "visible"
+    }
+  },
+  transition: {
+    className: "ol-tooltip-share"
+  }
+}
+
+export default function ShareTooltip({ children, placement = "top", objectType, url, hideSocialButtons }: Props) {
+  const [visible, setVisible] = useState(false)
+  const setClose = useCallback(() => setVisible(false), [])
+  const setOpen = useCallback(() => setVisible(true), [])
   return (
-    <Tooltip
-      placement={placement || "top"}
-      trigger={["click"]}
-      overlay={() => <ShareTooltipHelper {...props} />}
-      destroyTooltipOnHide={true}
-    >
-      {children}
-    </Tooltip>
+    <ClickAwayListener onClickAway={setClose}>
+      <span>
+        <Tooltip
+          placement={placement}
+          open={visible}
+          describeChild
+          componentsProps={muiTooltipProps}
+          title={
+            <ShareTooltipHelper objectType={objectType} hideSocialButtons={hideSocialButtons} url={url} />
+          }
+          disableFocusListener
+          disableHoverListener
+          disableTouchListener
+          onClick={setOpen}
+        >
+          {children}
+        </Tooltip>
+      </span>
+    </ClickAwayListener>
   )
 }

@@ -191,24 +191,22 @@ $drawer-trans: width 500ms;
   }
 }
 
-.rc-tooltip {
-  opacity: 1;
-  box-shadow: 0 0 20px 0;
+.ol-tooltip-share {
+  min-width: 250px;
+  max-width: 250px;
 
-  .rc-tooltip-inner {
-    border: none;
-    padding: 0;
+  box-shadow: 0 0 20px 0 black;
+
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 6px;
+    margin-bottom: 12px;
   }
 
-  .rc-tooltip-arrow {
-    border-top-color: white;
+  .ol-tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-
-  position: absolute;
-  z-index: 5000;
-  display: block;
-  line-height: 1.5;
-  font-size: 12px;
-  background-color: rgba(0, 0, 0, 0.05);
-  padding: 1px;
 }

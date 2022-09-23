@@ -108,7 +108,6 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
         )}
         <ShareTooltip
           url={formatShareLink(resource)}
-          placement="topLeft"
           objectType={resource.object_type}
         >
           <Button variant="outlined" startIcon={<ReplyIcon sx={invertIconSx} />}>
