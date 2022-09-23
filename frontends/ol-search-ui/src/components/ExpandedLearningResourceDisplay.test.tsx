@@ -14,10 +14,10 @@ import {
   makeRun,
   makeVideoResult
 } from "../factories"
-import { resourceThumbnailSrc, getInstructorName } from "../util"
+import { resourceThumbnailSrc, getInstructorName, findBestRun } from "../util"
 
 const renderLearningResourceDetails = (
-  overrides: Partial<LearningResourceDetailsProps>
+  overrides: Partial<LearningResourceDetailsProps> = {}
 ): LearningResourceDetailsProps => {
   const resource = makeCourseResult()
   const imgConfig = makeImgConfig()
@@ -176,6 +176,21 @@ describe("ExpandedLearningResourceDisplay", () => {
       expect(runDropdown === null).not.toBe(hasDropdown)
     }
   )
+
+  it("Initially selects the 'best' run", () => {
+    const runs = Array(4)
+      .fill(null)
+      .map(() => makeRun())
+    const bestRun = findBestRun(runs)
+    assertNotNil(bestRun)
+
+    const resource = makeCourseResult({ runs })
+    renderLearningResourceDetails({ resource })
+    const runDropdown = screen.queryByRole("combobox")
+    assertInstanceOf(runDropdown, HTMLSelectElement)
+
+    expect(runDropdown.value).toBe(String(bestRun.id))
+  })
 
   it("should update the info when course run changes", async () => {
     /**

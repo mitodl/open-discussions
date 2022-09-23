@@ -12,7 +12,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import CardMedia from "@mui/material/CardMedia"
 import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
 import {
-  bestRun,
+  findBestRun,
   getReadableResourceType,
   resourceThumbnailSrc,
   CertificateIcon
@@ -33,7 +33,6 @@ type LearningResourceCardProps<
    */
   variant?: CardVariant
   resource: R
-  searchResultLayout?: string
   reordering?: boolean
   className?: string
   /**
@@ -78,7 +77,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
   className,
   onActivate
 }: LearningResourceCardProps<R>) => {
-  const bestAvailableRun = bestRun(resource.runs ?? [])
+  const bestAvailableRun = findBestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
   const startDate =

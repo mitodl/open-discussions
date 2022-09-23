@@ -13,7 +13,7 @@ import {
   LearningResourceRun
 } from "../interfaces"
 import {
-  bestRun,
+  findBestRun,
   minPrice,
   getStartDate,
   getInstructorName,
@@ -39,7 +39,11 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
   resource,
   imgConfig
 }) => {
-  const [runId, setRunId] = useState<number | undefined>()
+  const objectRuns = resource.runs ?? []
+  const [runId, setRunId] = useState<number | undefined>(
+    () => findBestRun(objectRuns)?.id
+  )
+  const selectedRun = objectRuns.find(r => r.id === runId)
 
   const hasCertificate = resource.certification?.length > 0
 
@@ -50,13 +54,7 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
     []
   )
 
-  const objectRuns = resource.runs ?? []
-
   const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
-
-  const selectedRun =
-    bestRun(runId ? objectRuns.filter(run => run.id === runId) : objectRuns) ??
-    objectRuns[0]
 
   const url = selectedRun?.url ?? resource.url
 

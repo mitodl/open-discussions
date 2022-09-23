@@ -72,7 +72,9 @@ const compareRuns = (
   secondRun: LearningResourceRun
 ) => runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
-const bestRun = (runs: LearningResourceRun[]): LearningResourceRun | null => {
+const findBestRun = (
+  runs: LearningResourceRun[]
+): LearningResourceRun | undefined => {
   const dated = runs.filter(run => run.best_start_date && run.best_end_date)
 
   // Runs that are running right now
@@ -93,7 +95,7 @@ const bestRun = (runs: LearningResourceRun[]): LearningResourceRun | null => {
     .sort(compareRuns)
     .reverse()
   if (bestRecentRun) return bestRecentRun
-  return null
+  return undefined
 }
 
 const readableLearningResources: Record<LR, string> = {
@@ -124,7 +126,7 @@ const getReadableResourceType = (type: string): string => {
   return readableLearningResources[type]
 }
 
-export { resourceThumbnailSrc, bestRun, getReadableResourceType }
+export { resourceThumbnailSrc, findBestRun, getReadableResourceType }
 export type { EmbedlyConfig }
 
 export const getViewportWidth = () => window.innerWidth

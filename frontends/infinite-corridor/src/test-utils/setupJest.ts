@@ -40,3 +40,17 @@ const DEFAULT_DEVICE_WIDTH = "1200px"
 beforeAll(() => {
   window.matchMedia = createMatchMediaForJsDom({ width: DEFAULT_DEVICE_WIDTH })
 })
+
+/**
+ * We frequently spy on these, so let's just do it once.
+ */
+jest.mock("ol-search-ui", () => {
+  const actual = jest.requireActual("ol-search-ui")
+  return {
+    ...actual,
+    LearningResourceCard:            jest.fn(actual.LearningResourceCard),
+    ExpandedLearningResourceDisplay: jest.fn(
+      actual.ExpandedLearningResourceDisplay
+    )
+  }
+})

@@ -33,16 +33,6 @@ jest.mock("./WidgetsList", () => {
 })
 const mockWidgetList = jest.mocked(WidgetList)
 
-jest.mock("ol-search-ui", () => {
-  const actual = jest.requireActual("ol-search-ui")
-  return {
-    ...actual,
-    LearningResourceCard:            jest.fn(actual.LearningResourceCard),
-    ExpandedLearningResourceDisplay: jest.fn(
-      actual.ExpandedLearningResourceDisplay
-    )
-  }
-})
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
 const spyExpandedLearningResourceDisplay = jest.mocked(
   ExpandedLearningResourceDisplay
