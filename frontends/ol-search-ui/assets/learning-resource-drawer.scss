@@ -38,11 +38,6 @@
       width: 100%;
     }
   }
-
-  .link-share-offered-by {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
   
   .object-type {
     font-size: 15px;
@@ -51,30 +46,6 @@
     line-height: 19px;
     text-transform: uppercase;
     color: #b0b0b0;
-  }
-
-  .external-links {
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 37px;
-    border-radius: 4px;
-    background-color: #A32034;
-    padding-right: 10px;
-    padding-left: 10px;
-    color: white;
-    text-transform: capitalize;
-    margin: auto;
-    width: 128px;
-    cursor: pointer;
-    float: left;
-    margin-right: 20px;
-
-    a.link-button {
-      margin: auto;
-      font-size: 18px;
-      line-height: 37px
-    }
   }
 
   .section-label {
@@ -139,47 +110,22 @@
   }
 }
 
-.elr-share {
-  display: inline-block;
-  border: 1px solid #D8D8D8;
-  border-radius: 4px;
-  background-color: #FAFAFA;
-  height: 37px;
-  align-items: center;
-  margin: auto;
-  width: 128px;
-  cursor: pointer;
-  font-size: 18px;
-  margin-right: 20px;
-
-  .share-contents {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 18px;
-    line-height: 37px;
-
-    i {
-      transform: scaleX(-1);
-      font-size: 30px;
-      margin-left: 23px;
-    }
+.resource-actions {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  > *:not(:first-child) {
+    margin-left: 5px;
+  }
+  *:not(:last-child) {
+    margin-right: 5px;
   }
 }
-
 
 $red-link-color: #9a2a33;
 $link-padding: 11px 20px 11px 11px;
 $footer-height: 172px;
 
 $drawer-trans: width 500ms;
-
-.lr-drawer {
-  .MuiDrawer-paper {
-    width: 100%;
-    max-width: 600px;
-  }
-}
 
 .lr-drawer.MuiDrawer-root .drawer-close{
   float: right;

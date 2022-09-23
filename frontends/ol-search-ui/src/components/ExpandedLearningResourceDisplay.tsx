@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from "react"
 import striptags from "striptags"
 import { decode } from "html-entities"
-import { propsNotNil } from "ol-util"
+import { propsNotNil, capitalize } from "ol-util"
+import Button from "@mui/material/Button"
+import ReplyIcon from '@mui/icons-material/Reply'
 
 import TruncatedText from "./TruncatedText"
-
 import ShareTooltip from "./ShareTooltip"
 
 import {
@@ -26,6 +27,9 @@ import {
 
 import { EmbedlyCard, formatDurationClockTime } from "ol-util"
 import moment from "moment"
+
+const invertIconSx = { transform: "scaleX(-1)" }
+const isTakeableResource = (resource: LearningResourceResult): boolean => [LearningResourceType.Course, LearningResourceType.Program].includes(resource.object_type)
 
 type LearningResourceDetailsProps = {
   resource: LearningResourceResult
@@ -91,36 +95,26 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
       </div>
       <div className="image-div">
         {resource.object_type === "video" && resource.url ? (
-          <EmbedlyCard url={resource.url} className="watch-video" />
+          <EmbedlyCard url={resource.url} />
         ) : (
           <img src={resourceThumbnailSrc(resource, imgConfig)} alt="" />
         )}
       </div>
-      <div className="link-share-offered-by">
-        {url && resource.object_type !== "video" ? (
-          <div className="external-links">
-            <a
-              className="link-button blue-btn"
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {`Take ${resource.object_type}`}
-            </a>
-          </div>
-        ) : null}
-        <button className="elr-share">
-          <ShareTooltip
-            url={formatShareLink(resource)}
-            placement="topLeft"
-            objectType={resource.object_type}
-          >
-            <div className="share-contents">
-              <i className="material-icons reply">reply</i>
-              <span>Share</span>
-            </div>
-          </ShareTooltip>
-        </button>
+      <div className="resource-actions">
+        {url && isTakeableResource(resource) && (
+          <Button variant="contained" component="a" href={url} target="_blank" rel="noopener noreferrer">
+            Take {capitalize(resource.object_type)}
+          </Button>
+        )}
+        <ShareTooltip
+          url={formatShareLink(resource)}
+          placement="topLeft"
+          objectType={resource.object_type}
+        >
+          <Button variant="outlined" startIcon={<ReplyIcon sx={invertIconSx} />}>
+            Share
+          </Button>
+        </ShareTooltip>
         <div className="offered-by">
           <span className="label">Offered by -&nbsp;</span>
           <span className="offeror">

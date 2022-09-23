@@ -3,7 +3,8 @@
 
 $color: theme.$color-primary;
 
-.app-container {
+// body not #app-root because MUI modals are not in the app root.
+body {
   .MuiTab-root {
     text-transform: none;
   }
