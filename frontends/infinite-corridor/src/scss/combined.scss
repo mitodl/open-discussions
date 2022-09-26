@@ -30,6 +30,10 @@ body {
   height: 100vh;
 }
 
+button {
+  color: theme.$font-color-default;
+}
+
 a {
   text-decoration: none;
   &:hover {
