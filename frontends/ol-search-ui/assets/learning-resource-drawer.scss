@@ -94,8 +94,8 @@ $semiBoldWeight: 600 !default;
 }
 
 .ol-lrd-actions-row {
-  margin-top: 20px;
-  margin-bottom: 20px;
+  margin-top: 15px;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -103,6 +103,10 @@ $semiBoldWeight: 600 !default;
 }
 
 .ol-lrd-actions {
+  > .MuiButton-root {
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
   > *:not(:first-child) {
     margin-left: 5px;
   }
