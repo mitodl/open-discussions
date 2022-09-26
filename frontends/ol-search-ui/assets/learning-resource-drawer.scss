@@ -1,9 +1,8 @@
 @use "ol-util/assets/breakpoint" as *;
 
+$lightText: #B0B0B0 !default;
+
 .expanded-lr-summary {
-  flex-direction: column;
-  font-size:  16px;
-  line-height: 1.3;
   padding: 30px;
 
   select {
@@ -16,7 +15,7 @@
     font-size: 13px;
 
     .info-label {
-      color: #B0B0B0;
+      color: $lightText;
       padding-right: 6px;
     }
   }
@@ -27,7 +26,6 @@
 
   .image-div {
     width: 100%;
-    margin-bottom: 10px;
     overflow: hidden;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -45,7 +43,7 @@
     letter-spacing: 0;
     line-height: 19px;
     text-transform: uppercase;
-    color: #b0b0b0;
+    color: $lightText;
   }
 
   .section-label {
@@ -60,7 +58,7 @@
     height: 37px;
     align-items: center;
     .label {
-      color:  #B0B0B0;
+      color:  $lightText;
     }
 
     .offeror {
@@ -74,15 +72,10 @@
   }
 
   .title {
-    font-size: 20px;
-    color: black;
-    font-weight: bold;
     margin: 5px 0;
   }
 
   .description {
-    font-size: 16px;
-    color: black;
 
     .tt-expansion-control {
       @include breakpoint(materialmobile) {
@@ -121,74 +114,11 @@
   }
 }
 
-$red-link-color: #9a2a33;
-$link-padding: 11px 20px 11px 11px;
-$footer-height: 172px;
-
-$drawer-trans: width 500ms;
-
 .lr-drawer.MuiDrawer-root .drawer-close{
   float: right;
   padding: 20px;
   padding-bottom: 0px;
-  .material-icons {
-    font-size: 35px;
-    float: right;
-  }
   border: none;
-  background-color: white;
-}
-
-.drawer-mobile-header {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  height: 60px;
-}
-
-
-.tooltip {
-  background: white;
-  padding: 12px;
-  min-width: 250px;
-  max-width: 250px;
-  opacity: 1 !important;
-  z-index: 5000;
-
-  .tooltip-text,
-  h4 {
-    width: 90%;
-  }
-
-  h4 {
-    padding: 0 0 10px 0;
-    margin: 0;
-    font-size: inherit;
-  }
-
-  input {
-    width: 100%;
-    box-sizing: border-box;
-  }
-
-  .bottom-row {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-top: 15px;
-
-    .tooltip-buttons {
-      display: flex;
-
-      > div {
-        margin-right: 3px;
-      }
-    }
-
-    .copy-url {
-      font-size: 12px;
-    }
-  }
 }
 
 .ol-tooltip-share {
