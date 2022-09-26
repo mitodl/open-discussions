@@ -1,8 +1,16 @@
 @use "ol-util/assets/breakpoint" as *;
 
 $lightText: #B0B0B0 !default;
+$semiBoldWeight: 600 !default;
 
-.expanded-lr-summary {
+.ol-lr-details {
+  h2, h3, h4 {
+    margin: 5px 0
+  }
+  dl {
+    margin: 8px 0
+  }
+
   padding: 30px;
 
   select {
@@ -12,7 +20,7 @@ $lightText: #B0B0B0 !default;
 
   .run-selector {
     display: inline-flex;
-    font-size: 13px;
+    font-size: 0.8125em;
 
     .info-label {
       color: $lightText;
@@ -39,24 +47,13 @@ $lightText: #B0B0B0 !default;
   
   .object-type {
     font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0;
-    line-height: 19px;
+    font-weight: $semiBoldWeight;
     text-transform: uppercase;
     color: $lightText;
   }
 
-  .section-label {
-    color: black;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-
   .offered-by {
-    display: inline-flex;
     font-size: 15px;
-    height: 37px;
-    align-items: center;
     .label {
       color:  $lightText;
     }
@@ -65,15 +62,8 @@ $lightText: #B0B0B0 !default;
       font-weight: bold;
     }
 
-    @include breakpoint(desktop) {
-      float: right;
-    }
-
   }
 
-  .title {
-    margin: 5px 0;
-  }
 
   .description {
 
@@ -103,22 +93,22 @@ $lightText: #B0B0B0 !default;
   }
 }
 
-.resource-actions {
+.ol-lrd-actions-row {
   margin-top: 20px;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ol-lrd-actions {
   > *:not(:first-child) {
     margin-left: 5px;
   }
   *:not(:last-child) {
     margin-right: 5px;
   }
-}
-
-.lr-drawer.MuiDrawer-root .drawer-close{
-  float: right;
-  padding: 20px;
-  padding-bottom: 0px;
-  border: none;
 }
 
 .ol-tooltip-share {
@@ -130,8 +120,8 @@ $lightText: #B0B0B0 !default;
   input {
     width: 100%;
     box-sizing: border-box;
-    margin-top: 6px;
-    margin-bottom: 12px;
+    margin-top: 0.5em;
+    margin-bottom: 1em;
   }
 
   .ol-tooltip-row {

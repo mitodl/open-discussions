@@ -63,18 +63,16 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
   const url = selectedRun?.url ?? resource.url
 
   return (
-    <div className="expanded-lr-summary">
+    <div className="ol-lr-details">
       <div className="object-type">
         {getReadableResourceType(resource.object_type)}
       </div>
-      <h3 className="title">{resource.title}</h3>
-      <div className="run-certification-container">
+      <h2>{resource.title}</h2>
+      <div>
         {selectedRun ? (
           <div className="run-selector">
-            <div>
-              <div className="info-label">
-                {resource.platform === "ocw" ? "As Taught In" : "Start Date"}
-              </div>
+            <div className="info-label">
+              {resource.platform === "ocw" ? "As Taught In" : "Start Date"}
             </div>
             <div className="select-semester-div">
               {objectRuns.length > 1 ? (
@@ -100,20 +98,22 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
           <img src={resourceThumbnailSrc(resource, imgConfig)} alt="" />
         )}
       </div>
-      <div className="resource-actions">
-        {url && isTakeableResource(resource) && (
-          <Button variant="contained" component="a" href={url} target="_blank" rel="noopener noreferrer">
+      <div className="ol-lrd-actions-row ">
+        <div className="ol-lrd-actions">
+          {url && isTakeableResource(resource) && (
+            <Button variant="contained" component="a" href={url} target="_blank" rel="noopener noreferrer">
             Take {capitalize(resource.object_type)}
-          </Button>
-        )}
-        <ShareTooltip
-          url={formatShareLink(resource)}
-          objectType={resource.object_type}
-        >
-          <Button variant="outlined" startIcon={<ReplyIcon sx={invertIconSx} />}>
+            </Button>
+          )}
+          <ShareTooltip
+            url={formatShareLink(resource)}
+            objectType={resource.object_type}
+          >
+            <Button variant="outlined" startIcon={<ReplyIcon sx={invertIconSx} />}>
             Share
-          </Button>
-        </ShareTooltip>
+            </Button>
+          </ShareTooltip>
+        </div>
         <div className="offered-by">
           <span className="label">Offered by -&nbsp;</span>
           <span className="offeror">
