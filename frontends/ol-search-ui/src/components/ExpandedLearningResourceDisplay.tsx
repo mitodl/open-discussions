@@ -3,7 +3,7 @@ import striptags from "striptags"
 import { decode } from "html-entities"
 import { propsNotNil, capitalize } from "ol-util"
 import Button from "@mui/material/Button"
-import ReplyIcon from '@mui/icons-material/Reply'
+import ReplyIcon from "@mui/icons-material/Reply"
 
 import TruncatedText from "./TruncatedText"
 import ShareTooltip from "./ShareTooltip"
@@ -29,7 +29,10 @@ import { EmbedlyCard, formatDurationClockTime } from "ol-util"
 import moment from "moment"
 
 const invertIconSx = { transform: "scaleX(-1)" }
-const isTakeableResource = (resource: LearningResourceResult): boolean => [LearningResourceType.Course, LearningResourceType.Program].includes(resource.object_type)
+const isTakeableResource = (resource: LearningResourceResult): boolean =>
+  [LearningResourceType.Course, LearningResourceType.Program].includes(
+    resource.object_type
+  )
 
 type LearningResourceDetailsProps = {
   resource: LearningResourceResult
@@ -101,16 +104,25 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
       <div className="ol-lrd-actions-row ">
         <div className="ol-lrd-actions">
           {url && isTakeableResource(resource) && (
-            <Button variant="contained" component="a" href={url} target="_blank" rel="noopener noreferrer">
-            Take {capitalize(resource.object_type)}
+            <Button
+              variant="contained"
+              component="a"
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Take {capitalize(resource.object_type)}
             </Button>
           )}
           <ShareTooltip
             url={formatShareLink(resource)}
             objectType={resource.object_type}
           >
-            <Button variant="outlined" startIcon={<ReplyIcon sx={invertIconSx} />}>
-            Share
+            <Button
+              variant="outlined"
+              startIcon={<ReplyIcon sx={invertIconSx} />}
+            >
+              Share
             </Button>
           </ShareTooltip>
         </div>

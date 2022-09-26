@@ -38,8 +38,14 @@ const RenderedNewlines = React.memo<RenderedNewlinesProps>(({ text }) => (
 ))
 
 export default function TruncatedText(props: TruncatedTextProps) {
-  const { component: Component = 'p', text, lines, estCharsPerLine, className, showExpansionControls } =
-    props
+  const {
+    component: Component = "p",
+    text,
+    lines,
+    estCharsPerLine,
+    className,
+    showExpansionControls
+  } = props
   const [expanded, setExpanded] = useState(false)
   const [hasOverflow, setHasOverflow] = useState(false)
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0)
@@ -81,7 +87,13 @@ export default function TruncatedText(props: TruncatedTextProps) {
           <RenderedNewlines text={text} />
         </Component>
       ) : (
-        <Dotdotdot tagName={Component} as="" clamp={lines} ref={dotRef} className={className}>
+        <Dotdotdot
+          tagName={Component}
+          as=""
+          clamp={lines}
+          ref={dotRef}
+          className={className}
+        >
           {/* Dotdotdot seems to trip on long, unbroken strings. As a fail-safe, we're limiting
               the input string to a number of characters that is greater than the characters that
               will be shown, but not so long that it will cause issues with Dotdotdot.*/}

@@ -22,7 +22,6 @@ const muiCopyButtonSx: ButtonProps["sx"] = {
   fontSize: "100%"
 }
 
-
 export const ShareTooltipHelper: React.FC<HelperProps> = ({
   url,
   hideSocialButtons,
@@ -57,7 +56,11 @@ export const ShareTooltipHelper: React.FC<HelperProps> = ({
             </TwitterShareButton>
           </div>
         )}
-        <Button size="small" sx={muiCopyButtonSx} onClick={selectAndCopyLinkText}>
+        <Button
+          size="small"
+          sx={muiCopyButtonSx}
+          onClick={selectAndCopyLinkText}
+        >
           Copy URL to clipboard
         </Button>
       </div>
@@ -91,7 +94,13 @@ const muiTooltipProps: TooltipProps["componentsProps"] = {
   }
 }
 
-export default function ShareTooltip({ children, placement = "top", objectType, url, hideSocialButtons }: Props) {
+export default function ShareTooltip({
+  children,
+  placement = "top",
+  objectType,
+  url,
+  hideSocialButtons
+}: Props) {
   const [visible, setVisible] = useState(false)
   const setClose = useCallback(() => setVisible(false), [])
   const setOpen = useCallback(() => setVisible(true), [])
@@ -104,7 +113,11 @@ export default function ShareTooltip({ children, placement = "top", objectType, 
           describeChild
           componentsProps={muiTooltipProps}
           title={
-            <ShareTooltipHelper objectType={objectType} hideSocialButtons={hideSocialButtons} url={url} />
+            <ShareTooltipHelper
+              objectType={objectType}
+              hideSocialButtons={hideSocialButtons}
+              url={url}
+            />
           }
           disableFocusListener
           disableHoverListener

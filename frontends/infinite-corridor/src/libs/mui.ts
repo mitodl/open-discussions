@@ -12,8 +12,8 @@ const muiTheme = createTheme({
       main: "#03152d"
     },
     text: {
-      primary: "#03152d",
-    },
+      primary: "#03152d"
+    }
   },
   breakpoints: {
     values: {

@@ -4,7 +4,6 @@ import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
 import classNames from "classnames"
 
-import Button from "@mui/material/Button"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Chip from "@mui/material/Chip"
@@ -46,8 +45,6 @@ type LearningResourceCardProps<
 type OffererProps = {
   offerers: string[]
 }
-
-const linkButtonSx = { lineHeight: "unset", margin: "unset", padding: "unset" }
 
 const Offerers: React.FC<OffererProps> = ({ offerers }) => {
   return (
