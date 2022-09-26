@@ -10,7 +10,10 @@ const muiTheme = createTheme({
     },
     secondary: {
       main: "#03152d"
-    }
+    },
+    text: {
+      primary: "#03152d",
+    },
   },
   breakpoints: {
     values: {
