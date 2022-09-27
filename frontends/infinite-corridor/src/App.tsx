@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/field-details/FieldPage"
 import FieldAdminApp from "./pages/field-details/FieldAdminApp"
+import LearningResourceDrawer from "./pages/LearningResourceDrawer"
 import * as urls from "./pages/urls"
 import { Route, Router } from "react-router"
 import { History } from "history"
@@ -57,6 +58,7 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
         <Route path={urls.FIELD_EDIT} exact>
           <FieldAdminApp />
         </Route>
+        <LearningResourceDrawer />
       </AppProviders>
     </div>
   )

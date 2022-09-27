@@ -1,5 +1,5 @@
 import moment from "moment"
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
 import classNames from "classnames"
@@ -12,33 +12,34 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 import CardMedia from "@mui/material/CardMedia"
 import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
 import {
-  bestRun,
+  findBestRun,
   getReadableResourceType,
   resourceThumbnailSrc,
   CertificateIcon
 } from "../util"
 
-import { ResourceIdentifiers } from "./LearningResourceDrawer"
-
 const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
 type CardVariant = "column" | "row" | "row-reverse"
-type CardImgConfig = EmbedlyConfig
-type LearningResourceCardProps = {
+type OnActivateCard<R extends CardMinimalResource = CardMinimalResource> = (
+  resource: R
+) => void
+type LearningResourceCardProps<
+  R extends CardMinimalResource = CardMinimalResource
+> = {
   /**
    * Whether the course picture and info display as a column or row.
    * Defaults to `'column'`.
    */
   variant?: CardVariant
-  resource: CardMinimalResource
-  searchResultLayout?: string
+  resource: R
   reordering?: boolean
   className?: string
   /**
    * Config used to generate embedly urls.
    */
-  imgConfig: CardImgConfig
-  toggleDrawer?: (params: ResourceIdentifiers | null) => void
+  imgConfig: EmbedlyConfig
+  onActivate?: OnActivateCard
 }
 
 type OffererProps = {
@@ -69,14 +70,14 @@ const variantClasses: Record<CardVariant, string> = {
   "row-reverse": "ol-lrc-row-reverse"
 }
 
-const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
+const LearningResourceCard = <R extends CardMinimalResource>({
   variant = "column",
   resource,
   imgConfig,
   className,
-  toggleDrawer
-}) => {
-  const bestAvailableRun = bestRun(resource.runs ?? [])
+  onActivate
+}: LearningResourceCardProps<R>) => {
+  const bestAvailableRun = findBestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
   const startDate =
@@ -84,6 +85,10 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
       moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
       null
   const offerers = resource.offered_by ?? []
+  const handleActivate = useCallback(
+    () => onActivate?.(resource),
+    [resource, onActivate]
+  )
 
   const isRow = variant === "row" || variant === "row-reverse"
   const cardImg = useMemo(
@@ -114,17 +119,8 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           </span>
           {hasCertificate && <CertificateIcon />}
         </div>
-        {toggleDrawer ? (
-          <button
-            className="clickable-title"
-            onClick={() =>
-              toggleDrawer({
-                type:  resource.object_type,
-                id:    resource.id,
-                runId: bestAvailableRun?.id
-              })
-            }
-          >
+        {onActivate ? (
+          <button className="clickable-title" onClick={handleActivate}>
             <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
               {resource.title}
             </Dotdotdot>
@@ -157,6 +153,6 @@ export default LearningResourceCard
 export type {
   LearningResourceCardProps,
   CardMinimalResource,
-  CardImgConfig,
-  CardVariant
+  CardVariant,
+  OnActivateCard
 }

@@ -1,16 +1,12 @@
-import React, { useState, useCallback } from "react"
+import React, { useCallback } from "react"
 import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
-import {
-  LearningResourceCard,
-  LearningResourceDrawer,
-  useGetResourceIdentifiersFromUrl,
-  ResourceIdentifiers
-} from "ol-search-ui"
+import { LearningResourceCard } from "ol-search-ui"
+import type { OnActivateCard } from "ol-search-ui"
 import { TitledCarousel, useMuiBreakpoint } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
@@ -20,6 +16,7 @@ import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
+import { useActivateResourceDrawer } from "../LearningResourceDrawer"
 
 type RouteParams = {
   name: string
@@ -32,10 +29,10 @@ const keyFromHash = (hash: string) => {
 }
 interface FieldListProps {
   list: UserList
-  setDrawerObject: (params: ResourceIdentifiers | null) => void
+  onActivateCard: OnActivateCard
 }
 
-const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
+const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
   return (
@@ -49,7 +46,7 @@ const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
               className="ic-resource-card"
               resource={item}
               imgConfig={imgConfigs["row-reverse"]}
-              toggleDrawer={setDrawerObject}
+              onActivate={onActivateCard}
             />
           </li>
         ))}
@@ -58,7 +55,7 @@ const FieldList: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
   )
 }
 
-const FieldCarousel: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
+const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
   const itemsQuery = useFieldListItems(list.id)
   const items = itemsQuery.data?.results ?? []
   const isSm = useMuiBreakpoint("sm")
@@ -95,7 +92,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list, setDrawerObject }) => {
           className="ic-resource-card ic-carousel-card"
           resource={item}
           imgConfig={imgConfigs["column"]}
-          toggleDrawer={setDrawerObject}
+          onActivate={onActivateCard}
         />
       ))}
     </TitledCarousel>
@@ -106,7 +103,7 @@ const MANAGE_WIDGETS_SUFFIX = "manage/widgets/"
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
-
+  const activateResource = useActivateResourceDrawer()
   const history = useHistory()
   const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
@@ -128,9 +125,6 @@ const FieldPage: React.FC = () => {
       pathname: pathname.slice(0, -MANAGE_WIDGETS_SUFFIX.length)
     })
   }, [history])
-  const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
-    useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
-  )
 
   return (
     <FieldPageSkeleton name={name}>
@@ -161,14 +155,14 @@ const FieldPage: React.FC = () => {
                 {featuredList && (
                   <FieldCarousel
                     list={featuredList}
-                    setDrawerObject={setDrawerObject}
+                    onActivateCard={activateResource}
                   />
                 )}
                 {fieldLists.map(list => (
                   <FieldList
                     key={list.id}
                     list={list}
-                    setDrawerObject={setDrawerObject}
+                    onActivateCard={activateResource}
                   />
                 ))}
               </TabPanel>
@@ -187,10 +181,6 @@ const FieldPage: React.FC = () => {
           </GridContainer>
         </Container>
       </TabContext>
-      <LearningResourceDrawer
-        drawerObject={drawerObject}
-        setDrawerObject={setDrawerObject}
-      />
     </FieldPageSkeleton>
   )
 }

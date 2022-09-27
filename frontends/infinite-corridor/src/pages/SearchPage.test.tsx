@@ -1,14 +1,34 @@
 import { when } from "jest-when"
+import { faker } from "@faker-js/faker"
 
-import { makeSearchResponse } from "ol-search-ui/build/factories"
+import { urls as resourceUrls } from "../api/learning-resources"
+
+import {
+  makeLearningResource,
+  makeSearchResponse
+} from "ol-search-ui/build/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
 import { createMatchMediaForJsDom } from "ol-util/build/test-utils"
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
-import { fireEvent, waitFor } from "@testing-library/react"
+import {
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+  within
+} from "@testing-library/react"
 import { makeRequest } from "../test-utils/mockAxios"
+import {
+  ExpandedLearningResourceDisplay,
+  LearningResourceCard
+} from "ol-search-ui"
+
+const spyLearningResourceCard = jest.mocked(LearningResourceCard)
+const spyExpandedLearningResourceDisplay = jest.mocked(
+  ExpandedLearningResourceDisplay
+)
 
 const expectedFacets = {
   audience:            [],
@@ -81,7 +101,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -93,7 +112,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         4,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -143,7 +161,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -166,7 +183,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: filteredFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -178,7 +194,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -200,7 +215,6 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
@@ -212,9 +226,68 @@ describe("SearchPage", () => {
         text:         "New Search Text",
         from:         0,
         activeFacets: expectedFacets,
-        sort:         null,
         size:         4
       })
     )
+  })
+
+  it("render a <LearningResourceCard /> for each search result", async () => {
+    const results = makeSearchResponse(2)
+    setMockResponse.post("search/", results)
+    await renderTestApp({ url: "/search" })
+    const list = await screen.findByRole("list", { name: "Search Results" })
+    const items = await within(list).findAllByRole("listitem")
+    expect(items).toHaveLength(2)
+    expect(spyLearningResourceCard).toHaveBeenCalledTimes(2)
+    expect(spyLearningResourceCard).toHaveBeenCalledWith(
+      expect.objectContaining({ resource: results.hits.hits[0]._source }),
+      expect.anything()
+    )
+    expect(spyLearningResourceCard).toHaveBeenCalledWith(
+      expect.objectContaining({ resource: results.hits.hits[1]._source }),
+      expect.anything()
+    )
+  })
+
+  test("Clicking a card title opens the LearningResourceDrawer", async () => {
+    const pageSize = 4
+    const results = makeSearchResponse(pageSize)
+    const i = faker.datatype.number({ min: 0, max: pageSize - 1 })
+    const resource = makeLearningResource({
+      id:          results.hits.hits[i]._source.id,
+      title:       results.hits.hits[i]._source.title,
+      object_type: results.hits.hits[i]._source.object_type
+    })
+    setMockResponse.get(
+      resourceUrls.resource(resource.object_type, resource.id),
+      resource
+    )
+
+    setMockResponse.post("search/", results)
+    const { history } = await renderTestApp({ url: "/search" })
+    const list = await screen.findByRole("list", { name: "Search Results" })
+    const items = await within(list).findAllByRole("listitem")
+    const item = items[i]
+    await user.click(
+      within(item).getByRole("heading", { name: resource.title })
+    )
+
+    const params0 = new URLSearchParams(history.location.search)
+    expect(params0.get("resource_id")).toBe(String(resource.id))
+    expect(params0.get("resource_type")).toBe(resource.object_type)
+
+    const getDrawerContent = () => screen.getByLabelText("Detailed description")
+    const drawer = getDrawerContent()
+    await within(drawer).findByRole("heading", { name: resource.title })
+    expect(spyExpandedLearningResourceDisplay).toHaveBeenCalledWith(
+      expect.objectContaining({ resource }),
+      expect.anything()
+    )
+
+    await user.click(screen.getByRole("button", { name: "Close" }))
+    const params1 = new URLSearchParams(history.location.search)
+    expect(params1.get("resource_id")).toBe(null)
+    expect(params1.get("resource_type")).toBe(null)
+    await waitForElementToBeRemoved(getDrawerContent)
   })
 })

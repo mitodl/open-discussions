@@ -1,75 +1,90 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react"
-import { assertInstanceOf } from "ol-util"
-import ExpandedLearningResourceDisplay from "./ExpandedLearningResourceDisplay"
+import { render, screen, fireEvent, within } from "@testing-library/react"
+import user from "@testing-library/user-event"
+import { faker } from "@faker-js/faker"
+import { assertInstanceOf, assertNotNil } from "ol-util"
+import { getByTerm, queryByTerm } from "ol-util/build/test-utils"
+import { makeUrl } from "ol-util/build/factories"
+import LearningResourceDetails, {
+  LearningResourceDetailsProps
+} from "./ExpandedLearningResourceDisplay"
 import {
-  makeMinimalResoure,
+  makeCourseResult,
   makeImgConfig,
+  makeRun,
   makeVideoResult
 } from "../factories"
-import { resourceThumbnailSrc, getInstructorName } from "../util"
+import { resourceThumbnailSrc, getInstructorName, findBestRun } from "../util"
+
+const formatShareLink: LearningResourceDetailsProps["formatShareLink"] = r =>
+  `www.tests.org?resource_id=${r.id}&resource_type=${r.object_type}`
+
+const renderLearningResourceDetails = (
+  overrides: Partial<LearningResourceDetailsProps> = {}
+): LearningResourceDetailsProps => {
+  const resource = makeCourseResult()
+  const imgConfig = makeImgConfig()
+  const props = { resource, imgConfig, formatShareLink, ...overrides }
+  render(<LearningResourceDetails {...props} />)
+  return props
+}
 
 describe("ExpandedLearningResourceDisplay", () => {
-  it("renders the expected fields", () => {
-    const resource = makeMinimalResoure()
-    const imgConfig = makeImgConfig({
-      embedlyKey: SETTINGS.embedlyKey,
-      ocwBaseUrl: SETTINGS.ocw_next_base_url,
-      width:      440,
-      height:     239
-    })
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+  it("renders the expected fields for a course", () => {
+    const run = makeRun()
+    const offerer = "ocw"
+    const resource = makeCourseResult({ runs: [run], offered_by: [offerer] })
 
-    expect(screen.getByText(resource.title)).toBeInTheDocument()
+    const { imgConfig } = renderLearningResourceDetails({ resource })
 
     const instructors = resource.runs[0].instructors
       .map(instructor => getInstructorName(instructor))
       .join(", ")
-    expect(screen.getByText(instructors)).toBeInTheDocument()
 
-    expect(screen.getByText(resource.offered_by)).toBeInTheDocument()
-    if (resource.runs[0].level) {
-      expect(screen.getByText(resource.runs[0].level)).toBeInTheDocument()
-      expect(screen.getByText("Level:")).toBeInTheDocument()
-    } else {
-      expect(screen.queryByText("Level:")).toBe(null)
-    }
+    screen.getByText(resource.title)
+    screen.getByText(instructors)
+    screen.getByText(offerer)
 
     const coverImg = screen.getByAltText("")
-    expect(coverImg).toHaveAccessibleName("")
-
     assertInstanceOf(coverImg, HTMLImageElement)
+    expect(coverImg).toHaveAccessibleName("")
     expect(coverImg.src).toBe(resourceThumbnailSrc(resource, imgConfig))
+
+    expect(queryByTerm(document.body, "Date Posted:")).toBe(null)
+  })
+
+  it.each([
+    { level: null, shouldDisplay: false },
+    { level: "", shouldDisplay: false },
+    { level: "Really hard", shouldDisplay: true }
+  ])("Displays 'Level' iff there is one", ({ level, shouldDisplay }) => {
+    const run = makeRun({ level })
+    const resource = makeCourseResult({ runs: [run] })
+    renderLearningResourceDetails({ resource })
+    const el = queryByTerm(document.body, "Level:")
+    if (shouldDisplay) {
+      expect(el).toHaveTextContent(level as string)
+    } else {
+      expect(el).toBe(null)
+    }
   })
 
   it("renders the expected fields for a video", () => {
-    const resource = makeVideoResult()
+    const offeredBy = faker.word.noun()
+    const resource = makeVideoResult({ offered_by: [offeredBy] })
 
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={null}
-        setShowResourceDrawer={null}
-      />
-    )
+    renderLearningResourceDetails({ resource })
 
-    expect(screen.getByText(resource.title)).toBeInTheDocument()
+    screen.getByText(resource.title)
+    screen.getByText(offeredBy)
 
-    expect(screen.getByText(resource.offered_by)).toBeInTheDocument()
-
-    expect(screen.queryByText("Level:")).toBe(null)
-    expect(screen.getByText("Duration:")).toBeInTheDocument()
-    expect(screen.getByText("Date Posted:")).toBeInTheDocument()
+    expect(queryByTerm(document.body, "Level:")).toBe(null)
+    getByTerm(document.body, "Duration:")
+    getByTerm(document.body, "Date Posted:")
 
     const a = screen.getByRole("link")
     assertInstanceOf(a, HTMLAnchorElement)
-    expect(a.href).toBe(resource.url.toLowerCase())
+    expect(a.href).toBe(resource.url?.toLowerCase())
     expect(a.dataset.cardChrome).toBe("0")
     expect(a.dataset.cardControls).toBe("0")
     expect(a.dataset.cardKey).toBe("fake")
@@ -78,20 +93,13 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it.each([
     { certification: [], hasCertificate: false },
-    { certification: undefined, hasCertificate: false },
     { certification: ["cert"], hasCertificate: true }
   ])(
     "should render an icon if the object has a certificate",
     ({ certification, hasCertificate }) => {
-      const resource = makeMinimalResoure({ certification })
+      const resource = makeCourseResult({ certification })
 
-      render(
-        <ExpandedLearningResourceDisplay
-          object={resource}
-          runId={resource.runs[0].id}
-          setShowResourceDrawer={null}
-        />
-      )
+      renderLearningResourceDetails({ resource })
       const certIcon = screen.queryByAltText("Receive a certificate", {
         exact: false
       })
@@ -100,67 +108,33 @@ describe("ExpandedLearningResourceDisplay", () => {
   )
 
   it("renders the default cover image if none exists", () => {
-    const resource = makeMinimalResoure({ image_src: null })
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    const resource = makeCourseResult({ image_src: null })
+    renderLearningResourceDetails({ resource })
 
     const coverImg = screen.getByAltText("")
+    assertInstanceOf(coverImg, HTMLImageElement)
     expect(coverImg.src).toContain("default_resource_thumb.jpg")
   })
 
   it("renders the run url if it is set", () => {
-    const resource = makeMinimalResoure()
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    const run = makeRun()
+    const resource = makeCourseResult({ runs: [run] })
+    renderLearningResourceDetails({ resource })
     const link = screen.getByRole("link")
-    expect(link.href).toBe(resource.runs[0].url.toLowerCase())
+    assertInstanceOf(link, HTMLAnchorElement)
+    assertNotNil(run.url)
+    expect(link.href).toBe(run.url.toLowerCase())
   })
 
   it("renders the object url if the run url is not set", () => {
-    const resource = makeMinimalResoure()
-    resource.runs[0].url = null
-    resource.url = "www.aurl.com"
+    const run = makeRun({ url: null })
+    const resource = makeCourseResult({ runs: [run], url: "www.aurl.com" })
 
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    renderLearningResourceDetails({ resource })
     const link = screen.getByRole("link")
+    assertInstanceOf(link, HTMLAnchorElement)
     expect(link.href).toContain(resource.url)
   })
-
-  it.each([
-    { numRuns: 1, hasDropdown: false },
-    { numRuns: 2, hasDropdown: true }
-  ])(
-    "should render an drop down to select runs if there are at least two runs",
-    ({ numRuns, hasDropdown }) => {
-      const resource = makeMinimalResoure()
-      resource.runs = resource.runs.slice(0, numRuns)
-      render(
-        <ExpandedLearningResourceDisplay
-          object={resource}
-          runId={resource.runs[0].id}
-          setShowResourceDrawer={null}
-        />
-      )
-      const runDropdown = screen.queryByRole("combobox")
-      expect(runDropdown === null).not.toBe(hasDropdown)
-    }
-  )
 
   it.each([
     { languageCode: "en-us", language: "English" },
@@ -169,49 +143,102 @@ describe("ExpandedLearningResourceDisplay", () => {
     { languageCode: null, language: "English" },
     { languageCode: "", language: "English" }
   ])("should render the course language", ({ languageCode, language }) => {
-    const resource = makeMinimalResoure()
-    resource.runs[0].language = languageCode
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
-    expect(screen.getByText(language)).toBeInTheDocument()
+    const run = makeRun({ language: languageCode })
+    const resource = makeCourseResult({ runs: [run] })
+    renderLearningResourceDetails({ resource })
+    screen.getByText(language)
   })
 
   it("formats and renders the cost", () => {
-    const resource = makeMinimalResoure()
-    resource.runs[0].prices = [{ price: 25.5, mode: "" }]
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    const run = makeRun({ prices: [{ price: 25.5, mode: "" }] })
+    const resource = makeCourseResult({ runs: [run] })
+    renderLearningResourceDetails({ resource })
     expect(screen.getByText("$25.50")).toBeInTheDocument()
   })
 
   it("has a share button with the direct url for the resource", async () => {
-    const resource = makeMinimalResoure()
-    render(
-      <ExpandedLearningResourceDisplay
-        object={resource}
-        runId={resource.runs[0].id}
-        setShowResourceDrawer={null}
-      />
-    )
+    const resource = makeCourseResult()
+    renderLearningResourceDetails({ resource })
 
-    const learningResourcePermalink = `${window.location.origin}${window.location.pathname}?resourceId=${resource.id}&resourceType=${resource.object_type}`
+    const expectedLink = formatShareLink(resource)
 
-    await waitFor(async () => {
-      await fireEvent.click(screen.getByText("Share"))
-    })
+    await fireEvent.click(screen.getByText("Share"))
+    screen.getByDisplayValue(expectedLink)
+  })
 
-    expect(
-      screen.getByDisplayValue(learningResourcePermalink)
-    ).toBeInTheDocument()
+  it.each([
+    { numRuns: 1, hasDropdown: false },
+    { numRuns: 2, hasDropdown: true }
+  ])(
+    "should render an drop down to select runs if there are at least two runs",
+    ({ numRuns, hasDropdown }) => {
+      const runs = Array(numRuns)
+        .fill(null)
+        .map(() => makeRun())
+      const resource = makeCourseResult({ runs })
+      renderLearningResourceDetails({ resource })
+      const runDropdown = screen.queryByRole("combobox")
+      expect(runDropdown === null).not.toBe(hasDropdown)
+    }
+  )
+
+  it("Initially selects the 'best' run", () => {
+    const runs = Array(4)
+      .fill(null)
+      .map(() => makeRun())
+    const bestRun = findBestRun(runs)
+    assertNotNil(bestRun)
+
+    const resource = makeCourseResult({ runs })
+    renderLearningResourceDetails({ resource })
+    const runDropdown = screen.queryByRole("combobox")
+    assertInstanceOf(runDropdown, HTMLSelectElement)
+
+    expect(runDropdown.value).toBe(String(bestRun.id))
+  })
+
+  it("should update the info when course run changes", async () => {
+    /**
+     * This test is slightly annoying to write because the initially selected
+     * could be any of the `resource.runs`.
+     */
+
+    const url0 = makeUrl()
+    const url1 = makeUrl()
+    const run0 = makeRun({ url: url0 })
+    const run1 = makeRun({ url: url1 })
+    const runs = [run0, run1]
+    const resource = makeCourseResult({ runs: [run0, run1] })
+    renderLearningResourceDetails({ resource })
+
+    const dropdown = screen.getByRole("combobox")
+    const options = within(dropdown).getAllByRole(
+      "option"
+    ) as HTMLOptionElement[]
+
+    /**
+     * The initially selected option
+     */
+    const optA = options.find(e => e.selected)
+    /**
+     * The initially unspected option
+     */
+    const optB = options.find(e => !e.selected)
+    assertNotNil(optA)
+    assertNotNil(optB)
+
+    const runA = runs.find(r => r.id === +optA.value)
+    const runB = runs.find(r => r.id === +optB.value)
+    assertNotNil(runA)
+    assertNotNil(runB)
+
+    const link = screen.getByRole("link")
+    assertInstanceOf(link, HTMLAnchorElement)
+
+    expect(link.href).toBe(runA.url)
+
+    await user.selectOptions(dropdown, optB)
+
+    expect(link.href).toBe(runB.url)
   })
 })

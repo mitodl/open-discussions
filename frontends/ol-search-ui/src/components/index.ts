@@ -7,14 +7,13 @@ export type { SearchInputProps } from "./SearchInput"
 export { default as LearningResourceCard } from "./LearningResourceCard"
 export type {
   LearningResourceCardProps,
-  CardImgConfig,
+  OnActivateCard,
   CardVariant
 } from "./LearningResourceCard"
 
 export { default as SearchFilterDrawer } from "./SearchFilterDrawer"
 
 export {
-  LearningResourceDrawer,
-  useGetResourceIdentifiersFromUrl,
-  ResourceIdentifiers
-} from "./LearningResourceDrawer"
+  default as ExpandedLearningResourceDisplay,
+  LearningResourceDetailsProps as ExpandedLearningResourceDisplayProps
+} from "./ExpandedLearningResourceDisplay"

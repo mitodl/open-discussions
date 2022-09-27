@@ -1,3 +1,4 @@
+import { faker } from "@faker-js/faker"
 import type { PaginatedResult } from "./interfaces"
 import { times } from "lodash"
 
@@ -24,5 +25,10 @@ const makePaginatedFactory =
       }
     }
 
-export { makePaginatedFactory }
+/**
+ * Make a random URL with `faker`, but standardize it to what browsers use.
+ */
+const makeUrl = (): string => new URL(faker.internet.url()).toString()
+
+export { makePaginatedFactory, makeUrl }
 export type { Factory }

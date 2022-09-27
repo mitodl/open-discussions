@@ -10,7 +10,8 @@ import {
   LearningResource,
   LearningResourceType,
   CardMinimalResource,
-  EmbedlyConfig
+  EmbedlyConfig,
+  CourseResult
 } from "./interfaces"
 
 import { pick, times } from "lodash"
@@ -20,29 +21,39 @@ const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
 const CERTIFICATE = "Certificates"
 
-export const makeSearchResult = (type: string | null) => {
-  if (!type) {
-    type = casual.random_element(["course", "program"])
-  }
-  let hit
-  switch (type) {
-  case "course":
-    hit = makeCourseResult()
-    break
-  case "program":
-    hit = makeProgramResult()
-    break
-  default:
-    throw new Error("unknown type")
-  }
-
+export const makeRun: Factory<LearningResourceRun> = overrides => {
   return {
-    _id:     `id_String${casual.random}`,
-    _source: hit
+    id:               faker.unique(faker.datatype.number),
+    url:              casual.url,
+    language:         casual.random_element(["en-US", "fr", null]),
+    semester:         casual.random_element(["Fall", "Spring", null]),
+    year:             casual.year,
+    level:            casual.random_element(["Graduate", "Undergraduate", null]),
+    start_date:       casual.date(DATE_FORMAT),
+    end_date:         casual.date(DATE_FORMAT),
+    best_start_date:  casual.date(DATE_FORMAT),
+    best_end_date:    casual.date(DATE_FORMAT),
+    enrollment_start: casual.date(DATE_FORMAT),
+    enrollment_end:   casual.date(DATE_FORMAT),
+    availability:     casual.random_element(["archived", "current", "Upcoming"]),
+    instructors:      [
+      {
+        first_name: casual.name,
+        last_name:  casual.name,
+        full_name:  casual.name
+      },
+      {
+        first_name: casual.name,
+        last_name:  casual.name,
+        full_name:  casual.name
+      }
+    ],
+    prices: [{ mode: "audit", price: casual.integer(1, 1000) }],
+    ...overrides
   }
 }
 
-export const makeCourseResult: Factory<LearningResourceResult> = overrides => ({
+export const makeCourseResult: Factory<CourseResult> = overrides => ({
   id:                faker.unique(faker.datatype.number),
   title:             casual.title,
   url:               casual.url,
@@ -86,6 +97,7 @@ export const makeProgramResult: Factory<
     [OPEN_CONTENT, PROFESSIONAL]
   ]),
   certification: casual.random_element([[], [CERTIFICATE]]),
+  platform:      faker.word.noun(),
   ...overrides
 })
 
@@ -101,42 +113,32 @@ export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
   duration:          moment.duration(casual.integer(30, 60 * 90) * 1000).toISOString(),
   object_type:       LearningResourceType.Video,
   offered_by:        [casual.random_element(["mitc", "ocw"])],
-  runs:              [],
+  runs:              undefined,
   lists:             [],
   audience:          [],
   certification:     [],
+  platform:          faker.word.noun(),
   ...overrides
 })
 
-export const makeRun: Factory<LearningResourceRun> = overrides => {
+const resultMakers = {
+  course:  makeCourseResult,
+  program: makeProgramResult,
+  video:   makeCourseResult
+}
+type MakeableResultType = keyof typeof resultMakers
+
+const makeLearningResourceResult = (type?: MakeableResultType | null) => {
+  const maker = type ?
+    resultMakers[type] :
+    faker.helpers.arrayElement(Object.values(resultMakers))
+  return maker()
+}
+
+export const makeSearchResult = (type?: MakeableResultType) => {
   return {
-    id:               faker.unique(faker.datatype.number),
-    url:              casual.url,
-    language:         casual.random_element(["en-US", "fr", null]),
-    semester:         casual.random_element(["Fall", "Spring", null]),
-    year:             casual.year,
-    level:            casual.random_element(["Graduate", "Undergraduate", null]),
-    start_date:       casual.date(DATE_FORMAT),
-    end_date:         casual.date(DATE_FORMAT),
-    best_start_date:  casual.date(DATE_FORMAT),
-    best_end_date:    casual.date(DATE_FORMAT),
-    enrollment_start: casual.date(DATE_FORMAT),
-    enrollment_end:   casual.date(DATE_FORMAT),
-    availability:     casual.random_element(["archived", "current", "Upcoming"]),
-    instructors:      [
-      {
-        first_name: casual.name,
-        last_name:  casual.name,
-        full_name:  casual.name
-      },
-      {
-        first_name: casual.name,
-        last_name:  casual.name,
-        full_name:  casual.name
-      }
-    ],
-    prices: [{ mode: "audit", price: casual.integer(1, 1000) }],
-    ...overrides
+    _id:     `id_String${casual.random}`,
+    _source: makeLearningResourceResult(type)
   }
 }
 
@@ -144,7 +146,7 @@ const TEST_SEARCH_PAGE_SIZE = 4
 export const makeSearchResponse = (
   pageSize: number = TEST_SEARCH_PAGE_SIZE,
   total: number = 2 * TEST_SEARCH_PAGE_SIZE,
-  type: string | null = null,
+  type?: MakeableResultType,
   withFacets = true
 ) => {
   const hits = times(pageSize, () => makeSearchResult(type))
@@ -192,14 +194,15 @@ export const makeTopic: Factory<CourseTopic> = overrides => {
 
 export const makeLearningResource: Factory<LearningResource> = overrides => {
   const resource: LearningResource = {
-    id:          faker.unique(faker.datatype.number),
-    title:       faker.lorem.words(),
-    image_src:   new URL(faker.internet.url()).toString(),
-    topics:      times(2, () => makeTopic()),
-    object_type: makeLearningResourceType(),
-    platform:    faker.lorem.word(),
-    runs:        times(3, () => makeRun()),
-    lists:       [],
+    id:            faker.unique(faker.datatype.number),
+    title:         faker.lorem.words(),
+    image_src:     new URL(faker.internet.url()).toString(),
+    topics:        times(2, () => makeTopic()),
+    object_type:   makeLearningResourceType(),
+    platform:      faker.lorem.word(),
+    runs:          times(3, () => makeRun()),
+    lists:         [],
+    certification: [],
     ...overrides
   }
   return resource

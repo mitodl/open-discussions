@@ -1,6 +1,6 @@
-import type { CardVariant, CardImgConfig } from "ol-search-ui"
+import type { CardVariant, EmbedlyConfig } from "ol-search-ui"
 
-const imgConfigs: Record<CardVariant, CardImgConfig> = {
+const imgConfigs: Record<CardVariant, EmbedlyConfig> = {
   row: {
     ocwBaseUrl: SETTINGS.ocw_next_base_url,
     embedlyKey: SETTINGS.embedlyKey,

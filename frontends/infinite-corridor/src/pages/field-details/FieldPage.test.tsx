@@ -1,7 +1,13 @@
+/* eslint-disable testing-library/no-node-access */
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
-import { LearningResource, LearningResourceCard } from "ol-search-ui"
+import { urls as resourceUrls } from "../../api/learning-resources"
+import {
+  LearningResource,
+  LearningResourceCard,
+  ExpandedLearningResourceDisplay
+} from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import type { UserList, UserListItem, FieldChannel } from "../../api/fields"
 import * as factory from "../../api/fields/factories"
@@ -15,6 +21,8 @@ import {
   waitFor
 } from "../../test-utils"
 import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeLearningResource } from "ol-search-ui/src/factories"
+import { waitForElementToBeRemoved } from "@testing-library/react"
 
 jest.mock("./WidgetsList", () => {
   const actual = jest.requireActual("./WidgetsList")
@@ -25,14 +33,10 @@ jest.mock("./WidgetsList", () => {
 })
 const mockWidgetList = jest.mocked(WidgetList)
 
-jest.mock("ol-search-ui", () => {
-  const actual = jest.requireActual("ol-search-ui")
-  return {
-    ...actual,
-    LearningResourceCard: jest.fn(actual.LearningResourceCard)
-  }
-})
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
+const spyExpandedLearningResourceDisplay = jest.mocked(
+  ExpandedLearningResourceDisplay
+)
 
 jest.mock("ol-util", () => {
   const actual = jest.requireActual("ol-util")
@@ -93,8 +97,36 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
     { list: list2, items: toLearningResources(items2.results) },
     { list: list3, items: toLearningResources(items3.results) }
   ]
-  return { field, featured, lists, widgets: widgetsList.widgets }
+
+  const resources = Object.fromEntries(
+    [...lists, featured].flatMap(({ items }) =>
+      items.map(item => {
+        const resource = makeLearningResource({
+          id:          item.id,
+          title:       item.title,
+          object_type: item.object_type
+        })
+        return [resource.id, resource]
+      })
+    )
+  )
+
+  Object.values(resources).forEach(r => {
+    setMockResponse.get(resourceUrls.resource(r.object_type, r.id), r)
+  })
+
+  return {
+    field,
+    featured,
+    lists,
+    widgets: widgetsList.widgets,
+    /**
+     * Full resource objects used, e.g., in the LearningResourceDrawer
+     */
+    resources
+  }
 }
+type SetupResult = ReturnType<typeof setupApis>
 
 describe("FieldPage", () => {
   it("Displays the field title, banner, and avatar", async () => {
@@ -212,6 +244,47 @@ describe("FieldPage", () => {
       await waitFor(() => {
         expect(history.location.pathname).toEndWith(`/fields/${field.name}/`)
       })
+    }
+  )
+
+  test.each([
+    {
+      getItem:  (setupResult: SetupResult) => setupResult.featured.items[0],
+      cardDesc: "featured card"
+    },
+    {
+      getItem:  (setupResult: SetupResult) => setupResult.lists[0].items[0],
+      cardDesc: "subfield card"
+    }
+  ])(
+    "Clicking a $cardDesc opens the <LearningResourceDrawer />",
+    async ({ getItem }) => {
+      const result = setupApis()
+      const item = getItem(result)
+      const { field, resources } = result
+
+      const url = `/fields/${field.name}/`
+      const { history } = renderTestApp({ url })
+
+      await user.click(await screen.findByRole("button", { name: item.title }))
+      const params0 = new URLSearchParams(history.location.search)
+      expect(params0.get("resource_id")).toBe(String(item.id))
+      expect(params0.get("resource_type")).toBe(item.object_type)
+
+      const getDrawerContent = () =>
+        screen.getByLabelText("Detailed description")
+      const drawer = getDrawerContent()
+      await within(drawer).findByRole("heading", { name: item.title })
+      expect(spyExpandedLearningResourceDisplay).toHaveBeenCalledWith(
+        expect.objectContaining({ resource: resources[item.id] }),
+        expect.anything()
+      )
+
+      await user.click(screen.getByRole("button", { name: "Close" }))
+      const params1 = new URLSearchParams(history.location.search)
+      expect(params1.get("resource_id")).toBe(null)
+      expect(params1.get("resource_type")).toBe(null)
+      await waitForElementToBeRemoved(getDrawerContent)
     }
   )
 })

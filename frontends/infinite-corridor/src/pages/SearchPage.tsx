@@ -17,12 +17,10 @@ import {
   LearningResourceCardProps,
   SearchInput,
   SearchFilterDrawer,
-  FacetManifest,
-  LearningResourceDrawer,
-  useGetResourceIdentifiersFromUrl,
-  ResourceIdentifiers
+  FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
+import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 
 import axios from "../libs/axios"
 import { useHistory } from "react-router"
@@ -66,10 +64,8 @@ const SearchPage: React.FC = () => {
   const [requestInFlight, setRequestInFlight] = useState(false)
   const [searchApiFailed, setSearchApiFailed] = useState(false)
   const [aggregations, setAggregations] = useState<Aggregations>(new Map())
-  const [drawerObject, setDrawerObject] = useState<ResourceIdentifiers | null>(
-    useGetResourceIdentifiersFromUrl() as ResourceIdentifiers
-  )
   const isMd = useMuiBreakpoint("md")
+  const activateResource = useActivateResourceDrawer()
 
   const clearSearch = useCallback(() => {
     setSearchResults([])
@@ -208,7 +204,7 @@ const SearchPage: React.FC = () => {
                           variant="row-reverse"
                           imgConfig={imgConfig}
                           resource={hit._source}
-                          toggleDrawer={setDrawerObject}
+                          onActivate={activateResource}
                         />
                       </li>
                     ))}
@@ -221,10 +217,6 @@ const SearchPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <LearningResourceDrawer
-        drawerObject={drawerObject}
-        setDrawerObject={setDrawerObject}
-      />
     </BannerPage>
   )
 }

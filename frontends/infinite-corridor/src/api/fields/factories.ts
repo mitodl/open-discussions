@@ -24,6 +24,7 @@ export const makeUserList: Factory<UserList> = overrides => {
     privacy_level: "public",
     author:        faker.datatype.number({ min: 1, max: 1000 }),
     lists:         [],
+    certification: [],
     author_name:   faker.name.findName(),
     ...overrides
   }

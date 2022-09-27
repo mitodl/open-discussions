@@ -20,13 +20,13 @@ export type LearningResource = {
   image_src: string | null
   runs?: LearningResourceRun[]
   offered_by?: string[]
-  platform?: string | null
+  platform?: string
   is_favorite?: boolean
   audience?: string[]
-  certification?: string[]
+  certification: string[]
 }
 
-export type LearningResourceResult = {
+export interface LearningResourceResult {
   id: number
   course_id?: string
   video_id?: string
@@ -47,6 +47,11 @@ export type LearningResourceResult = {
   item_count?: number
   last_modified?: string | null
   duration?: string | null
+}
+
+export interface CourseResult extends LearningResourceResult {
+  runs: NonNullable<LearningResourceResult["runs"]>
+  object_type: LearningResourceType.Course
 }
 
 export type CourseTopic = {

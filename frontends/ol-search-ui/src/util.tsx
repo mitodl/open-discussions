@@ -3,7 +3,6 @@ import {
   LearningResourceRun,
   CoursePrice,
   CourseInstructor,
-  LearningResourceResult,
   LearningResourceType as LR
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
@@ -73,7 +72,9 @@ const compareRuns = (
   secondRun: LearningResourceRun
 ) => runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
-const bestRun = (runs: LearningResourceRun[]): LearningResourceRun | null => {
+const findBestRun = (
+  runs: LearningResourceRun[]
+): LearningResourceRun | undefined => {
   const dated = runs.filter(run => run.best_start_date && run.best_end_date)
 
   // Runs that are running right now
@@ -94,7 +95,7 @@ const bestRun = (runs: LearningResourceRun[]): LearningResourceRun | null => {
     .sort(compareRuns)
     .reverse()
   if (bestRecentRun) return bestRecentRun
-  return null
+  return undefined
 }
 
 const readableLearningResources: Record<LR, string> = {
@@ -125,7 +126,7 @@ const getReadableResourceType = (type: string): string => {
   return readableLearningResources[type]
 }
 
-export { resourceThumbnailSrc, bestRun, getReadableResourceType }
+export { resourceThumbnailSrc, findBestRun, getReadableResourceType }
 export type { EmbedlyConfig }
 
 export const getViewportWidth = () => window.innerWidth
@@ -155,26 +156,26 @@ export const CertificateIcon = () => (
 )
 
 export const minPrice = (
-  prices: Array<CoursePrice>,
+  prices: CoursePrice[],
   includeDollarSign = false
-) => {
+): string | null => {
   if (emptyOrNil(prices)) {
     return null
   }
   const price = Math.min(...prices.map(price => price.price))
 
   if (price > 0 && price !== Infinity) {
-    return includeDollarSign ? `${formatPrice(price)}` : price
+    return includeDollarSign ? `${formatPrice(price)}` : String(price)
   } else {
     return "Free"
   }
 }
 
 export const getStartDate = (
-  object: LearningResourceResult,
+  platform: string,
   objectRun: LearningResourceRun
 ): string => {
-  if (object.platform === "ocw") {
+  if (platform === "ocw") {
     return `${capitalize(objectRun.semester || "")} ${objectRun.year || ""}`
   } else if (objectRun.start_date) {
     return moment(objectRun.start_date).format("MMMM DD, YYYY")
