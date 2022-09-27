@@ -120,6 +120,7 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
           >
             <Button
               variant="outlined"
+              color="secondary"
               startIcon={<ReplyIcon sx={invertIconSx} />}
             >
               Share
