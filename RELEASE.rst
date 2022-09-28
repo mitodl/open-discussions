@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.200.0
+---------------
+
+- Connect LearningResource Drawer to router (#3753)
+
 Version 0.199.4 (Released September 21, 2022)
 ---------------
 
