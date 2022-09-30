@@ -2,14 +2,13 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
+
 import { Link } from "react-router-dom"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -46,9 +45,8 @@ export class PasswordChangePage extends React.Component<Props> {
       this.props
     return (
       <React.Fragment>
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Change Password")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content settings-page">
           <h4>Change Password</h4>

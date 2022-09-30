@@ -1,14 +1,12 @@
 // @flow
 import React from "react"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import R from "ramda"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
 import LoginGreeting from "../../components/auth/LoginGreeting"
-import { NotFound } from "../../components/ErrorPages"
-import { CanonicalLink } from "ol-util"
+import { NotFound } from "ol-util"
 
 import { formatTitle } from "../../lib/title"
 import { getAuthProviderSelector } from "../../reducers/auth"
@@ -86,10 +84,10 @@ export const LoginProviderRequiredPage = ({
     <div className="auth-page login-provider-page">
       <div className="main-content">
         <Card className="login-provider-card">
-          <MetaTags>
+          <MetaTags canonicalLink={match?.url}>
             <title>{formatTitle("Welcome Back!")}</title>
-            <CanonicalLink match={match} />
           </MetaTags>
+
           <LoginGreeting
             email={email}
             name={name}

@@ -5,7 +5,7 @@ import sinon from "sinon"
 import R from "ramda"
 
 import PostList from "../components/PostList"
-import { NotFound, NotAuthorized } from "../components/ErrorPages"
+import { NotFound, NotAuthorized } from "ol-util"
 import ChannelPage, { ChannelPage as InnerChannelPage } from "./ChannelPage"
 
 import { makeChannelList } from "../factories/channels"
@@ -22,6 +22,7 @@ import { formatTitle } from "../lib/title"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
 import * as embedLib from "../lib/embed"
+import { waitFor } from "@testing-library/react"
 
 describe("ChannelPage", function() {
   this.timeout(10000)
@@ -127,7 +128,9 @@ describe("ChannelPage", function() {
 
     it("should set the document title", async () => {
       await renderPage(currentChannel)
-      assert.equal(document.title, formatTitle(currentChannel.title))
+      await waitFor(() =>
+        assert.equal(document.title, formatTitle(currentChannel.title))
+      )
     })
 
     it("should fetch postsForChannel, set post data, and render", async () => {

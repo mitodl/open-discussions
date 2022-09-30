@@ -2,14 +2,12 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { Radio } from "@mitodl/mdl-react-components"
 import { Checkbox } from "@rmwc/checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import SettingsTabs from "../components/SettingsTabs"
-import { CanonicalLink } from "ol-util"
 
 import { formatTitle } from "../lib/title"
 import { getTokenFromUrl } from "../lib/util"
@@ -198,10 +196,10 @@ class SettingsPage extends React.Component<Props> {
 
       return (
         <React.Fragment>
-          <MetaTags>
+          <MetaTags canonicalLink="settings">
             <title>{formatTitle("Settings")}</title>
-            <CanonicalLink relativeUrl="settings" />
           </MetaTags>
+
           <div className="main-content settings-page">
             <SettingsTabs />
             <form onSubmit={this.onSubmit}>

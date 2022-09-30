@@ -63,3 +63,11 @@ export const formatDurationClockTime = (value: string) => {
 
   return values.join(":")
 }
+
+const removeTrailingSlash = (str: string): string =>
+  str.length > 0 && str.endsWith("/") ? str.substring(0, str.length - 1) : str
+
+export const getCanonicalUrl = (url: string): string => {
+  const href = removeTrailingSlash(String(new URL(url, window.location.origin)))
+  return href
+}

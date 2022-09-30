@@ -1,10 +1,8 @@
 // @flow
 /* global SETTINGS:false */
 import React from "react"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
-import { CanonicalLink } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import { formatTitle } from "../../lib/title"
 
 import type { Match } from "react-router"
@@ -20,10 +18,11 @@ const InactiveUserPage = ({ match }: Props) => {
       <div className="main-content">
         <Card className="inactive-account-card">
           <h3>Log In</h3>
-          <MetaTags>
+
+          <MetaTags canonicalLink={match?.url}>
             <title>{formatTitle("Account is inactive")}</title>
-            <CanonicalLink match={match} />
           </MetaTags>
+
           <p>
             Your account is not currently active. To fix this, please email
             support at <a href={`mailto:${supportEmail}`}>{supportEmail}</a>

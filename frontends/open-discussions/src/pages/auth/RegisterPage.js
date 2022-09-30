@@ -3,15 +3,13 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 import qs from "query-string"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import ExternalLogins from "../../components/ExternalLogins"
 import AuthEmailForm from "../../components/auth/AuthEmailForm"
 import withForm from "../../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { setBannerMessage } from "../../actions/ui"
@@ -48,9 +46,8 @@ export const RegisterPage = ({
     <div className="main-content">
       <Card className="register-card">
         <h3>Join MIT OPEN for free</h3>
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Register")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         {renderForm({ formError, submitLabel: "Sign Up" })}
         <ExternalLogins next={next} />

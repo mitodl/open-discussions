@@ -4,11 +4,10 @@ import R from "ramda"
 import React, { useState, useEffect, useCallback } from "react"
 import InfiniteScroll from "react-infinite-scroller"
 import { useSelector, useDispatch } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
-import { CanonicalLink } from "ol-util"
+import { MetaTags } from "ol-util"
 import { Searchbox } from "ol-search-ui"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
@@ -225,9 +224,8 @@ export default function CourseSearchPage(props: Props) {
 
   return (
     <BannerPageWrapper>
-      <MetaTags>
-        <CanonicalLink match={match} />
-      </MetaTags>
+      <MetaTags canonicalLink={match?.url} />
+
       <BannerPageHeader tall compactOnMobile>
         <BannerContainer tall compactOnMobile>
           <BannerImage src={COURSE_SEARCH_BANNER_URL} tall compactOnMobile />

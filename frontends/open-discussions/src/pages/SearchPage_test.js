@@ -320,7 +320,7 @@ describe("SearchPage", () => {
         }
       }
     })
-    assert.equal(inner.find("NotFound").length, 1)
+    assert.isTrue(inner.find(".not-found").text().includes("Page not found"))
   })
 
   it("shows NotAuthorized if there is a 403 error", async () => {
@@ -331,7 +331,9 @@ describe("SearchPage", () => {
         }
       }
     })
-    assert.equal(inner.find("NotAuthorized").length, 1)
+    assert.isTrue(
+      inner.find(".not-found").text().includes("Stop! Who goes there?")
+    )
   })
 
   it("clears the text when the onClear prop is triggered", async () => {

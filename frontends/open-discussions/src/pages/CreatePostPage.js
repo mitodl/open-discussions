@@ -3,9 +3,9 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
-import { CanonicalLink } from "ol-util"
+
+import { MetaTags } from "ol-util"
 import isURL from "validator/lib/isURL"
 
 import CreatePostForm from "../components/CreatePostForm"
@@ -359,9 +359,8 @@ class CreatePostPage extends React.Component<CreatePostPageProps> {
 
     return (
       <React.Fragment>
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Submit a Post")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         <IntraPageNav>
           <a href="#" className="active">

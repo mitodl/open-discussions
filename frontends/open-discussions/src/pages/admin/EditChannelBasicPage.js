@@ -2,7 +2,8 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
+
+import { MetaTags } from "ol-util"
 
 import EditChannelBasicForm from "../../components/admin/EditChannelBasicForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"

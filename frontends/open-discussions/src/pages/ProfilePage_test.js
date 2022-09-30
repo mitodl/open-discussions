@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
+import { Helmet } from "react-helmet-async"
 
 import ProfileImage from "../components/ProfileImage"
 
@@ -10,6 +11,7 @@ import { makeProfile } from "../factories/profiles"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
+import { waitFor } from "@testing-library/react"
 
 describe("ProfilePage", function() {
   let helper, renderComponent, profile
@@ -44,7 +46,11 @@ describe("ProfilePage", function() {
 
   it("should set the document title", async () => {
     await renderPage()
-    assert.equal(document.title, formatTitle(`Profile for ${profile.name}`))
+    // const helmet = Helmet.peek()
+    // assert.equal(helmet.title, formatTitle(`Profile for ${profile.name}`))
+    await waitFor(() =>
+      assert.equal(document.title, formatTitle(`Profile for ${profile.name}`))
+    )
   })
 
   it("should display profile name, bio, and headline", async () => {

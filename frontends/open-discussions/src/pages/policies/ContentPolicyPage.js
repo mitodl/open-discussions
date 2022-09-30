@@ -1,10 +1,8 @@
 // @flow
 /* global SETTINGS: false */
 import React from "react"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
-import { CanonicalLink } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 
 import { formatTitle } from "../../lib/title"
 
@@ -20,9 +18,8 @@ export default class ContentPolicyPage extends React.Component<Props> {
 
     return (
       <div className="content content-policy-page">
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Community Guidelines")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content">
           <Card className="site-policy content-policy">

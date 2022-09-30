@@ -1,9 +1,7 @@
 // @flow
 import React from "react"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
-import { CanonicalLink } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 
 import { formatTitle } from "../../lib/title"
 import { MICROMASTERS_URL, getNextParam } from "../../lib/url"
@@ -22,9 +20,8 @@ export default class AuthRequiredPage extends React.Component<Props> {
 
     return (
       <div className="auth-page auth-required-page">
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Login Required")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content">
           <Card className="auth-required">

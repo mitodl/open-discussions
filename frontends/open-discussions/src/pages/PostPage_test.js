@@ -5,11 +5,10 @@ import R from "ramda"
 import { Link } from "react-router-dom"
 
 import CommentTree from "../components/CommentTree"
-import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
 import CommentForm from "../components/CommentForm"
-import { CanonicalLink } from "ol-util"
+import { CanonicalLink, NotFound, NotAuthorized } from "ol-util"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"
@@ -172,12 +171,7 @@ describe("PostPage", function() {
     const { inner } = await render()
 
     assert.equal(
-      inner
-        .find("MetaTags")
-        .props()
-        .children.find(child => child.type === CanonicalLink).props[
-          "relativeUrl"
-        ],
+      inner.find("MetaTags").props().canonicalLink,
       postDetailURL(channel.name, post.id, post.slug)
     )
   })
@@ -202,15 +196,7 @@ describe("PostPage", function() {
       }
     )
 
-    assert.equal(
-      inner
-        .find("MetaTags")
-        .props()
-        .children.find(child => child.type === CanonicalLink).props[
-          "relativeUrl"
-        ],
-      commentLink
-    )
+    assert.equal(inner.find("MetaTags").props().canonicalLink, commentLink)
   })
 
   it("should render comments", async () => {

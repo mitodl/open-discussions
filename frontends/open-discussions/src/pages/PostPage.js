@@ -5,9 +5,8 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { Link } from "react-router-dom"
 import qs from "query-string"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import { withSpinnerLoading } from "../components/Loading"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import CommentTree from "../components/CommentTree"
@@ -19,7 +18,6 @@ import {
   postModerationSelector
 } from "../hoc/withPostModeration"
 import { CommentSortPicker } from "../components/Picker"
-import { CanonicalLink } from "ol-util"
 import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"
@@ -274,18 +272,14 @@ export class PostPage extends React.Component<PostPageProps> {
 
     const showPermalinkUI = R.not(R.isNil(commentID))
     const hidePostDialog = this.hidePostDialog(DELETE_POST_DIALOG)
+    const relativeUrl = commentID
+      ? commentPermalink(channel.name, post.id, post.slug, commentID)
+      : postDetailURL(channel.name, post.id, post.slug)
 
     return (
       <div>
-        <MetaTags>
+        <MetaTags canonicalLink={relativeUrl}>
           <title>{formatTitle(post.title)}</title>
-          <CanonicalLink
-            relativeUrl={
-              commentID
-                ? commentPermalink(channel.name, post.id, post.slug, commentID)
-                : postDetailURL(channel.name, post.id, post.slug)
-            }
-          />
           <meta name="description" content={truncate(post.text, 300)} />
         </MetaTags>
         <Card className="post-card">

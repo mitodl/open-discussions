@@ -2,12 +2,10 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
@@ -43,9 +41,8 @@ export const RegisterDetailsPage = ({
       <Card className="register-card">
         <h3>Thanks for confirming!</h3>
         <h4>Last details:</h4>
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Thanks for confirming!")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         {renderForm({ formError })}
       </Card>

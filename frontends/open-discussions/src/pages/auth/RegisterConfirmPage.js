@@ -2,13 +2,11 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
 import { Link } from "react-router-dom"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import { Loading } from "../../components/Loading"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse } from "../../lib/auth"
@@ -76,10 +74,11 @@ export class RegisterConfirmPage extends React.Component<Props> {
         <div className="main-content">
           <Card className="register-confirm-card">
             <h3>Confirming Email</h3>
-            <MetaTags>
+
+            <MetaTags canonicalLink={match?.url}>
               <title>{formatTitle("Confirming Email")}</title>
-              <CanonicalLink match={match} />
             </MetaTags>
+
             {showLoading ? (
               <Loading />
             ) : (
