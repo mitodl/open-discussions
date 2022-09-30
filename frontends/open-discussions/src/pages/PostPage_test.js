@@ -8,7 +8,7 @@ import CommentTree from "../components/CommentTree"
 import ExpandedPostDisplay from "../components/ExpandedPostDisplay"
 import PostPage, { PostPage as InnerPostPage } from "./PostPage"
 import CommentForm from "../components/CommentForm"
-import { CanonicalLink, NotFound, NotAuthorized } from "ol-util"
+import { NotFound, NotAuthorized } from "ol-util"
 
 import { wait } from "../lib/util"
 import { makePost } from "../factories/posts"

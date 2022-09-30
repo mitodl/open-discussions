@@ -1,7 +1,6 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
-import { Helmet } from "react-helmet-async"
 
 import ProfileImage from "../components/ProfileImage"
 
