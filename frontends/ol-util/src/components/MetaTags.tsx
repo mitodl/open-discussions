@@ -1,10 +1,17 @@
 import React from "react"
 import { Helmet } from "react-helmet-async"
-import { getCanonicalUrl } from "../lib"
 
 type MetaTagsProps = {
   canonicalLink?: string
   children?: React.ReactNode
+}
+
+const removeTrailingSlash = (str: string): string =>
+  str.length > 0 && str.endsWith("/") ? str.substring(0, str.length - 1) : str
+
+const getCanonicalUrl = (url: string): string => {
+  const href = removeTrailingSlash(String(new URL(url, window.location.origin)))
+  return href
 }
 
 /**

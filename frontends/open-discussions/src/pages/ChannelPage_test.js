@@ -3,6 +3,7 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
+import { waitFor } from "@testing-library/react"
 
 import PostList from "../components/PostList"
 import { NotFound, NotAuthorized } from "ol-util"
@@ -22,7 +23,6 @@ import { formatTitle } from "../lib/title"
 import { POSTS_SORT_HOT, VALID_POST_SORT_TYPES } from "../lib/picker"
 import { makeReportRecord } from "../factories/reports"
 import * as embedLib from "../lib/embed"
-import { waitFor } from "@testing-library/react"
 
 describe("ChannelPage", function() {
   this.timeout(10000)
@@ -229,6 +229,12 @@ describe("ChannelPage", function() {
       }
     })
     assert(inner.find(NotFound).exists())
+    await waitFor(() =>
+      assert.equal(
+        document.getElementsByTagName("meta")[0].content,
+        "noindex,noarchive"
+      )
+    )
   })
 
   it("should show an 'unauthorized' if the user is not authorized", async () => {
@@ -240,6 +246,12 @@ describe("ChannelPage", function() {
       }
     })
     assert(inner.find(NotAuthorized).exists())
+    await waitFor(() =>
+      assert.equal(
+        document.getElementsByTagName("meta")[0].content,
+        "noindex,noarchive"
+      )
+    )
   })
 
   it("should show a normal error for other error codes", async () => {

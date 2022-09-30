@@ -3,6 +3,5 @@ export {
   capitalize,
   emptyOrNil,
   formatDurationClockTime,
-  useMuiBreakpoint,
-  getCanonicalUrl
+  useMuiBreakpoint
 } from "./utils"
