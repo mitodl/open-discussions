@@ -3,9 +3,10 @@
 import { assert } from "chai"
 import sinon from "sinon"
 import R from "ramda"
+import { waitFor } from "@testing-library/react"
 
 import PostList from "../components/PostList"
-import { NotFound, NotAuthorized } from "../components/ErrorPages"
+import { NotFound, NotAuthorized } from "ol-util"
 import ChannelPage, { ChannelPage as InnerChannelPage } from "./ChannelPage"
 
 import { makeChannelList } from "../factories/channels"
@@ -127,7 +128,9 @@ describe("ChannelPage", function() {
 
     it("should set the document title", async () => {
       await renderPage(currentChannel)
-      assert.equal(document.title, formatTitle(currentChannel.title))
+      await waitFor(() =>
+        assert.equal(document.title, formatTitle(currentChannel.title))
+      )
     })
 
     it("should fetch postsForChannel, set post data, and render", async () => {
@@ -226,6 +229,12 @@ describe("ChannelPage", function() {
       }
     })
     assert(inner.find(NotFound).exists())
+    await waitFor(() =>
+      assert.equal(
+        document.getElementsByTagName("meta")[0].content,
+        "noindex,noarchive"
+      )
+    )
   })
 
   it("should show an 'unauthorized' if the user is not authorized", async () => {
@@ -237,6 +246,12 @@ describe("ChannelPage", function() {
       }
     })
     assert(inner.find(NotAuthorized).exists())
+    await waitFor(() =>
+      assert.equal(
+        document.getElementsByTagName("meta")[0].content,
+        "noindex,noarchive"
+      )
+    )
   })
 
   it("should show a normal error for other error codes", async () => {

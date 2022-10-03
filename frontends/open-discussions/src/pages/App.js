@@ -3,8 +3,10 @@
 import React from "react"
 import { Route, Redirect, Switch, useLocation } from "react-router-dom"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import qs from "query-string"
+import "focus-visible"
+
+import { MetaTags } from "ol-util"
 
 import HomePage from "./HomePage"
 import SearchPage from "./SearchPage"
@@ -65,7 +67,6 @@ import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
 import type { SnackbarState, BannerState } from "../reducers/ui"
 import type { Profile } from "../flow/discussionTypes"
-import "focus-visible"
 
 export const USER_MENU_DROPDOWN = "USER_MENU_DROPDOWN"
 

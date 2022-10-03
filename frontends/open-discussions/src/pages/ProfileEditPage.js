@@ -3,12 +3,12 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
+
+import { MetaTags } from "ol-util"
 
 import ProfileForm from "../components/ProfileForm"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -217,9 +217,8 @@ class ProfileEditPage extends React.Component<Props> {
 
     return profile.username === SETTINGS.username ? (
       <React.Fragment>
-        <MetaTags>
+        <MetaTags canonicalLink="profile/edit">
           <title>{formatTitle("Edit your profile")}</title>
-          <CanonicalLink relativeUrl="profile/edit" />
         </MetaTags>
         <ProfileForm
           profile={profile}

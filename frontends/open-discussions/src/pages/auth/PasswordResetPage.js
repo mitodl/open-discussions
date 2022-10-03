@@ -1,15 +1,13 @@
 // @flow
 import React from "react"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 import R from "ramda"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import PasswordResetForm from "../../components/auth/PasswordResetForm"
 import ExternalLogins from "../../components/ExternalLogins"
 import withForm from "../../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"
@@ -44,10 +42,10 @@ export const PasswordResetPage = ({
         </Card>
       ) : (
         <Card className="login-card">
-          <MetaTags>
+          <MetaTags canonicalLink={match?.url}>
             <title>{formatTitle("Password Reset")}</title>
-            <CanonicalLink match={match} />
           </MetaTags>
+
           <h3>Forgot your password?</h3>
           {renderForm()}
           <ExternalLogins />

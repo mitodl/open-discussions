@@ -1,4 +1,3 @@
-export { default as CanonicalLink } from "./CanonicalLink"
 export {
   BannerContainer,
   BannerImage,
@@ -25,3 +24,7 @@ export type {
 } from "./SortableList"
 
 export { EmbedlyCard } from "./embedly"
+
+export { NotFound, NotAuthorized } from "./ErrorPage"
+
+export { default as MetaTags } from "./MetaTags"

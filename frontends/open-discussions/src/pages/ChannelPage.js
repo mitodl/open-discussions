@@ -4,9 +4,9 @@ import React from "react"
 import R from "ramda"
 import qs from "query-string"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 
-import { CanonicalLink } from "ol-util"
+import { MetaTags } from "ol-util"
+
 import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"
 import {
@@ -117,10 +117,10 @@ export class ChannelPage extends React.Component<ChannelPageProps> {
     } else {
       return (
         <React.Fragment>
-          <MetaTags>
+          <MetaTags canonicalLink={match?.url}>
             <title>{formatTitle(channel.title)}</title>
-            <CanonicalLink match={match} />
           </MetaTags>
+
           <div className="post-list-title">
             <PostSortPicker
               updatePickerParam={updatePostSortParam(this.props)}

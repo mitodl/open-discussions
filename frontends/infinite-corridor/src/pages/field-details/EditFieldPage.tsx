@@ -1,12 +1,13 @@
 import React, { useCallback } from "react"
 import { useHistory, useLocation, useParams } from "react-router"
 import { Link } from "react-router-dom"
-import { Helmet, HelmetProvider } from "react-helmet-async"
 import Container from "@mui/material/Container"
 import TabList from "@mui/lab/TabList"
 import Tab from "@mui/material/Tab"
 import { TabContext } from "@mui/lab"
 import TabPanel from "@mui/lab/TabPanel"
+
+import { MetaTags } from "ol-util"
 
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useFieldDetails } from "../../api/fields"
@@ -39,11 +40,9 @@ const EditFieldPage: React.FC = () => {
 
   return field.data ? (
     <FieldPageSkeleton name={name || ""}>
-      <HelmetProvider>
-        <Helmet>
-          <title>Edit {field.data.title} Channel</title>
-        </Helmet>
-      </HelmetProvider>
+      <MetaTags>
+        <title>Edit {field.data.title} Channel</title>
+      </MetaTags>
       {field.data.is_moderator ? (
         <TabContext value={tabValue}>
           <div className="page-subbanner">

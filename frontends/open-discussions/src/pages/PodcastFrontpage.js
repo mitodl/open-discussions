@@ -1,6 +1,8 @@
 // @flow
 import React from "react"
-import { MetaTags } from "react-meta-tags"
+
+import { MetaTags } from "ol-util"
+
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
 
@@ -45,6 +47,7 @@ export default function PodcastFrontpage() {
       <MetaTags>
         <title>{formatTitle("Podcasts")}</title>
       </MetaTags>
+
       <div className="recent-episodes">
         <div className="recent-header">
           <div className="title">RECENT EPISODES</div>

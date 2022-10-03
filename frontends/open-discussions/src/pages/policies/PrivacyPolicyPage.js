@@ -1,10 +1,8 @@
 // @flow
 /* global SETTINGS */
 import React from "react"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
-import { CanonicalLink } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import PoliciesNavBar from "../../components/PoliciesNavBar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 
@@ -18,10 +16,10 @@ type Props = {
 
 const PrivacyPolicyPage = ({ match }: Props) => (
   <React.Fragment>
-    <MetaTags>
+    <MetaTags canonicalLink={match?.url}>
       <title>{formatTitle("Privacy Statement")}</title>
-      <CanonicalLink match={match} />
     </MetaTags>
+
     <PoliciesNavBar />
     <div className="main-content">
       <Card className="site-policy privacy-statement">

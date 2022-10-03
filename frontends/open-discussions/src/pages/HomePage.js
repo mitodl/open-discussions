@@ -4,11 +4,11 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 import qs from "query-string"
-import { MetaTags } from "react-meta-tags"
+
+import { MetaTags } from "ol-util"
 
 import NewCoursesWidget from "../components/NewCoursesWidget"
 import LiveStream from "../components/LiveStream"
-import { CanonicalLink } from "ol-util"
 import IntroCard from "../components/IntroCard"
 import { withPostLoading } from "../components/Loading"
 import { withSidebar } from "../hoc/withSidebar"
@@ -89,9 +89,7 @@ export class HomePage extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <MetaTags>
-          <CanonicalLink match={match} />
-        </MetaTags>
+        <MetaTags canonicalLink={match?.url} />
         <IntroCard />
         <div className="post-list-title">
           <PostSortPicker

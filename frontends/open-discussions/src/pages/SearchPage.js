@@ -5,11 +5,11 @@ import R from "ramda"
 import React from "react"
 import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
+
+import { MetaTags } from "ol-util"
 
 import { Loading, PostLoading, withSearchLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"
-import { CanonicalLink } from "ol-util"
 import { SearchFilterPicker } from "../components/Picker"
 import SearchResult from "../components/SearchResult"
 import { Cell, Grid } from "../components/Grid"
@@ -270,9 +270,7 @@ export class SearchPage extends React.Component<Props, State> {
     return (
       <Grid className="main-content two-column search-page">
         <Cell mobileWidth={8} width={7}>
-          <MetaTags>
-            <CanonicalLink match={match} />
-          </MetaTags>
+          <MetaTags canonicalLink={match ? match.url : null} />
           <SearchTextbox
             onChange={this.updateText}
             value={text || ""}

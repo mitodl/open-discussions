@@ -1,7 +1,9 @@
 // @flow
 import React from "react"
+import { HelmetProvider } from "react-helmet-async"
 import { assert } from "chai"
 import { shallow, mount } from "enzyme"
+import { waitFor } from "@testing-library/react"
 
 import {
   withLoading,
@@ -10,7 +12,7 @@ import {
   PodcastLoading,
   PodcastEpisodeLoading
 } from "./Loading"
-import { NotFound, NotAuthorized } from "../components/ErrorPages"
+import { NotFound, NotAuthorized } from "ol-util"
 
 const GenericLoader = () => <div className="loading">loading...</div>
 
@@ -37,7 +39,11 @@ describe("Loading component", () => {
   })
 
   const renderLoading = () => {
-    return mount(<GenericLoadingContent {...props} />)
+    return mount(
+      <HelmetProvider>
+        <GenericLoadingContent {...props} />
+      </HelmetProvider>
+    )
   }
 
   it("should render a loading indicator if not loaded and not errored", () => {
@@ -48,11 +54,13 @@ describe("Loading component", () => {
 
   //
   ;[true, false].forEach(loaded => {
-    it(`should render errors correctly if loaded=${String(loaded)}`, () => {
+    it(`should render errors correctly if loaded=${String(
+      loaded
+    )}`, async () => {
       props.loaded = loaded
       props.errored = true
       const wrapper = renderLoading()
-      assert.equal(wrapper.text(), "Error loading page")
+      await waitFor(() => assert.equal(wrapper.text(), "Error loading page"))
     })
   })
 

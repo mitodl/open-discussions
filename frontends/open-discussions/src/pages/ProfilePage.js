@@ -3,14 +3,12 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../components/ProfileImage"
 import ProfileContributionFeed from "../components/ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
-import { CanonicalLink } from "ol-util"
 import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
 
 import { actions } from "../actions"
@@ -94,9 +92,8 @@ class ProfilePage extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <MetaTags>
+        <MetaTags canonicalLink="profile">
           <title>{formatTitle(`Profile for ${profile.name}`)}</title>
-          <CanonicalLink relativeUrl="profile" />
         </MetaTags>
         <Card className="profile-card">
           <div className="row basic-info">

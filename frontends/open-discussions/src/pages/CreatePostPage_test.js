@@ -31,6 +31,7 @@ import { shouldIf, makeEvent, mockCourseAPIMethods } from "../lib/test_utils"
 import { newPostForm } from "../lib/posts"
 
 import type { CreatePostPayload } from "../flow/discussionTypes"
+import { waitFor } from "@testing-library/react"
 
 type CDUTypeOne = [Array<string>, Array<string>, ?string, boolean, boolean]
 type CDUTypeTwo = [Array<string>, ?string, boolean, boolean]
@@ -126,7 +127,9 @@ describe("CreatePostPage", () => {
 
   it("should set the document title and load channels", async () => {
     await renderPage()
-    assert.equal(document.title, formatTitle("Submit a Post"))
+    await waitFor(() =>
+      assert.equal(document.title, formatTitle("Submit a Post"))
+    )
     sinon.assert.calledOnce(helper.getChannelStub)
   })
 

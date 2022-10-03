@@ -3,10 +3,9 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { Redirect } from "react-router"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import {
   withPostModeration,
   postModerationSelector

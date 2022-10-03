@@ -3,12 +3,10 @@
 import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import SettingsTabs from "../components/SettingsTabs"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
@@ -77,9 +75,8 @@ class AccountSettingsPage extends React.Component<Props> {
 
     return (
       <React.Fragment>
-        <MetaTags>
+        <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle("Account Settings")}</title>
-          <CanonicalLink match={match} />
         </MetaTags>
         <div className="main-content settings-page">
           <SettingsTabs />

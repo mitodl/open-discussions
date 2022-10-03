@@ -1,14 +1,12 @@
 // @flow
 import React from "react"
 import { connect } from "react-redux"
-import { MetaTags } from "react-meta-tags"
 import { Link } from "react-router-dom"
 import R from "ramda"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import PasswordResetConfirmForm from "../../components/auth/PasswordResetConfirmForm"
 import withForm from "../../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { configureForm } from "../../lib/forms"
@@ -42,10 +40,11 @@ export const PasswordResetConfirmPage = ({
       ) : (
         <Card className="login-card">
           <h3>Enter your new password</h3>
-          <MetaTags>
+
+          <MetaTags canonicalLink="password_reset/confirm">
             <title>{formatTitle("Password Reset")} </title>
-            <CanonicalLink relativeUrl="password_reset/confirm" />
           </MetaTags>
+
           {renderForm({ tokenApiError })}
         </Card>
       )}

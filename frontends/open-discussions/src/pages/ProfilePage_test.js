@@ -1,6 +1,7 @@
 // @flow
 /* global SETTINGS: false */
 import { assert } from "chai"
+import { waitFor } from "@testing-library/react"
 
 import ProfileImage from "../components/ProfileImage"
 
@@ -36,15 +37,40 @@ describe("ProfilePage", function() {
     actions.userContributions.get.requestType
   ]
 
+  const basicProfilePageErrorActions = [
+    actions.profiles.get.requestType,
+    actions.profiles.get.failureType,
+    actions.subscribedChannels.get.requestType
+  ]
+
   const renderPage = async (url: ?string) => {
     url = url || profileURL(profile.username)
     const [wrapper] = await renderComponent(url, basicProfilePageActions)
     return wrapper.update()
   }
 
+  const renderPageWith404Error = async (url: ?string) => {
+    url = url || profileURL("fake")
+    helper.getProfileStub.returns(Promise.reject({ errorStatusCode: 404 }))
+    const [wrapper] = await renderComponent(url, basicProfilePageErrorActions)
+    return wrapper.update()
+  }
+
   it("should set the document title", async () => {
     await renderPage()
-    assert.equal(document.title, formatTitle(`Profile for ${profile.name}`))
+    await waitFor(() =>
+      assert.equal(document.title, formatTitle(`Profile for ${profile.name}`))
+    )
+  })
+
+  it("should render a noindex meta if profile not found", async () => {
+    await renderPageWith404Error()
+    await waitFor(() =>
+      assert.equal(
+        document.getElementsByTagName("meta")[0].content,
+        "noindex,noarchive"
+      )
+    )
   })
 
   it("should display profile name, bio, and headline", async () => {

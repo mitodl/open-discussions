@@ -13,6 +13,7 @@ import ScrollToTop from "./components/ScrollToTop"
 import { getQueries } from "./lib/redux_query"
 
 import type { Store } from "redux"
+import { HelmetProvider } from "react-helmet-async"
 
 type Props = {
   store: Store<*, *>,
@@ -28,11 +29,13 @@ export default class Router extends React.Component<Props> {
       <div>
         <Provider store={store}>
           <ReduxQueryProvider queriesSelector={getQueries}>
-            <ReactRouter history={history}>
-              <ThemeProvider theme={combinedTheme}>
-                <ScrollToTop>{children}</ScrollToTop>
-              </ThemeProvider>
-            </ReactRouter>
+            <HelmetProvider>
+              <ReactRouter history={history}>
+                <ThemeProvider theme={combinedTheme}>
+                  <ScrollToTop>{children}</ScrollToTop>
+                </ThemeProvider>
+              </ReactRouter>
+            </HelmetProvider>
           </ReduxQueryProvider>
         </Provider>
       </div>

@@ -33,6 +33,7 @@ import { topicApiURL, userListApiURL } from "../lib/url"
 import { queryListResponse } from "../lib/test_utils"
 
 import type { Sandbox } from "../flow/sinonTypes"
+import { HelmetProvider } from "react-helmet-async"
 
 export default class IntegrationTestHelper {
   sandbox: Sandbox
@@ -227,7 +228,9 @@ export default class IntegrationTestHelper {
         <Provider store={store}>
           <ReduxQueryProvider queriesSelector={getQueries}>
             <Router store={store} history={this.browserHistory}>
-              <Component {...defaultProps} {...extraProps} />
+              <HelmetProvider>
+                <Component {...defaultProps} {...extraProps} />
+              </HelmetProvider>
             </Router>
           </ReduxQueryProvider>
         </Provider>

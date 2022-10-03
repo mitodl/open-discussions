@@ -1,4 +1,6 @@
 import React from "react"
+import { HelmetProvider } from "react-helmet-async"
+
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/field-details/FieldPage"
@@ -35,7 +37,9 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
   return (
     <MuiThemeProvider theme={muiTheme}>
       <QueryClientProvider client={queryClient}>
-        <Router history={history}>{children}</Router>
+        <HelmetProvider>
+          <Router history={history}>{children}</Router>
+        </HelmetProvider>
       </QueryClientProvider>
     </MuiThemeProvider>
   )

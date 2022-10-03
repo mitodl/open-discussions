@@ -2,13 +2,11 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { MetaTags } from "react-meta-tags"
 
-import { Card } from "ol-util"
+import { MetaTags, Card } from "ol-util"
 import AuthPasswordForm from "../../components/auth/AuthPasswordForm"
 import LoginGreeting from "../../components/auth/LoginGreeting"
 import withForm from "../../hoc/withForm"
-import { CanonicalLink } from "ol-util"
 
 import { actions } from "../../actions"
 import { processAuthResponse, goToFirstLoginStep } from "../../lib/auth"
@@ -63,10 +61,10 @@ export class LoginPasswordPage extends React.Component<Props> {
       <div className="auth-page login-password-page">
         <div className="main-content">
           <Card className="login-card">
-            <MetaTags>
+            <MetaTags canonicalLink={match?.url}>
               <title>{formatTitle("Welcome Back!")}</title>
-              <CanonicalLink match={match} />
             </MetaTags>
+
             <div className="form-header">
               <div className="row">
                 <LoginGreeting
