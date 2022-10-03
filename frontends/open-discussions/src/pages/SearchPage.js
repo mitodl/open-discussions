@@ -270,9 +270,7 @@ export class SearchPage extends React.Component<Props, State> {
     return (
       <Grid className="main-content two-column search-page">
         <Cell mobileWidth={8} width={7}>
-          <MetaTags canonicalLink={match ? match.url : null}>
-            <title>Hello</title>
-          </MetaTags>
+          <MetaTags canonicalLink={match ? match.url : null} />
           <SearchTextbox
             onChange={this.updateText}
             value={text || ""}
