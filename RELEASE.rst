@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.201.0
+Version 0.201.0 (Released October 04, 2022)
 ---------------
 
 - Use react-helmet-async instead of react-meta-tags, add noindex meta tag to 404/403 error pages (#3757)
