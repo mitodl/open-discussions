@@ -1,13 +1,13 @@
 {
   "root": true,
-  "extends": "eslint-config-mitodl",
+  "extends": ["eslint-config-mitodl", "eslint-config-mitodl/flow", "eslint-config-mitodl/mocha"],
   "rules": {
-      "no-prototype-builtins": [0]
+      "operator-linebreak": "off"
   },
   "settings": {
     "react": {
       "version": "16.4.0",
-      "flowVersion": "0.75.0" // Flow version
+      "flowVersion": "0.94.0" // Flow version
     }
   }
 }

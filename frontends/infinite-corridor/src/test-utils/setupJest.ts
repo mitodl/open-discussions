@@ -1,4 +1,3 @@
-/* eslint-disable mocha/no-top-level-hooks */
 import "jest-extended"
 import "jest-extended/all"
 
