@@ -32,6 +32,6 @@ describe("SortableItem", () => {
     renderItem()
     const deleteButton = await screen.findByText("remove_circle_outline")
     await user.click(deleteButton)
-    expect(deleteStub).toBeCalledWith("item-id")
+    expect(deleteStub).toHaveBeenCalledWith("item-id")
   })
 })
