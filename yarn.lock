@@ -10631,9 +10631,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-mitodl@portal:/Users/cchudzicki/dev/eslint-config::locator=open-discussions-root%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "eslint-config-mitodl@portal:/Users/cchudzicki/dev/eslint-config::locator=open-discussions-root%40workspace%3A."
+"eslint-config-mitodl@git+https://github.com/mitodl/eslint-config.git#ts":
+  version: 0.2.1
+  resolution: "eslint-config-mitodl@https://github.com/mitodl/eslint-config.git#commit=e9f51554d306eca3ea239ce8cdd0e2c143c3db86"
   dependencies:
     "@typescript-eslint/parser": ^5.39.0
     babel-eslint: ^10.1.0
@@ -10645,14 +10645,16 @@ __metadata:
     eslint-plugin-mocha: 6.x
     eslint-plugin-react: ^7.31.8
     eslint-plugin-react-hooks: ^4.6
-    prettier-eslint-cli: ^7.1.0
   peerDependenciesMeta:
+    eslint-plugin-flowtype:
+      optional: true
     eslint-plugin-jest:
       optional: true
     eslint-plugin-mocha:
       optional: true
+  checksum: 9e6d46d78eaf1908902d80fe708a6ef2f8bfae656165c91385b7ab6de802da51cafbfc07881fe025442f525c1569fdf48d8b9319e41491dd61cde5cea6e1116f
   languageName: node
-  linkType: soft
+  linkType: hard
 
 "eslint-plugin-babel@npm:5.3.0":
   version: 5.3.0
@@ -16825,7 +16827,7 @@ __metadata:
     casual-browserify: ^1.5.19-2
     css-mediaquery: ^0.1.2
     eslint: ^8.18.0
-    eslint-config-mitodl: ^0.2.1
+    eslint-config-mitodl: "git+https://github.com/mitodl/eslint-config.git#ts"
     eslint-plugin-jest: ^27.1.1
     eslint-plugin-mocha: ^10.0.5
     eslint-plugin-react: ^7.30.1
@@ -16906,7 +16908,7 @@ __metadata:
     enzyme: 3.11.0
     enzyme-adapter-react-16: 1.15.2
     eslint: 7.5.0
-    eslint-config-mitodl: 0.0.8
+    eslint-config-mitodl: "git+https://github.com/mitodl/eslint-config.git#ts"
     eslint-plugin-babel: 5.3.0
     eslint-plugin-flow-vars: 0.5.0
     eslint-plugin-flowtype: 4.2.0

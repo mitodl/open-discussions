@@ -228,7 +228,10 @@ describe("FieldPage", () => {
         isEditing:    isEditing
       })
       const expectedContext = expect.anything()
-      expect(mockWidgetList).toHaveBeenLastCalledWith(expectedProps, expectedContext)
+      expect(mockWidgetList).toHaveBeenLastCalledWith(
+        expectedProps,
+        expectedContext
+      )
     }
   )
 
