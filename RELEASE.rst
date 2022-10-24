@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.201.1
+---------------
+
+- Bump pillow from 9.0.0 to 9.0.1 (#3538)
+- Bump django from 2.2.27 to 2.2.28 (#3560)
+
 Version 0.201.0 (Released October 04, 2022)
 ---------------
 
