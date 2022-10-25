@@ -78,7 +78,7 @@ click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-cryptography==3.3.2
+cryptography==3.4.8
     # via pyopenssl
 cssselect2==0.2.1
     # via cairosvg
@@ -290,7 +290,7 @@ pyjwt==1.5.2
     #   djangorestframework-jwt
     #   pygithub
     #   social-auth-core
-pyopenssl==17.5.0
+pyopenssl==19.1.0
     # via -r requirements.in
 pyparsing==2.4.7
     # via
@@ -357,7 +357,6 @@ sgmllib3k==1.0.0
 six==1.15.0
     # via
     #   click-repl
-    #   cryptography
     #   django-anymail
     #   django-appconf
     #   django-bitfield
