@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.201.1
+Version 0.201.1 (Released October 31, 2022)
 ---------------
 
 - Fix moira by updating openssl (#3768)
