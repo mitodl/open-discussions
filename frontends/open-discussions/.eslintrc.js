@@ -1,4 +1,4 @@
-{
+module.exports = {
   "root": true,
   "extends": ["eslint-config-mitodl", "eslint-config-mitodl/flow", "eslint-config-mitodl/mocha"],
   "rules": {

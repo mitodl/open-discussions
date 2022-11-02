@@ -2,7 +2,6 @@ import { setupMockMarkdownEditor } from "./test-utils"
 
 setupMockMarkdownEditor()
 
-// eslint-disable-next-line mocha/no-top-level-hooks
 afterEach(() => {
   /**
    * Clear all mock call counts between tests.
