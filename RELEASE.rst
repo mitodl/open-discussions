@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.201.2
+---------------
+
+- Remove Dockerfile line related to moira and ssl (#3771)
+- Cc/linting updates (#3769)
+
 Version 0.201.1 (Released October 31, 2022)
 ---------------
 
