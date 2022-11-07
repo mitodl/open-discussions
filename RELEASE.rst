@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.201.2
+Version 0.201.2 (Released November 07, 2022)
 ---------------
 
 - Remove Dockerfile line related to moira and ssl (#3771)
