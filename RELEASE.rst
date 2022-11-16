@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.202.1
+---------------
+
+- Bump moment from 2.29.1 to 2.29.4 (#3765)
+
 Version 0.202.0 (Released November 16, 2022)
 ---------------
 
