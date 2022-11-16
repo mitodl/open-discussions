@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.202.0
+---------------
+
+- Bump nokogiri from 1.12.5 to 1.13.9 in /docs (#3764)
+
 Version 0.201.2 (Released November 07, 2022)
 ---------------
 
