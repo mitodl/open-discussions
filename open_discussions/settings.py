@@ -29,7 +29,7 @@ from open_discussions.envs import (
 )
 from open_discussions.sentry import init_sentry
 
-VERSION = "0.202.1"
+VERSION = "0.203.0"
 
 log = logging.getLogger()
 
