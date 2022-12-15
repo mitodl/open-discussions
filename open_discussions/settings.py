@@ -621,6 +621,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_oll_data",
         "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
     },
+    "update-prolearn-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_prolearn_data",
+        "schedule": crontab(minute=30, hour=21),  # 5:30pm EST
+    },
     "update-youtube-videos": {
         "task": "course_catalog.tasks.get_youtube_data",
         "schedule": get_int(
@@ -881,6 +885,9 @@ DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
 
 # Base URL for Micromasters data
 MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
+
+# Base URL for Prolearn data
+PROLEARN_CATALOG_API_URL = get_string("PROLEARN_CATALOG_API_URL", None)
 
 # Iterator chunk size for MITx and xPRO courses
 LEARNING_COURSE_ITERATOR_CHUNK_SIZE = get_int("LEARNING_COURSE_ITERATOR_CHUNK_SIZE", 20)

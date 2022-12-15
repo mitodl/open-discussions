@@ -493,6 +493,10 @@
       "description": "The time in seconds between periodic syncs of podcasts",
       "required": false
     },
+    "PROLEARN_CATALOG_API_URL": {
+      "description": "Base URL for the Prolearn search API",
+      "required": false
+    },
     "RECAPTCHA_SITE_KEY": {
       "description": "Google Recaptcha site key",
       "required": false

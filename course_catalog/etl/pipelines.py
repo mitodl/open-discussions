@@ -1,4 +1,6 @@
 """ETL pipelines"""
+from typing import List
+
 from toolz import compose, curry, curried
 
 from course_catalog.etl import (
@@ -12,6 +14,7 @@ from course_catalog.etl import (
     video,
     youtube,
     podcast,
+    prolearn,
 )
 from course_catalog.etl.constants import (
     ProgramLoaderConfig,
@@ -20,6 +23,7 @@ from course_catalog.etl.constants import (
     OfferedByLoaderConfig,
 )
 from course_catalog.constants import PlatformType
+from course_catalog.models import Program, Course
 
 # A few notes on how this module works:
 #
@@ -97,3 +101,29 @@ youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.ex
 video_topics_etl = compose(loaders.load_videos, video.extract_videos_topics)
 
 podcast_etl = compose(loaders.load_podcasts, podcast.transform, podcast.extract)
+
+
+def prolearn_programs_etl() -> List[Program]:
+    """Iterate through all supported prolearn platforms to import programs"""
+    results = []
+    for platform in prolearn.PROLEARN_DEPARTMENT_MAPPING.keys():
+        platform_func = compose(
+            load_programs(platform),
+            prolearn.transform_programs,
+            prolearn.extract_programs,
+        )
+        results.extend(platform_func(platform))
+    return results
+
+
+def prolearn_courses_etl() -> List[Course]:
+    """Iterate through all supported prolearn platforms to import courses"""
+    results = []
+    for platform in prolearn.PROLEARN_DEPARTMENT_MAPPING.keys():
+        platform_func = compose(
+            load_courses(platform),
+            prolearn.transform_courses,
+            prolearn.extract_courses,
+        )
+        results.extend(platform_func(platform))
+    return results

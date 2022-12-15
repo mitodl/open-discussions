@@ -22,6 +22,7 @@ def populate_offerors(apps, schema_editor):
     offered_by_mapping = {
         o.value: LearningResourceOfferor.objects.get_or_create(name=o.value)[0]
         for o in OfferedBy
+        if len(o.value) <= 32
     }
 
     for program in Program.objects.all():

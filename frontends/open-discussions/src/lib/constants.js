@@ -26,6 +26,8 @@ const ollPlatform = "oll"
 const seePlatform = "see"
 const mitpePlatform = "mitpe"
 const csailPlatform = "csail"
+const sccPlatform = "scc"
+const ctlPlatform = "ctl"
 
 export const platforms = {
   OCW:          ocwPlatform,
@@ -38,7 +40,9 @@ export const platforms = {
   oll:          ollPlatform,
   see:          seePlatform,
   mitpe:        mitpePlatform,
-  csail:        csailPlatform
+  csail:        csailPlatform,
+  scc:          sccPlatform,
+  ctl:          ctlPlatform
 }
 
 export const platformLogos = {
@@ -51,7 +55,9 @@ export const platformLogos = {
   [seePlatform]:          "/static/images/sloan-logo.png",
   [mitpePlatform]:        "/static/images/mitpe-logo.png",
   [csailPlatform]:        "/static/images/csail-logo.png",
-  [mitxPlatform]:         "/static/images/mitx-online-logo.png"
+  [mitxPlatform]:         "/static/images/mitx-online-logo.png",
+  [sccPlatform]:          "/static/images/scc-logo.svg",
+  [ctlPlatform]:          "/static/images/ctl-logo.svg"
 }
 
 export const offeredBys = {

@@ -19,6 +19,10 @@ class OfferedBy(Enum):
     xpro = "xPRO"
     oll = "Open Learning Library"
     csail = "CSAIL"
+    mitpe = "Professional Education"
+    see = "Sloan Executive Education"
+    scc = "Schwarzman College of Computing"
+    ctl = "Center for Transportation & Logistics"
 
 
 class PlatformType(Enum):
@@ -36,6 +40,10 @@ class PlatformType(Enum):
     youtube = "youtube"
     podcast = "podcast"
     csail = "csail"
+    mitpe = "mitpe"
+    see = "see"
+    scc = "scc"
+    ctl = "ctl"
 
 
 class ResourceType(Enum):
@@ -104,6 +112,11 @@ OFFERED_BY_MAPPINGS = {
     OfferedBy.oll.value: PlatformType.oll.value,
     OfferedBy.xpro.value: PlatformType.xpro.value,
     OfferedBy.bootcamps.value: PlatformType.bootcamps.value,
+    OfferedBy.csail.value: PlatformType.csail.value,
+    OfferedBy.ctl.value: PlatformType.ctl.value,
+    OfferedBy.mitpe.value: PlatformType.mitpe.value,
+    OfferedBy.scc.value: PlatformType.scc.value,
+    OfferedBy.see.value: PlatformType.see.value,
 }
 
 semester_mapping = {"1T": "spring", "2T": "summer", "3T": "fall"}
