@@ -3,6 +3,8 @@ from contextlib import contextmanager
 from importlib import reload
 from unittest.mock import patch
 
+import pytest
+
 from course_catalog.constants import PlatformType
 from course_catalog.etl import pipelines
 from course_catalog.etl.constants import (
@@ -11,6 +13,8 @@ from course_catalog.etl.constants import (
     LearningResourceRunLoaderConfig,
     OfferedByLoaderConfig,
 )
+from course_catalog.etl.prolearn import PROLEARN_DEPARTMENT_MAPPING
+from course_catalog.factories import ProgramFactory, CourseFactory
 
 
 @contextmanager
@@ -184,3 +188,55 @@ def test_podcast_etl():
     mock_load_podcasts.assert_called_once_with(mock_transform.return_value)
 
     assert result == mock_load_podcasts.return_value
+
+
+@pytest.mark.django_db
+def test_prolearn_programs_etl():
+    """
+    Verify that the prolearn programs etl executes correctly
+    """
+    platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
+    mock_programs = ProgramFactory.create_batch(len(platforms))
+    with reload_mocked_pipeline(
+        patch("course_catalog.etl.prolearn.extract_programs", autospec=True),
+        patch("course_catalog.etl.prolearn.transform_programs", autospec=True),
+        patch(
+            "course_catalog.etl.loaders.load_programs",
+            autospec=True,
+            side_effect=[[mock_result] for mock_result in mock_programs],
+        ),
+    ) as patches:
+        mock_extract, mock_transform, mock_load_programs = patches
+        result = pipelines.prolearn_programs_etl()
+
+        assert mock_transform.call_count == len(platforms)
+        for platform in platforms:
+            mock_extract.assert_any_call(platform)
+            mock_load_programs.assert_any_call(platform, mock_transform.return_value)
+        assert result == mock_programs
+
+
+@pytest.mark.django_db
+def test_prolearn_courses_etl():
+    """
+    Verify that the prolearn courses etl executes correctly
+    """
+    platforms = PROLEARN_DEPARTMENT_MAPPING.keys()
+    mock_courses = CourseFactory.create_batch(len(platforms))
+    with reload_mocked_pipeline(
+        patch("course_catalog.etl.prolearn.extract_courses", autospec=True),
+        patch("course_catalog.etl.prolearn.transform_courses", autospec=True),
+        patch(
+            "course_catalog.etl.loaders.load_courses",
+            autospec=True,
+            side_effect=[[mock_result] for mock_result in mock_courses],
+        ),
+    ) as patches:
+        mock_extract, mock_transform, mock_load_courses = patches
+        result = pipelines.prolearn_courses_etl()
+
+        assert mock_transform.call_count == len(platforms)
+        for platform in platforms:
+            mock_extract.assert_any_call(platform)
+            mock_load_courses.assert_any_call(platform, mock_transform.return_value)
+        assert result == mock_courses

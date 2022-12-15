@@ -1,0 +1,99 @@
+{
+  "data": {
+    "searchAPISearch": {
+      "result_count": 7,
+      "documents": [
+        {
+          "title": "Machine Learning for Business, Engineering, and Science",
+          "nid": "547",
+          "url": "/machine-learning-business-engineering-and-science",
+          "certificate_name": "Professional Certificate",
+          "course_application_url": "https://csail.mit.edu/checkout/?product=451",
+          "course_link": null,
+          "field_course_or_program": "program",
+          "start_value": [
+            1673352000
+          ],
+          "end_value": [
+            1686398400
+          ],
+          "department": "MIT CSAIL",
+          "department_url": "https://csail.mit.edu",
+          "body": null,
+          "body_override": null,
+          "field_time_commitment": null,
+          "field_duration": null,
+          "featured_image_url": "/sites/default/files/images/mit-dome.png",
+          "field_featured_video": null,
+          "field_non_degree_credits": null,
+          "field_price": null,
+          "field_related_courses_programs": [
+            545,
+            546
+          ],
+          "related_courses_programs_title": [
+            "Machine Learning, Modeling, and Simulation Principles",
+            "Use Cases of Machine Learning for Business, Engineering, and Science"
+          ],
+          "ucc_hot_topic": true,
+          "ucc_name": "AI/Machine Learning",
+          "ucc_tid": 21,
+          "application_process": null,
+          "application_process_override": null,
+          "format_name": "Online",
+          "image_override_url": null,
+          "video_override_url": null,
+          "field_new_course_program": false,
+          "field_tooltip": "On demand or live"
+        },
+        {
+          "title": "Executive Leadership Principles",
+          "nid": "503",
+          "url": "/executive-leadership-principles",
+          "certificate_name": "Professional Certificate",
+          "course_application_url": "https://csail.mit.edu/checkout/?product=442",
+          "course_link": "http://csail.mit.edu/programs/program-v1:xPRO-SL+LASERx-SL/",
+          "field_course_or_program": "program",
+          "start_value": [
+            1673352000
+          ],
+          "end_value": [
+            1686571200
+          ],
+          "department": "MIT CSAIL",
+          "department_url": "https://csail.mit.edu",
+          "body": null,
+          "body_override": null,
+          "field_time_commitment": null,
+          "field_duration": null,
+          "featured_image_url": "/sites/default/files/images/mit-dome.png",
+          "field_featured_video": null,
+          "field_non_degree_credits": null,
+          "field_price": "$2,500",
+          "field_related_courses_programs": [
+            502,
+            501,
+            500,
+            499
+          ],
+          "related_courses_programs_title": [
+            "Understanding Organizational Strategy and Capabilities",
+            "Negotiating and Applying Influence and Power",
+            "Navigating and Leveraging Culture and Networks",
+            "Discovering and Implementing Your Leadership Strengths"
+          ],
+          "ucc_hot_topic": null,
+          "ucc_name": null,
+          "ucc_tid": null,
+          "application_process": null,
+          "application_process_override": null,
+          "format_name": "Online",
+          "image_override_url": null,
+          "video_override_url": null,
+          "field_new_course_program": false,
+          "field_tooltip": "On demand or live"
+        }
+      ]
+    }
+  }
+}

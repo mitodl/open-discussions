@@ -411,10 +411,11 @@ def _load_ucc_topic_mappings():
         rows = list(csv.reader(mapping_file))
         # drop the column headers (first row)
         rows = rows[1:]
-        mapping = {
-            f"{row[0]}:{row[1]}": list(filter(lambda item: item, row[2:]))
-            for row in rows
-        }
+        mapping = dict()
+        for row in rows:
+            ocw_topics = list(filter(lambda item: item, row[2:]))
+            mapping[f"{row[0]}:{row[1]}"] = ocw_topics
+            mapping[row[1]] = ocw_topics
         return mapping
 
 
@@ -435,6 +436,10 @@ def transform_topics(topics):
     return [
         {"name": topic_name}
         for topic_name in chain.from_iterable(
-            [UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]]) for topic in topics]
+            [
+                UCC_TOPIC_MAPPINGS.get(topic["name"], [topic["name"]])
+                for topic in topics
+                if topic is not None
+            ]
         )
     ]
