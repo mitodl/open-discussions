@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.203.0
+Version 0.203.0 (Released December 20, 2022)
 ---------------
 
 - Import courses from the prolearn search api (#3790)
