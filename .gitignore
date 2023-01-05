@@ -125,3 +125,6 @@ tsconfig.tsbuildinfo
 
 # VS-Code
 .vscode
+
+# docker
+docker-compose.override.yml

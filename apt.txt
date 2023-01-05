@@ -7,3 +7,5 @@ net-tools
 pkg-config
 libffi-dev
 libxmlsec1-dev
+libpq-dev
+postgresql-client

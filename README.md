@@ -242,12 +242,12 @@ otherwise do in a Django shell. To get started:
     ```
 - Build the `notebook` container _(for first time use, or when requirements change)_
     ```bash
-    docker-compose -f docker-compose-notebook.yml build
+    docker-compose --profile notebook build
     ```
 - Run all the standard containers (`docker-compose up`)
-- In another terminal window, run the `notebook` container
+- In another terminal window, run the app with the `notebook` container
     ```bash
-    docker-compose -f docker-compose-notebook.yml run --rm --service-ports notebook
+    docker-compose --profile notebook up
     ```
 - Visit the running notebook server in your browser. The `notebook` container log output will
   indicate the URL and `token` param with some output that looks like this:
