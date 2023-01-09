@@ -110,16 +110,19 @@ def test_prolearn_transform_programs(mock_csail_programs_data):
             "offered_by": [{"name": OfferedBy.csail.value}],
             "runs": [
                 {
-                    "run_id": program["nid"],
+                    "run_id": f"{program['nid']}_{start_val}",
                     "platform": PlatformType.csail.value,
                     "title": program["title"],
                     "offered_by": [{"name": OfferedBy.csail.value}],
                     "prices": parse_price(program),
-                    "start_date": parse_date(program["start_value"]),
-                    "end_date": parse_date(program["end_value"]),
-                    "best_start_date": parse_date(program["start_value"]),
-                    "best_end_date": parse_date(program["end_value"]),
+                    "start_date": parse_date(start_val),
+                    "end_date": parse_date(end_val),
+                    "best_start_date": parse_date(start_val),
+                    "best_end_date": parse_date(end_val),
                 }
+                for (start_val, end_val) in zip(
+                    program["start_value"], program["end_value"]
+                )
             ],
             "topics": parse_topic(program),
             # all we need for course data is the relative positioning of courses by course_id
@@ -160,16 +163,16 @@ def test_prolearn_transform_courses(mock_mitpe_courses_data):
             "topics": parse_topic(course),
             "runs": [
                 {
-                    "run_id": course["nid"],
+                    "run_id": f"{course['nid']}_{start_val}",
                     "title": course["title"],
                     "image_src": parse_image(course),
                     "offered_by": [{"name": OfferedBy.mitpe.value}],
                     "short_description": course["body"],
                     "platform": PlatformType.mitpe.value,
-                    "start_date": parse_date(course["start_value"]),
-                    "end_date": parse_date(course["end_value"]),
-                    "best_start_date": parse_date(course["start_value"]),
-                    "best_end_date": parse_date(course["end_value"]),
+                    "start_date": parse_date(start_val),
+                    "end_date": parse_date(end_val),
+                    "best_start_date": parse_date(start_val),
+                    "best_end_date": parse_date(end_val),
                     "published": True,
                     "prices": parse_price(course),
                     "url": course["course_link"]
@@ -177,6 +180,9 @@ def test_prolearn_transform_courses(mock_mitpe_courses_data):
                     or course["url"],
                     "raw_json": course,
                 }
+                for (start_val, end_val) in zip(
+                    course["start_value"], course["end_value"]
+                )
             ],
         }
         for course in extracted_data
@@ -185,16 +191,15 @@ def test_prolearn_transform_courses(mock_mitpe_courses_data):
 
 
 @pytest.mark.parametrize(
-    "date_ints, expected_dt",
+    "date_int, expected_dt",
     [
-        [[1670932800], datetime(2022, 12, 13, 12, 0, tzinfo=pytz.UTC)],
-        [[], None],
-        [[None], None],
+        [1670932800, datetime(2022, 12, 13, 12, 0, tzinfo=pytz.UTC)],
+        [None, None],
     ],
 )
-def test_parse_date(date_ints, expected_dt):
+def test_parse_date(date_int, expected_dt):
     """Integer array should be parsed into correct datetimes"""
-    assert parse_date(date_ints) == expected_dt
+    assert parse_date(date_int) == expected_dt
 
 
 @pytest.mark.parametrize(

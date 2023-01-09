@@ -107,7 +107,7 @@ def parse_offered_by(document: dict) -> str:
     )
 
 
-def parse_date(num_array: List[str]) -> datetime:
+def parse_date(num) -> datetime:
     """
     Get a datetime value from an list containing one integer
 
@@ -117,8 +117,8 @@ def parse_date(num_array: List[str]) -> datetime:
     Returns:
         datetime: start or end date
     """
-    if num_array and num_array[0]:
-        return datetime.fromtimestamp(num_array[0], tz=pytz.UTC)
+    if num:
+        return datetime.fromtimestamp(num, tz=pytz.UTC)
 
 
 def parse_price(document: dict) -> Decimal:
@@ -249,16 +249,19 @@ def transform_programs(programs: List[dict]) -> List[dict]:
             "offered_by": [{"name": parse_offered_by(program)}],
             "runs": [
                 {
-                    "run_id": program["nid"],
+                    "run_id": f'{program["nid"]}_{start_value}',
                     "platform": OFFERED_BY_MAPPINGS[parse_offered_by(program)],
                     "title": program["title"],
                     "offered_by": [{"name": parse_offered_by(program)}],
                     "prices": parse_price(program),
-                    "start_date": parse_date(program["start_value"]),
-                    "end_date": parse_date(program["end_value"]),
-                    "best_start_date": parse_date(program["start_value"]),
-                    "best_end_date": parse_date(program["end_value"]),
+                    "start_date": parse_date(start_value),
+                    "end_date": parse_date(end_value),
+                    "best_start_date": parse_date(start_value),
+                    "best_end_date": parse_date(end_value),
                 }
+                for (start_value, end_value) in zip(
+                    program["start_value"], program["end_value"]
+                )
             ],
             "topics": parse_topic(program),
             # all we need for course data is the relative positioning of courses by course_id
@@ -282,7 +285,7 @@ def transform_programs(programs: List[dict]) -> List[dict]:
     ]
 
 
-def _transform_run(course_run: dict) -> dict:
+def _transform_runs(course_run: dict) -> dict:
     """
     Transforms a course run into our normalized data structure
 
@@ -292,22 +295,27 @@ def _transform_run(course_run: dict) -> dict:
     Returns:
         dict: normalized course run data
     """
-    return {
-        "run_id": course_run["nid"],
-        "title": course_run["title"],
-        "image_src": parse_image(course_run),
-        "offered_by": [{"name": parse_offered_by(course_run)}],
-        "short_description": course_run["body"],
-        "platform": OFFERED_BY_MAPPINGS[parse_offered_by(course_run)],
-        "start_date": parse_date(course_run["start_value"]),
-        "end_date": parse_date(course_run["end_value"]),
-        "best_start_date": parse_date(course_run["start_value"]),
-        "best_end_date": parse_date(course_run["end_value"]),
-        "published": True,
-        "prices": parse_price(course_run),
-        "url": parse_url(course_run),
-        "raw_json": course_run,
-    }
+    return [
+        {
+            "run_id": f'{course_run["nid"]}_{start_value}',
+            "title": course_run["title"],
+            "image_src": parse_image(course_run),
+            "offered_by": [{"name": parse_offered_by(course_run)}],
+            "short_description": course_run["body"],
+            "platform": OFFERED_BY_MAPPINGS[parse_offered_by(course_run)],
+            "start_date": parse_date(start_value),
+            "end_date": parse_date(end_value),
+            "best_start_date": parse_date(start_value),
+            "best_end_date": parse_date(end_value),
+            "published": True,
+            "prices": parse_price(course_run),
+            "url": parse_url(course_run),
+            "raw_json": course_run,
+        }
+        for (start_value, end_value) in zip(
+            course_run["start_value"], course_run["end_value"]
+        )
+    ]
 
 
 def _transform_course(course: dict) -> dict:
@@ -329,7 +337,7 @@ def _transform_course(course: dict) -> dict:
         "short_description": course["body"],
         "published": True,
         "topics": parse_topic(course),
-        "runs": [_transform_run(course)],
+        "runs": _transform_runs(course),
     }
 
 
