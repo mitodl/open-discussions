@@ -27,6 +27,12 @@ CERTIFICATE = "Certificates"
 
 PROFESSIONAL_COURSE_PLATFORMS = [
     PlatformType.xpro.value,
+    PlatformType.bootcamps.value,
+    PlatformType.csail.value,
+    PlatformType.ctl.value,
+    PlatformType.mitpe.value,
+    PlatformType.scc.value,
+    PlatformType.see.value,
 ]
 
 
