@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.204.0
+---------------
+
+- Add all prolearn imports to professional offerings, handle multiple start/end dates as separate runs (#3804)
+- Bump json5 from 1.0.1 to 1.0.2 (#3803)
+- Bump loader-utils from 1.4.0 to 1.4.2 (#3791)
+- Bump certifi from 2017.4.17 to 2022.12.7 (#3785)
+- Bump decode-uri-component from 0.2.0 to 0.2.2 (#3784)
+
 Version 0.203.0 (Released December 20, 2022)
 ---------------
 
