@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.204.0
+Version 0.204.0 (Released January 17, 2023)
 ---------------
 
 - Add all prolearn imports to professional offerings, handle multiple start/end dates as separate runs (#3804)
