@@ -80,7 +80,6 @@ def _transform_run(course_run):
             {"full_name": instructor["name"]}
             for instructor in course_run["instructors"]
         ],
-        "url": course_run.get("courseware_url", None),
         "raw_json": course_run,
     }
 
@@ -102,6 +101,7 @@ def _transform_course(course):
         "image_src": course["thumbnail_url"],
         "offered_by": copy.deepcopy(OFFERED_BY),
         "short_description": course["description"],
+        "url": course.get("url"),
         "published": any(
             map(
                 lambda course_run: course_run.get("current_price", None),
@@ -162,7 +162,6 @@ def transform_programs(programs):
                         {"full_name": instructor["name"]}
                         for instructor in program.get("instructors", [])
                     ],
-                    "url": program.get("url", None),
                     "raw_json": program,
                 }
             ],

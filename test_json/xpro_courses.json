@@ -3,6 +3,7 @@
     "id": 18,
     "title": "SEED Architecture of Complex Systems",
     "description": "<p>Course 1 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program.</p>",
+    "url": "https://xpro.mit.edu/courses/course-v1:xPRO+SysEngxB1",
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+SysEngxB1",
     "courseruns": [],
@@ -40,6 +41,7 @@
     "description": "<p>Course 2 of 4 that comprises the Architecture and Systems Engineering Professional Certificate Program. This course may be taken individually, without enrolling in the professional certificate program.</p>",
     "thumbnail_url": "/static/images/mit-dome.png",
     "readable_id": "course-v1:xPRO+SysEngxB2",
+    "url": "https://xpro.mit.edu/courses/course-v1:xPRO+SysEngxB2",
     "courseruns": [
       {
         "title": "SEED Models in Engineering - Spring 2020",

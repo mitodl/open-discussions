@@ -119,7 +119,6 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "title": program_data["title"],
                     "short_description": program_data["description"],
                     "offered_by": xpro.OFFERED_BY,
-                    "url": program_data["url"],
                     "raw_json": program_data,
                 }
             ],
@@ -130,6 +129,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "title": course_data["title"],
                     "image_src": course_data["thumbnail_url"],
                     "short_description": course_data["description"],
+                    "url": course_data.get("url", None),
                     "offered_by": xpro.OFFERED_BY,
                     "published": any(
                         map(
@@ -172,7 +172,6 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                                 {"full_name": instructor["name"]}
                                 for instructor in course_run_data["instructors"]
                             ],
-                            "url": course_run_data["courseware_url"],
                             "raw_json": course_run_data,
                         }
                         for course_run_data in course_data["courseruns"]
@@ -196,6 +195,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
             "title": course_data["title"],
             "image_src": course_data["thumbnail_url"],
             "short_description": course_data["description"],
+            "url": course_data.get("url"),
             "offered_by": xpro.OFFERED_BY,
             "published": any(
                 map(
@@ -237,7 +237,6 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
                         {"full_name": instructor["name"]}
                         for instructor in course_run_data["instructors"]
                     ],
-                    "url": course_run_data["courseware_url"],
                     "raw_json": course_run_data,
                 }
                 for course_run_data in course_data["courseruns"]
