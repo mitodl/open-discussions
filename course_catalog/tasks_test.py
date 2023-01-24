@@ -481,18 +481,18 @@ def test_import_all_mitx_files(settings, mocker, mocked_celery, mock_blocklist):
     )
 
 
-def test_get_content_tasks(mocker, mocked_celery, settings):
+def test_get_content_tasks(settings, mocker, mocked_celery):
     """Test that get_content_tasks calls get_content_files with the correct args"""
     mock_get_content_files = mocker.patch("course_catalog.tasks.get_content_files.si")
     mocker.patch("course_catalog.tasks.load_course_blocklist", return_value=[])
     setup_s3(settings)
-
+    settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE = 2
     platform = PlatformType.mitx.value
     CourseFactory.create_batch(3, published=True, platform=platform)
     bucket_name = "test-bucket"
 
     s3_prefix = "course-prefix"
-    get_content_tasks(bucket_name, platform, 2, s3_prefix)
+    get_content_tasks(bucket_name, platform, s3_prefix=s3_prefix)
     assert mocked_celery.group.call_count == 1
     assert (
         Course.objects.filter(published=True)
