@@ -107,6 +107,10 @@
       "description": "EdX secret key to access the MITx course catalog API",
       "required": false
     },
+    "EDX_LEARNING_COURSE_BUCKET_NAME": {
+      "description": "Name of the bucket with course run tar archives for MITx",
+      "required": false
+    },
     "ELASTICSEARCH_HTTP_AUTH": {
       "description": "Basic auth settings for connecting to Elasticsearch"
     },
