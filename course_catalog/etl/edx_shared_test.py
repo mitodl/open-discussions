@@ -17,7 +17,7 @@ pytestmark = pytest.mark.django_db
     [
         [PlatformType.mitxonline.value, "courses"],
         [PlatformType.xpro.value, "courses"],
-        [PlatformType.mitx.value, "simeon-mitx-course-tarballs"]
+        [PlatformType.mitx.value, "simeon-mitx-course-tarballs"],
     ],
 )
 def test_sync_edx_course_files(
@@ -66,8 +66,6 @@ def test_sync_edx_course_files(
             LearningResourceRun.objects.get(run_id=run_id), fake_data
         )
     mock_log.assert_not_called()
-
-
 
 
 @pytest.mark.parametrize(
