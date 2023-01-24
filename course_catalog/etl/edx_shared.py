@@ -4,9 +4,11 @@ import os
 import re
 from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
+from typing import List
 
 from django.contrib.contenttypes.models import ContentType
 
+from course_catalog.constants import PlatformType
 from course_catalog.etl.loaders import load_content_files
 from course_catalog.etl.utils import get_learning_course_bucket, transform_content_files
 from course_catalog.models import Course, LearningResourceRun
@@ -15,17 +17,24 @@ from course_catalog.utils import get_s3_object_and_read
 log = logging.getLogger()
 
 
-def sync_edx_course_files(bucket_name, platform, ids):
+def sync_edx_course_files(
+    bucket_name: str, platform: str, ids: List[int], s3_prefix: str = None
+):
     """
     Sync all edx course run files for a list of course ids to database
 
     Args:
+        bucket_name(str): Name of S3 bucket
+        platform(str): The edx platform
         ids(list of int): list of course ids to process
+        s3_prefix(str): path prefix to include in regex for S3
     """
     bucket = get_learning_course_bucket(bucket_name)
+    if s3_prefix is None:
+        s3_prefix = "courses"
 
     try:
-        course_tar_regex = r".*/courses/.*\.tar\.gz$"
+        course_tar_regex = rf".*/{s3_prefix}/.*\.tar\.gz$"
         most_recent_export_date = next(
             reversed(
                 sorted(
@@ -50,17 +59,27 @@ def sync_edx_course_files(bucket_name, platform, ids):
         return
 
     for course_tarfile in most_recent_course_zips:
-        matches = re.search(r"courses/(.+)\.tar\.gz$", course_tarfile.key)
-        run = LearningResourceRun.objects.filter(
+        matches = re.search(rf"{s3_prefix}/(.+)\.tar\.gz$", course_tarfile.key)
+        run_id = matches.group(1)
+
+        runs = LearningResourceRun.objects.filter(
             platform=platform,
-            run_id=matches.group(1),
             content_type=ContentType.objects.get_for_model(Course),
             object_id__in=ids,
-        ).first()
+        )
+        if platform == PlatformType.mitx.value:
+            # Additional processing of run ids and tarfile names, because MITx data is a mess of id/file formats
+            run_id = run_id.strip(
+                "-course-prod-analytics.xml"
+            )  # suffix on edx tar file basename
+            potential_run_ids = rf"{run_id.replace('-', '.').replace('+', '.')}"
+            runs = runs.filter(run_id__iregex=potential_run_ids)
+        else:
+            runs = runs.filter(run_id=run_id)
+        run = runs.first()
+
         if not run:
-            log.info(
-                "No %s courses matched course tarfile %s", platform, course_tarfile
-            )
+            log.info("No %s course runs matched tarfile %s", platform, course_tarfile)
             continue
         with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
             tarbytes = get_s3_object_and_read(course_tarfile)

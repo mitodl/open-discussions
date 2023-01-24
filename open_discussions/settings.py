@@ -591,6 +591,10 @@ CELERY_BEAT_SCHEDULE = {
         "task": "course_catalog.tasks.get_mitx_data",
         "schedule": crontab(minute=30, hour=13),  # 9:30am EST
     },
+    "update-edx-files-every-1-days": {
+        "task": "course_catalog.tasks.import_all_mitx_files",
+        "schedule": crontab(minute=00, hour=14),  # 10:00 AM EST
+    },
     "update-micromasters-courses-every-1-days": {
         "task": "course_catalog.tasks.get_micromasters_data",
         "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
@@ -851,6 +855,7 @@ EDX_API_URL = get_string("EDX_API_URL", None)
 EDX_API_ACCESS_TOKEN_URL = get_string("EDX_API_ACCESS_TOKEN_URL", None)
 EDX_API_CLIENT_ID = get_string("EDX_API_CLIENT_ID", None)
 EDX_API_CLIENT_SECRET = get_string("EDX_API_CLIENT_SECRET", None)
+EDX_LEARNING_COURSE_BUCKET_NAME = get_string("EDX_LEARNING_COURSE_BUCKET_NAME", None)
 
 # Authentication for the github api
 GITHUB_ACCESS_TOKEN = get_string("GITHUB_ACCESS_TOKEN", None)
