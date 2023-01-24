@@ -16,8 +16,8 @@ pytestmark = pytest.mark.django_db
     "platform, s3_prefix",
     [
         [PlatformType.mitxonline.value, "courses"],
-        # [PlatformType.xpro.value, "courses"],
-        # [PlatformType.mitx.value, "simeon-mitx-course-tarballs"]
+        [PlatformType.xpro.value, "courses"],
+        [PlatformType.mitx.value, "simeon-mitx-course-tarballs"]
     ],
 )
 def test_sync_edx_course_files(
@@ -68,109 +68,109 @@ def test_sync_edx_course_files(
     mock_log.assert_not_called()
 
 
-#
-#
-# @pytest.mark.parametrize(
-#     "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
-# )
-# def test_sync_edx_course_files_invalid_tarfile(
-#     mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
-# ):
-#     """an invalid mitxonline tarball should be skipped"""
-#     run = LearningResourceRunFactory.create(
-#         platform=platform,
-#         content_type=ContentType.objects.get_for_model(Course),
-#     )
-#     bucket = (
-#         mock_mitxonline_learning_bucket
-#         if platform == PlatformType.mitxonline.value
-#         else mock_xpro_learning_bucket
-#     ).bucket
-#     bucket.put_object(
-#         Key=f"20220101/courses/{run.run_id}.tar.gz",
-#         Body=b"".join([b"x" for _ in range(100)]),
-#         ACL="public-read",
-#     )
-#     mock_load_content_files = mocker.patch(
-#         "course_catalog.etl.edx_shared.load_content_files",
-#         autospec=True,
-#         return_value=[],
-#     )
-#     mocker.patch(
-#         "course_catalog.etl.edx_shared.check_call",
-#         side_effect=CalledProcessError(0, ""),
-#     )
-#     mock_log = mocker.patch("course_catalog.etl.edx_shared.log.exception")
-#
-#     sync_edx_course_files(bucket.name, platform, [run.object_id])
-#     mock_load_content_files.assert_not_called()
-#     mock_log.assert_called_once()
-#     assert mock_log.call_args[0][0].startswith("Unable to untar ") is True
-#
-#
-# @pytest.mark.parametrize(
-#     "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
-# )
-# def test_sync_edx_course_files_empty_bucket(
-#     mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
-# ):
-#     """If the mitxonline bucket has no tarballs matching a filename, it should be skipped"""
-#     run = LearningResourceRunFactory.create(
-#         platform=platform,
-#         content_type=ContentType.objects.get_for_model(Course),
-#     )
-#     bucket = (
-#         mock_mitxonline_learning_bucket
-#         if platform == PlatformType.mitxonline.value
-#         else mock_xpro_learning_bucket
-#     ).bucket
-#     bucket.put_object(
-#         Key="20220101/courses/some_other_course.tar.gz",
-#         Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
-#         ACL="public-read",
-#     )
-#     mock_load_content_files = mocker.patch(
-#         "course_catalog.etl.edx_shared.load_content_files",
-#         autospec=True,
-#         return_value=[],
-#     )
-#     sync_edx_course_files(bucket.name, platform, [run.object_id])
-#     mock_load_content_files.assert_not_called()
-#
-#
-# @pytest.mark.parametrize(
-#     "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
-# )
-# def test_sync_edx_course_files_error(
-#     mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
-# ):
-#     """Exceptions raised during sync_mitxonline_course_files should be logged"""
-#     run = LearningResourceRunFactory.create(
-#         platform=platform,
-#         content_type=ContentType.objects.get_for_model(Course),
-#     )
-#     bucket = (
-#         mock_mitxonline_learning_bucket
-#         if platform == PlatformType.mitxonline.value
-#         else mock_xpro_learning_bucket
-#     ).bucket
-#     bucket.put_object(
-#         Key=f"20220101/courses/{run.run_id}.tar.gz",
-#         Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
-#         ACL="public-read",
-#     )
-#     mock_load_content_files = mocker.patch(
-#         "course_catalog.etl.edx_shared.load_content_files",
-#         autospec=True,
-#         side_effect=Exception,
-#     )
-#     fake_data = '{"key": "data"}'
-#     mock_log = mocker.patch("course_catalog.etl.edx_shared.log.exception")
-#     mock_transform = mocker.patch(
-#         "course_catalog.etl.edx_shared.transform_content_files", return_value=fake_data
-#     )
-#     sync_edx_course_files(bucket.name, platform, [run.object_id])
-#     assert mock_transform.call_count == 1
-#     assert mock_transform.call_args[0][0].endswith(f"{run.run_id}.tar.gz") is True
-#     mock_load_content_files.assert_called_once_with(run, fake_data)
-#     assert mock_log.call_args[0][0].startswith("Error ingesting OLX content data for ")
+
+
+@pytest.mark.parametrize(
+    "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
+)
+def test_sync_edx_course_files_invalid_tarfile(
+    mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
+):
+    """an invalid mitxonline tarball should be skipped"""
+    run = LearningResourceRunFactory.create(
+        platform=platform,
+        content_type=ContentType.objects.get_for_model(Course),
+    )
+    bucket = (
+        mock_mitxonline_learning_bucket
+        if platform == PlatformType.mitxonline.value
+        else mock_xpro_learning_bucket
+    ).bucket
+    bucket.put_object(
+        Key=f"20220101/courses/{run.run_id}.tar.gz",
+        Body=b"".join([b"x" for _ in range(100)]),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.etl.edx_shared.load_content_files",
+        autospec=True,
+        return_value=[],
+    )
+    mocker.patch(
+        "course_catalog.etl.edx_shared.check_call",
+        side_effect=CalledProcessError(0, ""),
+    )
+    mock_log = mocker.patch("course_catalog.etl.edx_shared.log.exception")
+
+    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    mock_load_content_files.assert_not_called()
+    mock_log.assert_called_once()
+    assert mock_log.call_args[0][0].startswith("Unable to untar ") is True
+
+
+@pytest.mark.parametrize(
+    "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
+)
+def test_sync_edx_course_files_empty_bucket(
+    mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
+):
+    """If the mitxonline bucket has no tarballs matching a filename, it should be skipped"""
+    run = LearningResourceRunFactory.create(
+        platform=platform,
+        content_type=ContentType.objects.get_for_model(Course),
+    )
+    bucket = (
+        mock_mitxonline_learning_bucket
+        if platform == PlatformType.mitxonline.value
+        else mock_xpro_learning_bucket
+    ).bucket
+    bucket.put_object(
+        Key="20220101/courses/some_other_course.tar.gz",
+        Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.etl.edx_shared.load_content_files",
+        autospec=True,
+        return_value=[],
+    )
+    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    mock_load_content_files.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
+)
+def test_sync_edx_course_files_error(
+    mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
+):
+    """Exceptions raised during sync_mitxonline_course_files should be logged"""
+    run = LearningResourceRunFactory.create(
+        platform=platform,
+        content_type=ContentType.objects.get_for_model(Course),
+    )
+    bucket = (
+        mock_mitxonline_learning_bucket
+        if platform == PlatformType.mitxonline.value
+        else mock_xpro_learning_bucket
+    ).bucket
+    bucket.put_object(
+        Key=f"20220101/courses/{run.run_id}.tar.gz",
+        Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
+        ACL="public-read",
+    )
+    mock_load_content_files = mocker.patch(
+        "course_catalog.etl.edx_shared.load_content_files",
+        autospec=True,
+        side_effect=Exception,
+    )
+    fake_data = '{"key": "data"}'
+    mock_log = mocker.patch("course_catalog.etl.edx_shared.log.exception")
+    mock_transform = mocker.patch(
+        "course_catalog.etl.edx_shared.transform_content_files", return_value=fake_data
+    )
+    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    assert mock_transform.call_count == 1
+    assert mock_transform.call_args[0][0].endswith(f"{run.run_id}.tar.gz") is True
+    mock_load_content_files.assert_called_once_with(run, fake_data)
+    assert mock_log.call_args[0][0].startswith("Error ingesting OLX content data for ")

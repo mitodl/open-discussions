@@ -39,7 +39,7 @@ from course_catalog.tasks import (
     import_all_ocw_files,
     import_all_xpro_files,
     update_enrollments_for_email,
-    upload_ocw_parsed_json,
+    upload_ocw_parsed_json, import_all_mitx_files,
 )
 from open_discussions.factories import UserFactory
 
@@ -451,7 +451,7 @@ def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blocklist):
 
 @mock_s3
 def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
-    """import_all_xpro_files should start chunked tasks which"""
+    """import_all_xpro_files should start chunked tasks with correct bucket, platform"""
     setup_s3(settings)
     get_content_tasks_mock = mocker.patch(
         "course_catalog.tasks.get_content_tasks", autospec=True
@@ -460,6 +460,20 @@ def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
         import_all_xpro_files.delay(3)
     get_content_tasks_mock.assert_called_once_with(
         settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, 3
+    )
+
+
+@mock_s3
+def test_import_all_mitx_files(settings, mocker, mocked_celery, mock_blocklist):
+    """import_all_mitx_files should start chunked tasks with correct bucket, platform"""
+    setup_s3(settings)
+    get_content_tasks_mock = mocker.patch(
+        "course_catalog.tasks.get_content_tasks", autospec=True
+    )
+    with pytest.raises(mocked_celery.replace_exception_class):
+        import_all_mitx_files.delay(4)
+    get_content_tasks_mock.assert_called_once_with(
+        settings.EDX_LEARNING_COURSE_BUCKET_NAME, PlatformType.mitx.value, 4, s3_prefix='simeon-mitx-course-tarballs'
     )
 
 

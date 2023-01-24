@@ -111,6 +111,10 @@
       "description": "Name of the bucket with course run tar archives for MITx",
       "required": false
     },
+    "EDX_LEARNING_COURSE_BUCKET_PREFIX": {
+      "description": "S3 prefix for MITx bucket keys",
+      "required": false
+    },
     "ELASTICSEARCH_HTTP_AUTH": {
       "description": "Basic auth settings for connecting to Elasticsearch"
     },

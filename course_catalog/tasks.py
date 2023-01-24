@@ -310,7 +310,7 @@ def import_all_mitx_files(self, chunk_size=None):
             settings.EDX_LEARNING_COURSE_BUCKET_NAME,
             PlatformType.mitx.value,
             chunk_size,
-            s3_prefix="simeon-mitx-course-tarballs",
+            s3_prefix=settings.EDX_LEARNING_COURSE_BUCKET_PREFIX,
         )
     )
 
