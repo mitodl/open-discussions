@@ -100,6 +100,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
             "runs": [
                 {
                     "run_id": program_data["readable_id"],
+                    "title": program_data["title"],
                     "platform": PlatformType.xpro.value,
                     "start_date": any_instance_of(datetime, type(None)),
                     "end_date": any_instance_of(datetime, type(None)),
@@ -118,6 +119,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "title": program_data["title"],
                     "short_description": program_data["description"],
                     "offered_by": xpro.OFFERED_BY,
+                    "raw_json": program_data,
                 }
             ],
             "courses": [
@@ -127,6 +129,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "title": course_data["title"],
                     "image_src": course_data["thumbnail_url"],
                     "short_description": course_data["description"],
+                    "url": course_data.get("url", None),
                     "offered_by": xpro.OFFERED_BY,
                     "published": any(
                         map(
@@ -146,6 +149,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                     "runs": [
                         {
                             "run_id": course_run_data["courseware_id"],
+                            "title": course_run_data["title"],
                             "platform": PlatformType.xpro.value,
                             "start_date": any_instance_of(datetime, type(None)),
                             "end_date": any_instance_of(datetime, type(None)),
@@ -168,6 +172,7 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                                 {"full_name": instructor["name"]}
                                 for instructor in course_run_data["instructors"]
                             ],
+                            "raw_json": course_run_data,
                         }
                         for course_run_data in course_data["courseruns"]
                     ],
@@ -190,6 +195,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
             "title": course_data["title"],
             "image_src": course_data["thumbnail_url"],
             "short_description": course_data["description"],
+            "url": course_data.get("url"),
             "offered_by": xpro.OFFERED_BY,
             "published": any(
                 map(
@@ -209,6 +215,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
             "runs": [
                 {
                     "run_id": course_run_data["courseware_id"],
+                    "title": course_run_data["title"],
                     "platform": PlatformType.xpro.value,
                     "start_date": any_instance_of(datetime, type(None)),
                     "end_date": any_instance_of(datetime, type(None)),
@@ -230,6 +237,7 @@ def test_xpro_transform_courses(mock_xpro_courses_data):
                         {"full_name": instructor["name"]}
                         for instructor in course_run_data["instructors"]
                     ],
+                    "raw_json": course_run_data,
                 }
                 for course_run_data in course_data["courseruns"]
             ],

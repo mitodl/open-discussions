@@ -61,6 +61,7 @@ def _transform_run(course_run):
     """
     return {
         "run_id": course_run["courseware_id"],
+        "title": course_run["title"],
         "platform": PlatformType.xpro.value,
         "start_date": _parse_datetime(course_run["start_date"]),
         "end_date": _parse_datetime(course_run["end_date"]),
@@ -79,6 +80,7 @@ def _transform_run(course_run):
             {"full_name": instructor["name"]}
             for instructor in course_run["instructors"]
         ],
+        "raw_json": course_run,
     }
 
 
@@ -99,6 +101,7 @@ def _transform_course(course):
         "image_src": course["thumbnail_url"],
         "offered_by": copy.deepcopy(OFFERED_BY),
         "short_description": course["description"],
+        "url": course.get("url"),
         "published": any(
             map(
                 lambda course_run: course_run.get("current_price", None),
@@ -143,6 +146,7 @@ def transform_programs(programs):
                     "prices": [{"price": program["current_price"], "mode": ""}]
                     if program.get("current_price", None)
                     else [],
+                    "title": program["title"],
                     "run_id": program["readable_id"],
                     "platform": PlatformType.xpro.value,
                     "enrollment_start": _parse_datetime(program["enrollment_start"]),
@@ -158,6 +162,7 @@ def transform_programs(programs):
                         {"full_name": instructor["name"]}
                         for instructor in program.get("instructors", [])
                     ],
+                    "raw_json": program,
                 }
             ],
             "courses": [_transform_course(course) for course in program["courses"]],
