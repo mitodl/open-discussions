@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.205.0
+---------------
+
+- Import content files for mitx platform (#3811)
+- Fix blank fields for xpro etl (#3809)
+- Bump future from 0.18.2 to 0.18.3 (#3810)
+- Bump terser from 5.14.1 to 5.16.1 (#3805)
+
 Version 0.204.0 (Released January 17, 2023)
 ---------------
 
