@@ -7,18 +7,27 @@ from django.contrib.contenttypes.models import ContentType
 from course_catalog.constants import PlatformType
 from course_catalog.etl.edx_shared import sync_edx_course_files
 from course_catalog.factories import LearningResourceRunFactory
-from course_catalog.models import Course
+from course_catalog.models import Course, LearningResourceRun
 
 pytestmark = pytest.mark.django_db
 
 
 @pytest.mark.parametrize(
-    "platform", [PlatformType.mitxonline.value, PlatformType.xpro.value]
+    "platform, s3_prefix",
+    [
+        [PlatformType.mitxonline.value, "courses"],
+        [PlatformType.xpro.value, "courses"],
+        [PlatformType.mitx.value, "simeon-mitx-course-tarballs"],
+    ],
 )
 def test_sync_edx_course_files(
-    mock_mitxonline_learning_bucket, mock_xpro_learning_bucket, mocker, platform
+    mock_mitxonline_learning_bucket,
+    mock_xpro_learning_bucket,
+    mocker,
+    platform,
+    s3_prefix,
 ):
-    """sync mitxonline courses from a tarball stored in S3"""
+    """sync edx courses from a tarball stored in S3"""
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
         autospec=True,
@@ -38,7 +47,7 @@ def test_sync_edx_course_files(
     ).bucket
     for run_id in run_ids:
         bucket.put_object(
-            Key=f"20220101/courses/{run_id}.tar.gz",
+            Key=f"20220101/{s3_prefix}/{run_id}.tar.gz",
             Body=open(f"test_json/{run_id}.tar.gz", "rb").read(),
             ACL="public-read",
         )
@@ -48,10 +57,14 @@ def test_sync_edx_course_files(
             content_type=ContentType.objects.get_for_model(Course),
         )
         course_ids.append(run.object_id)
-    sync_edx_course_files(bucket.name, platform, course_ids)
+    sync_edx_course_files(bucket.name, platform, course_ids, s3_prefix)
     assert mock_transform.call_count == 2
-    assert mock_transform.call_args[0][0].endswith(f"{run_id}.tar.gz") is True
-    mock_load_content_files.assert_any_call(run, fake_data)
+    assert mock_load_content_files.call_count == 2
+    assert mock_transform.call_args[0][0].endswith(f"{run_ids[1]}.tar.gz") is True
+    for run_id in run_ids:
+        mock_load_content_files.assert_any_call(
+            LearningResourceRun.objects.get(run_id=run_id), fake_data
+        )
     mock_log.assert_not_called()
 
 

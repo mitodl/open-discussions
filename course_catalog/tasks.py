@@ -3,11 +3,13 @@ course_catalog tasks
 """
 import logging
 from datetime import datetime
+from typing import List
 
 import boto3
 import celery
 import pytz
 import rapidjson
+from celery import Task
 from django.conf import settings
 from django.contrib.auth.models import User
 
@@ -60,6 +62,31 @@ def get_ocw_courses(
         upload_to_s3=upload_to_s3,
         start_timestamp=utc_start_timestamp,
         force_s3_upload=force_s3_upload,
+    )
+
+
+def get_content_tasks(
+    bucket_name: str, platform: str, chunk_size: int = None, s3_prefix: str = None
+) -> List[Task]:
+    """
+    Return a list of grouped celery tasks for indexing edx content
+    """
+    if chunk_size is None:
+        chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
+
+    blocklisted_ids = load_course_blocklist()
+    return celery.group(
+        [
+            get_content_files.si(ids, bucket_name, platform, s3_prefix=s3_prefix)
+            for ids in chunks(
+                Course.objects.filter(published=True)
+                .filter(platform=platform)
+                .exclude(course_id__in=blocklisted_ids)
+                .order_by("id")
+                .values_list("id", flat=True),
+                chunk_size=chunk_size,
+            )
+        ]
     )
 
 
@@ -236,89 +263,56 @@ def import_all_ocw_files(self, chunk_size):
 
 
 @app.task
-def get_xpro_files(ids):
+def get_content_files(
+    ids: List[int], bucket_name: str, platform: str, s3_prefix: str = None
+):
     """
-    Task to sync xPRO OLX course files with database
+    Task to sync edX course content files with database
     """
     if not (
-        settings.XPRO_LEARNING_COURSE_BUCKET_NAME
-        and settings.AWS_ACCESS_KEY_ID
-        and settings.AWS_SECRET_ACCESS_KEY
+        bucket_name and settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY
     ):
-        log.warning("Required settings missing for get_xpro_files")
+        log.warning("Required settings missing for %s files", platform)
         return
-    sync_edx_course_files(
-        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, ids
-    )
+    sync_edx_course_files(bucket_name, platform, ids, s3_prefix)
 
 
 @app.task(bind=True)
 def import_all_xpro_files(self, chunk_size=None):
-    """Ingest xPRO OLX files from the S3 bucket"""
-    if chunk_size is None:
-        chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
+    """Ingest xPRO OLX files from an S3 bucket"""
 
-    blocklisted_ids = load_course_blocklist()
-    tasks = celery.group(
-        [
-            get_xpro_files.si(ids)
-            for ids in chunks(
-                Course.objects.filter(published=True)
-                .filter(platform=PlatformType.xpro.value)
-                .exclude(course_id__in=blocklisted_ids)
-                .order_by("id")
-                .values_list("id", flat=True),
-                chunk_size=chunk_size,
-            )
-        ]
-    )
-
-    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
-    raise self.replace(tasks)
-
-
-@app.task
-def get_mitxonline_files(ids):
-    """
-    Task to sync MITx Online course files with database
-    """
-    if not (
-        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME
-        and settings.AWS_ACCESS_KEY_ID
-        and settings.AWS_SECRET_ACCESS_KEY
-    ):
-        log.warning("Required settings missing for get_mitxonline_files")
-        return
-    sync_edx_course_files(
-        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
-        PlatformType.mitxonline.value,
-        ids,
+    raise self.replace(
+        get_content_tasks(
+            settings.XPRO_LEARNING_COURSE_BUCKET_NAME,
+            PlatformType.xpro.value,
+            chunk_size,
+        )
     )
 
 
 @app.task(bind=True)
 def import_all_mitxonline_files(self, chunk_size=None):
-    """Ingest MITx Online files from the S3 bucket"""
-    if chunk_size is None:
-        chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
-
-    blocklisted_ids = load_course_blocklist()
-    tasks = celery.group(
-        [
-            get_mitxonline_files.si(ids)
-            for ids in chunks(
-                Course.objects.filter(published=True)
-                .filter(platform=PlatformType.mitxonline.value)
-                .exclude(course_id__in=blocklisted_ids)
-                .order_by("id")
-                .values_list("id", flat=True),
-                chunk_size=chunk_size,
-            )
-        ]
+    """Ingest MITx Online files from an S3 bucket"""
+    raise self.replace(
+        get_content_tasks(
+            settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
+            PlatformType.mitxonline.value,
+            chunk_size,
+        )
     )
 
-    # to reduce the risk of triggering these multiple times, we trigger and replace this task all at once
-    raise self.replace(tasks)
+
+@app.task(bind=True)
+def import_all_mitx_files(self, chunk_size=None):
+    """Ingest MITx files from an S3 bucket"""
+    raise self.replace(
+        get_content_tasks(
+            settings.EDX_LEARNING_COURSE_BUCKET_NAME,
+            PlatformType.mitx.value,
+            chunk_size,
+            s3_prefix=settings.EDX_LEARNING_COURSE_BUCKET_PREFIX,
+        )
+    )
 
 
 @app.task

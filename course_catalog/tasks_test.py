@@ -6,6 +6,7 @@ from contextlib import contextmanager
 
 import boto3
 import pytest
+from mock.mock import ANY
 from moto import mock_s3
 
 from course_catalog.conftest import (
@@ -18,10 +19,11 @@ from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory, LearningResourceRunFactory
 from course_catalog.models import Course, CourseInstructor, CoursePrice, CourseTopic
 from course_catalog.tasks import (
+    get_content_files,
+    get_content_tasks,
     get_micromasters_data,
     get_mitx_data,
     get_mitxonline_data,
-    get_mitxonline_files,
     get_ocw_courses,
     get_ocw_data,
     get_ocw_files,
@@ -31,7 +33,6 @@ from course_catalog.tasks import (
     get_podcast_data,
     get_video_topics,
     get_xpro_data,
-    get_xpro_files,
     get_youtube_data,
     get_youtube_transcripts,
     import_all_mitxonline_files,
@@ -39,6 +40,7 @@ from course_catalog.tasks import (
     import_all_xpro_files,
     update_enrollments_for_email,
     upload_ocw_parsed_json,
+    import_all_mitx_files,
 )
 from open_discussions.factories import UserFactory
 
@@ -449,95 +451,91 @@ def test_import_all_ocw_files(settings, mocker, mocked_celery, mock_blocklist):
 
 
 @mock_s3
-def test_get_xpro_files(mocker, settings):
-    """Test that get_xpro_files calls api.sync_edx_course_files with the correct ids"""
-    mock_sync_edx_course_files = mocker.patch(
-        "course_catalog.tasks.sync_edx_course_files"
-    )
+def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
+    """import_all_xpro_files should start chunked tasks with correct bucket, platform"""
     setup_s3(settings)
-    ids = [1, 2, 3]
-    get_xpro_files(ids)
-    mock_sync_edx_course_files.assert_called_with(
-        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, "xpro", ids
+    get_content_tasks_mock = mocker.patch(
+        "course_catalog.tasks.get_content_tasks", autospec=True
     )
-
-
-def test_get_xpro_files_missing_settings(mocker, settings):
-    """Test that get_xpro_files does nothing without required settings"""
-    mock_sync_edx_course_files = mocker.patch(
-        "course_catalog.tasks.sync_edx_course_files"
+    with pytest.raises(mocked_celery.replace_exception_class):
+        import_all_xpro_files.delay(3)
+    get_content_tasks_mock.assert_called_once_with(
+        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, 3
     )
-    mock_log = mocker.patch("course_catalog.tasks.log.warning")
-    settings.XPRO_LEARNING_COURSE_BUCKET_NAME = None
-    get_xpro_files([1, 2])
-    mock_sync_edx_course_files.assert_not_called()
-    mock_log.assert_called_once_with("Required settings missing for get_xpro_files")
 
 
 @mock_s3
-def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
-    """import_all_xpro_files should start chunked tasks which"""
+def test_import_all_mitx_files(settings, mocker, mocked_celery, mock_blocklist):
+    """import_all_mitx_files should start chunked tasks with correct bucket, platform"""
     setup_s3(settings)
-    get_xpro_files_mock = mocker.patch(
-        "course_catalog.tasks.get_xpro_files", autospec=True
+    get_content_tasks_mock = mocker.patch(
+        "course_catalog.tasks.get_content_tasks", autospec=True
     )
-    courses = CourseFactory.create_batch(
-        3, platform=PlatformType.xpro.value, published=True
-    )
-    CourseFactory.create_batch(3, platform=PlatformType.oll.value, published=False)
-
     with pytest.raises(mocked_celery.replace_exception_class):
-        import_all_xpro_files.delay(3)
-    assert mocked_celery.group.call_count == 1
-    get_xpro_files_mock.si.assert_called_once_with([course.id for course in courses])
-
-
-def test_get_mitxonline_files(mocker, settings):
-    """Test that get_mitxonline_files calls api.sync_mitxonline_course_files with the correct ids"""
-    mock_sync_edx_course_files = mocker.patch(
-        "course_catalog.tasks.sync_edx_course_files"
+        import_all_mitx_files.delay(4)
+    get_content_tasks_mock.assert_called_once_with(
+        settings.EDX_LEARNING_COURSE_BUCKET_NAME,
+        PlatformType.mitx.value,
+        4,
+        s3_prefix="simeon-mitx-course-tarballs",
     )
+
+
+def test_get_content_tasks(settings, mocker, mocked_celery):
+    """Test that get_content_tasks calls get_content_files with the correct args"""
+    mock_get_content_files = mocker.patch("course_catalog.tasks.get_content_files.si")
+    mocker.patch("course_catalog.tasks.load_course_blocklist", return_value=[])
     setup_s3(settings)
-    ids = [1, 2, 3]
-    get_mitxonline_files(ids)
-    mock_sync_edx_course_files.assert_called_with(
-        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME, "mitxonline", ids
+    settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE = 2
+    platform = PlatformType.mitx.value
+    CourseFactory.create_batch(3, published=True, platform=platform)
+    bucket_name = "test-bucket"
+
+    s3_prefix = "course-prefix"
+    get_content_tasks(bucket_name, platform, s3_prefix=s3_prefix)
+    assert mocked_celery.group.call_count == 1
+    assert (
+        Course.objects.filter(published=True)
+        .filter(platform=platform)
+        .exclude(course_id__in=[])
+        .order_by("id")
+        .values_list("id", flat=True)
+    ).count() == 3
+    assert mock_get_content_files.call_count == 2
+    mock_get_content_files.assert_any_call(
+        ANY, bucket_name, platform, s3_prefix=s3_prefix
     )
 
 
-def test_get_mitxonline_files_missing_settings(mocker, settings):
-    """Test that get_mitxonline_files does nothing without required settings"""
+def test_get_test_get_content_tasks_missing_settings(mocker, settings):
+    """Test that get_content_files does nothing without required settings"""
     mock_sync_edx_course_files = mocker.patch(
         "course_catalog.tasks.sync_edx_course_files"
     )
     mock_log = mocker.patch("course_catalog.tasks.log.warning")
     settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = None
-    get_mitxonline_files([1, 2])
-    mock_sync_edx_course_files.assert_not_called()
-    mock_log.assert_called_once_with(
-        "Required settings missing for get_mitxonline_files"
+    platform = "mitx"
+    get_content_files(
+        [1, 2], settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME, platform
     )
+    mock_sync_edx_course_files.assert_not_called()
+    mock_log.assert_called_once_with("Required settings missing for %s files", platform)
 
 
 @mock_s3
 def test_import_all_mitxonline_files(settings, mocker, mocked_celery, mock_blocklist):
-    """import_all_mitxonline_files should start chunked get_mitxonline_files tasks"""
+    """import_all_mitxonline_files should be replaced with get_content_tasks"""
     setup_s3(settings)
-    get_mitxonline_files_mock = mocker.patch(
-        "course_catalog.tasks.get_mitxonline_files", autospec=True
-    )
-    courses = CourseFactory.create_batch(
-        3, platform=PlatformType.mitxonline.value, published=True
-    )
-    CourseFactory.create_batch(
-        3, platform=PlatformType.mitxonline.value, published=False
+    get_content_tasks_mock = mocker.patch(
+        "course_catalog.tasks.get_content_tasks", autospec=True
     )
 
     with pytest.raises(mocked_celery.replace_exception_class):
         import_all_mitxonline_files.delay(3)
-    assert mocked_celery.group.call_count == 1
-    get_mitxonline_files_mock.si.assert_called_once_with(
-        [course.id for course in courses]
+    get_content_tasks_mock.assert_called_once_with(
+        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
+        PlatformType.mitxonline.value,
+        3,
     )
 
 
