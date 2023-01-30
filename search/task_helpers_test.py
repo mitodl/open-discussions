@@ -47,7 +47,6 @@ from search.task_helpers import (
     delete_video,
     upsert_user_list,
     delete_user_list,
-    delete_content_file,
     upsert_content_file,
     delete_course,
     index_run_content_files,
@@ -443,17 +442,14 @@ def test_delete_course(mocker):
     """
     Tests that delete_course calls the delete tasks for the course and its content files
     """
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    patched_delete_task = mocker.patch("search.task_helpers.delete_run_content_files")
     course = CourseFactory.create()
     course_es_id = gen_course_id(course.platform, course.course_id)
-    content_files = [ContentFileFactory.create(run=run) for run in course.runs.all()]
 
     delete_course(course)
     patched_delete_task.delay.assert_any_call(course_es_id, COURSE_TYPE)
-    for content_file in content_files:
-        patched_delete_task.delay.assert_any_call(
-            gen_content_file_id(content_file.key), COURSE_TYPE, routing=course_es_id
-        )
+    for run in course.runs:
+        patched_delete_task.delay.assert_any_call(run.id)
 
 
 @pytest.mark.django_db
@@ -535,19 +531,6 @@ def test_upsert_content_file(mocker):
     content_file = ContentFileFactory.create()
     upsert_content_file(content_file.id)
     patched_task.delay.assert_called_once_with(content_file.id)
-
-
-@pytest.mark.django_db
-def test_delete_content_file(mocker):
-    """Tests that deleting a content_file triggers the correct ES delete task"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
-    content_file = ContentFileFactory.create()
-    delete_content_file(content_file)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (
-        gen_content_file_id(content_file.key),
-        COURSE_TYPE,
-    )
 
 
 @pytest.mark.django_db

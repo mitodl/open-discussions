@@ -360,10 +360,8 @@ def delete_course(course_obj):
     delete_document.delay(
         gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
     )
-    for content_file in ContentFile.objects.filter(run__object_id=course_obj.id).filter(
-        run__content_type=ContentType.objects.get(model=COURSE_TYPE)
-    ):
-        delete_content_file(content_file)
+    for run_id in course_obj.runs.values_list("id", flat=True):
+        delete_run_content_files(run_id)
 
 
 def upsert_content_file(content_file_id):
@@ -374,21 +372,6 @@ def upsert_content_file(content_file_id):
         content_file_id (int): the primary key for the ContentFile to update
     """
     tasks.upsert_content_file.delay(content_file_id)
-
-
-def delete_content_file(content_file_obj):
-    """
-    Runs a task to delete an ES CourseRunFile document
-
-    Args:
-        content_file_obj (course_catalog.models.ContentFile): A CourseRunFile object
-    """
-    course = content_file_obj.run.content_object
-    delete_document.delay(
-        gen_content_file_id(content_file_obj.key),
-        COURSE_TYPE,
-        routing=gen_course_id(course.platform, course.course_id),
-    )
 
 
 def index_run_content_files(run_id):
