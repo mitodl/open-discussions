@@ -5,9 +5,7 @@ import logging
 from functools import wraps, partial
 
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 
-from course_catalog.models import ContentFile
 from open_discussions.features import INDEX_UPDATES, if_feature_enabled
 from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
 from channels.models import Comment
@@ -22,7 +20,6 @@ from search.api import (
     gen_program_id,
     gen_user_list_id,
     gen_video_id,
-    gen_content_file_id,
     gen_podcast_id,
     gen_podcast_episode_id,
 )

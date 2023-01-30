@@ -62,7 +62,6 @@ from search.api import (
     gen_profile_id,
     gen_video_id,
     gen_user_list_id,
-    gen_content_file_id,
     gen_course_id,
     gen_podcast_id,
     gen_podcast_episode_id,
@@ -442,14 +441,15 @@ def test_delete_course(mocker):
     """
     Tests that delete_course calls the delete tasks for the course and its content files
     """
-    patched_delete_task = mocker.patch("search.task_helpers.delete_run_content_files")
+    mock_del_document = mocker.patch("search.task_helpers.delete_document")
+    mock_bulk_del = mocker.patch("search.task_helpers.delete_run_content_files")
     course = CourseFactory.create()
     course_es_id = gen_course_id(course.platform, course.course_id)
 
     delete_course(course)
-    patched_delete_task.delay.assert_any_call(course_es_id, COURSE_TYPE)
-    for run in course.runs:
-        patched_delete_task.delay.assert_any_call(run.id)
+    mock_del_document.delay.assert_called_once_with(course_es_id, COURSE_TYPE)
+    for run in course.runs.iterator():
+        mock_bulk_del.assert_any_call(run.id)
 
 
 @pytest.mark.django_db
