@@ -9,7 +9,7 @@ import ShareTooltip from "./ShareTooltip"
 
 import {
   LearningResourceType,
-  LearningResourceResult,
+  LearningResource,
   LearningResourceRun
 } from "../interfaces"
 import {
@@ -28,8 +28,8 @@ import { EmbedlyCard, formatDurationClockTime } from "ol-util"
 import moment from "moment"
 
 type LearningResourceDetailsProps = {
-  resource: LearningResourceResult
-  formatShareLink: (resource: LearningResourceResult) => string
+  resource: LearningResource
+  formatShareLink: (resource: LearningResource) => string
   /**
    * Config used to generate embedly urls.
    */
@@ -146,7 +146,7 @@ const LearningResourceDetails: React.FC<LearningResourceDetailsProps> = ({
 }
 
 type LearningResourceInfoProps = {
-  resource: LearningResourceResult
+  resource: LearningResource
   run?: LearningResourceRun
 }
 const LearningResourceInfo: React.FC<LearningResourceInfoProps> = ({
@@ -176,7 +176,7 @@ type FlexibleInfoRow = {
   include: boolean
 }
 const getInfoRows = (
-  resource: LearningResourceResult,
+  resource: LearningResource,
   run?: LearningResourceRun
 ): ResourceInfoRow[] => {
   const rows: FlexibleInfoRow[] = [
@@ -212,7 +212,7 @@ const getInfoRows = (
     },
     {
       label:   "Number of Courses",
-      include: resource.object_type === LearningResourceType.Program,
+      include: resource.object_type === LearningResourceType.Userlist,
       value:   resource.item_count
     },
     {

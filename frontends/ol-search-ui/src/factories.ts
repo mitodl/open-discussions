@@ -11,7 +11,7 @@ import {
   LearningResourceType,
   CardMinimalResource,
   EmbedlyConfig,
-  CourseResult
+  Course
 } from "./interfaces"
 
 import { pick, times } from "lodash"
@@ -53,7 +53,7 @@ export const makeRun: Factory<LearningResourceRun> = overrides => {
   }
 }
 
-export const makeCourseResult: Factory<CourseResult> = overrides => ({
+export const makeCourse: Factory<Course> = overrides => ({
   id:                faker.unique(faker.datatype.number),
   title:             casual.title,
   url:               casual.url,
@@ -76,8 +76,8 @@ export const makeCourseResult: Factory<CourseResult> = overrides => ({
   ...overrides
 })
 
-export const makeProgramResult: Factory<
-  LearningResourceResult
+export const makeProgram: Factory<
+  LearningResource
 > = overrides => ({
   id:                faker.unique(faker.datatype.number),
   title:             casual.title,
@@ -101,7 +101,7 @@ export const makeProgramResult: Factory<
   ...overrides
 })
 
-export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
+export const makeVideo: Factory<LearningResource> = overrides => ({
   id:                faker.unique(faker.datatype.number),
   video_id:          `video_${String(casual.random)}`,
   title:             casual.title,
@@ -117,28 +117,28 @@ export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
   lists:             [],
   audience:          [],
   certification:     [],
+  topics:            [],
   platform:          faker.word.noun(),
   ...overrides
 })
 
 const resultMakers = {
-  course:  makeCourseResult,
-  program: makeProgramResult,
-  video:   makeCourseResult
+  course:  makeCourse,
+  program: makeProgram,
+  video:   makeVideo
 }
 type MakeableResultType = keyof typeof resultMakers
 
-const makeLearningResourceResult = (type?: MakeableResultType | null) => {
-  const maker = type ?
-    resultMakers[type] :
-    faker.helpers.arrayElement(Object.values(resultMakers))
-  return maker()
-}
-
-export const makeSearchResult = (type?: MakeableResultType) => {
+const makeSearchResult = (type?: MakeableResultType): {
+  _id: string
+  _source: LearningResourceResult
+} => {
+  const maker = type ? resultMakers[type] : faker.helpers.arrayElement(Object.values(resultMakers))
+  const resource = maker()
+  const topics = resource.topics.map(topic => topic.name)
   return {
     _id:     `id_String${casual.random}`,
-    _source: makeLearningResourceResult(type)
+    _source: { ...resource, topics }
   }
 }
 
@@ -219,7 +219,7 @@ export const makeMinimalResoure: Factory<CardMinimalResource> = overrides => {
     "platform"
   ] as const
   return {
-    ...pick(makeCourseResult(), keys),
+    ...pick(makeCourse(), keys),
     ...overrides
   } as CardMinimalResource
 }

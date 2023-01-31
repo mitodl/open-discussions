@@ -4,8 +4,6 @@ import type { LearningResource, LearningResourceType } from "ol-search-ui"
 type UserList = LearningResource & {
   image_description: string | null | undefined
   list_type: string
-  title: string
-  short_description?: string
   object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
   privacy_level: string
   author: number

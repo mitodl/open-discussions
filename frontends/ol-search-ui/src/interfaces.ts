@@ -15,6 +15,8 @@ export type LearningResource = {
   id: number
   title: string
   topics: CourseTopic[]
+  short_description?: string | null
+  full_description?: string | null
   object_type: LearningResourceType
   lists: ListItemMember[]
   image_src: string | null
@@ -24,33 +26,22 @@ export type LearningResource = {
   is_favorite?: boolean
   audience?: string[]
   certification: string[]
-}
-
-export interface LearningResourceResult {
-  id: number
-  course_id?: string
-  video_id?: string
-  url?: string
-  title: string
-  image_src: string | null
-  object_type: LearningResourceType
-  offered_by?: string[]
-  short_description?: string | null
-  full_description?: string | null
-  platform?: string
-  topics?: string[]
-  runs?: LearningResourceRun[]
-  lists: ListItemMember[]
-  is_favorite: boolean
-  certification: string[]
-  audience: string[]
-  item_count?: number
-  last_modified?: string | null
   duration?: string | null
+  url?: string | null
+  last_modified?: string | null
+  item_count?: number             // userlist annotation
+  course_id?: string              // required for courses
+  video_id?: string               // required for videos
 }
 
-export interface CourseResult extends LearningResourceResult {
-  runs: NonNullable<LearningResourceResult["runs"]>
+type SearchResult<T> = Omit<T, "topics"> & {
+  topics?: string[]
+}
+
+export type LearningResourceResult = SearchResult<LearningResource>
+
+export interface Course extends LearningResource {
+  runs: NonNullable<LearningResource["runs"]>
   object_type: LearningResourceType.Course
 }
 
