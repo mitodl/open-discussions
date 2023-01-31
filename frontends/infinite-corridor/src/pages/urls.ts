@@ -14,4 +14,7 @@ export const makeFieldEditPath = (name: string) =>
   generatePath(FIELD_EDIT, { name })
 export const makeFieldManageWidgetsPath = (name: string) =>
   generatePath(FIELD_EDIT_WIDGETS, { name })
+
 export const SEARCH = `${BASE}/search`
+
+export const LISTS = `${BASE}/lists`

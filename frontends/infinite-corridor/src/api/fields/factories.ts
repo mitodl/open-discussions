@@ -1,50 +1,7 @@
 import { faker } from "@faker-js/faker"
 import { makePaginatedFactory, Factory } from "ol-util/build/factories"
-import { LearningResourceType } from "ol-search-ui"
-import * as factories from "ol-search-ui/build/factories"
-import { times } from "lodash"
-import type { FieldChannel, UserList, UserListItem } from "./interfaces"
-
-export const makeUserList: Factory<UserList> = overrides => {
-  const userList: UserList = {
-    id:                faker.unique(faker.datatype.number),
-    short_description: faker.lorem.paragraph(),
-    offered_by:        [],
-    title:             faker.lorem.words(),
-    topics:            times(2, () => factories.makeTopic()),
-    is_favorite:       faker.datatype.boolean(),
-    image_src:         new URL(faker.internet.url()).toString(),
-    image_description: faker.helpers.arrayElement([
-      null,
-      faker.lorem.sentence()
-    ]),
-    item_count:    faker.datatype.number({ min: 2, max: 5 }),
-    object_type:   LearningResourceType.Userlist,
-    list_type:     "userlist",
-    privacy_level: "public",
-    author:        faker.datatype.number({ min: 1, max: 1000 }),
-    lists:         [],
-    certification: [],
-    author_name:   faker.name.findName(),
-    ...overrides
-  }
-  return userList
-}
-
-export const makeUserListItem: Factory<UserListItem> = overrides => {
-  const content = factories.makeLearningResource()
-  const item: UserListItem = {
-    id:           faker.unique(faker.datatype.number),
-    is_favorite:  faker.datatype.boolean(),
-    object_id:    content.id,
-    position:     faker.datatype.number(),
-    program:      faker.datatype.number(),
-    content_type: content.object_type,
-    content_data: content,
-    ...overrides
-  }
-  return item
-}
+import { makeUserList } from "ol-search-ui/build/factories"
+import type { FieldChannel } from "./interfaces"
 
 const makeField: Factory<FieldChannel> = overrides => ({
   name:               faker.unique(faker.lorem.slug),
@@ -64,13 +21,4 @@ const makeField: Factory<FieldChannel> = overrides => ({
 
 const makeFieldsPaginated = makePaginatedFactory(makeField)
 
-const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
-
-const makeUserListsPaginated = makePaginatedFactory(makeUserList)
-
-export {
-  makeField,
-  makeFieldsPaginated,
-  makeUserListItemsPaginated,
-  makeUserListsPaginated
-}
+export { makeField, makeFieldsPaginated }

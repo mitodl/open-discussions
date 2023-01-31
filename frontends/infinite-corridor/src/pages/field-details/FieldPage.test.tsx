@@ -2,15 +2,17 @@
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
-import { urls as resourceUrls } from "../../api/learning-resources"
+import { urls as lrUrls } from "../../api/learning-resources"
 import {
   LearningResource,
   LearningResourceCard,
   ExpandedLearningResourceDisplay
 } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem, FieldChannel } from "../../api/fields"
+import type { UserList, UserListItem } from "ol-search-ui"
+import type { FieldChannel } from "../../api/fields"
 import * as factory from "../../api/fields/factories"
+import * as lrFactory from "ol-search-ui/src/factories"
 import WidgetList from "./WidgetsList"
 import {
   renderTestApp,
@@ -66,12 +68,12 @@ type SubfieldData = {
 }
 
 const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
-  const list1 = factory.makeUserList()
-  const list2 = factory.makeUserList()
-  const list3 = factory.makeUserList()
-  const items1 = factory.makeUserListItemsPaginated(4)
-  const items2 = factory.makeUserListItemsPaginated(2)
-  const items3 = factory.makeUserListItemsPaginated(2)
+  const list1 = lrFactory.makeUserList()
+  const list2 = lrFactory.makeUserList()
+  const list3 = lrFactory.makeUserList()
+  const items1 = lrFactory.makeUserListItemsPaginated(4)
+  const items2 = lrFactory.makeUserListItemsPaginated(2)
+  const items3 = lrFactory.makeUserListItemsPaginated(2)
 
   const field = factory.makeField({
     featured_list: list1,
@@ -80,9 +82,9 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   })
 
   setMockResponse.get(urls.fieldDetails(field.name), field)
-  setMockResponse.get(urls.userListItems(list1.id), items1)
-  setMockResponse.get(urls.userListItems(list2.id), items2)
-  setMockResponse.get(urls.userListItems(list3.id), items3)
+  setMockResponse.get(lrUrls.userListItems(list1.id), items1)
+  setMockResponse.get(lrUrls.userListItems(list2.id), items2)
+  setMockResponse.get(lrUrls.userListItems(list3.id), items3)
 
   const widgetsList = makeWidgetListResponse()
   setMockResponse.get(widgetUrls.widgetList(field.widget_list), widgetsList)
@@ -112,7 +114,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   )
 
   Object.values(resources).forEach(r => {
-    setMockResponse.get(resourceUrls.resource(r.object_type, r.id), r)
+    setMockResponse.get(lrUrls.resource(r.object_type, r.id), r)
   })
 
   return {

@@ -1,9 +1,12 @@
 import { waitFor } from "@testing-library/react"
 
 import { PaginatedResult } from "ol-util"
-import { FieldChannel, UserList, urls } from "../../api/fields"
+import { FieldChannel, urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
+import { urls as lrUrls } from "../../api/learning-resources"
 import * as factory from "../../api/fields/factories"
+import * as resourceFactory from "ol-search-ui/build/factories"
+import type { UserList } from "ol-search-ui"
 import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
 import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
@@ -13,9 +16,9 @@ describe("EditFieldBasicForm", () => {
   let field: FieldChannel, publicLists: PaginatedResult<UserList>
 
   beforeEach(() => {
-    publicLists = factory.makeUserListsPaginated(5)
+    publicLists = resourceFactory.makeUserListsPaginated(5)
     setMockResponse.get(
-      urls.userLists({ limit: DEFAULT_PAGE_SIZE, offset: 0 }),
+      lrUrls.userLists({ limit: DEFAULT_PAGE_SIZE, offset: 0, public: true }),
       publicLists
     )
     field = factory.makeField({
@@ -24,20 +27,20 @@ describe("EditFieldBasicForm", () => {
       lists:         publicLists.results.slice(0, 3)
     })
     setMockResponse.get(
-      urls.userListItems(publicLists.results[0].id),
-      factory.makeUserListItemsPaginated(2)
+      lrUrls.userListItems(publicLists.results[0].id),
+      resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      urls.userListItems(publicLists.results[1].id),
-      factory.makeUserListItemsPaginated(2)
+      lrUrls.userListItems(publicLists.results[1].id),
+      resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      urls.userListItems(publicLists.results[2].id),
-      factory.makeUserListItemsPaginated(2)
+      lrUrls.userListItems(publicLists.results[2].id),
+      resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      urls.userListItems(publicLists.results[4].id),
-      factory.makeUserListItemsPaginated(2)
+      lrUrls.userListItems(publicLists.results[4].id),
+      resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(urls.fieldDetails(field.name), field)
     setMockResponse.get(

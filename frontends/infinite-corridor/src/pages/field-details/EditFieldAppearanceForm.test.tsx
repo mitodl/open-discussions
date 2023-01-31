@@ -8,6 +8,7 @@ import {
 import * as factory from "../../api/fields/factories"
 import { FieldChannel, urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
+import { urls as lrUrls } from "../../api/learning-resources"
 import { waitFor } from "@testing-library/react"
 import { makeFieldViewPath } from "../urls"
 import { makeWidgetListResponse } from "ol-widgets/build/factories"
@@ -15,7 +16,7 @@ import { makeWidgetListResponse } from "ol-widgets/build/factories"
 const setupApis = (fieldOverrides?: Partial<FieldChannel>) => {
   const field = factory.makeField({ is_moderator: true, ...fieldOverrides })
   setMockResponse.get(urls.fieldDetails(field.name), field)
-  setMockResponse.get(urls.userLists(), [field])
+  setMockResponse.get(lrUrls.userLists({ public: true }), [field])
   setMockResponse.get(
     widgetUrls.widgetList(field.widget_list),
     makeWidgetListResponse({}, { count: 0 })

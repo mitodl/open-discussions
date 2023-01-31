@@ -5,12 +5,10 @@ import { Autocomplete, Button, TextField } from "@mui/material"
 import { SortableSelect } from "ol-forms"
 import { UniqueIdentifier } from "@dnd-kit/core"
 
-import {
-  FieldChannelBasicForm,
-  useMutateField,
-  usePublicLists
-} from "../../api/fields"
-import type { FieldChannel, UserList } from "../../api/fields/interfaces"
+import { FieldChannelBasicForm, useMutateField } from "../../api/fields"
+import type { FieldChannel } from "../../api/fields/interfaces"
+import type { UserList } from "ol-search-ui"
+import { useUserListsData } from "../../api/learning-resources"
 import { makeFieldViewPath } from "../../pages/urls"
 
 type FormProps = {
@@ -22,7 +20,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
   const mutation = useMutateField(field)
   const history = useHistory()
 
-  const listsQuery = usePublicLists()
+  const listsQuery = useUserListsData({ public: true })
   const listOptions = useMemo(
     () => [
       ...(listsQuery.data?.results ?? []).map((userList: UserList) => ({

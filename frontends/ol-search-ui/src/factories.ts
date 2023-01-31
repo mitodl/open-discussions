@@ -2,7 +2,7 @@
 import casual from "casual-browserify"
 import { faker } from "@faker-js/faker"
 import { DATE_FORMAT } from "./util"
-import { Factory } from "ol-util/build/factories"
+import { Factory, makePaginatedFactory } from "ol-util/build/factories"
 import {
   CourseTopic,
   LearningResourceResult,
@@ -11,7 +11,9 @@ import {
   LearningResourceType,
   CardMinimalResource,
   EmbedlyConfig,
-  Course
+  Course,
+  UserList,
+  UserListItem
 } from "./interfaces"
 
 import { pick, times } from "lodash"
@@ -76,9 +78,7 @@ export const makeCourse: Factory<Course> = overrides => ({
   ...overrides
 })
 
-export const makeProgram: Factory<
-  LearningResource
-> = overrides => ({
+export const makeProgram: Factory<LearningResource> = overrides => ({
   id:                faker.unique(faker.datatype.number),
   title:             casual.title,
   url:               casual.url,
@@ -129,11 +129,15 @@ const resultMakers = {
 }
 type MakeableResultType = keyof typeof resultMakers
 
-const makeSearchResult = (type?: MakeableResultType): {
+const makeSearchResult = (
+  type?: MakeableResultType
+): {
   _id: string
   _source: LearningResourceResult
 } => {
-  const maker = type ? resultMakers[type] : faker.helpers.arrayElement(Object.values(resultMakers))
+  const maker = type ?
+    resultMakers[type] :
+    faker.helpers.arrayElement(Object.values(resultMakers))
   const resource = maker()
   const topics = resource.topics.map(topic => topic.name)
   return {
@@ -207,6 +211,51 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
   }
   return resource
 }
+
+export const makeUserList: Factory<UserList> = overrides => {
+  const userList: UserList = {
+    id:                faker.unique(faker.datatype.number),
+    short_description: faker.lorem.paragraph(),
+    offered_by:        [],
+    title:             faker.lorem.words(),
+    topics:            times(2, () => makeTopic()),
+    is_favorite:       faker.datatype.boolean(),
+    image_src:         new URL(faker.internet.url()).toString(),
+    image_description: faker.helpers.arrayElement([
+      null,
+      faker.lorem.sentence()
+    ]),
+    item_count:    faker.datatype.number({ min: 2, max: 5 }),
+    object_type:   LearningResourceType.Userlist,
+    list_type:     "userlist",
+    privacy_level: "public",
+    author:        faker.datatype.number({ min: 1, max: 1000 }),
+    lists:         [],
+    certification: [],
+    author_name:   faker.name.findName(),
+    ...overrides
+  }
+  return userList
+}
+
+export const makeUserListItem: Factory<UserListItem> = overrides => {
+  const content = makeLearningResource()
+  const item: UserListItem = {
+    id:           faker.unique(faker.datatype.number),
+    is_favorite:  faker.datatype.boolean(),
+    object_id:    content.id,
+    position:     faker.datatype.number(),
+    program:      faker.datatype.number(),
+    content_type: content.object_type,
+    content_data: content,
+    ...overrides
+  }
+  return item
+}
+
+export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
+
+export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
 
 export const makeMinimalResoure: Factory<CardMinimalResource> = overrides => {
   const keys = [

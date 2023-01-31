@@ -1,4 +1,5 @@
 import { Facets } from "@mitodl/course-search-utils"
+import { PaginatedResult } from "ol-util"
 
 export enum LearningResourceType {
   Course = "course",
@@ -29,9 +30,9 @@ export type LearningResource = {
   duration?: string | null
   url?: string | null
   last_modified?: string | null
-  item_count?: number             // userlist annotation
-  course_id?: string              // required for courses
-  video_id?: string               // required for videos
+  item_count?: number // userlist annotation
+  course_id?: string // required for courses
+  video_id?: string // required for videos
 }
 
 type SearchResult<T> = Omit<T, "topics"> & {
@@ -43,6 +44,26 @@ export type LearningResourceResult = SearchResult<LearningResource>
 export interface Course extends LearningResource {
   runs: NonNullable<LearningResource["runs"]>
   object_type: LearningResourceType.Course
+}
+
+export type UserList = LearningResource & {
+  image_description: string | null | undefined
+  list_type: string
+  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
+  privacy_level: string
+  author: number
+  author_name: string
+  item_count: number
+}
+
+export type UserListItem = {
+  id: number
+  is_favorite: boolean
+  object_id: number
+  position: number
+  program: number
+  content_type: string
+  content_data: LearningResource
 }
 
 export type CourseTopic = {
@@ -110,3 +131,7 @@ export type EmbedlyConfig = {
   width: number
   height: number
 }
+
+export type PaginatedUserListItems = PaginatedResult<UserListItem>
+
+export type PaginatedUserLists = PaginatedResult<UserList>
