@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.205.0
+Version 0.205.0 (Released February 01, 2023)
 ---------------
 
 - Always bulk delete content files from search index (#3816)
