@@ -1,7 +1,7 @@
 import type {
   LearningResource,
   PaginatedUserListItems,
-  PaginatedUserLists,
+  UserList,
   UserListItem
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
@@ -12,24 +12,31 @@ import * as urls from "./urls"
 const useResource = (type: string, id: number) => {
   return useQuery<LearningResource>(urls.resource(type, id))
 }
-
-const useUserLists = (options?: urls.UserListOptions) => {
-  return useQuery<PaginatedUserLists>(urls.userLists(options))
+const useUserList = (id: number) => {
+  return useResource("userlist", id) as UseQueryResult<UserList>
 }
 
-const useUserListsData = (options?: urls.UserListOptions) => {
-  const userLists = useUserLists(options)
+/**
+ *
+ */
+const useContentData = <D>(
+  query: UseQueryResult<PaginatedResult<{ content_data: D }>>
+) => {
   return useMemo(() => {
-    const { data, ...others } = userLists
-    const lrData = data && {
+    const { data, ...others } = query
+    const contentData = data && {
       ...data,
-      results: data.results
+      results: data.results.map(d => d.content_data)
     }
     return {
-      data: lrData,
+      data: contentData,
       ...others
-    } as UseQueryResult<PaginatedUserLists>
-  }, [userLists])
+    } as UseQueryResult<PaginatedResult<D>>
+  }, [query])
+}
+
+const useUserListsListing = (options?: urls.UserListOptions) => {
+  return useQuery<PaginatedResult<UserList>>(urls.userLists(options))
 }
 
 const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
@@ -39,19 +46,24 @@ const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
 const useUserListItemsData = (
   listId: number,
   options?: PaginationSearchParams
-) => {
+): UseQueryResult<PaginatedResult<LearningResource>> => {
   const userListItems = useUserListItems(listId, options)
-  return useMemo(() => {
-    const { data, ...others } = userListItems
-    const lrData = data && {
-      ...data,
-      results: data.results.map(d => d.content_data)
-    }
-    return {
-      data: lrData,
-      ...others
-    } as UseQueryResult<PaginatedResult<UserListItem["content_data"]>>
-  }, [userListItems])
+  return useContentData(userListItems)
 }
 
-export { useResource, useUserListItemsData, useUserListsData }
+const useFavoritesData = (
+  options?: PaginationSearchParams
+): UseQueryResult<PaginatedResult<LearningResource>> => {
+  const userListItems = useQuery<PaginatedUserListItems>(
+    urls.favorites(options)
+  )
+  return useContentData(userListItems)
+}
+
+export {
+  useResource,
+  useUserListItemsData,
+  useUserList,
+  useUserListsListing,
+  useFavoritesData
+}

@@ -127,7 +127,6 @@ export type CardMinimalResource = Pick<
   | "object_type"
   | "image_src"
   | "platform"
-  | "id"
   | "item_count"
 >
 

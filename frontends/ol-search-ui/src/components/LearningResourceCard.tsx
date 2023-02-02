@@ -44,6 +44,10 @@ type LearningResourceCardProps<
    */
   imgConfig: EmbedlyConfig
   onActivate?: OnActivateCard
+  /**
+   * Suppress the image.
+   */
+  suppressImage?: boolean
 }
 
 type OffererProps = {
@@ -80,9 +84,21 @@ const CardBody: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
   ) : null
 }
 
-const CardFooter: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
+const ResourceFooterDetails: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
   resource
 }) => {
+  const isList = [
+    LearningResourceType.Userlist,
+    LearningResourceType.LearningPath
+  ].includes(resource.object_type)
+  if (isList && resource.item_count !== undefined) {
+    return (
+      <span>
+        {resource.item_count} {pluralize("item", resource.item_count)}
+      </span>
+    )
+  }
+
   const bestAvailableRun = findBestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
@@ -90,27 +106,48 @@ const CardFooter: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
     hasCertificate && bestAvailableRun ?
       moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
       null
-  const isList = [
-    LearningResourceType.Userlist,
-    LearningResourceType.LearningPath
-  ].includes(resource.object_type)
-  return (
-    <div className="ol-lrc-footer-row">
-      {startDate && (
-        <Chip
-          className="ol-lrc-chip"
-          avatar={<CalendarTodayIcon />}
-          label={startDate}
+  if (startDate) {
+    return <Chip
+      className="ol-lrc-chip"
+      avatar={<CalendarTodayIcon />}
+      label={startDate}
+    />
+  }
+
+  return null
+}
+
+type CardImageProps = Pick<
+  LearningResourceCardProps,
+  "resource" | "imgConfig" | "variant"
+>
+const CardImage: React.FC<CardImageProps> = ({
+  resource,
+  imgConfig,
+  variant
+}) => {
+  const isRow = variant === "row" || variant === "row-reverse"
+  if (isRow) {
+    return (
+      <CardContent className="ol-lrc-image">
+        <CardMedia
+          component="img"
+          height={imgConfig.height}
+          src={resourceThumbnailSrc(resource, imgConfig)}
+          alt=""
         />
-      )}
-      {isList &&
-        resource.item_count !== undefined && ( // for TS; should not be undefined for lists
-        <span>
-          {resource.item_count} {pluralize("item", resource.item_count)}
-        </span>
-      )}
-    </div>
-  )
+      </CardContent>
+    )
+  } else {
+    return (
+      <CardMedia
+        component="img"
+        height={imgConfig.height}
+        src={resourceThumbnailSrc(resource, imgConfig)}
+        alt=""
+      />
+    )
+  }
 }
 
 const variantClasses: Record<CardVariant, string> = {
@@ -124,6 +161,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
   resource,
   imgConfig,
   className,
+  suppressImage = false,
   onActivate
 }: LearningResourceCardProps<R>) => {
   const hasCertificate =
@@ -133,27 +171,16 @@ const LearningResourceCard = <R extends CardMinimalResource>({
     [resource, onActivate]
   )
 
-  const isRow = variant === "row" || variant === "row-reverse"
-  const cardImg = useMemo(
-    () => (
-      <CardMedia
-        component="img"
-        height={imgConfig.height}
-        src={resourceThumbnailSrc(resource, imgConfig)}
-        alt=""
-      />
-    ),
-    [resource, imgConfig]
-  )
-
   return (
     <Card
       className={classNames(className, variantClasses[variant], "ol-lrc-root")}
     >
-      {isRow ? (
-        <CardContent className="ol-lrc-image">{cardImg}</CardContent>
-      ) : (
-        cardImg
+      {!suppressImage && (
+        <CardImage
+          resource={resource}
+          variant={variant}
+          imgConfig={imgConfig}
+        />
       )}
       <CardContent className="ol-lrc-content">
         <div className="ol-lrc-type-row">
@@ -174,7 +201,14 @@ const LearningResourceCard = <R extends CardMinimalResource>({
           </Dotdotdot>
         )}
         <CardBody resource={resource} />
-        <CardFooter resource={resource} />
+        <div className="ol-lrc-fill-space-content-end">
+          <div className="ol-lrc-footer-row">
+            <div>
+              <ResourceFooterDetails resource={resource} />
+            </div>
+            <span>cats</span>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

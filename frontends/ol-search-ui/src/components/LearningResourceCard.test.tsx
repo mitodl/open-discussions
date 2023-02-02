@@ -1,6 +1,5 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
-import { faker } from "@faker-js/faker"
 import { assertInstanceOf } from "ol-util"
 import LearningResourceCard from "./LearningResourceCard"
 import { makeCourse, makeUserList, makeImgConfig } from "../factories"
@@ -13,14 +12,35 @@ describe("LearningResourceCard", () => {
     render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
     const heading = screen.getByRole("heading")
 
-    // Alert! This should be empty unless it is meaningful.
-    const coverImg = screen.getByAltText("")
-    expect(heading).toHaveAccessibleName(resource.title)
-    expect(coverImg).toHaveAccessibleName("")
-
+    const coverImg = screen.getByRole("img", { name: "" })
     assertInstanceOf(coverImg, HTMLImageElement)
+    expect(heading).toHaveAccessibleName(resource.title)
+    expect(coverImg.alt).toBe("") // Alert! This should be empty unless it is meaningful.
     expect(coverImg.src).toBe(resourceThumbnailSrc(resource, imgConfig))
   })
+
+  it.each([
+    { suppressImage: false, hasNoImage: false },
+    { suppressImage: true, hasNoImage: true }
+  ])(
+    "does not show an image iff suppressImage is true",
+    ({ suppressImage, hasNoImage }) => {
+      const resource = makeCourse({
+        // if has certificates, we'll get extra images. Simpler to have none for this test.
+        certification: []
+      })
+      const imgConfig = makeImgConfig()
+      render(
+        <LearningResourceCard
+          resource={resource}
+          imgConfig={imgConfig}
+          suppressImage={suppressImage}
+        />
+      )
+      const coverImg = screen.queryByRole("img")
+      expect(coverImg === null).toBe(hasNoImage)
+    }
+  )
 
   it("has the correct embedly url", () => {
     const resource = makeCourse()

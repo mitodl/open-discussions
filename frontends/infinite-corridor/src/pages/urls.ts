@@ -17,4 +17,7 @@ export const makeFieldManageWidgetsPath = (name: string) =>
 
 export const SEARCH = `${BASE}/search`
 
-export const LISTS = `${BASE}/lists`
+export const USERLISTS_LISTING = `${BASE}/lists`
+export const USERLIST_VIEW = `${BASE}/lists/:id` as const
+export const makeUserListViewPath = (id: number) =>
+  generatePath(USERLIST_VIEW, { id })

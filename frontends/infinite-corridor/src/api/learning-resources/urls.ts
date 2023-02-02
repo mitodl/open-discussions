@@ -13,17 +13,20 @@ const userListItems = (
   return `/userlists/${id}/items?${searchParams}`
 }
 
-type UserListOptions = {
-  public?: boolean
-} & PaginationSearchParams
-const userLists = ({
-  limit = DEFAULT_PAGE_SIZE,
-  offset = 0,
-  public: isPublic
-}: UserListOptions = {}) => {
-  const searchParams = toQueryString({ limit, offset, public: isPublic })
-  return `/userlists/?${searchParams}`
+const resourceList = <Opts extends PaginationSearchParams>(
+  type: string,
+  options?: Opts
+) => {
+  const { limit = DEFAULT_PAGE_SIZE, offset = 0, ...others } = options ?? {}
+  const searchParams = toQueryString({ limit, offset, ...others })
+  return `/${type}s/?${searchParams}`
 }
 
-export { resource, userListItems, userLists }
+type UserListOptions = { public?: boolean } & PaginationSearchParams
+const userLists = (opts?: UserListOptions) =>
+  resourceList<UserListOptions>("userlist", opts)
+const favorites = (opts?: PaginationSearchParams) =>
+  resourceList("favorite", opts)
+
+export { resource, userListItems, userLists, favorites }
 export type { UserListOptions }
