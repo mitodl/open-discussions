@@ -1,7 +1,7 @@
 import moment from "moment"
 import React, { useCallback, useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
-import { toQueryString } from "ol-util"
+import { toQueryString, pluralize } from "ol-util"
 import classNames from "classnames"
 
 import Card from "@mui/material/Card"
@@ -10,7 +10,11 @@ import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
 
 import CardMedia from "@mui/material/CardMedia"
-import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
+import {
+  CardMinimalResource,
+  EmbedlyConfig,
+  LearningResourceType
+} from "../interfaces"
 import {
   findBestRun,
   getReadableResourceType,
@@ -64,6 +68,51 @@ const Offerers: React.FC<OffererProps> = ({ offerers }) => {
   )
 }
 
+const CardBody: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
+  resource
+}) => {
+  const offerers = resource.offered_by ?? []
+  return offerers.length > 0 ? (
+    <div>
+      <span className="ol-lrc-offered-by">Offered by &ndash;</span>
+      <Offerers offerers={offerers} />
+    </div>
+  ) : null
+}
+
+const CardFooter: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
+  resource
+}) => {
+  const bestAvailableRun = findBestRun(resource.runs ?? [])
+  const hasCertificate =
+    resource.certification && resource.certification.length > 0
+  const startDate =
+    hasCertificate && bestAvailableRun ?
+      moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
+      null
+  const isList = [
+    LearningResourceType.Userlist,
+    LearningResourceType.LearningPath
+  ].includes(resource.object_type)
+  return (
+    <div className="ol-lrc-footer-row">
+      {startDate && (
+        <Chip
+          className="ol-lrc-chip"
+          avatar={<CalendarTodayIcon />}
+          label={startDate}
+        />
+      )}
+      {isList &&
+        resource.item_count !== undefined && ( // for TS; should not be undefined for lists
+        <span>
+          {resource.item_count} {pluralize("item", resource.item_count)}
+        </span>
+      )}
+    </div>
+  )
+}
+
 const variantClasses: Record<CardVariant, string> = {
   column:        "ol-lrc-col",
   row:           "ol-lrc-row",
@@ -77,14 +126,8 @@ const LearningResourceCard = <R extends CardMinimalResource>({
   className,
   onActivate
 }: LearningResourceCardProps<R>) => {
-  const bestAvailableRun = findBestRun(resource.runs ?? [])
   const hasCertificate =
     resource.certification && resource.certification.length > 0
-  const startDate =
-    hasCertificate && bestAvailableRun ?
-      moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
-      null
-  const offerers = resource.offered_by ?? []
   const handleActivate = useCallback(
     () => onActivate?.(resource),
     [resource, onActivate]
@@ -130,19 +173,8 @@ const LearningResourceCard = <R extends CardMinimalResource>({
             {resource.title}
           </Dotdotdot>
         )}
-        <div>
-          <span className="ol-lrc-offered-by">Offered by &ndash;</span>
-          {offerers.length && <Offerers offerers={offerers} />}
-        </div>
-        <div className="ol-lrc-date-row">
-          {startDate && (
-            <Chip
-              className="ol-lrc-chip"
-              avatar={<CalendarTodayIcon />}
-              label={startDate}
-            />
-          )}
-        </div>
+        <CardBody resource={resource} />
+        <CardFooter resource={resource} />
       </CardContent>
     </Card>
   )

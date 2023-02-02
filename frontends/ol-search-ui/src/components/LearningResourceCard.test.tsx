@@ -1,13 +1,14 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
+import { faker } from "@faker-js/faker"
 import { assertInstanceOf } from "ol-util"
 import LearningResourceCard from "./LearningResourceCard"
-import { makeMinimalResoure, makeImgConfig } from "../factories"
+import { makeCourse, makeUserList, makeImgConfig } from "../factories"
 import { resourceThumbnailSrc } from "../util"
 
 describe("LearningResourceCard", () => {
   it("renders title and cover image", () => {
-    const resource = makeMinimalResoure()
+    const resource = makeCourse()
     const imgConfig = makeImgConfig()
     render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
     const heading = screen.getByRole("heading")
@@ -22,7 +23,7 @@ describe("LearningResourceCard", () => {
   })
 
   it("has the correct embedly url", () => {
-    const resource = makeMinimalResoure()
+    const resource = makeCourse()
     const imgConfig = makeImgConfig()
     render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
     const heading = screen.getByRole("heading")
@@ -40,7 +41,7 @@ describe("LearningResourceCard", () => {
   ])(
     "should render an icon if the object has a certificate",
     ({ certification, hasCertificate }) => {
-      const resource = makeMinimalResoure({ certification })
+      const resource = makeCourse({ certification })
       const imgConfig = makeImgConfig()
 
       render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
@@ -50,4 +51,22 @@ describe("LearningResourceCard", () => {
       expect(certIcon === null).not.toBe(hasCertificate)
     }
   )
+
+  it.each([
+    { itemCount: 0, expectedText: "0 items" },
+    { itemCount: 1, expectedText: "1 item" },
+    { itemCount: 2, expectedText: "2 items" }
+  ])("Renders item count for UserLists", ({ itemCount, expectedText }) => {
+    const resource = makeUserList({ item_count: itemCount })
+    const imgConfig = makeImgConfig()
+    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    screen.getByText(expectedText)
+  })
+
+  it("Does not render item count for courses, etc", () => {
+    const resource = makeCourse()
+    const imgConfig = makeImgConfig()
+    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    expect(screen.queryByText("item", { exact: false })).toBe(null)
+  })
 })

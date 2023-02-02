@@ -3,6 +3,8 @@ import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useUserListsData } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
+import { LearningResourceCard } from "ol-search-ui"
+import { imgConfigs } from "../../util/constants"
 
 const UserListsPage: React.FC = () => {
   const userListsQuery = useUserListsData()
@@ -18,11 +20,16 @@ const UserListsPage: React.FC = () => {
             <h1>My Lists</h1>
             {userListsQuery.isLoading && <p>Loading...</p>}
             {userListsQuery.data && (
-              <ul>
+              <ul className="ic-card-row-list">
                 {userListsQuery.data.results.map(list => {
                   return (
                     <li key={list.id}>
-                      {list.title}
+                      <LearningResourceCard
+                        variant="row-reverse"
+                        className="ic-resource-card"
+                        resource={list}
+                        imgConfig={imgConfigs["row-reverse-small"]}
+                      />
                     </li>
                   )
                 })}

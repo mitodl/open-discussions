@@ -46,14 +46,19 @@ export interface Course extends LearningResource {
   object_type: LearningResourceType.Course
 }
 
-export type UserList = LearningResource & {
+export interface ListBase extends LearningResource {
   image_description: string | null | undefined
   list_type: string
-  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
   privacy_level: string
   author: number
   author_name: string
   item_count: number
+}
+export interface UserList extends ListBase {
+  object_type: LearningResourceType.Userlist
+}
+export interface LearningPath extends ListBase {
+  object_type: LearningResourceType.LearningPath
 }
 
 export type UserListItem = {
@@ -123,6 +128,7 @@ export type CardMinimalResource = Pick<
   | "image_src"
   | "platform"
   | "id"
+  | "item_count"
 >
 
 export type EmbedlyConfig = {
