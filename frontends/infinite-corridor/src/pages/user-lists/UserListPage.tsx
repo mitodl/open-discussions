@@ -17,6 +17,7 @@ const UserListsPage: React.FC = () => {
   const userListQuery = useUserList(id)
   const itemsDataQuery = useUserListItemsData(id)
   const activateResource = useActivateResourceDrawer()
+
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"

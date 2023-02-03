@@ -46,19 +46,14 @@ export interface Course extends LearningResource {
   object_type: LearningResourceType.Course
 }
 
-export interface ListBase extends LearningResource {
+export interface UserList extends LearningResource {
   image_description?: string | null
   list_type: string
   privacy_level: string
   author: number
   author_name: string
   item_count: number
-}
-export interface UserList extends ListBase {
-  object_type: LearningResourceType.Userlist
-}
-export interface LearningPath extends ListBase {
-  object_type: LearningResourceType.LearningPath
+  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
 }
 
 export type UserListItem = {
