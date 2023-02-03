@@ -47,7 +47,7 @@ export interface Course extends LearningResource {
 }
 
 export interface ListBase extends LearningResource {
-  image_description: string | null | undefined
+  image_description?: string | null
   list_type: string
   privacy_level: string
   author: number

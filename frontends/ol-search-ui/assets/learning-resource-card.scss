@@ -104,10 +104,9 @@ $smallFontSize: 0.75em !default;
   min-height: 2.5*$smallFontSize; // ensure consistent spacing even if no date
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   width: 100%;
-  border: 1pt solid blue;
 }
 .ol-lrc-chip.MuiChip-root {
   height: 2.5*$smallFontSize;

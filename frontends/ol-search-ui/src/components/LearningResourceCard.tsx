@@ -1,5 +1,5 @@
 import moment from "moment"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString, pluralize } from "ol-util"
 import classNames from "classnames"
@@ -48,6 +48,7 @@ type LearningResourceCardProps<
    * Suppress the image.
    */
   suppressImage?: boolean
+  footerActionSlot?: React.ReactNode
 }
 
 type OffererProps = {
@@ -162,7 +163,8 @@ const LearningResourceCard = <R extends CardMinimalResource>({
   imgConfig,
   className,
   suppressImage = false,
-  onActivate
+  onActivate,
+  footerActionSlot
 }: LearningResourceCardProps<R>) => {
   const hasCertificate =
     resource.certification && resource.certification.length > 0
@@ -206,7 +208,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
             <div>
               <ResourceFooterDetails resource={resource} />
             </div>
-            <span>cats</span>
+            {footerActionSlot}
           </div>
         </div>
       </CardContent>
