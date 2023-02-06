@@ -2,7 +2,7 @@ import type {
   LearningResource,
   PaginatedUserListItems,
   UserList,
-  UserListItem
+  CourseTopic
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
 import { useMemo } from "react"
@@ -60,10 +60,15 @@ const useFavoritesData = (
   return useContentData(userListItems)
 }
 
+const useTopics = () => {
+  return useQuery<PaginatedResult<CourseTopic>>(urls.topics())
+}
+
 export {
   useResource,
   useUserListItemsData,
   useUserList,
   useUserListsListing,
-  useFavoritesData
+  useFavoritesData,
+  useTopics
 }

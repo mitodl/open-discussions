@@ -28,5 +28,7 @@ const userLists = (opts?: UserListOptions) =>
 const favorites = (opts?: PaginationSearchParams) =>
   resourceList("favorite", opts)
 
-export { resource, userListItems, userLists, favorites }
+const topics = () => '/topics/'
+
+export { resource, userListItems, userLists, favorites, topics }
 export type { UserListOptions }
