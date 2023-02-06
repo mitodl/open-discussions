@@ -6,12 +6,12 @@ import DialogTitle from "@mui/material/DialogTitle"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import Close from "@mui/icons-material/Close"
-import Button from "@mui/material/Button"
+import Button, { ButtonProps } from "@mui/material/Button"
 
 type BasicDialog = {
   open: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm?: () => void
   title: string
   children?: React.ReactNode
   /**
@@ -32,6 +32,8 @@ type BasicDialog = {
    * [Dialog Props](https://mui.com/material-ui/api/dialog/#props).
    */
   fullWidth?: boolean
+  cancelButtonProps?: ButtonProps
+  confirmButtonProps?: ButtonProps
 }
 const BasicDialog: React.FC<BasicDialog> = ({
   title,
@@ -41,11 +43,15 @@ const BasicDialog: React.FC<BasicDialog> = ({
   onConfirm,
   cancelText = "Cancel",
   confirmText = "Confirm",
+  cancelButtonProps,
+  confirmButtonProps,
   closeOnConfirm = true,
   fullWidth
 }) => {
   const handleConfirm = useCallback(() => {
-    onConfirm()
+    if (onConfirm) {
+      onConfirm()
+    }
     if (closeOnConfirm) {
       onClose()
     }
@@ -64,8 +70,8 @@ const BasicDialog: React.FC<BasicDialog> = ({
         {children}
       </DialogContent>
       <DialogActions>
-        <Button variant="outlined" color="secondary" onClick={onClose}>{cancelText}</Button>
-        <Button variant="contained" color="primary" onClick={handleConfirm}>{confirmText}</Button>
+        <Button variant="outlined" color="secondary" onClick={onClose} {...cancelButtonProps}>{cancelText}</Button>
+        <Button variant="contained" color="primary" onClick={handleConfirm} {...confirmButtonProps} >{confirmText}</Button>
       </DialogActions>
     </Dialog>
   )
