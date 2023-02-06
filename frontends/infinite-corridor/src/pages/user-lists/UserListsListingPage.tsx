@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback } from "react"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import EditIcon from '@mui/icons-material/Edit'
@@ -34,10 +34,12 @@ const EditListMenu: React.FC<EditListMenuProps> = ({ resource, onEdit, onDelete 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const handleEdit = useCallback(() => {
     onEdit(resource)
-  }, [resource, onEdit])
+    toggleOpen.off()
+  }, [resource, onEdit, toggleOpen])
   const handleDelete = useCallback(() => {
     onDelete(resource)
-  }, [resource, onDelete])
+    toggleOpen.off()
+  }, [resource, onDelete, toggleOpen])
   return (
     (
       <>

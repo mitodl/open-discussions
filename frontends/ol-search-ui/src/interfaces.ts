@@ -12,6 +12,11 @@ export enum LearningResourceType {
   Favorites = "favorites"
 }
 
+export enum PrivacyLevel {
+  Public = "public",
+  Private = "private"
+}
+
 export type LearningResource = {
   id: number
   title: string

@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react"
-import Button from "@mui/material/Button"
-import { Formik, Form, Field, ErrorMessage, FieldProps } from "formik"
+import ManageListForm from "./ManageListForm"
 import BasicDialog from "../../components/BasicDialog"
 import { useToggle } from "ol-util"
 import type { UserList } from "ol-search-ui"
@@ -13,17 +12,20 @@ const CreateListDialog: React.FC<CreateListDialogProps> = ({
   open,
   onClose
 }) => {
-  const handleConfirm = useCallback(() => {
-    console.log(`Creating list`)
-  }, [])
   return (
     <BasicDialog
       open={open}
       onClose={onClose}
-      onConfirm={handleConfirm}
       title="Create a new list"
       fullWidth
-    />
+      confirmButtonProps={{ type: "submit", form: "manage-list-form" }}
+      closeOnConfirm={false}
+    >
+      <ManageListForm
+        id="manage-list-form"
+        onSubmit={onClose}
+      />
+    </BasicDialog>
   )
 }
 
@@ -44,7 +46,13 @@ const EditListDialog: React.FC<EditListDialogProps> = ({
       onClose={onClose}
       onConfirm={handleConfirm}
       title="Edit list"
-    />
+    >
+      <ManageListForm
+        id="manage-list-form"
+        onSubmit={onClose}
+        resource={resource}
+      />
+    </BasicDialog>
   )
 }
 

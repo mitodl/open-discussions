@@ -1,4 +1,26 @@
+@use "theme"; 
+
 .ic-list-header {
   margin-top: 1rem;
   margin-bottom: 1rem;
+}
+
+.manage-list-form {
+  .radio-option {
+    .MuiFormControlLabel-label {
+      border: 1pt solid theme.$input-border-grey;
+      border-radius: theme.$border-radius;
+      width: 200px;
+      padding: 1rem;
+      align-self: stretch;
+    }
+    .option-header {
+      font-weight: bold;
+      font-size: theme.$font-normal;
+      display: block;
+    }
+    .option-detail {
+      font-size: theme.$font-sm;
+    }
+  }
 }

@@ -60,3 +60,9 @@ $color: theme.$color-primary;
     }
   }
 }
+
+body {
+  .MuiOutlinedInput-notchedOutline {
+    border-color: theme.$input-border-grey;
+  }
+}

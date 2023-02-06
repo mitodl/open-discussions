@@ -19,7 +19,8 @@ interface RadioChoiceFieldProps {
   name: string
   choices: RadioChoiceProps[]
   row?: boolean,
-  onChange?: RadioGroupProps["onChange"]
+  onChange?: RadioGroupProps["onChange"],
+  className?: string
 }
 
 /**
@@ -37,11 +38,12 @@ const RadioChoiceField: React.FC<RadioChoiceFieldProps> = ({
   defaultValue,
   name,
   choices,
-  onChange
+  onChange,
+  className
 }) => {
   const labelId = useId()
   return (
-    <FormControl>
+    <FormControl className={className}>
       <FormLabel id={labelId}>{label}</FormLabel>
       <RadioGroup
         aria-labelledby={labelId}
