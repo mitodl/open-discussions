@@ -72,7 +72,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
       }) => (
         <>
           <Form onSubmit={handleSubmit} className="form channel-form">
-            <div className="row form-item">
+            <div className="form-row form-item">
               <label htmlFor="field-featured_list">
                 <div className="header-padded">Featured learning resources</div>
               </label>
@@ -102,7 +102,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
                 <div className="validation-message">{errors.featured_list}</div>
               ) : null}
             </div>
-            <div className="row form-item divider">
+            <div className="form-row form-item divider">
               <label htmlFor="field-lists-sorted">
                 <div className="header-padded">Subfields</div>
               </label>
@@ -130,7 +130,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
                   )}
               />
             </div>
-            <div className="row actions">
+            <div className="form-row actions">
               <Button
                 className="cancel"
                 onClick={() => history.push(makeFieldViewPath(field.name))}
