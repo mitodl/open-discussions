@@ -1,26 +1,27 @@
 import React, { useCallback } from "react"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
-import EditIcon from '@mui/icons-material/Edit'
-import Button from '@mui/material/Button'
+import EditIcon from "@mui/icons-material/Edit"
+import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
-import DeleteIcon from '@mui/icons-material/Delete'
-import MoreVertIcon from '@mui/icons-material/MoreVert'
-import ListItemIcon from '@mui/material/ListItemIcon'
+import DeleteIcon from "@mui/icons-material/Delete"
+import MoreVertIcon from "@mui/icons-material/MoreVert"
+import ListItemIcon from "@mui/material/ListItemIcon"
 import IconButton from "@mui/material/IconButton"
 
 import { BannerPage, useToggle } from "ol-util"
-import { CreateListDialog, EditListDialog, DeletionDialog, useDeletionDialog, useEditingDialog, useCreationDialog } from "./ManageListDialog"
+import {
+  CreateListDialog,
+  EditListDialog,
+  DeletionDialog,
+  useDeletionDialog,
+  useEditingDialog,
+  useCreationDialog
+} from "./ManageListDialog"
 import { GridColumn, GridContainer } from "../../components/layout"
-import {
-  useFavorites,
-  useUserListsListing
-} from "../../api/learning-resources"
+import { useFavorites, useUserListsListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
-import {
-  LearningResourceCard,
-  LearningResourceType,
-} from "ol-search-ui"
+import { LearningResourceCard, LearningResourceType } from "ol-search-ui"
 import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
@@ -28,10 +29,14 @@ import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
 
 type EditListMenuProps = {
   resource: UserList
-  onEdit:   (resource: UserList) => void
+  onEdit: (resource: UserList) => void
   onDelete: (resource: UserList) => void
 }
-const EditListMenu: React.FC<EditListMenuProps> = ({ resource, onEdit, onDelete }) => {
+const EditListMenu: React.FC<EditListMenuProps> = ({
+  resource,
+  onEdit,
+  onDelete
+}) => {
   const [open, toggleOpen] = useToggle(false)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const handleEdit = useCallback(() => {
@@ -43,26 +48,25 @@ const EditListMenu: React.FC<EditListMenuProps> = ({ resource, onEdit, onDelete 
     toggleOpen.off()
   }, [resource, onDelete, toggleOpen])
   return (
-    (
-      <>
-        <IconButton onClick={toggleOpen.on} ref={setAnchorEl} size="small">
-          <MoreVertIcon fontSize="inherit" />
-        </IconButton><Menu open={open} onClose={toggleOpen.off} anchorEl={anchorEl}>
-          <MenuItem onClick={handleEdit}>
-            <ListItemIcon>
-              <EditIcon />
-            </ListItemIcon>
-            Edit
-          </MenuItem>
-          <MenuItem onClick={handleDelete}>
-            <ListItemIcon>
-              <DeleteIcon />
-            </ListItemIcon>
-            Delete
-          </MenuItem>
-        </Menu>
-      </>
-    )
+    <>
+      <IconButton onClick={toggleOpen.on} ref={setAnchorEl} size="small">
+        <MoreVertIcon fontSize="inherit" />
+      </IconButton>
+      <Menu open={open} onClose={toggleOpen.off} anchorEl={anchorEl}>
+        <MenuItem onClick={handleEdit}>
+          <ListItemIcon>
+            <EditIcon />
+          </ListItemIcon>
+          Edit
+        </MenuItem>
+        <MenuItem onClick={handleDelete}>
+          <ListItemIcon>
+            <DeleteIcon />
+          </ListItemIcon>
+          Delete
+        </MenuItem>
+      </Menu>
+    </>
   )
 }
 
@@ -73,9 +77,7 @@ const EditListMenu: React.FC<EditListMenuProps> = ({ resource, onEdit, onDelete 
  * topics, etc). It's just a list of favorited items that we present similarly
  * to other lists.
  */
-const makeFavorites = (
-  count: number
-): Favorites => {
+const makeFavorites = (count: number): Favorites => {
   return {
     title:         "My Favorites",
     object_type:   LearningResourceType.Favorites,
@@ -100,12 +102,16 @@ const UserListsPage: React.FC = () => {
     null
 
   const history = useHistory()
-  const handleActivate = useCallback((resource: UserList | Favorites) => {
-    const path = resource.object_type === LearningResourceType.Favorites ?
-      FAVORITES_VIEW :
-      makeUserListViewPath(resource.id)
-    history.push(path)
-  }, [history])
+  const handleActivate = useCallback(
+    (resource: UserList | Favorites) => {
+      const path =
+        resource.object_type === LearningResourceType.Favorites ?
+          FAVORITES_VIEW :
+          makeUserListViewPath(resource.id)
+      history.push(path)
+    },
+    [history]
+  )
 
   return (
     <BannerPage
@@ -151,7 +157,11 @@ const UserListsPage: React.FC = () => {
                           resource={list}
                           imgConfig={imgConfigs["row-reverse-small"]}
                           footerActionSlot={
-                            <EditListMenu resource={list} onEdit={editing.handleStart} onDelete={deletion.handleStart} />
+                            <EditListMenu
+                              resource={list}
+                              onEdit={editing.handleStart}
+                              onDelete={deletion.handleStart}
+                            />
                           }
                           onActivate={handleActivate}
                         />

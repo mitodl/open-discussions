@@ -2,10 +2,10 @@ import type { Dispatch, SetStateAction } from "react"
 import { useCallback, useMemo, useState } from "react"
 
 interface Toggler extends Dispatch<SetStateAction<boolean>> {
-  toggle: () => void;
-  on: () => void;
-  off: () => void;
-  set: Dispatch<SetStateAction<boolean>>;
+  toggle: () => void
+  on: () => void
+  off: () => void
+  set: Dispatch<SetStateAction<boolean>>
 }
 
 /**
@@ -23,7 +23,7 @@ const useToggle = (initialValue: boolean): [boolean, Toggler] => {
       on,
       off,
       toggle,
-      set: setValue,
+      set: setValue
     })
     // This is safe because none of the above have any dependencies
     // eslint-disable-next-line react-hooks/exhaustive-deps

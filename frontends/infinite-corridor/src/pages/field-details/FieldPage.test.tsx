@@ -114,7 +114,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   )
 
   Object.values(resources).forEach(r => {
-    setMockResponse.get(lrUrls.resource(r.object_type, r.id), r)
+    setMockResponse.get(lrUrls.resourceDetails(r.object_type, r.id), r)
   })
 
   return {

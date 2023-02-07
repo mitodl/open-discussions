@@ -9,7 +9,7 @@ describe("EditFieldPage", () => {
   beforeEach(() => {
     field = factory.makeField({ is_moderator: true })
     setMockResponse.get(urls.fieldDetails(field.name), field)
-    setMockResponse.get(lrUrls.userLists({ public: true }), [field])
+    setMockResponse.get(lrUrls.userListsListing({ public: true }), [field])
   })
 
   it("Displays 3 tabs for moderators", async () => {

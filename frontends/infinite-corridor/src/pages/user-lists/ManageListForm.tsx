@@ -3,30 +3,45 @@ import { useFormik, FormikConfig } from "formik"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
 import { RadioChoiceField } from "ol-forms"
-import { UserList, LearningResourceType as LRType, PrivacyLevel } from "ol-search-ui"
+import {
+  UserList,
+  LearningResourceType as LRType,
+  PrivacyLevel
+} from "ol-search-ui"
 import * as Yup from "yup"
-import { useTopics, useCreateUserList, useUpdateUserList } from "../../api/learning-resources"
+import {
+  useTopics,
+  useCreateUserList,
+  useUpdateUserList
+} from "../../api/learning-resources"
 
-type ListFormSchema = Pick<UserList,
-  | "title"
-  | "list_type"
-  | "privacy_level"
-  | "short_description"
-  | "topics"
-  >
+type ListFormSchema = Pick<
+  UserList,
+  "title" | "list_type" | "privacy_level" | "short_description" | "topics"
+>
 
 const listFormSchema: Yup.SchemaOf<ListFormSchema> = Yup.object().shape({
-  title:             Yup.string().default("").required("Title is required"),
-  list_type:         Yup.string().default(LRType.Userlist).required("List type is required"),
-  privacy_level:     Yup.string().default(PrivacyLevel.Private).required("Privacy is required"),
-  short_description: Yup.string().default("").required("Short description is required"),
-  topics:            Yup.array().of(Yup.object().shape({
-    id:   Yup.number().required(),
-    name: Yup.string().required()
-  }))
+  title:     Yup.string().default("").required("Title is required"),
+  list_type: Yup.string()
+    .default(LRType.Userlist)
+    .required("List type is required"),
+  privacy_level: Yup.string()
+    .default(PrivacyLevel.Private)
+    .required("Privacy is required"),
+  short_description: Yup.string()
+    .default("")
+    .required("Short description is required"),
+  topics: Yup.array()
+    .of(
+      Yup.object().shape({
+        id:   Yup.number().required(),
+        name: Yup.string().required()
+      })
+    )
     .min(1, "At least one subject is required.")
     .max(3, "Select no more than 3 subjects.")
-    .default([]).required()
+    .default([])
+    .required()
 })
 
 const variantProps = { InputLabelProps: { shrink: true } }
@@ -36,11 +51,9 @@ const LIST_TYPE_CHOICES = [
     value: LRType.Userlist,
     label: (
       <>
-        <span className="option-header">
-          Learning List
-        </span>
+        <span className="option-header">Learning List</span>
         <span className="option-detail">
-         Create a list of of any of our learning resources.
+          Create a list of of any of our learning resources.
         </span>
       </>
     ),
@@ -50,9 +63,7 @@ const LIST_TYPE_CHOICES = [
     value: LRType.LearningPath,
     label: (
       <>
-        <span className="option-header">
-          Learning Path
-        </span>
+        <span className="option-header">Learning Path</span>
         <span className="option-detail">
           An ordered list of learning resources.
         </span>
@@ -80,23 +91,32 @@ interface ManageListFormProps {
   resource?: UserList | null
   onSubmit?: FormikConfig<Partial<ListFormSchema>>["onSubmit"]
 }
-const ManageListForm: React.FC<ManageListFormProps> = ({ resource, onSubmit, id: formId }) => {
+const ManageListForm: React.FC<ManageListFormProps> = ({
+  resource,
+  onSubmit,
+  id: formId
+}) => {
   const createUserList = useCreateUserList()
   const updateUserList = useUpdateUserList()
-  const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] = useCallback(async (values, helpers) => {
-    console.log("Submitting")
-    if (resource) {
-      console.log("updating!")
-      await updateUserList.mutateAsync({ id: resource.id, ...values })
-    } else {
-      await createUserList.mutateAsync(values)
-    }
-    if (onSubmit) {
-      onSubmit(values, helpers)
-    }
-  }, [resource, onSubmit, createUserList, updateUserList])
+  const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] =
+    useCallback(
+      async (values, helpers) => {
+        console.log("Submitting")
+        if (resource) {
+          console.log("updating!")
+          await updateUserList.mutateAsync({ id: resource.id, ...values })
+        } else {
+          await createUserList.mutateAsync(values)
+        }
+        if (onSubmit) {
+          onSubmit(values, helpers)
+        }
+      },
+      [resource, onSubmit, createUserList, updateUserList]
+    )
   const formik = useFormik({
-    initialValues:    resource ?? listFormSchema.getDefault() as Partial<ListFormSchema>,
+    initialValues:
+      resource ?? (listFormSchema.getDefault() as Partial<ListFormSchema>),
     validationSchema: listFormSchema,
     onSubmit:         handleSubmit,
     validateOnChange: false,
@@ -106,7 +126,11 @@ const ManageListForm: React.FC<ManageListFormProps> = ({ resource, onSubmit, id:
   const topicsQuery = useTopics()
   const topics = topicsQuery.data?.results ?? []
   return (
-    <form id={formId} onSubmit={formik.handleSubmit} className="manage-list-form">
+    <form
+      id={formId}
+      onSubmit={formik.handleSubmit}
+      className="manage-list-form"
+    >
       <RadioChoiceField
         className="form-row"
         name="list_type"
@@ -166,7 +190,9 @@ const ManageListForm: React.FC<ManageListFormProps> = ({ resource, onSubmit, id:
             helperText={formik.errors.topics}
             label="Subjects"
             name="topics"
-            placeholder={formik.values.topics?.length ? undefined : "Pick 1 to 3 subjects" }
+            placeholder={
+              formik.values.topics?.length ? undefined : "Pick 1 to 3 subjects"
+            }
           />
         )}
       />

@@ -58,20 +58,30 @@ const BasicDialog: React.FC<BasicDialog> = ({
   }, [onClose, onConfirm, closeOnConfirm])
   return (
     <Dialog fullWidth={fullWidth} open={open} onClose={onClose}>
-      <DialogTitle>
-        {title}
-      </DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <Box position="absolute" top={0} right={0}>
         <IconButton onClick={onClose}>
           <Close />
         </IconButton>
       </Box>
-      <DialogContent>
-        {children}
-      </DialogContent>
+      <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button variant="outlined" color="secondary" onClick={onClose} {...cancelButtonProps}>{cancelText}</Button>
-        <Button variant="contained" color="primary" onClick={handleConfirm} {...confirmButtonProps} >{confirmText}</Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={onClose}
+          {...cancelButtonProps}
+        >
+          {cancelText}
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleConfirm}
+          {...confirmButtonProps}
+        >
+          {confirmText}
+        </Button>
       </DialogActions>
     </Dialog>
   )

@@ -259,7 +259,7 @@ describe("SearchPage", () => {
       object_type: results.hits.hits[i]._source.object_type
     })
     setMockResponse.get(
-      resourceUrls.resource(resource.object_type, resource.id),
+      resourceUrls.resourceDetails(resource.object_type, resource.id),
       resource
     )
 

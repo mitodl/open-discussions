@@ -85,9 +85,9 @@ const CardBody: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
   ) : null
 }
 
-const ResourceFooterDetails: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
-  resource
-}) => {
+const ResourceFooterDetails: React.FC<
+  Pick<LearningResourceCardProps, "resource">
+> = ({ resource }) => {
   const isList = [
     LearningResourceType.Userlist,
     LearningResourceType.LearningPath,
@@ -109,11 +109,13 @@ const ResourceFooterDetails: React.FC<Pick<LearningResourceCardProps, "resource"
       moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
       null
   if (startDate) {
-    return <Chip
-      className="ol-lrc-chip"
-      avatar={<CalendarTodayIcon />}
-      label={startDate}
-    />
+    return (
+      <Chip
+        className="ol-lrc-chip"
+        avatar={<CalendarTodayIcon />}
+        label={startDate}
+      />
+    )
   }
 
   return null

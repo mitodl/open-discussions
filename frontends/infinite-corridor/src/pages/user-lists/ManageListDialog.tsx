@@ -22,10 +22,7 @@ const CreateListDialog: React.FC<CreateListDialogProps> = ({
       confirmButtonProps={{ type: "submit", form: "create-list-form" }}
       closeOnConfirm={false}
     >
-      <ManageListForm
-        id="create-list-form"
-        onSubmit={onClose}
-      />
+      <ManageListForm id="create-list-form" onSubmit={onClose} />
     </BasicDialog>
   )
 }
@@ -108,7 +105,9 @@ const useEditingDialog = () => {
 }
 
 const useDeletionDialog = () => {
-  const [resourceToDelete, setResourceToDelete] = useState<UserList | null>(null)
+  const [resourceToDelete, setResourceToDelete] = useState<UserList | null>(
+    null
+  )
   const isOpen = !!resourceToDelete
   const handleStart = useCallback((resource: UserList) => {
     setResourceToDelete(resource)

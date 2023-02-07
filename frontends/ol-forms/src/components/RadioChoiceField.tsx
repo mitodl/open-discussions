@@ -18,8 +18,8 @@ interface RadioChoiceFieldProps {
   defaultValue?: string
   name: string
   choices: RadioChoiceProps[]
-  row?: boolean,
-  onChange?: RadioGroupProps["onChange"],
+  row?: boolean
+  onChange?: RadioGroupProps["onChange"]
   className?: string
 }
 
@@ -64,8 +64,7 @@ const RadioChoiceField: React.FC<RadioChoiceFieldProps> = ({
               className={className}
             />
           )
-        })
-        }
+        })}
       </RadioGroup>
     </FormControl>
   )
