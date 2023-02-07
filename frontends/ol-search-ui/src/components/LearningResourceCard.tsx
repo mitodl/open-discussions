@@ -90,7 +90,8 @@ const ResourceFooterDetails: React.FC<Pick<LearningResourceCardProps, "resource"
 }) => {
   const isList = [
     LearningResourceType.Userlist,
-    LearningResourceType.LearningPath
+    LearningResourceType.LearningPath,
+    LearningResourceType.Favorites
   ].includes(resource.object_type)
   if (isList && resource.item_count !== undefined) {
     return (

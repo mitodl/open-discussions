@@ -1,7 +1,7 @@
 import React from "react"
 import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useUserListItemsData, useUserList } from "../../api/learning-resources"
+import { useUserListItems, useUserList } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import { LearningResourceCard } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
@@ -15,7 +15,7 @@ type RouteParams = {
 const UserListsPage: React.FC = () => {
   const id = Number(useParams<RouteParams>().id)
   const userListQuery = useUserList(id)
-  const itemsDataQuery = useUserListItemsData(id)
+  const itemsDataQuery = useUserListItems(id)
   const activateResource = useActivateResourceDrawer()
 
   return (
@@ -37,7 +37,7 @@ const UserListsPage: React.FC = () => {
                       <LearningResourceCard
                         variant="row-reverse"
                         className="ic-resource-card"
-                        resource={list}
+                        resource={list.content_data}
                         imgConfig={imgConfigs["row-reverse"]}
                         onActivate={activateResource}
                       />

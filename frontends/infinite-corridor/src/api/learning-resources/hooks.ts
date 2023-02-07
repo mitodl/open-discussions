@@ -5,70 +5,108 @@ import type {
   CourseTopic
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
-import { useMemo } from "react"
-import { useQuery, UseQueryResult } from "react-query"
-import * as urls from "./urls"
+import axios from "../../libs/axios"
+import { useMutation, useQuery, useQueryClient, UseQueryResult } from "react-query"
+import { urls, keys, UserListOptions } from "./urls"
 
 const useResource = (type: string, id: number) => {
-  return useQuery<LearningResource>(urls.resource(type, id))
+  const url = urls.resourceDetails(type, id)
+  const key = keys.resourceDetails(type, id)
+  return useQuery<LearningResource>(key, () => axios.get(url).then(res => res.data))
 }
 const useUserList = (id: number) => {
   return useResource("userlist", id) as UseQueryResult<UserList>
 }
 
-/**
- *
- */
-const useContentData = <D>(
-  query: UseQueryResult<PaginatedResult<{ content_data: D }>>
-) => {
-  return useMemo(() => {
-    const { data, ...others } = query
-    const contentData = data && {
-      ...data,
-      results: data.results.map(d => d.content_data)
-    }
-    return {
-      data: contentData,
-      ...others
-    } as UseQueryResult<PaginatedResult<D>>
-  }, [query])
-}
-
-const useUserListsListing = (options?: urls.UserListOptions) => {
-  return useQuery<PaginatedResult<UserList>>(urls.userLists(options))
+const useUserListsListing = (options?: UserListOptions) => {
+  const url = urls.userListsListing(options)
+  const key = keys.userListsListing(options)
+  return useQuery<PaginatedResult<UserList>>(key, () => axios.get(url).then(res => res.data))
 }
 
 const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
   return useQuery<PaginatedUserListItems>(urls.userListItems(listId, options))
 }
 
-const useUserListItemsData = (
-  listId: number,
+const useFavorites = (
   options?: PaginationSearchParams
-): UseQueryResult<PaginatedResult<LearningResource>> => {
-  const userListItems = useUserListItems(listId, options)
-  return useContentData(userListItems)
-}
-
-const useFavoritesData = (
-  options?: PaginationSearchParams
-): UseQueryResult<PaginatedResult<LearningResource>> => {
-  const userListItems = useQuery<PaginatedUserListItems>(
-    urls.favorites(options)
+) => {
+  const url = urls.favoritesListing(options)
+  const key = keys.favoritesListing(options)
+  return useQuery<PaginatedUserListItems>(
+    key, () => axios.get(url).then(res => res.data)
   )
-  return useContentData(userListItems)
 }
 
 const useTopics = () => {
   return useQuery<PaginatedResult<CourseTopic>>(urls.topics())
 }
 
+const updateUserList = async (data: Partial<UserList> & { id: number }) => {
+  const { data: response } = await axios.patch(urls.updateUserList(data.id), data)
+  return response
+}
+const useUpdateUserList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    updateUserList,
+    {
+      onSuccess: (_data, variables) => {
+        queryClient.invalidateQueries({
+          queryKey: keys.userListDetails(variables.id)
+        })
+        queryClient.invalidateQueries({
+          queryKey: keys.userListsListing()
+        })
+      }
+    }
+  )
+}
+
+const createUserList = async (data: Partial<UserList>) => {
+  const { data: response } = await axios.post(urls.createUserList(), data)
+  return response
+}
+const useCreateUserList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    createUserList,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: keys.userListsListing()
+        })
+      }
+    }
+  )
+}
+
+const deleteUserList = async (id: number) => {
+  const { data: response } = await axios.delete(urls.deleteUserList(id))
+  return response
+}
+const useDeleteUserList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(
+    deleteUserList,
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: keys.userListsListing()
+        })
+      }
+    }
+  )
+}
+
 export {
   useResource,
-  useUserListItemsData,
+  useUserListItems,
   useUserList,
   useUserListsListing,
-  useFavoritesData,
-  useTopics
+  useFavorites,
+  useTopics,
+  useCreateUserList,
+  useUpdateUserList,
+  useDeleteUserList
 }

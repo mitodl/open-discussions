@@ -5,7 +5,7 @@ import Autocomplete from "@mui/material/Autocomplete"
 import { RadioChoiceField } from "ol-forms"
 import { UserList, LearningResourceType as LRType, PrivacyLevel } from "ol-search-ui"
 import * as Yup from "yup"
-import { useTopics } from "../../api/learning-resources"
+import { useTopics, useCreateUserList, useUpdateUserList } from "../../api/learning-resources"
 
 type ListFormSchema = Pick<UserList,
   | "title"
@@ -81,11 +81,20 @@ interface ManageListFormProps {
   onSubmit?: FormikConfig<Partial<ListFormSchema>>["onSubmit"]
 }
 const ManageListForm: React.FC<ManageListFormProps> = ({ resource, onSubmit, id: formId }) => {
-  const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] = useCallback((values, helpers) => {
+  const createUserList = useCreateUserList()
+  const updateUserList = useUpdateUserList()
+  const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] = useCallback(async (values, helpers) => {
+    console.log("Submitting")
+    if (resource) {
+      console.log("updating!")
+      await updateUserList.mutateAsync({ id: resource.id, ...values })
+    } else {
+      await createUserList.mutateAsync(values)
+    }
     if (onSubmit) {
       onSubmit(values, helpers)
     }
-  }, [onSubmit])
+  }, [resource, onSubmit, createUserList, updateUserList])
   const formik = useFormik({
     initialValues:    resource ?? listFormSchema.getDefault() as Partial<ListFormSchema>,
     validationSchema: listFormSchema,

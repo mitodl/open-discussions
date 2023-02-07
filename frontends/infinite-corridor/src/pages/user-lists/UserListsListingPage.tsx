@@ -13,7 +13,7 @@ import { BannerPage, useToggle } from "ol-util"
 import { CreateListDialog, EditListDialog, DeletionDialog, useDeletionDialog, useEditingDialog, useCreationDialog } from "./ManageListDialog"
 import { GridColumn, GridContainer } from "../../components/layout"
 import {
-  useFavoritesData,
+  useFavorites,
   useUserListsListing
 } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
@@ -21,7 +21,7 @@ import {
   LearningResourceCard,
   LearningResourceType,
 } from "ol-search-ui"
-import type { UserList } from "ol-search-ui"
+import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 
 type EditListMenuProps = {
@@ -64,14 +64,20 @@ const EditListMenu: React.FC<EditListMenuProps> = ({ resource, onEdit, onDelete 
   )
 }
 
+/**
+ * Makes a fake userlist object for the favorites list.
+ *
+ * "Favotires" is a special case because it's not a real userlist (with title,
+ * topics, etc). It's just a list of favorited items that we present similarly
+ * to other lists.
+ */
 const makeFavorites = (
   count: number
-): Omit<UserList, "id" | "author" | "author_name"> => {
+): Favorites => {
   return {
     title:         "My Favorites",
-    object_type:   LearningResourceType.Userlist,
+    object_type:   LearningResourceType.Favorites,
     list_type:     "favorites",
-    privacy_level: "public",
     item_count:    count,
     topics:        [],
     lists:         [],
@@ -86,15 +92,10 @@ const UserListsPage: React.FC = () => {
   const deletion = useDeletionDialog()
 
   const userListsQuery = useUserListsListing()
-  const favoritesQuery = useFavoritesData()
+  const favoritesQuery = useFavorites()
   const favorites = favoritesQuery.data ?
     makeFavorites(favoritesQuery.data.count) :
     null
-
-  const handleDelete = useCallback((id: number) => {
-    console.log(`Deleting list ${id}`)
-  }, [])
-
 
   return (
     <BannerPage

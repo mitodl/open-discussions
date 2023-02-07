@@ -3,6 +3,7 @@ import ManageListForm from "./ManageListForm"
 import BasicDialog from "../../components/BasicDialog"
 import { useToggle } from "ol-util"
 import type { UserList } from "ol-search-ui"
+import { useDeleteUserList } from "../../api/learning-resources"
 
 type CreateListDialogProps = {
   open: boolean
@@ -18,11 +19,11 @@ const CreateListDialog: React.FC<CreateListDialogProps> = ({
       onClose={onClose}
       title="Create a new list"
       fullWidth
-      confirmButtonProps={{ type: "submit", form: "manage-list-form" }}
+      confirmButtonProps={{ type: "submit", form: "create-list-form" }}
       closeOnConfirm={false}
     >
       <ManageListForm
-        id="manage-list-form"
+        id="create-list-form"
         onSubmit={onClose}
       />
     </BasicDialog>
@@ -37,18 +38,16 @@ const EditListDialog: React.FC<EditListDialogProps> = ({
   onClose,
   resource
 }) => {
-  const handleConfirm = useCallback(() => {
-    console.log(`Editing list`)
-  }, [])
   return (
     <BasicDialog
       open={!!resource}
       onClose={onClose}
-      onConfirm={handleConfirm}
       title="Edit list"
+      confirmButtonProps={{ type: "submit", form: "edit-list-form" }}
+      closeOnConfirm={false}
     >
       <ManageListForm
-        id="manage-list-form"
+        id="edit-list-form"
         onSubmit={onClose}
         resource={resource}
       />
@@ -64,9 +63,11 @@ const DeletionDialog: React.FC<DeletionDialogProps> = ({
   onClose,
   resource
 }) => {
-  const handleConfirm = useCallback(() => {
-    console.log(`Deleting list`)
-  }, [])
+  const deleteUserList = useDeleteUserList()
+  const handleConfirm = useCallback(async () => {
+    if (!resource) return
+    await deleteUserList.mutateAsync(resource.id)
+  }, [deleteUserList, resource])
   return (
     <BasicDialog
       open={!!resource}
@@ -97,7 +98,6 @@ const useEditingDialog = () => {
   }, [])
   const handleFinish = useCallback(() => {
     setResourceToEdit(null)
-    console.log("Done editing")
   }, [])
   return {
     resource: resourceToEdit,
@@ -115,7 +115,6 @@ const useDeletionDialog = () => {
   }, [])
   const handleFinish = useCallback(() => {
     setResourceToDelete(null)
-    console.log("Done editing")
   }, [])
   return {
     resource: resourceToDelete,

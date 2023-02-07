@@ -13,7 +13,7 @@ import FieldPageSkeleton from "./FieldPageSkeleton"
 import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
 import { useFieldDetails } from "../../api/fields"
-import { useUserListItemsData } from "../../api/learning-resources"
+import { useUserListItems } from "../../api/learning-resources"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
@@ -34,8 +34,8 @@ interface FieldListProps {
 }
 
 const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
-  const itemsQuery = useUserListItemsData(list.id)
-  const items = itemsQuery.data?.results ?? []
+  const itemsQuery = useUserListItems(list.id)
+  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   return (
     <section>
       <h3>{list.title}</h3>
@@ -57,8 +57,8 @@ const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
 }
 
 const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
-  const itemsQuery = useUserListItemsData(list.id)
-  const items = itemsQuery.data?.results ?? []
+  const itemsQuery = useUserListItems(list.id)
+  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   const isSm = useMuiBreakpoint("sm")
   const isLg = useMuiBreakpoint("lg")
   const pageSize = isLg ? 3 : isSm ? 2 : 1

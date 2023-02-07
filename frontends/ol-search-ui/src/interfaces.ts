@@ -60,6 +60,12 @@ export interface UserList extends LearningResource {
   item_count: number
   object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
 }
+export interface Favorites extends Omit<LearningResource, "id"> {
+  image_description?: string | null;
+  list_type: string;
+  item_count: number;
+  object_type: LearningResourceType.Favorites
+}
 
 export type UserListItem = {
   id: number
