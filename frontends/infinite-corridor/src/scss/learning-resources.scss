@@ -19,7 +19,8 @@ $cardListSpacer: 1.5em;
 
 .ic-card-row-list {
   padding-left: 0pt;
-  margin: 0pt;
+  margin-left:0pt;
+  margin-right:0pt;
   > li {
     list-style: none;
     margin-top: $cardListSpacer;

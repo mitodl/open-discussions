@@ -23,6 +23,8 @@ import {
 } from "ol-search-ui"
 import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
+import { useHistory } from "react-router"
+import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
 
 type EditListMenuProps = {
   resource: UserList
@@ -97,6 +99,14 @@ const UserListsPage: React.FC = () => {
     makeFavorites(favoritesQuery.data.count) :
     null
 
+  const history = useHistory()
+  const handleActivate = useCallback((resource: UserList | Favorites) => {
+    const path = resource.object_type === LearningResourceType.Favorites ?
+      FAVORITES_VIEW :
+      makeUserListViewPath(resource.id)
+    history.push(path)
+  }, [history])
+
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"
@@ -128,6 +138,7 @@ const UserListsPage: React.FC = () => {
                         className="ic-resource-card"
                         resource={favorites}
                         imgConfig={imgConfigs["row-reverse-small"]}
+                        onActivate={handleActivate}
                       />
                     </li>
                   )}
@@ -142,6 +153,7 @@ const UserListsPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu resource={list} onEdit={editing.handleStart} onDelete={deletion.handleStart} />
                           }
+                          onActivate={handleActivate}
                         />
                       </li>
                     )
