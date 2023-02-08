@@ -18,7 +18,11 @@ describe("EditFieldBasicForm", () => {
   beforeEach(() => {
     publicLists = resourceFactory.makeUserListsPaginated(5)
     setMockResponse.get(
-      lrUrls.userListsListing({ limit: DEFAULT_PAGE_SIZE, offset: 0, public: true }),
+      lrUrls.userListsListing({
+        limit:  DEFAULT_PAGE_SIZE,
+        offset: 0,
+        public: true
+      }),
       publicLists
     )
     field = factory.makeField({

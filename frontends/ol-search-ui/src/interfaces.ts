@@ -69,10 +69,8 @@ export interface Favorites extends Omit<LearningResource, "id"> {
 
 export type UserListItem = {
   id: number
-  is_favorite: boolean
   object_id: number
   position: number
-  program: number
   content_type: string
   content_data: LearningResource
 }

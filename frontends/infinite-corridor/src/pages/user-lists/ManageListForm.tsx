@@ -21,16 +21,16 @@ type ListFormSchema = Pick<
 >
 
 const listFormSchema: Yup.SchemaOf<ListFormSchema> = Yup.object().shape({
-  title:     Yup.string().default("").required("Title is required"),
+  title:     Yup.string().default("").required("Title is required."),
   list_type: Yup.string()
     .default(LRType.Userlist)
-    .required("List type is required"),
+    .required("List type is required."),
   privacy_level: Yup.string()
     .default(PrivacyLevel.Private)
-    .required("Privacy is required"),
+    .required("A privacy setting is required."),
   short_description: Yup.string()
     .default("")
-    .required("Short description is required"),
+    .required("Description is required."),
   topics: Yup.array()
     .of(
       Yup.object().shape({
@@ -38,8 +38,8 @@ const listFormSchema: Yup.SchemaOf<ListFormSchema> = Yup.object().shape({
         name: Yup.string().required()
       })
     )
-    .min(1, "At least one subject is required.")
-    .max(3, "Select no more than 3 subjects.")
+    .min(1, "Select between 1 and 3 subjects.")
+    .max(3, "Select between 1 and 3 subjects.")
     .default([])
     .required()
 })
@@ -101,9 +101,7 @@ const ManageListForm: React.FC<ManageListFormProps> = ({
   const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] =
     useCallback(
       async (values, helpers) => {
-        console.log("Submitting")
         if (resource) {
-          console.log("updating!")
           await updateUserList.mutateAsync({ id: resource.id, ...values })
         } else {
           await createUserList.mutateAsync(values)
@@ -179,6 +177,7 @@ const ManageListForm: React.FC<ManageListFormProps> = ({
         className="form-row"
         multiple
         options={topics}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
         getOptionLabel={option => option.name}
         value={formik.values.topics}
         onChange={(_event, value) => formik.setFieldValue("topics", value)}

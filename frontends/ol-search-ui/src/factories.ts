@@ -12,7 +12,8 @@ import {
   EmbedlyConfig,
   Course,
   UserList,
-  UserListItem
+  UserListItem,
+  PrivacyLevel
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -131,6 +132,10 @@ export const makeVideo: Factory<LearningResource> = overrides => ({
 })
 
 export const makeUserList: Factory<UserList> = overrides => {
+  const type = faker.helpers.arrayElement([
+    LearningResourceType.Userlist,
+    LearningResourceType.LearningPath
+  ] as const)
   const userList: UserList = {
     id:                faker.unique(faker.datatype.number),
     short_description: faker.lorem.paragraph(),
@@ -144,9 +149,12 @@ export const makeUserList: Factory<UserList> = overrides => {
       faker.lorem.sentence()
     ]),
     item_count:    faker.datatype.number({ min: 2, max: 5 }),
-    object_type:   LearningResourceType.Userlist,
-    list_type:     "userlist",
-    privacy_level: "public",
+    object_type:   type,
+    list_type:     type,
+    privacy_level: faker.helpers.arrayElement([
+      PrivacyLevel.Public,
+      PrivacyLevel.Private
+    ]),
     author:        faker.datatype.number({ min: 1, max: 1000 }),
     lists:         [],
     certification: [],
@@ -241,10 +249,8 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
   const content = makeLearningResource()
   const item: UserListItem = {
     id:           faker.unique(faker.datatype.number),
-    is_favorite:  faker.datatype.boolean(),
     object_id:    content.id,
     position:     faker.datatype.number(),
-    program:      faker.datatype.number(),
     content_type: content.object_type,
     content_data: content,
     ...overrides
@@ -254,7 +260,11 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
 
 export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
 
+export const makeFavorites = makeUserListItemsPaginated
+
 export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
+
+export const makeTopicsPaginated = makePaginatedFactory(makeTopic)
 
 export const makeImgConfig: Factory<EmbedlyConfig> = overrides => {
   const imgConfig = {

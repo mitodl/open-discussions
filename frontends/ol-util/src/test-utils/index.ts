@@ -1,6 +1,7 @@
 import { buildQueries, within } from "@testing-library/react"
 import type { GetErrorFunction } from "@testing-library/react"
 import mediaQuery from "css-mediaquery"
+import { assertInstanceOf } from "../predicates"
 
 /**
  * Create a mock mediaQuery functiton. Matches are determined by comparison with
@@ -73,6 +74,19 @@ const getByTerm = byTerm[2]
 const findAllByTerm = byTerm[3]
 const findByTerm = byTerm[4]
 
+const getDescriptionFor = (el: HTMLElement) => {
+  const errId = el.getAttribute("aria-describedby")
+  if (errId === null) {
+    throw new Error(
+      "The specified element does not have an associated ariia-describedby."
+    )
+  }
+  // eslint-disable-next-line testing-library/no-node-access
+  const errEl = document.getElementById(errId)
+  assertInstanceOf(errEl, HTMLElement)
+  return errEl
+}
+
 export {
   queryAllByTerm,
   queryByTerm,
@@ -80,5 +94,6 @@ export {
   getByTerm,
   findAllByTerm,
   findByTerm,
+  getDescriptionFor,
   createMatchMediaForJsDom
 }

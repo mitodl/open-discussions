@@ -68,9 +68,9 @@ type SubfieldData = {
 }
 
 const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
-  const list1 = lrFactory.makeUserList()
-  const list2 = lrFactory.makeUserList()
-  const list3 = lrFactory.makeUserList()
+  const list1 = factory.makeFieldUserList()
+  const list2 = factory.makeFieldUserList()
+  const list3 = factory.makeFieldUserList()
   const items1 = lrFactory.makeUserListItemsPaginated(4)
   const items2 = lrFactory.makeUserListItemsPaginated(2)
   const items3 = lrFactory.makeUserListItemsPaginated(2)

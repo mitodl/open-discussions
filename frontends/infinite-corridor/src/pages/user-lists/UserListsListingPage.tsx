@@ -49,7 +49,12 @@ const EditListMenu: React.FC<EditListMenuProps> = ({
   }, [resource, onDelete, toggleOpen])
   return (
     <>
-      <IconButton onClick={toggleOpen.on} ref={setAnchorEl} size="small">
+      <IconButton
+        aria-label={`Edit list ${resource.title}`}
+        onClick={toggleOpen.on}
+        ref={setAnchorEl}
+        size="small"
+      >
         <MoreVertIcon fontSize="inherit" />
       </IconButton>
       <Menu open={open} onClose={toggleOpen.off} anchorEl={anchorEl}>

@@ -73,7 +73,7 @@ describe("Editing widgets with WidgetsList", () => {
       screen.getByRole("heading", { name: widgets[1].title })
       screen.getByRole("heading", { name: widgets[2].title })
     })
-    expectProps(spyWidgetsListEditable, { widgetsList })
+    expectProps(spyWidgetsListEditable, { widgetsList }, -1)
   })
 
   it("makes the expected API call when WidgetsListEditable is edited+submitted", async () => {

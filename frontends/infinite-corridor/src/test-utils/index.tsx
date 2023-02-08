@@ -48,15 +48,6 @@ const renderWithProviders = (
 }
 
 /**
- * Sample a random element of an array.
- */
-const sample = <T, >(array: T[]): T => {
-  const item = lodashSample(array)
-  assertNotNil(item)
-  return item
-}
-
-/**
  * Assert that a functional component was called with the given props.
  * @param fc the mock or spied upon functional component
  * @param partialProps an object of props
@@ -67,16 +58,23 @@ const expectProps = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fc: jest.Mock<any, any>,
   partialProps: unknown,
-  call = -1
+  call?: number
 ) => {
-  const callArgs = fc.mock.calls.at(call)
-  expect(callArgs).toEqual([
-    expect.objectContaining(partialProps),
-    expect.anything()
-  ])
+  if (call !== undefined) {
+    const callArgs = fc.mock.calls.at(call)
+    expect(callArgs).toEqual([
+      expect.objectContaining(partialProps),
+      expect.anything()
+    ])
+  } else {
+    expect(fc).toHaveBeenCalledWith(
+      expect.objectContaining(partialProps),
+      expect.anything()
+    )
+  }
 }
 
-export { renderTestApp, renderWithProviders, sample, expectProps }
+export { renderTestApp, renderWithProviders, expectProps }
 // Conveniences
 export { setMockResponse }
 export {

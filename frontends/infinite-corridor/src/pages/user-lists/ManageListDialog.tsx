@@ -17,7 +17,8 @@ const CreateListDialog: React.FC<CreateListDialogProps> = ({
     <BasicDialog
       open={open}
       onClose={onClose}
-      title="Create a new list"
+      title="Create list"
+      confirmText="Save"
       fullWidth
       confirmButtonProps={{ type: "submit", form: "create-list-form" }}
       closeOnConfirm={false}
@@ -40,6 +41,7 @@ const EditListDialog: React.FC<EditListDialogProps> = ({
       open={!!resource}
       onClose={onClose}
       title="Edit list"
+      confirmText="Save"
       confirmButtonProps={{ type: "submit", form: "edit-list-form" }}
       closeOnConfirm={false}
     >

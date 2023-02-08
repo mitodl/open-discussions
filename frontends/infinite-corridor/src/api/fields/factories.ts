@@ -1,7 +1,15 @@
 import { faker } from "@faker-js/faker"
 import { makePaginatedFactory, Factory } from "ol-util/build/factories"
 import { makeUserList } from "ol-search-ui/build/factories"
+import type { UserList } from "ol-search-ui"
+import { PrivacyLevel, LearningResourceType } from "ol-search-ui"
 import type { FieldChannel } from "./interfaces"
+
+const makeFieldUserList: Factory<UserList> = overrides => makeUserList({
+  privacy_level: PrivacyLevel.Public,
+  object_type:   LearningResourceType.Userlist,
+  ...overrides
+})
 
 const makeField: Factory<FieldChannel> = overrides => ({
   name:               faker.unique(faker.lorem.slug),
@@ -21,4 +29,4 @@ const makeField: Factory<FieldChannel> = overrides => ({
 
 const makeFieldsPaginated = makePaginatedFactory(makeField)
 
-export { makeField, makeFieldsPaginated }
+export { makeField, makeFieldsPaginated, makeFieldUserList }
