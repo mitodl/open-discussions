@@ -11,7 +11,7 @@ import {
   EditListDialog,
   CreateListDialog,
   DeletionDialog
-} from "./ManageListDialog"
+} from "./ManageListDialogs"
 import UserListsListingPage from "./UserListsListingPage"
 import {
   screen,
@@ -23,8 +23,8 @@ import {
 
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
 
-jest.mock("./ManageListDialog", () => {
-  const actual = jest.requireActual("./ManageListDialog")
+jest.mock("./ManageListDialogs", () => {
+  const actual = jest.requireActual("./ManageListDialogs")
   return {
     ...actual,
     EditListDialog:   jest.fn(actual.EditListDialog),

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react"
-import ManageListForm from "./ManageListForm"
+import UpsertListDialog from "./UpsertListDialog"
 import BasicDialog from "../../components/BasicDialog"
 import { useToggle } from "ol-util"
 import type { UserList } from "ol-search-ui"
@@ -13,19 +13,7 @@ const CreateListDialog: React.FC<CreateListDialogProps> = ({
   open,
   onClose
 }) => {
-  return (
-    <BasicDialog
-      open={open}
-      onClose={onClose}
-      title="Create list"
-      confirmText="Save"
-      fullWidth
-      confirmButtonProps={{ type: "submit", form: "create-list-form" }}
-      closeOnConfirm={false}
-    >
-      <ManageListForm id="create-list-form" onSubmit={onClose} />
-    </BasicDialog>
-  )
+  return <UpsertListDialog open={open} onClose={onClose} title="Create list" />
 }
 
 type EditListDialogProps = {
@@ -37,20 +25,12 @@ const EditListDialog: React.FC<EditListDialogProps> = ({
   resource
 }) => {
   return (
-    <BasicDialog
+    <UpsertListDialog
       open={!!resource}
+      resource={resource}
       onClose={onClose}
       title="Edit list"
-      confirmText="Save"
-      confirmButtonProps={{ type: "submit", form: "edit-list-form" }}
-      closeOnConfirm={false}
-    >
-      <ManageListForm
-        id="edit-list-form"
-        onSubmit={onClose}
-        resource={resource}
-      />
-    </BasicDialog>
+    />
   )
 }
 

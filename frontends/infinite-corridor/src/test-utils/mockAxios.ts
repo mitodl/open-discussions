@@ -46,10 +46,21 @@ const mockRequest = (
   responseBody: unknown,
   code: number
 ) => {
-  when(makeRequest).calledWith(method, url, requestBody).mockResolvedValue({
-    data:   responseBody,
-    status: code
-  })
+  if (code >= 400) {
+    when(makeRequest)
+      .calledWith(method, url, requestBody)
+      .mockRejectedValue({
+        response: {
+          data:   responseBody,
+          status: code
+        }
+      })
+  } else {
+    when(makeRequest).calledWith(method, url, requestBody).mockResolvedValue({
+      data:   responseBody,
+      status: code
+    })
+  }
 }
 
 interface MockResponseOptions {

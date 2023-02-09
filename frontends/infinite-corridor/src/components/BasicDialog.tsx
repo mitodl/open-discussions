@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -11,14 +11,9 @@ import Button, { ButtonProps } from "@mui/material/Button"
 type BasicDialog = {
   open: boolean
   onClose: () => void
-  onConfirm?: () => void
+  onConfirm?: () => void | Promise<void>
   title: string
   children?: React.ReactNode
-  /**
-   * Whether to call `onClose` immediately after `onConfirm` is called. Defaults
-   * to `true`.
-   */
-  closeOnConfirm?: boolean
   /**
    * The text to display on the cancel button. Defaults to "Cancel".
    */
@@ -32,9 +27,8 @@ type BasicDialog = {
    * [Dialog Props](https://mui.com/material-ui/api/dialog/#props).
    */
   fullWidth?: boolean
-  cancelButtonProps?: ButtonProps
-  confirmButtonProps?: ButtonProps
 }
+
 const BasicDialog: React.FC<BasicDialog> = ({
   title,
   children,
@@ -43,19 +37,20 @@ const BasicDialog: React.FC<BasicDialog> = ({
   onConfirm,
   cancelText = "Cancel",
   confirmText = "Confirm",
-  cancelButtonProps,
-  confirmButtonProps,
-  closeOnConfirm = true,
   fullWidth
 }) => {
-  const handleConfirm = useCallback(() => {
-    if (onConfirm) {
-      onConfirm()
-    }
-    if (closeOnConfirm) {
+  const [confirming, setConfirming] = useState(false)
+  const handleConfirm = useCallback(async () => {
+    try {
+      setConfirming(true)
+      if (onConfirm) {
+        await onConfirm()
+      }
       onClose()
+    } finally {
+      setConfirming(false)
     }
-  }, [onClose, onConfirm, closeOnConfirm])
+  }, [onClose, onConfirm])
   return (
     <Dialog fullWidth={fullWidth} open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
@@ -66,19 +61,14 @@ const BasicDialog: React.FC<BasicDialog> = ({
       </Box>
       <DialogContent>{children}</DialogContent>
       <DialogActions>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={onClose}
-          {...cancelButtonProps}
-        >
+        <Button variant="outlined" color="secondary" onClick={onClose}>
           {cancelText}
         </Button>
         <Button
           variant="contained"
           color="primary"
           onClick={handleConfirm}
-          {...confirmButtonProps}
+          disabled={confirming}
         >
           {confirmText}
         </Button>

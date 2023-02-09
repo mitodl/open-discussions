@@ -8,19 +8,19 @@ import {
   UserList
 } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
-import { getDescriptionFor } from "ol-util/build/test-utils"
+import { allowConsoleErrors, getDescriptionFor } from "ol-util/build/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {
   EditListDialog,
   CreateListDialog,
   DeletionDialog
-} from "./ManageListDialog"
+} from "./ManageListDialogs"
 import {
   screen,
   renderWithProviders,
   setMockResponse,
   user,
-  within,
+  within
 } from "../../test-utils"
 import { makeRequest } from "../../test-utils/mockAxios"
 import { assertNotNil } from "ol-util"
@@ -42,18 +42,20 @@ const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
  */
 const inputs = {
   list_type: {
-    [LearningResourceType.LearningPath]: () => screen.getByLabelText("Learning Path", { exact: false }),
-    [LearningResourceType.Userlist]:     () => screen.getByLabelText("Learning List", { exact: false }),
+    [LearningResourceType.LearningPath]: () =>
+      screen.getByLabelText("Learning Path", { exact: false }),
+    [LearningResourceType.Userlist]: () =>
+      screen.getByLabelText("Learning List", { exact: false })
   },
   pivacy_level: {
     [PrivacyLevel.Public]:  () => screen.getByLabelText("Public"),
-    [PrivacyLevel.Private]: () => screen.getByLabelText("Private"),
+    [PrivacyLevel.Private]: () => screen.getByLabelText("Private")
   },
   title:       () => screen.getByLabelText("Title"),
   description: () => screen.getByLabelText("Description"),
   topics:      () => screen.getByLabelText("Subjects"),
   submit:      () => screen.getByRole("button", { name: "Save" }),
-  cancel:      () => screen.getByRole("button", { name: "Cancel" }),
+  cancel:      () => screen.getByRole("button", { name: "Cancel" })
 }
 
 describe("Creation", () => {
@@ -64,14 +66,8 @@ describe("Creation", () => {
     renderWithProviders(<CreateListDialog open={true} onClose={onClose} />)
     return { topics, onClose }
   }
-  test("Creating a userlist", async () => {
-    const { topics, onClose } = setup()
 
-    const userList = factories.makeUserList({
-      short_description: faker.lorem.paragraph(),
-      topics:            [faker.helpers.arrayElement(topics.results)]
-    })
-
+  const fillInForm = async (userList: UserList) => {
     await user.click(inputs.list_type[userList.list_type]())
 
     await user.click(inputs.pivacy_level[userList.privacy_level]())
@@ -84,15 +80,31 @@ describe("Creation", () => {
     await user.paste(userList.short_description)
 
     await selectFromAutocomplete(inputs.topics(), userList.topics[0].name)
+  }
+
+  test("Creating a userlist", async () => {
+    const { topics, onClose } = setup()
+
+    const userList = factories.makeUserList({
+      short_description: faker.lorem.paragraph(),
+      topics:            [faker.helpers.arrayElement(topics.results)]
+    })
+
+    await fillInForm(userList)
 
     expect(onClose).not.toHaveBeenCalled()
     setMockResponse.post(lrUrls.createUserList(), userList)
     await user.click(inputs.submit())
-
     expect(makeRequest).toHaveBeenCalledWith(
       "post",
       lrUrls.createUserList(),
-      pick(userList, ["title", "list_type", "privacy_level", "short_description", "topics"])
+      pick(userList, [
+        "title",
+        "list_type",
+        "privacy_level",
+        "short_description",
+        "topics"
+      ])
     )
     expect(onClose).toHaveBeenCalled()
   })
@@ -125,19 +137,41 @@ describe("Creation", () => {
     expect(onClose).toHaveBeenCalled()
   })
 
-  test("Lists are private by default", () => {
+  test("Userlists are private by default", () => {
     setup()
     expect(inputs.pivacy_level[PrivacyLevel.Private]()).toBeChecked()
   })
 
-  test("Userlists are lists (not paths) by default", () => {
+  test("Userlists are Learning Lists (not Learning Paths) by default", () => {
     setup()
     expect(inputs.list_type[LearningResourceType.Userlist]()).toBeChecked()
+  })
+
+  test("Displays overall error if form validates but API call fails", async () => {
+    allowConsoleErrors()
+    const { topics, onClose } = setup()
+
+    const userList = factories.makeUserList({
+      short_description: faker.lorem.paragraph(),
+      topics:            [faker.helpers.arrayElement(topics.results)]
+    })
+
+    await fillInForm(userList)
+    setMockResponse.post(lrUrls.createUserList(), {}, { code: 408 })
+    await user.click(inputs.submit())
+    const alertMessage = await screen.findByRole("alert")
+    expect(alertMessage).toHaveTextContent(
+      "There was an error saving your list."
+    )
+    expect(onClose).not.toHaveBeenCalled()
   })
 })
 
 describe("Editing", () => {
-  const setup = (resourceOverrides: Partial<UserList> = {}, topicsCount = 1) => {
+  const setup = (
+    resourceOverrides: Partial<UserList> = {},
+    topicsCount = 1
+  ) => {
     const topics = factories.makeTopicsPaginated(5)
     setMockResponse.get(lrUrls.topics(), topics)
     const resource = factories.makeUserList({
@@ -145,7 +179,9 @@ describe("Editing", () => {
       topics: faker.helpers.arrayElements(topics.results, topicsCount)
     })
     const onClose = jest.fn()
-    renderWithProviders(<EditListDialog resource={resource} onClose={onClose} />)
+    renderWithProviders(
+      <EditListDialog resource={resource} onClose={onClose} />
+    )
     return { topics, resource, onClose }
   }
 
@@ -155,7 +191,7 @@ describe("Editing", () => {
     const updatedResource = factories.makeUserList({
       ...resource,
       title:             faker.lorem.words(),
-      short_description: faker.lorem.paragraph(),
+      short_description: faker.lorem.paragraph()
     })
 
     const titleInput = inputs.title()
@@ -204,12 +240,33 @@ describe("Editing", () => {
       topicsCount:   4,
       expectedError: "Select between 1 and 3 subjects."
     }
-  ])("Error messages ($expectedError)", async ({ overrides, topicsCount, expectedError, targetInput }) => {
-    setup(overrides, topicsCount)
+  ])(
+    "Error messages ($expectedError)",
+    async ({ overrides, topicsCount, expectedError, targetInput }) => {
+      setup(overrides, topicsCount)
+      await user.click(inputs.submit())
+      const theInput = targetInput()
+      const description = getDescriptionFor(theInput)
+      expect(theInput).toBeInvalid()
+      expect(description).toHaveTextContent(expectedError)
+    }
+  )
+
+  test("Displays overall error if form validates but API call fails", async () => {
+    allowConsoleErrors()
+    const { resource, onClose } = setup()
+
+    const titleInput = inputs.title()
+    await user.click(titleInput)
+    await user.clear(titleInput)
+    await user.paste("New title")
+
     await user.click(inputs.submit())
-    const theInput = targetInput()
-    const description = getDescriptionFor(theInput)
-    expect(theInput).toBeInvalid()
-    expect(description).toHaveTextContent(expectedError)
+    setMockResponse.post(lrUrls.updateUserList(resource.id), {}, { code: 408 })
+    const alertMessage = await screen.findByRole("alert")
+    expect(alertMessage).toHaveTextContent(
+      "There was an error saving your list."
+    )
+    expect(onClose).not.toHaveBeenCalled()
   })
 })

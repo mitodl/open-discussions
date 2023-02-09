@@ -5,11 +5,12 @@ import type { UserList } from "ol-search-ui"
 import { PrivacyLevel, LearningResourceType } from "ol-search-ui"
 import type { FieldChannel } from "./interfaces"
 
-const makeFieldUserList: Factory<UserList> = overrides => makeUserList({
-  privacy_level: PrivacyLevel.Public,
-  object_type:   LearningResourceType.Userlist,
-  ...overrides
-})
+const makeFieldUserList: Factory<UserList> = overrides =>
+  makeUserList({
+    privacy_level: PrivacyLevel.Public,
+    object_type:   LearningResourceType.Userlist,
+    ...overrides
+  })
 
 const makeField: Factory<FieldChannel> = overrides => ({
   name:               faker.unique(faker.lorem.slug),
