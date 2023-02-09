@@ -58,6 +58,7 @@ const keys = {
 const urls = {
   resourceDetails,
   resourceListing,
+  userListDetails: (id: number) => resourceDetails("userlist", id),
   userListItems,
   userListsListing,
   createUserList,

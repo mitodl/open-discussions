@@ -5,6 +5,12 @@
   margin-bottom: 1rem;
 }
 
+.userlist-page {
+  .empty-message {
+    font-style: italic;
+  }
+}
+
 .manage-list-form {
   .radio-option {
     .MuiFormControlLabel-label {

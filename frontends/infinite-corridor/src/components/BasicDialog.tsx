@@ -6,7 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 import Close from "@mui/icons-material/Close"
-import Button, { ButtonProps } from "@mui/material/Button"
+import Button from "@mui/material/Button"
 
 type BasicDialog = {
   open: boolean

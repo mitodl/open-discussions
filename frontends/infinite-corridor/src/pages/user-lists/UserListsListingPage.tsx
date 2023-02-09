@@ -18,7 +18,6 @@ import {
   useEditingDialog,
   useCreationDialog
 } from "./ManageListDialogs"
-import UpsertListDialog from "./UpsertListDialog"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useFavorites, useUserListsListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"

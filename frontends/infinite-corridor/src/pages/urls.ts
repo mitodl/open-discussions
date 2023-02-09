@@ -19,6 +19,6 @@ export const SEARCH = `${BASE}/search`
 
 export const USERLISTS_LISTING = `${BASE}/lists`
 export const USERLIST_VIEW = `${BASE}/lists/:id` as const
-export const FAVORITES_VIEW = `${BASE}/lists//favorites`
+export const FAVORITES_VIEW = `${BASE}/lists/favorites`
 export const makeUserListViewPath = (id: number) =>
   generatePath(USERLIST_VIEW, { id })

@@ -29,7 +29,7 @@ const UserListsPage: React.FC = () => {
       alt=""
       compactOnMobile
     >
-      <Container>
+      <Container className="userlist-page">
         <GridContainer>
           <GridColumn variant="main-2-wide-main">
             {userListQuery.data && (
@@ -49,23 +49,28 @@ const UserListsPage: React.FC = () => {
               </Grid>
             )}
             {itemsDataQuery.isLoading && <p>Loading...</p>}
-            {itemsDataQuery.data && (
-              <ul className="ic-card-row-list">
-                {itemsDataQuery.data.results.map(list => {
-                  return (
-                    <li key={list.id}>
-                      <LearningResourceCard
-                        variant="row-reverse"
-                        className="ic-resource-card"
-                        resource={list.content_data}
-                        imgConfig={imgConfigs["row-reverse"]}
-                        onActivate={activateResource}
-                      />
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
+            {itemsDataQuery.data &&
+              (itemsDataQuery.data.results.length === 0 ? (
+                <p className="empty-message">
+                  There are no items in this list yet.
+                </p>
+              ) : (
+                <ul className="ic-card-row-list">
+                  {itemsDataQuery.data.results.map(list => {
+                    return (
+                      <li key={list.id}>
+                        <LearningResourceCard
+                          variant="row-reverse"
+                          className="ic-resource-card"
+                          resource={list.content_data}
+                          imgConfig={imgConfigs["row-reverse"]}
+                          onActivate={activateResource}
+                        />
+                      </li>
+                    )
+                  })}
+                </ul>
+              ))}
           </GridColumn>
         </GridContainer>
       </Container>

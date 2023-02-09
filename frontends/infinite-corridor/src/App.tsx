@@ -6,10 +6,11 @@ import SearchPage from "./pages/SearchPage"
 import FieldPage from "./pages/field-details/FieldPage"
 import FieldAdminApp from "./pages/field-details/FieldAdminApp"
 import LearningResourceDrawer from "./pages/LearningResourceDrawer"
-import ListsListingPage from "./pages/user-lists/UserListsListingPage"
-import ListPage from "./pages/user-lists/UserListDetailsPage"
+import UserListsListingPage from "./pages/user-lists/UserListsListingPage"
+import UserListDetailsPage from "./pages/user-lists/UserListDetailsPage"
+import FavoritesPage from "./pages/user-lists/FavoritesPage"
 import * as urls from "./pages/urls"
-import { Route, Router } from "react-router"
+import { Route, Router, Switch } from "react-router"
 import { History } from "history"
 import { QueryClientProvider, QueryClient } from "react-query"
 import Header from "./components/Header"
@@ -52,24 +53,29 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
     <div className="app-container">
       <AppProviders history={history} queryClient={queryClient}>
         <Header />
-        <Route path={urls.HOME} exact>
-          <HomePage />
-        </Route>
-        <Route path={urls.SEARCH}>
-          <SearchPage />
-        </Route>
-        <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
-          <FieldPage />
-        </Route>
-        <Route path={urls.FIELD_EDIT} exact>
-          <FieldAdminApp />
-        </Route>
-        <Route path={urls.USERLISTS_LISTING} exact>
-          <ListsListingPage />
-        </Route>
-        <Route path={urls.USERLIST_VIEW} exact>
-          <ListPage />
-        </Route>
+        <Switch>
+          <Route path={urls.HOME} exact>
+            <HomePage />
+          </Route>
+          <Route path={urls.SEARCH}>
+            <SearchPage />
+          </Route>
+          <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
+            <FieldPage />
+          </Route>
+          <Route path={urls.FIELD_EDIT} exact>
+            <FieldAdminApp />
+          </Route>
+          <Route path={urls.USERLISTS_LISTING} exact>
+            <UserListsListingPage />
+          </Route>
+          <Route path={urls.FAVORITES_VIEW} exact>
+            <FavoritesPage />
+          </Route>
+          <Route path={urls.USERLIST_VIEW} exact>
+            <UserListDetailsPage />
+          </Route>
+        </Switch>
         <LearningResourceDrawer />
       </AppProviders>
     </div>

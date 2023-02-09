@@ -2,9 +2,7 @@ import React from "react"
 import App, { AppProviders, BASE_URL } from "../App"
 import { render } from "@testing-library/react"
 import { createMemoryHistory } from "history"
-import { sample as lodashSample } from "lodash"
 import { setMockResponse } from "./mockAxios"
-import { assertNotNil } from "ol-util"
 import { createQueryClient } from "../libs/react-query"
 
 interface TestAppOptions {
