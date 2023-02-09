@@ -199,7 +199,7 @@ def make_thumbnail(full_size_image, max_dimension):
     pil_image = Image.open(full_size_image)
     pil_image.thumbnail(
         shrink_dimensions(pil_image.width, pil_image.height, max_dimension),
-        Image.ANTIALIAS,
+        Image.LANCZOS,
     )
     buffer = BytesIO()
     pil_image.convert("RGB").save(buffer, "JPEG", quality=90)
@@ -237,7 +237,7 @@ def make_cropped_thumbnail(full_size_image, max_width, max_height):
             box=(0, adjust, pil_image.width, pil_image.height - adjust)
         )
     pil_image.thumbnail(
-        shrink_dimensions(pil_image.width, pil_image.height, max_width), Image.ANTIALIAS
+        shrink_dimensions(pil_image.width, pil_image.height, max_width), Image.LANCZOS
     )
     buffer = BytesIO()
     pil_image.convert("RGB").save(buffer, "JPEG", quality=90)
