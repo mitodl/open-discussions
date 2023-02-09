@@ -2,7 +2,6 @@ import React from "react"
 import { faker } from "@faker-js/faker"
 import { pick } from "lodash"
 import {
-  Favorites,
   LearningResourceType,
   PrivacyLevel,
   UserList
@@ -22,7 +21,7 @@ import {
   user,
   within
 } from "../../test-utils"
-import { makeRequest } from "../../test-utils/mockAxios"
+import { mockAxiosInstance as axios } from "../../test-utils/mockAxios"
 import { assertNotNil } from "ol-util"
 
 const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
@@ -55,7 +54,8 @@ const inputs = {
   description: () => screen.getByLabelText("Description"),
   topics:      () => screen.getByLabelText("Subjects"),
   submit:      () => screen.getByRole("button", { name: "Save" }),
-  cancel:      () => screen.getByRole("button", { name: "Cancel" })
+  cancel:      () => screen.getByRole("button", { name: "Cancel" }),
+  delete:      () => screen.getByRole("button", { name: "Yes, delete" }),
 }
 
 describe("Creation", () => {
@@ -95,8 +95,7 @@ describe("Creation", () => {
     expect(onClose).not.toHaveBeenCalled()
     setMockResponse.post(lrUrls.createUserList(), userList)
     await user.click(inputs.submit())
-    expect(makeRequest).toHaveBeenCalledWith(
-      "post",
+    expect(axios.post).toHaveBeenCalledWith(
       lrUrls.createUserList(),
       pick(userList, [
         "title",
@@ -129,12 +128,13 @@ describe("Creation", () => {
     expect(topicsFeedback).toHaveTextContent("Select between 1 and 3 subjects.")
   })
 
-  test("Calls onClose when cancelled", async () => {
+  test("Calls onClose and not POST when cancelled", async () => {
     const { onClose } = setup()
 
     expect(onClose).not.toHaveBeenCalled()
     await user.click(inputs.cancel())
     expect(onClose).toHaveBeenCalled()
+    expect(axios.post).not.toHaveBeenCalled()
   })
 
   test("Userlists are private by default", () => {
@@ -209,8 +209,7 @@ describe("Editing", () => {
     setMockResponse.patch(lrUrls.updateUserList(resource.id), updatedResource)
     await user.click(inputs.submit())
 
-    expect(makeRequest).toHaveBeenCalledWith(
-      "patch",
+    expect(axios.patch).toHaveBeenCalledWith(
       lrUrls.updateUserList(resource.id),
       updatedResource
     )
@@ -252,6 +251,15 @@ describe("Editing", () => {
     }
   )
 
+  test("Calls onClose and not PATCH when cancelled", async () => {
+    const { onClose } = setup()
+
+    expect(onClose).not.toHaveBeenCalled()
+    await user.click(inputs.cancel())
+    expect(onClose).toHaveBeenCalled()
+    expect(axios.patch).not.toHaveBeenCalled()
+  })
+
   test("Displays overall error if form validates but API call fails", async () => {
     allowConsoleErrors()
     const { resource, onClose } = setup()
@@ -268,5 +276,39 @@ describe("Editing", () => {
       "There was an error saving your list."
     )
     expect(onClose).not.toHaveBeenCalled()
+  })
+})
+
+describe("Deleting lists", () => {
+  const setup = (resourceOverrides: Partial<UserList> = {}) => {
+    const resource = factories.makeUserList(resourceOverrides)
+    const onClose = jest.fn()
+    renderWithProviders(
+      <DeletionDialog resource={resource} onClose={onClose} />
+    )
+    return { resource, onClose }
+  }
+
+  test("Deleting a userlist calls correct API", async () => {
+    const { resource, onClose } = setup()
+
+    expect(onClose).not.toHaveBeenCalled()
+    setMockResponse.delete(lrUrls.deleteUserList(resource.id), undefined)
+    await user.click(inputs.delete())
+
+    expect(axios.delete).toHaveBeenCalledWith(
+      lrUrls.deleteUserList(resource.id)
+    )
+    expect(onClose).toHaveBeenCalled()
+  })
+
+  test("Clicking cancel does not delete list", async () => {
+    const { onClose } = setup()
+
+    expect(onClose).not.toHaveBeenCalled()
+    await user.click(inputs.cancel())
+
+    expect(axios.delete).not.toHaveBeenCalled()
+    expect(onClose).toHaveBeenCalled()
   })
 })

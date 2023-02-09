@@ -20,6 +20,7 @@ import {
   useUpdateUserList
 } from "../../api/learning-resources"
 import Alert from "@mui/material/Alert"
+import Divider from "@mui/material/Divider"
 
 type ListFormSchema = Pick<
   UserList,
@@ -198,6 +199,7 @@ const UpsertListForm: React.FC<UpsertListFormProps> = ({
           )}
         />
       </DialogContent>
+      <Divider />
       <DialogActions>
         <Button variant="outlined" color="secondary" onClick={onClose}>
           Cancel
@@ -236,6 +238,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
+      <Divider />
       <UpsertListForm resource={resource} onClose={onClose} />
     </Dialog>
   )

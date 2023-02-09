@@ -3,7 +3,11 @@ import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useUserListItems, useUserList } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
+import EditIcon from "@mui/icons-material/Edit"
+import Grid from "@mui/material/Grid"
+import Button from "@mui/material/Button"
 import { LearningResourceCard } from "ol-search-ui"
+import { EditListDialog, useEditingDialog } from "./ManageListDialogs"
 import { imgConfigs } from "../../util/constants"
 import { useParams } from "react-router"
 import { useActivateResourceDrawer } from "../LearningResourceDrawer"
@@ -17,6 +21,7 @@ const UserListsPage: React.FC = () => {
   const userListQuery = useUserList(id)
   const itemsDataQuery = useUserListItems(id)
   const activateResource = useActivateResourceDrawer()
+  const editing = useEditingDialog()
 
   return (
     <BannerPage
@@ -27,7 +32,22 @@ const UserListsPage: React.FC = () => {
       <Container>
         <GridContainer>
           <GridColumn variant="main-2-wide-main">
-            {userListQuery.data && <h1>{userListQuery.data.title}</h1>}
+            {userListQuery.data && (
+              <Grid container className="ic-list-header">
+                <Grid item xs={6}>
+                  <h1>{userListQuery.data.title}</h1>
+                </Grid>
+                <Grid item xs={6} className="ic-centered-right">
+                  <Button
+                    color="secondary"
+                    startIcon={<EditIcon />}
+                    onClick={() => editing.handleStart(userListQuery.data)}
+                  >
+                    Edit
+                  </Button>
+                </Grid>
+              </Grid>
+            )}
             {itemsDataQuery.isLoading && <p>Loading...</p>}
             {itemsDataQuery.data && (
               <ul className="ic-card-row-list">
@@ -49,6 +69,10 @@ const UserListsPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
+      <EditListDialog
+        resource={editing.resource}
+        onClose={editing.handleFinish}
+      />
     </BannerPage>
   )
 }
