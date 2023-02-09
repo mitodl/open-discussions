@@ -1,5 +1,6 @@
 """Management command for populating xpro course run file data"""
 
+from django.conf import settings
 from django.core.management import BaseCommand
 
 from course_catalog.tasks import import_all_xpro_files
@@ -16,7 +17,8 @@ class Command(BaseCommand):
             "-c",
             "--chunk-size",
             dest="chunk_size",
-            default=1000,
+            default=settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE,
+            type=int,
             help="Chunk size for batch import task",
         )
 

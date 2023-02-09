@@ -3,6 +3,7 @@
 from django.core.management import BaseCommand
 
 from course_catalog.tasks import import_all_mitxonline_files
+from open_discussions import settings
 from open_discussions.utils import now_in_utc
 
 
@@ -16,7 +17,8 @@ class Command(BaseCommand):
             "-c",
             "--chunk-size",
             dest="chunk_size",
-            default=1000,
+            default=settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE,
+            type=int,
             help="Chunk size for batch import task",
         )
 
