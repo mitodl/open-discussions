@@ -31,9 +31,11 @@ const alwaysError = (
 const makeRequest = jest.fn(alwaysError)
 
 const mockAxiosInstance = {
-  get:    jest.fn((url: string) => makeRequest("get", url, undefined)),
-  post:   jest.fn((url: string, body: unknown) => makeRequest("post", url, body)),
-  patch:  jest.fn((url: string, body: unknown) => makeRequest("patch", url, body)),
+  get:   jest.fn((url: string) => makeRequest("get", url, undefined)),
+  post:  jest.fn((url: string, body: unknown) => makeRequest("post", url, body)),
+  patch: jest.fn((url: string, body: unknown) =>
+    makeRequest("patch", url, body)
+  ),
   delete: jest.fn((url: string) => makeRequest("delete", url, undefined))
 }
 
@@ -97,6 +99,5 @@ const setMockResponse = {
     { code = 204, requestBody }: MockResponseOptions = {}
   ) => mockRequest("delete", url, requestBody, responseBody, code)
 }
-
 
 export { setMockResponse, mockAxiosInstance, makeRequest }

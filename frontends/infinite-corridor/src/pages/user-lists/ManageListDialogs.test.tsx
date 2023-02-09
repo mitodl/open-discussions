@@ -1,11 +1,7 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
 import { pick } from "lodash"
-import {
-  LearningResourceType,
-  PrivacyLevel,
-  UserList
-} from "ol-search-ui"
+import { LearningResourceType, PrivacyLevel, UserList } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
 import { allowConsoleErrors, getDescriptionFor } from "ol-util/build/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"
@@ -55,7 +51,7 @@ const inputs = {
   topics:      () => screen.getByLabelText("Subjects"),
   submit:      () => screen.getByRole("button", { name: "Save" }),
   cancel:      () => screen.getByRole("button", { name: "Cancel" }),
-  delete:      () => screen.getByRole("button", { name: "Yes, delete" }),
+  delete:      () => screen.getByRole("button", { name: "Yes, delete" })
 }
 
 describe("Creation", () => {
