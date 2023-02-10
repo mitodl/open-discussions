@@ -100,4 +100,9 @@ const setMockResponse = {
   ) => mockRequest("delete", url, requestBody, responseBody, code)
 }
 
-export { setMockResponse, mockAxiosInstance, makeRequest }
+const resetApi = () => {
+  makeRequest.mockReset()
+  makeRequest.mockImplementation(alwaysError)
+}
+
+export { setMockResponse, mockAxiosInstance, makeRequest, resetApi }
