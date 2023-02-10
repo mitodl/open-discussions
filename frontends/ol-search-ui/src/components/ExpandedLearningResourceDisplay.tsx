@@ -212,7 +212,7 @@ const getInfoRows = (
     },
     {
       label:   "Number of Courses",
-      include: resource.object_type === LearningResourceType.Userlist,
+      include: resource.object_type === LearningResourceType.Program,
       value:   resource.item_count
     },
     {

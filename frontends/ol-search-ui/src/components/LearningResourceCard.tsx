@@ -39,7 +39,7 @@ type LearningResourceCardProps<
    * Config used to generate embedly urls.
    */
   imgConfig: EmbedlyConfig
-  onActivate?: OnActivateCard
+  onActivate?: OnActivateCard<R>
 }
 
 type OffererProps = {

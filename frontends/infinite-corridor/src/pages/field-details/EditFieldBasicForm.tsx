@@ -5,12 +5,10 @@ import { Autocomplete, Button, TextField } from "@mui/material"
 import { SortableSelect } from "ol-forms"
 import { UniqueIdentifier } from "@dnd-kit/core"
 
-import {
-  FieldChannelBasicForm,
-  useMutateField,
-  usePublicLists
-} from "../../api/fields"
-import type { FieldChannel, UserList } from "../../api/fields/interfaces"
+import { FieldChannelBasicForm, useMutateField } from "../../api/fields"
+import type { FieldChannel } from "../../api/fields/interfaces"
+import type { UserList } from "ol-search-ui"
+import { useUserListsListing } from "../../api/learning-resources"
 import { makeFieldViewPath } from "../../pages/urls"
 
 type FormProps = {
@@ -22,7 +20,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
   const mutation = useMutateField(field)
   const history = useHistory()
 
-  const listsQuery = usePublicLists()
+  const listsQuery = useUserListsListing({ public: true })
   const listOptions = useMemo(
     () => [
       ...(listsQuery.data?.results ?? []).map((userList: UserList) => ({
@@ -74,7 +72,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
       }) => (
         <>
           <Form onSubmit={handleSubmit} className="form channel-form">
-            <div className="row form-item">
+            <div className="form-row form-item">
               <label htmlFor="field-featured_list">
                 <div className="header-padded">Featured learning resources</div>
               </label>
@@ -104,7 +102,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
                 <div className="validation-message">{errors.featured_list}</div>
               ) : null}
             </div>
-            <div className="row form-item divider">
+            <div className="form-row form-item divider">
               <label htmlFor="field-lists-sorted">
                 <div className="header-padded">Subfields</div>
               </label>
@@ -132,7 +130,7 @@ const EditFieldBasicForm = (props: FormProps): JSX.Element => {
                   )}
               />
             </div>
-            <div className="row actions">
+            <div className="form-row actions">
               <Button
                 className="cancel"
                 onClick={() => history.push(makeFieldViewPath(field.name))}

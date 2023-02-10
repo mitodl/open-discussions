@@ -109,7 +109,7 @@ const DialogContentEditing: React.FC<WidgetEditingProps> = ({
   }, [isNew, spec])
   const onSubmitForm = useCallback(
     (value: AnonymousWidget) => {
-      const event: WidgetSubmitEvent = isNil((value as any).id) ?
+      const event: WidgetSubmitEvent = isNil(value.id) ?
         {
           type:   "add",
           widget: { ...value, id: null }

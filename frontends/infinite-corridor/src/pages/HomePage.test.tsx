@@ -3,13 +3,13 @@ import { zip } from "lodash"
 import { FieldChannel, urls } from "../api/fields"
 import { urls as widgetUrls } from "../api/widgets"
 import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { faker } from "@faker-js/faker"
 import * as factories from "../api/fields/factories"
 import {
   screen,
   renderTestApp,
   setMockResponse,
   within,
-  sample,
   user
 } from "../test-utils"
 import { makeFieldViewPath } from "./urls"
@@ -58,7 +58,7 @@ describe("HomePage", () => {
   test("Clicking on a link goes to the field page", async () => {
     const fieldsList = factories.makeFieldsPaginated(3)
     const field: FieldChannel = {
-      ...sample(fieldsList.results),
+      ...faker.helpers.arrayElement(fieldsList.results),
       featured_list: null,
       lists:         []
     }

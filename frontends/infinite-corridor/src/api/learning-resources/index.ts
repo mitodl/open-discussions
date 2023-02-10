@@ -1,2 +1,2 @@
 export * from "./hooks"
-export * as urls from "./urls"
+export { urls } from "./urls"

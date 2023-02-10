@@ -1,4 +1,5 @@
 import { Facets } from "@mitodl/course-search-utils"
+import { PaginatedResult } from "ol-util"
 
 export enum LearningResourceType {
   Course = "course",
@@ -9,6 +10,11 @@ export enum LearningResourceType {
   Podcast = "podcast",
   PodcastEpisode = "podcastepisode",
   Favorites = "favorites"
+}
+
+export enum PrivacyLevel {
+  Public = "public",
+  Private = "private"
 }
 
 export type LearningResource = {
@@ -29,9 +35,9 @@ export type LearningResource = {
   duration?: string | null
   url?: string | null
   last_modified?: string | null
-  item_count?: number             // userlist annotation
-  course_id?: string              // required for courses
-  video_id?: string               // required for videos
+  item_count?: number // userlist annotation
+  course_id?: string // required for courses
+  video_id?: string // required for videos
 }
 
 type SearchResult<T> = Omit<T, "topics"> & {
@@ -43,6 +49,30 @@ export type LearningResourceResult = SearchResult<LearningResource>
 export interface Course extends LearningResource {
   runs: NonNullable<LearningResource["runs"]>
   object_type: LearningResourceType.Course
+}
+
+export interface UserList extends LearningResource {
+  image_description?: string | null
+  list_type: string
+  privacy_level: string
+  author: number
+  author_name: string
+  item_count: number
+  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
+}
+export interface Favorites extends Omit<LearningResource, "id"> {
+  image_description?: string | null
+  list_type: string
+  item_count: number
+  object_type: LearningResourceType.Favorites
+}
+
+export type UserListItem = {
+  id: number
+  object_id: number
+  position: number
+  content_type: string
+  content_data: LearningResource
 }
 
 export type CourseTopic = {
@@ -101,7 +131,7 @@ export type CardMinimalResource = Pick<
   | "object_type"
   | "image_src"
   | "platform"
-  | "id"
+  | "item_count"
 >
 
 export type EmbedlyConfig = {
@@ -110,3 +140,7 @@ export type EmbedlyConfig = {
   width: number
   height: number
 }
+
+export type PaginatedUserListItems = PaginatedResult<UserListItem>
+
+export type PaginatedUserLists = PaginatedResult<UserList>

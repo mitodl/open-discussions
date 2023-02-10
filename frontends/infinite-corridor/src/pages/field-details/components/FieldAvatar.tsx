@@ -39,7 +39,7 @@ const FieldAvatar: React.FC<AvatarProps> = props => {
   const isDefault = !imageUrl
 
   return (
-    <div className={`avatar-container row ${imageSize}-size`}>
+    <div className={`avatar-container ${imageSize}-size`}>
       <div className="avatar">
         {isDefault ? (
           <div className="avatar-initials">{initials(field.title)}</div>

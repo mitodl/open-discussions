@@ -46,7 +46,7 @@ const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
       {({ handleSubmit, values, errors, isSubmitting }) => (
         <>
           <Form onSubmit={handleSubmit} className="form channel-form">
-            <div className="row avatar-and-title">
+            <div className="form-row avatar-and-title">
               <FieldAvatar field={field} imageSize="medium" />
               <div className="title-container">
                 <label htmlFor="field-title">
@@ -65,7 +65,7 @@ const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
                 ) : null}
               </div>
             </div>
-            <div className="row form-item">
+            <div className="form-row form-item">
               <label htmlFor="field-description">
                 <span className="header">Description</span>
               </label>
@@ -83,7 +83,7 @@ const EditFieldAppearanceForm = (props: FormProps): JSX.Element => {
               ) : null}
             </div>
 
-            <div className="row actions">
+            <div className="form-row actions">
               <Button
                 className="cancel"
                 onClick={() => history.push(makeFieldViewPath(field.name))}
