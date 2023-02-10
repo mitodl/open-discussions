@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+Version 0.206.0
+---------------
+
+- Documentation and .env changes for initial setup (#3826)
+- Bump http-cache-semantics from 4.1.0 to 4.1.1 (#3823)
+- Fix mgmt commands for importing content files (#3821)
+- Upgrade pillow and replace deprecated constant (#3822)
+- Bump nokogiri from 1.13.9 to 1.13.10 in /docs (#3786)
+- Bump cookiejar from 2.1.3 to 2.1.4 (#3812)
+- Bump ua-parser-js from 0.7.31 to 0.7.33 (#3813)
+
 Version 0.205.0 (Released February 01, 2023)
 ---------------
 
