@@ -10,7 +10,7 @@ This provides a discussion forum for use with other MIT applications.
 
 # Initial Setup
 
-Open Discussions follows the same [initial setup steps outlined in the common ODL web app guide](https://github.com/mitodl/handbook/blob/master/common-web-app-guide.md).
+Open Discussions follows the same [initial setup steps outlined in the common ODL web app guide](https://mitodl.github.io/handbook/how-to/common-web-app-guide.html).
 Run through those steps **including the addition of `/etc/hosts` aliases and the optional step for running the
 `createsuperuser` command**.
 
@@ -37,6 +37,11 @@ The following settings must be configured before running the app:
     You can set these values to any non-empty string value if email-sending functionality
     is not needed. It's recommended that you eventually configure the site to be able
     to send emails. Those configuration steps can be found [below](#enabling-email).
+
+- `OPEN_DISCUSSIONS_HOSTNAME`
+    
+    Sets the hostname required by webpack for building the frontend. Should likely be whatever you set 
+    the host to in your /etc/hosts or the hostname that you're accessing it from. Likely `od.odl.local`.
 
 ### Run the app and create a new user via the signup flow
 
