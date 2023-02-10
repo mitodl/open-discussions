@@ -1,9 +1,9 @@
 import "jest-extended"
 import "jest-extended/all"
 
-import { setupMockMarkdownEditor } from "ol-widgets/build/test-utils"
+import { setupMockMarkdownEditor } from "ol-widgets/src/test-utils"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
-import { mockAxiosInstance } from "./mockAxios"
+import { mockAxiosInstance, resetApi } from "./mockAxios"
 
 setupMockMarkdownEditor()
 
@@ -31,6 +31,7 @@ afterEach(() => {
    * Mock implementations are always cleared between test files.
    */
   jest.clearAllMocks()
+  resetApi()
   global.SETTINGS = _createSettings()
 })
 
