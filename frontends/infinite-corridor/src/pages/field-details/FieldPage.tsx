@@ -6,7 +6,7 @@ import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
 import { LearningResourceCard } from "ol-search-ui"
-import type { OnActivateCard, UserList } from "ol-search-ui"
+import type { OnActivateCard, UserList, LearningResource } from "ol-search-ui"
 import { TitledCarousel, useMuiBreakpoint } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
@@ -30,7 +30,7 @@ const keyFromHash = (hash: string) => {
 }
 interface FieldListProps {
   list: UserList
-  onActivateCard: OnActivateCard
+  onActivateCard: OnActivateCard<LearningResource>
 }
 
 const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
