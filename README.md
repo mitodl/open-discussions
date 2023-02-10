@@ -40,8 +40,8 @@ The following settings must be configured before running the app:
 
 - `OPEN_DISCUSSIONS_HOSTNAME`
     
-    Sets the hostname for DOCKER_HOST in setup. Should likely be whatever you set the host to in your /etc/hosts
-    or the hostname that you're accessing it from. Likely `od.odl.local`.
+    Sets the hostname required by webpack for building the frontend. Should likely be whatever you set 
+    the host to in your /etc/hosts or the hostname that you're accessing it from. Likely `od.odl.local`.
 
 ### Run the app and create a new user via the signup flow
 
