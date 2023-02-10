@@ -181,4 +181,11 @@ label.radiolabel {
     cursor: pointer;
 }
 
-
+.MuiDialogContent-root {
+  .MuiFormControl-root:first-child {
+    margin-top: 0;
+  }
+  .MuiFormControl-root:last-child {
+    margin-bottom: 0;
+  }
+}

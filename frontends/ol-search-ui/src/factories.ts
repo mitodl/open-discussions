@@ -260,7 +260,11 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
 
 export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
 
+export const makeFavorites = makeUserListItemsPaginated
+
 export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
+
+export const makeTopicsPaginated = makePaginatedFactory(makeTopic)
 
 export const makeImgConfig: Factory<EmbedlyConfig> = overrides => {
   const imgConfig = {

@@ -7,7 +7,9 @@ const alphabeticalSort = (a: string, b: string) => a.localeCompare(b)
  *
  * Does NOT prepend a "?".
  */
-const toQueryString = (params?: Record<string, number | string>) => {
+const toQueryString = (
+  params?: Record<string, number | string | boolean | undefined>
+) => {
   return qs.stringify(params, { sort: alphabeticalSort })
 }
 
