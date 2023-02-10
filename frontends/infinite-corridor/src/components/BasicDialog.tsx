@@ -29,6 +29,13 @@ type BasicDialog = {
   fullWidth?: boolean
 }
 
+/**
+ * A basic modal dialog.
+ *
+ * This is useful for things like confirmation or notifications, but not
+ * particularly good for forms, where a <form /> element should wrap the inputs
+ * and footer buttons.
+ */
 const BasicDialog: React.FC<BasicDialog> = ({
   title,
   children,
