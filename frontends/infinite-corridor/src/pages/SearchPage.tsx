@@ -12,7 +12,7 @@ import {
   Facets
 } from "@mitodl/course-search-utils"
 import {
-  LearningResourceResult,
+  LearningResourceSearchResult,
   LearningResourceCard,
   LearningResourceCardProps,
   SearchInput,
@@ -35,7 +35,7 @@ const facetMap: FacetManifest = [
 ]
 
 interface Result {
-  _source: LearningResourceResult
+  _source: LearningResourceSearchResult
 }
 
 const imgConfig: LearningResourceCardProps["imgConfig"] = {

@@ -5,7 +5,7 @@ import { DATE_FORMAT } from "./util"
 import { Factory, makePaginatedFactory } from "ol-util/build/factories"
 import {
   CourseTopic,
-  LearningResourceResult,
+  LearningResourceSearchResult,
   LearningResourceRun,
   LearningResource,
   LearningResourceType,
@@ -175,7 +175,7 @@ const makeSearchResult = (
   type?: MakeableResultType
 ): {
   _id: string
-  _source: LearningResourceResult
+  _source: LearningResourceSearchResult
 } => {
   const maker = type ?
     resultMakers[type] :

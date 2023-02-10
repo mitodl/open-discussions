@@ -44,7 +44,7 @@ type SearchResult<T> = Omit<T, "topics"> & {
   topics?: string[]
 }
 
-export type LearningResourceResult = SearchResult<LearningResource>
+export type LearningResourceSearchResult = SearchResult<LearningResource>
 
 export interface Course extends LearningResource {
   runs: NonNullable<LearningResource["runs"]>
