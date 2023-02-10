@@ -95,7 +95,7 @@ const makeFavorites = (count: number): Favorites => {
   }
 }
 
-const UserListsPage: React.FC = () => {
+const UserListsListingPage: React.FC = () => {
   const creation = useCreationDialog()
   const editing = useEditingDialog()
   const deletion = useDeletionDialog()
@@ -195,4 +195,4 @@ const UserListsPage: React.FC = () => {
   )
 }
 
-export default UserListsPage
+export default UserListsListingPage

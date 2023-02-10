@@ -7,7 +7,7 @@ import { LearningResourceCard } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useActivateResourceDrawer } from "../LearningResourceDrawer"
 
-const UserListsPage: React.FC = () => {
+const FavoritesPage: React.FC = () => {
   const favoritesQuery = useFavorites()
   const favorites = favoritesQuery.data?.results
   const activateResource = useActivateResourceDrawer()
@@ -52,4 +52,4 @@ const UserListsPage: React.FC = () => {
   )
 }
 
-export default UserListsPage
+export default FavoritesPage

@@ -16,7 +16,7 @@ type RouteParams = {
   id: string
 }
 
-const UserListsPage: React.FC = () => {
+const UserListsDetailsPage: React.FC = () => {
   const id = Number(useParams<RouteParams>().id)
   const userListQuery = useUserList(id)
   const itemsDataQuery = useUserListItems(id)
@@ -82,4 +82,4 @@ const UserListsPage: React.FC = () => {
   )
 }
 
-export default UserListsPage
+export default UserListsDetailsPage
