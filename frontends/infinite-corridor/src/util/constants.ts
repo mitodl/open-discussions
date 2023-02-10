@@ -1,6 +1,6 @@
-import type { CardVariant, EmbedlyConfig } from "ol-search-ui"
+import type { EmbedlyConfig } from "ol-search-ui"
 
-const imgConfigs: Record<CardVariant, EmbedlyConfig> = {
+const imgConfigs = {
   row: {
     ocwBaseUrl: SETTINGS.ocw_next_base_url,
     embedlyKey: SETTINGS.embedlyKey,
@@ -13,12 +13,18 @@ const imgConfigs: Record<CardVariant, EmbedlyConfig> = {
     width:      170,
     height:     130
   },
+  "row-reverse-small": {
+    ocwBaseUrl: SETTINGS.ocw_next_base_url,
+    embedlyKey: SETTINGS.embedlyKey,
+    width:      160,
+    height:     100
+  },
   column: {
     ocwBaseUrl: SETTINGS.ocw_next_base_url,
     embedlyKey: SETTINGS.embedlyKey,
     width:      220,
     height:     170
   }
-}
+} satisfies Record<string, EmbedlyConfig>
 
 export { imgConfigs }

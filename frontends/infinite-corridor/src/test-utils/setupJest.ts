@@ -1,9 +1,9 @@
 import "jest-extended"
 import "jest-extended/all"
 
-import { setupMockMarkdownEditor } from "ol-widgets/src/test-utils"
+import { setupMockMarkdownEditor } from "ol-widgets/build/test-utils"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
-import { mockAxiosInstance, resetApi } from "./mockAxios"
+import { mockAxiosInstance } from "./mockAxios"
 
 setupMockMarkdownEditor()
 
@@ -32,7 +32,6 @@ afterEach(() => {
    */
   jest.clearAllMocks()
   global.SETTINGS = _createSettings()
-  resetApi()
 })
 
 const DEFAULT_DEVICE_WIDTH = "1200px"
