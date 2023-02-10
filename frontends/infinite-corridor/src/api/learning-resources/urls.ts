@@ -4,6 +4,9 @@ import { toQueryString } from "ol-util"
 const DEFAULT_PAGE_SIZE = 50
 
 const resourceDetails = (type: string, id: number) => `/${type}s/${id}/`
+const updateResource = (type: string, id: number) => `/${type}s/${id}/`
+const createResource = (type: string) => `/${type}s/`
+const deleteResource = (type: string, id: number) => `/${type}s/${id}/`
 
 const resourceListing = <Opts extends PaginationSearchParams>(
   type: string,
@@ -22,6 +25,13 @@ const userListItems = (id: number, options?: PaginationSearchParams) => {
 type UserListOptions = { public?: boolean } & PaginationSearchParams
 const userListsListing = (opts?: UserListOptions) =>
   resourceListing("userlist", opts)
+const favoritesListing = (opts?: PaginationSearchParams) =>
+  resourceListing("favorite", opts)
+const createUserList = () => createResource("userlist")
+const updateUserList = (id: number) => updateResource("userlist", id)
+const deleteUserList = (id: number) => deleteResource("userlist", id)
+
+const topics = () => "/topics/"
 
 const keys = {
   resourceDetails: (type: string, id: number) => [type, id, "details"],
@@ -37,9 +47,12 @@ const keys = {
     "items",
     options
   ],
+  topics:           () => ["topics"],
   userListsListing: (opts?: UserListOptions) =>
     keys.resourceListing("userlist", opts),
-  userListDetails: (id: number) => keys.resourceDetails("userlist", id)
+  userListDetails:  (id: number) => keys.resourceDetails("userlist", id),
+  favoritesListing: (opts?: PaginationSearchParams) =>
+    keys.resourceListing("favorite", opts)
 }
 
 const urls = {
@@ -47,7 +60,12 @@ const urls = {
   resourceListing,
   userListDetails: (id: number) => resourceDetails("userlist", id),
   userListItems,
-  userListsListing
+  userListsListing,
+  createUserList,
+  updateUserList,
+  deleteUserList,
+  favoritesListing,
+  topics
 }
 
 export { urls, keys }

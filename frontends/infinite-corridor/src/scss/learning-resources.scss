@@ -18,11 +18,19 @@ $cardListSpacer: 1.5em;
 }
 
 .ic-card-row-list {
-  padding-left: 0;
+  padding-left: 0pt;
+  margin-left:0pt;
+  margin-right:0pt;
   > li {
     list-style: none;
     margin-top: $cardListSpacer;
     margin-bottom: $cardListSpacer;
+  }
+  > li:first-child {
+    margin-top: 0px;
+  }
+  > li:last-child {
+    margin-bottom: 0px;
   }
 }
 
