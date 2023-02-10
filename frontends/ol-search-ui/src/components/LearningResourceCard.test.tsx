@@ -2,7 +2,7 @@ import React from "react"
 import { render, screen } from "@testing-library/react"
 import { assertInstanceOf } from "ol-util"
 import LearningResourceCard from "./LearningResourceCard"
-import { makeCourse, makeImgConfig } from "../factories"
+import { makeCourse, makeImgConfig, makeUserList } from "../factories"
 import { resourceThumbnailSrc } from "../util"
 
 describe("LearningResourceCard", () => {
