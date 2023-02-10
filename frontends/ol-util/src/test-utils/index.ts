@@ -74,6 +74,15 @@ const getByTerm = byTerm[2]
 const findAllByTerm = byTerm[3]
 const findByTerm = byTerm[4]
 
+/**
+ * Given an HTMLElement with an aria-describedby attribute, return the element
+ * that describes it.
+ *
+ * This is particularly useful with `@testing-library`, which makes it easy to
+ * find form inputs by label, but has no builtin method for finding the
+ * corresponding descriptions (which you might want when asserting about form
+ * validation).
+ */
 const getDescriptionFor = (el: HTMLElement) => {
   const errId = el.getAttribute("aria-describedby")
   if (errId === null) {
