@@ -10,7 +10,7 @@ import requests
 from toolz import compose
 
 from course_catalog.etl.constants import COMMON_HEADERS
-from course_catalog.utils import get_year_and_semester, semester_year_to_date
+from course_catalog.utils import get_year_and_semester, semester_year_to_date, extract_valid_department_from_id
 
 OpenEdxConfiguration = namedtuple(
     "OpenEdxConfiguration",
@@ -235,6 +235,7 @@ def _transform_course(config, course):
     return {
         "course_id": course.get("key"),
         "title": course.get("title"),
+        "department": extract_valid_department_from_id(course.get("key")),
         "short_description": course.get("short_description"),
         "full_description": course.get("full_description"),
         "platform": config.platform,
