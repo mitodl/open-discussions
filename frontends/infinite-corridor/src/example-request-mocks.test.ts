@@ -51,7 +51,6 @@ describe("request mocking", () => {
     expect(r3.data).toEqual({
       someResponseKey: "response for request with {a:5}"
     })
-    console.log("DONE WITH TEST")
   })
 
   test("Error codes reject", async () => {
