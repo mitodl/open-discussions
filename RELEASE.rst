@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.206.0
+Version 0.206.0 (Released February 13, 2023)
 ---------------
 
 - Documentation and .env changes for initial setup (#3826)
