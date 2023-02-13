@@ -18,9 +18,9 @@ const FavoritesPage: React.FC = () => {
       alt=""
       compactOnMobile
     >
-      <Container className="userlist-page">
+      <Container maxWidth="sm" className="userlist-page">
         <GridContainer>
-          <GridColumn variant="main-2-wide-main">
+          <GridColumn variant="single-full">
             <h1 className="ic-list-header">My Favorites</h1>
             {favoritesQuery.isLoading && <p>Loading...</p>}
             {favorites &&
