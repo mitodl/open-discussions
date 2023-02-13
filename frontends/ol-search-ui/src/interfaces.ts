@@ -1,4 +1,5 @@
 import { Facets } from "@mitodl/course-search-utils"
+import { PaginatedResult } from "ol-util"
 
 export enum LearningResourceType {
   Course = "course",
@@ -11,10 +12,17 @@ export enum LearningResourceType {
   Favorites = "favorites"
 }
 
+export enum PrivacyLevel {
+  Public = "public",
+  Private = "private"
+}
+
 export type LearningResource = {
   id: number
   title: string
   topics: CourseTopic[]
+  short_description?: string | null
+  full_description?: string | null
   object_type: LearningResourceType
   lists: ListItemMember[]
   image_src: string | null
@@ -24,34 +32,47 @@ export type LearningResource = {
   is_favorite?: boolean
   audience?: string[]
   certification: string[]
-}
-
-export interface LearningResourceResult {
-  id: number
-  course_id?: string
-  video_id?: string
-  url?: string
-  title: string
-  image_src: string | null
-  object_type: LearningResourceType
-  offered_by?: string[]
-  short_description?: string | null
-  full_description?: string | null
-  platform?: string
-  topics?: string[]
-  runs?: LearningResourceRun[]
-  lists: ListItemMember[]
-  is_favorite: boolean
-  certification: string[]
-  audience: string[]
-  item_count?: number
-  last_modified?: string | null
   duration?: string | null
+  url?: string | null
+  last_modified?: string | null
+  item_count?: number // userlist annotation
+  course_id?: string // required for courses
+  video_id?: string // required for videos
 }
 
-export interface CourseResult extends LearningResourceResult {
-  runs: NonNullable<LearningResourceResult["runs"]>
+type SearchResult<T> = Omit<T, "topics"> & {
+  topics?: string[]
+}
+
+export type LearningResourceSearchResult = SearchResult<LearningResource>
+
+export interface Course extends LearningResource {
+  runs: NonNullable<LearningResource["runs"]>
   object_type: LearningResourceType.Course
+}
+
+export interface UserList extends LearningResource {
+  image_description?: string | null
+  list_type: string
+  privacy_level: string
+  author: number
+  author_name: string
+  item_count: number
+  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
+}
+export interface Favorites extends Omit<LearningResource, "id"> {
+  image_description?: string | null
+  list_type: string
+  item_count: number
+  object_type: LearningResourceType.Favorites
+}
+
+export type UserListItem = {
+  id: number
+  object_id: number
+  position: number
+  content_type: string
+  content_data: LearningResource
 }
 
 export type CourseTopic = {
@@ -110,7 +131,7 @@ export type CardMinimalResource = Pick<
   | "object_type"
   | "image_src"
   | "platform"
-  | "id"
+  | "item_count"
 >
 
 export type EmbedlyConfig = {
@@ -119,3 +140,7 @@ export type EmbedlyConfig = {
   width: number
   height: number
 }
+
+export type PaginatedUserListItems = PaginatedResult<UserListItem>
+
+export type PaginatedUserLists = PaginatedResult<UserList>

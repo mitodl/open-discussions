@@ -2,24 +2,35 @@
 import casual from "casual-browserify"
 import { faker } from "@faker-js/faker"
 import { DATE_FORMAT } from "./util"
-import { Factory } from "ol-util/build/factories"
+import { Factory, makePaginatedFactory } from "ol-util/build/factories"
 import {
   CourseTopic,
-  LearningResourceResult,
+  LearningResourceSearchResult,
   LearningResourceRun,
   LearningResource,
   LearningResourceType,
-  CardMinimalResource,
   EmbedlyConfig,
-  CourseResult
+  Course,
+  UserList,
+  UserListItem,
+  PrivacyLevel
 } from "./interfaces"
 
-import { pick, times } from "lodash"
+import { times } from "lodash"
 import moment from "moment"
 
 const OPEN_CONTENT = "Open Content"
 const PROFESSIONAL = "Professional Offerings"
 const CERTIFICATE = "Certificates"
+
+export const makeTopic: Factory<CourseTopic> = overrides => {
+  const topic: CourseTopic = {
+    id:   faker.unique(faker.datatype.number),
+    name: faker.lorem.words(),
+    ...overrides
+  }
+  return topic
+}
 
 export const makeRun: Factory<LearningResourceRun> = overrides => {
   return {
@@ -53,15 +64,15 @@ export const makeRun: Factory<LearningResourceRun> = overrides => {
   }
 }
 
-export const makeCourseResult: Factory<CourseResult> = overrides => ({
+export const makeCourse: Factory<Course> = overrides => ({
   id:                faker.unique(faker.datatype.number),
-  title:             casual.title,
+  title:             faker.lorem.words(),
   url:               casual.url,
   image_src:         "http://image.medium.url",
   short_description: casual.description,
   platform:          casual.random_element(["edx", "ocw"]),
   offered_by:        [casual.random_element(["edx", "ocw"])],
-  topics:            [casual.word, casual.word],
+  topics:            times(2, () => makeTopic()),
   object_type:       LearningResourceType.Course,
   runs:              times(3, () => makeRun()),
   is_favorite:       casual.coin_flip,
@@ -76,15 +87,13 @@ export const makeCourseResult: Factory<CourseResult> = overrides => ({
   ...overrides
 })
 
-export const makeProgramResult: Factory<
-  LearningResourceResult
-> = overrides => ({
+export const makeProgram: Factory<LearningResource> = overrides => ({
   id:                faker.unique(faker.datatype.number),
-  title:             casual.title,
+  title:             faker.lorem.words(),
   url:               casual.url,
   image_src:         "http://image.medium.url",
   short_description: casual.description,
-  topics:            [casual.word, casual.word],
+  topics:            times(2, () => makeTopic()),
   object_type:       LearningResourceType.Program,
   offered_by:        [casual.random_element(["xpro", "micromasters"])],
   runs:              [makeRun()],
@@ -101,10 +110,10 @@ export const makeProgramResult: Factory<
   ...overrides
 })
 
-export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
+export const makeVideo: Factory<LearningResource> = overrides => ({
   id:                faker.unique(faker.datatype.number),
   video_id:          `video_${String(casual.random)}`,
-  title:             casual.title,
+  title:             faker.lorem.words(),
   url:               casual.url,
   is_favorite:       casual.boolean,
   last_modified:     casual.date(DATE_FORMAT),
@@ -117,28 +126,65 @@ export const makeVideoResult: Factory<LearningResourceResult> = overrides => ({
   lists:             [],
   audience:          [],
   certification:     [],
+  topics:            [],
   platform:          faker.word.noun(),
   ...overrides
 })
 
+export const makeUserList: Factory<UserList> = overrides => {
+  const type = faker.helpers.arrayElement([
+    LearningResourceType.Userlist,
+    LearningResourceType.LearningPath
+  ] as const)
+  const userList: UserList = {
+    id:                faker.unique(faker.datatype.number),
+    short_description: faker.lorem.paragraph(),
+    offered_by:        [],
+    title:             faker.lorem.words(),
+    topics:            times(2, () => makeTopic()),
+    is_favorite:       faker.datatype.boolean(),
+    image_src:         new URL(faker.internet.url()).toString(),
+    image_description: faker.helpers.arrayElement([
+      null,
+      faker.lorem.sentence()
+    ]),
+    item_count:    faker.datatype.number({ min: 2, max: 5 }),
+    object_type:   type,
+    list_type:     type,
+    privacy_level: faker.helpers.arrayElement([
+      PrivacyLevel.Public,
+      PrivacyLevel.Private
+    ]),
+    author:        faker.datatype.number({ min: 1, max: 1000 }),
+    lists:         [],
+    certification: [],
+    author_name:   faker.name.findName(),
+    ...overrides
+  }
+  return userList
+}
+
 const resultMakers = {
-  course:  makeCourseResult,
-  program: makeProgramResult,
-  video:   makeCourseResult
+  course:  makeCourse,
+  program: makeProgram,
+  video:   makeVideo
 }
 type MakeableResultType = keyof typeof resultMakers
 
-const makeLearningResourceResult = (type?: MakeableResultType | null) => {
+const makeSearchResult = (
+  type?: MakeableResultType
+): {
+  _id: string
+  _source: LearningResourceSearchResult
+} => {
   const maker = type ?
     resultMakers[type] :
     faker.helpers.arrayElement(Object.values(resultMakers))
-  return maker()
-}
-
-export const makeSearchResult = (type?: MakeableResultType) => {
+  const resource = maker()
+  const topics = resource.topics.map(topic => topic.name)
   return {
     _id:     `id_String${casual.random}`,
-    _source: makeLearningResourceResult(type)
+    _source: { ...resource, topics }
   }
 }
 
@@ -183,15 +229,6 @@ export const makeSearchFacetResult = () => {
 const makeLearningResourceType = () =>
   faker.helpers.arrayElement(Object.values(LearningResourceType))
 
-export const makeTopic: Factory<CourseTopic> = overrides => {
-  const topic: CourseTopic = {
-    id:   faker.unique(faker.datatype.number),
-    name: faker.lorem.words(),
-    ...overrides
-  }
-  return topic
-}
-
 export const makeLearningResource: Factory<LearningResource> = overrides => {
   const resource: LearningResource = {
     id:            faker.unique(faker.datatype.number),
@@ -208,21 +245,22 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
   return resource
 }
 
-export const makeMinimalResoure: Factory<CardMinimalResource> = overrides => {
-  const keys = [
-    "runs",
-    "certification",
-    "title",
-    "offered_by",
-    "object_type",
-    "image_src",
-    "platform"
-  ] as const
-  return {
-    ...pick(makeCourseResult(), keys),
+export const makeUserListItem: Factory<UserListItem> = overrides => {
+  const content = makeLearningResource()
+  const item: UserListItem = {
+    id:           faker.unique(faker.datatype.number),
+    object_id:    content.id,
+    position:     faker.datatype.number(),
+    content_type: content.object_type,
+    content_data: content,
     ...overrides
-  } as CardMinimalResource
+  }
+  return item
 }
+
+export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
+
+export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
 
 export const makeImgConfig: Factory<EmbedlyConfig> = overrides => {
   const imgConfig = {

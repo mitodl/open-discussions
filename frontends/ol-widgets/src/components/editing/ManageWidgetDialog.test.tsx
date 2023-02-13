@@ -72,11 +72,12 @@ describe("ManageWidgetDialog (Editing)", () => {
   })
 
   it("passes classes to relevant elements", () => {
+    const fakerClassName = () => faker.unique(faker.lorem.slug)
     const classes = {
-      label:      faker.lorem.word(),
-      field:      faker.lorem.word(),
-      fieldGroup: faker.lorem.word(),
-      dialog:     faker.lorem.word()
+      label:      fakerClassName(),
+      field:      fakerClassName(),
+      fieldGroup: fakerClassName(),
+      dialog:     fakerClassName()
     }
     setupEditingDialog({ classes })
     // eslint-disable-next-line testing-library/no-node-access

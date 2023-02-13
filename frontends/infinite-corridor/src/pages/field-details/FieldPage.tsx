@@ -6,13 +6,14 @@ import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
 import { LearningResourceCard } from "ol-search-ui"
-import type { OnActivateCard } from "ol-search-ui"
+import type { OnActivateCard, UserList, LearningResource } from "ol-search-ui"
 import { TitledCarousel, useMuiBreakpoint } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
 import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
-import { useFieldDetails, useFieldListItems, UserList } from "../../api/fields"
+import { useFieldDetails } from "../../api/fields"
+import { useUserListItems } from "../../api/learning-resources"
 import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
@@ -29,12 +30,12 @@ const keyFromHash = (hash: string) => {
 }
 interface FieldListProps {
   list: UserList
-  onActivateCard: OnActivateCard
+  onActivateCard: OnActivateCard<LearningResource>
 }
 
 const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
-  const itemsQuery = useFieldListItems(list.id)
-  const items = itemsQuery.data?.results ?? []
+  const itemsQuery = useUserListItems(list.id)
+  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   return (
     <section>
       <h3>{list.title}</h3>
@@ -56,8 +57,8 @@ const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
 }
 
 const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
-  const itemsQuery = useFieldListItems(list.id)
-  const items = itemsQuery.data?.results ?? []
+  const itemsQuery = useUserListItems(list.id)
+  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   const isSm = useMuiBreakpoint("sm")
   const isLg = useMuiBreakpoint("lg")
   const pageSize = isLg ? 3 : isSm ? 2 : 1

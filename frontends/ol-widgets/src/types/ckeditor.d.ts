@@ -7,6 +7,7 @@ declare module "@ckeditor/ckeditor5-react" {
 
   type CKEditorProps = {
     editor: ConstructorType<Editor>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     config?: any
     data: string
     onChange?: (event: unknown, editor: Editor) => void

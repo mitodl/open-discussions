@@ -1,27 +1,5 @@
 import type { PaginatedResult } from "ol-util"
-import type { LearningResource, LearningResourceType } from "ol-search-ui"
-
-type UserList = LearningResource & {
-  image_description: string | null | undefined
-  list_type: string
-  title: string
-  short_description?: string
-  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
-  privacy_level: string
-  author: number
-  author_name: string
-  item_count: number
-}
-
-type UserListItem = {
-  id: number
-  is_favorite: boolean
-  object_id: number
-  position: number
-  program: number
-  content_type: string
-  content_data: LearningResource
-}
+import type { UserList } from "ol-search-ui"
 
 interface FieldChannel {
   banner: string | null
@@ -72,18 +50,4 @@ export type FieldAppearanceEditValidation = {
 
 type PaginatedFields = PaginatedResult<FieldChannel>
 
-type PaginatedUserListItems = PaginatedResult<UserListItem>
-
-type PaginatedUserLists = PaginatedResult<UserList>
-
-type PaginatedFieldListItems = PaginatedResult<UserListItem["content_data"]>
-
-export type {
-  UserList,
-  FieldChannel,
-  PaginatedFields,
-  UserListItem,
-  PaginatedUserListItems,
-  PaginatedUserLists,
-  PaginatedFieldListItems
-}
+export type { FieldChannel, PaginatedFields }

@@ -5,7 +5,7 @@ import SearchFilter from "./SearchFilter"
 import { Aggregation, Facets } from "@mitodl/course-search-utils"
 import { FacetManifest, FacetKey } from "../interfaces"
 
-interface Props {
+interface FacetDisplayProps {
   facetMap: FacetManifest
   facetOptions: (group: string) => Aggregation | null
   activeFacets: Facets
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const FacetDisplay = React.memo(
-  function FacetDisplay(props: Props) {
+  function FacetDisplay(props: FacetDisplayProps) {
     const {
       facetMap,
       facetOptions,
@@ -82,3 +82,4 @@ const FacetDisplay = React.memo(
 )
 
 export default FacetDisplay
+export type { FacetDisplayProps }

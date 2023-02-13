@@ -8,12 +8,7 @@ import { makeUrl } from "ol-util/build/factories"
 import LearningResourceDetails, {
   LearningResourceDetailsProps
 } from "./ExpandedLearningResourceDisplay"
-import {
-  makeCourseResult,
-  makeImgConfig,
-  makeRun,
-  makeVideoResult
-} from "../factories"
+import { makeCourse, makeImgConfig, makeRun, makeVideo } from "../factories"
 import { resourceThumbnailSrc, getInstructorName, findBestRun } from "../util"
 
 const formatShareLink: LearningResourceDetailsProps["formatShareLink"] = r =>
@@ -22,7 +17,7 @@ const formatShareLink: LearningResourceDetailsProps["formatShareLink"] = r =>
 const renderLearningResourceDetails = (
   overrides: Partial<LearningResourceDetailsProps> = {}
 ): LearningResourceDetailsProps => {
-  const resource = makeCourseResult()
+  const resource = makeCourse()
   const imgConfig = makeImgConfig()
   const props = { resource, imgConfig, formatShareLink, ...overrides }
   render(<LearningResourceDetails {...props} />)
@@ -33,7 +28,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   it("renders the expected fields for a course", () => {
     const run = makeRun()
     const offerer = "ocw"
-    const resource = makeCourseResult({ runs: [run], offered_by: [offerer] })
+    const resource = makeCourse({ runs: [run], offered_by: [offerer] })
 
     const { imgConfig } = renderLearningResourceDetails({ resource })
 
@@ -59,7 +54,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     { level: "Really hard", shouldDisplay: true }
   ])("Displays 'Level' iff there is one", ({ level, shouldDisplay }) => {
     const run = makeRun({ level })
-    const resource = makeCourseResult({ runs: [run] })
+    const resource = makeCourse({ runs: [run] })
     renderLearningResourceDetails({ resource })
     const el = queryByTerm(document.body, "Level:")
     if (shouldDisplay) {
@@ -71,7 +66,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("renders the expected fields for a video", () => {
     const offeredBy = faker.word.noun()
-    const resource = makeVideoResult({ offered_by: [offeredBy] })
+    const resource = makeVideo({ offered_by: [offeredBy] })
 
     renderLearningResourceDetails({ resource })
 
@@ -97,7 +92,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   ])(
     "should render an icon if the object has a certificate",
     ({ certification, hasCertificate }) => {
-      const resource = makeCourseResult({ certification })
+      const resource = makeCourse({ certification })
 
       renderLearningResourceDetails({ resource })
       const certIcon = screen.queryByAltText("Receive a certificate", {
@@ -108,7 +103,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   )
 
   it("renders the default cover image if none exists", () => {
-    const resource = makeCourseResult({ image_src: null })
+    const resource = makeCourse({ image_src: null })
     renderLearningResourceDetails({ resource })
 
     const coverImg = screen.getByAltText("")
@@ -118,7 +113,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("renders the run url if it is set", () => {
     const run = makeRun()
-    const resource = makeCourseResult({ runs: [run] })
+    const resource = makeCourse({ runs: [run] })
     renderLearningResourceDetails({ resource })
     const link = screen.getByRole("link")
     assertInstanceOf(link, HTMLAnchorElement)
@@ -128,7 +123,7 @@ describe("ExpandedLearningResourceDisplay", () => {
 
   it("renders the object url if the run url is not set", () => {
     const run = makeRun({ url: null })
-    const resource = makeCourseResult({ runs: [run], url: "www.aurl.com" })
+    const resource = makeCourse({ runs: [run], url: "www.aurl.com" })
 
     renderLearningResourceDetails({ resource })
     const link = screen.getByRole("link")
@@ -144,20 +139,20 @@ describe("ExpandedLearningResourceDisplay", () => {
     { languageCode: "", language: "English" }
   ])("should render the course language", ({ languageCode, language }) => {
     const run = makeRun({ language: languageCode })
-    const resource = makeCourseResult({ runs: [run] })
+    const resource = makeCourse({ runs: [run] })
     renderLearningResourceDetails({ resource })
     screen.getByText(language)
   })
 
   it("formats and renders the cost", () => {
     const run = makeRun({ prices: [{ price: 25.5, mode: "" }] })
-    const resource = makeCourseResult({ runs: [run] })
+    const resource = makeCourse({ runs: [run] })
     renderLearningResourceDetails({ resource })
     expect(screen.getByText("$25.50")).toBeInTheDocument()
   })
 
   it("has a share button with the direct url for the resource", async () => {
-    const resource = makeCourseResult()
+    const resource = makeCourse()
     renderLearningResourceDetails({ resource })
 
     const expectedLink = formatShareLink(resource)
@@ -175,7 +170,7 @@ describe("ExpandedLearningResourceDisplay", () => {
       const runs = Array(numRuns)
         .fill(null)
         .map(() => makeRun())
-      const resource = makeCourseResult({ runs })
+      const resource = makeCourse({ runs })
       renderLearningResourceDetails({ resource })
       const runDropdown = screen.queryByRole("combobox")
       expect(runDropdown === null).not.toBe(hasDropdown)
@@ -189,7 +184,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     const bestRun = findBestRun(runs)
     assertNotNil(bestRun)
 
-    const resource = makeCourseResult({ runs })
+    const resource = makeCourse({ runs })
     renderLearningResourceDetails({ resource })
     const runDropdown = screen.queryByRole("combobox")
     assertInstanceOf(runDropdown, HTMLSelectElement)
@@ -208,7 +203,7 @@ describe("ExpandedLearningResourceDisplay", () => {
     const run0 = makeRun({ url: url0 })
     const run1 = makeRun({ url: url1 })
     const runs = [run0, run1]
-    const resource = makeCourseResult({ runs: [run0, run1] })
+    const resource = makeCourse({ runs: [run0, run1] })
     renderLearningResourceDetails({ resource })
 
     const dropdown = screen.getByRole("combobox")

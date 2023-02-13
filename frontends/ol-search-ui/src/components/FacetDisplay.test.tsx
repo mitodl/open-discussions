@@ -1,15 +1,16 @@
-import FacetDisplay, { Props } from "./FacetDisplay"
+import FacetDisplay, { FacetDisplayProps } from "./FacetDisplay"
+import type { FacetManifest } from "../interfaces"
 import { render, screen } from "@testing-library/react"
 import React from "react"
 
 describe("FacetDisplay", () => {
-  const facetMap = [
+  const facetMap: FacetManifest = [
     ["topics", "Topics"],
     ["type", "Types"],
     ["department_name", "Departments"]
   ]
 
-  const renderFacetDisplay = (props: Partial<Props> = {}) => {
+  const renderFacetDisplay = (props: Partial<FacetDisplayProps> = {}) => {
     const activeFacets = {}
     const facetOptions = jest.fn()
     const onUpdateFacets = jest.fn()
