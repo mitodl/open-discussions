@@ -29,15 +29,15 @@ const UserListsDetailsPage: React.FC = () => {
       alt=""
       compactOnMobile
     >
-      <Container className="userlist-page">
+      <Container maxWidth="sm" className="userlist-page">
         <GridContainer>
-          <GridColumn variant="main-2-wide-main">
+          <GridColumn variant="single-full">
             {userListQuery.data && (
               <Grid container className="ic-list-header">
-                <Grid item xs={6}>
+                <Grid item xs={9}>
                   <h1>{userListQuery.data.title}</h1>
                 </Grid>
-                <Grid item xs={6} className="ic-centered-right">
+                <Grid item xs={3} className="ic-centered-right">
                   <Button
                     color="secondary"
                     startIcon={<EditIcon />}

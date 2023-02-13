@@ -124,9 +124,9 @@ const UserListsListingPage: React.FC = () => {
       alt=""
       compactOnMobile
     >
-      <Container>
+      <Container maxWidth="sm">
         <GridContainer>
-          <GridColumn variant="main-2-wide-main">
+          <GridColumn variant="single-full">
             <Grid container className="ic-list-header">
               <Grid item xs={6}>
                 <h1>My Lists</h1>
