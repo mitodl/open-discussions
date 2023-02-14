@@ -119,6 +119,7 @@ def test_transform_course(
     assert transformed_courses[0] == {
         "title": "The Analytics Edge",
         "course_id": "MITx+15.071x",
+        "department": ["15"],
         "short_description": "short_description",
         "full_description": "full description",
         "platform": openedx_config.platform,

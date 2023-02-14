@@ -26,6 +26,7 @@ from course_catalog.constants import (
     CONTENT_TYPE_FILE,
     CONTENT_TYPE_VERTICAL,
     VALID_TEXT_FILE_TYPES,
+    OCW_DEPARTMENTS,
 )
 from course_catalog.models import get_max_length
 
@@ -443,3 +444,20 @@ def transform_topics(topics):
             ]
         )
     ]
+
+
+def extract_valid_department_from_id(course_string):
+    """
+    Extracts a department from course data and returns
+
+    Args:
+        course_string (str): course name as string
+
+    Returns:
+        department (str): parsed department string
+    """
+    department_string = re.search("\+([^\.]*)\.", course_string)
+    if department_string:
+        dept_candidate = department_string.groups()[0]
+        return [dept_candidate] if dept_candidate in OCW_DEPARTMENTS.keys() else None
+    return None

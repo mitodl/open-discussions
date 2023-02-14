@@ -10,7 +10,7 @@ import requests
 import yaml
 from django.conf import settings
 
-from course_catalog.constants import OCW_DEPARTMENTS, PlatformType, semester_mapping
+from course_catalog.constants import PlatformType, semester_mapping
 from open_discussions.utils import generate_filepath
 
 log = logging.getLogger()
@@ -331,23 +331,3 @@ def parse_instructors(staff):
         instructors.append(instructor)
 
     return instructors
-
-
-def extract_valid_department_from_id(course_string):
-    """
-    Extracts a department from course data and returns
-
-    Args:
-        course_string (str): course name as string
-
-    Returns:
-        department (str): parsed department string
-    """
-    department_string = re.search("\+([^\.]*)\.", course_string)
-    if department_string:
-        dept_candidate = department_string.groups()[0]
-        return ([dept_candidate]
-                if dept_candidate in OCW_DEPARTMENTS.keys()
-                else None
-                )
-    return None

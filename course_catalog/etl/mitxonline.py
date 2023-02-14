@@ -10,8 +10,7 @@ import requests
 from django.conf import settings
 
 from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.utils import extract_valid_department_from_id
-from course_catalog.etl.utils import transform_topics
+from course_catalog.etl.utils import transform_topics, extract_valid_department_from_id
 
 log = logging.getLogger(__name__)
 
@@ -131,7 +130,7 @@ def _transform_course(course):
     return {
         "course_id": course["readable_id"],
         "platform": PlatformType.mitxonline.value,
-        "department": extract_valid_department_from_id(course.get("key")),
+        "department": extract_valid_department_from_id(course["readable_id"]),
         "title": course["title"],
         "offered_by": copy.deepcopy(OFFERED_BY),
         "topics": transform_topics(course.get("topics", [])),
