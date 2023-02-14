@@ -15,6 +15,7 @@ from course_catalog.etl.utils import (
     documents_from_olx,
     extract_text_from_url,
     extract_text_metadata,
+    extract_valid_department_from_id,
     generate_unique_id,
     get_text_from_element,
     log_exceptions,
@@ -298,3 +299,14 @@ def test_documents_from_olx():
     assert formula2do[1]["key"].endswith("formula2do.xml")
     assert formula2do[1]["content_type"] == CONTENT_TYPE_FILE
     assert formula2do[1]["mime_type"] == "application/xml"
+
+
+def test_extract_valid_department_from_id():
+    """Test that correct department is extracted from ID"""
+    assert extract_valid_department_from_id("MITx+7.03.2x") == ["7"]
+    assert extract_valid_department_from_id("course-v1:MITxT+21A.819.2x") == ["21A"]
+    # Has a department not in the list and thus should not be entered
+    assert extract_valid_department_from_id("course-v1:MITxT+123.658.2x") is None
+    # Has no discernible department
+    assert extract_valid_department_from_id("MITx+CITE101x") is None
+    assert extract_valid_department_from_id("RanD0mStr1ng") is None
