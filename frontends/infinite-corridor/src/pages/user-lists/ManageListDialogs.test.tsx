@@ -46,9 +46,9 @@ const inputs = {
     [PrivacyLevel.Public]:  () => screen.getByLabelText("Public"),
     [PrivacyLevel.Private]: () => screen.getByLabelText("Private")
   },
-  title:       () => screen.getByLabelText("Title"),
-  description: () => screen.getByLabelText("Description"),
-  topics:      () => screen.getByLabelText("Subjects"),
+  title:       () => screen.getByLabelText("Title", { exact: false }),
+  description: () => screen.getByLabelText("Description", { exact: false }),
+  topics:      () => screen.getByLabelText("Subjects", { exact: false }),
   submit:      () => screen.getByRole("button", { name: "Save" }),
   cancel:      () => screen.getByRole("button", { name: "Cancel" }),
   delete:      () => screen.getByRole("button", { name: "Yes, delete" })
@@ -157,7 +157,7 @@ describe("Creation", () => {
     await user.click(inputs.submit())
     const alertMessage = await screen.findByRole("alert")
     expect(alertMessage).toHaveTextContent(
-      "There was an error saving your list."
+      "There was a problem saving your list."
     )
     expect(onClose).not.toHaveBeenCalled()
   })
@@ -269,7 +269,7 @@ describe("Editing", () => {
     setMockResponse.post(lrUrls.updateUserList(resource.id), {}, { code: 408 })
     const alertMessage = await screen.findByRole("alert")
     expect(alertMessage).toHaveTextContent(
-      "There was an error saving your list."
+      "There was a problem saving your list."
     )
     expect(onClose).not.toHaveBeenCalled()
   })

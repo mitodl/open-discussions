@@ -1,13 +1,8 @@
 import React, { useCallback } from "react"
 import { useFormik, FormikConfig } from "formik"
-import Dialog from "@mui/material/Dialog"
-import DialogActions from "@mui/material/DialogActions"
-import DialogContent from "@mui/material/DialogContent"
-import DialogTitle from "@mui/material/DialogTitle"
-import Button from "@mui/material/Button"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
-import { RadioChoiceField } from "ol-forms"
+import { RadioChoiceField, FormDialog } from "ol-forms"
 import {
   UserList,
   LearningResourceType as LRType,
@@ -20,7 +15,6 @@ import {
   useUpdateUserList
 } from "../../api/learning-resources"
 import Alert from "@mui/material/Alert"
-import Divider from "@mui/material/Divider"
 
 type ListFormSchema = Pick<
   UserList,
@@ -93,13 +87,17 @@ const PRIVACY_CHOICES = [
   }
 ]
 
-interface UpsertListFormProps {
+interface UpsertListDialogProps {
+  title: string
+  open: boolean
   resource?: UserList | null
   onClose: () => void
 }
-const UpsertListForm: React.FC<UpsertListFormProps> = ({
+const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
   resource,
-  onClose
+  open,
+  onClose,
+  title
 }) => {
   const createUserList = useCreateUserList()
   const updateUserList = useUpdateUserList()
@@ -116,6 +114,7 @@ const UpsertListForm: React.FC<UpsertListFormProps> = ({
       [resource, onClose, createUserList, updateUserList]
     )
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues:
       resource ?? (listFormSchema.getDefault() as Partial<ListFormSchema>),
     validationSchema: listFormSchema,
@@ -127,120 +126,95 @@ const UpsertListForm: React.FC<UpsertListFormProps> = ({
   const topicsQuery = useTopics()
   const topics = topicsQuery.data?.results ?? []
   const hasError = createUserList.isError || updateUserList.isError
-  return (
-    <form onSubmit={formik.handleSubmit} className="manage-list-form">
-      <DialogContent>
-        <RadioChoiceField
-          className="form-row"
-          name="list_type"
-          label="List Type"
-          choices={LIST_TYPE_CHOICES}
-          value={formik.values.list_type}
-          row
-          onChange={formik.handleChange}
-        />
-        <RadioChoiceField
-          className="form-row"
-          name="privacy_level"
-          label="Privacy"
-          choices={PRIVACY_CHOICES}
-          value={formik.values.privacy_level}
-          row
-          onChange={formik.handleChange}
-        />
-        <TextField
-          className="form-row"
-          name="title"
-          label="Title"
-          placeholder="List Title"
-          value={formik.values.title}
-          error={!!formik.errors.title}
-          helperText={formik.errors.title}
-          onChange={formik.handleChange}
-          {...variantProps}
-          fullWidth
-        />
-        <TextField
-          className="form-row"
-          label="Description"
-          name="short_description"
-          placeholder="List Description"
-          value={formik.values.short_description}
-          error={!!formik.errors.short_description}
-          helperText={formik.errors.short_description}
-          onChange={formik.handleChange}
-          {...variantProps}
-          fullWidth
-          multiline
-          minRows={3}
-        />
-        <Autocomplete
-          className="form-row"
-          multiple
-          options={topics}
-          isOptionEqualToValue={(option, value) => option.id === value.id}
-          getOptionLabel={option => option.name}
-          value={formik.values.topics}
-          onChange={(_event, value) => formik.setFieldValue("topics", value)}
-          renderInput={params => (
-            <TextField
-              {...params}
-              {...variantProps}
-              error={!!formik.errors.topics}
-              helperText={formik.errors.topics}
-              label="Subjects"
-              name="topics"
-              placeholder={
-                formik.values.topics?.length ?
-                  undefined :
-                  "Pick 1 to 3 subjects"
-              }
-            />
-          )}
-        />
-      </DialogContent>
-      <Divider />
-      <DialogActions>
-        <Button variant="outlined" color="secondary" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          type="submit"
-          disabled={formik.isSubmitting}
-        >
-          Save
-        </Button>
-      </DialogActions>
-      {hasError && !formik.isSubmitting && (
-        <DialogContent>
-          <Alert severity="error">
-            There was an error saving your list. Please try again.
-          </Alert>
-        </DialogContent>
-      )}
-    </form>
-  )
-}
 
-interface UpsertListDialogProps {
-  title: string
-  open: boolean
-  resource?: UserList | null
-  onClose: () => void
-}
-const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
-  resource,
-  open,
-  onClose,
-  title
-}) => {
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>{title}</DialogTitle>
-      <Divider />
-      <UpsertListForm resource={resource} onClose={onClose} />
-    </Dialog>
+    <FormDialog
+      open={open}
+      title={title}
+      formClassName="manage-list-form"
+      onClose={onClose}
+      onReset={formik.resetForm}
+      onSubmit={formik.handleSubmit}
+      noValidate
+      footerContent={
+        hasError &&
+        !formik.isSubmitting && (
+          <Alert severity="error">
+            There was a problem saving your list. Please try again later.
+          </Alert>
+        )
+      }
+    >
+      <RadioChoiceField
+        className="form-row"
+        name="list_type"
+        label="List Type"
+        choices={LIST_TYPE_CHOICES}
+        value={formik.values.list_type}
+        row
+        onChange={formik.handleChange}
+      />
+      <RadioChoiceField
+        className="form-row"
+        name="privacy_level"
+        label="Privacy"
+        choices={PRIVACY_CHOICES}
+        value={formik.values.privacy_level}
+        row
+        onChange={formik.handleChange}
+      />
+      <TextField
+        required
+        className="form-row"
+        name="title"
+        label="Title"
+        placeholder="List Title"
+        value={formik.values.title}
+        error={!!formik.errors.title}
+        helperText={formik.errors.title}
+        onChange={formik.handleChange}
+        {...variantProps}
+        fullWidth
+      />
+      <TextField
+        required
+        className="form-row"
+        label="Description"
+        name="short_description"
+        placeholder="List Description"
+        value={formik.values.short_description}
+        error={!!formik.errors.short_description}
+        helperText={formik.errors.short_description}
+        onChange={formik.handleChange}
+        {...variantProps}
+        fullWidth
+        multiline
+        minRows={3}
+      />
+      <Autocomplete
+        className="form-row"
+        multiple
+        options={topics}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        getOptionLabel={option => option.name}
+        value={formik.values.topics}
+        onChange={(_event, value) => formik.setFieldValue("topics", value)}
+        renderInput={params => (
+          <TextField
+            {...params}
+            {...variantProps}
+            required
+            error={!!formik.errors.topics}
+            helperText={formik.errors.topics}
+            label="Subjects"
+            name="topics"
+            placeholder={
+              formik.values.topics?.length ? undefined : "Pick 1 to 3 subjects"
+            }
+          />
+        )}
+      />
+    </FormDialog>
   )
 }
 
