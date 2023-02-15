@@ -183,6 +183,10 @@ def digest_ocw_next_course(course_json, last_modified, uid, url_path):
 
         run_slug = url_path.strip("/")
 
+        image_src = course_json.get("image_src")
+        if image_src is not None:
+            image_src = urljoin(settings.OCW_NEXT_BASE_URL, image_src)
+
         run_serializer = LearningResourceRunSerializer(
             data={
                 "platform": PlatformType.ocw.value,
@@ -196,7 +200,7 @@ def digest_ocw_next_course(course_json, last_modified, uid, url_path):
                 "semester": course_json.get("term"),
                 "availability": AvailabilityType.current.value,
                 "image": {
-                    "src": course_json.get("image_src"),
+                    "src": image_src,
                     "description": course_json.get("course_image_metadata", {}).get(
                         "description"
                     ),
