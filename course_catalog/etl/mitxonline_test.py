@@ -11,7 +11,10 @@ import pytest
 from course_catalog.constants import PlatformType
 from course_catalog.etl import mitxonline
 from course_catalog.etl.mitxonline import _parse_datetime, parse_page_attribute
-from course_catalog.etl.utils import UCC_TOPIC_MAPPINGS
+from course_catalog.etl.utils import (
+    UCC_TOPIC_MAPPINGS,
+    extract_valid_department_from_id,
+)
 from open_discussions.test_utils import any_instance_of
 
 pytestmark = pytest.mark.django_db
@@ -135,6 +138,9 @@ def test_mitxonline_transform_programs(mock_mitxonline_programs_data):
                 {
                     "course_id": course_data["readable_id"],
                     "platform": PlatformType.mitxonline.value,
+                    "department": extract_valid_department_from_id(
+                        course_data["readable_id"]
+                    ),
                     "title": course_data["title"],
                     "image_src": parse_page_attribute(
                         course_data, "feature_image_src", is_url=True
@@ -219,6 +225,7 @@ def test_mitxonline_transform_courses(settings, mock_mitxonline_courses_data):
         {
             "course_id": course_data["readable_id"],
             "platform": PlatformType.mitxonline.value,
+            "department": extract_valid_department_from_id(course_data["readable_id"]),
             "title": course_data["title"],
             "image_src": parse_page_attribute(
                 course_data, "feature_image_src", is_url=True
