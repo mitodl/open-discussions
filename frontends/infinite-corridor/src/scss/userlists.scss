@@ -33,3 +33,12 @@
     }
   }
 }
+
+.add-to-list-dialog {
+  .MuiDialog-paper {
+    width: 325px;
+  }
+  .resource-title-inline {
+    font-style: italic
+  }
+}

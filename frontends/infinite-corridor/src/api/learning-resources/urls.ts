@@ -66,9 +66,10 @@ const userListUrls = {
   create:  userListApi.toString(),
   listing: (options: UserListOptions = {}) =>
     userListApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  itemsListing: (id: number, options: PaginationSearchParams = {}) =>
+  itemAdd:      (listId: number) => userListItemsApiU.param({ id: listId }).toString(),
+  itemsListing: (listId: number, options: PaginationSearchParams = {}) =>
     userListItemsApiU
-      .param({ id, ...DEFAULT_PAGINATION_PARAMS, ...options })
+      .param({ id: listId, ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
   itemDetails: (id: number, itemId: number) =>
     userListItemsDetailApi.param({ id, itemId }).toString()
