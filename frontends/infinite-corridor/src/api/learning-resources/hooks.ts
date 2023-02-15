@@ -2,7 +2,9 @@ import type {
   LearningResource,
   PaginatedUserListItems,
   UserList,
-  CourseTopic
+  CourseTopic,
+  LearningResourceType,
+  ListItemMember,
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
 import axios from "../../libs/axios"
@@ -10,7 +12,7 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryResult
+  UseQueryResult,
 } from "react-query"
 import { urls, keys, UserListOptions } from "./urls"
 
@@ -114,6 +116,64 @@ const useDeleteUserList = () => {
   })
 }
 
+type AddToUserListPayload = {
+  object_id: number
+  content_type: LearningResourceType
+}
+const addToUserList = async ({
+  userListId,
+  payload
+}: { userListId: number, payload: AddToUserListPayload }): Promise<ListItemMember & { content_data: LearningResource }> => {
+  const { data: response } = await axios.post(urls.userList.itemAdd(userListId), payload)
+  return response
+}
+const useAddToUserListItems = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: addToUserList,
+    // Skip optimistic updates for now. We do not know the list item id.
+    onSuccess:  (data, variables) => {
+      const resource = data.content_data
+      queryClient.setQueryData(keys.resource(resource.object_type).id(resource.id).details, resource)
+      queryClient.invalidateQueries({ queryKey: keys.userList.id(variables.userListId).all })
+      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+    },
+  })
+}
+
+const deleteFromUserListItems = async (item: ListItemMember): Promise<void> => {
+  await axios.delete(urls.userList.itemDetails(item.list_id, item.item_id))
+}
+const useDeleteFromUserListItems = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteFromUserListItems,
+    onMutate:   vars => {
+      const resourceKey = keys.resource(vars.content_type).id(vars.object_id).details
+      const previousResource = queryClient.getQueryData<LearningResource>(resourceKey)
+      console.log("previousResource", previousResource)
+      if (previousResource) {
+        const newResource: LearningResource = {
+          ...previousResource,
+          lists: previousResource.lists.filter(member => member.item_id !== vars.item_id)
+        }
+        queryClient.setQueryData(resourceKey, newResource)
+      }
+      const rollback = () => {
+        queryClient.setQueryData(resourceKey, previousResource)
+      }
+      return { rollback }
+    },
+    onError: (_error, _var, context) => {
+      context?.rollback()
+    },
+    onSettled: (_data, _error, vars) => {
+      queryClient.invalidateQueries(keys.resource(vars.content_type).id(vars.object_id).details)
+      queryClient.invalidateQueries(keys.userList.id(vars.list_id).all)
+    }
+  })
+}
+
 export {
   useResource,
   useUserListItems,
@@ -123,5 +183,7 @@ export {
   useTopics,
   useCreateUserList,
   useUpdateUserList,
-  useDeleteUserList
+  useDeleteUserList,
+  useAddToUserListItems,
+  useDeleteFromUserListItems
 }

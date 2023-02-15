@@ -123,7 +123,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
     validateOnBlur:   false
   })
 
-  const topicsQuery = useTopics()
+  const topicsQuery = useTopics({ enabled: open })
   const topics = topicsQuery.data?.results ?? []
   const hasError = createUserList.isError || updateUserList.isError
 

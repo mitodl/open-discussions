@@ -2,6 +2,9 @@ import React from "react"
 import { LearningResourceCard, type PaginatedUserListItems } from "ol-search-ui"
 import { useActivateResourceDrawer } from "../LearningResourceDrawer"
 import { imgConfigs } from "../../util/constants"
+import IconButton from "@mui/material/IconButton"
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder'
+import AddToListDialog, { useAddToListDialog } from "./AddToListDialog"
 
 type UserListItemsProps = {
   isLoading: boolean
@@ -14,6 +17,7 @@ const UserListItems: React.FC<UserListItemsProps> = ({
   data,
   emptyMessage
 }) => {
+  const addToList = useAddToListDialog()
   const activateResource = useActivateResourceDrawer()
   return (
     <>
@@ -32,12 +36,24 @@ const UserListItems: React.FC<UserListItemsProps> = ({
                     resource={list.content_data}
                     imgConfig={imgConfigs["row-reverse"]}
                     onActivate={activateResource}
+                    footerActionSlot={
+                      <IconButton onClick={() => addToList.open(list.content_data)}>
+                        <BookmarkBorderIcon />
+                      </IconButton>
+                    }
                   />
                 </li>
               )
             })}
           </ul>
         ))}
+      {addToList.ressourceKey && (
+        <AddToListDialog
+          resourceKey={addToList.ressourceKey}
+          onClose={addToList.close}
+          open={addToList.isOpen}
+        />
+      )}
     </>
   )
 }
