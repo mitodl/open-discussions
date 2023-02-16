@@ -8,7 +8,9 @@ import {
 import * as factory from "../../api/fields/factories"
 import { FieldChannel, urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
-import { urls as lrUrls } from "../../api/learning-resources"
+import {
+  urls as lrUrls
+} from "../../api/learning-resources"
 import { waitFor } from "@testing-library/react"
 import { makeFieldViewPath } from "../urls"
 import { makeWidgetListResponse } from "ol-widgets/build/factories"

@@ -1,6 +1,8 @@
 import { faker } from "@faker-js/faker"
 import * as factories from "ol-search-ui/build/factories"
-import { urls as lrUrls } from "../../api/learning-resources"
+import {
+  urls as lrUrls
+} from "../../api/learning-resources"
 import {
   screen,
   renderTestApp,
