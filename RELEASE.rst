@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.207.0
+---------------
+
+- Assign department to MITX Online, MITx, and OLL courses (#3837)
+- Move userlist types out of fields, update TS (#3831)
+
 Version 0.206.0 (Released February 13, 2023)
 ---------------
 
