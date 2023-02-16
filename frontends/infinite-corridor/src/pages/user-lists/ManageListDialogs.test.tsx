@@ -57,7 +57,7 @@ const inputs = {
 describe("Creation", () => {
   const setup = () => {
     const topics = factories.makeTopicsPaginated(5)
-    setMockResponse.get(lrUrls.topics(), topics)
+    setMockResponse.get(lrUrls.topics.listing, topics)
     const onClose = jest.fn()
     renderWithProviders(<CreateListDialog open={true} onClose={onClose} />)
     return { topics, onClose }
@@ -89,10 +89,10 @@ describe("Creation", () => {
     await fillInForm(userList)
 
     expect(onClose).not.toHaveBeenCalled()
-    setMockResponse.post(lrUrls.createUserList(), userList)
+    setMockResponse.post(lrUrls.userList.create, userList)
     await user.click(inputs.submit())
     expect(axios.post).toHaveBeenCalledWith(
-      lrUrls.createUserList(),
+      lrUrls.userList.create,
       pick(userList, [
         "title",
         "list_type",
@@ -153,7 +153,7 @@ describe("Creation", () => {
     })
 
     await fillInForm(userList)
-    setMockResponse.post(lrUrls.createUserList(), {}, { code: 408 })
+    setMockResponse.post(lrUrls.userList.listing(), {}, { code: 408 })
     await user.click(inputs.submit())
     const alertMessage = await screen.findByRole("alert")
     expect(alertMessage).toHaveTextContent(
@@ -169,7 +169,7 @@ describe("Editing", () => {
     topicsCount = 1
   ) => {
     const topics = factories.makeTopicsPaginated(5)
-    setMockResponse.get(lrUrls.topics(), topics)
+    setMockResponse.get(lrUrls.topics.listing, topics)
     const resource = factories.makeUserList({
       ...resourceOverrides,
       topics: faker.helpers.arrayElements(topics.results, topicsCount)
@@ -202,11 +202,11 @@ describe("Editing", () => {
     await user.paste(updatedResource.short_description)
 
     expect(onClose).not.toHaveBeenCalled()
-    setMockResponse.patch(lrUrls.updateUserList(resource.id), updatedResource)
+    setMockResponse.patch(lrUrls.userList.details(resource.id), updatedResource)
     await user.click(inputs.submit())
 
     expect(axios.patch).toHaveBeenCalledWith(
-      lrUrls.updateUserList(resource.id),
+      lrUrls.userList.details(resource.id),
       updatedResource
     )
     expect(onClose).toHaveBeenCalled()
@@ -266,7 +266,11 @@ describe("Editing", () => {
     await user.paste("New title")
 
     await user.click(inputs.submit())
-    setMockResponse.post(lrUrls.updateUserList(resource.id), {}, { code: 408 })
+    setMockResponse.patch(
+      lrUrls.userList.details(resource.id),
+      {},
+      { code: 408 }
+    )
     const alertMessage = await screen.findByRole("alert")
     expect(alertMessage).toHaveTextContent(
       "There was a problem saving your list."
@@ -289,11 +293,11 @@ describe("Deleting lists", () => {
     const { resource, onClose } = setup()
 
     expect(onClose).not.toHaveBeenCalled()
-    setMockResponse.delete(lrUrls.deleteUserList(resource.id), undefined)
+    setMockResponse.delete(lrUrls.userList.details(resource.id), undefined)
     await user.click(inputs.delete())
 
     expect(axios.delete).toHaveBeenCalledWith(
-      lrUrls.deleteUserList(resource.id)
+      lrUrls.userList.details(resource.id)
     )
     expect(onClose).toHaveBeenCalled()
   })

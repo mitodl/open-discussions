@@ -82,9 +82,9 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   })
 
   setMockResponse.get(urls.fieldDetails(field.name), field)
-  setMockResponse.get(lrUrls.userListItems(list1.id), items1)
-  setMockResponse.get(lrUrls.userListItems(list2.id), items2)
-  setMockResponse.get(lrUrls.userListItems(list3.id), items3)
+  setMockResponse.get(lrUrls.userList.itemsListing(list1.id), items1)
+  setMockResponse.get(lrUrls.userList.itemsListing(list2.id), items2)
+  setMockResponse.get(lrUrls.userList.itemsListing(list3.id), items3)
 
   const widgetsList = makeWidgetListResponse()
   setMockResponse.get(widgetUrls.widgetList(field.widget_list), widgetsList)
@@ -114,7 +114,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   )
 
   Object.values(resources).forEach(r => {
-    setMockResponse.get(lrUrls.resourceDetails(r.object_type, r.id), r)
+    setMockResponse.get(lrUrls.resource.details(r.object_type, r.id), r)
   })
 
   return {

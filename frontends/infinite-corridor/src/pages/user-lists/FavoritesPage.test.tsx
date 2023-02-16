@@ -31,7 +31,7 @@ describe("FavoritesPage", () => {
     const favorites = factories.makeFavorites(
       itemsCount ?? faker.datatype.number({ min: 2, max: 5 })
     )
-    setMockResponse.get(lrUrls.favoritesListing(), favorites)
+    setMockResponse.get(lrUrls.favorite.listing(), favorites)
 
     const { history } = renderTestApp({ url: `/lists/favorites` })
     return { history, favorites }

@@ -16,7 +16,7 @@ import { makeWidgetListResponse } from "ol-widgets/build/factories"
 const setupApis = (fieldOverrides?: Partial<FieldChannel>) => {
   const field = factory.makeField({ is_moderator: true, ...fieldOverrides })
   setMockResponse.get(urls.fieldDetails(field.name), field)
-  setMockResponse.get(lrUrls.userListsListing({ public: true }), [field])
+  setMockResponse.get(lrUrls.userList.listing({ public: true }), [field])
   setMockResponse.get(
     widgetUrls.widgetList(field.widget_list),
     makeWidgetListResponse({}, { count: 0 })

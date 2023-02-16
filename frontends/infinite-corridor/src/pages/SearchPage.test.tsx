@@ -1,7 +1,7 @@
 import { when } from "jest-when"
 import { faker } from "@faker-js/faker"
 
-import { urls as resourceUrls } from "../api/learning-resources"
+import { urls as lrUrls } from "../api/learning-resources"
 
 import {
   makeLearningResource,
@@ -259,7 +259,7 @@ describe("SearchPage", () => {
       object_type: results.hits.hits[i]._source.object_type
     })
     setMockResponse.get(
-      resourceUrls.resourceDetails(resource.object_type, resource.id),
+      lrUrls.resource.details(resource.object_type, resource.id),
       resource
     )
 
