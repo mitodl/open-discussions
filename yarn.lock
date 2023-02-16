@@ -6342,6 +6342,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/url-assembler@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@types/url-assembler@npm:2.1.1"
+  dependencies:
+    "@types/qs": "*"
+  checksum: c2361a6b5161049a338738e9da81f9a0e325e02548b180bf2230fd5b9e600e6fc6428e97416a7fba588c80f8d2d509a68b70e459bfd27dc9272da86074b99703
+  languageName: node
+  linkType: hard
+
 "@types/validator@npm:^13.7.6":
   version: 13.7.6
   resolution: "@types/validator@npm:13.7.6"
@@ -12922,6 +12931,7 @@ __metadata:
     "@types/react-dom": ^18.0.5
     "@types/react-router": ^5.1.18
     "@types/react-router-dom": ^5.3.3
+    "@types/url-assembler": ^2.1.1
     axios: ^0.27.2
     css-loader: ^6.7.1
     lodash: ^4.17.21
@@ -12940,6 +12950,7 @@ __metadata:
     style-loader: ^3.3.1
     styled-components: ^5.3.5
     swc-loader: ^0.2.3
+    url-assembler: ^2.1.1
     webpack: ^5.71.0
     webpack-bundle-analyzer: ^4.6.1
     webpack-bundle-tracker: ^1.4.0
@@ -17094,7 +17105,7 @@ __metadata:
     style-loader: 3.3.1
     styled-components: ^5.3.5
     url: 0.11.0
-    url-assembler: 2.1.0
+    url-assembler: ^2.1.1
     uuid: ^8.3.2
     validator: 13.7.0
     webpack: 5.73.0
@@ -22975,13 +22986,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-assembler@npm:2.1.0":
-  version: 2.1.0
-  resolution: "url-assembler@npm:2.1.0"
+"url-assembler@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "url-assembler@npm:2.1.1"
   dependencies:
     extend: ^2.0.2
     qs: ^6.5.1
-  checksum: c1780a9459d1f8d8f085d9f08c0229e045b721ee75a23a36d78e64b890a6faa9d175a174e7f00df89a6ab8748131f33d08d7fc9874b2fb17e36a01a8be461561
+  checksum: 72bf50d7a96c17d9ce54f9e5efcd91e89cb71556fc9d78ea076862818632187d21c382e5204532734b55589a9c4d1b99ffb831088122cd62c3eadb6f9c430d9d
   languageName: node
   linkType: hard
 

@@ -51,9 +51,9 @@ describe("UserListsListingPage", () => {
       ...userLists.results,
       ...favorites.results.map(fav => fav.content_data)
     ].flatMap(list => list.topics)
-    setMockResponse.get(lrUrls.favoritesListing(), favorites)
-    setMockResponse.get(lrUrls.userListsListing(), userLists)
-    setMockResponse.get(lrUrls.topics(), topics)
+    setMockResponse.get(lrUrls.favorite.listing(), favorites)
+    setMockResponse.get(lrUrls.userList.listing(), userLists)
+    setMockResponse.get(lrUrls.topics.listing, topics)
     const { history } = renderWithProviders(<UserListsListingPage />, {
       url: "/lists"
     })

@@ -15,8 +15,8 @@ import {
 import { urls, keys, UserListOptions } from "./urls"
 
 const useResource = (type: string, id: number) => {
-  const url = urls.resourceDetails(type, id)
-  const key = keys.resourceDetails(type, id)
+  const url = urls.resource.details(type, id)
+  const key = keys.resource(type).id(id).details
   return useQuery<LearningResource>(key, () =>
     axios.get(url).then(res => res.data)
   )
@@ -26,34 +26,40 @@ const useUserList = (id: number) => {
 }
 
 const useUserListsListing = (options?: UserListOptions) => {
-  const url = urls.userListsListing(options)
-  const key = keys.userListsListing(options)
+  const url = urls.userList.listing(options)
+  const key = keys.userList.listing.page(options)
   return useQuery<PaginatedResult<UserList>>(key, () =>
     axios.get(url).then(res => res.data)
   )
 }
 
 const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
-  return useQuery<PaginatedUserListItems>(urls.userListItems(listId, options))
+  const key = keys.userList.id(listId).itemsListing(options)
+  const url = urls.userList.itemsListing(listId, options)
+  return useQuery<PaginatedUserListItems>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
 }
 
 const useFavorites = (options?: PaginationSearchParams) => {
-  const url = urls.favoritesListing(options)
-  const key = keys.favoritesListing(options)
+  const url = urls.favorite.listing(options)
+  const key = keys.favorites.listing.page(options)
   return useQuery<PaginatedUserListItems>(key, () =>
     axios.get(url).then(res => res.data)
   )
 }
 
 const useTopics = () => {
-  return useQuery<PaginatedResult<CourseTopic>>(urls.topics())
+  const key = keys.topics
+  const url = urls.topics.listing
+  return useQuery<PaginatedResult<CourseTopic>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
 }
 
 const updateUserList = async (data: Partial<UserList> & { id: number }) => {
-  const { data: response } = await axios.patch(
-    urls.updateUserList(data.id),
-    data
-  )
+  const url = urls.userList.details(data.id)
+  const { data: response } = await axios.patch(url, data)
   return response
 }
 const useUpdateUserList = () => {
@@ -61,17 +67,18 @@ const useUpdateUserList = () => {
   return useMutation(updateUserList, {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: keys.userListDetails(variables.id)
+        queryKey: keys.userList.id(variables.id).details
       })
       queryClient.invalidateQueries({
-        queryKey: keys.userListsListing()
+        queryKey: keys.userList.listing.all
       })
     }
   })
 }
 
 const createUserList = async (data: Partial<UserList>) => {
-  const { data: response } = await axios.post(urls.createUserList(), data)
+  const url = urls.userList.create
+  const { data: response } = await axios.post(url, data)
   return response
 }
 const useCreateUserList = () => {
@@ -79,14 +86,14 @@ const useCreateUserList = () => {
   return useMutation(createUserList, {
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: keys.userListsListing()
+        queryKey: keys.userList.listing.all
       })
     }
   })
 }
 
 const deleteUserList = async (id: number) => {
-  const { data: response } = await axios.delete(urls.deleteUserList(id))
+  const { data: response } = await axios.delete(urls.userList.details(id))
   return response
 }
 const useDeleteUserList = () => {
@@ -94,7 +101,14 @@ const useDeleteUserList = () => {
   return useMutation(deleteUserList, {
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: keys.userListsListing()
+        /**
+         * Invalid everything related to learning resources, since any resource
+         * could have belonged to this list.
+         *
+         * This is a little bit overzealous, e.g., we do not really need to
+         * invalidate topics and favorites.
+         */
+        queryKey: keys.all
       })
     }
   })

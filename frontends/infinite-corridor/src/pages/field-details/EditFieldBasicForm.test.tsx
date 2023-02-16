@@ -7,7 +7,6 @@ import { urls as lrUrls } from "../../api/learning-resources"
 import * as factory from "../../api/fields/factories"
 import * as resourceFactory from "ol-search-ui/src/factories"
 import type { UserList } from "ol-search-ui"
-import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
 import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
 import { makeWidgetListResponse } from "ol-widgets/src/factories"
@@ -18,9 +17,7 @@ describe("EditFieldBasicForm", () => {
   beforeEach(() => {
     publicLists = resourceFactory.makeUserListsPaginated(5)
     setMockResponse.get(
-      lrUrls.userListsListing({
-        limit:  DEFAULT_PAGE_SIZE,
-        offset: 0,
+      lrUrls.userList.listing({
         public: true
       }),
       publicLists
@@ -31,19 +28,19 @@ describe("EditFieldBasicForm", () => {
       lists:         publicLists.results.slice(0, 3)
     })
     setMockResponse.get(
-      lrUrls.userListItems(publicLists.results[0].id),
+      lrUrls.userList.itemsListing(publicLists.results[0].id),
       resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      lrUrls.userListItems(publicLists.results[1].id),
+      lrUrls.userList.itemsListing(publicLists.results[1].id),
       resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      lrUrls.userListItems(publicLists.results[2].id),
+      lrUrls.userList.itemsListing(publicLists.results[2].id),
       resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(
-      lrUrls.userListItems(publicLists.results[4].id),
+      lrUrls.userList.itemsListing(publicLists.results[4].id),
       resourceFactory.makeUserListItemsPaginated(2)
     )
     setMockResponse.get(urls.fieldDetails(field.name), field)

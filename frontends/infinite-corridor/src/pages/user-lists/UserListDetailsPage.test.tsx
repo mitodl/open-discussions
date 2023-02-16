@@ -47,9 +47,12 @@ describe("UserListDetailsPage", () => {
       ...userList.topics,
       ...factories.makeTopicsPaginated(3).results
     ]
-    setMockResponse.get(lrUrls.userListDetails(userList.id), userList)
-    setMockResponse.get(lrUrls.userListItems(userList.id), paginatedItems)
-    setMockResponse.get(lrUrls.topics(), topics)
+    setMockResponse.get(lrUrls.userList.details(userList.id), userList)
+    setMockResponse.get(
+      lrUrls.userList.itemsListing(userList.id),
+      paginatedItems
+    )
+    setMockResponse.get(lrUrls.topics.listing, topics)
 
     const { history } = renderTestApp({ url: `/lists/${userList.id}` })
     return { history, userList, items }
