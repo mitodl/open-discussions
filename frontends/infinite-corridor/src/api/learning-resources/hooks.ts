@@ -104,7 +104,7 @@ const useDeleteUserList = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         /**
-         * Invalid everything related to learning resources, since any resource
+         * Invalidate everything related to learning resources, since any resource
          * could have belonged to this list.
          *
          * This is a little bit overzealous, e.g., we do not really need to
@@ -136,6 +136,7 @@ const useAddToUserListItems = () => {
       const resource = data.content_data
       queryClient.setQueryData(keys.resource(resource.object_type).id(resource.id).details, resource)
       queryClient.invalidateQueries({ queryKey: keys.userList.id(variables.userListId).all })
+      // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
     },
   })
@@ -151,7 +152,6 @@ const useDeleteFromUserListItems = () => {
     onMutate:   vars => {
       const resourceKey = keys.resource(vars.content_type).id(vars.object_id).details
       const previousResource = queryClient.getQueryData<LearningResource>(resourceKey)
-      console.log("previousResource", previousResource)
       if (previousResource) {
         const newResource: LearningResource = {
           ...previousResource,
@@ -170,6 +170,8 @@ const useDeleteFromUserListItems = () => {
     onSettled: (_data, _error, vars) => {
       queryClient.invalidateQueries(keys.resource(vars.content_type).id(vars.object_id).details)
       queryClient.invalidateQueries(keys.userList.id(vars.list_id).all)
+      // The listing response includes item counts, which have changed
+      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
     }
   })
 }
