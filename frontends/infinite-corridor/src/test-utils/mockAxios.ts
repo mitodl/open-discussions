@@ -97,7 +97,14 @@ const setMockResponse = {
     url: string,
     responseBody: unknown,
     { code = 204, requestBody }: MockResponseOptions = {}
-  ) => mockRequest("delete", url, requestBody, responseBody, code)
+  ) => mockRequest("delete", url, requestBody, responseBody, code),
+  /**
+   * Set a custom fallback implementation when no responses have been specified.
+   *
+   * If no custom fallback is specified, unmocked responses will result in an
+   * error.
+   */
+  defaultImplementation: when(makeRequest).defaultImplementation
 }
 
 const resetApi = () => {

@@ -13,7 +13,8 @@ import {
   Course,
   UserList,
   UserListItem,
-  PrivacyLevel
+  PrivacyLevel,
+  ListItemMember
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -256,6 +257,17 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
     ...overrides
   }
   return item
+}
+
+export const makeListItemMember: Factory<ListItemMember> = overrides => {
+  return {
+    id:           faker.unique(faker.datatype.number),
+    list_id:      faker.unique(faker.datatype.number),
+    item_id:      faker.unique(faker.datatype.number),
+    object_id:    faker.unique(faker.datatype.number),
+    content_type: faker.helpers.arrayElement(Object.values(LearningResourceType)),
+    ...overrides
+  }
 }
 
 export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
