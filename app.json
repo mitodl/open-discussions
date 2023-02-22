@@ -118,6 +118,10 @@
     "ELASTICSEARCH_HTTP_AUTH": {
       "description": "Basic auth settings for connecting to Elasticsearch"
     },
+    "ELASTICSEARCH_CONNECTIONS_PER_NODE": {
+      "description": "The size of the connection pool created for each node detected within an ElasticSearch cluster.",
+      "required": false
+    },
     "ELASTICSEARCH_INDEX": {
       "description": "Index to use on Elasticsearch",
       "required": true
