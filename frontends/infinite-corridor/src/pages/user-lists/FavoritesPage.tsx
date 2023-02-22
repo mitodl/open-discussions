@@ -1,12 +1,12 @@
 import React from "react"
 import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useFavorites } from "../../api/learning-resources"
+import { useFavoritesListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import UserListItems from "./ItemsListing"
 
 const FavoritesPage: React.FC = () => {
-  const favoritesQuery = useFavorites()
+  const favoritesQuery = useFavoritesListing()
 
   return (
     <BannerPage
