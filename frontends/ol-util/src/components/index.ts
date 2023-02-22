@@ -28,3 +28,5 @@ export { EmbedlyCard } from "./embedly"
 export { NotFound, NotAuthorized } from "./ErrorPage"
 
 export { default as MetaTags } from "./MetaTags"
+
+export { default as LoadingSpinner } from "./LoadingSpinner"
