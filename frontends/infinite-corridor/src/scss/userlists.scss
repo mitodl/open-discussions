@@ -40,3 +40,21 @@
     font-style: italic
   }
 }
+
+.add-to-list-description {
+  &.MuiDialogContent-root {
+    padding-bottom: 0px;
+  }
+}
+.add-to-list-listing {
+  &.MuiDialogContent-root {
+    padding: 0px;
+  }
+  .MuiListItem-root {
+    padding: 0px;
+  }
+  .MuiListItemButton-root {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+}
