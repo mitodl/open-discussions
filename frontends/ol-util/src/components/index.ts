@@ -23,3 +23,5 @@ export type {
 export { EmbedlyCard } from "./embedly"
 
 export { default as MetaTags } from "./MetaTags"
+
+export { default as LoadingSpinner } from "./LoadingSpinner"
