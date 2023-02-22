@@ -50,10 +50,10 @@
   &.MuiDialogContent-root {
     padding: 0px;
   }
-  .MuiListItem-root {
+  .MuiListItem-root:not(.add-to-list-new) {
     padding: 0px;
   }
-  .MuiListItemButton-root {
+  .MuiListItemButton-root:not(.add-to-list-new) {
     padding-top: 0px;
     padding-bottom: 0px;
   }

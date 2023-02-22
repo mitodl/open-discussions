@@ -12,7 +12,9 @@ const courseDetailsApi = courseApi.segment(":id/")
 const courseUrls = {
   details: (id: number) => courseDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
-    courseApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString()
+    courseApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
+  favorite:   (id: number) => courseDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => courseDetailsApi.segment("unfavorite/").param({ id }).toString(),
 }
 
 const programApi = UrlAssembler("/programs/")
@@ -20,7 +22,9 @@ const programDetailsApi = programApi.segment(":id/")
 const programUrls = {
   details: (id: number) => programDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
-    programApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString()
+    programApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
+  favorite:   (id: number) => programDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => programDetailsApi.segment("unfavorite/").param({ id }).toString(),
 }
 
 const videoApi = UrlAssembler("/videos/")
@@ -28,7 +32,9 @@ const videoDetailsApi = videoApi.segment(":id/")
 const videoUrls = {
   details: (id: number) => videoDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
-    videoApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString()
+    videoApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
+  favorite:   (id: number) => videoDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => videoDetailsApi.segment("unfavorite/").param({ id }).toString(),
 }
 
 const podcastApi = UrlAssembler("/podcasts/")
@@ -36,7 +42,9 @@ const podcastDetailsApi = podcastApi.segment(":id/")
 const podcastUrls = {
   details: (id: number) => podcastDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
-    podcastApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString()
+    podcastApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
+  favorite:   (id: number) => podcastDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => podcastDetailsApi.segment("unfavorite/").param({ id }).toString(),
 }
 
 const podcastEpisodeApi = UrlAssembler("/podcastepisodes/")
@@ -46,7 +54,9 @@ const podcastEpisodeUrls = {
   listing: (options: PaginationSearchParams = {}) =>
     podcastEpisodeApi
       .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
-      .toString()
+      .toString(),
+  favorite:   (id: number) => podcastEpisodeDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => podcastEpisodeDetailsApi.segment("unfavorite/").param({ id }).toString(),
 }
 
 const favoriteApi = UrlAssembler("/favorites/")
@@ -72,30 +82,40 @@ const userListUrls = {
       .param({ id: listId, ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
   itemDetails: (id: number, itemId: number) =>
-    userListItemsDetailApi.param({ id, itemId }).toString()
+    userListItemsDetailApi.param({ id, itemId }).toString(),
+  favorite:   (id: number) => userListDetailApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) => userListDetailApi.segment("unfavorite/").param({ id }).toString(),
 }
 
-const resourceUrls = {
-  details: (type: string, id: number) => {
-    switch (type) {
-    case LRT.Course:
-      return courseUrls.details(id)
-    case LRT.Program:
-      return programUrls.details(id)
-    case LRT.Video:
-      return videoUrls.details(id)
-    case LRT.Podcast:
-      return podcastUrls.details(id)
-    case LRT.PodcastEpisode:
-      return podcastEpisodeUrls.details(id)
-    case LRT.Userlist:
-      return userListUrls.details(id)
-    case LRT.LearningPath:
-      return userListUrls.details(id) // LearningPaths are handled by UserList api
-    default:
-      throw new Error(`Unknown resource type: ${type}`)
-    }
+type ResourceUrls = {
+  details: (id: number) => string,
+  favorite: (id: number) => string,
+  unfavorite: (id: number) => string
+}
+const getResourceUrls = (type: string): ResourceUrls => {
+  switch (type) {
+  case LRT.Course:
+    return courseUrls
+  case LRT.Program:
+    return programUrls
+  case LRT.Video:
+    return videoUrls
+  case LRT.Podcast:
+    return podcastUrls
+  case LRT.PodcastEpisode:
+    return podcastEpisodeUrls
+  case LRT.Userlist:
+    return userListUrls
+  case LRT.LearningPath:
+    return userListUrls // LearningPaths are handled by UserList api
+  default:
+    throw new Error(`Unknown resource type: ${type}`)
   }
+}
+const resourceUrls = {
+  details:    (type: string, id: number) => getResourceUrls(type).details(id),
+  favorite:   (type: string, id: number) => getResourceUrls(type).favorite(id),
+  unfavorite: (type: string, id: number) => getResourceUrls(type).unfavorite(id)
 }
 
 const topicsUrls = {

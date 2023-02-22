@@ -43,12 +43,49 @@ const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
   )
 }
 
-const useFavorites = (options?: PaginationSearchParams) => {
+const useFavoritesListing = (options?: PaginationSearchParams) => {
   const url = urls.favorite.listing(options)
   const key = keys.favorites.listing.page(options)
   return useQuery<PaginatedUserListItems>(key, () =>
     axios.get(url).then(res => res.data)
   )
+}
+
+const useFavorite = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (resource: LearningResource) => {
+      const url = urls.resource.favorite(resource.object_type, resource.id)
+      return axios.post(url).then(res => res.data)
+    },
+    onSuccess(_data, resource) {
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(resource.object_type).id(resource.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.favorites.listing.all
+      })
+    },
+  }
+  )
+}
+
+const useUnfavorite = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (resource: LearningResource) => {
+      const url = urls.resource.unfavorite(resource.object_type, resource.id)
+      return axios.post(url).then(res => res.data)
+    },
+    onSuccess(_data, resource) {
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(resource.object_type).id(resource.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.favorites.listing.all
+      })
+    },
+  })
 }
 
 const useTopics = () => {
@@ -181,11 +218,13 @@ export {
   useUserListItems,
   useUserList,
   useUserListsListing,
-  useFavorites,
+  useFavoritesListing,
   useTopics,
   useCreateUserList,
   useUpdateUserList,
   useDeleteUserList,
   useAddToUserListItems,
-  useDeleteFromUserListItems
+  useDeleteFromUserListItems,
+  useFavorite,
+  useUnfavorite
 }

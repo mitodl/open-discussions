@@ -14,11 +14,17 @@ import ListItemText from '@mui/material/ListItemText'
 import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
 import Chip from "@mui/material/Chip"
+import AddIcon from '@mui/icons-material/Add'
 
 import { LearningResource, PrivacyLevel, UserList } from "ol-search-ui"
 import { LoadingSpinner } from "ol-util"
 
-import { useAddToUserListItems, useDeleteFromUserListItems, useResource, useUserListsListing } from "../../api/learning-resources"
+import { useAddToUserListItems, useDeleteFromUserListItems, useFavorite, useResource, useUnfavorite, useUserListsListing } from "../../api/learning-resources"
+import {
+  CreateListDialog,
+  useCreationDialog
+} from "./ManageListDialogs"
+
 
 type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
@@ -28,21 +34,84 @@ type AddToListDialogProps =  {
   onClose: () => void
 }
 
+type UserListOrFavorites = UserList | {
+  id: 'favorites'
+  title: string
+  privacy_level: PrivacyLevel
+}
+
 const useRequestRecord = () => {
   const [pending, setPending] = useState<Map<string, "delete" | "add">>(new Map())
-  const key = (resource: LearningResource, userList: UserList) => `${resource.object_type}-${resource.id}-${userList.id}`
-  const get = (resource: LearningResource, userList: UserList) => pending.get(key(resource, userList))
-  const set = (resource: LearningResource, userList: UserList, value: "delete" | "add") => {
-    setPending(current => new Map(current).set(key(resource, userList), value))
+  const key = (resource: LearningResource, list: UserListOrFavorites) => `${resource.object_type}-${resource.id}-${list.id}`
+  const get = (resource: LearningResource, list: UserListOrFavorites) => pending.get(key(resource, list))
+  const set = (resource: LearningResource, list: UserListOrFavorites, value: "delete" | "add") => {
+    setPending(current => new Map(current).set(key(resource, list), value))
   }
-  const clear = (resource: LearningResource, userList: UserList) => {
+  const clear = (resource: LearningResource, list: UserListOrFavorites) => {
     setPending(current => {
       const next = new Map(current)
-      next.delete(key(resource, userList))
+      next.delete(key(resource, list))
       return next
     })
   }
   return { get, set, clear }
+}
+
+const useToggleItemInList = (resource?: LearningResource) => {
+  const requestRecord = useRequestRecord()
+  const addTo = useAddToUserListItems()
+  const deleteFrom = useDeleteFromUserListItems()
+  const favorite = useFavorite()
+  const unfavorite = useUnfavorite()
+  const handleAdd = async (list: UserListOrFavorites) => {
+    if (!resource) return
+    console.log('handling add')
+    console.log('list is', { ...list})
+    try {
+      requestRecord.set(resource, list, "add")
+      if (list.id === "favorites") {
+        await favorite.mutateAsync(resource)
+      } else {
+        await addTo.mutateAsync({
+          userListId: list.id,
+          payload:    { object_id: resource.id, content_type: resource.object_type }
+        })
+      }
+    } finally {
+      requestRecord.clear(resource, list)
+    }
+  }
+  const handleRemove = async (list: UserListOrFavorites) => {
+    if (!resource) return
+    try {
+      requestRecord.set(resource, list, "delete")
+      if (list.id === "favorites") {
+        await unfavorite.mutateAsync(resource)
+      } else {
+        const listItem = resource.lists.find(l => l.list_id === list.id)
+        if (!listItem) return // should not happen
+        await deleteFrom.mutateAsync(listItem)
+      }
+    } finally {
+      requestRecord.clear(resource, list)
+    }
+  }
+
+  const isChecked = (list: UserListOrFavorites): boolean => {
+    if (!resource) return false
+    if (list.id === "favorites") {
+      return !!resource.is_favorite
+    }
+    return resource.lists.some(l => l.list_id === list.id)
+  }
+
+  const isAdding = (list: UserListOrFavorites) => !!resource && requestRecord.get(resource, list) === "add"
+  const isRemoving = (list: UserListOrFavorites) => !!resource && requestRecord.get(resource, list) === "delete"
+
+  const handleToggle = (list: UserListOrFavorites) => async () => {
+    return isChecked(list) ? handleRemove(list) : handleAdd(list)
+  }
+  return { handleToggle, isChecked, isAdding, isRemoving }
 }
 
 const AddToListDialog: React.FC<AddToListDialogProps> = ({
@@ -50,31 +119,17 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
   resourceKey,
   onClose
 }) => {
-  const requestRecord = useRequestRecord()
+  const listCreation = useCreationDialog()
   const resourceQuery = useResource(resourceKey.object_type, resourceKey.id)
   const resource = resourceQuery.data
   const userListsQuery = useUserListsListing()
   const userLists = userListsQuery.data?.results
-  const addTo = useAddToUserListItems()
-  const deleteFrom = useDeleteFromUserListItems()
-  const handleToggle = (userList: UserList) => async () => {
-    if (!resource) return
-    const listItem = resource.lists.find(list => list.list_id === userList.id)
-    try {
-      if (listItem) {
-        requestRecord.set(resource, userList, "delete")
-        await deleteFrom.mutateAsync(listItem)
-      } else {
-        requestRecord.set(resource, userList, "add")
-        await addTo.mutateAsync({
-          userListId: userList.id,
-          payload:    { object_id: resource.id, content_type: resource.object_type }
-        })
-      }
-    } finally {
-      requestRecord.clear(resource, userList)
-    }
-  }
+  const lists: UserListOrFavorites[] = [
+    { id: 'favorites', title: 'Favorites', privacy_level: PrivacyLevel.Private},
+    ...(userLists || []),
+  ]
+
+  const { handleToggle, isChecked, isAdding, isRemoving } = useToggleItemInList(resource)
 
   const isReady = resource && userLists
 
@@ -93,35 +148,47 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
       }
       {isReady && <DialogContent className="add-to-list-listing">
         <List>
-          {userListsQuery?.data?.results.map(userList => {
-            const labelId = `checkbox-list-label-${userList.id}`
-            const isAdding = requestRecord.get(resource, userList) === "add"
-            const isDeleting = requestRecord.get(resource, userList) === "delete"
-            const disabled = isAdding || isDeleting
-            const isChecked = isAdding || resource.lists.some(list => list.list_id === userList.id)
+          {lists.map(list => {
+            const labelId = `checkbox-list-label-${list.id}`
+            const adding = isAdding(list)
+            const removing = isRemoving(list)
+            const disabled = adding || removing
+            const checked = adding || isChecked(list)
             return  (
-              <ListItem key={userList.id} secondaryAction={
-                <PrivacyChip privacyLevel={userList.privacy_level} />
+              <ListItem key={list.id} secondaryAction={
+                <PrivacyChip privacyLevel={list.privacy_level} />
               }>
-                <ListItemButton disabled={disabled} onClick={handleToggle(userList)}>
+                <ListItemButton
+                  aria-disabled={disabled}
+                  onClick={disabled ? undefined : handleToggle(list)}>
                   <Checkbox
                     edge="start"
                     disabled={disabled}
-                    checked={isChecked}
+                    checked={checked}
                     tabIndex={-1}
                     disableRipple
                     inputProps={{ 'aria-labelledby': labelId }}
                   />
-                  <ListItemText id={labelId} primary={userList.title} />
+                  <ListItemText id={labelId} primary={list.title} />
                 </ListItemButton>
               </ListItem>
             )
           })}
+          <ListItem className="add-to-list-new">
+            <ListItemButton onClick={listCreation.handleStart}>
+              <AddIcon />
+              <ListItemText primary="Add new list" />
+            </ListItemButton>
+          </ListItem>
         </List>
       </DialogContent>}
       {!isReady && <DialogContent>
         <LoadingSpinner loading={!isReady} />
       </DialogContent>}
+      <CreateListDialog
+        open={listCreation.isOpen}
+        onClose={listCreation.handleFinish}
+      />
     </Dialog>
   )
 }
