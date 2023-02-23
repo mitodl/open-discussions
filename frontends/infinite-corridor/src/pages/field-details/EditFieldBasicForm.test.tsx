@@ -3,9 +3,7 @@ import { waitFor } from "@testing-library/react"
 import { PaginatedResult } from "ol-util"
 import { FieldChannel, urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
-import {
-  urls as lrUrls
-} from "../../api/learning-resources"
+import { urls as lrUrls } from "../../api/learning-resources"
 import * as factory from "../../api/fields/factories"
 import * as resourceFactory from "ol-search-ui/build/factories"
 import type { UserList } from "ol-search-ui"

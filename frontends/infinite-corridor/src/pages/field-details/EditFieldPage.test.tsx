@@ -1,9 +1,7 @@
 import { renderTestApp, screen, setMockResponse } from "../../test-utils"
 import * as factory from "../../api/fields/factories"
 import { urls } from "../../api/fields"
-import {
-  urls as lrUrls
-} from "../../api/learning-resources"
+import { urls as lrUrls } from "../../api/learning-resources"
 
 describe("EditFieldPage", () => {
   let field

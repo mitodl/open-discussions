@@ -4,9 +4,7 @@ import { pick } from "lodash"
 import { LearningResourceType, PrivacyLevel, UserList } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
 import { allowConsoleErrors, getDescriptionFor } from "ol-util/build/test-utils"
-import {
-  urls as lrUrls
-} from "../../api/learning-resources"
+import { urls as lrUrls } from "../../api/learning-resources"
 import {
   EditListDialog,
   CreateListDialog,

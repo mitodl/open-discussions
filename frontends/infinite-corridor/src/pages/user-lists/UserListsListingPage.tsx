@@ -19,7 +19,10 @@ import {
   useCreationDialog
 } from "./ManageListDialogs"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useFavoritesListing, useUserListsListing } from "../../api/learning-resources"
+import {
+  useFavoritesListing,
+  useUserListsListing
+} from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import { LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
 import type { UserList, Favorites } from "ol-search-ui"

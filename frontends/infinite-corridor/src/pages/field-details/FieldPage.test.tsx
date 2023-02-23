@@ -2,9 +2,7 @@
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
-import {
-  urls as lrUrls
-} from "../../api/learning-resources"
+import { urls as lrUrls } from "../../api/learning-resources"
 import {
   LearningResource,
   LearningResourceCard,

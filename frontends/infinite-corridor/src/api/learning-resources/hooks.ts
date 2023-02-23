@@ -4,7 +4,7 @@ import type {
   UserList,
   CourseTopic,
   LearningResourceType,
-  ListItemMember,
+  ListItemMember
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
 import axios from "../../libs/axios"
@@ -13,6 +13,7 @@ import {
   useQuery,
   useQueryClient,
   UseQueryResult,
+  UseQueryOptions
 } from "react-query"
 import { urls, keys, UserListOptions } from "./urls"
 
@@ -65,9 +66,8 @@ const useFavorite = () => {
       queryClient.invalidateQueries({
         queryKey: keys.favorites.listing.all
       })
-    },
-  }
-  )
+    }
+  })
 }
 
 const useUnfavorite = () => {
@@ -84,15 +84,17 @@ const useUnfavorite = () => {
       queryClient.invalidateQueries({
         queryKey: keys.favorites.listing.all
       })
-    },
+    }
   })
 }
 
-const useTopics = () => {
+const useTopics = (opts?: Pick<UseQueryOptions, "enabled">) => {
   const key = keys.topics
   const url = urls.topics.listing
-  return useQuery<PaginatedResult<CourseTopic>>(key, () =>
-    axios.get(url).then(res => res.data)
+  return useQuery<PaginatedResult<CourseTopic>>(
+    key,
+    () => axios.get(url).then(res => res.data),
+    opts
   )
 }
 
@@ -160,8 +162,14 @@ type AddToUserListPayload = {
 const addToUserList = async ({
   userListId,
   payload
-}: { userListId: number, payload: AddToUserListPayload }): Promise<ListItemMember & { content_data: LearningResource }> => {
-  const { data: response } = await axios.post(urls.userList.itemAdd(userListId), payload)
+}: {
+  userListId: number
+  payload: AddToUserListPayload
+}): Promise<ListItemMember & { content_data: LearningResource }> => {
+  const { data: response } = await axios.post(
+    urls.userList.itemAdd(userListId),
+    payload
+  )
   return response
 }
 const useAddToUserListItems = () => {
@@ -171,11 +179,16 @@ const useAddToUserListItems = () => {
     // Skip optimistic updates for now. We do not know the list item id.
     onSuccess:  (data, variables) => {
       const resource = data.content_data
-      queryClient.setQueryData(keys.resource(resource.object_type).id(resource.id).details, resource)
-      queryClient.invalidateQueries({ queryKey: keys.userList.id(variables.userListId).all })
+      queryClient.setQueryData(
+        keys.resource(resource.object_type).id(resource.id).details,
+        resource
+      )
+      queryClient.invalidateQueries({
+        queryKey: keys.userList.id(variables.userListId).all
+      })
       // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
-    },
+    }
   })
 }
 
@@ -187,12 +200,17 @@ const useDeleteFromUserListItems = () => {
   return useMutation({
     mutationFn: deleteFromUserListItems,
     onMutate:   vars => {
-      const resourceKey = keys.resource(vars.content_type).id(vars.object_id).details
-      const previousResource = queryClient.getQueryData<LearningResource>(resourceKey)
+      const resourceKey = keys
+        .resource(vars.content_type)
+        .id(vars.object_id).details
+      const previousResource =
+        queryClient.getQueryData<LearningResource>(resourceKey)
       if (previousResource) {
         const newResource: LearningResource = {
           ...previousResource,
-          lists: previousResource.lists.filter(member => member.item_id !== vars.item_id)
+          lists: previousResource.lists.filter(
+            member => member.item_id !== vars.item_id
+          )
         }
         queryClient.setQueryData(resourceKey, newResource)
       }
@@ -205,7 +223,9 @@ const useDeleteFromUserListItems = () => {
       context?.rollback()
     },
     onSettled: (_data, _error, vars) => {
-      queryClient.invalidateQueries(keys.resource(vars.content_type).id(vars.object_id).details)
+      queryClient.invalidateQueries(
+        keys.resource(vars.content_type).id(vars.object_id).details
+      )
       queryClient.invalidateQueries(keys.userList.id(vars.list_id).all)
       // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })

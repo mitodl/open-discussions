@@ -1,11 +1,19 @@
 import React from "react"
-import { renderHook } from '@testing-library/react-hooks/dom'
+import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
 import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
-import { QueryClient, QueryClientProvider } from 'react-query'
-import { useAddToUserListItems, useCreateUserList, useDeleteFromUserListItems, useDeleteUserList, useResource, useUserListItems, useUserListsListing } from "./hooks"
+import { QueryClient, QueryClientProvider } from "react-query"
+import {
+  useAddToUserListItems,
+  useCreateUserList,
+  useDeleteFromUserListItems,
+  useDeleteUserList,
+  useResource,
+  useUserListItems,
+  useUserListsListing
+} from "./hooks"
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls } from "./urls"
 
@@ -27,9 +35,7 @@ const setup = () => {
   })
   const queryClient = new QueryClient()
   const wrapper = ({ children }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
   return { wrapper }
@@ -51,9 +57,14 @@ test("useCreateUserList invalidates userlist Listings", async () => {
   }
 
   const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(() => result.current.existingList.isSuccess && result.current.listing.isSuccess)
+  await waitFor(
+    () =>
+      result.current.existingList.isSuccess && result.current.listing.isSuccess
+  )
   const before = result.current
-  await act(() => result.current.createList.mutateAsync({ title: "My new list" }))
+  await act(() =>
+    result.current.createList.mutateAsync({ title: "My new list" })
+  )
   const after = result.current
 
   // specific list is still cached
@@ -79,9 +90,14 @@ test("useDeleteUserList invalidates all resource queries", async () => {
   }
 
   const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(() => result.current.otherResource.isSuccess && result.current.listing.isSuccess)
+  await waitFor(
+    () =>
+      result.current.otherResource.isSuccess && result.current.listing.isSuccess
+  )
   const before = result.current
-  await act(() => result.current.deleteList.mutateAsync(faker.datatype.number()))
+  await act(() =>
+    result.current.deleteList.mutateAsync(faker.datatype.number())
+  )
   const after = result.current
 
   // other resource is re-fetched. (It could have been in the deleted list.)
@@ -107,38 +123,51 @@ test("useAddToUserListItems invalidates userlist details and listing", async () 
   const addedResourceData = factories.makeCourse()
   const modifiedAddedResource = {
     ...addedResourceData,
-    lists: addedResourceData.lists.concat({} as ListItemMember),
+    lists: addedResourceData.lists.concat({} as ListItemMember)
   }
 
   const useTestHook = () => {
     const addItem = useAddToUserListItems()
-    const addedResource = useResource(addedResourceData.object_type, addedResourceData.id)
+    const addedResource = useResource(
+      addedResourceData.object_type,
+      addedResourceData.id
+    )
     const targetList = useResource(LRT.Userlist, targetListData.id)
     const otherList = useResource(LRT.Userlist, otherListData.id)
     const listing = useUserListsListing()
     const targetItems = useUserListItems(targetListData.id)
-    return { addedResource, addItem, targetList, otherList, listing, targetItems}
+    return {
+      addedResource,
+      addItem,
+      targetList,
+      otherList,
+      listing,
+      targetItems
+    }
   }
 
   const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(() =>
-    result.current.targetList.isSuccess &&
-    result.current.otherList.isSuccess &&
-    result.current.listing.isSuccess &&
-    result.current.targetItems.isSuccess &&
-    result.current.addedResource.isSuccess
+  await waitFor(
+    () =>
+      result.current.targetList.isSuccess &&
+      result.current.otherList.isSuccess &&
+      result.current.listing.isSuccess &&
+      result.current.targetItems.isSuccess &&
+      result.current.addedResource.isSuccess
   )
 
-  setMockResponse.post(
-    urls.userList.itemAdd(targetListData.id),
-    { content_data: modifiedAddedResource }
-  )
+  setMockResponse.post(urls.userList.itemAdd(targetListData.id), {
+    content_data: modifiedAddedResource
+  })
 
   const before = result.current
   await act(async () => {
     await result.current.addItem.mutateAsync({
       userListId: targetListData.id,
-      payload:    { object_id: addedResourceData.id, content_type: addedResourceData.object_type },
+      payload:    {
+        object_id:    addedResourceData.id,
+        content_type: addedResourceData.object_type
+      }
     })
   })
   const after = result.current
@@ -173,35 +202,58 @@ test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
   const unaffectedListData = factories.makeUserList()
   const itemToDeleteData = factories.makeListItemMember({
     content_type: LRT.Course, // should match affectedResourceData
-    list_id:      affectedListData.id,
+    list_id:      affectedListData.id
   })
 
   const affectedResourceData = factories.makeCourse({
-    lists: [itemToDeleteData],
+    lists: [itemToDeleteData]
   })
-  setMockResponse.get(urls.resource.details(itemToDeleteData.content_type, itemToDeleteData.object_id), affectedResourceData)
-  const modifiedResource = {...affectedResourceData, lists: []}
+  setMockResponse.get(
+    urls.resource.details(
+      itemToDeleteData.content_type,
+      itemToDeleteData.object_id
+    ),
+    affectedResourceData
+  )
+  const modifiedResource = { ...affectedResourceData, lists: [] }
 
   const useTestHook = () => {
     const deleteItem = useDeleteFromUserListItems()
-    const affectedResource = useResource(itemToDeleteData.content_type, itemToDeleteData.object_id)
+    const affectedResource = useResource(
+      itemToDeleteData.content_type,
+      itemToDeleteData.object_id
+    )
     const affectedList = useResource(LRT.Userlist, affectedListData.id)
     const unaffectedList = useResource(LRT.Userlist, unaffectedListData.id)
     const listing = useUserListsListing()
     const affectedListItems = useUserListItems(affectedListData.id)
-    return { affectedResource, deleteItem, affectedList, unaffectedList, listing, affectedListItems}
+    return {
+      affectedResource,
+      deleteItem,
+      affectedList,
+      unaffectedList,
+      listing,
+      affectedListItems
+    }
   }
 
   const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(() =>
-    result.current.affectedList.isSuccess &&
-    result.current.unaffectedList.isSuccess &&
-    result.current.listing.isSuccess &&
-    result.current.affectedListItems.isSuccess &&
-    result.current.affectedResource.isSuccess
+  await waitFor(
+    () =>
+      result.current.affectedList.isSuccess &&
+      result.current.unaffectedList.isSuccess &&
+      result.current.listing.isSuccess &&
+      result.current.affectedListItems.isSuccess &&
+      result.current.affectedResource.isSuccess
   )
 
-  setMockResponse.get(urls.resource.details(itemToDeleteData.content_type, itemToDeleteData.object_id), modifiedResource)
+  setMockResponse.get(
+    urls.resource.details(
+      itemToDeleteData.content_type,
+      itemToDeleteData.object_id
+    ),
+    modifiedResource
+  )
   const before = result.current
   await act(async () => {
     await result.current.deleteItem.mutateAsync(itemToDeleteData)
@@ -211,7 +263,9 @@ test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
   expect(before.affectedResource.data).not.toEqual(after.affectedResource.data)
   expect(before.affectedList.data).not.toEqual(after.affectedList.data)
   expect(before.listing.data).not.toEqual(after.listing.data)
-  expect(before.affectedListItems.data).not.toEqual(after.affectedListItems.data)
+  expect(before.affectedListItems.data).not.toEqual(
+    after.affectedListItems.data
+  )
 
   expect(before.unaffectedList.data).toEqual(after.unaffectedList.data)
 })

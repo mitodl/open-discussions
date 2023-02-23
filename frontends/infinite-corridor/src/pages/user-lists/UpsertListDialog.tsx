@@ -26,7 +26,8 @@ const listFormSchema: Yup.SchemaOf<ListFormSchema> = Yup.object().shape({
   list_type: Yup.string()
     .default(LRType.Userlist)
     .required("List type is required."),
-  privacy_level: Yup.string()
+  privacy_level: Yup.mixed<PrivacyLevel>()
+    .oneOf(Object.values(PrivacyLevel))
     .default(PrivacyLevel.Private)
     .required("A privacy setting is required."),
   short_description: Yup.string()

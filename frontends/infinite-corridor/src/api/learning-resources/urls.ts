@@ -13,8 +13,10 @@ const courseUrls = {
   details: (id: number) => courseDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
     courseApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  favorite:   (id: number) => courseDetailsApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => courseDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    courseDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    courseDetailsApi.segment("unfavorite/").param({ id }).toString()
 }
 
 const programApi = UrlAssembler("/programs/")
@@ -23,8 +25,10 @@ const programUrls = {
   details: (id: number) => programDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
     programApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  favorite:   (id: number) => programDetailsApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => programDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    programDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    programDetailsApi.segment("unfavorite/").param({ id }).toString()
 }
 
 const videoApi = UrlAssembler("/videos/")
@@ -33,8 +37,10 @@ const videoUrls = {
   details: (id: number) => videoDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
     videoApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  favorite:   (id: number) => videoDetailsApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => videoDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    videoDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    videoDetailsApi.segment("unfavorite/").param({ id }).toString()
 }
 
 const podcastApi = UrlAssembler("/podcasts/")
@@ -43,8 +49,10 @@ const podcastUrls = {
   details: (id: number) => podcastDetailsApi.param({ id }).toString(),
   listing: (options: PaginationSearchParams = {}) =>
     podcastApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  favorite:   (id: number) => podcastDetailsApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => podcastDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    podcastDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    podcastDetailsApi.segment("unfavorite/").param({ id }).toString()
 }
 
 const podcastEpisodeApi = UrlAssembler("/podcastepisodes/")
@@ -55,8 +63,10 @@ const podcastEpisodeUrls = {
     podcastEpisodeApi
       .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
-  favorite:   (id: number) => podcastEpisodeDetailsApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => podcastEpisodeDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    podcastEpisodeDetailsApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    podcastEpisodeDetailsApi.segment("unfavorite/").param({ id }).toString()
 }
 
 const favoriteApi = UrlAssembler("/favorites/")
@@ -76,20 +86,23 @@ const userListUrls = {
   create:  userListApi.toString(),
   listing: (options: UserListOptions = {}) =>
     userListApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
-  itemAdd:      (listId: number) => userListItemsApiU.param({ id: listId }).toString(),
+  itemAdd: (listId: number) =>
+    userListItemsApiU.param({ id: listId }).toString(),
   itemsListing: (listId: number, options: PaginationSearchParams = {}) =>
     userListItemsApiU
       .param({ id: listId, ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
   itemDetails: (id: number, itemId: number) =>
     userListItemsDetailApi.param({ id, itemId }).toString(),
-  favorite:   (id: number) => userListDetailApi.segment("favorite/").param({ id }).toString(),
-  unfavorite: (id: number) => userListDetailApi.segment("unfavorite/").param({ id }).toString(),
+  favorite: (id: number) =>
+    userListDetailApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    userListDetailApi.segment("unfavorite/").param({ id }).toString()
 }
 
 type ResourceUrls = {
-  details: (id: number) => string,
-  favorite: (id: number) => string,
+  details: (id: number) => string
+  favorite: (id: number) => string
   unfavorite: (id: number) => string
 }
 const getResourceUrls = (type: string): ResourceUrls => {
