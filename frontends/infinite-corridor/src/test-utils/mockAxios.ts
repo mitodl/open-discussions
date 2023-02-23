@@ -45,7 +45,7 @@ const mockRequest = (
   method: Method,
   url: string,
   requestBody = expectAnyOrNil,
-  responseBody: unknown,
+  responseBody: unknown = undefined,
   code: number
 ) => {
   if (code >= 400) {
@@ -85,17 +85,17 @@ const setMockResponse = {
   ) => mockRequest("get", url, requestBody, responseBody, code),
   post: (
     url: string,
-    responseBody: unknown,
+    responseBody?: unknown,
     { code = 201, requestBody }: MockResponseOptions = {}
   ) => mockRequest("post", url, requestBody, responseBody, code),
   patch: (
     url: string,
-    responseBody: unknown,
+    responseBody?: unknown,
     { code = 200, requestBody }: MockResponseOptions = {}
   ) => mockRequest("patch", url, requestBody, responseBody, code),
   delete: (
     url: string,
-    responseBody: unknown,
+    responseBody?: unknown,
     { code = 204, requestBody }: MockResponseOptions = {}
   ) => mockRequest("delete", url, requestBody, responseBody, code),
   /**

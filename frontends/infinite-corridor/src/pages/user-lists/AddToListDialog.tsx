@@ -7,44 +7,57 @@ import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
 import Divider from "@mui/material/Divider"
 import Checkbox from "@mui/material/Checkbox"
-import List from '@mui/material/List'
-import ListItem from '@mui/material/ListItem'
-import ListItemButton from '@mui/material/ListItemButton'
-import ListItemText from '@mui/material/ListItemText'
-import LockOpenIcon from '@mui/icons-material/LockOpen'
-import LockIcon from '@mui/icons-material/Lock'
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemButton from "@mui/material/ListItemButton"
+import ListItemText from "@mui/material/ListItemText"
+import LockOpenIcon from "@mui/icons-material/LockOpen"
+import LockIcon from "@mui/icons-material/Lock"
 import Chip from "@mui/material/Chip"
-import AddIcon from '@mui/icons-material/Add'
+import AddIcon from "@mui/icons-material/Add"
 
 import { LearningResource, PrivacyLevel, UserList } from "ol-search-ui"
 import { LoadingSpinner } from "ol-util"
 
-import { useAddToUserListItems, useDeleteFromUserListItems, useFavorite, useResource, useUnfavorite, useUserListsListing } from "../../api/learning-resources"
 import {
-  CreateListDialog,
-  useCreationDialog
-} from "./ManageListDialogs"
-
+  useAddToUserListItems,
+  useDeleteFromUserListItems,
+  useFavorite,
+  useResource,
+  useUnfavorite,
+  useUserListsListing
+} from "../../api/learning-resources"
+import { CreateListDialog, useCreationDialog } from "./ManageListDialogs"
 
 type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
-type AddToListDialogProps =  {
+type AddToListDialogProps = {
   open: boolean
   resourceKey: ResourceKey
   onClose: () => void
 }
 
-type UserListOrFavorites = UserList | {
-  id: 'favorites'
-  title: string
-  privacy_level: PrivacyLevel
-}
+type UserListOrFavorites =
+  | UserList
+  | {
+      id: "favorites"
+      title: string
+      privacy_level: PrivacyLevel
+    }
 
 const useRequestRecord = () => {
-  const [pending, setPending] = useState<Map<string, "delete" | "add">>(new Map())
-  const key = (resource: LearningResource, list: UserListOrFavorites) => `${resource.object_type}-${resource.id}-${list.id}`
-  const get = (resource: LearningResource, list: UserListOrFavorites) => pending.get(key(resource, list))
-  const set = (resource: LearningResource, list: UserListOrFavorites, value: "delete" | "add") => {
+  const [pending, setPending] = useState<Map<string, "delete" | "add">>(
+    new Map()
+  )
+  const key = (resource: LearningResource, list: UserListOrFavorites) =>
+    `${resource.object_type}-${resource.id}-${list.id}`
+  const get = (resource: LearningResource, list: UserListOrFavorites) =>
+    pending.get(key(resource, list))
+  const set = (
+    resource: LearningResource,
+    list: UserListOrFavorites,
+    value: "delete" | "add"
+  ) => {
     setPending(current => new Map(current).set(key(resource, list), value))
   }
   const clear = (resource: LearningResource, list: UserListOrFavorites) => {
@@ -65,8 +78,6 @@ const useToggleItemInList = (resource?: LearningResource) => {
   const unfavorite = useUnfavorite()
   const handleAdd = async (list: UserListOrFavorites) => {
     if (!resource) return
-    console.log('handling add')
-    console.log('list is', { ...list})
     try {
       requestRecord.set(resource, list, "add")
       if (list.id === "favorites") {
@@ -74,7 +85,10 @@ const useToggleItemInList = (resource?: LearningResource) => {
       } else {
         await addTo.mutateAsync({
           userListId: list.id,
-          payload:    { object_id: resource.id, content_type: resource.object_type }
+          payload:    {
+            object_id:    resource.id,
+            content_type: resource.object_type
+          }
         })
       }
     } finally {
@@ -105,8 +119,10 @@ const useToggleItemInList = (resource?: LearningResource) => {
     return resource.lists.some(l => l.list_id === list.id)
   }
 
-  const isAdding = (list: UserListOrFavorites) => !!resource && requestRecord.get(resource, list) === "add"
-  const isRemoving = (list: UserListOrFavorites) => !!resource && requestRecord.get(resource, list) === "delete"
+  const isAdding = (list: UserListOrFavorites) =>
+    !!resource && requestRecord.get(resource, list) === "add"
+  const isRemoving = (list: UserListOrFavorites) =>
+    !!resource && requestRecord.get(resource, list) === "delete"
 
   const handleToggle = (list: UserListOrFavorites) => async () => {
     return isChecked(list) ? handleRemove(list) : handleAdd(list)
@@ -125,11 +141,16 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
   const userListsQuery = useUserListsListing()
   const userLists = userListsQuery.data?.results
   const lists: UserListOrFavorites[] = [
-    { id: 'favorites', title: 'Favorites', privacy_level: PrivacyLevel.Private},
-    ...(userLists || []),
+    {
+      id:            "favorites",
+      title:         "Favorites",
+      privacy_level: PrivacyLevel.Private
+    },
+    ...(userLists || [])
   ]
 
-  const { handleToggle, isChecked, isAdding, isRemoving } = useToggleItemInList(resource)
+  const { handleToggle, isChecked, isAdding, isRemoving } =
+    useToggleItemInList(resource)
 
   const isReady = resource && userLists
 
@@ -137,54 +158,61 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
     <Dialog className="add-to-list-dialog" open={open} onClose={onClose}>
       <DialogTitle>Add to list</DialogTitle>
       <Box position="absolute" top={0} right={0}>
-        <IconButton onClick={onClose}>
+        <IconButton onClick={onClose} aria-label="Close">
           <CloseIcon />
         </IconButton>
       </Box>
       <Divider />
-      {isReady && <DialogContent className="add-to-list-description">
-        Adding <span className="resource-title-inline">{resource.title}</span>
-      </DialogContent>
-      }
-      {isReady && <DialogContent className="add-to-list-listing">
-        <List>
-          {lists.map(list => {
-            const labelId = `checkbox-list-label-${list.id}`
-            const adding = isAdding(list)
-            const removing = isRemoving(list)
-            const disabled = adding || removing
-            const checked = adding || isChecked(list)
-            return  (
-              <ListItem key={list.id} secondaryAction={
-                <PrivacyChip privacyLevel={list.privacy_level} />
-              }>
-                <ListItemButton
-                  aria-disabled={disabled}
-                  onClick={disabled ? undefined : handleToggle(list)}>
-                  <Checkbox
-                    edge="start"
-                    disabled={disabled}
-                    checked={checked}
-                    tabIndex={-1}
-                    disableRipple
-                    inputProps={{ 'aria-labelledby': labelId }}
-                  />
-                  <ListItemText id={labelId} primary={list.title} />
-                </ListItemButton>
-              </ListItem>
-            )
-          })}
-          <ListItem className="add-to-list-new">
-            <ListItemButton onClick={listCreation.handleStart}>
-              <AddIcon />
-              <ListItemText primary="Add new list" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </DialogContent>}
-      {!isReady && <DialogContent>
-        <LoadingSpinner loading={!isReady} />
-      </DialogContent>}
+      {isReady && (
+        <DialogContent className="add-to-list-description">
+          Adding <span className="resource-title-inline">{resource.title}</span>
+        </DialogContent>
+      )}
+      {isReady && (
+        <DialogContent className="add-to-list-listing">
+          <List>
+            {lists.map(list => {
+              const adding = isAdding(list)
+              const removing = isRemoving(list)
+              const disabled = adding || removing
+              const checked = adding || isChecked(list)
+              return (
+                <ListItem
+                  key={list.id}
+                  secondaryAction={
+                    <PrivacyChip privacyLevel={list.privacy_level} />
+                  }
+                >
+                  <ListItemButton
+                    aria-disabled={disabled}
+                    onClick={disabled ? undefined : handleToggle(list)}
+                  >
+                    <Checkbox
+                      edge="start"
+                      disabled={disabled}
+                      checked={checked}
+                      tabIndex={-1}
+                      disableRipple
+                    />
+                    <ListItemText primary={list.title} />
+                  </ListItemButton>
+                </ListItem>
+              )
+            })}
+            <ListItem className="add-to-list-new">
+              <ListItemButton onClick={listCreation.handleStart}>
+                <AddIcon />
+                <ListItemText primary="Create a new list" />
+              </ListItemButton>
+            </ListItem>
+          </List>
+        </DialogContent>
+      )}
+      {!isReady && (
+        <DialogContent>
+          <LoadingSpinner loading={!isReady} />
+        </DialogContent>
+      )}
       <CreateListDialog
         open={listCreation.isOpen}
         onClose={listCreation.handleFinish}
@@ -227,3 +255,4 @@ const useAddToListDialog = () => {
 
 export default AddToListDialog
 export { useAddToListDialog }
+export type { AddToListDialogProps }
