@@ -1,31 +1,31 @@
-import { renderHook, act } from '@testing-library/react-hooks/dom'
-import useToggle from './useToggle'
+import { renderHook, act } from "@testing-library/react-hooks/dom"
+import useToggle from "./useToggle"
 
-test.each([
-  { initialValue: true },
-  { initialValue: false }
-])("useToggle($initialValue)'s initial state is $initialValue", ({ initialValue }) => {
-  const { result } = renderHook(() => useToggle(initialValue))
-  expect(result.current[0]).toBe(initialValue)
-})
+test.each([{ initialValue: true }, { initialValue: false }])(
+  "useToggle($initialValue)'s initial state is $initialValue",
+  ({ initialValue }) => {
+    const { result } = renderHook(() => useToggle(initialValue))
+    expect(result.current[0]).toBe(initialValue)
+  }
+)
 
-test.each([
-  { initialValue: true },
-  { initialValue: false }
-])("toggle.on sets value to true", ({ initialValue }) => {
-  const { result } = renderHook(() => useToggle(initialValue))
-  act(() => result.current[1].on())
-  expect(result.current[0]).toBe(true)
-})
+test.each([{ initialValue: true }, { initialValue: false }])(
+  "toggle.on sets value to true",
+  ({ initialValue }) => {
+    const { result } = renderHook(() => useToggle(initialValue))
+    act(() => result.current[1].on())
+    expect(result.current[0]).toBe(true)
+  }
+)
 
-test.each([
-  { initialValue: true },
-  { initialValue: false }
-])("toggle.off sets value to false", ({ initialValue }) => {
-  const { result } = renderHook(() => useToggle(initialValue))
-  act(() => result.current[1].off())
-  expect(result.current[0]).toBe(false)
-})
+test.each([{ initialValue: true }, { initialValue: false }])(
+  "toggle.off sets value to false",
+  ({ initialValue }) => {
+    const { result } = renderHook(() => useToggle(initialValue))
+    act(() => result.current[1].off())
+    expect(result.current[0]).toBe(false)
+  }
+)
 
 test("toggle.set(val) sets value to val", () => {
   const { result } = renderHook(() => useToggle(false))
