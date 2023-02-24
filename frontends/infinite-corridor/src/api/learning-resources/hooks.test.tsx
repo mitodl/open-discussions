@@ -12,7 +12,10 @@ import {
   useDeleteUserList,
   useResource,
   useUserListItems,
-  useUserListsListing
+  useUserListsListing,
+  useFavoritesListing,
+  useFavorite,
+  useUnfavorite
 } from "./hooks"
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls } from "./urls"
@@ -27,7 +30,6 @@ function* makeCounter() {
 const setup = () => {
   const idCounter = makeCounter()
   setMockResponse.defaultImplementation((method, url) => {
-    console.log(`Responding to ${method} ${url}`)
     return Promise.resolve({
       data:   `request number ${idCounter.next().value} (${method} to ${url})`,
       status: 200
@@ -269,3 +271,68 @@ test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
 
   expect(before.unaffectedList.data).toEqual(after.unaffectedList.data)
 })
+
+test.each([
+  {
+    hook:        useFavorite,
+    wasFavorite: false
+  },
+  {
+    hook:        useUnfavorite,
+    wasFavorite: true
+  }
+])(
+  "$hook.name invalidates appropriate queries",
+  async ({ hook, wasFavorite }) => {
+    const { wrapper } = setup()
+    const targetResourceData = factories.makeCourse({
+      is_favorite: wasFavorite
+    })
+    const otherResourceData = factories.makeCourse()
+
+    const targetResourceUrl = urls.resource.details(
+      targetResourceData.object_type,
+      targetResourceData.id
+    )
+    setMockResponse.get(targetResourceUrl, targetResourceData)
+
+    const useTestHook = () => {
+      const favoritesListing = useFavoritesListing()
+      const mutation = hook()
+      const targetResource = useResource(
+        targetResourceData.object_type,
+        targetResourceData.id
+      )
+      const otherResource = useResource(
+        otherResourceData.object_type,
+        otherResourceData.id
+      )
+      return { mutation, targetResource, favoritesListing, otherResource }
+    }
+    const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+    await waitFor(
+      () =>
+        result.current.targetResource.isSuccess &&
+        result.current.favoritesListing.isSuccess &&
+        result.current.otherResource.isSuccess
+    )
+
+    const before = result.current
+    setMockResponse.get(targetResourceUrl, {
+      ...targetResourceData,
+      is_favorite: !wasFavorite
+    })
+    await act(async () => {
+      await result.current.mutation.mutateAsync(targetResourceData)
+    })
+    const after = result.current
+
+    // These two are invalidated
+    expect(before.targetResource.data).not.toEqual(after.targetResource.data)
+    expect(before.favoritesListing.data).not.toEqual(
+      after.favoritesListing.data
+    )
+    // this is not
+    expect(before.otherResource.data).toEqual(after.otherResource.data)
+  }
+)
