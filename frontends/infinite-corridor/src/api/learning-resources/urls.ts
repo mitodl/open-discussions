@@ -142,7 +142,6 @@ const resourceKeys = (type: string) => {
  *
  * Some entries, e.g., `resource.all()` are not used directly as query keys.
  * Rather, they are used to conveniently invalidate a portion of the cache.
- * For example,
  */
 const keys = {
   all:      [baseKey],
