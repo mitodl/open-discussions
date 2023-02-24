@@ -78,7 +78,7 @@ const EditListMenu: React.FC<EditListMenuProps> = ({
 /**
  * Makes a fake userlist object for the favorites list.
  *
- * "Favotires" is a special case because it's not a real userlist (with title,
+ * "Favorites" is a special case because it's not a real userlist (with title,
  * topics, etc). It's just a list of favorited items that we present similarly
  * to other lists.
  */
