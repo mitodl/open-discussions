@@ -93,7 +93,12 @@ const resourceUrls = {
       return userListUrls.details(id) // LearningPaths are handled by UserList api
     default:
       /**
-         * This should not happen and will likely result in a 404.
+         * This could happen if the query is constructed dynamically from user
+         * input. E.g., by making an error when copy-pasting a URL, a user could
+         * request type=cours, which would result in a 404.
+         *
+         * A 404 seems reasonable in that case, and whatever component is
+         * making the request should handle it.
          */
       return `/${type}s/${id}/`
     }
