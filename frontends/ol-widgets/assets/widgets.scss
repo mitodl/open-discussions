@@ -1,29 +1,31 @@
-$iconSize: 20px !default;
+$icon-size: 20px !default;
 
 .ol-widget {
   button {
     padding: 2px;
-    font-size: $iconSize;
+    font-size: $icon-size;
     display: inline-flex;
-  }
-  &.ol-widget-collapsed {
-    .ol-widget-header {
-      margin: 0;
-    }
   }
 }
 
 .ol-widget-header {
-  margin-top: 0px;
+  margin-top: 0;
   display:flex;
   justify-content: space-between;
   align-items: flex-start;
+
   button {
-    font-size: 1.2*$iconSize;
+    font-size: 1.2 * $icon-size;
     padding: 0;
     margin: 0;
     background-color: transparent;
     border: none;
+  }
+}
+
+.ol-widget.ol-widget-collapsed {
+  .ol-widget-header {
+    margin: 0;
   }
 }
 
@@ -41,17 +43,18 @@ $iconSize: 20px !default;
   align-items: center;
 }
 
-$dialogZIndex: 1300;
+$dialog-z-index: 1300;
+
 .ol-widget-dialog.MuiDialog-root {
   /*
   This is the default z-index for MUI anyway.
   Setting it explicitly for use below.
   */
-  z-index: $dialogZIndex;
+  z-index: $dialog-z-index;
 }
 
 .ol-widget-ckeditor {
-  --ck-z-modal: #{$dialogZIndex + 1};
+  --ck-z-modal: #{$dialog-z-index + 1};
 }
 
 .ol-widget-content {
