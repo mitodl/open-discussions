@@ -1,24 +1,23 @@
 @use "theme";
 
 $spacer: 1.75rem;
-$maxWidth: 520px;
-$thumnailSize: 60px;
-$linkMinSize: 100px;
-$linkMaxSize: 120px;
+$max-width: 520px;
+$thumnail-size: 60px;
+$link-min-size: 100px;
+$link-max-size: 120px;
 
 .homepage {
-
   h1 {
     font-size: 32px;
   }
 
   &.MuiContainer-root {
-    max-width: $maxWidth;
+    max-width: $max-width;
     padding: 1rem;
   }
 
   .page-title {
-    margin-top: 2*$spacer;
+    margin-top: 2 * $spacer;
     margin-bottom: $spacer;
     text-align: center;
   }
@@ -37,6 +36,7 @@ $linkMaxSize: 120px;
 
 .field-list {
   padding: 0;
+
   li {
     list-style-type: none;
     display: flex;
@@ -52,24 +52,23 @@ $linkMaxSize: 120px;
   }
 
   img {
-    width: $thumnailSize;
-    height: $thumnailSize;
+    width: $thumnail-size;
+    height: $thumnail-size;
   }
 
   figure {
-    min-width: $linkMinSize;
-    max-width: $linkMaxSize;
+    min-width: $link-min-size;
+    max-width: $link-max-size;
     margin: 0;
     padding: 0.5em;
     display: flex;
     flex-direction: column;
     align-items: center;
-
     transition-property: background-color border;
     transition-duration: theme.$transition-duration;
     border: 1px solid transparent;
-  
     border-radius: theme.$border-radius;
+
     &:hover {
       background-color: theme.$color-background-light;
       margin: -1px;

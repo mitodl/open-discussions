@@ -4,10 +4,10 @@
 header.ic-header {
   background-color: theme.$color-background-light;
   color: theme.$font-color-default;
-
   min-height: 55px;
   display: flex;
   flex-direction: column;
+
   > * {
     flex: 1
   }
@@ -30,6 +30,7 @@ header.ic-header {
 
   .ic-mit-logo {
     height: 1.5em;
+
     img {
       height: 100%
     }

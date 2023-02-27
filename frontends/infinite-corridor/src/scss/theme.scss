@@ -1,67 +1,54 @@
-$color-gray-1: #ffffff;
+$color-gray-1: #fff;
 $color-gray-2: #f2f2f2;
 $color-gray-3: #b0b0b0;
 $color-gray-4: #787878;
-$color-gray-5: #000000;
-
+$color-gray-5: #000;
 $color-red-1: #e3d5d5;
 $color-red-2: #d6b2b3;
 $color-red-3: #a31f34;
 $color-red-4: #57081a;
 $color-red-5: #30020e;
-
 $color-blue-1: #edeff5;
 $color-blue-5: #03152d;
-
 $color-primary: $color-red-3;
-
 $color-secondary-light: $color-blue-1;
 $color-secondary: $color-blue-5;
-
 $color-background: $color-blue-1;
 $color-background-light: $color-gray-1;
-
 $font-color-light: $color-gray-3;
 $font-color-default: $color-blue-5;
 $font-family-default: "Source Sans Pro", helvetica, arial, sans-serif !important;
-
 $font-size-small: 12px;
 $font-size-normal: 16px;
 $font-size-h1: 24px;
 $font-size-h2: 18px;
 $font-size-h4: 14px;
-
 $font-weight-bold: bold;
 $font-weight-semi-bold: 500;
-
 $transition-duration: 300ms;
-
 $border-radius: 5px;
+$shadow-offset-x: 3px;
+$shadow-offset-y: 4px;
+$shadow-color: rgb(0 0 0 / 36%);
+$shadow-blur-radius: 12px;
+$shadow: $shadow-offset-x $shadow-offset-y $shadow-blur-radius $shadow-color;
 
-$shadowOffsetX: 3px;
-$shadowOffsetY: 4px;
-$shadowColor: rgba(0, 0, 0, 0.36);
-$shadowBlurRadius: 12px;
-$shadow: $shadowOffsetX $shadowOffsetY $shadowBlurRadius $shadowColor;
 /*
   Useful when needing to add padding to a container to ensure shadow is visible.
 */
-$shadowOverflowTop: $shadowBlurRadius - $shadowOffsetX;
-$shadowOverflowBottom: $shadowBlurRadius + $shadowOffsetY;
+$shadow-overflow-top: $shadow-blur-radius - $shadow-offset-x;
+$shadow-overflow-bottom: $shadow-blur-radius + $shadow-offset-y;
 $channel-avatar-bg: #2aab8b;
 
 // Forms
-$font-black: rgba(0, 0, 0, 0.87);
+$font-black: rgb(0 0 0 / 87%);
 $std-border-radius: 3px;
 $validation-bg: #ffe8ec;
 $validation-text: #f07183;
 $font-grey-light: #b0b0b0;
-
 $input-border-grey: #b7b7b7;
 $navy: #03152d;
 $link-blue: #0b51bf;
-
-
 $font-xxxl: 2rem; /* 32px == 2 x 16 */
 $font-xxl: 1.75rem; /* 28px == 2 x 16 */
 $font-xl: 1.5rem; /* 24px == 1.5 x 16 */
@@ -71,4 +58,4 @@ $font-normal: 1rem; /* 16px */
 $font-sm: 0.875rem; /* 14px */
 $font-xs: 0.75rem; /* 12px */
 
-$muiAppBarZIndex: 11000;
+$mui-app-bar-z-index: 11000;

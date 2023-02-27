@@ -8,18 +8,17 @@ See also https://mui.com/material-ui/customization/breakpoints/
 
 
 // Alert! If you change these values, change them in mui.ts, too.
-$xs: 0px;
+$xs: 0;
 $sm: 600px;
 $md: 840px;
 $lg: 1200px;
 $xl: 1536px;
-
 $spacer: 0.05px;
-$xsDown: $xs - $spacer;
-$smDown: $sm - $spacer;
-$mdDown: $md - $spacer;
-$lgDown: $lg - $spacer;
-$xlDown: $xl - $spacer;
+$xs-down: $xs - $spacer;
+$sm-down: $sm - $spacer;
+$md-down: $md - $spacer;
+$lg-down: $lg - $spacer;
+$xl-down: $xl - $spacer;
 
 /*
 Generate a media query that matches screens ABOVE the given breakpoint.
@@ -53,23 +52,23 @@ Generate a media query that matches screens BELOW the given breakpoint.
 */
 @mixin down($name) {
   @if $name == xs {
-    @media (max-width: $xsDown) {
+    @media (max-width: $xs-down) {
       @content;
     }
   } @else if $name == sm {
-    @media (max-width: $smDown) {
+    @media (max-width: $sm-down) {
       @content;
     }
   } @else if $name == md {
-    @media (max-width: $mdDown) {
+    @media (max-width: $md-down) {
       @content;
     }
   } @else if $name == lg {
-    @media (max-width: $lgDown) {
+    @media (max-width: $lg-down) {
       @content;
     }
   } @else if $name == xl {
-    @media (max-width: $xlDown) {
+    @media (max-width: $xl-down) {
       @content;
     }
   }

@@ -1,15 +1,14 @@
 @use "theme";
 
-$fontColor: theme.$font-color-default;
-$fontColorLight: theme.$font-color-light;
-
+$font-color: theme.$font-color-default;
+$font-color-light: theme.$font-color-light;
 $radius: theme.$std-border-radius;
-$borderColor: theme.$input-border-grey;
+$border-color: theme.$input-border-grey;
 
 form, .form {
   .form-item {
-    margin: 0 0 28px 0;
-    color: $fontColor;
+    margin: 0 0 28px;
+    color: $font-color;
 
     .label,
     .input {
@@ -21,9 +20,10 @@ form, .form {
     background: #f8f8f8;
     border: 1px solid #bbb;
     font-size: 15px;
-    color: $fontColor;
+    color: $font-color;
     border-radius: $radius;
     height: 39px;
+
     /* If you add too much padding here, the options won't show in IE */
     padding: 8px 20px;
     width: 100%;
@@ -49,17 +49,35 @@ form .form-row,
 }
 
 .form-field {
-  color: $fontColor;
+  color: $font-color;
 }
 
 .field-label {
   color: theme.$color-gray-4;
 }
+
 .field-detail {
   color: theme.$color-gray-4;
   font-size: theme.$font-size-small;
 }
 
+textarea,
+input[type="text"] {
+  &.form-field {
+    padding: 12px 10px;
+    background-color: #fff;
+    resize: auto;
+    font-family: inherit;
+  }
+}
+
+input[type="email"],
+input[type="url"],
+input[type="password"] {
+  &.form-field {
+    padding: 10px;
+  }
+}
 
 input[type="email"],
 input[type="text"],
@@ -67,50 +85,15 @@ input[type="url"],
 input[type="password"] {
   &.form-field {
     width: 100%;
-    padding: 10px 10px;
     font-size: 15px;
     border-radius: $radius;
-    border: 1px solid $borderColor;
+    border: 1px solid $border-color;
     transition: width 0.4s ease-in-out;
     box-sizing: border-box;
   
     &:disabled {
       background: #f7f7f7;
       border-color: #ccc;
-    }
-  }
-}
-
-textarea,
-input[type="text"] {
-  &.form-field {
-    width: 100%;
-    padding: 12px 10px;
-    box-sizing: border-box;
-    border-radius: theme.$std-border-radius;
-    border: 1px solid theme.$input-border-grey;
-    background-color: #fff;
-    resize: auto;
-    font-size: 15px;
-    font-family: inherit;
-  
-    &.no-height {
-      height: auto;
-    }
-  
-    &.underlined {
-      border-radius: 6.5px 6.5px 0 0;
-      border-bottom: 2px solid black;
-      border-top: none;
-      border-left: none;
-      border-right: none;
-    }
-  
-    &.h1 {
-      font-size: 24px;
-      font-weight: bold;
-      border: none;
-      outline: none;
     }
   }
 }
@@ -137,7 +120,7 @@ textarea.form-field {
 
 label.form-label {
   display: block;
-  margin: 0 0 6px 0;
+  margin: 0 0 6px;
   font-family: roboto, helvetica, arial, sans-serif;
   font-weight: 400;
   font-size: 15px;
@@ -174,7 +157,7 @@ label.radiolabel {
 
 .drag-delete-btn {
     cursor: pointer;
-    color: #000000;
+    color: #000;
 }
 
 .drag-handle {

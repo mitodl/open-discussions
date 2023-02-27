@@ -1,6 +1,6 @@
 @use "theme";
 
-$avatarSize: 60px;
+$avatar-size: 60px;
 
 .field-title-container.MuiContainer-root {
   display: flex;
@@ -15,29 +15,31 @@ $avatarSize: 60px;
   align-items: center;
 
   img {
-    height: $avatarSize;
-    width: $avatarSize;
+    height: $avatar-size;
+    width: $avatar-size;
   }
 
   h1 a {
     color: theme.$color-gray-1;
     margin-left: 1em;
+
     &:hover {
       text-decoration: none;
     }
   }
 }
 
-$carouselSpacing: 24px;
+$carousel-spacing: 24px;
+
 .ic-carousel-card {
   height:100%;
-  margin-left: $carouselSpacing*0.5;
-  margin-right: $carouselSpacing*0.5;
+  margin-left: $carousel-spacing * 0.5;
+  margin-right: $carousel-spacing * 0.5;
 }
 
 .ic-carousel {
-  padding-top: theme.$shadowOverflowTop;
-  padding-bottom: theme.$shadowOverflowBottom;
+  padding-top: theme.$shadow-overflow-top;
+  padding-bottom: theme.$shadow-overflow-bottom;
 
   /*
   We want the carousel cards to be:
@@ -56,7 +58,8 @@ $carouselSpacing: 24px;
   Caveat: This is not a good solution if there is content within $carouselSpacing
   of the carousel's left edge. But...there's not.
   */
-  transform: translateX(-$carouselSpacing*0.5);
+  transform: translateX(-$carousel-spacing * 0.5);
+
   /*
   We also want the carousel contents (cards) to appear as if they are full
   width. By default, the width is 100% and since there's cell-spacing, the
@@ -69,12 +72,13 @@ $carouselSpacing: 24px;
   This needs to be !important because Nuke Carousel applies width: 100% as an
   inline style.
   */
-  width: calc(100% + #{$carouselSpacing}) !important;
+  width: calc(100% + #{$carousel-spacing}) !important;
 }
 
 .ic-carousel-button-prev {
   margin-right: 0.5em;
 }
+
 .ic-carousel-button-next {
   margin-left: 0.5em;
 }
@@ -130,14 +134,17 @@ $avatar-dimension-small: 22px;
 }
 
 
-$minTabHeigt: 44px;
+$min-tab-height: 44px;
+
 .page-nav-content {
   > *:first-child {
-    margin-top: 0px; // subbanner bottom-margin handles this
+    margin-top: 0; // subbanner bottom-margin handles this
   }
 }
+
 .page-nav-content.MuiTabPanel-root {
-  padding-top: 0px; // subbanner bottom-margin handles this
+  padding-top: 0; // subbanner bottom-margin handles this
+
   /*
   page-nav is meant for the main content of a page.
   We don't need extra padding beyond that of Container, and removing this
@@ -148,16 +155,16 @@ $minTabHeigt: 44px;
 }
 
 .page-nav  {
-
   .MuiTabs-indicator {
     height:4px;
   }
+
   &.MuiTabs-root {
-    min-height: $minTabHeigt;
+    min-height: $min-tab-height;
   }
 
   .MuiTab-root {
-    min-height: $minTabHeigt;
+    min-height: $min-tab-height;
     font-size: theme.$font-size-h2;
     padding: 10px 16px;
 
@@ -169,9 +176,11 @@ $minTabHeigt: 44px;
 
 .page-subbanner {
   background-color: theme.$color-background-light;
+
   .MuiGrid-root > .MuiGrid-item  {
-    padding-top: 0px;
+    padding-top: 0;
   }
+
   margin-bottom: 40px;
 }
 
@@ -187,10 +196,6 @@ $minTabHeigt: 44px;
     .field-edit-button {
       cursor: pointer;
       color: #fff;
+      z-index: 2000;
     }
-}
-
-.field-edit-button {
-  z-index: 2000;
-  color: #fff;
 }

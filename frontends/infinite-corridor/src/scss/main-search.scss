@@ -1,13 +1,16 @@
 @use "theme";
-$maxWidth: 520px;
+
+$max-width: 520px;
 
 .main-search {
   background-color: theme.$color-background-light;
+
   &.MuiInputBase-root {
-    max-width: $maxWidth;
+    max-width: $max-width;
     width: 100%;
     border-radius: 100vh;
     font-size: 1.25rem;
+
     &.Mui-focused fieldset {
       border-color: theme.$color-gray-4;
     }
