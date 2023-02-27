@@ -1,12 +1,11 @@
 @use "sass:math";
 
-$lightText: #8c8c8c !default;
+$light-text: #8c8c8c !default;
 $spacer: 0.75rem !default;
-$boldWeight: bold !default;
-$smallFontSize: 0.75em !default;
+$bold-weight: bold !default;
+$small-font-size: 0.75em !default;
 
 .ol-lrc-root {
-
   // Ensure the resource image borders match card borders
   .MuiCardMedia-root, > .MuiCardContent-root {
     border-radius: inherit
@@ -17,10 +16,12 @@ $smallFontSize: 0.75em !default;
   display:flex;
   flex-direction: column;
 }
+
 .ol-lrc-row {
   display:flex;
   flex-direction: row;
 }
+
 .ol-lrc-row-reverse {
   display:flex;
   flex-direction: row-reverse;
@@ -31,8 +32,8 @@ $smallFontSize: 0.75em !default;
   background-color: white;
   display: block;
   text-align: left;
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
 }
 
 .ol-lrc-content .clickable-title:hover {
@@ -47,6 +48,7 @@ $smallFontSize: 0.75em !default;
   flex: 1;
   display: flex;
   flex-direction: column;
+
   > * {
     /*
     Flexbox doesn't have collapsing margins, so we need to avoid double spacing.
@@ -55,11 +57,14 @@ $smallFontSize: 0.75em !default;
     */
     margin-top: math.div($spacer, 2);
     margin-bottom: math.div($spacer, 2);
+
     &:first-child {
       margin-top: 0; 
     }
+
     &:last-child {
       margin-bottom: 0;
+
       /*
       Last child of ol-lrc-content will take up any extra space (flex: 1) but
       with its contents at the bottom of its box.
@@ -80,33 +85,36 @@ $smallFontSize: 0.75em !default;
   align-items: center;
   min-height: 1.5em; // ensure consistent height even if no certificate
 }
+
 .ol-lrc-type {
   text-transform: uppercase;
-  color: $lightText;
+  color: $light-text;
 }
+
 .ol-lrc-cert {
   height: 1.5em;
 }
 
 .ol-lrc-offered-by {
-  color: $lightText;
+  color: $light-text;
   padding-right: 0.25em;
 }
 
 .ol-lrc-title {
-  font-weight: $boldWeight;
+  font-weight: $bold-weight;
   margin:0;
 }
 
 .ol-lrc-date-row {
-  min-height: 2.5*$smallFontSize; // ensure consistent spacing even if no date
+  min-height: 2.5 * $small-font-size; // ensure consistent spacing even if no date
 }
+
 .ol-lrc-chip.MuiChip-root {
-  height: 2.5*$smallFontSize;
-  font-size: $smallFontSize;
+  height: 2.5 * $small-font-size;
+  font-size: $small-font-size;
 
   .MuiSvgIcon-root {
-    height: 1.25*$smallFontSize;
-    width: 1.25*$smallFontSize;
+    height: 1.25 * $small-font-size;
+    width: 1.25 * $small-font-size;
   }
 }
