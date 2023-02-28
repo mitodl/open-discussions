@@ -1,19 +1,17 @@
-import React from "react"
 import { faker } from "@faker-js/faker"
-import { LearningResourceCard, UserList } from "ol-search-ui"
+import { UserList } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { EditListDialog } from "./ManageListDialogs"
+import ItemsListing from "./ItemsListing"
 import {
   screen,
   renderTestApp,
   setMockResponse,
   user,
-  expectProps
+  expectProps,
+  waitFor
 } from "../../test-utils"
-import { waitForElementToBeRemoved } from "@testing-library/react"
-
-const spyLearningResourceCard = jest.mocked(LearningResourceCard)
 
 jest.mock("./ManageListDialogs", () => {
   const actual = jest.requireActual("./ManageListDialogs")
@@ -22,16 +20,17 @@ jest.mock("./ManageListDialogs", () => {
     EditListDialog: jest.fn(actual.EditListDialog)
   }
 })
-jest.mock("../LearningResourceDrawer", () => {
-  const actual = jest.requireActual("../LearningResourceDrawer")
+jest.mock("./ItemsListing", () => {
+  const actual = jest.requireActual("./ItemsListing")
   return {
     __esModule: true,
     ...actual,
-    default:    jest.fn(() => <div>LearningResourceDrawer</div>)
+    default:    jest.fn(actual.default)
   }
 })
 
 const spyEditListDialog = jest.mocked(EditListDialog)
+const spyItemsListing = jest.mocked(ItemsListing)
 
 describe("UserListDetailsPage", () => {
   /**
@@ -55,24 +54,12 @@ describe("UserListDetailsPage", () => {
     setMockResponse.get(lrUrls.topics.listing, topics)
 
     const { history } = renderTestApp({ url: `/lists/${userList.id}` })
-    return { history, userList, items }
+    return { history, userList, items, paginatedItems }
   }
 
   test("renders list title", async () => {
     const { userList } = setup()
     await screen.findByRole("heading", { name: userList.title })
-  })
-
-  test("Renders a card for each item in list", async () => {
-    const { items } = setup()
-    const titles = items.map(item => item.title)
-    const headings = await screen.findAllByRole("heading", {
-      name: value => titles.includes(value)
-    })
-    expect(headings.map(h => h.textContent)).toEqual(titles)
-    items.forEach(resource => {
-      expectProps(spyLearningResourceCard, { resource })
-    })
   })
 
   test("Edit buttons opens editing dialog", async () => {
@@ -83,28 +70,24 @@ describe("UserListDetailsPage", () => {
     expectProps(spyEditListDialog, { resource: userList })
   })
 
-  test.each([
-    { count: 0, nullMessage: false },
-    { count: 3, nullMessage: true }
-  ])(
-    "Renders empty message if and only if list is empty",
-    async ({ count, nullMessage }) => {
-      setup(count)
-      const loading = screen.getByText("Loading", { exact: false })
-      await waitForElementToBeRemoved(loading)
-      const message = screen.queryByText("There are no items in this list yet.")
-      expect(message === null).toBe(nullMessage)
-    }
-  )
+  test("Passes appropriate props to ItemsListing", async () => {
+    const { paginatedItems } = setup()
+    expectProps(spyItemsListing, {
+      isLoading:    true,
+      data:         undefined,
+      emptyMessage: "There are no items in this list yet."
+    })
 
-  test("Clicking a card title routes to resource drawer", async () => {
-    const { items, history } = setup()
-    const item = faker.helpers.arrayElement(items)
-    const cardTitle = await screen.findByRole("heading", { name: item.title })
-
-    await user.click(cardTitle)
-    const searchParams = new URLSearchParams(history.location.search)
-    expect(searchParams.get("resource_id")).toEqual(String(item.id))
-    expect(searchParams.get("resource_type")).toEqual(item.object_type)
+    await waitFor(() => {
+      expectProps(
+        spyItemsListing,
+        {
+          isLoading:    false,
+          data:         paginatedItems,
+          emptyMessage: "There are no items in this list yet."
+        },
+        -1
+      )
+    })
   })
 })

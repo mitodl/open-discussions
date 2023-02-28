@@ -54,7 +54,6 @@ describe("request mocking", () => {
   })
 
   test("Error codes reject", async () => {
-    console.log("STARTING TEST")
     setMockResponse.post("/some-example", "Bad request", { code: 400 })
     await expect(axios.post("/some-example", { a: 5 })).rejects.toEqual({
       response: { data: "Bad request", status: 400 }

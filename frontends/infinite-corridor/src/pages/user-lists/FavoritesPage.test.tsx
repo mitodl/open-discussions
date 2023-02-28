@@ -1,27 +1,25 @@
-import React from "react"
 import { faker } from "@faker-js/faker"
-import { LearningResourceCard } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {
   screen,
   renderTestApp,
   setMockResponse,
-  user,
+  waitFor,
   expectProps
 } from "../../test-utils"
-import { waitForElementToBeRemoved } from "@testing-library/react"
+import ItemsListing from "./ItemsListing"
 
-const spyLearningResourceCard = jest.mocked(LearningResourceCard)
-
-jest.mock("../LearningResourceDrawer", () => {
-  const actual = jest.requireActual("../LearningResourceDrawer")
+jest.mock("./ItemsListing", () => {
+  const actual = jest.requireActual("./ItemsListing")
   return {
     __esModule: true,
     ...actual,
-    default:    jest.fn(() => <div>LearningResourceDrawer</div>)
+    default:    jest.fn(actual.default)
   }
 })
+
+const spyItemsListing = jest.mocked(ItemsListing)
 
 describe("FavoritesPage", () => {
   /**
@@ -42,43 +40,24 @@ describe("FavoritesPage", () => {
     await screen.findByRole("heading", { name: "My Favorites" })
   })
 
-  test("Renders a card for each item in list", async () => {
+  test("Passes appropriate props to ItemsListing", async () => {
     const { favorites } = setup()
-    const items = favorites.results.map(r => r.content_data)
-    const titles = items.map(item => item.title)
-    const headings = await screen.findAllByRole("heading", {
-      name: value => titles.includes(value)
+    expectProps(spyItemsListing, {
+      isLoading:    true,
+      data:         undefined,
+      emptyMessage: "You don't have any favorites yet."
     })
-    expect(headings.map(h => h.textContent)).toEqual(titles)
-    items.forEach(resource => {
-      expectProps(spyLearningResourceCard, { resource })
+
+    await waitFor(() => {
+      expectProps(
+        spyItemsListing,
+        {
+          isLoading:    false,
+          data:         favorites,
+          emptyMessage: "You don't have any favorites yet."
+        },
+        -1
+      )
     })
-  })
-
-  test.each([
-    { count: 0, nullMessage: false },
-    { count: 3, nullMessage: true }
-  ])(
-    "Renders empty message if and only if no favorites",
-    async ({ count, nullMessage }) => {
-      setup(count)
-      const loading = screen.getByText("Loading", { exact: false })
-      await waitForElementToBeRemoved(loading)
-      const message = screen.queryByText("You don't have any favorites yet.")
-      expect(message === null).toBe(nullMessage)
-    }
-  )
-
-  test("Clicking a card title routes to resource drawer", async () => {
-    const { favorites, history } = setup()
-    const item = faker.helpers.arrayElement(
-      favorites.results.map(r => r.content_data)
-    )
-    const cardTitle = await screen.findByRole("heading", { name: item.title })
-
-    await user.click(cardTitle)
-    const searchParams = new URLSearchParams(history.location.search)
-    expect(searchParams.get("resource_id")).toEqual(String(item.id))
-    expect(searchParams.get("resource_type")).toEqual(item.object_type)
   })
 })
