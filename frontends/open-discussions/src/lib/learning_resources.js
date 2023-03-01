@@ -61,7 +61,7 @@ export const bestRun = (runs: Array<LearningResourceRun>) => {
   // The next future run
   const futureRuns = runs
     .filter(run => runStartDate(run).isAfter())
-    .sort(compareRuns).reverse()
+    .sort(compareRuns)
   if (!emptyOrNil(futureRuns)) {
     return futureRuns[0]
   }
