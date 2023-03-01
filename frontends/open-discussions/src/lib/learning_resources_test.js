@@ -122,10 +122,10 @@ describe("Course utils", () => {
         const nullRun = makeRun()
 
         if (currentRunAvailable) {
-          currentRun.best_start_date = moment(currentDate)
+          currentRun.start_date = moment(currentDate)
             .add(5, "days")
             .format(DATE_FORMAT)
-          currentRun.best_end_date = moment(currentDate)
+          currentRun.end_date = moment(currentDate)
             .subtract(5, "days")
             .format(DATE_FORMAT)
           course.runs.push(currentRun)
