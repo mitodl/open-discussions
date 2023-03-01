@@ -62,10 +62,10 @@ const resourceThumbnailSrc = (
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"
 
 const runStartDate = (objectRun: LearningResourceRun): moment.Moment =>
-  moment(objectRun.best_start_date, DATE_FORMAT)
+  moment(objectRun.start_date, DATE_FORMAT)
 
 const runEndDate = (objectRun: LearningResourceRun): moment.Moment =>
-  moment(objectRun.best_end_date, DATE_FORMAT)
+  moment(objectRun.end_date, DATE_FORMAT)
 
 const compareRuns = (
   firstRun: LearningResourceRun,
@@ -75,7 +75,7 @@ const compareRuns = (
 const findBestRun = (
   runs: LearningResourceRun[]
 ): LearningResourceRun | undefined => {
-  const dated = runs.filter(run => run.best_start_date && run.best_end_date)
+  const dated = runs.filter(run => run.start_date && run.end_date)
 
   // Runs that are running right now
   const [bestCurrentRun] = dated.filter(

@@ -82,7 +82,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
     resource.certification && resource.certification.length > 0
   const startDate =
     hasCertificate && bestAvailableRun ?
-      moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
+      moment(bestAvailableRun.start_date).format(DISPLAY_DATE_FORMAT) :
       null
   const offerers = resource.offered_by ?? []
   const handleActivate = useCallback(

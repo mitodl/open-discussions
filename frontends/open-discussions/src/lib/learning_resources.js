@@ -37,10 +37,10 @@ export const availabilityLabel = (availability: ?string) => {
 }
 
 const runStartDate = (objectRun: LearningResourceRun): moment$Moment =>
-  moment(objectRun.best_start_date, DATE_FORMAT)
+  moment(objectRun.start_date, DATE_FORMAT)
 
 const runEndDate = (objectRun: LearningResourceRun): moment$Moment =>
-  moment(objectRun.best_end_date, DATE_FORMAT)
+  moment(objectRun.end_date, DATE_FORMAT)
 
 const compareRuns = (
   firstRun: LearningResourceRun,
@@ -48,7 +48,7 @@ const compareRuns = (
 ) => runStartDate(firstRun).diff(runStartDate(secondRun), "hours")
 
 export const bestRun = (runs: Array<LearningResourceRun>) => {
-  runs = runs.filter(run => run.best_start_date && run.best_end_date)
+  runs = runs.filter(run => run.start_date && run.end_date)
 
   // Runs that are running right now
   const currentRuns = runs.filter(
@@ -61,7 +61,7 @@ export const bestRun = (runs: Array<LearningResourceRun>) => {
   // The next future run
   const futureRuns = runs
     .filter(run => runStartDate(run).isAfter())
-    .sort(compareRuns)
+    .sort(compareRuns).reverse()
   if (!emptyOrNil(futureRuns)) {
     return futureRuns[0]
   }
