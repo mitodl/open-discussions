@@ -122,56 +122,56 @@ describe("Course utils", () => {
         const nullRun = makeRun()
 
         if (currentRunAvailable) {
-          currentRun.start_date = moment(currentDate)
+          currentRun.best_start_date = moment(currentDate)
             .add(5, "days")
             .format(DATE_FORMAT)
-          currentRun.end_date = moment(currentDate)
+          currentRun.best_end_date = moment(currentDate)
             .subtract(5, "days")
             .format(DATE_FORMAT)
           course.runs.push(currentRun)
         }
 
         if (futureRunAvailable) {
-          futureRun.start_date = moment(currentDate)
+          futureRun.best_start_date = moment(currentDate)
             .add(5, "days")
             .format(DATE_FORMAT)
-          futureRun.end_date = moment(currentDate)
+          futureRun.best_end_date = moment(currentDate)
             .add(6, "days")
             .format(DATE_FORMAT)
           course.runs.push(futureRun)
 
           const otherFutureRun = makeRun()
-          otherFutureRun.start_date = moment(currentDate)
+          otherFutureRun.best_start_date = moment(currentDate)
             .add(15, "days")
             .format(DATE_FORMAT)
-          otherFutureRun.end_date = moment(currentDate)
+          otherFutureRun.best_end_date = moment(currentDate)
             .add(16, "days")
             .format(DATE_FORMAT)
           course.runs.push(otherFutureRun)
         }
 
         if (pastRunAvailable) {
-          pastRun.start_date = moment(currentDate)
+          pastRun.best_start_date = moment(currentDate)
             .subtract(5, "days")
             .format(DATE_FORMAT)
-          pastRun.end_date = moment(currentDate)
+          pastRun.best_end_date = moment(currentDate)
             .subtract(4, "days")
             .format(DATE_FORMAT)
           course.runs.push(pastRun)
 
           const otherPastRun = makeRun()
-          otherPastRun.start_date = moment(currentDate)
+          otherPastRun.best_start_date = moment(currentDate)
             .subtract(15, "days")
             .format(DATE_FORMAT)
-          otherPastRun.end_date = moment(currentDate)
+          otherPastRun.best_end_date = moment(currentDate)
             .subtract(14, "days")
             .format(DATE_FORMAT)
           course.runs.push(otherPastRun)
         }
 
         if (runWithNullStartDatesAvailable) {
-          nullRun.start_date = null
-          nullRun.end_date = null
+          nullRun.best_start_date = null
+          nullRun.best_end_date = null
           course.runs.push(nullRun)
         }
 
