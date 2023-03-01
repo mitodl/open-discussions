@@ -132,46 +132,46 @@ describe("Course utils", () => {
         }
 
         if (futureRunAvailable) {
-          futureRun.best_start_date = moment(currentDate)
+          futureRun.start_date = moment(currentDate)
             .add(5, "days")
             .format(DATE_FORMAT)
-          futureRun.best_end_date = moment(currentDate)
+          futureRun.end_date = moment(currentDate)
             .add(6, "days")
             .format(DATE_FORMAT)
           course.runs.push(futureRun)
 
           const otherFutureRun = makeRun()
-          otherFutureRun.best_start_date = moment(currentDate)
+          otherFutureRun.start_date = moment(currentDate)
             .add(15, "days")
             .format(DATE_FORMAT)
-          otherFutureRun.best_end_date = moment(currentDate)
+          otherFutureRun.end_date = moment(currentDate)
             .add(16, "days")
             .format(DATE_FORMAT)
           course.runs.push(otherFutureRun)
         }
 
         if (pastRunAvailable) {
-          pastRun.best_start_date = moment(currentDate)
+          pastRun.start_date = moment(currentDate)
             .subtract(5, "days")
             .format(DATE_FORMAT)
-          pastRun.best_end_date = moment(currentDate)
+          pastRun.end_date = moment(currentDate)
             .subtract(4, "days")
             .format(DATE_FORMAT)
           course.runs.push(pastRun)
 
           const otherPastRun = makeRun()
-          otherPastRun.best_start_date = moment(currentDate)
+          otherPastRun.start_date = moment(currentDate)
             .subtract(15, "days")
             .format(DATE_FORMAT)
-          otherPastRun.best_end_date = moment(currentDate)
+          otherPastRun.end_date = moment(currentDate)
             .subtract(14, "days")
             .format(DATE_FORMAT)
           course.runs.push(otherPastRun)
         }
 
         if (runWithNullStartDatesAvailable) {
-          nullRun.best_start_date = null
-          nullRun.best_end_date = null
+          nullRun.start_date = null
+          nullRun.end_date = null
           course.runs.push(nullRun)
         }
 
