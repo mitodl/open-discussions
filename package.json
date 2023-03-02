@@ -6,7 +6,6 @@
     ],
     "scripts": {
         "foreach-with-fallback": "yarn workspaces foreach --verbose --topological exec node ${PROJECT_CWD}/scripts/yarn-run-with-fallback.js $0 $1",
-        "postinstall": "yarn run build",
         "start-dev": "yarn run build && yarn workspaces foreach --verbose --parallel --jobs unlimited --interlaced exec node ${PROJECT_CWD}/scripts/yarn-run-with-fallback.js start-dev global:start-dev",
         "build": "run foreach-with-fallback build global:build",
         "clean": "run foreach-with-fallback clean global:clean",
