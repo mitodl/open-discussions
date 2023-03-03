@@ -8,9 +8,19 @@ export enum LearningResourceType {
   LearningPath = "learningpath",
   Video = "video",
   Podcast = "podcast",
-  PodcastEpisode = "podcastepisode",
-  Favorites = "favorites"
+  PodcastEpisode = "podcastepisode"
 }
+
+/**
+ * "favorites" is not a real learning resource type in the sense that none of
+ * the resource objects returned by the /catalogs API endpoints have
+ * object_type === "favorites".
+ *
+ * We occasionally treat it somewhat like a LearningResourceType, though
+ * (Example: LearningResourceCards can render a list of "Favorites" similarly
+ * to a UserList.)
+ */
+export const TYPE_FAVORITES = "favorites"
 
 export enum PrivacyLevel {
   Public = "public",
@@ -60,11 +70,13 @@ export interface UserList extends LearningResource {
   item_count: number
   object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
 }
-export interface Favorites extends Omit<LearningResource, "id"> {
+
+export interface Favorites
+  extends Omit<LearningResource, "id" | "object_type"> {
   image_description?: string | null
   list_type: string
   item_count: number
-  object_type: LearningResourceType.Favorites
+  object_type: typeof TYPE_FAVORITES
 }
 
 export type UserListItem = {
@@ -122,17 +134,19 @@ export type CourseInstructor = {
 export type FacetKey = keyof Facets
 export type FacetManifest = [FacetKey, string][]
 
-export type CardMinimalResource = Pick<
-  LearningResource,
-  | "runs"
-  | "certification"
-  | "title"
-  | "offered_by"
-  | "object_type"
-  | "image_src"
-  | "platform"
-  | "item_count"
->
+export type CardMinimalResource =
+  | Pick<
+      LearningResource,
+      | "runs"
+      | "certification"
+      | "title"
+      | "offered_by"
+      | "object_type"
+      | "image_src"
+      | "platform"
+      | "item_count"
+    >
+  | Favorites
 
 export type EmbedlyConfig = {
   embedlyKey: string

@@ -1,5 +1,5 @@
 import UrlAssembler from "url-assembler"
-import { LearningResourceType as LRT } from "ol-search-ui"
+import { LearningResourceType as LRT, TYPE_FAVORITES } from "ol-search-ui"
 import type { PaginationSearchParams } from "ol-util"
 
 const DEFAULT_PAGINATION_PARAMS: PaginationSearchParams = {
@@ -161,8 +161,8 @@ const keys = {
   },
   topics:    [baseKey, "topics"],
   favorites: {
-    all:     resourceKeys(LRT.Favorites).all,
-    listing: resourceKeys(LRT.Favorites).listing
+    all:     resourceKeys(TYPE_FAVORITES).all,
+    listing: resourceKeys(TYPE_FAVORITES).listing
   }
 }
 

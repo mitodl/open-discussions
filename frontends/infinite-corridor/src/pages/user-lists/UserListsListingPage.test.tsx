@@ -1,10 +1,6 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
-import {
-  Favorites,
-  LearningResourceCard,
-  LearningResourceType
-} from "ol-search-ui"
+import { Favorites, LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
 import * as factories from "ol-search-ui/build/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {
@@ -88,7 +84,7 @@ describe("UserListsListingPage", () => {
     const favoritesList: Partial<Favorites> = {
       title:       "My Favorites",
       item_count:  numFavorites,
-      object_type: LearningResourceType.Favorites
+      object_type: TYPE_FAVORITES
     }
     expectProps(spyLearningResourceCard, {
       resource: expect.objectContaining(favoritesList)

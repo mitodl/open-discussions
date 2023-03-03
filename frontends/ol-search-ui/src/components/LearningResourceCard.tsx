@@ -13,7 +13,8 @@ import CardMedia from "@mui/material/CardMedia"
 import {
   CardMinimalResource,
   EmbedlyConfig,
-  LearningResourceType
+  LearningResourceType,
+  TYPE_FAVORITES
 } from "../interfaces"
 import {
   findBestRun,
@@ -90,7 +91,7 @@ const ResourceFooterDetails: React.FC<
   const isList = [
     LearningResourceType.Userlist,
     LearningResourceType.LearningPath,
-    LearningResourceType.Favorites
+    TYPE_FAVORITES
   ].includes(resource.object_type)
   if (isList && resource.item_count !== undefined) {
     return (
