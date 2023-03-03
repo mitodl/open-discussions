@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
 import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
+import { allowConsoleErrors } from "ol-util/build/test-utils"
 import * as factories from "ol-search-ui/build/factories"
 import { QueryClient, QueryClientProvider } from "react-query"
 import {
@@ -35,13 +36,32 @@ const setup = () => {
       status: 200
     })
   })
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false
+      }
+    }
+  })
   const wrapper = ({ children }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
   return { wrapper }
 }
+
+test("useResource rejects with invalid resource type", async () => {
+  const { wrapper } = setup()
+  const { result, waitFor } = renderHook(() => useResource("fake_type", 123), {
+    wrapper
+  })
+
+  allowConsoleErrors()
+  await waitFor(() => result.current.isError)
+  expect(result.current.error).toEqual(
+    new Error("Unknown resource type: fake_type")
+  )
+})
 
 test("useCreateUserList invalidates userlist Listings", async () => {
   const { wrapper } = setup()

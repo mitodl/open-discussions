@@ -41,6 +41,7 @@ const DrawerContent: React.FC<DrawerContentProps> = ({
   resourceType
 }) => {
   const resourceQuery = useResource(resourceType, resourceId)
+  console.log(resourceQuery)
   const resource = resourceQuery.data
   return (
     <section className="ic-lr-drawer" aria-label="Detailed description">
