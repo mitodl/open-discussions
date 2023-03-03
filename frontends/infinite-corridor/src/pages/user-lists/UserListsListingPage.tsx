@@ -21,7 +21,7 @@ import {
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useFavorites, useUserListsListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
-import { LearningResourceCard, LearningResourceType } from "ol-search-ui"
+import { LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
 import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
@@ -85,7 +85,7 @@ const EditListMenu: React.FC<EditListMenuProps> = ({
 const makeFavorites = (count: number): Favorites => {
   return {
     title:         "My Favorites",
-    object_type:   LearningResourceType.Favorites,
+    object_type:   TYPE_FAVORITES,
     list_type:     "favorites",
     item_count:    count,
     topics:        [],
@@ -110,7 +110,7 @@ const UserListsListingPage: React.FC = () => {
   const handleActivate = useCallback(
     (resource: UserList | Favorites) => {
       const path =
-        resource.object_type === LearningResourceType.Favorites ?
+        resource.object_type === TYPE_FAVORITES ?
           FAVORITES_VIEW :
           makeUserListViewPath(resource.id)
       history.push(path)

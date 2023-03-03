@@ -3,7 +3,8 @@ import {
   LearningResourceRun,
   CoursePrice,
   CourseInstructor,
-  LearningResourceType as LR
+  LearningResourceType as LR,
+  TYPE_FAVORITES
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
 import { capitalize, emptyOrNil } from "ol-util"
@@ -98,20 +99,23 @@ const findBestRun = (
   return undefined
 }
 
-const readableLearningResources: Record<LR, string> = {
+const readableLearningResources: Record<LR | typeof TYPE_FAVORITES, string> = {
   [LR.Course]:         "Course",
   [LR.Program]:        "Program",
   [LR.Userlist]:       "Learning List",
   [LR.LearningPath]:   "Learning Path",
   [LR.Video]:          "Video",
-  [LR.Favorites]:      "Favorites",
+  [TYPE_FAVORITES]:    "Favorites",
   [LR.Podcast]:        "Podcast",
   [LR.PodcastEpisode]: "Podcast Episode"
 }
 const LR_TYPES: string[] = Object.values(LR)
 
-const assertIsLrType: (type: string) => asserts type is LR = type => {
+const assertIsLrType: (
+  type: string
+) => asserts type is LR | typeof TYPE_FAVORITES = type => {
   if (LR_TYPES.includes(type)) return
+  if (type === TYPE_FAVORITES) return
   throw new Error(`Type ${type} is not a valid LearningResourceType`)
 }
 
