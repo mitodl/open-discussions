@@ -15,11 +15,11 @@ import {
 import { urls, keys, UserListOptions } from "./urls"
 
 const useResource = (type: string, id: number) => {
-  const url = urls.resource.details(type, id)
   const key = keys.resource(type).id(id).details
-  return useQuery<LearningResource>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
+  return useQuery<LearningResource>(key, async () => {
+    const url = urls.resource.details(type, id)
+    return axios.get(url).then(res => res.data)
+  })
 }
 const useUserList = (id: number) => {
   return useResource("userlist", id) as UseQueryResult<UserList>
