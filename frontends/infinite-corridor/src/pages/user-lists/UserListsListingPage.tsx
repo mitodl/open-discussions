@@ -13,8 +13,8 @@ import { BannerPage, useToggle } from "ol-util"
 import {
   CreateListDialog,
   EditListDialog,
-  DeletionDialog,
-  useDeletionDialog,
+  DeleteListDialog,
+  useDeleteListDialog,
   useEditingDialog,
   useCreationDialog
 } from "./ManageListDialogs"
@@ -98,7 +98,7 @@ const makeFavorites = (count: number): Favorites => {
 const UserListsListingPage: React.FC = () => {
   const creation = useCreationDialog()
   const editing = useEditingDialog()
-  const deletion = useDeletionDialog()
+  const deletion = useDeleteListDialog()
 
   const userListsQuery = useUserListsListing()
   const favoritesQuery = useFavorites()
@@ -187,7 +187,7 @@ const UserListsListingPage: React.FC = () => {
         resource={editing.resource}
         onClose={editing.handleFinish}
       />
-      <DeletionDialog
+      <DeleteListDialog
         resource={deletion.resource}
         onClose={deletion.handleFinish}
       />

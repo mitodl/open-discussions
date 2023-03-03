@@ -34,11 +34,11 @@ const EditListDialog: React.FC<EditListDialogProps> = ({
   )
 }
 
-type DeletionDialogProps = {
+type DeleteListDialogProps = {
   onClose: () => void
   resource: UserList | null
 }
-const DeletionDialog: React.FC<DeletionDialogProps> = ({
+const DeleteListDialog: React.FC<DeleteListDialogProps> = ({
   onClose,
   resource
 }) => {
@@ -86,7 +86,7 @@ const useEditingDialog = () => {
   }
 }
 
-const useDeletionDialog = () => {
+const useDeleteListDialog = () => {
   const [resourceToDelete, setResourceToDelete] = useState<UserList | null>(
     null
   )
@@ -108,8 +108,8 @@ const useDeletionDialog = () => {
 export {
   CreateListDialog,
   EditListDialog,
-  DeletionDialog,
+  DeleteListDialog,
   useCreationDialog,
   useEditingDialog,
-  useDeletionDialog
+  useDeleteListDialog
 }

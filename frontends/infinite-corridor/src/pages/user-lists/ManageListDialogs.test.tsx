@@ -8,7 +8,7 @@ import { urls as lrUrls } from "../../api/learning-resources"
 import {
   EditListDialog,
   CreateListDialog,
-  DeletionDialog
+  DeleteListDialog
 } from "./ManageListDialogs"
 import {
   screen,
@@ -284,7 +284,7 @@ describe("Deleting lists", () => {
     const resource = factories.makeUserList(resourceOverrides)
     const onClose = jest.fn()
     renderWithProviders(
-      <DeletionDialog resource={resource} onClose={onClose} />
+      <DeleteListDialog resource={resource} onClose={onClose} />
     )
     return { resource, onClose }
   }

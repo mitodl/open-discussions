@@ -6,7 +6,7 @@ import { urls as lrUrls } from "../../api/learning-resources"
 import {
   EditListDialog,
   CreateListDialog,
-  DeletionDialog
+  DeleteListDialog
 } from "./ManageListDialogs"
 import UserListsListingPage from "./UserListsListingPage"
 import {
@@ -25,13 +25,13 @@ jest.mock("./ManageListDialogs", () => {
     ...actual,
     EditListDialog:   jest.fn(actual.EditListDialog),
     CreateListDialog: jest.fn(actual.CreateListDialog),
-    DeletionDialog:   jest.fn(actual.DeletionDialog)
+    DeleteListDialog: jest.fn(actual.DeleteListDialog)
   }
 })
 
 const spyEditListDialog = jest.mocked(EditListDialog)
 const spyCreateListDialog = jest.mocked(CreateListDialog)
-const spyDeletionDialog = jest.mocked(DeletionDialog)
+const spyDeleteListDialog = jest.mocked(DeleteListDialog)
 
 describe("UserListsListingPage", () => {
   /**
@@ -118,7 +118,7 @@ describe("UserListsListingPage", () => {
     screen.getByRole("dialog", { name: "Delete list" })
 
     // Check details of this dialog elsewhere
-    expectProps(spyDeletionDialog, { resource: targetList })
+    expectProps(spyDeleteListDialog, { resource: targetList })
   })
 
   test("Clicking new list opens the creation dialog", async () => {
