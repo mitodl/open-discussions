@@ -66,6 +66,7 @@ $small-font-size: 0.75em !default;
       margin-bottom: 0;
     }
   }
+
   .ol-lrc-fill-space-content-end {
     /*
     Last child of ol-lrc-content will take up any extra space (flex: 1) but
@@ -107,7 +108,7 @@ $small-font-size: 0.75em !default;
 }
 
 .ol-lrc-footer-row {
-  min-height: 2.5*$smallFontSize; // ensure consistent spacing even if no date
+  min-height: 2.5 * $small-font-size; // ensure consistent spacing even if no date
   display: flex;
   flex-direction: row;
   align-items: center;
