@@ -1,15 +1,16 @@
 @use "theme";
 
-$resultsSpacer: 1rem;
+$results-spacer: 1rem;
 
 .searchbar-container {
   display: flex;
+  height: 500px;
   justify-content: center;
 }
 
 .ic-searchpage-list {
   > * {
-    margin: $resultsSpacer;
+    margin: $results-spacer;
   }
 }
 
@@ -46,10 +47,6 @@ $resultsSpacer: 1rem;
     max-height: 400px;
     overflow: auto;
   }
-}
-
-.searchbar-container{
-	height: 500px;
 }
 
 .filter-section-title {
@@ -136,8 +133,38 @@ $resultsSpacer: 1rem;
   }
 }
 
+.search-filter-drawer-open {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  left: 0;
+  background: white;
+  width: 100%;
+  overflow: scroll;
+  z-index: theme.$mui-app-bar-z-index + 1;
+
+  .search-filter-header {
+    display: flex;
+    justify-content: flex-end;
+
+    i {
+      font-size: 2rem
+    }
+  }
+
+  .search-filter-contents { 
+    padding: 0 20px;
+
+    > button {
+      width: 100%;
+      font-size: theme.$font-lg;
+      margin-bottom: 20px;
+    }
+  }
+}
+
 .active-search-filters {
-  margin: 0rem 1rem 1.4rem 1rem;
+  margin: 0 1rem 1.4rem;
 
   .clear-all-filters {
     font-size: theme.$font-normal;
@@ -148,7 +175,7 @@ $resultsSpacer: 1rem;
   }
 
   .active-search-filter {
-    margin: 0px 5px 9px 0px;
+    margin: 0 5px 9px 0;
     background-color: theme.$color-gray-2;
     padding: 6px 10px;
     font-size: theme.$font-sm;
@@ -170,36 +197,8 @@ $resultsSpacer: 1rem;
   }
 }
 
-.search-filter-drawer-open {
-  position: fixed;
-  top: 0px;
-  height: 100%;
-  left: 0;
-  background: white;
-  width: 100%;
-  overflow: scroll;
-  z-index: theme.$muiAppBarZIndex + 1;
-
-  .search-filter-header {
-    display: flex;
-    justify-content: flex-end;
-    i {
-      font-size: 2rem
-    }
-  }
-
-  .search-filter-contents { 
-    padding: 0 20px;
-    > button {
-      width: 100%;
-      font-size: theme.$font-lg;
-      margin-bottom: 20px;
-    }
-  }
-}
-
 .search-filter-toggle {
-  margin: 0 $resultsSpacer;
+  margin: 0 $results-spacer;
 
   .MuiButton-endIcon svg {
     font-size: 2rem;

@@ -6,6 +6,7 @@
   flex-direction:row;
   justify-content: center;
   align-items: center;
+
   &:not([disabled]) {
     color: inherit;
     cursor: pointer;
@@ -14,16 +15,19 @@
 
 .outlined-button {
   @extend %button-base;
+
   background: transparent;
   display: flex;
   border-width: 1px;
+
   &:not([disabled]) {
     border-color: theme.$font-color-default;
   }
 }
 
-.background-button {
+%background-button {
   @extend %button-base;
+
   border: none;
   background-color: theme.$color-background;
 }

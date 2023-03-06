@@ -76,6 +76,10 @@
       width: 100%;
       border-spacing: 12px;
 
+      td:last-child {
+        text-align: center;
+      }
+
       .three-cols {
         td {
           width: 3 * 100% * 0.125;
@@ -88,10 +92,6 @@
 
       .two-cols {
         width: 50%;
-      }
-
-      td:last-child {
-        text-align: center;
       }
     }
   }
@@ -108,7 +108,7 @@
     font-size: 14px;
 
     &:hover {
-      box-shadow: 2px 3px 5px 0px rgba(0, 0, 0, 0.2);
+      box-shadow: 2px 3px 5px 0 rgb(0 0 0 / 20%);
       transition: none;
     }
   }
@@ -129,7 +129,7 @@
     }
   }
 
-  .cant_remove {
+  .cant-remove {
     color: theme.$font-grey-light;
     font-weight: normal;
   }

@@ -7,9 +7,11 @@
     &:first-child {
       margin-top: 0;
     }
+
     &:not(:first-child) {
       margin-top: 1em;
     }
+
     &:not(:last-child) {
       margin-bottom: 1em;
     }
@@ -22,7 +24,7 @@
   }
 
   .MuiCardActions-root button {
-    @extend .background-button;
+    @extend %background-button;
   }
 
   .ol-markdown {
@@ -39,8 +41,9 @@
 
 .ic-widget-editing-header {
   h4 {
-    margin-top: 0px;
+    margin-top: 0;
   }
+
   button:not(:first-child) {
     margin-left: 8px;
   }

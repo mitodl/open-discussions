@@ -1,15 +1,13 @@
 @use "theme";
 @use "breakpoints";
 @use "ol-search-ui/assets/learning-resource-card" with (
-  $lightText: theme.$font-color-light
+  $light-text: theme.$font-color-light
 );
-
 @use "ol-search-ui/assets/learning-resource-drawer";
 
-$cardListSpacer: 1.5em;
+$card-list-spacer: 1.5em;
 
 .ic-resource-card {
-
   @include breakpoints.down(sm) {
     .ol-lrc-image{
       display: none;
@@ -19,10 +17,11 @@ $cardListSpacer: 1.5em;
 
 .ic-card-row-list {
   padding-left: 0;
+
   > li {
     list-style: none;
-    margin-top: $cardListSpacer;
-    margin-bottom: $cardListSpacer;
+    margin-top: $card-list-spacer;
+    margin-bottom: $card-list-spacer;
   }
 }
 

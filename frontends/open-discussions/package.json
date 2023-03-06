@@ -177,6 +177,7 @@
     "lint-check": "eslint ./src",
     "lint-fix": "eslint --fix ./src",
     "scss-lint": "sass-lint --verbose --no-exit",
+    "scss-lint-fix": "echo 'not implemented'",
     "test": "./scripts/js_test.sh",
     "coverage": "COVERAGE=1 ./scripts/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/js_test.sh",
