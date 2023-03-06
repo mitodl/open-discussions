@@ -8,7 +8,7 @@ import { Cell, Grid } from "./Grid"
 import ChannelAvatar, { CHANNEL_AVATAR_MEDIUM } from "./ChannelAvatar"
 import ChannelSettingsLink from "./ChannelSettingsLink"
 import ChannelFollowControls from "./ChannelFollowControls"
-import { BannerPageHeader } from "ol-util"
+import { BannerPageHeader } from "./PageBanner"
 
 import { channelURL } from "../lib/url"
 

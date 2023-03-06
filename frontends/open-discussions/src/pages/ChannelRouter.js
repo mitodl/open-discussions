@@ -14,7 +14,7 @@ import ChannelMembersPage from "./ChannelMembersPage"
 import ManageWidgetHeader from "../components/widgets/ManageWidgetHeader"
 import ChannelHeader from "../components/ChannelHeader"
 import ChannelNavbar from "../components/ChannelNavbar"
-import { BannerPageWrapper } from "ol-util"
+import { BannerPageWrapper } from "../components/PageBanner"
 
 import { actions } from "../actions"
 import { getChannelName } from "../lib/util"

@@ -18,7 +18,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "ol-util"
+} from "../components/PageBanner"
 import CourseFilterDrawer from "../components/search/CourseFilterDrawer"
 
 import { actions } from "../actions"

@@ -11,7 +11,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "ol-util"
+} from "../components/PageBanner"
 import { Cell, Grid } from "../components/Grid"
 import { CarouselLoading } from "../components/Loading"
 import ResponsiveWrapper from "../components/ResponsiveWrapper"
