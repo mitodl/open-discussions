@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { useMutation } from "redux-query-react"
 import { Link } from "react-router-dom"
 
-import { Card } from "ol-util"
+import Card from "./Card"
 import Dialog from "./Dialog"
 import DropdownMenu from "./DropdownMenu"
 import UserListFormDialog from "./UserListFormDialog"

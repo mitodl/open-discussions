@@ -2,7 +2,8 @@
 /* global SETTINGS */
 import React from "react"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import PoliciesNavBar from "../../components/PoliciesNavBar"
 import withSingleColumn from "../../hoc/withSingleColumn"
 

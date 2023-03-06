@@ -4,7 +4,7 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../../components/MetaTags"
 
 import EditChannelAppearanceForm from "../../components/admin/EditChannelAppearanceForm"
 import EditChannelNavbar from "../../components/admin/EditChannelNavbar"

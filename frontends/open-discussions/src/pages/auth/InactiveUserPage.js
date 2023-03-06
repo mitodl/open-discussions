@@ -2,7 +2,8 @@
 /* global SETTINGS:false */
 import React from "react"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import { formatTitle } from "../../lib/title"
 
 import type { Match } from "react-router"

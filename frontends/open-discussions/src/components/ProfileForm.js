@@ -6,7 +6,7 @@ import { ValidationError } from "ol-forms"
 
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"
-import { Card } from "ol-util"
+import Card from "./Card"
 
 import { goBackAndHandleEvent } from "../lib/util"
 import { getSocialSites, getPersonalSite } from "../lib/profile"

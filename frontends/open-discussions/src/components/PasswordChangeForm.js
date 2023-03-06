@@ -2,7 +2,7 @@
 import React from "react"
 import { Link } from "react-router-dom"
 
-import { Card } from "ol-util"
+import Card from "./Card"
 
 import { validationMessage } from "../lib/validation"
 import { ACCOUNT_SETTINGS_URL } from "../lib/url"

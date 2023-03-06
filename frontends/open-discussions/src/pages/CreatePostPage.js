@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 import isURL from "validator/lib/isURL"
 
 import CreatePostForm from "../components/CreatePostForm"

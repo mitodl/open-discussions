@@ -4,7 +4,8 @@ import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import R from "ramda"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import PasswordResetConfirmForm from "../../components/auth/PasswordResetConfirmForm"
 import withForm from "../../hoc/withForm"
 

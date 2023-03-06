@@ -5,7 +5,7 @@ import R from "ramda"
 import qs from "query-string"
 import { connect } from "react-redux"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 
 import { PostLoading, withLoading } from "../components/Loading"
 import { PostSortPicker } from "../components/Picker"

@@ -5,7 +5,8 @@ import R from "ramda"
 import { connect } from "react-redux"
 import { Redirect } from "react-router"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import {
   withPostModeration,
   postModerationSelector

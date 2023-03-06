@@ -5,7 +5,7 @@ import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { useDispatch } from "react-redux"
 
-import { Card } from "ol-util"
+import Card from "./Card"
 import LoginTooltip from "./LoginTooltip"
 import LearningResourceIcon from "./LearningResourceIcon"
 

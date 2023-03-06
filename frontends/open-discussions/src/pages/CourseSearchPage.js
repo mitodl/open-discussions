@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 import { Searchbox } from "ol-search-ui"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"

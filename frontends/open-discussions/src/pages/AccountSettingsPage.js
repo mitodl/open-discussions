@@ -5,7 +5,8 @@ import R from "ramda"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../components/Card"
+import MetaTags from "../components/MetaTags"
 import SettingsTabs from "../components/SettingsTabs"
 
 import { actions } from "../actions"
