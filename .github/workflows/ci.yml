@@ -127,6 +127,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Webpack build
+        run: yarn run build
+
       - name: Lints
         run: yarn run lint-check
 
@@ -144,9 +147,6 @@ jobs:
         env:
           CODECOV: true
           NODE_ENV: test
-
-      - name: Webpack build
-        run: yarn run build
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1
