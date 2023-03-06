@@ -6,7 +6,7 @@ import R from "ramda"
 import { waitFor } from "@testing-library/react"
 
 import PostList from "../components/PostList"
-import { NotFound, NotAuthorized } from "ol-util"
+import { NotFound, NotAuthorized } from "../components/ErrorPages"
 import ChannelPage, { ChannelPage as InnerChannelPage } from "./ChannelPage"
 
 import { makeChannelList } from "../factories/channels"

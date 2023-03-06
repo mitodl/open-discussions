@@ -12,7 +12,7 @@ import {
   PodcastLoading,
   PodcastEpisodeLoading
 } from "./Loading"
-import { NotFound, NotAuthorized } from "ol-util"
+import { NotFound, NotAuthorized } from "./ErrorPages"
 
 const GenericLoader = () => <div className="loading">loading...</div>
 

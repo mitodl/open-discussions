@@ -3,7 +3,8 @@ import React from "react"
 import R from "ramda"
 import ContentLoader from "react-content-loader"
 
-import { Card, NotFound, NotAuthorized } from "ol-util"
+import Card from "./Card"
+import { NotFound, NotAuthorized } from "./ErrorPages"
 import { Cell, Grid } from "./Grid"
 
 import { contentLoaderSpeed } from "../lib/constants"
