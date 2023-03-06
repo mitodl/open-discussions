@@ -1,26 +1,74 @@
-@mixin breakpoint($name) {
-  @if $name == desktop {
-    @media (min-width: 801px) {
+/*
+
+This file adds SASS breakpoint mixins. The breakpoint values match our MUI
+breakpoints in mui.ts.
+
+See also https://mui.com/material-ui/customization/breakpoints/
+*/
+
+
+// Alert! If you change these values, change them in mui.ts, too.
+$xs: 0;
+$sm: 600px;
+$md: 840px;
+$lg: 1200px;
+$xl: 1536px;
+$spacer: 0.05px;
+$xs-down: $xs - $spacer;
+$sm-down: $sm - $spacer;
+$md-down: $md - $spacer;
+$lg-down: $lg - $spacer;
+$xl-down: $xl - $spacer;
+
+/*
+Generate a media query that matches screens ABOVE the given breakpoint.
+*/
+@mixin up($name) {
+  @if $name == xs {
+    @media (min-width: $xs) {
       @content;
     }
-  } @else if $name == desktopwide {
-    @media (min-width: 1000px) {
+  } @else if $name == sm {
+    @media (min-width: $sm) {
       @content;
     }
-  } @else if $name == extrawide {
-    @media (min-width: 1150px) {
+  } @else if $name == md {
+    @media (min-width: $md) {
       @content;
     }
-  } @else if $name == mobile {
-    @media (max-width: 800px) {
+  } @else if $name == lg {
+    @media (min-width: $lg) {
       @content;
     }
-  } @else if $name == phone {
-    @media (max-width: 580px) {
+  } @else if $name == xl {
+    @media (min-width: $xl) {
       @content;
     }
-  } @else if $name == materialmobile {
-    @media (max-width: 599px) {
+  }
+}
+
+/*
+Generate a media query that matches screens BELOW the given breakpoint.
+*/
+@mixin down($name) {
+  @if $name == xs {
+    @media (max-width: $xs-down) {
+      @content;
+    }
+  } @else if $name == sm {
+    @media (max-width: $sm-down) {
+      @content;
+    }
+  } @else if $name == md {
+    @media (max-width: $md-down) {
+      @content;
+    }
+  } @else if $name == lg {
+    @media (max-width: $lg-down) {
+      @content;
+    }
+  } @else if $name == xl {
+    @media (max-width: $xl-down) {
       @content;
     }
   }
