@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.207.0
+Version 0.207.0 (Released March 06, 2023)
 ---------------
 
 - Assign department to MITX Online, MITx, and OLL courses (#3837)
