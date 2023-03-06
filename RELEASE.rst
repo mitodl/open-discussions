@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.207.1
+Version 0.207.1 (Released March 06, 2023)
 ---------------
 
 - Remove yarn postinstall script (#3851)
