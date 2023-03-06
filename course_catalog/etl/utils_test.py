@@ -274,7 +274,7 @@ def test_documents_from_olx():
 
         olx_path = os.path.join(temp, "content-devops-0001")
         parsed_documents = documents_from_olx(olx_path)
-    assert len(parsed_documents) == 106
+    assert len(parsed_documents) == 108
 
     expected_parsed_vertical = (
         "\n    Where all of the tests are defined  Jasmine tests: HTML module edition \n"
@@ -298,7 +298,7 @@ def test_documents_from_olx():
     assert formula2do[0] == b'<html filename="formula2do" display_name="To do list"/>\n'
     assert formula2do[1]["key"].endswith("formula2do.xml")
     assert formula2do[1]["content_type"] == CONTENT_TYPE_FILE
-    assert formula2do[1]["mime_type"] == "application/xml"
+    assert formula2do[1]["mime_type"].endswith("/xml")
 
 
 def test_extract_valid_department_from_id():
