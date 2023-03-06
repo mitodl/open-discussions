@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.207.1
+---------------
+
+- Remove yarn postinstall script (#3851)
+- Add stylelint for scss linting (#3849)
+- Revert "oops fixed tests on this branch"
+- oops fixed tests on this branch
+
 Version 0.207.0 (Released March 06, 2023)
 ---------------
 
