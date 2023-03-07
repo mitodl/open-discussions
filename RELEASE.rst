@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.207.2
+---------------
+
+- Add more valid text file types (#3855)
+
 Version 0.207.1 (Released March 06, 2023)
 ---------------
 
