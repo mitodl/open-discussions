@@ -1,4 +1,3 @@
-import moment from "moment"
 import React, { useCallback, useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
@@ -14,11 +13,10 @@ import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
 import {
   findBestRun,
   getReadableResourceType,
+  getStartDate,
   resourceThumbnailSrc,
   CertificateIcon
 } from "../util"
-
-const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
 type CardVariant = "column" | "row" | "row-reverse"
 type OnActivateCard<R extends CardMinimalResource = CardMinimalResource> = (
@@ -82,7 +80,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
     resource.certification && resource.certification.length > 0
   const startDate =
     hasCertificate && bestAvailableRun ?
-      moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT) :
+      getStartDate(resource.platform ?? "", bestAvailableRun) :
       null
   const offerers = resource.offered_by ?? []
   const handleActivate = useCallback(

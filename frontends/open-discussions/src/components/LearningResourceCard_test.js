@@ -235,7 +235,7 @@ describe("LearningResourceCard", () => {
       .replace("calendar_today", "")
     assert.equal(
       startDate,
-      moment(bestRun(object.runs).best_start_date).format(DISPLAY_DATE_FORMAT)
+      moment(bestRun(object.runs).start_date).format(DISPLAY_DATE_FORMAT)
     )
   })
 

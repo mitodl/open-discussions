@@ -1,6 +1,5 @@
 // @flow
 /* global SETTINGS:false */
-import moment from "moment"
 import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { useDispatch } from "react-redux"
@@ -10,13 +9,12 @@ import LoginTooltip from "./LoginTooltip"
 import LearningResourceIcon from "./LearningResourceIcon"
 
 import { setDialogData } from "../actions/ui"
-import { bestRun } from "../lib/learning_resources"
+import { bestRun, getStartDate } from "../lib/learning_resources"
 import { defaultResourceImageURL, embedlyThumbnail } from "../lib/url"
 import {
   CAROUSEL_IMG_WIDTH,
   CAROUSEL_IMG_HEIGHT,
   LR_TYPE_VIDEO,
-  DISPLAY_DATE_FORMAT,
   readableLearningResources
 } from "../lib/constants"
 import { SEARCH_GRID_UI, SEARCH_LIST_UI } from "../lib/search"
@@ -148,7 +146,7 @@ export function LearningResourceDisplay(props: Props) {
   const hasCertificate = object.certification && object.certification.length > 0
   const startDate =
     hasCertificate && bestAvailableRun
-      ? moment(bestAvailableRun.best_start_date).format(DISPLAY_DATE_FORMAT)
+      ? getStartDate(object, bestAvailableRun)
       : null
 
   const iconKeys =
