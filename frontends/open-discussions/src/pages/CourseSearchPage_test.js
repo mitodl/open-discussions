@@ -11,7 +11,7 @@ import {
   LR_TYPE_ALL,
   LR_TYPE_COURSE
 } from "@mitodl/course-search-utils/dist/constants"
-import { Searchbox } from "ol-search-ui"
+import Searchbox from "../components/search/SearchBox"
 
 import CourseSearchPage from "./CourseSearchPage"
 

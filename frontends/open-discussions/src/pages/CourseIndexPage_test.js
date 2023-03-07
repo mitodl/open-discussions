@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
-import { Searchbox } from "ol-search-ui"
+import Searchbox from "../components/search/SearchBox"
 
 import CourseIndexPage from "./CourseIndexPage"
 import {
