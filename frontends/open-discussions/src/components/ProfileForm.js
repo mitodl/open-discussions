@@ -2,7 +2,7 @@
 /* global SETTINGS: false */
 import React from "react"
 import R from "ramda"
-import { ValidationError } from "ol-forms"
+import ValidationError from "./ValidationError"
 
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "./ProfileImage"
 import { SocialSiteLogoLink, SiteLogoLink } from "./SiteLogoLink"

@@ -15,7 +15,7 @@ const ValidationDiv = styled.div`
 
 /**
  * Displays a styled validation message for use with forms.
- * Fonte color and background color are controlled by css variables
+ * Font color and background color are controlled by css variables
  * ```css
  *  --validation-bg
  *  --validation-text

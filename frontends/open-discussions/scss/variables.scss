@@ -78,13 +78,3 @@ $audio-player-padding-horizontal: 12px;
 
 // podcast
 $podcast-subscribe-bg: #4c4c4c;
-
-/*
-Define the Sass variables as custom CSS properties, too, so that they can be
-used by other packages (e.g., ol-forms). 
-*/
-body {
-  --validation-bg: #{$validation-bg};
-  --validation-text: #{$validation-text};
-  --font-grey-mid: #{$font-grey-mid};
-}
