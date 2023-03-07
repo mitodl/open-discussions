@@ -50,14 +50,13 @@ const SearchInput = (props: SearchInputProps) => {
     }
     onSubmit(event)
   }, [onSubmit, value])
-  const onInputKeyDown =
-    useCallback(
-      e => {
-        if (e.key !== "Enter") return
-        handleSubmit()
-      },
-      [handleSubmit]
-    )
+  const onInputKeyDown = useCallback(
+    e => {
+      if (e.key !== "Enter") return
+      handleSubmit()
+    },
+    [handleSubmit]
+  )
   const muiInputProps = useMemo(() => ({ "aria-label": "Search for" }), [])
   return (
     <OutlinedInput
