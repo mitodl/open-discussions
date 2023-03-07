@@ -14,6 +14,7 @@ import { CardMinimalResource, EmbedlyConfig } from "../interfaces"
 import {
   findBestRun,
   getReadableResourceType,
+  getStartDate,
   resourceThumbnailSrc,
   CertificateIcon
 } from "../util"
@@ -82,7 +83,7 @@ const LearningResourceCard = <R extends CardMinimalResource>({
     resource.certification && resource.certification.length > 0
   const startDate =
     hasCertificate && bestAvailableRun ?
-      moment(bestAvailableRun.start_date).format(DISPLAY_DATE_FORMAT) :
+      getStartDate(resource.platform ?? "", bestAvailableRun) :
       null
   const offerers = resource.offered_by ?? []
   const handleActivate = useCallback(
