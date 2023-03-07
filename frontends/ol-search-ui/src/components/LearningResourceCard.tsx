@@ -1,4 +1,3 @@
-import moment from "moment"
 import React, { useCallback, useMemo } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString } from "ol-util"
@@ -18,8 +17,6 @@ import {
   resourceThumbnailSrc,
   CertificateIcon
 } from "../util"
-
-const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
 
 type CardVariant = "column" | "row" | "row-reverse"
 type OnActivateCard<R extends CardMinimalResource = CardMinimalResource> = (

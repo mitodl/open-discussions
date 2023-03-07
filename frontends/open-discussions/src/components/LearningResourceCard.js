@@ -1,6 +1,5 @@
 // @flow
 /* global SETTINGS:false */
-import moment from "moment"
 import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { useDispatch } from "react-redux"
