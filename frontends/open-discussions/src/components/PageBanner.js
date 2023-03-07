@@ -1,5 +1,5 @@
 // @flow
-import React from "react"
+import * as React from "react"
 import styled, { css } from "styled-components"
 
 // TODO: Move contsants somewhere shared
@@ -112,14 +112,14 @@ type BannerPageProps = ImgProps & {
   /**
    * Child elements placed below the banner.
    */
-  children?: React.ReactNode,
+  children?: React.Node,
   /**
    * Child elements within the banner.
    *
    * By default, the banner content will be vertically centered. Customize this
    * behavior with `bannerContainerClass`.
    */
-  bannerContent?: React.ReactNode,
+  bannerContent?: React.Node,
   bannerContainerClass?: string
 }
 
