@@ -122,20 +122,29 @@ OFFERED_BY_MAPPINGS = {
 semester_mapping = {"1T": "spring", "2T": "summer", "3T": "fall"}
 
 VALID_TEXT_FILE_TYPES = [
-    ".pdf",
-    ".htm",
-    ".html",
-    ".txt",
+    ".csv",
     ".doc",
     ".docx",
-    ".xls",
-    ".xlsx",
+    ".htm",
+    ".html",
+    ".json",
+    ".m",
+    ".mat",
+    ".md",
+    ".pdf",
     ".ppt",
     ".pptx",
-    ".xml",
-    ".json",
-    ".rtf",
     ".ps",
+    ".py",
+    ".r",
+    ".rtf",
+    ".sjson",
+    ".srt",
+    ".txt",
+    ".vtt",
+    ".xls",
+    ".xlsx",
+    ".xml",
 ]
 
 
