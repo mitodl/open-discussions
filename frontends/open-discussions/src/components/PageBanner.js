@@ -1,9 +1,7 @@
 // @flow
 import * as React from "react"
 import styled, { css } from "styled-components"
-
-// TODO: Move contsants somewhere shared
-const PHONE_WIDTH = 580
+import { PHONE_WIDTH } from "../lib/constants"
 
 const bannerHeight = "200px"
 const tallBannerHeight = "252px"
