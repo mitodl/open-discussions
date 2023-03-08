@@ -315,7 +315,7 @@ def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
                 )
             )
     except Exception as err:
-        log.exception(err)
+        log.exception("Could not read verticals from path %s", olx_path)
 
     counter = _infinite_counter()
 
