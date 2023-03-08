@@ -239,9 +239,12 @@ def test_transform_content_files(mocker, has_metadata):
     script_dir = os.path.dirname(
         os.path.dirname(pathlib.Path(__file__).parent.absolute())
     )
-    content = transform_content_files(
-        os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
-    )
+    content = [
+        f
+        for f in transform_content_files(
+            os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
+        )
+    ]
     assert content == [
         {
             "content": tika_output["content"],
@@ -273,7 +276,7 @@ def test_documents_from_olx():
         check_call(["tar", "xf", "content-devops-0001.tar.gz"], cwd=temp)
 
         olx_path = os.path.join(temp, "content-devops-0001")
-        parsed_documents = documents_from_olx(olx_path)
+        parsed_documents = [doc for doc in documents_from_olx(olx_path)]
     assert len(parsed_documents) == 108
 
     expected_parsed_vertical = (

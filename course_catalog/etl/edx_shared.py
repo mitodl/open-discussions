@@ -12,7 +12,6 @@ from course_catalog.constants import PlatformType
 from course_catalog.etl.loaders import load_content_files
 from course_catalog.etl.utils import get_learning_course_bucket, transform_content_files
 from course_catalog.models import Course, LearningResourceRun
-from course_catalog.utils import get_s3_object_and_read
 
 log = logging.getLogger()
 
@@ -82,12 +81,10 @@ def sync_edx_course_files(
             log.info("No %s course runs matched tarfile %s", platform, course_tarfile)
             continue
         with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-            tarbytes = get_s3_object_and_read(course_tarfile)
             course_tarpath = os.path.join(
                 export_tempdir, course_tarfile.key.split("/")[-1]
             )
-            with open(course_tarpath, "wb") as f:
-                f.write(tarbytes)
+            bucket.download_file(course_tarfile.key, course_tarpath)
             try:
                 check_call(["tar", "xf", course_tarpath], cwd=tar_tempdir)
             except CalledProcessError:
