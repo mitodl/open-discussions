@@ -11,7 +11,7 @@ import {
   LR_TYPE_ALL,
   LR_TYPE_COURSE
 } from "@mitodl/course-search-utils/dist/constants"
-import * as Searchbox from "../components/search/SearchBox"
+import * as Searchbox from "../components/search/Searchbox"
 
 import CourseSearchPage from "./CourseSearchPage"
 

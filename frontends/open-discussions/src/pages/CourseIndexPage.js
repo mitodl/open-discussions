@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from "react"
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"
-import Searchbox from "../components/search/SearchBox"
+import Searchbox from "../components/search/Searchbox"
 
 import CourseCarousel from "../components/CourseCarousel"
 

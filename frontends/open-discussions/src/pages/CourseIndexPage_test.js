@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
-import * as Searchbox from "../components/search/SearchBox"
+import * as Searchbox from "../components/search/Searchbox"
 
 import CourseIndexPage from "./CourseIndexPage"
 import {
