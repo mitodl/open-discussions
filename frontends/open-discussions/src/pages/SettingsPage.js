@@ -6,7 +6,8 @@ import { Radio } from "@mitodl/mdl-react-components"
 import { Checkbox } from "@rmwc/checkbox"
 import { FETCH_PROCESSING } from "redux-hammock/constants"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../components/Card"
+import MetaTags from "../components/MetaTags"
 import SettingsTabs from "../components/SettingsTabs"
 
 import { formatTitle } from "../lib/title"

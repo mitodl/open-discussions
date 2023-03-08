@@ -12,7 +12,7 @@ import {
   BannerPageHeader,
   BannerContainer,
   BannerImage
-} from "ol-util"
+} from "../components/PageBanner"
 import UserListFormDialog from "../components/UserListFormDialog"
 import { UserListItemSortableCards } from "../components/UserListItems"
 

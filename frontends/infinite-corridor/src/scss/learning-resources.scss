@@ -1,5 +1,5 @@
 @use "theme";
-@use "breakpoints";
+@use "ol-util/assets/breakpoint";
 @use "ol-search-ui/assets/learning-resource-card" with (
   $light-text: theme.$font-color-light
 );
@@ -8,7 +8,7 @@
 $card-list-spacer: 1.5em;
 
 .ic-resource-card {
-  @include breakpoints.down(sm) {
+  @include breakpoint.down(sm) {
     .ol-lrc-image{
       display: none;
     }

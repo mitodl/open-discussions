@@ -5,7 +5,8 @@ import { connect } from "react-redux"
 import qs from "query-string"
 import { Link } from "react-router-dom"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import { Loading } from "../../components/Loading"
 
 import { actions } from "../../actions"

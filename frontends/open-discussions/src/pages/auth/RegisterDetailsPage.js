@@ -3,7 +3,8 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import AuthDetailsForm from "../../components/auth/AuthDetailsForm"
 import withForm from "../../hoc/withForm"
 

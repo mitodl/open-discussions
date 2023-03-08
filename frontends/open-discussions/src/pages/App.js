@@ -6,7 +6,7 @@ import { connect } from "react-redux"
 import qs from "query-string"
 import "focus-visible"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 
 import HomePage from "./HomePage"
 import SearchPage from "./SearchPage"

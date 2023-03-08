@@ -6,7 +6,9 @@ import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { FETCH_SUCCESS } from "redux-hammock/constants"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../components/Card"
+import MetaTags from "../components/MetaTags"
+
 import PasswordChangeForm from "../components/PasswordChangeForm"
 import withForm from "../hoc/withForm"
 

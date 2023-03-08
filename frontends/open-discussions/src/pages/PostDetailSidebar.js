@@ -7,7 +7,7 @@ import { Link } from "react-router-dom"
 
 import { actions } from "../actions"
 import { Loading } from "../components/Loading"
-import { Card } from "ol-util"
+import Card from "../components/Card"
 import { LINK_TYPE_LINK } from "../lib/channels"
 import { postDetailURL, profileURL, channelURL } from "../lib/url"
 

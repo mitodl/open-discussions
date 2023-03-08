@@ -6,7 +6,7 @@ import React from "react"
 import InfiniteScroll from "react-infinite-scroller"
 import { connect } from "react-redux"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 
 import { Loading, PostLoading, withSearchLoading } from "../components/Loading"
 import SearchTextbox from "../components/SearchTextbox"

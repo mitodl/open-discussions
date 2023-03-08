@@ -5,7 +5,7 @@ import { connect } from "react-redux"
 import R from "ramda"
 import qs from "query-string"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 
 import NewCoursesWidget from "../components/NewCoursesWidget"
 import LiveStream from "../components/LiveStream"

@@ -6,7 +6,7 @@ import { Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 import { useRequest } from "redux-query-react"
 
-import { Card } from "ol-util"
+import Card from "./Card"
 
 import {
   newCoursesRequest,

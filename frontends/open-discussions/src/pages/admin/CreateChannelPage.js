@@ -3,7 +3,8 @@ import React from "react"
 import R from "ramda"
 import { connect } from "react-redux"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import CreateChannelForm from "../../components/admin/CreateChannelForm"
 
 import { actions } from "../../actions"

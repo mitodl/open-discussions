@@ -6,7 +6,7 @@ import {
   LearningResourceCard,
   LearningResourceRow
 } from "./LearningResourceCard"
-import { Card } from "ol-util"
+import Card from "./Card"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 

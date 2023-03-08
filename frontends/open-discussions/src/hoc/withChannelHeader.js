@@ -3,7 +3,7 @@ import React from "react"
 import R from "ramda"
 
 import ChannelHeader from "../components/ChannelHeader"
-import { BannerPageWrapper } from "ol-util"
+import { BannerPageWrapper } from "../components/PageBanner"
 
 const withChannelHeader = R.curry(
   (WrappedComponent: Class<React.Component<*, *>>) => {

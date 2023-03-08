@@ -1,7 +1,7 @@
 // @flow
 import React from "react"
 
-import { MetaTags } from "ol-util"
+import MetaTags from "../components/MetaTags"
 
 import { useRequest } from "redux-query-react"
 import { useSelector } from "react-redux"

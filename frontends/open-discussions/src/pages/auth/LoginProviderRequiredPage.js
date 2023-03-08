@@ -3,10 +3,11 @@ import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
 
-import { MetaTags, Card } from "ol-util"
+import Card from "../../components/Card"
+import MetaTags from "../../components/MetaTags"
 import TouchstoneLoginButton from "../../components/auth/TouchstoneLoginButton"
 import LoginGreeting from "../../components/auth/LoginGreeting"
-import { NotFound } from "ol-util"
+import { NotFound } from "../../components/ErrorPages"
 
 import { formatTitle } from "../../lib/title"
 import { getAuthProviderSelector } from "../../reducers/auth"

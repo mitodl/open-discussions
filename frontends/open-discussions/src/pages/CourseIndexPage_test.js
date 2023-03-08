@@ -5,7 +5,11 @@ import sinon from "sinon"
 import { Searchbox } from "ol-search-ui"
 
 import CourseIndexPage from "./CourseIndexPage"
-import { BannerPageWrapper, BannerPageHeader, BannerContainer } from "ol-util"
+import {
+  BannerPageWrapper,
+  BannerPageHeader,
+  BannerContainer
+} from "../components/PageBanner"
 import CourseCarousel from "../components/CourseCarousel"
 
 import {
