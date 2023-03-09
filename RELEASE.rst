@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.207.3
+---------------
+
+- Stop sharing new code with old open (#3862)
+- Remove ol-util components from ol-open (#3857)
+- Learn search results list dates are different than default drawer details dates (#3850)
+
 Version 0.207.2 (Released March 07, 2023)
 ---------------
 
