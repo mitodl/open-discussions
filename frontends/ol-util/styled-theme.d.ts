@@ -1,5 +1,5 @@
 // import original module declarations
-import 'styled-components';
+import 'styled-components'
 import type { CombinedTheme } from "./src/styles"
 
 // and extend them!

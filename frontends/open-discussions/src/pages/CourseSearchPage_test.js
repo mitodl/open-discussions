@@ -11,7 +11,7 @@ import {
   LR_TYPE_ALL,
   LR_TYPE_COURSE
 } from "@mitodl/course-search-utils/dist/constants"
-import { Searchbox } from "ol-search-ui"
+import * as Searchbox from "../components/search/Searchbox"
 
 import CourseSearchPage from "./CourseSearchPage"
 
@@ -67,6 +67,8 @@ describe("CourseSearchPage", () => {
       "LearningResourceCard",
       "LearningResourceCard"
     )
+
+    helper.stubComponent(Searchbox, "Searchbox", "default")
 
     initialState = {
       channels: {
@@ -355,19 +357,19 @@ describe("CourseSearchPage", () => {
     const text = "xyz"
     setLocation(helper, { text })
     const { wrapper } = await render()
-    assert.equal(wrapper.find(Searchbox).prop("value"), text)
+    assert.equal(wrapper.find("Searchbox").prop("value"), text)
   })
 
   it("updates the textbox, and echoes to URL bar on search", async () => {
     const { wrapper } = await render()
     const text = "newwwww text"
-    wrapper.find(Searchbox).prop("onChange")({
+    wrapper.find("Searchbox").prop("onChange")({
       target: {
         value: text
       }
     })
     wrapper.update()
-    wrapper.find(Searchbox).prop("onSubmit")({
+    wrapper.find("Searchbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
     await wait(1)
@@ -393,12 +395,12 @@ describe("CourseSearchPage", () => {
   it("triggers a non-incremental search from textbox input", async () => {
     const { wrapper } = await render()
     const text = "some other text"
-    const searchBox = wrapper.find(Searchbox)
+    const searchBox = wrapper.find("Searchbox")
     searchBox.prop("onChange")({
       target: { value: text }
     })
     wrapper.update()
-    wrapper.find(Searchbox).prop("onSubmit")({
+    wrapper.find("Searchbox").prop("onSubmit")({
       preventDefault: helper.sandbox.stub()
     })
     await wait(1)

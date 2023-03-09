@@ -2,7 +2,7 @@
 import { assert } from "chai"
 import R from "ramda"
 import sinon from "sinon"
-import { Searchbox } from "ol-search-ui"
+import * as Searchbox from "../components/search/Searchbox"
 
 import CourseIndexPage from "./CourseIndexPage"
 import {
@@ -104,6 +104,8 @@ describe("CourseIndexPage", () => {
       .returns(queryListResponse([]))
     render = helper.configureReduxQueryRenderer(CourseIndexPage)
 
+    helper.stubComponent(Searchbox, "Searchbox", "default")
+
     hookStub = helper.sandbox.stub(lrHooks, "useLearningResourcePermalink")
   })
 
@@ -203,11 +205,11 @@ describe("CourseIndexPage", () => {
 
   it("should have a search textbox which redirects you", async () => {
     const { wrapper } = await render()
-    wrapper.find(Searchbox).prop("onChange")({
+    wrapper.find("Searchbox").prop("onChange")({
       target: { value: "search term" }
     })
     wrapper.update()
-    wrapper.find(Searchbox).prop("onSubmit")()
+    wrapper.find("Searchbox").prop("onSubmit")()
     const { pathname, search } = helper.currentLocation
     assert.equal(pathname, "/learn/search")
     assert.equal(search, "?q=search%20term")

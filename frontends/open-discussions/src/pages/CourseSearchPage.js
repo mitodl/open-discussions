@@ -8,7 +8,7 @@ import { createSelector } from "reselect"
 import { useCourseSearch } from "@mitodl/course-search-utils"
 
 import MetaTags from "../components/MetaTags"
-import { Searchbox } from "ol-search-ui"
+import Searchbox from "../components/search/Searchbox"
 import { Cell, Grid } from "../components/Grid"
 import { Loading, CourseSearchLoading } from "../components/Loading"
 

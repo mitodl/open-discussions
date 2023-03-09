@@ -6,7 +6,7 @@ import Dropzone from "react-dropzone"
 import CropperWrapper from "./CropperWrapper"
 import Dialog from "./Dialog"
 
-import { ValidationError } from "ol-forms"
+import ValidationError from "./ValidationError"
 
 import type { FormProps } from "../flow/formTypes"
 import type { FormErrors, FormValue } from "../flow/formTypes"
