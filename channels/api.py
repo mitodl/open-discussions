@@ -1290,7 +1290,8 @@ class Api:
         with transaction.atomic():
             comment = Comment.objects.filter(comment_id=comment_id)
             comment.update(removed=True)
-            comment.post.update(num_comments=comment.post.num_comments - 1)
+            for c in comment:
+                c.post.update(num_comments=c.post.num_comments - 1)
             comment.mod.remove()
         return comment
 
@@ -1321,7 +1322,8 @@ class Api:
         with transaction.atomic():
             comment = Comment.objects.filter(comment_id=comment_id)
             comment.update(deleted=False)
-            comment.post.update(num_comments=comment.post.num_comments - 1)
+            for c in comment:
+                c.post.update(num_comments=c.post.num_comments - 1)
             comment.delete()
         return comment
 
