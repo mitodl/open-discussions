@@ -20,6 +20,8 @@ const UserListsDetailsPage: React.FC = () => {
   const itemsDataQuery = useUserListItems(id)
   const editing = useEditingDialog()
 
+  const canEdit = userListQuery.data?.author === SETTINGS.user.id
+
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"
@@ -35,13 +37,15 @@ const UserListsDetailsPage: React.FC = () => {
                   <h1>{userListQuery.data.title}</h1>
                 </Grid>
                 <Grid item xs={3} className="ic-centered-right">
-                  <Button
-                    color="secondary"
-                    startIcon={<EditIcon />}
-                    onClick={() => editing.handleStart(userListQuery.data)}
-                  >
-                    Edit
-                  </Button>
+                  {canEdit && (
+                    <Button
+                      color="secondary"
+                      startIcon={<EditIcon />}
+                      onClick={() => editing.handleStart(userListQuery.data)}
+                    >
+                      Edit
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             )}
@@ -53,10 +57,12 @@ const UserListsDetailsPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <EditListDialog
-        resource={editing.resource}
-        onClose={editing.handleFinish}
-      />
+      {canEdit && (
+        <EditListDialog
+          resource={editing.resource}
+          onClose={editing.handleFinish}
+        />
+      )}
     </BannerPage>
   )
 }

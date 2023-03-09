@@ -12,6 +12,7 @@ import {
   expectProps,
   waitFor
 } from "../../test-utils"
+import { User } from "../../types/settings"
 
 jest.mock("./ManageListDialogs", () => {
   const actual = jest.requireActual("./ManageListDialogs")
@@ -36,10 +37,13 @@ describe("UserListDetailsPage", () => {
   /**
    * Set up the mock API responses for lists page.
    */
-  const setup = (itemsCount?: number, listOverrides?: Partial<UserList>) => {
-    const userList = factories.makeUserList(listOverrides)
+  const setup = ({
+    user,
+    list
+  }: { user?: Partial<User>; list?: Partial<UserList> } = {}) => {
+    const userList = factories.makeUserList(list)
     const paginatedItems = factories.makeUserListItemsPaginated(
-      itemsCount ?? faker.datatype.number({ min: 2, max: 5 })
+      faker.datatype.number({ min: 2, max: 5 })
     )
     const items = paginatedItems.results.map(r => r.content_data)
     const topics = [
@@ -53,7 +57,7 @@ describe("UserListDetailsPage", () => {
     )
     setMockResponse.get(lrUrls.topics.listing, topics)
 
-    const { history } = renderTestApp({ url: `/lists/${userList.id}` })
+    const { history } = renderTestApp({ url: `/lists/${userList.id}`, user })
     return { history, userList, items, paginatedItems }
   }
 
@@ -62,8 +66,30 @@ describe("UserListDetailsPage", () => {
     await screen.findByRole("heading", { name: userList.title })
   })
 
+  test.each([
+    { authorId: 1, userId: 1, canEdit: true },
+    { authorId: 1, userId: 2, canEdit: false },
+    { authorId: 1, userId: null, canEdit: false }
+  ])(
+    "Shows edit button if and only if user is the author",
+    async ({ userId, authorId, canEdit }) => {
+      const { userList } = setup({
+        user: { id: userId },
+        list: { author: authorId }
+      })
+      await screen.findByRole("heading", { name: userList.title })
+
+      const editButton = screen.queryByRole("button", { name: "Edit" })
+      expect(!!editButton).toBe(canEdit)
+    }
+  )
+
   test("Edit buttons opens editing dialog", async () => {
-    const { userList } = setup()
+    const userId = faker.datatype.number()
+    const { userList } = setup({
+      user: { id: userId },
+      list: { author: userId }
+    })
     const editButton = await screen.findByRole("button", { name: "Edit" })
     await user.click(editButton)
     await screen.findByRole("dialog", { name: "Edit list" })

@@ -4,6 +4,7 @@ import "jest-extended/all"
 import { setupMockMarkdownEditor } from "ol-widgets/src/test-utils"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
 import { mockAxiosInstance, resetApi } from "./mockAxios"
+import { makeUserSettings } from "./factories"
 
 setupMockMarkdownEditor()
 
@@ -19,7 +20,8 @@ jest.mock("axios", () => {
 const _createSettings = () => ({
   embedlyKey:        "fake",
   ocw_next_base_url: "fake-ocw.com",
-  search_page_size:  4
+  search_page_size:  4,
+  user:              makeUserSettings()
 })
 
 global.SETTINGS = _createSettings()

@@ -1,4 +1,3 @@
-import moment from "moment"
 import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
 import { toQueryString, pluralize } from "ol-util"
