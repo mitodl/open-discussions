@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.207.3
+Version 0.207.3 (Released March 09, 2023)
 ---------------
 
 - Stop sharing new code with old open (#3862)
