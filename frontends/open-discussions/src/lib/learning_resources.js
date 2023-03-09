@@ -12,7 +12,8 @@ import {
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_PROGRAM,
   LR_TYPE_COURSE,
-  platforms
+  platforms,
+  DISPLAY_DATE_FORMAT
 } from "./constants"
 
 import { capitalize, emptyOrNil, formatPrice } from "./util"
@@ -116,9 +117,9 @@ export const getStartDate = (
   if (object.platform === platforms.OCW) {
     return `${capitalize(objectRun.semester || "")} ${objectRun.year || ""}`
   } else if (objectRun.start_date) {
-    return moment(objectRun.start_date).format("MMMM DD, YYYY")
+    return moment(objectRun.start_date).format(DISPLAY_DATE_FORMAT)
   } else if (objectRun.best_start_date) {
-    return moment(objectRun.best_start_date).format("MMMM DD, YYYY")
+    return moment(objectRun.best_start_date).format(DISPLAY_DATE_FORMAT)
   }
   return "Ongoing"
 }

@@ -253,3 +253,10 @@ export const makeRandomResource = () =>
 export const makePopularContentResponse = (count: number = 10) => {
   return R.times(makeRandomResource, count)
 }
+
+export const makePlatform = ({
+  exclude = []
+}: { exclude?: string[] } = {}): string => {
+  const include = Object.values(platforms).filter(p => !exclude.includes(p))
+  return casual.random_element(include)
+}

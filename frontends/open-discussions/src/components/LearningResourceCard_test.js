@@ -12,6 +12,7 @@ import IntegrationTestHelper from "../util/integration_test_helper"
 
 import { bestRun } from "../lib/learning_resources"
 import {
+  makePlatform,
   makeCourse,
   makeLearningResource,
   makeUserList
@@ -24,7 +25,8 @@ import {
   OPEN_CONTENT,
   PROFESSIONAL,
   CERTIFICATE,
-  DISPLAY_DATE_FORMAT
+  DISPLAY_DATE_FORMAT,
+  platforms
 } from "../lib/constants"
 import {
   COURSE_SEARCH_URL,
@@ -228,6 +230,8 @@ describe("LearningResourceCard", () => {
   it(`should render a start date if there is a certificate`, async () => {
     const object = makeLearningResource(LR_TYPE_COURSE)
     object.certification = [CERTIFICATE]
+    // OCW courses format dates differently, so exclude them here.
+    object.platform = makePlatform({ exclude: [platforms.OCW] })
     const { wrapper } = await render({ object })
     const startDate = wrapper
       .find(".start-date")
