@@ -347,7 +347,8 @@ def transform_content_files(course_tarpath):
         course_tarpath (str): The path to the tarball which contains the OLX
     """
     content = []
-    with TemporaryDirectory() as inner_tempdir:
+    basedir = os.path.basename(course_tarpath).split(".")[0]
+    with TemporaryDirectory(prefix=basedir) as inner_tempdir:
         check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
         olx_path = glob.glob(inner_tempdir + "/*")[0]
         for document, metadata in documents_from_olx(olx_path):
