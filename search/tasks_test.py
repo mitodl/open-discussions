@@ -456,8 +456,8 @@ def test_start_recreate_index(
         index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id])
         index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id])
 
-        # chunk size is 2 and there is only one course each for ocw and xpro
-        assert index_course_content_mock.si.call_count == 1
+        # chunk size is 2 and there is only one course each for ocw, xpro, and mitx
+        assert index_course_content_mock.si.call_count == 2
         index_course_content_mock.si.assert_any_call(
             [
                 *[
@@ -465,6 +465,15 @@ def test_start_recreate_index(
                     for course in courses
                     if course.platform == PlatformType.ocw.value
                 ],
+                *[
+                    course.id
+                    for course in courses
+                    if course.platform == PlatformType.mitx.value
+                ],
+            ]
+        )
+        index_course_content_mock.si.assert_any_call(
+            [
                 *[
                     course.id
                     for course in courses

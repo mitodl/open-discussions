@@ -764,6 +764,8 @@ def start_recreate_index(self, indexes):
                             platform__in=(
                                 PlatformType.ocw.value,
                                 PlatformType.xpro.value,
+                                PlatformType.mitx.value,
+                                PlatformType.mitxonline.value,
                             )
                         )
                         .exclude(course_id__in=blocklisted_ids)

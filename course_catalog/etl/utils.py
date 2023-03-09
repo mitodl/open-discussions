@@ -25,8 +25,8 @@ from xbundle import XBundle
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,
     CONTENT_TYPE_VERTICAL,
-    VALID_TEXT_FILE_TYPES,
     OCW_DEPARTMENTS,
+    VALID_TEXT_FILE_TYPES,
 )
 from course_catalog.models import get_max_length
 
@@ -297,23 +297,25 @@ def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
         list of tuple:
             A list of (bytes of content, metadata)
     """
-    documents = []
-    bundle = XBundle()
-    bundle.import_from_directory(olx_path)
-    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
-        content = get_text_from_element(vertical)
+    try:
+        bundle = XBundle()
+        bundle.import_from_directory(olx_path)
+        for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+            content = get_text_from_element(vertical)
 
-        documents.append(
-            (
-                content,
-                {
-                    "key": f"vertical_{index + 1}",
-                    "content_type": CONTENT_TYPE_VERTICAL,
-                    "title": vertical.attrib.get("display_name") or "",
-                    "mime_type": "application/xml",
-                },
+            yield (
+                (
+                    content,
+                    {
+                        "key": f"vertical_{index + 1}",
+                        "content_type": CONTENT_TYPE_VERTICAL,
+                        "title": vertical.attrib.get("display_name") or "",
+                        "mime_type": "application/xml",
+                    },
+                )
             )
-        )
+    except Exception as err:
+        log.exception("Could not read verticals from path %s", olx_path)
 
     counter = _infinite_counter()
 
@@ -327,18 +329,14 @@ def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
 
                 mimetype = mimetypes.types_map.get(extension_lower)
 
-                documents.append(
-                    (
-                        filebytes,
-                        {
-                            "key": f"document_{next(counter)}_{filename}",
-                            "content_type": CONTENT_TYPE_FILE,
-                            "mime_type": mimetype,
-                        },
-                    )
+                yield (
+                    filebytes,
+                    {
+                        "key": f"document_{next(counter)}_{filename}",
+                        "content_type": CONTENT_TYPE_FILE,
+                        "mime_type": mimetype,
+                    },
                 )
-
-    return documents
 
 
 def transform_content_files(course_tarpath):
@@ -349,7 +347,8 @@ def transform_content_files(course_tarpath):
         course_tarpath (str): The path to the tarball which contains the OLX
     """
     content = []
-    with TemporaryDirectory() as inner_tempdir:
+    basedir = os.path.basename(course_tarpath).split(".")[0]
+    with TemporaryDirectory(prefix=basedir) as inner_tempdir:
         check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
         olx_path = glob.glob(inner_tempdir + "/*")[0]
         for document, metadata in documents_from_olx(olx_path):
@@ -366,7 +365,7 @@ def transform_content_files(course_tarpath):
 
             tika_content = tika_output.get("content") or ""
             tika_metadata = tika_output.get("metadata") or {}
-            content.append(
+            yield (
                 {
                     "content": tika_content.strip(),
                     "key": key,
@@ -382,7 +381,6 @@ def transform_content_files(course_tarpath):
                     "content_type": content_type,
                 }
             )
-    return content
 
 
 def get_learning_course_bucket(bucket_name):

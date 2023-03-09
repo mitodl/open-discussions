@@ -5,6 +5,7 @@ import os
 import pathlib
 from subprocess import check_call
 from tempfile import TemporaryDirectory
+from unittest.mock import ANY
 
 import pytest
 import pytz
@@ -27,6 +28,26 @@ from course_catalog.etl.utils import (
 )
 
 pytestmark = pytest.mark.django_db
+
+
+def get_olx_test_docs():
+    """Get a list of edx docs from a sample archive file"""
+    script_dir = os.path.dirname(
+        os.path.dirname(pathlib.Path(__file__).parent.absolute())
+    )
+    with TemporaryDirectory() as temp:
+        check_call(
+            [
+                "tar",
+                "xf",
+                os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz"),
+            ],
+            cwd=temp,
+        )
+        check_call(["tar", "xf", "content-devops-0001.tar.gz"], cwd=temp)
+
+        olx_path = os.path.join(temp, "content-devops-0001")
+        return [doc for doc in documents_from_olx(olx_path)]
 
 
 @pytest.mark.parametrize("side_effect", ["One", Exception("error")])
@@ -239,9 +260,12 @@ def test_transform_content_files(mocker, has_metadata):
     script_dir = os.path.dirname(
         os.path.dirname(pathlib.Path(__file__).parent.absolute())
     )
-    content = transform_content_files(
-        os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
-    )
+    content = [
+        f
+        for f in transform_content_files(
+            os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
+        )
+    ]
     assert content == [
         {
             "content": tika_output["content"],
@@ -261,19 +285,7 @@ def test_documents_from_olx():
     script_dir = os.path.dirname(
         os.path.dirname(pathlib.Path(__file__).parent.absolute())
     )
-    with TemporaryDirectory() as temp:
-        check_call(
-            [
-                "tar",
-                "xf",
-                os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz"),
-            ],
-            cwd=temp,
-        )
-        check_call(["tar", "xf", "content-devops-0001.tar.gz"], cwd=temp)
-
-        olx_path = os.path.join(temp, "content-devops-0001")
-        parsed_documents = documents_from_olx(olx_path)
+    parsed_documents = get_olx_test_docs()
     assert len(parsed_documents) == 108
 
     expected_parsed_vertical = (
@@ -299,6 +311,16 @@ def test_documents_from_olx():
     assert formula2do[1]["key"].endswith("formula2do.xml")
     assert formula2do[1]["content_type"] == CONTENT_TYPE_FILE
     assert formula2do[1]["mime_type"].endswith("/xml")
+
+
+def test_documents_from_olx_bad_vertical(mocker):
+    """An exception should be logged if verticals can't be read, other files should still be processed"""
+    mock_log = mocker.patch("course_catalog.etl.utils.log.exception")
+    mock_bundle = mocker.patch("course_catalog.etl.utils.XBundle")
+    mock_bundle.return_value.import_from_directory.side_effect = OSError()
+    parsed_documents = get_olx_test_docs()
+    mock_log.assert_called_once_with("Could not read verticals from path %s", ANY)
+    assert len(parsed_documents) == 92
 
 
 def test_extract_valid_department_from_id():
