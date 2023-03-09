@@ -1288,7 +1288,9 @@ class Api:
         """
         comment = self.get_comment(comment_id)
         with transaction.atomic():
-            Comment.objects.filter(comment_id=comment_id).update(removed=True)
+            comment = Comment.objects.filter(comment_id=comment_id)
+            comment.update(removed=True)
+            comment.post.update(num_comments=comment.post.num_comments - 1)
             comment.mod.remove()
         return comment
 
@@ -1317,7 +1319,9 @@ class Api:
         """
         comment = self.get_comment(comment_id)
         with transaction.atomic():
-            Comment.objects.filter(comment_id=comment_id).update(deleted=False)
+            comment = Comment.objects.filter(comment_id=comment_id)
+            comment.update(deleted=False)
+            comment.post.update(num_comments=comment.post.num_comments - 1)
             comment.delete()
         return comment
 
