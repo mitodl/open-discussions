@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo } from "react"
 
 import SearchIcon from "@mui/icons-material/Search"
-import EastIcon from "@mui/icons-material/East"
 import ClearIcon from "@mui/icons-material/Clear"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
+import Button from "@mui/material/Button"
 
 interface SearchSubmissionEvent {
   target: {
@@ -22,7 +22,6 @@ type SearchSubmitHandler = (event: SearchSubmissionEvent) => void
 interface SearchInputProps {
   className?: string
   classNameClear?: string
-  classNameSubmit?: string
   classNameSearch?: string
   value: string
   placeholder?: string
@@ -33,12 +32,20 @@ interface SearchInputProps {
 }
 
 const searchIconAdjustments = {
-  fontSize:  "150%",
+  fontSize:  "300%",
   /**
    * We want the icon to have its circle a bit closer to the baseline, which
    * this accounts for.
    */
-  transform: "translateY(+5%)"
+  transform: "translateY(+5%)",
+  color:     "white"
+}
+
+const searchButtonAdormentAdjustments = {
+  alignSelf:   "stretch",
+  maxHeight:   "initial",
+  height:      "initial",
+  marginRight: "-13px"
 }
 
 const SearchInput: React.FC<SearchInputProps> = props => {
@@ -70,38 +77,34 @@ const SearchInput: React.FC<SearchInputProps> = props => {
       onKeyDown={onInputKeyDown}
       startAdornment={
         <InputAdornment position="start">
-          <IconButton
-            aria-label="Search"
-            className={props.classNameSearch}
-            onClick={handleSubmit}
-          >
-            <SearchIcon sx={searchIconAdjustments} />
-          </IconButton>
+          {props.value && (
+            <IconButton
+              className={props.classNameClear}
+              aria-label="Clear"
+              onClick={props.onClear}
+            >
+              <ClearIcon />
+            </IconButton>
+          )}
         </InputAdornment>
       }
       endAdornment={
-        <>
-          <InputAdornment position="end">
-            {props.value && (
-              <IconButton
-                className={props.classNameClear}
-                aria-label="Clear"
-                onClick={props.onClear}
-              >
-                <ClearIcon />
-              </IconButton>
-            )}
-          </InputAdornment>
-          <InputAdornment position="end">
-            <IconButton
-              aria-label="Search"
-              className={props.classNameSubmit}
-              onClick={handleSubmit}
-            >
-              <EastIcon />
-            </IconButton>
-          </InputAdornment>
-        </>
+        <InputAdornment
+          position="end"
+          sx={searchButtonAdormentAdjustments}
+          color="secondary"
+        >
+          <Button
+            aria-label="Search"
+            className={props.classNameSearch}
+            onClick={handleSubmit}
+            color="secondary"
+            variant="contained"
+            disableElevation
+          >
+            <SearchIcon sx={searchIconAdjustments} color="secondary" />
+          </Button>
+        </InputAdornment>
       }
     />
   )

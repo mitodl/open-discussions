@@ -10,13 +10,8 @@ const getSearchInput = () => {
   return element
 }
 
-/**
- * There are two search buttons at the moment, a magnifier on the left
- * and an arrow -> on the right.
- */
-const getSearchButton = ({ rhs = false } = {}): HTMLButtonElement => {
-  const buttonIndex = rhs ? 1 : 0
-  const button = screen.getAllByLabelText("Search")[buttonIndex]
+const getSearchButton = (): HTMLButtonElement => {
+  const button = screen.getByLabelText("Search")
   assertInstanceOf(button, HTMLButtonElement)
   return button
 }
@@ -67,14 +62,11 @@ describe("Searchbox", () => {
     )
   })
 
-  it.each([{ rhs: false }, { rhs: true }])(
-    "Calls onSubmit when search is clicked",
-    async ({ rhs }) => {
-      const { user, spies } = renderSearchInput({ value: "chemistry" })
-      await user.click(getSearchButton({ rhs }))
-      expect(spies.onSubmit).toHaveBeenCalledWith(searchEvent("chemistry"))
-    }
-  )
+  it("Calls onSubmit when search is clicked", async () => {
+    const { user, spies } = renderSearchInput({ value: "chemistry" })
+    await user.click(getSearchButton())
+    expect(spies.onSubmit).toHaveBeenCalledWith(searchEvent("chemistry"))
+  })
 
   it("Calls onClear clear is clicked", async () => {
     const { user, spies } = renderSearchInput({ value: "biology" })

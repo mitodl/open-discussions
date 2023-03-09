@@ -48,7 +48,6 @@ describe("Searchbox", () => {
       onClear:         jest.fn(),
       onChange:        jest.fn(),
       className:       "some-classname",
-      classNameSubmit: "some-classname-submit",
       classNameClear:  "some-classname-clear",
       classNameSearch: "some-classname-search",
       value:           "some-value",
