@@ -128,7 +128,7 @@ export const readableLearningResources = {
 }
 
 export const DATE_FORMAT = "YYYY-MM-DD[T]HH:mm:ss[Z]"
-export const DISPLAY_DATE_FORMAT = "MMMM D, YYYY"
+export const DISPLAY_DATE_FORMAT = "MMMM DD, YYYY"
 
 export const PHONE = "PHONE"
 export const TABLET = "TABLET"
