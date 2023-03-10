@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.207.4
+---------------
+
+- stop building individual ts packages (#3874)
+- use MMMM DD, YYYY format in tests, too (#3869)
+- More efficient download and processing of edx content archives (#3861)
+
 Version 0.207.3 (Released March 09, 2023)
 ---------------
 
