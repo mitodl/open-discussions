@@ -127,10 +127,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
   const topics = topicsQuery.data?.results ?? []
   const hasError = createUserList.isError || updateUserList.isError
 
-  const priaceChoices = PRIVACY_CHOICES.filter(choice => {
-    if (choice.value === PrivacyLevel.Public) return SETTINGS.user.is_list_staff
-    return true
-  })
+  const canChangePrivacy = SETTINGS.user.is_list_staff
 
   return (
     <FormDialog
@@ -159,15 +156,17 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
         row
         onChange={formik.handleChange}
       />
-      <RadioChoiceField
-        className="form-row"
-        name="privacy_level"
-        label="Privacy"
-        choices={priaceChoices}
-        value={formik.values.privacy_level}
-        row
-        onChange={formik.handleChange}
-      />
+      {canChangePrivacy && (
+        <RadioChoiceField
+          className="form-row"
+          name="privacy_level"
+          label="Privacy"
+          choices={PRIVACY_CHOICES}
+          value={formik.values.privacy_level}
+          row
+          onChange={formik.handleChange}
+        />
+      )}
       <TextField
         required
         className="form-row"

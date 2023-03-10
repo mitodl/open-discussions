@@ -43,7 +43,7 @@ const inputs = {
     [LearningResourceType.Userlist]: () =>
       screen.getByLabelText("Learning List", { exact: false })
   },
-  pivacy_level: {
+  privacy_level: {
     [PrivacyLevel.Public]:  () => screen.getByLabelText("Public"),
     [PrivacyLevel.Private]: () => screen.getByLabelText("Private")
   },
@@ -74,7 +74,7 @@ describe("Creation", () => {
   const fillInForm = async (userList: UserList) => {
     await user.click(inputs.list_type[userList.list_type]())
 
-    await user.click(inputs.pivacy_level[userList.privacy_level]())
+    await user.click(inputs.privacy_level[userList.privacy_level]())
 
     await user.click(inputs.title())
     await user.paste(userList.title)
@@ -143,24 +143,24 @@ describe("Creation", () => {
 
   test("Userlists are private by default", () => {
     setup()
-    expect(inputs.pivacy_level[PrivacyLevel.Private]()).toBeChecked()
+    expect(inputs.privacy_level[PrivacyLevel.Private]()).toBeChecked()
   })
 
   test.each([
     {
-      user:            { is_list_staff: true, is_authenticated: true },
-      canCreatePublic: true
+      user:              { is_list_staff: true, is_authenticated: true },
+      hasPrivacyChoices: true
     },
     {
-      user:            { is_list_staff: false, is_authenticated: true },
-      canCreatePublic: false
+      user:              { is_list_staff: false, is_authenticated: true },
+      hasPrivacyChoices: false
     }
   ])(
-    "Users can create public userlists if and only if user.is_list_staff",
-    ({ user, canCreatePublic }) => {
+    "Form has privacy options if and only if user.is_list_staff",
+    ({ user, hasPrivacyChoices }) => {
       setup({ user })
-      const publicChoice = screen.queryByLabelText("Public")
-      expect(!!publicChoice).toBe(canCreatePublic)
+      const publicChoice = screen.queryByText("Privacy")
+      expect(!!publicChoice).toBe(hasPrivacyChoices)
     }
   )
 
