@@ -3,8 +3,8 @@ import { render, screen, fireEvent, within } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import { faker } from "@faker-js/faker"
 import { assertInstanceOf, assertNotNil } from "ol-util"
-import { getByTerm, queryByTerm } from "ol-util/build/test-utils"
-import { makeUrl } from "ol-util/build/factories"
+import { getByTerm, queryByTerm } from "ol-util/src/test-utils"
+import { makeUrl } from "ol-util/src/factories"
 import LearningResourceDetails, {
   LearningResourceDetailsProps
 } from "./ExpandedLearningResourceDisplay"

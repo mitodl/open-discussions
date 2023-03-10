@@ -22,7 +22,7 @@ import {
   user,
   waitFor
 } from "../../test-utils"
-import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeWidgetListResponse } from "ol-widgets/src/factories"
 import { makeLearningResource } from "ol-search-ui/src/factories"
 import { waitForElementToBeRemoved } from "@testing-library/react"
 

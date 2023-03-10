@@ -5,12 +5,12 @@ import { FieldChannel, urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
 import { urls as lrUrls } from "../../api/learning-resources"
 import * as factory from "../../api/fields/factories"
-import * as resourceFactory from "ol-search-ui/build/factories"
+import * as resourceFactory from "ol-search-ui/src/factories"
 import type { UserList } from "ol-search-ui"
 import { DEFAULT_PAGE_SIZE } from "../../api/fields/urls"
 import { makeFieldViewPath } from "../urls"
 import { renderTestApp, screen, setMockResponse, user } from "../../test-utils"
-import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeWidgetListResponse } from "ol-widgets/src/factories"
 
 describe("EditFieldBasicForm", () => {
   let field: FieldChannel, publicLists: PaginatedResult<UserList>
