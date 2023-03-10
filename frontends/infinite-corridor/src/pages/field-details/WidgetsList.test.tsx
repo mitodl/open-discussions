@@ -7,7 +7,7 @@ import {
   user
 } from "../../test-utils"
 import { Widget, WidgetsListEditable } from "ol-widgets"
-import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeWidgetListResponse } from "ol-widgets/src/factories"
 import WidgetsList from "./WidgetsList"
 import { setMockResponse } from "../../test-utils"
 import { urls } from "../../api/widgets"

@@ -2,7 +2,7 @@ import { assertInstanceOf, assertNotNil } from "ol-util"
 import { zip } from "lodash"
 import { FieldChannel, urls } from "../api/fields"
 import { urls as widgetUrls } from "../api/widgets"
-import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeWidgetListResponse } from "ol-widgets/src/factories"
 import { faker } from "@faker-js/faker"
 import * as factories from "../api/fields/factories"
 import {

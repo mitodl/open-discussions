@@ -11,7 +11,7 @@ import { urls as widgetUrls } from "../../api/widgets"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { waitFor } from "@testing-library/react"
 import { makeFieldViewPath } from "../urls"
-import { makeWidgetListResponse } from "ol-widgets/build/factories"
+import { makeWidgetListResponse } from "ol-widgets/src/factories"
 
 const setupApis = (fieldOverrides?: Partial<FieldChannel>) => {
   const field = factory.makeField({ is_moderator: true, ...fieldOverrides })

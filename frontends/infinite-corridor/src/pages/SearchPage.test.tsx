@@ -6,11 +6,11 @@ import { urls as resourceUrls } from "../api/learning-resources"
 import {
   makeLearningResource,
   makeSearchResponse
-} from "ol-search-ui/build/factories"
+} from "ol-search-ui/src/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
-import { createMatchMediaForJsDom } from "ol-util/build/test-utils"
+import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
 import {

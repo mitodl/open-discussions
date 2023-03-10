@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker"
-import { makePaginatedFactory, Factory } from "ol-util/build/factories"
-import { makeUserList } from "ol-search-ui/build/factories"
+import { makePaginatedFactory, Factory } from "ol-util/src/factories"
+import { makeUserList } from "ol-search-ui/src/factories"
 import type { UserList } from "ol-search-ui"
 import { PrivacyLevel, LearningResourceType } from "ol-search-ui"
 import type { FieldChannel } from "./interfaces"
