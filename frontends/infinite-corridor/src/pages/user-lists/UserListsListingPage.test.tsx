@@ -1,7 +1,7 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
 import { Favorites, LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
-import * as factories from "ol-search-ui/build/factories"
+import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {
   EditListDialog,

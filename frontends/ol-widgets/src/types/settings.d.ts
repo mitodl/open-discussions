@@ -1,5 +1,5 @@
 declare interface Window {
   SETTINGS?: {
-    embedlyKey?: unknown
+    embedlyKey?: string
   }
 }

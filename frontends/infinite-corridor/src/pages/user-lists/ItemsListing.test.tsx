@@ -1,7 +1,7 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
 import { LearningResourceCard } from "ol-search-ui"
-import * as factories from "ol-search-ui/build/factories"
+import * as factories from "ol-search-ui/src/factories"
 import {
   screen,
   user,

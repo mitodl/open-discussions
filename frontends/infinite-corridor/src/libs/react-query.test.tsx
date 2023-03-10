@@ -1,6 +1,6 @@
 import React from "react"
 import { renderHook } from "@testing-library/react-hooks/dom"
-import { allowConsoleErrors } from "ol-util/build/test-utils"
+import { allowConsoleErrors } from "ol-util/src/test-utils"
 import { QueryClientProvider } from "react-query"
 import { useQuery } from "react-query"
 import { createQueryClient } from "./react-query"

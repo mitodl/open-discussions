@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker"
-import type { Factory } from "ol-util/build/factories"
+import type { Factory } from "ol-util/src/factories"
 import type { User } from "../types/settings"
 
 const makeUserSettings: Factory<User> = (overrides = {}) => {
