@@ -15,7 +15,8 @@ import {
   renderWithProviders,
   setMockResponse,
   user,
-  within
+  within,
+  type TestAppOptions
 } from "../../test-utils"
 import { mockAxiosInstance as axios } from "../../test-utils/mockAxios"
 import { assertNotNil } from "ol-util"
@@ -55,11 +56,18 @@ const inputs = {
 }
 
 describe("Creation", () => {
-  const setup = () => {
+  const setup = (
+    opts: Partial<TestAppOptions> = {
+      user: { is_list_staff: true, is_authenticated: true }
+    }
+  ) => {
     const topics = factories.makeTopicsPaginated(5)
     setMockResponse.get(lrUrls.topics.listing, topics)
     const onClose = jest.fn()
-    renderWithProviders(<CreateListDialog open={true} onClose={onClose} />)
+    renderWithProviders(
+      <CreateListDialog open={true} onClose={onClose} />,
+      opts
+    )
     return { topics, onClose }
   }
 
@@ -137,6 +145,24 @@ describe("Creation", () => {
     setup()
     expect(inputs.pivacy_level[PrivacyLevel.Private]()).toBeChecked()
   })
+
+  test.each([
+    {
+      user:            { is_list_staff: true, is_authenticated: true },
+      canCreatePublic: true
+    },
+    {
+      user:            { is_list_staff: false, is_authenticated: true },
+      canCreatePublic: false
+    }
+  ])(
+    "Users can create public userlists if and only if user.is_list_staff",
+    ({ user, canCreatePublic }) => {
+      setup({ user })
+      const publicChoice = screen.queryByLabelText("Public")
+      expect(!!publicChoice).toBe(canCreatePublic)
+    }
+  )
 
   test("Userlists are Learning Lists (not Learning Paths) by default", () => {
     setup()
