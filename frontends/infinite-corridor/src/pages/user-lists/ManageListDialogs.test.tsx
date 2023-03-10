@@ -141,9 +141,34 @@ describe("Creation", () => {
     expect(axios.post).not.toHaveBeenCalled()
   })
 
-  test("Userlists are private by default", () => {
+  test("Userlists are private by default for staff", () => {
     setup()
     expect(inputs.privacy_level[PrivacyLevel.Private]()).toBeChecked()
+  })
+
+  test("Userlists are private by default for non-staff", async () => {
+    const { topics } = setup({
+      user: { is_authenticated: true, is_list_staff: false }
+    })
+
+    const userList = factories.makeUserList()
+
+    await user.click(inputs.title())
+    await user.paste(userList.title)
+
+    await user.click(inputs.description())
+    assertNotNil(userList.short_description)
+    await user.paste(userList.short_description)
+
+    await selectFromAutocomplete(inputs.topics(), topics.results[0].name)
+
+    setMockResponse.post(lrUrls.userList.create, userList)
+    await user.click(inputs.submit())
+
+    expect(axios.post).toHaveBeenCalledWith(
+      lrUrls.userList.create,
+      expect.objectContaining({ privacy_level: PrivacyLevel.Private })
+    )
   })
 
   test.each([
