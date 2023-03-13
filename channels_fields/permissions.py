@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from channels_fields.api import is_moderator
 from channels_fields.models import FieldChannel
-from open_discussions.permissions import is_staff_user
+from open_discussions.permissions import is_admin_user
 
 log = logging.getLogger()
 
@@ -38,7 +38,7 @@ class FieldModeratorPermissions(BasePermission):
 
     def has_permission(self, request, view):
         return field_exists(view) and (
-            is_staff_user(request) or is_field_moderator(request, view)
+            is_admin_user(request) or is_field_moderator(request, view)
         )
 
     def has_object_permission(self, request, view, obj):
