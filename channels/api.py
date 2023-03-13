@@ -1287,11 +1287,11 @@ class Api:
             comment_id(str): the id of the comment
         """
         comment = self.get_comment(comment_id)
+        post = comment.post
         with transaction.atomic():
-            comment = Comment.objects.filter(comment_id=comment_id)
-            comment.update(removed=True)
-            for c in comment:
-                c.post.update(num_comments=c.post.num_comments - 1)
+            comment.removed = True
+            if post.num_comments:
+                post.num_comments = post.num_comments - 1
             comment.mod.remove()
         return comment
 
@@ -1319,11 +1319,11 @@ class Api:
 
         """
         comment = self.get_comment(comment_id)
+        post = comment.post
         with transaction.atomic():
-            comment = Comment.objects.filter(comment_id=comment_id)
-            comment.update(deleted=False)
-            for c in comment:
-                c.post.update(num_comments=c.post.num_comments - 1)
+            comment.deleted = False
+            if post.num_comments:
+                post.num_comments = post.num_comments - 1
             comment.delete()
         return comment
 
