@@ -26,7 +26,7 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
 )
-from course_catalog.models import FavoriteItem, UserListItem
+from course_catalog.models import FavoriteItem, UserListItem, StaffListItem
 from course_catalog.serializers import (
     CourseSerializer,
     CourseTopicSerializer,
@@ -207,6 +207,7 @@ def test_userlistitem_serializer_validation(
         "content_type": content_type,
         "object_id": object_id,
         "user_list": userlist.id,
+        "image_src": "https://test.edu/myimage.jpg",
     }
     serializer = UserListItemSerializer(data=data)
     assert serializer.is_valid() == (valid_type and object_exists)
@@ -271,6 +272,31 @@ def test_favorites_serializer():
     serializer = FavoriteItemSerializer(favorite_item)
     with pytest.raises(Exception):
         assert serializer.data.get("content_data").get("id") == course_topic.id
+
+
+@pytest.mark.parametrize(
+    "factory,valid_type",
+    [
+        ["CourseFactory", True],
+        ["ProgramFactory", True],
+        ["StaffListFactory", True],
+        ["VideoFactory", True],
+        ["CourseTopicFactory", False],
+    ],
+)
+def test_stafflist_generic_foreign_key_serializer_classes(factory, valid_type):
+    """
+    Test that generic foreign key serializer properly accepts expected classes and rejects others for staff lists
+    """
+    stafflist = StaffListFactory.create()
+    obj = getattr(factories, factory).create()
+    list_item = StaffListItem(staff_list=stafflist, item=obj)
+    serializer = StaffListItemSerializer(list_item)
+    if valid_type:
+        assert serializer.data.get("content_data").get("id") == obj.id
+    else:
+        with pytest.raises(Exception):
+            assert serializer.data.get("content_data").get("id") == obj.id
 
 
 @pytest.mark.parametrize(
@@ -345,6 +371,7 @@ def test_stafflistitem_serializer_validation(
         "content_type": content_type,
         "object_id": object_id,
         "staff_list": stafflist.id,
+        "image_src": "https://test.edu/myimage.jpg",
     }
     serializer = StaffListItemSerializer(data=data)
     assert serializer.is_valid() == (valid_type and object_exists)

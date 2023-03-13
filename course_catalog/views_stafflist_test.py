@@ -181,8 +181,8 @@ def test_staff_list_items_endpoint_create_item_bad_data(client, user):
     }
 
 
-@pytest.mark.parametrize("is_editor", [True, False])
-def test_staff_list_items_endpoint_update_item(client, user, is_editor):
+@pytest.mark.parametrize("is_editor, position", [[True, 0], [True, 2], [False, 1]])
+def test_staff_list_items_endpoint_update_item(client, user, is_editor, position):
     """Test stafflistitems endpoint for updating StaffListItem positions"""
     topics = CourseTopicFactory.create_batch(3)
     stafflist = StaffListFactory.create(
@@ -197,19 +197,23 @@ def test_staff_list_items_endpoint_update_item(client, user, is_editor):
     update_editor_group(user, is_editor)
     client.force_login(user)
 
-    data = {"position": 0}
+    data = {"position": position}
 
     resp = client.patch(
-        reverse("stafflistitems-detail", args=[stafflist.id, list_item_3.id]),
+        reverse("stafflistitems-detail", args=[stafflist.id, list_item_2.id]),
         data=data,
         format="json",
     )
     assert resp.status_code == (200 if is_editor else 403)
     if resp.status_code == 200:
-        assert resp.json()["position"] == 0
-        for idx, item in enumerate([list_item_3, list_item_1, list_item_2]):
+        assert resp.json()["position"] == position
+        for item, expected_pos in (
+            [list_item_3, 1 if position == 2 else 2],
+            [list_item_1, 0 if position == 2 else 1],
+            [list_item_2, position],
+        ):
             item.refresh_from_db()
-            assert item.position == idx
+            assert item.position == expected_pos
 
 
 def test_staff_list_items_endpoint_update_items_wrong_list(client, user):

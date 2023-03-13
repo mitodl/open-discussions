@@ -815,7 +815,7 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
         with transaction.atomic():
             if position > instance.position:
                 # move items between the old and new positions up, inclusive of the new position
-                UserListItem.objects.filter(
+                StaffListItem.objects.filter(
                     position__lte=position, position__gt=instance.position
                 ).update(position=F("position") - 1)
             else:
