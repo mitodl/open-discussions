@@ -143,13 +143,13 @@ describe("App", () => {
     [false, true],
     [true, false],
     [false, false]
-  ].forEach(([isUIEnabled, isListStaff]) => {
+  ].forEach(([isUIEnabled, isPublicListEditor]) => {
     it(`should render something at "/learn if the UI is enabled or the user is list staff"`, async () => {
       SETTINGS.course_ui_enabled = isUIEnabled
-      SETTINGS.is_list_staff = isListStaff
+      SETTINGS.is_public_list_editor = isPublicListEditor
       const [wrapper] = await renderComponent("/learn/", [])
       assert.equal(
-        isUIEnabled || isListStaff,
+        isUIEnabled || isPublicListEditor,
         wrapper.find("LearnRouter").exists()
       )
     })

@@ -5,53 +5,52 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 
-from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.api import add_user_role
+from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.factories.models import ChannelFactory
-from course_catalog.constants import PrivacyLevel, PlatformType
+from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.factories import (
+    ContentFileFactory,
     CourseFactory,
+    ProgramFactory,
     UserListFactory,
     UserListItemFactory,
     VideoFactory,
-    ProgramFactory,
-    ContentFileFactory,
 )
 from course_catalog.models import FavoriteItem
 from open_discussions import features
 from open_discussions.factories import UserFactory
 from open_discussions.utils import extract_values
 from search.api import (
-    execute_search,
-    is_reddit_object_removed,
-    gen_post_id,
-    gen_comment_id,
-    gen_video_id,
-    find_related_documents,
-    get_similar_topics,
-    transform_results,
-    find_similar_resources,
     SIMILAR_RESOURCE_RELEVANT_FIELDS,
     execute_learn_search,
+    execute_search,
+    find_related_documents,
+    find_similar_resources,
+    gen_comment_id,
+    gen_post_id,
+    gen_video_id,
+    get_similar_topics,
+    is_reddit_object_removed,
+    transform_results,
 )
 from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
-    GLOBAL_DOC_TYPE,
-    USER_LIST_TYPE,
-    LEARNING_PATH_TYPE,
     COURSE_TYPE,
-    PODCAST_TYPE,
+    GLOBAL_DOC_TYPE,
     PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    USER_LIST_TYPE,
+    USER_PATH_TYPE,
 )
 from search.serializers import (
+    ESContentFileSerializer,
     ESCourseSerializer,
+    ESProgramSerializer,
     ESUserListSerializer,
     ESVideoSerializer,
-    ESProgramSerializer,
-    ESContentFileSerializer,
 )
-
 
 RAW_SUGGESTIONS = {
     "short_description": [
@@ -368,7 +367,7 @@ def test_execute_learn_search(user, elasticsearch):
                                                     "terms": {
                                                         "object_type": [
                                                             USER_LIST_TYPE,
-                                                            LEARNING_PATH_TYPE,
+                                                            USER_PATH_TYPE,
                                                         ]
                                                     }
                                                 }
@@ -418,7 +417,7 @@ def test_execute_learn_search_anonymous(elasticsearch):
                                                     "terms": {
                                                         "object_type": [
                                                             USER_LIST_TYPE,
-                                                            LEARNING_PATH_TYPE,
+                                                            USER_PATH_TYPE,
                                                         ]
                                                     }
                                                 }
@@ -579,7 +578,7 @@ def test_transform_results(
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
-        author=UserFactory.create(), list_type=LEARNING_PATH_TYPE
+        author=UserFactory.create(), list_type=USER_PATH_TYPE
     )
     user_list = UserListFactory.create(author=user)
 

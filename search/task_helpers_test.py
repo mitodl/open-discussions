@@ -2,69 +2,69 @@
 # pylint: disable=redefined-outer-name,unused-argument
 import pytest
 
-from course_catalog.factories import (
-    CourseFactory,
-    ProgramFactory,
-    VideoFactory,
-    UserListFactory,
-    ContentFileFactory,
-    PodcastFactory,
-    PodcastEpisodeFactory,
-)
-from open_discussions.features import INDEX_UPDATES
-from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.constants import COMMENT_TYPE, POST_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
+from course_catalog.factories import (
+    ContentFileFactory,
+    CourseFactory,
+    PodcastEpisodeFactory,
+    PodcastFactory,
+    ProgramFactory,
+    UserListFactory,
+    VideoFactory,
+)
+from open_discussions.features import INDEX_UPDATES
+from search.api import (
+    gen_comment_id,
+    gen_course_id,
+    gen_podcast_episode_id,
+    gen_podcast_id,
+    gen_post_id,
+    gen_profile_id,
+    gen_user_list_id,
+    gen_video_id,
+)
 from search.constants import (
-    PROFILE_TYPE,
-    VIDEO_TYPE,
-    USER_LIST_TYPE,
-    LEARNING_PATH_TYPE,
     COURSE_TYPE,
-    PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    PROFILE_TYPE,
+    USER_LIST_TYPE,
+    USER_PATH_TYPE,
+    VIDEO_TYPE,
 )
 from search.task_helpers import (
-    reddit_object_persist,
-    index_new_post,
-    index_new_comment,
-    update_post_text,
-    update_comment_text,
-    update_post_removal_status,
-    update_field_for_all_post_comments,
-    update_comment_removal_status,
-    increment_parent_post_comment_count,
     decrement_parent_post_comment_count,
-    set_comment_to_deleted,
-    update_indexed_score,
-    upsert_profile,
-    update_author_posts_comments,
-    update_channel_index,
-    upsert_course,
-    delete_profile,
-    upsert_program,
-    upsert_video,
-    delete_video,
-    upsert_user_list,
-    delete_user_list,
-    upsert_content_file,
     delete_course,
-    index_run_content_files,
-    delete_run_content_files,
-    upsert_podcast,
-    upsert_podcast_episode,
     delete_podcast,
     delete_podcast_episode,
-)
-from search.api import (
-    gen_post_id,
-    gen_comment_id,
-    gen_profile_id,
-    gen_video_id,
-    gen_user_list_id,
-    gen_course_id,
-    gen_podcast_id,
-    gen_podcast_episode_id,
+    delete_profile,
+    delete_run_content_files,
+    delete_user_list,
+    delete_video,
+    increment_parent_post_comment_count,
+    index_new_comment,
+    index_new_post,
+    index_run_content_files,
+    reddit_object_persist,
+    set_comment_to_deleted,
+    update_author_posts_comments,
+    update_channel_index,
+    update_comment_removal_status,
+    update_comment_text,
+    update_field_for_all_post_comments,
+    update_indexed_score,
+    update_post_removal_status,
+    update_post_text,
+    upsert_content_file,
+    upsert_course,
+    upsert_podcast,
+    upsert_podcast_episode,
+    upsert_profile,
+    upsert_program,
+    upsert_user_list,
+    upsert_video,
 )
 
 es_profile_serializer_data = {
@@ -497,7 +497,7 @@ def test_delete_video(mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
+@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, USER_PATH_TYPE])
 def test_upsert_user_list(mocker, list_type):
     """
     Tests that upsert_user_list calls update_field_values_by_query with the right parameters
@@ -509,7 +509,7 @@ def test_upsert_user_list(mocker, list_type):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, LEARNING_PATH_TYPE])
+@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, USER_PATH_TYPE])
 def test_delete_user_list(mocker, list_type):
     """Tests that deleting a UserList triggers a delete on a UserList document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")

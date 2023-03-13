@@ -3,13 +3,13 @@ Functions and constants for Elasticsearch indexing
 """
 import logging
 
-from elasticsearch.helpers import bulk, BulkIndexError
-from elasticsearch.exceptions import ConflictError, NotFoundError
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from elasticsearch.exceptions import ConflictError, NotFoundError
+from elasticsearch.helpers import BulkIndexError, bulk
 
-from course_catalog.models import Course, ContentFile, LearningResourceRun
+from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks
 from search.api import gen_course_id
 from search.connection import (
@@ -21,43 +21,42 @@ from search.connection import (
     refresh_index,
 )
 from search.constants import (
-    POST_TYPE,
-    COMMENT_TYPE,
-    PROFILE_TYPE,
-    COURSE_TYPE,
     ALIAS_ALL_INDICES,
-    VALID_OBJECT_TYPES,
+    COMMENT_TYPE,
+    COURSE_TYPE,
     GLOBAL_DOC_TYPE,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    POST_TYPE,
+    PROFILE_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_PATH_TYPE,
+    VALID_OBJECT_TYPES,
     VIDEO_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    serialize_bulk_posts,
-    serialize_bulk_comments,
-    serialize_bulk_profiles,
-    serialize_bulk_courses,
     ESPostSerializer,
+    serialize_bulk_comments,
+    serialize_bulk_courses,
+    serialize_bulk_courses_for_deletion,
+    serialize_bulk_podcast_episodes,
+    serialize_bulk_podcast_episodes_for_deletion,
+    serialize_bulk_podcasts,
+    serialize_bulk_podcasts_for_deletion,
+    serialize_bulk_posts,
+    serialize_bulk_profiles,
+    serialize_bulk_profiles_for_deletion,
     serialize_bulk_programs,
+    serialize_bulk_programs_for_deletion,
     serialize_bulk_user_lists,
+    serialize_bulk_user_lists_for_deletion,
     serialize_bulk_videos,
+    serialize_bulk_videos_for_deletion,
     serialize_content_file_for_bulk,
     serialize_content_file_for_bulk_deletion,
-    serialize_bulk_podcasts,
-    serialize_bulk_podcast_episodes,
-    serialize_bulk_profiles_for_deletion,
-    serialize_bulk_courses_for_deletion,
-    serialize_bulk_programs_for_deletion,
-    serialize_bulk_user_lists_for_deletion,
-    serialize_bulk_videos_for_deletion,
-    serialize_bulk_podcasts_for_deletion,
-    serialize_bulk_podcast_episodes_for_deletion,
 )
-
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -284,7 +283,7 @@ MAPPING = {
     COURSE_TYPE: COURSE_OBJECT_TYPE,
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
     USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
-    LEARNING_PATH_TYPE: USER_LIST_OBJECT_TYPE,
+    USER_PATH_TYPE: USER_LIST_OBJECT_TYPE,
     VIDEO_TYPE: VIDEO_OBJECT_TYPE,
     PODCAST_TYPE: PODCAST_OBJECT_TYPE,
     PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,

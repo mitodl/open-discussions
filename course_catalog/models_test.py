@@ -10,6 +10,8 @@ from course_catalog.factories import (
     LearningResourceOfferorFactory,
     LearningResourceRunFactory,
     ProgramFactory,
+    StaffListFactory,
+    StaffListItemFactory,
     UserListFactory,
     UserListItemFactory,
 )
@@ -141,3 +143,23 @@ def test_userlist_audience():
         user_list=user_list, content_object=not_open_learning_resource
     )
     assert user_list.audience == []
+
+
+@pytest.mark.django_db
+def test_stafflist_audience():
+    """
+    Should return the correct audience for the StaffList
+    """
+    staff_list = StaffListFactory.create()
+    open_learning_resource = CourseFactory.create(platform=PlatformType.ocw.value)
+    not_open_learning_resource = CourseFactory.create(platform=PlatformType.xpro.value)
+
+    StaffListItemFactory.create(
+        staff_list=staff_list, content_object=open_learning_resource
+    )
+    assert staff_list.audience == ["Open Content"]
+
+    StaffListItemFactory.create(
+        staff_list=staff_list, content_object=not_open_learning_resource
+    )
+    assert staff_list.audience == []

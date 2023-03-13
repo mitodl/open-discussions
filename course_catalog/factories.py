@@ -3,20 +3,21 @@ import random
 from datetime import timedelta
 
 import factory
-from factory.django import DjangoModelFactory
-from factory.fuzzy import FuzzyChoice, FuzzyText
 import pytz
 from django.contrib.contenttypes.models import ContentType
+from factory.django import DjangoModelFactory
+from factory.fuzzy import FuzzyChoice, FuzzyText
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,
     CONTENT_TYPE_PAGE,
     OCW_DEPARTMENTS,
     AvailabilityType,
-    ListType,
     OfferedBy,
     PlatformType,
     PrivacyLevel,
+    StaffListType,
+    UserListType,
 )
 from course_catalog.models import (
     ContentFile,
@@ -31,6 +32,8 @@ from course_catalog.models import (
     PodcastEpisode,
     Program,
     ProgramItem,
+    StaffList,
+    StaffListItem,
     UserList,
     UserListItem,
     Video,
@@ -378,7 +381,7 @@ class UserListFactory(DjangoModelFactory):
     """Factory for Learning Paths"""
 
     title = FuzzyText()
-    list_type = FuzzyChoice((ListType.LEARNING_PATH.value, ListType.LIST.value))
+    list_type = FuzzyChoice((UserListType.LEARNING_PATH.value, UserListType.LIST.value))
     privacy_level = FuzzyChoice((PrivacyLevel.public.value, PrivacyLevel.private.value))
     image_src = factory.Faker("file_path", extension="jpg")
 
@@ -398,8 +401,69 @@ class UserListFactory(DjangoModelFactory):
         model = UserList
 
     class Params:
-        is_learning_path = factory.Trait(list_type=ListType.LEARNING_PATH.value)
-        is_list = factory.Trait(list_type=ListType.LIST.value)
+        is_learning_path = factory.Trait(list_type=UserListType.LEARNING_PATH.value)
+        is_list = factory.Trait(list_type=UserListType.LIST.value)
+        is_public = factory.Trait(privacy_level=PrivacyLevel.public.value)
+        is_private = factory.Trait(privacy_level=PrivacyLevel.private.value)
+
+
+class StaffListItemFactory(ListItemFactory):
+    """Factory for StaffList items"""
+
+    staff_list = factory.SubFactory("course_catalog.factories.StaffListFactory")
+    content_object = factory.SubFactory("course_catalog.factories.CourseFactory")
+
+    class Meta:
+        model = StaffListItem
+
+    class Params:
+        is_course = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.CourseFactory")
+        )
+        is_userlist = factory.Trait(
+            content_object=factory.SubFactory(
+                "course_catalog.factories.UserListFactory"
+            )
+        )
+        is_stafflist = factory.Trait(
+            content_object=factory.SubFactory(
+                "course_catalog.factories.StaffListFactory"
+            )
+        )
+        is_program = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.ProgramFactory")
+        )
+        is_video = factory.Trait(
+            content_object=factory.SubFactory("course_catalog.factories.VideoFactory")
+        )
+
+
+class StaffListFactory(DjangoModelFactory):
+    """Factory for Staff Lists"""
+
+    title = FuzzyText()
+    list_type = FuzzyChoice((StaffListType.LIST.value, StaffListType.PATH.value))
+    privacy_level = FuzzyChoice((PrivacyLevel.public.value, PrivacyLevel.private.value))
+    image_src = factory.Faker("file_path", extension="jpg")
+
+    author = factory.SubFactory(UserFactory)
+
+    @factory.post_generation
+    def topics(self, create, extracted, **kwargs):
+        """Create topics for learning path"""
+        if not create:
+            return
+
+        if extracted:
+            for topic in extracted:
+                self.topics.add(topic)
+
+    class Meta:
+        model = StaffList
+
+    class Params:
+        is_path = factory.Trait(list_type=StaffListType.PATH.value)
+        is_list = factory.Trait(list_type=StaffListType.LIST.value)
         is_public = factory.Trait(privacy_level=PrivacyLevel.public.value)
         is_private = factory.Trait(privacy_level=PrivacyLevel.private.value)
 

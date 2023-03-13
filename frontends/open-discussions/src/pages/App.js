@@ -326,7 +326,7 @@ class App extends React.Component<Props> {
             path={`${match.url}privacy-statement`}
             component={PrivacyPolicyPage}
           />
-          {SETTINGS.course_ui_enabled || SETTINGS.is_list_staff ? (
+          {SETTINGS.course_ui_enabled || SETTINGS.is_public_list_editor ? (
             <>
               <Route path={`${match.url}courses`}>
                 <CourseLearnRedirect />

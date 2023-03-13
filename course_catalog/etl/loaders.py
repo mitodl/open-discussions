@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
-from course_catalog.constants import ListType, PrivacyLevel
+from course_catalog.constants import PrivacyLevel, UserListType
 from course_catalog.etl.constants import (
     CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
@@ -449,7 +449,7 @@ def load_playlist_user_list(playlist, user_list_title):
             playlist.user_list = UserList.objects.create(
                 author=owner,
                 privacy_level=PrivacyLevel.public.value,
-                list_type=ListType.LIST.value,
+                list_type=UserListType.LIST.value,
             )
             playlist.save()
 

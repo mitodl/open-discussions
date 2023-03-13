@@ -88,7 +88,11 @@ def test_popular_content_serializer(mocker, is_deleted, user):
         for resource in resources
     ]
 
-    context = {"request": mocker.Mock(user=user)}
+    context = {
+        "request": mocker.Mock(
+            user=user, build_absolute_uri=mocker.Mock(return_value="")
+        )
+    }
     # NOTE: we test PopularContentSerializer instead of PopularContentListSerializer
     #       because the list serializer is never used directly, but rather many=True tells
     #       PopularContentSerializer to delegate to PopularContentListSerializer

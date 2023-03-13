@@ -5,7 +5,12 @@ import pytest
 
 from course_catalog import factories
 from course_catalog.api_test import ocw_next_valid_data  # pylint:disable=unused-import
-from course_catalog.constants import OCW_DEPARTMENTS, ListType, OfferedBy
+from course_catalog.constants import (
+    OCW_DEPARTMENTS,
+    OfferedBy,
+    StaffListType,
+    UserListType,
+)
 from course_catalog.factories import (
     CourseFactory,
     CourseInstructorFactory,
@@ -17,6 +22,7 @@ from course_catalog.factories import (
     PodcastFactory,
     ProgramFactory,
     ProgramItemCourseFactory,
+    StaffListFactory,
     UserListFactory,
     VideoFactory,
 )
@@ -30,6 +36,8 @@ from course_catalog.serializers import (
     PodcastEpisodeSerializer,
     PodcastSerializer,
     ProgramSerializer,
+    StaffListItemSerializer,
+    StaffListSerializer,
     UserListItemSerializer,
     UserListSerializer,
     VideoSerializer,
@@ -130,8 +138,8 @@ def test_generic_foreign_key_serializer_classes(factory, valid_type):
 @pytest.mark.parametrize(
     "list_type,valid",
     [
-        [ListType.LIST.value, True],
-        [ListType.LEARNING_PATH.value, True],
+        [UserListType.LIST.value, True],
+        [UserListType.LEARNING_PATH.value, True],
         ["bad_type", False],
         [None, False],
     ],
@@ -167,7 +175,7 @@ def test_userlist_serializer_validation_bad_topic(data, error):
     """
     data = {
         "title": "My List",
-        "list_type": ListType.LEARNING_PATH.value,
+        "list_type": UserListType.LEARNING_PATH.value,
         "topics": [data],
     }
     serializer = UserListSerializer(data=data)
@@ -263,6 +271,83 @@ def test_favorites_serializer():
     serializer = FavoriteItemSerializer(favorite_item)
     with pytest.raises(Exception):
         assert serializer.data.get("content_data").get("id") == course_topic.id
+
+
+@pytest.mark.parametrize(
+    "list_type,valid",
+    [
+        [StaffListType.LIST.value, True],
+        [StaffListType.PATH.value, True],
+        ["bad_type", False],
+        [None, False],
+    ],
+)
+def test_stafflist_serializer_validation(list_type, valid):
+    """
+    Test that the StaffListSerializer validates list_type and topics correctly
+    """
+    topics = CourseTopicFactory.create_batch(2)
+    data = {
+        "title": "My List",
+        "list_type": list_type,
+        "topics": [topic.id for topic in topics],
+    }
+    serializer = StaffListSerializer(data=data)
+    assert serializer.is_valid() is valid
+    data["topics"] = CourseTopicSerializer(instance=topics, many=True).data
+    serializer = StaffListSerializer(data=data)
+    assert serializer.is_valid() is valid
+
+
+@pytest.mark.parametrize(
+    "data, error",
+    [
+        [9999, "Invalid topic ids: {9999}"],
+        [None, "Invalid topic ids: {None}"],
+        ["a", "Topic ids must be integers"],
+    ],
+)
+def test_stafflist_serializer_validation_bad_topic(data, error):
+    """
+    Test that the StaffListSerializer invalidates a non-existent topic
+    """
+    serializer_data = {
+        "title": "My List",
+        "list_type": StaffListType.PATH.value,
+        "topics": [data],
+    }
+    serializer = StaffListSerializer(data=serializer_data)
+    assert serializer.is_valid() is False
+    assert serializer.errors["topics"][0] == error
+
+
+@pytest.mark.parametrize("object_exists", [True, False])
+@pytest.mark.parametrize(
+    "content_type,factory,valid_type",
+    [
+        ["course", "CourseFactory", True],
+        ["program", "ProgramFactory", True],
+        ["video", "VideoFactory", True],
+        ["userlist", "UserListFactory", False],
+        [None, "CourseFactory", False],
+    ],
+)
+def test_stafflistitem_serializer_validation(
+    content_type, factory, valid_type, object_exists
+):
+    """
+    Test that the StaffListItemSerializer validates content_type and object correctly
+    """
+    stafflist = StaffListFactory.create()
+    # pylint:disable=redefined-builtin
+    object_id = getattr(factories, factory).create().id if object_exists else 1_001_001
+    data = {
+        "content_type": content_type,
+        "object_id": object_id,
+        "staff_list": stafflist.id,
+    }
+    serializer = StaffListItemSerializer(data=data)
+    assert serializer.is_valid() == (valid_type and object_exists)
 
 
 def test_podcast_serializer():

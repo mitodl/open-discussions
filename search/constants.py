@@ -1,5 +1,5 @@
 """ Constants for search """
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import COMMENT_TYPE, POST_TYPE
 
 ALIAS_ALL_INDICES = "all"
 PROFILE_TYPE = "profile"
@@ -7,7 +7,7 @@ COURSE_TYPE = "course"
 RESOURCE_FILE_TYPE = "resourcefile"
 PROGRAM_TYPE = "program"
 USER_LIST_TYPE = "userlist"
-LEARNING_PATH_TYPE = "learningpath"
+USER_PATH_TYPE = "learningpath"
 VIDEO_TYPE = "video"
 PODCAST_TYPE = "podcast"
 PODCAST_EPISODE_TYPE = "podcastepisode"
@@ -16,7 +16,7 @@ LEARNING_RESOURCE_TYPES = (
     COURSE_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
-    LEARNING_PATH_TYPE,
+    USER_PATH_TYPE,
     VIDEO_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,

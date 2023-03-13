@@ -1,6 +1,7 @@
 """Custom permissions"""
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedirect
+from prawcore.exceptions import Forbidden as PrawForbidden
+from prawcore.exceptions import Redirect as PrawRedirect
 from rest_framework import permissions
 
 from channels.models import Channel
@@ -30,9 +31,11 @@ def is_staff_user(request):
         request (HTTPRequest): django request object
 
     Returns:
-        bool: True if user is staff
+        bool: True if user is staff/admin
     """
-    return request.user is not None and request.user.is_staff
+    return request.user is not None and (
+        request.user.is_staff or request.user.is_superuser
+    )
 
 
 def is_moderator(request, view):

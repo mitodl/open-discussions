@@ -43,9 +43,9 @@ describe("UserListFormDialog", () => {
   })
 
   //
-  ;[true, false].forEach(isListStaff => {
+  ;[true, false].forEach(isPublicListEditor => {
     it("should render a form with all the right inputs", async () => {
-      SETTINGS.is_list_staff = isListStaff
+      SETTINGS.is_public_list_editor = isPublicListEditor
       const { wrapper } = await render()
       assert.ok(wrapper.find('textarea[name="short_description"]').exists())
       assert.ok(wrapper.find('input[name="title"]').exists())
@@ -56,11 +56,11 @@ describe("UserListFormDialog", () => {
       )
       assert.equal(
         wrapper.find(`input[value="${LR_PUBLIC}"]`).exists(),
-        isListStaff
+        isPublicListEditor
       )
       assert.equal(
         wrapper.find(`input[value="${LR_PRIVATE}"]`).exists(),
-        isListStaff
+        isPublicListEditor
       )
     })
   })
@@ -71,7 +71,7 @@ describe("UserListFormDialog", () => {
     [4, `Select no more than ${TOPICS_LENGTH_MAXIMUM} subjects`]
   ].forEach(([selectCount, topicError]) => {
     it(`should call validator, show the results with ${selectCount} subjects selected`, async () => {
-      SETTINGS.is_list_staff = true
+      SETTINGS.is_public_list_editor = true
       const { wrapper } = await render()
       // Select all 5 topics (only 3 allowed)
       topics.slice(0, selectCount).forEach(topic => {
@@ -100,7 +100,7 @@ describe("UserListFormDialog", () => {
   })
 
   it("should let a user with correct permissions fill out the form and create a public list", async () => {
-    SETTINGS.is_list_staff = true
+    SETTINGS.is_public_list_editor = true
     const { wrapper } = await render()
     changeFormikInput(
       wrapper.find(`input[value="${LR_TYPE_USERLIST}"]`),
@@ -140,7 +140,7 @@ describe("UserListFormDialog", () => {
   })
 
   it("should let a user fill out the form and create a private list", async () => {
-    SETTINGS.is_list_staff = false
+    SETTINGS.is_public_list_editor = false
     const { wrapper } = await render()
     changeFormikInput(
       wrapper.find(`input[value="${LR_TYPE_USERLIST}"]`),
@@ -175,7 +175,7 @@ describe("UserListFormDialog", () => {
   })
 
   it("should pre-populate fields when you pass a list", async () => {
-    SETTINGS.is_list_staff = true
+    SETTINGS.is_public_list_editor = true
     const { wrapper } = await render({ userList })
     assert.equal(wrapper.find(Dialog).prop("title"), `Edit ${userList.title}`)
     assert.isTrue(

@@ -2,24 +2,25 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedirect
+from prawcore.exceptions import Forbidden as PrawForbidden
+from prawcore.exceptions import Redirect as PrawRedirect
 
 from channels.models import Channel
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ContributorPermissions,
-    IsStaffPermission,
+    IsOwnSubscriptionOrAdminPermission,
+    IsStaffModeratorOrReadonlyPermission,
     IsStaffOrModeratorPermission,
     IsStaffOrReadonlyPermission,
-    IsStaffModeratorOrReadonlyPermission,
-    IsOwnSubscriptionOrAdminPermission,
+    IsStaffPermission,
     ModeratorPermissions,
     ObjectOnlyPermissions,
-    channel_is_mod_editable,
-    is_readonly,
-    is_moderator,
-    is_staff_user,
     channel_exists,
+    channel_is_mod_editable,
+    is_moderator,
+    is_readonly,
+    is_staff_user,
 )
 
 pytestmark = pytest.mark.usefixtures("mock_channel_exists")
@@ -50,16 +51,22 @@ def test_is_moderator(user, mocker, result):
 
 
 @pytest.mark.parametrize(
-    "has_user, is_staff, expected",
-    [[False, False, False], [True, False, False], [True, True, True]],
+    "has_user, is_staff, is_super, expected",
+    [
+        [False, False, False, False],
+        [True, False, False, False],
+        [True, True, False, True],
+        [True, False, True, True],
+    ],
 )
 def test_is_staff_user(
-    mocker, user, staff_user, has_user, is_staff, expected
+    mocker, user, staff_user, has_user, is_staff, is_super, expected
 ):  # pylint: disable=too-many-arguments
     """is_staff_user should return True if a valid JWT is provided"""
     request = mocker.Mock()
     if has_user:
         request.user = staff_user if is_staff else user
+        request.user.is_superuser = is_super
     else:
         request.user = None
     assert is_staff_user(request) is expected

@@ -36,13 +36,18 @@ from course_catalog.models import (
     Podcast,
     PodcastEpisode,
     Program,
+    StaffList,
+    StaffListItem,
     UserList,
     UserListItem,
     Video,
 )
 from course_catalog.permissions import (
+    HasStaffListItemPermissions,
+    HasStaffListPermission,
     HasUserListItemPermissions,
     HasUserListPermissions,
+    is_staff_list_editor,
 )
 from course_catalog.serializers import (
     CourseSerializer,
@@ -51,6 +56,8 @@ from course_catalog.serializers import (
     PodcastEpisodeSerializer,
     PodcastSerializer,
     ProgramSerializer,
+    StaffListItemSerializer,
+    StaffListSerializer,
     UserListItemSerializer,
     UserListSerializer,
     VideoSerializer,
@@ -232,7 +239,7 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
     """
 
     serializer_class = UserListSerializer
-    pagination_class = LargePagination
+    pagination_class = DefaultPagination
     permission_classes = (HasUserListPermissions,)
 
     def get_queryset(self):
@@ -300,6 +307,74 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
             upsert_user_list(user_list.id)
         else:
             delete_user_list(user_list)
+
+
+class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
+    """
+    Viewset for Staff Lists
+    """
+
+    serializer_class = StaffListSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (HasStaffListPermission,)
+
+    def get_queryset(self):
+        """Return a queryset for this user"""
+        user = self.request.user
+        return (
+            StaffList.objects.prefetch_related("topics", "offered_by")
+            .annotate(item_count=Count("items"))
+            .annotate_is_favorite_for_user(user)
+            .prefetch_list_items_for_user(user)
+        )
+
+    def list(self, request, *args, **kwargs):
+        """Override default list to only get lists authored by user"""
+
+        if is_staff_list_editor(request):
+            queryset = self.get_queryset()
+        else:
+            queryset = self.get_queryset().filter(
+                privacy_level=PrivacyLevel.public.value
+            )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def perform_destroy(self, instance):
+        instance.delete()
+
+
+class StaffListItemViewSet(
+    NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin
+):
+    """
+    Viewset for Staff List Items
+    """
+
+    queryset = StaffListItem.objects.select_related("content_type").order_by("position")
+    serializer_class = StaffListItemSerializer
+    pagination_class = DefaultPagination
+    permission_classes = (HasStaffListItemPermissions,)
+
+    def create(self, request, *args, **kwargs):
+        staff_list_id = kwargs["parent_lookup_staff_list_id"]
+        request.data["staff_list"] = staff_list_id
+
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        staff_list_id = kwargs["parent_lookup_staff_list_id"]
+        request.data["staff_list"] = staff_list_id
+        return super().update(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        instance.delete()
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
