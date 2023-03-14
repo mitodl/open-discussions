@@ -25,6 +25,7 @@ from authentication.decorators import blocked_ip_exempt
 from course_catalog.constants import PlatformType, PrivacyLevel, ResourceType
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from course_catalog.exceptions import WebhookException
+from course_catalog.filters import CourseFilter
 from course_catalog.models import (
     Course,
     CourseTopic,
@@ -145,6 +146,8 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+    filter_backends = [CourseFilter]
+    filterset_fields = ["upcoming", "platform", "program_type", "certificate"]
 
     def _get_base_queryset(self, *args, **kwargs):
         """Return the base queryset for all actions"""
@@ -194,6 +197,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """
         Get upcoming courses
         """
+        kwargs = request.body
         page = self.paginate_queryset(
             self._get_base_queryset(runs__start_date__gt=timezone.now()).order_by(
                 "runs__start_date"
