@@ -15,4 +15,4 @@ class CourseFilter(django_filters.FilterSet):
 
     class Meta:
         model = Course
-        fields = ("upcoming", "platform", "program_type", "certificate")
+        fields = ["upcoming", "platform", "program_type", "certificate"]
