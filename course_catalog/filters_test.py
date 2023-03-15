@@ -19,7 +19,7 @@ def test_course_filter_upcoming():
     upcoming_course.start_date = now_in_utc + timedelta(days=1)
     not_upcoming_course.start_date = now_in_utc - timedelta(days=1)
 
-    query = CourseFilter().qs
+    query = CourseFilter({}).qs
 
     assert upcoming_course in query
     assert not_upcoming_course not in query
