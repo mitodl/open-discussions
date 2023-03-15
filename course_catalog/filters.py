@@ -9,10 +9,12 @@ class CourseFilter(django_filters.FilterSet):
 
     upcoming = django_filters.DateFilter(field_name="start_date", lookup_expr="gt")
 
-    certificate = django_filters.Filter(
+    certificates = django_filters.Filter(
         field_name="certificates", lookup_expr="icontains"
     )
 
+    # Need to update for audience
+
     class Meta:
         model = Course
-        fields = ["upcoming", "platform", "program_type", "certificate"]
+        fields = ["upcoming", "platform", "audience", "certificates"]
