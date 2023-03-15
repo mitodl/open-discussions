@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.207.4
+Version 0.207.4 (Released March 15, 2023)
 ---------------
 
 - stop building individual ts packages (#3874)
