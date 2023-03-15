@@ -2,7 +2,6 @@
 import logging
 import os
 import re
-from subprocess import CalledProcessError, check_call
 from tempfile import TemporaryDirectory
 from typing import List
 
@@ -16,22 +15,11 @@ from course_catalog.models import Course, LearningResourceRun
 log = logging.getLogger()
 
 
-def sync_edx_course_files(
-    bucket_name: str, platform: str, ids: List[int], s3_prefix: str = None
-):
-    """
-    Sync all edx course run files for a list of course ids to database
-
-    Args:
-        bucket_name(str): Name of S3 bucket
-        platform(str): The edx platform
-        ids(list of int): list of course ids to process
-        s3_prefix(str): path prefix to include in regex for S3
-    """
-    bucket = get_learning_course_bucket(bucket_name)
+def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> list[str]:
+    """Retrieve a list of S3 keys for the most recent edx course archives"""
+    bucket = get_learning_course_bucket(platform)
     if s3_prefix is None:
         s3_prefix = "courses"
-
     try:
         course_tar_regex = rf".*/{s3_prefix}/.*\.tar\.gz$"
         most_recent_export_date = next(
@@ -46,19 +34,35 @@ def sync_edx_course_files(
                 )
             )
         ).key.split("/")[0]
-        most_recent_course_zips = [
-            obj
+        return [
+            obj.key
             for obj in bucket.objects.filter(Prefix=most_recent_export_date)
             if re.search(course_tar_regex, obj.key)
         ]
     except (StopIteration, IndexError):
         log.warning(
-            "No %s exported courses found in S3 bucket %s", platform, bucket_name
+            "No %s exported courses found in S3 bucket %s", platform, bucket.name
         )
-        return
+        return []
 
-    for course_tarfile in most_recent_course_zips:
-        matches = re.search(rf"{s3_prefix}/(.+)\.tar\.gz$", course_tarfile.key)
+
+def sync_edx_course_files(
+    platform: str, ids: List[int], keys: list[str], s3_prefix: str = None
+):
+    """
+    Sync all edx course run files for a list of course ids to database
+
+    Args:
+        platform(str): The edx platform
+        ids(list of int): list of course ids to process
+        s3_prefix(str): path prefix to include in regex for S3
+    """
+    bucket = get_learning_course_bucket(platform)
+    if s3_prefix is None:
+        s3_prefix = "courses"
+
+    for key in keys:
+        matches = re.search(rf"{s3_prefix}/(.+)\.tar\.gz$", key)
         run_id = matches.group(1)
 
         runs = LearningResourceRun.objects.filter(
@@ -78,19 +82,12 @@ def sync_edx_course_files(
         run = runs.first()
 
         if not run:
-            log.info("No %s course runs matched tarfile %s", platform, course_tarfile)
+            log.info("No %s course runs matched tarfile %s", platform, key)
             continue
-        with TemporaryDirectory() as export_tempdir, TemporaryDirectory() as tar_tempdir:
-            course_tarpath = os.path.join(
-                export_tempdir, course_tarfile.key.split("/")[-1]
-            )
-            bucket.download_file(course_tarfile.key, course_tarpath)
-            try:
-                check_call(["tar", "xf", course_tarpath], cwd=tar_tempdir)
-            except CalledProcessError:
-                log.exception("Unable to untar %s", course_tarfile)
-                continue
+        with TemporaryDirectory() as export_tempdir:
+            course_tarpath = os.path.join(export_tempdir, key.split("/")[-1])
+            bucket.download_file(key, course_tarpath)
             try:
                 load_content_files(run, transform_content_files(course_tarpath))
             except:  # pylint: disable=bare-except
-                log.exception("Error ingesting OLX content data for %s", course_tarfile)
+                log.exception("Error ingesting OLX content data for %s", key)

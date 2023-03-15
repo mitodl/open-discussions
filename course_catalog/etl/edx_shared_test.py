@@ -5,7 +5,10 @@ import pytest
 from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PlatformType
-from course_catalog.etl.edx_shared import sync_edx_course_files
+from course_catalog.etl.edx_shared import (
+    get_most_recent_course_archives,
+    sync_edx_course_files,
+)
 from course_catalog.factories import LearningResourceRunFactory
 from course_catalog.models import Course, LearningResourceRun
 
@@ -45,9 +48,13 @@ def test_sync_edx_course_files(
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
-    for run_id in run_ids:
+    mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
+    )
+    keys = [f"20220101/{s3_prefix}/{run_id}.tar.gz" for run_id in run_ids]
+    for idx, run_id in enumerate(run_ids):
         bucket.put_object(
-            Key=f"20220101/{s3_prefix}/{run_id}.tar.gz",
+            Key=keys[idx],
             Body=open(f"test_json/{run_id}.tar.gz", "rb").read(),
             ACL="public-read",
         )
@@ -57,7 +64,7 @@ def test_sync_edx_course_files(
             content_type=ContentType.objects.get_for_model(Course),
         )
         course_ids.append(run.object_id)
-    sync_edx_course_files(bucket.name, platform, course_ids, s3_prefix)
+    sync_edx_course_files(platform, course_ids, keys, s3_prefix)
     assert mock_transform.call_count == 2
     assert mock_load_content_files.call_count == 2
     assert mock_transform.call_args[0][0].endswith(f"{run_ids[1]}.tar.gz") is True
@@ -79,15 +86,19 @@ def test_sync_edx_course_files_invalid_tarfile(
         platform=platform,
         content_type=ContentType.objects.get_for_model(Course),
     )
+    key = f"20220101/courses/{run.run_id}.tar.gz"
     bucket = (
         mock_mitxonline_learning_bucket
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
     bucket.put_object(
-        Key=f"20220101/courses/{run.run_id}.tar.gz",
+        Key=key,
         Body=b"".join([b"x" for _ in range(100)]),
         ACL="public-read",
+    )
+    mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
     )
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
@@ -95,15 +106,18 @@ def test_sync_edx_course_files_invalid_tarfile(
         return_value=[],
     )
     mocker.patch(
-        "course_catalog.etl.edx_shared.check_call",
+        "course_catalog.etl.edx_shared.transform_content_files",
         side_effect=CalledProcessError(0, ""),
     )
     mock_log = mocker.patch("course_catalog.etl.edx_shared.log.exception")
 
-    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    sync_edx_course_files(platform, [run.object_id], [key])
     mock_load_content_files.assert_not_called()
     mock_log.assert_called_once()
-    assert mock_log.call_args[0][0].startswith("Unable to untar ") is True
+    assert (
+        mock_log.call_args[0][0].startswith("Error ingesting OLX content data for")
+        is True
+    )
 
 
 @pytest.mark.parametrize(
@@ -117,13 +131,14 @@ def test_sync_edx_course_files_empty_bucket(
         platform=platform,
         content_type=ContentType.objects.get_for_model(Course),
     )
+    key = "20220101/courses/some_other_course.tar.gz"
     bucket = (
         mock_mitxonline_learning_bucket
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
     bucket.put_object(
-        Key="20220101/courses/some_other_course.tar.gz",
+        Key=key,
         Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
         ACL="public-read",
     )
@@ -132,7 +147,10 @@ def test_sync_edx_course_files_empty_bucket(
         autospec=True,
         return_value=[],
     )
-    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
+    )
+    sync_edx_course_files(platform, [run.object_id], [key])
     mock_load_content_files.assert_not_called()
 
 
@@ -147,15 +165,19 @@ def test_sync_edx_course_files_error(
         platform=platform,
         content_type=ContentType.objects.get_for_model(Course),
     )
+    key = f"20220101/courses/{run.run_id}.tar.gz"
     bucket = (
         mock_mitxonline_learning_bucket
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
     bucket.put_object(
-        Key=f"20220101/courses/{run.run_id}.tar.gz",
+        Key=key,
         Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
         ACL="public-read",
+    )
+    mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
     )
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
@@ -167,8 +189,28 @@ def test_sync_edx_course_files_error(
     mock_transform = mocker.patch(
         "course_catalog.etl.edx_shared.transform_content_files", return_value=fake_data
     )
-    sync_edx_course_files(bucket.name, platform, [run.object_id])
+    sync_edx_course_files(platform, [run.object_id], [key])
     assert mock_transform.call_count == 1
     assert mock_transform.call_args[0][0].endswith(f"{run.run_id}.tar.gz") is True
     mock_load_content_files.assert_called_once_with(run, fake_data)
     assert mock_log.call_args[0][0].startswith("Error ingesting OLX content data for ")
+
+
+@pytest.mark.parametrize("platform", [PlatformType.mitx.value, PlatformType.xpro.value])
+def test_get_most_recent_course_archives(
+    mocker, mock_mitxonline_learning_bucket, platform
+):
+    """get_most_recent_course_archives should return expected keys"""
+    bucket = mock_mitxonline_learning_bucket.bucket
+    base_key = "0101/courses/my-course.tar.gz"
+    for year in [2021, 2022, 2023]:
+        bucket.put_object(
+            Key=f"{year}{base_key}",
+            Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
+            ACL="public-read",
+        )
+    mock_get_bucket = mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
+    )
+    assert get_most_recent_course_archives(platform) == [f"2023{base_key}"]
+    mock_get_bucket.assert_called_once_with(platform)

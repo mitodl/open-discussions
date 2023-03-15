@@ -35,12 +35,12 @@ from course_catalog.tasks import (
     get_xpro_data,
     get_youtube_data,
     get_youtube_transcripts,
+    import_all_mitx_files,
     import_all_mitxonline_files,
     import_all_ocw_files,
     import_all_xpro_files,
     update_enrollments_for_email,
     upload_ocw_parsed_json,
-    import_all_mitx_files,
 )
 from open_discussions.factories import UserFactory
 
@@ -459,9 +459,7 @@ def test_import_all_xpro_files(settings, mocker, mocked_celery, mock_blocklist):
     )
     with pytest.raises(mocked_celery.replace_exception_class):
         import_all_xpro_files.delay(3)
-    get_content_tasks_mock.assert_called_once_with(
-        settings.XPRO_LEARNING_COURSE_BUCKET_NAME, PlatformType.xpro.value, 3
-    )
+    get_content_tasks_mock.assert_called_once_with(PlatformType.xpro.value, 3)
 
 
 @mock_s3
@@ -474,25 +472,28 @@ def test_import_all_mitx_files(settings, mocker, mocked_celery, mock_blocklist):
     with pytest.raises(mocked_celery.replace_exception_class):
         import_all_mitx_files.delay(4)
     get_content_tasks_mock.assert_called_once_with(
-        settings.EDX_LEARNING_COURSE_BUCKET_NAME,
         PlatformType.mitx.value,
         4,
         s3_prefix="simeon-mitx-course-tarballs",
     )
 
 
-def test_get_content_tasks(settings, mocker, mocked_celery):
+@mock_s3
+def test_get_content_tasks(settings, mocker, mocked_celery, mock_mitx_learning_bucket):
     """Test that get_content_tasks calls get_content_files with the correct args"""
     mock_get_content_files = mocker.patch("course_catalog.tasks.get_content_files.si")
     mocker.patch("course_catalog.tasks.load_course_blocklist", return_value=[])
+    mocker.patch(
+        "course_catalog.tasks.get_most_recent_course_archives",
+        return_value=["foo.tar.gz"],
+    )
     setup_s3(settings)
     settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE = 2
     platform = PlatformType.mitx.value
     CourseFactory.create_batch(3, published=True, platform=platform)
-    bucket_name = "test-bucket"
 
     s3_prefix = "course-prefix"
-    get_content_tasks(bucket_name, platform, s3_prefix=s3_prefix)
+    get_content_tasks(platform, s3_prefix=s3_prefix)
     assert mocked_celery.group.call_count == 1
     assert (
         Course.objects.filter(published=True)
@@ -503,7 +504,7 @@ def test_get_content_tasks(settings, mocker, mocked_celery):
     ).count() == 3
     assert mock_get_content_files.call_count == 2
     mock_get_content_files.assert_any_call(
-        ANY, bucket_name, platform, s3_prefix=s3_prefix
+        ANY, platform, ["foo.tar.gz"], s3_prefix=s3_prefix
     )
 
 
@@ -514,10 +515,8 @@ def test_get_test_get_content_tasks_missing_settings(mocker, settings):
     )
     mock_log = mocker.patch("course_catalog.tasks.log.warning")
     settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = None
-    platform = "mitx"
-    get_content_files(
-        [1, 2], settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME, platform
-    )
+    platform = "mitxonline"
+    get_content_files([1, 2], platform, ["foo.tar.gz"])
     mock_sync_edx_course_files.assert_not_called()
     mock_log.assert_called_once_with("Required settings missing for %s files", platform)
 
@@ -533,7 +532,6 @@ def test_import_all_mitxonline_files(settings, mocker, mocked_celery, mock_block
     with pytest.raises(mocked_celery.replace_exception_class):
         import_all_mitxonline_files.delay(3)
     get_content_tasks_mock.assert_called_once_with(
-        settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
         PlatformType.mitxonline.value,
         3,
     )
