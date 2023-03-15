@@ -12,6 +12,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_course_filter_upcoming():
+    """Test that the upcoming course filter works"""
     upcoming_course = CourseFactory.create()
     not_upcoming_course = CourseFactory.create()
 
@@ -25,6 +26,7 @@ def test_course_filter_upcoming():
 
 
 def test_course_filter_micromasters():
+    """test that the platform filter works"""
     mm_course = CourseFactory.create(platform=PlatformType.micromasters.value)
     mitx_course = CourseFactory.create(platform=PlatformType.mitxonline.value)
 
@@ -35,11 +37,13 @@ def test_course_filter_micromasters():
 
 
 def test_course_filter_professional():
+    """Test that the audience filter works"""
     # swapping this to audience, need a moment
     return
 
 
 def test_course_filter_certificate():
+    """Test that the certificate filter works"""
     cert_course = CourseFactory.create(certificates=["Certificate"])
     no_cert_course = CourseFactory.create(platform=[])
 
@@ -50,4 +54,5 @@ def test_course_filter_certificate():
 
 
 def test_course_filter_multi():
+    """Tests that filters can be combined"""
     return
