@@ -1,6 +1,6 @@
 """Tests for Course Catalog Filters"""
 import pytest
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
@@ -27,8 +27,11 @@ def test_course_filter_upcoming():
 
 def test_course_filter_micromasters():
     """test that the platform filter works"""
-    mm_course = CourseFactory.create(platform=PlatformType.micromasters.value)
-    mitx_course = CourseFactory.create(platform=PlatformType.mitxonline.value)
+    mm_course = CourseFactory.create()
+    mitx_course = CourseFactory.create()
+
+    mm_course.platform = PlatformType.micromasters.value
+    mitx_course.platform = PlatformType.mitxonline.value
 
     query = CourseFilter(platform="micromasters").qs
 
@@ -44,8 +47,11 @@ def test_course_filter_professional():
 
 def test_course_filter_certificate():
     """Test that the certificate filter works"""
-    cert_course = CourseFactory.create(certificates=["Certificate"])
-    no_cert_course = CourseFactory.create(platform=[])
+    cert_course = CourseFactory.create()
+    no_cert_course = CourseFactory.create()
+
+    cert_course.certificate = ["Certificate"]
+    no_cert_course.certificate = []
 
     query = CourseFilter(certificate="Certificate").qs
 
