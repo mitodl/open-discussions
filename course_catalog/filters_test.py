@@ -19,7 +19,7 @@ def test_course_filter_upcoming():
     upcoming_course.start_date = now_in_utc + timedelta(days=1)
     not_upcoming_course.start_date = now_in_utc - timedelta(days=1)
 
-    query = CourseFilter({}).qs
+    query = CourseFilter({"upcoming": True}).qs
 
     assert upcoming_course in query
     assert not_upcoming_course not in query
@@ -33,7 +33,7 @@ def test_course_filter_micromasters():
     mm_course.platform = PlatformType.micromasters.value
     mitx_course.platform = PlatformType.mitxonline.value
 
-    query = CourseFilter(platform="micromasters").qs
+    query = CourseFilter({"platform": "micromasters"}).qs
 
     assert mm_course in query
     assert mitx_course not in query
@@ -53,7 +53,7 @@ def test_course_filter_certificate():
     cert_course.certificate = ["Certificate"]
     no_cert_course.certificate = []
 
-    query = CourseFilter(certificate="Certificate").qs
+    query = CourseFilter({"certificate": "Certificate"}).qs
 
     assert cert_course in query
     assert no_cert_course not in query

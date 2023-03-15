@@ -1,5 +1,5 @@
 """Course Catalog Filters for API"""
-from django_filters import CharFilter, DateTimeFilter, Filter, FilterSet
+from django_filters import AllValuesFilter, BooleanFilter, DateTimeFilter, Filter, FilterSet
 from django.db.models import Q
 
 from course_catalog.constants import PlatformType
@@ -11,8 +11,9 @@ class CourseFilter(FilterSet):
     """Course filter"""
 
     upcoming = DateTimeFilter(method="filter_upcoming")
-    professional_courses = CharFilter(method="filter_audience")
-    certificate = CharFilter(method="filter_certificate")
+    professional_courses = BooleanFilter(method="filter_audience")
+    certificate = BooleanFilter(method="filter_certificate")
+    platform = AllValuesFilter()
 
     class Meta:
         model = Course
