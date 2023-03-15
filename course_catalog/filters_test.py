@@ -10,8 +10,8 @@ pytestmark = pytest.mark.django_db
 
 def test_course_filter_micromasters():
     """test that the platform filter works"""
-    mm_course = CourseFactory.create(platform = PlatformType.micromasters.value)
-    mitx_course = CourseFactory.create(platform = PlatformType.mitxonline.value)
+    mm_course = CourseFactory.create(platform=PlatformType.micromasters.value)
+    mitx_course = CourseFactory.create(platform=PlatformType.mitxonline.value)
 
     query = CourseFilter({"platform": "micromasters"}).qs
 
