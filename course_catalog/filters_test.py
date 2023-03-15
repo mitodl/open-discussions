@@ -1,6 +1,6 @@
 """Tests for Course Catalog Filters"""
-import pytest
 from datetime import timedelta
+import pytest
 
 from course_catalog.constants import PlatformType
 from course_catalog.factories import CourseFactory
