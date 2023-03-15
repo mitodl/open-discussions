@@ -11,4 +11,8 @@ afterEach(() => {
   jest.clearAllMocks()
 })
 
-window.SETTINGS = { embedlyKey: "fake-embedly-key" }
+window.SETTINGS = {
+  embedlyKey:        "fake-embedly-key",
+  search_page_size:  4,
+  ocw_next_base_url: "fake-ocw-next-base-url"
+}

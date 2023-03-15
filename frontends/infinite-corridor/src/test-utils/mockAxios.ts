@@ -31,10 +31,12 @@ const alwaysError = (
 const makeRequest = jest.fn(alwaysError)
 
 const mockAxiosInstance = {
-  get:    (url: string) => makeRequest("get", url, undefined),
-  post:   (url: string, body: unknown) => makeRequest("post", url, body),
-  patch:  (url: string, body: unknown) => makeRequest("patch", url, body),
-  delete: (url: string) => makeRequest("delete", url, undefined)
+  get:   jest.fn((url: string) => makeRequest("get", url, undefined)),
+  post:  jest.fn((url: string, body: unknown) => makeRequest("post", url, body)),
+  patch: jest.fn((url: string, body: unknown) =>
+    makeRequest("patch", url, body)
+  ),
+  delete: jest.fn((url: string) => makeRequest("delete", url, undefined))
 }
 
 const expectAnyOrNil = expect.toBeOneOf([expect.anything(), undefined, null])
@@ -46,10 +48,21 @@ const mockRequest = (
   responseBody: unknown,
   code: number
 ) => {
-  when(makeRequest).calledWith(method, url, requestBody).mockResolvedValue({
-    data:   responseBody,
-    status: code
-  })
+  if (code >= 400) {
+    when(makeRequest)
+      .calledWith(method, url, requestBody)
+      .mockRejectedValue({
+        response: {
+          data:   responseBody,
+          status: code
+        }
+      })
+  } else {
+    when(makeRequest).calledWith(method, url, requestBody).mockResolvedValue({
+      data:   responseBody,
+      status: code
+    })
+  }
 }
 
 interface MockResponseOptions {
@@ -88,6 +101,7 @@ const setMockResponse = {
 }
 
 const resetApi = () => {
+  makeRequest.mockReset()
   makeRequest.mockImplementation(alwaysError)
 }
 

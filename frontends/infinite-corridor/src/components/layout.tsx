@@ -8,6 +8,7 @@ type GridContainerProps = Omit<
 > & { component?: React.ElementType }
 
 type ColumnVariant =
+  | "single-full"
   | "main-2"
   | "sidebar-2"
   | "main-2-wide-main"
@@ -18,6 +19,10 @@ type GridItemProps = Omit<
 > & { variant: ColumnVariant; component?: React.ElementType }
 
 const columnVariants: Record<ColumnVariant, GridProps> = {
+  "single-full": {
+    xs: 12,
+    md: 12
+  },
   "main-2": {
     xs: 12,
     md: 9

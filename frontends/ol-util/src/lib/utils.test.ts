@@ -59,3 +59,19 @@ describe("formatDurationClockTime", () => {
     expect(u.formatDurationClockTime("PT44S")).toBe("0:44")
   })
 })
+
+describe("pluralize", () => {
+  test("If 'plural' is not provided, appends an 's' iff count != 1", () => {
+    expect(u.pluralize("dog", 0)).toBe("dogs")
+    expect(u.pluralize("dog", 1)).toBe("dog")
+    expect(u.pluralize("dog", 2)).toBe("dogs")
+    expect(u.pluralize("dog", 500)).toBe("dogs")
+  })
+
+  test("If 'plural' is provided, returns it iff count != 1", () => {
+    expect(u.pluralize("pup", 0, "puppies")).toBe("puppies")
+    expect(u.pluralize("pup", 1, "puppies")).toBe("pup")
+    expect(u.pluralize("pup", 2, "puppies")).toBe("puppies")
+    expect(u.pluralize("pup", 500, "puppies")).toBe("puppies")
+  })
+})

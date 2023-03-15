@@ -1,6 +1,7 @@
 import { buildQueries, within } from "@testing-library/react"
 import type { GetErrorFunction } from "@testing-library/react"
 import mediaQuery from "css-mediaquery"
+import { assertInstanceOf } from "../predicates"
 
 /**
  * Create a mock mediaQuery functiton. Matches are determined by comparison with
@@ -73,6 +74,41 @@ const getByTerm = byTerm[2]
 const findAllByTerm = byTerm[3]
 const findByTerm = byTerm[4]
 
+/**
+ * Given an HTMLElement with an aria-describedby attribute, return the element
+ * that describes it.
+ *
+ * This is particularly useful with `@testing-library`, which makes it easy to
+ * find form inputs by label, but has no builtin method for finding the
+ * corresponding descriptions (which you might want when asserting about form
+ * validation).
+ */
+const getDescriptionFor = (el: HTMLElement) => {
+  const errId = el.getAttribute("aria-describedby")
+  if (errId === null) {
+    throw new Error(
+      "The specified element does not have an associated ariia-describedby."
+    )
+  }
+  // eslint-disable-next-line testing-library/no-node-access
+  const errEl = document.getElementById(errId)
+  assertInstanceOf(errEl, HTMLElement)
+  return errEl
+}
+
+/**
+ * We use [jest-fail-on-console](https://www.npmjs.com/package/jest-fail-on-console)
+ * to fail on console errors/warnings.
+ *
+ * This function allows us to temporarily disable that behavior for a test,
+ * e.g., to test API error handling.
+ */
+const allowConsoleErrors = () => {
+  const consoleError = jest.spyOn(console, "error").mockImplementation()
+  const consoleWarn = jest.spyOn(console, "warn").mockImplementation()
+  return { consoleError, consoleWarn }
+}
+
 export {
   queryAllByTerm,
   queryByTerm,
@@ -80,5 +116,7 @@ export {
   getByTerm,
   findAllByTerm,
   findByTerm,
-  createMatchMediaForJsDom
+  getDescriptionFor,
+  createMatchMediaForJsDom,
+  allowConsoleErrors
 }

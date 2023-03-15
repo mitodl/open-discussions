@@ -17,11 +17,21 @@ $card-list-spacer: 1.5em;
 
 .ic-card-row-list {
   padding-left: 0;
+  margin-left: 0;
+  margin-right: 0;
 
   > li {
     list-style: none;
     margin-top: $card-list-spacer;
     margin-bottom: $card-list-spacer;
+  }
+
+  > li:first-child {
+    margin-top: 0;
+  }
+
+  > li:last-child {
+    margin-bottom: 0;
   }
 }
 
