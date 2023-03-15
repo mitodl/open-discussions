@@ -9,6 +9,7 @@ from open_discussions.utils import now_in_utc
 
 class CourseFilter(FilterSet):
     """Course filter"""
+
     upcoming = DateTimeFilter(method="filter_upcoming")
     professional_courses = CharFilter(method="filter_audience")
     certificate = CharFilter(method="filter_certificate")
@@ -31,12 +32,15 @@ class CourseFilter(FilterSet):
             queryset = queryset.filter(platform__not_in=PROFESSIONAL_COURSE_PLATFORMS)
         return queryset
 
-
     def filter_certificate(self, queryset, value):
         if value:
-            queryset = queryset.filter(Q(platform__in=PROFESSIONAL_COURSE_PLATFORMS) | Q(platform=
-                                                    PlatformType.mitx.value))
+            queryset = queryset.filter(
+                Q(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
+                | Q(platform=PlatformType.mitx.value)
+            )
         else:
-            queryset = queryset.filter(Q(platform__not_in=PROFESSIONAL_COURSE_PLATFORMS) | ~Q(platform=
-                                                    PlatformType.mitx.value))
+            queryset = queryset.filter(
+                Q(platform__not_in=PROFESSIONAL_COURSE_PLATFORMS)
+                | ~Q(platform=PlatformType.mitx.value)
+            )
         return queryset
