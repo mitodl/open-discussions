@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.208.0
+---------------
+
+- CRUD for userlists in TS (#3835)
+
 Version 0.207.4 (Released March 15, 2023)
 ---------------
 
