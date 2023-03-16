@@ -27,6 +27,9 @@ def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> lis
         list of str: edx archive S3 keys
     """
     bucket = get_learning_course_bucket(platform)
+    if not bucket:
+        log.warning("No S3 bucket for platform %s", platform)
+        return []
     if s3_prefix is None:
         s3_prefix = "courses"
     try:

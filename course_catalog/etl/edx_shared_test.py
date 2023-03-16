@@ -231,3 +231,13 @@ def test_get_most_recent_course_archives_empty(
     mock_warning.assert_called_once_with(
         "No %s exported courses found in S3 bucket %s", platform, bucket.name
     )
+
+
+@pytest.mark.parametrize("platform", [PlatformType.mitx.value, PlatformType.xpro.value])
+def test_get_most_recent_course_archives_no_bucket(settings, mocker, platform):
+    """Empty list should be returned and a warning logged if no bucket is found"""
+    settings.EDX_LEARNING_COURSE_BUCKET_NAME = None
+    settings.XPRO_LEARNING_COURSE_BUCKET_NAME = None
+    mock_warning = mocker.patch("course_catalog.etl.edx_shared.log.warning")
+    assert get_most_recent_course_archives(platform) == []
+    mock_warning.assert_called_once_with("No S3 bucket for platform %s", platform)

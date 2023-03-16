@@ -277,7 +277,7 @@ def get_content_files(
     if not (
         settings.AWS_ACCESS_KEY_ID
         and settings.AWS_SECRET_ACCESS_KEY
-        and get_learning_course_bucket_name(platform)
+        and get_learning_course_bucket_name(platform) is not None
     ):
         log.warning("Required settings missing for %s files", platform)
         return
