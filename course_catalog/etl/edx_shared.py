@@ -16,7 +16,16 @@ log = logging.getLogger()
 
 
 def get_most_recent_course_archives(platform: str, s3_prefix: str = None) -> list[str]:
-    """Retrieve a list of S3 keys for the most recent edx course archives"""
+    """
+    Retrieve a list of S3 keys for the most recent edx course archives
+
+    Args:
+        platform(str): The edx platform
+        s3_prefix(str): The prefix for S3 object keys
+
+    Returns:
+        list of str: edx archive S3 keys
+    """
     bucket = get_learning_course_bucket(platform)
     if s3_prefix is None:
         s3_prefix = "courses"
