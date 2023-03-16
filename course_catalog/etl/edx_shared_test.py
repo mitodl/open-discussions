@@ -214,3 +214,20 @@ def test_get_most_recent_course_archives(
     )
     assert get_most_recent_course_archives(platform) == [f"2023{base_key}"]
     mock_get_bucket.assert_called_once_with(platform)
+
+
+@pytest.mark.parametrize("platform", [PlatformType.mitx.value, PlatformType.xpro.value])
+def test_get_most_recent_course_archives_empty(
+    mocker, mock_mitxonline_learning_bucket, platform
+):
+    """Empty list should be returned and a warning logged if no recent tar archives are found"""
+    bucket = mock_mitxonline_learning_bucket.bucket
+    mock_get_bucket = mocker.patch(
+        "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
+    )
+    mock_warning = mocker.patch("course_catalog.etl.edx_shared.log.warning")
+    assert get_most_recent_course_archives(platform) == []
+    mock_get_bucket.assert_called_once_with(platform)
+    mock_warning.assert_called_once_with(
+        "No %s exported courses found in S3 bucket %s", platform, bucket.name
+    )

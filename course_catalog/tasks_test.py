@@ -508,7 +508,22 @@ def test_get_content_tasks(settings, mocker, mocked_celery, mock_mitx_learning_b
     )
 
 
-def test_get_test_get_content_tasks_missing_settings(mocker, settings):
+def test_get_content_files(mocker, mock_mitx_learning_bucket):
+    """Test that get_content_files calls sync_edx_course_files with expected parameters"""
+    mock_sync_edx_course_files = mocker.patch(
+        "course_catalog.tasks.sync_edx_course_files"
+    )
+    mocker.patch(
+        "course_catalog.tasks.get_learning_course_bucket_name",
+        return_value=mock_mitx_learning_bucket.bucket.name,
+    )
+    get_content_files([1, 2], "mitx", ["foo.tar.gz"])
+    mock_sync_edx_course_files.assert_called_once_with(
+        "mitx", [1, 2], ["foo.tar.gz"], s3_prefix=None
+    )
+
+
+def test_get_content_files_missing_settings(mocker, settings):
     """Test that get_content_files does nothing without required settings"""
     mock_sync_edx_course_files = mocker.patch(
         "course_catalog.tasks.sync_edx_course_files"
