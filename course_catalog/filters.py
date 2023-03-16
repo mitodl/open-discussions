@@ -10,8 +10,13 @@ from course_catalog.models import (
 class CourseFilter(FilterSet):
     """Course filter"""
 
-    audience = ChoiceFilter(method="filter_audience", field_name="platform", lookup_expr="in", choices=((
-        "professional", "professional"), ("open", "open")))
+    audience = ChoiceFilter(
+        label="Audience",
+        method="filter_audience",
+        field_name="platform",
+        lookup_expr="in",
+        choices=(("professional", "professional"), ("open", "open")),
+    )
     platform = AllValuesFilter()
 
     class Meta:
