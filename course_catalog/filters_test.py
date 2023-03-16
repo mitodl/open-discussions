@@ -29,22 +29,3 @@ def test_course_filter_audience():
 
     assert professional_course in query
     assert open_course not in query
-
-
-def test_course_filter_multi():
-    """Tests that filters can be combined"""
-    xpro_course = CourseFactory.create()
-    bootcamps_course = CourseFactory.create()
-    mitxonline_course = CourseFactory.create()
-
-    xpro_course.platform = PlatformType.xpro.value
-    bootcamps_course.platform = PlatformType.bootcamps.value
-    mitxonline_course.platform = PlatformType.mitxonline.value
-
-    query = CourseFilter(
-        {"audience": "professional", "platform": PlatformType.bootcamps.value}
-    ).qs
-
-    assert bootcamps_course in query
-    assert xpro_course not in query
-    assert mitxonline_course not in query

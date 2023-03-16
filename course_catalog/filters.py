@@ -1,9 +1,8 @@
 """Course Catalog Filters for API"""
-from django_filters import AllValuesFilter, ChoiceFilter, FilterSet
+from django_filters import AllValuesFilter, Filter, FilterSet
 
 from course_catalog.models import (
     Course,
-    PlatformType,
     PROFESSIONAL_COURSE_PLATFORMS,
 )
 
@@ -11,14 +10,15 @@ from course_catalog.models import (
 class CourseFilter(FilterSet):
     """Course filter"""
 
-    audience = ChoiceFilter(method="filter_audience", choices=PlatformType)
+    audience = Filter(method="filter_audience", field_name="platform", lookup_expr="in")
     platform = AllValuesFilter()
 
     class Meta:
         model = Course
         fields = ["audience", "platform"]
 
-    def filter_audience(self, queryset, value):
+    def filter_audience(self, queryset, name, value):
+        """Audience filter for courses"""
         if value == "professional":
             queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
         else:
