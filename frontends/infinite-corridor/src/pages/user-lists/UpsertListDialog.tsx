@@ -127,7 +127,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
   const topics = topicsQuery.data?.results ?? []
   const hasError = createUserList.isError || updateUserList.isError
 
-  const canChangePrivacy = SETTINGS.user.is_list_staff
+  const canChangePrivacy = SETTINGS.user.is_public_list_editor
 
   return (
     <FormDialog
