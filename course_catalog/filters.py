@@ -22,5 +22,5 @@ class CourseFilter(FilterSet):
         if value == "professional":
             queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
         else:
-            queryset = queryset.filter(platform__not_in=PROFESSIONAL_COURSE_PLATFORMS)
+            queryset = queryset.exclude(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
         return queryset
