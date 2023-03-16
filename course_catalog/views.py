@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django_filters import rest_framework as filters
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -146,8 +147,8 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
-    filter_backends = [CourseFilter]
-    filterset_fields = ["upcoming", "platform", "program_type", "certificate"]
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = CourseFilter
 
     def _get_base_queryset(self, *args, **kwargs):
         """Return the base queryset for all actions"""
