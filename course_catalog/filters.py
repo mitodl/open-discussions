@@ -17,11 +17,11 @@ class CourseFilter(FilterSet):
         lookup_expr="in",
         choices=(("professional", "professional"), ("open", "open")),
     )
-    platform = AllValuesFilter()
+    offered_by = AllValuesFilter()
 
     class Meta:
         model = Course
-        fields = ["audience", "platform"]
+        fields = ["audience", "offered_by"]
 
     def filter_audience(self, queryset, _, value):
         """Audience filter for courses"""
