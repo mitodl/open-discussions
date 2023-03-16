@@ -17,7 +17,7 @@ class CourseFilter(FilterSet):
         model = Course
         fields = ["audience", "platform"]
 
-    def filter_audience(self, queryset, name, value):
+    def filter_audience(self, queryset, _, value):
         """Audience filter for courses"""
         if value == "professional":
             queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)

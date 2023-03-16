@@ -109,7 +109,7 @@ INSTALLED_APPS = (
     "guardian",
     "imagekit",
     "django_json_widget",
-    "django-filters"
+    "django_filters",
     # Put our apps after this point
     "open_discussions",
     "authentication",
