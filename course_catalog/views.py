@@ -198,7 +198,6 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
         """
         Get upcoming courses
         """
-        kwargs = request.body
         page = self.paginate_queryset(
             self._get_base_queryset(runs__start_date__gt=timezone.now()).order_by(
                 "runs__start_date"
