@@ -1,5 +1,5 @@
 """Course Catalog Filters for API"""
-from django_filters import Filter, ChoiceFilter, FilterSet
+from django_filters import ChoiceFilter, FilterSet
 
 from course_catalog.constants import OfferedBy
 from course_catalog.models import (
