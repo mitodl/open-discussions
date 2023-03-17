@@ -1,4 +1,5 @@
 @use "theme";
+@use "ol-util/assets/breakpoint";
 
 $spacer: 1.75rem;
 $max-width: 520px;
@@ -7,19 +8,22 @@ $link-min-size: 100px;
 $link-max-size: 120px;
 
 .homepage {
-  h1 {
-    font-size: 32px;
-  }
-
-  &.MuiContainer-root {
-    max-width: $max-width;
-    padding: 1rem;
+  .MuiGrid-item {
+    margin-top: 3.5rem;
   }
 
   .page-title {
-    margin-top: 2 * $spacer;
-    margin-bottom: $spacer;
-    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 50px;
+    color: theme.$color-blue-5;
+  }
+
+  .frontpage-image-decoration {
+    height: 435px;
+
+    @include breakpoint.down(md) {
+      display: none;
+    }
   }
 
   .homepage-search {
@@ -28,51 +32,49 @@ $link-max-size: 120px;
   }
 
   h2 {
-    margin-top: $spacer;
-    color: theme.$color-primary;
-    text-align: center;
-  }
-}
-
-.field-list {
-  padding: 0;
-
-  li {
-    list-style-type: none;
-    display: flex;
-    justify-content: center;
-  }
-}
-
-.field-link {
-  color: theme.$color-primary;
-
-  .field-title {
-    text-align: center;
-  }
-
-  img {
-    width: $thumnail-size;
-    height: $thumnail-size;
-  }
-
-  figure {
-    min-width: $link-min-size;
-    max-width: $link-max-size;
+    font-size: 22px;
+    max-width: 430px;
     margin: 0;
-    padding: 0.5em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition-property: background-color border;
-    transition-duration: theme.$transition-duration;
-    border: 1px solid transparent;
-    border-radius: theme.$border-radius;
+    font-weight: theme.$font-weight-semi-bold;
+    color: theme.$color-blue-5;
+  }
 
-    &:hover {
-      background-color: theme.$color-background-light;
-      margin: -1px;
-      border: 1px solid currentcolor;
+  .search-buttons-container {
+    max-width: $max-width;
+
+    a.homepage-button {
+      color: black;
+      font-size: 13px;
+      border-color: theme.$color-blue-5;
+      border-radius: 15px;
+      margin: 8px;
+      margin-left: 0;
+      margin-right: 16px;
+    }
+
+    a.homepage-button:hover {
+      background-color: theme.$color-blue-5;
+      color: white;
+    }
+  }
+
+  .search-buttons-container-label {
+    font-size: theme.$font-size-normal;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .background-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -100;
+    height: 615px;
+    background-image: linear-gradient(theme.$color-blue-1, theme.$color-gray-1);
+    width: 70%;
+
+    @include breakpoint.down(md) {
+      width: 100%;
     }
   }
 }
