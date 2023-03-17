@@ -20,7 +20,9 @@ class CourseFilter(FilterSet):
         lookup_expr="in",
         choices=(("professional", "professional"), ("open", "open")),
     )
-    offered_by = ChoiceFilter(method="filter_offered_by", choices=OFFERED_BY_CHOICES, field_name="offered_by")
+    offered_by = ChoiceFilter(
+        method="filter_offered_by", choices=OFFERED_BY_CHOICES, field_name="offered_by"
+    )
 
     class Meta:
         model = Course

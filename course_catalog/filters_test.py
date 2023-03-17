@@ -19,7 +19,7 @@ def test_course_filter_micromasters():
     mm_course.offered_by.set([mm])
     mitx_course.offered_by.set([mitx])
 
-    query = CourseFilter({"offered_by": "Micromasters"}).qs
+    query = CourseFilter({"offered_by": OfferedBy.micromasters.value}).qs
 
     assert mm_course in query
     assert mitx_course not in query
