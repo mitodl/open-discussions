@@ -14,6 +14,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django_filters import rest_framework as filters
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -25,6 +26,7 @@ from authentication.decorators import blocked_ip_exempt
 from course_catalog.constants import PlatformType, PrivacyLevel, ResourceType
 from course_catalog.etl.podcast import generate_aggregate_podcast_rss
 from course_catalog.exceptions import WebhookException
+from course_catalog.filters import CourseFilter
 from course_catalog.models import (
     Course,
     CourseTopic,
@@ -145,6 +147,8 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     serializer_class = CourseSerializer
     pagination_class = DefaultPagination
     permission_classes = (AnonymousAccessReadonlyPermission,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = CourseFilter
 
     def _get_base_queryset(self, *args, **kwargs):
         """Return the base queryset for all actions"""
