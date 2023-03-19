@@ -4,7 +4,7 @@ import {
   makeCourse,
   makeUserListsPaginated,
   makeListItemMember
-} from "ol-search-ui/build/factories"
+} from "ol-search-ui/src/factories"
 import { UserList, LearningResource } from "ol-search-ui"
 import { assertNotNil } from "ol-util"
 

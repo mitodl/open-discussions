@@ -3,8 +3,8 @@ import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
 import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
-import { allowConsoleErrors } from "ol-util/build/test-utils"
-import * as factories from "ol-search-ui/build/factories"
+import { allowConsoleErrors } from "ol-util/src/test-utils"
+import * as factories from "ol-search-ui/src/factories"
 import { QueryClient, QueryClientProvider } from "react-query"
 import {
   useAddToUserListItems,
