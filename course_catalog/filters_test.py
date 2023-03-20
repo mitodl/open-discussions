@@ -1,19 +1,25 @@
 """Tests for Course Catalog Filters"""
 import pytest
 
-from course_catalog.constants import PlatformType
-from course_catalog.factories import CourseFactory
+from course_catalog.constants import OfferedBy, PlatformType
+from course_catalog.factories import CourseFactory, LearningResourceOfferorFactory
 from course_catalog.filters import CourseFilter
 
 pytestmark = pytest.mark.django_db
 
 
 def test_course_filter_micromasters():
-    """test that the platform filter works"""
-    mm_course = CourseFactory.create(platform=PlatformType.micromasters.value)
-    mitx_course = CourseFactory.create(platform=PlatformType.mitxonline.value)
+    """test that the offered_by filter works"""
+    mm = LearningResourceOfferorFactory.create(is_micromasters=True)
+    mitx = LearningResourceOfferorFactory.create(is_mitx=True)
 
-    query = CourseFilter({"platform": "micromasters"}).qs
+    mm_course = CourseFactory.create()
+    mitx_course = CourseFactory.create()
+
+    mm_course.offered_by.set([mm])
+    mitx_course.offered_by.set([mitx])
+
+    query = CourseFilter({"offered_by": OfferedBy.micromasters.value}).qs
 
     assert mm_course in query
     assert mitx_course not in query

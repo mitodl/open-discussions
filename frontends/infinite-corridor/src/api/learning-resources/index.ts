@@ -1,2 +1,2 @@
 export * from "./hooks"
-export { urls } from "./urls"
+export { urls, DEFAULT_PAGINATION_PARAMS } from "./urls"

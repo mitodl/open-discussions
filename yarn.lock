@@ -5210,6 +5210,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testing-library/react-hooks@npm:^8.0.1":
+  version: 8.0.1
+  resolution: "@testing-library/react-hooks@npm:8.0.1"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+    react-error-boundary: ^3.1.0
+  peerDependencies:
+    "@types/react": ^16.9.0 || ^17.0.0
+    react: ^16.9.0 || ^17.0.0
+    react-dom: ^16.9.0 || ^17.0.0
+    react-test-renderer: ^16.9.0 || ^17.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    react-dom:
+      optional: true
+    react-test-renderer:
+      optional: true
+  checksum: 7fe44352e920deb5cb1876f80d64e48615232072c9d5382f1e0284b3aab46bb1c659a040b774c45cdf084a5257b8fe463f7e08695ad8480d8a15635d4d3d1f6d
+  languageName: node
+  linkType: hard
+
 "@testing-library/react@npm:12":
   version: 12.1.5
   resolution: "@testing-library/react@npm:12.1.5"
@@ -6339,6 +6361,15 @@ __metadata:
   version: 2.0.6
   resolution: "@types/unist@npm:2.0.6"
   checksum: 25cb860ff10dde48b54622d58b23e66214211a61c84c0f15f88d38b61aa1b53d4d46e42b557924a93178c501c166aa37e28d7f6d994aba13d24685326272d5db
+  languageName: node
+  linkType: hard
+
+"@types/url-assembler@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "@types/url-assembler@npm:2.1.1"
+  dependencies:
+    "@types/qs": "*"
+  checksum: c2361a6b5161049a338738e9da81f9a0e325e02548b180bf2230fd5b9e600e6fc6428e97416a7fba588c80f8d2d509a68b70e459bfd27dc9272da86074b99703
   languageName: node
   linkType: hard
 
@@ -16764,6 +16795,7 @@ __metadata:
     "@dnd-kit/utilities": ^3.2.0
     formik: ^2.2.9
     lodash: ^4.17.21
+    ol-util: "workspace:*"
     react-select: ^5.4.0
     yup: ^0.32.11
   peerDependencies:
@@ -16904,6 +16936,7 @@ __metadata:
     "@swc/jest": ^0.2.21
     "@testing-library/jest-dom": ^5.16.4
     "@testing-library/react": 12
+    "@testing-library/react-hooks": ^8.0.1
     "@testing-library/user-event": ^14.2.1
     "@types/css-mediaquery": ^0.1.1
     "@types/enzyme": ^3.10.12
@@ -16913,6 +16946,7 @@ __metadata:
     "@types/react-dotdotdot": ^1.2.5
     "@types/react-infinite-scroller": ^1.2.3
     "@types/styled-components": ^5.1.25
+    "@types/url-assembler": ^2.1.1
     "@typescript-eslint/eslint-plugin": ^5.30.0
     casual-browserify: ^1.5.19-2
     css-mediaquery: ^0.1.2
@@ -16944,6 +16978,7 @@ __metadata:
     ts-jest: ^28.0.5
     ts-node: ^10.8.1
     typescript: ^4.9.5
+    url-assembler: ^2.1.1
   languageName: unknown
   linkType: soft
 
@@ -17093,7 +17128,7 @@ __metadata:
     style-loader: 3.3.1
     styled-components: ^5.3.5
     url: 0.11.0
-    url-assembler: 2.1.0
+    url-assembler: ^2.1.1
     uuid: ^8.3.2
     validator: 13.7.0
     webpack: 5.73.0
@@ -19207,6 +19242,17 @@ __metadata:
   peerDependencies:
     react: ">=0.14.0"
   checksum: cd0f036f846a4b9c85accc1cf064fff1a3169fd84be099eb4ce93d6effe00189d098afab97e2f9d36021facaa07e0a088de37d7b51f0253b0a6f1203b1708990
+  languageName: node
+  linkType: hard
+
+"react-error-boundary@npm:^3.1.0":
+  version: 3.1.4
+  resolution: "react-error-boundary@npm:3.1.4"
+  dependencies:
+    "@babel/runtime": ^7.12.5
+  peerDependencies:
+    react: ">=16.13.1"
+  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
   languageName: node
   linkType: hard
 
@@ -22974,13 +23020,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"url-assembler@npm:2.1.0":
-  version: 2.1.0
-  resolution: "url-assembler@npm:2.1.0"
+"url-assembler@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "url-assembler@npm:2.1.1"
   dependencies:
     extend: ^2.0.2
     qs: ^6.5.1
-  checksum: c1780a9459d1f8d8f085d9f08c0229e045b721ee75a23a36d78e64b890a6faa9d175a174e7f00df89a6ab8748131f33d08d7fc9874b2fb17e36a01a8be461561
+  checksum: 72bf50d7a96c17d9ce54f9e5efcd91e89cb71556fc9d78ea076862818632187d21c382e5204532734b55589a9c4d1b99ffb831088122cd62c3eadb6f9c430d9d
   languageName: node
   linkType: hard
 

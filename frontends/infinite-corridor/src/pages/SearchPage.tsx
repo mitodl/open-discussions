@@ -142,7 +142,6 @@ const SearchPage: React.FC = () => {
             <GridColumn variant="main-2" component="section">
               <SearchInput
                 className="main-search"
-                classNameSubmit="search-icon-button"
                 placeholder="Search for online courses or programs at MIT"
                 onChange={updateText}
                 value={text || ""}

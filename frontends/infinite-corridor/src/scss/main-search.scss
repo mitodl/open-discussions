@@ -8,11 +8,16 @@ $max-width: 520px;
   &.MuiInputBase-root {
     max-width: $max-width;
     width: 100%;
-    border-radius: 100vh;
+    border-radius: 3px;
     font-size: 1.25rem;
 
-    &.Mui-focused fieldset {
-      border-color: theme.$color-gray-4;
+    fieldset {
+      border-color: theme.$color-blue-5;
+      border-width: 1.5px;
+    }
+
+    &.Mui-focused  fieldset{
+       border-color: theme.$color-blue-5;
     }
   }
   
@@ -22,9 +27,8 @@ $max-width: 520px;
     }
   }
 
-  .search-icon-button {
-    border: solid 1px;
-    border-color: #A32034;
+  .MuiButton-root {
+    border-radius: 3px;
+    padding: 10px;
   }
-
 }

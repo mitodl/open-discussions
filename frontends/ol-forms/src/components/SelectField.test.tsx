@@ -1,6 +1,6 @@
 import React from "react"
 import { render, screen, fireEvent } from "@testing-library/react"
-import { default as user } from "@testing-library/user-event"
+import user from "@testing-library/user-event"
 
 import SelectField, { Option } from "./SelectField"
 

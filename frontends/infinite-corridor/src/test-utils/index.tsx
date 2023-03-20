@@ -4,10 +4,13 @@ import { render } from "@testing-library/react"
 import { createMemoryHistory } from "history"
 import { setMockResponse } from "./mockAxios"
 import { createQueryClient } from "../libs/react-query"
+import type { User } from "../types/settings"
+import { makeUserSettings } from "./factories"
 
 interface TestAppOptions {
   /** This will be prefixed with the baseUrl */
   url: string
+  user: Partial<User>
 }
 
 const defaultTestAppOptions = {
@@ -19,6 +22,10 @@ const defaultTestAppOptions = {
  */
 const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
   const { url } = { ...defaultTestAppOptions, ...options }
+
+  // window.SETTINGS is reset during tests via afterEach hook.
+  window.SETTINGS.user = makeUserSettings(options.user)
+
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
   const queryClient = createQueryClient()
   render(<App queryClient={queryClient} history={history} />)
@@ -35,6 +42,10 @@ const renderWithProviders = (
   options: Partial<TestAppOptions> = {}
 ) => {
   const { url } = { ...defaultTestAppOptions, ...options }
+
+  // window.SETTINGS is reset during tests via afterEach hook.
+  window.SETTINGS.user = makeUserSettings(options.user)
+
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
   const queryClient = createQueryClient()
   render(
@@ -85,3 +96,5 @@ export {
   waitFor
 } from "@testing-library/react"
 export { default as user } from "@testing-library/user-event"
+
+export type { TestAppOptions }

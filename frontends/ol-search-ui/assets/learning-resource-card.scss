@@ -64,17 +64,19 @@ $small-font-size: 0.75em !default;
 
     &:last-child {
       margin-bottom: 0;
-
-      /*
-      Last child of ol-lrc-content will take up any extra space (flex: 1) but
-      with its contents at the bottom of its box.
-      */
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      align-items: flex-start; // The default is stretch, we we do not want.
     }
+  }
+
+  .ol-lrc-fill-space-content-end {
+    /*
+    Last child of ol-lrc-content will take up any extra space (flex: 1) but
+    with its contents at the bottom of its box.
+    */
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start; // The default is stretch, we we do not want.
   }
 }
 
@@ -105,8 +107,13 @@ $small-font-size: 0.75em !default;
   margin:0;
 }
 
-.ol-lrc-date-row {
+.ol-lrc-footer-row {
   min-height: 2.5 * $small-font-size; // ensure consistent spacing even if no date
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .ol-lrc-chip.MuiChip-root {

@@ -63,3 +63,14 @@ export const formatDurationClockTime = (value: string) => {
 
   return values.join(":")
 }
+
+/**
+ * Append an 's' to the end of a string if the count is not 1. Optionally,
+ * provide a custom plural string.
+ */
+export const pluralize = (singular: string, count: number, plural?: string) => {
+  if (count === 1) {
+    return singular
+  }
+  return plural ?? `${singular}s`
+}

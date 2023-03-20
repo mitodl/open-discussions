@@ -12,11 +12,13 @@ from functools import wraps
 from itertools import chain
 from subprocess import check_call
 from tempfile import TemporaryDirectory
+from typing import Generator
 
 import boto3
 import pytz
 import rapidjson
 import requests
+from boto.s3.bucket import Bucket
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from tika import parser as tika_parser
@@ -27,6 +29,7 @@ from course_catalog.constants import (
     CONTENT_TYPE_VERTICAL,
     OCW_DEPARTMENTS,
     VALID_TEXT_FILE_TYPES,
+    PlatformType,
 )
 from course_catalog.models import get_max_length
 
@@ -286,34 +289,46 @@ def get_text_from_element(element):
     return " ".join(content)
 
 
-def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
+def get_xbundle_docs(olx_path: str) -> Generator[dict, None, None]:
+    """
+    Get vertical documents from an edx tar archive
+
+    Args:
+        olx_path(str): path to extracted edx tar archive
+
+    Yields:
+        tuple: A list of (bytes of content, metadata)
+    """
+    bundle = XBundle()
+    bundle.import_from_directory(olx_path)
+    for index, vertical in enumerate(bundle.course.findall(".//vertical")):
+        content = get_text_from_element(vertical)
+        yield (
+            content,
+            {
+                "key": f"vertical_{index + 1}",
+                "content_type": CONTENT_TYPE_VERTICAL,
+                "title": vertical.attrib.get("display_name") or "",
+                "mime_type": "application/xml",
+            },
+        )
+
+
+def documents_from_olx(
+    olx_path: str,
+) -> Generator[tuple, None, None]:  # pylint: disable=too-many-locals
     """
     Extract text from OLX directory
 
     Args:
         olx_path (str): The path to the directory with the OLX data
 
-    Returns:
-        list of tuple:
-            A list of (bytes of content, metadata)
+    Yields:
+        tuple: A list of (bytes of content, metadata)
     """
     try:
-        bundle = XBundle()
-        bundle.import_from_directory(olx_path)
-        for index, vertical in enumerate(bundle.course.findall(".//vertical")):
-            content = get_text_from_element(vertical)
-
-            yield (
-                (
-                    content,
-                    {
-                        "key": f"vertical_{index + 1}",
-                        "content_type": CONTENT_TYPE_VERTICAL,
-                        "title": vertical.attrib.get("display_name") or "",
-                        "mime_type": "application/xml",
-                    },
-                )
-            )
+        for vertical in get_xbundle_docs(olx_path):
+            yield vertical
     except Exception as err:
         log.exception("Could not read verticals from path %s", olx_path)
 
@@ -339,14 +354,16 @@ def documents_from_olx(olx_path):  # pylint: disable=too-many-locals
                 )
 
 
-def transform_content_files(course_tarpath):
+def transform_content_files(course_tarpath: str) -> Generator[dict, None, None]:
     """
     Pass content to tika, then return a JSON document with the transformed content inside it
 
     Args:
         course_tarpath (str): The path to the tarball which contains the OLX
+
+    Yields:
+        dict: content from file
     """
-    content = []
     basedir = os.path.basename(course_tarpath).split(".")[0]
     with TemporaryDirectory(prefix=basedir) as inner_tempdir:
         check_call(["tar", "xf", course_tarpath], cwd=inner_tempdir)
@@ -383,19 +400,42 @@ def transform_content_files(course_tarpath):
             )
 
 
-def get_learning_course_bucket(bucket_name):
+def get_learning_course_bucket_name(platform: str) -> str:
     """
-    Get the learning course S3 Bucket holding content file data
+    Get the name of the platform's edx content bucket
+
+    Args:
+        platform(str): The edx platform
+
+    Returns:
+        str: The name of the edx archive bucket for the platform
+    """
+    bucket_names = {
+        PlatformType.mitx.value: settings.EDX_LEARNING_COURSE_BUCKET_NAME,
+        PlatformType.xpro.value: settings.XPRO_LEARNING_COURSE_BUCKET_NAME,
+        PlatformType.mitxonline.value: settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
+    }
+    return bucket_names.get(platform)
+
+
+def get_learning_course_bucket(platform: str) -> Bucket:
+    """
+    Get the platform's learning course S3 Bucket holding content file data
+
+    Args:
+        platform(str): The platform value
 
     Returns:
         boto3.Bucket: the OCW S3 Bucket or None
     """
-    s3 = boto3.resource(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    )
-    return s3.Bucket(bucket_name)
+    bucket_name = get_learning_course_bucket_name(platform)
+    if bucket_name:
+        s3 = boto3.resource(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        )
+        return s3.Bucket(bucket_name)
 
 
 def _load_ucc_topic_mappings():

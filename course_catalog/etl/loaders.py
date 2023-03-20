@@ -2,45 +2,44 @@
 import logging
 
 from django.conf import settings
-from django.db import transaction
-from django.db.models import OuterRef, Exists
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
+from django.db import transaction
+from django.db.models import Exists, OuterRef
 
-
-from course_catalog.constants import PrivacyLevel, ListType
+from course_catalog.constants import ListType, PrivacyLevel
 from course_catalog.etl.constants import (
+    CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
     OfferedByLoaderConfig,
-    CourseLoaderConfig,
-    ProgramLoaderConfig,
+    PlaylistLoaderConfig,
     PodcastEpisodeLoaderConfig,
     PodcastLoaderConfig,
-    PlaylistLoaderConfig,
+    ProgramLoaderConfig,
     VideoLoaderConfig,
 )
+from course_catalog.etl.deduplication import get_most_relevant_run
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.models import (
+    ContentFile,
     Course,
     CourseInstructor,
     CoursePrice,
     CourseTopic,
-    LearningResourceRun,
     LearningResourceOfferor,
-    Program,
-    ProgramItem,
-    Video,
-    VideoChannel,
+    LearningResourceRun,
     Playlist,
     PlaylistVideo,
-    UserList,
-    UserListItem,
-    ContentFile,
     Podcast,
     PodcastEpisode,
+    Program,
+    ProgramItem,
+    UserList,
+    UserListItem,
+    Video,
+    VideoChannel,
 )
 from course_catalog.utils import load_course_blocklist, load_course_duplicates
-from course_catalog.etl.deduplication import get_most_relevant_run
 from search import task_helpers as search_task_helpers
 from search.constants import COURSE_TYPE
 
@@ -687,9 +686,9 @@ def load_content_files(course_run, content_files_data):
             for content_file in content_files_data
         ]
 
-        deleted_files = ContentFile.objects.filter(
-            run=course_run, published=True
-        ).exclude(pk__in=content_files_ids)
+        deleted_files = course_run.content_files.filter(published=True).exclude(
+            pk__in=content_files_ids
+        )
 
         deleted_files.update(published=False)
 

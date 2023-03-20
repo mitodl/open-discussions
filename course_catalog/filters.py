@@ -1,11 +1,13 @@
 """Course Catalog Filters for API"""
-from django.db.models import Max
-from django_filters import AllValuesFilter, ChoiceFilter, FilterSet
+from django_filters import ChoiceFilter, FilterSet
 
+from course_catalog.constants import OfferedBy
 from course_catalog.models import (
     Course,
     PROFESSIONAL_COURSE_PLATFORMS,
 )
+
+OFFERED_BY_CHOICES = tuple([(ob.value, ob.value) for ob in OfferedBy])
 
 
 class CourseFilter(FilterSet):
@@ -18,11 +20,17 @@ class CourseFilter(FilterSet):
         lookup_expr="in",
         choices=(("professional", "professional"), ("open", "open")),
     )
-    platform = AllValuesFilter()
+    offered_by = ChoiceFilter(
+        method="filter_offered_by", choices=OFFERED_BY_CHOICES, field_name="offered_by"
+    )
 
     class Meta:
         model = Course
-        fields = ["audience", "platform"]
+        fields = ["audience", "offered_by"]
+
+    def filter_offered_by(self, queryset, _, value):
+        """OfferedBy Filter for courses"""
+        return queryset.filter(offered_by__name=value)
 
     def filter_audience(self, queryset, _, value):
         """Audience filter for courses"""
@@ -30,31 +38,4 @@ class CourseFilter(FilterSet):
             queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
         else:
             queryset = queryset.exclude(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
-        return queryset
-
-    def filter_certificate(self, queryset, _, value):
-        if value:
-            qs1 = (
-                queryset.filter(
-                    runs__availability__in=["Current", "Upcoming", "Starting Soon"]
-                )
-                .filter(platform="mtx")
-                .annotate(max_start_date=Max("runs__start_date"))
-            )
-            qs2 = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS).annotate(
-                max_start_date=Max("runs__start_date")
-            )
-            queryset = qs1.union(qs2)
-        else:
-            qs1 = (
-                queryset.filter(
-                    runs__availability__not_in=["Current", "Upcoming", "Starting Soon"]
-                )
-                .filter(platform="mtx")
-                .annotate(max_start_date=Max("runs__start_date"))
-            )
-            qs2 = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS).annotate(
-                max_start_date=Max("runs__start_date")
-            )
-            queryset = qs1.union(qs2)
         return queryset
