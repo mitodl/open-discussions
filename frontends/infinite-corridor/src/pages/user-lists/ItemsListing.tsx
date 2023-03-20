@@ -1,10 +1,6 @@
 import React from "react"
-import { LearningResourceCard, type PaginatedUserListItems } from "ol-search-ui"
-import { useActivateResourceDrawer } from "../LearningResourceDrawer"
-import { imgConfigs } from "../../util/constants"
-import IconButton from "@mui/material/IconButton"
-import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"
-import AddToListDialog, { useAddToListDialog } from "./AddToListDialog"
+import type { PaginatedUserListItems } from "ol-search-ui"
+import LearningResourceCard from "../../components/LearningResourceCard"
 
 type UserListItemsProps = {
   isLoading: boolean
@@ -17,8 +13,6 @@ const UserListItems: React.FC<UserListItemsProps> = ({
   data,
   emptyMessage
 }) => {
-  const addToList = useAddToListDialog()
-  const activateResource = useActivateResourceDrawer()
   return (
     <>
       {isLoading && <p>Loading...</p>}
@@ -32,30 +26,13 @@ const UserListItems: React.FC<UserListItemsProps> = ({
                 <li key={list.id}>
                   <LearningResourceCard
                     variant="row-reverse"
-                    className="ic-resource-card"
                     resource={list.content_data}
-                    imgConfig={imgConfigs["row-reverse"]}
-                    onActivate={activateResource}
-                    footerActionSlot={
-                      <IconButton
-                        onClick={() => addToList.open(list.content_data)}
-                      >
-                        <BookmarkBorderIcon />
-                      </IconButton>
-                    }
                   />
                 </li>
               )
             })}
           </ul>
         ))}
-      {addToList.ressourceKey && (
-        <AddToListDialog
-          resourceKey={addToList.ressourceKey}
-          onClose={addToList.close}
-          open={addToList.isOpen}
-        />
-      )}
     </>
   )
 }

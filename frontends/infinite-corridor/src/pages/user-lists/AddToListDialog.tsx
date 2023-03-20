@@ -237,7 +237,7 @@ const useAddToListDialog = () => {
    */
   const [isOpen, setIsOpen] = useState(false)
   const [ressourceKey, setResourceKey] = useState<ResourceKey | null>(null)
-  const open = useCallback((resource: LearningResource) => {
+  const open = useCallback((resource: ResourceKey) => {
     setIsOpen(true)
     setResourceKey(resource)
   }, [])

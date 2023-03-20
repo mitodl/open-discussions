@@ -4,12 +4,12 @@ export type { SearchboxProps } from "./Searchbox"
 export { default as SearchInput } from "./SearchInput"
 export type { SearchInputProps } from "./SearchInput"
 
-export { default as LearningResourceCard } from "./LearningResourceCard"
+export { default as LearningResourceCardTemplate } from "./LearningResourceCardTemplate"
 export type {
-  LearningResourceCardProps,
+  LearningResourceCardTemplateProps,
   OnActivateCard,
   CardVariant
-} from "./LearningResourceCard"
+} from "./LearningResourceCardTemplate"
 
 export { default as SearchFilterDrawer } from "./SearchFilterDrawer"
 

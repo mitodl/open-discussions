@@ -5,8 +5,7 @@ import TabContext from "@mui/lab/TabContext"
 import TabList from "@mui/lab/TabList"
 import TabPanel from "@mui/lab/TabPanel"
 import Container from "@mui/material/Container"
-import { LearningResourceCard } from "ol-search-ui"
-import type { OnActivateCard, UserList, LearningResource } from "ol-search-ui"
+import type { UserList } from "ol-search-ui"
 import { TitledCarousel, useMuiBreakpoint } from "ol-util"
 import { Link } from "react-router-dom"
 import FieldPageSkeleton from "./FieldPageSkeleton"
@@ -14,10 +13,9 @@ import ArrowForward from "@mui/icons-material/ArrowForward"
 import ArrowBack from "@mui/icons-material/ArrowBack"
 import { useFieldDetails } from "../../api/fields"
 import { useUserListItems } from "../../api/learning-resources"
-import { imgConfigs } from "../../util/constants"
 import WidgetsList from "./WidgetsList"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useActivateResourceDrawer } from "../LearningResourceDrawer"
+import LearningResourceCard from "../../components/LearningResourceCard"
 
 type RouteParams = {
   name: string
@@ -30,10 +28,9 @@ const keyFromHash = (hash: string) => {
 }
 interface FieldListProps {
   list: UserList
-  onActivateCard: OnActivateCard<LearningResource>
 }
 
-const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
+const FieldList: React.FC<FieldListProps> = ({ list }) => {
   const itemsQuery = useUserListItems(list.id)
   const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   return (
@@ -42,13 +39,7 @@ const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
       <ul className="ic-card-row-list">
         {items.map(item => (
           <li key={item.id}>
-            <LearningResourceCard
-              variant="row-reverse"
-              className="ic-resource-card"
-              resource={item}
-              imgConfig={imgConfigs["row-reverse"]}
-              onActivate={onActivateCard}
-            />
+            <LearningResourceCard variant="row-reverse" resource={item} />
           </li>
         ))}
       </ul>
@@ -56,7 +47,7 @@ const FieldList: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
   )
 }
 
-const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
+const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
   const itemsQuery = useUserListItems(list.id)
   const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
   const isSm = useMuiBreakpoint("sm")
@@ -93,8 +84,6 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
           className="ic-resource-card ic-carousel-card"
           resource={item}
           variant="column"
-          imgConfig={imgConfigs["column"]}
-          onActivate={onActivateCard}
         />
       ))}
     </TitledCarousel>
@@ -105,7 +94,6 @@ const MANAGE_WIDGETS_SUFFIX = "manage/widgets/"
 
 const FieldPage: React.FC = () => {
   const { name } = useParams<RouteParams>()
-  const activateResource = useActivateResourceDrawer()
   const history = useHistory()
   const { hash, pathname } = useLocation()
   const tabValue = keyFromHash(hash)
@@ -154,18 +142,9 @@ const FieldPage: React.FC = () => {
             <GridColumn variant="main-2-wide-main">
               <TabPanel value="home" className="page-nav-content">
                 <p>{fieldQuery.data?.public_description}</p>
-                {featuredList && (
-                  <FieldCarousel
-                    list={featuredList}
-                    onActivateCard={activateResource}
-                  />
-                )}
+                {featuredList && <FieldCarousel list={featuredList} />}
                 {fieldLists.map(list => (
-                  <FieldList
-                    key={list.id}
-                    list={list}
-                    onActivateCard={activateResource}
-                  />
+                  <FieldList key={list.id} list={list} />
                 ))}
               </TabPanel>
               <TabPanel value="about" className="page-nav-content"></TabPanel>

@@ -17,8 +17,8 @@ export enum LearningResourceType {
  * object_type === "favorites".
  *
  * We occasionally treat it somewhat like a LearningResourceType, though
- * (Example: LearningResourceCards can render a list of "Favorites" similarly
- * to a UserList.)
+ * (Example: LearningResourceCardTemplate can render a list of "Favorites"
+ * similarly to a UserList.)
  */
 export const TYPE_FAVORITES = "favorites"
 

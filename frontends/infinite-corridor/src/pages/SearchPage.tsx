@@ -13,16 +13,14 @@ import {
 } from "@mitodl/course-search-utils"
 import {
   LearningResourceSearchResult,
-  LearningResourceCard,
-  LearningResourceCardProps,
   SearchInput,
   SearchFilterDrawer,
   FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
-import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 
 import axios from "../libs/axios"
+import LearningResourceCard from "../components/LearningResourceCard"
 import { useHistory } from "react-router"
 
 const ALLOWED_TYPES = ["program", "course"]
@@ -36,13 +34,6 @@ const facetMap: FacetManifest = [
 
 interface Result {
   _source: LearningResourceSearchResult
-}
-
-const imgConfig: LearningResourceCardProps["imgConfig"] = {
-  ocwBaseUrl: SETTINGS.ocw_next_base_url,
-  embedlyKey: SETTINGS.embedlyKey,
-  width:      170,
-  height:     130
 }
 
 const SEARCH_API_URL = "search/"
@@ -65,7 +56,6 @@ const SearchPage: React.FC = () => {
   const [searchApiFailed, setSearchApiFailed] = useState(false)
   const [aggregations, setAggregations] = useState<Aggregations>(new Map())
   const isMd = useMuiBreakpoint("md")
-  const activateResource = useActivateResourceDrawer()
 
   const clearSearch = useCallback(() => {
     setSearchResults([])
@@ -199,11 +189,8 @@ const SearchPage: React.FC = () => {
                         )}
                       >
                         <LearningResourceCard
-                          className="ic-resource-card"
                           variant="row-reverse"
-                          imgConfig={imgConfig}
                           resource={hit._source}
-                          onActivate={activateResource}
                         />
                       </li>
                     ))}

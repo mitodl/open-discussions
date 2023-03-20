@@ -24,7 +24,7 @@ import {
   useUserListsListing
 } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
-import { LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
+import { LearningResourceCardTemplate, TYPE_FAVORITES } from "ol-search-ui"
 import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
@@ -146,7 +146,7 @@ const UserListsListingPage: React.FC = () => {
                 <ul className="ic-card-row-list">
                   {favorites && (
                     <li>
-                      <LearningResourceCard
+                      <LearningResourceCardTemplate
                         suppressImage
                         variant="row-reverse"
                         className="ic-resource-card"
@@ -159,7 +159,7 @@ const UserListsListingPage: React.FC = () => {
                   {userListsQuery.data.results.map(list => {
                     return (
                       <li key={list.id}>
-                        <LearningResourceCard
+                        <LearningResourceCardTemplate
                           variant="row-reverse"
                           className="ic-resource-card"
                           resource={list}
