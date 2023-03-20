@@ -11,13 +11,18 @@ import pytest
 import pytz
 from lxml import etree
 
-from course_catalog.constants import CONTENT_TYPE_FILE, CONTENT_TYPE_VERTICAL
+from course_catalog.constants import (
+    CONTENT_TYPE_FILE,
+    CONTENT_TYPE_VERTICAL,
+    PlatformType,
+)
 from course_catalog.etl.utils import (
     documents_from_olx,
     extract_text_from_url,
     extract_text_metadata,
     extract_valid_department_from_id,
     generate_unique_id,
+    get_learning_course_bucket,
     get_text_from_element,
     log_exceptions,
     map_topics,
@@ -282,9 +287,6 @@ def test_transform_content_files(mocker, has_metadata):
 
 def test_documents_from_olx():
     """test for documents_from_olx"""
-    script_dir = os.path.dirname(
-        os.path.dirname(pathlib.Path(__file__).parent.absolute())
-    )
     parsed_documents = get_olx_test_docs()
     assert len(parsed_documents) == 108
 
@@ -332,3 +334,15 @@ def test_extract_valid_department_from_id():
     # Has no discernible department
     assert extract_valid_department_from_id("MITx+CITE101x") is None
     assert extract_valid_department_from_id("RanD0mStr1ng") is None
+
+
+@pytest.mark.parametrize("platform", [PlatformType.mitx.value, PlatformType.xpro.value])
+def test_get_learning_course_bucket(
+    aws_settings, mock_mitx_learning_bucket, mock_xpro_learning_bucket, platform
+):
+    """The correct bucket should be returned by the function"""
+    assert get_learning_course_bucket(platform).name == (
+        aws_settings.EDX_LEARNING_COURSE_BUCKET_NAME
+        if platform == PlatformType.mitx.value
+        else aws_settings.XPRO_LEARNING_COURSE_BUCKET_NAME
+    )

@@ -156,7 +156,6 @@ def transform_programs(programs):
                     or _parse_datetime(program["start_date"]),
                     "best_end_date": _parse_datetime(program["end_date"]),
                     "offered_by": copy.deepcopy(OFFERED_BY),
-                    "title": program["title"],
                     "short_description": program["description"],
                     "instructors": [
                         {"full_name": instructor["name"]}

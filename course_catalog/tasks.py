@@ -21,7 +21,11 @@ from course_catalog.api import (
 )
 from course_catalog.constants import PlatformType
 from course_catalog.etl import enrollments, pipelines, youtube
-from course_catalog.etl.edx_shared import sync_edx_course_files
+from course_catalog.etl.edx_shared import (
+    get_most_recent_course_archives,
+    sync_edx_course_files,
+)
+from course_catalog.etl.utils import get_learning_course_bucket_name
 from course_catalog.models import Course
 from course_catalog.utils import load_course_blocklist
 from open_discussions.celery import app
@@ -66,7 +70,7 @@ def get_ocw_courses(
 
 
 def get_content_tasks(
-    bucket_name: str, platform: str, chunk_size: int = None, s3_prefix: str = None
+    platform: str, chunk_size: int = None, s3_prefix: str = None
 ) -> List[Task]:
     """
     Return a list of grouped celery tasks for indexing edx content
@@ -75,14 +79,15 @@ def get_content_tasks(
         chunk_size = settings.LEARNING_COURSE_ITERATOR_CHUNK_SIZE
 
     blocklisted_ids = load_course_blocklist()
+    archive_keys = get_most_recent_course_archives(platform, s3_prefix=s3_prefix)
     return celery.group(
         [
-            get_content_files.si(ids, bucket_name, platform, s3_prefix=s3_prefix)
+            get_content_files.si(ids, platform, archive_keys, s3_prefix=s3_prefix)
             for ids in chunks(
                 Course.objects.filter(published=True)
                 .filter(platform=platform)
                 .exclude(course_id__in=blocklisted_ids)
-                .order_by("id")
+                .order_by("-id")
                 .values_list("id", flat=True),
                 chunk_size=chunk_size,
             )
@@ -264,17 +269,19 @@ def import_all_ocw_files(self, chunk_size):
 
 @app.task
 def get_content_files(
-    ids: List[int], bucket_name: str, platform: str, s3_prefix: str = None
+    ids: List[int], platform: str, keys: List[str], s3_prefix: str = None
 ):
     """
     Task to sync edX course content files with database
     """
     if not (
-        bucket_name and settings.AWS_ACCESS_KEY_ID and settings.AWS_SECRET_ACCESS_KEY
+        settings.AWS_ACCESS_KEY_ID
+        and settings.AWS_SECRET_ACCESS_KEY
+        and get_learning_course_bucket_name(platform) is not None
     ):
         log.warning("Required settings missing for %s files", platform)
         return
-    sync_edx_course_files(bucket_name, platform, ids, s3_prefix)
+    sync_edx_course_files(platform, ids, keys, s3_prefix=s3_prefix)
 
 
 @app.task(bind=True)
@@ -283,7 +290,6 @@ def import_all_xpro_files(self, chunk_size=None):
 
     raise self.replace(
         get_content_tasks(
-            settings.XPRO_LEARNING_COURSE_BUCKET_NAME,
             PlatformType.xpro.value,
             chunk_size,
         )
@@ -295,7 +301,6 @@ def import_all_mitxonline_files(self, chunk_size=None):
     """Ingest MITx Online files from an S3 bucket"""
     raise self.replace(
         get_content_tasks(
-            settings.MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME,
             PlatformType.mitxonline.value,
             chunk_size,
         )
@@ -307,7 +312,6 @@ def import_all_mitx_files(self, chunk_size=None):
     """Ingest MITx files from an S3 bucket"""
     raise self.replace(
         get_content_tasks(
-            settings.EDX_LEARNING_COURSE_BUCKET_NAME,
             PlatformType.mitx.value,
             chunk_size,
             s3_prefix=settings.EDX_LEARNING_COURSE_BUCKET_PREFIX,

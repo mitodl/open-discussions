@@ -116,7 +116,6 @@ def test_xpro_transform_programs(mock_xpro_programs_data):
                         {"full_name": instructor["name"]}
                         for instructor in program_data.get("instructors", [])
                     ],
-                    "title": program_data["title"],
                     "short_description": program_data["description"],
                     "offered_by": xpro.OFFERED_BY,
                     "raw_json": program_data,
