@@ -5,7 +5,7 @@ import type {
   LearningResourceCardTemplateProps,
   LearningResource
 } from "ol-search-ui"
-import { useActivateResourceDrawer } from "../pages/LearningResourceDrawer"
+import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 import { imgConfigs } from "../util/constants"
 import IconButton from "@mui/material/IconButton"
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"
@@ -57,3 +57,4 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }
 
 export default LearningResourceCard
+export type { LearningResourceCardProps }
