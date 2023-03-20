@@ -53,7 +53,7 @@ cachetools==3.1.1
     # via google-auth
 cairocffi==0.8.1
     # via cairosvg
-cairosvg==2.5.1
+cairosvg==2.7.0
     # via -r requirements.in
 celery==5.2.1
     # via
