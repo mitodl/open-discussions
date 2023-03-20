@@ -92,6 +92,7 @@ const FieldCarousel: React.FC<FieldListProps> = ({ list, onActivateCard }) => {
           key={item.id}
           className="ic-resource-card ic-carousel-card"
           resource={item}
+          variant="column"
           imgConfig={imgConfigs["column"]}
           onActivate={onActivateCard}
         />

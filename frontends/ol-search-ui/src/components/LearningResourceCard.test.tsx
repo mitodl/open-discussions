@@ -32,6 +32,7 @@ describe("LearningResourceCard", () => {
       const imgConfig = makeImgConfig()
       render(
         <LearningResourceCard
+          variant="column"
           resource={resource}
           imgConfig={imgConfig}
           suppressImage={suppressImage}

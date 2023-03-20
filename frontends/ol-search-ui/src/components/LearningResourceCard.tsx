@@ -32,9 +32,8 @@ type LearningResourceCardProps<
 > = {
   /**
    * Whether the course picture and info display as a column or row.
-   * Defaults to `'column'`.
    */
-  variant?: CardVariant
+  variant: CardVariant
   resource: R
   reordering?: boolean
   className?: string
@@ -160,7 +159,7 @@ const variantClasses: Record<CardVariant, string> = {
 }
 
 const LearningResourceCard = <R extends CardMinimalResource>({
-  variant = "column",
+  variant,
   resource,
   imgConfig,
   className,
