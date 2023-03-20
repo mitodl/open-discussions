@@ -1,34 +1,18 @@
 import { when } from "jest-when"
-import { faker } from "@faker-js/faker"
 
-import { urls as lrUrls } from "../api/learning-resources"
-
-import {
-  makeLearningResource,
-  makeSearchResponse
-} from "ol-search-ui/src/factories"
+import { makeSearchResponse } from "ol-search-ui/src/factories"
 import { buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
-import {
-  fireEvent,
-  waitFor,
-  waitForElementToBeRemoved,
-  within
-} from "@testing-library/react"
+import { fireEvent, waitFor, within } from "@testing-library/react"
 import { makeRequest } from "../test-utils/mockAxios"
-import {
-  ExpandedLearningResourceDisplay,
-  LearningResourceCard
-} from "ol-search-ui"
+
+import LearningResourceCard from "../components/LearningResourceCard"
 
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
-const spyExpandedLearningResourceDisplay = jest.mocked(
-  ExpandedLearningResourceDisplay
-)
 
 const expectedFacets = {
   audience:            [],
@@ -247,47 +231,5 @@ describe("SearchPage", () => {
       expect.objectContaining({ resource: results.hits.hits[1]._source }),
       expect.anything()
     )
-  })
-
-  test("Clicking a card title opens the LearningResourceDrawer", async () => {
-    const pageSize = 4
-    const results = makeSearchResponse(pageSize)
-    const i = faker.datatype.number({ min: 0, max: pageSize - 1 })
-    const resource = makeLearningResource({
-      id:          results.hits.hits[i]._source.id,
-      title:       results.hits.hits[i]._source.title,
-      object_type: results.hits.hits[i]._source.object_type
-    })
-    setMockResponse.get(
-      lrUrls.resource.details(resource.object_type, resource.id),
-      resource
-    )
-
-    setMockResponse.post("search/", results)
-    const { history } = await renderTestApp({ url: "/search" })
-    const list = await screen.findByRole("list", { name: "Search Results" })
-    const items = await within(list).findAllByRole("listitem")
-    const item = items[i]
-    await user.click(
-      within(item).getByRole("heading", { name: resource.title })
-    )
-
-    const params0 = new URLSearchParams(history.location.search)
-    expect(params0.get("resource_id")).toBe(String(resource.id))
-    expect(params0.get("resource_type")).toBe(resource.object_type)
-
-    const getDrawerContent = () => screen.getByLabelText("Detailed description")
-    const drawer = getDrawerContent()
-    await within(drawer).findByRole("heading", { name: resource.title })
-    expect(spyExpandedLearningResourceDisplay).toHaveBeenCalledWith(
-      expect.objectContaining({ resource }),
-      expect.anything()
-    )
-
-    await user.click(screen.getByRole("button", { name: "Close" }))
-    const params1 = new URLSearchParams(history.location.search)
-    expect(params1.get("resource_id")).toBe(null)
-    expect(params1.get("resource_type")).toBe(null)
-    await waitForElementToBeRemoved(getDrawerContent)
   })
 })

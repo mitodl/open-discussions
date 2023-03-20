@@ -43,17 +43,6 @@ beforeAll(() => {
 })
 
 /**
- * We frequently spy on this
- */
-jest.mock("../components/LearningResourceCard", () => {
-  const actual = jest.requireActual("../components/LearningResourceCard")
-  return {
-    ...actual,
-    LearningResourceCard: jest.fn(actual.default)
-  }
-})
-
-/**
  * We frequently spy on these, so let's just do it once.
  */
 jest.mock("ol-search-ui", () => {
@@ -64,5 +53,13 @@ jest.mock("ol-search-ui", () => {
     ExpandedLearningResourceDisplay: jest.fn(
       actual.ExpandedLearningResourceDisplay
     )
+  }
+})
+jest.mock("../components/LearningResourceCard", () => {
+  const actual = jest.requireActual("../components/LearningResourceCard")
+  return {
+    __esModule: true,
+    ...actual,
+    default:    jest.fn(actual.default)
   }
 })

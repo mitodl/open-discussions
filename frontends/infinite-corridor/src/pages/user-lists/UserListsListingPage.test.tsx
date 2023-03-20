@@ -1,6 +1,10 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
-import { Favorites, LearningResourceCard, TYPE_FAVORITES } from "ol-search-ui"
+import {
+  Favorites,
+  LearningResourceCardTemplate as LRCardTemplate,
+  TYPE_FAVORITES
+} from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {
@@ -17,7 +21,7 @@ import {
   expectProps
 } from "../../test-utils"
 
-const spyLearningResourceCard = jest.mocked(LearningResourceCard)
+const spyLRCardTemplate = jest.mocked(LRCardTemplate)
 
 jest.mock("./ManageListDialogs", () => {
   const actual = jest.requireActual("./ManageListDialogs")
@@ -69,7 +73,7 @@ describe("UserListsListingPage", () => {
 
     expect(headings.map(h => h.textContent)).toEqual(titles)
     userLists.results.forEach(resource => {
-      expectProps(spyLearningResourceCard, { resource })
+      expectProps(spyLRCardTemplate, { resource })
     })
   })
 
@@ -86,7 +90,7 @@ describe("UserListsListingPage", () => {
       item_count:  numFavorites,
       object_type: TYPE_FAVORITES
     }
-    expectProps(spyLearningResourceCard, {
+    expectProps(spyLRCardTemplate, {
       resource: expect.objectContaining(favoritesList)
     })
   })
