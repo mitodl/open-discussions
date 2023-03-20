@@ -4,7 +4,7 @@ infinite_example views
 from django.shortcuts import render
 from django.conf import settings
 
-from moira_lists.moira_api import is_list_staff
+from moira_lists.moira_api import is_public_list_editor
 
 
 def index(request, **kwargs):  # pylint: disable=unused-argument
@@ -19,7 +19,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
         "user": {
             "id": user.id,
             "is_authenticated": bool(user.is_authenticated),
-            "is_list_staff": user.is_authenticated and is_list_staff(user),
+            "is_public_list_editor": user.is_authenticated and is_public_list_editor(user),
         },
     }
 
