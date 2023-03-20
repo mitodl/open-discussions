@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.209.0
+---------------
+
+- More improvements in memory usage for edx content archive processing (#3880)
+- new infinite search (#3873)
+- 2 New API filters for new open - offered_by and audience (#3877)
+
 Version 0.208.0 (Released March 15, 2023)
 ---------------
 
