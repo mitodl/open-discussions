@@ -56,7 +56,7 @@ class CourseFilter(FilterSet):
                     AvailabilityType.starting_soon.value,
                 ],
                 platform=PlatformType.mitx.value,
-            ).annotate(max_start_date=Max("runs__start_date"))
+            )
             qs2 = queryset.filter(
                 runs__availability__in=[
                     AvailabilityType.current.value,
@@ -64,8 +64,8 @@ class CourseFilter(FilterSet):
                     AvailabilityType.starting_soon.value,
                 ],
                 platform__in=PROFESSIONAL_COURSE_PLATFORMS,
-            ).annotate(max_start_date=Max("runs__start_date"))
-            union_queryset = qs1.union(qs2).order_by("-max_start_date")
+            )
+            union_queryset = qs1.union(qs2)
             if value:
                 return union_queryset
             else:

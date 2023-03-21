@@ -76,3 +76,10 @@ def test_course_filter_certificated():
     assert pro_course_with_cert in query
     assert course_without_certificate not in query
     assert archived_course not in query
+
+    negative_query = CourseFilter({"certificated": "False"}).qs
+
+    assert course_with_certificate not in negative_query
+    assert pro_course_with_cert not in negative_query
+    assert course_without_certificate in negative_query
+    assert archived_course in negative_query
