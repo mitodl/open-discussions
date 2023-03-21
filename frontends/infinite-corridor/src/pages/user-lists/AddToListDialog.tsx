@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import Box from "@mui/material/Box"
 import CloseIcon from "@mui/icons-material/Close"
@@ -35,6 +35,7 @@ type AddToListDialogProps = {
   open: boolean
   resourceKey: ResourceKey
   onClose: () => void
+  onExited: () => void
 }
 
 type UserListOrFavorites =
@@ -133,7 +134,8 @@ const useToggleItemInList = (resource?: LearningResource) => {
 const AddToListDialog: React.FC<AddToListDialogProps> = ({
   open,
   resourceKey,
-  onClose
+  onClose,
+  onExited
 }) => {
   const listCreation = useCreationDialog()
   const resourceQuery = useResource(resourceKey.object_type, resourceKey.id)
@@ -153,9 +155,15 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
     useToggleItemInList(resource)
 
   const isReady = resource && userLists
+  const transitionProps = useMemo(() => ({ onExited }), [onExited])
 
   return (
-    <Dialog className="add-to-list-dialog" open={open} onClose={onClose}>
+    <Dialog
+      className="add-to-list-dialog"
+      open={open}
+      onClose={onClose}
+      TransitionProps={transitionProps}
+    >
       <DialogTitle>Add to list</DialogTitle>
       <Box position="absolute" top={0} right={0}>
         <IconButton onClick={onClose} aria-label="Close">
@@ -232,7 +240,7 @@ const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
 const useAddToListDialog = () => {
   /**
    * Track isOpen and the current resource separately.
-   * If we infer `isOpen === !!resource`, then the diagram content is not
+   * If we infer `isOpen === !!resource`, then the dialog content is not
    * visible during the closing animation.
    */
   const [isOpen, setIsOpen] = useState(false)
@@ -244,12 +252,16 @@ const useAddToListDialog = () => {
   const close = useCallback(() => {
     setIsOpen(false)
   }, [])
+  const onExited = useCallback(() => {
+    setResourceKey(null)
+  }, [])
 
   return {
     isOpen,
     ressourceKey,
     open,
-    close
+    close,
+    onExited
   }
 }
 

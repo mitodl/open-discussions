@@ -39,7 +39,10 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
         onActivate={activateResource}
         footerActionSlot={
           user.is_authenticated && (
-            <IconButton onClick={() => addToList.open(resource)}>
+            <IconButton
+              aria-label="Add to list"
+              onClick={() => addToList.open(resource)}
+            >
               <BookmarkBorderIcon />
             </IconButton>
           )
@@ -50,6 +53,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
           resourceKey={addToList.ressourceKey}
           onClose={addToList.close}
           open={addToList.isOpen}
+          onExited={addToList.onExited}
         />
       )}
     </>

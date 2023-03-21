@@ -48,12 +48,12 @@ const renderWithProviders = (
 
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
   const queryClient = createQueryClient()
-  render(
+  const view = render(
     <AppProviders queryClient={queryClient} history={history}>
       {component}
     </AppProviders>
   )
-  return { history }
+  return { history, view }
 }
 
 /**
