@@ -1,13 +1,13 @@
 """API for general search-related functionality"""
 from base64 import urlsafe_b64encode
 from collections import Counter, defaultdict
-
 from operator import itemgetter
+
+from django.conf import settings
 from elasticsearch_dsl import Q, Search
 from elasticsearch_dsl.query import MoreLikeThis
 from nested_lookup import nested_lookup
 
-from django.conf import settings
 from channels.constants import (
     CHANNEL_TYPE_PUBLIC,
     CHANNEL_TYPE_RESTRICTED,
@@ -25,13 +25,13 @@ from open_discussions.utils import extract_values
 from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
-    GLOBAL_DOC_TYPE,
     COURSE_TYPE,
-    USER_LIST_TYPE,
-    LEARNING_PATH_TYPE,
+    GLOBAL_DOC_TYPE,
     LEARNING_RESOURCE_TYPES,
-    PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    USER_LIST_TYPE,
+    USER_PATH_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -244,7 +244,7 @@ def _apply_learning_query_filters(search, user):
     """
     # Search public lists (and user's own lists if logged in)
     user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
-        "terms", object_type=[USER_LIST_TYPE, LEARNING_PATH_TYPE]
+        "terms", object_type=[USER_LIST_TYPE, USER_PATH_TYPE]
     )
     if not user.is_anonymous:
         user_list_filter = user_list_filter | Q("term", author=user.id)
@@ -406,7 +406,7 @@ def transform_results(search_result, user, department_filters):
     if types:
         type_merges = dict(
             zip(
-                (PODCAST_EPISODE_TYPE, LEARNING_PATH_TYPE),
+                (PODCAST_EPISODE_TYPE, USER_PATH_TYPE),
                 (PODCAST_TYPE, USER_LIST_TYPE),
             )
         )
@@ -444,7 +444,7 @@ def transform_results(search_result, user, department_filters):
         for hit in search_result.get("hits", {}).get("hits", []):
             object_type = hit["_source"]["object_type"]
             if object_type in LEARNING_RESOURCE_TYPES:
-                if object_type == LEARNING_PATH_TYPE:
+                if object_type == USER_PATH_TYPE:
                     object_type = USER_LIST_TYPE
                 object_id = hit["_source"]["id"]
                 hit["_source"]["is_favorite"] = (object_type, object_id) in favorites
@@ -563,7 +563,7 @@ def find_similar_resources(*, user, value_doc):
             else:
                 object_type = hit["object_type"]
                 if object_type in LEARNING_RESOURCE_TYPES:
-                    if object_type == LEARNING_PATH_TYPE:
+                    if object_type == USER_PATH_TYPE:
                         object_type = USER_LIST_TYPE
                     object_id = hit["id"]
                     hit["is_favorite"] = (object_type, object_id) in favorites

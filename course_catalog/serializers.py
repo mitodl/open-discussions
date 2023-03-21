@@ -12,7 +12,13 @@ from django.db.models import F, Max, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from course_catalog.constants import ListType, PlatformType, PrivacyLevel, ResourceType
+from course_catalog.constants import (
+    PlatformType,
+    PrivacyLevel,
+    ResourceType,
+    StaffListType,
+    UserListType,
+)
 from course_catalog.models import (
     Course,
     CourseInstructor,
@@ -24,6 +30,8 @@ from course_catalog.models import (
     PodcastEpisode,
     Program,
     ProgramItem,
+    StaffList,
+    StaffListItem,
     UserList,
     UserListItem,
     Video,
@@ -36,7 +44,7 @@ from course_catalog.utils import (
     parse_instructors,
     semester_year_to_date,
 )
-from moira_lists.moira_api import is_list_staff
+from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
 from search.task_helpers import delete_user_list, upsert_user_list
 
@@ -53,6 +61,8 @@ class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
         context = self.context
         if isinstance(instance, Course):
             serializer = CourseSerializer(instance, context=context)
+        elif isinstance(instance, StaffList):
+            serializer = StaffListSerializer(instance, context=context)
         elif isinstance(instance, UserList):
             serializer = UserListSerializer(instance, context=context)
         elif isinstance(instance, Program):
@@ -439,7 +449,7 @@ class OCWNextSerializer(CourseSerializer):
         return super().to_internal_value(course_fields)
 
 
-class UserListItemListSerializer(serializers.ListSerializer):
+class ListItemListSerializer(serializers.ListSerializer):
     """
     This class exists to handle the limitation that prefetch_related
     cannot correctly handle GenericRelation for multiple content types
@@ -482,9 +492,9 @@ class UserListItemListSerializer(serializers.ListSerializer):
         return super().to_representation(data)
 
 
-class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):
+class BaseListItemSerializer(serializers.Serializer):
     """
-    Serializer for UserListItem model, includes content_data
+    Base class for list items
     """
 
     content_data = GenericForeignKeyFieldSerializer(read_only=True, source="item")
@@ -529,6 +539,14 @@ class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixi
             ):
                 raise ValidationError("Podcast Episode does not exist")
         return attrs
+
+
+class UserListItemSerializer(
+    serializers.ModelSerializer, BaseListItemSerializer, FavoriteSerializerMixin
+):
+    """
+    Serializer for UserListItem model, includes content_data
+    """
 
     def update_index(self, user_list):
         """
@@ -588,14 +606,12 @@ class UserListItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixi
         model = UserListItem
         extra_kwargs = {"position": {"required": False}}
         exclude = ("created_on", "updated_on")
-        list_serializer_class = UserListItemListSerializer
+        list_serializer_class = ListItemListSerializer
 
 
-class UserListSerializer(
-    serializers.ModelSerializer, FavoriteSerializerMixin, ListsSerializerMixin
-):
+class BaseListSerializer(serializers.Serializer):
     """
-    Simplified serializer for UserList model.
+    Base serializer for user lists and staff lists
     """
 
     item_count = serializers.SerializerMethodField()
@@ -649,11 +665,24 @@ class UserListSerializer(
         """Returns the list of topics"""
         return [CourseTopicSerializer(topic).data for topic in instance.topics.all()]
 
+
+class UserListSerializer(
+    serializers.ModelSerializer,
+    BaseListSerializer,
+    FavoriteSerializerMixin,
+    ListsSerializerMixin,
+):
+    """
+    Simplified serializer for UserList model.
+    """
+
     def validate_list_type(self, list_type):
         """
         Validator for list_type.
         """
-        if not list_type or list_type not in [listtype.value for listtype in ListType]:
+        if not list_type or list_type not in [
+            listtype.value for listtype in UserListType
+        ]:
             raise ValidationError("Missing/incorrect list type information")
         return list_type
 
@@ -663,8 +692,9 @@ class UserListSerializer(
         """
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
-            if privacy_level == PrivacyLevel.public.value and not is_list_staff(
-                request.user
+            if (
+                privacy_level == PrivacyLevel.public.value
+                and not is_public_list_editor(request.user)
             ):
                 raise ValidationError("Invalid permissions for public lists")
         return privacy_level
@@ -700,6 +730,109 @@ class UserListSerializer(
         model = UserList
         exclude = COMMON_IGNORED_FIELDS
         read_only_fields = ["author", "items", "author_name"]
+
+
+class StaffListSerializer(
+    serializers.ModelSerializer,
+    BaseListSerializer,
+    FavoriteSerializerMixin,
+    ListsSerializerMixin,
+):
+    """Serlalizer for StaffList model"""
+
+    def validate_privacy_level(self, privacy_level):
+        """
+        Validator for privacy_level, should always be True
+        """
+        return privacy_level
+
+    def validate_list_type(self, list_type):
+        """
+        Validator for list_type.
+        """
+        if not list_type or list_type not in [
+            listtype.value for listtype in StaffListType
+        ]:
+            raise ValidationError("Missing/incorrect list type information")
+        return list_type
+
+    def create(self, validated_data):
+        """Ensure that the list is created by the requesting user, and set topics"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            validated_data["author"] = request.user
+            topics_data = validated_data.pop("topics", [])
+            with transaction.atomic():
+                stafflist = super().create(validated_data)
+                stafflist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
+            return stafflist
+
+    def update(self, instance, validated_data):
+        """Set stafflist topics and update the model object"""
+        request = self.context.get("request")
+        if request and hasattr(request, "user") and isinstance(request.user, User):
+            topics_data = validated_data.pop("topics", None)
+            with transaction.atomic():
+                stafflist = super().update(instance, validated_data)
+                if topics_data is not None:
+                    stafflist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
+                return stafflist
+
+    class Meta:
+        model = StaffList
+        exclude = COMMON_IGNORED_FIELDS
+        read_only_fields = ["author", "items", "author_name"]
+
+
+class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerializer):
+    """
+    Serializer for StaffListItem model, includes content_data
+    """
+
+    def create(self, validated_data):
+        staff_list = validated_data["staff_list"]
+        items = StaffListItem.objects.filter(staff_list=staff_list)
+        position = (
+            items.aggregate(Max("position"))["position__max"] or items.count()
+        ) + 1
+        item, _ = StaffListItem.objects.get_or_create(
+            staff_list=validated_data["staff_list"],
+            content_type=ContentType.objects.get(
+                model=validated_data["content_type"]["name"]
+            ),
+            object_id=validated_data["object_id"],
+            defaults={"position": position},
+        )
+        return item
+
+    def update(self, instance, validated_data):
+        position = validated_data["position"]
+        # to perform an update on position we atomically:
+        # 1) move everything between the old position and the new position towards the old position by 1
+        # 2) move the item into its new position
+        # this operation gets slower the further the item is moved, but it is sufficient for now
+        with transaction.atomic():
+            if position > instance.position:
+                # move items between the old and new positions up, inclusive of the new position
+                StaffListItem.objects.filter(
+                    position__lte=position, position__gt=instance.position
+                ).update(position=F("position") - 1)
+            else:
+                # move items between the old and new positions down, inclusive of the new position
+                StaffListItem.objects.filter(
+                    position__lt=instance.position, position__gte=position
+                ).update(position=F("position") + 1)
+            # now move the item into place
+            instance.position = position
+            instance.save()
+
+        return instance
+
+    class Meta:
+        model = StaffListItem
+        extra_kwargs = {"position": {"required": False}}
+        exclude = ("created_on", "updated_on")
+        list_serializer_class = ListItemListSerializer
 
 
 class ProgramItemSerializer(serializers.ModelSerializer, FavoriteSerializerMixin):

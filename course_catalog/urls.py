@@ -30,6 +30,12 @@ router.register(r"userlists", views.UserListViewSet, basename="userlists").regis
     basename="userlistitems",
     parents_query_lookups=["user_list_id"],
 )
+router.register(r"stafflists", views.StaffListViewSet, basename="stafflists").register(
+    r"items",
+    views.StaffListItemViewSet,
+    basename="stafflistitems",
+    parents_query_lookups=["staff_list_id"],
+)
 router.register(r"videos", views.VideoViewSet, basename="videos")
 router.register(r"favorites", views.FavoriteItemViewSet, basename="favorites")
 router.register(r"topics", views.TopicViewSet, basename="topics")

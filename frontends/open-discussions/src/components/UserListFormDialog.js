@@ -73,7 +73,7 @@ export default function UserListFormDialog(props: Props) {
             title:             "",
             short_description: "",
             topics:            [],
-            privacy_level:     SETTINGS.is_list_staff ? null : LR_PRIVATE
+            privacy_level:     SETTINGS.is_public_list_editor ? null : LR_PRIVATE
           }
       }
       validate={validateCreateUserListForm}
@@ -120,7 +120,7 @@ export default function UserListFormDialog(props: Props) {
               </div>
             </div>
             {validationMessage(errors.list_type)}
-            {SETTINGS.is_list_staff ? (
+            {SETTINGS.is_public_list_editor ? (
               <>
                 <span className="input-name">Privacy</span>
                 <div className="privacy radio">

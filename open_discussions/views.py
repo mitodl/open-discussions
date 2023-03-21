@@ -15,7 +15,8 @@ from django.urls import reverse
 from social_django.utils import load_strategy, load_backend
 
 from channels.models import Post
-from moira_lists.moira_api import is_list_staff
+from course_catalog.permissions import is_staff_list_editor
+from moira_lists.moira_api import is_public_list_editor
 from open_discussions import features
 
 from profiles.models import SOCIAL_SITE_NAME_MAP
@@ -38,7 +39,8 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
     user_email = None
     user_is_superuser = False
     user_id = None
-    user_list_staff = False
+    user_public_list_editor = False  # User can make public user lists
+    user_staff_list_editor = False  # User can make staff lists
 
     if request.user.is_authenticated:
         user = request.user
@@ -47,7 +49,8 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
         user_email = user.email
         user_is_superuser = user.is_superuser
         user_id = user.id
-        user_list_staff = is_list_staff(user)
+        user_public_list_editor = is_public_list_editor(user)
+        user_staff_list_editor = is_staff_list_editor(request)
 
     article_ui_enabled = (
         features.is_enabled(features.ARTICLE_UI)
@@ -76,7 +79,8 @@ def _render_app(request, initial_state=None):  # pylint:disable=unused-argument
         "user_email": user_email,
         "user_id": user_id,
         "is_admin": user_is_superuser,
-        "is_list_staff": user_list_staff,
+        "is_public_list_editor": user_public_list_editor,
+        "is_staff_list_editor": user_staff_list_editor,
         "authenticated_site": {
             "title": settings.OPEN_DISCUSSIONS_TITLE,
             "base_url": settings.SITE_BASE_URL,

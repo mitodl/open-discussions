@@ -2,24 +2,25 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedirect
+from prawcore.exceptions import Forbidden as PrawForbidden
+from prawcore.exceptions import Redirect as PrawRedirect
 
 from channels.models import Channel
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ContributorPermissions,
-    IsStaffPermission,
+    IsOwnSubscriptionOrAdminPermission,
+    IsStaffModeratorOrReadonlyPermission,
     IsStaffOrModeratorPermission,
     IsStaffOrReadonlyPermission,
-    IsStaffModeratorOrReadonlyPermission,
-    IsOwnSubscriptionOrAdminPermission,
+    IsStaffPermission,
     ModeratorPermissions,
     ObjectOnlyPermissions,
-    channel_is_mod_editable,
-    is_readonly,
-    is_moderator,
-    is_staff_user,
     channel_exists,
+    channel_is_mod_editable,
+    is_moderator,
+    is_readonly,
+    is_admin_user,
 )
 
 pytestmark = pytest.mark.usefixtures("mock_channel_exists")
@@ -50,19 +51,25 @@ def test_is_moderator(user, mocker, result):
 
 
 @pytest.mark.parametrize(
-    "has_user, is_staff, expected",
-    [[False, False, False], [True, False, False], [True, True, True]],
+    "has_user, is_staff, is_super, expected",
+    [
+        [False, False, False, False],
+        [True, False, False, False],
+        [True, True, False, True],
+        [True, False, True, True],
+    ],
 )
 def test_is_staff_user(
-    mocker, user, staff_user, has_user, is_staff, expected
+    mocker, user, staff_user, has_user, is_staff, is_super, expected
 ):  # pylint: disable=too-many-arguments
-    """is_staff_user should return True if a valid JWT is provided"""
+    """is_admin_user should return True if a valid JWT is provided"""
     request = mocker.Mock()
     if has_user:
         request.user = staff_user if is_staff else user
+        request.user.is_superuser = is_super
     else:
         request.user = None
-    assert is_staff_user(request) is expected
+    assert is_admin_user(request) is expected
 
 
 @pytest.mark.parametrize(
@@ -93,7 +100,7 @@ def test_is_staff_permission(mocker, is_staff):
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )
@@ -116,7 +123,7 @@ def test_is_staff_or_readonly_permission(mocker, is_staff, readonly, expected):
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )
@@ -144,7 +151,7 @@ def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected)
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )
@@ -195,7 +202,7 @@ def test_is_staff_moderator_or_readonly_permission(
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )
@@ -255,7 +262,7 @@ def test_is_own_subscription_permission(
         user=mocker.Mock(username=logged_in_username),
         data={"subscriber_name": req_body_username} if req_body_username else {},
     )
-    mocker.patch("open_discussions.permissions.is_staff_user", return_value=False)
+    mocker.patch("open_discussions.permissions.is_admin_user", return_value=False)
     mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
     mocker.patch("open_discussions.permissions.is_readonly", return_value=False)
     assert (
@@ -267,7 +274,7 @@ def test_contributor_permission_self_delete(mocker):
     """
     Test that users can delete their own contributor status
     """
-    mocker.patch("open_discussions.permissions.is_staff_user", return_value=False)
+    mocker.patch("open_discussions.permissions.is_admin_user", return_value=False)
     mocker.patch("open_discussions.permissions.is_moderator", return_value=False)
     username = "user1"
     request, view = mocker.Mock(), mocker.Mock()
@@ -307,7 +314,7 @@ def test_contributor_permission(  # pylint:disable=unused-argument,too-many-argu
     """
     request, view = mocker.Mock(), mocker.Mock()
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )
@@ -366,7 +373,7 @@ def test_moderator_permission(  # pylint:disable=unused-argument,too-many-argume
         "open_discussions.permissions.is_readonly", autospec=True, return_value=readonly
     )
     is_staff_user_mock = mocker.patch(
-        "open_discussions.permissions.is_staff_user",
+        "open_discussions.permissions.is_admin_user",
         autospec=True,
         return_value=is_staff,
     )

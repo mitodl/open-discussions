@@ -1,13 +1,13 @@
 """ Permissions for profiles """
 from rest_framework import permissions
 
-from open_discussions.permissions import is_staff_user
+from open_discussions.permissions import is_admin_user
 
 
 def is_owner_or_privileged_user(obj_user, request):
     """Returns True if the given user matches the requesting user, or the given user is superuser/staff"""
     return (
-        obj_user == request.user or request.user.is_superuser or is_staff_user(request)
+        obj_user == request.user or request.user.is_superuser or is_admin_user(request)
     )
 
 

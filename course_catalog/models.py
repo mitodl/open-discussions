@@ -18,7 +18,7 @@ from course_catalog.constants import (
     PrivacyLevel,
     ResourceType,
 )
-from course_catalog.utils import user_list_image_upload_uri
+from course_catalog.utils import staff_list_image_upload_uri, user_list_image_upload_uri
 from open_discussions.models import TimestampedModel, TimestampedModelQuerySet
 
 OPEN = "Open Content"
@@ -396,18 +396,15 @@ class ListItem(TimestampedModel):
         abstract = True
 
 
-class UserList(List, LearningResourceGenericRelationsMixin):
+class LearningList(List, LearningResourceGenericRelationsMixin):
     """
-    UserList is a user-created model tracking a restricted list of LearningResources.
+    Abstract class and base for user lists and staff lists
     """
 
     objects = LearningResourceQuerySet.as_manager()
 
     author = models.ForeignKey(User, on_delete=models.PROTECT)
     privacy_level = models.CharField(max_length=32, default=PrivacyLevel.private.value)
-    image_src = models.ImageField(
-        null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
-    )
     list_type = models.CharField(max_length=128)
 
     @property
@@ -428,6 +425,19 @@ class UserList(List, LearningResourceGenericRelationsMixin):
         return f"{self.title}"
 
     class Meta:
+        abstract = True
+
+
+class UserList(LearningList):
+    """
+    UserList is a user-created model tracking a restricted list of LearningResources.
+    """
+
+    image_src = models.ImageField(
+        null=True, blank=True, max_length=2083, upload_to=user_list_image_upload_uri
+    )
+
+    class Meta:
         verbose_name = "userlist"
 
 
@@ -445,6 +455,36 @@ class UserListItem(ListItem):
     )
     user_list = models.ForeignKey(
         UserList, related_name="items", on_delete=models.CASCADE
+    )
+
+
+class StaffList(LearningList):
+    """
+    StaffList is similar to UserList but can only be creadted/edited by a specific group of users
+    """
+
+    image_src = models.ImageField(
+        null=True, blank=True, max_length=2083, upload_to=staff_list_image_upload_uri
+    )
+
+    class Meta:
+        verbose_name = "stafflist"
+
+
+class StaffListItem(ListItem):
+    """
+    ListItem model for StaffLists
+    """
+
+    content_type = models.ForeignKey(
+        ContentType,
+        limit_choices_to={
+            "model__in": ("course", "program", "video", "podcast", "podcastepisode")
+        },
+        on_delete=models.CASCADE,
+    )
+    staff_list = models.ForeignKey(
+        StaffList, related_name="items", on_delete=models.CASCADE
     )
 
 
@@ -500,6 +540,7 @@ class FavoriteItem(TimestampedModel):
         limit_choices_to={
             "model__in": (
                 "course",
+                "stafflist",
                 "userlist",
                 "program",
                 "video",

@@ -1,99 +1,101 @@
 """Tests for elasticsearch serializers"""
+from datetime import datetime
+
 # pylint: disable=redefined-outer-name,unused-argument
 from functools import reduce
-from datetime import datetime
+
 import pytest
 
-from channels.constants import POST_TYPE, COMMENT_TYPE, LINK_TYPE_SELF
-from channels.factories.models import PostFactory, CommentFactory
+from channels.constants import COMMENT_TYPE, LINK_TYPE_SELF, POST_TYPE
+from channels.factories.models import CommentFactory, PostFactory
 from channels.utils import render_article_text
 from course_catalog.constants import (
+    AvailabilityType,
     OfferedBy,
     PlatformType,
-    ListType,
     PrivacyLevel,
-    AvailabilityType,
+    UserListType,
 )
 from course_catalog.factories import (
+    ContentFileFactory,
     CourseFactory,
-    LearningResourceRunFactory,
     CoursePriceFactory,
+    LearningResourceOfferorFactory,
+    LearningResourceRunFactory,
+    PodcastEpisodeFactory,
+    PodcastFactory,
     ProgramFactory,
     UserListFactory,
-    VideoFactory,
     UserListItemFactory,
-    ContentFileFactory,
-    PodcastFactory,
-    PodcastEpisodeFactory,
-    LearningResourceOfferorFactory,
+    VideoFactory,
 )
 from course_catalog.models import (
-    Course,
-    Video,
-    ContentType,
-    Program,
     PROFESSIONAL_COURSE_PLATFORMS,
+    ContentType,
+    Course,
+    Program,
+    Video,
 )
 from open_discussions.constants import ISOFORMAT
 from open_discussions.factories import UserFactory
-from open_discussions.test_utils import drf_datetime, assert_json_equal
+from open_discussions.test_utils import assert_json_equal, drf_datetime
 from profiles.models import Profile
-from profiles.utils import image_uri, IMAGE_MEDIUM
+from profiles.utils import IMAGE_MEDIUM, image_uri
 from search.api import (
-    gen_course_id,
-    gen_video_id,
     gen_content_file_id,
-    gen_podcast_id,
+    gen_course_id,
     gen_podcast_episode_id,
+    gen_podcast_id,
     gen_profile_id,
-    gen_user_list_id,
     gen_program_id,
+    gen_user_list_id,
+    gen_video_id,
 )
 from search.constants import (
-    PROFILE_TYPE,
     COURSE_TYPE,
-    PROGRAM_TYPE,
-    RESOURCE_FILE_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
     OCW_TYPE_ASSIGNMENTS,
     OCW_TYPE_LECTURE_NOTES,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    PROFILE_TYPE,
+    PROGRAM_TYPE,
+    RESOURCE_FILE_TYPE,
 )
 from search.serializers import (
-    ESPostSerializer,
     ESCommentSerializer,
-    ESProgramSerializer,
-    ESCourseSerializer,
-    ESRunSerializer,
-    ESProfileSerializer,
-    ESCoursePriceSerializer,
-    ESVideoSerializer,
-    serialize_post_for_bulk,
-    serialize_comment_for_bulk,
-    serialize_bulk_comments,
-    serialize_bulk_profiles,
-    serialize_profile_for_bulk,
-    serialize_bulk_courses,
-    serialize_course_for_bulk,
-    ESUserListSerializer,
-    serialize_bulk_videos,
-    serialize_video_for_bulk,
-    serialize_content_file_for_bulk,
     ESContentFileSerializer,
-    serialize_content_file_for_bulk_deletion,
-    ESPodcastSerializer,
-    serialize_bulk_podcasts,
-    serialize_podcast_for_bulk,
+    ESCoursePriceSerializer,
+    ESCourseSerializer,
     ESPodcastEpisodeSerializer,
-    serialize_bulk_podcast_episodes,
-    serialize_podcast_episode_for_bulk,
-    serialize_bulk_profiles_for_deletion,
+    ESPodcastSerializer,
+    ESPostSerializer,
+    ESProfileSerializer,
+    ESProgramSerializer,
+    ESRunSerializer,
+    ESUserListSerializer,
+    ESVideoSerializer,
+    serialize_bulk_comments,
+    serialize_bulk_courses,
     serialize_bulk_courses_for_deletion,
+    serialize_bulk_podcast_episodes,
+    serialize_bulk_podcast_episodes_for_deletion,
+    serialize_bulk_podcasts,
+    serialize_bulk_podcasts_for_deletion,
+    serialize_bulk_profiles,
+    serialize_bulk_profiles_for_deletion,
     serialize_bulk_programs_for_deletion,
     serialize_bulk_user_lists_for_deletion,
+    serialize_bulk_videos,
     serialize_bulk_videos_for_deletion,
-    serialize_bulk_podcasts_for_deletion,
-    serialize_bulk_podcast_episodes_for_deletion,
+    serialize_comment_for_bulk,
+    serialize_content_file_for_bulk,
+    serialize_content_file_for_bulk_deletion,
+    serialize_course_for_bulk,
+    serialize_podcast_episode_for_bulk,
+    serialize_podcast_for_bulk,
+    serialize_post_for_bulk,
+    serialize_profile_for_bulk,
+    serialize_video_for_bulk,
 )
 
 
@@ -578,7 +580,7 @@ def expected_audience_for_list(user_list):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("list_type", [list_type.value for list_type in ListType])
+@pytest.mark.parametrize("list_type", [list_type.value for list_type in UserListType])
 @pytest.mark.parametrize("privacy_level", [privacy.value for privacy in PrivacyLevel])
 def test_es_userlist_serializer(list_type, privacy_level, user):
     """

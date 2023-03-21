@@ -2,66 +2,66 @@
 # pylint: disable=redefined-outer-name,too-many-locals,too-many-lines
 from types import SimpleNamespace
 
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
-import pytest
 
-from course_catalog.constants import ListType, PrivacyLevel, PlatformType
-from course_catalog.etl.constants import OfferedByLoaderConfig, CourseLoaderConfig
+from course_catalog.constants import PlatformType, PrivacyLevel, UserListType
+from course_catalog.etl.constants import CourseLoaderConfig, OfferedByLoaderConfig
 from course_catalog.etl.exceptions import ExtractException
 from course_catalog.etl.loaders import (
-    load_program,
+    load_content_file,
+    load_content_files,
     load_course,
-    load_run,
-    load_topics,
-    load_prices,
+    load_courses,
     load_instructors,
     load_offered_bys,
-    load_video,
-    load_videos,
     load_playlist,
-    load_playlists,
-    load_video_channels,
     load_playlist_user_list,
-    load_courses,
-    load_programs,
-    load_content_files,
-    load_content_file,
-    load_podcasts,
+    load_playlists,
     load_podcast,
     load_podcast_episode,
+    load_podcasts,
+    load_prices,
+    load_program,
+    load_programs,
+    load_run,
+    load_topics,
+    load_video,
+    load_video_channels,
+    load_videos,
 )
 from course_catalog.etl.xpro import _parse_datetime
 from course_catalog.factories import (
-    ProgramFactory,
+    ContentFileFactory,
     CourseFactory,
-    LearningResourceRunFactory,
-    LearningResourceOfferorFactory,
+    CourseInstructorFactory,
     CoursePriceFactory,
     CourseTopicFactory,
-    CourseInstructorFactory,
-    VideoFactory,
+    LearningResourceOfferorFactory,
+    LearningResourceRunFactory,
     PlaylistFactory,
-    VideoChannelFactory,
-    UserListFactory,
-    ContentFileFactory,
-    PodcastFactory,
     PodcastEpisodeFactory,
+    PodcastFactory,
+    ProgramFactory,
+    UserListFactory,
+    VideoChannelFactory,
+    VideoFactory,
 )
 from course_catalog.models import (
-    Program,
+    ContentFile,
     Course,
     LearningResourceRun,
-    ProgramItem,
-    Video,
     Playlist,
-    VideoChannel,
     PlaylistVideo,
-    UserList,
-    UserListItem,
-    ContentFile,
     Podcast,
     PodcastEpisode,
+    Program,
+    ProgramItem,
+    UserList,
+    UserListItem,
+    Video,
+    VideoChannel,
 )
 
 pytestmark = pytest.mark.django_db
@@ -793,7 +793,7 @@ def test_load_playlist_user_list(
             assert user_list.title == playlist.title
 
         assert user_list.privacy_level == PrivacyLevel.public.value
-        assert user_list.list_type == ListType.LIST.value
+        assert user_list.list_type == UserListType.LIST.value
 
         assert (
             UserListItem.objects.filter(

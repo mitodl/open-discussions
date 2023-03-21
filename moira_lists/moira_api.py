@@ -173,9 +173,9 @@ def update_moira_list_users(moira_list):
     moira_list.users.set(users)
 
 
-def is_list_staff(user):
+def is_public_list_editor(user):
     """
-    Determine if a user can author lists & paths
+    Determine if a user can author public user lists & paths
 
     Args:
         user (User): a user

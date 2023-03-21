@@ -71,7 +71,7 @@ class AvailabilityType(Enum):
     archived = "Archived"  # displayed as "Prior"
 
 
-class ListType(Enum):
+class UserListType(Enum):
     """
     Enum for UserLists. User-created lists that are not Learning Paths are displayed
     to the user as "Your Lists"
@@ -79,6 +79,15 @@ class ListType(Enum):
 
     LEARNING_PATH = "learningpath"
     LIST = "userlist"
+
+
+class StaffListType(Enum):
+    """
+    Enum for StaffList objects; sorted = staffpath, unsorted = stafflist
+    """
+
+    PATH = "path"
+    LIST = "list"
 
 
 class PrivacyLevel(Enum):
@@ -241,3 +250,5 @@ OCW_DEPARTMENTS = {
     },
     "WGS": {"slug": "womens-and-gender-studies", "name": "Women's and Gender Studies"},
 }
+
+GROUP_STAFF_LISTS_EDITORS = "staff_list_editors"

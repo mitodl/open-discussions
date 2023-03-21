@@ -1,6 +1,7 @@
 """Custom permissions"""
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden, Redirect as PrawRedirect
+from prawcore.exceptions import Forbidden as PrawForbidden
+from prawcore.exceptions import Redirect as PrawRedirect
 from rest_framework import permissions
 
 from channels.models import Channel
@@ -24,15 +25,17 @@ def channel_exists(view):
     raise Http404()
 
 
-def is_staff_user(request):
+def is_admin_user(request):
     """
     Args:
         request (HTTPRequest): django request object
 
     Returns:
-        bool: True if user is staff
+        bool: True if user is staff/admin
     """
-    return request.user is not None and request.user.is_staff
+    return request.user is not None and (
+        request.user.is_staff or request.user.is_superuser
+    )
 
 
 def is_moderator(request, view):
@@ -103,7 +106,7 @@ class IsStaffPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role"""
-        return is_staff_user(request)
+        return is_admin_user(request)
 
 
 class IsStaffOrReadonlyPermission(permissions.BasePermission):
@@ -111,7 +114,7 @@ class IsStaffOrReadonlyPermission(permissions.BasePermission):
 
     def has_permission(self, request, view):
         """Returns True if the user has the staff role or if the request is readonly"""
-        return is_readonly(request) or is_staff_user(request)
+        return is_readonly(request) or is_admin_user(request)
 
 
 class IsStaffOrModeratorPermission(permissions.BasePermission):
@@ -121,7 +124,7 @@ class IsStaffOrModeratorPermission(permissions.BasePermission):
         """Returns True if the user has the staff role or is a moderator"""
 
         return channel_exists(view) and (
-            is_staff_user(request) or is_moderator(request, view)
+            is_admin_user(request) or is_moderator(request, view)
         )
 
 
@@ -132,7 +135,7 @@ class IsStaffModeratorOrReadonlyPermission(permissions.BasePermission):
         """Returns True if the user has the staff role, is a moderator, or the request is readonly"""
         return channel_exists(view) and (
             is_readonly(request)
-            or is_staff_user(request)
+            or is_admin_user(request)
             or is_moderator(request, view)
         )
 
@@ -159,7 +162,7 @@ class IsOwnSubscriptionOrAdminPermission(permissions.BasePermission):
         return (
             is_readonly(request)
             or self.is_own_resource_request(request, view)
-            or is_staff_user(request)
+            or is_admin_user(request)
             or is_moderator(request, view)
         )
 
@@ -178,7 +181,7 @@ class ContributorPermissions(permissions.BasePermission):
             and view.kwargs.get("contributor_name", None) == request.user.username
         ):
             return True
-        return is_staff_user(request) or (
+        return is_admin_user(request) or (
             (channel_is_mod_editable(view) or is_readonly(request))
             and is_moderator(request, view)
         )
@@ -192,7 +195,7 @@ class ModeratorPermissions(permissions.BasePermission):
     def has_permission(self, request, view):
         return channel_exists(view) and (
             is_readonly(request)
-            or is_staff_user(request)
+            or is_admin_user(request)
             or (channel_is_mod_editable(view) and is_moderator(request, view))
         )
 

@@ -9,8 +9,13 @@ import rapidjson
 import requests
 import yaml
 from django.conf import settings
+from django.contrib.auth.models import Group, User
 
-from course_catalog.constants import PlatformType, semester_mapping
+from course_catalog.constants import (
+    GROUP_STAFF_LISTS_EDITORS,
+    PlatformType,
+    semester_mapping,
+)
 from open_discussions.utils import generate_filepath
 
 log = logging.getLogger()
@@ -23,6 +28,13 @@ def user_list_image_upload_uri(instance, filename):
     return generate_filepath(
         filename, instance.author.username, instance.title, "user_list"
     )
+
+
+def staff_list_image_upload_uri(instance, filename):
+    """
+    upload_to handler for user-created UserList image
+    """
+    return generate_filepath(filename, "staff_list", instance.title, "")
 
 
 # NOTE: this is unused, but a migration references it, so we'll leave it until we decide to squash migrations or something
@@ -331,3 +343,12 @@ def parse_instructors(staff):
         instructors.append(instructor)
 
     return instructors
+
+
+def update_editor_group(user: User, is_editor: False):
+    """Assign or unassign user to staff list editors group"""
+    group, _ = Group.objects.get_or_create(name=GROUP_STAFF_LISTS_EDITORS)
+    if is_editor:
+        user.groups.add(group)
+    else:
+        user.groups.remove(group)

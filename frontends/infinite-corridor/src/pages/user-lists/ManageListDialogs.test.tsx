@@ -58,7 +58,7 @@ const inputs = {
 describe("Creation", () => {
   const setup = (
     opts: Partial<TestAppOptions> = {
-      user: { is_list_staff: true, is_authenticated: true }
+      user: { is_public_list_editor: true, is_authenticated: true }
     }
   ) => {
     const topics = factories.makeTopicsPaginated(5)
@@ -148,7 +148,7 @@ describe("Creation", () => {
 
   test("Userlists are private by default for non-staff", async () => {
     const { topics } = setup({
-      user: { is_authenticated: true, is_list_staff: false }
+      user: { is_authenticated: true, is_public_list_editor: false }
     })
 
     const userList = factories.makeUserList()
@@ -173,15 +173,15 @@ describe("Creation", () => {
 
   test.each([
     {
-      user:              { is_list_staff: true, is_authenticated: true },
+      user:              { is_public_list_editor: true, is_authenticated: true },
       hasPrivacyChoices: true
     },
     {
-      user:              { is_list_staff: false, is_authenticated: true },
+      user:              { is_public_list_editor: false, is_authenticated: true },
       hasPrivacyChoices: false
     }
   ])(
-    "Form has privacy options if and only if user.is_list_staff",
+    "Form has privacy options if and only if user.is_public_list_editor",
     ({ user, hasPrivacyChoices }) => {
       setup({ user })
       const publicChoice = screen.queryByText("Privacy")

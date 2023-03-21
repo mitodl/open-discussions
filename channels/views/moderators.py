@@ -15,7 +15,7 @@ from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ModeratorPermissions,
     is_moderator,
-    is_staff_user,
+    is_admin_user,
 )
 
 
@@ -32,7 +32,7 @@ class ModeratorListView(ListCreateAPIView):
         """
         return (
             ModeratorPrivateSerializer
-            if (is_staff_user(self.request) or is_moderator(self.request, self))
+            if (is_admin_user(self.request) or is_moderator(self.request, self))
             else ModeratorPublicSerializer
         )
 
