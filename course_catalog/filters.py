@@ -49,14 +49,10 @@ class CourseFilter(FilterSet):
         if value == "":
             return queryset
         else:
-            withcertificate_queryset = queryset.filter(
-                runs__availability__in=[
-                    AvailabilityType.current.value,
-                    AvailabilityType.upcoming.value,
-                    AvailabilityType.starting_soon.value,
-                ]).filter(
-                Q(platform=PlatformType.mitx.value) | Q(platform__in=PROFESSIONAL_COURSE_PLATFORMS),
-            )
+            professional_queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
+            mitx_queryset = queryset.filter(platform=PlatformType.mitx.value).exclude(
+                runs__availability=AvailabilityType.archived.value)
+            withcertificate_queryset = professional_queryset.union(mitx_queryset)
             if value:
                 return withcertificate_queryset
             else:
