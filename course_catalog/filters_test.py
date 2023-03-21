@@ -62,7 +62,9 @@ def test_course_filter_certificated():
     LearningResourceRunFactory.create(
         content_object=pro_course_with_cert, availability=AvailabilityType.current.value
     )
-    course_without_certificate = CourseFactory.create(platform=PlatformType.ocw.value, runs=None)
+    course_without_certificate = CourseFactory.create(
+        platform=PlatformType.ocw.value, runs=None
+    )
     LearningResourceRunFactory.create(
         content_object=course_without_certificate,
         availability=AvailabilityType.current.value,
