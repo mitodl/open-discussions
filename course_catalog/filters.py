@@ -1,5 +1,4 @@
 """Course Catalog Filters for API"""
-from django.db.models import Max
 from django_filters import BooleanFilter, ChoiceFilter, FilterSet
 
 from course_catalog.constants import AvailabilityType, OfferedBy, PlatformType
