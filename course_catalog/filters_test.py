@@ -35,3 +35,15 @@ def test_course_filter_audience():
 
     assert professional_course in query
     assert open_course not in query
+
+
+def test_course_filter_certificated():
+    """Test that the certificated filter works"""
+
+    course_with_certificate = CourseFactory.create()
+    course_without_certificate = CourseFactory.create()
+
+    query = CourseFilter({"certificated": "True"}).qs
+
+    assert course_with_certificate in query
+    assert course_without_certificate in query
