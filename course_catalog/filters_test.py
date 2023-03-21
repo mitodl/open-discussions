@@ -1,6 +1,5 @@
 """Tests for Course Catalog Filters"""
 import pytest
-from open_discussions.utils import now_in_utc
 
 from course_catalog.constants import AvailabilityType, OfferedBy, PlatformType
 from course_catalog.factories import (
@@ -41,6 +40,11 @@ def test_course_filter_audience():
     assert professional_course in query
     assert open_course not in query
 
+    open_query = CourseFilter({"audience": "open"}).qs
+
+    assert open_course in open_query
+    assert professional_course not in open_query
+
 
 def test_course_filter_certificated():
     """Test that the certificated filter works"""
@@ -58,9 +62,7 @@ def test_course_filter_certificated():
     LearningResourceRunFactory.create(
         content_object=pro_course_with_cert, availability=AvailabilityType.current.value
     )
-    course_without_certificate = CourseFactory.create(
-        platform=PlatformType.ocw.value, runs=None
-    )
+    course_without_certificate = CourseFactory.create(platform=PlatformType.ocw.value, runs=None)
     LearningResourceRunFactory.create(
         content_object=course_without_certificate,
         availability=AvailabilityType.current.value,
@@ -83,3 +85,10 @@ def test_course_filter_certificated():
     assert pro_course_with_cert not in negative_query
     assert course_without_certificate in negative_query
     assert archived_course in negative_query
+
+    empty_query = CourseFilter({"certificated": ""}).qs
+
+    assert course_with_certificate in empty_query
+    assert pro_course_with_cert in empty_query
+    assert course_without_certificate in empty_query
+    assert archived_course in empty_query
