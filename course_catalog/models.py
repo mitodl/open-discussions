@@ -320,7 +320,7 @@ class Course(AbstractCourse, LearningResourceGenericRelationsMixin):
     def certification(self):
         """Returns the certification for the course"""
         if self.platform in PROFESSIONAL_COURSE_PLATFORMS or (
-            self.platform == PlatformType.mitx.value
+            self.platform in [PlatformType.mitx.value, PlatformType.mitxonline.value]
             and any(
                 availability != AvailabilityType.archived.value
                 for availability in self.runs.values_list("availability", flat=True)

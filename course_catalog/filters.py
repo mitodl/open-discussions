@@ -50,7 +50,8 @@ class CourseFilter(FilterSet):
             return queryset
         else:
             professional_queryset = queryset.filter(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
-            mitx_queryset = queryset.filter(platform=PlatformType.mitx.value).exclude(
+            mitx_queryset = queryset.filter(platform__in=[PlatformType.mitx.value,
+                                                          PlatformType.mitxonline.value]).exclude(
                 runs__availability=AvailabilityType.archived.value)
             withcertificate_queryset = professional_queryset.union(mitx_queryset)
             if value:
