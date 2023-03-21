@@ -23,8 +23,8 @@ class CourseFilter(FilterSet):
     offered_by = ChoiceFilter(
         method="filter_offered_by", choices=OFFERED_BY_CHOICES, field_name="offered_by"
     )
-    certificated = BooleanFilter(
-        method="filter_certificated", field_name="certificated"
+    withcertificate = BooleanFilter(
+        method="filter_withcertificate", field_name="withcertificate"
     )
 
     class Meta:
@@ -43,7 +43,7 @@ class CourseFilter(FilterSet):
             queryset = queryset.exclude(platform__in=PROFESSIONAL_COURSE_PLATFORMS)
         return queryset
 
-    def filter_certificated(self, queryset, _, value):
+    def filter_withcertificate(self, queryset, _, value):
         """Certificate filter for courses"""
         if value == "":
             return queryset

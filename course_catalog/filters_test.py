@@ -46,8 +46,8 @@ def test_course_filter_audience():
     assert professional_course not in open_query
 
 
-def test_course_filter_certificated():
-    """Test that the certificated filter works"""
+def test_course_filter_withcertificate():
+    """Test that the withcertificate filter works"""
 
     course_with_certificate = CourseFactory.create(
         platform=PlatformType.mitx.value, runs=None
@@ -74,21 +74,21 @@ def test_course_filter_certificated():
         content_object=archived_course, availability=AvailabilityType.archived.value
     )
 
-    query = CourseFilter({"certificated": "True"}).qs
+    query = CourseFilter({"withcertificate": "True"}).qs
 
     assert course_with_certificate in query
     assert pro_course_with_cert in query
     assert course_without_certificate not in query
     assert archived_course not in query
 
-    negative_query = CourseFilter({"certificated": "False"}).qs
+    negative_query = CourseFilter({"withcertificate": "False"}).qs
 
     assert course_with_certificate not in negative_query
     assert pro_course_with_cert not in negative_query
     assert course_without_certificate in negative_query
     assert archived_course in negative_query
 
-    empty_query = CourseFilter({"certificated": ""}).qs
+    empty_query = CourseFilter({"withcertificate": ""}).qs
 
     assert course_with_certificate in empty_query
     assert pro_course_with_cert in empty_query
