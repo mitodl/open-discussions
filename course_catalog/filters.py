@@ -1,5 +1,6 @@
 """Course Catalog Filters for API"""
 from django_filters import BooleanFilter, ChoiceFilter, FilterSet
+from django.db.models import Q
 
 from course_catalog.constants import AvailabilityType, OfferedBy, PlatformType
 from course_catalog.models import (
@@ -48,24 +49,15 @@ class CourseFilter(FilterSet):
         if value == "":
             return queryset
         else:
-            qs1 = queryset.filter(
+            withcertificate_queryset = queryset.filter(
                 runs__availability__in=[
                     AvailabilityType.current.value,
                     AvailabilityType.upcoming.value,
                     AvailabilityType.starting_soon.value,
-                ],
-                platform=PlatformType.mitx.value,
+                ]).filter(
+                Q(platform=PlatformType.mitx.value) | Q(platform__in=PROFESSIONAL_COURSE_PLATFORMS),
             )
-            qs2 = queryset.filter(
-                runs__availability__in=[
-                    AvailabilityType.current.value,
-                    AvailabilityType.upcoming.value,
-                    AvailabilityType.starting_soon.value,
-                ],
-                platform__in=PROFESSIONAL_COURSE_PLATFORMS,
-            )
-            union_queryset = qs1.union(qs2)
             if value:
-                return union_queryset
+                return withcertificate_queryset
             else:
-                return queryset.difference(union_queryset)
+                return queryset.difference(withcertificate_queryset)
