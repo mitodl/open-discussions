@@ -19,9 +19,9 @@ const makeUserSettings: Factory<User> = (overrides = {}) => {
     calculated.id = faker.datatype.number()
   }
   return {
-    id:               null,
-    is_authenticated: false,
-    is_public_list_editor:    false,
+    id:                    null,
+    is_authenticated:      false,
+    is_public_list_editor: false,
     ...calculated,
     ...overrides
   }

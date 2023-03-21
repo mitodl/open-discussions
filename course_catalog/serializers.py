@@ -768,10 +768,9 @@ class StaffListSerializer(
             return stafflist
 
     def update(self, instance, validated_data):
-        """Ensure that the list is authored by the requesting user before modifying, and set topics"""
+        """Set stafflist topics and update the model object"""
         request = self.context.get("request")
         if request and hasattr(request, "user") and isinstance(request.user, User):
-            validated_data["author"] = request.user
             topics_data = validated_data.pop("topics", None)
             with transaction.atomic():
                 stafflist = super().update(instance, validated_data)

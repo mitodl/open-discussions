@@ -86,8 +86,8 @@ class StaffListType(Enum):
     Enum for StaffList objects; sorted = staffpath, unsorted = stafflist
     """
 
-    PATH = "staffpath"
-    LIST = "stafflist"
+    PATH = "path"
+    LIST = "list"
 
 
 class PrivacyLevel(Enum):

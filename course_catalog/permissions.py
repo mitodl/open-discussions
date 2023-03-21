@@ -99,7 +99,7 @@ class HasStaffListItemPermissions(BasePermission):
         return can_edit
 
     def has_object_permission(self, request, view, obj):
-        can_edit = is_staff_list_editor(request)
+        can_edit = is_staff_list_editor(request) or is_admin_user(request)
         if request.method in SAFE_METHODS:
             return obj.staff_list.privacy_level == PrivacyLevel.public.value or can_edit
         return can_edit

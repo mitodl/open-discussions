@@ -329,7 +329,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
         )
 
     def list(self, request, *args, **kwargs):
-        """Override default list to only get lists authored by user"""
+        """Get all stafflists for stafflist editors, public stafflists for all others"""
 
         if is_staff_list_editor(request):
             queryset = self.get_queryset()
