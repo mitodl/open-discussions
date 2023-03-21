@@ -158,6 +158,14 @@ const variantClasses: Record<CardVariant, string> = {
   "row-reverse": "ol-lrc-row-reverse"
 }
 
+/**
+ * A card display for Learning Resources. Includes a title, image, and various
+ * metadata.
+ *
+ * This template does not provide any meaningful user interaction by itself, but
+ * does accept props to build user interaction (e.g., `onActivate` and
+ * `footerActionSlot`).
+ */
 const LearningResourceCardTemplate = <R extends CardMinimalResource>({
   variant,
   resource,
