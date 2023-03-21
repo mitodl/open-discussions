@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.209.0
+Version 0.209.0 (Released March 21, 2023)
 ---------------
 
 - More improvements in memory usage for edx content archive processing (#3880)
