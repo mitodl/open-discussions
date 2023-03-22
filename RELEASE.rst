@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.209.1
+---------------
+
+- Set concurrency=4 (2x CPU) for the extra_worker_performance dyno in Procfile (#3889)
+- Staff lists: backend models and API (#3871)
+
 Version 0.209.0 (Released March 21, 2023)
 ---------------
 
