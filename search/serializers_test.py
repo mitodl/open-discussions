@@ -1,6 +1,5 @@
 """Tests for elasticsearch serializers"""
 from datetime import datetime
-
 # pylint: disable=redefined-outer-name,unused-argument
 from functools import reduce
 
@@ -59,7 +58,8 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    RESOURCE_FILE_TYPE, USER_LIST_TYPE,
+    RESOURCE_FILE_TYPE,
+    USER_LIST_TYPE,
 )
 from search.serializers import (
     ESCommentSerializer,

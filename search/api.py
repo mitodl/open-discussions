@@ -31,7 +31,6 @@ from search.constants import (
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
-    STAFF_LIST_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -264,9 +263,7 @@ def _apply_learning_query_filters(search, user):
             user_list_filter = user_list_filter | Q("term", author=user.id)
         search = search.filter(user_list_filter)
     else:
-        search = search.exclude(
-            Q("terms", object_type=[USER_LIST_TYPE])
-        )
+        search = search.exclude(Q("terms", object_type=[USER_LIST_TYPE]))
     if not features.is_enabled(features.PODCAST_SEARCH):
         # Exclude podcasts from the search results if the feature flag isn't enabled
         search = search.exclude(

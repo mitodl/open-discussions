@@ -50,12 +50,14 @@ from search.serializers import (
     serialize_bulk_profiles_for_deletion,
     serialize_bulk_programs,
     serialize_bulk_programs_for_deletion,
+    serialize_bulk_staff_lists,
+    serialize_bulk_staff_lists_for_deletion,
     serialize_bulk_user_lists,
     serialize_bulk_user_lists_for_deletion,
     serialize_bulk_videos,
     serialize_bulk_videos_for_deletion,
     serialize_content_file_for_bulk,
-    serialize_content_file_for_bulk_deletion, serialize_bulk_staff_lists_for_deletion, serialize_bulk_staff_lists,
+    serialize_content_file_for_bulk_deletion,
 )
 
 log = logging.getLogger(__name__)

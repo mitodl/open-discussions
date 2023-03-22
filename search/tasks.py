@@ -1,8 +1,8 @@
 """Indexing tasks"""
 # pylint: disable=too-many-lines
 
-from contextlib import contextmanager
 import logging
+from contextlib import contextmanager
 
 import celery
 from celery.exceptions import Ignore
@@ -11,47 +11,49 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from elasticsearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
-from prawcore.exceptions import PrawcoreException, NotFound
+from prawcore.exceptions import NotFound, PrawcoreException
 
-from channels.constants import LINK_TYPE_LINK, POST_TYPE, COMMENT_TYPE
+from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
 from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.models import (
+    ContentFile,
     Course,
+    Podcast,
+    PodcastEpisode,
     Program,
+    StaffList,
     UserList,
     Video,
-    ContentFile,
-    Podcast,
-    PodcastEpisode, StaffList,
 )
 from course_catalog.utils import load_course_blocklist
 from embedly.api import get_embedly_content
 from open_discussions.celery import app
-from open_discussions.utils import merge_strings, chunks, html_to_plain_text
+from open_discussions.utils import chunks, html_to_plain_text, merge_strings
 from profiles.models import Profile
 from search import indexing_api as api
 from search.api import gen_content_file_id, gen_course_id
 from search.constants import (
     COURSE_TYPE,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    VIDEO_TYPE,
+    RESOURCE_FILE_TYPE,
+    STAFF_LIST_TYPE,
     USER_LIST_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
-    RESOURCE_FILE_TYPE, STAFF_LIST_TYPE,
+    VIDEO_TYPE,
 )
-from search.exceptions import RetryException, ReindexException
+from search.exceptions import ReindexException, RetryException
 from search.serializers import (
-    ESCourseSerializer,
-    ESProgramSerializer,
-    ESProfileSerializer,
-    ESVideoSerializer,
-    ESUserListSerializer,
     ESContentFileSerializer,
-    ESPodcastSerializer,
+    ESCourseSerializer,
     ESPodcastEpisodeSerializer,
+    ESPodcastSerializer,
+    ESProfileSerializer,
+    ESProgramSerializer,
+    ESUserListSerializer,
+    ESVideoSerializer,
 )
 
 User = get_user_model()

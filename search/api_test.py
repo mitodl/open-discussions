@@ -364,9 +364,7 @@ def test_execute_learn_search(user, elasticsearch):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE
-                                                        ]
+                                                        "object_type": [USER_LIST_TYPE]
                                                     }
                                                 }
                                             ]
@@ -413,9 +411,7 @@ def test_execute_learn_search_anonymous(elasticsearch):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE
-                                                        ]
+                                                        "object_type": [USER_LIST_TYPE]
                                                     }
                                                 }
                                             ]
@@ -575,7 +571,8 @@ def test_transform_results(
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
-        author=UserFactory.create(), list_type=UserListType.LEARNING_PATH.value,
+        author=UserFactory.create(),
+        list_type=UserListType.LEARNING_PATH.value,
     )
     user_list = UserListFactory.create(author=user)
 
