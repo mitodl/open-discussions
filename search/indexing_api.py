@@ -30,8 +30,8 @@ from search.constants import (
     POST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
+    STAFF_LIST_TYPE,
     USER_LIST_TYPE,
-    USER_PATH_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
 )
@@ -220,7 +220,7 @@ COURSE_OBJECT_TYPE = {
 
 PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
 
-USER_LIST_OBJECT_TYPE = {
+LIST_OBJECT_TYPE = {
     **RESOURCE_RELATIONS,
     "audience": {"type": "keyword"},
     "certification": {"type": "keyword"},
@@ -232,6 +232,7 @@ USER_LIST_OBJECT_TYPE = {
     "author": {"type": "keyword"},
     "privacy_level": {"type": "keyword"},
     "list_type": {"type": "keyword"},
+    "object_type": {"type": "keyword"}.
     "created": {"type": "date"},
     "default_search_priority": {"type": "integer"},
     "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
@@ -282,8 +283,8 @@ MAPPING = {
     PROFILE_TYPE: PROFILE_OBJECT_TYPE,
     COURSE_TYPE: COURSE_OBJECT_TYPE,
     PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
-    USER_LIST_TYPE: USER_LIST_OBJECT_TYPE,
-    USER_PATH_TYPE: USER_LIST_OBJECT_TYPE,
+    USER_LIST_TYPE: LIST_OBJECT_TYPE,
+    STAFF_LIST_TYPE: LIST_OBJECT_TYPE,
     VIDEO_TYPE: VIDEO_OBJECT_TYPE,
     PODCAST_TYPE: PODCAST_OBJECT_TYPE,
     PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,
@@ -779,6 +780,29 @@ def delete_user_lists(ids):
 
     """
     delete_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
+
+
+def index_staff_lists(ids, update_only=False):
+    """
+    Index a list of staff lists by id
+
+    Args:
+        ids(list of int): List of StaffList id's
+        update_only (bool): Update existing index only
+
+    """
+    index_items(serialize_bulk_staff_lists(ids), STAFF_LIST_TYPE, update_only)
+
+
+def delete_staff_lists(ids):
+    """
+    Delete a list of staff lists by id
+
+    Args:
+        ids(list of int): List of StaffList ids
+
+    """
+    delete_items(serialize_bulk_staff_lists_for_deletion(ids), STAFF_LIST_TYPE, True)
 
 
 def index_videos(ids, update_only=False):
