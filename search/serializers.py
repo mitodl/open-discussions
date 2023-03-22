@@ -20,6 +20,7 @@ from course_catalog.models import (
     ContentFile,
     Podcast,
     PodcastEpisode,
+    StaffList,
 )
 
 from course_catalog.constants import PlatformType, OCW_DEPARTMENTS
@@ -32,6 +33,7 @@ from search.api import (
     gen_profile_id,
     gen_course_id,
     gen_user_list_id,
+    gen_staff_list_id,
     gen_program_id,
     gen_video_id,
     gen_content_file_id,
@@ -44,6 +46,7 @@ from search.constants import (
     PROGRAM_TYPE,
     VIDEO_TYPE,
     USER_LIST_TYPE,
+    STAFF_LIST_TYPE,
     RESOURCE_FILE_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
@@ -628,7 +631,7 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
 
 class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for user_lists
+    Elasticsearch serializer class for UserLists
     """
 
     default_search_priority = serializers.SerializerMethodField()
@@ -643,7 +646,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
         """Serializes the instance"""
         ret = super().to_representation(instance)
 
-        ret["object_type"] = instance.list_type
+        ret["object_type"] = USER_LIST_TYPE
         if not instance.image_src:
             first_item = (
                 instance.items.exclude(content_type__model=USER_LIST_TYPE)
@@ -665,6 +668,54 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
             "author",
             "list_type",
             "privacy_level",
+            "created",
+            "default_search_priority",
+            "minimum_price",
+            "audience",
+            "certification",
+        ]
+
+        read_only_fields = fields
+
+
+class ESStaffListSerializer(ESModelSerializer, LearningResourceSerializer):
+    """
+    Elasticsearch serializer class for StaffLists
+    """
+
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        Staff Lists should have lower priority in the default search
+        """
+        return 0
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+
+        ret["object_type"] = STAFF_LIST_TYPE
+        if not instance.image_src:
+            first_item = (
+                instance.items.exclude(content_type__model=STAFF_LIST_TYPE)
+                .order_by("position")
+                .first()
+            )
+            if first_item:
+                ret["image_src"] = first_item.item.image_src
+        return ret
+
+    class Meta:
+        model = StaffList
+        fields = [
+            "id",
+            "short_description",
+            "title",
+            "image_src",
+            "topics",
+            "author",
+            "list_type",
             "created",
             "default_search_priority",
             "minimum_price",
@@ -1048,13 +1099,48 @@ def serialize_user_list_for_bulk(user_list_obj):
 
 def serialize_bulk_user_lists_for_deletion(ids):
     """
-    Serialize programs for bulk deletion
+    Serialize user lists for bulk deletion
 
     Args:
-        ids(list of int): List of program id's
+        ids(list of int): List of user list id's
     """
     for user_list in UserList.objects.filter(id__in=ids):
         yield serialize_for_deletion(gen_user_list_id(user_list))
+
+
+def serialize_bulk_staff_lists(ids):
+    """
+    Serialize StaffLists for bulk indexing
+
+    Args:
+        ids(list of int): List of StaffList id's
+    """
+    for staff_list in StaffList.objects.filter(id__in=ids).prefetch_related("topics"):
+        yield serialize_staff_list_for_bulk(staff_list)
+
+
+def serialize_staff_list_for_bulk(staff_list_obj):
+    """
+    Serialize a StaffList for bulk API request
+
+    Args:
+        staff_list_obj (StaffList): A staff list
+    """
+    return {
+        "_id": gen_staff_list_id(staff_list_obj),
+        **ESStaffListSerializer(staff_list_obj).data,
+    }
+
+
+def serialize_bulk_staff_lists_for_deletion(ids):
+    """
+    Serialize staff lists for bulk deletion
+
+    Args:
+        ids(list of int): List of staff list id's
+    """
+    for staff_list in StaffList.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_staff_list_id(staff_list))
 
 
 def serialize_bulk_videos(ids):

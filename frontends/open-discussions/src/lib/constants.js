@@ -91,6 +91,7 @@ export const LR_TYPE_COURSE = "course"
 export const LR_TYPE_PROGRAM = "program"
 export const LR_TYPE_USERLIST = "userlist"
 export const LR_TYPE_LEARNINGPATH = "learningpath"
+export const LR_TYPE_STAFFLIST = "stafflist"
 export const LR_TYPE_VIDEO = "video"
 export const LR_TYPE_PODCAST = "podcast"
 export const LR_TYPE_PODCAST_EPISODE = "podcastepisode"
@@ -100,6 +101,7 @@ export const LR_TYPE_ALL = [
   LR_TYPE_COURSE,
   LR_TYPE_PROGRAM,
   LR_TYPE_USERLIST,
+  LR_TYPE_STAFFLIST,
   LR_TYPE_LEARNINGPATH,
   LR_TYPE_VIDEO,
   LR_TYPE_PODCAST,
@@ -111,6 +113,7 @@ export const OBJECT_TYPE_MAPPING = {
   [LR_TYPE_PROGRAM]:         LR_TYPE_PROGRAM,
   [LR_TYPE_USERLIST]:        LR_TYPE_USERLIST,
   [LR_TYPE_LEARNINGPATH]:    LR_TYPE_USERLIST,
+  [LR_TYPE_STAFFLIST]:       LR_TYPE_STAFFLIST,
   [LR_TYPE_VIDEO]:           LR_TYPE_VIDEO,
   [LR_TYPE_PODCAST]:         LR_TYPE_PODCAST,
   [LR_TYPE_PODCAST_EPISODE]: LR_TYPE_PODCAST_EPISODE
@@ -119,6 +122,7 @@ export const OBJECT_TYPE_MAPPING = {
 export const readableLearningResources = {
   [LR_TYPE_COURSE]:          "Course",
   [LR_TYPE_PROGRAM]:         "Program",
+  [LR_TYPE_STAFFLIST]:       "Staff List",
   [LR_TYPE_USERLIST]:        "Learning List",
   [LR_TYPE_LEARNINGPATH]:    "Learning Path",
   [LR_TYPE_VIDEO]:           "Video",

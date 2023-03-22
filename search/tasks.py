@@ -15,7 +15,7 @@ from prawcore.exceptions import PrawcoreException, NotFound
 
 from channels.constants import LINK_TYPE_LINK, POST_TYPE, COMMENT_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import PlatformType
+from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.models import (
     Course,
     Program,
@@ -23,7 +23,7 @@ from course_catalog.models import (
     Video,
     ContentFile,
     Podcast,
-    PodcastEpisode,
+    PodcastEpisode, StaffList,
 )
 from course_catalog.utils import load_course_blocklist
 from embedly.api import get_embedly_content
@@ -40,7 +40,7 @@ from search.constants import (
     USER_LIST_TYPE,
     PODCAST_TYPE,
     PODCAST_EPISODE_TYPE,
-    RESOURCE_FILE_TYPE,
+    RESOURCE_FILE_TYPE, STAFF_LIST_TYPE,
 )
 from search.exceptions import RetryException, ReindexException
 from search.serializers import (
@@ -267,6 +267,21 @@ def upsert_user_list(user_list_id):
         gen_user_list_id(user_list_obj),
         user_list_data,
         USER_LIST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+@app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
+def upsert_staff_list(staff_list_id):
+    """Upsert staff list based on stored database information"""
+    from search.api import gen_staff_list_id
+
+    staff_list_obj = UserList.objects.get(id=staff_list_id)
+    staff_list_data = ESUserListSerializer(staff_list_obj).data
+    api.upsert_document(
+        gen_staff_list_id(staff_list_obj),
+        staff_list_data,
+        STAFF_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
@@ -565,10 +580,10 @@ def index_user_lists(ids, update_only=False):
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def bulk_delete_user_lists(ids):
     """
-    Delete programs
+    Delete UserLists
 
     Args:
-        ids(list of int): List of program id's
+        ids(list of int): List of UserList id's
 
     """
     try:
@@ -577,6 +592,45 @@ def bulk_delete_user_lists(ids):
         raise
     except:  # pylint: disable=bare-except
         error = "bulk_delete_user_lists threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def index_staff_lists(ids, update_only=False):
+    """
+    Index StaffLists
+
+    Args:
+        ids(list of int): List of StaffList id's
+        update_only (bool): update existing index only
+
+    """
+    try:
+        api.index_staff_lists(ids, update_only)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = "index_user_lists threw an error"
+        log.exception(error)
+        return error
+
+
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
+def bulk_delete_staff_lists(ids):
+    """
+    Delete StaffLists
+
+    Args:
+        ids(list of int): List of StaffList id's
+
+    """
+    try:
+        api.delete_staff_lists(ids)
+    except (RetryException, Ignore):
+        raise
+    except:  # pylint: disable=bare-except
+        error = "bulk_delete_staff_lists threw an error"
         log.exception(error)
         return error
 
@@ -883,6 +937,9 @@ def start_update_index(self, indexes, platform):
         if USER_LIST_TYPE in indexes:
             index_tasks = index_tasks + get_update_user_lists_tasks()
 
+        if STAFF_LIST_TYPE in indexes:
+            index_tasks = index_tasks + get_update_staff_lists_tasks()
+
         if VIDEO_TYPE in indexes:
             index_tasks = index_tasks + get_update_videos_tasks()
 
@@ -1078,6 +1135,35 @@ def get_update_user_lists_tasks():
         for ids in chunks(
             UserList.objects.order_by("id")
             .filter(items=None)
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    return index_tasks
+
+
+def get_update_staff_lists_tasks():
+    """
+    Get list of tasks to update staff lists
+    """
+
+    index_tasks = [
+        index_staff_lists.si(ids, True)
+        for ids in chunks(
+            StaffList.objects.order_by("id")
+            .filter(privacy_level=PrivacyLevel.public.value)
+            .exclude(items=None)
+            .values_list("id", flat=True),
+            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+        )
+    ]
+
+    index_tasks = index_tasks + [
+        bulk_delete_user_lists.si(ids)
+        for ids in chunks(
+            StaffList.objects.order_by("id")
+            .filter(Q(items=None) | Q(privacy_level=PrivacyLevel.private.value))
             .values_list("id", flat=True),
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
         )

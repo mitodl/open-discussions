@@ -31,7 +31,7 @@ from search.constants import (
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
-    USER_PATH_TYPE,
+    STAFF_LIST_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -131,6 +131,19 @@ def gen_user_list_id(user_list_obj):
         str: The Elasticsearch document id for this object
     """
     return "user_list_{}".format(user_list_obj.id)
+
+
+def gen_staff_list_id(staff_list_obj):
+    """
+    Generates the Elasticsearch document id for a StaffList
+
+    Args:
+        staff_list_obj (StaffList): The StaffList object
+
+    Returns:
+        str: The Elasticsearch document id for this object
+    """
+    return "staff_list_{}".format(staff_list_obj.id)
 
 
 def gen_video_id(video_obj):
@@ -242,14 +255,18 @@ def _apply_learning_query_filters(search, user):
     Returns:
         elasticsearch_dsl.Search: Search object with filters applied
     """
-    # Search public lists (and user's own lists if logged in)
-    user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
-        "terms", object_type=[USER_LIST_TYPE, USER_PATH_TYPE]
-    )
-    if not user.is_anonymous:
-        user_list_filter = user_list_filter | Q("term", author=user.id)
-
-    search = search.filter(user_list_filter)
+    # Search public user lists (and user's own lists if logged in)
+    if features.is_enabled(features.USER_LIST_SEARCH):
+        user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
+            "terms", object_type=[USER_LIST_TYPE]
+        )
+        if not user.is_anonymous:
+            user_list_filter = user_list_filter | Q("term", author=user.id)
+        search = search.filter(user_list_filter)
+    else:
+        search = search.exclude(
+            Q("terms", object_type=[USER_LIST_TYPE])
+        )
     if not features.is_enabled(features.PODCAST_SEARCH):
         # Exclude podcasts from the search results if the feature flag isn't enabled
         search = search.exclude(
@@ -406,8 +423,8 @@ def transform_results(search_result, user, department_filters):
     if types:
         type_merges = dict(
             zip(
-                (PODCAST_EPISODE_TYPE, USER_PATH_TYPE),
-                (PODCAST_TYPE, USER_LIST_TYPE),
+                (PODCAST_EPISODE_TYPE,),
+                (PODCAST_TYPE,),
             )
         )
 
@@ -444,8 +461,6 @@ def transform_results(search_result, user, department_filters):
         for hit in search_result.get("hits", {}).get("hits", []):
             object_type = hit["_source"]["object_type"]
             if object_type in LEARNING_RESOURCE_TYPES:
-                if object_type == USER_PATH_TYPE:
-                    object_type = USER_LIST_TYPE
                 object_id = hit["_source"]["id"]
                 hit["_source"]["is_favorite"] = (object_type, object_id) in favorites
                 hit["_source"]["lists"] = get_list_items_by_resource(
@@ -563,8 +578,6 @@ def find_similar_resources(*, user, value_doc):
             else:
                 object_type = hit["object_type"]
                 if object_type in LEARNING_RESOURCE_TYPES:
-                    if object_type == USER_PATH_TYPE:
-                        object_type = USER_LIST_TYPE
                     object_id = hit["id"]
                     hit["is_favorite"] = (object_type, object_id) in favorites
                     hit["lists"] = get_list_items_by_resource(

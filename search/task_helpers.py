@@ -21,7 +21,7 @@ from search.api import (
     gen_user_list_id,
     gen_video_id,
     gen_podcast_id,
-    gen_podcast_episode_id,
+    gen_podcast_episode_id, gen_staff_list_id,
 )
 from search.constants import (
     PROFILE_TYPE,
@@ -30,7 +30,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
     PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
+    PODCAST_EPISODE_TYPE, STAFF_LIST_TYPE,
 )
 from search.serializers import ESPostSerializer, ESCommentSerializer
 from search import tasks
@@ -435,6 +435,28 @@ def delete_user_list(user_list_obj):
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
     delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def upsert_staff_list(staff_list_id):
+    """
+    Run a task to update all fields of a StaffList Elasticsearch document
+
+    Args:
+        staff_list_id (int): the primary key for the StaffList to update in ES
+    """
+    tasks.upsert_staff_list.delay(staff_list_id)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_staff_list(staff_list_obj):
+    """
+    Runs a task to delete an ES StaffList document
+
+    Args:
+        staff_list_obj (course_catalog.models.StaffList): A StaffList object
+    """
+    delete_document.delay(gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)

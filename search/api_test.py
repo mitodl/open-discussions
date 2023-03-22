@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from channels.api import add_user_role
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.factories.models import ChannelFactory
-from course_catalog.constants import PlatformType, PrivacyLevel
+from course_catalog.constants import PlatformType, PrivacyLevel, UserListType
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -42,7 +42,6 @@ from search.constants import (
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
-    USER_PATH_TYPE,
 )
 from search.serializers import (
     ESContentFileSerializer,
@@ -366,8 +365,7 @@ def test_execute_learn_search(user, elasticsearch):
                                                 {
                                                     "terms": {
                                                         "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            USER_PATH_TYPE,
+                                                            USER_LIST_TYPE
                                                         ]
                                                     }
                                                 }
@@ -416,8 +414,7 @@ def test_execute_learn_search_anonymous(elasticsearch):
                                                 {
                                                     "terms": {
                                                         "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            USER_PATH_TYPE,
+                                                            USER_LIST_TYPE
                                                         ]
                                                     }
                                                 }
@@ -578,7 +575,7 @@ def test_transform_results(
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
-        author=UserFactory.create(), list_type=USER_PATH_TYPE
+        author=UserFactory.create(), list_type=UserListType.LEARNING_PATH.value,
     )
     user_list = UserListFactory.create(author=user)
 
@@ -915,11 +912,8 @@ def test_transform_resource_type_aggregations():
 
 
 @pytest.mark.parametrize("podcast_present_in_aggregate", [True, False])
-@pytest.mark.parametrize("userlist_present_in_aggregate", [True, False])
 @pytest.mark.django_db
-def test_combine_type_buckets_in_aggregates(
-    podcast_present_in_aggregate, userlist_present_in_aggregate
-):
+def test_combine_type_buckets_in_aggregates(podcast_present_in_aggregate):
     """
     transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
     """
@@ -936,15 +930,7 @@ def test_combine_type_buckets_in_aggregates(
     else:
         type_buckets.append({"key": "podcastepisode", "doc_count": 2})
 
-    if userlist_present_in_aggregate:
-        type_buckets.extend(
-            [
-                {"key": "userlist", "doc_count": 2},
-                {"key": "learningpath", "doc_count": 1},
-            ]
-        )
-    else:
-        type_buckets.append({"key": "learningpath", "doc_count": 3})
+    type_buckets.append({"key": "userlist", "doc_count": 3})
 
     results = {
         "hits": {"hits": {}, "total": 15},

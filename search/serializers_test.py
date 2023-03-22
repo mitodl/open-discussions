@@ -59,7 +59,7 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    RESOURCE_FILE_TYPE,
+    RESOURCE_FILE_TYPE, USER_LIST_TYPE,
 )
 from search.serializers import (
     ESCommentSerializer,
@@ -594,7 +594,7 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
         serialized,
         {
             "author": user.id,
-            "object_type": list_type,
+            "object_type": USER_LIST_TYPE,
             "list_type": list_type,
             "privacy_level": privacy_level,
             "id": user_list.id,
@@ -627,7 +627,7 @@ def test_es_userlist_serializer_image_src():
         serialized,
         {
             "author": user_list.author.id,
-            "object_type": user_list.list_type,
+            "object_type": USER_LIST_TYPE,
             "list_type": user_list.list_type,
             "privacy_level": user_list.privacy_level,
             "id": user_list.id,

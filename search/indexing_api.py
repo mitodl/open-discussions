@@ -55,7 +55,7 @@ from search.serializers import (
     serialize_bulk_videos,
     serialize_bulk_videos_for_deletion,
     serialize_content_file_for_bulk,
-    serialize_content_file_for_bulk_deletion,
+    serialize_content_file_for_bulk_deletion, serialize_bulk_staff_lists_for_deletion, serialize_bulk_staff_lists,
 )
 
 log = logging.getLogger(__name__)
@@ -232,7 +232,7 @@ LIST_OBJECT_TYPE = {
     "author": {"type": "keyword"},
     "privacy_level": {"type": "keyword"},
     "list_type": {"type": "keyword"},
-    "object_type": {"type": "keyword"}.
+    "object_type": {"type": "keyword"},
     "created": {"type": "date"},
     "default_search_priority": {"type": "integer"},
     "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
