@@ -9,7 +9,7 @@ from prawcore.exceptions import NotFound, PrawcoreException
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
-from course_catalog.constants import PlatformType
+from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -17,7 +17,10 @@ from course_catalog.factories import (
     PodcastEpisodeFactory,
     PodcastFactory,
     ProgramFactory,
+    StaffListFactory,
+    StaffListItemFactory,
     UserListFactory,
+    UserListItemFactory,
     VideoFactory,
 )
 from open_discussions.factories import UserFactory
@@ -32,6 +35,7 @@ from search.api import (
     gen_program_id,
     gen_user_list_id,
     gen_video_id,
+    gen_staff_list_id,
 )
 from search.constants import (
     COMMENT_TYPE,
@@ -42,6 +46,7 @@ from search.constants import (
     PROFILE_TYPE,
     PROGRAM_TYPE,
     RESOURCE_FILE_TYPE,
+    STAFF_LIST_TYPE,
     USER_LIST_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
@@ -56,6 +61,7 @@ from search.serializers import (
     ESProgramSerializer,
     ESUserListSerializer,
     ESVideoSerializer,
+    ESStaffListSerializer,
 )
 from search.tasks import (
     create_document,
@@ -84,6 +90,9 @@ from search.tasks import (
     upsert_user_list,
     upsert_video,
     wrap_retry_exception,
+    upsert_staff_list,
+    index_staff_lists,
+    bulk_delete_staff_lists,
 )
 
 pytestmark = pytest.mark.django_db
@@ -170,6 +179,19 @@ def test_upsert_user_list_task(mocked_api):
         gen_user_list_id(user_list),
         data,
         USER_LIST_TYPE,
+        retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
+    )
+
+
+def test_upsert_staff_list_task(mocked_api):
+    """Test that upsert_staff_list will serialize the StaffList data and upsert it to the ES index"""
+    staff_list = StaffListFactory.create()
+    upsert_staff_list(staff_list.id)
+    data = ESStaffListSerializer(staff_list).data
+    mocked_api.upsert_document.assert_called_once_with(
+        gen_staff_list_id(staff_list),
+        data,
+        STAFF_LIST_TYPE,
         retry_on_conflict=settings.INDEXING_ERROR_RETRIES,
     )
 
@@ -349,12 +371,39 @@ def test_index_videos(
     index_videos_mock.assert_called_once_with([1, 2, 3], update_only)
 
 
+@pytest.mark.parametrize("with_error", [True, False])
+@pytest.mark.parametrize("update_only", [True, False])
+def test_index_staff_lists(mocker, with_error, update_only):
+    """index_staff_lists should call the api function of the same name"""
+    index_staff_lists_mock = mocker.patch("search.indexing_api.index_staff_lists")
+    if with_error:
+        index_staff_lists_mock.side_effect = TabError
+    result = index_staff_lists.delay([1, 2, 3], update_only).get()
+    assert result == ("index_staff_lists threw an error" if with_error else None)
+
+    index_staff_lists_mock.assert_called_once_with([1, 2, 3], update_only)
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_bulk_delete_staff_lists(mocker, with_error):  # pylint: disable=unused-argument
+    """bulk_delete_staff_lists should call the api function of the same name"""
+    bulk_delete_staff_lists_mock = mocker.patch(
+        "search.indexing_api.delete_staff_lists"
+    )
+    if with_error:
+        bulk_delete_staff_lists_mock.side_effect = TabError
+    result = bulk_delete_staff_lists.delay([1, 2, 3]).get()
+    assert result == ("bulk_delete_staff_lists threw an error" if with_error else None)
+
+    bulk_delete_staff_lists_mock.assert_called_once_with([1, 2, 3])
+
+
 @pytest.mark.parametrize(
     "indexes",
     [
         ["post", "comment", "profile"],
         ["course", "program"],
-        ["userlist"],
+        ["userlist", "stafflist"],
         ["video"],
         ["podcast", "podcastepisode"],
     ],
@@ -392,6 +441,18 @@ def test_start_recreate_index(
         PodcastEpisodeFactory.create_batch(4),
         key=lambda podcast_episode: podcast_episode.id,
     )
+    if USER_LIST_TYPE in indexes:
+        userlists = UserListFactory.create_batch(
+            4, privacy_level=PrivacyLevel.public.value
+        )
+        for userlist in userlists:
+            UserListItemFactory.create(user_list=userlist)
+    if STAFF_LIST_TYPE in indexes:
+        stafflists = StaffListFactory.create_batch(
+            4, privacy_level=PrivacyLevel.public.value
+        )
+        for stafflist in stafflists:
+            StaffListItemFactory.create(staff_list=stafflist)
     index_posts_mock = mocker.patch("search.tasks.index_posts", autospec=True)
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
@@ -403,6 +464,10 @@ def test_start_recreate_index(
     )
     index_course_content_mock = mocker.patch(
         "search.tasks.index_course_content_files", autospec=True
+    )
+    index_userlists_mock = mocker.patch("search.tasks.index_user_lists", autospec=True)
+    index_stafflists_mock = mocker.patch(
+        "search.tasks.index_staff_lists", autospec=True
     )
     backing_index = "backing"
     create_backing_index_mock = mocker.patch(
@@ -499,6 +564,16 @@ def test_start_recreate_index(
         index_podcast_episodes_mock.si.assert_any_call(
             [podcast_episodes[2].id, podcast_episodes[3].id]
         )
+
+    if USER_LIST_TYPE in indexes:
+        assert index_userlists_mock.si.call_count == 2
+        index_userlists_mock.si.assert_any_call([userlists[0].id, userlists[1].id])
+        index_userlists_mock.si.assert_any_call([userlists[2].id, userlists[3].id])
+
+    if STAFF_LIST_TYPE in indexes:
+        assert index_stafflists_mock.si.call_count == 2
+        index_stafflists_mock.si.assert_any_call([stafflists[0].id, stafflists[1].id])
+        index_stafflists_mock.si.assert_any_call([stafflists[2].id, stafflists[3].id])
 
     assert mocked_celery.replace.call_count == 1
     assert mocked_celery.replace.call_args[0][1] == mocked_celery.chain.return_value

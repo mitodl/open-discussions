@@ -30,7 +30,7 @@ import type {
   ListItem,
   Video
 } from "../flow/discussionTypes"
-import {TYPE_USER_LIST} from "ol-search-ui";
+import { TYPE_USER_LIST } from "ol-search-ui"
 
 const incrCourse = incrementer()
 const courseId: any = incrementer()
@@ -225,7 +225,7 @@ export const makeLearningResource = (object_type: string): Object =>
 
 export const makeLearningPath = R.compose(
   R.merge({
-    list_type:   LR_TYPE_LEARNINGPATH
+    list_type: LR_TYPE_LEARNINGPATH
   }),
   makeUserList
 )

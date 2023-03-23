@@ -13,7 +13,8 @@ import {
   Course,
   UserList,
   UserListItem,
-  PrivacyLevel, TYPE_USER_LIST
+  PrivacyLevel,
+  TYPE_USER_LIST
 } from "./interfaces"
 
 import { times } from "lodash"

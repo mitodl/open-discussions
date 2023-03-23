@@ -53,7 +53,7 @@ from search.serializers import (
     ESProfileSerializer,
     ESProgramSerializer,
     ESUserListSerializer,
-    ESVideoSerializer,
+    ESVideoSerializer, ESStaffListSerializer,
 )
 
 User = get_user_model()
@@ -278,8 +278,8 @@ def upsert_staff_list(staff_list_id):
     """Upsert staff list based on stored database information"""
     from search.api import gen_staff_list_id
 
-    staff_list_obj = UserList.objects.get(id=staff_list_id)
-    staff_list_data = ESUserListSerializer(staff_list_obj).data
+    staff_list_obj = StaffList.objects.get(id=staff_list_id)
+    staff_list_data = ESStaffListSerializer(staff_list_obj).data
     api.upsert_document(
         gen_staff_list_id(staff_list_obj),
         staff_list_data,
@@ -613,7 +613,7 @@ def index_staff_lists(ids, update_only=False):
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "index_user_lists threw an error"
+        error = "index_staff_lists threw an error"
         log.exception(error)
         return error
 
