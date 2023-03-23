@@ -130,7 +130,7 @@
       "description": "Number of shards to allocate when creating an Elasticsearch index. Generally set to the CPU count of an individual node in the cluster.",
       "required": false
     },
-    "ELASTICSEARC_REPLICA_COUNT": {
+    "ELASTICSEARCH_REPLICA_COUNT": {
       "description": "Number of index replicas to create when initializing a new Elasticsearch index. Generally set to the number of search nodes available in the cluster.",
       "required": false
     },
