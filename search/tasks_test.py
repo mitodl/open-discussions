@@ -1,91 +1,90 @@
 """Search task tests"""
 # pylint: disable=redefined-outer-name,unused-argument
 
+import pytest
 from django.conf import settings
 from praw.exceptions import PRAWException
-from prawcore.exceptions import PrawcoreException, NotFound
-import pytest
+from prawcore.exceptions import NotFound, PrawcoreException
 
+from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
-from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from course_catalog.constants import PlatformType
 from course_catalog.factories import (
-    CourseFactory,
-    ProgramFactory,
-    VideoFactory,
-    UserListFactory,
     ContentFileFactory,
+    CourseFactory,
     LearningResourceRunFactory,
-    PodcastFactory,
     PodcastEpisodeFactory,
+    PodcastFactory,
+    ProgramFactory,
+    UserListFactory,
+    VideoFactory,
 )
 from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_not_raises
+from search import tasks
 from search.api import (
-    gen_course_id,
-    gen_program_id,
-    gen_video_id,
-    gen_user_list_id,
-    gen_profile_id,
     gen_content_file_id,
-    gen_podcast_id,
+    gen_course_id,
     gen_podcast_episode_id,
+    gen_podcast_id,
+    gen_profile_id,
+    gen_program_id,
+    gen_user_list_id,
+    gen_video_id,
 )
 from search.constants import (
-    COURSE_TYPE,
-    POST_TYPE,
-    PROGRAM_TYPE,
     COMMENT_TYPE,
+    COURSE_TYPE,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    POST_TYPE,
+    PROFILE_TYPE,
+    PROGRAM_TYPE,
+    RESOURCE_FILE_TYPE,
+    USER_LIST_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
-    USER_LIST_TYPE,
-    PROFILE_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
-    RESOURCE_FILE_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
-    ESCourseSerializer,
-    ESProgramSerializer,
-    ESVideoSerializer,
-    ESUserListSerializer,
-    ESProfileSerializer,
     ESContentFileSerializer,
-    ESPodcastSerializer,
+    ESCourseSerializer,
     ESPodcastEpisodeSerializer,
+    ESPodcastSerializer,
+    ESProfileSerializer,
+    ESProgramSerializer,
+    ESUserListSerializer,
+    ESVideoSerializer,
 )
-from search import tasks
 from search.tasks import (
     create_document,
     create_post_document,
-    update_link_post_with_preview,
-    update_document_with_partial,
+    delete_document,
+    delete_run_content_files,
     finish_recreate_index,
     increment_document_integer_field,
-    update_field_values_by_query,
-    index_posts,
-    start_recreate_index,
-    wrap_retry_exception,
     index_comments,
-    index_courses,
-    index_videos,
-    delete_document,
-    upsert_course,
-    upsert_program,
-    upsert_video,
-    upsert_user_list,
-    upsert_profile,
-    upsert_content_file,
     index_course_content_files,
+    index_courses,
+    index_posts,
     index_run_content_files,
-    delete_run_content_files,
+    index_videos,
+    start_recreate_index,
+    start_update_index,
+    update_document_with_partial,
+    update_field_values_by_query,
+    update_link_post_with_preview,
+    upsert_content_file,
+    upsert_course,
     upsert_podcast,
     upsert_podcast_episode,
-    start_update_index,
+    upsert_profile,
+    upsert_program,
+    upsert_user_list,
+    upsert_video,
+    wrap_retry_exception,
 )
-
 
 pytestmark = pytest.mark.django_db
 

@@ -234,7 +234,6 @@ LIST_OBJECT_TYPE = {
     "author": {"type": "keyword"},
     "privacy_level": {"type": "keyword"},
     "list_type": {"type": "keyword"},
-    "object_type": {"type": "keyword"},
     "created": {"type": "date"},
     "default_search_priority": {"type": "integer"},
     "minimum_price": {"type": "scaled_float", "scaling_factor": 100},

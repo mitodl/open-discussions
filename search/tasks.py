@@ -854,6 +854,18 @@ def start_recreate_index(self, indexes):
                 )
             ]
 
+        if STAFF_LIST_TYPE in indexes:
+            index_tasks = index_tasks + [
+                index_staff_lists.si(ids)
+                for ids in chunks(
+                    StaffList.objects.order_by("id")
+                    .filter(privacy_level=PrivacyLevel.public.value)
+                    .exclude(items=None)
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+
         if VIDEO_TYPE in indexes:
             index_tasks = index_tasks + [
                 index_videos.si(ids)

@@ -13,7 +13,7 @@ import {
   Course,
   UserList,
   UserListItem,
-  PrivacyLevel
+  PrivacyLevel, TYPE_USER_LIST
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -149,7 +149,7 @@ export const makeUserList: Factory<UserList> = overrides => {
       faker.lorem.sentence()
     ]),
     item_count:    faker.datatype.number({ min: 2, max: 5 }),
-    object_type:   type,
+    object_type:   TYPE_USER_LIST,
     list_type:     type,
     privacy_level: faker.helpers.arrayElement([
       PrivacyLevel.Public,

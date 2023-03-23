@@ -21,6 +21,7 @@ export enum LearningResourceType {
  * to a UserList.)
  */
 export const TYPE_FAVORITES = "favorites"
+export const TYPE_USER_LIST = "userlist"
 
 export enum PrivacyLevel {
   Public = "public",
@@ -68,7 +69,7 @@ export interface UserList extends LearningResource {
   author: number
   author_name: string
   item_count: number
-  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
+  object_type: typeof TYPE_USER_LIST
 }
 
 export interface Favorites

@@ -2,59 +2,57 @@
 # pylint: disable=unused-argument,too-many-lines
 import logging
 import re
-
 from functools import reduce
+
 from django.db.models import Prefetch
 from prawcore import NotFound
 from rest_framework import serializers
 
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import COMMENT_TYPE, POST_TYPE
 from channels.models import Comment, Post
+from course_catalog.constants import OCW_DEPARTMENTS, PlatformType
 from course_catalog.models import (
-    Course,
-    LearningResourceRun,
-    CoursePrice,
-    Program,
-    UserList,
-    Video,
     ContentFile,
+    Course,
+    CoursePrice,
+    LearningResourceRun,
     Podcast,
     PodcastEpisode,
+    Program,
     StaffList,
+    UserList,
+    Video,
 )
-
-from course_catalog.constants import PlatformType, OCW_DEPARTMENTS
-from profiles.api import get_channels, get_channel_join_dates
+from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
+from profiles.api import get_channel_join_dates, get_channels
 from profiles.models import Profile
 from profiles.utils import image_uri
 from search.api import (
-    gen_post_id,
     gen_comment_id,
-    gen_profile_id,
-    gen_course_id,
-    gen_user_list_id,
-    gen_staff_list_id,
-    gen_program_id,
-    gen_video_id,
     gen_content_file_id,
-    gen_podcast_id,
+    gen_course_id,
     gen_podcast_episode_id,
+    gen_podcast_id,
+    gen_post_id,
+    gen_profile_id,
+    gen_program_id,
+    gen_staff_list_id,
+    gen_user_list_id,
+    gen_video_id,
 )
 from search.constants import (
-    PROFILE_TYPE,
     COURSE_TYPE,
-    PROGRAM_TYPE,
-    VIDEO_TYPE,
-    USER_LIST_TYPE,
-    STAFF_LIST_TYPE,
-    RESOURCE_FILE_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
     OCW_SECTION_TYPE_MAPPING,
     OCW_TYPE_ASSIGNMENTS,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    PROFILE_TYPE,
+    PROGRAM_TYPE,
+    RESOURCE_FILE_TYPE,
+    STAFF_LIST_TYPE,
+    USER_LIST_TYPE,
+    VIDEO_TYPE,
 )
-
-from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 log = logging.getLogger()
 

@@ -255,7 +255,7 @@ def _apply_learning_query_filters(search, user):
         elasticsearch_dsl.Search: Search object with filters applied
     """
     # Search public user lists (and user's own lists if logged in)
-    if features.is_enabled(features.USER_LIST_SEARCH):
+    if True:  # features.is_enabled(features.USER_LIST_SEARCH):
         user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
             "terms", object_type=[USER_LIST_TYPE]
         )
