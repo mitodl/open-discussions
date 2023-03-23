@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.210.0
+---------------
+
+- fix: Nonbreaking typo in app.json for new  env var. (#3895)
+- Open discussions Elastic/Opensearch performance updates (#3843)
+
 Version 0.209.1 (Released March 23, 2023)
 ---------------
 
