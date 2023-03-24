@@ -49,7 +49,7 @@ const variantProps = { InputLabelProps: { shrink: true } }
 
 const LIST_TYPE_CHOICES = [
   {
-    value: UserListType.List,
+    value: LRType.Userlist,
     label: (
       <>
         <span className="option-header">Learning List</span>
@@ -61,7 +61,7 @@ const LIST_TYPE_CHOICES = [
     className: "radio-option"
   },
   {
-    value: UserListType.Path,
+    value: LRType.LearningPath,
     label: (
       <>
         <span className="option-header">Learning Path</span>

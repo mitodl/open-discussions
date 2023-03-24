@@ -5,14 +5,10 @@ export enum LearningResourceType {
   Course = "course",
   Program = "program",
   Userlist = "userlist",
+  LearningPath = "learningpath",
   Video = "video",
   Podcast = "podcast",
   PodcastEpisode = "podcastepisode"
-}
-
-export enum UserListType {
-  List = "userlist",
-  Path = "learningpath"
 }
 
 /**
@@ -72,7 +68,7 @@ export interface UserList extends LearningResource {
   author: number
   author_name: string
   item_count: number
-  object_type: LearningResourceType.Userlist
+  object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
 }
 
 export interface Favorites

@@ -89,6 +89,7 @@ const ResourceFooterDetails: React.FC<
 > = ({ resource }) => {
   const isList = [
     LearningResourceType.Userlist,
+    LearningResourceType.LearningPath,
     TYPE_FAVORITES
   ].includes(resource.object_type)
   if (isList && resource.item_count !== undefined) {

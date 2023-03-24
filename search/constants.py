@@ -7,6 +7,7 @@ COURSE_TYPE = "course"
 RESOURCE_FILE_TYPE = "resourcefile"
 PROGRAM_TYPE = "program"
 USER_LIST_TYPE = "userlist"
+USER_PATH_TYPE = "learningpath"
 STAFF_LIST_TYPE = "stafflist"
 VIDEO_TYPE = "video"
 PODCAST_TYPE = "podcast"
@@ -16,6 +17,7 @@ LEARNING_RESOURCE_TYPES = (
     COURSE_TYPE,
     PROGRAM_TYPE,
     USER_LIST_TYPE,
+    USER_PATH_TYPE,
     STAFF_LIST_TYPE,
     VIDEO_TYPE,
     PODCAST_TYPE,

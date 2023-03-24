@@ -121,17 +121,19 @@ describe("learning resource queries", () => {
   LR_TYPE_ALL.forEach(resourceType => {
     it(`similarResourcesRequest allows fetching similar resources for a ${resourceType}`, () => {
       const resource = makeLearningResource(resourceType)
+      const objectType =
+        resourceType === LR_TYPE_LEARNINGPATH ? LR_TYPE_USERLIST : resourceType
       const request = similarResourcesRequest(resource)
       assert.equal(request.url, similarResourcesURL)
       assert.deepEqual(request.body, {
         id:                resource.id,
-        object_type:       resourceType,
+        object_type:       objectType,
         title:             resource.title,
         short_description: resource.short_description
       })
       assert.deepEqual(request.transform({ id: "foobar" }), {
         similarResources: {
-          [`${resourceType}_${resource.id}`]: { id: "foobar" }
+          [`${objectType}_${resource.id}`]: { id: "foobar" }
         }
       })
     })

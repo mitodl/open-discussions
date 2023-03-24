@@ -32,15 +32,15 @@ const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
 /**
  * Helpers to find various inputs.
  *
- * E.g., `inputs.object_type[UserListType.Path]()` will return
+ * E.g., `inputs.object_type[LearningResourceType.LearningPath]()` will return
  * radio button for "Learning Path".
  *
  */
 const inputs = {
   list_type: {
-    [UserListType.Path]: () =>
+    [LearningResourceType.LearningPath]: () =>
       screen.getByLabelText("Learning Path", { exact: false }),
-    [UserListType.List]: () =>
+    [LearningResourceType.Userlist]: () =>
       screen.getByLabelText("Learning List", { exact: false })
   },
   privacy_level: {
@@ -91,7 +91,7 @@ describe("Creation", () => {
 
     const userList = factories.makeUserList({
       short_description: faker.lorem.paragraph(),
-      topics:            [faker.helpers.arrayElement(topics.results)],
+      topics:            [faker.helpers.arrayElement(topics.results)]
     })
 
     await fillInForm(userList)

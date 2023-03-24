@@ -30,7 +30,6 @@ import type {
   ListItem,
   Video
 } from "../flow/discussionTypes"
-import { TYPE_USER_LIST } from "ol-search-ui"
 
 const incrCourse = incrementer()
 const courseId: any = incrementer()
@@ -157,8 +156,8 @@ export const makeUserList = (): UserList => ({
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   item_count:        3,
-  object_type:       LR_TYPE_USERLIST,
-  list_type:         casual.random_element(["userlist", "learningpath"]),
+  object_type:       "userlist",
+  list_type:         "userlist",
   profile_img:       casual.url,
   profile_name:      casual.name,
   privacy_level:     casual.random_element(["public", "private"]),
@@ -225,7 +224,8 @@ export const makeLearningResource = (object_type: string): Object =>
 
 export const makeLearningPath = R.compose(
   R.merge({
-    list_type: LR_TYPE_LEARNINGPATH
+    list_type:   LR_TYPE_LEARNINGPATH,
+    object_type: LR_TYPE_LEARNINGPATH
   }),
   makeUserList
 )

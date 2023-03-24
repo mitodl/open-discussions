@@ -604,7 +604,7 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
         serialized,
         {
             "author": user.id,
-            "object_type": USER_LIST_TYPE,
+            "object_type": list_type,
             "list_type": list_type,
             "privacy_level": privacy_level,
             "id": user_list.id,

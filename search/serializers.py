@@ -644,7 +644,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
         """Serializes the instance"""
         ret = super().to_representation(instance)
 
-        ret["object_type"] = USER_LIST_TYPE
+        ret["object_type"] = instance.list_type
         if not instance.image_src:
             first_item = (
                 instance.items.exclude(content_type__model=USER_LIST_TYPE)

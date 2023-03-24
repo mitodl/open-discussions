@@ -623,6 +623,7 @@ class BaseListSerializer(serializers.Serializer):
     item_count = serializers.SerializerMethodField()
     topics = WriteableSerializerMethodField()
     author_name = serializers.SerializerMethodField()
+    object_type = serializers.CharField(read_only=True, source="list_type")
     image_src = serializers.SerializerMethodField()
     audience = serializers.ReadOnlyField()
     certification = serializers.ReadOnlyField()
@@ -680,7 +681,6 @@ class UserListSerializer(
     """
     Simplified serializer for UserList model.
     """
-    object_type = serializers.CharField(default=USER_LIST_TYPE, read_only=True)
 
     def validate_list_type(self, list_type):
         """
@@ -745,8 +745,6 @@ class StaffListSerializer(
     ListsSerializerMixin,
 ):
     """Serlalizer for StaffList model"""
-
-    object_type = serializers.CharField(default=STAFF_LIST_TYPE, read_only=True)
 
     def validate_privacy_level(self, privacy_level):
         """

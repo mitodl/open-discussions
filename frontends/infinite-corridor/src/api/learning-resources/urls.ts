@@ -89,6 +89,8 @@ const resourceUrls = {
       return podcastEpisodeUrls.details(id)
     case LRT.Userlist:
       return userListUrls.details(id)
+    case LRT.LearningPath:
+      return userListUrls.details(id) // LearningPaths are handled by UserList api
     default:
       throw new Error(`Unknown resource type: ${type}`)
     }

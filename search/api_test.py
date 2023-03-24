@@ -364,7 +364,10 @@ def test_execute_learn_search(user, elasticsearch):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [USER_LIST_TYPE]
+                                                        "object_type": [
+                                                            USER_LIST_TYPE,
+                                                            USER_PATH_TYPE,
+                                                        ]
                                                     }
                                                 }
                                             ]
@@ -411,7 +414,10 @@ def test_execute_learn_search_anonymous(elasticsearch):
                                             "must_not": [
                                                 {
                                                     "terms": {
-                                                        "object_type": [USER_LIST_TYPE]
+                                                        "object_type": [
+                                                            USER_LIST_TYPE,
+                                                            USER_PATH_TYPE,
+                                                        ]
                                                     }
                                                 }
                                             ]
@@ -571,8 +577,7 @@ def test_transform_results(
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
-        author=UserFactory.create(),
-        list_type=UserListType.LEARNING_PATH.value,
+        author=UserFactory.create(), list_type=USER_PATH_TYPE
     )
     user_list = UserListFactory.create(author=user)
 
@@ -909,8 +914,11 @@ def test_transform_resource_type_aggregations():
 
 
 @pytest.mark.parametrize("podcast_present_in_aggregate", [True, False])
+@pytest.mark.parametrize("userlist_present_in_aggregate", [True, False])
 @pytest.mark.django_db
-def test_combine_type_buckets_in_aggregates(podcast_present_in_aggregate):
+def test_combine_type_buckets_in_aggregates(
+    podcast_present_in_aggregate, userlist_present_in_aggregate
+):
     """
     transform_results should merge podcasts and podcast episodes and userlists and learning resources in the aggregate data
     """
@@ -927,7 +935,15 @@ def test_combine_type_buckets_in_aggregates(podcast_present_in_aggregate):
     else:
         type_buckets.append({"key": "podcastepisode", "doc_count": 2})
 
-    type_buckets.append({"key": "userlist", "doc_count": 3})
+    if userlist_present_in_aggregate:
+        type_buckets.extend(
+            [
+                {"key": "userlist", "doc_count": 2},
+                {"key": "learningpath", "doc_count": 1},
+            ]
+        )
+    else:
+        type_buckets.append({"key": "learningpath", "doc_count": 3})
 
     results = {
         "hits": {"hits": {}, "total": 15},
