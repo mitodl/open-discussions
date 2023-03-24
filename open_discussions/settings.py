@@ -588,43 +588,43 @@ CELERY_BEAT_SCHEDULE = {
         "task": "notifications.tasks.send_weekly_frontpage_digests",
         "schedule": crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
     },
-    "update_edx-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_mitx_data",
-        "schedule": crontab(minute=30, hour=13),  # 9:30am EST
-    },
-    "update-edx-files-every-1-days": {
-        "task": "course_catalog.tasks.import_all_mitx_files",
-        "schedule": crontab(minute=00, hour=14),  # 10:00 AM EST
-    },
     "update-micromasters-courses-every-1-days": {
         "task": "course_catalog.tasks.get_micromasters_data",
-        "schedule": crontab(minute=30, hour=16),  # 12:30pm EST
+        "schedule": crontab(minute=00, hour=15),  # 11:00am EST
+    },
+    "update_edx-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_mitx_data",
+        "schedule": crontab(minute=30, hour=15),  # 11:30am EST
+    },
+    "update-xpro-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_xpro_data",
+        "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
+    },
+    "update-mitxonline-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_mitxonline_data",
+        "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
+    },
+    "update-edx-files-every-1-weeks": {
+        "task": "course_catalog.tasks.import_all_mitx_files",
+        "schedule": crontab(minute=0, hour=16, day_of_week=1),  # 12:00 PM EST on Mondays
+    },
+    "update-xpro-files-every-1-weeks": {
+        "task": "course_catalog.tasks.import_all_xpro_files",
+        "schedule": crontab(minute=0, hour=16, day_of_week=2),  # 12:00 PM EST on Tuesdays
+    },
+    "update-mitxonline-files-every-1-weeks": {
+        "task": "course_catalog.tasks.import_all_mitxonline_files",
+        "schedule": crontab(minute=0,  hour=16, day_of_week=3),  # 12:00 PM EST on Wednesdays
+    },
+    "update-oll-courses-every-1-days": {
+        "task": "course_catalog.tasks.get_oll_data",
+        "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
     },
     "update-podcasts": {
         "task": "course_catalog.tasks.get_podcast_data",
         "schedule": get_int(
             "PODCAST_FETCH_SCHEDULE_SECONDS", 60 * 60 * 2
         ),  # default is every 2 hours
-    },
-    "update-xpro-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_xpro_data",
-        "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
-    },
-    "update-xpro-files-every-1-days": {
-        "task": "course_catalog.tasks.import_all_xpro_files",
-        "schedule": crontab(minute=0, hour=18),  # 2:00pm EST
-    },
-    "update-mitxonline-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_mitxonline_data",
-        "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
-    },
-    "update-mitxonline-files-every-1-days": {
-        "task": "course_catalog.tasks.import_all_mitxonline_files",
-        "schedule": crontab(minute=30, hour=20),  # 4:30pm EST
-    },
-    "update-oll-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_oll_data",
-        "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
     },
     "update-prolearn-courses-every-1-days": {
         "task": "course_catalog.tasks.get_prolearn_data",
