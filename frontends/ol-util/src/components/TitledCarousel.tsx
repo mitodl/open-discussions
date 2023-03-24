@@ -6,7 +6,7 @@ import styled from "styled-components"
 
 type TitledCarouselProps = {
   children: React.ReactNode
-  title: React.ReactNode
+  title?: React.ReactNode
   as?: ElementType
   className?: string
   carouselClassName?: string
@@ -31,6 +31,8 @@ type TitledCarouselProps = {
    * `onClick` will be added.
    */
   next?: React.ReactElement
+
+  showNavigationButtons?: boolean
 }
 
 const HeaderContainer = styled.div`
@@ -59,7 +61,8 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
   animationDuration = defaultAnimationDuration,
   as: ContainerComponent = "div",
   previous = <button>Previous</button>,
-  next = <button>Next</button>
+  next = <button>Next</button>,
+  showNavigationButtons = true
 }) => {
   const wasButtonChange = useRef(false)
   const [index, setIndex] = useState(0)
@@ -90,16 +93,18 @@ const TitledCarousel: React.FC<TitledCarouselProps> = ({
     <ContainerComponent className={className}>
       <HeaderContainer className={headerClassName}>
         {title}
-        <ButtonsContainer>
-          {React.cloneElement(previous, {
-            disabled: !canPageDown,
-            onClick:  pageDown
-          })}
-          {React.cloneElement(next, {
-            disabled: !canPageUp,
-            onClick:  pageUp
-          })}
-        </ButtonsContainer>
+        {showNavigationButtons && (
+          <ButtonsContainer>
+            {React.cloneElement(previous, {
+              disabled: !canPageDown,
+              onClick:  pageDown
+            })}
+            {React.cloneElement(next, {
+              disabled: !canPageUp,
+              onClick:  pageUp
+            })}
+          </ButtonsContainer>
+        )}
       </HeaderContainer>
       <Carousel
         slideIndex={index}

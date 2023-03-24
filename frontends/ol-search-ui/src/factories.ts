@@ -285,6 +285,13 @@ export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
 
 export const makeTopicsPaginated = makePaginatedFactory(makeTopic)
 
+export const makeCoursesPaginated = makePaginatedFactory(makeCourse)
+
+export const makeVideosPaginated = makePaginatedFactory(makeVideo)
+
+export const makeLearningResourcesPaginated =
+  makePaginatedFactory(makeLearningResource)
+
 export const makeImgConfig: Factory<EmbedlyConfig> = overrides => {
   const imgConfig = {
     width:      faker.datatype.number(),

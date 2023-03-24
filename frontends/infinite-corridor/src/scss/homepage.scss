@@ -58,10 +58,47 @@ $link-max-size: 120px;
     }
   }
 
-  .search-buttons-container-label {
-    font-size: theme.$font-size-normal;
+  h3 {
+    font-size: 18px;
     font-weight: bold;
     margin-bottom: 8px;
+  }
+
+  .courses-nav {
+    max-width: 500px;
+
+    button {
+      align-items: start;
+      color: theme.$color-blue-5;
+      min-width: 0;
+      padding: 0;
+      margin-right: 30px;
+      font-weight: normal;
+    }
+  }
+
+  .courses-carusel {
+    margin-top: 20px;
+  }
+
+  .ic-carousel-header {
+    float: right;
+    margin-top: -45px;
+    margin-bottom: 20px;
+  }
+
+  .MuiTabPanel-root {
+    padding: 0;
+
+    .ic-carousel-header {
+        margin-top: -75px;
+    }
+  }
+
+  .ic-carousel-button-next, .ic-carousel-button-prev {
+    padding: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 
   .background-gradient {
@@ -71,10 +108,63 @@ $link-max-size: 120px;
     z-index: -100;
     height: 615px;
     background-image: linear-gradient(theme.$color-blue-1, theme.$color-gray-1);
-    width: 70%;
+    width: 100%;
+  }
 
-    @include breakpoint.down(md) {
-      width: 100%;
+  .professional-box {
+    background-color: theme.$color-blue-4;
+    width: 100vw;
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 636px;
+    z-index: -100;
+
+    img {
+      width: 50%;
+      float: right;
     }
+
+    margin-top: 60px;
+  }
+
+  .professional-title {
+    color: white;
+    font-weight: bold;
+    margin-top: 50px;
+    margin-bottom: 40px;
+  }
+
+  .ic-resource-card {
+    color: theme.$color-blue-5;
+    font-size: 14px;
+
+    .ol-lrc-type {
+      color: theme.$color-blue-5;
+      text-transform: none;
+      margin-right: 10px;
+    }
+
+    .clickable-title {
+      color: theme.$color-blue-5;
+    }
+  }
+
+  .professional-carusel {
+    margin-top: 20px;
+  }
+
+  .professional-button-container {
+    display: flex;
+    margin-top: 35px;
+  }
+
+  .professional-button {
+    color: white;
+    margin: auto;
+    border-color: white;
+    padding: 10px;
+    padding-left: 50px;
+    padding-right: 50px;
   }
 }
