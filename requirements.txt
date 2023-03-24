@@ -13,7 +13,9 @@ appdirs==1.4.3
 async-timeout==4.0.2
     # via redis
 attrs==19.3.0
-    # via zeep
+    # via
+    #   jsonschema
+    #   zeep
 backcall==0.1.0
     # via ipython
 base36==0.1.1
@@ -110,6 +112,7 @@ django==2.2.28
     #   django-filter
     #   django-redis
     #   djangorestframework
+    #   drf-spectacular
 django-anymail[mailgun]==3.0
     # via -r requirements.in
 django-appconf==1.0.3
@@ -155,6 +158,7 @@ djangorestframework==3.11.2
     # via
     #   -r requirements.in
     #   drf-extensions
+    #   drf-spectacular
 djangorestframework-jwt==1.11.0
     # via -r requirements.in
 djoser==2.0.3
@@ -166,6 +170,8 @@ docopt==0.6.2
 docutils==0.14
     # via botocore
 drf-extensions==0.5.0
+    # via -r requirements.in
+drf-spectacular==0.26.1
     # via -r requirements.in
 elasticsearch==6.3.0
     # via
@@ -202,6 +208,8 @@ idna==2.5
     # via
     #   requests
     #   tldextract
+inflection==0.5.1
+    # via drf-spectacular
 ipaddress==1.0.22
     # via elasticsearch-dsl
 ipython==7.16.3
@@ -218,6 +226,8 @@ jmespath==0.9.3
     # via
     #   boto3
     #   botocore
+jsonschema==4.17.3
+    # via drf-spectacular
 kombu==5.2.4
     # via
     #   celery
@@ -296,6 +306,8 @@ pyparsing==2.4.7
     # via
     #   httplib2
     #   packaging
+pyrsistent==0.19.3
+    # via jsonschema
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
@@ -316,7 +328,9 @@ pytz==2022.1
     #   django
     #   zeep
 pyyaml==5.4
-    # via -r requirements.in
+    # via
+    #   -r requirements.in
+    #   drf-spectacular
 redis==4.3.4
     # via
     #   -r requirements.in
@@ -415,7 +429,9 @@ ulid-py==0.0.3
 update-checker==0.16
     # via praw
 uritemplate==3.0.0
-    # via google-api-python-client
+    # via
+    #   drf-spectacular
+    #   google-api-python-client
 urllib3==1.25.10
     # via
     #   -r requirements.in

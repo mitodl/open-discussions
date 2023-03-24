@@ -110,6 +110,7 @@ INSTALLED_APPS = (
     "imagekit",
     "django_json_widget",
     "django_filters",
+    "drf_spectacular",
     # Put our apps after this point
     "open_discussions",
     "authentication",
@@ -826,6 +827,14 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.MultiPartRenderer",
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MIT Open Discussions Course Catalog API',
+    'DESCRIPTION': 'Open Discussions public API',
+    'VERSION': '0.0.1',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 USE_X_FORWARDED_PORT = get_bool("USE_X_FORWARDED_PORT", False)
