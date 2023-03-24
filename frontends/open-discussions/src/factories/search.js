@@ -211,7 +211,7 @@ export const makeUserListResult = (
   short_description: casual.description,
   topics:            [casual.word, casual.word],
   list_type:         listType,
-  object_type:       listType,
+  object_type:       LR_TYPE_USERLIST,
   offered_by:        [casual.random_element([offeredBys.mitx, offeredBys.ocw])],
   runs:              [],
   is_favorite:       casual.coin_flip,

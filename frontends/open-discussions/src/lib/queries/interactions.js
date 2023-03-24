@@ -8,7 +8,6 @@ import {
   LR_TYPE_VIDEO,
   LR_TYPE_PODCAST,
   LR_TYPE_PODCAST_EPISODE,
-  LR_TYPE_LEARNINGPATH
 } from "../constants"
 import { interactionsApiURL, popularContentUrl } from "../url"
 import { constructIdMap, DEFAULT_POST_OPTIONS } from "../redux_query"
@@ -66,10 +65,7 @@ export const popularContentRequest = () => ({
           filterObjectType(body.results, LR_TYPE_PROGRAM)
         ),
         userLists: constructIdMap(
-          filterObjectType(body.results, [
-            LR_TYPE_USERLIST,
-            LR_TYPE_LEARNINGPATH
-          ])
+          filterObjectType(body.results, LR_TYPE_USERLIST)
         ),
         podcasts: constructIdMap(
           filterObjectType(body.results, LR_TYPE_PODCAST)

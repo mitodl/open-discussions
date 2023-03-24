@@ -270,7 +270,7 @@ describe("CourseSearchPage", () => {
   })
 
   //
-  it("searches for learning path when the type parameter is userlist", async () => {
+  it("searches for userlist", async () => {
     setLocation(helper, {
       text:         "text",
       activeFacets: {
@@ -289,12 +289,12 @@ describe("CourseSearchPage", () => {
       from:        0,
       size:        SETTINGS.search_page_size,
       text:        "text",
-      type:        ["userlist", "learningpath"],
+      type:        ["userlist"],
       facets:      new Map(
         Object.entries({
           audience:            [],
           certification:       [],
-          type:                ["userlist", "learningpath"],
+          type:                ["userlist"],
           offered_by:          [],
           department_name:     [],
           topics:              [],

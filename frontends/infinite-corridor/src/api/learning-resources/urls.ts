@@ -89,8 +89,6 @@ const resourceUrls = {
       return podcastEpisodeUrls.details(id)
     case LRT.Userlist:
       return userListUrls.details(id)
-    case LRT.LearningPath:
-      return userListUrls.details(id) // LearningPaths are handled by UserList api
     default:
       throw new Error(`Unknown resource type: ${type}`)
     }
@@ -115,18 +113,17 @@ const urls = {
 
 const baseKey = "learning-resources"
 const resourceKeys = (type: string) => {
-  const normalized = type === LRT.LearningPath ? LRT.Userlist : type
   return {
-    all: [baseKey, normalized],
+    all: [baseKey, type],
     id:  (id: number) => ({
-      all:     [baseKey, normalized, id],
-      details: [baseKey, normalized, id, "details"]
+      all:     [baseKey, type, id],
+      details: [baseKey, type, id, "details"]
     }),
     listing: {
-      all:  [baseKey, normalized, "listing"],
+      all:  [baseKey, type, "listing"],
       page: <T extends PaginationSearchParams>(opts?: T) => [
         baseKey,
-        normalized,
+        type,
         "listing",
         opts
       ]

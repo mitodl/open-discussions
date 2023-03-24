@@ -4,9 +4,9 @@ import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
 import { RadioChoiceField, FormDialog } from "ol-forms"
 import {
-  UserList,
-  LearningResourceType as LRType,
-  PrivacyLevel
+    UserList,
+    LearningResourceType as LRType,
+    PrivacyLevel, UserListType
 } from "ol-search-ui"
 import * as Yup from "yup"
 import {
@@ -49,7 +49,7 @@ const variantProps = { InputLabelProps: { shrink: true } }
 
 const LIST_TYPE_CHOICES = [
   {
-    value: LRType.Userlist,
+    value: UserListType.List,
     label: (
       <>
         <span className="option-header">Learning List</span>
@@ -61,7 +61,7 @@ const LIST_TYPE_CHOICES = [
     className: "radio-option"
   },
   {
-    value: LRType.LearningPath,
+    value: UserListType.Path,
     label: (
       <>
         <span className="option-header">Learning Path</span>

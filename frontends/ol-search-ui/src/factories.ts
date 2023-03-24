@@ -13,8 +13,7 @@ import {
   Course,
   UserList,
   UserListItem,
-  PrivacyLevel,
-  TYPE_USER_LIST
+  PrivacyLevel, UserListType
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -134,8 +133,8 @@ export const makeVideo: Factory<LearningResource> = overrides => ({
 
 export const makeUserList: Factory<UserList> = overrides => {
   const type = faker.helpers.arrayElement([
-    LearningResourceType.Userlist,
-    LearningResourceType.LearningPath
+    UserListType.List,
+    UserListType.Path
   ] as const)
   const userList: UserList = {
     id:                faker.unique(faker.datatype.number),
@@ -150,7 +149,7 @@ export const makeUserList: Factory<UserList> = overrides => {
       faker.lorem.sentence()
     ]),
     item_count:    faker.datatype.number({ min: 2, max: 5 }),
-    object_type:   TYPE_USER_LIST,
+    object_type:   LearningResourceType.Userlist,
     list_type:     type,
     privacy_level: faker.helpers.arrayElement([
       PrivacyLevel.Public,

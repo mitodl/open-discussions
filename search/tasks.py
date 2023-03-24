@@ -53,7 +53,8 @@ from search.serializers import (
     ESProfileSerializer,
     ESProgramSerializer,
     ESUserListSerializer,
-    ESVideoSerializer, ESStaffListSerializer,
+    ESVideoSerializer,
+    ESStaffListSerializer,
 )
 
 User = get_user_model()

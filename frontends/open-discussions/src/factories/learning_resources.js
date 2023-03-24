@@ -157,7 +157,7 @@ export const makeUserList = (): UserList => ({
   image_src:         "http://image.medium.url",
   image_description: casual.description,
   item_count:        3,
-  object_type:       TYPE_USER_LIST,
+  object_type:       LR_TYPE_USERLIST,
   list_type:         casual.random_element(["userlist", "learningpath"]),
   profile_img:       casual.url,
   profile_name:      casual.name,

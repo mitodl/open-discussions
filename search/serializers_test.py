@@ -15,6 +15,7 @@ from course_catalog.constants import (
     PlatformType,
     PrivacyLevel,
     UserListType,
+    StaffListType,
 )
 from course_catalog.factories import (
     ContentFileFactory,
@@ -28,6 +29,8 @@ from course_catalog.factories import (
     UserListFactory,
     UserListItemFactory,
     VideoFactory,
+    StaffListFactory,
+    StaffListItemFactory,
 )
 from course_catalog.models import (
     PROFESSIONAL_COURSE_PLATFORMS,
@@ -35,6 +38,7 @@ from course_catalog.models import (
     Course,
     Program,
     Video,
+    StaffList,
 )
 from open_discussions.constants import ISOFORMAT
 from open_discussions.factories import UserFactory
@@ -50,6 +54,7 @@ from search.api import (
     gen_program_id,
     gen_user_list_id,
     gen_video_id,
+    gen_staff_list_id,
 )
 from search.constants import (
     COURSE_TYPE,
@@ -61,6 +66,7 @@ from search.constants import (
     PROGRAM_TYPE,
     RESOURCE_FILE_TYPE,
     USER_LIST_TYPE,
+    STAFF_LIST_TYPE,
 )
 from search.serializers import (
     ESCommentSerializer,
@@ -97,6 +103,9 @@ from search.serializers import (
     serialize_post_for_bulk,
     serialize_profile_for_bulk,
     serialize_video_for_bulk,
+    serialize_bulk_staff_lists_for_deletion,
+    ESStaffListSerializer,
+    serialize_staff_list_for_bulk,
 )
 
 
@@ -613,6 +622,38 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("list_type", [list_type.value for list_type in StaffListType])
+@pytest.mark.parametrize("privacy_level", [privacy.value for privacy in PrivacyLevel])
+def test_es_stafflist_serializer(list_type, privacy_level, user):
+    """
+    Test that ESStaffListSerializer correctly serializes a StaffList object
+    """
+    staff_list = StaffListFactory.create(
+        list_type=list_type, privacy_level=privacy_level, author=user
+    )
+    serialized = ESStaffListSerializer(staff_list).data
+    assert_json_equal(
+        serialized,
+        {
+            "author": user.id,
+            "object_type": STAFF_LIST_TYPE,
+            "list_type": list_type,
+            "privacy_level": privacy_level,
+            "id": staff_list.id,
+            "short_description": staff_list.short_description,
+            "title": staff_list.title,
+            "image_src": staff_list.image_src.url,
+            "topics": list(staff_list.topics.values_list("name", flat=True)),
+            "created": drf_datetime(staff_list.created_on),
+            "default_search_priority": 0,
+            "minimum_price": 0,
+            "certification": [],
+            "audience": expected_audience_for_list(staff_list),
+        },
+    )
+
+
+@pytest.mark.django_db
 def test_es_userlist_serializer_image_src():
     """
     Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
@@ -794,6 +835,44 @@ def test_serialize_course_for_bulk():
 
 
 @pytest.mark.django_db
+def test_serialize_bulk_staff_lists(mocker):
+    """
+    Test that serialize_bulk_staff_lists calls serialize_staff_list_for_bulk for every existing public StaffList
+    """
+    mock_serialize_staff_list = mocker.patch(
+        "search.serializers.serialize_staff_list_for_bulk"
+    )
+    staff_lists = StaffListFactory.create_batch(
+        3, privacy_level=PrivacyLevel.public.value
+    )
+    for staff_list in staff_lists:
+        StaffListItemFactory.create(staff_list=staff_list)
+    list(
+        serialize_bulk_courses(
+            [staff_list.id for staff_list in StaffList.objects.all()]
+        )
+    )
+    for staff_list in staff_list:
+        mock_serialize_staff_list.assert_any_call(staff_list)
+
+
+@pytest.mark.django_db
+def test_serialize_staff_list_for_bulk():
+    """
+    Test that serialize_staff_list_for_bulk yields a valid ESStaffListSerializer
+    """
+    staff_list = StaffListFactory.create()
+    StaffListItemFactory.create(staff_list=staff_list)
+    assert_json_equal(
+        serialize_staff_list_for_bulk(staff_list),
+        {
+            "_id": gen_course_id(staff_list.platform, staff_list.course_id),
+            **ESStaffListSerializer(staff_list).data,
+        },
+    )
+
+
+@pytest.mark.django_db
 def test_serialize_bulk_video(mocker):
     """
     Test that serialize_bulk_video calls serialize_video_for_bulk for every existing video
@@ -938,6 +1017,17 @@ def test_serialize_bulk_user_lists_for_deletion():
     userlist = UserListFactory.create()
     assert list(serialize_bulk_user_lists_for_deletion([userlist.id])) == [
         {"_id": gen_user_list_id(userlist), "_op_type": "delete"}
+    ]
+
+
+@pytest.mark.django_db
+def test_serialize_bulk_staff_lists_for_deletion():
+    """
+    Test that serialize_bulk_user_lists_for_deletion yields correct data
+    """
+    stafflist = StaffListFactory.create()
+    assert list(serialize_bulk_staff_lists_for_deletion([stafflist.id])) == [
+        {"_id": gen_staff_list_id(stafflist), "_op_type": "delete"}
     ]
 
 

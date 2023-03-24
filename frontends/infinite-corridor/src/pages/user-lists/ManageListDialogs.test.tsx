@@ -1,7 +1,7 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
 import { pick } from "lodash"
-import { LearningResourceType, PrivacyLevel, UserList } from "ol-search-ui"
+import {LearningResourceType, PrivacyLevel, UserList, UserListType} from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { allowConsoleErrors, getDescriptionFor } from "ol-util/src/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"
@@ -32,15 +32,15 @@ const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
 /**
  * Helpers to find various inputs.
  *
- * E.g., `inputs.object_type[LearningResourceType.LearningPath]()` will return
+ * E.g., `inputs.object_type[UserListType.Path]()` will return
  * radio button for "Learning Path".
  *
  */
 const inputs = {
   list_type: {
-    [LearningResourceType.LearningPath]: () =>
+    [UserListType.Path]: () =>
       screen.getByLabelText("Learning Path", { exact: false }),
-    [LearningResourceType.Userlist]: () =>
+    [UserListType.List]: () =>
       screen.getByLabelText("Learning List", { exact: false })
   },
   privacy_level: {
@@ -91,7 +91,7 @@ describe("Creation", () => {
 
     const userList = factories.makeUserList({
       short_description: faker.lorem.paragraph(),
-      topics:            [faker.helpers.arrayElement(topics.results)]
+      topics:            [faker.helpers.arrayElement(topics.results)],
     })
 
     await fillInForm(userList)
