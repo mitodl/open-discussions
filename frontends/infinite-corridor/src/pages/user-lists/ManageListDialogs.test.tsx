@@ -1,7 +1,7 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
 import { pick } from "lodash"
-import {LearningResourceType, PrivacyLevel, UserList, UserListType} from "ol-search-ui"
+import { LearningResourceType, PrivacyLevel, UserList } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { allowConsoleErrors, getDescriptionFor } from "ol-util/src/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"

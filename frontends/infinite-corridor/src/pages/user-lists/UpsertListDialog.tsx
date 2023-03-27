@@ -4,9 +4,9 @@ import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
 import { RadioChoiceField, FormDialog } from "ol-forms"
 import {
-    UserList,
-    LearningResourceType as LRType,
-    PrivacyLevel, UserListType
+  UserList,
+  LearningResourceType as LRType,
+  PrivacyLevel
 } from "ol-search-ui"
 import * as Yup from "yup"
 import {

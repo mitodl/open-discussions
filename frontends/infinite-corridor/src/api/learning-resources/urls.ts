@@ -115,17 +115,18 @@ const urls = {
 
 const baseKey = "learning-resources"
 const resourceKeys = (type: string) => {
+  const normalized = type === LRT.LearningPath ? LRT.Userlist : type
   return {
-    all: [baseKey, type],
+    all: [baseKey, normalized],
     id:  (id: number) => ({
-      all:     [baseKey, type, id],
-      details: [baseKey, type, id, "details"]
+      all:     [baseKey, normalized, id],
+      details: [baseKey, normalized, id, "details"]
     }),
     listing: {
-      all:  [baseKey, type, "listing"],
+      all:  [baseKey, normalized, "listing"],
       page: <T extends PaginationSearchParams>(opts?: T) => [
         baseKey,
-        type,
+        normalized,
         "listing",
         opts
       ]
