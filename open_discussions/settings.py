@@ -778,7 +778,7 @@ OPEN_DISCUSSIONS_FEATURES_PREFIX = get_string(
 )
 OPEN_DISCUSSIONS_FEATURES_DEFAULT = get_bool("OPEN_DISCUSSIONS_FEATURES_DEFAULT", False)
 FEATURES = {
-    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_any(key, None)
+    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX) :]: get_any(key, None)
     for key in get_all_config_keys()
     if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
 }
