@@ -28,6 +28,7 @@ from open_discussions.envs import (
     get_key,
 )
 from open_discussions.sentry import init_sentry
+from open_discussions.settings_spectacular import open_spectacular_settings
 
 VERSION = "0.209.1"
 
@@ -983,4 +984,4 @@ def setup_x509():
 
 setup_x509()
 
-from open_discussions.settings_spectacular import *
+SPECTACULAR_SETTINGS = open_spectacular_settings
