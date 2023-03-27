@@ -93,9 +93,7 @@ defusedxml==0.6.0
     #   social-auth-core
     #   zeep
 deprecated==1.2.7
-    # via
-    #   pygithub
-    #   redis
+    # via pygithub
 dj-database-url==0.3.0
     # via -r requirements.in
 dj-static==0.0.6
@@ -243,8 +241,6 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
-packaging==21.3
-    # via redis
 parso==0.6.1
     # via jedi
 pexpect==4.8.0
@@ -293,9 +289,7 @@ pyjwt==1.5.2
 pyopenssl==19.1.0
     # via -r requirements.in
 pyparsing==2.4.7
-    # via
-    #   httplib2
-    #   packaging
+    # via httplib2
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
@@ -317,7 +311,7 @@ pytz==2022.1
     #   zeep
 pyyaml==5.4
     # via -r requirements.in
-redis==4.3.4
+redis==4.5.3
     # via
     #   -r requirements.in
     #   django-redis
