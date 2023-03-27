@@ -256,7 +256,7 @@ def _apply_learning_query_filters(search, user):
         elasticsearch_dsl.Search: Search object with filters applied
     """
     # Search public user lists (and user's own lists if logged in)
-    if True:  # features.is_enabled(features.USER_LIST_SEARCH):
+    if features.is_enabled(features.USER_LIST_SEARCH):
         user_list_filter = Q("term", privacy_level=PrivacyLevel.public.value) | ~Q(
             "terms", object_type=[USER_LIST_TYPE, USER_PATH_TYPE]
         )
@@ -264,7 +264,9 @@ def _apply_learning_query_filters(search, user):
             user_list_filter = user_list_filter | Q("term", author=user.id)
         search = search.filter(user_list_filter)
     else:
-        search = search.exclude(Q("terms", object_type=[USER_LIST_TYPE, USER_PATH_TYPE]))
+        search = search.exclude(
+            Q("terms", object_type=[USER_LIST_TYPE, USER_PATH_TYPE])
+        )
     if not features.is_enabled(features.PODCAST_SEARCH):
         # Exclude podcasts from the search results if the feature flag isn't enabled
         search = search.exclude(

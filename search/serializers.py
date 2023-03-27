@@ -719,6 +719,7 @@ class ESStaffListSerializer(ESModelSerializer, LearningResourceSerializer):
             "minimum_price",
             "audience",
             "certification",
+            "privacy_level",
         ]
 
         read_only_fields = fields

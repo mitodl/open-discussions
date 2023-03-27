@@ -17,21 +17,7 @@ from course_catalog.constants import (
     UserListType,
     StaffListType,
 )
-from course_catalog.factories import (
-    ContentFileFactory,
-    CourseFactory,
-    CoursePriceFactory,
-    LearningResourceOfferorFactory,
-    LearningResourceRunFactory,
-    PodcastEpisodeFactory,
-    PodcastFactory,
-    ProgramFactory,
-    UserListFactory,
-    UserListItemFactory,
-    VideoFactory,
-    StaffListFactory,
-    StaffListItemFactory,
-)
+from course_catalog import factories
 from course_catalog.models import (
     PROFESSIONAL_COURSE_PLATFORMS,
     ContentType,
@@ -45,68 +31,9 @@ from open_discussions.factories import UserFactory
 from open_discussions.test_utils import assert_json_equal, drf_datetime
 from profiles.models import Profile
 from profiles.utils import IMAGE_MEDIUM, image_uri
-from search.api import (
-    gen_content_file_id,
-    gen_course_id,
-    gen_podcast_episode_id,
-    gen_podcast_id,
-    gen_profile_id,
-    gen_program_id,
-    gen_user_list_id,
-    gen_video_id,
-    gen_staff_list_id,
-)
-from search.constants import (
-    COURSE_TYPE,
-    OCW_TYPE_ASSIGNMENTS,
-    OCW_TYPE_LECTURE_NOTES,
-    PODCAST_EPISODE_TYPE,
-    PODCAST_TYPE,
-    PROFILE_TYPE,
-    PROGRAM_TYPE,
-    RESOURCE_FILE_TYPE,
-    USER_LIST_TYPE,
-    STAFF_LIST_TYPE,
-)
-from search.serializers import (
-    ESCommentSerializer,
-    ESContentFileSerializer,
-    ESCoursePriceSerializer,
-    ESCourseSerializer,
-    ESPodcastEpisodeSerializer,
-    ESPodcastSerializer,
-    ESPostSerializer,
-    ESProfileSerializer,
-    ESProgramSerializer,
-    ESRunSerializer,
-    ESUserListSerializer,
-    ESVideoSerializer,
-    serialize_bulk_comments,
-    serialize_bulk_courses,
-    serialize_bulk_courses_for_deletion,
-    serialize_bulk_podcast_episodes,
-    serialize_bulk_podcast_episodes_for_deletion,
-    serialize_bulk_podcasts,
-    serialize_bulk_podcasts_for_deletion,
-    serialize_bulk_profiles,
-    serialize_bulk_profiles_for_deletion,
-    serialize_bulk_programs_for_deletion,
-    serialize_bulk_user_lists_for_deletion,
-    serialize_bulk_videos,
-    serialize_bulk_videos_for_deletion,
-    serialize_comment_for_bulk,
-    serialize_content_file_for_bulk,
-    serialize_content_file_for_bulk_deletion,
-    serialize_course_for_bulk,
-    serialize_podcast_episode_for_bulk,
-    serialize_podcast_for_bulk,
-    serialize_post_for_bulk,
-    serialize_profile_for_bulk,
-    serialize_video_for_bulk,
-    serialize_bulk_staff_lists_for_deletion,
-    ESStaffListSerializer,
-    serialize_staff_list_for_bulk,
-)
+from search import api
+from search import constants
+from search import serializers
 
 
 def minimum_price(learning_resource):
@@ -186,7 +113,7 @@ def test_es_post_serializer(factory_kwargs):
     Test that ESPostSerializer correctly serializes a post object
     """
     post = PostFactory.create(**factory_kwargs)
-    serialized = ESPostSerializer(instance=post).data
+    serialized = serializers.ESPostSerializer(instance=post).data
     assert serialized == {
         "object_type": POST_TYPE,
         "article_content": post.article.content
@@ -226,7 +153,7 @@ def test_es_comment_serializer(has_author):
     Test that ESCommentSerializer correctly serializes a comment object
     """
     comment = CommentFactory.create()
-    serialized = ESCommentSerializer(instance=comment).data
+    serialized = serializers.ESCommentSerializer(instance=comment).data
     assert serialized == {
         "object_type": COMMENT_TYPE,
         "author_id": comment.author.username if comment.author is not None else None,
@@ -264,9 +191,9 @@ def test_es_profile_serializer(mocker, user):
     )
     return_value = [("channel01", datetime.now()), ("channel02", datetime.now())]
     mocker.patch("search.serializers.get_channel_join_dates", return_value=return_value)
-    serialized = ESProfileSerializer().serialize(user.profile)
+    serialized = serializers.ESProfileSerializer().serialize(user.profile)
     assert serialized == {
-        "object_type": PROFILE_TYPE,
+        "object_type": constants.PROFILE_TYPE,
         "author_id": user.username,
         "author_name": user.profile.name,
         "author_avatar_small": image_uri(user.profile),
@@ -286,16 +213,16 @@ def test_serialize_bulk_comments():
     """serialize_bulk_comments should index all comments it is passed"""
     comments = CommentFactory.create_batch(10)
     assert len(
-        list(serialize_bulk_comments([comment.id for comment in comments]))
+        list(serializers.serialize_bulk_comments([comment.id for comment in comments]))
     ) == len(comments)
 
 
 @pytest.mark.django_db
 def test_es_course_price_serializer():
     """Test that the course price serializer serializes a price"""
-    price = CoursePriceFactory.create()
+    price = factories.CoursePriceFactory.create()
     assert_json_equal(
-        ESCoursePriceSerializer(price).data,
+        serializers.ESCoursePriceSerializer(price).data,
         {"price": f"{price.price:.2f}", "mode": price.mode},
     )
 
@@ -308,13 +235,13 @@ def test_es_run_serializer(has_full_name, level):
     Test that ESRunSerializer correctly serializes a run object
     """
     learning_resource_run = (
-        LearningResourceRunFactory.create()
+        factories.LearningResourceRunFactory.create()
         if has_full_name
-        else LearningResourceRunFactory.create(instructors__full_name=None)
+        else factories.LearningResourceRunFactory.create(instructors__full_name=None)
     )
     learning_resource_run.level = level
     learning_resource_run.save()
-    serialized = ESRunSerializer(learning_resource_run).data
+    serialized = serializers.ESRunSerializer(learning_resource_run).data
 
     assert_json_equal(
         serialized,
@@ -346,7 +273,7 @@ def test_es_run_serializer(has_full_name, level):
                 for instructor in learning_resource_run.instructors.all()
             ],
             "prices": [
-                ESCoursePriceSerializer(price).data
+                serializers.ESCoursePriceSerializer(price).data
                 for price in learning_resource_run.prices.all()
             ],
             "published": True,
@@ -367,7 +294,7 @@ def test_es_course_serializer(offered_by, platform, department):
     """
     Test that ESCourseSerializer correctly serializes a course object
     """
-    course = CourseFactory.create(platform=platform, department=department)
+    course = factories.CourseFactory.create(platform=platform, department=department)
 
     if platform == PlatformType.ocw.value:
         course.course_id = "sfsdfsdf+2.11"
@@ -393,9 +320,9 @@ def test_es_course_serializer(offered_by, platform, department):
     unpublished_run = course.runs.first()
     unpublished_run.published = False
     unpublished_run.save()
-    course.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+    course.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = ESCourseSerializer(course).data
+    serialized = serializers.ESCourseSerializer(course).data
 
     if platform in PROFESSIONAL_COURSE_PLATFORMS:
         expected_audience = ["Professional Offerings"]
@@ -421,7 +348,7 @@ def test_es_course_serializer(offered_by, platform, department):
     assert_json_equal(
         serialized,
         {
-            "object_type": COURSE_TYPE,
+            "object_type": constants.COURSE_TYPE,
             "id": course.id,
             "course_id": course.course_id,
             "coursenum": course.course_id.split("+")[-1],
@@ -432,7 +359,7 @@ def test_es_course_serializer(offered_by, platform, department):
             "image_src": course.image_src,
             "topics": list(course.topics.values_list("name", flat=True)),
             "runs": [
-                ESRunSerializer(course_run).data
+                serializers.ESRunSerializer(course_run).data
                 for course_run in course.runs.exclude(published=False).order_by(
                     "-best_start_date"
                 )
@@ -459,11 +386,11 @@ def test_es_course_serializer(offered_by, platform, department):
 @pytest.mark.parametrize(
     "section,section_resource_type",
     [
-        ["First Paper Assignment", OCW_TYPE_ASSIGNMENTS],
-        ["Assignment 1.2", OCW_TYPE_ASSIGNMENTS],
+        ["First Paper Assignment", constants.OCW_TYPE_ASSIGNMENTS],
+        ["Assignment 1.2", constants.OCW_TYPE_ASSIGNMENTS],
         ["Assignments and Exams", None],
-        ["Lecture Summaries", OCW_TYPE_LECTURE_NOTES],
-        [OCW_TYPE_LECTURE_NOTES, OCW_TYPE_LECTURE_NOTES],
+        ["Lecture Summaries", constants.OCW_TYPE_LECTURE_NOTES],
+        [constants.OCW_TYPE_LECTURE_NOTES, constants.OCW_TYPE_LECTURE_NOTES],
         ["Resources", None],
         ["Exercises", None],
     ],
@@ -478,7 +405,7 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
         "content_title": "test title",
         "section": section,
     }
-    content_file = ContentFileFactory.create(**content_kwargs)
+    content_file = factories.ContentFileFactory.create(**content_kwargs)
     course = content_file.run.content_object
     course.ocw_next_course = ocw_next_course
     course.save()
@@ -488,12 +415,12 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
     else:
         resource_type = section_resource_type
 
-    serialized = ESContentFileSerializer(content_file).data
+    serialized = serializers.ESContentFileSerializer(content_file).data
 
     assert_json_equal(
         serialized,
         {
-            "object_type": RESOURCE_FILE_TYPE,
+            "object_type": constants.RESOURCE_FILE_TYPE,
             "run_id": content_file.run.run_id,
             "run_title": content_file.run.title,
             "run_slug": content_file.run.slug,
@@ -507,7 +434,7 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
             "uid": content_file.uid,
             "resource_relations": {
                 "name": "resourcefile",
-                "parent": gen_course_id(
+                "parent": api.gen_course_id(
                     content_file.run.content_object.platform,
                     content_file.run.content_object.course_id,
                 ),
@@ -538,10 +465,10 @@ def test_es_program_serializer(offered_by):
     """
     Test that ESProgramSerializer correctly serializes a program object
     """
-    program = ProgramFactory.create()
-    program.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+    program = factories.ProgramFactory.create()
+    program.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = ESProgramSerializer(program).data
+    serialized = serializers.ESProgramSerializer(program).data
 
     if offered_by == OfferedBy.micromasters.value:
         expected_audience = ["Open Content", "Professional Offerings"]
@@ -551,14 +478,14 @@ def test_es_program_serializer(offered_by):
     assert_json_equal(
         serialized,
         {
-            "object_type": PROGRAM_TYPE,
+            "object_type": constants.PROGRAM_TYPE,
             "id": program.id,
             "short_description": program.short_description,
             "title": program.title,
             "image_src": program.image_src,
             "topics": list(program.topics.values_list("name", flat=True)),
             "runs": [
-                ESRunSerializer(program_run).data
+                serializers.ESRunSerializer(program_run).data
                 for program_run in program.runs.order_by("-best_start_date")
             ],
             "offered_by": [offered_by],
@@ -596,10 +523,10 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
     """
     Test that ESUserListSerializer correctly serializes a UserList object
     """
-    user_list = UserListFactory.create(
+    user_list = factories.UserListFactory.create(
         list_type=list_type, privacy_level=privacy_level, author=user
     )
-    serialized = ESUserListSerializer(user_list).data
+    serialized = serializers.ESUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
         {
@@ -623,20 +550,22 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("list_type", [list_type.value for list_type in StaffListType])
-@pytest.mark.parametrize("privacy_level", [privacy.value for privacy in PrivacyLevel])
+@pytest.mark.parametrize(
+    "privacy_level", [PrivacyLevel.public.value, PrivacyLevel.private.value]
+)
 def test_es_stafflist_serializer(list_type, privacy_level, user):
     """
     Test that ESStaffListSerializer correctly serializes a StaffList object
     """
-    staff_list = StaffListFactory.create(
+    staff_list = factories.StaffListFactory.create(
         list_type=list_type, privacy_level=privacy_level, author=user
     )
-    serialized = ESStaffListSerializer(staff_list).data
+    serialized = serializers.ESStaffListSerializer(staff_list).data
     assert_json_equal(
         serialized,
         {
             "author": user.id,
-            "object_type": STAFF_LIST_TYPE,
+            "object_type": constants.STAFF_LIST_TYPE,
             "list_type": list_type,
             "privacy_level": privacy_level,
             "id": staff_list.id,
@@ -658,18 +587,18 @@ def test_es_userlist_serializer_image_src():
     """
     Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
     """
-    user_list = UserListFactory.create(image_src=None)
-    UserListItemFactory.create(user_list=user_list, position=1, is_userlist=True)
-    list_item_course = UserListItemFactory.create(
+    user_list = factories.UserListFactory.create(image_src=None)
+    factories.UserListItemFactory.create(user_list=user_list, position=1, is_userlist=True)
+    list_item_course = factories.UserListItemFactory.create(
         user_list=user_list, position=2, is_course=True
     )
 
-    serialized = ESUserListSerializer(user_list).data
+    serialized = serializers.ESUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
         {
             "author": user_list.author.id,
-            "object_type": USER_LIST_TYPE,
+            "object_type": user_list.list_type,
             "list_type": user_list.list_type,
             "privacy_level": user_list.privacy_level,
             "id": user_list.id,
@@ -692,14 +621,14 @@ def test_es_podcast_serializer(offered_by):
     """
     Test that ESPodcastSerializer correctly serializes a Podcast object
     """
-    podcast = PodcastFactory.create()
-    podcast.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+    podcast = factories.PodcastFactory.create()
+    podcast.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = ESPodcastSerializer(podcast).data
+    serialized = serializers.ESPodcastSerializer(podcast).data
     assert_json_equal(
         serialized,
         {
-            "object_type": PODCAST_TYPE,
+            "object_type": constants.PODCAST_TYPE,
             "id": podcast.id,
             "podcast_id": podcast.podcast_id,
             "short_description": podcast.short_description,
@@ -726,14 +655,14 @@ def test_es_podcast_episode_serializer(offered_by):
     """
     Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
     """
-    podcast_episode = PodcastEpisodeFactory.create()
-    podcast_episode.offered_by.set([LearningResourceOfferorFactory(name=offered_by)])
+    podcast_episode = factories.PodcastEpisodeFactory.create()
+    podcast_episode.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = ESPodcastEpisodeSerializer(podcast_episode).data
+    serialized = serializers.ESPodcastEpisodeSerializer(podcast_episode).data
     assert_json_equal(
         serialized,
         {
-            "object_type": PODCAST_EPISODE_TYPE,
+            "object_type": constants.PODCAST_EPISODE_TYPE,
             "id": podcast_episode.id,
             "podcast_id": podcast_episode.podcast.id,
             "series_title": podcast_episode.podcast.title,
@@ -765,7 +694,7 @@ def test_serialize_post_for_bulk(mocker):
         "search.serializers.ESPostSerializer.to_representation",
         return_value=base_serialized_post,
     )
-    serialized = serialize_post_for_bulk(mocker.Mock(post_id=post_id))
+    serialized = serializers.serialize_post_for_bulk(mocker.Mock(post_id=post_id))
     assert serialized == {"_id": f"p_{post_id}", **base_serialized_post}
 
 
@@ -779,7 +708,7 @@ def test_serialize_comment_for_bulk(mocker):
         "search.serializers.ESCommentSerializer.to_representation",
         return_value=base_serialized_comment,
     )
-    serialized = serialize_comment_for_bulk(mocker.Mock(comment_id=comment_id))
+    serialized = serializers.serialize_comment_for_bulk(mocker.Mock(comment_id=comment_id))
     assert serialized == {"_id": f"c_{comment_id}", **base_serialized_comment}
 
 
@@ -792,7 +721,7 @@ def test_serialize_bulk_profiles(mocker):
         "search.serializers.serialize_profile_for_bulk"
     )
     users = UserFactory.create_batch(5)
-    list(serialize_bulk_profiles([profile.id for profile in Profile.objects.all()]))
+    list(serializers.serialize_bulk_profiles([profile.id for profile in Profile.objects.all()]))
     for user in users:
         mock_serialize_profile.assert_any_call(user.profile)
 
@@ -801,9 +730,9 @@ def test_serialize_profile_for_bulk(user):
     """
     Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
     """
-    assert serialize_profile_for_bulk(user.profile) == {
+    assert serializers.serialize_profile_for_bulk(user.profile) == {
         "_id": "u_{}".format(user.username),
-        **ESProfileSerializer().serialize(user.profile),
+        **serializers.ESProfileSerializer().serialize(user.profile),
     }
 
 
@@ -813,8 +742,8 @@ def test_serialize_bulk_courses(mocker):
     Test that serialize_bulk_courses calls serialize_course_for_bulk for every existing course
     """
     mock_serialize_course = mocker.patch("search.serializers.serialize_course_for_bulk")
-    courses = CourseFactory.create_batch(5)
-    list(serialize_bulk_courses([course.id for course in Course.objects.all()]))
+    courses = factories.CourseFactory.create_batch(5)
+    list(serializers.serialize_bulk_courses([course.id for course in Course.objects.all()]))
     for course in courses:
         mock_serialize_course.assert_any_call(course)
 
@@ -824,12 +753,12 @@ def test_serialize_course_for_bulk():
     """
     Test that serialize_course_for_bulk yields a valid ESCourseSerializer
     """
-    course = CourseFactory.create()
+    course = factories.CourseFactory.create()
     assert_json_equal(
-        serialize_course_for_bulk(course),
+        serializers.serialize_course_for_bulk(course),
         {
-            "_id": gen_course_id(course.platform, course.course_id),
-            **ESCourseSerializer(course).data,
+            "_id": api.gen_course_id(course.platform, course.course_id),
+            **serializers.ESCourseSerializer(course).data,
         },
     )
 
@@ -842,17 +771,17 @@ def test_serialize_bulk_staff_lists(mocker):
     mock_serialize_staff_list = mocker.patch(
         "search.serializers.serialize_staff_list_for_bulk"
     )
-    staff_lists = StaffListFactory.create_batch(
+    staff_lists = factories.StaffListFactory.create_batch(
         3, privacy_level=PrivacyLevel.public.value
     )
     for staff_list in staff_lists:
-        StaffListItemFactory.create(staff_list=staff_list)
+        factories.StaffListItemFactory.create(staff_list=staff_list)
     list(
-        serialize_bulk_courses(
+        serializers.serialize_bulk_staff_lists(
             [staff_list.id for staff_list in StaffList.objects.all()]
         )
     )
-    for staff_list in staff_list:
+    for staff_list in staff_lists:
         mock_serialize_staff_list.assert_any_call(staff_list)
 
 
@@ -861,13 +790,13 @@ def test_serialize_staff_list_for_bulk():
     """
     Test that serialize_staff_list_for_bulk yields a valid ESStaffListSerializer
     """
-    staff_list = StaffListFactory.create()
-    StaffListItemFactory.create(staff_list=staff_list)
+    staff_list = factories.StaffListFactory.create()
+    factories.StaffListItemFactory.create(staff_list=staff_list)
     assert_json_equal(
-        serialize_staff_list_for_bulk(staff_list),
+        serializers.serialize_staff_list_for_bulk(staff_list),
         {
-            "_id": gen_course_id(staff_list.platform, staff_list.course_id),
-            **ESStaffListSerializer(staff_list).data,
+            "_id": api.gen_staff_list_id(staff_list),
+            **serializers.ESStaffListSerializer(staff_list).data,
         },
     )
 
@@ -878,8 +807,8 @@ def test_serialize_bulk_video(mocker):
     Test that serialize_bulk_video calls serialize_video_for_bulk for every existing video
     """
     mock_serialize_video = mocker.patch("search.serializers.serialize_video_for_bulk")
-    videos = VideoFactory.create_batch(5)
-    list(serialize_bulk_videos(Video.objects.values_list("id", flat=True)))
+    videos = factories.VideoFactory.create_batch(5)
+    list(serializers.serialize_bulk_videos(Video.objects.values_list("id", flat=True)))
     for video in videos:
         mock_serialize_video.assert_any_call(video)
 
@@ -889,10 +818,10 @@ def test_serialize_video_for_bulk():
     """
     Test that serialize_video_for_bulk yields a valid ESVideoSerializer
     """
-    video = VideoFactory.create()
-    assert serialize_video_for_bulk(video) == {
-        "_id": gen_video_id(video),
-        **ESVideoSerializer(video).data,
+    video = factories.VideoFactory.create()
+    assert serializers.serialize_video_for_bulk(video) == {
+        "_id": api.gen_video_id(video),
+        **serializers.ESVideoSerializer(video).data,
     }
 
 
@@ -901,10 +830,10 @@ def test_serialize_content_file_for_bulk():
     """
     Test that serialize_content_file_for_bulk yields a valid ESContentFileSerializer
     """
-    content_file = ContentFileFactory.create()
-    assert serialize_content_file_for_bulk(content_file) == {
-        "_id": gen_content_file_id(content_file.key),
-        **ESContentFileSerializer(content_file).data,
+    content_file = factories.ContentFileFactory.create()
+    assert serializers.serialize_content_file_for_bulk(content_file) == {
+        "_id": api.gen_content_file_id(content_file.key),
+        **serializers.ESContentFileSerializer(content_file).data,
     }
 
 
@@ -913,9 +842,9 @@ def test_serialize_content_file_for_bulk_deletion():
     """
     Test that serialize_content_file_for_bulk_deletion yields a valid ESContentFileSerializer
     """
-    content_file = ContentFileFactory.create()
-    assert serialize_content_file_for_bulk_deletion(content_file) == {
-        "_id": gen_content_file_id(content_file.key),
+    content_file = factories.ContentFileFactory.create()
+    assert serializers.serialize_content_file_for_bulk_deletion(content_file) == {
+        "_id": api.gen_content_file_id(content_file.key),
         "_op_type": "delete",
     }
 
@@ -928,8 +857,8 @@ def test_serialize_bulk_podcasts(mocker):
     mock_serialize_podcast = mocker.patch(
         "search.serializers.serialize_podcast_for_bulk"
     )
-    podcasts = PodcastFactory.create_batch(5)
-    list(serialize_bulk_podcasts([podcast.id for podcast in podcasts]))
+    podcasts = factories.PodcastFactory.create_batch(5)
+    list(serializers.serialize_bulk_podcasts([podcast.id for podcast in podcasts]))
     for podcast in podcasts:
         mock_serialize_podcast.assert_any_call(podcast)
 
@@ -939,10 +868,10 @@ def test_serialize_podcast_for_bulk():
     """
     Test that serialize_podcast_for_bulk yields a valid ESPodcastSerializer
     """
-    podcast = PodcastFactory.create()
-    assert serialize_podcast_for_bulk(podcast) == {
-        "_id": gen_podcast_id(podcast),
-        **ESPodcastSerializer(podcast).data,
+    podcast = factories.PodcastFactory.create()
+    assert serializers.serialize_podcast_for_bulk(podcast) == {
+        "_id": api.gen_podcast_id(podcast),
+        **serializers.ESPodcastSerializer(podcast).data,
     }
 
 
@@ -955,9 +884,9 @@ def test_serialize_bulk_podcast_episodes(mocker):
     mock_serialize_podcast_episode = mocker.patch(
         "search.serializers.serialize_podcast_episode_for_bulk"
     )
-    podcast_episodes = PodcastEpisodeFactory.create_batch(5)
+    podcast_episodes = factories.PodcastEpisodeFactory.create_batch(5)
     list(
-        serialize_bulk_podcast_episodes(
+        serializers.serialize_bulk_podcast_episodes(
             [podcast_episode.id for podcast_episode in podcast_episodes]
         )
     )
@@ -970,10 +899,10 @@ def test_serialize_podcast_episode_for_bulk():
     """
     Test that serialize_podcast_episode_for_bulk yields a valid ESPodcastEpisodeSerializer
     """
-    podcast_episode = PodcastEpisodeFactory.create()
-    assert serialize_podcast_episode_for_bulk(podcast_episode) == {
-        "_id": gen_podcast_episode_id(podcast_episode),
-        **ESPodcastEpisodeSerializer(podcast_episode).data,
+    podcast_episode = factories.PodcastEpisodeFactory.create()
+    assert serializers.serialize_podcast_episode_for_bulk(podcast_episode) == {
+        "_id": api.gen_podcast_episode_id(podcast_episode),
+        **serializers.ESPodcastEpisodeSerializer(podcast_episode).data,
     }
 
 
@@ -982,8 +911,8 @@ def test_serialize_profiles_file_for_bulk_deletion(user):
     """
     Test that serialize_profiles_file_for_bulk_deletion yield correct data
     """
-    assert list(serialize_bulk_profiles_for_deletion([user.profile.id])) == [
-        {"_id": gen_profile_id(user.username), "_op_type": "delete"}
+    assert list(serializers.serialize_bulk_profiles_for_deletion([user.profile.id])) == [
+        {"_id": api.gen_profile_id(user.username), "_op_type": "delete"}
     ]
 
 
@@ -992,9 +921,9 @@ def test_serialize_bulk_courses_for_deletion():
     """
     Test that serialize_bulk_courses_for_deletion yields correct data
     """
-    course = CourseFactory.create()
-    assert list(serialize_bulk_courses_for_deletion([course.id])) == [
-        {"_id": gen_course_id(course.platform, course.course_id), "_op_type": "delete"}
+    course = factories.CourseFactory.create()
+    assert list(serializers.serialize_bulk_courses_for_deletion([course.id])) == [
+        {"_id": api.gen_course_id(course.platform, course.course_id), "_op_type": "delete"}
     ]
 
 
@@ -1003,9 +932,9 @@ def test_serialize_bulk_programs_for_deletion():
     """
     Test that serialize_bulk_programs_for_deletion yields correct data
     """
-    program = ProgramFactory.create()
-    assert list(serialize_bulk_programs_for_deletion([program.id])) == [
-        {"_id": gen_program_id(program), "_op_type": "delete"}
+    program = factories.ProgramFactory.create()
+    assert list(serializers.serialize_bulk_programs_for_deletion([program.id])) == [
+        {"_id": api.gen_program_id(program), "_op_type": "delete"}
     ]
 
 
@@ -1014,9 +943,9 @@ def test_serialize_bulk_user_lists_for_deletion():
     """
     Test that serialize_bulk_user_lists_for_deletion yields correct data
     """
-    userlist = UserListFactory.create()
-    assert list(serialize_bulk_user_lists_for_deletion([userlist.id])) == [
-        {"_id": gen_user_list_id(userlist), "_op_type": "delete"}
+    userlist = factories.UserListFactory.create()
+    assert list(serializers.serialize_bulk_user_lists_for_deletion([userlist.id])) == [
+        {"_id": api.gen_user_list_id(userlist), "_op_type": "delete"}
     ]
 
 
@@ -1025,9 +954,9 @@ def test_serialize_bulk_staff_lists_for_deletion():
     """
     Test that serialize_bulk_user_lists_for_deletion yields correct data
     """
-    stafflist = StaffListFactory.create()
-    assert list(serialize_bulk_staff_lists_for_deletion([stafflist.id])) == [
-        {"_id": gen_staff_list_id(stafflist), "_op_type": "delete"}
+    stafflist = factories.StaffListFactory.create()
+    assert list(serializers.serialize_bulk_staff_lists_for_deletion([stafflist.id])) == [
+        {"_id": api.gen_staff_list_id(stafflist), "_op_type": "delete"}
     ]
 
 
@@ -1036,9 +965,9 @@ def test_serialize_bulk_videos_for_deletion():
     """
     Test that serialize_bulk_videos_for_deletion yields correct data
     """
-    video = VideoFactory.create()
-    assert list(serialize_bulk_videos_for_deletion([video.id])) == [
-        {"_id": gen_video_id(video), "_op_type": "delete"}
+    video = factories.VideoFactory.create()
+    assert list(serializers.serialize_bulk_videos_for_deletion([video.id])) == [
+        {"_id": api.gen_video_id(video), "_op_type": "delete"}
     ]
 
 
@@ -1047,9 +976,9 @@ def test_serialize_bulk_podcasts_for_deletion():
     """
     Test that serialize_bulk_podcasts_for_deletion yields correct data
     """
-    podcast = PodcastFactory.create()
-    assert list(serialize_bulk_podcasts_for_deletion([podcast.id])) == [
-        {"_id": gen_podcast_id(podcast), "_op_type": "delete"}
+    podcast = factories.PodcastFactory.create()
+    assert list(serializers.serialize_bulk_podcasts_for_deletion([podcast.id])) == [
+        {"_id": api.gen_podcast_id(podcast), "_op_type": "delete"}
     ]
 
 
@@ -1058,7 +987,7 @@ def test_serialize_bulk_podcast_episodes_for_deletion():
     """
     Test that serialize_bulk_podcasts_for_deletion yields correct data
     """
-    podcast_episode = PodcastEpisodeFactory.create()
-    assert list(serialize_bulk_podcast_episodes_for_deletion([podcast_episode.id])) == [
-        {"_id": gen_podcast_episode_id(podcast_episode), "_op_type": "delete"}
+    podcast_episode = factories.PodcastEpisodeFactory.create()
+    assert list(serializers.serialize_bulk_podcast_episodes_for_deletion([podcast_episode.id])) == [
+        {"_id": api.gen_podcast_episode_id(podcast_episode), "_op_type": "delete"}
     ]

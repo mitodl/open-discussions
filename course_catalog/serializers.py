@@ -46,7 +46,6 @@ from course_catalog.utils import (
 )
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
-from search.constants import USER_LIST_TYPE, STAFF_LIST_TYPE
 from search.task_helpers import (
     delete_staff_list,
     delete_user_list,

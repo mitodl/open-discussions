@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from channels.api import add_user_role
 from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
 from channels.factories.models import ChannelFactory
-from course_catalog.constants import PlatformType, PrivacyLevel, UserListType
+from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -42,6 +42,7 @@ from search.constants import (
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
+    USER_PATH_TYPE,
 )
 from search.serializers import (
     ESContentFileSerializer,
