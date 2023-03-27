@@ -339,8 +339,10 @@ def test_execute_search_with_suggestion(
     }
 
 
-def test_execute_learn_search(user, elasticsearch):
+@pytest.mark.parametrize("list_search_enabled", [True, False])
+def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
+    settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
     elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
@@ -351,49 +353,68 @@ def test_execute_learn_search(user, elasticsearch):
         execute_learn_search(user=user, query=query)
         == elasticsearch.conn.search.return_value
     )
-    elasticsearch.conn.search.assert_called_once_with(
-        body={
-            **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            USER_PATH_TYPE,
-                                                        ]
-                                                    }
+    if list_search_enabled:
+        subquery = {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": [
+                                                        USER_LIST_TYPE,
+                                                        USER_PATH_TYPE,
+                                                    ]
                                                 }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                    {"term": {"author": user.id}},
-                                ]
-                            }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {"term": {"privacy_level": PrivacyLevel.public.value}},
+                                {"term": {"author": user.id}},
+                            ]
                         }
-                    ]
-                }
-            },
-        },
+                    }
+                ]
+            }
+        }
+    else:
+        subquery = {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "must_not": [
+                                {
+                                    "terms": {
+                                        "object_type": [
+                                            USER_LIST_TYPE,
+                                            USER_PATH_TYPE,
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+
+    elasticsearch.conn.search.assert_called_once_with(
+        body={**query, "query": subquery},
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
 
-def test_execute_learn_search_anonymous(elasticsearch):
+@pytest.mark.parametrize("list_search_enabled", [True, False])
+def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
+    settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
     elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     user = AnonymousUser()
     query = {"a": "query"}
@@ -401,40 +422,59 @@ def test_execute_learn_search_anonymous(elasticsearch):
         execute_learn_search(user=user, query=query)
         == elasticsearch.conn.search.return_value
     )
+    if list_search_enabled:
+        subquery = {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "should": [
+                                {
+                                    "bool": {
+                                        "must_not": [
+                                            {
+                                                "terms": {
+                                                    "object_type": [
+                                                        USER_LIST_TYPE,
+                                                        USER_PATH_TYPE,
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                {"term": {"privacy_level": PrivacyLevel.public.value}},
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
+    else:
+        subquery = {
+            "bool": {
+                "filter": [
+                    {
+                        "bool": {
+                            "must_not": [
+                                {
+                                    "terms": {
+                                        "object_type": [
+                                            USER_LIST_TYPE,
+                                            USER_PATH_TYPE,
+                                        ]
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        }
     elasticsearch.conn.search.assert_called_once_with(
         body={
             **query,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
-                            "bool": {
-                                "should": [
-                                    {
-                                        "bool": {
-                                            "must_not": [
-                                                {
-                                                    "terms": {
-                                                        "object_type": [
-                                                            USER_LIST_TYPE,
-                                                            USER_PATH_TYPE,
-                                                        ]
-                                                    }
-                                                }
-                                            ]
-                                        }
-                                    },
-                                    {
-                                        "term": {
-                                            "privacy_level": PrivacyLevel.public.value
-                                        }
-                                    },
-                                ]
-                            }
-                        }
-                    ]
-                }
-            },
+            "query": subquery,
         },
         doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
