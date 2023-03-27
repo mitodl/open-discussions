@@ -588,7 +588,9 @@ def test_es_userlist_serializer_image_src():
     Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
     """
     user_list = factories.UserListFactory.create(image_src=None)
-    factories.UserListItemFactory.create(user_list=user_list, position=1, is_userlist=True)
+    factories.UserListItemFactory.create(
+        user_list=user_list, position=1, is_userlist=True
+    )
     list_item_course = factories.UserListItemFactory.create(
         user_list=user_list, position=2, is_course=True
     )
@@ -656,7 +658,9 @@ def test_es_podcast_episode_serializer(offered_by):
     Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
     """
     podcast_episode = factories.PodcastEpisodeFactory.create()
-    podcast_episode.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
+    podcast_episode.offered_by.set(
+        [factories.LearningResourceOfferorFactory(name=offered_by)]
+    )
 
     serialized = serializers.ESPodcastEpisodeSerializer(podcast_episode).data
     assert_json_equal(
@@ -708,7 +712,9 @@ def test_serialize_comment_for_bulk(mocker):
         "search.serializers.ESCommentSerializer.to_representation",
         return_value=base_serialized_comment,
     )
-    serialized = serializers.serialize_comment_for_bulk(mocker.Mock(comment_id=comment_id))
+    serialized = serializers.serialize_comment_for_bulk(
+        mocker.Mock(comment_id=comment_id)
+    )
     assert serialized == {"_id": f"c_{comment_id}", **base_serialized_comment}
 
 
@@ -721,7 +727,11 @@ def test_serialize_bulk_profiles(mocker):
         "search.serializers.serialize_profile_for_bulk"
     )
     users = UserFactory.create_batch(5)
-    list(serializers.serialize_bulk_profiles([profile.id for profile in Profile.objects.all()]))
+    list(
+        serializers.serialize_bulk_profiles(
+            [profile.id for profile in Profile.objects.all()]
+        )
+    )
     for user in users:
         mock_serialize_profile.assert_any_call(user.profile)
 
@@ -743,7 +753,11 @@ def test_serialize_bulk_courses(mocker):
     """
     mock_serialize_course = mocker.patch("search.serializers.serialize_course_for_bulk")
     courses = factories.CourseFactory.create_batch(5)
-    list(serializers.serialize_bulk_courses([course.id for course in Course.objects.all()]))
+    list(
+        serializers.serialize_bulk_courses(
+            [course.id for course in Course.objects.all()]
+        )
+    )
     for course in courses:
         mock_serialize_course.assert_any_call(course)
 
@@ -911,9 +925,9 @@ def test_serialize_profiles_file_for_bulk_deletion(user):
     """
     Test that serialize_profiles_file_for_bulk_deletion yield correct data
     """
-    assert list(serializers.serialize_bulk_profiles_for_deletion([user.profile.id])) == [
-        {"_id": api.gen_profile_id(user.username), "_op_type": "delete"}
-    ]
+    assert list(
+        serializers.serialize_bulk_profiles_for_deletion([user.profile.id])
+    ) == [{"_id": api.gen_profile_id(user.username), "_op_type": "delete"}]
 
 
 @pytest.mark.django_db
@@ -923,7 +937,10 @@ def test_serialize_bulk_courses_for_deletion():
     """
     course = factories.CourseFactory.create()
     assert list(serializers.serialize_bulk_courses_for_deletion([course.id])) == [
-        {"_id": api.gen_course_id(course.platform, course.course_id), "_op_type": "delete"}
+        {
+            "_id": api.gen_course_id(course.platform, course.course_id),
+            "_op_type": "delete",
+        }
     ]
 
 
@@ -955,9 +972,9 @@ def test_serialize_bulk_staff_lists_for_deletion():
     Test that serialize_bulk_user_lists_for_deletion yields correct data
     """
     stafflist = factories.StaffListFactory.create()
-    assert list(serializers.serialize_bulk_staff_lists_for_deletion([stafflist.id])) == [
-        {"_id": api.gen_staff_list_id(stafflist), "_op_type": "delete"}
-    ]
+    assert list(
+        serializers.serialize_bulk_staff_lists_for_deletion([stafflist.id])
+    ) == [{"_id": api.gen_staff_list_id(stafflist), "_op_type": "delete"}]
 
 
 @pytest.mark.django_db
@@ -988,6 +1005,6 @@ def test_serialize_bulk_podcast_episodes_for_deletion():
     Test that serialize_bulk_podcasts_for_deletion yields correct data
     """
     podcast_episode = factories.PodcastEpisodeFactory.create()
-    assert list(serializers.serialize_bulk_podcast_episodes_for_deletion([podcast_episode.id])) == [
-        {"_id": api.gen_podcast_episode_id(podcast_episode), "_op_type": "delete"}
-    ]
+    assert list(
+        serializers.serialize_bulk_podcast_episodes_for_deletion([podcast_episode.id])
+    ) == [{"_id": api.gen_podcast_episode_id(podcast_episode), "_op_type": "delete"}]
