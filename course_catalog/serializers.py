@@ -51,7 +51,7 @@ from search.task_helpers import delete_user_list, upsert_user_list
 COMMON_IGNORED_FIELDS = ("created_on", "updated_on")
 
 
-class GenericForeignKeyFieldSerializer(serializers.ModelSerializer):
+class GenericForeignKeyFieldSerializer(serializers.Serializer):
     """
     Special field to handle the generic foreign key in FavoriteItem and ListItem
     """
