@@ -33,9 +33,9 @@ from search.api import (
     gen_podcast_id,
     gen_profile_id,
     gen_program_id,
+    gen_staff_list_id,
     gen_user_list_id,
     gen_video_id,
-    gen_staff_list_id,
 )
 from search.constants import (
     COMMENT_TYPE,
@@ -59,11 +59,12 @@ from search.serializers import (
     ESPodcastSerializer,
     ESProfileSerializer,
     ESProgramSerializer,
+    ESStaffListSerializer,
     ESUserListSerializer,
     ESVideoSerializer,
-    ESStaffListSerializer,
 )
 from search.tasks import (
+    bulk_delete_staff_lists,
     create_document,
     create_post_document,
     delete_document,
@@ -75,6 +76,7 @@ from search.tasks import (
     index_courses,
     index_posts,
     index_run_content_files,
+    index_staff_lists,
     index_videos,
     start_recreate_index,
     start_update_index,
@@ -87,12 +89,10 @@ from search.tasks import (
     upsert_podcast_episode,
     upsert_profile,
     upsert_program,
+    upsert_staff_list,
     upsert_user_list,
     upsert_video,
     wrap_retry_exception,
-    upsert_staff_list,
-    index_staff_lists,
-    bulk_delete_staff_lists,
 )
 
 pytestmark = pytest.mark.django_db
@@ -410,7 +410,7 @@ def test_bulk_delete_staff_lists(mocker, with_error):  # pylint: disable=unused-
 )
 def test_start_recreate_index(
     mocker, mocked_celery, user, indexes
-):  # pylint:disable=too-many-locals,too-many-statements
+):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
     """
     recreate_index should recreate the elasticsearch index and reindex all data with it
     """

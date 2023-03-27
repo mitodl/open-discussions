@@ -3,8 +3,8 @@ Tests for the indexing API
 """
 import pytest
 
-from search.constants import COURSE_TYPE
 from search.connection import get_active_aliases
+from search.constants import COURSE_TYPE
 
 
 @pytest.mark.parametrize("include_reindexing", [True, False])

@@ -1,8 +1,8 @@
 """
 Elasticsearch connection functionality
 """
-from functools import partial
 import uuid
+from functools import partial
 
 from django.conf import settings
 from elasticsearch_dsl.connections import connections

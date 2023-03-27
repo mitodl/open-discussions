@@ -1,6 +1,7 @@
 # pylint: disable=redefined-outer-name
 """Tests for search views"""
 from types import SimpleNamespace
+
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
