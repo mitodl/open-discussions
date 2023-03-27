@@ -85,7 +85,6 @@ WEBPACK_LOADER = {
     },
 }
 
-
 # Application definition
 
 INSTALLED_APPS = (
@@ -182,7 +181,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "open_discussions.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 # Uses DATABASE_URL to configure with sqlite default:
@@ -202,7 +200,6 @@ if get_bool("OPEN_DISCUSSIONS_DB_DISABLE_SSL", False):
     DEFAULT_DATABASE_CONFIG["OPTIONS"] = {}
 else:
     DEFAULT_DATABASE_CONFIG["OPTIONS"] = {"sslmode": "require"}
-
 
 DATABASES = {"default": DEFAULT_DATABASE_CONFIG}
 
@@ -243,7 +240,6 @@ SOCIAL_AUTH_MICROMASTERS_LOGIN_URL = get_string(
 # Email backend settings
 SOCIAL_AUTH_EMAIL_FORM_URL = "login"
 SOCIAL_AUTH_EMAIL_FORM_HTML = "login.html"
-
 
 # SAML backend settings
 SOCIAL_AUTH_SAML_LOGIN_URL = get_string("SOCIAL_AUTH_SAML_LOGIN_URL", None)
@@ -310,7 +306,6 @@ SOCIAL_AUTH_PIPELINE = (
     "authentication.pipeline.user.update_managed_channel_memberships",
 )
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
@@ -347,7 +342,6 @@ EMAIL_HOST_PASSWORD = get_string("OPEN_DISCUSSIONS_EMAIL_PASSWORD", "")
 EMAIL_USE_TLS = get_bool("OPEN_DISCUSSIONS_EMAIL_TLS", False)
 EMAIL_SUPPORT = get_string("OPEN_DISCUSSIONS_SUPPORT_EMAIL", "support@example.com")
 DEFAULT_FROM_EMAIL = get_string("OPEN_DISCUSSIONS_FROM_EMAIL", "webmaster@localhost")
-
 
 MAILGUN_SENDER_DOMAIN = get_string("MAILGUN_SENDER_DOMAIN", None)
 if not MAILGUN_SENDER_DOMAIN:
@@ -441,12 +435,10 @@ SOCIAL_AUTH_SAML_ENABLED_IDPS = {
     }
 }
 
-
 SOCIAL_AUTH_SAML_SECURITY_CONFIG = {
     "wantAssertionsEncrypted": SOCIAL_AUTH_SAML_SECURITY_ENCRYPTED,
     "requestedAuthnContext": False,
 }
-
 
 # embed.ly configuration
 EMBEDLY_KEY = get_string("EMBEDLY_KEY", None)
@@ -654,7 +646,6 @@ CELERY_RESULT_SERIALIZER = "json"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TIMEZONE = "UTC"
 
-
 # django cache back-ends
 CACHES = {
     "default": {
@@ -671,7 +662,6 @@ CACHES = {
         "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
     },
 }
-
 
 # Elasticsearch
 ELASTICSEARCH_DEFAULT_PAGE_SIZE = get_int("ELASTICSEARCH_DEFAULT_PAGE_SIZE", 6)
@@ -788,7 +778,7 @@ OPEN_DISCUSSIONS_FEATURES_PREFIX = get_string(
 )
 OPEN_DISCUSSIONS_FEATURES_DEFAULT = get_bool("OPEN_DISCUSSIONS_FEATURES_DEFAULT", False)
 FEATURES = {
-    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX) :]: get_any(key, None)
+    key[len(OPEN_DISCUSSIONS_FEATURES_PREFIX):]: get_any(key, None)
     for key in get_all_config_keys()
     if key.startswith(OPEN_DISCUSSIONS_FEATURES_PREFIX)
 }
@@ -828,14 +818,6 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.MultiPartRenderer",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-}
-
-SPECTACULAR_SETTINGS = {
-    "TITLE": "MIT Open Discussions Course Catalog API",
-    "DESCRIPTION": "Open Discussions public API",
-    "VERSION": "0.0.1",
-    "SERVE_INCLUDE_SCHEMA": False,
-    "SERVE_URLCONF": "course_catalog.urls",
 }
 
 USE_X_FORWARDED_PORT = get_bool("USE_X_FORWARDED_PORT", False)
@@ -900,7 +882,6 @@ BLOCKLISTED_COURSES_URL = get_string(
     "BLOCKLISTED_COURSES_URL",
     "https://raw.githubusercontent.com/mitodl/open-resource-blocklists/master/courses.txt",
 )
-
 DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
 
 # Base URL for Micromasters data
@@ -1001,3 +982,5 @@ def setup_x509():
 
 
 setup_x509()
+
+from open_discussions.settings_spectacular import *
