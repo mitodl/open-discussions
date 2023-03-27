@@ -835,6 +835,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Open Discussions public API',
     'VERSION': '0.0.1',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SERVE_URLCONF': "course_catalog.urls",
 }
 
 USE_X_FORWARDED_PORT = get_bool("USE_X_FORWARDED_PORT", False)

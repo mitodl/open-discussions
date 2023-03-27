@@ -226,8 +226,6 @@ jmespath==0.9.3
     # via
     #   boto3
     #   botocore
-jsonschema==4.17.3
-    # via drf-spectacular
 kombu==5.2.4
     # via
     #   celery
@@ -306,8 +304,6 @@ pyparsing==2.4.7
     # via
     #   httplib2
     #   packaging
-pyrsistent==0.19.3
-    # via jsonschema
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
