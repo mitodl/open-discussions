@@ -16,7 +16,11 @@ Including another URLconf
 from django.conf.urls import url
 from django.urls import include
 from rest_framework_extensions.routers import ExtendedSimpleRouter
-from drf_spectacular.views import SpectacularAPIView,SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 from course_catalog import views
 from course_catalog.views import WebhookOCWNextView, WebhookOCWView
@@ -68,7 +72,15 @@ urlpatterns = [
         r"^api/v0/ocw-course-report", views.ocw_course_report, name="ocw-course-report"
     ),
     url(r"^podcasts/rss_feed", views.podcast_rss_feed, name="podcast-rss-feed"),
-    url(r'api/v0/schema/$', SpectacularAPIView.as_view(), name="schema"),
-    url('api/v0/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    url('api/v0/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    url(r"api/v0/schema/$", SpectacularAPIView.as_view(), name="schema"),
+    url(
+        "api/v0/schema/swagger-ui/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    url(
+        "api/v0/schema/redoc/",
+        SpectacularRedocView.as_view(url_name="schema"),
+        name="redoc",
+    ),
 ]

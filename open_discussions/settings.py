@@ -827,15 +827,15 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.MultiPartRenderer",
     ],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'MIT Open Discussions Course Catalog API',
-    'DESCRIPTION': 'Open Discussions public API',
-    'VERSION': '0.0.1',
-    'SERVE_INCLUDE_SCHEMA': False,
-    'SERVE_URLCONF': "course_catalog.urls",
+    "TITLE": "MIT Open Discussions Course Catalog API",
+    "DESCRIPTION": "Open Discussions public API",
+    "VERSION": "0.0.1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SERVE_URLCONF": "course_catalog.urls",
 }
 
 USE_X_FORWARDED_PORT = get_bool("USE_X_FORWARDED_PORT", False)
