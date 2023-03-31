@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.211.0
+---------------
+
+- Jw/drf spectacular (#3900)
+
 Version 0.210.0 (Released March 27, 2023)
 ---------------
 
