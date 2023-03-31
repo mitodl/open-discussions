@@ -73,10 +73,8 @@ describe("CompactPostDisplay", () => {
     assert.ok(titleDisplay.exists())
     assert.deepEqual(titleDisplay.props().post, post)
 
-    assert.include(
-      wrapper.find(".comment-link").at(0).text(),
-      `${post.num_comments}`
-    )
+    const commentHref = wrapper.find(".comment-link")
+    assert.ok(commentHref.exists())
 
     const authoredBy = wrapper.find(".authored-by").text()
     assert(authoredBy.startsWith(post.author_name))

@@ -99,7 +99,6 @@ export class CompactPostDisplay extends React.Component<Props> {
           <i className="material-icons chat_bubble_outline">
             chat_bubble_outline
           </i>
-          <span>{post.num_comments}</span>
         </Link>
         {userIsAnonymous() || useSearchPageUI ? null : (
           <i
