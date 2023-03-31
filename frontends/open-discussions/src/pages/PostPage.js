@@ -22,10 +22,7 @@ import { CommentSortPicker } from "../components/Picker"
 import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"
-import {
-  getPostDropdownMenuKey,
-  postMenuDropdownFuncs
-} from "../lib/posts"
+import { getPostDropdownMenuKey, postMenuDropdownFuncs } from "../lib/posts"
 import { actions } from "../actions"
 import { clearCommentError, replaceMoreComments } from "../actions/comment"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
