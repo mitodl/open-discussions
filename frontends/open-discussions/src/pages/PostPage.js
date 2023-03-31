@@ -235,7 +235,7 @@ export class PostPage extends React.Component<PostPageProps> {
     if (post.num_comments > 0) {
       return (
         <div className="count-and-sort">
-          <div className="comments-count">{formatCommentsCount(post)}</div>
+          <div className="comments-count"></div>
           <CommentSortPicker
             updatePickerParam={updateCommentSortParam(this.props)}
             value={qs.parse(search).sort || COMMENT_SORT_BEST}
