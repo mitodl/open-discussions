@@ -23,7 +23,6 @@ import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"
 import {
-  formatCommentsCount,
   getPostDropdownMenuKey,
   postMenuDropdownFuncs
 } from "../lib/posts"
