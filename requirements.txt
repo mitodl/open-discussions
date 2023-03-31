@@ -10,6 +10,8 @@ amqp==5.1.1
     # via kombu
 appdirs==1.4.3
     # via zeep
+asttokens==2.2.1
+    # via stack-data
 async-timeout==4.0.2
     # via redis
 attrs==19.3.0
@@ -84,9 +86,7 @@ cryptography==3.4.8
 cssselect2==0.2.1
     # via cairosvg
 decorator==4.4.1
-    # via
-    #   ipython
-    #   traitlets
+    # via ipython
 defusedxml==0.6.0
     # via
     #   cairosvg
@@ -177,6 +177,8 @@ elasticsearch==6.3.0
     #   elasticsearch-dsl
 elasticsearch-dsl==6.1.0
     # via -r requirements.in
+executing==1.2.0
+    # via stack-data
 factory-boy==2.12.0
     # via -r requirements.in
 faker==2.0.0
@@ -209,10 +211,8 @@ inflection==0.5.1
     # via drf-spectacular
 ipaddress==1.0.22
     # via elasticsearch-dsl
-ipython==7.16.3
+ipython==8.10.0
     # via -r requirements.in
-ipython-genutils==0.2.0
-    # via traitlets
 isodate==0.6.1
     # via
     #   python3-saml
@@ -238,6 +238,8 @@ lxml==4.6.5
     #   zeep
 markdown2==2.4.0
     # via -r requirements.in
+matplotlib-inline==0.1.6
+    # via ipython
 mit-moira @ git+https://github.com/mitodl/mit-moira.git
     # via -r requirements.in
 nested-lookup==0.2.22
@@ -268,7 +270,7 @@ praw==4.5.1
     # via -r requirements.in
 prawcore==0.10.1
     # via praw
-prompt-toolkit==3.0.3
+prompt-toolkit==3.0.38
     # via
     #   click-repl
     #   ipython
@@ -278,6 +280,8 @@ psycopg2==2.8.3
     #   django-server-status
 ptyprocess==0.6.0
     # via pexpect
+pure-eval==0.2.2
+    # via stack-data
 pyasn1==0.4.7
     # via
     #   pyasn1-modules
@@ -367,6 +371,7 @@ sgmllib3k==1.0.0
     # via feedparser
 six==1.15.0
     # via
+    #   asttokens
     #   click-repl
     #   django-anymail
     #   django-appconf
@@ -389,7 +394,6 @@ six==1.15.0
     #   social-auth-app-django
     #   social-auth-core
     #   tenacity
-    #   traitlets
     #   zeep
 smart-open==1.8.0
     # via ocw-data-parser
@@ -401,6 +405,8 @@ soupsieve==2.0
     # via beautifulsoup4
 sqlparse==0.3.0
     # via django
+stack-data==0.6.2
+    # via ipython
 static3==0.5.1
     # via
     #   -r requirements.in
@@ -419,8 +425,10 @@ tldextract==2.2.0
     # via -r requirements.in
 toolz==0.10.0
     # via -r requirements.in
-traitlets==4.3.3
-    # via ipython
+traitlets==5.9.0
+    # via
+    #   ipython
+    #   matplotlib-inline
 ulid-py==0.0.3
     # via -r requirements.in
 update-checker==0.16
