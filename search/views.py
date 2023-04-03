@@ -10,10 +10,10 @@ from rest_framework.views import APIView
 from authentication.decorators import blocked_ip_exempt
 from open_discussions import features
 from search.api import (
+    execute_learn_search,
     execute_search,
     find_related_documents,
     find_similar_resources,
-    execute_learn_search,
     is_learning_query,
 )
 

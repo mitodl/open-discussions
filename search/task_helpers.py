@@ -2,45 +2,46 @@
 Functions that execute search-related asynchronous tasks
 """
 import logging
-from functools import wraps, partial
+from functools import partial, wraps
 
 from django.conf import settings
 
-from open_discussions.features import INDEX_UPDATES, if_feature_enabled
-from channels.constants import POST_TYPE, COMMENT_TYPE, VoteActions
+from channels.constants import COMMENT_TYPE, POST_TYPE, VoteActions
 from channels.models import Comment
 from channels.utils import render_article_text
-
+from open_discussions.features import INDEX_UPDATES, if_feature_enabled
+from search import tasks
 from search.api import (
-    gen_post_id,
     gen_comment_id,
-    gen_profile_id,
-    is_reddit_object_removed,
     gen_course_id,
+    gen_podcast_episode_id,
+    gen_podcast_id,
+    gen_post_id,
+    gen_profile_id,
     gen_program_id,
+    gen_staff_list_id,
     gen_user_list_id,
     gen_video_id,
-    gen_podcast_id,
-    gen_podcast_episode_id,
+    is_reddit_object_removed,
 )
 from search.constants import (
-    PROFILE_TYPE,
     COURSE_TYPE,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    PROFILE_TYPE,
     PROGRAM_TYPE,
+    STAFF_LIST_TYPE,
     USER_LIST_TYPE,
     VIDEO_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
 )
-from search.serializers import ESPostSerializer, ESCommentSerializer
-from search import tasks
+from search.serializers import ESCommentSerializer, ESPostSerializer
 from search.tasks import (
     create_document,
     create_post_document,
-    update_document_with_partial,
-    increment_document_integer_field,
-    update_field_values_by_query,
     delete_document,
+    increment_document_integer_field,
+    update_document_with_partial,
+    update_field_values_by_query,
 )
 
 log = logging.getLogger()
@@ -435,6 +436,28 @@ def delete_user_list(user_list_obj):
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
     delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def upsert_staff_list(staff_list_id):
+    """
+    Run a task to update all fields of a StaffList Elasticsearch document
+
+    Args:
+        staff_list_id (int): the primary key for the StaffList to update in ES
+    """
+    tasks.upsert_staff_list.delay(staff_list_id)
+
+
+@if_feature_enabled(INDEX_UPDATES)
+def delete_staff_list(staff_list_obj):
+    """
+    Runs a task to delete an ES StaffList document
+
+    Args:
+        staff_list_obj (course_catalog.models.StaffList): A StaffList object
+    """
+    delete_document.delay(gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)

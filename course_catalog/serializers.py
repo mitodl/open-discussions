@@ -46,7 +46,12 @@ from course_catalog.utils import (
 )
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
-from search.task_helpers import delete_user_list, upsert_user_list
+from search.task_helpers import (
+    delete_staff_list,
+    delete_user_list,
+    upsert_staff_list,
+    upsert_user_list,
+)
 
 COMMON_IGNORED_FIELDS = ("created_on", "updated_on")
 
@@ -776,6 +781,13 @@ class StaffListSerializer(
                 stafflist = super().update(instance, validated_data)
                 if topics_data is not None:
                     stafflist.topics.set(CourseTopic.objects.filter(id__in=topics_data))
+                if (
+                    instance.items.exists()
+                    and instance.privacy_level == PrivacyLevel.public.value
+                ):
+                    upsert_staff_list(stafflist.id)
+                else:
+                    delete_staff_list(stafflist)
                 return stafflist
 
     class Meta:

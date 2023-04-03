@@ -5,37 +5,36 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
 from course_catalog.factories import (
+    ContentFileFactory,
     CourseFactory,
     LearningResourceRunFactory,
-    ContentFileFactory,
 )
 from open_discussions.utils import chunks
+from search import indexing_api
 from search.api import gen_course_id
 from search.connection import get_default_alias_name
-from search.constants import POST_TYPE, COMMENT_TYPE, ALIAS_ALL_INDICES, GLOBAL_DOC_TYPE
+from search.constants import ALIAS_ALL_INDICES, COMMENT_TYPE, GLOBAL_DOC_TYPE, POST_TYPE
 from search.exceptions import ReindexException
-from search import indexing_api
 from search.indexing_api import (
+    SCRIPTING_LANG,
+    UPDATE_CONFLICT_SETTING,
     clear_and_create_index,
     create_backing_index,
     create_document,
-    update_field_values_by_query,
-    get_reindexing_alias_name,
-    update_document_with_partial,
-    update_post,
-    increment_document_integer_field,
-    switch_indices,
-    SCRIPTING_LANG,
-    UPDATE_CONFLICT_SETTING,
-    delete_document,
-    index_course_content_files,
     delete_courses,
-    index_run_content_files,
+    delete_document,
     delete_run_content_files,
+    get_reindexing_alias_name,
+    increment_document_integer_field,
+    index_course_content_files,
+    index_run_content_files,
+    switch_indices,
+    update_document_with_partial,
+    update_field_values_by_query,
+    update_post,
 )
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]

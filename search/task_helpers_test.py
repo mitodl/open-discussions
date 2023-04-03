@@ -5,6 +5,7 @@ import pytest
 from channels.constants import COMMENT_TYPE, POST_TYPE, VoteActions
 from channels.factories.models import CommentFactory
 from channels.utils import render_article_text
+from course_catalog.constants import UserListType
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -31,7 +32,6 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     USER_LIST_TYPE,
-    USER_PATH_TYPE,
     VIDEO_TYPE,
 )
 from search.task_helpers import (
@@ -497,7 +497,9 @@ def test_delete_video(mocker):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, USER_PATH_TYPE])
+@pytest.mark.parametrize(
+    "list_type", [UserListType.LIST.value, UserListType.LEARNING_PATH.value]
+)
 def test_upsert_user_list(mocker, list_type):
     """
     Tests that upsert_user_list calls update_field_values_by_query with the right parameters
@@ -509,7 +511,9 @@ def test_upsert_user_list(mocker, list_type):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("list_type", [USER_LIST_TYPE, USER_PATH_TYPE])
+@pytest.mark.parametrize(
+    "list_type", [UserListType.LIST.value, UserListType.LEARNING_PATH.value]
+)
 def test_delete_user_list(mocker, list_type):
     """Tests that deleting a UserList triggers a delete on a UserList document"""
     patched_delete_task = mocker.patch("search.task_helpers.delete_document")

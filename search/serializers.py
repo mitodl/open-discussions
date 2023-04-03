@@ -2,56 +2,57 @@
 # pylint: disable=unused-argument,too-many-lines
 import logging
 import re
-
 from functools import reduce
+
 from django.db.models import Prefetch
 from prawcore import NotFound
 from rest_framework import serializers
 
-from channels.constants import POST_TYPE, COMMENT_TYPE
+from channels.constants import COMMENT_TYPE, POST_TYPE
 from channels.models import Comment, Post
+from course_catalog.constants import OCW_DEPARTMENTS, PlatformType
 from course_catalog.models import (
-    Course,
-    LearningResourceRun,
-    CoursePrice,
-    Program,
-    UserList,
-    Video,
     ContentFile,
+    Course,
+    CoursePrice,
+    LearningResourceRun,
     Podcast,
     PodcastEpisode,
+    Program,
+    StaffList,
+    UserList,
+    Video,
 )
-
-from course_catalog.constants import PlatformType, OCW_DEPARTMENTS
-from profiles.api import get_channels, get_channel_join_dates
+from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
+from profiles.api import get_channel_join_dates, get_channels
 from profiles.models import Profile
 from profiles.utils import image_uri
 from search.api import (
-    gen_post_id,
     gen_comment_id,
-    gen_profile_id,
-    gen_course_id,
-    gen_user_list_id,
-    gen_program_id,
-    gen_video_id,
     gen_content_file_id,
-    gen_podcast_id,
+    gen_course_id,
     gen_podcast_episode_id,
+    gen_podcast_id,
+    gen_post_id,
+    gen_profile_id,
+    gen_program_id,
+    gen_staff_list_id,
+    gen_user_list_id,
+    gen_video_id,
 )
 from search.constants import (
-    PROFILE_TYPE,
     COURSE_TYPE,
-    PROGRAM_TYPE,
-    VIDEO_TYPE,
-    USER_LIST_TYPE,
-    RESOURCE_FILE_TYPE,
-    PODCAST_TYPE,
-    PODCAST_EPISODE_TYPE,
     OCW_SECTION_TYPE_MAPPING,
     OCW_TYPE_ASSIGNMENTS,
+    PODCAST_EPISODE_TYPE,
+    PODCAST_TYPE,
+    PROFILE_TYPE,
+    PROGRAM_TYPE,
+    RESOURCE_FILE_TYPE,
+    STAFF_LIST_TYPE,
+    USER_LIST_TYPE,
+    VIDEO_TYPE,
 )
-
-from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 
 log = logging.getLogger()
 
@@ -628,7 +629,7 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
 
 class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for user_lists
+    Elasticsearch serializer class for UserLists
     """
 
     default_search_priority = serializers.SerializerMethodField()
@@ -670,6 +671,55 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
             "minimum_price",
             "audience",
             "certification",
+        ]
+
+        read_only_fields = fields
+
+
+class ESStaffListSerializer(ESModelSerializer, LearningResourceSerializer):
+    """
+    Elasticsearch serializer class for StaffLists
+    """
+
+    default_search_priority = serializers.SerializerMethodField()
+
+    def get_default_search_priority(self, instance):
+        """
+        Staff Lists should have lower priority in the default search
+        """
+        return 0
+
+    def to_representation(self, instance):
+        """Serializes the instance"""
+        ret = super().to_representation(instance)
+
+        ret["object_type"] = STAFF_LIST_TYPE
+        if not instance.image_src:
+            first_item = (
+                instance.items.exclude(content_type__model=STAFF_LIST_TYPE)
+                .order_by("position")
+                .first()
+            )
+            if first_item:
+                ret["image_src"] = first_item.item.image_src
+        return ret
+
+    class Meta:
+        model = StaffList
+        fields = [
+            "id",
+            "short_description",
+            "title",
+            "image_src",
+            "topics",
+            "author",
+            "list_type",
+            "created",
+            "default_search_priority",
+            "minimum_price",
+            "audience",
+            "certification",
+            "privacy_level",
         ]
 
         read_only_fields = fields
@@ -1048,13 +1098,48 @@ def serialize_user_list_for_bulk(user_list_obj):
 
 def serialize_bulk_user_lists_for_deletion(ids):
     """
-    Serialize programs for bulk deletion
+    Serialize user lists for bulk deletion
 
     Args:
-        ids(list of int): List of program id's
+        ids(list of int): List of user list id's
     """
     for user_list in UserList.objects.filter(id__in=ids):
         yield serialize_for_deletion(gen_user_list_id(user_list))
+
+
+def serialize_bulk_staff_lists(ids):
+    """
+    Serialize StaffLists for bulk indexing
+
+    Args:
+        ids(list of int): List of StaffList id's
+    """
+    for staff_list in StaffList.objects.filter(id__in=ids).prefetch_related("topics"):
+        yield serialize_staff_list_for_bulk(staff_list)
+
+
+def serialize_staff_list_for_bulk(staff_list_obj):
+    """
+    Serialize a StaffList for bulk API request
+
+    Args:
+        staff_list_obj (StaffList): A staff list
+    """
+    return {
+        "_id": gen_staff_list_id(staff_list_obj),
+        **ESStaffListSerializer(staff_list_obj).data,
+    }
+
+
+def serialize_bulk_staff_lists_for_deletion(ids):
+    """
+    Serialize staff lists for bulk deletion
+
+    Args:
+        ids(list of int): List of staff list id's
+    """
+    for staff_list in StaffList.objects.filter(id__in=ids):
+        yield serialize_for_deletion(gen_staff_list_id(staff_list))
 
 
 def serialize_bulk_videos(ids):
