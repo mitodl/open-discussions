@@ -9,6 +9,7 @@ import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 import { imgConfigs } from "../util/constants"
 import IconButton from "@mui/material/IconButton"
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"
+import BookmarkIcon from "@mui/icons-material/Bookmark"
 import AddToListDialog, {
   useAddToListDialog
 } from "../pages/user-lists/AddToListDialog"
@@ -29,6 +30,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   const activateResource = useActivateResourceDrawer()
   const addToList = useAddToListDialog()
   const { user } = SETTINGS
+  const isInList = resource.lists.length > 0 || resource.is_favorite
   return (
     <>
       <LearningResourceCardTemplate
@@ -40,10 +42,11 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
         footerActionSlot={
           user.is_authenticated && (
             <IconButton
+              size="small"
               aria-label="Add to list"
               onClick={() => addToList.open(resource)}
             >
-              <BookmarkBorderIcon />
+              {isInList ? <BookmarkIcon /> : <BookmarkBorderIcon />}
             </IconButton>
           )
         }
