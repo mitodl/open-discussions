@@ -17,8 +17,8 @@ export enum LearningResourceType {
  * object_type === "favorites".
  *
  * We occasionally treat it somewhat like a LearningResourceType, though
- * (Example: LearningResourceCards can render a list of "Favorites" similarly
- * to a UserList.)
+ * (Example: LearningResourceCardTemplate can render a list of "Favorites"
+ * similarly to a UserList.)
  */
 export const TYPE_FAVORITES = "favorites"
 
@@ -64,7 +64,7 @@ export interface Course extends LearningResource {
 export interface UserList extends LearningResource {
   image_description?: string | null
   list_type: string
-  privacy_level: string
+  privacy_level: PrivacyLevel
   author: number
   author_name: string
   item_count: number
@@ -111,12 +111,25 @@ export type LearningResourceRun = {
 }
 
 export type LearningResourceRef = {
+  /**
+   * The learning resource type
+   */
+  content_type: LearningResourceType
+  /**
+   * id of the learning resource itself
+   */
   object_id: number
-  content_type: string
 }
 
 export type ListItemMember = {
+  /**
+   * The id of the list
+   */
   list_id: number
+  /**
+   * The id of the item member record, **not** the id of the learning resource,
+   * which is available at `listItemMember.object_id`.
+   */
   item_id: number
 } & LearningResourceRef
 

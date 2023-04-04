@@ -1,7 +1,6 @@
 import React from "react"
-import { LearningResourceCard, type PaginatedUserListItems } from "ol-search-ui"
-import { useActivateResourceDrawer } from "../LearningResourceDrawer"
-import { imgConfigs } from "../../util/constants"
+import type { PaginatedUserListItems } from "ol-search-ui"
+import LearningResourceCard from "../../components/LearningResourceCard"
 
 type UserListItemsProps = {
   isLoading: boolean
@@ -14,7 +13,6 @@ const UserListItems: React.FC<UserListItemsProps> = ({
   data,
   emptyMessage
 }) => {
-  const activateResource = useActivateResourceDrawer()
   return (
     <>
       {isLoading && <p>Loading...</p>}
@@ -28,10 +26,7 @@ const UserListItems: React.FC<UserListItemsProps> = ({
                 <li key={list.id}>
                   <LearningResourceCard
                     variant="row-reverse"
-                    className="ic-resource-card"
                     resource={list.content_data}
-                    imgConfig={imgConfigs["row-reverse"]}
-                    onActivate={activateResource}
                   />
                 </li>
               )

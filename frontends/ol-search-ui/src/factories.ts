@@ -13,7 +13,8 @@ import {
   Course,
   UserList,
   UserListItem,
-  PrivacyLevel
+  PrivacyLevel,
+  ListItemMember
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -76,7 +77,7 @@ export const makeCourse: Factory<Course> = overrides => ({
   object_type:       LearningResourceType.Course,
   runs:              times(3, () => makeRun()),
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]]),
+  lists:             times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          casual.random_element([
     [],
     [OPEN_CONTENT],
@@ -98,7 +99,7 @@ export const makeProgram: Factory<LearningResource> = overrides => ({
   offered_by:        [casual.random_element(["xpro", "micromasters"])],
   runs:              [makeRun()],
   is_favorite:       casual.coin_flip,
-  lists:             casual.random_element([[], [100, 200]]),
+  lists:             times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          casual.random_element([
     [],
     [OPEN_CONTENT],
@@ -123,7 +124,7 @@ export const makeVideo: Factory<LearningResource> = overrides => ({
   object_type:       LearningResourceType.Video,
   offered_by:        [casual.random_element(["mitc", "ocw"])],
   runs:              undefined,
-  lists:             [],
+  lists:             times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          [],
   certification:     [],
   topics:            [],
@@ -256,6 +257,24 @@ export const makeUserListItem: Factory<UserListItem> = overrides => {
     ...overrides
   }
   return item
+}
+
+export const makeListItemMember: Factory<
+  ListItemMember,
+  {
+    resource?: LearningResource
+    userList?: UserList
+  }
+> = (overrides, { resource, userList } = {}) => {
+  return {
+    list_id:      userList?.id ?? faker.unique(faker.datatype.number),
+    item_id:      faker.unique(faker.datatype.number),
+    object_id:    resource?.id ?? faker.unique(faker.datatype.number),
+    content_type:
+      resource?.object_type ??
+      faker.helpers.arrayElement(Object.values(LearningResourceType)),
+    ...overrides
+  }
 }
 
 export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)

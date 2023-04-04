@@ -27,14 +27,13 @@ type CardVariant = "column" | "row" | "row-reverse"
 type OnActivateCard<R extends CardMinimalResource = CardMinimalResource> = (
   resource: R
 ) => void
-type LearningResourceCardProps<
+type LearningResourceCardTemplateProps<
   R extends CardMinimalResource = CardMinimalResource
 > = {
   /**
    * Whether the course picture and info display as a column or row.
-   * Defaults to `'column'`.
    */
-  variant?: CardVariant
+  variant: CardVariant
   resource: R
   reordering?: boolean
   className?: string
@@ -72,9 +71,9 @@ const Offerers: React.FC<OffererProps> = ({ offerers }) => {
   )
 }
 
-const CardBody: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
-  resource
-}) => {
+const CardBody: React.FC<
+  Pick<LearningResourceCardTemplateProps, "resource">
+> = ({ resource }) => {
   const offerers = resource.offered_by ?? []
   return offerers.length > 0 ? (
     <div>
@@ -85,7 +84,7 @@ const CardBody: React.FC<Pick<LearningResourceCardProps, "resource">> = ({
 }
 
 const ResourceFooterDetails: React.FC<
-  Pick<LearningResourceCardProps, "resource">
+  Pick<LearningResourceCardTemplateProps, "resource">
 > = ({ resource }) => {
   const isList = [
     LearningResourceType.Userlist,
@@ -121,7 +120,7 @@ const ResourceFooterDetails: React.FC<
 }
 
 type CardImageProps = Pick<
-  LearningResourceCardProps,
+  LearningResourceCardTemplateProps,
   "resource" | "imgConfig" | "variant"
 >
 const CardImage: React.FC<CardImageProps> = ({
@@ -159,15 +158,23 @@ const variantClasses: Record<CardVariant, string> = {
   "row-reverse": "ol-lrc-row-reverse"
 }
 
-const LearningResourceCard = <R extends CardMinimalResource>({
-  variant = "column",
+/**
+ * A card display for Learning Resources. Includes a title, image, and various
+ * metadata.
+ *
+ * This template does not provide any meaningful user interaction by itself, but
+ * does accept props to build user interaction (e.g., `onActivate` and
+ * `footerActionSlot`).
+ */
+const LearningResourceCardTemplate = <R extends CardMinimalResource>({
+  variant,
   resource,
   imgConfig,
   className,
   suppressImage = false,
   onActivate,
   footerActionSlot
-}: LearningResourceCardProps<R>) => {
+}: LearningResourceCardTemplateProps<R>) => {
   const hasCertificate =
     resource.certification && resource.certification.length > 0
   const handleActivate = useCallback(
@@ -218,10 +225,10 @@ const LearningResourceCard = <R extends CardMinimalResource>({
   )
 }
 
-export default LearningResourceCard
+export default LearningResourceCardTemplate
 
 export type {
-  LearningResourceCardProps,
+  LearningResourceCardTemplateProps,
   CardMinimalResource,
   CardVariant,
   OnActivateCard

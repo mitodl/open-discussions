@@ -33,3 +33,34 @@
     }
   }
 }
+
+.add-to-list-dialog {
+  .MuiDialog-paper {
+    width: 325px;
+  }
+
+  .resource-title-inline {
+    font-style: italic
+  }
+}
+
+.add-to-list-description {
+  &.MuiDialogContent-root {
+    padding-bottom: 0;
+  }
+}
+
+.add-to-list-listing {
+  &.MuiDialogContent-root {
+    padding: 0;
+  }
+
+  .MuiListItem-root:not(.add-to-list-new) {
+    padding: 0;
+  }
+
+  .MuiListItemButton-root:not(.add-to-list-new) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

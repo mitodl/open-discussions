@@ -13,6 +13,10 @@ $card-list-spacer: 1.5em;
       display: none;
     }
   }
+
+  .bookmark-icon {
+    color: theme.$color-blue-3;
+  }
 }
 
 .ic-card-row-list {

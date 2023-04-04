@@ -3,11 +3,7 @@ import { assertInstanceOf, assertNotNil } from "ol-util"
 import { urls } from "../../api/fields"
 import { urls as widgetUrls } from "../../api/widgets"
 import { urls as lrUrls } from "../../api/learning-resources"
-import {
-  LearningResource,
-  LearningResourceCard,
-  ExpandedLearningResourceDisplay
-} from "ol-search-ui"
+import { LearningResource } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
 import type { UserList, UserListItem } from "ol-search-ui"
 import type { FieldChannel } from "../../api/fields"
@@ -24,7 +20,7 @@ import {
 } from "../../test-utils"
 import { makeWidgetListResponse } from "ol-widgets/src/factories"
 import { makeLearningResource } from "ol-search-ui/src/factories"
-import { waitForElementToBeRemoved } from "@testing-library/react"
+import LearningResourceCard from "../../components/LearningResourceCard"
 
 jest.mock("./WidgetsList", () => {
   const actual = jest.requireActual("./WidgetsList")
@@ -36,9 +32,6 @@ jest.mock("./WidgetsList", () => {
 const mockWidgetList = jest.mocked(WidgetList)
 
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
-const spyExpandedLearningResourceDisplay = jest.mocked(
-  ExpandedLearningResourceDisplay
-)
 
 jest.mock("ol-util", () => {
   const actual = jest.requireActual("ol-util")
@@ -128,7 +121,6 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
     resources
   }
 }
-type SetupResult = ReturnType<typeof setupApis>
 
 describe("FieldPage", () => {
   it("Displays the field title, banner, and avatar", async () => {
@@ -249,47 +241,6 @@ describe("FieldPage", () => {
       await waitFor(() => {
         expect(history.location.pathname).toEndWith(`/fields/${field.name}/`)
       })
-    }
-  )
-
-  test.each([
-    {
-      getItem:  (setupResult: SetupResult) => setupResult.featured.items[0],
-      cardDesc: "featured card"
-    },
-    {
-      getItem:  (setupResult: SetupResult) => setupResult.lists[0].items[0],
-      cardDesc: "subfield card"
-    }
-  ])(
-    "Clicking a $cardDesc opens the <LearningResourceDrawer />",
-    async ({ getItem }) => {
-      const result = setupApis()
-      const item = getItem(result)
-      const { field, resources } = result
-
-      const url = `/fields/${field.name}/`
-      const { history } = renderTestApp({ url })
-
-      await user.click(await screen.findByRole("button", { name: item.title }))
-      const params0 = new URLSearchParams(history.location.search)
-      expect(params0.get("resource_id")).toBe(String(item.id))
-      expect(params0.get("resource_type")).toBe(item.object_type)
-
-      const getDrawerContent = () =>
-        screen.getByLabelText("Detailed description")
-      const drawer = getDrawerContent()
-      await within(drawer).findByRole("heading", { name: item.title })
-      expect(spyExpandedLearningResourceDisplay).toHaveBeenCalledWith(
-        expect.objectContaining({ resource: resources[item.id] }),
-        expect.anything()
-      )
-
-      await user.click(screen.getByRole("button", { name: "Close" }))
-      const params1 = new URLSearchParams(history.location.search)
-      expect(params1.get("resource_id")).toBe(null)
-      expect(params1.get("resource_type")).toBe(null)
-      await waitForElementToBeRemoved(getDrawerContent)
     }
   )
 })

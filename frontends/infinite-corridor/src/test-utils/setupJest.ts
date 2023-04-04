@@ -49,9 +49,17 @@ jest.mock("ol-search-ui", () => {
   const actual = jest.requireActual("ol-search-ui")
   return {
     ...actual,
-    LearningResourceCard:            jest.fn(actual.LearningResourceCard),
+    LearningResourceCardTemplate:    jest.fn(actual.LearningResourceCardTemplate),
     ExpandedLearningResourceDisplay: jest.fn(
       actual.ExpandedLearningResourceDisplay
     )
+  }
+})
+jest.mock("../components/LearningResourceCard", () => {
+  const actual = jest.requireActual("../components/LearningResourceCard")
+  return {
+    __esModule: true,
+    ...actual,
+    default:    jest.fn(actual.default)
   }
 })

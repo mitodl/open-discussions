@@ -2,7 +2,9 @@ import type {
   LearningResource,
   PaginatedUserListItems,
   UserList,
-  CourseTopic
+  CourseTopic,
+  LearningResourceType,
+  ListItemMember
 } from "ol-search-ui"
 import type { PaginatedResult, PaginationSearchParams } from "ol-util"
 import axios from "../../libs/axios"
@@ -10,7 +12,8 @@ import {
   useMutation,
   useQuery,
   useQueryClient,
-  UseQueryResult
+  UseQueryResult,
+  UseQueryOptions
 } from "react-query"
 import { urls, keys, UserListOptions } from "./urls"
 
@@ -41,7 +44,7 @@ const useUserListItems = (listId: number, options?: PaginationSearchParams) => {
   )
 }
 
-const useFavorites = (options?: PaginationSearchParams) => {
+const useFavoritesListing = (options?: PaginationSearchParams) => {
   const url = urls.favorite.listing(options)
   const key = keys.favorites.listing.page(options)
   return useQuery<PaginatedUserListItems>(key, () =>
@@ -49,11 +52,49 @@ const useFavorites = (options?: PaginationSearchParams) => {
   )
 }
 
-const useTopics = () => {
+const useFavorite = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (resource: LearningResource) => {
+      const url = urls.resource.favorite(resource.object_type, resource.id)
+      return axios.post(url).then(res => res.data)
+    },
+    onSuccess(_data, resource) {
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(resource.object_type).id(resource.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.favorites.listing.all
+      })
+    }
+  })
+}
+
+const useUnfavorite = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (resource: LearningResource) => {
+      const url = urls.resource.unfavorite(resource.object_type, resource.id)
+      return axios.post(url).then(res => res.data)
+    },
+    onSuccess(_data, resource) {
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(resource.object_type).id(resource.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.favorites.listing.all
+      })
+    }
+  })
+}
+
+const useTopics = (opts?: Pick<UseQueryOptions, "enabled">) => {
   const key = keys.topics
   const url = urls.topics.listing
-  return useQuery<PaginatedResult<CourseTopic>>(key, () =>
-    axios.get(url).then(res => res.data)
+  return useQuery<PaginatedResult<CourseTopic>>(
+    key,
+    () => axios.get(url).then(res => res.data),
+    opts
   )
 }
 
@@ -102,7 +143,7 @@ const useDeleteUserList = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         /**
-         * Invalid everything related to learning resources, since any resource
+         * Invalidate everything related to learning resources, since any resource
          * could have belonged to this list.
          *
          * This is a little bit overzealous, e.g., we do not really need to
@@ -114,14 +155,96 @@ const useDeleteUserList = () => {
   })
 }
 
+type AddToUserListPayload = {
+  object_id: number
+  content_type: LearningResourceType
+}
+const addToUserList = async ({
+  userListId,
+  payload
+}: {
+  userListId: number
+  payload: AddToUserListPayload
+}): Promise<ListItemMember & { content_data: LearningResource }> => {
+  const { data: response } = await axios.post(
+    urls.userList.itemAdd(userListId),
+    payload
+  )
+  return response
+}
+const useAddToUserListItems = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: addToUserList,
+    // Skip optimistic updates for now. We do not know the list item id.
+    onSuccess:  (data, variables) => {
+      const resource = data.content_data
+      queryClient.setQueryData(
+        keys.resource(resource.object_type).id(resource.id).details,
+        resource
+      )
+      queryClient.invalidateQueries({
+        queryKey: keys.userList.id(variables.userListId).all
+      })
+      // The listing response includes item counts, which have changed
+      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+    }
+  })
+}
+
+const deleteFromUserListItems = async (item: ListItemMember): Promise<void> => {
+  await axios.delete(urls.userList.itemDetails(item.list_id, item.item_id))
+}
+const useDeleteFromUserListItems = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: deleteFromUserListItems,
+    onMutate:   vars => {
+      const resourceKey = keys
+        .resource(vars.content_type)
+        .id(vars.object_id).details
+      const previousResource =
+        queryClient.getQueryData<LearningResource>(resourceKey)
+      if (previousResource) {
+        const newResource: LearningResource = {
+          ...previousResource,
+          lists: previousResource.lists.filter(
+            member => member.item_id !== vars.item_id
+          )
+        }
+        queryClient.setQueryData(resourceKey, newResource)
+      }
+      const rollback = () => {
+        queryClient.setQueryData(resourceKey, previousResource)
+      }
+      return { rollback }
+    },
+    onError: (_error, _var, context) => {
+      context?.rollback()
+    },
+    onSettled: (_data, _error, vars) => {
+      queryClient.invalidateQueries(
+        keys.resource(vars.content_type).id(vars.object_id).details
+      )
+      queryClient.invalidateQueries(keys.userList.id(vars.list_id).all)
+      // The listing response includes item counts, which have changed
+      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+    }
+  })
+}
+
 export {
   useResource,
   useUserListItems,
   useUserList,
   useUserListsListing,
-  useFavorites,
+  useFavoritesListing,
   useTopics,
   useCreateUserList,
   useUpdateUserList,
-  useDeleteUserList
+  useDeleteUserList,
+  useAddToUserListItems,
+  useDeleteFromUserListItems,
+  useFavorite,
+  useUnfavorite
 }

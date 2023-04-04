@@ -1,7 +1,7 @@
 import React from "react"
 import { render, screen } from "@testing-library/react"
 import { assertInstanceOf } from "ol-util"
-import LearningResourceCard from "./LearningResourceCard"
+import LearningResourceCardTemplate from "./LearningResourceCardTemplate"
 import { makeCourse, makeImgConfig, makeUserList } from "../factories"
 import { resourceThumbnailSrc } from "../util"
 
@@ -9,7 +9,13 @@ describe("LearningResourceCard", () => {
   it("renders title and cover image", () => {
     const resource = makeCourse()
     const imgConfig = makeImgConfig()
-    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    render(
+      <LearningResourceCardTemplate
+        variant="column"
+        resource={resource}
+        imgConfig={imgConfig}
+      />
+    )
     const heading = screen.getByRole("heading")
 
     const coverImg = screen.getByRole("img", { name: "" })
@@ -31,7 +37,8 @@ describe("LearningResourceCard", () => {
       })
       const imgConfig = makeImgConfig()
       render(
-        <LearningResourceCard
+        <LearningResourceCardTemplate
+          variant="column"
           resource={resource}
           imgConfig={imgConfig}
           suppressImage={suppressImage}
@@ -45,7 +52,13 @@ describe("LearningResourceCard", () => {
   it("has the correct embedly url", () => {
     const resource = makeCourse()
     const imgConfig = makeImgConfig()
-    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    render(
+      <LearningResourceCardTemplate
+        variant="column"
+        resource={resource}
+        imgConfig={imgConfig}
+      />
+    )
     const heading = screen.getByRole("heading")
 
     // Alert! This should be empty unless it is meaningful.
@@ -64,7 +77,13 @@ describe("LearningResourceCard", () => {
       const resource = makeCourse({ certification })
       const imgConfig = makeImgConfig()
 
-      render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+      render(
+        <LearningResourceCardTemplate
+          variant="column"
+          resource={resource}
+          imgConfig={imgConfig}
+        />
+      )
       const certIcon = screen.queryByAltText("Receive a certificate", {
         exact: false
       })
@@ -79,14 +98,26 @@ describe("LearningResourceCard", () => {
   ])("Renders item count for UserLists", ({ itemCount, expectedText }) => {
     const resource = makeUserList({ item_count: itemCount })
     const imgConfig = makeImgConfig()
-    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    render(
+      <LearningResourceCardTemplate
+        variant="column"
+        resource={resource}
+        imgConfig={imgConfig}
+      />
+    )
     screen.getByText(expectedText)
   })
 
   it("Does not render item count for courses, etc", () => {
     const resource = makeCourse()
     const imgConfig = makeImgConfig()
-    render(<LearningResourceCard resource={resource} imgConfig={imgConfig} />)
+    render(
+      <LearningResourceCardTemplate
+        variant="column"
+        resource={resource}
+        imgConfig={imgConfig}
+      />
+    )
     expect(screen.queryByText("item", { exact: false })).toBe(null)
   })
 })
