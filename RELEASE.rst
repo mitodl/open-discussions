@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.211.1
+---------------
+
+- fix resource cards for search with anon users (#3911)
+- add/remove items from userlists (#3883)
+- Search index for staff lists (#3893)
+
 Version 0.211.0 (Released April 03, 2023)
 ---------------
 
