@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.211.1
+---------------
+
+- add/remove items from userlists (#3883)
+- Search index for staff lists (#3893)
+
 Version 0.211.0 (Released April 03, 2023)
 ---------------
 
