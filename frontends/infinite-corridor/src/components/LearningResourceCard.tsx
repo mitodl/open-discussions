@@ -3,7 +3,8 @@ import classNames from "classnames"
 import { LearningResourceCardTemplate } from "ol-search-ui"
 import type {
   LearningResourceCardTemplateProps,
-  LearningResource
+  LearningResource,
+  LearningResourceSearchResult
 } from "ol-search-ui"
 import { useActivateResourceDrawer } from "./LearningResourceDrawer"
 import { imgConfigs } from "../util/constants"
@@ -15,7 +16,7 @@ import AddToListDialog, {
 } from "../pages/user-lists/AddToListDialog"
 
 type TemplateProps = LearningResourceCardTemplateProps<
-  Omit<LearningResource, "topics">
+  LearningResource | LearningResourceSearchResult
 >
 type LearningResourceCardProps = Pick<
   TemplateProps,
@@ -30,7 +31,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   const activateResource = useActivateResourceDrawer()
   const addToList = useAddToListDialog()
   const { user } = SETTINGS
-  const isInList = resource.lists.length > 0 || resource.is_favorite
+  const isInList = (resource.lists?.length ?? 0) > 0 || resource.is_favorite
   return (
     <>
       <LearningResourceCardTemplate

@@ -50,8 +50,9 @@ export type LearningResource = {
   video_id?: string // required for videos
 }
 
-type SearchResult<T> = Omit<T, "topics"> & {
+type SearchResult<T> = Omit<T, "topics" | "lists"> & {
   topics?: string[]
+  lists?: ListItemMember[]
 }
 
 export type LearningResourceSearchResult = SearchResult<LearningResource>
