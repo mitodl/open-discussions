@@ -1,7 +1,8 @@
 import React from "react"
 import {
   makeLearningResource,
-  makeListItemMember
+  makeListItemMember,
+  makeSearchResult
 } from "ol-search-ui/src/factories"
 import {
   renderWithProviders,
@@ -13,7 +14,6 @@ import {
 import LearningResourceCard from "./LearningResourceCard"
 import type { LearningResourceCardProps } from "./LearningResourceCard"
 import AddToListDialog from "../pages/user-lists/AddToListDialog"
-import { LearningResource } from "ol-search-ui"
 
 jest.mock("../pages/user-lists/AddToListDialog", () => {
   const actual = jest.requireActual("../pages/user-lists/AddToListDialog")
@@ -29,17 +29,9 @@ const spyAddToListDialog = jest.mocked(AddToListDialog)
 type SetupOptions = {
   isAuthenticated?: boolean
   props?: Partial<LearningResourceCardProps>
-  resourceOverrides?: Partial<LearningResource>
 }
-const setup = ({
-  isAuthenticated = false,
-  props = {},
-  resourceOverrides
-}: SetupOptions = {}) => {
-  const {
-    resource = makeLearningResource(resourceOverrides),
-    variant = "column"
-  } = props
+const setup = ({ isAuthenticated = false, props = {} }: SetupOptions = {}) => {
+  const { resource = makeLearningResource(), variant = "column" } = props
   const { view, history } = renderWithProviders(
     <LearningResourceCard {...props} resource={resource} variant={variant} />,
     {
@@ -67,11 +59,19 @@ describe("LearningResourceCard", () => {
 
   test.each([
     { isAuthenticated: true, canAddToList: true },
-    { isAuthenticated: false, canAddToList: false }
+    { isAuthenticated: false, canAddToList: false },
+    {
+      isAuthenticated: false,
+      canAddToList:    false,
+      resource:        {
+        ...makeSearchResult()._source,
+        lists: undefined
+      }
+    }
   ])(
     "Shows 'add to list' button if and only if user is logged in",
-    ({ isAuthenticated, canAddToList }) => {
-      setup({ isAuthenticated })
+    ({ isAuthenticated, canAddToList, resource }) => {
+      setup({ isAuthenticated, props: { resource } })
       const button = screen.queryByRole("button", { name: "Add to list" })
       expect(!!button).toBe(canAddToList)
     }
@@ -80,33 +80,45 @@ describe("LearningResourceCard", () => {
   test.each([
     // The testId is added by MUI
     {
-      style:  "outlined",
-      is:     "is not",
-      testId: "BookmarkBorderIcon",
-      lists:  []
+      style:    "outlined",
+      is:       "is not",
+      testId:   "BookmarkBorderIcon",
+      resource: makeLearningResource({ lists: [] })
     },
     {
-      style:  "filled",
-      is:     "is",
-      testId: "BookmarkIcon",
-      lists:  [makeListItemMember()]
+      style:    "filled",
+      is:       "is",
+      testId:   "BookmarkIcon",
+      resource: makeLearningResource({ lists: [makeListItemMember()] })
     }
-  ])("Bookmark icon is $style if resource $is in list", ({ testId, lists }) => {
-    setup({ isAuthenticated: true, resourceOverrides: { lists } })
-    const button = screen.getByRole("button", { name: "Add to list" })
-    within(button).getByTestId(testId)
-  })
+  ])(
+    "Bookmark icon is $style if resource $is in list",
+    ({ testId, resource }) => {
+      const props = { resource }
+      setup({ isAuthenticated: true, props })
+      const button = screen.getByRole("button", { name: "Add to list" })
+      within(button).getByTestId(testId)
+    }
+  )
 
   test.each([
     // The testId is added by MUI
-    { style: "outlined", testId: "BookmarkBorderIcon", isFavorite: false },
-    { style: "filled", testId: "BookmarkIcon", isFavorite: true }
+    {
+      style:    "outlined",
+      testId:   "BookmarkBorderIcon",
+      resource: makeLearningResource({ is_favorite: false })
+    },
+    {
+      style:    "filled",
+      testId:   "BookmarkIcon",
+      resource: makeLearningResource({ is_favorite: true })
+    }
   ])(
-    "Bookmark icon is $style if resource isFavorite=$isFavorite",
-    ({ testId, isFavorite }) => {
+    "Bookmark icon is $style if resource.is_favorite=$resource.is_favorite",
+    ({ testId, resource }) => {
       setup({
-        isAuthenticated:   true,
-        resourceOverrides: { is_favorite: isFavorite }
+        isAuthenticated: true,
+        props:           { resource }
       })
       const button = screen.getByRole("button", { name: "Add to list" })
       within(button).getByTestId(testId)

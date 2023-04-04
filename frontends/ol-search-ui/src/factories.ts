@@ -172,7 +172,7 @@ const resultMakers = {
 }
 type MakeableResultType = keyof typeof resultMakers
 
-const makeSearchResult = (
+export const makeSearchResult = (
   type?: MakeableResultType
 ): {
   _id: string
