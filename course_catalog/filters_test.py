@@ -1,8 +1,12 @@
 """Tests for Course Catalog Filters"""
 import pytest
 
-from course_catalog.constants import OfferedBy, PlatformType
-from course_catalog.factories import CourseFactory, LearningResourceOfferorFactory
+from course_catalog.constants import AvailabilityType, OfferedBy, PlatformType
+from course_catalog.factories import (
+    CourseFactory,
+    LearningResourceOfferorFactory,
+    LearningResourceRunFactory,
+)
 from course_catalog.filters import CourseFilter
 
 pytestmark = pytest.mark.django_db
@@ -35,3 +39,58 @@ def test_course_filter_audience():
 
     assert professional_course in query
     assert open_course not in query
+
+    open_query = CourseFilter({"audience": "open"}).qs
+
+    assert open_course in open_query
+    assert professional_course not in open_query
+
+
+def test_course_filter_withcertificate():
+    """Test that the withcertificate filter works"""
+
+    course_with_certificate = CourseFactory.create(
+        platform=PlatformType.mitx.value, runs=None
+    )
+    LearningResourceRunFactory.create(
+        content_object=course_with_certificate,
+        availability=AvailabilityType.upcoming.value,
+    )
+    pro_course_with_cert = CourseFactory.create(
+        platform=PlatformType.xpro.value, runs=None
+    )
+    LearningResourceRunFactory.create(
+        content_object=pro_course_with_cert, availability=AvailabilityType.current.value
+    )
+    course_without_certificate = CourseFactory.create(
+        platform=PlatformType.ocw.value, runs=None
+    )
+    LearningResourceRunFactory.create(
+        content_object=course_without_certificate,
+        availability=AvailabilityType.current.value,
+    )
+    archived_course = CourseFactory.create(platform=PlatformType.mitx.value, runs=None)
+    LearningResourceRunFactory.create(
+        content_object=archived_course, availability=AvailabilityType.archived.value
+    )
+
+    query = CourseFilter({"withcertificate": "True"}).qs
+
+    assert course_with_certificate in query
+    assert pro_course_with_cert in query
+    assert course_without_certificate not in query
+    assert archived_course not in query
+
+    negative_query = CourseFilter({"withcertificate": "False"}).qs
+
+    assert course_with_certificate not in negative_query
+    assert pro_course_with_cert not in negative_query
+    assert course_without_certificate in negative_query
+    assert archived_course in negative_query
+
+    empty_query = CourseFilter({"withcertificate": ""}).qs
+
+    assert course_with_certificate in empty_query
+    assert pro_course_with_cert in empty_query
+    assert course_without_certificate in empty_query
+    assert archived_course in empty_query
