@@ -2,6 +2,7 @@
 import copy
 import logging
 from datetime import datetime
+from dateutil.parser import parse
 
 import pytz
 import requests
@@ -12,8 +13,6 @@ from course_catalog.etl.utils import transform_topics
 
 log = logging.getLogger(__name__)
 
-
-XPRO_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 OFFERED_BY = [{"name": OfferedBy.xpro.value}]
 
@@ -29,7 +28,7 @@ def _parse_datetime(value):
         datetime: the parsed datetime
     """
     return (
-        datetime.strptime(value, XPRO_DATETIME_FORMAT).replace(tzinfo=pytz.utc)
+        parse(value).replace(tzinfo=pytz.utc)
         if value
         else None
     )

@@ -3,6 +3,7 @@ import copy
 import logging
 import re
 from datetime import datetime
+from dateutil.parser import parse
 from urllib.parse import urljoin
 
 import pytz
@@ -14,8 +15,6 @@ from course_catalog.etl.utils import transform_topics, extract_valid_department_
 
 log = logging.getLogger(__name__)
 
-
-MITX_ONLINE_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 
 EXCLUDE_REGEX = r"PROCTORED EXAM"
 
@@ -33,7 +32,7 @@ def _parse_datetime(value):
         datetime: the parsed datetime
     """
     return (
-        datetime.strptime(value, MITX_ONLINE_DATETIME_FORMAT).replace(tzinfo=pytz.utc)
+        parse(value).replace(tzinfo=pytz.utc)
         if value
         else None
     )
