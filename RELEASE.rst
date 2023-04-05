@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.211.1
+Version 0.211.1 (Released April 05, 2023)
 ---------------
 
 - fix resource cards for search with anon users (#3911)
