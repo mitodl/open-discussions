@@ -83,10 +83,6 @@
       "description": "A list of origins that are authorized to make cross-site HTTP requests",
       "required": false      
     },
-    "DRF_NESTED_PARENT_LOOKUP_PREFIX": {
-      "description": "DRF extensions parent lookup kwarg name prefix",
-      "required": false
-    },
     "CORS_ALLOWED_ORIGIN_REGEXES": {
       "description": "A list of regexes that match origins that are authorized to make cross-site HTTP requests",
       "required": false      

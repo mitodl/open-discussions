@@ -70,7 +70,6 @@ from open_discussions.permissions import (
     ReadOnly,
     is_admin_user,
 )
-from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 from search.task_helpers import (
     delete_course,
     delete_staff_list,
@@ -298,13 +297,13 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
     permission_classes = (HasUserListItemPermissions,)
 
     def create(self, request, *args, **kwargs):
-        user_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id"]
+        user_list_id = kwargs["parent_lookup_user_list_id"]
         request.data["user_list"] = user_list_id
 
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        user_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id"]
+        user_list_id = kwargs["parent_lookup_user_list_id"]
         request.data["user_list"] = user_list_id
         return super().update(request, *args, **kwargs)
 
@@ -372,13 +371,13 @@ class StaffListItemViewSet(
     permission_classes = (HasStaffListItemPermissions,)
 
     def create(self, request, *args, **kwargs):
-        staff_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id"]
+        staff_list_id = kwargs["parent_lookup_staff_list_id"]
         request.data["staff_list"] = staff_list_id
 
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        staff_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id"]
+        staff_list_id = kwargs["parent_lookup_staff_list_id"]
         request.data["staff_list"] = staff_list_id
         return super().update(request, *args, **kwargs)
 

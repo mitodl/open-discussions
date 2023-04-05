@@ -46,7 +46,6 @@ from course_catalog.utils import (
 )
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
-from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 from search.task_helpers import (
     delete_staff_list,
     delete_user_list,
@@ -563,9 +562,7 @@ class UserListItemSerializer(
 
         """
         view = self.context.get("view", None)
-        if view is not None and view.kwargs.get(
-            f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id", None
-        ):
+        if view is not None and view.kwargs.get("parent_lookup_user_list_id", None):
             # this was sent via userlistitems API, so update the search index
             upsert_user_list(user_list.id)
 
@@ -809,13 +806,11 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
         If this serializer was instantiated from the StaffListItemView, then update the search index
 
         Args:
-            staff_list (StaffList): the UserList object to update in the search index.
+            staff_list (StaffList): the StaffList object to update in the search index.
 
         """
         view = self.context.get("view", None)
-        if view is not None and view.kwargs.get(
-            f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id", None
-        ):
+        if view is not None and view.kwargs.get("parent_lookup_staff_list_id", None):
             # this was sent via stafflistitems API, so update the search index
             upsert_staff_list(staff_list.id)
 
