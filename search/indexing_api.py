@@ -573,14 +573,21 @@ def index_items(documents, object_type, update_only, **kwargs):
     for chunk in chunks(
         documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
     ):
-        documents_size = sys.getsizeof(json.dumps(chunk))
+        documents_size = len(json.dumps(chunk))
+        # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
         if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
-                log.exception(f"Document id {chunk[0]['_id']} for object_type {object_type} exceeds max size")
+                log.error(
+                    f"Document id {chunk[0]['_id']} for object_type {object_type} exceeds max size: {documents_size}"
+                )
                 continue
-            num_chunks = ceil(len(chunk) / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE))
-            for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
-                index_items(smaller_chunk, object_type, update_only, **kwargs)
+            else:
+                num_chunks = ceil(
+                    len(chunk)
+                    / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                )
+                for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
+                    index_items(smaller_chunk, object_type, update_only, **kwargs)
         else:
             for alias in get_active_aliases(
                 conn, object_types=[object_type], include_reindexing=(not update_only)
@@ -738,7 +745,7 @@ def delete_run_content_files(run_id, unpublished_only=False):
     if unpublished_only:
         content_files = run.content_files.filter(published=False).only("key")
     else:
-        content_files = run.content_files.iterator().only("key")
+        content_files = run.content_files.only("key")
 
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
@@ -751,8 +758,6 @@ def delete_run_content_files(run_id, unpublished_only=False):
         True,
         routing=gen_course_id(course.platform, course.course_id),
     )
-    # Delete them (no point in keeping them around)
-    ContentFile.objects.delete(key__in=content_files.values_list("key", flat=True))
 
 
 def index_programs(ids, update_only=False):

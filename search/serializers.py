@@ -1,9 +1,13 @@
 """Serializers for elasticsearch data"""
 # pylint: disable=unused-argument,too-many-lines
+import json
 import logging
 import re
+import sys
 from functools import reduce
+from math import floor
 
+from django.conf import settings
 from django.db.models import Prefetch
 from prawcore import NotFound
 from rest_framework import serializers
@@ -390,6 +394,28 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             if re.search(r"Assignment($|\s)", instance.section):
                 return OCW_TYPE_ASSIGNMENTS
             return OCW_SECTION_TYPE_MAPPING.get(instance.section, None)
+
+    def to_representation(self, instance):
+        """Truncate content if necessary"""
+        data = super().to_representation(instance)
+        if len(json.dumps(data)) > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
+            log.warning(
+                f"Length of content file {instance.id} exceeds max size, truncating"
+            )
+            content = data.pop("content")
+            len_minus_content = len(json.dumps(data))
+            # Include some buffer for bulk id
+            max_content_size = (
+                settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content - 50
+            )
+            # JSON dump of content might be significantly larger due to extra backslashes etc
+            content_ratio = len(json.dumps(content)) / len(content)
+            content = content[: floor(max_content_size / content_ratio)]
+            # Keep shrinking if necessary until under the limit
+            while len(json.dumps(content)) > max_content_size:
+                content = content[: len(content) - 500]
+            data["content"] = content
+        return data
 
     class Meta:
         model = ContentFile
