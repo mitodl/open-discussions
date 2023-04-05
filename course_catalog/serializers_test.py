@@ -26,7 +26,7 @@ from course_catalog.factories import (
     UserListFactory,
     VideoFactory,
 )
-from course_catalog.models import FavoriteItem, UserListItem, StaffListItem
+from course_catalog.models import FavoriteItem, StaffListItem, UserListItem
 from course_catalog.serializers import (
     CourseSerializer,
     CourseTopicSerializer,

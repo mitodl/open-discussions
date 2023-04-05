@@ -67,12 +67,19 @@ from course_catalog.utils import load_course_blocklist
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
-    ReadOnly, is_admin_user,
+    ReadOnly,
+    is_admin_user,
+)
+from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
+from search.task_helpers import (
+    delete_course,
+    delete_staff_list,
+    delete_user_list,
+    upsert_staff_list,
+    upsert_user_list,
 )
 
 # pylint:disable=unused-argument
-from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
-from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
 log = logging.getLogger()
 
@@ -348,6 +355,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
         return Response(serializer.data)
 
     def perform_destroy(self, instance):
+        delete_staff_list(instance)
         instance.delete()
 
 
@@ -376,6 +384,11 @@ class StaffListItemViewSet(
 
     def perform_destroy(self, instance):
         instance.delete()
+        staff_list = instance.staff_list
+        if staff_list.items.count() > 0:
+            upsert_staff_list(staff_list.id)
+        else:
+            delete_staff_list(staff_list)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):

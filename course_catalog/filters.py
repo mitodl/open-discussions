@@ -2,10 +2,7 @@
 from django_filters import ChoiceFilter, FilterSet
 
 from course_catalog.constants import OfferedBy
-from course_catalog.models import (
-    Course,
-    PROFESSIONAL_COURSE_PLATFORMS,
-)
+from course_catalog.models import PROFESSIONAL_COURSE_PLATFORMS, Course
 
 OFFERED_BY_CHOICES = tuple([(ob.value, ob.value) for ob in OfferedBy])
 
