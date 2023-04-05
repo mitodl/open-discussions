@@ -12,3 +12,4 @@ ReactDOM.render(
   <App queryClient={queryClient} history={browserHistory} />,
   container
 )
+window.queryClient = queryClient

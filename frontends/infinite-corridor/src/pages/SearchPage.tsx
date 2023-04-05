@@ -20,8 +20,9 @@ import {
 import { GridColumn, GridContainer } from "../components/layout"
 
 import axios from "../libs/axios"
-import LearningResourceCard from "../components/LearningResourceCard"
+import LearningResourceCard, { LearningResourceCardProps } from "../components/LearningResourceCard"
 import { useHistory } from "react-router"
+import { useResource } from "../api/learning-resources"
 
 const ALLOWED_TYPES = ["program", "course"]
 const pageSize = SETTINGS.search_page_size
@@ -36,7 +37,7 @@ interface Result {
   _source: LearningResourceSearchResult
 }
 
-const SEARCH_API_URL = "search/"
+const SEARCH_API_URL = "/search/"
 
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
@@ -46,6 +47,19 @@ const search = async (params: SearchQueryParams) => {
   } catch (err) {
     return null
   }
+}
+
+const SearchCard: React.FC<{ resource: LearningResourceSearchResult }> = ({ resource }) => {
+  const resourceQuery = useResource(resource.object_type, resource.id, { enabled: false, cacheTime: 0 })
+  const isFavorite = resourceQuery.data?.is_favorite ?? resource.is_favorite
+  const lists = resourceQuery.data?.lists ?? resource.lists
+  const copy: LearningResourceSearchResult = {
+    ...resource,
+    is_favorite: isFavorite,
+    lists
+  }
+
+  return <LearningResourceCard resource={copy} variant="row-reverse" />
 }
 
 const SearchPage: React.FC = () => {
@@ -188,8 +202,7 @@ const SearchPage: React.FC = () => {
                           hit._source.id.toString()
                         )}
                       >
-                        <LearningResourceCard
-                          variant="row-reverse"
+                        <SearchCard
                           resource={hit._source}
                         />
                       </li>

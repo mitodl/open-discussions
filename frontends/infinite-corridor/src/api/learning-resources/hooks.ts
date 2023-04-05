@@ -13,16 +13,18 @@ import {
   useQuery,
   useQueryClient,
   UseQueryResult,
-  UseQueryOptions
+  UseQueryOptions,
+  Query,
+  QueryClient
 } from "react-query"
 import { urls, keys, UserListOptions } from "./urls"
 
-const useResource = (type: string, id: number) => {
+const useResource = (type: string, id: number, opts?: Pick<UseQueryOptions, "enabled" | "cacheTime">) => {
   const key = keys.resource(type).id(id).details
   return useQuery<LearningResource>(key, async () => {
     const url = urls.resource.details(type, id)
     return axios.get(url).then(res => res.data)
-  })
+  }, opts)
 }
 const useUserList = (id: number) => {
   return useResource("userlist", id) as UseQueryResult<UserList>
@@ -231,6 +233,15 @@ const useDeleteFromUserListItems = () => {
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
     }
   })
+}
+
+/**
+ * Find an existing query for learning resources.
+ */
+const findLearningResource = (queryClient: QueryClient, resource: Pick<LearningResource, "object_type" | "id">): Query<LearningResource> | undefined => {
+  return queryClient.getQueryCache().find(
+    keys.resource(resource.object_type).id(resource.id).details
+  )
 }
 
 export {
