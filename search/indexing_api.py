@@ -582,9 +582,12 @@ def index_items(documents, object_type, update_only, **kwargs):
                 )
                 continue
             else:
-                num_chunks = ceil(
-                    len(chunk)
-                    / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                num_chunks = min(
+                    ceil(
+                        len(chunk)
+                        / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                    ),
+                    len(chunk) - 1,
                 )
                 for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
                     index_items(smaller_chunk, object_type, update_only, **kwargs)
