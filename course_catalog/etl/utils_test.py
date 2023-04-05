@@ -275,6 +275,7 @@ def test_transform_content_files(mocker, has_metadata):
         {
             "content": tika_output["content"],
             "key": key,
+            "published": True,
             "content_author": metadata["Author"] if has_metadata else "",
             "content_title": metadata["title"] if has_metadata else "",
             "content_language": metadata["language"] if has_metadata else "",
