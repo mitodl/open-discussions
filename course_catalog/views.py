@@ -67,10 +67,11 @@ from course_catalog.utils import load_course_blocklist
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
-    ReadOnly,
+    ReadOnly, is_admin_user,
 )
 
 # pylint:disable=unused-argument
+from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
 log = logging.getLogger()
@@ -290,13 +291,13 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
     permission_classes = (HasUserListItemPermissions,)
 
     def create(self, request, *args, **kwargs):
-        user_list_id = kwargs["parent_lookup_user_list_id"]
+        user_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id"]
         request.data["user_list"] = user_list_id
 
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        user_list_id = kwargs["parent_lookup_user_list_id"]
+        user_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id"]
         request.data["user_list"] = user_list_id
         return super().update(request, *args, **kwargs)
 
@@ -331,7 +332,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
     def list(self, request, *args, **kwargs):
         """Get all stafflists for stafflist editors, public stafflists for all others"""
 
-        if is_staff_list_editor(request):
+        if is_staff_list_editor(request) or is_admin_user(request):
             queryset = self.get_queryset()
         else:
             queryset = self.get_queryset().filter(
@@ -363,13 +364,13 @@ class StaffListItemViewSet(
     permission_classes = (HasStaffListItemPermissions,)
 
     def create(self, request, *args, **kwargs):
-        staff_list_id = kwargs["parent_lookup_staff_list_id"]
+        staff_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id"]
         request.data["staff_list"] = staff_list_id
 
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
-        staff_list_id = kwargs["parent_lookup_staff_list_id"]
+        staff_list_id = kwargs[f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id"]
         request.data["staff_list"] = staff_list_id
         return super().update(request, *args, **kwargs)
 
