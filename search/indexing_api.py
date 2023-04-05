@@ -3,8 +3,7 @@ Functions and constants for Elasticsearch indexing
 """
 import json
 import logging
-import sys
-from math import ceil, floor
+from math import ceil
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -578,19 +577,21 @@ def index_items(documents, object_type, update_only, **kwargs):
         if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
                 log.error(
-                    f"Document id {chunk[0]['_id']} for object_type {object_type} exceeds max size: {documents_size}"
+                    "Document id %s for object_type %s exceeds max size: %d",
+                    chunk[0]["_id"],
+                    object_type,
+                    documents_size,
                 )
                 continue
-            else:
-                num_chunks = min(
-                    ceil(
-                        len(chunk)
-                        / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
-                    ),
-                    len(chunk) - 1,
-                )
-                for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
-                    index_items(smaller_chunk, object_type, update_only, **kwargs)
+            num_chunks = min(
+                ceil(
+                    len(chunk)
+                    / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                ),
+                len(chunk) - 1,
+            )
+            for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
+                index_items(smaller_chunk, object_type, update_only, **kwargs)
         else:
             for alias in get_active_aliases(
                 conn, object_types=[object_type], include_reindexing=(not update_only)

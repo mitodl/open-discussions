@@ -3,7 +3,6 @@
 import json
 import logging
 import re
-import sys
 from functools import reduce
 from math import floor
 
@@ -400,7 +399,7 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
         data = super().to_representation(instance)
         if len(json.dumps(data)) > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             log.warning(
-                f"Length of content file {instance.id} exceeds max size, truncating"
+                "Length of content file %d exceeds max size, truncating", instance.id
             )
             content = data.pop("content")
             len_minus_content = len(json.dumps(data))

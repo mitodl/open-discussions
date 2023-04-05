@@ -1,6 +1,5 @@
 """Tests for elasticsearch serializers"""
 from datetime import datetime
-
 # pylint: disable=redefined-outer-name,unused-argument
 from functools import reduce
 
