@@ -6,7 +6,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@faker-js/faker": "^7.3.0",
-    "@mitodl/course-search-utils": "^2.0.1",
+    "@mitodl/course-search-utils": "mitodl-course-search-utils-v2.0.6.tgz",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.0",
     "lodash": "^4.17.21",
