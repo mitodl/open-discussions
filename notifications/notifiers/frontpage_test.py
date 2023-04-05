@@ -68,9 +68,9 @@ def test_can_notify(
 
     episode = PodcastEpisodeFactory.create()
     if has_episodes_after:
-        episode.created_on = created_on + timedelta(days=10)
+        episode.last_modified = created_on + timedelta(days=10)
     else:
-        episode.created_on = created_on + timedelta(days=-10)
+        episode.last_modified = created_on + timedelta(days=-10)
     episode.save()
 
     post = PostFactory.create(
