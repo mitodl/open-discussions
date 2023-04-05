@@ -102,7 +102,8 @@ services:
     command: >
       /bin/bash -c '
       sleep 3;
-      celery -A open_discussions.celery:app worker -Q spam,digest_emails,default -B -l ${OPEN_DISCUSSIONS_LOG_LEVEL:-INFO}'
+      celery -A open_discussions.celery:app worker -Q spam,digest_emails,default -B -l ${OPEN_DISCUSSIONS_LOG_LEVEL:-INFO} &
+      celery -A open_discussions.celery:app worker -Q spam,digest_emails,edx_content,default -l ${OPEN_DISCUSSIONS_LOG_LEVEL:-INFO}'
     links:
       - db
       - redis
