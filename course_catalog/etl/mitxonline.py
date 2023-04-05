@@ -31,11 +31,7 @@ def _parse_datetime(value):
     Returns:
         datetime: the parsed datetime
     """
-    return (
-        parse(value).replace(tzinfo=pytz.utc)
-        if value
-        else None
-    )
+    return parse(value).replace(tzinfo=pytz.utc) if value else None
 
 
 def parse_page_attribute(mitx_json, attribute, is_url=False, is_list=False):

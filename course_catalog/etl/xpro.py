@@ -27,11 +27,7 @@ def _parse_datetime(value):
     Returns:
         datetime: the parsed datetime
     """
-    return (
-        parse(value).replace(tzinfo=pytz.utc)
-        if value
-        else None
-    )
+    return parse(value).replace(tzinfo=pytz.utc) if value else None
 
 
 def extract_programs():
