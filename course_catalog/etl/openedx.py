@@ -2,7 +2,7 @@
 ETL extract and transformations for openedx
 """
 from collections import namedtuple
-from datetime import datetime
+from dateutil.parser import parse
 import logging
 
 import pytz
@@ -88,7 +88,7 @@ def _parse_openedx_datetime(datetime_str):
     Returns:
         str: the parsed datetime
     """
-    return datetime.strptime(datetime_str, "%Y-%m-%dT%H:%M:%S.%fZ").astimezone(pytz.utc)
+    return parse(datetime_str).astimezone(pytz.utc)
 
 
 def _get_course_marketing_url(config, course):
