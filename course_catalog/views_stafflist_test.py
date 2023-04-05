@@ -15,10 +15,12 @@ from course_catalog.models import StaffList
 from course_catalog.utils import update_editor_group
 from open_discussions.factories import UserFactory
 
+# pylint:disable=redefined-outer-name
+
 
 @pytest.fixture()
 def mock_staff_list_index(mocker):
-    """Mocks index updating functions for user lists"""
+    """Mocks index updating functions for staff lists"""
     return SimpleNamespace(
         upsert_staff_list=mocker.patch("course_catalog.serializers.upsert_staff_list"),
         upsert_staff_list_view=mocker.patch("course_catalog.views.upsert_staff_list"),
