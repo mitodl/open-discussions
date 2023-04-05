@@ -22,11 +22,7 @@ import { CommentSortPicker } from "../components/Picker"
 import Dialog from "../components/Dialog"
 
 import { updateCommentSortParam, COMMENT_SORT_BEST } from "../lib/picker"
-import {
-  formatCommentsCount,
-  getPostDropdownMenuKey,
-  postMenuDropdownFuncs
-} from "../lib/posts"
+import { getPostDropdownMenuKey, postMenuDropdownFuncs } from "../lib/posts"
 import { actions } from "../actions"
 import { clearCommentError, replaceMoreComments } from "../actions/comment"
 import { setSnackbarMessage, showDialog, hideDialog } from "../actions/ui"
@@ -235,7 +231,7 @@ export class PostPage extends React.Component<PostPageProps> {
     if (post.num_comments > 0) {
       return (
         <div className="count-and-sort">
-          <div className="comments-count">{formatCommentsCount(post)}</div>
+          <div className="comments-count"></div>
           <CommentSortPicker
             updatePickerParam={updateCommentSortParam(this.props)}
             value={qs.parse(search).sort || COMMENT_SORT_BEST}
