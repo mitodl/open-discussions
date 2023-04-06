@@ -1,5 +1,5 @@
 /* global SETTINGS:false */
-import React, { useState, useCallback, useMemo } from "react"
+import React, { useState, useCallback, useMemo, useEffect } from "react"
 import Container from "@mui/material/Container"
 import { intersection } from "lodash"
 import { BannerPage, useMuiBreakpoint } from "ol-util"
@@ -47,24 +47,29 @@ const doSearch = async (params: SearchQueryParams) => {
   const { data } = await axios.post(SEARCH_API_URL, body)
   return data
 }
+const restrictFacetTypes = (allowedTypes: string[], facets?: Facets) => {
+  const facetTypes = facets?.["type"] ?? []
+  const normalized = facetTypes.length > 0 ? intersection(facetTypes, allowedTypes) : allowedTypes
+  return { ...facets, type: normalized }
+}
 
-const useInfiniteSearch = (params: Omit<SearchQueryParams, "from">) => {
-  if (params.activeFacets?.["type"]?.length > 0) {
-    params.activeFacets["type"] = intersection(params.activeFacets["type"], ALLOWED_TYPES)
-  } else {
-    params.activeFacets = {
-      ...params.activeFacets,
-      type: ALLOWED_TYPES
-    }
-  }
-  console.log(params)
+type InfiniteSearchOptions = Omit<SearchQueryParams, "from"> & { size: NonNullable<SearchQueryParams["size"]> } & {
+  allowedTypes?: string []
+}
+const useInfiniteSearch = (params: InfiniteSearchOptions) => {
+  const { size, allowedTypes } = params
+  const normalized: SearchQueryParams = allowedTypes ? {
+    ...params,
+    activeFacets: restrictFacetTypes(allowedTypes, params.activeFacets)
+  } : params
   return useInfiniteQuery({
     keepPreviousData: true,
-    queryKey:         ["search", params],
-    queryFn:          ({ pageParam = 0 }) => doSearch({ ...params, from: pageParam }),
+    queryKey:         ["search", normalized],
+    queryFn:          ({ pageParam = 0 }) => doSearch({ ...normalized, size, from: pageParam }),
     getNextPageParam: (lastPage, pages) => {
-      if (pages.length * pageSize >= lastPage.hits.total) return undefined
-      return pages.length * pageSize
+      const nextFrom = pages.length * size
+      if (nextFrom >= lastPage.hits.total) return undefined
+      return nextFrom
     }
   })
 }
@@ -85,9 +90,12 @@ const SearchPage: React.FC = () => {
   } = useSearchInputs(history)
 
   const search = useInfiniteSearch({
-    text: searchText,
-    activeFacets
+    text:         searchText,
+    activeFacets,
+    size:         pageSize,
+    allowedTypes: ALLOWED_TYPES
   })
+
   const aggregations = useMemo(() => {
     return new Map(Object.entries(search.data?.pages[0].aggregations ?? {})) as Aggregations
   }, [search.data?.pages])
@@ -107,9 +115,11 @@ const SearchPage: React.FC = () => {
     return search.data?.pages.flatMap(page => page.hits.hits) || []
   }, [search.data])
   const { fetchNextPage } = search
-  const loadMore = useCallback((page: number) => {
-    fetchNextPage({ pageParam: page * pageSize })
-  }, [fetchNextPage])
+  const loadMore = useCallback(() => {
+    if (!search.isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [fetchNextPage, search.isFetchingNextPage])
 
   const hasResultsAvailable = !search.isLoading && !search.isPreviousData
 
