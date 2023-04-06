@@ -577,9 +577,10 @@ def index_items(documents, object_type, update_only, **kwargs):
         if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
                 log.error(
-                    "Document id %s for object_type %s exceeds max size: %d",
+                    "Document id %s for object_type %s exceeds max size %d: %d",
                     chunk[0]["_id"],
                     object_type,
+                    settings.ELASTICSEARCH_MAX_REQUEST_SIZE,
                     documents_size,
                 )
                 continue

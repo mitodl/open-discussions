@@ -402,18 +402,15 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
                 "Length of content file %d exceeds max size, truncating", instance.id
             )
             content = data.pop("content")
-            len_minus_content = len(json.dumps(data))
-            # Include some buffer for bulk id
+            # Include a little extra buffer to be safe
+            len_minus_content = len(json.dumps(data)) + 100
             max_content_size = (
-                settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content - 50
+                settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content
             )
-            # JSON dump of content might be significantly larger due to extra backslashes etc
-            content_ratio = len(json.dumps(content)) / len(content)
-            content = content[: floor(max_content_size / content_ratio)]
-            # Keep shrinking if necessary until under the limit
-            while len(json.dumps(content)) > max_content_size:
-                content = content[: len(content) - 500]
-            data["content"] = content
+            truncated_content = (
+                json.dumps(content).strip('"')[:max_content_size].rstrip("\\")
+            )
+            data["content"] = json.loads(f'"{truncated_content}"')
         return data
 
     class Meta:
