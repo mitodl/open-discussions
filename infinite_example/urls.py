@@ -4,4 +4,8 @@ from django.conf.urls import url
 
 from infinite_example.views import index
 
-urlpatterns = [url(r"^infinite", index)] if settings.ENABLE_INFINITE_CORRIDOR else []
+urlpatterns = (
+    [url(r"^infinite", index)]
+    if settings.ENABLE_INFINITE_CORRIDOR
+    else [url(r"^infinite/demo", index)]
+)

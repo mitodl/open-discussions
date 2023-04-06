@@ -13,6 +13,7 @@
 @use "widgets";
 @use "layout";
 @use "ol-util/assets/loading_spinner";
+@use "demopage";
 
 html {
   font-family: theme.$font-family-default;
