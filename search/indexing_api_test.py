@@ -30,6 +30,7 @@ from search.indexing_api import (
     get_reindexing_alias_name,
     increment_document_integer_field,
     index_course_content_files,
+    index_items,
     index_run_content_files,
     switch_indices,
     update_document_with_partial,
@@ -514,6 +515,27 @@ def test_index_content_files(mocker, update_only):
     for course in courses:
         for run in course.runs.all():
             mock_index_run_content_files.assert_any_call(run.id, update_only)
+
+
+@pytest.mark.parametrize("max_size,chunks", [[10000, 2], [500, 4]])
+@pytest.mark.parametrize("exceeds_size", [True, False])
+def test_index_items_size_limits(settings, mocker, max_size, chunks, exceeds_size):
+    """
+    Chunks should get split into smaller chunks if necessary, log error if single-file chunks too big
+    """
+    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 5
+    settings.ELASTICSEARCH_MAX_REQUEST_SIZE = max_size
+    mock_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases", autospec=True, return_value=[]
+    )
+    mock_log = mocker.patch("search.indexing_api.log.error")
+    documents = [
+        {"_id": 1, "content": "a" * (max_size if exceeds_size else 100)}
+        for _ in range(10)
+    ]
+    index_items(documents, "course", update_only=True)
+    assert mock_aliases.call_count == (chunks if not exceeds_size else 0)
+    assert mock_log.call_count == (10 if exceeds_size else 0)
 
 
 @pytest.mark.usefixtures("indexing_user")
