@@ -801,6 +801,19 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
     Serializer for StaffListItem model, includes content_data
     """
 
+    def update_index(self, staff_list):
+        """
+        If this serializer was instantiated from the StaffListItemView, then update the search index
+
+        Args:
+            staff_list (StaffList): the StaffList object to update in the search index.
+
+        """
+        view = self.context.get("view", None)
+        if view is not None and view.kwargs.get("parent_lookup_staff_list_id", None):
+            # this was sent via stafflistitems API, so update the search index
+            upsert_staff_list(staff_list.id)
+
     def create(self, validated_data):
         staff_list = validated_data["staff_list"]
         items = StaffListItem.objects.filter(staff_list=staff_list)
@@ -815,6 +828,7 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
             object_id=validated_data["object_id"],
             defaults={"position": position},
         )
+        self.update_index(item.staff_list)
         return item
 
     def update(self, instance, validated_data):
@@ -837,6 +851,7 @@ class StaffListItemSerializer(BaseListItemSerializer, serializers.ModelSerialize
             # now move the item into place
             instance.position = position
             instance.save()
+            self.update_index(instance.staff_list)
 
         return instance
 

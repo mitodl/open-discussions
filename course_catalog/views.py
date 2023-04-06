@@ -68,10 +68,17 @@ from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     PodcastFeatureFlag,
     ReadOnly,
+    is_admin_user,
+)
+from search.task_helpers import (
+    delete_course,
+    delete_staff_list,
+    delete_user_list,
+    upsert_staff_list,
+    upsert_user_list,
 )
 
 # pylint:disable=unused-argument
-from search.task_helpers import delete_course, delete_user_list, upsert_user_list
 
 log = logging.getLogger()
 
@@ -331,7 +338,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
     def list(self, request, *args, **kwargs):
         """Get all stafflists for stafflist editors, public stafflists for all others"""
 
-        if is_staff_list_editor(request):
+        if is_staff_list_editor(request) or is_admin_user(request):
             queryset = self.get_queryset()
         else:
             queryset = self.get_queryset().filter(
@@ -347,6 +354,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
         return Response(serializer.data)
 
     def perform_destroy(self, instance):
+        delete_staff_list(instance)
         instance.delete()
 
 
@@ -375,6 +383,11 @@ class StaffListItemViewSet(
 
     def perform_destroy(self, instance):
         instance.delete()
+        staff_list = instance.staff_list
+        if staff_list.items.count() > 0:
+            upsert_staff_list(staff_list.id)
+        else:
+            delete_staff_list(staff_list)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):

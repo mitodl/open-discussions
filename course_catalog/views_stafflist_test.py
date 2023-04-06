@@ -1,4 +1,6 @@
 """Tests for course_catalog StaffList views"""
+from types import SimpleNamespace
+
 import pytest
 from django.urls import reverse
 
@@ -12,6 +14,19 @@ from course_catalog.factories import (
 from course_catalog.models import StaffList
 from course_catalog.utils import update_editor_group
 from open_discussions.factories import UserFactory
+
+# pylint:disable=redefined-outer-name
+
+
+@pytest.fixture()
+def mock_staff_list_index(mocker):
+    """Mocks index updating functions for staff lists"""
+    return SimpleNamespace(
+        upsert_staff_list=mocker.patch("course_catalog.serializers.upsert_staff_list"),
+        upsert_staff_list_view=mocker.patch("course_catalog.views.upsert_staff_list"),
+        delete_staff_list=mocker.patch("course_catalog.serializers.delete_staff_list"),
+        delete_staff_list_view=mocker.patch("course_catalog.views.delete_staff_list"),
+    )
 
 
 @pytest.mark.parametrize("is_public", [True, False])
@@ -139,7 +154,9 @@ def test_staff_list_endpoint_patch(client, update_topics, is_public, is_editor):
 
 
 @pytest.mark.parametrize("is_editor", [True, False])
-def test_staff_list_items_endpoint_create_item(client, user, is_editor):
+def test_staff_list_items_endpoint_create_item(
+    mock_staff_list_index, client, user, is_editor
+):
     """Test stafflistitems endpoint for creating a StaffListItem"""
     stafflist = StaffListFactory.create(
         author=UserFactory.create(), privacy_level=PrivacyLevel.public.value
@@ -157,6 +174,7 @@ def test_staff_list_items_endpoint_create_item(client, user, is_editor):
     assert resp.status_code == (201 if is_editor else 403)
     if resp.status_code == 201:
         assert resp.json().get("object_id") == course.id
+        mock_staff_list_index.upsert_staff_list.assert_called_once_with(stafflist.id)
 
 
 def test_staff_list_items_endpoint_create_item_bad_data(client, user):
@@ -182,7 +200,9 @@ def test_staff_list_items_endpoint_create_item_bad_data(client, user):
 
 
 @pytest.mark.parametrize("is_editor, position", [[True, 0], [True, 2], [False, 1]])
-def test_staff_list_items_endpoint_update_item(client, user, is_editor, position):
+def test_staff_list_items_endpoint_update_item(
+    mock_staff_list_index, client, user, is_editor, position
+):
     """Test stafflistitems endpoint for updating StaffListItem positions"""
     topics = CourseTopicFactory.create_batch(3)
     stafflist = StaffListFactory.create(
@@ -214,6 +234,9 @@ def test_staff_list_items_endpoint_update_item(client, user, is_editor, position
         ):
             item.refresh_from_db()
             assert item.position == expected_pos
+            mock_staff_list_index.upsert_staff_list.assert_called_once_with(
+                stafflist.id
+            )
 
 
 def test_staff_list_items_endpoint_update_items_wrong_list(client, user):
@@ -236,14 +259,17 @@ def test_staff_list_items_endpoint_update_items_wrong_list(client, user):
     assert resp.status_code == 404
 
 
+@pytest.mark.parametrize("num_items", [1, 2])
 @pytest.mark.parametrize("is_editor", [True, False])
-def test_staff_list_items_endpoint_delete_items(client, user, is_editor):
+def test_staff_list_items_endpoint_delete_items(
+    mock_staff_list_index, client, user, is_editor, num_items
+):
     """Test stafflistitems endpoint for deleting StaffListItems"""
     stafflist = StaffListFactory.create(
         author=UserFactory.create(), privacy_level=PrivacyLevel.public.value
     )
     list_items = sorted(
-        StaffListItemFactory.create_batch(2, staff_list=stafflist),
+        StaffListItemFactory.create_batch(num_items, staff_list=stafflist),
         key=lambda item: item.id,
     )
 
@@ -255,10 +281,17 @@ def test_staff_list_items_endpoint_delete_items(client, user, is_editor):
         format="json",
     )
     assert resp.status_code == (204 if is_editor else 403)
+    if is_editor:
+        assert mock_staff_list_index.delete_staff_list_view.call_count == (
+            0 if num_items == 2 else 1
+        )
+        assert mock_staff_list_index.upsert_staff_list_view.call_count == (
+            1 if num_items == 2 else 0
+        )
 
 
 @pytest.mark.parametrize("is_editor", [True, False])
-def test_staff_list_endpoint_delete(client, user, is_editor):
+def test_staff_list_endpoint_delete(mock_staff_list_index, client, user, is_editor):
     """Test stafflist endpoint for deleting a StaffList"""
     stafflist = StaffListFactory.create(
         author=UserFactory.create(), privacy_level=PrivacyLevel.public.value
@@ -270,3 +303,6 @@ def test_staff_list_endpoint_delete(client, user, is_editor):
     resp = client.delete(reverse("stafflists-detail", args=[stafflist.id]))
     assert resp.status_code == (204 if is_editor else 403)
     assert StaffList.objects.filter(id=stafflist.id).exists() is not is_editor
+    assert mock_staff_list_index.delete_staff_list_view.call_count == (
+        1 if is_editor else 0
+    )

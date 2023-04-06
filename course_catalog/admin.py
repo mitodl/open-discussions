@@ -14,6 +14,8 @@ from course_catalog.models import (
     PodcastEpisode,
     Program,
     ProgramItem,
+    StaffList,
+    StaffListItem,
     UserList,
     UserListItem,
 )
@@ -92,6 +94,16 @@ class CourseAdmin(admin.ModelAdmin):
     autocomplete_fields = ("topics",)
 
 
+class StaffListItemInline(admin.StackedInline):
+    """Inline list items for staff lists"""
+
+    model = StaffListItem
+    classes = ["collapse"]
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+
 class UserListItemInline(admin.StackedInline):
     """Inline list items for user lists"""
 
@@ -120,6 +132,16 @@ class ProgramAdmin(admin.ModelAdmin):
     search_fields = ("title", "short_description")
     autocomplete_fields = ("topics",)
     inlines = [ProgramItemInline, LearningResourceRunInline]
+
+
+class StaffListAdmin(admin.ModelAdmin):
+    """StaffList Admin"""
+
+    model = StaffList
+    list_filter = ("privacy_level", "list_type")
+    list_display = ("title", "short_description", "author", "privacy_level")
+    search_fields = ("title", "short_description", "author__username", "author__email")
+    inlines = [StaffListItemInline]
 
 
 class UserListAdmin(admin.ModelAdmin):
@@ -190,6 +212,7 @@ admin.site.register(CourseInstructor, CourseInstructorAdmin)
 admin.site.register(Course, CourseAdmin)
 admin.site.register(LearningResourceRun, LearningResourceRunAdmin)
 admin.site.register(Program, ProgramAdmin)
+admin.site.register(StaffList, StaffListAdmin)
 admin.site.register(UserList, UserListAdmin)
 admin.site.register(Podcast, PodcastAdmin)
 admin.site.register(PodcastEpisode, PodcastEpisodeAdmin)

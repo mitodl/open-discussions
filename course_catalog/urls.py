@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.urls import include
-from rest_framework_extensions.routers import ExtendedSimpleRouter
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
     SpectacularSwaggerView,
 )
+from rest_framework_extensions.routers import ExtendedSimpleRouter
 
 from course_catalog import views
 from course_catalog.views import WebhookOCWNextView, WebhookOCWView
