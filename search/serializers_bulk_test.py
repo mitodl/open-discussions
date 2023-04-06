@@ -61,11 +61,11 @@ def test_serialize_bulk_profiles(mocker):
 
 def test_serialize_profile_for_bulk(user):
     """
-    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    Test that serialize_profile_for_bulk yields a valid OSProfileSerializer
     """
     assert serializers.serialize_profile_for_bulk(user.profile) == {
         "_id": "u_{}".format(user.username),
-        **serializers.ESProfileSerializer().serialize(user.profile),
+        **serializers.OSProfileSerializer().serialize(user.profile),
     }
 
 

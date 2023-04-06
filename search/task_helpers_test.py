@@ -87,9 +87,9 @@ def enable_index_update_feature(settings):
 
 @pytest.fixture()
 def mock_es_profile_serializer(mocker):
-    """Mock ESProfileSerializer with canned serialized data"""
+    """Mock OSProfileSerializer with canned serialized data"""
     mocker.patch(
-        "search.tasks.ESProfileSerializer.serialize",
+        "search.tasks.OSProfileSerializer.serialize",
         autospec=True,
         return_value=es_profile_serializer_data,
     )

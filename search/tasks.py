@@ -50,7 +50,7 @@ from search.serializers import (
     OSCourseSerializer,
     OSPodcastEpisodeSerializer,
     OSPodcastSerializer,
-    ESProfileSerializer,
+    OSProfileSerializer,
     OSProgramSerializer,
     OSStaffListSerializer,
     OSUserListSerializer,
@@ -109,7 +109,7 @@ def upsert_profile(profile_id):
     profile = Profile.objects.get(id=profile_id)
 
     if profile.user.username != settings.INDEXING_API_USERNAME:
-        data = ESProfileSerializer().serialize(profile)
+        data = OSProfileSerializer().serialize(profile)
         api.upsert_document(
             gen_profile_id(profile.user.username),
             data,
@@ -138,7 +138,7 @@ def _update_fields_by_username(username, field_dict, object_types):
 def update_author_posts_comments(profile_id):
     """Update author name and avatar in all associated post and comment docs"""
     profile_obj = Profile.objects.get(id=profile_id)
-    profile_data = ESProfileSerializer().serialize(profile_obj)
+    profile_data = OSProfileSerializer().serialize(profile_obj)
     update_keys = {
         key: value
         for key, value in profile_data.items()

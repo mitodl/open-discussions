@@ -178,14 +178,14 @@ def test_es_comment_serializer(has_author):
 
 def test_es_profile_serializer(mocker, user):
     """
-    Test that ESProfileSerializer correctly serializes a profile object
+    Test that OSProfileSerializer correctly serializes a profile object
     """
     mocker.patch(
         "search.serializers.get_channels", return_value={"channel01", "channel02"}
     )
     return_value = [("channel01", datetime.now()), ("channel02", datetime.now())]
     mocker.patch("search.serializers.get_channel_join_dates", return_value=return_value)
-    serialized = serializers.ESProfileSerializer().serialize(user.profile)
+    serialized = serializers.OSProfileSerializer().serialize(user.profile)
     assert serialized == {
         "object_type": constants.PROFILE_TYPE,
         "author_id": user.username,
@@ -216,7 +216,7 @@ def test_es_course_price_serializer():
     """Test that the course price serializer serializes a price"""
     price = factories.CoursePriceFactory.create()
     assert_json_equal(
-        serializers.ESCoursePriceSerializer(price).data,
+        serializers.OSCoursePriceSerializer(price).data,
         {"price": f"{price.price:.2f}", "mode": price.mode},
     )
 
@@ -226,7 +226,7 @@ def test_es_course_price_serializer():
 @pytest.mark.parametrize("level", ["Undergraduate", "Undergraduate, Graduate"])
 def test_es_run_serializer(has_full_name, level):
     """
-    Test that ESRunSerializer correctly serializes a run object
+    Test that OSRunSerializer correctly serializes a run object
     """
     learning_resource_run = (
         factories.LearningResourceRunFactory.create()
@@ -235,7 +235,7 @@ def test_es_run_serializer(has_full_name, level):
     )
     learning_resource_run.level = level
     learning_resource_run.save()
-    serialized = serializers.ESRunSerializer(learning_resource_run).data
+    serialized = serializers.OSRunSerializer(learning_resource_run).data
 
     assert_json_equal(
         serialized,
@@ -267,7 +267,7 @@ def test_es_run_serializer(has_full_name, level):
                 for instructor in learning_resource_run.instructors.all()
             ],
             "prices": [
-                serializers.ESCoursePriceSerializer(price).data
+                serializers.OSCoursePriceSerializer(price).data
                 for price in learning_resource_run.prices.all()
             ],
             "published": True,
@@ -353,7 +353,7 @@ def test_es_course_serializer(offered_by, platform, department):
             "image_src": course.image_src,
             "topics": list(course.topics.values_list("name", flat=True)),
             "runs": [
-                serializers.ESRunSerializer(course_run).data
+                serializers.OSRunSerializer(course_run).data
                 for course_run in course.runs.exclude(published=False).order_by(
                     "-best_start_date"
                 )
@@ -479,7 +479,7 @@ def test_es_program_serializer(offered_by):
             "image_src": program.image_src,
             "topics": list(program.topics.values_list("name", flat=True)),
             "runs": [
-                serializers.ESRunSerializer(program_run).data
+                serializers.OSRunSerializer(program_run).data
                 for program_run in program.runs.order_by("-best_start_date")
             ],
             "offered_by": [offered_by],

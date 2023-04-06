@@ -57,7 +57,7 @@ from search.serializers import (
     OSCourseSerializer,
     OSPodcastEpisodeSerializer,
     OSPodcastSerializer,
-    ESProfileSerializer,
+    OSProfileSerializer,
     OSProgramSerializer,
     OSStaffListSerializer,
     OSUserListSerializer,
@@ -632,7 +632,7 @@ def test_upsert_profile_task(mocked_api, user, settings, is_indexing_user):
     if is_indexing_user:
         mocked_api.upsert_document.assert_not_called()
     else:
-        data = ESProfileSerializer().serialize(user.profile)
+        data = OSProfileSerializer().serialize(user.profile)
         mocked_api.upsert_document.assert_called_once_with(
             gen_profile_id(user.username),
             data,

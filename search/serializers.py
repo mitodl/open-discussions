@@ -71,7 +71,7 @@ class OSModelSerializer(serializers.ModelSerializer):
         return ret
 
 
-class ESProxySerializer:
+class OSProxySerializer:
     """
     Serializer class for Opensearch objects that proxy to another serializer for serialization
 
@@ -112,9 +112,9 @@ class ESProxySerializer:
         return {**serialized, **self.postprocess_fields(discussions_obj, serialized)}
 
 
-class ESProfileSerializer(ESProxySerializer):
+class OSProfileSerializer(OSProxySerializer):
     """
-    Elasticsearch serializer class for profiles
+    Opensearch serializer class for profiles
     """
 
     object_type = PROFILE_TYPE
@@ -145,7 +145,7 @@ class ESProfileSerializer(ESProxySerializer):
 
 
 class OSPostSerializer(OSModelSerializer):
-    """Elasticsearch serializer class for posts"""
+    """Opensearch serializer class for posts"""
 
     object_type = POST_TYPE
 
@@ -223,7 +223,7 @@ class OSPostSerializer(OSModelSerializer):
 
 
 class OSCommentSerializer(OSModelSerializer):
-    """Elasticsearch serializer class for comments"""
+    """Opensearch serializer class for comments"""
 
     object_type = COMMENT_TYPE
 
@@ -286,15 +286,15 @@ class OSCommentSerializer(OSModelSerializer):
         read_only_fields = ("text", "score", "created", "removed", "deleted")
 
 
-class ESCoursePriceSerializer(serializers.ModelSerializer):
-    """ES serializer for course prices"""
+class OSCoursePriceSerializer(serializers.ModelSerializer):
+    """OS serializer for course prices"""
 
     class Meta:
         model = CoursePrice
         fields = ("price", "mode")
 
 
-class ESTopicsField(serializers.Field):
+class OSTopicsField(serializers.Field):
     """Serializes the topics as a list of topic names"""
 
     def to_representation(self, value):
@@ -302,7 +302,7 @@ class ESTopicsField(serializers.Field):
         return list(value.values_list("name", flat=True))
 
 
-class ESOfferedByField(serializers.Field):
+class OSOfferedByField(serializers.Field):
     """Serializes offered_by as a list of OfferedBy names"""
 
     def to_representation(self, value):
@@ -313,8 +313,8 @@ class ESOfferedByField(serializers.Field):
 class LearningResourceSerializer(serializers.ModelSerializer):
     """Abstract serializer for LearningResource subclasses"""
 
-    offered_by = ESOfferedByField()
-    topics = ESTopicsField()
+    offered_by = OSOfferedByField()
+    topics = OSTopicsField()
     minimum_price = serializers.SerializerMethodField()
     created = serializers.DateTimeField(source="created_on", read_only=True)
 
@@ -340,9 +340,9 @@ class LearningResourceSerializer(serializers.ModelSerializer):
             return 0
 
 
-class ESResourceFileSerializerMixin(serializers.Serializer):
+class OSResourceFileSerializerMixin(serializers.Serializer):
     """
-    Elasticsearch base serializer mixin for resource files
+    Opensearch base serializer mixin for resource files
     """
 
     object_type = RESOURCE_FILE_TYPE
@@ -353,9 +353,9 @@ class ESResourceFileSerializerMixin(serializers.Serializer):
         raise NotImplementedError
 
 
-class OSContentFileSerializer(ESResourceFileSerializerMixin, OSModelSerializer):
+class OSContentFileSerializer(OSResourceFileSerializerMixin, OSModelSerializer):
     """
-    Elasticsearch serializer class for course run files
+    Opensearch serializer class for course run files
     """
 
     run_id = serializers.CharField(source="run.run_id")
@@ -366,7 +366,7 @@ class OSContentFileSerializer(ESResourceFileSerializerMixin, OSModelSerializer):
     )
     semester = serializers.CharField(source="run.semester")
     year = serializers.IntegerField(source="run.year")
-    topics = ESTopicsField(source="run.content_object.topics")
+    topics = OSTopicsField(source="run.content_object.topics")
     short_description = serializers.CharField(source="description")
     course_id = serializers.CharField(source="run.content_object.course_id")
     coursenum = serializers.CharField(source="run.content_object.coursenum")
@@ -423,12 +423,12 @@ class OSContentFileSerializer(ESResourceFileSerializerMixin, OSModelSerializer):
         ]
 
 
-class ESRunSerializer(LearningResourceSerializer):
+class OSRunSerializer(LearningResourceSerializer):
     """
-    Elasticsearch serializer class for course runs
+    Opensearch serializer class for course runs
     """
 
-    prices = ESCoursePriceSerializer(many=True)
+    prices = OSCoursePriceSerializer(many=True)
     instructors = serializers.SerializerMethodField()
     availability = serializers.SerializerMethodField()
     level = serializers.SerializerMethodField()
@@ -512,7 +512,7 @@ def get_ocw_departmet_course_number_dict(coursenum, primary):
 
 class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for courses
+    Opensearch serializer class for courses
     """
 
     object_type = COURSE_TYPE
@@ -528,7 +528,7 @@ class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
         Get published runs in reverse chronological order by best_start_date
         """
         return [
-            ESRunSerializer(run).data
+            OSRunSerializer(run).data
             for run in course.runs.exclude(published=False).order_by("-best_start_date")
         ]
 
@@ -593,12 +593,12 @@ class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
 
 class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for programs
+    Opensearch serializer class for programs
     """
 
     object_type = PROGRAM_TYPE
 
-    runs = ESRunSerializer(many=True)
+    runs = OSRunSerializer(many=True)
     default_search_priority = serializers.SerializerMethodField()
 
     def get_default_search_priority(self, instance):
@@ -629,7 +629,7 @@ class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
 
 class OSUserListSerializer(OSModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for UserLists
+    Opensearch serializer class for UserLists
     """
 
     default_search_priority = serializers.SerializerMethodField()
@@ -678,7 +678,7 @@ class OSUserListSerializer(OSModelSerializer, LearningResourceSerializer):
 
 class OSStaffListSerializer(OSModelSerializer, LearningResourceSerializer):
     """
-    Elasticsearch serializer class for StaffLists
+    Opensearch serializer class for StaffLists
     """
 
     default_search_priority = serializers.SerializerMethodField()
@@ -726,7 +726,7 @@ class OSStaffListSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSVideoSerializer(OSModelSerializer, LearningResourceSerializer):
-    """ElasticSearch serializer for Videos"""
+    """Opensearch serializer for Videos"""
 
     object_type = VIDEO_TYPE
 
@@ -763,7 +763,7 @@ class OSVideoSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSPodcastSerializer(OSModelSerializer, LearningResourceSerializer):
-    """ElasticSearch serializer for Podcasts"""
+    """Opensearch serializer for Podcasts"""
 
     object_type = PODCAST_TYPE
 
@@ -799,7 +799,7 @@ class OSPodcastSerializer(OSModelSerializer, LearningResourceSerializer):
 
 
 class OSPodcastEpisodeSerializer(OSModelSerializer, LearningResourceSerializer):
-    """ElasticSearch serializer for PodcastEpisodes"""
+    """Opensearch serializer for PodcastEpisodes"""
 
     object_type = PODCAST_EPISODE_TYPE
 
@@ -912,21 +912,21 @@ def serialize_profile_for_bulk(profile_obj):
     """
     return {
         "_id": gen_profile_id(profile_obj.user.username),
-        **ESProfileSerializer().serialize(profile_obj),
+        **OSProfileSerializer().serialize(profile_obj),
     }
 
 
-def serialize_for_deletion(elasticsearch_object_id):
+def serialize_for_deletion(opensearch_object_id):
     """
     Serialize content for bulk deletion API request
 
     Args:
-        elasticsearch_object_id (string): Elasticsearch object id
+        opensearch_object_id (string): Opensearch object id
 
     Returns:
         dict: the object deletion data
     """
-    return {"_id": elasticsearch_object_id, "_op_type": "delete"}
+    return {"_id": opensearch_object_id, "_op_type": "delete"}
 
 
 def serialize_post_for_bulk(post_obj):
