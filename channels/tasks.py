@@ -170,14 +170,14 @@ def populate_subscriptions_and_roles(self):
                 .exclude(profile__isnull=True)
                 .order_by("id")
                 .values_list("id", flat=True),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
         + [
             populate_user_roles.si(ids)
             for ids in chunks(
                 Channel.objects.order_by("id").values_list("id", flat=True),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
     )
@@ -211,7 +211,7 @@ def populate_post_and_comment_fields(self):
             populate_post_and_comment_fields_batch.si(ids)
             for ids in chunks(
                 Post.objects.order_by("id").values_list("id", flat=True),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
     )
@@ -261,7 +261,7 @@ def populate_channel_fields(self):
             populate_channel_fields_batch.si(ids)
             for ids in chunks(
                 Channel.objects.values_list("id", flat=True),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
     )
@@ -372,7 +372,7 @@ def populate_all_posts_and_comments(self):
             populate_posts_and_comments.si(post_ids)
             for post_ids in chunks(
                 range(newest_post_id + 1),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         )
         | populate_posts_and_comments_merge_results.s()

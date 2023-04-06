@@ -11,24 +11,24 @@ from search.tasks import delete_document
 class Command(BaseCommand):
     """Delete es course records that don't have a database object"""
 
-    help = "Remove courses with no database record from the elasticsearch index"
+    help = "Remove courses with no database record from the Opensearch index"
 
     def handle(self, *args, **options):
         """Delete es course records that don't have a database object"""
         index = get_default_alias_name(COURSE_TYPE)
 
-        es_course_ids = set()
+        os_course_ids = set()
         bad_courses = []
         bad_documents = []
 
         for course_obj in Course.objects.filter(published=True):
-            es_course_ids.add(gen_course_id(course_obj.platform, course_obj.course_id))
+            os_course_ids.add(gen_course_id(course_obj.platform, course_obj.course_id))
 
         query = {"term": {"object_type": "course"}}
 
         for listing in es_iterate_all_documents(index, query):
             es_id = listing["_id"]
-            if es_id not in es_course_ids:
+            if es_id not in os_course_ids:
                 bad_courses.append(listing)
 
         for course in bad_courses:

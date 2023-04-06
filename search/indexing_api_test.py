@@ -5,7 +5,7 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-from elasticsearch.exceptions import ConflictError, NotFoundError
+from opensearch.exceptions import ConflictError, NotFoundError
 
 from course_catalog.factories import (
     ContentFileFactory,
@@ -37,14 +37,14 @@ from search.indexing_api import (
     update_post,
 )
 
-pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_os")]
 
 
 @pytest.fixture()
 def mocked_es(mocker, settings):
-    """Mocked ES client objects/functions"""
+    """Mocked OS client objects/functions"""
     index_name = "test"
-    settings.ELASTICSEARCH_INDEX = index_name
+    settings.OPENSEARCH_INDEX = index_name
     conn = mocker.Mock()
     get_conn_patch = mocker.patch(
         "search.indexing_api.get_conn", autospec=True, return_value=conn
@@ -65,7 +65,7 @@ def mocked_es(mocker, settings):
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 def test_create_document(mocked_es, mocker, object_type):
     """
-    Test that create_document gets a connection and calls the correct elasticsearch-dsl function
+    Test that create_document gets a connection and calls the correct opensearch-dsl function
     """
     doc_id, data = ("doc_id", {"object_type": object_type})
     mock_get_aliases = mocker.patch(
