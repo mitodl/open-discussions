@@ -13,7 +13,7 @@ x-environment:
   OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
   OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
   OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-  ELASTICSEARCH_URL: elastic:9200
+  OPENSEARCH_URL: opensearch-node1:9200
   CELERY_TASK_ALWAYS_EAGER: 'False'
   CELERY_BROKER_URL: redis://redis:6379/4
   CELERY_RESULT_BACKEND: redis://redis:6379/4
@@ -38,16 +38,29 @@ services:
     ports:
       - "6379"
 
-  elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+  opensearch-node1:
+    image: opensearchproject/opensearch:2.5.0
+    container_name: opensearch-node1
     environment:
-      - network.host=0.0.0.0
-      - http.cors.enabled=true
-      - http.cors.allow-origin=*
-      - rest.action.multi.allow_explicit_index=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
+      - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
     ports:
-      - "9101:9200"
+      - 9100:9200
+      - 9600:9600 # required for Performance Analyzer
 
   nginx:
     image: nginx:1.9.5
@@ -71,7 +84,7 @@ services:
       - "8061:8061"
     links:
       - db
-      - elastic
+      - opensearch-node1
       - redis
       - watch
     extra_hosts: *default-extra-hosts
@@ -106,6 +119,7 @@ services:
       celery -A open_discussions.celery:app worker -Q spam,digest_emails,edx_content,default -l ${OPEN_DISCUSSIONS_LOG_LEVEL:-INFO}'
     links:
       - db
+      - opensearch-node1
       - redis
     extra_hosts: *default-extra-hosts
 
@@ -114,3 +128,6 @@ services:
     entrypoint: java -jar tika-server-1.23.jar -h 0.0.0.0 -spawnChild
     ports:
       - "9998:9998"
+
+volumes:
+  opensearch-data1:
