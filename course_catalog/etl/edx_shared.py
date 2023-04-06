@@ -81,6 +81,7 @@ def sync_edx_course_files(
             platform=platform,
             content_type=ContentType.objects.get_for_model(Course),
             object_id__in=ids,
+            published=True,
         )
         if platform == PlatformType.mitx.value:
             # Additional processing of run ids and tarfile names, because MITx data is a mess of id/file formats

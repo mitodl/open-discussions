@@ -247,6 +247,16 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
                     setattr(course, attr, val)
                 course.save()
 
+        if run_ids_to_update_or_create and config.prune:
+            # mark runs no longer included here as unpublished
+            for run in course.runs.exclude(
+                run_id__in=run_ids_to_update_or_create
+            ).filter(published=True):
+                run.published = False
+                run.save()
+                if course.published:
+                    search_task_helpers.delete_run_content_files(run.id)
+
         load_topics(course, topics_data)
         load_offered_bys(course, offered_bys_data, config=config.offered_by)
 

@@ -98,7 +98,9 @@ def test_xpro_courses_etl():
     mock_extract.assert_called_once_with()
     mock_transform.assert_called_once_with(mock_extract.return_value)
     mock_load_courses.assert_called_once_with(
-        PlatformType.xpro.value, mock_transform.return_value
+        PlatformType.xpro.value,
+        mock_transform.return_value,
+        config=CourseLoaderConfig(prune=True),
     )
 
     assert result == mock_load_courses.return_value
@@ -126,6 +128,7 @@ def test_mitx_etl():
         PlatformType.mitx.value,
         mock_transform.return_value,
         config=CourseLoaderConfig(
+            prune=True,
             offered_by=OfferedByLoaderConfig(additive=True),
             runs=LearningResourceRunLoaderConfig(
                 offered_by=OfferedByLoaderConfig(additive=True)
@@ -149,7 +152,9 @@ def test_oll_etl():
     mock_extract.assert_called_once_with()
     mock_transform.assert_called_once_with(mock_extract.return_value)
     mock_load_courses.assert_called_once_with(
-        PlatformType.oll.value, mock_transform.return_value
+        PlatformType.oll.value,
+        mock_transform.return_value,
+        config=CourseLoaderConfig(prune=True),
     )
 
     assert result == mock_load_courses.return_value

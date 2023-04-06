@@ -59,16 +59,21 @@ xpro_programs_etl = compose(
     xpro.extract_programs,
 )
 xpro_courses_etl = compose(
-    load_courses(PlatformType.xpro.value), xpro.transform_courses, xpro.extract_courses
+    load_courses(PlatformType.xpro.value, config=CourseLoaderConfig(prune=True)),
+    xpro.transform_courses,
+    xpro.extract_courses,
 )
 
 mitxonline_programs_etl = compose(
-    load_programs(PlatformType.mitxonline.value),
+    load_programs(
+        PlatformType.mitxonline.value,
+        config=ProgramLoaderConfig(courses=CourseLoaderConfig(prune=True)),
+    ),
     mitxonline.transform_programs,
     mitxonline.extract_programs,
 )
 mitxonline_courses_etl = compose(
-    load_courses(PlatformType.mitxonline.value),
+    load_courses(PlatformType.mitxonline.value, config=CourseLoaderConfig(prune=True)),
     mitxonline.transform_courses,
     mitxonline.extract_courses,
 )
@@ -78,6 +83,7 @@ mitx_etl = compose(
         PlatformType.mitx.value,
         # MicroMasters courses overlap with MITx, so configure course and run level offerors to be additive
         config=CourseLoaderConfig(
+            prune=True,
             offered_by=OfferedByLoaderConfig(additive=True),
             runs=LearningResourceRunLoaderConfig(
                 offered_by=OfferedByLoaderConfig(additive=True)
@@ -93,7 +99,11 @@ mitx_etl = compose(
     mitx.extract,
 )
 
-oll_etl = compose(load_courses(PlatformType.oll.value), oll.transform, oll.extract)
+oll_etl = compose(
+    load_courses(PlatformType.oll.value, config=CourseLoaderConfig(prune=True)),
+    oll.transform,
+    oll.extract,
+)
 
 youtube_etl = compose(loaders.load_video_channels, youtube.transform, youtube.extract)
 
