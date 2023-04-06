@@ -1,5 +1,5 @@
 /* global SETTINGS:false */
-import React, { useState, useCallback } from "react"
+import React, { useState, useCallback, useMemo } from "react"
 import Container from "@mui/material/Container"
 import { intersection } from "lodash"
 import { BannerPage, useMuiBreakpoint } from "ol-util"
@@ -8,9 +8,11 @@ import {
   useCourseSearch,
   buildSearchQuery,
   Aggregations,
+  Aggregation,
   SearchQueryParams,
   Facets,
-  useSearchInputs
+  useSearchInputs,
+  getFacetOptions
 } from "@mitodl/course-search-utils"
 import {
   LearningResourceSearchResult,
@@ -47,7 +49,7 @@ const doSearch = async (params: SearchQueryParams) => {
 }
 
 const useInfiniteSearch = (params: Omit<SearchQueryParams, "from">) => {
-  if (params.activeFacets?.["type"]) {
+  if (params.activeFacets?.["type"]?.length > 0) {
     params.activeFacets["type"] = intersection(params.activeFacets["type"], ALLOWED_TYPES)
   } else {
     params.activeFacets = {
@@ -55,20 +57,19 @@ const useInfiniteSearch = (params: Omit<SearchQueryParams, "from">) => {
       type: ALLOWED_TYPES
     }
   }
+  console.log(params)
   return useInfiniteQuery({
+    keepPreviousData: true,
     queryKey:         ["search", params],
     queryFn:          ({ pageParam = 0 }) => doSearch({ ...params, from: pageParam }),
     getNextPageParam: (lastPage, pages) => {
-      console.log("getNextPageParam")
-      console.log(lastPage)
-      console.log(pages)
+      if (pages.length * pageSize >= lastPage.hits.total) return undefined
       return pages.length * pageSize
     }
   })
 }
 
 const SearchPage: React.FC = () => {
-  const [aggregations, setAggregations] = useState<Aggregations>(new Map())
   const isMd = useMuiBreakpoint("md")
   const [searchText, setSearchText] = useState("")
 
@@ -76,21 +77,24 @@ const SearchPage: React.FC = () => {
   const {
     updateText,
     text,
-    facetOptions,
     onUpdateFacets,
     clearAllFilters,
     toggleFacet,
     activeFacets,
     setText,
-  } = useSearchInputs(
-    history,
-    aggregations
-  )
+  } = useSearchInputs(history)
 
   const search = useInfiniteSearch({
     text: searchText,
     activeFacets
   })
+  const aggregations = useMemo(() => {
+    return new Map(Object.entries(search.data?.pages[0].aggregations ?? {})) as Aggregations
+  }, [search.data?.pages])
+  const facetOptions = useCallback(
+    (group: string) => getFacetOptions(aggregations, activeFacets, group),
+    [aggregations, activeFacets]
+  )
 
   const clearText = useCallback(() => {
     setText("")
@@ -99,8 +103,15 @@ const SearchPage: React.FC = () => {
   const onSubmit = () => {
     setSearchText(text)
   }
-  const total = search.data?.pages[0].hits.total || 0
-  const retrieved = search.data?.pages.reduce((acc, page) => acc + page.hits.hits.length, 0) || 0
+  const results = useMemo(() => {
+    return search.data?.pages.flatMap(page => page.hits.hits) || []
+  }, [search.data])
+  const { fetchNextPage } = search
+  const loadMore = useCallback((page: number) => {
+    fetchNextPage({ pageParam: page * pageSize })
+  }, [fetchNextPage])
+
+  const hasResultsAvailable = !search.isLoading && !search.isPreviousData
 
   return (
     <BannerPage
@@ -140,8 +151,8 @@ const SearchPage: React.FC = () => {
           </GridColumn>
           <GridColumn variant="main-2" component="section">
             <InfiniteScroll
-              hasMore={retrieved < total}
-              loadMore={page => search.fetchNextPage({pageParam: page })}
+              hasMore={search.hasNextPage}
+              loadMore={loadMore}
               initialLoad={search.data === undefined}
               loader={
                 <div key="loader" className="loader">
@@ -149,11 +160,37 @@ const SearchPage: React.FC = () => {
                 </div>
               }
             >
-              {search.data?.pages.flatMap((page, index) => {
-                return page.hits.hits.map(result => {
-                  return <div key={result.id}>{JSON.stringify(result)}</div>
-                })
-              })}
+              {search.isError ? (
+                <div className="no-results-found">
+                  <span>Oops! Something went wrong.</span>
+                </div>
+              ) : hasResultsAvailable ? (
+                results.length === 0 ? (
+                  <div className="no-results-found">
+                    <span>No results found for your query</span>
+                  </div>
+                ) : (
+                  <ul
+                    aria-label="Search Results"
+                    className="ic-searchpage-list ic-card-row-list"
+                  >
+                    {results.map(hit => (
+                      <li
+                        key={hit._source.object_type.concat(
+                          hit._source.id.toString()
+                        )}
+                      >
+                        <LearningResourceCard
+                          variant="row-reverse"
+                          resource={hit._source}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )
+              ) : (
+                <span>Loading...</span>
+              )}
             </InfiniteScroll>
           </GridColumn>
         </GridContainer>

@@ -3923,9 +3923,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mitodl/course-search-utils@file:/src/mitodl-course-search-utils-v2.0.6.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor":
-  version: 2.0.6
-  resolution: "@mitodl/course-search-utils@file:/src/mitodl-course-search-utils-v2.0.6.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor"
+"@mitodl/course-search-utils@file:/src/mitodl-course-search-utils-v2.0.7.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor":
+  version: 2.0.7
+  resolution: "@mitodl/course-search-utils@file:/src/mitodl-course-search-utils-v2.0.7.tgz::locator=infinite-corridor%40workspace%3Afrontends%2Finfinite-corridor"
   dependencies:
     bodybuilder: ^2.5.0
     history: ^4.9 || ^5.0.0
@@ -3933,7 +3933,7 @@ __metadata:
     ramda: ^0.27.1
   peerDependencies:
     react: ^16.13.1
-  checksum: ab1d5359071447955b88ad116d2728a493568d5db4b8de00983707f99612e75307b7c80c7a8bd1b63d552b0b89968babb952ba3a5c68ae30bfe590b4adb81449
+  checksum: d21405c7c86572c3dfd5aecbc310c5cc234cea89846997cefa04017c292d75529da71dbb02c4a9e841842aa8259a41ec9125fc625bb9ad8b82d3ea7deed321ea
   languageName: node
   linkType: hard
 
@@ -12957,7 +12957,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
-    "@mitodl/course-search-utils": /src/mitodl-course-search-utils-v2.0.6.tgz
+    "@mitodl/course-search-utils": /src/mitodl-course-search-utils-v2.0.7.tgz
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
