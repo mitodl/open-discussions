@@ -44,7 +44,7 @@ def minimum_price(learning_resource):
 
 @pytest.fixture
 def patched_base_post_serializer(mocker):
-    """Fixture that patches the base serializer class for ESPostSerializer"""
+    """Fixture that patches the base serializer class for OSPostSerializer"""
     article_content = {"text": "hello world"}
     base_serialized_data = {
         "author_id": 1,
@@ -70,14 +70,14 @@ def patched_base_post_serializer(mocker):
         "slug": "post-title",
     }
     yield mocker.patch(
-        "search.serializers.ESPostSerializer.base_serializer",
+        "search.serializers.OSPostSerializer.base_serializer",
         return_value=mocker.Mock(data=base_serialized_data, _get_user=mocker.Mock()),
     )
 
 
 @pytest.fixture
 def patched_base_comment_serializer(mocker):
-    """Fixture that patches the base serializer class for ESCommentSerializer"""
+    """Fixture that patches the base serializer class for OSCommentSerializer"""
     base_serialized_data = {
         "author_id": 1,
         "author_name": "Author Name",
@@ -92,7 +92,7 @@ def patched_base_comment_serializer(mocker):
         "parent_id": 2,
     }
     yield mocker.patch(
-        "search.serializers.ESCommentSerializer.base_serializer",
+        "search.serializers.OSCommentSerializer.base_serializer",
         return_value=mocker.Mock(data=base_serialized_data, _get_user=mocker.Mock()),
     )
 
@@ -104,10 +104,10 @@ def patched_base_comment_serializer(mocker):
 )
 def test_es_post_serializer(factory_kwargs):
     """
-    Test that ESPostSerializer correctly serializes a post object
+    Test that OSPostSerializer correctly serializes a post object
     """
     post = PostFactory.create(**factory_kwargs)
-    serialized = serializers.ESPostSerializer(instance=post).data
+    serialized = serializers.OSPostSerializer(instance=post).data
     assert serialized == {
         "object_type": POST_TYPE,
         "article_content": post.article.content
@@ -144,10 +144,10 @@ def test_es_post_serializer(factory_kwargs):
 @pytest.mark.parametrize("has_author", [True, False])
 def test_es_comment_serializer(has_author):
     """
-    Test that ESCommentSerializer correctly serializes a comment object
+    Test that OSCommentSerializer correctly serializes a comment object
     """
     comment = CommentFactory.create()
-    serialized = serializers.ESCommentSerializer(instance=comment).data
+    serialized = serializers.OSCommentSerializer(instance=comment).data
     assert serialized == {
         "object_type": COMMENT_TYPE,
         "author_id": comment.author.username if comment.author is not None else None,
@@ -286,7 +286,7 @@ def test_es_run_serializer(has_full_name, level):
 @pytest.mark.parametrize("department", [None, ["2"]])
 def test_es_course_serializer(offered_by, platform, department):
     """
-    Test that ESCourseSerializer correctly serializes a course object
+    Test that OSCourseSerializer correctly serializes a course object
     """
     course = factories.CourseFactory.create(platform=platform, department=department)
 
@@ -316,7 +316,7 @@ def test_es_course_serializer(offered_by, platform, department):
     unpublished_run.save()
     course.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = serializers.ESCourseSerializer(course).data
+    serialized = serializers.OSCourseSerializer(course).data
 
     if platform in PROFESSIONAL_COURSE_PLATFORMS:
         expected_audience = ["Professional Offerings"]
@@ -391,7 +391,7 @@ def test_es_course_serializer(offered_by, platform, department):
 )
 @pytest.mark.parametrize("ocw_next_course", [True, False])
 def test_es_content_file_serializer(section, section_resource_type, ocw_next_course):
-    """Verify that the ESContentFileSerializer has the correct data"""
+    """Verify that the OSContentFileSerializer has the correct data"""
     content_kwargs = {
         "content": "Some text",
         "content_author": "MIT",
@@ -409,7 +409,7 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
     else:
         resource_type = section_resource_type
 
-    serialized = serializers.ESContentFileSerializer(content_file).data
+    serialized = serializers.OSContentFileSerializer(content_file).data
 
     assert_json_equal(
         serialized,
@@ -457,12 +457,12 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
 def test_es_program_serializer(offered_by):
     """
-    Test that ESProgramSerializer correctly serializes a program object
+    Test that OSProgramSerializer correctly serializes a program object
     """
     program = factories.ProgramFactory.create()
     program.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = serializers.ESProgramSerializer(program).data
+    serialized = serializers.OSProgramSerializer(program).data
 
     if offered_by == OfferedBy.micromasters.value:
         expected_audience = ["Open Content", "Professional Offerings"]
@@ -515,12 +515,12 @@ def expected_audience_for_list(user_list):
 @pytest.mark.parametrize("privacy_level", [privacy.value for privacy in PrivacyLevel])
 def test_es_userlist_serializer(list_type, privacy_level, user):
     """
-    Test that ESUserListSerializer correctly serializes a UserList object
+    Test that OSUserListSerializer correctly serializes a UserList object
     """
     user_list = factories.UserListFactory.create(
         list_type=list_type, privacy_level=privacy_level, author=user
     )
-    serialized = serializers.ESUserListSerializer(user_list).data
+    serialized = serializers.OSUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
         {
@@ -549,12 +549,12 @@ def test_es_userlist_serializer(list_type, privacy_level, user):
 )
 def test_es_stafflist_serializer(list_type, privacy_level, user):
     """
-    Test that ESStaffListSerializer correctly serializes a StaffList object
+    Test that OSStaffListSerializer correctly serializes a StaffList object
     """
     staff_list = factories.StaffListFactory.create(
         list_type=list_type, privacy_level=privacy_level, author=user
     )
-    serialized = serializers.ESStaffListSerializer(staff_list).data
+    serialized = serializers.OSStaffListSerializer(staff_list).data
     assert_json_equal(
         serialized,
         {
@@ -579,7 +579,7 @@ def test_es_stafflist_serializer(list_type, privacy_level, user):
 @pytest.mark.django_db
 def test_es_userlist_serializer_image_src():
     """
-    Test that ESUserListSerializer uses 1st non-list list item image_src if the list image_src is None
+    Test that OSUserListSerializer uses 1st non-list list item image_src if the list image_src is None
     """
     user_list = factories.UserListFactory.create(image_src=None)
     factories.UserListItemFactory.create(
@@ -589,7 +589,7 @@ def test_es_userlist_serializer_image_src():
         user_list=user_list, position=2, is_course=True
     )
 
-    serialized = serializers.ESUserListSerializer(user_list).data
+    serialized = serializers.OSUserListSerializer(user_list).data
     assert_json_equal(
         serialized,
         {
@@ -615,12 +615,12 @@ def test_es_userlist_serializer_image_src():
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
 def test_es_podcast_serializer(offered_by):
     """
-    Test that ESPodcastSerializer correctly serializes a Podcast object
+    Test that OSPodcastSerializer correctly serializes a Podcast object
     """
     podcast = factories.PodcastFactory.create()
     podcast.offered_by.set([factories.LearningResourceOfferorFactory(name=offered_by)])
 
-    serialized = serializers.ESPodcastSerializer(podcast).data
+    serialized = serializers.OSPodcastSerializer(podcast).data
     assert_json_equal(
         serialized,
         {
@@ -649,14 +649,14 @@ def test_es_podcast_serializer(offered_by):
 @pytest.mark.parametrize("offered_by", [offered_by.value for offered_by in OfferedBy])
 def test_es_podcast_episode_serializer(offered_by):
     """
-    Test that ESPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
+    Test that OSPodcastEpisodeSerializer correctly serializes a PodcastEpisode object
     """
     podcast_episode = factories.PodcastEpisodeFactory.create()
     podcast_episode.offered_by.set(
         [factories.LearningResourceOfferorFactory(name=offered_by)]
     )
 
-    serialized = serializers.ESPodcastEpisodeSerializer(podcast_episode).data
+    serialized = serializers.OSPodcastEpisodeSerializer(podcast_episode).data
     assert_json_equal(
         serialized,
         {

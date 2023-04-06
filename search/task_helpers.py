@@ -34,7 +34,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import ESCommentSerializer, ESPostSerializer
+from search.serializers import OSCommentSerializer, OSPostSerializer
 from search.tasks import (
     create_document,
     create_post_document,
@@ -81,7 +81,7 @@ def index_new_post(post_obj):
         post_obj (channels.proxies.PostProxy): A proxied post/submission
     """
     post = post_obj._self_post  # pylint: disable=protected-access
-    data = ESPostSerializer(instance=post).data
+    data = OSPostSerializer(instance=post).data
     create_post_document.delay(gen_post_id(post.post_id), data)
 
 
@@ -94,7 +94,7 @@ def index_new_comment(comment_obj):
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
     comment = Comment.objects.get(comment_id=comment_obj.id)
-    data = ESCommentSerializer(instance=comment).data
+    data = OSCommentSerializer(instance=comment).data
     create_document.delay(gen_comment_id(comment_obj.id), data)
     increment_parent_post_comment_count(comment_obj)
 

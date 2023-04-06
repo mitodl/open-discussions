@@ -157,7 +157,7 @@ def test_update_post(mocker):
         "search.indexing_api.update_document_with_partial"
     )
     mocker.patch(
-        "search.indexing_api.ESPostSerializer", return_value=fake_serialized_post
+        "search.indexing_api.OSPostSerializer", return_value=fake_serialized_post
     )
 
     update_post("abc", fake_post)

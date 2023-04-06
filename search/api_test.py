@@ -45,11 +45,11 @@ from search.constants import (
     USER_PATH_TYPE,
 )
 from search.serializers import (
-    ESContentFileSerializer,
-    ESCourseSerializer,
-    ESProgramSerializer,
-    ESUserListSerializer,
-    ESVideoSerializer,
+    OSContentFileSerializer,
+    OSCourseSerializer,
+    OSProgramSerializer,
+    OSUserListSerializer,
+    OSVideoSerializer,
 )
 
 RAW_SUGGESTIONS = {
@@ -561,13 +561,13 @@ def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
     elasticsearch.conn.search.return_value = {
         "hits": {
             "hits": [
-                {"_source": ESCourseSerializer(course).data},
-                {"_source": ESCourseSerializer(favorited_course).data},
-                {"_source": ESCourseSerializer(saved_course).data},
-                {"_source": ESVideoSerializer(VideoFactory.create()).data},
-                {"_source": ESProgramSerializer(ProgramFactory.create()).data},
-                {"_source": ESUserListSerializer(UserListFactory.create()).data},
-                {"_source": ESContentFileSerializer(ContentFileFactory.create()).data},
+                {"_source": OSCourseSerializer(course).data},
+                {"_source": OSCourseSerializer(favorited_course).data},
+                {"_source": OSCourseSerializer(saved_course).data},
+                {"_source": OSVideoSerializer(VideoFactory.create()).data},
+                {"_source": OSProgramSerializer(ProgramFactory.create()).data},
+                {"_source": OSUserListSerializer(UserListFactory.create()).data},
+                {"_source": OSContentFileSerializer(ContentFileFactory.create()).data},
             ]
         }
     }
@@ -648,21 +648,21 @@ def test_transform_results(
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
-            "_source": ESCourseSerializer(generic_course).data,
+            "_source": OSCourseSerializer(generic_course).data,
         },
         {
             "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a1",
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeB",
             "_score": 1.0,
-            "_source": ESCourseSerializer(favorited_course).data,
+            "_source": OSCourseSerializer(favorited_course).data,
         },
         {
             "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a2",
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeC",
             "_score": 1.0,
-            "_source": ESUserListSerializer(listed_learningpath).data,
+            "_source": OSUserListSerializer(listed_learningpath).data,
         },
     ]
 
@@ -673,7 +673,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
             "_source": {
-                **ESCourseSerializer(generic_course).data,
+                **OSCourseSerializer(generic_course).data,
                 "is_favorite": False,
                 "lists": [],
             },
@@ -684,7 +684,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeB",
             "_score": 1.0,
             "_source": {
-                **ESCourseSerializer(favorited_course).data,
+                **OSCourseSerializer(favorited_course).data,
                 "is_favorite": True,
                 "lists": [],
             },
@@ -695,7 +695,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeC",
             "_score": 1.0,
             "_source": {
-                **ESUserListSerializer(listed_learningpath).data,
+                **OSUserListSerializer(listed_learningpath).data,
                 "is_favorite": False,
                 "lists": [
                     {
@@ -765,7 +765,7 @@ def test_transform_department_filter(department_fitler):
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
-            "_source": ESCourseSerializer(course).data,
+            "_source": OSCourseSerializer(course).data,
         }
     ]
 

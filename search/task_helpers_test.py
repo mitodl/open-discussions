@@ -127,7 +127,7 @@ def test_index_new_post(mocker):
     mock_post = mocker.Mock(post_id="abc")
     mock_post_proxy = mocker.Mock(_self_post=mock_post)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.ESPostSerializer.to_representation",
+        "search.task_helpers.OSPostSerializer.to_representation",
         return_value=fake_serialized_data,
     )
     patched_task = mocker.patch("search.task_helpers.create_post_document")
@@ -150,7 +150,7 @@ def test_index_new_comment(mocker):
     mock_submission = mocker.Mock(id="123")
     mock_comment = mocker.Mock(id=comment.comment_id, submission=mock_submission)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.ESCommentSerializer.to_representation",
+        "search.task_helpers.OSCommentSerializer.to_representation",
         return_value=fake_serialized_data,
     )
     patched_create_task = mocker.patch("search.task_helpers.create_document")

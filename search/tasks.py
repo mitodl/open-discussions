@@ -46,15 +46,15 @@ from search.constants import (
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
-    ESContentFileSerializer,
-    ESCourseSerializer,
-    ESPodcastEpisodeSerializer,
-    ESPodcastSerializer,
+    OSContentFileSerializer,
+    OSCourseSerializer,
+    OSPodcastEpisodeSerializer,
+    OSPodcastSerializer,
     ESProfileSerializer,
-    ESProgramSerializer,
-    ESStaffListSerializer,
-    ESUserListSerializer,
-    ESVideoSerializer,
+    OSProgramSerializer,
+    OSStaffListSerializer,
+    OSUserListSerializer,
+    OSVideoSerializer,
 )
 
 User = get_user_model()
@@ -157,7 +157,7 @@ def update_link_post_with_preview(doc_id, data):
 
     Args:
         doc_id (str): ES document ID
-        data (dict): Dict of serialized post data produced by ESPostSerializer
+        data (dict): Dict of serialized post data produced by OSPostSerializer
     """
     if not data["post_link_url"]:
         return None
@@ -202,7 +202,7 @@ def update_document_with_partial(
 def upsert_course(course_id):
     """Upsert course based on stored database information"""
     course_obj = Course.objects.get(id=course_id)
-    course_data = ESCourseSerializer(course_obj).data
+    course_data = OSCourseSerializer(course_obj).data
     api.upsert_document(
         gen_course_id(course_obj.platform, course_obj.course_id),
         course_data,
@@ -216,7 +216,7 @@ def upsert_content_file(file_id):
     """Upsert content file based on stored database information"""
 
     content_file_obj = ContentFile.objects.get(id=file_id)
-    content_file_data = ESContentFileSerializer(content_file_obj).data
+    content_file_data = OSContentFileSerializer(content_file_obj).data
     api.upsert_document(
         gen_content_file_id(content_file_obj.key),
         content_file_data,
@@ -235,7 +235,7 @@ def upsert_program(program_id):
     from search.api import gen_program_id
 
     program_obj = Program.objects.get(id=program_id)
-    program_data = ESProgramSerializer(program_obj).data
+    program_data = OSProgramSerializer(program_obj).data
     api.upsert_document(
         gen_program_id(program_obj),
         program_data,
@@ -250,7 +250,7 @@ def upsert_video(video_id):
     from search.api import gen_video_id
 
     video_obj = Video.objects.get(id=video_id)
-    video_data = ESVideoSerializer(video_obj).data
+    video_data = OSVideoSerializer(video_obj).data
     api.upsert_document(
         gen_video_id(video_obj),
         video_data,
@@ -265,7 +265,7 @@ def upsert_user_list(user_list_id):
     from search.api import gen_user_list_id
 
     user_list_obj = UserList.objects.get(id=user_list_id)
-    user_list_data = ESUserListSerializer(user_list_obj).data
+    user_list_data = OSUserListSerializer(user_list_obj).data
     api.upsert_document(
         gen_user_list_id(user_list_obj),
         user_list_data,
@@ -280,7 +280,7 @@ def upsert_staff_list(staff_list_id):
     from search.api import gen_staff_list_id
 
     staff_list_obj = StaffList.objects.get(id=staff_list_id)
-    staff_list_data = ESStaffListSerializer(staff_list_obj).data
+    staff_list_data = OSStaffListSerializer(staff_list_obj).data
     api.upsert_document(
         gen_staff_list_id(staff_list_obj),
         staff_list_data,
@@ -295,7 +295,7 @@ def upsert_podcast(podcast_id):
     from search.api import gen_podcast_id
 
     podcast_obj = Podcast.objects.get(id=podcast_id)
-    podcast_data = ESPodcastSerializer(podcast_obj).data
+    podcast_data = OSPodcastSerializer(podcast_obj).data
     api.upsert_document(
         gen_podcast_id(podcast_obj),
         podcast_data,
@@ -310,7 +310,7 @@ def upsert_podcast_episode(podcast_episode_id):
     from search.api import gen_podcast_episode_id
 
     podcast_episode_obj = PodcastEpisode.objects.get(id=podcast_episode_id)
-    podcast_episode_data = ESPodcastEpisodeSerializer(podcast_episode_obj).data
+    podcast_episode_data = OSPodcastEpisodeSerializer(podcast_episode_obj).data
     api.upsert_document(
         gen_podcast_episode_id(podcast_episode_obj),
         podcast_episode_data,

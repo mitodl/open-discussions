@@ -38,7 +38,7 @@ from search.constants import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    ESPostSerializer,
+    OSPostSerializer,
     serialize_bulk_comments,
     serialize_bulk_courses,
     serialize_bulk_courses_for_deletion,
@@ -526,7 +526,7 @@ def update_post(doc_id, post):
         post (channels.models.Post): A Post object
     """
     return update_document_with_partial(
-        doc_id, ESPostSerializer(instance=post).data, POST_TYPE
+        doc_id, OSPostSerializer(instance=post).data, POST_TYPE
     )
 
 

@@ -57,9 +57,9 @@ from search.constants import (
 log = logging.getLogger()
 
 
-class ESModelSerializer(serializers.ModelSerializer):
+class OSModelSerializer(serializers.ModelSerializer):
     """
-    Base ElasticSearch serializer for model-based objects
+    Base Opensearch serializer for model-based objects
     """
 
     object_type = None
@@ -73,7 +73,7 @@ class ESModelSerializer(serializers.ModelSerializer):
 
 class ESProxySerializer:
     """
-    Serializer class for Elasticsearch objects that proxy to another serializer for serialization
+    Serializer class for Opensearch objects that proxy to another serializer for serialization
 
     Attributes:
         object_type (str): String indicating the type of reddit/django object
@@ -144,7 +144,7 @@ class ESProfileSerializer(ESProxySerializer):
         }
 
 
-class ESPostSerializer(ESModelSerializer):
+class OSPostSerializer(OSModelSerializer):
     """Elasticsearch serializer class for posts"""
 
     object_type = POST_TYPE
@@ -222,7 +222,7 @@ class ESPostSerializer(ESModelSerializer):
         )
 
 
-class ESCommentSerializer(ESModelSerializer):
+class OSCommentSerializer(OSModelSerializer):
     """Elasticsearch serializer class for comments"""
 
     object_type = COMMENT_TYPE
@@ -353,7 +353,7 @@ class ESResourceFileSerializerMixin(serializers.Serializer):
         raise NotImplementedError
 
 
-class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
+class OSContentFileSerializer(ESResourceFileSerializerMixin, OSModelSerializer):
     """
     Elasticsearch serializer class for course run files
     """
@@ -510,7 +510,7 @@ def get_ocw_departmet_course_number_dict(coursenum, primary):
     }
 
 
-class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSCourseSerializer(OSModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for courses
     """
@@ -591,7 +591,7 @@ class ESCourseSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSProgramSerializer(OSModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for programs
     """
@@ -627,7 +627,7 @@ class ESProgramSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSUserListSerializer(OSModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for UserLists
     """
@@ -676,7 +676,7 @@ class ESUserListSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESStaffListSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSStaffListSerializer(OSModelSerializer, LearningResourceSerializer):
     """
     Elasticsearch serializer class for StaffLists
     """
@@ -725,7 +725,7 @@ class ESStaffListSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSVideoSerializer(OSModelSerializer, LearningResourceSerializer):
     """ElasticSearch serializer for Videos"""
 
     object_type = VIDEO_TYPE
@@ -762,7 +762,7 @@ class ESVideoSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSPodcastSerializer(OSModelSerializer, LearningResourceSerializer):
     """ElasticSearch serializer for Podcasts"""
 
     object_type = PODCAST_TYPE
@@ -798,7 +798,7 @@ class ESPodcastSerializer(ESModelSerializer, LearningResourceSerializer):
         read_only_fields = fields
 
 
-class ESPodcastEpisodeSerializer(ESModelSerializer, LearningResourceSerializer):
+class OSPodcastEpisodeSerializer(OSModelSerializer, LearningResourceSerializer):
     """ElasticSearch serializer for PodcastEpisodes"""
 
     object_type = PODCAST_EPISODE_TYPE
@@ -942,7 +942,7 @@ def serialize_post_for_bulk(post_obj):
     try:
         return {
             "_id": gen_post_id(post_obj.post_id),
-            **ESPostSerializer(instance=post_obj).data,
+            **OSPostSerializer(instance=post_obj).data,
         }
     except NotFound:
         log.exception("Reddit post not found: %s", post_obj.id)
@@ -962,7 +962,7 @@ def serialize_comment_for_bulk(comment_obj):
     try:
         return {
             "_id": gen_comment_id(comment_obj.comment_id),
-            **ESCommentSerializer(instance=comment_obj).data,
+            **OSCommentSerializer(instance=comment_obj).data,
         }
     except NotFound:
         log.exception("Reddit comment not found: %s", comment_obj.id)
@@ -1011,7 +1011,7 @@ def serialize_course_for_bulk(course_obj):
     """
     return {
         "_id": gen_course_id(course_obj.platform, course_obj.course_id),
-        **ESCourseSerializer(course_obj).data,
+        **OSCourseSerializer(course_obj).data,
     }
 
 
@@ -1024,7 +1024,7 @@ def serialize_content_file_for_bulk(content_file_obj):
     """
     return {
         "_id": gen_content_file_id(content_file_obj.key),
-        **ESContentFileSerializer(content_file_obj).data,
+        **OSContentFileSerializer(content_file_obj).data,
     }
 
 
@@ -1069,7 +1069,7 @@ def serialize_program_for_bulk(program_obj):
     Args:
         program_obj (Program): A program
     """
-    return {"_id": gen_program_id(program_obj), **ESProgramSerializer(program_obj).data}
+    return {"_id": gen_program_id(program_obj), **OSProgramSerializer(program_obj).data}
 
 
 def serialize_bulk_user_lists(ids):
@@ -1092,7 +1092,7 @@ def serialize_user_list_for_bulk(user_list_obj):
     """
     return {
         "_id": gen_user_list_id(user_list_obj),
-        **ESUserListSerializer(user_list_obj).data,
+        **OSUserListSerializer(user_list_obj).data,
     }
 
 
@@ -1127,7 +1127,7 @@ def serialize_staff_list_for_bulk(staff_list_obj):
     """
     return {
         "_id": gen_staff_list_id(staff_list_obj),
-        **ESStaffListSerializer(staff_list_obj).data,
+        **OSStaffListSerializer(staff_list_obj).data,
     }
 
 
@@ -1173,7 +1173,7 @@ def serialize_video_for_bulk(video_obj):
     Args:
         video_obj (Video): A video instance
     """
-    return {"_id": gen_video_id(video_obj), **ESVideoSerializer(video_obj).data}
+    return {"_id": gen_video_id(video_obj), **OSVideoSerializer(video_obj).data}
 
 
 def serialize_bulk_podcasts(ids):
@@ -1207,7 +1207,7 @@ def serialize_podcast_for_bulk(podcast_obj):
     Args:
         podcast_obj (Podcast): A podcast instance
     """
-    return {"_id": gen_podcast_id(podcast_obj), **ESPodcastSerializer(podcast_obj).data}
+    return {"_id": gen_podcast_id(podcast_obj), **OSPodcastSerializer(podcast_obj).data}
 
 
 def serialize_bulk_podcast_episodes(ids):
@@ -1243,5 +1243,5 @@ def serialize_podcast_episode_for_bulk(podcast_episode_obj):
     """
     return {
         "_id": gen_podcast_episode_id(podcast_episode_obj),
-        **ESPodcastEpisodeSerializer(podcast_episode_obj).data,
+        **OSPodcastEpisodeSerializer(podcast_episode_obj).data,
     }
