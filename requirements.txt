@@ -60,6 +60,7 @@ celery==5.2.1
     #   django-server-status
 certifi==2022.12.7
     # via
+    #   opensearch-py
     #   requests
     #   sentry-sdk
 cffi==1.14.4
@@ -251,6 +252,12 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
+opensearch-dsl==2.1.0
+    # via -r requirements.in
+opensearch-py==2.2.0
+    # via
+    #   -r requirements.in
+    #   opensearch-dsl
 packaging==21.3
     # via redis
 parso==0.6.1
@@ -310,6 +317,8 @@ python-dateutil==2.8.1
     #   botocore
     #   elasticsearch-dsl
     #   faker
+    #   opensearch-dsl
+    #   opensearch-py
 python-rapidjson==1.8
     # via -r requirements.in
 python3-openid==3.1.0
@@ -339,6 +348,7 @@ requests==2.24.0
     #   betamax
     #   django-anymail
     #   ocw-data-parser
+    #   opensearch-py
     #   prawcore
     #   pygithub
     #   requests-file
@@ -381,6 +391,8 @@ six==1.15.0
     #   html5lib
     #   isodate
     #   nested-lookup
+    #   opensearch-dsl
+    #   opensearch-py
     #   pygithub
     #   pyopenssl
     #   python-dateutil
@@ -433,6 +445,7 @@ urllib3==1.25.10
     #   -r requirements.in
     #   botocore
     #   elasticsearch
+    #   opensearch-py
     #   requests
     #   sentry-sdk
 uwsgi==2.0.20

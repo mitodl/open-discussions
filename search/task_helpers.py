@@ -339,7 +339,7 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_course(course_id):
     """
-    Run a task to create or update a course's Elasticsearch document
+    Run a task to create or update a course's OpenSearch document
 
     Args:
         course_id (int): the primary key for the Course to update
@@ -364,7 +364,7 @@ def delete_course(course_obj):
 
 def upsert_content_file(content_file_id):
     """
-    Run a task to create or update a content file's Elasticsearch document
+    Run a task to create or update a content file's OpenSearch document
 
     Args:
         content_file_id (int): the primary key for the ContentFile to update
@@ -397,7 +397,7 @@ def delete_run_content_files(run_id):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_program(program_id):
     """
-    Run a task to create or update a program Elasticsearch document
+    Run a task to create or update a program OpenSearch document
 
     Args:
         program_id (int): the primary key for the Program to update in ES
@@ -419,7 +419,7 @@ def delete_program(program_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_user_list(user_list_id):
     """
-    Run a task to update all fields of a UserList Elasticsearch document
+    Run a task to update all fields of a UserList OpenSearch document
 
     Args:
         user_list_id (int): the primary key for the UserList to update in ES
@@ -441,7 +441,7 @@ def delete_user_list(user_list_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_staff_list(staff_list_id):
     """
-    Run a task to update all fields of a StaffList Elasticsearch document
+    Run a task to update all fields of a StaffList OpenSearch document
 
     Args:
         staff_list_id (int): the primary key for the StaffList to update in ES
@@ -463,7 +463,7 @@ def delete_staff_list(staff_list_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_video(video_id):
     """
-    Run a task to create or update a video Elasticsearch document
+    Run a task to create or update a video OpenSearch document
 
     Args:
         video_id (int): the database primary key of the Video to update in ES
@@ -485,7 +485,7 @@ def delete_video(video_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_podcast(podcast_id):
     """
-    Run a task to create or update a podcast Elasticsearch document
+    Run a task to create or update a podcast OpenSearch document
 
     Args:
         podcast_id (int): the database primary key of the Podcast to update in ES
@@ -507,7 +507,7 @@ def delete_podcast(podcast_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_podcast_episode(podcast_episode_id):
     """
-    Run a task to create or update a podcast episode Elasticsearch document
+    Run a task to create or update a podcast episode OpenSearch document
 
     Args:
         podcast_episode_id (int): the database primary key of the PodcastEpisode to update in ES

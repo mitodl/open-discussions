@@ -313,8 +313,8 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
     index_create_data = {
         "settings": {
             "index": {
-                "number_of_shards": settings.ELASTICSEARCH_SHARD_COUNT,
-                "number_of_replicas": settings.ELASTICSEARCH_REPLICA_COUNT,
+                "number_of_shards": settings.OPENSEARCH_SHARD_COUNT,
+                "number_of_replicas": settings.OPENSEARCH_REPLICA_COUNT,
                 "refresh_interval": "60s",
             },
             "analysis": {

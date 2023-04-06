@@ -68,3 +68,5 @@ git+https://github.com/mitodl/mit-moira.git#egg=mit-moira==0.0.4
 pyathena==2.1.1
 nested-lookup==0.2.22
 drf-spectacular==0.26.1
+opensearch-py==2.2.0
+opensearch-dsl==2.1.0
