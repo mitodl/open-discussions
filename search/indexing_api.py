@@ -1,13 +1,13 @@
 """
-Functions and constants for Elasticsearch indexing
+Functions and constants for Opensearch indexing
 """
 import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from elasticsearch.exceptions import ConflictError, NotFoundError
-from elasticsearch.helpers import BulkIndexError, bulk
+from opensearch.exceptions import ConflictError, NotFoundError
+from opensearch.helpers import BulkIndexError, bulk
 
 from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks
@@ -348,16 +348,18 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
             GLOBAL_DOC_TYPE: {"properties": MAPPING[object_type]}
         }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
+    # related OS docs: https://opensearch-project.github.io/opensearch-net/api/OpenSearch.Client
+    # .AsciiFoldingTokenFilter.html
     conn.indices.create(index_name, body=index_create_data)
 
 
 def create_document(doc_id, data):
     """
-    Makes a request to ES to create a new document
+    Makes a request to OS to create a new document
 
     Args:
-        doc_id (str): The ES document id
-        data (dict): Full ES document data
+        doc_id (str): The OS document id
+        data (dict): Full OS document data
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[data["object_type"]]):
@@ -366,10 +368,10 @@ def create_document(doc_id, data):
 
 def delete_document(doc_id, object_type, **kwargs):
     """
-    Makes a request to ES to delete a document
+    Makes a request to OS to delete a document
 
     Args:
-        doc_id (str): The ES document id
+        doc_id (str): The OS document id
         object_type (str): The object type
         kwargs (dict): optional parameters for the request
     """
@@ -379,17 +381,17 @@ def delete_document(doc_id, object_type, **kwargs):
             conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id, params=kwargs)
         except NotFoundError:
             log.debug(
-                "Tried to delete an ES document that didn't exist, doc_id: '%s'", doc_id
+                "Tried to delete an OS document that didn't exist, doc_id: '%s'", doc_id
             )
 
 
 def update_field_values_by_query(query, field_dict, object_types=None):
     """
-    Makes a request to ES to use the update_by_query API to update one or more field
+    Makes a request to OS to use the update_by_query API to update one or more field
     values for all documents that match the given query.
 
     Args:
-        query (dict): A dict representing an ES query
+        query (dict): A dict representing an OS query
         field_dict (dict): dictionary of fields with values to update
         object_types (list of str): The object types to query (post, comment, etc)
     """
@@ -430,11 +432,11 @@ def update_field_values_by_query(query, field_dict, object_types=None):
 
 def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **kwargs):
     """
-    Makes a request to ES to update an existing document
+    Makes a request to OS to update an existing document
 
     Args:
-        doc_id (str): The ES document id
-        body (dict): ES update operation body
+        doc_id (str): The OS document id
+        body (dict): OS update operation body
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
         kwargs (dict): Optional kwargs to be passed to ElasticSearch
@@ -461,11 +463,11 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
 
 def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=0):
     """
-    Makes a request to ES to update an existing document
+    Makes a request to OS to update an existing document
 
     Args:
-        doc_id (str): The ES document id
-        doc (dict): Full or partial ES document
+        doc_id (str): The OS document id
+        doc (dict): Full or partial OS document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
     """
@@ -476,11 +478,11 @@ def update_document_with_partial(doc_id, doc, object_type, *, retry_on_conflict=
 
 def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
     """
-    Makes a request to ES to create or update a document
+    Makes a request to OS to create or update a document
 
     Args:
-        doc_id (str): The ES document id
-        doc (dict): Full ES document
+        doc_id (str): The OS document id
+        doc (dict): Full OS document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
         kwargs (dict): Optional kwargs to be passed to ElasticSearch
@@ -496,10 +498,10 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
 
 def increment_document_integer_field(doc_id, field_name, incr_amount, object_type):
     """
-    Makes a request to ES to increment some integer field in a document
+    Makes a request to OS to increment some integer field in a document
 
     Args:
-        doc_id (str): The ES document id
+        doc_id (str): The OS document id
         object_type (str): The object type to update (post, comment, etc)
         field_name (str): The name of the field to increment
         incr_amount (int): The amount to increment by

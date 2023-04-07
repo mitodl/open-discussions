@@ -457,11 +457,11 @@
       "required": false
     },
     "OPEN_RESOURCES_MIN_DOC_FREQ": {
-      "description": "Elasticsearch min_doc_freq value for determining similar resources",
+      "description": "Opensearch min_doc_freq value for determining similar resources",
       "required": false
     },
     "OPEN_RESOURCES_MIN_TERM_FREQ": {
-      "description": "Elasticsearch min_term_freq value for determining similar resources",
+      "description": "Opensearch min_term_freq value for determining similar resources",
       "required": false
     },
     "OPEN_VIDEO_DATA_BRANCH": {
@@ -473,11 +473,11 @@
       "required": false
     },
     "OPEN_VIDEO_MIN_DOC_FREQ": {
-      "description": "Elasticsearch min_doc_freq value for determing video topics",
+      "description": "Opensearch min_doc_freq value for determing video topics",
       "required": false
     },
     "OPEN_VIDEO_MIN_TERM_FREQ": {
-      "description": "Elasticsearch min_term_freq value for determing video topics",
+      "description": "Opensearch min_term_freq value for determining video topics",
       "required": false
     },
     "OPEN_VIDEO_USER_LIST_OWNER": {

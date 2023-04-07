@@ -252,9 +252,9 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
-opensearch-dsl==2.1.0
+opensearch-dsl==1.0.0
     # via -r requirements.in
-opensearch-py==2.2.0
+opensearch-py==1.1.0
     # via
     #   -r requirements.in
     #   opensearch-dsl
@@ -318,7 +318,6 @@ python-dateutil==2.8.1
     #   elasticsearch-dsl
     #   faker
     #   opensearch-dsl
-    #   opensearch-py
 python-rapidjson==1.8
     # via -r requirements.in
 python3-openid==3.1.0
@@ -348,7 +347,6 @@ requests==2.24.0
     #   betamax
     #   django-anymail
     #   ocw-data-parser
-    #   opensearch-py
     #   prawcore
     #   pygithub
     #   requests-file
@@ -392,7 +390,6 @@ six==1.15.0
     #   isodate
     #   nested-lookup
     #   opensearch-dsl
-    #   opensearch-py
     #   pygithub
     #   pyopenssl
     #   python-dateutil

@@ -1,4 +1,4 @@
-"""Tests for elasticsearch bulk serializers"""
+"""Tests for opensearch bulk serializers"""
 
 import pytest
 

@@ -41,7 +41,7 @@ pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_os")]
 
 
 @pytest.fixture()
-def mocked_es(mocker, settings):
+def mocked_os(mocker, settings):
     """Mocked OS client objects/functions"""
     index_name = "test"
     settings.OPENSEARCH_INDEX = index_name
@@ -63,7 +63,7 @@ def mocked_es(mocker, settings):
 
 
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
-def test_create_document(mocked_es, mocker, object_type):
+def test_create_document(mocked_os, mocker, object_type):
     """
     Test that create_document gets a connection and calls the correct opensearch-dsl function
     """
@@ -72,9 +72,9 @@ def test_create_document(mocked_es, mocker, object_type):
         "search.indexing_api.get_active_aliases", return_value=[object_type]
     )
     create_document(doc_id, data)
-    mock_get_aliases.assert_called_once_with(mocked_es.conn, object_types=[object_type])
-    mocked_es.get_conn.assert_called_once_with()
-    mocked_es.conn.create.assert_any_call(
+    mock_get_aliases.assert_called_once_with(mocked_os.conn, object_types=[object_type])
+    mocked_os.get_conn.assert_called_once_with()
+    mocked_os.conn.create.assert_any_call(
         index=object_type, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id
     )
 
@@ -83,23 +83,23 @@ def test_create_document(mocked_es, mocker, object_type):
     "version_conflicts,expected_error_logged", [(0, False), (1, True)]
 )
 def test_update_field_values_by_query(
-    mocker, mocked_es, version_conflicts, expected_error_logged
+    mocker, mocked_os, version_conflicts, expected_error_logged
 ):
     """
-    Tests that update_field_values_by_query gets a connection, calls the correct elasticsearch-dsl function,
+    Tests that update_field_values_by_query gets a connection, calls the correct opensearch-dsl function,
     and logs an error if the results indicate version conflicts
     """
     patched_logger = mocker.patch("search.indexing_api.log")
     query, field_name, field_value = ({"query": None}, "field1", "value1")
     new_value_param = "new_value_{}".format(field_name)
-    mocked_es.conn.update_by_query.return_value = {
+    mocked_os.conn.update_by_query.return_value = {
         "version_conflicts": version_conflicts
     }
     update_field_values_by_query(query, {field_name: field_value})
 
-    mocked_es.get_conn.assert_called_once_with()
-    for alias in mocked_es.active_aliases:
-        mocked_es.conn.update_by_query.assert_any_call(
+    mocked_os.get_conn.assert_called_once_with()
+    for alias in mocked_os.active_aliases:
+        mocked_os.conn.update_by_query.assert_any_call(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
@@ -118,18 +118,18 @@ def test_update_field_values_by_query(
 
 
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
-def test_update_document_with_partial(mocked_es, mocker, object_type):
+def test_update_document_with_partial(mocked_os, mocker, object_type):
     """
-    Test that update_document_with_partial gets a connection and calls the correct elasticsearch-dsl function
+    Test that update_document_with_partial gets a connection and calls the correct opensearch-dsl function
     """
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", return_value=[object_type]
     )
     doc_id, data = ("doc_id", {"key1": "value1"})
     update_document_with_partial(doc_id, data, object_type)
-    mock_get_aliases.assert_called_once_with(mocked_es.conn, object_types=[object_type])
-    mocked_es.get_conn.assert_called_once_with()
-    mocked_es.conn.update.assert_called_once_with(
+    mock_get_aliases.assert_called_once_with(mocked_os.conn, object_types=[object_type])
+    mocked_os.get_conn.assert_called_once_with()
+    mocked_os.conn.update.assert_called_once_with(
         index=object_type,
         doc_type=GLOBAL_DOC_TYPE,
         body={"doc": data},
@@ -138,19 +138,19 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     )
 
 
-def test_update_partial_conflict_logging(mocker, mocked_es):
+def test_update_partial_conflict_logging(mocker, mocked_os):
     """
     Test that update_document_with_partial logs an error if a version conflict occurs
     """
     patched_logger = mocker.patch("search.indexing_api.log")
     doc_id, data = ("doc_id", {"key1": "value1", "object_type": POST_TYPE})
-    mocked_es.conn.update.side_effect = ConflictError
+    mocked_os.conn.update.side_effect = ConflictError
     update_document_with_partial(doc_id, data, POST_TYPE)
     assert patched_logger.error.called is True
 
 
 def test_update_post(mocker):
-    """Test that update_post serializes a Post object and updates the corresponding ES document"""
+    """Test that update_post serializes a Post object and updates the corresponding OS document"""
     fake_post = mocker.Mock(post_id="1")
     fake_serialized_post = mocker.Mock(data={"key": "value"})
     mock_update_document = mocker.patch(
@@ -169,17 +169,17 @@ def test_update_post(mocker):
     )
 
 
-def test_increment_document_integer_field(mocked_es):
+def test_increment_document_integer_field(mocked_os):
     """
     Test that increment_document_integer_field gets a connection and calls the
-    correct elasticsearch-dsl function
+    correct opensearch-dsl function
     """
     doc_id, field_name, incr_amount = ("doc_id", "some_field_name", 1)
     increment_document_integer_field(doc_id, field_name, incr_amount, POST_TYPE)
-    mocked_es.get_conn.assert_called_once_with()
+    mocked_os.get_conn.assert_called_once_with()
 
-    for alias in mocked_es.active_aliases:
-        mocked_es.conn.update.assert_any_call(
+    for alias in mocked_os.active_aliases:
+        mocked_os.conn.update.assert_any_call(
             index=alias,
             doc_type=GLOBAL_DOC_TYPE,
             body={
@@ -197,13 +197,13 @@ def test_increment_document_integer_field(mocked_es):
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("skip_mapping", [True, False])
 @pytest.mark.parametrize("already_exists", [True, False])
-def test_clear_and_create_index(mocked_es, object_type, skip_mapping, already_exists):
+def test_clear_and_create_index(mocked_os, object_type, skip_mapping, already_exists):
     """
     clear_and_create_index should delete the index and create a new empty one with a mapping
     """
     index = "index"
 
-    conn = mocked_es.conn
+    conn = mocked_os.conn
     conn.indices.exists.return_value = already_exists
 
     clear_and_create_index(
@@ -236,13 +236,13 @@ def test_clear_and_create_index_error(object_type):
 
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 @pytest.mark.parametrize("default_exists", [True, False])
-def test_switch_indices(mocked_es, mocker, default_exists, object_type):
+def test_switch_indices(mocked_os, mocker, default_exists, object_type):
     """
     switch_indices should atomically remove the old backing index
     for the default alias and replace it with the new one
     """
     refresh_mock = mocker.patch("search.indexing_api.refresh_index", autospec=True)
-    conn_mock = mocked_es.conn
+    conn_mock = mocked_os.conn
     conn_mock.indices.exists_alias.return_value = default_exists
     old_backing_index = "old_backing"
     conn_mock.indices.get_alias.return_value.keys.return_value = [old_backing_index]
@@ -284,11 +284,11 @@ def test_switch_indices(mocked_es, mocker, default_exists, object_type):
 
 
 @pytest.mark.parametrize("temp_alias_exists", [True, False])
-def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
+def test_create_backing_index(mocked_os, mocker, temp_alias_exists):
     """create_backing_index should make a new backing index and set the reindex alias to point to it"""
     reindexing_alias = get_reindexing_alias_name(POST_TYPE)
     backing_index = "backing_index"
-    conn_mock = mocked_es.conn
+    conn_mock = mocked_os.conn
     conn_mock.indices.exists_alias.return_value = temp_alias_exists
     get_alias = conn_mock.indices.get_alias
     get_alias.return_value = (
@@ -303,7 +303,7 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
 
     assert create_backing_index(POST_TYPE) == backing_index
 
-    get_conn_mock = mocked_es.get_conn
+    get_conn_mock = mocked_os.get_conn
     get_conn_mock.assert_called_once_with()
     make_backing_index_mock.assert_called_once_with(POST_TYPE)
     clear_and_create_mock.assert_called_once_with(
@@ -340,7 +340,7 @@ def test_create_backing_index(mocked_es, mocker, temp_alias_exists):
 )
 @pytest.mark.parametrize("update_only", (True, False))
 def test_index_functions(
-    mocked_es,
+    mocked_os,
     mocker,
     settings,
     errors,
@@ -373,7 +373,7 @@ def test_index_functions(
     else:
         index_func([1, 2, 3], update_only)
         mock_get_aliases.assert_called_with(
-            mocked_es.conn,
+            mocked_os.conn,
             object_types=[object_type],
             include_reindexing=(not update_only),
         )
@@ -383,7 +383,7 @@ def test_index_functions(
                 documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
-                    mocked_es.conn,
+                    mocked_os.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
@@ -410,7 +410,7 @@ def test_index_functions(
     ],
 )
 def test_bulk_deletion_functions(
-    mocked_es,
+    mocked_os,
     mocker,
     settings,
     errors,
@@ -442,7 +442,7 @@ def test_bulk_deletion_functions(
     else:
         index_func([1, 2, 3])
         mock_get_aliases.assert_called_with(
-            mocked_es.conn, object_types=[object_type], include_reindexing=False
+            mocked_os.conn, object_types=[object_type], include_reindexing=False
         )
 
         for alias in mock_get_aliases.return_value:
@@ -450,7 +450,7 @@ def test_bulk_deletion_functions(
                 documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
-                    mocked_es.conn,
+                    mocked_os.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
@@ -461,7 +461,7 @@ def test_bulk_deletion_functions(
 @pytest.mark.usefixtures("indexing_user")
 def test_bulk_content_file_deletion_on_course_deletion(mocker):
     """
-    ES should delete content files on bulk  course deletion
+    OS should delete content files on bulk  course deletion
     """
     mock_delete_run_content_files = mocker.patch(
         "search.indexing_api.delete_run_content_files", autospec=True
@@ -475,7 +475,7 @@ def test_bulk_content_file_deletion_on_course_deletion(mocker):
             mock_delete_run_content_files.assert_any_call(run.id)
 
 
-def test_delete_document(mocked_es, mocker):
+def test_delete_document(mocked_os, mocker):
     """
     ES should try deleting the specified document from the correct index
     """
@@ -483,12 +483,12 @@ def test_delete_document(mocked_es, mocker):
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
     delete_document(1, "course")
-    mocked_es.conn.delete.assert_called_with(
+    mocked_os.conn.delete.assert_called_with(
         index="a", doc_type=GLOBAL_DOC_TYPE, id=1, params={}
     )
 
 
-def test_delete_document_not_found(mocked_es, mocker):
+def test_delete_document_not_found(mocked_os, mocker):
     """
     ES should try deleting the specified document from the correct index
     """
@@ -496,7 +496,7 @@ def test_delete_document_not_found(mocked_es, mocker):
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
-    mocked_es.conn.delete.side_effect = NotFoundError
+    mocked_os.conn.delete.side_effect = NotFoundError
     delete_document(1, "course")
     assert patched_logger.debug.called is True
 
@@ -530,7 +530,7 @@ def test_index_content_files(mocker, update_only):
 )
 @pytest.mark.parametrize("errors", ([], ["error"]))
 def test_bulk_index_content_files(
-    mocked_es,
+    mocked_os,
     mocker,
     settings,
     errors,
@@ -590,7 +590,7 @@ def test_bulk_index_content_files(
         for alias in mock_get_aliases.return_value:
             for chunk in chunks([doc for _ in content_files], chunk_size=chunk_size):
                 bulk_mock.assert_any_call(
-                    mocked_es.conn,
+                    mocked_os.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
