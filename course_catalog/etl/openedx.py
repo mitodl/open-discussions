@@ -1,17 +1,17 @@
 """
 ETL extract and transformations for openedx
 """
-import logging
 from collections import namedtuple
+from dateutil.parser import parse
+import logging
 
 import pytz
 import requests
-from dateutil.parser import parse
 from toolz import compose
 
 from course_catalog.etl.constants import COMMON_HEADERS
-from course_catalog.etl.utils import extract_valid_department_from_id
 from course_catalog.utils import get_year_and_semester, semester_year_to_date
+from course_catalog.etl.utils import extract_valid_department_from_id
 
 OpenEdxConfiguration = namedtuple(
     "OpenEdxConfiguration",

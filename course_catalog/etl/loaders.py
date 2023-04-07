@@ -255,8 +255,7 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
             ).filter(published=True):
                 run.published = False
                 run.save()
-                if run.content_files.filter(published=True).exists():
-                    unpublished_runs.append(run.id)
+                unpublished_runs.append(run.id)
 
         load_topics(course, topics_data)
         load_offered_bys(course, offered_bys_data, config=config.offered_by)
@@ -704,7 +703,6 @@ def load_content_files(course_run, content_files_data):
         deleted_files = course_run.content_files.filter(published=True).exclude(
             pk__in=content_files_ids
         )
-
         deleted_files.update(published=False)
 
         if course_run.published:

@@ -2,13 +2,12 @@
 # pylint: disable=redefined-outer-name
 from datetime import datetime
 from urllib.parse import urlencode
-
 import pytest
 
 from course_catalog.etl.constants import COMMON_HEADERS
 from course_catalog.etl.openedx import (
-    OpenEdxConfiguration,
     openedx_extract_transform_factory,
+    OpenEdxConfiguration,
 )
 from open_discussions.test_utils import any_instance_of
 
@@ -107,6 +106,7 @@ def test_transform_course(
 ):  # pylint: disable=too-many-arguments
     """Test that the transform function normalizes and filters out data"""
     extracted = mitx_course_data["results"]
+    expected = extracted if not is_course_deleted and has_runs else []
     for course in extracted:
         if not has_runs:
             course["course_runs"] = []
