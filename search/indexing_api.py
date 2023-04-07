@@ -752,12 +752,14 @@ def delete_run_content_files(run_id, unpublished_only=False):
     else:
         content_files = run.content_files.only("key")
 
+    if not content_files.exists():
+        return
+
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
         for content_file in content_files
     )
-    if not documents:
-        return
+
     course = run.content_object
     delete_items(
         documents,

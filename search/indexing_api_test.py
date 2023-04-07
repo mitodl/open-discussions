@@ -619,3 +619,14 @@ def test_bulk_index_content_files(
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                     routing=gen_course_id(course.platform, course.course_id),
                 )
+
+
+@pytest.mark.parametrize("has_files", [True, False])
+def test_delete_run_content_files_no_files(mocker, has_files):
+    """delete_run_content_files shouldn't do anything if there are no content files"""
+    mock_delete_items = mocker.patch("search.indexing_api.delete_items")
+    run = LearningResourceRunFactory.create(published=True)
+    if has_files:
+        ContentFileFactory.create(run=run, published=False)
+    delete_run_content_files(run.id, unpublished_only=True)
+    assert mock_delete_items.call_count == (1 if has_files else 0)

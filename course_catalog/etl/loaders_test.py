@@ -256,6 +256,7 @@ def test_load_course(  # pylint:disable=too-many-arguments
         run = LearningResourceRunFactory.create(
             platform=course.platform, content_object=course, published=True
         )
+        ContentFileFactory.create(run=run, published=True)
         LearningResourceRunFactory.create(
             platform=course.platform, content_object=course, published=True
         )

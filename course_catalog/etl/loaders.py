@@ -255,7 +255,8 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
             ).filter(published=True):
                 run.published = False
                 run.save()
-                unpublished_runs.append(run.id)
+                if run.content_files.filter(published=True).exists():
+                    unpublished_runs.append(run.id)
 
         load_topics(course, topics_data)
         load_offered_bys(course, offered_bys_data, config=config.offered_by)
