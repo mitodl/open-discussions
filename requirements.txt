@@ -175,12 +175,7 @@ drf-extensions==0.5.0
 drf-spectacular==0.26.1
     # via -r requirements.in
 elasticsearch==6.3.0
-    # via
-    #   -r requirements.in
-    #   django-server-status
-    #   elasticsearch-dsl
-elasticsearch-dsl==6.1.0
-    # via -r requirements.in
+    # via django-server-status
 factory-boy==2.12.0
     # via -r requirements.in
 faker==2.0.0
@@ -211,8 +206,6 @@ idna==2.5
     #   tldextract
 inflection==0.5.1
     # via drf-spectacular
-ipaddress==1.0.22
-    # via elasticsearch-dsl
 ipython==7.16.3
     # via -r requirements.in
 ipython-genutils==0.2.0
@@ -315,7 +308,6 @@ python-dateutil==2.8.1
     # via
     #   -r requirements.in
     #   botocore
-    #   elasticsearch-dsl
     #   faker
     #   opensearch-dsl
 python-rapidjson==1.8
@@ -382,7 +374,6 @@ six==1.15.0
     #   django-guardian
     #   django-imagekit
     #   django-server-status
-    #   elasticsearch-dsl
     #   faker
     #   google-api-python-client
     #   google-auth
