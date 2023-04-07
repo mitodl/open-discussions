@@ -23,13 +23,15 @@ pytestmark = pytest.mark.django_db
         [PlatformType.mitx.value, "simeon-mitx-course-tarballs"],
     ],
 )
+@pytest.mark.parametrize("published", [True, False])
 def test_sync_edx_course_files(
     mock_mitxonline_learning_bucket,
     mock_xpro_learning_bucket,
     mocker,
     platform,
     s3_prefix,
-):
+    published,
+):  # pylint: disable=too-many-arguments,too-many-locals
     """sync edx courses from a tarball stored in S3"""
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
@@ -62,16 +64,18 @@ def test_sync_edx_course_files(
             platform=platform,
             run_id=run_id,
             content_type=ContentType.objects.get_for_model(Course),
+            published=published,
         )
         course_ids.append(run.object_id)
     sync_edx_course_files(platform, course_ids, keys, s3_prefix)
-    assert mock_transform.call_count == 2
-    assert mock_load_content_files.call_count == 2
-    assert mock_transform.call_args[0][0].endswith(f"{run_ids[1]}.tar.gz") is True
-    for run_id in run_ids:
-        mock_load_content_files.assert_any_call(
-            LearningResourceRun.objects.get(run_id=run_id), fake_data
-        )
+    assert mock_transform.call_count == (2 if published else 0)
+    assert mock_load_content_files.call_count == (2 if published else 0)
+    if published:
+        assert mock_transform.call_args[0][0].endswith(f"{run_ids[1]}.tar.gz") is True
+        for run_id in run_ids:
+            mock_load_content_files.assert_any_call(
+                LearningResourceRun.objects.get(run_id=run_id), fake_data
+            )
     mock_log.assert_not_called()
 
 

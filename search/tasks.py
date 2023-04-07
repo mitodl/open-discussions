@@ -492,7 +492,7 @@ def index_run_content_files(run_id, update_only=False):
 
     """
     try:
-        api.index_run_content_files(run_id, update_only)
+        api.index_run_content_files(run_id, update_only=update_only)
         api.delete_run_content_files(run_id, unpublished_only=True)
     except (RetryException, Ignore):
         raise

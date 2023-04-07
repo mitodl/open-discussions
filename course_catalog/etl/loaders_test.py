@@ -235,19 +235,30 @@ def test_load_program(
 @pytest.mark.parametrize("is_published", [True, False])
 @pytest.mark.parametrize("is_run_published", [True, False])
 @pytest.mark.parametrize("blocklisted", [True, False])
-def test_load_course(
-    mocker, mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted
+def test_load_course(  # pylint:disable=too-many-arguments
+    mocker,
+    mock_upsert_tasks,
+    course_exists,
+    is_published,
+    is_run_published,
+    blocklisted,
 ):
     """Test that load_course loads the course"""
-    mock_delete_files = mocker.patch("course_catalog.etl.loaders.search_task_helpers.delete_run_content_files")
+    mock_delete_files = mocker.patch(
+        "course_catalog.etl.loaders.search_task_helpers.delete_run_content_files"
+    )
     course = (
         CourseFactory.create(runs=None, published=is_published)
         if course_exists
         else CourseFactory.build()
     )
     if course_exists:
-        run = LearningResourceRunFactory.create(platform=course.platform, content_object=course, published=True)
-        LearningResourceRunFactory.create(platform=course.platform, content_object=course, published=True)
+        run = LearningResourceRunFactory.create(
+            platform=course.platform, content_object=course, published=True
+        )
+        LearningResourceRunFactory.create(
+            platform=course.platform, content_object=course, published=True
+        )
     else:
         run = LearningResourceRunFactory.build(platform=course.platform)
     assert Course.objects.count() == (1 if course_exists else 0)
@@ -288,7 +299,9 @@ def test_load_course(
         assert mock_delete_files.call_count == (1 if course.published else 0)
 
     assert Course.objects.count() == 1
-    assert LearningResourceRun.objects.count() == (2 if course_exists else 1 if is_run_published else 0)
+    assert LearningResourceRun.objects.count() == (
+        2 if course_exists else 1 if is_run_published else 0
+    )
 
     # assert we got a course back
     assert isinstance(result, Course)
