@@ -439,7 +439,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
         body (dict): OS update operation body
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
-        kwargs (dict): Optional kwargs to be passed to ElasticSearch
+        kwargs (dict): Optional kwargs to be passed to Opensearch
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[object_type]):
@@ -485,7 +485,7 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
         doc (dict): Full OS document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
-        kwargs (dict): Optional kwargs to be passed to ElasticSearch
+        kwargs (dict): Optional kwargs to be passed to Opensearch
     """
     _update_document_by_id(
         doc_id,
@@ -538,7 +538,7 @@ def delete_items(documents, object_type, update_only, **kwargs):
     in the index
 
     Args:
-        documents (iterable of dict): An iterable with ElasticSearch documents to index
+        documents (iterable of dict): An iterable with Opensearch documents to index
         object_type (str): the ES object type
         update_only (bool): Update existing index only
 
@@ -561,7 +561,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     Index items based on list of item ids
 
     Args:
-        documents (iterable of dict): An iterable with ElasticSearch documents to index
+        documents (iterable of dict): An iterable with Opensearch documents to index
         object_type (str): the ES object type
         update_only (bool): Update existing index only
 
@@ -570,7 +570,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     # bulk will also break an iterable into chunks. However we should do this here so that
     # we can use the same documents when indexing to multiple aliases.
     for chunk in chunks(
-        documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+        documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
     ):
         for alias in get_active_aliases(
             conn, object_types=[object_type], include_reindexing=(not update_only)
@@ -580,7 +580,7 @@ def index_items(documents, object_type, update_only, **kwargs):
                 chunk,
                 index=alias,
                 doc_type=GLOBAL_DOC_TYPE,
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 **kwargs,
             )
             if len(errors) > 0:
@@ -693,7 +693,7 @@ def index_run_content_files(run_id, update_only=False):
     )
 
     for ids_chunk in chunks(
-        content_file_ids, chunk_size=settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE
+        content_file_ids, chunk_size=settings.OPENSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE
     ):
 
         documents = (
@@ -953,7 +953,7 @@ def es_iterate_all_documents(index, query, pagesize=250):
     Helper to iterate all values from an index
 
     index (str): The index
-    query (dict): Elasticsearch query filter
+    query (dict): Opensearch query filter
     pagesize (int): integer
 
     """

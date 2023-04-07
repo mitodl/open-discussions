@@ -352,7 +352,7 @@ def test_index_functions(
     """
     index functions should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 3
     documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
@@ -380,14 +380,14 @@ def test_index_functions(
 
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
-                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+                documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
                     mocked_os.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
 
@@ -421,7 +421,7 @@ def test_bulk_deletion_functions(
     """
     index deletion functions should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 3
     documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
@@ -447,14 +447,14 @@ def test_bulk_deletion_functions(
 
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
-                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+                documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
                     mocked_os.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
 
@@ -543,8 +543,8 @@ def test_bulk_index_content_files(
     """
     index functions for content files should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = indexing_chunk_size
-    settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = indexing_chunk_size
+    settings.OPENSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
     content_files = ContentFileFactory.create_batch(5, run=run, published=True)
@@ -594,6 +594,6 @@ def test_bulk_index_content_files(
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                     routing=gen_course_id(course.platform, course.course_id),
                 )

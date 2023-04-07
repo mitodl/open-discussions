@@ -15,8 +15,8 @@ import semantic_version
 
 
 REQUIRED_SETTINGS = {
-    "ELASTICSEARCH_URL": "http://localhost:9300/",
-    "ELASTICSEARCH_INDEX": "some_index",
+    "OPENSEARCH_URL": "http://localhost:9300/",
+    "OPENSEARCH_INDEX": "some_index",
     "MAILGUN_SENDER_DOMAIN": "mailgun.fake.domain",
     "MAILGUN_KEY": "fake_mailgun_key",
     "OPEN_DISCUSSIONS_COOKIE_NAME": "cookie_monster",
@@ -134,8 +134,8 @@ class TestSettings(TestCase):
                 settings_vars["DATABASES"]["default"]["OPTIONS"], {"sslmode": "require"}
             )
 
-    def test_elasticsearch_index_pr_build(self):
-        """For PR builds we will use the heroku app name instead of the given ELASTICSEARCH_INDEX"""
+    def test_opensearch_index_pr_build(self):
+        """For PR builds we will use the heroku app name instead of the given OPENSEARCH_INDEX"""
         index_name = "heroku_app_name_as_index"
         with mock.patch.dict(
             "os.environ",
@@ -146,7 +146,7 @@ class TestSettings(TestCase):
             },
         ):
             settings_vars = self.reload_settings()
-            assert settings_vars["ELASTICSEARCH_INDEX"] == index_name
+            assert settings_vars["OPENSEARCH_INDEX"] == index_name
 
     @staticmethod
     def test_semantic_version():
