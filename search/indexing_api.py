@@ -569,9 +569,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     conn = get_conn()
     # bulk will also break an iterable into chunks. However we should do this here so that
     # we can use the same documents when indexing to multiple aliases.
-    for chunk in chunks(
-        documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
-    ):
+    for chunk in chunks(documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE):
         for alias in get_active_aliases(
             conn, object_types=[object_type], include_reindexing=(not update_only)
         ):
