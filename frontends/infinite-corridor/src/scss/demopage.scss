@@ -1,0 +1,32 @@
+@use "theme";
+
+.demo-page {
+  color: theme.$color-blue-5;
+
+  .page-title {
+    margin-bottom: 0.5rem;
+    color: theme.$color-blue-5;
+    padding-top: 20px;
+    padding-bottom: 16px;
+  }
+
+  h2 {
+    padding-top: 20px;
+  }
+
+  .search-label {
+    font-size: 13px;
+    padding-top: 5px;
+  }
+
+
+  .header {
+      max-width: 520px;
+      padding-bottom: 20px;
+  }
+
+  .results-container {
+    padding-top: 10px;
+    padding-bottom: 80px;
+  }
+}
