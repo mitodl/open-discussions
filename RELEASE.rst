@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.212.0
+---------------
+
+- Demo ui (#3919)
+- More stafflist index code (#3914)
+- Run edx content file tasks weekly in a separate queue (#3899)
+- Modify date parsing to be less rigid (#3916)
+- Remove comment count from discussions (#3904)
+
 Version 0.211.1 (Released April 05, 2023)
 ---------------
 
