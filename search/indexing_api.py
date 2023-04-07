@@ -6,8 +6,8 @@ import logging
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from opensearch.exceptions import ConflictError, NotFoundError
-from opensearch.helpers import BulkIndexError, bulk
+from opensearchpy.exceptions import ConflictError, NotFoundError
+from opensearchpy.helpers import BulkIndexError, bulk
 
 from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks

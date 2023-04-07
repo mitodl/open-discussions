@@ -5,7 +5,7 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-from opensearch.exceptions import ConflictError, NotFoundError
+from opensearchpy.exceptions import ConflictError, NotFoundError
 
 from course_catalog.factories import (
     ContentFileFactory,

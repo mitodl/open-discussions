@@ -9,7 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from opensearch.exceptions import NotFoundError
+from opensearchpy.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import NotFound, PrawcoreException
 
