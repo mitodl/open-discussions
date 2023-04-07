@@ -9,7 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from elasticsearch.exceptions import NotFoundError
+from opensearch.exceptions import NotFoundError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import NotFound, PrawcoreException
 
@@ -153,7 +153,7 @@ def update_author_posts_comments(profile_id):
 def update_link_post_with_preview(doc_id, data):
     """
     Task that fetches Embedly preview data for a link post and updates the corresponding
-    database and Elasticsearch objects
+    database and Opensearch objects
 
     Args:
         doc_id (str): ES document ID
@@ -773,7 +773,7 @@ def start_recreate_index(self, indexes):
                 index_posts.si(post_ids)
                 for post_ids in chunks(
                     Post.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -782,7 +782,7 @@ def start_recreate_index(self, indexes):
                 index_comments.si(comment_ids)
                 for comment_ids in chunks(
                     Comment.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -795,7 +795,7 @@ def start_recreate_index(self, indexes):
                     .filter(is_active=True)
                     .order_by("id")
                     .values_list("profile__id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -810,7 +810,7 @@ def start_recreate_index(self, indexes):
                         .exclude(course_id__in=blocklisted_ids)
                         .order_by("id")
                         .values_list("id", flat=True),
-                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                        chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                     )
                 ]
                 + [
@@ -828,7 +828,7 @@ def start_recreate_index(self, indexes):
                         .exclude(course_id__in=blocklisted_ids)
                         .order_by("id")
                         .values_list("id", flat=True),
-                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                        chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                     )
                 ]
             )
@@ -840,7 +840,7 @@ def start_recreate_index(self, indexes):
                     Program.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -851,7 +851,7 @@ def start_recreate_index(self, indexes):
                     UserList.objects.order_by("id")
                     .exclude(items=None)
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -863,7 +863,7 @@ def start_recreate_index(self, indexes):
                     .filter(privacy_level=PrivacyLevel.public.value)
                     .exclude(items=None)
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -874,7 +874,7 @@ def start_recreate_index(self, indexes):
                     Video.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -885,7 +885,7 @@ def start_recreate_index(self, indexes):
                     Podcast.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -896,7 +896,7 @@ def start_recreate_index(self, indexes):
                     PodcastEpisode.objects.filter(published=True)
                     .order_by("id")
                     .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
             ]
 
@@ -979,7 +979,7 @@ def get_update_posts_tasks():
         index_posts.si(post_ids, True)
         for post_ids in chunks(
             Post.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -990,7 +990,7 @@ def get_update_comments_tasks():
         index_comments.si(comment_ids, True)
         for comment_ids in chunks(
             Comment.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1005,7 +1005,7 @@ def get_update_profiles_tasks():
             .filter(is_active=True)
             .order_by("id")
             .values_list("profile__id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1016,7 +1016,7 @@ def get_update_profiles_tasks():
             .filter(is_active=False)
             .order_by("id")
             .values_list("profile__id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1049,7 +1049,7 @@ def get_update_courses_tasks(blocklisted_ids, platform):
         index_courses.si(ids, True)
         for ids in chunks(
             course_update_query.values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1057,7 +1057,7 @@ def get_update_courses_tasks(blocklisted_ids, platform):
         bulk_delete_courses.si(ids)
         for ids in chunks(
             course_deletion_query.values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1096,7 +1096,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
             index_course_content_files.si(ids, True)
             for ids in chunks(
                 course_update_query.values_list("id", flat=True),
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
             )
         ]
     else:
@@ -1113,7 +1113,7 @@ def get_update_programs_tasks():
             Program.objects.filter(published=True)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1123,7 +1123,7 @@ def get_update_programs_tasks():
             Program.objects.filter(published=False)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1141,7 +1141,7 @@ def get_update_user_lists_tasks():
             UserList.objects.order_by("id")
             .exclude(items=None)
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1151,7 +1151,7 @@ def get_update_user_lists_tasks():
             UserList.objects.order_by("id")
             .filter(items=None)
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1170,7 +1170,7 @@ def get_update_staff_lists_tasks():
             .filter(privacy_level=PrivacyLevel.public.value)
             .exclude(items=None)
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1180,7 +1180,7 @@ def get_update_staff_lists_tasks():
             StaffList.objects.order_by("id")
             .filter(Q(items=None) | Q(privacy_level=PrivacyLevel.private.value))
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1198,7 +1198,7 @@ def get_update_videos_tasks():
             Video.objects.filter(published=True)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1208,7 +1208,7 @@ def get_update_videos_tasks():
             Video.objects.filter(published=False)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1225,7 +1225,7 @@ def get_update_podcasts_tasks():
             Podcast.objects.filter(published=True)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1235,7 +1235,7 @@ def get_update_podcasts_tasks():
             Podcast.objects.filter(published=False)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1252,7 +1252,7 @@ def get_update_podcast_episodes_tasks():
             PodcastEpisode.objects.filter(published=True)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1262,7 +1262,7 @@ def get_update_podcast_episodes_tasks():
             PodcastEpisode.objects.filter(published=False)
             .order_by("id")
             .values_list("id", flat=True),
-            chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
         )
     ]
 
@@ -1276,7 +1276,7 @@ def finish_recreate_index(results, backing_indices):
 
     Args:
         results (list or bool): Results saying whether the error exists
-        backing_indices (dict): The backing elasticsearch indices keyed by object type
+        backing_indices (dict): The backing Opensearch indices keyed by object type
     """
     errors = merge_strings(results)
     if errors:

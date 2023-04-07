@@ -412,10 +412,10 @@ def test_start_recreate_index(
     mocker, mocked_celery, user, indexes
 ):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
     """
-    recreate_index should recreate the elasticsearch index and reindex all data with it
+    recreate_index should recreate the Opensearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_blocklist = mocker.patch("search.tasks.load_course_blocklist", return_value=[])
     UserFactory.create_batch(
         4, is_active=False
@@ -762,10 +762,10 @@ def test_start_update_index(
     mocker, mocked_celery, user, indexes, platform
 ):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
     """
-    recreate_index should recreate the elasticsearch index and reindex all data with it
+    recreate_index should recreate the Opensearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_blocklist = mocker.patch("search.tasks.load_course_blocklist", return_value=[])
     inactive_users = UserFactory.create_batch(4, is_active=False)
     comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)

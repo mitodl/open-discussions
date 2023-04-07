@@ -63,7 +63,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         return location
 
     def update(self, instance, validated_data):
-        """Update the profile and related docs in Elasticsearch"""
+        """Update the profile and related docs in Opensearch"""
         with transaction.atomic():
             for attr, value in validated_data.items():
                 setattr(instance, attr, value)

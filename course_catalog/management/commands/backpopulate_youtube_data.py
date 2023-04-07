@@ -67,7 +67,7 @@ class Command(BaseCommand):
         if command == "delete":
             videos = Video.objects.filter(platform=PlatformType.youtube.value)
             self.stdout.write(
-                f"Deleting {videos.count()} existing YouTube videos from database and ElasticSearch"
+                f"Deleting {videos.count()} existing YouTube videos from database and OpenSearch"
             )
             for video in videos:
                 video.delete()

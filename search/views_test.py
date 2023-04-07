@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
-from elasticsearch.exceptions import TransportError
+from opensearch.exceptions import TransportError
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 
 from course_catalog.factories import CourseFactory
@@ -89,7 +89,7 @@ def related_posts_view(settings):
     "status_code, raise_error", [[418, False], [503, True], ["N/A", True]]
 )
 def test_search_es_exception(mocker, client, search_view, status_code, raise_error):
-    """If a 4xx status is returned from Elasticsearch it should be returned from the API"""
+    """If a 4xx status is returned from Opensearch it should be returned from the API"""
     log_mock = mocker.patch("search.views.log.exception")
     search_mock = mocker.patch(
         "search.views.execute_search",
@@ -101,14 +101,14 @@ def test_search_es_exception(mocker, client, search_view, status_code, raise_err
         resp = client.post(search_view.url, query)
         assert resp.status_code == status_code
         search_mock.assert_called_once_with(user=AnonymousUser(), query=query)
-        log_mock.assert_called_once_with("Received a 4xx error from Elasticsearch")
+        log_mock.assert_called_once_with("Received a 4xx error from Opensearch")
     else:
         with pytest.raises(TransportError):
             client.post(search_view.url, query)
 
 
 def test_related_posts_es_exception(mocker, client, related_posts_view):
-    """If a 4xx status is returned from Elasticsearch it should be returned from the API"""
+    """If a 4xx status is returned from Opensearch it should be returned from the API"""
     status_code = 418
     related_documents_mock = mocker.patch(
         "search.views.find_related_documents",

@@ -26,7 +26,7 @@ class Command(BaseCommand):
         """Run Populate oll courses"""
         if options["delete"]:
             self.stdout.write(
-                "Deleting all existing OLL courses from database and ElasticSearch"
+                "Deleting all existing OLL courses from database and OpenSearch"
             )
             for course in Course.objects.filter(platform=PlatformType.oll.value):
                 course.delete()

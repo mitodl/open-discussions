@@ -1,4 +1,4 @@
-"""Tests for elasticsearch serializers"""
+"""Tests for OpenSearch serializers"""
 from datetime import datetime
 
 # pylint: disable=redefined-outer-name,unused-argument

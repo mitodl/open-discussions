@@ -11,9 +11,9 @@ valid_object_types.append(RESOURCE_FILE_TYPE)
 
 
 class Command(BaseCommand):
-    """Indexes elasticsearch content"""
+    """Indexes opensearch content"""
 
-    help = "Update elasticsearch index"
+    help = "Update opensearch index"
 
     def add_arguments(self, parser):
         allowed_course_platforms = [
