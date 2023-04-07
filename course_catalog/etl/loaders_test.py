@@ -236,16 +236,21 @@ def test_load_program(
 @pytest.mark.parametrize("is_run_published", [True, False])
 @pytest.mark.parametrize("blocklisted", [True, False])
 def test_load_course(
-    mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted
+    mocker, mock_upsert_tasks, course_exists, is_published, is_run_published, blocklisted
 ):
     """Test that load_course loads the course"""
+    mock_delete_files = mocker.patch("course_catalog.etl.loaders.search_task_helpers.delete_run_content_files")
     course = (
         CourseFactory.create(runs=None, published=is_published)
         if course_exists
         else CourseFactory.build()
     )
+    if course_exists:
+        run = LearningResourceRunFactory.create(platform=course.platform, content_object=course, published=True)
+        LearningResourceRunFactory.create(platform=course.platform, content_object=course, published=True)
+    else:
+        run = LearningResourceRunFactory.build(platform=course.platform)
     assert Course.objects.count() == (1 if course_exists else 0)
-    assert LearningResourceRun.objects.count() == 0
 
     props = model_to_dict(
         CourseFactory.build(
@@ -254,17 +259,20 @@ def test_load_course(
     )
     del props["id"]
     if is_run_published:
-        run = model_to_dict(LearningResourceRunFactory.build(platform=course.platform))
+        run = model_to_dict(run)
         del run["content_type"]
         del run["object_id"]
         del run["id"]
+        del run["topics"]
+        del run["prices"]
+        del run["instructors"]
         props["runs"] = [run]
     else:
         props["runs"] = []
 
     blocklist = [course.course_id] if blocklisted else []
 
-    result = load_course(props, blocklist, [])
+    result = load_course(props, blocklist, [], config=CourseLoaderConfig(prune=True))
 
     if course_exists and (not is_published or not is_run_published) and not blocklisted:
         mock_upsert_tasks.delete_course.assert_called_with(result)
@@ -273,9 +281,14 @@ def test_load_course(
     else:
         mock_upsert_tasks.delete_program.assert_not_called()
         mock_upsert_tasks.upsert_course.assert_not_called()
+    if course_exists and is_published and not blocklisted:
+        course.refresh_from_db()
+        assert course.runs.first().published is is_run_published
+        assert course.published == (is_published and is_run_published)
+        assert mock_delete_files.call_count == (1 if course.published else 0)
 
     assert Course.objects.count() == 1
-    assert LearningResourceRun.objects.count() == (1 if is_run_published else 0)
+    assert LearningResourceRun.objects.count() == (2 if course_exists else 1 if is_run_published else 0)
 
     # assert we got a course back
     assert isinstance(result, Course)
