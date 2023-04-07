@@ -11,11 +11,21 @@ const getSearchTextInput = (): HTMLInputElement => {
 
 const buildSearchQueryWithCollapse = params => {
   const query = buildSearchQuery(params)
-  query["collapse"] = {
-    field:      "offered_by",
-    inner_hits: {
-      name: "top_by_offeror",
-      size: 3
+  if (params.activeFacets.type[0] === "course") {
+    query["collapse"] = {
+      field:      "platform",
+      inner_hits: {
+        name: "top_by_category",
+        size: 6
+      }
+    }
+  } else {
+    query["collapse"] = {
+      field:      "offered_by",
+      inner_hits: {
+        name: "top_by_category",
+        size: 6
+      }
     }
   }
 
@@ -36,10 +46,10 @@ describe("DemoPage", () => {
       1,
       "search/",
       buildSearchQueryWithCollapse({
-        text:         '"New Search Text"',
+        text:         "New Search Text",
         from:         0,
         activeFacets: { type: ["course"] },
-        size:         6
+        size:         12
       })
     )
 
@@ -47,10 +57,10 @@ describe("DemoPage", () => {
       2,
       "search/",
       buildSearchQueryWithCollapse({
-        text:         '"New Search Text"',
+        text:         "New Search Text",
         from:         0,
         activeFacets: { type: ["video"] },
-        size:         6
+        size:         12
       })
     )
 
@@ -58,10 +68,10 @@ describe("DemoPage", () => {
       3,
       "search/",
       buildSearchQueryWithCollapse({
-        text:         '"New Search Text"',
+        text:         "New Search Text",
         from:         0,
         activeFacets: { type: ["podcast", "podcastepisode"] },
-        size:         6
+        size:         12
       })
     )
   })

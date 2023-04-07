@@ -12,13 +12,16 @@ import { LoadingSpinner } from "ol-util"
 
 import axios from "../libs/axios"
 import { useHistory } from "react-router"
+import ReactAppzi from "react-appzi"
+import Button from "@mui/material/Button"
 
-const pageSize = 6
+const pageSize = 12
+const categoryLimit = 6
 
 interface ResultWithInnerHits {
   _source: LearningResourceSearchResult
   inner_hits: {
-    top_by_offeror: {
+    top_by_category: {
       hits: { hits: { _source: LearningResourceSearchResult; _score: number } }
     }
   }
@@ -31,14 +34,24 @@ interface Result {
 
 const SEARCH_API_URL = "search/"
 
-const search = async (params: SearchQueryParams) => {
+const search = async (params: SearchQueryParams, type: string) => {
   const body = buildSearchQuery(params)
 
-  body["collapse"] = {
-    field:      "offered_by",
-    inner_hits: {
-      name: "top_by_offeror",
-      size: 3
+  if (type === "course") {
+    body["collapse"] = {
+      field:      "platform",
+      inner_hits: {
+        name: "top_by_category",
+        size: categoryLimit
+      }
+    }
+  } else {
+    body["collapse"] = {
+      field:      "offered_by",
+      inner_hits: {
+        name: "top_by_category",
+        size: categoryLimit
+      }
     }
   }
 
@@ -53,9 +66,9 @@ const search = async (params: SearchQueryParams) => {
 const extractNestedResults = (results: ResultWithInnerHits[]) => {
   return results
     .flatMap(
-      categoryResults => categoryResults.inner_hits.top_by_offeror.hits.hits
+      categoryResults => categoryResults.inner_hits.top_by_category.hits.hits
     )
-    .sort((result1, result2) => result1._score - result2._score)
+    .sort((result1, result2) => result2._score - result1._score)
     .slice(0, pageSize)
 }
 
@@ -89,6 +102,7 @@ const DemoPage: React.FC = () => {
   const [completedInitialLoad, setCompletedInitialLoad] = useState(false)
   const [requestInFlight, setRequestInFlight] = useState(false)
   const [searchApiFailed, setSearchApiFailed] = useState(false)
+  ReactAppzi.initialize("J0puw")
 
   const clearSearch = useCallback(() => {
     setCourseResults([])
@@ -100,13 +114,6 @@ const DemoPage: React.FC = () => {
   const runSearch = useCallback(async (text: string) => {
     if (text) {
       //add quotes to multi word strings if they don't already have them
-      if (
-        text.trim().indexOf(" ") !== -1 &&
-        !(text[0] === "'" && text[text.length - 1] === "'") &&
-        !(text[0] === '"' && text[text.length - 1] === '"')
-      ) {
-        text = `"${text.trim()}"`
-      }
 
       setRequestInFlight(true)
       const from = 0
@@ -115,24 +122,33 @@ const DemoPage: React.FC = () => {
       const podcastFilter = { type: ["podcast", "podcastepisode"] }
 
       const promises = [
-        search({
-          text,
-          from,
-          activeFacets: courseFilter,
-          size:         pageSize
-        }),
-        search({
-          text,
-          from,
-          activeFacets: videoFilter,
-          size:         pageSize
-        }),
-        search({
-          text,
-          from,
-          activeFacets: podcastFilter,
-          size:         pageSize
-        })
+        search(
+          {
+            text,
+            from,
+            activeFacets: courseFilter,
+            size:         pageSize
+          },
+          "course"
+        ),
+        search(
+          {
+            text,
+            from,
+            activeFacets: videoFilter,
+            size:         pageSize
+          },
+          "video"
+        ),
+        search(
+          {
+            text,
+            from,
+            activeFacets: podcastFilter,
+            size:         pageSize
+          },
+          "podcast"
+        )
       ]
 
       const [newCourseResults, newVideoResults, newPodcastResults] =
@@ -204,10 +220,26 @@ const DemoPage: React.FC = () => {
           videoResults.length === 0 &&
           podcastResults.length === 0 ? (
               <div>
-                <span>No results found for your query</span>
+                <div>
+                  <Button
+                    data-az-l="8c48a94d-2e0b-4a17-aa0e-2aa0cd910974"
+                    className="feedback-button"
+                    variant="outlined"
+                  >
+                  Feedback?
+                  </Button>
+                </div>
+                <div className="no-results">No results found for your query</div>
               </div>
             ) : (
               <div>
+                <Button
+                  data-az-l="8c48a94d-2e0b-4a17-aa0e-2aa0cd910974"
+                  className="feedback-button"
+                  variant="outlined"
+                >
+                Feedback?
+                </Button>
                 {courseResults.length > 0 ? (
                   <div>
                     <h2>Courses</h2>

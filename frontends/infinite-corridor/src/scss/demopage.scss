@@ -6,12 +6,8 @@
   .page-title {
     margin-bottom: 0.5rem;
     color: theme.$color-blue-5;
-    padding-top: 20px;
-    padding-bottom: 16px;
-  }
-
-  h2 {
-    padding-top: 20px;
+    padding-top: 15px;
+    padding-bottom: 10px;
   }
 
   .search-label {
@@ -22,11 +18,22 @@
 
   .header {
       max-width: 520px;
-      padding-bottom: 20px;
+      padding-bottom: 10px;
   }
 
   .results-container {
     padding-top: 10px;
     padding-bottom: 80px;
+  }
+
+  .feedback-button {
+    padding: 10px;
+    background: white;
+    margin-top: 10px;
+    max-width: 520px;
+  }
+
+  .no-results {
+    padding-top: 20px;
   }
 }
