@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models import Exists, OuterRef
 
-from course_catalog.constants import PrivacyLevel, UserListType
+from course_catalog.constants import PrivacyLevel, UserListType, EDX_PLATFORMS
 from course_catalog.etl.constants import (
     CourseLoaderConfig,
     LearningResourceRunLoaderConfig,
@@ -167,7 +167,9 @@ def load_run(learning_resource, run_data, *, config=LearningResourceRunLoaderCon
         load_offered_bys(
             learning_resource_run, offered_bys_data, config=config.offered_by
         )
-        load_content_files(learning_resource_run, content_files)
+        if platform not in EDX_PLATFORMS:
+            # edx content files should be handled separately
+            load_content_files(learning_resource_run, content_files)
 
     return learning_resource_run
 

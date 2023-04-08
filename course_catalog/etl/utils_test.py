@@ -279,6 +279,7 @@ def test_transform_content_files(mocker, has_metadata):
             "content_title": metadata["title"] if has_metadata else "",
             "content_language": metadata["language"] if has_metadata else "",
             "content_type": content_type,
+            "published": True,
         }
     ]
     extract_mock.assert_called_once_with(document, other_headers={})
@@ -339,7 +340,7 @@ def test_extract_valid_department_from_id():
 @pytest.mark.parametrize("platform", [PlatformType.mitx.value, PlatformType.xpro.value])
 def test_get_learning_course_bucket(
     aws_settings, mock_mitx_learning_bucket, mock_xpro_learning_bucket, platform
-):
+):  # pylint: disable=unused-argument
     """The correct bucket should be returned by the function"""
     assert get_learning_course_bucket(platform).name == (
         aws_settings.EDX_LEARNING_COURSE_BUCKET_NAME
