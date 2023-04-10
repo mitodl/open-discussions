@@ -29,17 +29,6 @@ def mock_staff_list_index(mocker):
     )
 
 
-@pytest.fixture()
-def mock_staff_list_index(mocker):
-    """Mocks index updating functions for user lists"""
-    return SimpleNamespace(
-        upsert_staff_list=mocker.patch("course_catalog.serializers.upsert_staff_list"),
-        upsert_staff_list_view=mocker.patch("course_catalog.views.upsert_staff_list"),
-        delete_staff_list=mocker.patch("course_catalog.serializers.delete_staff_list"),
-        delete_staff_list_view=mocker.patch("course_catalog.views.delete_staff_list"),
-    )
-
-
 @pytest.mark.parametrize("is_public", [True, False])
 @pytest.mark.parametrize("is_editor", [True, False])
 def test_staff_list_endpoint_get(client, is_public, is_editor, user):
