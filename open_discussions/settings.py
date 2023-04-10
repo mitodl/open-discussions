@@ -30,7 +30,7 @@ from open_discussions.envs import (
 from open_discussions.sentry import init_sentry
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.211.1"
+VERSION = "0.212.0"
 
 log = logging.getLogger()
 
