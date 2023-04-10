@@ -46,6 +46,17 @@ class PlatformType(Enum):
     ctl = "ctl"
 
 
+EDX_PLATFORMS = [
+    platform.value
+    for platform in (
+        PlatformType.mitx,
+        PlatformType.mitxonline,
+        PlatformType.xpro,
+        PlatformType.oll,
+    )
+]
+
+
 class ResourceType(Enum):
     """
     Enum for resource types (for OCW and MitX)

@@ -353,14 +353,21 @@ def test_load_duplicate_course(
         ), f"Property {key} should be updated to {value} in the database"
 
 
+@pytest.mark.parametrize(
+    "platform, load_content",
+    [[PlatformType.ocw.value, True], [PlatformType.xpro.value, False]],
+)
 @pytest.mark.parametrize("run_exists", [True, False])
-def test_load_run(run_exists):
+def test_load_run(mocker, run_exists, platform, load_content):
     """Test that load_run loads the course run"""
-    course = CourseFactory.create(runs=None)
+    mock_load_content_files = mocker.patch(
+        "course_catalog.etl.loaders.load_content_files"
+    )
+    course = CourseFactory.create(runs=None, platform=platform)
     learning_resource_run = (
-        LearningResourceRunFactory.create(content_object=course)
+        LearningResourceRunFactory.create(content_object=course, platform=platform)
         if run_exists
-        else LearningResourceRunFactory.build()
+        else LearningResourceRunFactory.build(platform=platform)
     )
 
     props = model_to_dict(
@@ -382,6 +389,8 @@ def test_load_run(run_exists):
 
     # assert we got a course run back
     assert isinstance(result, LearningResourceRun)
+
+    assert mock_load_content_files.call_count == (1 if load_content else 0)
 
     for key, value in props.items():
         assert getattr(result, key) == value, f"Property {key} should equal {value}"
