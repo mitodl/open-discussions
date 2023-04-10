@@ -16971,6 +16971,7 @@ __metadata:
     prettier-eslint-cli: ^6.0.1
     query-string: ^7.1.1
     rc-tooltip: ^5.2.2
+    react-appzi: ^1.0.4
     react-share: ^4.4.0
     rimraf: ^3.0.2
     stylelint: ^15.2.0
@@ -19145,6 +19146,13 @@ __metadata:
     fbjs: ^0.8.4
     object-assign: ^4.1.0
   checksum: cfe94358c6103f8434b91969a2a1876d3e76df227f0be9bf58c11a1bdec01500475eb09ca7ddd9d98519a14c18f91fbd11127adfdd092c4f3c5b234b638c4802
+  languageName: node
+  linkType: hard
+
+"react-appzi@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "react-appzi@npm:1.0.4"
+  checksum: 7f98d6e0426dcb2bf00c8effdd52e36d8c04157b5de264737ec7acfe36c35c49679e7e4dc0d2be441281b328b18724215392315543bdeae8784e4c44e9013148
   languageName: node
   linkType: hard
 
