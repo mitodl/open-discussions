@@ -4,6 +4,7 @@ import { HelmetProvider } from "react-helmet-async"
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
 import DemoPage from "./pages/DemoPage"
+import SearchPage2 from "./pages/SearchPage2"
 import FieldPage from "./pages/field-details/FieldPage"
 import FieldAdminApp from "./pages/field-details/FieldAdminApp"
 import LearningResourceDrawer from "./components/LearningResourceDrawer"
@@ -63,6 +64,9 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
           </Route>
           <Route path={urls.DEMO}>
             <DemoPage />
+          </Route>
+          <Route path={`${urls.SEARCH}2`}>
+            <SearchPage2 />
           </Route>
           <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
             <FieldPage />
