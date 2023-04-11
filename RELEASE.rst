@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.212.1
+Version 0.212.1 (Released April 11, 2023)
 ---------------
 
 - demo ui css (#3933)
