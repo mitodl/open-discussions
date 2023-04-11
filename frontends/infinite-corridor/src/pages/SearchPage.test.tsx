@@ -1,7 +1,10 @@
 import { when } from "jest-when"
 
 import { makeSearchResponse } from "ol-search-ui/src/factories"
-import { SearchQueryParams, buildSearchQuery } from "@mitodl/course-search-utils"
+import {
+  SearchQueryParams,
+  buildSearchQuery
+} from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
@@ -26,7 +29,10 @@ const expectedFacets = {
   resource_type:       []
 }
 
-const assertLastSearchRequest = (params: SearchQueryParams, callCount?: number) => {
+const assertLastSearchRequest = (
+  params: SearchQueryParams,
+  callCount?: number
+) => {
   const calls = makeRequest.mock.calls.filter(([method, url]) => {
     return method === "post" && url === "search/"
   })
@@ -139,11 +145,14 @@ describe("SearchPage", () => {
     setMockResponse.post("search/", makeSearchResponse())
     const { history } = await renderTestApp({ url: "/search" })
 
-    assertLastSearchRequest({
-      from:         0,
-      size:         4,
-      activeFacets: expectedFacets
-    }, 1)
+    assertLastSearchRequest(
+      {
+        from:         0,
+        size:         4,
+        activeFacets: expectedFacets
+      },
+      1
+    )
 
     await user.click(await screen.findByDisplayValue("MITx"))
 
@@ -151,47 +160,58 @@ describe("SearchPage", () => {
       expect(history.location.search).toBe("?o=MITx")
     })
 
-    assertLastSearchRequest({
-      from:         0,
-      size:         4,
-      activeFacets: {
-        ...expectedFacets,
-        offered_by: ["MITx"],
-      }
-    }, 2)
+    assertLastSearchRequest(
+      {
+        from:         0,
+        size:         4,
+        activeFacets: {
+          ...expectedFacets,
+          offered_by: ["MITx"]
+        }
+      },
+      2
+    )
   })
 
   test("Clearing facets issues a new request", async () => {
     setMockResponse.post("search/", makeSearchResponse())
     const { history } = await renderTestApp({ url: "/search?o=MITx" })
 
-    assertLastSearchRequest({
-      from:         0,
-      size:         4,
-      activeFacets: {
-        ...expectedFacets,
-        offered_by: ["MITx"],
-      }
-    }, 1)
+    assertLastSearchRequest(
+      {
+        from:         0,
+        size:         4,
+        activeFacets: {
+          ...expectedFacets,
+          offered_by: ["MITx"]
+        }
+      },
+      1
+    )
 
     await waitFor(async () => {
       await user.click(screen.getByText("Clear All"))
     })
 
     await waitFor(() => {
-      expect(history.location).toEqual(expect.objectContaining({
-        search:   "",
-        pathname: "/infinite/search"
-      }))
+      expect(history.location).toEqual(
+        expect.objectContaining({
+          search:   "",
+          pathname: "/infinite/search"
+        })
+      )
     })
 
-    assertLastSearchRequest({
-      from:         0,
-      size:         4,
-      activeFacets: {
-        ...expectedFacets,
-      }
-    }, 2)
+    assertLastSearchRequest(
+      {
+        from:         0,
+        size:         4,
+        activeFacets: {
+          ...expectedFacets
+        }
+      },
+      2
+    )
   })
 
   test("the user should be able to update the search text and submit", async () => {

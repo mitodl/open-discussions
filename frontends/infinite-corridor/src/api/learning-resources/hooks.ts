@@ -16,6 +16,7 @@ import {
   UseQueryOptions
 } from "react-query"
 import { urls, keys, UserListOptions } from "./urls"
+import { modifyCachedSearchResource } from "./search"
 
 const useResource = (type: string, id: number) => {
   const key = keys.resource(type).id(id).details
@@ -66,6 +67,14 @@ const useFavorite = () => {
       queryClient.invalidateQueries({
         queryKey: keys.favorites.listing.all
       })
+      modifyCachedSearchResource(
+        queryClient,
+        {
+          id:          resource.id,
+          object_type: resource.object_type
+        },
+        () => ({ is_favorite: true })
+      )
     }
   })
 }
@@ -84,6 +93,14 @@ const useUnfavorite = () => {
       queryClient.invalidateQueries({
         queryKey: keys.favorites.listing.all
       })
+      modifyCachedSearchResource(
+        queryClient,
+        {
+          id:          resource.id,
+          object_type: resource.object_type
+        },
+        () => ({ is_favorite: false })
+      )
     }
   })
 }
@@ -188,6 +205,14 @@ const useAddToUserListItems = () => {
       })
       // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+      modifyCachedSearchResource(
+        queryClient,
+        {
+          id:          resource.id,
+          object_type: resource.object_type
+        },
+        () => ({ lists: resource.lists })
+      )
     }
   })
 }
@@ -229,6 +254,18 @@ const useDeleteFromUserListItems = () => {
       queryClient.invalidateQueries(keys.userList.id(vars.list_id).all)
       // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+    },
+    onSuccess(_data, vars) {
+      modifyCachedSearchResource(
+        queryClient,
+        {
+          id:          vars.object_id,
+          object_type: vars.content_type
+        },
+        current => ({
+          lists: current.lists?.filter?.(r => r.item_id !== vars.item_id)
+        })
+      )
     }
   })
 }

@@ -202,7 +202,10 @@ const keys = {
   },
   search: {
     all:   [baseKey, "search"],
-    pages: (params: Omit<SearchQueryParams, "from">) => [...keys.search.all, params]
+    pages: (params: Omit<SearchQueryParams, "from">) => [
+      ...keys.search.all,
+      params
+    ]
   }
 }
 
