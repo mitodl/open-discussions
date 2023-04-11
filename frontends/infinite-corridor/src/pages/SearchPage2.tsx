@@ -1,5 +1,5 @@
 /* global SETTINGS:false */
-import React, { useCallback, useMemo, } from "react"
+import React, { useCallback, useMemo } from "react"
 import Container from "@mui/material/Container"
 import { BannerPage, useMuiBreakpoint } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
@@ -9,11 +9,7 @@ import {
   useFacetOptions,
   useSyncUrlAndSearch
 } from "@mitodl/course-search-utils"
-import {
-  SearchInput,
-  SearchFilterDrawer,
-  FacetManifest
-} from "ol-search-ui"
+import { SearchInput, SearchFilterDrawer, FacetManifest } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
 import { useInfiniteSearch } from "../api/learning-resources/search"
 
@@ -44,7 +40,9 @@ const SearchPage: React.FC = () => {
   useSyncUrlAndSearch(history, search)
   window.searchQuery = searchQuery
   const aggregations = useMemo(() => {
-    return new Map(Object.entries(searchQuery.data?.pages[0].aggregations ?? {})) as Aggregations
+    return new Map(
+      Object.entries(searchQuery.data?.pages[0].aggregations ?? {})
+    ) as Aggregations
   }, [searchQuery.data?.pages])
   const facetOptions = useFacetOptions(aggregations, activeFacets)
 
@@ -58,7 +56,8 @@ const SearchPage: React.FC = () => {
     }
   }, [fetchNextPage, searchQuery.isFetchingNextPage])
 
-  const hasResultsAvailable = !searchQuery.isLoading && !searchQuery.isPreviousData
+  const hasResultsAvailable =
+    !searchQuery.isLoading && !searchQuery.isPreviousData
 
   return (
     <BannerPage
@@ -122,11 +121,7 @@ const SearchPage: React.FC = () => {
                     className="ic-searchpage-list ic-card-row-list"
                   >
                     {results.map(hit => (
-                      <li
-                        key={hit.object_type.concat(
-                          hit.id.toString()
-                        )}
-                      >
+                      <li key={hit.object_type.concat(hit.id.toString())}>
                         <LearningResourceCard
                           variant="row-reverse"
                           resource={hit}

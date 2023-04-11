@@ -1,5 +1,8 @@
 import React from "react"
-import { SearchQueryParams, buildSearchQuery } from "@mitodl/course-search-utils"
+import {
+  SearchQueryParams,
+  buildSearchQuery
+} from "@mitodl/course-search-utils"
 import { act } from "@testing-library/react"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import * as factories from "ol-search-ui/src/factories"
@@ -7,23 +10,30 @@ import { QueryClient, QueryClientProvider } from "react-query"
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls } from "./urls"
 import axios from "../../libs/axios"
-import {useInfiniteSearch} from "./search"
+import { useInfiniteSearch } from "./search"
 
 import { assertNotNil } from "ol-util"
 
 const setSearchResponse = (pageSize: number, total: number) => {
-  setMockResponse.post(urls.search, factories.makeSearchResponse(pageSize, total))
+  setMockResponse.post(
+    urls.search,
+    factories.makeSearchResponse(pageSize, total)
+  )
 }
 
-const assertSearchLastCalledWith = (params: SearchQueryParams, exactly = false) => {
+const assertSearchLastCalledWith = (
+  params: SearchQueryParams,
+  exactly = false
+) => {
   const body = exactly ? params : expect.objectContaining(params)
   expect(axios.post).toHaveBeenLastCalledWith(urls.search, body)
 }
 const assertSearchCalledTimes = (count: number) => {
-  const searchCalls = jest.mocked(axios.post).mock.calls.filter(args => args[0] === urls.search)
+  const searchCalls = jest
+    .mocked(axios.post)
+    .mock.calls.filter(args => args[0] === urls.search)
   expect(searchCalls).toHaveLength(count)
 }
-
 
 const setup = () => {
   const queryClient = new QueryClient({
@@ -44,9 +54,13 @@ describe("useInfiniteSearch", () => {
   it("Returns pages of results until none are left", async () => {
     setSearchResponse(3, 7)
     const { wrapper } = setup()
-    const { result, waitFor } = renderHook(() => useInfiniteSearch({
-      size: 3,
-    }), { wrapper })
+    const { result, waitFor } = renderHook(
+      () =>
+        useInfiniteSearch({
+          size: 3
+        }),
+      { wrapper }
+    )
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
@@ -63,7 +77,6 @@ describe("useInfiniteSearch", () => {
 
     expect(result.current.data.pages.length).toBe(2)
     assertSearchLastCalledWith({ from: 3, size: 3 })
-
 
     await act(async () => {
       await result.current.fetchNextPage()
@@ -84,20 +97,27 @@ describe("useInfiniteSearch", () => {
   it("uses correct searchparams when making calls", () => {
     setSearchResponse(3, 7)
     const { wrapper } = setup()
-    const { result } = renderHook(() => useInfiniteSearch({
-      size:         3,
-      text:         "foo",
-      activeFacets: {
-        type: ["course"]
-      }
-    }), { wrapper })
-    expect(axios.post).toHaveBeenCalledWith(urls.search, buildSearchQuery({
-      text:         "foo",
-      size:         3,
-      from:         0,
-      activeFacets: {
-        type: ["course"]
-      }
-    }))
+    renderHook(
+      () =>
+        useInfiniteSearch({
+          size:         3,
+          text:         "foo",
+          activeFacets: {
+            type: ["course"]
+          }
+        }),
+      { wrapper }
+    )
+    expect(axios.post).toHaveBeenCalledWith(
+      urls.search,
+      buildSearchQuery({
+        text:         "foo",
+        size:         3,
+        from:         0,
+        activeFacets: {
+          type: ["course"]
+        }
+      })
+    )
   })
 })
