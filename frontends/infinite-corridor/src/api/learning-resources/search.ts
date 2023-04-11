@@ -19,26 +19,11 @@ type SearchResponse = {
     hits: { _source: LearningResourceSearchResult }[]
   }
 }
-type TransformedSearchResponse = {
-  aggregations: Aggregations
-  hits: {
-    total: number
-    results: LearningResourceSearchResult[]
-  }
-}
 
-const doSearch = async (
-  params: SearchQueryParams
-): Promise<TransformedSearchResponse> => {
+const doSearch = async (params: SearchQueryParams): Promise<SearchResponse> => {
   const body = buildSearchQuery(params)
   const { data } = await axios.post<SearchResponse>(urls.search, body)
-  return {
-    aggregations: data.aggregations,
-    hits:         {
-      total:   data.hits.total,
-      results: data.hits.hits.map(hit => hit._source)
-    }
-  }
+  return data
 }
 const restrictFacetTypes = (allowedTypes: string[], facets?: Facets) => {
   const facetTypes = facets?.["type"] ?? []
@@ -61,7 +46,7 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
       activeFacets: restrictFacetTypes(allowedTypes, params.activeFacets)
     } :
     params
-  return useInfiniteQuery<TransformedSearchResponse>({
+  return useInfiniteQuery<SearchResponse>({
     keepPreviousData: true,
     queryKey:         keys.search.pages(normalized),
     queryFn:          ({ pageParam = 0 }) =>
@@ -87,27 +72,34 @@ const modifyCachedSearchResource = (
   searchQueries.forEach(query => {
     let match = false
     const data = query.state.data as {
-      pages: TransformedSearchResponse[]
+      pages: SearchResponse[]
       pageParams: unknown[]
     }
     const newPages = data.pages.map(page => {
-      const { results } = page.hits
-      const index = results.findIndex(
-        result => result.id === key.id && result.object_type === key.object_type
+      const { hits } = page.hits
+      const index = hits.findIndex(
+        hit =>
+          hit._source.id === key.id &&
+          hit._source.object_type === key.object_type
       )
       if (index === -1) return page
       match = true
-      const newResult = { ...results[index], ...patcher(results[index]) }
-      const newResults = results.map((res, i) =>
-        i === index ? newResult : res
-      )
-      return {
+      const newHit = {
+        ...hits[index],
+        _source: {
+          ...hits[index]._source,
+          ...patcher(hits[index]._source)
+        }
+      }
+      const newResults = hits.map((res, i) => (i === index ? newHit : res))
+      const newPage: SearchResponse = {
         ...page,
         hits: {
           ...page.hits,
-          results: newResults
+          hits: newResults
         }
       }
+      return newPage
     })
 
     if (match) {

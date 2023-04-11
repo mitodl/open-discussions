@@ -46,7 +46,11 @@ const SearchPage: React.FC = () => {
   const facetOptions = useFacetOptions(aggregations, activeFacets)
 
   const results = useMemo(() => {
-    return searchQuery.data?.pages.flatMap(page => page.hits.results) || []
+    return (
+      searchQuery.data?.pages.flatMap(page =>
+        page.hits.hits.map(h => h._source)
+      ) || []
+    )
   }, [searchQuery.data])
   const { fetchNextPage } = searchQuery
   const loadMore = useCallback(() => {

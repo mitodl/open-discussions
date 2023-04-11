@@ -68,7 +68,7 @@ describe("useInfiniteSearch", () => {
 
     assertNotNil(result.current.data)
     expect(result.current.data.pages.length).toBe(1)
-    expect(result.current.data.pages[0].hits.results.length).toBe(3)
+    expect(result.current.data.pages[0].hits.hits.length).toBe(3)
     assertSearchLastCalledWith({ from: 0, size: 3 })
 
     await act(async () => {
