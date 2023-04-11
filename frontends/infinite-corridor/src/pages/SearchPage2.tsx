@@ -42,7 +42,7 @@ const SearchPage: React.FC = () => {
     allowedTypes: ALLOWED_TYPES
   })
   useSyncUrlAndSearch(history, search)
-
+  window.searchQuery = searchQuery
   const aggregations = useMemo(() => {
     return new Map(Object.entries(searchQuery.data?.pages[0].aggregations ?? {})) as Aggregations
   }, [searchQuery.data?.pages])

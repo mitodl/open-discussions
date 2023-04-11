@@ -146,7 +146,7 @@ const urls = {
   userList:       userListUrls,
   resource:       resourceUrls,
   topics:         topicsUrls,
-  search:         "https://discussions-rc.odl.mit.edu/api/v0/search/"
+  search:         "/search/"
 }
 
 const baseKey = "learning-resources"
