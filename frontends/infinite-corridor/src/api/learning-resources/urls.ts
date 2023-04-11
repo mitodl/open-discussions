@@ -146,7 +146,7 @@ const urls = {
   userList:       userListUrls,
   resource:       resourceUrls,
   topics:         topicsUrls,
-  search:         "/search/"
+  search:         "search/"
 }
 
 const baseKey = "learning-resources"
