@@ -10,14 +10,18 @@ $max-width: 520px;
     width: 100%;
     border-radius: 3px;
     font-size: 1.25rem;
+    margin-top: 20px;
 
     fieldset {
-      border-color: theme.$color-blue-5;
-      border-width: 1.5px;
+      border: 2px solid theme.$color-gray-4;
     }
 
     &.Mui-focused  fieldset{
        border-color: theme.$color-blue-5;
+    }
+
+    &.Mui-focused .MuiSvgIcon-root {
+      color: theme.$color-blue-5;
     }
   }
   

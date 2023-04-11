@@ -85,9 +85,16 @@ const ResultsList: React.FC<ResultsListProps> = ({ results }) => {
           key={hit._source.object_type.concat(hit._source.id.toString())}
         >
           {hit._source.title}{" "}
-          {hit._source.offered_by && hit._source.offered_by.length > 0 ?
-            `(${hit._source.offered_by.join(", ")})` :
-            null}
+          {hit._source.offered_by && hit._source.offered_by.length > 0 ? (
+            <span>
+              {" "}
+              (
+              <span className="offeror">
+                {hit._source.offered_by.join(", ")}
+              </span>
+              ){" "}
+            </span>
+          ) : null}
         </li>
       ))}
     </ul>
@@ -199,7 +206,7 @@ const DemoPage: React.FC = () => {
 
         <SearchInput
           className="main-search"
-          placeholder=""
+          placeholder="What do you want to learn?"
           onChange={updateText}
           value={text || ""}
           onClear={clearText}
@@ -220,7 +227,7 @@ const DemoPage: React.FC = () => {
           videoResults.length === 0 &&
           podcastResults.length === 0 ? (
               <div>
-                <div>
+                <div className="button-container">
                   <Button
                     data-az-l="8c48a94d-2e0b-4a17-aa0e-2aa0cd910974"
                     className="feedback-button"
@@ -232,14 +239,17 @@ const DemoPage: React.FC = () => {
                 <div className="no-results">No results found for your query</div>
               </div>
             ) : (
-              <div>
-                <Button
-                  data-az-l="8c48a94d-2e0b-4a17-aa0e-2aa0cd910974"
-                  className="feedback-button"
-                  variant="outlined"
-                >
-                Feedback?
-                </Button>
+              <div className="results-div">
+                <div className="button-container">
+                  <Button
+                    data-az-l="8c48a94d-2e0b-4a17-aa0e-2aa0cd910974"
+                    className="feedback-button"
+                    variant="outlined"
+                  >
+                  Feedback?
+                  </Button>
+                </div>
+
                 {courseResults.length > 0 ? (
                   <div>
                     <h2>Courses</h2>
