@@ -1,7 +1,7 @@
 import { when } from "jest-when"
 
 import { makeSearchResponse } from "ol-search-ui/src/factories"
-import { buildSearchQuery } from "@mitodl/course-search-utils"
+import { SearchQueryParams, buildSearchQuery } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
@@ -24,6 +24,17 @@ const expectedFacets = {
   level:               [],
   course_feature_tags: [],
   resource_type:       []
+}
+
+const assertLastSearchRequest = (params: SearchQueryParams, callCount?: number) => {
+  const calls = makeRequest.mock.calls.filter(([method, url]) => {
+    return method === "post" && url === "search/"
+  })
+  const lastCall = calls[calls.length - 1]
+  expect(lastCall[2]).toEqual(buildSearchQuery(params))
+  if (callCount !== undefined) {
+    expect(calls).toHaveLength(callCount)
+  }
 }
 
 const getSearchTextInput = (): HTMLInputElement => {
@@ -128,59 +139,59 @@ describe("SearchPage", () => {
     setMockResponse.post("search/", makeSearchResponse())
     const { history } = await renderTestApp({ url: "/search" })
 
-    await fireEvent.click(await screen.findByDisplayValue("MITx"))
+    assertLastSearchRequest({
+      from:         0,
+      size:         4,
+      activeFacets: expectedFacets
+    }, 1)
+
+    await user.click(await screen.findByDisplayValue("MITx"))
 
     await waitFor(() => {
       expect(history.location.search).toBe("?o=MITx")
     })
 
+    assertLastSearchRequest({
+      from:         0,
+      size:         4,
+      activeFacets: {
+        ...expectedFacets,
+        offered_by: ["MITx"],
+      }
+    }, 2)
+  })
+
+  test("Clearing facets issues a new request", async () => {
+    setMockResponse.post("search/", makeSearchResponse())
+    const { history } = await renderTestApp({ url: "/search?o=MITx" })
+
+    assertLastSearchRequest({
+      from:         0,
+      size:         4,
+      activeFacets: {
+        ...expectedFacets,
+        offered_by: ["MITx"],
+      }
+    }, 1)
+
     await waitFor(async () => {
-      await fireEvent.click(screen.getByText("Clear All"))
+      await user.click(screen.getByText("Clear All"))
     })
 
-    expect(makeRequest.mock.calls[0][0]).toEqual("post")
-    expect(makeRequest.mock.calls[0][1]).toEqual("search/")
-    expect(makeRequest.mock.calls[0][2]).toMatchObject(
-      buildSearchQuery({
-        text:         "",
-        from:         0,
-        activeFacets: expectedFacets,
-        size:         4
-      })
-    )
+    await waitFor(() => {
+      expect(history.location).toEqual(expect.objectContaining({
+        search:   "",
+        pathname: "/infinite/search"
+      }))
+    })
 
-    const filteredFacets = {
-      audience:            [],
-      certification:       [],
-      type:                ["program", "course"],
-      offered_by:          ["MITx"],
-      topics:              [],
-      department_name:     [],
-      level:               [],
-      course_feature_tags: [],
-      resource_type:       []
-    }
-    expect(makeRequest.mock.calls[1][0]).toEqual("post")
-    expect(makeRequest.mock.calls[1][1]).toEqual("search/")
-    expect(makeRequest.mock.calls[1][2]).toMatchObject(
-      buildSearchQuery({
-        text:         "",
-        from:         0,
-        activeFacets: filteredFacets,
-        size:         4
-      })
-    )
-
-    expect(makeRequest.mock.calls[2][0]).toEqual("post")
-    expect(makeRequest.mock.calls[2][1]).toEqual("search/")
-    expect(makeRequest.mock.calls[2][2]).toMatchObject(
-      buildSearchQuery({
-        text:         "",
-        from:         0,
-        activeFacets: expectedFacets,
-        size:         4
-      })
-    )
+    assertLastSearchRequest({
+      from:         0,
+      size:         4,
+      activeFacets: {
+        ...expectedFacets,
+      }
+    }, 2)
   })
 
   test("the user should be able to update the search text and submit", async () => {

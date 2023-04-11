@@ -1,25 +1,21 @@
-/* global SETTINGS:false */
-import React, { useState, useCallback } from "react"
+import React, { useCallback, useMemo, } from "react"
 import Container from "@mui/material/Container"
-import { intersection } from "lodash"
 import { BannerPage, useMuiBreakpoint } from "ol-util"
 import InfiniteScroll from "react-infinite-scroller"
 import {
-  useCourseSearch,
-  buildSearchQuery,
   Aggregations,
-  SearchQueryParams,
-  Facets
+  useSearchInputs,
+  useFacetOptions,
+  useSyncUrlAndSearch
 } from "@mitodl/course-search-utils"
 import {
-  LearningResourceSearchResult,
   SearchInput,
   SearchFilterDrawer,
   FacetManifest
 } from "ol-search-ui"
 import { GridColumn, GridContainer } from "../components/layout"
+import { useInfiniteSearch } from "../api/learning-resources/search"
 
-import axios from "../libs/axios"
 import LearningResourceCard from "../components/LearningResourceCard"
 import { useHistory } from "react-router"
 
@@ -32,94 +28,36 @@ const facetMap: FacetManifest = [
   ["offered_by", "Offered By"]
 ]
 
-interface Result {
-  _source: LearningResourceSearchResult
-}
-
-const SEARCH_API_URL = "/search/"
-
-const search = async (params: SearchQueryParams) => {
-  const body = buildSearchQuery(params)
-  try {
-    const { data } = await axios.post(SEARCH_API_URL, body)
-    return data
-  } catch (err) {
-    return null
-  }
-}
-
 const SearchPage: React.FC = () => {
-  const [results, setSearchResults] = useState<Result[]>([])
-  const [total, setTotal] = useState(0)
-  const [completedInitialLoad, setCompletedInitialLoad] = useState(false)
-  const [requestInFlight, setRequestInFlight] = useState(false)
-  const [searchApiFailed, setSearchApiFailed] = useState(false)
-  const [aggregations, setAggregations] = useState<Aggregations>(new Map())
   const isMd = useMuiBreakpoint("md")
 
-  const clearSearch = useCallback(() => {
-    setSearchResults([])
-    setCompletedInitialLoad(false)
-    setTotal(0)
-  }, [])
-
-  const runSearch = useCallback(
-    async (text: string, activeFacets: Facets, from: number) => {
-      if (activeFacets["type"]) {
-        activeFacets["type"] = intersection(ALLOWED_TYPES, activeFacets["type"])
-      } else {
-        activeFacets["type"] = ALLOWED_TYPES
-      }
-      setRequestInFlight(true)
-      const newResults = await search({
-        text,
-        from,
-        activeFacets,
-        size: pageSize
-      })
-      setRequestInFlight(false)
-
-      if (!newResults || newResults["apiFailed"]) {
-        setSearchApiFailed(true)
-        return
-      }
-
-      setAggregations(new Map(Object.entries(newResults.aggregations ?? {})))
-
-      setSearchResults(results =>
-        from === 0 ?
-          newResults.hits.hits :
-          [...results, ...newResults.hits.hits]
-      )
-      setTotal(newResults.hits.total)
-      setCompletedInitialLoad(true)
-    },
-    []
-  )
-
   const history = useHistory()
-  const {
-    updateText,
-    loadMore,
+  const search = useSearchInputs(history)
+  const { text, activeFacets } = search.searchParams
+  const searchQuery = useInfiniteSearch({
     text,
-    onSubmit,
-    from,
-    clearText,
-    facetOptions,
-    onUpdateFacets,
-    clearAllFilters,
-    toggleFacet,
-    activeFacets
-  } = useCourseSearch(
-    runSearch,
-    clearSearch,
-    aggregations,
-    // this is the 'loaded' value, which is what useCourseSearch uses
-    // to determine whether to fire off a request or not.
-    completedInitialLoad && !requestInFlight,
-    pageSize,
-    history
-  )
+    activeFacets,
+    size:         pageSize,
+    allowedTypes: ALLOWED_TYPES
+  })
+  useSyncUrlAndSearch(history, search)
+
+  const aggregations = useMemo(() => {
+    return new Map(Object.entries(searchQuery.data?.pages[0].aggregations ?? {})) as Aggregations
+  }, [searchQuery.data?.pages])
+  const facetOptions = useFacetOptions(aggregations, activeFacets)
+
+  const results = useMemo(() => {
+    return searchQuery.data?.pages.flatMap(page => page.hits.results) || []
+  }, [searchQuery.data])
+  const { fetchNextPage } = searchQuery
+  const loadMore = useCallback(() => {
+    if (!searchQuery.isFetchingNextPage) {
+      fetchNextPage()
+    }
+  }, [fetchNextPage, searchQuery.isFetchingNextPage])
+
+  const hasResultsAvailable = !searchQuery.isLoading && !searchQuery.isPreviousData
 
   return (
     <BannerPage
@@ -133,10 +71,10 @@ const SearchPage: React.FC = () => {
               <SearchInput
                 className="main-search"
                 placeholder="Search for online courses or programs at MIT"
-                onChange={updateText}
-                value={text || ""}
-                onClear={clearText}
-                onSubmit={onSubmit}
+                onChange={search.updateText}
+                value={search.text || ""}
+                onClear={search.clearText}
+                onSubmit={search.submitText}
                 autoFocus
               />
             </GridColumn>
@@ -152,27 +90,27 @@ const SearchPage: React.FC = () => {
               facetMap={facetMap}
               facetOptions={facetOptions}
               activeFacets={activeFacets}
-              onUpdateFacets={onUpdateFacets}
-              clearAllFilters={clearAllFilters}
-              toggleFacet={toggleFacet}
+              onUpdateFacets={search.onUpdateFacet}
+              clearAllFilters={search.clearAllFilters}
+              toggleFacet={search.toggleFacet}
             />
           </GridColumn>
           <GridColumn variant="main-2" component="section">
             <InfiniteScroll
-              hasMore={from + pageSize < total}
+              hasMore={searchQuery.hasNextPage}
               loadMore={loadMore}
-              initialLoad={from === 0}
+              initialLoad={searchQuery.data === undefined}
               loader={
                 <div key="loader" className="loader">
                   Loading ...
                 </div>
               }
             >
-              {searchApiFailed ? (
+              {searchQuery.isError ? (
                 <div className="no-results-found">
                   <span>Oops! Something went wrong.</span>
                 </div>
-              ) : completedInitialLoad ? (
+              ) : hasResultsAvailable ? (
                 results.length === 0 ? (
                   <div className="no-results-found">
                     <span>No results found for your query</span>
@@ -184,13 +122,13 @@ const SearchPage: React.FC = () => {
                   >
                     {results.map(hit => (
                       <li
-                        key={hit._source.object_type.concat(
-                          hit._source.id.toString()
+                        key={hit.object_type.concat(
+                          hit.id.toString()
                         )}
                       >
                         <LearningResourceCard
                           variant="row-reverse"
-                          resource={hit._source}
+                          resource={hit}
                         />
                       </li>
                     ))}
