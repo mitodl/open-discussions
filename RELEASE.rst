@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.212.0
+Version 0.212.0 (Released April 11, 2023)
 ---------------
 
 - demo ui surveys (#3926)
