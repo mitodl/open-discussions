@@ -1,4 +1,5 @@
 type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 interface PaginatedResult<T> {
   count: number
@@ -12,4 +13,4 @@ interface PaginationSearchParams {
   limit?: number
 }
 
-export { PaginationSearchParams, PaginatedResult, PartialBy }
+export { PaginationSearchParams, PaginatedResult, PartialBy, RequiredBy }

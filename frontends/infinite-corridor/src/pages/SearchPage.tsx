@@ -36,7 +36,7 @@ interface Result {
   _source: LearningResourceSearchResult
 }
 
-const SEARCH_API_URL = "search/"
+const SEARCH_API_URL = "https://discussions-rc.odl.mit.edu/api/v0/search/"
 
 const search = async (params: SearchQueryParams) => {
   const body = buildSearchQuery(params)
