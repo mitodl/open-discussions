@@ -8,6 +8,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 from course_catalog.constants import GROUP_STAFF_LISTS_EDITORS, PrivacyLevel
 from course_catalog.models import StaffList, UserList
 from open_discussions.permissions import is_admin_user, is_readonly
+from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 
 
 def is_staff_list_editor(request: HttpRequest) -> bool:
@@ -49,7 +50,8 @@ class HasUserListItemPermissions(BasePermission):
 
     def has_permission(self, request, view):
         user_list = get_object_or_404(
-            UserList, id=view.kwargs.get("parent_lookup_user_list_id", None)
+            UserList,
+            id=view.kwargs.get(f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}user_list_id", None),
         )
         if request.method in SAFE_METHODS:
             return (
@@ -91,7 +93,8 @@ class HasStaffListItemPermissions(BasePermission):
 
     def has_permission(self, request, view):
         staff_list = get_object_or_404(
-            StaffList, id=view.kwargs.get("parent_lookup_staff_list_id", None)
+            StaffList,
+            id=view.kwargs.get(f"{DRF_NESTED_PARENT_LOOKUP_PREFIX}staff_list_id", None),
         )
         can_edit = is_staff_list_editor(request) or is_admin_user(request)
         if request.method in SAFE_METHODS:
