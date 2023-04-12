@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_filters import rest_framework as filters
-from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.pagination import LimitOffsetPagination
@@ -61,7 +60,7 @@ from course_catalog.serializers import (
     StaffListSerializer,
     UserListItemSerializer,
     UserListSerializer,
-    VideoSerializer, CourseSchemaSerializer,
+    VideoSerializer,
 )
 from course_catalog.tasks import get_ocw_courses, get_ocw_next_courses
 from course_catalog.utils import load_course_blocklist
@@ -154,9 +153,6 @@ class FavoriteViewMixin:
         return Response(status=status.HTTP_200_OK)
 
 
-@extend_schema_view(
-    list=extend_schema(serializer_classs=CourseSchemaSerializer)
-)
 class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
     """
     Viewset for Courses

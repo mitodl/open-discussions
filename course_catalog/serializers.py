@@ -978,7 +978,3 @@ class PodcastSerializer(
     class Meta:
         model = Podcast
         exclude = COMMON_IGNORED_FIELDS
-
-
-class CourseSchemaSerializer(CourseSerializer):
-    offered_by = serializers.ReadOnlyField()
