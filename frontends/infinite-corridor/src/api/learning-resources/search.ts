@@ -62,9 +62,21 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
 type SearchPatcher = (
   current: LearningResourceSearchResult
 ) => Partial<LearningResourceSearchResult>
+
+/**
+ * Modify a cached search result.
+ *
+ * This is useful when a mutation affects learning resources that show up in
+ * search results. (Example: marking a resource as "favorite".)
+ *
+ * @param queryClient
+ * @param resourceKey id and object_type identifying resource
+ * @param patcher A function mapping current LearningResourceSearchResult to a
+ * to a patch that will be bemerged into the cached LearningResourceSearchResult
+ */
 const modifyCachedSearchResource = (
   queryClient: QueryClient,
-  key: Pick<LearningResourceSearchResult, "id" | "object_type">,
+  resourceKey: Pick<LearningResourceSearchResult, "id" | "object_type">,
   patcher: SearchPatcher
 ) => {
   const cache = queryClient.getQueryCache()
@@ -79,8 +91,8 @@ const modifyCachedSearchResource = (
       const { hits } = page.hits
       const index = hits.findIndex(
         hit =>
-          hit._source.id === key.id &&
-          hit._source.object_type === key.object_type
+          hit._source.id === resourceKey.id &&
+          hit._source.object_type === resourceKey.object_type
       )
       if (index === -1) return page
       match = true

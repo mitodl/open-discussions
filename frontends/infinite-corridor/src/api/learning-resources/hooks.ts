@@ -205,6 +205,7 @@ const useAddToUserListItems = () => {
       })
       // The listing response includes item counts, which have changed
       queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+
       modifyCachedSearchResource(
         queryClient,
         {
