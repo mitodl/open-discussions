@@ -1,7 +1,9 @@
 """
 Functions and constants for Elasticsearch indexing
 """
+import json
 import logging
+from math import ceil
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -570,21 +572,44 @@ def index_items(documents, object_type, update_only, **kwargs):
     for chunk in chunks(
         documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
     ):
-        for alias in get_active_aliases(
-            conn, object_types=[object_type], include_reindexing=(not update_only)
-        ):
-            _, errors = bulk(
-                conn,
-                chunk,
-                index=alias,
-                doc_type=GLOBAL_DOC_TYPE,
-                chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                **kwargs,
-            )
-            if len(errors) > 0:
-                raise ReindexException(
-                    f"Error during bulk {object_type} insert: {errors}"
+        documents_size = len(json.dumps(chunk))
+        # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
+        if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
+            if len(chunk) == 1:
+                log.error(
+                    "Document id %s for object_type %s exceeds max size %d: %d",
+                    chunk[0]["_id"],
+                    object_type,
+                    settings.ELASTICSEARCH_MAX_REQUEST_SIZE,
+                    documents_size,
                 )
+                continue
+            num_chunks = min(
+                ceil(
+                    len(chunk)
+                    / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                ),
+                len(chunk) - 1,
+            )
+            for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
+                index_items(smaller_chunk, object_type, update_only, **kwargs)
+        else:
+            for alias in get_active_aliases(
+                conn, object_types=[object_type], include_reindexing=(not update_only)
+            ):
+                _, errors = bulk(
+                    conn,
+                    chunk,
+                    index=alias,
+                    doc_type=GLOBAL_DOC_TYPE,
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    **kwargs,
+                )
+                if len(errors) > 0:
+                    log.error(errors)
+                    raise ReindexException(
+                        f"Error during bulk {object_type} insert: {errors}"
+                    )
 
 
 def index_posts(ids, update_only=False):
@@ -723,9 +748,9 @@ def delete_run_content_files(run_id, unpublished_only=False):
     """
     run = LearningResourceRun.objects.get(id=run_id)
     if unpublished_only:
-        content_files = ContentFile.objects.filter(run=run, published=False)
+        content_files = run.content_files.filter(published=False).only("key")
     else:
-        content_files = ContentFile.objects.filter(run=run)
+        content_files = run.content_files.only("key")
 
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)

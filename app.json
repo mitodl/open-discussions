@@ -126,6 +126,10 @@
       "description": "Index to use on Elasticsearch",
       "required": true
     },
+    "ELASTICSEARCH_MAX_REQUEST_SIZE": {
+      "description": "Maximum size of JSON data requests sent to Elasticsearch",
+      "required": false
+    },
     "ELASTICSEARCH_SHARD_COUNT": {
       "description": "Number of shards to allocate when creating an Elasticsearch index. Generally set to the CPU count of an individual node in the cluster.",
       "required": false
