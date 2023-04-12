@@ -48,6 +48,14 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
     params
   return useInfiniteQuery<SearchResponse>({
     keepPreviousData: true,
+    /**
+     * React query caches query results. If no currently mounted components are
+     * using a query, then it is inactive. Inactive queries are removed from the
+     * cache after `cacheTime`. The default is 5 minutes.
+     *
+     * Let's use a smaller cache time here since search requests can fire pretty
+     * frequently.
+     */
     cacheTime:        1000 * 60,
     queryKey:         keys.search.pages(normalized),
     queryFn:          ({ pageParam = 0 }) =>
