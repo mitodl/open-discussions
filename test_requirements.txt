@@ -1,7 +1,6 @@
 astroid==2.11.6
 black==22.6.0
 bpython
-codecov
 ddt
 django-debug-toolbar
 ipdb
