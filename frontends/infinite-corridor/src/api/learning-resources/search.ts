@@ -10,7 +10,7 @@ import { buildSearchQuery } from "@mitodl/course-search-utils"
 import axios from "../../libs/axios"
 import { keys, urls } from "./urls"
 
-const DEFAULT_SEARCH_PAGE_SIZE = 20
+const DEFAULT_SEARCH_PAGE_SIZE = 10
 
 type SearchResponse = {
   aggregations: Aggregations
@@ -48,6 +48,7 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
     params
   return useInfiniteQuery<SearchResponse>({
     keepPreviousData: true,
+    cacheTime:        1000 * 60,
     queryKey:         keys.search.pages(normalized),
     queryFn:          ({ pageParam = 0 }) =>
       doSearch({ ...normalized, size, from: pageParam }),
