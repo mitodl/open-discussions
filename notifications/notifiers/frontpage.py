@@ -108,10 +108,10 @@ def _podcast_episodes_since_notification(notification):
         list of PodcastEpisode: list of podcast episodes
     """
 
-    episodes = PodcastEpisode.objects.order_by("-created_on")
+    episodes = PodcastEpisode.objects.filter(published=True).order_by("-last_modified")
 
     if notification:
-        episodes = episodes.filter(created_on__gt=notification.created_on)
+        episodes = episodes.filter(last_modified__gt=notification.created_on)
     else:
         episodes = episodes.all()
     return episodes[: settings.OPEN_DISCUSSIONS_FRONTPAGE_DIGEST_MAX_EPISODES]
