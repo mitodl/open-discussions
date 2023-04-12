@@ -1,5 +1,6 @@
 import React, { useCallback } from "react"
 import Dotdotdot from "react-dotdotdot"
+import invariant from "tiny-invariant"
 import { toQueryString, pluralize } from "ol-util"
 import classNames from "classnames"
 
@@ -7,6 +8,7 @@ import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 
 import CardMedia from "@mui/material/CardMedia"
 import {
@@ -35,7 +37,7 @@ type LearningResourceCardTemplateProps<
    */
   variant: CardVariant
   resource: R
-  reordering?: boolean
+  sortable?: boolean
   className?: string
   /**
    * Config used to generate embedly urls.
@@ -119,37 +121,27 @@ const ResourceFooterDetails: React.FC<
   return null
 }
 
-type CardImageProps = Pick<
+type LRCImageProps = Pick<
   LearningResourceCardTemplateProps,
-  "resource" | "imgConfig" | "variant"
+  "resource" | "imgConfig" | "suppressImage" | "variant"
 >
-const CardImage: React.FC<CardImageProps> = ({
+const LRCImage: React.FC<LRCImageProps> = ({
   resource,
   imgConfig,
+  suppressImage,
   variant
 }) => {
-  const isRow = variant === "row" || variant === "row-reverse"
-  if (isRow) {
-    return (
-      <CardContent className="ol-lrc-image">
-        <CardMedia
-          component="img"
-          height={imgConfig.height}
-          src={resourceThumbnailSrc(resource, imgConfig)}
-          alt=""
-        />
-      </CardContent>
-    )
-  } else {
-    return (
-      <CardMedia
-        component="img"
-        height={imgConfig.height}
-        src={resourceThumbnailSrc(resource, imgConfig)}
-        alt=""
-      />
-    )
-  }
+  if (suppressImage) return null
+  const dims = variant === 'column' ? { height: imgConfig.height } : {width: imgConfig.width, height: imgConfig.height}
+  return (
+    <CardMedia
+      component="img"
+      className="ol-lrc-image"
+      sx={dims}
+      src={resourceThumbnailSrc(resource, imgConfig)}
+      alt=""
+    />
+  )
 }
 
 const variantClasses: Record<CardVariant, string> = {
@@ -173,7 +165,8 @@ const LearningResourceCardTemplate = <R extends CardMinimalResource>({
   className,
   suppressImage = false,
   onActivate,
-  footerActionSlot
+  footerActionSlot,
+  sortable
 }: LearningResourceCardTemplateProps<R>) => {
   const hasCertificate =
     resource.certification && resource.certification.length > 0
@@ -182,44 +175,68 @@ const LearningResourceCardTemplate = <R extends CardMinimalResource>({
     [resource, onActivate]
   )
 
+  invariant(!sortable || variant === "row-reverse", "sortable only supported for variant='row-reverse'")
+
   return (
     <Card
-      className={classNames(className, variantClasses[variant], "ol-lrc-root")}
+      className={classNames(className, "ol-lrc-root")}
     >
-      {!suppressImage && (
-        <CardImage
-          resource={resource}
+      {variant === 'column' ?
+        <LRCImage
           variant={variant}
+          suppressImage={suppressImage}
+          resource={resource}
           imgConfig={imgConfig}
-        />
-      )}
-      <CardContent className="ol-lrc-content">
-        <div className="ol-lrc-type-row">
-          <span className="ol-lrc-type">
-            {getReadableResourceType(resource.object_type)}
-          </span>
-          {hasCertificate && <CertificateIcon />}
-        </div>
-        {onActivate ? (
-          <button className="clickable-title" onClick={handleActivate}>
+        /> : null }
+      <CardContent className={classNames("ol-lrc-content", variantClasses[variant], {
+        "ol-lrc-sortable": sortable
+      })}>
+        {
+          variant !== 'column' ?
+            <LRCImage
+              variant={variant}
+              suppressImage={suppressImage}
+              resource={resource}
+              imgConfig={imgConfig}
+            /> : null
+        }
+        <div className="ol-lrc-details">
+          <div className="ol-lrc-type-row">
+            <span className="ol-lrc-type">
+              {getReadableResourceType(resource.object_type)}
+            </span>
+            {hasCertificate && <CertificateIcon />}
+          </div>
+          {onActivate ? (
+            <button className="clickable-title" onClick={handleActivate}>
+              <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
+                {resource.title}
+              </Dotdotdot>
+            </button>
+          ) : (
             <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
               {resource.title}
             </Dotdotdot>
-          </button>
-        ) : (
-          <Dotdotdot className="ol-lrc-title" tagName="h3" clamp={3}>
-            {resource.title}
-          </Dotdotdot>
-        )}
-        <CardBody resource={resource} />
-        <div className="ol-lrc-fill-space-content-end">
-          <div className="ol-lrc-footer-row">
-            <div>
-              <ResourceFooterDetails resource={resource} />
-            </div>
-            {footerActionSlot}
-          </div>
+          )}
+          {
+            sortable ? null : <>
+              <CardBody resource={resource} />
+              <div className="ol-lrc-fill-space-content-end">
+                <div className="ol-lrc-footer-row">
+                  <div>
+                    <ResourceFooterDetails resource={resource} />
+                  </div>
+                  {footerActionSlot}
+                </div>
+              </div>
+            </>
+          }
         </div>
+        { sortable ?
+          <div className="ol-lrc-drag-handle">
+            <DragIndicatorIcon fontSize="inherit" />
+          </div> :
+          null }
       </CardContent>
     </Card>
   )

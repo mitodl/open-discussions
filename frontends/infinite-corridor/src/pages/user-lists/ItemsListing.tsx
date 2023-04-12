@@ -25,6 +25,8 @@ const UserListItems: React.FC<UserListItemsProps> = ({
               return (
                 <li key={list.id}>
                   <LearningResourceCard
+                    sortable
+                    suppressImage
                     variant="row-reverse"
                     resource={list.content_data}
                   />

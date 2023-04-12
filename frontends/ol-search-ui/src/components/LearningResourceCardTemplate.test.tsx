@@ -120,4 +120,37 @@ describe("LearningResourceCard", () => {
     )
     expect(screen.queryByText("item", { exact: false })).toBe(null)
   })
+
+  it.each([
+    { sortable: true, shows: "Shows" },
+    { sortable: false, shows: "Does not show" }
+  ])("$shows a drag handle when sortable is $sortable", ({sortable}) => {
+    const resource = makeCourse()
+    const imgConfig = makeImgConfig()
+    render(
+      <LearningResourceCardTemplate
+        variant="row-reverse"
+        resource={resource}
+        imgConfig={imgConfig}
+        sortable={sortable}
+      />
+    )
+
+    expect(!!screen.queryByTestId("DragIndicatorIcon")).toBe(sortable)
+  })
+
+  it.each([
+    { svariant: "row" },
+    { variant: "column" },
+  ])("Throws error if sortable & unsupported variant", () => {
+    const resource = makeCourse()
+    const imgConfig = makeImgConfig()
+    expect(() => render(
+      <LearningResourceCardTemplate
+        variant="row-reverse"
+        resource={resource}
+        imgConfig={imgConfig}
+        sortable={true}
+      />)).toThrow(/only supported for variant='row-reverse'/)
+  })
 })
