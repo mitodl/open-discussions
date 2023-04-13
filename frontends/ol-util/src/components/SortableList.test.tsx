@@ -8,7 +8,7 @@ import type {
   UniqueIdentifier as Id
 } from "@dnd-kit/core"
 import type { SortableData } from "@dnd-kit/sortable"
-import SortableList from "./SortableList"
+import SortableList, { SortableItem } from "./SortableList"
 
 jest.mock("@dnd-kit/core", () => {
   const actual = jest.requireActual("@dnd-kit/core")
@@ -22,14 +22,6 @@ jest.mock("@dnd-kit/core", () => {
      * Since dnd-kit is non-functional in JSDom, let's always render the children.
      */
     DragOverlay: ({ children }) => <div>{children}</div>
-  }
-})
-
-jest.mock("./SortableList", () => {
-  const actual = jest.requireActual("./SortableList")
-  return {
-    __esModule: true,
-    default:    jest.fn(actual.default)
   }
 })
 
@@ -69,7 +61,6 @@ const setupTest = (itemIds: string[]) => {
   const spies = {
     renderActive: jest.fn((a: Active) => <div>Active Item {a.id}</div>),
     onSortEnd:    jest.fn(),
-    SortableList: jest.mocked(SortableList)
   }
   render(
     <SortableList
@@ -186,4 +177,25 @@ describe("SortableList", () => {
       })
     }
   )
+})
+
+describe("SortableItem", () => {
+  it.each([
+    { tag: "div" },
+    { tag: "li" },
+  ] as const)("Renders the specified tag", ({tag}) => {
+    const view = render(<SortableItem Component={tag} id="1" />)
+
+    // eslint-disable-next-line testing-library/no-node-access
+    const el = view.container.firstChild as HTMLElement
+    expect(el.tagName).toBe(tag.toUpperCase())
+  })
+
+  it("Renders child with class ol-draggable", () => {
+    render(<SortableItem Component="div" id="1" >
+      {props=> <div {...props} data-testid="sortable-child"  /> }
+    </SortableItem>)
+
+    expect(screen.getByTestId("sortable-child")).toHaveClass("ol-draggable")
+  })
 })

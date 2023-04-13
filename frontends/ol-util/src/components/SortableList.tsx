@@ -25,7 +25,8 @@ import { CSS } from "@dnd-kit/utilities"
 type SortableItemProps<I extends UniqueIdentifier = UniqueIdentifier> = {
   id: I
   children?: (props: HandleProps) => React.ReactNode
-  data?: Data
+  data?: Data,
+  Component?: React.ElementType
 }
 type HandleProps = React.HTMLAttributes<HTMLElement> & {
   ref: (el: HTMLElement | null) => void
@@ -53,15 +54,18 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
   const handleProps: HandleProps = useMemo(
     () => ({
       ...listeners,
-      ref: setActivatorNodeRef
+      ref:       setActivatorNodeRef,
+      className: "ol-draggable"
     }),
     [setActivatorNodeRef, listeners]
   )
 
+  const { Component = "div" } = props
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <Component ref={setNodeRef} style={style} {...attributes}>
       {props.children && props.children(handleProps)}
-    </div>
+    </Component>
   )
 }
 
@@ -132,7 +136,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   children,
   itemIds,
   renderActive,
-  onSortEnd
+  onSortEnd,
 }: SortableListProps<I>): React.ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -176,7 +180,9 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
         {children}
       </SortableContext>
       <DragOverlay dropAnimation={dropAnimationConfig}>
-        {active && renderActive(active)}
+        <div className="ol-dragging">
+          {active && renderActive(active)}
+        </div>
       </DragOverlay>
     </DndContext>
   )
