@@ -4,6 +4,7 @@ import { assertInstanceOf } from "ol-util"
 import LearningResourceCardTemplate from "./LearningResourceCardTemplate"
 import { makeCourse, makeImgConfig, makeUserList } from "../factories"
 import { resourceThumbnailSrc } from "../util"
+import { allowConsoleErrors } from "ol-util/src/test-utils"
 
 describe("LearningResourceCard", () => {
   it("renders title and cover image", () => {
@@ -124,7 +125,7 @@ describe("LearningResourceCard", () => {
   it.each([
     { sortable: true, shows: "Shows" },
     { sortable: false, shows: "Does not show" }
-  ])("$shows a drag handle when sortable is $sortable", ({sortable}) => {
+  ])("$shows a drag handle when sortable is $sortable", ({ sortable }) => {
     const resource = makeCourse()
     const imgConfig = makeImgConfig()
     render(
@@ -139,18 +140,23 @@ describe("LearningResourceCard", () => {
     expect(!!screen.queryByTestId("DragIndicatorIcon")).toBe(sortable)
   })
 
-  it.each([
-    { svariant: "row" },
-    { variant: "column" },
-  ])("Throws error if sortable & unsupported variant", () => {
-    const resource = makeCourse()
-    const imgConfig = makeImgConfig()
-    expect(() => render(
-      <LearningResourceCardTemplate
-        variant="row-reverse"
-        resource={resource}
-        imgConfig={imgConfig}
-        sortable={true}
-      />)).toThrow(/only supported for variant='row-reverse'/)
-  })
+  it.each([{ variant: "row" }, { variant: "column" }] as const)(
+    "Throws error if sortable & unsupported variant",
+    ({ variant }) => {
+      const resource = makeCourse()
+      const imgConfig = makeImgConfig()
+      const shouldThrow = () => {
+        render(
+          <LearningResourceCardTemplate
+            variant={variant}
+            resource={resource}
+            imgConfig={imgConfig}
+            sortable={true}
+          />
+        )
+      }
+      allowConsoleErrors()
+      expect(shouldThrow).toThrow(/only supported for variant='row-reverse'/)
+    }
+  )
 })

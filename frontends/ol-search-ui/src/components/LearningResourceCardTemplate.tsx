@@ -8,7 +8,7 @@ import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Chip from "@mui/material/Chip"
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday"
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator"
 
 import CardMedia from "@mui/material/CardMedia"
 import {
@@ -132,7 +132,10 @@ const LRCImage: React.FC<LRCImageProps> = ({
   variant
 }) => {
   if (suppressImage) return null
-  const dims = variant === 'column' ? { height: imgConfig.height } : {width: imgConfig.width, height: imgConfig.height}
+  const dims =
+    variant === "column" ?
+      { height: imgConfig.height } :
+      { width: imgConfig.width, height: imgConfig.height }
   return (
     <CardMedia
       component="img"
@@ -175,31 +178,34 @@ const LearningResourceCardTemplate = <R extends CardMinimalResource>({
     [resource, onActivate]
   )
 
-  invariant(!sortable || variant === "row-reverse", "sortable only supported for variant='row-reverse'")
+  invariant(
+    !sortable || variant === "row-reverse",
+    "sortable only supported for variant='row-reverse'"
+  )
 
   return (
-    <Card
-      className={classNames(className, "ol-lrc-root")}
-    >
-      {variant === 'column' ?
+    <Card className={classNames(className, "ol-lrc-root")}>
+      {variant === "column" ? (
         <LRCImage
           variant={variant}
           suppressImage={suppressImage}
           resource={resource}
           imgConfig={imgConfig}
-        /> : null }
-      <CardContent className={classNames("ol-lrc-content", variantClasses[variant], {
-        "ol-lrc-sortable": sortable
-      })}>
-        {
-          variant !== 'column' ?
-            <LRCImage
-              variant={variant}
-              suppressImage={suppressImage}
-              resource={resource}
-              imgConfig={imgConfig}
-            /> : null
-        }
+        />
+      ) : null}
+      <CardContent
+        className={classNames("ol-lrc-content", variantClasses[variant], {
+          "ol-lrc-sortable": sortable
+        })}
+      >
+        {variant !== "column" ? (
+          <LRCImage
+            variant={variant}
+            suppressImage={suppressImage}
+            resource={resource}
+            imgConfig={imgConfig}
+          />
+        ) : null}
         <div className="ol-lrc-details">
           <div className="ol-lrc-type-row">
             <span className="ol-lrc-type">
@@ -218,8 +224,8 @@ const LearningResourceCardTemplate = <R extends CardMinimalResource>({
               {resource.title}
             </Dotdotdot>
           )}
-          {
-            sortable ? null : <>
+          {sortable ? null : (
+            <>
               <CardBody resource={resource} />
               <div className="ol-lrc-fill-space-content-end">
                 <div className="ol-lrc-footer-row">
@@ -230,13 +236,13 @@ const LearningResourceCardTemplate = <R extends CardMinimalResource>({
                 </div>
               </div>
             </>
-          }
+          )}
         </div>
-        { sortable ?
+        {sortable ? (
           <div className="ol-lrc-drag-handle">
             <DragIndicatorIcon fontSize="inherit" />
-          </div> :
-          null }
+          </div>
+        ) : null}
       </CardContent>
     </Card>
   )
