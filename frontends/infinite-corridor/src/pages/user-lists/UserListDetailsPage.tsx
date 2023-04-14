@@ -1,5 +1,5 @@
 import React from "react"
-import { BannerPage } from "ol-util"
+import { BannerPage, useToggle, pluralize } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useUserListItems, useUserList } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
@@ -9,6 +9,9 @@ import Button from "@mui/material/Button"
 import { EditListDialog, useEditingDialog } from "./ManageListDialogs"
 import { useParams } from "react-router"
 import UserListItems from "./ItemsListing"
+import { LearningResourceType as LRT } from "ol-search-ui"
+import SwapVertIcon from "@mui/icons-material/SwapVert"
+import CheckIcon from "@mui/icons-material/Check"
 
 type RouteParams = {
   id: string
@@ -19,9 +22,12 @@ const UserListsDetailsPage: React.FC = () => {
   const userListQuery = useUserList(id)
   const itemsDataQuery = useUserListItems(id)
   const editing = useEditingDialog()
+  const [isSorting, toggleIsSorting] = useToggle(false)
+  const canSort = userListQuery.data?.list_type === LRT.LearningPath
 
   const canEdit = userListQuery.data?.author === SETTINGS.user.id
-
+  const description = userListQuery.data?.short_description
+  const count = userListQuery.data?.item_count
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"
@@ -33,11 +39,38 @@ const UserListsDetailsPage: React.FC = () => {
           <GridColumn variant="single-full">
             {userListQuery.data && (
               <Grid container className="ic-list-header">
-                <Grid item xs={9}>
+                <Grid item xs={12}>
                   <h1>{userListQuery.data.title}</h1>
+                  {description && <p>{description}</p>}
                 </Grid>
-                <Grid item xs={3} className="ic-centered-right">
-                  {canEdit && (
+                <Grid
+                  item
+                  xs={6}
+                  container
+                  alignItems="center"
+                  justifyContent="space-between"
+                >
+                  {canSort && (
+                    <Button
+                      color="secondary"
+                      startIcon={isSorting ? <CheckIcon /> : <SwapVertIcon />}
+                      onClick={toggleIsSorting.toggle}
+                    >
+                      {isSorting ? "Finished" : "Reorder"}
+                    </Button>
+                  )}
+                  {count !== undefined && count > 0 ?
+                    `${count} ${pluralize("item", count)}` :
+                    null}
+                </Grid>
+                <Grid
+                  item
+                  xs={6}
+                  container
+                  alignItems="center"
+                  className="ic-centered-right"
+                >
+                  {canEdit ? (
                     <Button
                       color="secondary"
                       startIcon={<EditIcon />}
@@ -45,13 +78,14 @@ const UserListsDetailsPage: React.FC = () => {
                     >
                       Edit
                     </Button>
-                  )}
+                  ) : null}
                 </Grid>
               </Grid>
             )}
             <UserListItems
               isLoading={itemsDataQuery.isLoading}
               data={itemsDataQuery.data}
+              sortable={isSorting}
               emptyMessage="There are no items in this list yet."
             />
           </GridColumn>
