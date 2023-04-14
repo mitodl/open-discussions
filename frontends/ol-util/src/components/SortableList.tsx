@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities"
 type SortableItemProps<I extends UniqueIdentifier = UniqueIdentifier> = {
   id: I
   children?: (props: HandleProps) => React.ReactNode
-  data?: Data,
+  data?: Data
   Component?: React.ElementType
 }
 type HandleProps = React.HTMLAttributes<HTMLElement> & {
@@ -75,6 +75,12 @@ type SortEndEvent<I extends UniqueIdentifier = UniqueIdentifier> = {
    * The item order post-sort
    */
   itemIds: I[]
+  /**
+   * The id of the item that was moved.
+   */
+  targetId: I
+  oldIndex: number
+  newIndex: number
 }
 
 interface SortableListProps<I extends UniqueIdentifier = UniqueIdentifier> {
@@ -136,7 +142,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   children,
   itemIds,
   renderActive,
-  onSortEnd,
+  onSortEnd
 }: SortableListProps<I>): React.ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -164,7 +170,12 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
       const { items: oldItems, index: from } = active.data.current.sortable
       const { index: to } = over.data.current.sortable
       const newItems = arrayMove(oldItems, from, to) as I[]
-      onSortEnd({ itemIds: newItems })
+      onSortEnd({
+        itemIds:  newItems,
+        targetId: newItems[to],
+        oldIndex: from,
+        newIndex: to
+      })
     },
     [onSortEnd]
   )
@@ -180,9 +191,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
         {children}
       </SortableContext>
       <DragOverlay dropAnimation={dropAnimationConfig}>
-        <div className="ol-dragging">
-          {active && renderActive(active)}
-        </div>
+        <div className="ol-dragging">{active && renderActive(active)}</div>
       </DragOverlay>
     </DndContext>
   )

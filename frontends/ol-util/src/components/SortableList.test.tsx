@@ -60,7 +60,7 @@ const setupTest = (itemIds: string[]) => {
   const spyDndContext = jest.mocked(DndContext)
   const spies = {
     renderActive: jest.fn((a: Active) => <div>Active Item {a.id}</div>),
-    onSortEnd:    jest.fn(),
+    onSortEnd:    jest.fn()
   }
   render(
     <SortableList
@@ -136,35 +136,40 @@ describe("SortableList", () => {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["B", "A", "C", "D"],
       dragIndex: 1,
-      dropIndex: 0
+      dropIndex: 0,
+      targetId:  "B"
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "B", "C", "D"],
       dragIndex: 1,
-      dropIndex: 1
+      dropIndex: 1,
+      targetId:  "B"
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "C", "B", "D"],
       dragIndex: 1,
-      dropIndex: 2
+      dropIndex: 2,
+      targetId:  "B"
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "C", "D", "B"],
       dragIndex: 1,
-      dropIndex: 3
+      dropIndex: 3,
+      targetId:  "B"
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["C", "A", "B", "D"],
       dragIndex: 2,
-      dropIndex: 0
+      dropIndex: 0,
+      targetId:  "C"
     }
   ])(
     "it emits the correct onSortEnd events ($dragIndex --> $dropIndex, $afterIds)",
-    ({ itemIds, afterIds, dragIndex, dropIndex }) => {
+    ({ itemIds, afterIds, dragIndex, dropIndex, targetId }) => {
       const { spies, dnd, dndEvents } = setupTest(itemIds)
 
       const startEvent = dndEvents.start(dragIndex)
@@ -173,28 +178,33 @@ describe("SortableList", () => {
       act(() => dnd.onDragEnd(endEvent))
       expect(spies.onSortEnd).toHaveBeenCalledTimes(1)
       expect(spies.onSortEnd).toHaveBeenCalledWith({
-        itemIds: afterIds
+        itemIds:  afterIds,
+        oldIndex: dragIndex,
+        newIndex: dropIndex,
+        targetId
       })
     }
   )
 })
 
 describe("SortableItem", () => {
-  it.each([
-    { tag: "div" },
-    { tag: "li" },
-  ] as const)("Renders the specified tag", ({tag}) => {
-    const view = render(<SortableItem Component={tag} id="1" />)
+  it.each([{ tag: "div" }, { tag: "li" }] as const)(
+    "Renders the specified tag",
+    ({ tag }) => {
+      const view = render(<SortableItem Component={tag} id="1" />)
 
-    // eslint-disable-next-line testing-library/no-node-access
-    const el = view.container.firstChild as HTMLElement
-    expect(el.tagName).toBe(tag.toUpperCase())
-  })
+      // eslint-disable-next-line testing-library/no-node-access
+      const el = view.container.firstChild as HTMLElement
+      expect(el.tagName).toBe(tag.toUpperCase())
+    }
+  )
 
   it("Renders child with class ol-draggable", () => {
-    render(<SortableItem Component="div" id="1" >
-      {props=> <div {...props} data-testid="sortable-child"  /> }
-    </SortableItem>)
+    render(
+      <SortableItem Component="div" id="1">
+        {props => <div {...props} data-testid="sortable-child" />}
+      </SortableItem>
+    )
 
     expect(screen.getByTestId("sortable-child")).toHaveClass("ol-draggable")
   })
