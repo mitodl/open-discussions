@@ -1,6 +1,7 @@
 import UrlAssembler from "url-assembler"
 import { LearningResourceType as LRT, TYPE_FAVORITES } from "ol-search-ui"
 import type { PaginationSearchParams } from "ol-util"
+import type { SearchQueryParams } from "@mitodl/course-search-utils"
 
 const DEFAULT_PAGINATION_PARAMS: PaginationSearchParams = {
   offset: 0,
@@ -144,7 +145,8 @@ const urls = {
   favorite:       favoriteUrls,
   userList:       userListUrls,
   resource:       resourceUrls,
-  topics:         topicsUrls
+  topics:         topicsUrls,
+  search:         "search/"
 }
 
 const baseKey = "learning-resources"
@@ -197,6 +199,13 @@ const keys = {
   favorites: {
     all:     resourceKeys(TYPE_FAVORITES).all,
     listing: resourceKeys(TYPE_FAVORITES).listing
+  },
+  search: {
+    all:   [baseKey, "search"],
+    pages: (params: Omit<SearchQueryParams, "from">) => [
+      ...keys.search.all,
+      params
+    ]
   }
 }
 
