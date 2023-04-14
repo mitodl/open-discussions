@@ -1,33 +1,52 @@
 @use "theme";
 
 .demo-page {
-  color: theme.$color-blue-5;
+  background: theme.$color-gray-1;
+  box-shadow: 0 2px 10px rgba(120 169 197 / 15%);
+  border-radius: 5px;
+  width: 780px;
+  padding: 40px 50px 50px;
+  margin-top: 40px;
+
+  body {
+    background: theme.$color-blue-1;
+  }
 
   .page-title {
-    margin-bottom: 0.5rem;
     color: theme.$color-blue-5;
-    padding-top: 15px;
-    padding-bottom: 10px;
+    margin: 0 0 10px ;
+    padding: 0;
+    font-size: 28px; 
   }
 
   .search-label {
     font-size: 13px;
-    padding-top: 5px;
+    padding-top: 20px;
   }
 
+  h2 {
+    padding: 0;
+    margin: 40px 0 0 ;
+  }
 
   .header {
       max-width: 520px;
       padding-bottom: 10px;
   }
 
-  .results-container {
+  .results-div {
     padding-top: 10px;
-    padding-bottom: 80px;
+  }
+
+  .button-container {
+    margin-top: 30px;
+    margin-bottom: 30px
   }
 
   .feedback-button {
     padding: 10px;
+    padding-left: 70px;
+    padding-right: 70px;
     background: white;
     margin-top: 10px;
     max-width: 520px;
@@ -35,5 +54,19 @@
 
   .no-results {
     padding-top: 20px;
+  }
+
+  .resource-result {
+    font-size: 14px;
+    line-height: 25px;
+  }
+
+  ul {
+    padding-inline-start: 20px;
+    margin-block-start: 10px;
+  }
+
+  .offeror {
+    font-weight: bold;
   }
 }

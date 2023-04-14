@@ -1,4 +1,5 @@
 """Tests for elasticsearch serializers"""
+import json
 from datetime import datetime
 
 # pylint: disable=redefined-outer-name,unused-argument
@@ -377,6 +378,7 @@ def test_es_course_serializer(offered_by, platform, department):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize("exceeds_max_size", [True, False])
 @pytest.mark.parametrize(
     "section,section_resource_type",
     [
@@ -390,10 +392,15 @@ def test_es_course_serializer(offered_by, platform, department):
     ],
 )
 @pytest.mark.parametrize("ocw_next_course", [True, False])
-def test_es_content_file_serializer(section, section_resource_type, ocw_next_course):
+def test_es_content_file_serializer(  # pylint:disable=too-many-arguments
+    settings, mocker, section, section_resource_type, ocw_next_course, exceeds_max_size
+):
     """Verify that the ESContentFileSerializer has the correct data"""
+    mock_warn = mocker.patch("search.serializers.log.warning")
+    settings.ELASTICSEARCH_MAX_REQUEST_SIZE = 5000
     content_kwargs = {
-        "content": "Some text",
+        "content": "a"
+        * (settings.ELASTICSEARCH_MAX_REQUEST_SIZE if exceeds_max_size else 500),
         "content_author": "MIT",
         "content_language": "en",
         "content_title": "test title",
@@ -410,6 +417,18 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
         resource_type = section_resource_type
 
     serialized = serializers.ESContentFileSerializer(content_file).data
+    serialized_content = serialized.pop("content")
+    expected_length = (
+        settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len(json.dumps(serialized)) - 100
+    )
+    expected_content = (
+        content_kwargs["content"][:expected_length]
+        if exceeds_max_size
+        else content_kwargs["content"]
+    )
+    serialized["content"] = serialized_content
+    assert serialized_content == expected_content
+    assert mock_warn.call_count == (1 if exceeds_max_size else 0)
 
     assert_json_equal(
         serialized,
@@ -441,7 +460,7 @@ def test_es_content_file_serializer(section, section_resource_type, ocw_next_cou
             "short_url": content_file.short_url,
             "section": content_file.section,
             "section_slug": content_file.section_slug,
-            "content": content_kwargs["content"],
+            "content": expected_content,
             "content_title": content_kwargs["content_title"],
             "content_author": content_kwargs["content_author"],
             "content_language": content_kwargs["content_language"],

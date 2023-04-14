@@ -5,7 +5,6 @@ import ClearIcon from "@mui/icons-material/Clear"
 import OutlinedInput from "@mui/material/OutlinedInput"
 import InputAdornment from "@mui/material/InputAdornment"
 import IconButton from "@mui/material/IconButton"
-import Button from "@mui/material/Button"
 
 interface SearchSubmissionEvent {
   target: {
@@ -32,20 +31,12 @@ interface SearchInputProps {
 }
 
 const searchIconAdjustments = {
-  fontSize:  "300%",
+  fontSize:  "150%",
   /**
    * We want the icon to have its circle a bit closer to the baseline, which
    * this accounts for.
    */
-  transform: "translateY(+5%)",
-  color:     "white"
-}
-
-const searchButtonAdormentAdjustments = {
-  alignSelf:   "stretch",
-  maxHeight:   "initial",
-  height:      "initial",
-  marginRight: "-13px"
+  transform: "translateY(+5%)"
 }
 
 const SearchInput: React.FC<SearchInputProps> = props => {
@@ -89,21 +80,14 @@ const SearchInput: React.FC<SearchInputProps> = props => {
         </InputAdornment>
       }
       endAdornment={
-        <InputAdornment
-          position="end"
-          sx={searchButtonAdormentAdjustments}
-          color="secondary"
-        >
-          <Button
+        <InputAdornment position="end" color="secondary">
+          <IconButton
             aria-label="Search"
             className={props.classNameSearch}
             onClick={handleSubmit}
-            color="secondary"
-            variant="contained"
-            disableElevation
           >
-            <SearchIcon sx={searchIconAdjustments} color="secondary" />
-          </Button>
+            <SearchIcon sx={searchIconAdjustments} />
+          </IconButton>
         </InputAdornment>
       }
     />

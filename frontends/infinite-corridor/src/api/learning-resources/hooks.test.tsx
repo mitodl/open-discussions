@@ -1,4 +1,5 @@
 import React from "react"
+import { clone } from "lodash"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
@@ -20,6 +21,7 @@ import {
 } from "./hooks"
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls } from "./urls"
+import { useInfiniteSearch } from "./search"
 
 function* makeCounter() {
   let i = 0
@@ -209,6 +211,89 @@ test("useAddToUserListItems invalidates userlist details and listing", async () 
   expect(after.addedResource.data).toEqual(modifiedAddedResource)
 })
 
+test("useAddToUserListItems patches search results", async () => {
+  const { wrapper } = setup()
+  const searchResults = factories.makeSearchResponse(4, 10)
+  const i = faker.datatype.number({ min: 0, max: 3 })
+  const searchResource = searchResults.hits.hits[i]._source
+  const oldMember = factories.makeListItemMember()
+  const newMember = factories.makeListItemMember()
+
+  // just one item to begin with
+  searchResource.lists = [oldMember]
+  const expected = clone(searchResults)
+  expected.hits.hits[i]._source = {
+    ...searchResource,
+    lists: [oldMember, newMember]
+  }
+
+  const useTestHook = () => {
+    const addItem = useAddToUserListItems()
+    const search = useInfiniteSearch({})
+    return { addItem, search }
+  }
+  setMockResponse.post(urls.search, searchResults)
+  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([searchResults])
+  })
+
+  setMockResponse.post(urls.userList.itemAdd(newMember.list_id), {
+    content_data: factories.makeLearningResource({
+      id:          searchResource.id,
+      object_type: searchResource.object_type,
+      lists:       [oldMember, newMember]
+    })
+  })
+  await result.current.addItem.mutateAsync({
+    userListId: newMember.list_id,
+    payload:    newMember
+  })
+
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([expected])
+  })
+})
+
+test("useDeleteFromUserListItems patches search results", async () => {
+  const { wrapper } = setup()
+  const searchResults = factories.makeSearchResponse(4, 10)
+  const i = faker.datatype.number({ min: 0, max: 3 })
+  const searchResource = searchResults.hits.hits[i]._source
+  const deleteIndex = faker.datatype.number({ min: 0, max: 1 })
+  const oldMembers = [
+    factories.makeListItemMember(),
+    factories.makeListItemMember()
+  ]
+
+  // just one item to begin with
+  searchResource.lists = oldMembers
+  const expected = clone(searchResults)
+  expected.hits.hits[i]._source = {
+    ...searchResource,
+    lists: oldMembers.filter((_, index) => index !== deleteIndex)
+  }
+
+  const useTestHook = () => {
+    const deleteItem = useDeleteFromUserListItems()
+    const search = useInfiniteSearch({})
+    return { deleteItem, search }
+  }
+  setMockResponse.post(urls.search, searchResults)
+  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([searchResults])
+  })
+
+  await result.current.deleteItem.mutateAsync(oldMembers[deleteIndex])
+
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([expected])
+  })
+})
+
 test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
   /**
    * This test will use a hook wrapping several react-query useQuery calls
@@ -356,3 +441,46 @@ test.each([
     expect(before.otherResource.data).toEqual(after.otherResource.data)
   }
 )
+
+test.each([
+  {
+    hook:        useFavorite,
+    wasFavorite: false
+  },
+  {
+    hook:        useUnfavorite,
+    wasFavorite: true
+  }
+])("$hook patches search results queries", async ({ hook, wasFavorite }) => {
+  const { wrapper } = setup()
+  const searchResults = factories.makeSearchResponse(4, 10)
+  const i = faker.datatype.number({ min: 0, max: 3 })
+  const searchResource = searchResults.hits.hits[i]._source
+  searchResource.is_favorite = wasFavorite
+
+  const expected = clone(searchResults)
+  expected.hits.hits[i]._source = {
+    ...searchResource,
+    is_favorite: !wasFavorite
+  }
+
+  const useTestHook = () => {
+    const mutation = hook()
+    const search = useInfiniteSearch({})
+    return { mutation, search }
+  }
+  setMockResponse.post(urls.search, searchResults)
+  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([searchResults])
+  })
+
+  await result.current.mutation.mutateAsync(
+    // @ts-expect-error searchResource is not a LearningResource but it is close enough
+    searchResource
+  )
+
+  await waitFor(() => {
+    expect(result.current.search.data?.pages).toEqual([expected])
+  })
+})

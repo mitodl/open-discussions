@@ -23,6 +23,12 @@ from course_catalog.utils import update_editor_group
 from open_discussions.factories import UserFactory
 
 
+@pytest.fixture(autouse=True)
+def drf_settings(settings):
+    """Default drf prefix setting"""
+    settings.DRF_NESTED_PARENT_LOOKUP_PREFIX = ""
+
+
 @pytest.mark.parametrize("is_safe", [True, False])
 @pytest.mark.parametrize("is_anonymous", [True, False])
 def test_userlist_permissions(mocker, user, is_safe, is_anonymous):
@@ -67,7 +73,7 @@ def test_userlistitems_permissions_404(mocker, user):
     """
     request = mocker.MagicMock(method="GET", user=user)
 
-    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": 99999})
+    view = mocker.MagicMock(kwargs={"user_list_id": 99999})
     with pytest.raises(Http404):
         HasUserListItemPermissions().has_permission(request, view)
 
@@ -88,7 +94,7 @@ def test_userlistitems_permissions(mocker, user, is_safe, is_public, is_author):
     )
     request = mocker.MagicMock(method="GET" if is_safe else "POST", user=user)
 
-    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": userlist.id})
+    view = mocker.MagicMock(kwargs={"user_list_id": userlist.id})
     assert HasUserListItemPermissions().has_permission(request, view) is (
         is_author or (is_safe and is_public)
     )
@@ -114,7 +120,7 @@ def test_userlistitems_object_permissions(mocker, user, is_public, is_author, is
         method="GET" if is_safe else "POST",
         user=(user if is_author else UserFactory.create()),
     )
-    view = mocker.MagicMock(kwargs={"parent_lookup_user_list_id": userlist.id})
+    view = mocker.MagicMock(kwargs={"user_list_id": userlist.id})
     assert HasUserListItemPermissions().has_object_permission(
         request, view, userlist_item
     ) is (is_author or (is_safe and is_public))
@@ -190,7 +196,7 @@ def test_stafflistitems_permissions_404(mocker, user):
     """
     request = mocker.MagicMock(method="GET", user=user)
 
-    view = mocker.MagicMock(kwargs={"parent_lookup_staff_list_id": 99999})
+    view = mocker.MagicMock(kwargs={"staff_list_id": 99999})
     with pytest.raises(Http404):
         HasStaffListItemPermissions().has_permission(request, view)
 
@@ -213,7 +219,7 @@ def test_stafflistitems_permissions(mocker, user, is_safe, is_public, is_editor)
     )
     request = mocker.MagicMock(method="GET" if is_safe else "POST", user=user)
 
-    view = mocker.MagicMock(kwargs={"parent_lookup_staff_list_id": stafflist.id})
+    view = mocker.MagicMock(kwargs={"staff_list_id": stafflist.id})
     assert HasStaffListItemPermissions().has_permission(request, view) is (
         is_editor or (is_safe and is_public)
     )
@@ -240,7 +246,7 @@ def test_stafflistitems_object_permissions(mocker, user, is_public, is_editor, i
         method="GET" if is_safe else "POST",
         user=user,
     )
-    view = mocker.MagicMock(kwargs={"parent_lookup_staff_list_id": stafflist.id})
+    view = mocker.MagicMock(kwargs={"staff_list_id": stafflist.id})
     assert HasStaffListItemPermissions().has_object_permission(
         request, view, stafflist_item
     ) is (is_editor or (is_safe and is_public))

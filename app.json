@@ -83,6 +83,10 @@
       "description": "A list of origins that are authorized to make cross-site HTTP requests",
       "required": false      
     },
+    "DRF_NESTED_PARENT_LOOKUP_PREFIX": {
+      "description": "DRF extensions parent lookup kwarg name prefix",
+      "required": false
+    },
     "CORS_ALLOWED_ORIGIN_REGEXES": {
       "description": "A list of regexes that match origins that are authorized to make cross-site HTTP requests",
       "required": false      
@@ -125,6 +129,10 @@
     "ELASTICSEARCH_INDEX": {
       "description": "Index to use on Elasticsearch",
       "required": true
+    },
+    "ELASTICSEARCH_MAX_REQUEST_SIZE": {
+      "description": "Maximum size of JSON data requests sent to Elasticsearch",
+      "required": false
     },
     "ELASTICSEARCH_SHARD_COUNT": {
       "description": "Number of shards to allocate when creating an Elasticsearch index. Generally set to the CPU count of an individual node in the cluster.",

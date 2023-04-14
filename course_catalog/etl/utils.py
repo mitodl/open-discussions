@@ -385,6 +385,7 @@ def transform_content_files(course_tarpath: str) -> Generator[dict, None, None]:
             yield (
                 {
                     "content": tika_content.strip(),
+                    "published": True,
                     "key": key,
                     "published": True,
                     "content_title": (

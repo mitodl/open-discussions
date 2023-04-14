@@ -30,7 +30,7 @@ from open_discussions.envs import (
 from open_discussions.sentry import init_sentry
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.212.0"
+VERSION = "0.212.1"
 
 log = logging.getLogger()
 
@@ -693,6 +693,7 @@ ELASTICSEARCH_MAX_SUGGEST_HITS = get_int("ELASTICSEARCH_MAX_SUGGEST_HITS", 1)
 ELASTICSEARCH_MAX_SUGGEST_RESULTS = get_int("ELASTICSEARCH_MAX_SUGGEST_RESULTS", 1)
 ELASTICSEARCH_SHARD_COUNT = get_int("ELASTICSEARCH_SHARD_COUNT", 2)
 ELASTICSEARCH_REPLICA_COUNT = get_int("ELASTICSEARCH_REPLICA_COUNT", 2)
+ELASTICSEARCH_MAX_REQUEST_SIZE = get_int("ELASTICSEARCH_MAX_REQUEST_SIZE", 10485760)
 INDEXING_API_USERNAME = get_string("INDEXING_API_USERNAME", None)
 if not INDEXING_API_USERNAME:
     raise ImproperlyConfigured("Missing setting INDEXING_API_USERNAME")
@@ -991,3 +992,9 @@ def setup_x509():
 setup_x509()
 
 SPECTACULAR_SETTINGS = open_spectacular_settings
+
+# drf extension settings
+DRF_NESTED_PARENT_LOOKUP_PREFIX = get_string("DRF_NESTED_PARENT_LOOKUP_PREFIX", "")
+REST_FRAMEWORK_EXTENSIONS = {
+    "DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX": DRF_NESTED_PARENT_LOOKUP_PREFIX
+}
