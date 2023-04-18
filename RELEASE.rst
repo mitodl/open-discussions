@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.212.2 (Released April 18, 2023)
+---------------
+
+- remove codecov; its pypi distro is discontinued (#3940)
+- Change default parent lookup for nested DRF serializer/url (#3931)
+- Handle indexing of large documents in search (#3917)
+- Podcast frontpage notifications (#3901)
+
 Version 0.212.1 (Released April 11, 2023)
 ---------------
 
