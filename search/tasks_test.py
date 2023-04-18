@@ -690,10 +690,10 @@ def test_index_run_content_files(mocker, with_error, update_only):
     result = index_run_content_files.delay(1, update_only).get()
     assert result == ("index_run_content_files threw an error" if with_error else None)
 
-    index_run_content_files_mock.assert_called_once_with(1, update_only)
+    index_run_content_files_mock.assert_called_once_with(1, update_only=update_only)
 
     if not with_error:
-        delete_run_content_files_mock.assert_called_once_with(1, True)
+        delete_run_content_files_mock.assert_called_once_with(1, unpublished_only=True)
 
 
 @pytest.mark.parametrize("with_error", [True, False])

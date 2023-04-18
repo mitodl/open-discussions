@@ -698,7 +698,7 @@ def index_course_content_files(course_ids, update_only=False):
     for run_id in LearningResourceRun.objects.filter(
         object_id__in=course_ids, content_type=course_content_type
     ).values_list("id", flat=True):
-        index_run_content_files(run_id, update_only)
+        index_run_content_files(run_id, update_only=update_only)
 
 
 def index_run_content_files(run_id, update_only=False):
@@ -752,10 +752,14 @@ def delete_run_content_files(run_id, unpublished_only=False):
     else:
         content_files = run.content_files.only("key")
 
+    if not content_files.exists():
+        return
+
     documents = (
         serialize_content_file_for_bulk_deletion(content_file)
         for content_file in content_files
     )
+
     course = run.content_object
     delete_items(
         documents,
