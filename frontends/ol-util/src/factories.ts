@@ -7,7 +7,7 @@ type Factory<T, U = never> = (overrides?: Partial<T>, options?: U) => T
 const makePaginatedFactory =
   <T>(makeResult: Factory<T>) =>
     (
-      count: number,
+      { count, pageSize }: { count: number; pageSize?: number },
       {
         previous = null,
         next = null
@@ -16,7 +16,7 @@ const makePaginatedFactory =
       previous?: string | null
     } = {}
     ): PaginatedResult<T> => {
-      const results = times(count, () => makeResult())
+      const results = times(pageSize ?? count, () => makeResult())
       return {
         results,
         count,

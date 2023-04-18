@@ -15,7 +15,7 @@ describe("EditFieldBasicForm", () => {
   let field: FieldChannel, publicLists: PaginatedResult<UserList>
 
   beforeEach(() => {
-    publicLists = resourceFactory.makeUserListsPaginated(5)
+    publicLists = resourceFactory.makeUserListsPaginated({ count: 5 })
     setMockResponse.get(
       lrUrls.userList.listing({
         public: true
@@ -29,19 +29,19 @@ describe("EditFieldBasicForm", () => {
     })
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[0].id),
-      resourceFactory.makeUserListItemsPaginated(2)
+      resourceFactory.makeUserListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[1].id),
-      resourceFactory.makeUserListItemsPaginated(2)
+      resourceFactory.makeUserListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[2].id),
-      resourceFactory.makeUserListItemsPaginated(2)
+      resourceFactory.makeUserListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[4].id),
-      resourceFactory.makeUserListItemsPaginated(2)
+      resourceFactory.makeUserListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(urls.fieldDetails(field.name), field)
     setMockResponse.get(

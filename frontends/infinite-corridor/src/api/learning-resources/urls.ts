@@ -232,13 +232,8 @@ const keys = {
   topics: [baseKey, "topics"],
 
   favorites: {
-    all:      resourceKeys(TYPE_FAVORITES).all,
-    infinite: <T extends Omit<PaginationSearchParams, "offset">>(opts?: T) => [
-      ...resourceKeys(TYPE_FAVORITES).all,
-      "items",
-      "infinite",
-      opts
-    ]
+    all:     resourceKeys(TYPE_FAVORITES).all,
+    listing: resourceKeys(TYPE_FAVORITES).listing
   },
 
   search: {

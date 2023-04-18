@@ -106,7 +106,7 @@ const UserListsListingPage: React.FC = () => {
   const userListsQuery = useUserListsListing()
   const favoritesQuery = useFavoritesListing()
   const favorites = favoritesQuery.data ?
-    makeFavorites(favoritesQuery.data.pages[0].count) :
+    makeFavorites(favoritesQuery.data.count) :
     null
 
   const history = useHistory()

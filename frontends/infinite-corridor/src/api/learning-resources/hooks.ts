@@ -69,24 +69,12 @@ const useUserListItems = (
   })
 }
 
-const useFavoritesListing = (
-  options?: Omit<PaginationSearchParams, "offset"> &
-    Pick<UseQueryOptions, "enabled">
-) => {
+const useFavoritesListing = (options?: PaginationSearchParams) => {
   const url = urls.favorite.listing(options)
-  const queryKey = keys.favorites.infinite(options)
-  const queryFn = (): Promise<PaginatedUserListItems> =>
+  const key = keys.favorites.listing.page(options)
+  return useQuery<PaginatedUserListItems>(key, () =>
     axios.get(url).then(res => res.data)
-  return useInfiniteQuery({
-    queryKey,
-    queryFn,
-    getNextPageParam: (lastPage, pages) => {
-      const { count } = lastPage
-      const pageSize = lastPage.results.length
-      const next = pages.length * pageSize
-      return next >= count ? undefined : next
-    }
-  })
+  )
 }
 
 const useFavorite = () => {
@@ -377,6 +365,23 @@ const useMoveUserListItem = () => {
         }
       )
       return { queryFilter }
+    },
+    onSettled: (_data, _error, vars) => {
+      const { item } = vars
+      /**
+       * We did an optimistic update that re-ordered the list for the UI.
+       * But the API calls are based on list items' `position` property, not
+       * their index within the list.
+       *
+       * The position properties are still out-of-date, so re-fetch the list.
+       *
+       * Since the listing is an InfiniteQuery, this invalidates all pages,
+       * which could be slow if several pages are showing. In practice, usually
+       * only one page (max 50 items) is showing.
+       */
+      queryClient.invalidateQueries({
+        queryKey: keys.userList.id(item.list_id).itemsListing.all
+      })
     },
     onError: (_error, _var, context) => {
       if (context) {

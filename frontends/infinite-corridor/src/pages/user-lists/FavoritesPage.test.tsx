@@ -25,10 +25,9 @@ describe("FavoritesPage", () => {
   /**
    * Set up the mock API responses for lists page.
    */
-  const setup = (itemsCount?: number) => {
-    const favorites = factories.makeFavorites(
-      itemsCount ?? faker.datatype.number({ min: 2, max: 5 })
-    )
+  const setup = () => {
+    const count = faker.datatype.number({ min: 2, max: 5 })
+    const favorites = factories.makeFavorites({ count })
     setMockResponse.get(lrUrls.favorite.listing(), favorites)
 
     const { history } = renderTestApp({ url: `/lists/favorites` })

@@ -22,9 +22,11 @@ const UserListsDetailsPage: React.FC = () => {
   const itemsQuery = useUserListItems(id)
   const editing = useEditingDialog()
   const [isSorting, toggleIsSorting] = useToggle(false)
-  const canSort = userListQuery.data?.list_type === LRT.LearningPath
 
+  const itemCount = userListQuery.data?.item_count
   const canEdit = userListQuery.data?.author === SETTINGS.user.id
+  const canSort =
+    canEdit && itemCount && userListQuery.data?.object_type === LRT.LearningPath
   const description = userListQuery.data?.short_description
   const count = userListQuery.data?.item_count
 

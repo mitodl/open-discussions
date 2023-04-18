@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React from "react"
 import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useFavoritesListing } from "../../api/learning-resources"
@@ -8,10 +8,7 @@ import UserListItems from "./ItemsListing"
 const FavoritesPage: React.FC = () => {
   const favoritesQuery = useFavoritesListing()
 
-  const items = useMemo(() => {
-    const pages = favoritesQuery.data?.pages
-    return pages?.flatMap(p => p.results.map(r => r))
-  }, [favoritesQuery.data])
+  const items = favoritesQuery.data?.results
 
   return (
     <BannerPage
