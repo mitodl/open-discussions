@@ -12,10 +12,16 @@ export { default as MITLogoLink } from "./MITLogoLink"
 export { default as TitledCarousel } from "./TitledCarousel"
 export type { TitledCarouselProps } from "./TitledCarousel"
 
-export { default as SortableList, SortableItem } from "./SortableList"
+export {
+  default as SortableList,
+  SortableItem,
+  arrayMove
+} from "./SortableList"
 export type {
   RenderActive,
   SortEndEvent,
+  OnSortEnd,
+  CancelSort,
   SortableItemProps,
   SortableListProps
 } from "./SortableList"

@@ -1,7 +1,7 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { BannerPage, useToggle, pluralize } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
-import { useUserListItems, useUserList } from "../../api/learning-resources"
+import { useUserList, useUserListItems } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import EditIcon from "@mui/icons-material/Edit"
 import Grid from "@mui/material/Grid"
@@ -11,7 +11,6 @@ import { useParams } from "react-router"
 import UserListItems from "./ItemsListing"
 import { LearningResourceType as LRT } from "ol-search-ui"
 import SwapVertIcon from "@mui/icons-material/SwapVert"
-import CheckIcon from "@mui/icons-material/Check"
 
 type RouteParams = {
   id: string
@@ -20,7 +19,7 @@ type RouteParams = {
 const UserListsDetailsPage: React.FC = () => {
   const id = Number(useParams<RouteParams>().id)
   const userListQuery = useUserList(id)
-  const itemsDataQuery = useUserListItems(id)
+  const itemsQuery = useUserListItems(id)
   const editing = useEditingDialog()
   const [isSorting, toggleIsSorting] = useToggle(false)
   const canSort = userListQuery.data?.list_type === LRT.LearningPath
@@ -28,6 +27,12 @@ const UserListsDetailsPage: React.FC = () => {
   const canEdit = userListQuery.data?.author === SETTINGS.user.id
   const description = userListQuery.data?.short_description
   const count = userListQuery.data?.item_count
+
+  const items = useMemo(() => {
+    const pages = itemsQuery.data?.pages
+    return pages?.flatMap(p => p.results.map(r => r))
+  }, [itemsQuery.data])
+
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"
@@ -53,10 +58,11 @@ const UserListsDetailsPage: React.FC = () => {
                   {canSort && (
                     <Button
                       color="secondary"
-                      startIcon={isSorting ? <CheckIcon /> : <SwapVertIcon />}
+                      disabled={count === 0}
+                      startIcon={isSorting ? undefined : <SwapVertIcon />}
                       onClick={toggleIsSorting.toggle}
                     >
-                      {isSorting ? "Finished" : "Reorder"}
+                      {isSorting ? "Done ordering" : "Reorder"}
                     </Button>
                   )}
                   {count !== undefined && count > 0 ?
@@ -83,8 +89,9 @@ const UserListsDetailsPage: React.FC = () => {
               </Grid>
             )}
             <UserListItems
-              isLoading={itemsDataQuery.isLoading}
-              data={itemsDataQuery.data}
+              id={id}
+              items={items}
+              isLoading={itemsQuery.isLoading}
               sortable={isSorting}
               emptyMessage="There are no items in this list yet."
             />

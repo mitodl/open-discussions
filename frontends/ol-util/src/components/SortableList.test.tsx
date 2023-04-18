@@ -60,12 +60,14 @@ const setupTest = (itemIds: string[]) => {
   const spyDndContext = jest.mocked(DndContext)
   const spies = {
     renderActive: jest.fn((a: Active) => <div>Active Item {a.id}</div>),
-    onSortEnd:    jest.fn()
+    onSortEnd:    jest.fn(),
+    cancelSort:   jest.fn(() => false)
   }
   render(
     <SortableList
       renderActive={spies.renderActive}
       onSortEnd={spies.onSortEnd}
+      cancelSort={spies.cancelSort}
       itemIds={itemIds}
     />
   )
@@ -80,6 +82,10 @@ const setupTest = (itemIds: string[]) => {
     onDragEnd: (e: DragEndEvent) => {
       const props = spyDndContext.mock.lastCall[0]
       if (!props.onDragEnd) throw new Error("props.onDragEnd should be defined")
+      if (!props.cancelDrop) {
+        throw new Error("props.cancelDrop should be defined")
+      }
+      props.cancelDrop(e)
       props.onDragEnd(e)
     }
   }
@@ -136,40 +142,29 @@ describe("SortableList", () => {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["B", "A", "C", "D"],
       dragIndex: 1,
-      dropIndex: 0,
-      targetId:  "B"
-    },
-    {
-      itemIds:   ["A", "B", "C", "D"],
-      afterIds:  ["A", "B", "C", "D"],
-      dragIndex: 1,
-      dropIndex: 1,
-      targetId:  "B"
+      dropIndex: 0
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "C", "B", "D"],
       dragIndex: 1,
-      dropIndex: 2,
-      targetId:  "B"
+      dropIndex: 2
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "C", "D", "B"],
       dragIndex: 1,
-      dropIndex: 3,
-      targetId:  "B"
+      dropIndex: 3
     },
     {
       itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["C", "A", "B", "D"],
       dragIndex: 2,
-      dropIndex: 0,
-      targetId:  "C"
+      dropIndex: 0
     }
   ])(
     "it emits the correct onSortEnd events ($dragIndex --> $dropIndex, $afterIds)",
-    ({ itemIds, afterIds, dragIndex, dropIndex, targetId }) => {
+    ({ itemIds, afterIds, dragIndex, dropIndex }) => {
       const { spies, dnd, dndEvents } = setupTest(itemIds)
 
       const startEvent = dndEvents.start(dragIndex)
@@ -178,13 +173,33 @@ describe("SortableList", () => {
       act(() => dnd.onDragEnd(endEvent))
       expect(spies.onSortEnd).toHaveBeenCalledTimes(1)
       expect(spies.onSortEnd).toHaveBeenCalledWith({
-        itemIds:  afterIds,
-        oldIndex: dragIndex,
-        newIndex: dropIndex,
-        targetId
+        itemIds:     afterIds,
+        activeIndex: dragIndex,
+        overIndex:   dropIndex,
+        over:        endEvent.over,
+        active:      endEvent.active
+      })
+
+      expect(spies.cancelSort).toHaveBeenCalledTimes(1)
+      expect(spies.cancelSort).toHaveBeenCalledWith({
+        itemIds:     afterIds,
+        activeIndex: dragIndex,
+        overIndex:   dropIndex,
+        over:        endEvent.over,
+        active:      endEvent.active
       })
     }
   )
+
+  it("Does not call onSortEnd if activeIndex === overIndex", () => {
+    const itemIds = ["A", "B", "C", "D"]
+    const { spies, dnd, dndEvents } = setupTest(itemIds)
+    const startEvent = dndEvents.start(1)
+    const endEvent = dndEvents.end(1, 1)
+    act(() => dnd.onDragStart(startEvent))
+    act(() => dnd.onDragEnd(endEvent))
+    expect(spies.onSortEnd).toHaveBeenCalledTimes(0)
+  })
 })
 
 describe("SortableItem", () => {

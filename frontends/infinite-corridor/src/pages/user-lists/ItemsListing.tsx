@@ -1,16 +1,19 @@
 import React, { useCallback } from "react"
-import type { PaginatedUserListItems, UserListItem } from "ol-search-ui"
+import type { UserListItem } from "ol-search-ui"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import {
   SortableItem,
   SortableList,
   RenderActive,
-  LoadingSpinner
+  LoadingSpinner,
+  CancelSort
 } from "ol-util"
+import { useMoveUserListItem } from "../../api/learning-resources"
 
 type UserListItemsProps = {
+  id?: number
+  items?: UserListItem[]
   isLoading: boolean
-  data?: PaginatedUserListItems
   emptyMessage: string
   sortable?: boolean
 }
@@ -35,8 +38,10 @@ const UserListItemsViewOnly: React.FC<{
 }
 
 const UserListItemsSortable: React.FC<{
+  listId: number
   items: UserListItem[]
-}> = ({ items }) => {
+}> = ({ items, listId }) => {
+  const move = useMoveUserListItem()
   const renderDragging: RenderActive = useCallback(active => {
     const item = active.data.current as UserListItem
     return (
@@ -49,11 +54,32 @@ const UserListItemsSortable: React.FC<{
       />
     )
   }, [])
+  const cancelSort: CancelSort<number> = useCallback(
+    async e => {
+      const active = e.active.data.current as unknown as UserListItem
+      const over = e.over.data.current as unknown as UserListItem
+      try {
+        await move.mutateAsync({
+          item: {
+            item_id: active.id,
+            list_id: listId
+          },
+          newPosition: over.position,
+          oldIndex:    e.activeIndex,
+          newIndex:    e.overIndex
+        })
+        return false
+      } catch (e) {
+        return true
+      }
+    },
+    [move, listId]
+  )
   return (
     <ul className="ic-card-row-list">
       <SortableList
         itemIds={items.map(item => item.id)}
-        onSortEnd={event => console.log(event)}
+        cancelSort={cancelSort}
         renderActive={renderDragging}
       >
         {items.map(item => {
@@ -80,20 +106,21 @@ const UserListItemsSortable: React.FC<{
 }
 
 const UserListItems: React.FC<UserListItemsProps> = ({
+  id,
+  items,
   isLoading,
-  data,
   emptyMessage,
   sortable = false
 }) => {
-  const items = data?.results
+  if (sortable && !id) throw new Error("Sortable list must have an id")
   return (
     <>
       {isLoading && <LoadingSpinner loading />}
       {items &&
         (items.length === 0 ? (
           <p className="empty-message">{emptyMessage}</p>
-        ) : sortable ? (
-          <UserListItemsSortable items={items} />
+        ) : sortable && id ? (
+          <UserListItemsSortable listId={id} items={items} />
         ) : (
           <UserListItemsViewOnly items={items} />
         ))}

@@ -210,15 +210,19 @@ const keys = {
   all:      [baseKey],
   resource: resourceKeys,
   userList: {
-    all: () => resourceKeys(LRT.Userlist).all,
-    id:  (id: number) => ({
-      ...resourceKeys(LRT.Userlist).id(id),
-      itemsListing: (options?: PaginationSearchParams) => [
-        ...keys.userList.id(id).all,
-        "items",
-        options
-      ]
-    }),
+    all: resourceKeys(LRT.Userlist).all,
+    id:  (id: number) => {
+      const forId = resourceKeys(LRT.Userlist).id(id)
+      return {
+        ...forId,
+        itemsListing: {
+          all:      [...forId.all, "items"],
+          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
+            opts?: T
+          ) => [...forId.all, "items", "infinite", opts]
+        }
+      }
+    },
     listing: {
       all:  resourceKeys(LRT.Userlist).listing.all,
       page: (opts?: UserListOptions) =>
@@ -228,8 +232,13 @@ const keys = {
   topics: [baseKey, "topics"],
 
   favorites: {
-    all:     resourceKeys(TYPE_FAVORITES).all,
-    listing: resourceKeys(TYPE_FAVORITES).listing
+    all:      resourceKeys(TYPE_FAVORITES).all,
+    infinite: <T extends Omit<PaginationSearchParams, "offset">>(opts?: T) => [
+      ...resourceKeys(TYPE_FAVORITES).all,
+      "items",
+      "infinite",
+      opts
+    ]
   },
 
   search: {

@@ -100,7 +100,7 @@ describe("UserListDetailsPage", () => {
     const { paginatedItems } = setup()
     expectProps(spyItemsListing, {
       isLoading:    true,
-      data:         undefined,
+      items:        undefined,
       emptyMessage: "There are no items in this list yet."
     })
 
@@ -109,7 +109,7 @@ describe("UserListDetailsPage", () => {
         spyItemsListing,
         {
           isLoading:    false,
-          data:         paginatedItems,
+          items:        paginatedItems.results,
           emptyMessage: "There are no items in this list yet."
         },
         -1

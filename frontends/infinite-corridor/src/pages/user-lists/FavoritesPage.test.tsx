@@ -44,7 +44,7 @@ describe("FavoritesPage", () => {
     const { favorites } = setup()
     expectProps(spyItemsListing, {
       isLoading:    true,
-      data:         undefined,
+      items:        undefined,
       emptyMessage: "You don't have any favorites yet."
     })
 
@@ -53,7 +53,7 @@ describe("FavoritesPage", () => {
         spyItemsListing,
         {
           isLoading:    false,
-          data:         favorites,
+          items:        favorites.results,
           emptyMessage: "You don't have any favorites yet."
         },
         -1

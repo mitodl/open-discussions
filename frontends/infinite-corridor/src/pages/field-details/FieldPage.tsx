@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useParams, useLocation, useHistory } from "react-router"
 import Tab from "@mui/material/Tab"
 import TabContext from "@mui/lab/TabContext"
@@ -32,7 +32,10 @@ interface FieldListProps {
 
 const FieldList: React.FC<FieldListProps> = ({ list }) => {
   const itemsQuery = useUserListItems(list.id)
-  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
+  const items = useMemo(() => {
+    const pages = itemsQuery.data?.pages ?? []
+    return pages.flatMap(p => p.results.map(r => r.content_data)) ?? []
+  }, [itemsQuery.data?.pages])
   return (
     <section>
       <h3>{list.title}</h3>
@@ -49,7 +52,10 @@ const FieldList: React.FC<FieldListProps> = ({ list }) => {
 
 const FieldCarousel: React.FC<FieldListProps> = ({ list }) => {
   const itemsQuery = useUserListItems(list.id)
-  const items = itemsQuery.data?.results.map(r => r.content_data) ?? []
+  const items = useMemo(() => {
+    const pages = itemsQuery.data?.pages ?? []
+    return pages.flatMap(p => p.results.map(r => r.content_data)) ?? []
+  }, [itemsQuery.data?.pages])
   const isSm = useMuiBreakpoint("sm")
   const isLg = useMuiBreakpoint("lg")
   const pageSize = isLg ? 3 : isSm ? 2 : 1
