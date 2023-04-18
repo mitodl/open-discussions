@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.212.2
+Version 0.212.2 (Released April 18, 2023)
 ---------------
 
 - remove codecov; its pypi distro is discontinued (#3940)
