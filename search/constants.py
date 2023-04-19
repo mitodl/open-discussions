@@ -154,3 +154,232 @@ OCW_SECTION_TYPE_MAPPING = {
     "Video Lectures and Slides": OCW_TYPE_LECTURE_VIDEOS,
     "Video Lectures": OCW_TYPE_LECTURE_VIDEOS,
 }
+
+SCRIPTING_LANG = "painless"
+UPDATE_CONFLICT_SETTING = "proceed"
+
+ENGLISH_TEXT_FIELD = {
+    "type": "text",
+    "fields": {"english": {"type": "text", "analyzer": "english"}},
+}
+
+ENGLISH_TEXT_FIELD_WITH_SUGGEST = {
+    "type": "text",
+    "fields": {
+        "english": {"type": "text", "analyzer": "english"},
+        "trigram": {"type": "text", "analyzer": "trigram"},
+    },
+}
+
+BASE_OBJECT_TYPE = {
+    "object_type": {"type": "keyword"},
+    "author_id": {"type": "keyword"},
+    "author_name": {
+        "type": "text",
+        "fields": {
+            "english": {"type": "text", "analyzer": "english"},
+            "trigram": {"type": "text", "analyzer": "trigram"},
+            "raw": {"type": "keyword"},
+        },
+    },
+    "author_avatar_small": {"type": "keyword"},
+    "author_headline": ENGLISH_TEXT_FIELD,
+}
+
+PROFILE_OBJECT_TYPE = {
+    **BASE_OBJECT_TYPE,
+    "author_bio": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "author_channel_membership": {"type": "keyword"},
+    "author_channel_join_data": {
+        "type": "nested",
+        "properties": {"name": {"type": "keyword"}, "joined": {"type": "date"}},
+    },
+    "author_avatar_medium": {"type": "keyword"},
+    "suggest_field1": {"type": "alias", "path": "author_name.trigram"},
+    "suggest_field2": {"type": "alias", "path": "author_bio.trigram"},
+}
+
+CONTENT_OBJECT_TYPE = {
+    **BASE_OBJECT_TYPE,
+    "channel_name": {"type": "keyword"},
+    "channel_title": ENGLISH_TEXT_FIELD,
+    "channel_type": {"type": "keyword"},
+    "text": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "score": {"type": "long"},
+    "post_id": {"type": "keyword"},
+    "post_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "post_slug": {"type": "keyword"},
+    "created": {"type": "date"},
+    "deleted": {"type": "boolean"},
+    "removed": {"type": "boolean"},
+    "suggest_field1": {"type": "alias", "path": "post_title.trigram"},
+    "suggest_field2": {"type": "alias", "path": "text.trigram"},
+}
+
+
+"""
+Each resource index needs this relation even if it won't be used,
+otherwise no results will be returned from indices without it.
+"""
+RESOURCE_RELATIONS = {
+    "resource_relations": {"type": "join", "relations": {"resource": "resourcefile"}}
+}
+
+LEARNING_RESOURCE_TYPE = {
+    **RESOURCE_RELATIONS,
+    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "image_src": {"type": "keyword"},
+    "topics": {"type": "keyword"},
+    "audience": {"type": "keyword"},
+    "certification": {"type": "keyword"},
+    "offered_by": {"type": "keyword"},
+    "created": {"type": "date"},
+    "default_search_priority": {"type": "integer"},
+    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
+    "runs": {
+        "type": "nested",
+        "properties": {
+            "id": {"type": "long"},
+            "course_id": {"type": "keyword"},
+            "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+            "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+            "full_description": ENGLISH_TEXT_FIELD,
+            "language": {"type": "keyword"},
+            "level": {"type": "keyword"},
+            "semester": {"type": "keyword"},
+            "year": {"type": "keyword"},
+            "start_date": {"type": "date"},
+            "end_date": {"type": "date"},
+            "enrollment_start": {"type": "date"},
+            "enrollment_end": {"type": "date"},
+            "topics": {"type": "keyword"},
+            "instructors": {"type": "text"},
+            "prices": {
+                "type": "nested",
+                "properties": {
+                    "mode": {"type": "text"},
+                    "price": {"type": "scaled_float", "scaling_factor": 100},
+                },
+            },
+            "image_src": {"type": "keyword"},
+            "published": {"type": "boolean"},
+            "availability": {"type": "keyword"},
+            "offered_by": {"type": "keyword"},
+            "created": {"type": "date"},
+            "slug": {"type": "keyword"},
+        },
+    },
+}
+
+COURSE_FILE_OBJECT_TYPE = {
+    "run_id": {"type": "keyword"},
+    "run_slug": {"type": "keyword"},
+    "run_title": ENGLISH_TEXT_FIELD,
+    "uid": {"type": "keyword"},
+    "key": {"type": "keyword"},
+    "url": {"type": "keyword"},
+    "short_url": {"type": "keyword"},
+    "section": {"type": "keyword"},
+    "section_slug": {"type": "keyword"},
+    "file_type": {"type": "keyword"},
+    "content_type": {"type": "keyword"},
+    "content": ENGLISH_TEXT_FIELD,
+    "location": {"type": "keyword"},
+    "resource_type": {"type": "keyword"},
+}
+
+COURSE_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    **COURSE_FILE_OBJECT_TYPE,
+    "id": {"type": "long"},
+    "course_id": {"type": "keyword"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "platform": {"type": "keyword"},
+    "published": {"type": "boolean"},
+    "department_name": {"type": "keyword"},
+    "course_feature_tags": {"type": "keyword"},
+    "coursenum": {"type": "keyword"},
+    "department_course_numbers": {
+        "type": "nested",
+        "properties": {
+            "coursenum": {"type": "keyword"},
+            "sort_coursenum": {"type": "keyword"},
+            "department": {"type": "keyword"},
+            "primary": {"type": "boolean"},
+        },
+    },
+}
+
+
+PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
+
+LIST_OBJECT_TYPE = {
+    **RESOURCE_RELATIONS,
+    "audience": {"type": "keyword"},
+    "certification": {"type": "keyword"},
+    "id": {"type": "long"},
+    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "image_src": {"type": "keyword"},
+    "topics": {"type": "keyword"},
+    "author": {"type": "keyword"},
+    "privacy_level": {"type": "keyword"},
+    "list_type": {"type": "keyword"},
+    "created": {"type": "date"},
+    "default_search_priority": {"type": "integer"},
+    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
+}
+
+VIDEO_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "video_id": {"type": "keyword"},
+    "platform": {"type": "keyword"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "transcript": ENGLISH_TEXT_FIELD,
+    "published": {"type": "boolean"},
+}
+
+PODCAST_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "full_description": ENGLISH_TEXT_FIELD,
+    "url": {"type": "keyword"},
+}
+
+PODCAST_EPISODE_OBJECT_TYPE = {
+    **LEARNING_RESOURCE_TYPE,
+    "id": {"type": "long"},
+    "podcast_id": {"type": "long"},
+    "series_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
+    "full_description": ENGLISH_TEXT_FIELD,
+    "url": {"type": "keyword"},
+    "last_modified": {"type": "date"},
+}
+
+MAPPING = {
+    POST_TYPE: {
+        **CONTENT_OBJECT_TYPE,
+        "post_link_url": {"type": "keyword"},
+        "post_link_thumbnail": {"type": "keyword"},
+        "num_comments": {"type": "long"},
+        "plain_text": ENGLISH_TEXT_FIELD,
+        "post_type": {"type": "keyword"},
+    },
+    COMMENT_TYPE: {
+        **CONTENT_OBJECT_TYPE,
+        "comment_id": {"type": "keyword"},
+        "parent_comment_id": {"type": "keyword"},
+        "parent_post_removed": {"type": "boolean"},
+    },
+    PROFILE_TYPE: PROFILE_OBJECT_TYPE,
+    COURSE_TYPE: COURSE_OBJECT_TYPE,
+    PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
+    USER_LIST_TYPE: LIST_OBJECT_TYPE,
+    USER_PATH_TYPE: LIST_OBJECT_TYPE,
+    STAFF_LIST_TYPE: LIST_OBJECT_TYPE,
+    VIDEO_TYPE: VIDEO_OBJECT_TYPE,
+    PODCAST_TYPE: PODCAST_OBJECT_TYPE,
+    PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,
+}

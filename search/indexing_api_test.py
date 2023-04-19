@@ -12,15 +12,21 @@ from course_catalog.factories import (
     CourseFactory,
     LearningResourceRunFactory,
 )
+from course_catalog.models import ContentFile
 from open_discussions.utils import chunks
 from search import indexing_api
 from search.api import gen_course_id
 from search.connection import get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, COMMENT_TYPE, GLOBAL_DOC_TYPE, POST_TYPE
-from search.exceptions import ReindexException
-from search.indexing_api import (
+from search.constants import (
+    ALIAS_ALL_INDICES,
+    COMMENT_TYPE,
+    GLOBAL_DOC_TYPE,
+    POST_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
+)
+from search.exceptions import ReindexException
+from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
     create_document,
@@ -474,6 +480,17 @@ def test_bulk_content_file_deletion_on_course_deletion(mocker):
     for course in courses:
         for run in course.runs.all():
             mock_delete_run_content_files.assert_any_call(run.id)
+
+
+def test_delete_run_content_files(mocker):
+    """delete_run_content_files should remove them from index and db"""
+    mock_delete = mocker.patch("search.indexing_api.delete_items")
+    run = LearningResourceRunFactory.create(published=True)
+    ContentFileFactory.create_batch(3, run=run, published=True)
+    assert ContentFile.objects.count() == 3
+    delete_run_content_files(run.id)
+    mock_delete.assert_called_once()
+    assert ContentFile.objects.count() == 0
 
 
 def test_delete_document(mocked_es, mocker):
