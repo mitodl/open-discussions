@@ -1,4 +1,5 @@
 import React, { useCallback } from "react"
+import classNames from "classnames"
 import type { UserListItem } from "ol-search-ui"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import {
@@ -13,7 +14,8 @@ import { useMoveUserListItem } from "../../api/learning-resources"
 type UserListItemsProps = {
   id?: number
   items?: UserListItem[]
-  isLoading: boolean
+  isLoading?: boolean
+  isRefetching?: boolean
   emptyMessage: string
   sortable?: boolean
 }
@@ -40,7 +42,8 @@ const UserListItemsViewOnly: React.FC<{
 const UserListItemsSortable: React.FC<{
   listId: number
   items: UserListItem[]
-}> = ({ items, listId }) => {
+  isRefetching?: boolean
+}> = ({ items, listId, isRefetching }) => {
   const move = useMoveUserListItem()
   const renderDragging: RenderActive = useCallback(active => {
     const item = active.data.current as UserListItem
@@ -75,8 +78,15 @@ const UserListItemsSortable: React.FC<{
     },
     [move, listId]
   )
+  const disabled = isRefetching || move.isLoading
+  console.log("move isLoading", move.isLoading)
+  console.log("isRefetching", isRefetching)
   return (
-    <ul className="ic-card-row-list">
+    <ul
+      className={classNames("ic-card-row-list", {
+        "sorting-disabled": disabled
+      })}
+    >
       <SortableList
         itemIds={items.map(item => item.id)}
         cancelSort={cancelSort}
@@ -84,7 +94,13 @@ const UserListItemsSortable: React.FC<{
       >
         {items.map(item => {
           return (
-            <SortableItem Component="li" key={item.id} id={item.id} data={item}>
+            <SortableItem
+              Component="li"
+              key={item.id}
+              id={item.id}
+              data={item}
+              disabled={disabled}
+            >
               {handleProps => {
                 return (
                   <div {...handleProps}>
@@ -109,6 +125,7 @@ const UserListItems: React.FC<UserListItemsProps> = ({
   id,
   items,
   isLoading,
+  isRefetching,
   emptyMessage,
   sortable = false
 }) => {
@@ -120,7 +137,11 @@ const UserListItems: React.FC<UserListItemsProps> = ({
         (items.length === 0 ? (
           <p className="empty-message">{emptyMessage}</p>
         ) : sortable && id ? (
-          <UserListItemsSortable listId={id} items={items} />
+          <UserListItemsSortable
+            listId={id}
+            items={items}
+            isRefetching={isRefetching}
+          />
         ) : (
           <UserListItemsViewOnly items={items} />
         ))}

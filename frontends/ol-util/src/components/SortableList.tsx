@@ -29,6 +29,7 @@ type SortableItemProps<I extends UniqueIdentifier = UniqueIdentifier> = {
   children?: (props: HandleProps) => React.ReactNode
   data?: Data
   Component?: React.ElementType
+  disabled?: boolean
 }
 type HandleProps = React.HTMLAttributes<HTMLElement> & {
   ref: (el: HTMLElement | null) => void
@@ -47,7 +48,7 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
     transition,
     isDragging,
     setActivatorNodeRef
-  } = useSortable({ id: props.id, data: props.data })
+  } = useSortable({ id: props.id, data: props.data, disabled: props.disabled })
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -57,9 +58,9 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
     () => ({
       ...listeners,
       ref:       setActivatorNodeRef,
-      className: "ol-draggable"
+      className: !props.disabled ? "ol-draggable" : undefined
     }),
-    [setActivatorNodeRef, listeners]
+    [setActivatorNodeRef, listeners, props.disabled]
   )
 
   const { Component = "div" } = props

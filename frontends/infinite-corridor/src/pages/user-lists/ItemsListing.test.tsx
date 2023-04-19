@@ -1,6 +1,6 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
-import { SortableList, assertNotNil } from "ol-util"
+import { SortableList, SortableItem, assertNotNil } from "ol-util"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import * as factories from "ol-search-ui/src/factories"
 import {
@@ -8,7 +8,8 @@ import {
   expectProps,
   renderWithProviders,
   setMockResponse,
-  waitFor
+  waitFor,
+  act
 } from "../../test-utils"
 import UserListItems, { UserListItemsProps } from "./ItemsListing"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
@@ -20,12 +21,14 @@ jest.mock("ol-util", () => {
   return {
     __esModule:   true,
     ...actual,
-    SortableList: jest.fn(actual.SortableList)
+    SortableList: jest.fn(actual.SortableList),
+    SortableItem: jest.fn(actual.SortableItem)
   }
 })
 
 const spyLearningResourceCard = jest.mocked(LearningResourceCard)
 const spySortableList = jest.mocked(SortableList)
+const spySortableItem = jest.mocked(SortableItem)
 
 describe("ItemsListing", () => {
   const setup = (props: Partial<UserListItemsProps>) => {
@@ -142,14 +145,43 @@ describe("Sorting ItemListing", () => {
     const active = items[from]
     const over = items[to]
     const patchUrl = urls.userList.itemDetails(listId, active.id)
+
     setMockResponse.patch(patchUrl)
 
-    simulateDrag(from, to)
+    act(() => simulateDrag(from, to))
 
     expect(axios.patch).toHaveBeenCalledTimes(0)
     await waitFor(() => expect(axios.patch).toHaveBeenCalled())
     expect(axios.patch).toHaveBeenCalledWith(patchUrl, {
       position: over.position
     })
+  })
+
+  test("Dragging is disabled while API call is made", async () => {
+    const { simulateDrag, items, listId } = setup()
+    const [from, to] = [1, 3]
+
+    const patchUrl = urls.userList.itemDetails(listId, items[from].id)
+    let resolvePatch: () => void = jest.fn()
+    const patchResponse = new Promise<void>(resolve => {
+      resolvePatch = resolve
+    })
+    setMockResponse.patch(patchUrl, patchResponse)
+    act(() => simulateDrag(from, to))
+
+    await waitFor(() => expect(axios.patch).toHaveBeenCalled())
+
+    expectProps(spySortableItem, { disabled: true })
+    await act(async () => {
+      resolvePatch()
+      await patchResponse
+    })
+
+    expectProps(spySortableItem, { disabled: false })
+  })
+
+  test("Sorting is disabled when isRefetching=true", async () => {
+    setup({ isRefetching: true })
+    expectProps(spySortableItem, { disabled: true })
   })
 })

@@ -89,6 +89,7 @@ export { renderTestApp, renderWithProviders, expectProps }
 // Conveniences
 export { setMockResponse }
 export {
+  act,
   screen,
   prettyDOM,
   within,

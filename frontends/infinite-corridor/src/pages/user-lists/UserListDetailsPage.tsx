@@ -94,6 +94,7 @@ const UserListsDetailsPage: React.FC = () => {
               id={id}
               items={items}
               isLoading={itemsQuery.isLoading}
+              isRefetching={itemsQuery.isFetching}
               sortable={isSorting}
               emptyMessage="There are no items in this list yet."
             />
