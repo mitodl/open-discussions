@@ -1,6 +1,6 @@
 import React from "react"
 import { faker } from "@faker-js/faker"
-import { SortableList, SortableItem, assertNotNil } from "ol-util"
+import { SortableList, SortableItem } from "ol-util"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import * as factories from "ol-search-ui/src/factories"
 import {
@@ -15,6 +15,7 @@ import UserListItems, { UserListItemsProps } from "./ItemsListing"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import axios from "../../libs/axios"
 import { urls } from "../../api/learning-resources"
+import invariant from "tiny-invariant"
 
 jest.mock("ol-util", () => {
   const actual = jest.requireActual("ol-util")
@@ -112,13 +113,13 @@ describe("Sorting ItemListing", () => {
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
 
-    const { cancelSort } = spySortableList.mock.lastCall[0]
-    assertNotNil(cancelSort)
+    const { cancelDrop } = spySortableList.mock.lastCall[0]
+    invariant(cancelDrop)
 
     const simulateDrag = (from: number, to: number) => {
       const active = items[from]
       const over = items[to]
-      cancelSort({
+      cancelDrop({
         activeIndex: from,
         overIndex:   to,
         active:      {

@@ -7,7 +7,7 @@ import {
   SortableList,
   RenderActive,
   LoadingSpinner,
-  CancelSort
+  CancelDrop
 } from "ol-util"
 import { useMoveUserListItem } from "../../api/learning-resources"
 
@@ -57,7 +57,23 @@ const UserListItemsSortable: React.FC<{
       />
     )
   }, [])
-  const cancelSort: CancelSort<number> = useCallback(
+
+  /**
+   * Use the cancelDrop callback to move the item.
+   *
+   * Why?
+   *
+   * The `useMoveUserListItem` mutation function makes an API call and
+   * optimistically updates the UI for immediate feedback. Except optimistic
+   * updates in react-query aren't actually immediate, they're asynchronous (no
+   * server interaction, but on the JS event loop).
+   *
+   * Using the cancelDrop callback delays dnd-kit's drop event until our API
+   * call has finished, at which point the optimistic update is also done.
+   *
+   * See https://github.com/clauderic/dnd-kit/issues/921
+   */
+  const moveItemsOnCancelDrop: CancelDrop<number> = useCallback(
     async e => {
       const active = e.active.data.current as unknown as UserListItem
       const over = e.over.data.current as unknown as UserListItem
@@ -79,8 +95,6 @@ const UserListItemsSortable: React.FC<{
     [move, listId]
   )
   const disabled = isRefetching || move.isLoading
-  console.log("move isLoading", move.isLoading)
-  console.log("isRefetching", isRefetching)
   return (
     <ul
       className={classNames("ic-card-row-list", {
@@ -89,7 +103,7 @@ const UserListItemsSortable: React.FC<{
     >
       <SortableList
         itemIds={items.map(item => item.id)}
-        cancelSort={cancelSort}
+        cancelDrop={moveItemsOnCancelDrop}
         renderActive={renderDragging}
       >
         {items.map(item => {

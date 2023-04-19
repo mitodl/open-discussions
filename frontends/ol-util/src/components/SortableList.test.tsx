@@ -61,13 +61,13 @@ const setupTest = (itemIds: string[]) => {
   const spies = {
     renderActive: jest.fn((a: Active) => <div>Active Item {a.id}</div>),
     onSortEnd:    jest.fn(),
-    cancelSort:   jest.fn(() => false)
+    cancelDrop:   jest.fn(() => false)
   }
   render(
     <SortableList
       renderActive={spies.renderActive}
       onSortEnd={spies.onSortEnd}
-      cancelSort={spies.cancelSort}
+      cancelDrop={spies.cancelDrop}
       itemIds={itemIds}
     />
   )
@@ -180,8 +180,8 @@ describe("SortableList", () => {
         active:      endEvent.active
       })
 
-      expect(spies.cancelSort).toHaveBeenCalledTimes(1)
-      expect(spies.cancelSort).toHaveBeenCalledWith({
+      expect(spies.cancelDrop).toHaveBeenCalledTimes(1)
+      expect(spies.cancelDrop).toHaveBeenCalledWith({
         itemIds:     afterIds,
         activeIndex: dragIndex,
         overIndex:   dropIndex,

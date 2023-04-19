@@ -86,7 +86,7 @@ type SortEndEvent<I extends UniqueIdentifier = UniqueIdentifier> = {
 type OnSortEnd<I extends UniqueIdentifier = UniqueIdentifier> = (
   event: SortEndEvent<I>
 ) => void
-type CancelSort<I extends UniqueIdentifier = UniqueIdentifier> = (
+type CancelDrop<I extends UniqueIdentifier = UniqueIdentifier> = (
   event: SortEndEvent<I>
 ) => boolean | Promise<boolean>
 
@@ -114,7 +114,7 @@ interface SortableListProps<I extends UniqueIdentifier = UniqueIdentifier> {
   itemIds: I[]
   onSortEnd?: OnSortEnd<I>
   renderActive: RenderActive
-  cancelSort?: CancelSort<I>
+  cancelDrop?: CancelDrop<I>
 }
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -170,7 +170,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   itemIds,
   renderActive,
   onSortEnd,
-  cancelSort
+  cancelDrop
 }: SortableListProps<I>): React.ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -204,9 +204,9 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
       setActive(null)
       const event = makeSortEndEvent<I>(e)
       if (!event) return true
-      return cancelSort?.(event) ?? false
+      return cancelDrop?.(event) ?? false
     },
-    [cancelSort]
+    [cancelDrop]
   )
 
   return (
@@ -233,7 +233,7 @@ export type {
   RenderActive,
   SortEndEvent,
   OnSortEnd,
-  CancelSort,
+  CancelDrop,
   SortableItemProps,
   SortableListProps
 }

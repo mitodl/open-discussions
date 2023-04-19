@@ -42,6 +42,9 @@ const useUserListsListing = (options?: UserListOptions) => {
   )
 }
 
+/**
+ * Note: this is an InfiniteQuery, so the data is an array of pages.
+ */
 const useUserListItems = (
   listId: number,
   options: Omit<PaginationSearchParams, "offset"> &
@@ -340,6 +343,17 @@ const moveUserListItem = async ({ item, newPosition }: MoveItemPayload) => {
   const body = { position: newPosition }
   await axios.patch(url, body)
 }
+
+/**
+ * Mutation for moving a list item to a new position.
+ *
+ * The `mutationFn` requires both the old and new
+ *   - the new item `position` (item positions come from the API)
+ *   - both the old and new indices within UI array.
+ *
+ * We use the indices to update the UI immediately, and the positions to make
+ * the API call.
+ */
 const useMoveUserListItem = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -373,7 +387,8 @@ const useMoveUserListItem = () => {
        * But the API calls are based on list items' `position` property, not
        * their index within the list.
        *
-       * The position properties are still out-of-date, so re-fetch the list.
+       * The position properties are incorrect after our reordering, so re-fetch
+       * the list.
        *
        * Since the listing is an InfiniteQuery, this invalidates all pages,
        * which could be slow if several pages are showing. In practice, usually

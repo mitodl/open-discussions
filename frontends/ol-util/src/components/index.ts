@@ -21,7 +21,7 @@ export type {
   RenderActive,
   SortEndEvent,
   OnSortEnd,
-  CancelSort,
+  CancelDrop,
   SortableItemProps,
   SortableListProps
 } from "./SortableList"
