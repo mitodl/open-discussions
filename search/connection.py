@@ -25,6 +25,7 @@ def configure_connections():
             "hosts": [settings.ELASTICSEARCH_URL],
             "http_auth": http_auth,
             "use_ssl": use_ssl,
+            "timeout": settings.ELASTICSEARCH_DEFAULT_TIMEOUT,
             "connections_per_node": settings.ELASTICSEARCH_CONNECTIONS_PER_NODE,
             # make sure we verify SSL certificates (off by default)
             "verify_certs": use_ssl,

@@ -9,9 +9,10 @@ from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from elasticsearch.exceptions import NotFoundError
+from elasticsearch.exceptions import NotFoundError, ConnectionError
 from praw.exceptions import PRAWException
 from prawcore.exceptions import NotFound, PrawcoreException
+from urllib3.exceptions import TimeoutError
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
@@ -70,6 +71,9 @@ PARTIAL_UPDATE_TASK_SETTINGS = dict(
     retry_kwargs={"max_retries": 5},
     default_retry_delay=2,
 )
+
+SEARCH_CONN_EXCEPTIONS = (ConnectionError, TimeoutError)
+REDDIT_EXCEPTIONS = (PrawcoreException, PRAWException)
 
 
 @contextmanager
@@ -389,7 +393,7 @@ def index_posts(post_ids, update_only=False):
 
     """
     try:
-        with wrap_retry_exception(PrawcoreException, PRAWException):
+        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
             api.index_posts(post_ids, update_only)
     except (RetryException, Ignore):
         raise
@@ -410,7 +414,7 @@ def index_comments(comment_ids, update_only=False):
 
     """
     try:
-        with wrap_retry_exception(PrawcoreException, PRAWException):
+        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
             api.index_comments(comment_ids, update_only)
     except (RetryException, Ignore):
         raise
@@ -432,7 +436,8 @@ def index_courses(ids, update_only=False):
 
     """
     try:
-        api.index_courses(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_courses(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -451,7 +456,8 @@ def bulk_deindex_courses(ids):
 
     """
     try:
-        api.deindex_courses(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_courses(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -472,7 +478,8 @@ def index_course_content_files(course_ids, update_only=False):
 
     """
     try:
-        api.index_course_content_files(course_ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_course_content_files(course_ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -492,8 +499,9 @@ def index_run_content_files(run_id, update_only=False):
 
     """
     try:
-        api.index_run_content_files(run_id, update_only=update_only)
-        api.deindex_run_content_files(run_id, unpublished_only=True)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_run_content_files(run_id, update_only=update_only)
+            api.deindex_run_content_files(run_id, unpublished_only=True)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -512,7 +520,8 @@ def deindex_run_content_files(run_id):
 
     """
     try:
-        api.deindex_run_content_files(run_id)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_run_content_files(run_id)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -532,7 +541,8 @@ def index_programs(ids, update_only=False):
 
     """
     try:
-        api.index_programs(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_programs(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -551,7 +561,8 @@ def bulk_deindex_programs(ids):
 
     """
     try:
-        api.deindex_programs(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_programs(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -571,7 +582,8 @@ def index_user_lists(ids, update_only=False):
 
     """
     try:
-        api.index_user_lists(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_user_lists(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -590,7 +602,8 @@ def bulk_deindex_user_lists(ids):
 
     """
     try:
-        api.deindex_user_lists(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_user_lists(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -610,7 +623,8 @@ def index_staff_lists(ids, update_only=False):
 
     """
     try:
-        api.index_staff_lists(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_staff_lists(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -629,7 +643,8 @@ def bulk_deindex_staff_lists(ids):
 
     """
     try:
-        api.deindex_staff_lists(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_staff_lists(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -649,7 +664,8 @@ def index_videos(ids, update_only=False):
 
     """
     try:
-        api.index_videos(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_videos(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -668,7 +684,8 @@ def bulk_deindex_videos(ids):
 
     """
     try:
-        api.deindex_videos(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_videos(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -687,7 +704,8 @@ def index_podcasts(ids, update_only=False):
         update_only (bool): update existing index only
     """
     try:
-        api.index_podcasts(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_podcasts(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -706,7 +724,8 @@ def bulk_deindex_podcasts(ids):
 
     """
     try:
-        api.deindex_podcasts(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_podcasts(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -725,7 +744,8 @@ def index_podcast_episodes(ids, update_only=False):
         update_only (bool): update existing index only
     """
     try:
-        api.index_podcast_episodes(ids, update_only)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.index_podcast_episodes(ids, update_only)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -744,7 +764,8 @@ def bulk_deindex_podcast_episodes(ids):
 
     """
     try:
-        api.deindex_podcast_episodes(ids)
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
+            api.deindex_podcast_episodes(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
