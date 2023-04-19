@@ -94,7 +94,8 @@ export {
   prettyDOM,
   within,
   fireEvent,
-  waitFor
+  waitFor,
+  act
 } from "@testing-library/react"
 export { default as user } from "@testing-library/user-event"
 

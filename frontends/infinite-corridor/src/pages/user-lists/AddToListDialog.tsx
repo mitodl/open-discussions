@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import Box from "@mui/material/Box"
 import CloseIcon from "@mui/icons-material/Close"
@@ -15,6 +15,7 @@ import LockOpenIcon from "@mui/icons-material/LockOpen"
 import LockIcon from "@mui/icons-material/Lock"
 import Chip from "@mui/material/Chip"
 import AddIcon from "@mui/icons-material/Add"
+import * as NiceModal from "@ebay/nice-modal-react"
 
 import { LearningResource, PrivacyLevel, UserList } from "ol-search-ui"
 import { LoadingSpinner } from "ol-util"
@@ -32,10 +33,7 @@ import { CreateListDialog, useCreationDialog } from "./ManageListDialogs"
 type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
 type AddToListDialogProps = {
-  open: boolean
   resourceKey: ResourceKey
-  onClose: () => void
-  onExited: () => void
 }
 
 type UserListOrFavorites =
@@ -131,12 +129,18 @@ const useToggleItemInList = (resource?: LearningResource) => {
   return { handleToggle, isChecked, isAdding, isRemoving }
 }
 
-const AddToListDialog: React.FC<AddToListDialogProps> = ({
-  open,
-  resourceKey,
-  onClose,
-  onExited
+type PrivacyChipProps = { privacyLevel: PrivacyLevel }
+const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
+  const isPrivate = privacyLevel === PrivacyLevel.Private
+  const icon = isPrivate ? <LockIcon /> : <LockOpenIcon />
+  const label = isPrivate ? "Private" : "Public"
+  return <Chip icon={icon} label={label} size="small" />
+}
+
+const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
+  resourceKey
 }) => {
+  const modal = NiceModal.useModal()
   const listCreation = useCreationDialog()
   const resourceQuery = useResource(resourceKey.object_type, resourceKey.id)
   const resource = resourceQuery.data
@@ -155,18 +159,12 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
     useToggleItemInList(resource)
 
   const isReady = resource && userLists
-  const transitionProps = useMemo(() => ({ onExited }), [onExited])
 
   return (
-    <Dialog
-      className="add-to-list-dialog"
-      open={open}
-      onClose={onClose}
-      TransitionProps={transitionProps}
-    >
+    <Dialog className="add-to-list-dialog" {...NiceModal.muiDialogV5(modal)}>
       <DialogTitle>Add to list</DialogTitle>
       <Box position="absolute" top={0} right={0}>
-        <IconButton onClick={onClose} aria-label="Close">
+        <IconButton onClick={modal.hide} aria-label="Close">
           <CloseIcon />
         </IconButton>
       </Box>
@@ -229,42 +227,7 @@ const AddToListDialog: React.FC<AddToListDialogProps> = ({
   )
 }
 
-type PrivacyChipProps = { privacyLevel: PrivacyLevel }
-const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
-  const isPrivate = privacyLevel === PrivacyLevel.Private
-  const icon = isPrivate ? <LockIcon /> : <LockOpenIcon />
-  const label = isPrivate ? "Private" : "Public"
-  return <Chip icon={icon} label={label} size="small" />
-}
-
-const useAddToListDialog = () => {
-  /**
-   * Track isOpen and the current resource separately.
-   * If we infer `isOpen === !!resource`, then the dialog content is not
-   * visible during the closing animation.
-   */
-  const [isOpen, setIsOpen] = useState(false)
-  const [ressourceKey, setResourceKey] = useState<ResourceKey | null>(null)
-  const open = useCallback((resource: ResourceKey) => {
-    setIsOpen(true)
-    setResourceKey(resource)
-  }, [])
-  const close = useCallback(() => {
-    setIsOpen(false)
-  }, [])
-  const onExited = useCallback(() => {
-    setResourceKey(null)
-  }, [])
-
-  return {
-    isOpen,
-    ressourceKey,
-    open,
-    close,
-    onExited
-  }
-}
+const AddToListDialog = NiceModal.create(AddToListDialogInner)
 
 export default AddToListDialog
-export { useAddToListDialog }
 export type { AddToListDialogProps }
