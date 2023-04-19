@@ -56,8 +56,11 @@ describe("UserListDetailsPage", () => {
     )
     setMockResponse.get(lrUrls.topics.listing, topics)
 
-    const { history } = renderTestApp({ url: `/lists/${userList.id}`, user })
-    return { history, userList, items, paginatedItems }
+    const { history, queryClient } = renderTestApp({
+      url: `/lists/${userList.id}`,
+      user
+    })
+    return { history, userList, items, paginatedItems, queryClient }
   }
 
   test("renders list title", async () => {
@@ -181,5 +184,23 @@ describe("UserListDetailsPage", () => {
         -1
       )
     })
+  })
+
+  test("Passes isRefetching=true to ItemsList while reloading data", async () => {
+    const { queryClient, paginatedItems } = setup()
+
+    await waitFor(() => expectProps(spyItemsListing, { isLoading: false }))
+
+    expectProps(spyItemsListing, { isRefetching: false }, -1)
+    spyItemsListing.mockClear()
+    // invalidate the cache entry for paginatedItems and check that
+    // isFetching is gets passed to ItemsListing
+    queryClient.invalidateQueries({
+      predicate: query => {
+        // @ts-expect-error Since this is all queries, data is unknown
+        return query.state.data?.pages?.[0] === paginatedItems
+      }
+    })
+    await waitFor(() => expectProps(spyItemsListing, { isRefetching: true }))
   })
 })
