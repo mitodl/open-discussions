@@ -199,7 +199,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
     [onSortEnd]
   )
 
-  const cancelDrop = useCallback(
+  const handleCancelDrop = useCallback(
     (e: CancelDropArguments) => {
       setActive(null)
       const event = makeSortEndEvent<I>(e)
@@ -215,7 +215,7 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
       onDragStart={handleDragStart}
       onDragMove={handleDragStart}
       onDragEnd={handleDragEnd}
-      cancelDrop={cancelDrop}
+      cancelDrop={handleCancelDrop}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={itemIds}>
         {children}
