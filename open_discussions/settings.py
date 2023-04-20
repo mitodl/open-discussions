@@ -802,7 +802,6 @@ def setup_x509():
 
 
 setup_x509()
-
 SPECTACULAR_SETTINGS = open_spectacular_settings
 
 # drf extension settings

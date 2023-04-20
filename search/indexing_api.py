@@ -39,9 +39,6 @@ from search.constants import (
     USER_LIST_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
-    MAPPING,
-    UPDATE_CONFLICT_SETTING,
-    SCRIPTING_LANG,
 )
 from search.exceptions import ReindexException
 from search.serializers import (
