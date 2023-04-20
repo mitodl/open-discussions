@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.212.3
+---------------
+
+- front page carusels (#3898)
+- Checksums for content files and archives (#3941)
+- Correct issues with documentation for offered_by filter on courses endpoint (#3942)
+- Unpublish runs for edx sources if they are no longer included in API results (#3923)
+- Use react query for search page; fix bookmarking bug (#3936)
+
 Version 0.212.2 (Released April 18, 2023)
 ---------------
 
