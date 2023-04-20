@@ -7,12 +7,15 @@ from types import SimpleNamespace
 import pytest
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from channels.api import add_user_role, sync_channel_subscription_model
+from channels.factories.models import ChannelFactory
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
     LearningResourceRunFactory,
 )
 from course_catalog.models import ContentFile
+from open_discussions.factories import UserFactory
 from open_discussions.utils import chunks
 from search import indexing_api
 from search.api import gen_course_id
@@ -22,6 +25,7 @@ from search.constants import (
     COMMENT_TYPE,
     GLOBAL_DOC_TYPE,
     POST_TYPE,
+    PROFILE_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
 )
@@ -43,6 +47,7 @@ from search.indexing_api import (
     update_field_values_by_query,
     update_post,
 )
+from search.serializers import serialize_bulk_profiles
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
 
@@ -553,6 +558,30 @@ def test_index_items_size_limits(settings, mocker, max_size, chunks, exceeds_siz
     index_items(documents, "course", update_only=True)
     assert mock_aliases.call_count == (chunks if not exceeds_size else 0)
     assert mock_log.call_count == (10 if exceeds_size else 0)
+
+
+def test_index_profile_items(mocker):
+    """
+    index_items for profiles should call alias and bulk index functions
+    """
+    users = UserFactory.create_batch(2)
+    for user in users:
+        channel = ChannelFactory.create()
+        sync_channel_subscription_model(channel, user)
+        add_user_role(channel, "moderators", user)
+    profile_ids = [user.profile.id for user in users]
+
+    mock_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases",
+        autospec=True,
+        return_value=["default"],
+    )
+    mock_bulk = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=[None, []]
+    )
+    index_items(serialize_bulk_profiles(profile_ids), PROFILE_TYPE, False)
+    assert mock_aliases.call_count == 1
+    assert mock_bulk.call_count == 1
 
 
 @pytest.mark.usefixtures("indexing_user")

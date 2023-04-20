@@ -345,7 +345,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     for chunk in chunks(
         documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
     ):
-        documents_size = len(json.dumps(chunk))
+        documents_size = len(json.dumps(chunk, default=str))
         # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
         if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
