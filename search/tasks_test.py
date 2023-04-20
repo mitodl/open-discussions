@@ -3,7 +3,10 @@
 
 import pytest
 from django.conf import settings
-from elasticsearch.exceptions import ConnectionError as ESConnectionError, ConnectionTimeout
+from elasticsearch.exceptions import (
+    ConnectionError as ESConnectionError,
+    ConnectionTimeout,
+)
 from prawcore.exceptions import NotFound
 
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
