@@ -5,7 +5,7 @@ base36
 beautifulsoup4==4.8.2
 betamax
 betamax_serializers
-boto==2.39.0
+boto3==1.26.110
 cairosvg
 celery==5.2.1
 dj-database-url==0.3.0

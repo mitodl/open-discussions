@@ -9,7 +9,11 @@ from django.contrib.contenttypes.models import ContentType
 
 from course_catalog.constants import PlatformType
 from course_catalog.etl.loaders import load_content_files
-from course_catalog.etl.utils import get_learning_course_bucket, transform_content_files
+from course_catalog.etl.utils import (
+    get_learning_course_bucket,
+    transform_content_files,
+    calc_checksum,
+)
 from course_catalog.models import Course, LearningResourceRun
 
 log = logging.getLogger()
@@ -67,6 +71,7 @@ def sync_edx_course_files(
     Args:
         platform(str): The edx platform
         ids(list of int): list of course ids to process
+        keys(list[str]): list of S3 archive keys to search through
         s3_prefix(str): path prefix to include in regex for S3
     """
     bucket = get_learning_course_bucket(platform)
@@ -95,12 +100,16 @@ def sync_edx_course_files(
         run = runs.first()
 
         if not run:
-            log.info("No %s course runs matched tarfile %s", platform, key)
             continue
         with TemporaryDirectory() as export_tempdir:
             course_tarpath = os.path.join(export_tempdir, key.split("/")[-1])
             bucket.download_file(key, course_tarpath)
+            checksum = calc_checksum(course_tarpath)
+            if run.checksum == checksum:
+                continue
             try:
-                load_content_files(run, transform_content_files(course_tarpath))
+                load_content_files(run, transform_content_files(course_tarpath, run))
+                run.checksum = checksum
+                run.save()
             except:  # pylint: disable=bare-except
                 log.exception("Error ingesting OLX content data for %s", key)

@@ -31,6 +31,7 @@ from course_catalog.etl.utils import (
     sync_s3_text,
     transform_content_files,
 )
+from course_catalog.factories import ContentFileFactory, LearningResourceRunFactory
 
 pytestmark = pytest.mark.django_db
 
@@ -243,20 +244,38 @@ def test_get_text_from_element():
 
 
 @pytest.mark.parametrize("has_metadata", [True, False])
-def test_transform_content_files(mocker, has_metadata):
+@pytest.mark.parametrize("matching_checksum", [True, False])
+def test_transform_content_files(mocker, has_metadata, matching_checksum):
     """transform_content_files"""
+    run = LearningResourceRunFactory.create(published=True)
     document = "some text in the document"
     key = "a key here"
     content_type = "course"
+    checksum = "7s35721d1647f962d59b8120a52210a7"
     metadata = (
         {"Author": "author", "language": "French", "title": "the title of the course"}
         if has_metadata
         else None
     )
     tika_output = {"content": "tika'ed text", "metadata": metadata}
+    if matching_checksum:
+        ContentFileFactory.create(
+            content=tika_output["content"],
+            content_author=metadata["Author"] if metadata else "",
+            content_title=metadata["title"] if metadata else "",
+            content_language=metadata["language"] if metadata else "",
+            content_type=content_type,
+            published=True,
+            run=run,
+            checksum=checksum,
+            key=key,
+        )
+
     documents_mock = mocker.patch(
         "course_catalog.etl.utils.documents_from_olx",
-        return_value=[(document, {"key": key, "content_type": content_type})],
+        return_value=[
+            (document, {"key": key, "content_type": content_type, "checksum": checksum})
+        ],
     )
     extract_mock = mocker.patch(
         "course_catalog.etl.utils.extract_text_metadata", return_value=tika_output
@@ -265,10 +284,11 @@ def test_transform_content_files(mocker, has_metadata):
     script_dir = os.path.dirname(
         os.path.dirname(pathlib.Path(__file__).parent.absolute())
     )
+
     content = [
         f
         for f in transform_content_files(
-            os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz")
+            os.path.join(script_dir, "test_json", "exported_courses_12345.tar.gz"), run
         )
     ]
     assert content == [
@@ -280,10 +300,13 @@ def test_transform_content_files(mocker, has_metadata):
             "content_title": metadata["title"] if has_metadata else "",
             "content_language": metadata["language"] if has_metadata else "",
             "content_type": content_type,
-            "published": True,
+            "checksum": checksum,
         }
     ]
-    extract_mock.assert_called_once_with(document, other_headers={})
+    if matching_checksum:
+        extract_mock.assert_not_called()
+    else:
+        extract_mock.assert_called_once_with(document, other_headers={})
     assert documents_mock.called is True
 
 
@@ -306,6 +329,7 @@ def test_documents_from_olx():
             "title": "HTML",
             "content_type": CONTENT_TYPE_VERTICAL,
             "mime_type": "application/xml",
+            "checksum": "2c35721d1647f962d59b8120a52210a7",
         },
     )
     formula2do = [
