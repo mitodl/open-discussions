@@ -367,7 +367,6 @@ def index_items(documents, object_type, update_only, **kwargs):
             for smaller_chunk in chunks(chunk, chunk_size=num_chunks):
                 index_items(smaller_chunk, object_type, update_only, **kwargs)
         else:
-            log.error(f"CHUNK SIZE:  {len(chunk)}")
             for alias in get_active_aliases(
                 conn, object_types=[object_type], include_reindexing=(not update_only)
             ):
