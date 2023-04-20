@@ -15,7 +15,7 @@ import {
   UseQueryResult,
   UseQueryOptions
 } from "react-query"
-import { urls, keys, UserListOptions } from "./urls"
+import { urls, keys, UserListOptions, CourseFilterParams } from "./urls"
 import { modifyCachedSearchResource } from "./search"
 
 const useResource = (type: string, id: number) => {
@@ -271,6 +271,39 @@ const useDeleteFromUserListItems = () => {
   })
 }
 
+const useUpcomingCourses = (
+  options?: PaginationSearchParams,
+  filters?: CourseFilterParams
+) => {
+  const url = urls.course.upcoming(options, filters)
+
+  const key = keys.courses.listing.all
+
+  return useQuery<PaginatedResult<LearningResource>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
+}
+
+const usePopularContent = (options?: PaginationSearchParams) => {
+  const url = urls.popularContent.listing(options)
+
+  const key = keys.popularContent.listing.all
+
+  return useQuery<PaginatedResult<LearningResource>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
+}
+
+const useNewVideos = (options?: PaginationSearchParams) => {
+  const url = urls.video.new(options)
+
+  const key = keys.videos.listing.all
+
+  return useQuery<PaginatedResult<LearningResource>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
+}
+
 export {
   useResource,
   useUserListItems,
@@ -284,5 +317,8 @@ export {
   useAddToUserListItems,
   useDeleteFromUserListItems,
   useFavorite,
-  useUnfavorite
+  useUnfavorite,
+  useUpcomingCourses,
+  usePopularContent,
+  useNewVideos
 }
