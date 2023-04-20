@@ -9,10 +9,8 @@ from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from elasticsearch.exceptions import NotFoundError, ConnectionError
-from praw.exceptions import PRAWException
-from prawcore.exceptions import NotFound, PrawcoreException
-from urllib3.exceptions import TimeoutError
+from elasticsearch.exceptions import NotFoundError
+from prawcore.exceptions import NotFound
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
@@ -40,7 +38,9 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
+    REDDIT_EXCEPTIONS,
     RESOURCE_FILE_TYPE,
+    SEARCH_CONN_EXCEPTIONS,
     STAFF_LIST_TYPE,
     USER_LIST_TYPE,
     VIDEO_TYPE,
@@ -71,9 +71,6 @@ PARTIAL_UPDATE_TASK_SETTINGS = dict(
     retry_kwargs={"max_retries": 5},
     default_retry_delay=2,
 )
-
-SEARCH_CONN_EXCEPTIONS = (ConnectionError, TimeoutError)
-REDDIT_EXCEPTIONS = (PrawcoreException, PRAWException)
 
 
 @contextmanager
@@ -373,7 +370,8 @@ def bulk_deindex_profiles(ids):
 
     """
     try:
-        api.deindex_profiles(ids)
+        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
+            api.deindex_profiles(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except

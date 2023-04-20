@@ -1,4 +1,9 @@
 """ Constants for search """
+from elasticsearch.exceptions import ConnectionError as ESConnectionError
+from praw.exceptions import PRAWException
+from prawcore.exceptions import PrawcoreException
+from urllib3.exceptions import TimeoutError as UrlTimeoutError
+
 from channels.constants import COMMENT_TYPE, POST_TYPE
 
 ALIAS_ALL_INDICES = "all"
@@ -383,3 +388,6 @@ MAPPING = {
     PODCAST_TYPE: PODCAST_OBJECT_TYPE,
     PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,
 }
+
+SEARCH_CONN_EXCEPTIONS = (ESConnectionError, UrlTimeoutError)
+REDDIT_EXCEPTIONS = (PrawcoreException, PRAWException)
