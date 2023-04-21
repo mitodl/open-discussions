@@ -407,21 +407,21 @@ const useMoveUserListItem = () => {
 }
 
 export {
-  useResource,                     // details
-  useUserListItems,                // items listing
-  useUserList,                     // details
-  useUserListsListing,             // listing
-  useFavoritesListing,             // items listing
+  useResource, // details
+  useUserListItems, // items listing
+  useUserList, // details
+  useUserListsListing, // listing
+  useFavoritesListing, // items listing
   useTopics,
-  useCreateUserList,               // mutation
-  useUpdateUserList,               // mutation
-  useDeleteUserList,              // mutation
-  useAddToUserListItems,          // mutation
-  useDeleteFromUserListItems,   // mutation
-  useFavorite,                    // mutation
-  useUnfavorite,                 // mutation
-  useUpcomingCourses,           // listing
-  usePopularContent,          // listing
-  useNewVideos,              // listing
-  useMoveUserListItem         // mutation
+  useCreateUserList, // mutation
+  useUpdateUserList, // mutation
+  useDeleteUserList, // mutation
+  useAddToUserListItems, // mutation
+  useDeleteFromUserListItems, // mutation
+  useFavorite, // mutation
+  useUnfavorite, // mutation
+  useUpcomingCourses, // listing
+  usePopularContent, // listing
+  useNewVideos, // listing
+  useMoveUserListItem // mutation
 }
