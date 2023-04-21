@@ -11,7 +11,7 @@ import {
   DragEndEvent,
   UniqueIdentifier
 } from "@dnd-kit/core"
-import type { DropAnimation, Active, Data } from "@dnd-kit/core"
+import type { DropAnimation, Active, Data, Over } from "@dnd-kit/core"
 import {
   useSortable,
   sortableKeyboardCoordinates,
@@ -20,18 +20,22 @@ import {
   hasSortableData,
   arrayMove
 } from "@dnd-kit/sortable"
+import type { SortableData } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { CancelDropArguments } from "@dnd-kit/core/dist/components/DndContext/DndContext"
 
 type SortableItemProps<I extends UniqueIdentifier = UniqueIdentifier> = {
   id: I
   children?: (props: HandleProps) => React.ReactNode
   data?: Data
+  Component?: React.ElementType
+  disabled?: boolean
 }
 type HandleProps = React.HTMLAttributes<HTMLElement> & {
   ref: (el: HTMLElement | null) => void
 }
 
-const DRAG_UNDERLAY_OPACITY = "0.4"
+const DRAG_UNDERLAY_OPACITY = "0.5"
 
 const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
   props: SortableItemProps<I>
@@ -44,7 +48,7 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
     transition,
     isDragging,
     setActivatorNodeRef
-  } = useSortable({ id: props.id, data: props.data })
+  } = useSortable({ id: props.id, data: props.data, disabled: props.disabled })
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
@@ -53,15 +57,18 @@ const SortableItem = <I extends UniqueIdentifier = UniqueIdentifier>(
   const handleProps: HandleProps = useMemo(
     () => ({
       ...listeners,
-      ref: setActivatorNodeRef
+      ref:       setActivatorNodeRef,
+      className: !props.disabled ? "ol-draggable" : undefined
     }),
-    [setActivatorNodeRef, listeners]
+    [setActivatorNodeRef, listeners, props.disabled]
   )
 
+  const { Component = "div" } = props
+
   return (
-    <div ref={setNodeRef} style={style} {...attributes}>
+    <Component ref={setNodeRef} style={style} {...attributes}>
       {props.children && props.children(handleProps)}
-    </div>
+    </Component>
   )
 }
 
@@ -71,13 +78,43 @@ type SortEndEvent<I extends UniqueIdentifier = UniqueIdentifier> = {
    * The item order post-sort
    */
   itemIds: I[]
+  activeIndex: number
+  overIndex: number
+  active: Active & { data: { current: SortableData } }
+  over: Over & { data: { current: SortableData } }
+}
+type OnSortEnd<I extends UniqueIdentifier = UniqueIdentifier> = (
+  event: SortEndEvent<I>
+) => void
+type CancelDrop<I extends UniqueIdentifier = UniqueIdentifier> = (
+  event: SortEndEvent<I>
+) => boolean | Promise<boolean>
+
+const makeSortEndEvent = <I extends UniqueIdentifier>(
+  e: DragEndEvent | CancelDropArguments
+): SortEndEvent<I> | undefined => {
+  const { active, over } = e
+  if (!hasSortableData(active)) return
+  if (!hasSortableData(over)) return
+  const { items: oldItems, index: from } = active.data.current.sortable
+  const { index: to } = over.data.current.sortable
+  const newItems = arrayMove(oldItems, from, to) as I[]
+  if (from === to) return
+  return {
+    itemIds:     newItems,
+    active,
+    over,
+    activeIndex: from,
+    overIndex:   to
+  }
 }
 
 interface SortableListProps<I extends UniqueIdentifier = UniqueIdentifier> {
   children?: React.ReactNode
   itemIds: I[]
-  onSortEnd: (event: SortEndEvent<I>) => void
+  onSortEnd?: OnSortEnd<I>
   renderActive: RenderActive
+  cancelDrop?: CancelDrop<I>
 }
 const dropAnimationConfig: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -132,7 +169,8 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   children,
   itemIds,
   renderActive,
-  onSortEnd
+  onSortEnd,
+  cancelDrop
 }: SortableListProps<I>): React.ReactElement => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -154,15 +192,21 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
   const handleDragEnd = useCallback(
     (e: DragEndEvent) => {
       setActive(null)
-      const { active, over } = e
-      if (!hasSortableData(active)) return
-      if (!hasSortableData(over)) return
-      const { items: oldItems, index: from } = active.data.current.sortable
-      const { index: to } = over.data.current.sortable
-      const newItems = arrayMove(oldItems, from, to) as I[]
-      onSortEnd({ itemIds: newItems })
+      const event = makeSortEndEvent<I>(e)
+      if (!event) return
+      onSortEnd?.(event)
     },
     [onSortEnd]
+  )
+
+  const handleCancelDrop = useCallback(
+    (e: CancelDropArguments) => {
+      setActive(null)
+      const event = makeSortEndEvent<I>(e)
+      if (!event) return true
+      return cancelDrop?.(event) ?? false
+    },
+    [cancelDrop]
   )
 
   return (
@@ -171,17 +215,25 @@ const SortableList = <I extends UniqueIdentifier = UniqueIdentifier>({
       onDragStart={handleDragStart}
       onDragMove={handleDragStart}
       onDragEnd={handleDragEnd}
+      cancelDrop={handleCancelDrop}
     >
       <SortableContext strategy={verticalListSortingStrategy} items={itemIds}>
         {children}
       </SortableContext>
       <DragOverlay dropAnimation={dropAnimationConfig}>
-        {active && renderActive(active)}
+        <div className="ol-dragging">{active && renderActive(active)}</div>
       </DragOverlay>
     </DndContext>
   )
 }
 
 export default SortableList
-export { SortableItem }
-export type { RenderActive, SortEndEvent, SortableItemProps, SortableListProps }
+export { SortableItem, arrayMove }
+export type {
+  RenderActive,
+  SortEndEvent,
+  OnSortEnd,
+  CancelDrop,
+  SortableItemProps,
+  SortableListProps
+}

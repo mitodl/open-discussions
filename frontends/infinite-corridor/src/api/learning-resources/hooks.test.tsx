@@ -13,15 +13,17 @@ import {
   useDeleteFromUserListItems,
   useDeleteUserList,
   useResource,
-  useUserListItems,
   useUserListsListing,
-  useFavoritesListing,
   useFavorite,
-  useUnfavorite
+  useUnfavorite,
+  useUserListItems,
+  useMoveUserListItem
 } from "./hooks"
-import { setMockResponse } from "../../test-utils/mockAxios"
-import { urls } from "./urls"
+import { mockAxiosInstance, setMockResponse } from "../../test-utils/mockAxios"
+import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
+import { assertNotNil } from "ol-util"
+import axios from "../../libs/axios"
 
 function* makeCounter() {
   let i = 0
@@ -49,7 +51,13 @@ const setup = () => {
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
-  return { wrapper }
+  const spies = {
+    queryClient: {
+      invalidateQueries: jest.spyOn(queryClient, "invalidateQueries")
+    }
+  }
+
+  return { wrapper, spies }
 }
 
 test("useResource rejects with invalid resource type", async () => {
@@ -131,84 +139,50 @@ test("useDeleteUserList invalidates all resource queries", async () => {
 })
 
 test("useAddToUserListItems invalidates userlist details and listing", async () => {
-  /**
-   * This test will use a hook wrapping several react-query useQuery calls
-   * and a react-query mutation call (`useAddToUserListItems`).
-   *
-   * Then, we'll add a list item via `useAddToUserListItems` and check
-   * that dependent queries are refetched (their cache should be invalided by
-   * the mutation). We'll also check that some other queries are unaffected
-   **/
+  const { wrapper, spies } = setup()
 
-  const { wrapper } = setup()
-
-  const targetListData = factories.makeUserList()
-  const otherListData = factories.makeUserList()
-  const addedResourceData = factories.makeCourse()
+  const list = factories.makeUserList()
+  const resource = factories.makeCourse()
   const modifiedAddedResource = {
-    ...addedResourceData,
-    lists: addedResourceData.lists.concat({} as ListItemMember)
+    ...resource,
+    lists: resource.lists.concat({} as ListItemMember)
   }
 
-  const useTestHook = () => {
-    const addItem = useAddToUserListItems()
-    const addedResource = useResource(
-      addedResourceData.object_type,
-      addedResourceData.id
-    )
-    const targetList = useResource(LRT.Userlist, targetListData.id)
-    const otherList = useResource(LRT.Userlist, otherListData.id)
-    const listing = useUserListsListing()
-    const targetItems = useUserListItems(targetListData.id)
-    return {
-      addedResource,
-      addItem,
-      targetList,
-      otherList,
-      listing,
-      targetItems
-    }
-  }
-
-  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(
-    () =>
-      result.current.targetList.isSuccess &&
-      result.current.otherList.isSuccess &&
-      result.current.listing.isSuccess &&
-      result.current.targetItems.isSuccess &&
-      result.current.addedResource.isSuccess
+  const { result: resourceResult } = renderHook(
+    () => useResource(resource.object_type, resource.id),
+    { wrapper }
   )
+  const { result: addResult } = renderHook(() => useAddToUserListItems(), {
+    wrapper
+  })
 
-  setMockResponse.post(urls.userList.itemAdd(targetListData.id), {
+  setMockResponse.post(urls.userList.itemAdd(list.id), {
     content_data: modifiedAddedResource
   })
 
-  const before = result.current
   await act(async () => {
-    await result.current.addItem.mutateAsync({
-      userListId: targetListData.id,
+    await addResult.current.mutateAsync({
+      userListId: list.id,
       payload:    {
-        object_id:    addedResourceData.id,
-        content_type: addedResourceData.object_type
+        object_id:    resource.id,
+        content_type: resource.object_type
       }
     })
   })
-  const after = result.current
 
-  // Non-target list refetched
-  expect(before.otherList.data).toEqual(after.otherList.data)
-  // Listing is refetched (list item counts have changed)
-  expect(before.listing.data).not.toEqual(after.listing.data)
-  // target list has been refetched
-  expect(before.targetList.data).not.toEqual(after.targetList.data)
-  // target list items are refetched
-  expect(before.targetItems.data).not.toEqual(after.targetItems.data)
+  // The list we modified was invalidated
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.id(list.id).all
+  })
+  // The list listing was invalided.
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.listing.all
+  })
+  // Nothing else invalidated
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
 
-  // The resource we added has changed ...
-  expect(after.addedResource.data).not.toEqual(before.addedResource.data)
-  // ... and comes from POST response
-  expect(after.addedResource.data).toEqual(modifiedAddedResource)
+  // The POST response result updated resource data
+  expect(resourceResult.current.data).toEqual(modifiedAddedResource)
 })
 
 test("useAddToUserListItems patches search results", async () => {
@@ -295,152 +269,110 @@ test("useDeleteFromUserListItems patches search results", async () => {
 })
 
 test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
-  /**
-   * This test will use a hook wrapping several react-query useQuery calls
-   * and a react-query mutation call (`useDeleteFromUserListItems`).
-   *
-   * Then, we'll delete a list item via `useDeleteFromUserListItems` and check
-   * that dependent queries are refetched (their cache should be invalided by
-   * the mutation). We'll also check that some other queries are unaffected
-   **/
-  const { wrapper } = setup()
+  const { wrapper, spies } = setup()
 
-  const affectedListData = factories.makeUserList()
-  const unaffectedListData = factories.makeUserList()
-  const itemToDeleteData = factories.makeListItemMember({
+  const userlist = factories.makeUserList()
+  const itemToDelete = factories.makeListItemMember({
     content_type: LRT.Course, // should match affectedResourceData
-    list_id:      affectedListData.id
+    list_id:      userlist.id
   })
 
-  const affectedResourceData = factories.makeCourse({
-    lists: [itemToDeleteData]
+  const resource = factories.makeCourse({
+    id:    itemToDelete.object_id,
+    lists: [itemToDelete]
   })
-  setMockResponse.get(
-    urls.resource.details(
-      itemToDeleteData.content_type,
-      itemToDeleteData.object_id
-    ),
-    affectedResourceData
-  )
-  const modifiedResource = { ...affectedResourceData, lists: [] }
+  const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+  setMockResponse.get(resourceUrl, resource)
 
-  const useTestHook = () => {
-    const deleteItem = useDeleteFromUserListItems()
-    const affectedResource = useResource(
-      itemToDeleteData.content_type,
-      itemToDeleteData.object_id
-    )
-    const affectedList = useResource(LRT.Userlist, affectedListData.id)
-    const unaffectedList = useResource(LRT.Userlist, unaffectedListData.id)
-    const listing = useUserListsListing()
-    const affectedListItems = useUserListItems(affectedListData.id)
-    return {
-      affectedResource,
-      deleteItem,
-      affectedList,
-      unaffectedList,
-      listing,
-      affectedListItems
-    }
-  }
+  const { result } = renderHook(() => useDeleteFromUserListItems(), { wrapper })
 
-  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(
-    () =>
-      result.current.affectedList.isSuccess &&
-      result.current.unaffectedList.isSuccess &&
-      result.current.listing.isSuccess &&
-      result.current.affectedListItems.isSuccess &&
-      result.current.affectedResource.isSuccess
-  )
+  await act(async () => result.current.mutateAsync(itemToDelete))
 
-  setMockResponse.get(
-    urls.resource.details(
-      itemToDeleteData.content_type,
-      itemToDeleteData.object_id
-    ),
-    modifiedResource
-  )
-  const before = result.current
-  await act(async () => {
-    await result.current.deleteItem.mutateAsync(itemToDeleteData)
+  // Check the invalidations
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.id(userlist.id).all
   })
-  const after = result.current
-
-  expect(before.affectedResource.data).not.toEqual(after.affectedResource.data)
-  expect(before.affectedList.data).not.toEqual(after.affectedList.data)
-  expect(before.listing.data).not.toEqual(after.listing.data)
-  expect(before.affectedListItems.data).not.toEqual(
-    after.affectedListItems.data
-  )
-
-  expect(before.unaffectedList.data).toEqual(after.unaffectedList.data)
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.listing.all
+  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.resource(resource.object_type).id(resource.id).details
+  })
 })
 
-test.each([
-  {
-    hook:        useFavorite,
-    wasFavorite: false
-  },
-  {
-    hook:        useUnfavorite,
-    wasFavorite: true
-  }
-])(
-  "$hook.name invalidates appropriate queries",
-  async ({ hook, wasFavorite }) => {
-    const { wrapper } = setup()
-    const targetResourceData = factories.makeCourse({
-      is_favorite: wasFavorite
-    })
-    const otherResourceData = factories.makeCourse()
+test("useDeleteFromUserListItems optimistically updates resource data", async () => {
+  const { wrapper } = setup()
 
-    const targetResourceUrl = urls.resource.details(
-      targetResourceData.object_type,
-      targetResourceData.id
-    )
-    setMockResponse.get(targetResourceUrl, targetResourceData)
+  const userlist = factories.makeUserList()
+  const itemToDelete = factories.makeListItemMember({
+    content_type: LRT.Course, // should match affectedResourceData
+    list_id:      userlist.id
+  })
 
-    const useTestHook = () => {
-      const favoritesListing = useFavoritesListing()
-      const mutation = hook()
-      const targetResource = useResource(
-        targetResourceData.object_type,
-        targetResourceData.id
-      )
-      const otherResource = useResource(
-        otherResourceData.object_type,
-        otherResourceData.id
-      )
-      return { mutation, targetResource, favoritesListing, otherResource }
-    }
-    const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-    await waitFor(
-      () =>
-        result.current.targetResource.isSuccess &&
-        result.current.favoritesListing.isSuccess &&
-        result.current.otherResource.isSuccess
-    )
+  const resource = factories.makeCourse({
+    id:    itemToDelete.object_id,
+    lists: [itemToDelete]
+  })
+  const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+  setMockResponse.get(resourceUrl, resource)
+  const modifiedResource = { ...resource, lists: [] }
 
-    const before = result.current
-    setMockResponse.get(targetResourceUrl, {
-      ...targetResourceData,
-      is_favorite: !wasFavorite
-    })
-    await act(async () => {
-      await result.current.mutation.mutateAsync(targetResourceData)
-    })
-    const after = result.current
+  const { result: resourceQuery } = renderHook(
+    () => useResource(resource.object_type, resource.id),
+    { wrapper }
+  )
+  const { result, waitFor } = renderHook(() => useDeleteFromUserListItems(), {
+    wrapper
+  })
 
-    // These two are invalidated
-    expect(before.targetResource.data).not.toEqual(after.targetResource.data)
-    expect(before.favoritesListing.data).not.toEqual(
-      after.favoritesListing.data
-    )
-    // this is not
-    expect(before.otherResource.data).toEqual(after.otherResource.data)
-  }
-)
+  await waitFor(() => resourceQuery.current.isFetched)
+
+  act(() => {
+    result.current.mutateAsync(itemToDelete)
+  })
+
+  // Check the optimistic update
+  await waitFor(() => {
+    expect(resourceQuery.current.data).toEqual(modifiedResource)
+  })
+})
+
+test("useFavorite invalidates appropriate queries", async () => {
+  const { wrapper, spies } = setup()
+  const resource = factories.makeCourse({ is_favorite: false })
+
+  const { result } = renderHook(() => useFavorite(), { wrapper })
+
+  await act(async () => {
+    await result.current.mutateAsync(resource)
+  })
+
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.resource(resource.object_type).id(resource.id).details
+  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.favorites.all
+  })
+})
+
+test("useUnfavorite invalidates appropriate queries", async () => {
+  const { wrapper, spies } = setup()
+  const resource = factories.makeCourse({ is_favorite: true })
+
+  const { result } = renderHook(() => useUnfavorite(), { wrapper })
+
+  await act(async () => {
+    await result.current.mutateAsync(resource)
+  })
+
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.resource(resource.object_type).id(resource.id).details
+  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.favorites.all
+  })
+})
 
 test.each([
   {
@@ -482,5 +414,88 @@ test.each([
 
   await waitFor(() => {
     expect(result.current.search.data?.pages).toEqual([expected])
+  })
+})
+
+test("useItemListing pagination", async () => {
+  const { wrapper } = setup()
+  setMockResponse.get(
+    expect.stringContaining("userlists/123/items"),
+    factories.makeUserListItemsPaginated({ count: 5, pageSize: 3 })
+  )
+  const { result, waitFor } = renderHook(
+    () => useUserListItems(123, { limit: 3 }),
+    { wrapper }
+  )
+
+  const assertApiCall = (limit: number, offset: number) => {
+    expect(axios.get).toHaveBeenLastCalledWith(
+      urls.userList.itemsListing(123, { limit, offset })
+    )
+  }
+
+  await waitFor(() => expect(result.current.isLoading).toBe(false))
+  assertNotNil(result.current.data)
+  expect(result.current.data.pages.length).toBe(1)
+  expect(result.current.data.pages[0].results.length).toBe(3)
+  assertApiCall(3, 0)
+
+  await act(async () => {
+    await result.current.fetchNextPage()
+  })
+  expect(result.current.data.pages.length).toBe(2)
+  assertApiCall(3, 3)
+
+  mockAxiosInstance.get.mockClear()
+  await act(async () => {
+    await result.current.fetchNextPage()
+  })
+  expect(result.current.data.pages.length).toBe(2)
+  expect(mockAxiosInstance.get).not.toHaveBeenCalled()
+})
+
+test("useMoveUserListItem optimistic updates", async () => {
+  const { wrapper, spies } = setup()
+  setMockResponse.get(
+    expect.stringContaining("userlists/123/items"),
+    factories.makeUserListItemsPaginated({ count: 5, pageSize: 3 })
+  )
+  const { result: itemsQ, waitFor } = renderHook(
+    () => useUserListItems(123, { limit: 3 }),
+    { wrapper }
+  )
+
+  const { result: moveItem } = renderHook(() => useMoveUserListItem(), {
+    wrapper
+  })
+
+  await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
+
+  setMockResponse.get(
+    expect.stringContaining("userlists/123/items"),
+    factories.makeUserListItemsPaginated({ count: 5, pageSize: 2 })
+  )
+
+  await act(async () => {
+    await itemsQ.current.fetchNextPage()
+  })
+
+  const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
+  const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
+
+  spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
+  await act(async () =>
+    moveItem.current.mutateAsync({
+      item:        { list_id: 123, item_id: item3.id },
+      newPosition: item1.position,
+      oldIndex:    3,
+      newIndex:    1
+    })
+  )
+
+  expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
+  expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.id(123).itemsListing.all
   })
 })

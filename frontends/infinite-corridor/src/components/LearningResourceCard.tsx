@@ -20,13 +20,15 @@ type TemplateProps = LearningResourceCardTemplateProps<
 >
 type LearningResourceCardProps = Pick<
   TemplateProps,
-  "variant" | "resource" | "className"
+  "variant" | "resource" | "className" | "sortable" | "suppressImage"
 >
 
 const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   resource,
   variant,
-  className
+  className,
+  sortable,
+  suppressImage
 }) => {
   const activateResource = useActivateResourceDrawer()
   const addToList = useAddToListDialog()
@@ -36,6 +38,8 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
     <>
       <LearningResourceCardTemplate
         variant={variant}
+        sortable={sortable}
+        suppressImage={suppressImage}
         className={classNames("ic-resource-card", className)}
         resource={resource}
         imgConfig={imgConfigs[variant]}

@@ -49,7 +49,7 @@ describe("HomePage", () => {
   })
 
   it("renders a resource carusel with upcoming courses", async () => {
-    const coursesResult = lrFactory.makeCoursesPaginated(4)
+    const coursesResult = lrFactory.makeCoursesPaginated({ count: 4 })
 
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 
@@ -80,7 +80,7 @@ describe("HomePage", () => {
   })
 
   it("renders a resource carusel with new videos", async () => {
-    const videosResult = lrFactory.makeVideosPaginated(4)
+    const videosResult = lrFactory.makeVideosPaginated({ count: 4 })
 
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 
@@ -111,7 +111,7 @@ describe("HomePage", () => {
   })
 
   it("renders a resource carusel with popular learning resources", async () => {
-    const popularResult = lrFactory.makeLearningResourcesPaginated(4)
+    const popularResult = lrFactory.makeLearningResourcesPaginated({ count: 4 })
 
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 

@@ -61,7 +61,7 @@ describe("Creation", () => {
       user: { is_public_list_editor: true, is_authenticated: true }
     }
   ) => {
-    const topics = factories.makeTopicsPaginated(5)
+    const topics = factories.makeTopicsPaginated({ count: 5 })
     setMockResponse.get(lrUrls.topics.listing, topics)
     const onClose = jest.fn()
     renderWithProviders(
@@ -219,7 +219,7 @@ describe("Editing", () => {
     resourceOverrides: Partial<UserList> = {},
     topicsCount = 1
   ) => {
-    const topics = factories.makeTopicsPaginated(5)
+    const topics = factories.makeTopicsPaginated({ count: 5 })
     setMockResponse.get(lrUrls.topics.listing, topics)
     const resource = factories.makeUserList({
       ...resourceOverrides,

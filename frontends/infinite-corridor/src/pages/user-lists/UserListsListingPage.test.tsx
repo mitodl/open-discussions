@@ -45,8 +45,8 @@ describe("UserListsListingPage", () => {
     favoritesCount = faker.datatype.number({ min: 2, max: 5 }),
     listsCount = faker.datatype.number({ min: 2, max: 5 })
   } = {}) => {
-    const favorites = factories.makeFavorites(favoritesCount)
-    const userLists = factories.makeUserListsPaginated(listsCount)
+    const favorites = factories.makeFavorites({ count: favoritesCount })
+    const userLists = factories.makeUserListsPaginated({ count: listsCount })
     const topics = [
       ...userLists.results,
       ...favorites.results.map(fav => fav.content_data)

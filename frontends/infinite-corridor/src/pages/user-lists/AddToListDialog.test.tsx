@@ -44,7 +44,7 @@ const setup = ({
   dialogOpen = true
 }: Partial<SetupOptions> = {}) => {
   const resource = makeCourse({ is_favorite: isFavorite })
-  const paginatedLists = makeUserListsPaginated(3)
+  const paginatedLists = makeUserListsPaginated({ count: 3 })
   const lists = paginatedLists.results
 
   inLists.forEach(index => {

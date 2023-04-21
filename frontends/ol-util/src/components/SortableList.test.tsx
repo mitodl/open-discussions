@@ -8,7 +8,7 @@ import type {
   UniqueIdentifier as Id
 } from "@dnd-kit/core"
 import type { SortableData } from "@dnd-kit/sortable"
-import SortableList from "./SortableList"
+import SortableList, { SortableItem } from "./SortableList"
 
 jest.mock("@dnd-kit/core", () => {
   const actual = jest.requireActual("@dnd-kit/core")
@@ -22,14 +22,6 @@ jest.mock("@dnd-kit/core", () => {
      * Since dnd-kit is non-functional in JSDom, let's always render the children.
      */
     DragOverlay: ({ children }) => <div>{children}</div>
-  }
-})
-
-jest.mock("./SortableList", () => {
-  const actual = jest.requireActual("./SortableList")
-  return {
-    __esModule: true,
-    default:    jest.fn(actual.default)
   }
 })
 
@@ -69,12 +61,13 @@ const setupTest = (itemIds: string[]) => {
   const spies = {
     renderActive: jest.fn((a: Active) => <div>Active Item {a.id}</div>),
     onSortEnd:    jest.fn(),
-    SortableList: jest.mocked(SortableList)
+    cancelDrop:   jest.fn(() => false)
   }
   render(
     <SortableList
       renderActive={spies.renderActive}
       onSortEnd={spies.onSortEnd}
+      cancelDrop={spies.cancelDrop}
       itemIds={itemIds}
     />
   )
@@ -89,6 +82,10 @@ const setupTest = (itemIds: string[]) => {
     onDragEnd: (e: DragEndEvent) => {
       const props = spyDndContext.mock.lastCall[0]
       if (!props.onDragEnd) throw new Error("props.onDragEnd should be defined")
+      if (!props.cancelDrop) {
+        throw new Error("props.cancelDrop should be defined")
+      }
+      props.cancelDrop(e)
       props.onDragEnd(e)
     }
   }
@@ -149,12 +146,6 @@ describe("SortableList", () => {
     },
     {
       itemIds:   ["A", "B", "C", "D"],
-      afterIds:  ["A", "B", "C", "D"],
-      dragIndex: 1,
-      dropIndex: 1
-    },
-    {
-      itemIds:   ["A", "B", "C", "D"],
       afterIds:  ["A", "C", "B", "D"],
       dragIndex: 1,
       dropIndex: 2
@@ -182,8 +173,54 @@ describe("SortableList", () => {
       act(() => dnd.onDragEnd(endEvent))
       expect(spies.onSortEnd).toHaveBeenCalledTimes(1)
       expect(spies.onSortEnd).toHaveBeenCalledWith({
-        itemIds: afterIds
+        itemIds:     afterIds,
+        activeIndex: dragIndex,
+        overIndex:   dropIndex,
+        over:        endEvent.over,
+        active:      endEvent.active
+      })
+
+      expect(spies.cancelDrop).toHaveBeenCalledTimes(1)
+      expect(spies.cancelDrop).toHaveBeenCalledWith({
+        itemIds:     afterIds,
+        activeIndex: dragIndex,
+        overIndex:   dropIndex,
+        over:        endEvent.over,
+        active:      endEvent.active
       })
     }
   )
+
+  it("Does not call onSortEnd if activeIndex === overIndex", () => {
+    const itemIds = ["A", "B", "C", "D"]
+    const { spies, dnd, dndEvents } = setupTest(itemIds)
+    const startEvent = dndEvents.start(1)
+    const endEvent = dndEvents.end(1, 1)
+    act(() => dnd.onDragStart(startEvent))
+    act(() => dnd.onDragEnd(endEvent))
+    expect(spies.onSortEnd).toHaveBeenCalledTimes(0)
+  })
+})
+
+describe("SortableItem", () => {
+  it.each([{ tag: "div" }, { tag: "li" }] as const)(
+    "Renders the specified tag",
+    ({ tag }) => {
+      const view = render(<SortableItem Component={tag} id="1" />)
+
+      // eslint-disable-next-line testing-library/no-node-access
+      const el = view.container.firstChild as HTMLElement
+      expect(el.tagName).toBe(tag.toUpperCase())
+    }
+  )
+
+  it("Renders child with class ol-draggable", () => {
+    render(
+      <SortableItem Component="div" id="1">
+        {props => <div {...props} data-testid="sortable-child" />}
+      </SortableItem>
+    )
+
+    expect(screen.getByTestId("sortable-child")).toHaveClass("ol-draggable")
+  })
 })
