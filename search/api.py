@@ -26,6 +26,7 @@ from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     COURSE_TYPE,
+    GLOBAL_DOC_TYPE,
     LEARNING_RESOURCE_TYPES,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
@@ -522,7 +523,7 @@ def find_related_documents(*, user, post_id):
     search = _apply_general_query_filters(search, user)
     search = search.query(
         MoreLikeThis(
-            like={"_id": gen_post_id(post_id)},
+            like={"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
             fields=RELATED_POST_RELEVANT_FIELDS,
             min_term_freq=1,
             min_doc_freq=1,
