@@ -217,8 +217,8 @@ const getInfoRows = (
     },
     {
       label:   "Language",
-      include: true,
-      value:   languageName(run?.language ?? "en")
+      include: !!languageName(run?.language),
+      value:   languageName(run?.language)
     }
   ]
 
