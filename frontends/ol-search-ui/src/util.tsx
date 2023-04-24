@@ -8,7 +8,7 @@ import {
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
 import { capitalize, emptyOrNil } from "ol-util"
-import LocaleCode from "locale-code"
+import ISO6391 from "iso-639-1"
 import Decimal from "decimal.js-light"
 
 export const getImageSrc = (
@@ -200,10 +200,20 @@ export const getInstructorName = (instructor: CourseInstructor) => {
   return ""
 }
 
-export const languageName = (langCode: string | null): string =>
-  LocaleCode.getLanguageName(
-    `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
-  )
+/**
+ * Given a 2-digit [ISO 639-1 language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes),
+ * return the language name in English.
+ *
+ * If code is invalid or null, return null.
+ *
+ * Tolerates codes with a region code, e.g. "en-US".
+ */
+export const languageName = (langCode?: string | null): string | null => {
+  if (!langCode) return null
+  const code = langCode.split("-")[0].toLowerCase()
+  const name = ISO6391.getName(code)
+  return name === "" ? null : name
+}
 
 const formatPrice = (price: number | null | undefined): string => {
   if (price === null || price === undefined) {
