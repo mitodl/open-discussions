@@ -8,8 +8,8 @@ from math import ceil
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from elasticsearch.exceptions import ConflictError, NotFoundError
-from elasticsearch.helpers import BulkIndexError, bulk
+from opensearchpy.exceptions import ConflictError, NotFoundError
+from opensearchpy.helpers import BulkIndexError, bulk
 
 from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks
@@ -363,7 +363,7 @@ def create_document(doc_id, data):
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[data["object_type"]]):
-        conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
+        conn.create(index=alias, body=data, id=doc_id)
 
 
 def delete_document(doc_id, object_type, **kwargs):
@@ -378,7 +378,7 @@ def delete_document(doc_id, object_type, **kwargs):
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[object_type]):
         try:
-            conn.delete(index=alias, doc_type=GLOBAL_DOC_TYPE, id=doc_id, params=kwargs)
+            conn.delete(index=alias, id=doc_id, params=kwargs)
         except NotFoundError:
             log.debug(
                 "Tried to delete an ES document that didn't exist, doc_id: '%s'", doc_id
@@ -407,7 +407,6 @@ def update_field_values_by_query(query, field_dict, object_types=None):
     for alias in get_active_aliases(conn, object_types=object_types):
         es_response = conn.update_by_query(  # pylint: disable=unexpected-keyword-arg
             index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
             body={
                 "script": {
@@ -446,7 +445,6 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
         try:
             conn.update(
                 index=alias,
-                doc_type=GLOBAL_DOC_TYPE,
                 body=body,
                 id=doc_id,
                 params={"retry_on_conflict": retry_on_conflict, **kwargs},
@@ -601,7 +599,6 @@ def index_items(documents, object_type, update_only, **kwargs):
                     conn,
                     chunk,
                     index=alias,
-                    doc_type=GLOBAL_DOC_TYPE,
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                     **kwargs,
                 )

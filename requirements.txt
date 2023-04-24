@@ -55,11 +55,10 @@ cairocffi==0.8.1
 cairosvg==2.5.1
     # via -r requirements.in
 celery==5.2.1
-    # via
-    #   -r requirements.in
-    #   django-server-status
+    # via -r requirements.in
 certifi==2022.12.7
     # via
+    #   opensearch-py
     #   requests
     #   sentry-sdk
 cffi==1.14.4
@@ -111,6 +110,7 @@ django==2.2.28
     #   django-cors-headers
     #   django-filter
     #   django-redis
+    #   django-server-status
     #   djangorestframework
     #   drf-spectacular
 django-anymail[mailgun]==3.0
@@ -146,7 +146,7 @@ django-json-widget==1.0.0
     # via -r requirements.in
 django-redis==4.10.0
     # via -r requirements.in
-django-server-status==0.5.0
+django-server-status==0.7.3
     # via -r requirements.in
 django-storages==1.6.6
     # via -r requirements.in
@@ -172,13 +172,6 @@ docutils==0.14
 drf-extensions==0.5.0
     # via -r requirements.in
 drf-spectacular==0.26.1
-    # via -r requirements.in
-elasticsearch==6.8.2
-    # via
-    #   -r requirements.in
-    #   django-server-status
-    #   elasticsearch-dsl
-elasticsearch-dsl==6.1.0
     # via -r requirements.in
 factory-boy==2.12.0
     # via -r requirements.in
@@ -210,8 +203,6 @@ idna==2.5
     #   tldextract
 inflection==0.5.1
     # via drf-spectacular
-ipaddress==1.0.22
-    # via elasticsearch-dsl
 ipython==7.16.3
     # via -r requirements.in
 ipython-genutils==0.2.0
@@ -227,9 +218,7 @@ jmespath==0.9.3
     #   boto3
     #   botocore
 kombu==5.2.4
-    # via
-    #   celery
-    #   django-server-status
+    # via celery
 lxml==4.6.5
     # via
     #   -r requirements.in
@@ -251,6 +240,12 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
+opensearch-dsl==1.0.0
+    # via -r requirements.in
+opensearch-py==1.0.0
+    # via
+    #   -r requirements.in
+    #   opensearch-dsl
 packaging==21.3
     # via redis
 parso==0.6.1
@@ -274,9 +269,7 @@ prompt-toolkit==3.0.3
     #   click-repl
     #   ipython
 psycopg2==2.8.3
-    # via
-    #   -r requirements.in
-    #   django-server-status
+    # via -r requirements.in
 ptyprocess==0.6.0
     # via pexpect
 pyasn1==0.4.7
@@ -308,8 +301,8 @@ python-dateutil==2.8.1
     # via
     #   -r requirements.in
     #   botocore
-    #   elasticsearch-dsl
     #   faker
+    #   opensearch-dsl
 python-rapidjson==1.8
     # via -r requirements.in
 python3-openid==3.1.0
@@ -331,7 +324,6 @@ redis==4.3.4
     # via
     #   -r requirements.in
     #   django-redis
-    #   django-server-status
 requests==2.24.0
     # via
     #   -r requirements.in
@@ -373,14 +365,13 @@ six==1.15.0
     #   django-compat
     #   django-guardian
     #   django-imagekit
-    #   django-server-status
-    #   elasticsearch-dsl
     #   faker
     #   google-api-python-client
     #   google-auth
     #   html5lib
     #   isodate
     #   nested-lookup
+    #   opensearch-dsl
     #   pygithub
     #   pyopenssl
     #   python-dateutil
@@ -432,7 +423,7 @@ urllib3==1.25.10
     # via
     #   -r requirements.in
     #   botocore
-    #   elasticsearch
+    #   opensearch-py
     #   requests
     #   sentry-sdk
 uwsgi==2.0.20

@@ -38,7 +38,6 @@ from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     COURSE_TYPE,
-    GLOBAL_DOC_TYPE,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     USER_LIST_TYPE,
@@ -225,7 +224,6 @@ def test_execute_search(user, elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -305,7 +303,6 @@ def test_execute_search_anonymous(elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -406,7 +403,6 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
 
     elasticsearch.conn.search.assert_called_once_with(
         body={**query, "query": subquery},
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -476,7 +472,6 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
             **query,
             "query": subquery,
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -514,7 +509,7 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
     constructed_query = elasticsearch.conn.search.call_args[1]
     assert constructed_query["body"]["query"] == {
         "more_like_this": {
-            "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
+            "like": {"_id": gen_post_id(post_id)},
             "fields": ["plain_text", "post_title", "author_id", "channel_name"],
             "min_term_freq": 1,
             "min_doc_freq": 1,
@@ -1055,6 +1050,5 @@ def test_get_similar_topics(settings, elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
     )

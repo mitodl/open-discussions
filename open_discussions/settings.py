@@ -510,7 +510,7 @@ LOGGING = {
             "level": DJANGO_LOG_LEVEL,
             "propagate": True,
         },
-        "elasticsearch": {"level": ES_LOG_LEVEL},
+        "opensearch": {"level": ES_LOG_LEVEL},
         "nplusone": {"handlers": ["console"], "level": "ERROR"},
         "boto3": {"handlers": ["console"], "level": "ERROR"},
     },

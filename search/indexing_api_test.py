@@ -5,7 +5,7 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-from elasticsearch.exceptions import ConflictError, NotFoundError
+from opensearchpy.exceptions import ConflictError, NotFoundError
 
 from course_catalog.factories import (
     ContentFileFactory,
@@ -16,7 +16,7 @@ from open_discussions.utils import chunks
 from search import indexing_api
 from search.api import gen_course_id
 from search.connection import get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, COMMENT_TYPE, GLOBAL_DOC_TYPE, POST_TYPE
+from search.constants import ALIAS_ALL_INDICES, COMMENT_TYPE, POST_TYPE
 from search.exceptions import ReindexException
 from search.indexing_api import (
     SCRIPTING_LANG,
@@ -76,7 +76,7 @@ def test_create_document(mocked_es, mocker, object_type):
     mock_get_aliases.assert_called_once_with(mocked_es.conn, object_types=[object_type])
     mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.create.assert_any_call(
-        index=object_type, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id
+        index=object_type, body=data, id=doc_id
     )
 
 
@@ -102,7 +102,6 @@ def test_update_field_values_by_query(
     for alias in mocked_es.active_aliases:
         mocked_es.conn.update_by_query.assert_any_call(
             index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
             conflicts=UPDATE_CONFLICT_SETTING,
             body={
                 "script": {
@@ -132,7 +131,6 @@ def test_update_document_with_partial(mocked_es, mocker, object_type):
     mocked_es.get_conn.assert_called_once_with()
     mocked_es.conn.update.assert_called_once_with(
         index=object_type,
-        doc_type=GLOBAL_DOC_TYPE,
         body={"doc": data},
         id=doc_id,
         params={"retry_on_conflict": 0},
@@ -182,7 +180,6 @@ def test_increment_document_integer_field(mocked_es):
     for alias in mocked_es.active_aliases:
         mocked_es.conn.update.assert_any_call(
             index=alias,
-            doc_type=GLOBAL_DOC_TYPE,
             body={
                 "script": {
                     "source": "ctx._source.{} += params.incr_amount".format(field_name),
@@ -387,7 +384,6 @@ def test_index_functions(
                     mocked_es.conn,
                     chunk,
                     index=alias,
-                    doc_type=GLOBAL_DOC_TYPE,
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
@@ -454,7 +450,6 @@ def test_bulk_deletion_functions(
                     mocked_es.conn,
                     chunk,
                     index=alias,
-                    doc_type=GLOBAL_DOC_TYPE,
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
@@ -485,7 +480,7 @@ def test_delete_document(mocked_es, mocker):
     )
     delete_document(1, "course")
     mocked_es.conn.delete.assert_called_with(
-        index="a", doc_type=GLOBAL_DOC_TYPE, id=1, params={}
+        index="a", id=1, params={}
     )
 
 
@@ -615,7 +610,6 @@ def test_bulk_index_content_files(
                     mocked_es.conn,
                     chunk,
                     index=alias,
-                    doc_type=GLOBAL_DOC_TYPE,
                     chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
                     routing=gen_course_id(course.platform, course.course_id),
                 )
