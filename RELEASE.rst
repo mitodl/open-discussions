@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.212.3
+Version 0.212.3 (Released April 24, 2023)
 ---------------
 
 - Fix profile bulk indexing (#3950)
