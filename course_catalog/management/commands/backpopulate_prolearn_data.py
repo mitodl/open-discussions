@@ -5,7 +5,7 @@ from course_catalog.etl.prolearn import PROLEARN_DEPARTMENT_MAPPING
 from course_catalog.models import Course, Program
 from course_catalog.tasks import get_prolearn_data
 from open_discussions.utils import now_in_utc
-from search.task_helpers import delete_course, delete_program
+from search.task_helpers import deindex_course, deindex_program
 
 
 class Command(BaseCommand):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
                 platform__in=PROLEARN_DEPARTMENT_MAPPING.keys()
             ):
                 course.delete()
-                delete_course(course)
+                deindex_course(course)
         else:
             task = get_prolearn_data.delay()
             self.stdout.write(

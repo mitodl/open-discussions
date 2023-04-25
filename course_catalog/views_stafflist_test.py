@@ -24,8 +24,8 @@ def mock_staff_list_index(mocker):
     return SimpleNamespace(
         upsert_staff_list=mocker.patch("course_catalog.serializers.upsert_staff_list"),
         upsert_staff_list_view=mocker.patch("course_catalog.views.upsert_staff_list"),
-        delete_staff_list=mocker.patch("course_catalog.serializers.delete_staff_list"),
-        delete_staff_list_view=mocker.patch("course_catalog.views.delete_staff_list"),
+        delete_staff_list=mocker.patch("course_catalog.serializers.deindex_staff_list"),
+        delete_staff_list_view=mocker.patch("course_catalog.views.deindex_staff_list"),
     )
 
 

@@ -38,7 +38,7 @@ from search.serializers import ESCommentSerializer, ESPostSerializer
 from search.tasks import (
     create_document,
     create_post_document,
-    delete_document,
+    deindex_document,
     increment_document_integer_field,
     update_document_with_partial,
     update_field_values_by_query,
@@ -189,7 +189,7 @@ def upsert_profile(user_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_profile(user_obj):
+def deindex_profile(user_obj):
     """
     Run a task to delete profile document
 
@@ -197,7 +197,7 @@ def delete_profile(user_obj):
         user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
     """
     if user_obj.username != settings.INDEXING_API_USERNAME:
-        delete_document.delay(gen_profile_id(user_obj.username), PROFILE_TYPE)
+        deindex_document.delay(gen_profile_id(user_obj.username), PROFILE_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -348,18 +348,18 @@ def upsert_course(course_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_course(course_obj):
+def deindex_course(course_obj):
     """
     Runs a task to delete an ES Course document
 
     Args:
         course_obj (course_catalog.models.Course): A Course object
     """
-    delete_document.delay(
+    deindex_document.delay(
         gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
     )
     for run_id in course_obj.runs.values_list("id", flat=True):
-        delete_run_content_files(run_id)
+        deindex_run_content_files(run_id)
 
 
 def upsert_content_file(content_file_id):
@@ -383,7 +383,7 @@ def index_run_content_files(run_id):
     tasks.index_run_content_files.delay(run_id)
 
 
-def delete_run_content_files(run_id):
+def deindex_run_content_files(run_id):
     """
     Runs a task to delete content files for a LearningResourceRun from the index
 
@@ -391,7 +391,7 @@ def delete_run_content_files(run_id):
         run_id(int): LearningResourceRun id
 
     """
-    tasks.delete_run_content_files.delay(run_id)
+    tasks.deindex_run_content_files.delay(run_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -406,14 +406,14 @@ def upsert_program(program_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_program(program_obj):
+def deindex_program(program_obj):
     """
     Runs a task to delete an ES Program document
 
     Args:
         program_obj (course_catalog.models.Program): A Program object
     """
-    delete_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
+    deindex_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -428,14 +428,14 @@ def upsert_user_list(user_list_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_user_list(user_list_obj):
+def deindex_user_list(user_list_obj):
     """
     Runs a task to delete an ES UserList document
 
     Args:
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    delete_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+    deindex_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -450,14 +450,14 @@ def upsert_staff_list(staff_list_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_staff_list(staff_list_obj):
+def deindex_staff_list(staff_list_obj):
     """
     Runs a task to delete an ES StaffList document
 
     Args:
         staff_list_obj (course_catalog.models.StaffList): A StaffList object
     """
-    delete_document.delay(gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE)
+    deindex_document.delay(gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -472,14 +472,14 @@ def upsert_video(video_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_video(video_obj):
+def deindex_video(video_obj):
     """
     Runs a task to delete an ES Video document
 
     Args:
         video_obj (course_catalog.models.Video): A Video object
     """
-    delete_document.delay(gen_video_id(video_obj), VIDEO_TYPE)
+    deindex_document.delay(gen_video_id(video_obj), VIDEO_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -494,14 +494,14 @@ def upsert_podcast(podcast_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_podcast(podcast_obj):
+def deindex_podcast(podcast_obj):
     """
     Runs a task to delete an ES Podcast document
 
     Args:
         podcast_obj (course_catalog.models.Podcast): A Podcast object
     """
-    delete_document.delay(gen_podcast_id(podcast_obj), PODCAST_TYPE)
+    deindex_document.delay(gen_podcast_id(podcast_obj), PODCAST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -516,13 +516,13 @@ def upsert_podcast_episode(podcast_episode_id):
 
 
 @if_feature_enabled(INDEX_UPDATES)
-def delete_podcast_episode(podcast_episode_obj):
+def deindex_podcast_episode(podcast_episode_obj):
     """
     Runs a task to delete an ES PodcastEpisode document
 
     Args:
         podcast_episode_obj (course_catalog.models.PodcastEpisode): A PodcastEpisode object
     """
-    delete_document.delay(
+    deindex_document.delay(
         gen_podcast_episode_id(podcast_episode_obj), PODCAST_EPISODE_TYPE
     )

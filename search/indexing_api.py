@@ -139,7 +139,7 @@ def create_document(doc_id, data):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
-def delete_document(doc_id, object_type, **kwargs):
+def deindex_document(doc_id, object_type, **kwargs):
     """
     Makes a request to ES to delete a document
 
@@ -305,7 +305,7 @@ def update_post(doc_id, post):
     )
 
 
-def delete_items(documents, object_type, update_only, **kwargs):
+def deindex_items(documents, object_type, update_only, **kwargs):
     """
     Calls index_items with error catching around not_found for objects that don't exist
     in the index
@@ -325,8 +325,8 @@ def delete_items(documents, object_type, update_only, **kwargs):
         for message in error_messages:
             message = list(message.values())[0]
             if message["result"] != "not_found":
-                log.error("Bulk deletion failed. Error: %s", str(message))
-                raise ReindexException(f"Bulk deletion failed: {message}")
+                log.error("Bulk deindex failed. Error: %s", str(message))
+                raise ReindexException(f"Bulk deindex failed: {message}")
 
 
 def index_items(documents, object_type, update_only, **kwargs):
@@ -420,14 +420,14 @@ def index_profiles(ids, update_only=False):
     index_items(serialize_bulk_profiles(ids), PROFILE_TYPE, update_only)
 
 
-def delete_profiles(ids):
+def deindex_profiles(ids):
     """
-    Delete a list of profiles by id
+    Deindex a list of profiles by id
 
     Args:
         ids(list of int): List of Profile ids
     """
-    delete_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
+    deindex_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
 
 
 def index_courses(ids, update_only=False):
@@ -442,20 +442,20 @@ def index_courses(ids, update_only=False):
     index_items(serialize_bulk_courses(ids), COURSE_TYPE, update_only)
 
 
-def delete_courses(ids):
+def deindex_courses(ids):
     """
-    Delete a list of courses by id
+    Deindex a list of courses by id
 
     Args:
         ids(list of int): List of Course id's
     """
-    delete_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
+    deindex_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
 
     course_content_type = ContentType.objects.get_for_model(Course)
     for run_id in LearningResourceRun.objects.filter(
         object_id__in=ids, content_type=course_content_type
     ).values_list("id", flat=True):
-        delete_run_content_files(run_id)
+        deindex_run_content_files(run_id)
 
 
 def index_course_content_files(course_ids, update_only=False):
@@ -510,9 +510,9 @@ def index_run_content_files(run_id, update_only=False):
         )
 
 
-def delete_run_content_files(run_id, unpublished_only=False):
+def deindex_run_content_files(run_id, unpublished_only=False):
     """
-    Delete a list of content files by run from the index
+    Deindex and delete a list of content files by run from the index
 
     Args:
         run_id(int): Course run id
@@ -534,7 +534,7 @@ def delete_run_content_files(run_id, unpublished_only=False):
     )
 
     course = run.content_object
-    delete_items(
+    deindex_items(
         documents,
         COURSE_TYPE,
         True,
@@ -556,14 +556,14 @@ def index_programs(ids, update_only=False):
     index_items(serialize_bulk_programs(ids), PROGRAM_TYPE, update_only)
 
 
-def delete_programs(ids):
+def deindex_programs(ids):
     """
     Delete a list of programs by id
 
     Args:
         ids(list of int): List of Program id's
     """
-    delete_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
+    deindex_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
 
 
 def index_user_lists(ids, update_only=False):
@@ -578,15 +578,15 @@ def index_user_lists(ids, update_only=False):
     index_items(serialize_bulk_user_lists(ids), USER_LIST_TYPE, update_only)
 
 
-def delete_user_lists(ids):
+def deindex_user_lists(ids):
     """
-    Delete a list of user lists by id
+    Deindex a list of user lists by id
 
     Args:
         ids(list of int): List of UserList ids
 
     """
-    delete_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
+    deindex_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
 
 
 def index_staff_lists(ids, update_only=False):
@@ -601,7 +601,7 @@ def index_staff_lists(ids, update_only=False):
     index_items(serialize_bulk_staff_lists(ids), STAFF_LIST_TYPE, update_only)
 
 
-def delete_staff_lists(ids):
+def deindex_staff_lists(ids):
     """
     Delete a list of staff lists by id
 
@@ -609,7 +609,7 @@ def delete_staff_lists(ids):
         ids(list of int): List of StaffList ids
 
     """
-    delete_items(serialize_bulk_staff_lists_for_deletion(ids), STAFF_LIST_TYPE, True)
+    deindex_items(serialize_bulk_staff_lists_for_deletion(ids), STAFF_LIST_TYPE, True)
 
 
 def index_videos(ids, update_only=False):
@@ -624,15 +624,15 @@ def index_videos(ids, update_only=False):
     index_items(serialize_bulk_videos(ids), VIDEO_TYPE, update_only)
 
 
-def delete_videos(ids):
+def deindex_videos(ids):
     """
-    Delete a list of videos by id
+    Deindex a list of videos by id
 
     Args:
         ids(list of int): List of video ids
 
     """
-    delete_items(serialize_bulk_videos_for_deletion(ids), VIDEO_TYPE, True)
+    deindex_items(serialize_bulk_videos_for_deletion(ids), VIDEO_TYPE, True)
 
 
 def index_podcasts(ids, update_only=False):
@@ -646,15 +646,15 @@ def index_podcasts(ids, update_only=False):
     index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE, update_only)
 
 
-def delete_podcasts(ids):
+def deindex_podcasts(ids):
     """
-    Delete a list of podcasts by id
+    Deindex a list of podcasts by id
 
     Args:
         ids(list of int): List of podcast ids
 
     """
-    delete_items(serialize_bulk_podcasts_for_deletion(ids), PODCAST_TYPE, True)
+    deindex_items(serialize_bulk_podcasts_for_deletion(ids), PODCAST_TYPE, True)
 
 
 def index_podcast_episodes(ids, update_only=False):
@@ -668,14 +668,14 @@ def index_podcast_episodes(ids, update_only=False):
     index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE, update_only)
 
 
-def delete_podcast_episodes(ids):
+def deindex_podcast_episodes(ids):
     """
     Delete a list of podcast episodes by id
 
     Args:
         ids(list of int): List of PodcastEpisode ids
     """
-    delete_items(
+    deindex_items(
         serialize_bulk_podcast_episodes_for_deletion(ids), PODCAST_EPISODE_TYPE, True
     )
 

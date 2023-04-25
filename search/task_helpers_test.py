@@ -36,13 +36,13 @@ from search.constants import (
 )
 from search.task_helpers import (
     decrement_parent_post_comment_count,
-    delete_course,
-    delete_podcast,
-    delete_podcast_episode,
-    delete_profile,
-    delete_run_content_files,
-    delete_user_list,
-    delete_video,
+    deindex_course,
+    deindex_podcast,
+    deindex_podcast_episode,
+    deindex_profile,
+    deindex_run_content_files,
+    deindex_user_list,
+    deindex_video,
     increment_parent_post_comment_count,
     index_new_comment,
     index_new_post,
@@ -439,14 +439,14 @@ def test_upsert_course(mocker):
 @pytest.mark.django_db
 def test_delete_course(mocker):
     """
-    Tests that delete_course calls the delete tasks for the course and its content files
+    Tests that deindex_course calls the delete tasks for the course and its content files
     """
-    mock_del_document = mocker.patch("search.task_helpers.delete_document")
-    mock_bulk_del = mocker.patch("search.task_helpers.delete_run_content_files")
+    mock_del_document = mocker.patch("search.task_helpers.deindex_document")
+    mock_bulk_del = mocker.patch("search.task_helpers.deindex_run_content_files")
     course = CourseFactory.create()
     course_es_id = gen_course_id(course.platform, course.course_id)
 
-    delete_course(course)
+    deindex_course(course)
     mock_del_document.delay.assert_called_once_with(course_es_id, COURSE_TYPE)
     for run in course.runs.iterator():
         mock_bulk_del.assert_any_call(run.id)
@@ -455,8 +455,8 @@ def test_delete_course(mocker):
 @pytest.mark.django_db
 def test_delete_profile(mocker, user):
     """Tests that deleting a user triggers a delete on a profile document"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
-    delete_profile(user)
+    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    deindex_profile(user)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (
         gen_profile_id(user.username),
@@ -489,9 +489,9 @@ def test_upsert_video(mocker):
 @pytest.mark.django_db
 def test_delete_video(mocker):
     """Tests that deleting a video triggers a delete on a video document"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
     video = VideoFactory.create()
-    delete_video(video)
+    deindex_video(video)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (gen_video_id(video), VIDEO_TYPE)
 
@@ -516,9 +516,9 @@ def test_upsert_user_list(mocker, list_type):
 )
 def test_delete_user_list(mocker, list_type):
     """Tests that deleting a UserList triggers a delete on a UserList document"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
     user_list = UserListFactory.create(list_type=list_type)
-    delete_user_list(user_list)
+    deindex_user_list(user_list)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (
         gen_user_list_id(user_list),
@@ -550,10 +550,10 @@ def test_index_run_content_files(mocker):
 
 @pytest.mark.django_db
 def test_delete_run_content_files(mocker):
-    """Tests that delete_run_content_files triggers the correct ES delete task"""
-    patched_task = mocker.patch("search.tasks.delete_run_content_files")
+    """Tests that deindex_run_content_files triggers the correct ES delete task"""
+    patched_task = mocker.patch("search.tasks.deindex_run_content_files")
     content_file = ContentFileFactory.create()
-    delete_run_content_files(content_file.id)
+    deindex_run_content_files(content_file.id)
     patched_task.delay.assert_called_once_with(content_file.id)
 
 
@@ -582,9 +582,9 @@ def test_upsert_podcast_episode(mocker):
 @pytest.mark.django_db
 def test_delete_podcast(mocker):
     """Tests that deleting a podcast triggers the correct ES delete task"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
     podcast = PodcastFactory.create()
-    delete_podcast(podcast)
+    deindex_podcast(podcast)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (
         gen_podcast_id(podcast),
@@ -595,9 +595,9 @@ def test_delete_podcast(mocker):
 @pytest.mark.django_db
 def test_delete_podcast_episode(mocker):
     """Tests that deleting a podcast episode triggers the correct ES delete task"""
-    patched_delete_task = mocker.patch("search.task_helpers.delete_document")
+    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
     episode = PodcastEpisodeFactory.create()
-    delete_podcast_episode(episode)
+    deindex_podcast_episode(episode)
     assert patched_delete_task.delay.called is True
     assert patched_delete_task.delay.call_args[0] == (
         gen_podcast_episode_id(episode),

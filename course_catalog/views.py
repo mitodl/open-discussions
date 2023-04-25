@@ -72,9 +72,9 @@ from open_discussions.permissions import (
 )
 from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 from search.task_helpers import (
-    delete_course,
-    delete_staff_list,
-    delete_user_list,
+    deindex_course,
+    deindex_staff_list,
+    deindex_user_list,
     upsert_staff_list,
     upsert_user_list,
 )
@@ -283,7 +283,7 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
         return Response(serializer.data)
 
     def perform_destroy(self, instance):
-        delete_user_list(instance)
+        deindex_user_list(instance)
         instance.delete()
 
 
@@ -314,7 +314,7 @@ class UserListItemViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteVie
         if user_list.items.count() > 0:
             upsert_user_list(user_list.id)
         else:
-            delete_user_list(user_list)
+            deindex_user_list(user_list)
 
 
 class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMixin):
@@ -355,7 +355,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
         return Response(serializer.data)
 
     def perform_destroy(self, instance):
-        delete_staff_list(instance)
+        deindex_staff_list(instance)
         instance.delete()
 
 
@@ -388,7 +388,7 @@ class StaffListItemViewSet(
         if staff_list.items.count() > 0:
             upsert_staff_list(staff_list.id)
         else:
-            delete_staff_list(staff_list)
+            deindex_staff_list(staff_list)
 
 
 class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
@@ -551,7 +551,7 @@ class WebhookOCWNextView(APIView):
                     course = course_run.content_object
                     course.published = False
                     course.save()
-                    delete_course(course)
+                    deindex_course(course)
 
         return Response({})
 
