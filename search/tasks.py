@@ -15,7 +15,7 @@ from prawcore.exceptions import NotFound, PrawcoreException
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import PlatformType, PrivacyLevel
+from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PlatformType, PrivacyLevel
 from course_catalog.models import (
     ContentFile,
     Course,
@@ -42,6 +42,7 @@ from search.constants import (
     RESOURCE_FILE_TYPE,
     STAFF_LIST_TYPE,
     USER_LIST_TYPE,
+    VALID_OBJECT_TYPES,
     VIDEO_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
@@ -760,13 +761,16 @@ def start_recreate_index(self, indexes):
     """
     try:
         new_backing_indices = {
-            obj_type: api.create_backing_index(obj_type) for obj_type in indexes
+            obj_type: api.create_backing_index(obj_type)
+            for obj_type in indexes
+            if obj_type in VALID_OBJECT_TYPES
         }
 
         # Do the indexing on the temp index
         log.info("starting to index %s objects...", ", ".join(indexes))
 
         index_tasks = []
+        blocklisted_ids = load_course_blocklist()
 
         if POST_TYPE in indexes:
             index_tasks = index_tasks + [
@@ -800,38 +804,29 @@ def start_recreate_index(self, indexes):
             ]
 
         if COURSE_TYPE in indexes:
-            blocklisted_ids = load_course_blocklist()
-            index_tasks = (
-                index_tasks
-                + [
-                    index_courses.si(ids)
-                    for ids in chunks(
-                        Course.objects.filter(published=True)
-                        .exclude(course_id__in=blocklisted_ids)
-                        .order_by("id")
-                        .values_list("id", flat=True),
-                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                    )
-                ]
-                + [
-                    index_course_content_files.si(ids)
-                    for ids in chunks(
-                        Course.objects.filter(published=True)
-                        .filter(
-                            platform__in=(
-                                PlatformType.ocw.value,
-                                PlatformType.xpro.value,
-                                PlatformType.mitx.value,
-                                PlatformType.mitxonline.value,
-                            )
-                        )
-                        .exclude(course_id__in=blocklisted_ids)
-                        .order_by("id")
-                        .values_list("id", flat=True),
-                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                    )
-                ]
-            )
+            index_tasks = index_tasks + [
+                index_courses.si(ids)
+                for ids in chunks(
+                    Course.objects.filter(published=True)
+                    .exclude(course_id__in=blocklisted_ids)
+                    .order_by("id")
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
+
+        if RESOURCE_FILE_TYPE in indexes:
+            index_tasks = index_tasks + [
+                index_course_content_files.si(ids)
+                for ids in chunks(
+                    Course.objects.filter(published=True)
+                    .filter(platform__in=RESOURCE_FILE_PLATFORMS)
+                    .exclude(course_id__in=blocklisted_ids)
+                    .order_by("id")
+                    .values_list("id", flat=True),
+                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                )
+            ]
 
         if PROGRAM_TYPE in indexes:
             index_tasks = index_tasks + [
@@ -1072,13 +1067,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
         platform(str): Platform filter for the task
     """
 
-    # There arn't seperate RESOURCE_FILE_TYPE deletion taks because
-    # content files are only deleted when courses are deleted
-
-    if platform is None or platform in (
-        PlatformType.ocw.value,
-        PlatformType.xpro.value,
-    ):
+    if platform is None or platform in RESOURCE_FILE_PLATFORMS:
         course_update_query = (
             Course.objects.filter(published=True)
             .exclude(course_id__in=blocklisted_ids)
@@ -1089,7 +1078,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
             course_update_query = course_update_query.filter(platform=platform)
         else:
             course_update_query = course_update_query.filter(
-                platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+                platform__in=RESOURCE_FILE_PLATFORMS
             )
 
         return [

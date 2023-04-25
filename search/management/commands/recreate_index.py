@@ -3,7 +3,11 @@ from django.core.management.base import BaseCommand, CommandError
 
 from open_discussions.utils import now_in_utc
 from search.tasks import start_recreate_index
-from search.constants import VALID_OBJECT_TYPES
+from search.constants import VALID_OBJECT_TYPES, RESOURCE_FILE_TYPE
+
+
+valid_object_types = list(VALID_OBJECT_TYPES)
+valid_object_types.append(RESOURCE_FILE_TYPE)
 
 
 class Command(BaseCommand):
@@ -16,7 +20,7 @@ class Command(BaseCommand):
             "--all", dest="all", action="store_true", help="Recreate all indexes"
         )
 
-        for object_type in sorted(VALID_OBJECT_TYPES):
+        for object_type in sorted(valid_object_types):
             parser.add_argument(
                 f"--{object_type}s",
                 dest=object_type,
@@ -28,7 +32,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Index the comments and posts for the channels the user is subscribed to"""
         if options["all"]:
-            task = start_recreate_index.delay(list(VALID_OBJECT_TYPES))
+            task = start_recreate_index.delay(valid_object_types)
             self.stdout.write(
                 "Started celery task {task} to index content for all indexes".format(
                     task=task
@@ -36,13 +40,13 @@ class Command(BaseCommand):
             )
         else:
             indexes_to_update = list(
-                filter(lambda object_type: options[object_type], VALID_OBJECT_TYPES)
+                filter(lambda object_type: options[object_type], valid_object_types)
             )
             if not indexes_to_update:
                 self.stdout.write("Must select at least one index to update")
                 self.stdout.write("The following are valid index options:")
                 self.stdout.write("  --all")
-                for object_type in sorted(VALID_OBJECT_TYPES):
+                for object_type in sorted(valid_object_types):
                     self.stdout.write(f"  --{object_type}s")
                 return
 

@@ -56,6 +56,10 @@ EDX_PLATFORMS = [
     )
 ]
 
+RESOURCE_FILE_PLATFORMS = [
+    PlatformType.ocw.value,
+    *EDX_PLATFORMS
+]
 
 class ResourceType(Enum):
     """
