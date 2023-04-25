@@ -15,7 +15,7 @@ from prawcore.exceptions import NotFound, PrawcoreException
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PlatformType, PrivacyLevel
+from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PrivacyLevel
 from course_catalog.models import (
     ContentFile,
     Course,
