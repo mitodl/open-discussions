@@ -623,5 +623,5 @@ def retire_user(user):
         user.save()
         user.social_auth.all().delete()
         user.received_invitations.all().delete()
-        task_helpers.delete_profile(user)
+        task_helpers.deindex_profile(user)
         user.content_subscriptions.all().delete()

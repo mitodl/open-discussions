@@ -5,7 +5,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.models import Program
 from course_catalog.tasks import get_micromasters_data
 from open_discussions.utils import now_in_utc
-from search.task_helpers import delete_program
+from search.task_helpers import deindex_program
 
 
 class Command(BaseCommand):
@@ -32,7 +32,7 @@ class Command(BaseCommand):
             for program in Program.objects.filter(
                 platform=PlatformType.micromasters.value
             ):
-                delete_program(program)
+                deindex_program(program)
         else:
             task = get_micromasters_data.delay()
             self.stdout.write(f"Started task {task} to get micromasters course data")

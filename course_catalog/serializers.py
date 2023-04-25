@@ -48,8 +48,8 @@ from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
 from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
 from search.task_helpers import (
-    delete_staff_list,
-    delete_user_list,
+    deindex_staff_list,
+    deindex_user_list,
     upsert_staff_list,
     upsert_user_list,
 )
@@ -731,7 +731,7 @@ class UserListSerializer(
                 if instance.items.exists():
                     upsert_user_list(userlist.id)
                 else:
-                    delete_user_list(userlist)
+                    deindex_user_list(userlist)
                 return userlist
 
     class Meta:
@@ -790,7 +790,7 @@ class StaffListSerializer(
                 ):
                     upsert_staff_list(stafflist.id)
                 else:
-                    delete_staff_list(stafflist)
+                    deindex_staff_list(stafflist)
                 return stafflist
 
     class Meta:

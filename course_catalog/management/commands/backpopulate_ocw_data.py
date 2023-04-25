@@ -7,7 +7,7 @@ from course_catalog.models import Course
 from course_catalog.tasks import get_ocw_data
 from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc
-from search.task_helpers import delete_course
+from search.task_helpers import deindex_course
 
 
 class Command(BaseCommand):
@@ -76,7 +76,7 @@ class Command(BaseCommand):
             self.stdout.write("Deleting all existing OCW courses")
             for course in Course.objects.filter(platform="ocw", ocw_next_course=False):
                 course.delete()
-                delete_course(course)
+                deindex_course(course)
         else:
             start = now_in_utc()
 

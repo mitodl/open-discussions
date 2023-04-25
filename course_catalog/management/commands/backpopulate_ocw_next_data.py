@@ -6,7 +6,7 @@ from course_catalog.tasks import get_ocw_next_data
 from course_catalog.constants import PlatformType
 from open_discussions.constants import ISOFORMAT
 from open_discussions.utils import now_in_utc
-from search.task_helpers import delete_course
+from search.task_helpers import deindex_course
 
 
 class Command(BaseCommand):
@@ -53,7 +53,7 @@ class Command(BaseCommand):
                     course = run.content_object
                     course.published = False
                     course.save()
-                    delete_course(course)
+                    deindex_course(course)
             else:
                 self.stdout.write(
                     "You must specify a course_url_substring with --delete"

@@ -320,9 +320,9 @@ def upsert_podcast_episode(podcast_episode_id):
 
 
 @app.task
-def delete_document(doc_id, object_type, **kwargs):
+def deindex_document(doc_id, object_type, **kwargs):
     """Task that makes a request to remove an ES document"""
-    return api.delete_document(doc_id, object_type, **kwargs)
+    return api.deindex_document(doc_id, object_type, **kwargs)
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -360,7 +360,7 @@ def index_profiles(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_profiles(ids):
+def bulk_deindex_profiles(ids):
     """
     Index user profiles by a list of Profile.id
 
@@ -369,11 +369,11 @@ def bulk_delete_profiles(ids):
 
     """
     try:
-        api.delete_profiles(ids)
+        api.deindex_profiles(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_profiles threw an error"
+        error = "bulk_deindex_profiles threw an error"
         log.exception(error)
         return error
 
@@ -442,20 +442,20 @@ def index_courses(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_courses(ids):
+def bulk_deindex_courses(ids):
     """
-    Delete courses by a list of course.id
+    Deindex courses by a list of course.id
 
     Args:
         ids(list of int): List of course id's
 
     """
     try:
-        api.delete_courses(ids)
+        api.deindex_courses(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_courses threw an error"
+        error = "bulk_deindex_courses threw an error"
         log.exception(error)
         return error
 
@@ -493,7 +493,7 @@ def index_run_content_files(run_id, update_only=False):
     """
     try:
         api.index_run_content_files(run_id, update_only=update_only)
-        api.delete_run_content_files(run_id, unpublished_only=True)
+        api.deindex_run_content_files(run_id, unpublished_only=True)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
@@ -503,20 +503,20 @@ def index_run_content_files(run_id, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def delete_run_content_files(run_id):
+def deindex_run_content_files(run_id):
     """
-    Deleted content files for a LearningResourceRun from the index
+    Deindex content files for a LearningResourceRun
 
     Args:
         run_id(int): LearningResourceRun id
 
     """
     try:
-        api.delete_run_content_files(run_id)
+        api.deindex_run_content_files(run_id)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "delete_run_content_files threw an error"
+        error = "deindex_run_content_files threw an error"
         log.exception(error)
         return error
 
@@ -542,20 +542,20 @@ def index_programs(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_programs(ids):
+def bulk_deindex_programs(ids):
     """
-    Delete programs
+    Deindex programs
 
     Args:
         ids(list of int): List of program id's
 
     """
     try:
-        api.delete_programs(ids)
+        api.deindex_programs(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_programs threw an error"
+        error = "bulk_deindex_programs threw an error"
         log.exception(error)
         return error
 
@@ -581,20 +581,20 @@ def index_user_lists(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_user_lists(ids):
+def bulk_deindex_user_lists(ids):
     """
-    Delete UserLists
+    Deindex UserLists
 
     Args:
         ids(list of int): List of UserList id's
 
     """
     try:
-        api.delete_user_lists(ids)
+        api.deindex_user_lists(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_user_lists threw an error"
+        error = "bulk_deindex_user_lists threw an error"
         log.exception(error)
         return error
 
@@ -620,20 +620,20 @@ def index_staff_lists(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_staff_lists(ids):
+def bulk_deindex_staff_lists(ids):
     """
-    Delete StaffLists
+    Deindex StaffLists
 
     Args:
         ids(list of int): List of StaffList id's
 
     """
     try:
-        api.delete_staff_lists(ids)
+        api.deindex_staff_lists(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_staff_lists threw an error"
+        error = "bulk_deindex_staff_lists threw an error"
         log.exception(error)
         return error
 
@@ -659,20 +659,20 @@ def index_videos(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_videos(ids):
+def bulk_deindex_videos(ids):
     """
-    Delete videos
+    Deindex videos
 
     Args:
         ids(list of int): List of video id's
 
     """
     try:
-        api.delete_videos(ids)
+        api.deindex_videos(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_videos threw an error"
+        error = "bulk_deindex_videos threw an error"
         log.exception(error)
         return error
 
@@ -697,20 +697,20 @@ def index_podcasts(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_podcasts(ids):
+def bulk_deindex_podcasts(ids):
     """
-    Delete videos
+    Deindex podcasts
 
     Args:
         ids(list of int): List of podcast id's
 
     """
     try:
-        api.delete_podcasts(ids)
+        api.deindex_podcasts(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_podcasts threw an error"
+        error = "bulk_deindex_podcasts threw an error"
         log.exception(error)
         return error
 
@@ -735,20 +735,20 @@ def index_podcast_episodes(ids, update_only=False):
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def bulk_delete_podcast_episodes(ids):
+def bulk_deindex_podcast_episodes(ids):
     """
-    Delete podcast_episodes
+    Deindex podcast_episodes
 
     Args:
         ids(list of int): List of podcast_episode id's
 
     """
     try:
-        api.delete_podcast_episodes(ids)
+        api.deindex_podcast_episodes(ids)
     except (RetryException, Ignore):
         raise
     except:  # pylint: disable=bare-except
-        error = "bulk_delete_podcast_episodes threw an error"
+        error = "bulk_deindex_podcast_episodes threw an error"
         log.exception(error)
         return error
 
@@ -1010,7 +1010,7 @@ def get_update_profiles_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_profiles.si(ids)
+        bulk_deindex_profiles.si(ids)
         for ids in chunks(
             User.objects.exclude(profile__isnull=True)
             .filter(is_active=False)
@@ -1054,7 +1054,7 @@ def get_update_courses_tasks(blocklisted_ids, platform):
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_courses.si(ids)
+        bulk_deindex_courses.si(ids)
         for ids in chunks(
             course_deletion_query.values_list("id", flat=True),
             chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
@@ -1118,7 +1118,7 @@ def get_update_programs_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_programs.si(ids)
+        bulk_deindex_programs.si(ids)
         for ids in chunks(
             Program.objects.filter(published=False)
             .order_by("id")
@@ -1146,7 +1146,7 @@ def get_update_user_lists_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_user_lists.si(ids)
+        bulk_deindex_user_lists.si(ids)
         for ids in chunks(
             UserList.objects.order_by("id")
             .filter(items=None)
@@ -1175,7 +1175,7 @@ def get_update_staff_lists_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_user_lists.si(ids)
+        bulk_deindex_user_lists.si(ids)
         for ids in chunks(
             StaffList.objects.order_by("id")
             .filter(Q(items=None) | Q(privacy_level=PrivacyLevel.private.value))
@@ -1203,7 +1203,7 @@ def get_update_videos_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_videos.si(ids)
+        bulk_deindex_videos.si(ids)
         for ids in chunks(
             Video.objects.filter(published=False)
             .order_by("id")
@@ -1230,7 +1230,7 @@ def get_update_podcasts_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_podcasts.si(ids)
+        bulk_deindex_podcasts.si(ids)
         for ids in chunks(
             Podcast.objects.filter(published=False)
             .order_by("id")
@@ -1257,7 +1257,7 @@ def get_update_podcast_episodes_tasks():
     ]
 
     index_tasks = index_tasks + [
-        bulk_delete_podcast_episodes.si(ids)
+        bulk_deindex_podcast_episodes.si(ids)
         for ids in chunks(
             PodcastEpisode.objects.filter(published=False)
             .order_by("id")

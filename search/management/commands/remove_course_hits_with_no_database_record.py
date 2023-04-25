@@ -5,7 +5,7 @@ from course_catalog.models import Course
 from search.connection import get_default_alias_name
 from search.constants import COURSE_TYPE
 from search.indexing_api import es_iterate_all_documents, gen_course_id
-from search.tasks import delete_document
+from search.tasks import deindex_document
 
 
 class Command(BaseCommand):
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         self.stdout.write("Removing {} document records".format(len(bad_documents)))
 
         for doc in bad_documents:
-            delete_document(
+            deindex_document(
                 doc["_id"],
                 COURSE_TYPE,
                 routing=doc["_source"]["resource_relations"]["parent"],
@@ -48,4 +48,4 @@ class Command(BaseCommand):
         self.stdout.write("Removing {} course records".format(len(bad_courses)))
 
         for course in bad_courses:
-            delete_document(course["_id"], COURSE_TYPE)
+            deindex_document(course["_id"], COURSE_TYPE)

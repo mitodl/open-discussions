@@ -5,7 +5,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.tasks import get_oll_data
 from open_discussions.utils import now_in_utc
-from search.task_helpers import delete_course
+from search.task_helpers import deindex_course
 
 
 class Command(BaseCommand):
@@ -30,7 +30,7 @@ class Command(BaseCommand):
             )
             for course in Course.objects.filter(platform=PlatformType.oll.value):
                 course.delete()
-                delete_course(course)
+                deindex_course(course)
         else:
             task = get_oll_data.delay()
             self.stdout.write(f"Started task {task} to get oll course data")
