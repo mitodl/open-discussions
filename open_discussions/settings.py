@@ -9,6 +9,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 
 """
+# pylint:disable=wildcard-import,unused-wildcard-import)
 import datetime
 import logging
 import os
@@ -16,18 +17,19 @@ import platform
 from urllib.parse import urljoin, urlparse
 
 import dj_database_url
-from celery.schedules import crontab
 from django.core.exceptions import ImproperlyConfigured
 
 from open_discussions.envs import (
     get_any,
     get_bool,
     get_int,
-    get_string,
-    get_list_of_str,
     get_key,
+    get_list_of_str,
+    get_string,
 )
 from open_discussions.sentry import init_sentry
+from open_discussions.settings_celery import *
+from open_discussions.settings_course_etl import *
 from open_discussions.settings_spectacular import open_spectacular_settings
 
 VERSION = "0.212.3"
@@ -553,105 +555,6 @@ if OPEN_DISCUSSIONS_USE_S3:
 IMAGEKIT_SPEC_CACHEFILE_NAMER = "imagekit.cachefiles.namers.source_name_dot_hash"
 IMAGEKIT_CACHEFILE_DIR = get_string("IMAGEKIT_CACHEFILE_DIR", "")
 
-# Celery
-USE_CELERY = True
-CELERY_BROKER_URL = get_string("CELERY_BROKER_URL", get_string("REDISCLOUD_URL", None))
-CELERY_RESULT_BACKEND = get_string(
-    "CELERY_RESULT_BACKEND", get_string("REDISCLOUD_URL", None)
-)
-CELERY_TASK_ALWAYS_EAGER = get_bool("CELERY_TASK_ALWAYS_EAGER", False)
-CELERY_TASK_EAGER_PROPAGATES = get_bool("CELERY_TASK_EAGER_PROPAGATES", True)
-CELERY_WORKER_MAX_MEMORY_PER_CHILD = get_int(
-    "CELERY_WORKER_MAX_MEMORY_PER_CHILD", 250_000
-)
-
-CELERY_BEAT_SCHEDULE = {
-    "evict-expired-access-tokens-every-1-hrs": {
-        "task": "channels.tasks.evict_expired_access_tokens",
-        "schedule": crontab(minute=0, hour="*"),
-    },
-    "send-unsent-emails-every-1-mins": {
-        "task": "notifications.tasks.send_unsent_email_notifications",
-        "schedule": crontab(minute="*"),
-    },
-    "send-frontpage-digests-every-1-days": {
-        "task": "notifications.tasks.send_daily_frontpage_digests",
-        "schedule": crontab(minute=0, hour=14),  # 10am EST
-    },
-    "send-frontpage-digests-every-1-weeks": {
-        "task": "notifications.tasks.send_weekly_frontpage_digests",
-        "schedule": crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
-    },
-    "update_edx-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_mitx_data",
-        "schedule": crontab(minute=30, hour=15),  # 11:30am EST
-    },
-    "update-edx-files-every-1-weeks": {
-        "task": "course_catalog.tasks.import_all_mitx_files",
-        "schedule": crontab(
-            minute=0, hour=16, day_of_week=1
-        ),  # 12:00 PM EST on Mondays
-    },
-    "update-micromasters-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_micromasters_data",
-        "schedule": crontab(minute=00, hour=15),  # 11:00am EST
-    },
-    "update-podcasts": {
-        "task": "course_catalog.tasks.get_podcast_data",
-        "schedule": get_int(
-            "PODCAST_FETCH_SCHEDULE_SECONDS", 60 * 60 * 2
-        ),  # default is every 2 hours
-    },
-    "update-xpro-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_xpro_data",
-        "schedule": crontab(minute=30, hour=17),  # 1:30pm EST
-    },
-    "update-xpro-files-every-1-weeks": {
-        "task": "course_catalog.tasks.import_all_xpro_files",
-        "schedule": crontab(
-            minute=0, hour=16, day_of_week=2
-        ),  # 12:00 PM EST on Tuesdays
-    },
-    "update-mitxonline-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_mitxonline_data",
-        "schedule": crontab(minute=30, hour=19),  # 3:30pm EST
-    },
-    "update-mitxonline-files-every-1-weeks": {
-        "task": "course_catalog.tasks.import_all_mitxonline_files",
-        "schedule": crontab(
-            minute=0, hour=16, day_of_week=3
-        ),  # 12:00 PM EST on Wednesdays
-    },
-    "update-oll-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_oll_data",
-        "schedule": crontab(minute=30, hour=18),  # 2:30pm EST
-    },
-    "update-prolearn-courses-every-1-days": {
-        "task": "course_catalog.tasks.get_prolearn_data",
-        "schedule": crontab(minute=30, hour=21),  # 5:30pm EST
-    },
-    "update-youtube-videos": {
-        "task": "course_catalog.tasks.get_youtube_data",
-        "schedule": get_int(
-            "YOUTUBE_FETCH_SCHEDULE_SECONDS", 60 * 30
-        ),  # default is every 30 minutes
-    },
-    "update-youtube-transcripts": {
-        "task": "course_catalog.tasks.get_youtube_transcripts",
-        "schedule": get_int(
-            "YOUTUBE_FETCH_TRANSCRIPT_SCHEDULE_SECONDS", 60 * 60 * 12
-        ),  # default is 12 hours
-    },
-    "update-managed-channel-memberships": {
-        "task": "channels.tasks.update_memberships_for_managed_channels",
-        "schedule": crontab(minute=30, hour=10),  # 6:30am EST
-    },
-}
-
-CELERY_TASK_SERIALIZER = "json"
-CELERY_RESULT_SERIALIZER = "json"
-CELERY_ACCEPT_CONTENT = ["json"]
-CELERY_TIMEZONE = "UTC"
 
 # django cache back-ends
 CACHES = {
@@ -853,104 +756,12 @@ HIJACK_LOGOUT_REDIRECT_URL = "/admin/auth/user"
 # disable the anonymous user creation
 ANONYMOUS_USER_NAME = None
 
-# EDX API Credentials
-EDX_API_URL = get_string("EDX_API_URL", None)
-EDX_API_ACCESS_TOKEN_URL = get_string("EDX_API_ACCESS_TOKEN_URL", None)
-EDX_API_CLIENT_ID = get_string("EDX_API_CLIENT_ID", None)
-EDX_API_CLIENT_SECRET = get_string("EDX_API_CLIENT_SECRET", None)
-EDX_LEARNING_COURSE_BUCKET_NAME = get_string("EDX_LEARNING_COURSE_BUCKET_NAME", None)
-EDX_LEARNING_COURSE_BUCKET_PREFIX = get_string(
-    "EDX_LEARNING_COURSE_BUCKET_PREFIX", "simeon-mitx-course-tarballs"
-)
-# Authentication for the github api
-GITHUB_ACCESS_TOKEN = get_string("GITHUB_ACCESS_TOKEN", None)
-
-# S3 Bucket info for OCW Plone CMS exports
-OCW_CONTENT_BUCKET_NAME = get_string("OCW_CONTENT_BUCKET_NAME", None)
-
-# s3 Buckets for OCW Next imports
-OCW_NEXT_LIVE_BUCKET = get_string("OCW_NEXT_LIVE_BUCKET", None)
-OCW_NEXT_AWS_STORAGE_BUCKET_NAME = get_string("OCW_NEXT_AWS_STORAGE_BUCKET_NAME", None)
-
-# S3 Bucket info for exporting OCW Plone media files
-OCW_LEARNING_COURSE_BUCKET_NAME = get_string("OCW_LEARNING_COURSE_BUCKET_NAME", None)
-OCW_UPLOAD_IMAGE_ONLY = get_bool("OCW_UPLOAD_IMAGE_ONLY", False)
-OCW_ITERATOR_CHUNK_SIZE = get_int("OCW_ITERATOR_CHUNK_SIZE", 1000)
-OCW_WEBHOOK_DELAY = get_int("OCW_WEBHOOK_DELAY", 120)
-OCW_WEBHOOK_KEY = get_string("OCW_WEBHOOK_KEY", None)
-OCW_NEXT_SEARCH_WEBHOOK_KEY = get_string("OCW_NEXT_SEARCH_WEBHOOK_KEY", None)
-MAX_S3_GET_ITERATIONS = get_int("MAX_S3_GET_ITERATIONS", 3)
-OCW_NEXT_BASE_URL = get_string("OCW_NEXT_BASE_URL", "http://ocw.mit.edu/")
-
-# Base URL's for courses
-OCW_BASE_URL = get_string("OCW_BASE_URL", "http://ocw.mit.edu/")
-MITX_BASE_URL = get_string("MITX_BASE_URL", "https://www.edx.org/course/")
-MITX_ALT_URL = get_string("MITX_ALT_URL", "https://courses.edx.org/courses/")
-BLOCKLISTED_COURSES_URL = get_string(
-    "BLOCKLISTED_COURSES_URL",
-    "https://raw.githubusercontent.com/mitodl/open-resource-blocklists/master/courses.txt",
-)
-DUPLICATE_COURSES_URL = get_string("DUPLICATE_COURSES_URL", None)
-
-# Base URL for Micromasters data
-MICROMASTERS_CATALOG_API_URL = get_string("MICROMASTERS_CATALOG_API_URL", None)
-
-# Base URL for Prolearn data
-PROLEARN_CATALOG_API_URL = get_string("PROLEARN_CATALOG_API_URL", None)
-
-# Iterator chunk size for MITx and xPRO courses
-LEARNING_COURSE_ITERATOR_CHUNK_SIZE = get_int("LEARNING_COURSE_ITERATOR_CHUNK_SIZE", 20)
-
-# xPRO settings for course/resource ingestion
-XPRO_LEARNING_COURSE_BUCKET_NAME = get_string("XPRO_LEARNING_COURSE_BUCKET_NAME", None)
-XPRO_CATALOG_API_URL = get_string("XPRO_CATALOG_API_URL", None)
-XPRO_COURSES_API_URL = get_string("XPRO_COURSES_API_URL", None)
-
-# MITx Online settings for course/resource ingestion
-MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME = get_string(
-    "MITX_ONLINE_LEARNING_COURSE_BUCKET_NAME", None
-)
-MITX_ONLINE_BASE_URL = get_string("MITX_ONLINE_BASE_URL", None)
-MITX_ONLINE_PROGRAMS_API_URL = get_string("MITX_ONLINE_PROGRAMS_API_URL", None)
-MITX_ONLINE_COURSES_API_URL = get_string("MITX_ONLINE_COURSES_API_URL", None)
-
-# Open Learning Library settings
-OLL_API_URL = get_string("OLL_API_URL", None)
-OLL_API_ACCESS_TOKEN_URL = get_string("OLL_API_ACCESS_TOKEN_URL", None)
-OLL_API_CLIENT_ID = get_string("OLL_API_CLIENT_ID", None)
-OLL_API_CLIENT_SECRET = get_string("OLL_API_CLIENT_SECRET", None)
-OLL_BASE_URL = get_string("OLL_BASE_URL", None)
-OLL_ALT_URL = get_string("OLL_ALT_URL", None)
-
-# More MIT URLs
-SEE_BASE_URL = get_string("SEE_BASE_URL", None)
-MITPE_BASE_URL = get_string("MITPE_BASE_URL", None)
-CSAIL_BASE_URL = get_string("CSAIL_BASE_URL", None)
-
 # Widgets
 WIDGETS_RSS_CACHE_TTL = get_int("WIDGETS_RSS_CACHE_TTL", 15 * 60)
 
 # livestream API credentials
 LIVESTREAM_SECRET_KEY = get_string("LIVESTREAM_SECRET_KEY", None)
 LIVESTREAM_ACCOUNT_ID = get_string("LIVESTREAM_ACCOUNT_ID", None)
-
-# course catalog video etl settings
-OPEN_VIDEO_DATA_BRANCH = get_string("OPEN_VIDEO_DATA_BRANCH", "master")
-OPEN_VIDEO_USER_LIST_OWNER = get_string("OPEN_VIDEO_USER_LIST_OWNER", None)
-OPEN_VIDEO_MAX_TOPICS = get_int("OPEN_VIDEO_MAX_TOPICS", 3)
-OPEN_VIDEO_MIN_TERM_FREQ = get_int("OPEN_VIDEO_MIN_TERM_FREQ", 1)
-OPEN_VIDEO_MIN_DOC_FREQ = get_int("OPEN_VIDEO_MIN_DOC_FREQ", 15)
-
-YOUTUBE_DEVELOPER_KEY = get_string("YOUTUBE_DEVELOPER_KEY", None)
-YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS = get_int(
-    "YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS", 5
-)
-
-# course catalog podcast etl settings
-OPEN_PODCAST_DATA_BRANCH = get_string("OPEN_PODCAST_DATA_BRANCH", "master")
-
-# Tika security
-TIKA_ACCESS_TOKEN = get_string("TIKA_ACCESS_TOKEN", None)
 
 # x509 certificate for moira
 MIT_WS_CERTIFICATE = get_key("MIT_WS_CERTIFICATE", "")
