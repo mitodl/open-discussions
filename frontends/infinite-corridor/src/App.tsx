@@ -18,6 +18,7 @@ import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
+import StaffListsListingPage from "./pages/resource-lists/StaffListsListingPage"
 
 export const BASE_URL = "/infinite"
 
@@ -81,6 +82,9 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
           </Route>
           <Route path={urls.USERLIST_VIEW} exact>
             <UserListDetailsPage />
+          </Route>
+          <Route path={urls.STAFFLISTS_LISTING} exact>
+            <StaffListsListingPage />
           </Route>
         </Switch>
         <LearningResourceDrawer />

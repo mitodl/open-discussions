@@ -312,4 +312,4 @@ const keys = {
 }
 
 export { urls, keys, DEFAULT_PAGINATION_PARAMS }
-export type { UserListOptions, CourseFilterParams }
+export type { UserListOptions, StaffListOptions, CourseFilterParams }

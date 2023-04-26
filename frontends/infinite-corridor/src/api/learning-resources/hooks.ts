@@ -5,7 +5,8 @@ import type {
   UserList,
   CourseTopic,
   LearningResourceType,
-  ListItemMember
+  ListItemMember,
+  StaffList
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
 import axios from "../../libs/axios"
@@ -18,7 +19,7 @@ import {
   useInfiniteQuery,
   InfiniteData
 } from "react-query"
-import { urls, keys, UserListOptions, CourseFilterParams } from "./urls"
+import { urls, keys, UserListOptions, CourseFilterParams, StaffListOptions } from "./urls"
 import { modifyCachedSearchResource } from "./search"
 import invariant from "tiny-invariant"
 import { QueryFilters } from "react-query/types/core/utils"
@@ -300,6 +301,14 @@ const useDeleteFromUserListItems = () => {
   })
 }
 
+const useStaffListsListing = (options?: StaffListOptions) => {
+  const url = urls.staffList.listing(options)
+  const key = keys.staffList.listing.page(options)
+  return useQuery<PaginatedResult<StaffList>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
+}
+
 const useUpcomingCourses = (
   options?: PaginationSearchParams,
   filters?: CourseFilterParams
@@ -418,6 +427,7 @@ export {
   useDeleteUserList, // mutation
   useAddToUserListItems, // mutation
   useDeleteFromUserListItems, // mutation
+  useStaffListsListing, // listing
   useFavorite, // mutation
   useUnfavorite, // mutation
   useUpcomingCourses, // listing
