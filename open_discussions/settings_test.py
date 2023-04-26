@@ -6,13 +6,12 @@ import importlib
 import sys
 from unittest import mock
 
+import semantic_version
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.urls import reverse
-import semantic_version
-
 
 REQUIRED_SETTINGS = {
     "ELASTICSEARCH_URL": "http://localhost:9300/",
