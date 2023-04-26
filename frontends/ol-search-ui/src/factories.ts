@@ -14,7 +14,8 @@ import {
   UserList,
   ListItem,
   PrivacyLevel,
-  ListItemMember
+  ListItemMember,
+  StaffList
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -164,6 +165,40 @@ export const makeUserList: Factory<UserList> = overrides => {
   }
   return userList
 }
+
+export const makeStaffList: Factory<StaffList> = overrides => {
+  const type = faker.helpers.arrayElement([
+    LearningResourceType.StaffList,
+    LearningResourceType.StaffPath
+  ] as const)
+  const staffList: StaffList = {
+    id:                faker.unique(faker.datatype.number),
+    short_description: faker.lorem.paragraph(),
+    offered_by:        [],
+    title:             faker.lorem.words(),
+    topics:            times(2, () => makeTopic()),
+    is_favorite:       faker.datatype.boolean(),
+    image_src:         new URL(faker.internet.url()).toString(),
+    image_description: faker.helpers.arrayElement([
+      null,
+      faker.lorem.sentence()
+    ]),
+    item_count:    faker.datatype.number({ min: 2, max: 5 }),
+    object_type:   type,
+    list_type:     type,
+    privacy_level: faker.helpers.arrayElement([
+      PrivacyLevel.Public,
+      PrivacyLevel.Private
+    ]),
+    author:        faker.datatype.number({ min: 1, max: 1000 }),
+    lists:         [],
+    certification: [],
+    author_name:   faker.name.findName(),
+    ...overrides
+  }
+  return staffList
+}
+
 
 const resultMakers = {
   course:  makeCourse,
