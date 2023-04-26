@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.213.0
+---------------
+
+- Rename search index functions, delete->deindex (#3963)
+- Make learning path items drag resortable (#3948)
+
 Version 0.212.3 (Released April 24, 2023)
 ---------------
 
