@@ -12,7 +12,7 @@ import {
   EmbedlyConfig,
   Course,
   UserList,
-  UserListItem,
+  ListItem,
   PrivacyLevel,
   ListItemMember
 } from "./interfaces"
@@ -246,9 +246,9 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
   return resource
 }
 
-export const makeUserListItem: Factory<UserListItem> = overrides => {
+export const makeListItem: Factory<ListItem> = overrides => {
   const content = makeLearningResource()
-  const item: UserListItem = {
+  const item: ListItem = {
     id:           faker.unique(faker.datatype.number),
     object_id:    content.id,
     position:     faker.datatype.number(),
@@ -277,9 +277,9 @@ export const makeListItemMember: Factory<
   }
 }
 
-export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
+export const makeListItemsPaginated = makePaginatedFactory(makeListItem)
 
-export const makeFavorites = makeUserListItemsPaginated
+export const makeFavorites = makeListItemsPaginated
 
 export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
 

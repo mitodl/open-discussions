@@ -104,6 +104,8 @@ const readableLearningResources: Record<LR | typeof TYPE_FAVORITES, string> = {
   [LR.Program]:        "Program",
   [LR.Userlist]:       "Learning List",
   [LR.LearningPath]:   "Learning Path",
+  [LR.StaffList]:      "Learning List",
+  [LR.StaffPath]:      "Learning Path",
   [LR.Video]:          "Video",
   [TYPE_FAVORITES]:    "Favorites",
   [LR.Podcast]:        "Podcast",

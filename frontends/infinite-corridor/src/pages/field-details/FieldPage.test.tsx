@@ -64,9 +64,9 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   const list1 = factory.makeFieldUserList()
   const list2 = factory.makeFieldUserList()
   const list3 = factory.makeFieldUserList()
-  const items1 = lrFactory.makeUserListItemsPaginated({ count: 4 })
-  const items2 = lrFactory.makeUserListItemsPaginated({ count: 2 })
-  const items3 = lrFactory.makeUserListItemsPaginated({ count: 2 })
+  const items1 = lrFactory.makeListItemsPaginated({ count: 4 })
+  const items2 = lrFactory.makeListItemsPaginated({ count: 2 })
+  const items3 = lrFactory.makeListItemsPaginated({ count: 2 })
 
   const field = factory.makeField({
     featured_list: list1,

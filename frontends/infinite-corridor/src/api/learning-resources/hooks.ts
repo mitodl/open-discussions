@@ -1,7 +1,7 @@
 import { chunk } from "lodash"
 import type {
   LearningResource,
-  PaginatedUserListItems,
+  PaginatedListItems,
   UserList,
   CourseTopic,
   LearningResourceType,
@@ -52,7 +52,7 @@ const useUserListItems = (
 ) => {
   const { enabled, ...others } = options
   const queryKey = keys.userList.id(listId).itemsListing.infinite(options)
-  const queryFn = ({ pageParam = 0 }): Promise<PaginatedUserListItems> => {
+  const queryFn = ({ pageParam = 0 }): Promise<PaginatedListItems> => {
     const url = urls.userList.itemsListing(listId, {
       ...others,
       offset: pageParam
@@ -75,7 +75,7 @@ const useUserListItems = (
 const useFavoritesListing = (options?: PaginationSearchParams) => {
   const url = urls.favorite.listing(options)
   const key = keys.favorites.listing.page(options)
-  return useQuery<PaginatedUserListItems>(key, () =>
+  return useQuery<PaginatedListItems>(key, () =>
     axios.get(url).then(res => res.data)
   )
 }
@@ -363,7 +363,7 @@ const useMoveUserListItem = () => {
         queryKey:  keys.userList.id(vars.item.list_id).itemsListing.all,
         predicate: query => query.state.data !== undefined
       }
-      queryClient.setQueriesData<InfiniteData<PaginatedUserListItems>>(
+      queryClient.setQueriesData<InfiniteData<PaginatedListItems>>(
         queryFilter,
         old => {
           invariant(old, "old data should be defined")

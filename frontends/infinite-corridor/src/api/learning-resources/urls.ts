@@ -107,8 +107,8 @@ const favoriteUrls = {
 
 const userListApi = UrlAssembler("/userlists/")
 const userListDetailApi = userListApi.segment(":id/")
-const userListItemsApiU = userListDetailApi.segment("items/")
-const userListItemsDetailApi = userListItemsApiU.segment(":itemId/")
+const userListItemsApi = userListDetailApi.segment("items/")
+const userListItemsDetailApi = userListItemsApi.segment(":itemId/")
 
 type UserListOptions = { public?: boolean } & PaginationSearchParams
 const userListUrls = {
@@ -117,9 +117,9 @@ const userListUrls = {
   listing: (options: UserListOptions = {}) =>
     userListApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
   itemAdd: (listId: number) =>
-    userListItemsApiU.param({ id: listId }).toString(),
+    userListItemsApi.param({ id: listId }).toString(),
   itemsListing: (listId: number, options: PaginationSearchParams = {}) =>
-    userListItemsApiU
+    userListItemsApi
       .param({ id: listId, ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
   itemDetails: (id: number, itemId: number) =>
@@ -128,6 +128,33 @@ const userListUrls = {
     userListDetailApi.segment("favorite/").param({ id }).toString(),
   unfavorite: (id: number) =>
     userListDetailApi.segment("unfavorite/").param({ id }).toString()
+}
+
+const staffListsApi = UrlAssembler("/stafflists/")
+const staffListsDetailApi = staffListsApi.segment(":id/")
+const staffListsItemsApi = staffListsDetailApi.segment("items/")
+const staffListsItemsDetailApi = staffListsItemsApi.segment(":itemId/")
+
+type StaffListOptions = { public?: boolean } & PaginationSearchParams
+const staffListUrls = {
+  details: (id: number) => staffListsDetailApi.param({ id }).toString(),
+  create:  staffListsApi.toString(),
+  listing: (options: UserListOptions = {}) =>
+    staffListsApi
+      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
+      .toString(),
+  itemAdd: (listId: number) =>
+    staffListsItemsApi.param({ id: listId }).toString(),
+  itemsListing: (listId: number, options: PaginationSearchParams = {}) =>
+    staffListsItemsApi
+      .param({ id: listId, ...DEFAULT_PAGINATION_PARAMS, ...options })
+      .toString(),
+  itemDetails: (id: number, itemId: number) =>
+    staffListsItemsDetailApi.param({ id, itemId }).toString(),
+  favorite: (id: number) =>
+    staffListsDetailApi.segment("favorite/").param({ id }).toString(),
+  unfavorite: (id: number) =>
+    staffListsDetailApi.segment("unfavorite/").param({ id }).toString()
 }
 
 type ResourceUrls = {
@@ -150,7 +177,11 @@ const getResourceUrls = (type: string): ResourceUrls => {
   case LRT.Userlist:
     return userListUrls
   case LRT.LearningPath:
-    return userListUrls // LearningPaths are handled by UserList api
+    return userListUrls // LearningPaths & UserLists are handled by the same api
+  case LRT.StaffList:
+    return staffListUrls
+  case LRT.StaffPath:
+    return staffListUrls // StaffPaths & StaffLists are handled by the same api
   default:
     throw new Error(`Unknown resource type: ${type}`)
   }
@@ -173,6 +204,7 @@ const urls = {
   podcastEpisode: podcastEpisodeUrls,
   favorite:       favoriteUrls,
   userList:       userListUrls,
+  staffList:      staffListUrls,
   resource:       resourceUrls,
   topics:         topicsUrls,
   search:         "search/",
@@ -227,6 +259,26 @@ const keys = {
       all:  resourceKeys(LRT.Userlist).listing.all,
       page: (opts?: UserListOptions) =>
         resourceKeys(LRT.Userlist).listing.page(opts)
+    }
+  },
+  staffList: {
+    all: resourceKeys(LRT.StaffList).all,
+    id:  (id: number) => {
+      const forId = resourceKeys(LRT.StaffList).id(id)
+      return {
+        ...forId,
+        itemsListing: {
+          all:      [...forId.all, "items"],
+          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
+            opts?: T
+          ) => [...forId.all, "items", "infinite", opts]
+        }
+      }
+    },
+    listing: {
+      all:  resourceKeys(LRT.StaffList).listing.all,
+      page: (opts?: StaffListOptions) =>
+        resourceKeys(LRT.StaffList).listing.page(opts)
     }
   },
   topics: [baseKey, "topics"],

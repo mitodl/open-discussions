@@ -29,19 +29,19 @@ describe("EditFieldBasicForm", () => {
     })
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[0].id),
-      resourceFactory.makeUserListItemsPaginated({ count: 2 })
+      resourceFactory.makeListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[1].id),
-      resourceFactory.makeUserListItemsPaginated({ count: 2 })
+      resourceFactory.makeListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[2].id),
-      resourceFactory.makeUserListItemsPaginated({ count: 2 })
+      resourceFactory.makeListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(
       lrUrls.userList.itemsListing(publicLists.results[4].id),
-      resourceFactory.makeUserListItemsPaginated({ count: 2 })
+      resourceFactory.makeListItemsPaginated({ count: 2 })
     )
     setMockResponse.get(urls.fieldDetails(field.name), field)
     setMockResponse.get(

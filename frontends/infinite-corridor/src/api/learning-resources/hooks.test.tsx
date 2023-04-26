@@ -421,7 +421,7 @@ test("useItemListing pagination", async () => {
   const { wrapper } = setup()
   setMockResponse.get(
     expect.stringContaining("userlists/123/items"),
-    factories.makeUserListItemsPaginated({ count: 5, pageSize: 3 })
+    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
   )
   const { result, waitFor } = renderHook(
     () => useUserListItems(123, { limit: 3 }),
@@ -458,7 +458,7 @@ test("useMoveUserListItem optimistic updates", async () => {
   const { wrapper, spies } = setup()
   setMockResponse.get(
     expect.stringContaining("userlists/123/items"),
-    factories.makeUserListItemsPaginated({ count: 5, pageSize: 3 })
+    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
   )
   const { result: itemsQ, waitFor } = renderHook(
     () => useUserListItems(123, { limit: 3 }),
@@ -473,7 +473,7 @@ test("useMoveUserListItem optimistic updates", async () => {
 
   setMockResponse.get(
     expect.stringContaining("userlists/123/items"),
-    factories.makeUserListItemsPaginated({ count: 5, pageSize: 2 })
+    factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
   )
 
   await act(async () => {

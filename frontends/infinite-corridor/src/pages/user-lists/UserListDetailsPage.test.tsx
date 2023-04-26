@@ -43,7 +43,7 @@ describe("UserListDetailsPage", () => {
   }: { user?: Partial<User>; list?: Partial<UserList> } = {}) => {
     const userList = factories.makeUserList(list)
     const count = faker.datatype.number({ min: 2, max: 5 })
-    const paginatedItems = factories.makeUserListItemsPaginated({ count })
+    const paginatedItems = factories.makeListItemsPaginated({ count })
     const items = paginatedItems.results.map(r => r.content_data)
     const topics = [
       ...userList.topics,
