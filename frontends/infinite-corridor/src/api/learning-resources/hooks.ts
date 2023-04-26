@@ -309,6 +309,42 @@ const useStaffListsListing = (options?: StaffListOptions) => {
   )
 }
 
+const updateStaffList = async (data: Partial<StaffList> & { id: number }) => {
+  const url = urls.staffList.details(data.id)
+  const { data: response } = await axios.patch(url, data)
+  return response
+}
+const useUpdateStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(updateStaffList, {
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.id(variables.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.listing.all
+      })
+    }
+  })
+}
+
+const createStaffList = async (data: Partial<StaffList>) => {
+  const url = urls.staffList.create
+  const { data: response } = await axios.post(url, data)
+  return response
+}
+const useCreateStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(createStaffList, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.listing.all
+      })
+    }
+  })
+}
+
+
 const useUpcomingCourses = (
   options?: PaginationSearchParams,
   filters?: CourseFilterParams
@@ -428,6 +464,8 @@ export {
   useAddToUserListItems, // mutation
   useDeleteFromUserListItems, // mutation
   useStaffListsListing, // listing
+  useCreateStaffList, // mutation
+  useUpdateStaffList, // mutation
   useFavorite, // mutation
   useUnfavorite, // mutation
   useUpcomingCourses, // listing

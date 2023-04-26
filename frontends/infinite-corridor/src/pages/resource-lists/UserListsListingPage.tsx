@@ -129,10 +129,12 @@ const UserListsListingPage: React.FC = () => {
         </GridContainer>
       </Container>
       <CreateListDialog
+        mode="userlist"
         open={creation.isOpen}
         onClose={creation.handleFinish}
       />
       <EditListDialog
+        mode="userlist"
         resource={editing.resource}
         onClose={editing.handleFinish}
       />

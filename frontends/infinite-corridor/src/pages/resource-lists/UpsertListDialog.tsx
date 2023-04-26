@@ -1,10 +1,11 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useFormik, FormikConfig } from "formik"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
-import { RadioChoiceField, FormDialog } from "ol-forms"
+import { RadioChoiceField, RadioChoiceProps, FormDialog } from "ol-forms"
 import {
   UserList,
+  StaffList,
   LearningResourceType as LRType,
   PrivacyLevel
 } from "ol-search-ui"
@@ -12,12 +13,14 @@ import * as Yup from "yup"
 import {
   useTopics,
   useCreateUserList,
-  useUpdateUserList
+  useUpdateUserList,
+  useCreateStaffList,
+  useUpdateStaffList
 } from "../../api/learning-resources"
 import Alert from "@mui/material/Alert"
 
 type ListFormSchema = Pick<
-  UserList,
+  UserList | StaffList,
   "title" | "list_type" | "privacy_level" | "short_description" | "topics"
 >
 
@@ -48,33 +51,34 @@ const listFormSchema: Yup.SchemaOf<ListFormSchema> = Yup.object().shape({
 
 const variantProps = { InputLabelProps: { shrink: true } }
 
-const LIST_TYPE_CHOICES = [
-  {
-    value: LRType.Userlist,
-    label: (
-      <>
-        <span className="option-header">Learning List</span>
-        <span className="option-detail">
-          Create a list of of any of our learning resources.
-        </span>
-      </>
-    ),
-    className: "radio-option"
-  },
-  {
-    value: LRType.LearningPath,
-    label: (
-      <>
-        <span className="option-header">Learning Path</span>
-        <span className="option-detail">
-          An ordered list of learning resources.
-        </span>
-      </>
-    ),
-    className: "radio-option"
-  }
-]
-
+const getListTypeChoices = (mode: "stafflist" | "userlist"): RadioChoiceProps[] => {
+  return [
+    {
+      value: mode === "stafflist" ? LRType.StaffList : LRType.Userlist,
+      label: (
+        <>
+          <span className="option-header">Learning List</span>
+          <span className="option-detail">
+            Create a list of of any of our learning resources.
+          </span>
+        </>
+      ),
+      className: "radio-option"
+    },
+    {
+      value: mode === "stafflist" ? LRType.StaffPath : LRType.LearningPath,
+      label: (
+        <>
+          <span className="option-header">Learning Path</span>
+          <span className="option-detail">
+            An ordered list of learning resources.
+          </span>
+        </>
+      ),
+      className: "radio-option"
+    }
+  ]
+}
 const PRIVACY_CHOICES = [
   {
     value:     PrivacyLevel.Private,
@@ -91,28 +95,35 @@ const PRIVACY_CHOICES = [
 interface UpsertListDialogProps {
   title: string
   open: boolean
-  resource?: UserList | null
+  resource?: UserList | StaffList | null
   onClose: () => void
+  mode: "stafflist" | "userlist"
 }
 const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
   resource,
   open,
   onClose,
-  title
+  title,
+  mode
 }) => {
   const createUserList = useCreateUserList()
   const updateUserList = useUpdateUserList()
+  const createStaffList = useCreateStaffList()
+  const updateStaffList = useUpdateStaffList()
+  const createList = mode === "stafflist" ? createStaffList : createUserList
+  const updateList = mode === "stafflist" ? updateStaffList : updateUserList
+  const mutation = resource?.id ? updateList : createList
   const handleSubmit: FormikConfig<Partial<ListFormSchema>>["onSubmit"] =
     useCallback(
       async values => {
         if (resource?.id) {
-          await updateUserList.mutateAsync({ id: resource.id, ...values })
+          await updateList.mutateAsync({ id: resource.id, ...values })
         } else {
-          await createUserList.mutateAsync(values)
+          await createList.mutateAsync(values)
         }
         onClose()
       },
-      [resource, onClose, createUserList, updateUserList]
+      [resource, onClose, createList, updateList]
     )
   const formik = useFormik({
     enableReinitialize: true,
@@ -126,9 +137,10 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
 
   const topicsQuery = useTopics({ enabled: open })
   const topics = topicsQuery.data?.results ?? []
-  const hasError = createUserList.isError || updateUserList.isError
 
-  const canChangePrivacy = SETTINGS.user.is_public_list_editor
+  const canChangePrivacy = mode === "stafflist" || SETTINGS.user.is_public_list_editor
+
+  const typeChoices = useMemo(() => getListTypeChoices(mode), [mode])
 
   return (
     <FormDialog
@@ -140,7 +152,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
       onSubmit={formik.handleSubmit}
       noValidate
       footerContent={
-        hasError &&
+        mutation.isError &&
         !formik.isSubmitting && (
           <Alert severity="error">
             There was a problem saving your list. Please try again later.
@@ -152,7 +164,7 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
         className="form-row"
         name="list_type"
         label="List Type"
-        choices={LIST_TYPE_CHOICES}
+        choices={typeChoices}
         value={formik.values.list_type}
         row
         onChange={formik.handleChange}
@@ -224,3 +236,4 @@ const UpsertListDialog: React.FC<UpsertListDialogProps> = ({
 }
 
 export default UpsertListDialog
+export type { UpsertListDialogProps }

@@ -14,10 +14,14 @@ import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { makeUserListViewPath } from "../urls"
 import EditListMenu from "./EditListMenu"
+import { CreateListDialog, EditListDialog, useCreationDialog, useDeleteListDialog, useEditingDialog } from "./ManageListDialogs"
 
 const placeholderHandler = () => console.log('TODO')
 
 const StaffListsListingPage: React.FC = () => {
+  const creation = useCreationDialog()
+  const editing = useEditingDialog()
+  const deletion = useDeleteListDialog()
   const staffListsQuery = useStaffListsListing()
 
   const history = useHistory()
@@ -63,8 +67,8 @@ const StaffListsListingPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu
                               resource={list}
-                              onEdit={placeholderHandler}
-                              onDelete={placeholderHandler}
+                              onEdit={editing.handleStart}
+                              onDelete={deletion.handleStart}
                             />
                           }
                           onActivate={handleActivate}
@@ -78,6 +82,16 @@ const StaffListsListingPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
+      <CreateListDialog
+        mode="stafflist"
+        open={creation.isOpen}
+        onClose={creation.handleFinish}
+      />
+      <EditListDialog
+        mode="stafflist"
+        resource={editing.resource}
+        onClose={editing.handleFinish}
+      />
     </BannerPage>
   )
 }

@@ -1,31 +1,37 @@
 import React, { useCallback, useState } from "react"
 import UpsertListDialog from "./UpsertListDialog"
+import type { UpsertListDialogProps } from "./UpsertListDialog"
 import BasicDialog from "../../components/BasicDialog"
 import { useToggle } from "ol-util"
-import type { UserList } from "ol-search-ui"
+import type { StaffList, UserList } from "ol-search-ui"
 import { useDeleteUserList } from "../../api/learning-resources"
 
 type CreateListDialogProps = {
   open: boolean
-  onClose: () => void
+  onClose: () => void,
+  mode: UpsertListDialogProps["mode"]
 }
 const CreateListDialog: React.FC<CreateListDialogProps> = ({
   open,
-  onClose
+  onClose,
+  mode
 }) => {
-  return <UpsertListDialog open={open} onClose={onClose} title="Create list" />
+  return <UpsertListDialog mode={mode} open={open} onClose={onClose} title="Create list" />
 }
 
 type EditListDialogProps = {
   onClose: () => void
-  resource: UserList | null
+  resource: UpsertListDialogProps["resource"]
+  mode: UpsertListDialogProps["mode"]
 }
 const EditListDialog: React.FC<EditListDialogProps> = ({
   onClose,
-  resource
+  resource,
+  mode
 }) => {
   return (
     <UpsertListDialog
+      mode={mode}
       open={!!resource}
       resource={resource}
       onClose={onClose}
@@ -70,9 +76,9 @@ const useCreationDialog = () => {
 }
 
 const useEditingDialog = () => {
-  const [resourceToEdit, setResourceToEdit] = useState<UserList | null>(null)
+  const [resourceToEdit, setResourceToEdit] = useState<UserList | StaffList | null>(null)
   const isOpen = !!resourceToEdit
-  const handleStart = useCallback((resource: UserList) => {
+  const handleStart = useCallback((resource: UserList | StaffList) => {
     setResourceToEdit(resource)
   }, [])
   const handleFinish = useCallback(() => {
@@ -87,11 +93,11 @@ const useEditingDialog = () => {
 }
 
 const useDeleteListDialog = () => {
-  const [resourceToDelete, setResourceToDelete] = useState<UserList | null>(
+  const [resourceToDelete, setResourceToDelete] = useState<UserList | StaffList | null>(
     null
   )
   const isOpen = !!resourceToDelete
-  const handleStart = useCallback((resource: UserList) => {
+  const handleStart = useCallback((resource: UserList | StaffList) => {
     setResourceToDelete(resource)
   }, [])
   const handleFinish = useCallback(() => {
