@@ -42,7 +42,6 @@ from search.constants import (
     RESOURCE_FILE_TYPE,
     STAFF_LIST_TYPE,
     USER_LIST_TYPE,
-    VALID_OBJECT_TYPES,
     VIDEO_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
@@ -761,16 +760,13 @@ def start_recreate_index(self, indexes):
     """
     try:
         new_backing_indices = {
-            obj_type: api.create_backing_index(obj_type)
-            for obj_type in indexes
-            if obj_type in VALID_OBJECT_TYPES
+            obj_type: api.create_backing_index(obj_type) for obj_type in indexes
         }
 
         # Do the indexing on the temp index
         log.info("starting to index %s objects...", ", ".join(indexes))
 
         index_tasks = []
-        blocklisted_ids = load_course_blocklist()
 
         if POST_TYPE in indexes:
             index_tasks = index_tasks + [
@@ -804,29 +800,31 @@ def start_recreate_index(self, indexes):
             ]
 
         if COURSE_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_courses.si(ids)
-                for ids in chunks(
-                    Course.objects.filter(published=True)
-                    .exclude(course_id__in=blocklisted_ids)
-                    .order_by("id")
-                    .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-
-        if RESOURCE_FILE_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_course_content_files.si(ids)
-                for ids in chunks(
-                    Course.objects.filter(published=True)
-                    .filter(platform__in=RESOURCE_FILE_PLATFORMS)
-                    .exclude(course_id__in=blocklisted_ids)
-                    .order_by("id")
-                    .values_list("id", flat=True),
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
+            blocklisted_ids = load_course_blocklist()
+            index_tasks = (
+                index_tasks
+                + [
+                    index_courses.si(ids)
+                    for ids in chunks(
+                        Course.objects.filter(published=True)
+                        .exclude(course_id__in=blocklisted_ids)
+                        .order_by("id")
+                        .values_list("id", flat=True),
+                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    )
+                ]
+                + [
+                    index_course_content_files.si(ids)
+                    for ids in chunks(
+                        Course.objects.filter(published=True)
+                        .filter(platform__in=RESOURCE_FILE_PLATFORMS)
+                        .exclude(course_id__in=blocklisted_ids)
+                        .order_by("id")
+                        .values_list("id", flat=True),
+                        chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    )
+                ]
+            )
 
         if PROGRAM_TYPE in indexes:
             index_tasks = index_tasks + [
