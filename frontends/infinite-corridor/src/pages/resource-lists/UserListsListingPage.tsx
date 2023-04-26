@@ -1,15 +1,8 @@
 import React, { useCallback } from "react"
-import Menu from "@mui/material/Menu"
-import MenuItem from "@mui/material/MenuItem"
-import EditIcon from "@mui/icons-material/Edit"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
-import DeleteIcon from "@mui/icons-material/Delete"
-import MoreVertIcon from "@mui/icons-material/MoreVert"
-import ListItemIcon from "@mui/material/ListItemIcon"
-import IconButton from "@mui/material/IconButton"
 
-import { BannerPage, useToggle } from "ol-util"
+import { BannerPage } from "ol-util"
 import {
   CreateListDialog,
   EditListDialog,
@@ -29,54 +22,7 @@ import type { UserList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
-
-type EditListMenuProps = {
-  resource: UserList
-  onEdit: (resource: UserList) => void
-  onDelete: (resource: UserList) => void
-}
-const EditListMenu: React.FC<EditListMenuProps> = ({
-  resource,
-  onEdit,
-  onDelete
-}) => {
-  const [open, toggleOpen] = useToggle(false)
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const handleEdit = useCallback(() => {
-    onEdit(resource)
-    toggleOpen.off()
-  }, [resource, onEdit, toggleOpen])
-  const handleDelete = useCallback(() => {
-    onDelete(resource)
-    toggleOpen.off()
-  }, [resource, onDelete, toggleOpen])
-  return (
-    <>
-      <IconButton
-        aria-label={`Edit list ${resource.title}`}
-        onClick={toggleOpen.on}
-        ref={setAnchorEl}
-        size="small"
-      >
-        <MoreVertIcon fontSize="inherit" />
-      </IconButton>
-      <Menu open={open} onClose={toggleOpen.off} anchorEl={anchorEl}>
-        <MenuItem onClick={handleEdit}>
-          <ListItemIcon>
-            <EditIcon />
-          </ListItemIcon>
-          Edit
-        </MenuItem>
-        <MenuItem onClick={handleDelete}>
-          <ListItemIcon>
-            <DeleteIcon />
-          </ListItemIcon>
-          Delete
-        </MenuItem>
-      </Menu>
-    </>
-  )
-}
+import EditListMenu from "./EditListMenu"
 
 /**
  * Makes a fake userlist object for the favorites list.
