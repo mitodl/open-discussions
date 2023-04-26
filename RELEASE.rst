@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.213.0
+Version 0.213.0 (Released April 26, 2023)
 ---------------
 
 - Rename search index functions, delete->deindex (#3963)
