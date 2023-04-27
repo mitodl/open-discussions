@@ -126,6 +126,10 @@
       "description": "The size of the connection pool created for each node detected within an ElasticSearch cluster.",
       "required": false
     },
+    "ELASTICSEARCH_DEFAULT_TIMEOUT": {
+      "description": "The default timeout in seconds for Elasticsearch requests",
+      "required": false
+    },
     "ELASTICSEARCH_INDEX": {
       "description": "Index to use on Elasticsearch",
       "required": true

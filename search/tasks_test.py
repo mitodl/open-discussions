@@ -3,8 +3,9 @@
 
 import pytest
 from django.conf import settings
-from praw.exceptions import PRAWException
-from prawcore.exceptions import NotFound, PrawcoreException
+from elasticsearch.exceptions import ConnectionError as ESConnectionError
+from elasticsearch.exceptions import ConnectionTimeout
+from prawcore.exceptions import NotFound
 
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from channels.factories.models import CommentFactory, PostFactory
@@ -106,7 +107,7 @@ def wrap_retry_mock(mocker):
     """
     wrap_mock = mocker.patch("search.tasks.wrap_retry_exception")
     yield
-    wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
+    wrap_mock.assert_called_once()
 
 
 @pytest.fixture()
@@ -308,19 +309,16 @@ def test_wrap_retry_exception(error):
 def test_wrap_retry_exception_matching(matching):
     """A matching exception should raise a RetryException"""
 
-    class SubError(KeyError):
-        """Use a subclass to assert isinstance use"""
-
     def raise_thing():
         """raise the exception"""
         if matching:
-            raise SubError()
+            raise ConnectionTimeout("err", "err", "err")
         else:
             raise TabError()
 
     matching_exception = RetryException if matching else TabError
     with pytest.raises(matching_exception):
-        with wrap_retry_exception(KeyError):
+        with wrap_retry_exception(ESConnectionError):
             raise_thing()
 
 
@@ -359,7 +357,7 @@ def test_index_comments(
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
 def test_index_videos(
-    mocker, with_error, update_only
+    mocker, wrap_retry_mock, with_error, update_only
 ):  # pylint: disable=unused-argument
     """index_videos should call the api function of the same name"""
     index_videos_mock = mocker.patch("search.indexing_api.index_videos")
@@ -373,7 +371,7 @@ def test_index_videos(
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_staff_lists(mocker, with_error, update_only):
+def test_index_staff_lists(mocker, wrap_retry_mock, with_error, update_only):
     """index_staff_lists should call the api function of the same name"""
     index_staff_lists_mock = mocker.patch("search.indexing_api.index_staff_lists")
     if with_error:
@@ -604,7 +602,7 @@ def test_finish_recreate_index(mocker, with_error):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_courses(mocker, with_error, update_only):
+def test_index_courses(mocker, wrap_retry_mock, with_error, update_only):
     """index_courses should call the api function of the same name"""
     index_courses_mock = mocker.patch("search.indexing_api.index_courses")
     if with_error:
@@ -662,7 +660,7 @@ def test_upsert_content_file_task(mocked_api):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_course_content_files(mocker, with_error, update_only):
+def test_index_course_content_files(mocker, wrap_retry_mock, with_error, update_only):
     """index_course_content_files should call the api function of the same name"""
     index_content_files_mock = mocker.patch(
         "search.indexing_api.index_course_content_files"
@@ -679,7 +677,7 @@ def test_index_course_content_files(mocker, with_error, update_only):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_run_content_files(mocker, with_error, update_only):
+def test_index_run_content_files(mocker, wrap_retry_mock, with_error, update_only):
     """index_run_content_files should call the api function of the same name"""
     index_run_content_files_mock = mocker.patch(
         "search.indexing_api.index_run_content_files"
@@ -699,7 +697,7 @@ def test_index_run_content_files(mocker, with_error, update_only):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_deindex_run_content_files(mocker, with_error):
+def test_delete_run_content_files(mocker, wrap_retry_mock, with_error):
     """deindex_run_content_files should call the api function of the same name"""
     deindex_run_content_files_mock = mocker.patch(
         "search.indexing_api.deindex_run_content_files"
@@ -727,7 +725,9 @@ def test_deindex_run_content_files(mocker, with_error):
         ("bulk_deindex_podcast_episodes", "deindex_podcast_episodes"),
     ],
 )
-def test_bulk_deletion_tasks(mocker, with_error, tasks_func_name, indexing_func_name):
+def test_bulk_deletion_tasks(
+    mocker, wrap_retry_mock, with_error, tasks_func_name, indexing_func_name
+):
     """bulk deletion tasks should call corresponding indexing api function"""
     indexing_api_task_mock = mocker.patch(f"search.indexing_api.{indexing_func_name}")
 
