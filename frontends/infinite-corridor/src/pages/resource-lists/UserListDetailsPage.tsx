@@ -22,7 +22,7 @@ const startEditing = (resource: UserList) => {
   NiceModal.show(UpsertListDialog, {
     resource,
     mode:  "userlist",
-    title: "Edit List"
+    title: "Edit list"
   })
 }
 

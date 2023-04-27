@@ -3,11 +3,7 @@ import { useFormik, FormikConfig } from "formik"
 import * as NiceModal from "@ebay/nice-modal-react"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
-import {
-  RadioChoiceField,
-  RadioChoiceProps,
-  FormDialog,
-} from "ol-forms"
+import { RadioChoiceField, RadioChoiceProps, FormDialog } from "ol-forms"
 import {
   UserList,
   StaffList,

@@ -43,14 +43,14 @@ const startEditing = (resource: UserList) => {
   NiceModal.show(UpsertListDialog, {
     resource,
     mode:  "userlist",
-    title: "Edit List"
+    title: "Edit list"
   })
 }
 const startCreating = () => {
   NiceModal.show(UpsertListDialog, {
     resource: null,
     mode:     "userlist",
-    title:    "Create List"
+    title:    "Create list"
   })
 }
 const startDeleting = (resource: UserList) => {

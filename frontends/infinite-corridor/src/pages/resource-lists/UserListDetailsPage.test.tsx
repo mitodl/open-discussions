@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { UserList, LearningResourceType as LRT } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
-import { EditListDialog } from "./ManageListDialogs"
+import UpsertListDialog from "./UpsertListDialog"
 import ItemsListing from "./ItemsListing"
 import {
   screen,
@@ -13,14 +13,16 @@ import {
   waitFor
 } from "../../test-utils"
 import { User } from "../../types/settings"
+import NiceModal from "@ebay/nice-modal-react"
 
-jest.mock("./ManageListDialogs", () => {
-  const actual = jest.requireActual("./ManageListDialogs")
+jest.mock("@ebay/nice-modal-react", () => {
+  const actual = jest.requireActual("@ebay/nice-modal-react")
   return {
     ...actual,
-    EditListDialog: jest.fn(actual.EditListDialog)
+    show: jest.fn(actual.show)
   }
 })
+
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
   return {
@@ -30,7 +32,6 @@ jest.mock("./ItemsListing", () => {
   }
 })
 
-const spyEditListDialog = jest.mocked(EditListDialog)
 const spyItemsListing = jest.mocked(ItemsListing)
 
 describe("UserListDetailsPage", () => {
@@ -160,9 +161,14 @@ describe("UserListDetailsPage", () => {
       list: { author: userId }
     })
     const editButton = await screen.findByRole("button", { name: "Edit" })
+
+    expect(NiceModal.show).not.toHaveBeenCalled()
     await user.click(editButton)
     await screen.findByRole("dialog", { name: "Edit list" })
-    expectProps(spyEditListDialog, { resource: userList })
+    expect(NiceModal.show).toHaveBeenCalledWith(
+      UpsertListDialog,
+      expect.objectContaining({ resource: userList })
+    )
   })
 
   test("Passes appropriate props to ItemsListing", async () => {

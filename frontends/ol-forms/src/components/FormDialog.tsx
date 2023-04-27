@@ -7,7 +7,6 @@ import Button, { ButtonProps } from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import Close from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
-import type { TransitionProps } from "@mui/material/transitions"
 
 interface FormDialogProps {
   /**

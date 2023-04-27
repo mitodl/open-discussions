@@ -1,4 +1,5 @@
 import React from "react"
+import * as NiceModal from "@ebay/nice-modal-react"
 import { faker } from "@faker-js/faker"
 import {
   Favorites,
@@ -7,11 +8,7 @@ import {
 } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
-import {
-  EditListDialog,
-  CreateListDialog,
-  DeleteListDialog
-} from "./ManageListDialogs"
+import { DeleteListDialog } from "./ManageListDialogs"
 import UserListsListingPage from "./UserListsListingPage"
 import {
   screen,
@@ -20,22 +17,17 @@ import {
   user,
   expectProps
 } from "../../test-utils"
+import UpsertListDialog from "./UpsertListDialog"
 
 const spyLRCardTemplate = jest.mocked(LRCardTemplate)
 
-jest.mock("./ManageListDialogs", () => {
-  const actual = jest.requireActual("./ManageListDialogs")
+jest.mock("@ebay/nice-modal-react", () => {
+  const actual = jest.requireActual("@ebay/nice-modal-react")
   return {
     ...actual,
-    EditListDialog:   jest.fn(actual.EditListDialog),
-    CreateListDialog: jest.fn(actual.CreateListDialog),
-    DeleteListDialog: jest.fn(actual.DeleteListDialog)
+    show: jest.fn(actual.show)
   }
 })
-
-const spyEditListDialog = jest.mocked(EditListDialog)
-const spyCreateListDialog = jest.mocked(CreateListDialog)
-const spyDeleteListDialog = jest.mocked(DeleteListDialog)
 
 describe("UserListsListingPage", () => {
   /**
@@ -106,8 +98,10 @@ describe("UserListsListingPage", () => {
     await user.click(editButton)
     screen.getByRole("dialog", { name: "Edit list" })
 
-    // Check details of this dialog elsewhere
-    expectProps(spyEditListDialog, { resource: targetList })
+    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
+      UpsertListDialog,
+      expect.objectContaining({ resource: targetList })
+    )
   })
 
   test("Clicking edit -> Delete opens the deletion dialog", async () => {
@@ -122,7 +116,10 @@ describe("UserListsListingPage", () => {
     screen.getByRole("dialog", { name: "Delete list" })
 
     // Check details of this dialog elsewhere
-    expectProps(spyDeleteListDialog, { resource: targetList })
+    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
+      DeleteListDialog,
+      expect.objectContaining({ resource: targetList })
+    )
   })
 
   test("Clicking new list opens the creation dialog", async () => {
@@ -134,7 +131,10 @@ describe("UserListsListingPage", () => {
     screen.getByRole("dialog", { name: "Create list" })
 
     // Check details of this dialog elsewhere
-    expect(spyCreateListDialog).toHaveBeenCalled()
+    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
+      UpsertListDialog,
+      expect.objectContaining({ resource: null })
+    )
   })
 
   test("Clicking on list title navigates to list page", async () => {

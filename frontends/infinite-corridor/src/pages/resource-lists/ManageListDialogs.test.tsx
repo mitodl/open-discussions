@@ -1,33 +1,17 @@
-import React from "react"
-import { faker } from "@faker-js/faker"
-import { pick } from "lodash"
-import { LearningResourceType, PrivacyLevel, UserList } from "ol-search-ui"
+import { UserList } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
-import { allowConsoleErrors, getDescriptionFor } from "ol-util/src/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"
-import {
-  EditListDialog,
-  CreateListDialog,
-  DeleteListDialog
-} from "./ManageListDialogs"
+import { DeleteListDialog } from "./ManageListDialogs"
 import {
   screen,
   renderWithProviders,
   setMockResponse,
   user,
-  within,
-  type TestAppOptions
+  act
 } from "../../test-utils"
 import { mockAxiosInstance as axios } from "../../test-utils/mockAxios"
-import { assertNotNil } from "ol-util"
-
-const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
-  await user.click(input)
-  const listbox = await screen.findByRole("listbox")
-  const option = within(listbox).getByRole("option", { name: label })
-  await user.click(option)
-  return
-}
+import NiceModal from "@ebay/nice-modal-react"
+import { waitForElementToBeRemoved } from "@testing-library/react"
 
 /**
  * Helpers to find various inputs.
@@ -37,329 +21,40 @@ const selectFromAutocomplete = async (input: HTMLElement, label: string) => {
  *
  */
 const inputs = {
-  list_type: {
-    [LearningResourceType.LearningPath]: () =>
-      screen.getByLabelText("Learning Path", { exact: false }),
-    [LearningResourceType.Userlist]: () =>
-      screen.getByLabelText("Learning List", { exact: false })
-  },
-  privacy_level: {
-    [PrivacyLevel.Public]:  () => screen.getByLabelText("Public"),
-    [PrivacyLevel.Private]: () => screen.getByLabelText("Private")
-  },
-  title:       () => screen.getByLabelText("Title", { exact: false }),
-  description: () => screen.getByLabelText("Description", { exact: false }),
-  topics:      () => screen.getByLabelText("Subjects", { exact: false }),
-  submit:      () => screen.getByRole("button", { name: "Save" }),
-  cancel:      () => screen.getByRole("button", { name: "Cancel" }),
-  delete:      () => screen.getByRole("button", { name: "Yes, delete" })
+  cancel: () => screen.getByRole("button", { name: "Cancel" }),
+  delete: () => screen.getByRole("button", { name: "Yes, delete" })
 }
-
-describe("Creation", () => {
-  const setup = (
-    opts: Partial<TestAppOptions> = {
-      user: { is_public_list_editor: true, is_authenticated: true }
-    }
-  ) => {
-    const topics = factories.makeTopicsPaginated({ count: 5 })
-    setMockResponse.get(lrUrls.topics.listing, topics)
-    const onClose = jest.fn()
-    renderWithProviders(
-      <CreateListDialog open={true} onClose={onClose} />,
-      opts
-    )
-    return { topics, onClose }
-  }
-
-  const fillInForm = async (userList: UserList) => {
-    await user.click(inputs.list_type[userList.list_type]())
-
-    await user.click(inputs.privacy_level[userList.privacy_level]())
-
-    await user.click(inputs.title())
-    await user.paste(userList.title)
-
-    await user.click(inputs.description())
-    assertNotNil(userList.short_description)
-    await user.paste(userList.short_description)
-
-    await selectFromAutocomplete(inputs.topics(), userList.topics[0].name)
-  }
-
-  test("Creating a userlist", async () => {
-    const { topics, onClose } = setup()
-
-    const userList = factories.makeUserList({
-      short_description: faker.lorem.paragraph(),
-      topics:            [faker.helpers.arrayElement(topics.results)]
-    })
-
-    await fillInForm(userList)
-
-    expect(onClose).not.toHaveBeenCalled()
-    setMockResponse.post(lrUrls.userList.create, userList)
-    await user.click(inputs.submit())
-    expect(axios.post).toHaveBeenCalledWith(
-      lrUrls.userList.create,
-      pick(userList, [
-        "title",
-        "list_type",
-        "privacy_level",
-        "short_description",
-        "topics"
-      ])
-    )
-    expect(onClose).toHaveBeenCalled()
-  })
-
-  test("Validates required fields", async () => {
-    setup()
-    await user.click(inputs.submit())
-
-    const titleInput = inputs.title()
-    const titleFeedback = getDescriptionFor(titleInput)
-    expect(titleInput).toBeInvalid()
-    expect(titleFeedback).toHaveTextContent("Title is required.")
-
-    const descriptionInput = inputs.description()
-    const descriptionFeedback = getDescriptionFor(descriptionInput)
-    expect(descriptionInput).toBeInvalid()
-    expect(descriptionFeedback).toHaveTextContent("Description is required.")
-
-    const topicsInput = inputs.topics()
-    const topicsFeedback = getDescriptionFor(topicsInput)
-    expect(topicsInput).toBeInvalid()
-    expect(topicsFeedback).toHaveTextContent("Select between 1 and 3 subjects.")
-  })
-
-  test("Calls onClose and not POST when cancelled", async () => {
-    const { onClose } = setup()
-
-    expect(onClose).not.toHaveBeenCalled()
-    await user.click(inputs.cancel())
-    expect(onClose).toHaveBeenCalled()
-    expect(axios.post).not.toHaveBeenCalled()
-  })
-
-  test("Userlists are private by default for staff", () => {
-    setup()
-    expect(inputs.privacy_level[PrivacyLevel.Private]()).toBeChecked()
-  })
-
-  test("Userlists are private by default for non-staff", async () => {
-    const { topics } = setup({
-      user: { is_authenticated: true, is_public_list_editor: false }
-    })
-
-    const userList = factories.makeUserList()
-
-    await user.click(inputs.title())
-    await user.paste(userList.title)
-
-    await user.click(inputs.description())
-    assertNotNil(userList.short_description)
-    await user.paste(userList.short_description)
-
-    await selectFromAutocomplete(inputs.topics(), topics.results[0].name)
-
-    setMockResponse.post(lrUrls.userList.create, userList)
-    await user.click(inputs.submit())
-
-    expect(axios.post).toHaveBeenCalledWith(
-      lrUrls.userList.create,
-      expect.objectContaining({ privacy_level: PrivacyLevel.Private })
-    )
-  })
-
-  test.each([
-    {
-      user:              { is_public_list_editor: true, is_authenticated: true },
-      hasPrivacyChoices: true
-    },
-    {
-      user:              { is_public_list_editor: false, is_authenticated: true },
-      hasPrivacyChoices: false
-    }
-  ])(
-    "Form has privacy options if and only if user.is_public_list_editor",
-    ({ user, hasPrivacyChoices }) => {
-      setup({ user })
-      const publicChoice = screen.queryByText("Privacy")
-      expect(!!publicChoice).toBe(hasPrivacyChoices)
-    }
-  )
-
-  test("Userlists are Learning Lists (not Learning Paths) by default", () => {
-    setup()
-    expect(inputs.list_type[LearningResourceType.Userlist]()).toBeChecked()
-  })
-
-  test("Displays overall error if form validates but API call fails", async () => {
-    allowConsoleErrors()
-    const { topics, onClose } = setup()
-
-    const userList = factories.makeUserList({
-      short_description: faker.lorem.paragraph(),
-      topics:            [faker.helpers.arrayElement(topics.results)]
-    })
-
-    await fillInForm(userList)
-    setMockResponse.post(lrUrls.userList.listing(), {}, { code: 408 })
-    await user.click(inputs.submit())
-    const alertMessage = await screen.findByRole("alert")
-    expect(alertMessage).toHaveTextContent(
-      "There was a problem saving your list."
-    )
-    expect(onClose).not.toHaveBeenCalled()
-  })
-})
-
-describe("Editing", () => {
-  const setup = (
-    resourceOverrides: Partial<UserList> = {},
-    topicsCount = 1
-  ) => {
-    const topics = factories.makeTopicsPaginated({ count: 5 })
-    setMockResponse.get(lrUrls.topics.listing, topics)
-    const resource = factories.makeUserList({
-      ...resourceOverrides,
-      topics: faker.helpers.arrayElements(topics.results, topicsCount)
-    })
-    const onClose = jest.fn()
-    renderWithProviders(
-      <EditListDialog resource={resource} onClose={onClose} />
-    )
-    return { topics, resource, onClose }
-  }
-
-  test("Editing a userlist calls correct API", async () => {
-    const { resource, onClose } = setup()
-
-    const updatedResource = factories.makeUserList({
-      ...resource,
-      title:             faker.lorem.words(),
-      short_description: faker.lorem.paragraph()
-    })
-
-    const titleInput = inputs.title()
-    await user.click(titleInput)
-    await user.clear(titleInput)
-    await user.paste(updatedResource.title)
-
-    const descriptionInput = inputs.description()
-    await user.click(descriptionInput)
-    await user.clear(descriptionInput)
-    assertNotNil(updatedResource.short_description)
-    await user.paste(updatedResource.short_description)
-
-    expect(onClose).not.toHaveBeenCalled()
-    setMockResponse.patch(lrUrls.userList.details(resource.id), updatedResource)
-    await user.click(inputs.submit())
-
-    expect(axios.patch).toHaveBeenCalledWith(
-      lrUrls.userList.details(resource.id),
-      updatedResource
-    )
-    expect(onClose).toHaveBeenCalled()
-  })
-
-  test.each([
-    {
-      overrides:     { title: "" },
-      targetInput:   inputs.title,
-      expectedError: "Title is required."
-    },
-    {
-      overrides:     { short_description: "" },
-      targetInput:   inputs.description,
-      expectedError: "Description is required."
-    },
-    {
-      overrides:     {},
-      targetInput:   inputs.topics,
-      topicsCount:   0,
-      expectedError: "Select between 1 and 3 subjects."
-    },
-    {
-      overrides:     {},
-      targetInput:   inputs.topics,
-      topicsCount:   4,
-      expectedError: "Select between 1 and 3 subjects."
-    }
-  ])(
-    "Error messages ($expectedError)",
-    async ({ overrides, topicsCount, expectedError, targetInput }) => {
-      setup(overrides, topicsCount)
-      await user.click(inputs.submit())
-      const theInput = targetInput()
-      const description = getDescriptionFor(theInput)
-      expect(theInput).toBeInvalid()
-      expect(description).toHaveTextContent(expectedError)
-    }
-  )
-
-  test("Calls onClose and not PATCH when cancelled", async () => {
-    const { onClose } = setup()
-
-    expect(onClose).not.toHaveBeenCalled()
-    await user.click(inputs.cancel())
-    expect(onClose).toHaveBeenCalled()
-    expect(axios.patch).not.toHaveBeenCalled()
-  })
-
-  test("Displays overall error if form validates but API call fails", async () => {
-    allowConsoleErrors()
-    const { resource, onClose } = setup()
-
-    const titleInput = inputs.title()
-    await user.click(titleInput)
-    await user.clear(titleInput)
-    await user.paste("New title")
-
-    await user.click(inputs.submit())
-    setMockResponse.patch(
-      lrUrls.userList.details(resource.id),
-      {},
-      { code: 408 }
-    )
-    const alertMessage = await screen.findByRole("alert")
-    expect(alertMessage).toHaveTextContent(
-      "There was a problem saving your list."
-    )
-    expect(onClose).not.toHaveBeenCalled()
-  })
-})
 
 describe("Deleting lists", () => {
   const setup = (resourceOverrides: Partial<UserList> = {}) => {
     const resource = factories.makeUserList(resourceOverrides)
-    const onClose = jest.fn()
-    renderWithProviders(
-      <DeleteListDialog resource={resource} onClose={onClose} />
-    )
-    return { resource, onClose }
+    renderWithProviders(null)
+    act(() => {
+      NiceModal.show(DeleteListDialog, { resource })
+    })
+    return { resource }
   }
 
   test("Deleting a userlist calls correct API", async () => {
-    const { resource, onClose } = setup()
+    const { resource } = setup()
 
-    expect(onClose).not.toHaveBeenCalled()
+    const dialog = screen.getByRole("dialog")
     setMockResponse.delete(lrUrls.userList.details(resource.id), undefined)
     await user.click(inputs.delete())
 
     expect(axios.delete).toHaveBeenCalledWith(
       lrUrls.userList.details(resource.id)
     )
-    expect(onClose).toHaveBeenCalled()
+    await waitForElementToBeRemoved(dialog)
   })
 
   test("Clicking cancel does not delete list", async () => {
-    const { onClose } = setup()
+    setup()
 
-    expect(onClose).not.toHaveBeenCalled()
+    const dialog = screen.getByRole("dialog")
     await user.click(inputs.cancel())
 
     expect(axios.delete).not.toHaveBeenCalled()
-    expect(onClose).toHaveBeenCalled()
+    await waitForElementToBeRemoved(dialog)
   })
 })
