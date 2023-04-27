@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.213.1
+Version 0.213.1 (Released April 27, 2023)
 ---------------
 
 - Upgrade Elasticsearch to 6.8.2 (#3970)
