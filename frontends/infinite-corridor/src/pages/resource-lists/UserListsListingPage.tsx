@@ -3,14 +3,7 @@ import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 
 import { BannerPage } from "ol-util"
-import {
-  CreateListDialog,
-  EditListDialog,
-  DeleteListDialog,
-  useDeleteListDialog,
-  useEditingDialog,
-  useCreationDialog
-} from "./ManageListDialogs"
+import { DeleteListDialog } from "./ManageListDialogs"
 import { GridColumn, GridContainer } from "../../components/layout"
 import {
   useFavoritesListing,
@@ -23,6 +16,8 @@ import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
 import EditListMenu from "./EditListMenu"
+import UpsertListDialog from "./UpsertListDialog"
+import NiceModal from "@ebay/nice-modal-react"
 
 /**
  * Makes a fake userlist object for the favorites list.
@@ -44,11 +39,25 @@ const makeFavorites = (count: number): Favorites => {
   }
 }
 
-const UserListsListingPage: React.FC = () => {
-  const creation = useCreationDialog()
-  const editing = useEditingDialog()
-  const deletion = useDeleteListDialog()
+const startEditing = (resource: UserList) => {
+  NiceModal.show(UpsertListDialog, {
+    resource,
+    mode:  "userlist",
+    title: "Edit List"
+  })
+}
+const startCreating = () => {
+  NiceModal.show(UpsertListDialog, {
+    resource: null,
+    mode:     "userlist",
+    title:    "Create List"
+  })
+}
+const startDeleting = (resource: UserList) => {
+  NiceModal.show(DeleteListDialog, { resource })
+}
 
+const UserListsListingPage: React.FC = () => {
   const userListsQuery = useUserListsListing()
   const favoritesQuery = useFavoritesListing()
   const favorites = favoritesQuery.data ?
@@ -81,7 +90,7 @@ const UserListsListingPage: React.FC = () => {
                 <h1>My Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
-                <Button variant="contained" onClick={creation.handleStart}>
+                <Button variant="contained" onClick={startCreating}>
                   Create new list
                 </Button>
               </Grid>
@@ -113,8 +122,8 @@ const UserListsListingPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu
                               resource={list}
-                              onEdit={editing.handleStart}
-                              onDelete={deletion.handleStart}
+                              onEdit={startEditing}
+                              onDelete={startDeleting}
                             />
                           }
                           onActivate={handleActivate}
@@ -128,20 +137,6 @@ const UserListsListingPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <CreateListDialog
-        mode="userlist"
-        open={creation.isOpen}
-        onClose={creation.handleFinish}
-      />
-      <EditListDialog
-        mode="userlist"
-        resource={editing.resource}
-        onClose={editing.handleFinish}
-      />
-      <DeleteListDialog
-        resource={deletion.resource}
-        onClose={deletion.handleFinish}
-      />
     </BannerPage>
   )
 }

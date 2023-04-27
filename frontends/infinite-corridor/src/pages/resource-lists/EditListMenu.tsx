@@ -9,12 +9,11 @@ import MoreVertIcon from "@mui/icons-material/MoreVert"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import IconButton from "@mui/material/IconButton"
 
-
 type EditListMenuProps<L extends UserList | StaffList> = {
-    resource: L
-    onEdit: (resource: L) => void
-    onDelete: (resource: L) => void
-  }
+  resource: L
+  onEdit: (resource: L) => void
+  onDelete: (resource: L) => void
+}
 const EditListMenu = <L extends UserList | StaffList>({
   resource,
   onEdit,
@@ -45,13 +44,13 @@ const EditListMenu = <L extends UserList | StaffList>({
           <ListItemIcon>
             <EditIcon />
           </ListItemIcon>
-            Edit
+          Edit
         </MenuItem>
         <MenuItem onClick={handleDelete}>
           <ListItemIcon>
             <DeleteIcon />
           </ListItemIcon>
-            Delete
+          Delete
         </MenuItem>
       </Menu>
     </>

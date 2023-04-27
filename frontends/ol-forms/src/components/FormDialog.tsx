@@ -7,6 +7,7 @@ import Button, { ButtonProps } from "@mui/material/Button"
 import IconButton from "@mui/material/IconButton"
 import Close from "@mui/icons-material/Close"
 import Box from "@mui/material/Box"
+import type { TransitionProps } from "@mui/material/transitions"
 
 interface FormDialogProps {
   /**
@@ -65,6 +66,10 @@ interface FormDialogProps {
    * Extra props passed to the cancel button
    */
   submitButtonProps?: ButtonProps
+  /**
+   * MUI Dialog's [TransitionProps](https://mui.com/material-ui/api/dialog/#props)
+   */
+  TransitionProps?: DialogProps["TransitionProps"]
 }
 
 /**
@@ -90,7 +95,8 @@ const FormDialog: React.FC<FormDialogProps> = ({
   cancelButtonContent = "Cancel",
   submitButtonContent = "Save",
   cancelButtonProps,
-  submitButtonProps
+  submitButtonProps,
+  TransitionProps
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = useCallback(
@@ -130,6 +136,7 @@ const FormDialog: React.FC<FormDialogProps> = ({
       open={open}
       onClose={onClose}
       PaperProps={paperProps}
+      TransitionProps={TransitionProps}
     >
       <DialogTitle>{title}</DialogTitle>
       <Box position="absolute" top={0} right={0}>

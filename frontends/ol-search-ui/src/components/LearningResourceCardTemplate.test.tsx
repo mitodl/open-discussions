@@ -2,7 +2,12 @@ import React from "react"
 import { render, screen } from "@testing-library/react"
 import { assertInstanceOf } from "ol-util"
 import LearningResourceCardTemplate from "./LearningResourceCardTemplate"
-import { makeCourse, makeImgConfig, makeStaffList, makeUserList } from "../factories"
+import {
+  makeCourse,
+  makeImgConfig,
+  makeStaffList,
+  makeUserList
+} from "../factories"
 import { resourceThumbnailSrc } from "../util"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 
@@ -97,18 +102,21 @@ describe("LearningResourceCard", () => {
     { resource: makeUserList({ item_count: 1 }), expectedText: "1 item" },
     { resource: makeUserList({ item_count: 2 }), expectedText: "2 items" },
     { resource: makeStaffList({ item_count: 0 }), expectedText: "0 items" },
-    { resource: makeStaffList({ item_count: 2 }), expectedText: "2 items" },
-  ])("Renders item count for UserLists and StaffLists", ({ resource, expectedText }) => {
-    const imgConfig = makeImgConfig()
-    render(
-      <LearningResourceCardTemplate
-        variant="column"
-        resource={resource}
-        imgConfig={imgConfig}
-      />
-    )
-    screen.getByText(expectedText)
-  })
+    { resource: makeStaffList({ item_count: 2 }), expectedText: "2 items" }
+  ])(
+    "Renders item count for UserLists and StaffLists",
+    ({ resource, expectedText }) => {
+      const imgConfig = makeImgConfig()
+      render(
+        <LearningResourceCardTemplate
+          variant="column"
+          resource={resource}
+          imgConfig={imgConfig}
+        />
+      )
+      screen.getByText(expectedText)
+    }
+  )
 
   it("Does not render item count for courses, etc", () => {
     const resource = makeCourse()

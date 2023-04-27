@@ -19,7 +19,13 @@ import {
   useInfiniteQuery,
   InfiniteData
 } from "react-query"
-import { urls, keys, UserListOptions, CourseFilterParams, StaffListOptions } from "./urls"
+import {
+  urls,
+  keys,
+  UserListOptions,
+  CourseFilterParams,
+  StaffListOptions
+} from "./urls"
 import { modifyCachedSearchResource } from "./search"
 import invariant from "tiny-invariant"
 import { QueryFilters } from "react-query/types/core/utils"
@@ -343,7 +349,6 @@ const useCreateStaffList = () => {
     }
   })
 }
-
 
 const useUpcomingCourses = (
   options?: PaginationSearchParams,

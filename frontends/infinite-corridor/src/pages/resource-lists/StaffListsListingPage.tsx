@@ -4,9 +4,7 @@ import Grid from "@mui/material/Grid"
 
 import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
-import {
-  useStaffListsListing,
-} from "../../api/learning-resources"
+import { useStaffListsListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import { LearningResourceCardTemplate } from "ol-search-ui"
 import type { StaffList } from "ol-search-ui"
@@ -14,14 +12,29 @@ import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { makeUserListViewPath } from "../urls"
 import EditListMenu from "./EditListMenu"
-import { CreateListDialog, EditListDialog, useCreationDialog, useDeleteListDialog, useEditingDialog } from "./ManageListDialogs"
+import UpsertListDialog from "./UpsertListDialog"
+import NiceModal from "@ebay/nice-modal-react"
+import { DeleteListDialog } from "./ManageListDialogs"
 
-const placeholderHandler = () => console.log('TODO')
+const startEditing = (resource: StaffList) => {
+  NiceModal.show(UpsertListDialog, {
+    resource,
+    mode:  "stafflist",
+    title: "Edit List"
+  })
+}
+const startCreating = () => {
+  NiceModal.show(UpsertListDialog, {
+    resource: null,
+    mode:     "stafflist",
+    title:    "Create List"
+  })
+}
+const startDeleting = (resource: StaffList) => {
+  NiceModal.show(DeleteListDialog, { resource })
+}
 
 const StaffListsListingPage: React.FC = () => {
-  const creation = useCreationDialog()
-  const editing = useEditingDialog()
-  const deletion = useDeleteListDialog()
   const staffListsQuery = useStaffListsListing()
 
   const history = useHistory()
@@ -47,7 +60,7 @@ const StaffListsListingPage: React.FC = () => {
                 <h1>Staff Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
-                <Button variant="contained" onClick={placeholderHandler}>
+                <Button variant="contained" onClick={startCreating}>
                   Create new list
                 </Button>
               </Grid>
@@ -67,8 +80,8 @@ const StaffListsListingPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu
                               resource={list}
-                              onEdit={editing.handleStart}
-                              onDelete={deletion.handleStart}
+                              onEdit={startEditing}
+                              onDelete={startDeleting}
                             />
                           }
                           onActivate={handleActivate}
@@ -82,16 +95,6 @@ const StaffListsListingPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <CreateListDialog
-        mode="stafflist"
-        open={creation.isOpen}
-        onClose={creation.handleFinish}
-      />
-      <EditListDialog
-        mode="stafflist"
-        resource={editing.resource}
-        onClose={editing.handleFinish}
-      />
     </BannerPage>
   )
 }

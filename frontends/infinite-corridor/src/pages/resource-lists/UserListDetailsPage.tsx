@@ -6,21 +6,30 @@ import Container from "@mui/material/Container"
 import EditIcon from "@mui/icons-material/Edit"
 import Grid from "@mui/material/Grid"
 import Button from "@mui/material/Button"
-import { EditListDialog, useEditingDialog } from "./ManageListDialogs"
+
 import { useParams } from "react-router"
 import UserListItems from "./ItemsListing"
-import { LearningResourceType as LRT } from "ol-search-ui"
+import { LearningResourceType as LRT, UserList } from "ol-search-ui"
 import SwapVertIcon from "@mui/icons-material/SwapVert"
+import NiceModal from "@ebay/nice-modal-react"
+import UpsertListDialog from "./UpsertListDialog"
 
 type RouteParams = {
   id: string
+}
+
+const startEditing = (resource: UserList) => {
+  NiceModal.show(UpsertListDialog, {
+    resource,
+    mode:  "userlist",
+    title: "Edit List"
+  })
 }
 
 const UserListsDetailsPage: React.FC = () => {
   const id = Number(useParams<RouteParams>().id)
   const userListQuery = useUserList(id)
   const itemsQuery = useUserListItems(id)
-  const editing = useEditingDialog()
   const [isSorting, toggleIsSorting] = useToggle(false)
 
   const itemCount = userListQuery.data?.item_count
@@ -82,7 +91,7 @@ const UserListsDetailsPage: React.FC = () => {
                     <Button
                       color="secondary"
                       startIcon={<EditIcon />}
-                      onClick={() => editing.handleStart(userListQuery.data)}
+                      onClick={() => startEditing(userListQuery.data)}
                     >
                       Edit
                     </Button>
@@ -101,12 +110,6 @@ const UserListsDetailsPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      {canEdit && (
-        <EditListDialog
-          resource={editing.resource}
-          onClose={editing.handleFinish}
-        />
-      )}
     </BannerPage>
   )
 }

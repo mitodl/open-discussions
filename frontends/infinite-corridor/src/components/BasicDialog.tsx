@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react"
-import Dialog from "@mui/material/Dialog"
+import Dialog, { DialogProps } from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
@@ -11,6 +11,10 @@ import Button from "@mui/material/Button"
 type BasicDialog = {
   open: boolean
   onClose: () => void
+  /**
+   * MUI Dialog's [TransitionProps](https://mui.com/material-ui/api/dialog/#props)
+   */
+  TransitionProps: DialogProps["TransitionProps"]
   onConfirm?: () => void | Promise<void>
   title: string
   children?: React.ReactNode

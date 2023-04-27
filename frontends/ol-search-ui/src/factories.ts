@@ -199,7 +199,6 @@ export const makeStaffList: Factory<StaffList> = overrides => {
   return staffList
 }
 
-
 const resultMakers = {
   course:  makeCourse,
   program: makeProgram,
