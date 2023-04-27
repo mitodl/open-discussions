@@ -342,7 +342,7 @@ def _transform_search_results_suggest(search_result):
 
     es_suggest = search_result.pop("suggest", {})
     if (
-        search_result.get("hits", {}).get("total", 0)
+        search_result.get("hits", {}).get("total", {}).get("value", 0)
         <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
     ):
         suggestion_dict = defaultdict(int)
@@ -364,7 +364,7 @@ def _transform_search_results_suggest(search_result):
         ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
     else:
         search_result["suggest"] = []
-
+    print(search_result)
     return search_result
 
 
