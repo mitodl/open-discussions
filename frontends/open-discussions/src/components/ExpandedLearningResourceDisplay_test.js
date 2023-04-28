@@ -450,9 +450,7 @@ describe("ExpandedLearningResourceDisplay", () => {
   ;[
     ["en-us", "English"],
     ["fr", "French"],
-    ["zh-CN", "Chinese"],
-    [null, "English"],
-    ["", "English"]
+    ["zh-CN", "Chinese"]
   ].forEach(([langCode, langName]) => {
     it(`should display the correct language name for ${String(
       langCode
@@ -465,6 +463,17 @@ describe("ExpandedLearningResourceDisplay", () => {
         wrapper.find(".language").closest(".info-row").find(".value").text(),
         langName
       )
+    })
+  })
+  ;["not-a-language", null, ""].forEach(langCode => {
+    it(`Does not display a language for langCode=${String(
+      langCode
+    )}`, async () => {
+      // $FlowFixMe: course run won't be null here
+      bestRun(course.runs).language = langCode
+      // $FlowFixMe: course run won't be null here
+      const { wrapper } = await render({}, { runId: bestRun(course.runs).id })
+      assert.equal(wrapper.find(".language").isEmpty(), true)
     })
   })
 
@@ -657,10 +666,6 @@ describe("ExpandedLearningResourceDisplay", () => {
     const { wrapper } = await render()
     assert.isNotOk(wrapper.find(".bar_chart").at(0).exists())
     assert.isNotOk(wrapper.find(".school").at(1).exists())
-    assert.equal(
-      wrapper.find(".language").closest(".info-row").find(".value").text(),
-      "English"
-    )
   })
 
   //

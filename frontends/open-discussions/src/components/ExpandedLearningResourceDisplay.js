@@ -325,11 +325,12 @@ export default function ExpandedLearningResourceDisplay(props: Props) {
                 )
                 : null}
               {isCoursewareResource(object.object_type)
-                ? lrInfoRow(
-                  "language",
-                  "Language:",
-                  languageName(selectedRun ? selectedRun.language : "en")
-                )
+                ? languageName(selectedRun?.language) &&
+                  lrInfoRow(
+                    "language",
+                    "Language:",
+                    languageName(selectedRun?.language)
+                  )
                 : null}
               {object.object_type === LR_TYPE_VIDEO ? (
                 <React.Fragment>
