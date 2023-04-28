@@ -1,30 +1,23 @@
 import React from "react"
+import * as NiceModal from "@ebay/nice-modal-react"
 import {
   makeLearningResource,
   makeListItemMember,
   makeSearchResult
 } from "ol-search-ui/src/factories"
-import {
-  renderWithProviders,
-  user,
-  screen,
-  expectProps,
-  within
-} from "../test-utils"
+import { renderWithProviders, user, screen, within } from "../test-utils"
 import LearningResourceCard from "./LearningResourceCard"
 import type { LearningResourceCardProps } from "./LearningResourceCard"
 import AddToListDialog from "../pages/user-lists/AddToListDialog"
 
-jest.mock("../pages/user-lists/AddToListDialog", () => {
-  const actual = jest.requireActual("../pages/user-lists/AddToListDialog")
+jest.mock("@ebay/nice-modal-react", () => {
+  const actual = jest.requireActual("@ebay/nice-modal-react")
   return {
     __esModule: true,
     ...actual,
-    default:    jest.fn(() => <div>AddToListDialog</div>)
+    show:       jest.fn()
   }
 })
-
-const spyAddToListDialog = jest.mocked(AddToListDialog)
 
 type SetupOptions = {
   isAuthenticated?: boolean
@@ -126,16 +119,15 @@ describe("LearningResourceCard", () => {
   )
 
   test("Clicking 'add to list' button opens AddToListDialog", async () => {
+    const showModal = jest.mocked(NiceModal.show)
+
     const { resource } = setup({ isAuthenticated: true })
     const button = screen.getByRole("button", { name: "Add to list" })
-    expect(spyAddToListDialog).not.toHaveBeenCalled()
+
+    expect(showModal).not.toHaveBeenCalled()
     await user.click(button)
-    expectProps(spyAddToListDialog, {
-      resourceKey: expect.objectContaining({
-        id:          resource.id,
-        object_type: resource.object_type
-      }),
-      open: true
+    expect(showModal).toHaveBeenCalledWith(AddToListDialog, {
+      resourceKey: resource
     })
   })
 
