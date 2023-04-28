@@ -350,6 +350,28 @@ const useCreateStaffList = () => {
   })
 }
 
+const deleteStaffList = async (id: number) => {
+  const { data: response } = await axios.delete(urls.staffList.details(id))
+  return response
+}
+const useDeleteStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(deleteStaffList, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        /**
+         * Invalidate everything related to learning resources, since any resource
+         * could have belonged to this list.
+         *
+         * This is a little bit overzealous, e.g., we do not really need to
+         * invalidate topics and favorites.
+         */
+        queryKey: keys.all
+      })
+    }
+  })
+}
+
 const useUpcomingCourses = (
   options?: PaginationSearchParams,
   filters?: CourseFilterParams
@@ -471,6 +493,7 @@ export {
   useStaffListsListing, // listing
   useCreateStaffList, // mutation
   useUpdateStaffList, // mutation
+  useDeleteStaffList, // mutation
   useFavorite, // mutation
   useUnfavorite, // mutation
   useUpcomingCourses, // listing
