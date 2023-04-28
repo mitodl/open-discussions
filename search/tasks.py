@@ -14,7 +14,7 @@ from prawcore.exceptions import NotFound
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
 from channels.models import Comment, Post
-from course_catalog.constants import PlatformType, PrivacyLevel
+from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PrivacyLevel
 from course_catalog.models import (
     ContentFile,
     Course,
@@ -836,14 +836,7 @@ def start_recreate_index(self, indexes):
                     index_course_content_files.si(ids)
                     for ids in chunks(
                         Course.objects.filter(published=True)
-                        .filter(
-                            platform__in=(
-                                PlatformType.ocw.value,
-                                PlatformType.xpro.value,
-                                PlatformType.mitx.value,
-                                PlatformType.mitxonline.value,
-                            )
-                        )
+                        .filter(platform__in=RESOURCE_FILE_PLATFORMS)
                         .exclude(course_id__in=blocklisted_ids)
                         .order_by("id")
                         .values_list("id", flat=True),
@@ -1091,13 +1084,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
         platform(str): Platform filter for the task
     """
 
-    # There arn't seperate RESOURCE_FILE_TYPE deletion taks because
-    # content files are only deleted when courses are deleted
-
-    if platform is None or platform in (
-        PlatformType.ocw.value,
-        PlatformType.xpro.value,
-    ):
+    if platform is None or platform in RESOURCE_FILE_PLATFORMS:
         course_update_query = (
             Course.objects.filter(published=True)
             .exclude(course_id__in=blocklisted_ids)
@@ -1108,7 +1095,7 @@ def get_update_resource_files_tasks(blocklisted_ids, platform):
             course_update_query = course_update_query.filter(platform=platform)
         else:
             course_update_query = course_update_query.filter(
-                platform__in=(PlatformType.ocw.value, PlatformType.xpro.value)
+                platform__in=RESOURCE_FILE_PLATFORMS
             )
 
         return [

@@ -10,7 +10,7 @@ from prawcore.exceptions import NotFound
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
-from course_catalog.constants import PlatformType, PrivacyLevel
+from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -543,6 +543,11 @@ def test_start_recreate_index(
                     for course in courses
                     if course.platform == PlatformType.xpro.value
                 ],
+                *[
+                    course.id
+                    for course in courses
+                    if course.platform == PlatformType.oll.value
+                ],
             ]
         )
 
@@ -911,7 +916,7 @@ def test_start_update_index(
             )
 
     if RESOURCE_FILE_TYPE in indexes:
-        if platform in (PlatformType.ocw.value, PlatformType.xpro.value):
+        if platform in RESOURCE_FILE_PLATFORMS:
             assert index_course_content_mock.si.call_count == 1
             course = next(course for course in courses if course.platform == platform)
 
@@ -920,22 +925,7 @@ def test_start_update_index(
         elif platform:
             assert index_course_content_mock.si.call_count == 0
         else:
-            assert index_course_content_mock.si.call_count == 1
-            index_course_content_mock.si.assert_any_call(
-                [
-                    *[
-                        course.id
-                        for course in courses
-                        if course.platform == PlatformType.ocw.value
-                    ],
-                    *[
-                        course.id
-                        for course in courses
-                        if course.platform == PlatformType.xpro.value
-                    ],
-                ],
-                True,
-            )
+            assert index_course_content_mock.si.call_count == 2
 
     if VIDEO_TYPE in indexes:
         assert index_videos_mock.si.call_count == 2
