@@ -9,21 +9,12 @@ import Button from "@mui/material/Button"
 
 import { useParams } from "react-router"
 import UserListItems from "./ItemsListing"
-import { LearningResourceType as LRT, UserList } from "ol-search-ui"
+import { LearningResourceType as LRT } from "ol-search-ui"
 import SwapVertIcon from "@mui/icons-material/SwapVert"
-import NiceModal from "@ebay/nice-modal-react"
-import UpsertListDialog from "./UpsertListDialog"
+import { manageListDialogs } from "./ManageListDialogs"
 
 type RouteParams = {
   id: string
-}
-
-const startEditing = (resource: UserList) => {
-  NiceModal.show(UpsertListDialog, {
-    resource,
-    mode:  "userlist",
-    title: "Edit list"
-  })
 }
 
 const UserListsDetailsPage: React.FC = () => {
@@ -91,7 +82,9 @@ const UserListsDetailsPage: React.FC = () => {
                     <Button
                       color="secondary"
                       startIcon={<EditIcon />}
-                      onClick={() => startEditing(userListQuery.data)}
+                      onClick={() =>
+                        manageListDialogs.editUserList(userListQuery.data)
+                      }
                     >
                       Edit
                     </Button>

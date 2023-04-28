@@ -1,5 +1,4 @@
 import React from "react"
-import * as NiceModal from "@ebay/nice-modal-react"
 import { faker } from "@faker-js/faker"
 import {
   Favorites,
@@ -8,7 +7,7 @@ import {
 } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
-import { DeleteListDialog } from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 import UserListsListingPage from "./UserListsListingPage"
 import {
   screen,
@@ -17,17 +16,8 @@ import {
   user,
   expectProps
 } from "../../test-utils"
-import UpsertListDialog from "./UpsertListDialog"
 
 const spyLRCardTemplate = jest.mocked(LRCardTemplate)
-
-jest.mock("@ebay/nice-modal-react", () => {
-  const actual = jest.requireActual("@ebay/nice-modal-react")
-  return {
-    ...actual,
-    show: jest.fn(actual.show)
-  }
-})
 
 describe("UserListsListingPage", () => {
   /**
@@ -88,6 +78,10 @@ describe("UserListsListingPage", () => {
   })
 
   test("Clicking edit -> Edit opens the editing dialog", async () => {
+    const editUserList = jest
+      .spyOn(manageListDialogs, "editUserList")
+      .mockImplementationOnce(jest.fn())
+
     const { userLists } = setup()
     const targetList = faker.helpers.arrayElement(userLists.results)
     const menuButton = await screen.findByRole("button", {
@@ -96,15 +90,15 @@ describe("UserListsListingPage", () => {
     await user.click(menuButton)
     const editButton = screen.getByRole("menuitem", { name: "Edit" })
     await user.click(editButton)
-    screen.getByRole("dialog", { name: "Edit list" })
 
-    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
-      UpsertListDialog,
-      expect.objectContaining({ resource: targetList })
-    )
+    expect(editUserList).toHaveBeenCalledWith(targetList)
   })
 
   test("Clicking edit -> Delete opens the deletion dialog", async () => {
+    const deleteList = jest
+      .spyOn(manageListDialogs, "deleteList")
+      .mockImplementationOnce(jest.fn())
+
     const { userLists } = setup()
     const targetList = faker.helpers.arrayElement(userLists.results)
     const menuButton = await screen.findByRole("button", {
@@ -112,29 +106,27 @@ describe("UserListsListingPage", () => {
     })
     await user.click(menuButton)
     const deleteButton = screen.getByRole("menuitem", { name: "Delete" })
+
     await user.click(deleteButton)
-    screen.getByRole("dialog", { name: "Delete list" })
 
     // Check details of this dialog elsewhere
-    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
-      DeleteListDialog,
-      expect.objectContaining({ resource: targetList })
-    )
+    expect(deleteList).toHaveBeenCalledWith(targetList)
   })
 
   test("Clicking new list opens the creation dialog", async () => {
+    const createUserList = jest
+      .spyOn(manageListDialogs, "createUserList")
+      .mockImplementationOnce(jest.fn())
     setup()
     const newListButton = await screen.findByRole("button", {
       name: "Create new list"
     })
+
+    expect(createUserList).not.toHaveBeenCalled()
     await user.click(newListButton)
-    screen.getByRole("dialog", { name: "Create list" })
 
     // Check details of this dialog elsewhere
-    expect(jest.mocked(NiceModal.show)).toHaveBeenCalledWith(
-      UpsertListDialog,
-      expect.objectContaining({ resource: null })
-    )
+    expect(createUserList).toHaveBeenCalled()
   })
 
   test("Clicking on list title navigates to list page", async () => {

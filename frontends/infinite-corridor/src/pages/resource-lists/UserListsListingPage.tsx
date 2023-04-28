@@ -3,7 +3,7 @@ import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 
 import { BannerPage } from "ol-util"
-import { DeleteListDialog } from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 import { GridColumn, GridContainer } from "../../components/layout"
 import {
   useFavoritesListing,
@@ -16,8 +16,6 @@ import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
 import EditListMenu from "./EditListMenu"
-import UpsertListDialog from "./UpsertListDialog"
-import NiceModal from "@ebay/nice-modal-react"
 
 /**
  * Makes a fake userlist object for the favorites list.
@@ -37,24 +35,6 @@ const makeFavorites = (count: number): Favorites => {
     image_src:     null,
     certification: []
   }
-}
-
-const startEditing = (resource: UserList) => {
-  NiceModal.show(UpsertListDialog, {
-    resource,
-    mode:  "userlist",
-    title: "Edit list"
-  })
-}
-const startCreating = () => {
-  NiceModal.show(UpsertListDialog, {
-    resource: null,
-    mode:     "userlist",
-    title:    "Create list"
-  })
-}
-const startDeleting = (resource: UserList) => {
-  NiceModal.show(DeleteListDialog, { resource })
 }
 
 const UserListsListingPage: React.FC = () => {
@@ -90,7 +70,10 @@ const UserListsListingPage: React.FC = () => {
                 <h1>My Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
-                <Button variant="contained" onClick={startCreating}>
+                <Button
+                  variant="contained"
+                  onClick={manageListDialogs.createUserList}
+                >
                   Create new list
                 </Button>
               </Grid>
@@ -122,8 +105,8 @@ const UserListsListingPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu
                               resource={list}
-                              onEdit={startEditing}
-                              onDelete={startDeleting}
+                              onEdit={manageListDialogs.editUserList}
+                              onDelete={manageListDialogs.deleteList}
                             />
                           }
                           onActivate={handleActivate}

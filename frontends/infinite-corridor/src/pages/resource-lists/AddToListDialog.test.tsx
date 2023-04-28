@@ -21,7 +21,7 @@ import {
   mockAxiosInstance as axios
 } from "../../test-utils/mockAxios"
 import { urls } from "../../api/learning-resources"
-import UpsertListDialog from "./UpsertListDialog"
+import { manageListDialogs } from "./ManageListDialogs"
 import { waitForElementToBeRemoved } from "@testing-library/react"
 
 jest.mock("@ebay/nice-modal-react", () => {
@@ -205,21 +205,19 @@ describe("AddToListDialog", () => {
   })
 
   test("Clicking 'Create a new list' opens the create list dialog", async () => {
+    // Don't actually open the 'Create List' modal, or we'll need to mock API responses.
+    const createUserList = jest
+      .spyOn(manageListDialogs, "createUserList")
+      .mockImplementationOnce(jest.fn())
+
     setup()
     const button = await screen.findByRole("button", {
       name: "Create a new list"
     })
 
-    // Don't actually open the 'Create List' modal, or we'll need to mock API responses.
-    const showModal = jest.spyOn(NiceModal, "show")
-    showModal.mockImplementationOnce(async () => /** pass */ null)
-
-    expect(showModal).not.toHaveBeenCalledWith(
-      UpsertListDialog,
-      expect.anything()
-    )
+    expect(createUserList).not.toHaveBeenCalled()
     await user.click(button)
-    expect(showModal).toHaveBeenCalledWith(UpsertListDialog, expect.anything())
+    expect(createUserList).toHaveBeenCalled()
   })
 
   test("Opens and closes via NiceModal", async () => {

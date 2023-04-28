@@ -28,7 +28,7 @@ import {
   useUnfavorite,
   useUserListsListing
 } from "../../api/learning-resources"
-import UpsertListDialog from "./UpsertListDialog"
+import { manageListDialogs } from "./ManageListDialogs"
 
 type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
@@ -137,14 +137,6 @@ const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
   return <Chip icon={icon} label={label} size="small" />
 }
 
-const startCreatingList = () => {
-  NiceModal.show(UpsertListDialog, {
-    resource: null,
-    mode:     "userlist",
-    title:    "Create List"
-  })
-}
-
 const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
   resourceKey
 }) => {
@@ -213,7 +205,7 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
               )
             })}
             <ListItem className="add-to-list-new">
-              <ListItemButton onClick={startCreatingList}>
+              <ListItemButton onClick={manageListDialogs.createUserList}>
                 <AddIcon />
                 <ListItemText primary="Create a new list" />
               </ListItemButton>

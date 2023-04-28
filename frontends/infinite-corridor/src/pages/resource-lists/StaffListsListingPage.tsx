@@ -12,27 +12,7 @@ import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
 import { makeUserListViewPath } from "../urls"
 import EditListMenu from "./EditListMenu"
-import UpsertListDialog from "./UpsertListDialog"
-import NiceModal from "@ebay/nice-modal-react"
-import { DeleteListDialog } from "./ManageListDialogs"
-
-const startEditing = (resource: StaffList) => {
-  NiceModal.show(UpsertListDialog, {
-    resource,
-    mode:  "stafflist",
-    title: "Edit List"
-  })
-}
-const startCreating = () => {
-  NiceModal.show(UpsertListDialog, {
-    resource: null,
-    mode:     "stafflist",
-    title:    "Create List"
-  })
-}
-const startDeleting = (resource: StaffList) => {
-  NiceModal.show(DeleteListDialog, { resource })
-}
+import { manageListDialogs } from "./ManageListDialogs"
 
 const StaffListsListingPage: React.FC = () => {
   const staffListsQuery = useStaffListsListing()
@@ -60,7 +40,10 @@ const StaffListsListingPage: React.FC = () => {
                 <h1>Staff Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
-                <Button variant="contained" onClick={startCreating}>
+                <Button
+                  variant="contained"
+                  onClick={manageListDialogs.createStaffList}
+                >
                   Create new list
                 </Button>
               </Grid>
@@ -80,8 +63,8 @@ const StaffListsListingPage: React.FC = () => {
                           footerActionSlot={
                             <EditListMenu
                               resource={list}
-                              onEdit={startEditing}
-                              onDelete={startDeleting}
+                              onEdit={manageListDialogs.editStaffList}
+                              onDelete={manageListDialogs.deleteList}
                             />
                           }
                           onActivate={handleActivate}

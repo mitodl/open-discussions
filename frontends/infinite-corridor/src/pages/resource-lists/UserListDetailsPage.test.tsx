@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { UserList, LearningResourceType as LRT } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
-import UpsertListDialog from "./UpsertListDialog"
+import { manageListDialogs } from "./ManageListDialogs"
 import ItemsListing from "./ItemsListing"
 import {
   screen,
@@ -13,15 +13,6 @@ import {
   waitFor
 } from "../../test-utils"
 import { User } from "../../types/settings"
-import NiceModal from "@ebay/nice-modal-react"
-
-jest.mock("@ebay/nice-modal-react", () => {
-  const actual = jest.requireActual("@ebay/nice-modal-react")
-  return {
-    ...actual,
-    show: jest.fn(actual.show)
-  }
-})
 
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
@@ -162,13 +153,12 @@ describe("UserListDetailsPage", () => {
     })
     const editButton = await screen.findByRole("button", { name: "Edit" })
 
-    expect(NiceModal.show).not.toHaveBeenCalled()
+    const editUserList = jest.spyOn(manageListDialogs, "editUserList")
+    editUserList.mockImplementationOnce(jest.fn())
+
+    expect(editUserList).not.toHaveBeenCalled()
     await user.click(editButton)
-    await screen.findByRole("dialog", { name: "Edit list" })
-    expect(NiceModal.show).toHaveBeenCalledWith(
-      UpsertListDialog,
-      expect.objectContaining({ resource: userList })
-    )
+    expect(editUserList).toHaveBeenCalledWith(userList)
   })
 
   test("Passes appropriate props to ItemsListing", async () => {
