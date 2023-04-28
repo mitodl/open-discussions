@@ -13719,7 +13719,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iso-639-1@npm:^2.0.0":
+"iso-639-1@npm:^2.0.0, iso-639-1@npm:^2.1.15":
   version: 2.1.15
   resolution: "iso-639-1@npm:2.1.15"
   checksum: a201530819d33e9ce077b02c786d67b35be5d823be27b5aacc18d880e580e559e39ec5055f8e2abcdc210f46618a643bf3c74e6fe6e8255fe62059682750e595
@@ -16982,6 +16982,7 @@ __metadata:
     eslint-plugin-testing-library: ^5.5.1
     exec-sh: ^0.4.0
     html-entities: ^2.3.3
+    iso-639-1: ^2.1.15
     jest: ^28.1.1
     jest-environment-jsdom: ^28.1.1
     jest-extended: ^3.0.1

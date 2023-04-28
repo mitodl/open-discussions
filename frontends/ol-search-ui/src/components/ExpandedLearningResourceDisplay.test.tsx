@@ -134,15 +134,33 @@ describe("ExpandedLearningResourceDisplay", () => {
   it.each([
     { languageCode: "en-us", language: "English" },
     { languageCode: "fr", language: "French" },
-    { languageCode: "zh-CN", language: "Chinese" },
-    { languageCode: null, language: "English" },
-    { languageCode: "", language: "English" }
-  ])("should render the course language", ({ languageCode, language }) => {
-    const run = makeRun({ language: languageCode })
-    const resource = makeCourse({ runs: [run] })
-    renderLearningResourceDetails({ resource })
-    screen.getByText(language)
-  })
+    { languageCode: "zh-CN", language: "Chinese" }
+  ])(
+    "should render Language: <LanguageName> if course language is specified",
+    ({ languageCode, language }) => {
+      const run = makeRun({ language: languageCode })
+      const resource = makeCourse({ runs: [run] })
+      renderLearningResourceDetails({ resource })
+      const dd = getByTerm(document.body, "Language:")
+      expect(dd.textContent).toBe(language)
+    }
+  )
+
+  it.each([
+    { languageCode: "en", shouldRender: true },
+    { languageCode: null, shouldRender: false },
+    { languageCode: "", shouldRender: false }
+  ])(
+    "Renders language info if and only if specified",
+    ({ languageCode, shouldRender }) => {
+      const run = makeRun({ language: languageCode })
+      const resource = makeCourse({ runs: [run] })
+      renderLearningResourceDetails({ resource })
+      expect(queryByTerm(document.body, "Language:") !== null).toBe(
+        shouldRender
+      )
+    }
+  )
 
   it("formats and renders the cost", () => {
     const run = makeRun({ prices: [{ price: 25.5, mode: "" }] })
