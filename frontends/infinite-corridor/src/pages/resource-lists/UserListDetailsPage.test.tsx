@@ -153,12 +153,12 @@ describe("UserListDetailsPage", () => {
     })
     const editButton = await screen.findByRole("button", { name: "Edit" })
 
-    const editUserList = jest.spyOn(manageListDialogs, "editUserList")
-    editUserList.mockImplementationOnce(jest.fn())
+    const editList = jest.spyOn(manageListDialogs, "editList")
+    editList.mockImplementationOnce(jest.fn())
 
-    expect(editUserList).not.toHaveBeenCalled()
+    expect(editList).not.toHaveBeenCalled()
     await user.click(editButton)
-    expect(editUserList).toHaveBeenCalledWith(userList)
+    expect(editList).toHaveBeenCalledWith(userList)
   })
 
   test("Passes appropriate props to ItemsListing", async () => {

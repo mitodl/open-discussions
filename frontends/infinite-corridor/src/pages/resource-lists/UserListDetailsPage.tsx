@@ -83,7 +83,7 @@ const UserListsDetailsPage: React.FC = () => {
                       color="secondary"
                       startIcon={<EditIcon />}
                       onClick={() =>
-                        manageListDialogs.editUserList(userListQuery.data)
+                        manageListDialogs.editList(userListQuery.data)
                       }
                     >
                       Edit

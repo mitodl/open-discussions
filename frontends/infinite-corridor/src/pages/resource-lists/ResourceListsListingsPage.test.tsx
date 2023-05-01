@@ -8,7 +8,7 @@ import {
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { manageListDialogs } from "./ManageListDialogs"
-import UserListsListingPage from "./UserListsListingPage"
+import { UserListsListingPage } from "./ResourceListsListingsPage"
 import {
   screen,
   renderWithProviders,
@@ -78,8 +78,8 @@ describe("UserListsListingPage", () => {
   })
 
   test("Clicking edit -> Edit opens the editing dialog", async () => {
-    const editUserList = jest
-      .spyOn(manageListDialogs, "editUserList")
+    const editList = jest
+      .spyOn(manageListDialogs, "editList")
       .mockImplementationOnce(jest.fn())
 
     const { userLists } = setup()
@@ -91,7 +91,7 @@ describe("UserListsListingPage", () => {
     const editButton = screen.getByRole("menuitem", { name: "Edit" })
     await user.click(editButton)
 
-    expect(editUserList).toHaveBeenCalledWith(targetList)
+    expect(editList).toHaveBeenCalledWith(targetList)
   })
 
   test("Clicking edit -> Delete opens the deletion dialog", async () => {

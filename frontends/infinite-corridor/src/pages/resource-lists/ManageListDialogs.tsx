@@ -244,6 +244,23 @@ const UpsertListDialog = NiceModal.create(
   }
 )
 
+const isUserListOrPath = (
+  resource: UserList | StaffList
+): resource is UserList => {
+  return (
+    resource.object_type === LRT.Userlist ||
+    resource.object_type === LRT.LearningPath
+  )
+}
+const isStaffListOrPath = (
+  resource: UserList | StaffList
+): resource is StaffList => {
+  return (
+    resource.object_type === LRT.StaffList ||
+    resource.object_type === LRT.StaffPath
+  )
+}
+
 type DeleteListDialogProps = {
   resource: UserList | StaffList
 }
@@ -251,12 +268,11 @@ type DeleteListDialogProps = {
 const useDeleteList = (resource: UserList | StaffList) => {
   const deleteUserList = useDeleteUserList()
   const deleteStaffList = useDeleteStaffList()
-  const type = resource.object_type
-  if (type === LRT.StaffList || type === LRT.StaffPath) {
-    return deleteStaffList
-  }
-  if (type === LRT.Userlist || type === LRT.LearningPath) {
+  if (isUserListOrPath(resource)) {
     return deleteUserList
+  }
+  if (isStaffListOrPath(resource)) {
+    return deleteStaffList
   }
   throw new Error("Expected a stafflist or userlist")
 }
@@ -297,18 +313,21 @@ const manageListDialogs = {
       mode:     "stafflist",
       resource: null
     }),
-  editUserList: (resource: UserList) =>
-    NiceModal.show(UpsertListDialog, {
-      title: "Edit list",
-      mode:  "userlist",
-      resource
-    }),
-  editStaffList: (resource: StaffList) =>
-    NiceModal.show(UpsertListDialog, {
-      title: "Edit list",
-      mode:  "stafflist",
-      resource
-    }),
+  editList: (resource: UserList | StaffList) => {
+    if (isUserListOrPath(resource)) {
+      NiceModal.show(UpsertListDialog, {
+        title: "Edit list",
+        mode:  "userlist",
+        resource
+      })
+    } else {
+      NiceModal.show(UpsertListDialog, {
+        title: "Edit list",
+        mode:  "stafflist",
+        resource
+      })
+    }
+  },
   deleteList: (resource: UserList | StaffList) =>
     NiceModal.show(DeleteListDialog, { resource })
 }

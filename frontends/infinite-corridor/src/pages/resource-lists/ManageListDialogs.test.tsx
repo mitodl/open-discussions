@@ -287,7 +287,6 @@ describe("Creating lists with manageListDialogs", () => {
 
 describe("Editing lists with manageListDialogs", () => {
   const setup = (
-    mode: "userlist" | "stafflist" = "userlist",
     resource: UserList | StaffList
   ) => {
     const topics = factories.makeTopicsPaginated({ count: 5 })
@@ -297,11 +296,7 @@ describe("Editing lists with manageListDialogs", () => {
     renderWithProviders(null)
 
     act(() => {
-      if (mode === "userlist") {
-        manageListDialogs.editUserList(resource as UserList)
-      } else {
-        manageListDialogs.editStaffList(resource as StaffList)
-      }
+      manageListDialogs.editList(resource)
     })
 
     return { topics, resource }
@@ -309,9 +304,9 @@ describe("Editing lists with manageListDialogs", () => {
 
   test.each(modes)(
     "Editing a userlist calls correct API",
-    async ({ mode, makeList, updateUrl }) => {
+    async ({ makeList, updateUrl }) => {
       const resource = makeList()
-      setup(mode, resource)
+      setup(resource)
 
       const updatedResource = {
         ...resource,
@@ -372,14 +367,14 @@ describe("Editing lists with manageListDialogs", () => {
   ])(
     "Error messages ($expectedError)",
     async ({ overrides, topicsCount, expectedError, targetInput }) => {
-      const { mode, makeList } = faker.helpers.arrayElement(modes)
+      const { makeList } = faker.helpers.arrayElement(modes)
       const resource = makeList({
         topics: Array(topicsCount)
           .fill(null)
           .map(() => factories.makeTopic()),
         ...overrides
       })
-      setup(mode, resource)
+      setup(resource)
       await user.click(inputs.submit())
       const theInput = targetInput()
       const description = getDescriptionFor(theInput)
@@ -390,17 +385,17 @@ describe("Editing lists with manageListDialogs", () => {
 
   test("Dialog title is 'Edit list'", async () => {
     // behavior does not depend on stafflist / userlist, so just pick one
-    const { mode, makeList } = faker.helpers.arrayElement(modes)
-    setup(mode, makeList())
+    const { makeList } = faker.helpers.arrayElement(modes)
+    setup(makeList())
     const dialog = screen.getByRole("heading", { name: "Edit list" })
     expect(dialog).toBeVisible()
   })
 
   test("'Cancel' closes dialog (and does not PATCH)", async () => {
     // Behavior does not depend on stafflist/userlist, so just pick one
-    const { mode, makeList } = faker.helpers.arrayElement(modes)
+    const { makeList } = faker.helpers.arrayElement(modes)
     const resource = makeList()
-    setup(mode, resource)
+    setup(resource)
     const dialog = screen.getByRole("dialog")
     await user.click(inputs.cancel())
     expect(axios.patch).not.toHaveBeenCalled()
@@ -409,10 +404,10 @@ describe("Editing lists with manageListDialogs", () => {
 
   test.each(modes)(
     "Displays overall error if form validates but API call fails",
-    async ({ mode, makeList, updateUrl }) => {
+    async ({ makeList, updateUrl }) => {
       allowConsoleErrors()
       const resource = makeList()
-      setup(mode, resource)
+      setup(resource)
 
       const titleInput = inputs.title()
       await user.click(titleInput)

@@ -7,7 +7,10 @@ import DemoPage from "./pages/DemoPage"
 import FieldPage from "./pages/field-details/FieldPage"
 import FieldAdminApp from "./pages/field-details/FieldAdminApp"
 import LearningResourceDrawer from "./components/LearningResourceDrawer"
-import UserListsListingPage from "./pages/resource-lists/UserListsListingPage"
+import {
+  UserListsListingPage,
+  StaffListsListingPage
+} from "./pages/resource-lists/ResourceListsListingsPage"
 import UserListDetailsPage from "./pages/resource-lists/UserListDetailsPage"
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import * as urls from "./pages/urls"
@@ -18,7 +21,6 @@ import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
-import StaffListsListingPage from "./pages/resource-lists/StaffListsListingPage"
 
 export const BASE_URL = "/infinite"
 
