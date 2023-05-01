@@ -206,8 +206,8 @@ describe("AddToListDialog", () => {
 
   test("Clicking 'Create a new list' opens the create list dialog", async () => {
     // Don't actually open the 'Create List' modal, or we'll need to mock API responses.
-    const createUserList = jest
-      .spyOn(manageListDialogs, "createUserList")
+    const createList = jest
+      .spyOn(manageListDialogs, "createList")
       .mockImplementationOnce(jest.fn())
 
     setup()
@@ -215,9 +215,9 @@ describe("AddToListDialog", () => {
       name: "Create a new list"
     })
 
-    expect(createUserList).not.toHaveBeenCalled()
+    expect(createList).not.toHaveBeenCalled()
     await user.click(button)
-    expect(createUserList).toHaveBeenCalled()
+    expect(createList).toHaveBeenCalledWith("userlist")
   })
 
   test("Opens and closes via NiceModal", async () => {

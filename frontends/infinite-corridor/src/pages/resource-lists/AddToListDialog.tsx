@@ -205,7 +205,9 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
               )
             })}
             <ListItem className="add-to-list-new">
-              <ListItemButton onClick={manageListDialogs.createUserList}>
+              <ListItemButton
+                onClick={() => manageListDialogs.createList("userlist")}
+              >
                 <AddIcon />
                 <ListItemText primary="Create a new list" />
               </ListItemButton>

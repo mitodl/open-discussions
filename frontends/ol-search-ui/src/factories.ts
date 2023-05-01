@@ -317,6 +317,8 @@ export const makeFavorites = makeListItemsPaginated
 
 export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
 
+export const makeStaffListsPaginated = makePaginatedFactory(makeStaffList)
+
 export const makeTopicsPaginated = makePaginatedFactory(makeTopic)
 
 export const makeCoursesPaginated = makePaginatedFactory(makeCourse)

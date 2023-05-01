@@ -93,11 +93,7 @@ describe("Creating lists with manageListDialogs", () => {
     renderWithProviders(null, opts)
 
     act(() => {
-      if (mode === "userlist") {
-        manageListDialogs.createUserList()
-      } else {
-        manageListDialogs.createStaffList()
-      }
+      manageListDialogs.createList(mode)
     })
 
     return { topics }
@@ -286,9 +282,7 @@ describe("Creating lists with manageListDialogs", () => {
 })
 
 describe("Editing lists with manageListDialogs", () => {
-  const setup = (
-    resource: UserList | StaffList
-  ) => {
+  const setup = (resource: UserList | StaffList) => {
     const topics = factories.makeTopicsPaginated({ count: 5 })
     topics.results = topics.results.concat(resource.topics)
     topics.count = topics.results.length

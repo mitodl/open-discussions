@@ -151,7 +151,7 @@ const UserListsListingPage: React.FC = () => {
               <Grid item xs={6} className="ic-centered-right">
                 <Button
                   variant="contained"
-                  onClick={manageListDialogs.createUserList}
+                  onClick={() => manageListDialogs.createList("userlist")}
                 >
                   Create new list
                 </Button>
@@ -206,12 +206,12 @@ const StaffListsListingPage: React.FC = () => {
           <GridColumn variant="single-full">
             <Grid container className="ic-list-header">
               <Grid item xs={6}>
-                <h1>Staff Lists</h1>
+                <h1>Learning Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
                 <Button
                   variant="contained"
-                  onClick={manageListDialogs.createStaffList}
+                  onClick={() => manageListDialogs.createList("stafflist")}
                 >
                   Create new list
                 </Button>

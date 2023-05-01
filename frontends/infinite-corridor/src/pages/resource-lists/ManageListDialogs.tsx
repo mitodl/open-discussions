@@ -301,16 +301,10 @@ const DeleteListDialog = NiceModal.create(
 )
 
 const manageListDialogs = {
-  createUserList: () =>
+  createList: (mode: DialogMode) =>
     NiceModal.show(UpsertListDialog, {
       title:    "Create list",
-      mode:     "userlist",
-      resource: null
-    }),
-  createStaffList: () =>
-    NiceModal.show(UpsertListDialog, {
-      title:    "Create list",
-      mode:     "stafflist",
+      mode:     mode,
       resource: null
     }),
   editList: (resource: UserList | StaffList) => {
