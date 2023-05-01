@@ -49,6 +49,8 @@ services:
       - rest.action.multi.allow_explicit_index=false
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
+      - "http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization"
+      - "http.cors.allow-credentials=true"
     ulimits:
       memlock:
         soft: -1
