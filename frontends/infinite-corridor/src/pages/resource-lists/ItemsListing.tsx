@@ -9,18 +9,19 @@ import {
   LoadingSpinner,
   CancelDrop
 } from "ol-util"
-import { useMoveUserListItem } from "../../api/learning-resources"
+import { useMoveListItem } from "../../api/learning-resources"
 
-type UserListItemsProps = {
+type ResourceListItemsProps = {
   id?: number
   items?: ListItem[]
   isLoading?: boolean
   isRefetching?: boolean
   emptyMessage: string
   sortable?: boolean
+  mode: "userlist" | "stafflist"
 }
 
-const UserListItemsViewOnly: React.FC<{
+const ResourceListItemsViewOnly: React.FC<{
   items: ListItem[]
 }> = ({ items }) => {
   return (
@@ -39,12 +40,13 @@ const UserListItemsViewOnly: React.FC<{
   )
 }
 
-const UserListItemsSortable: React.FC<{
+const ResourceListItemsSortable: React.FC<{
   listId: number
   items: ListItem[]
   isRefetching?: boolean
-}> = ({ items, listId, isRefetching }) => {
-  const move = useMoveUserListItem()
+  mode: ResourceListItemsProps["mode"]
+}> = ({ items, listId, isRefetching, mode }) => {
+  const move = useMoveListItem(mode)
   const renderDragging: RenderActive = useCallback(active => {
     const item = active.data.current as ListItem
     return (
@@ -63,7 +65,7 @@ const UserListItemsSortable: React.FC<{
    *
    * Why?
    *
-   * The `useMoveUserListItem` mutation function makes an API call and
+   * The `useMoveListItem` mutation function makes an API call and
    * optimistically updates the UI for immediate feedback. Except optimistic
    * updates in react-query aren't actually immediate, they're asynchronous (no
    * server interaction, but on the JS event loop).
@@ -135,13 +137,14 @@ const UserListItemsSortable: React.FC<{
   )
 }
 
-const UserListItems: React.FC<UserListItemsProps> = ({
+const ResurceListItems: React.FC<ResourceListItemsProps> = ({
   id,
   items,
   isLoading,
   isRefetching,
   emptyMessage,
-  sortable = false
+  sortable = false,
+  mode
 }) => {
   if (sortable && !id) throw new Error("Sortable list must have an id")
   return (
@@ -151,17 +154,18 @@ const UserListItems: React.FC<UserListItemsProps> = ({
         (items.length === 0 ? (
           <p className="empty-message">{emptyMessage}</p>
         ) : sortable && id ? (
-          <UserListItemsSortable
+          <ResourceListItemsSortable
             listId={id}
+            mode={mode}
             items={items}
             isRefetching={isRefetching}
           />
         ) : (
-          <UserListItemsViewOnly items={items} />
+          <ResourceListItemsViewOnly items={items} />
         ))}
     </>
   )
 }
 
-export default UserListItems
-export type { UserListItemsProps }
+export default ResurceListItems
+export type { ResourceListItemsProps as ResourceListItemsProps }
