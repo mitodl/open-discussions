@@ -31,8 +31,8 @@ describe("UserListDetailsPage", () => {
    */
   const setup = ({
     user,
-    list
-  }: { user?: Partial<User>; list?: Partial<UserList> } = {}) => {
+    list,
+  }: { user?: Partial<User>; list: UserList }) => {
     const userList = factories.makeUserList(list)
     const count = faker.datatype.number({ min: 2, max: 5 })
     const paginatedItems = factories.makeListItemsPaginated({ count })
@@ -52,12 +52,13 @@ describe("UserListDetailsPage", () => {
       url: `/lists/${userList.id}`,
       user
     })
-    return { history, userList, items, paginatedItems, queryClient }
+    return { history, items, paginatedItems, queryClient }
   }
 
   test("renders list title", async () => {
-    const { userList } = setup()
-    await screen.findByRole("heading", { name: userList.title })
+    const list = factories.makeUserList()
+    setup({ list })
+    await screen.findByRole("heading", { name: list.title })
   })
 
   test.each([
@@ -90,11 +91,9 @@ describe("UserListDetailsPage", () => {
     async ({ data, expected }) => {
       const { userId, authorId, type } = data
       const { canEdit, canReorder } = expected
-      const { userList } = setup({
-        user: { id: userId },
-        list: { author: authorId, object_type: type }
-      })
-      await screen.findByRole("heading", { name: userList.title })
+      const list = factories.makeUserList({ author: authorId, object_type: type })
+      setup({user: { id: userId }, list})
+      await screen.findByRole("heading", { name: list.title })
 
       const editButton = screen.queryByRole("button", { name: "Edit" })
       expect(!!editButton).toBe(canEdit)
@@ -107,10 +106,8 @@ describe("UserListDetailsPage", () => {
   )
 
   test("Clicking reorder makes items reorderable, clicking Done makes them static", async () => {
-    setup({
-      user: { id: 1 },
-      list: { author: 1, object_type: LRT.LearningPath }
-    })
+    const list = factories.makeUserList({ author: 1, object_type: LRT.LearningPath })
+    setup({ user: { id: 1 }, list})
     const reorderButton = await screen.findByRole("button", { name: "Reorder" })
     expectProps(spyItemsListing, { sortable: false }, -1)
     await user.click(reorderButton)
@@ -135,11 +132,9 @@ describe("UserListDetailsPage", () => {
   ])(
     "Shows 'Reorder' button for authorized paths if and only if not empty (item count = $count)",
     async ({ count, canReorder }) => {
-      const { userList } = setup({
-        user: { id: 1 },
-        list: { author: 1, object_type: LRT.LearningPath, item_count: count }
-      })
-      await screen.findByRole("heading", { name: userList.title })
+      const list = factories.makeUserList({ author: 1, object_type: LRT.LearningPath, item_count: count })
+      setup({ user: { id: 1 }, list})
+      await screen.findByRole("heading", { name: list.title })
       const reorderButton = screen.queryByRole("button", { name: "Reorder" })
       expect(!!reorderButton).toBe(canReorder)
     }
@@ -147,10 +142,8 @@ describe("UserListDetailsPage", () => {
 
   test("Edit buttons opens editing dialog", async () => {
     const userId = faker.datatype.number()
-    const { userList } = setup({
-      user: { id: userId },
-      list: { author: userId }
-    })
+    const list = factories.makeUserList({ author: userId })
+    setup({user: { id: userId }, list })
     const editButton = await screen.findByRole("button", { name: "Edit" })
 
     const editList = jest.spyOn(manageListDialogs, "editList")
@@ -158,11 +151,12 @@ describe("UserListDetailsPage", () => {
 
     expect(editList).not.toHaveBeenCalled()
     await user.click(editButton)
-    expect(editList).toHaveBeenCalledWith(userList)
+    expect(editList).toHaveBeenCalledWith(list)
   })
 
   test("Passes appropriate props to ItemsListing", async () => {
-    const { paginatedItems } = setup()
+    const list = factories.makeUserList()
+    const { paginatedItems } = setup({ list })
     expectProps(spyItemsListing, {
       isLoading:    true,
       items:        undefined,
@@ -183,7 +177,8 @@ describe("UserListDetailsPage", () => {
   })
 
   test("Passes isRefetching=true to ItemsList while reloading data", async () => {
-    const { queryClient, paginatedItems } = setup()
+    const list = factories.makeUserList()
+    const { queryClient, paginatedItems } = setup({ list })
 
     await waitFor(() => expectProps(spyItemsListing, { isLoading: false }))
 

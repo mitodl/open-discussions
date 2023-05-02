@@ -17,13 +17,12 @@ import {
   useFavorite,
   useUnfavorite,
   useUserListItems,
-  useMoveUserListItem
+  useMoveListItem,
+  useStaffListItems
 } from "./hooks"
-import { mockAxiosInstance, setMockResponse } from "../../test-utils/mockAxios"
+import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
-import { assertNotNil } from "ol-util"
-import axios from "../../libs/axios"
 
 function* makeCounter() {
   let i = 0
@@ -417,85 +416,76 @@ test.each([
   })
 })
 
-test("useItemListing pagination", async () => {
-  const { wrapper } = setup()
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
-  )
-  const { result, waitFor } = renderHook(
-    () => useUserListItems(123, { limit: 3 }),
-    { wrapper }
-  )
-
-  const assertApiCall = (limit: number, offset: number) => {
-    expect(axios.get).toHaveBeenLastCalledWith(
-      urls.userList.itemsListing(123, { limit, offset })
-    )
+test.each([
+  {
+    mode:          "userlist",
+    useItemsQuery: useUserListItems,
+    itemsUrl:      "userlists/123/items"
+  },
+  {
+    mode:          "stafflist",
+    useItemsQuery: useStaffListItems,
+    itemsUrl:      "stafflists/123/items"
   }
+] as const)(
+  "useMoveListItem($mode) optimistic updates",
+  async ({ mode, useItemsQuery, itemsUrl }) => {
+    const { wrapper, spies } = setup()
+    setMockResponse.get(
+      expect.stringContaining(itemsUrl),
+      factories.makeListItemsPaginated(
+        {
+          count:    5,
+          pageSize: 3
+        },
+        { next: `${itemsUrl}?limit=3&offset=3` }
+      )
+    )
+    const { result: itemsQ, waitFor } = renderHook(
+      () => useItemsQuery(123, { limit: 3 }),
+      { wrapper }
+    )
 
-  await waitFor(() => expect(result.current.isLoading).toBe(false))
-  assertNotNil(result.current.data)
-  expect(result.current.data.pages.length).toBe(1)
-  expect(result.current.data.pages[0].results.length).toBe(3)
-  assertApiCall(3, 0)
-
-  await act(async () => {
-    await result.current.fetchNextPage()
-  })
-  expect(result.current.data.pages.length).toBe(2)
-  assertApiCall(3, 3)
-
-  mockAxiosInstance.get.mockClear()
-  await act(async () => {
-    await result.current.fetchNextPage()
-  })
-  expect(result.current.data.pages.length).toBe(2)
-  expect(mockAxiosInstance.get).not.toHaveBeenCalled()
-})
-
-test("useMoveUserListItem optimistic updates", async () => {
-  const { wrapper, spies } = setup()
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
-  )
-  const { result: itemsQ, waitFor } = renderHook(
-    () => useUserListItems(123, { limit: 3 }),
-    { wrapper }
-  )
-
-  const { result: moveItem } = renderHook(() => useMoveUserListItem(), {
-    wrapper
-  })
-
-  await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
-
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
-  )
-
-  await act(async () => {
-    await itemsQ.current.fetchNextPage()
-  })
-
-  const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
-  const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
-
-  spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
-  await act(async () =>
-    moveItem.current.mutateAsync({
-      item:        { list_id: 123, item_id: item3.id },
-      newPosition: item1.position,
-      oldIndex:    3,
-      newIndex:    1
+    const { result: moveItem } = renderHook(() => useMoveListItem(mode), {
+      wrapper
     })
-  )
 
-  expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
-  expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(123).itemsListing.all
-  })
-})
+    await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
+
+    setMockResponse.get(
+      expect.stringContaining(itemsUrl),
+      factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
+    )
+
+    await act(async () => {
+      await itemsQ.current.fetchNextPage()
+    })
+
+    const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
+    const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
+
+    spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
+    await act(async () =>
+      moveItem.current.mutateAsync({
+        item:        { list_id: 123, item_id: item3.id },
+        newPosition: item1.position,
+        oldIndex:    3,
+        newIndex:    1
+      })
+    )
+
+    expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
+    expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
+
+    const listKeys = {
+      userlist:  keys.userList.id(123).itemsListing.all,
+      stafflist: keys.staffList.id(123).itemsListing.all
+    }
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: mode === "userlist" ? listKeys.userlist : listKeys.stafflist
+    })
+    expect(spies.queryClient.invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: mode === "stafflist" ? listKeys.userlist : listKeys.stafflist
+    })
+  }
+)

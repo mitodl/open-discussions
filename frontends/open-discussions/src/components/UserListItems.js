@@ -24,7 +24,7 @@ import {
 import type { ResourceItem } from "../lib/queries/user_list_items"
 import type { UserList } from "../flow/discussionTypes"
 
-type UserListItemsProps = {
+type ResourceListItemsProps = {
   userListId: number,
   items: Array<ResourceItem>,
   className: string,
@@ -44,7 +44,7 @@ type UserListItemSortableCardsProps = {
   pageSize: number
 }
 
-type PaginatedUserListItemsProps = {
+type PaginatedResourceListItemsProps = {
   userList: UserList,
   pageSize: number
 }
@@ -99,7 +99,7 @@ const ViewItems = ({ items, className }: ItemsProps) => {
   )
 }
 
-const SortAndViewItems = ({ isSorting, ...props }: UserListItemsProps) => {
+const SortAndViewItems = ({ isSorting, ...props }: ResourceListItemsProps) => {
   return isSorting ? <SortItems {...props} /> : <ViewItems {...props} />
 }
 
@@ -148,7 +148,7 @@ export function UserListItemSortableCards({
 export function PaginatedUserListItems({
   userList,
   pageSize
-}: PaginatedUserListItemsProps) {
+}: PaginatedResourceListItemsProps) {
   const userListId = userList.id
   const [page, setPage] = useState(0)
   const begin = page * pageSize

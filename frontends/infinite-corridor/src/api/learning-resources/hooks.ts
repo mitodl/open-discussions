@@ -1,12 +1,13 @@
 import { chunk } from "lodash"
-import type {
+import {
   LearningResource,
   PaginatedListItems,
   UserList,
   CourseTopic,
-  LearningResourceType,
+  LearningResourceType as LRT,
   ListItemMember,
-  StaffList
+  StaffList,
+  ListItem
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
 import axios from "../../libs/axios"
@@ -16,8 +17,7 @@ import {
   useQueryClient,
   UseQueryResult,
   UseQueryOptions,
-  useInfiniteQuery,
-  InfiniteData
+  InfiniteData,
 } from "react-query"
 import {
   urls,
@@ -29,24 +29,44 @@ import {
 import { modifyCachedSearchResource } from "./search"
 import invariant from "tiny-invariant"
 import { QueryFilters } from "react-query/types/core/utils"
+import { useInfiniteLimitOffsetQuery } from "./util"
 
-const useResource = (type: string, id: number) => {
+const useResource = (
+  type: string,
+  id: number,
+  options: Pick<UseQueryOptions, "enabled"> = {}
+) => {
   const key = keys.resource(type).id(id).details
-  return useQuery<LearningResource>(key, async () => {
-    const url = urls.resource.details(type, id)
-    return axios.get(url).then(res => res.data)
-  })
+  return useQuery<LearningResource>(
+    key,
+    async () => {
+      const url = urls.resource.details(type, id)
+      return axios.get(url).then(res => res.data)
+    },
+    options
+  )
 }
-const useUserList = (id: number) => {
-  return useResource("userlist", id) as UseQueryResult<UserList>
+const useUserList = (
+  id: number,
+  options: Pick<UseQueryOptions, "enabled"> = {}
+) => {
+  return useResource("userlist", id, options) as UseQueryResult<UserList>
+}
+
+const useStaffList = (
+  id: number,
+  options: Pick<UseQueryOptions, "enabled"> = {}
+) => {
+  return useResource(LRT.StaffList, id, options) as UseQueryResult<UserList>
 }
 
 const useUserListsListing = (options?: UserListOptions) => {
   const url = urls.userList.listing(options)
-  const key = keys.userList.listing.page(options)
-  return useQuery<PaginatedResult<UserList>>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
+  const queryKey = keys.userList.listing.page(options)
+  return useQuery<PaginatedResult<UserList>>({
+    queryKey,
+    queryFn: () => axios.get(url).then(res => res.data)
+  })
 }
 
 /**
@@ -59,22 +79,32 @@ const useUserListItems = (
 ) => {
   const { enabled, ...others } = options
   const queryKey = keys.userList.id(listId).itemsListing.infinite(options)
-  const queryFn = ({ pageParam = 0 }): Promise<PaginatedListItems> => {
-    const url = urls.userList.itemsListing(listId, {
-      ...others,
-      offset: pageParam
-    })
-    return axios.get(url).then(res => res.data)
-  }
-  return useInfiniteQuery({
+  const initialUrl = urls.userList.itemsListing(listId, {
+    ...others,
+    offset: 0
+  })
+  return useInfiniteLimitOffsetQuery<ListItem>(initialUrl, {
     queryKey,
-    queryFn,
-    getNextPageParam: (lastPage, pages) => {
-      const { count } = lastPage
-      const pageSize = lastPage.results.length
-      const next = pages.length * pageSize
-      return next >= count ? undefined : next
-    },
+    enabled
+  })
+}
+
+/**
+ * Note: this is an InfiniteQuery, so the data is an array of pages.
+ */
+const useStaffListItems = (
+  listId: number,
+  options: Omit<PaginationSearchParams, "offset"> &
+    Pick<UseQueryOptions, "enabled"> = {}
+) => {
+  const { enabled, ...others } = options
+  const queryKey = keys.staffList.id(listId).itemsListing.infinite(options)
+  const initialUrl = urls.staffList.itemsListing(listId, {
+    ...others,
+    offset: 0
+  })
+  return useInfiniteLimitOffsetQuery<ListItem>(initialUrl, {
+    queryKey,
     enabled
   })
 }
@@ -208,7 +238,7 @@ const useDeleteUserList = () => {
 
 type AddToUserListPayload = {
   object_id: number
-  content_type: LearningResourceType
+  content_type: LRT
 }
 const addToUserList = async ({
   userListId,
@@ -415,6 +445,11 @@ const moveUserListItem = async ({ item, newPosition }: MoveItemPayload) => {
   const body = { position: newPosition }
   await axios.patch(url, body)
 }
+const moveStaffListItem = async ({ item, newPosition }: MoveItemPayload) => {
+  const url = urls.staffList.itemDetails(item.list_id, item.item_id)
+  const body = { position: newPosition }
+  await axios.patch(url, body)
+}
 
 /**
  * Mutation for moving a list item to a new position.
@@ -426,13 +461,18 @@ const moveUserListItem = async ({ item, newPosition }: MoveItemPayload) => {
  * We use the indices to update the UI immediately, and the positions to make
  * the API call.
  */
-const useMoveUserListItem = () => {
+const useMoveListItem = (mode: "userlist" | "stafflist") => {
   const queryClient = useQueryClient()
+  const mutationFn = mode === "userlist" ? moveUserListItem : moveStaffListItem
+  const listingKey = (id: number) =>
+    mode === "userlist" ?
+      keys.userList.id(id).itemsListing.all :
+      keys.staffList.id(id).itemsListing.all
   return useMutation({
-    mutationFn: moveUserListItem,
-    onMutate:   vars => {
+    mutationFn,
+    onMutate: vars => {
       const queryFilter: QueryFilters = {
-        queryKey:  keys.userList.id(vars.item.list_id).itemsListing.all,
+        queryKey:  listingKey(vars.item.list_id),
         predicate: query => query.state.data !== undefined
       }
       queryClient.setQueriesData<InfiniteData<PaginatedListItems>>(
@@ -453,7 +493,6 @@ const useMoveUserListItem = () => {
       return { queryFilter }
     },
     onSettled: (_data, _error, vars) => {
-      const { item } = vars
       /**
        * We did an optimistic update that re-ordered the list for the UI.
        * But the API calls are based on list items' `position` property, not
@@ -467,13 +506,8 @@ const useMoveUserListItem = () => {
        * only one page (max 50 items) is showing.
        */
       queryClient.invalidateQueries({
-        queryKey: keys.userList.id(item.list_id).itemsListing.all
+        queryKey: listingKey(vars.item.list_id)
       })
-    },
-    onError: (_error, _var, context) => {
-      if (context) {
-        queryClient.invalidateQueries(context.queryFilter)
-      }
     }
   })
 }
@@ -482,6 +516,8 @@ export {
   useResource, // details
   useUserListItems, // items listing
   useUserList, // details
+  useStaffList, // details
+  useStaffListItems, // items listing
   useUserListsListing, // listing
   useFavoritesListing, // items listing
   useTopics,
@@ -499,5 +535,5 @@ export {
   useUpcomingCourses, // listing
   usePopularContent, // listing
   useNewVideos, // listing
-  useMoveUserListItem // mutation
+  useMoveListItem // mutation
 }
