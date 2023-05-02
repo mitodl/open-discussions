@@ -469,7 +469,9 @@ def transform_results(search_result, user, department_filters):
                 )
 
     search_result = _transform_search_results_suggest(search_result)
-    search_result["hits"]["total"] = search_result.get("hits", {}).get("total", {}).get("value", 0)
+    search_result["hits"]["total"] = (
+        search_result.get("hits", {}).get("total", {}).get("value", 0)
+    )
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
