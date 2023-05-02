@@ -8,13 +8,15 @@ import {
 import { UserList, LearningResource } from "ol-search-ui"
 import { assertNotNil } from "ol-util"
 
+import NiceModal from "@ebay/nice-modal-react"
 import AddToListDialog from "./AddToListDialog"
 import {
   expectProps,
   renderWithProviders,
   screen,
   user,
-  within
+  within,
+  act
 } from "../../test-utils"
 import {
   setMockResponse,
@@ -22,12 +24,13 @@ import {
 } from "../../test-utils/mockAxios"
 import { urls } from "../../api/learning-resources"
 import { CreateListDialog } from "./ManageListDialogs"
+import { waitForElementToBeRemoved } from "@testing-library/react"
 
 jest.mock("./ManageListDialogs", () => {
   const actual = jest.requireActual("./ManageListDialogs")
   return {
     ...actual,
-    CreateListDialog: jest.fn(() => <div role="dialog">Create new list</div>)
+    CreateListDialog: jest.fn(() => <div>Create new list</div>)
   }
 })
 
@@ -44,7 +47,7 @@ const setup = ({
   dialogOpen = true
 }: Partial<SetupOptions> = {}) => {
   const resource = makeCourse({ is_favorite: isFavorite })
-  const paginatedLists = makeUserListsPaginated(3)
+  const paginatedLists = makeUserListsPaginated({ count: 3 })
   const lists = paginatedLists.results
 
   inLists.forEach(index => {
@@ -60,13 +63,14 @@ const setup = ({
   setMockResponse.get(urls.userList.listing(), paginatedLists)
 
   const onClose = jest.fn()
-  const view = renderWithProviders(
-    <AddToListDialog
-      onClose={onClose}
-      open={dialogOpen}
-      resourceKey={resource}
-    />
-  )
+  const view = renderWithProviders(null)
+
+  if (dialogOpen) {
+    act(() => {
+      NiceModal.show(AddToListDialog, { resourceKey: resource })
+    })
+  }
+
   return {
     view,
     onClose,
@@ -216,12 +220,28 @@ describe("AddToListDialog", () => {
     await user.click(button)
     expectProps(spyCreateListDialog, { open: true }, -1)
   })
-  test("Clicking close button calls onClose", async () => {
-    const { onClose } = setup()
-    const button = await screen.findByRole("button", { name: "Close" })
 
-    expect(onClose).toHaveBeenCalledTimes(0)
-    await user.click(button)
-    expect(onClose).toHaveBeenCalledTimes(1)
+  test("Opens and closes via NiceModal", async () => {
+    const { resource: resource1 } = setup()
+    const dialog1 = await screen.findByRole("dialog")
+    await within(dialog1).findByText(resource1.title, { exact: false })
+
+    // Close the dialog
+    act(() => {
+      NiceModal.hide(AddToListDialog)
+    })
+    await waitForElementToBeRemoved(dialog1)
+
+    // Open it with a new resource
+    const resource2 = makeCourse()
+    setMockResponse.get(
+      urls.resource.details(resource2.object_type, resource2.id),
+      resource2
+    )
+    act(() => {
+      NiceModal.show(AddToListDialog, { resourceKey: resource2 })
+    })
+    const dialog2 = await screen.findByRole("dialog")
+    await within(dialog2).findByText(resource2.title, { exact: false })
   })
 })

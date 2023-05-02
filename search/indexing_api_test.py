@@ -7,26 +7,36 @@ from types import SimpleNamespace
 import pytest
 from elasticsearch.exceptions import ConflictError, NotFoundError
 
+from channels.api import add_user_role, sync_channel_subscription_model
+from channels.factories.models import ChannelFactory
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
     LearningResourceRunFactory,
 )
+from course_catalog.models import ContentFile
+from open_discussions.factories import UserFactory
 from open_discussions.utils import chunks
 from search import indexing_api
 from search.api import gen_course_id
 from search.connection import get_default_alias_name
-from search.constants import ALIAS_ALL_INDICES, COMMENT_TYPE, GLOBAL_DOC_TYPE, POST_TYPE
-from search.exceptions import ReindexException
-from search.indexing_api import (
+from search.constants import (
+    ALIAS_ALL_INDICES,
+    COMMENT_TYPE,
+    GLOBAL_DOC_TYPE,
+    POST_TYPE,
+    PROFILE_TYPE,
     SCRIPTING_LANG,
     UPDATE_CONFLICT_SETTING,
+)
+from search.exceptions import ReindexException
+from search.indexing_api import (
     clear_and_create_index,
     create_backing_index,
     create_document,
-    delete_courses,
-    delete_document,
-    delete_run_content_files,
+    deindex_courses,
+    deindex_document,
+    deindex_run_content_files,
     get_reindexing_alias_name,
     increment_document_integer_field,
     index_course_content_files,
@@ -37,6 +47,7 @@ from search.indexing_api import (
     update_field_values_by_query,
     update_post,
 )
+from search.serializers import serialize_bulk_profiles
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
 
@@ -200,7 +211,7 @@ def test_increment_document_integer_field(mocked_es):
 @pytest.mark.parametrize("already_exists", [True, False])
 def test_clear_and_create_index(mocked_es, object_type, skip_mapping, already_exists):
     """
-    clear_and_create_index should delete the index and create a new empty one with a mapping
+    clear_and_create_index should deindex the index and create a new empty one with a mapping
     """
     index = "index"
 
@@ -397,20 +408,20 @@ def test_index_functions(
 @pytest.mark.parametrize(
     "indexing_func_name, serializing_func_name, object_type",
     [
-        ("delete_profiles", "serialize_bulk_profiles_for_deletion", "profile"),
-        ("delete_programs", "serialize_bulk_programs_for_deletion", "program"),
-        ("delete_user_lists", "serialize_bulk_user_lists_for_deletion", "userlist"),
-        ("delete_podcasts", "serialize_bulk_podcasts_for_deletion", "podcast"),
+        ("deindex_profiles", "serialize_bulk_profiles_for_deletion", "profile"),
+        ("deindex_programs", "serialize_bulk_programs_for_deletion", "program"),
+        ("deindex_user_lists", "serialize_bulk_user_lists_for_deletion", "userlist"),
+        ("deindex_podcasts", "serialize_bulk_podcasts_for_deletion", "podcast"),
         (
-            "delete_podcast_episodes",
+            "deindex_podcast_episodes",
             "serialize_bulk_podcast_episodes_for_deletion",
             "podcastepisode",
         ),
-        ("delete_videos", "serialize_bulk_videos_for_deletion", "video"),
-        ("delete_courses", "serialize_bulk_courses_for_deletion", "course"),
+        ("deindex_videos", "serialize_bulk_videos_for_deletion", "video"),
+        ("deindex_courses", "serialize_bulk_courses_for_deletion", "course"),
     ],
 )
-def test_bulk_deletion_functions(
+def test_bulk_deindex_functions(
     mocked_es,
     mocker,
     settings,
@@ -420,7 +431,7 @@ def test_bulk_deletion_functions(
     object_type,
 ):  # pylint: disable=too-many-arguments
     """
-    index deletion functions should call bulk with correct arguments
+    Deindex functions should call bulk with correct arguments
     """
     settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
     documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
@@ -460,45 +471,56 @@ def test_bulk_deletion_functions(
 
 
 @pytest.mark.usefixtures("indexing_user")
-def test_bulk_content_file_deletion_on_course_deletion(mocker):
+def test_bulk_content_file_deindex_on_course_deletion(mocker):
     """
-    ES should delete content files on bulk  course deletion
+    ES should deindex content files on bulk  course deletion
     """
-    mock_delete_run_content_files = mocker.patch(
-        "search.indexing_api.delete_run_content_files", autospec=True
+    mock_deindex_run_content_files = mocker.patch(
+        "search.indexing_api.deindex_run_content_files", autospec=True
     )
-    mocker.patch("search.indexing_api.delete_items", autospec=True)
+    mocker.patch("search.indexing_api.deindex_items", autospec=True)
 
     courses = CourseFactory.create_batch(2)
-    delete_courses([course.id for course in courses])
+    deindex_courses([course.id for course in courses])
     for course in courses:
         for run in course.runs.all():
-            mock_delete_run_content_files.assert_any_call(run.id)
+            mock_deindex_run_content_files.assert_any_call(run.id)
 
 
-def test_delete_document(mocked_es, mocker):
+def test_deindex_run_content_files(mocker):
+    """deindex_run_content_files should remove them from index and db"""
+    mock_deindex = mocker.patch("search.indexing_api.deindex_items")
+    run = LearningResourceRunFactory.create(published=True)
+    ContentFileFactory.create_batch(3, run=run, published=True)
+    assert ContentFile.objects.count() == 3
+    deindex_run_content_files(run.id)
+    mock_deindex.assert_called_once()
+    assert ContentFile.objects.count() == 0
+
+
+def test_deindex_document(mocked_es, mocker):
     """
-    ES should try deleting the specified document from the correct index
+    ES should try removing the specified document from the correct index
     """
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
-    delete_document(1, "course")
+    deindex_document(1, "course")
     mocked_es.conn.delete.assert_called_with(
         index="a", doc_type=GLOBAL_DOC_TYPE, id=1, params={}
     )
 
 
-def test_delete_document_not_found(mocked_es, mocker):
+def test_deindex_document_not_found(mocked_es, mocker):
     """
-    ES should try deleting the specified document from the correct index
+    ES should try removing the specified document from the correct index
     """
     patched_logger = mocker.patch("search.indexing_api.log")
     mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a"]
     )
     mocked_es.conn.delete.side_effect = NotFoundError
-    delete_document(1, "course")
+    deindex_document(1, "course")
     assert patched_logger.debug.called is True
 
 
@@ -538,13 +560,37 @@ def test_index_items_size_limits(settings, mocker, max_size, chunks, exceeds_siz
     assert mock_log.call_count == (10 if exceeds_size else 0)
 
 
+def test_index_profile_items(mocker):
+    """
+    index_items for profiles should call alias and bulk index functions
+    """
+    users = UserFactory.create_batch(2)
+    for user in users:
+        channel = ChannelFactory.create()
+        sync_channel_subscription_model(channel, user)
+        add_user_role(channel, "moderators", user)
+    profile_ids = [user.profile.id for user in users]
+
+    mock_aliases = mocker.patch(
+        "search.indexing_api.get_active_aliases",
+        autospec=True,
+        return_value=["default"],
+    )
+    mock_bulk = mocker.patch(
+        "search.indexing_api.bulk", autospec=True, return_value=[None, []]
+    )
+    index_items(serialize_bulk_profiles(profile_ids), PROFILE_TYPE, False)
+    assert mock_aliases.call_count == 1
+    assert mock_bulk.call_count == 1
+
+
 @pytest.mark.usefixtures("indexing_user")
 @pytest.mark.parametrize(
     "indexing_func_name, doc, unpublished_only",
     [
         ["index_run_content_files", {"_id": "doc"}, None],
-        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}, True],
-        ["delete_run_content_files", {"_id": "doc", "_op_type": "delete"}, False],
+        ["deindex_run_content_files", {"_id": "doc", "_op_type": "deindex"}, True],
+        ["deindex_run_content_files", {"_id": "doc", "_op_type": "deindex"}, False],
     ],
 )
 @pytest.mark.parametrize(
@@ -570,7 +616,7 @@ def test_bulk_index_content_files(
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
     content_files = ContentFileFactory.create_batch(5, run=run, published=True)
-    deleted_content_file = ContentFileFactory.create_batch(5, run=run, published=False)
+    deindexd_content_file = ContentFileFactory.create_batch(5, run=run, published=False)
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
     )
@@ -602,12 +648,12 @@ def test_bulk_index_content_files(
         if indexing_func_name == "index_run_content_files":
             index_run_content_files(run.id)
         else:
-            delete_run_content_files(run.id, unpublished_only)
+            deindex_run_content_files(run.id, unpublished_only)
 
         if unpublished_only:
-            content_files = deleted_content_file
+            content_files = deindexd_content_file
         else:
-            content_files = content_files + [deleted_content_file]
+            content_files = content_files + [deindexd_content_file]
 
         for alias in mock_get_aliases.return_value:
             for chunk in chunks([doc for _ in content_files], chunk_size=chunk_size):
@@ -622,11 +668,11 @@ def test_bulk_index_content_files(
 
 
 @pytest.mark.parametrize("has_files", [True, False])
-def test_delete_run_content_files_no_files(mocker, has_files):
-    """delete_run_content_files shouldn't do anything if there are no content files"""
-    mock_delete_items = mocker.patch("search.indexing_api.delete_items")
+def test_deindex_run_content_files_no_files(mocker, has_files):
+    """deindex_run_content_files shouldn't do anything if there are no content files"""
+    mock_deindex_items = mocker.patch("search.indexing_api.deindex_items")
     run = LearningResourceRunFactory.create(published=True)
     if has_files:
         ContentFileFactory.create(run=run, published=False)
-    delete_run_content_files(run.id, unpublished_only=True)
-    assert mock_delete_items.call_count == (1 if has_files else 0)
+    deindex_run_content_files(run.id, unpublished_only=True)
+    assert mock_deindex_items.call_count == (1 if has_files else 0)

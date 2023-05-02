@@ -3,13 +3,14 @@
 
 import pytest
 from django.conf import settings
-from praw.exceptions import PRAWException
-from prawcore.exceptions import NotFound, PrawcoreException
+from elasticsearch.exceptions import ConnectionError as ESConnectionError
+from elasticsearch.exceptions import ConnectionTimeout
+from prawcore.exceptions import NotFound
 
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
 from channels.factories.models import CommentFactory, PostFactory
 from channels.models import Post
-from course_catalog.constants import PlatformType, PrivacyLevel
+from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
     CourseFactory,
@@ -64,11 +65,11 @@ from search.serializers import (
     ESVideoSerializer,
 )
 from search.tasks import (
-    bulk_delete_staff_lists,
+    bulk_deindex_staff_lists,
     create_document,
     create_post_document,
-    delete_document,
-    delete_run_content_files,
+    deindex_document,
+    deindex_run_content_files,
     finish_recreate_index,
     increment_document_integer_field,
     index_comments,
@@ -106,7 +107,7 @@ def wrap_retry_mock(mocker):
     """
     wrap_mock = mocker.patch("search.tasks.wrap_retry_exception")
     yield
-    wrap_mock.assert_called_once_with(PrawcoreException, PRAWException)
+    wrap_mock.assert_called_once()
 
 
 @pytest.fixture()
@@ -308,19 +309,16 @@ def test_wrap_retry_exception(error):
 def test_wrap_retry_exception_matching(matching):
     """A matching exception should raise a RetryException"""
 
-    class SubError(KeyError):
-        """Use a subclass to assert isinstance use"""
-
     def raise_thing():
         """raise the exception"""
         if matching:
-            raise SubError()
+            raise ConnectionTimeout("err", "err", "err")
         else:
             raise TabError()
 
     matching_exception = RetryException if matching else TabError
     with pytest.raises(matching_exception):
-        with wrap_retry_exception(KeyError):
+        with wrap_retry_exception(ESConnectionError):
             raise_thing()
 
 
@@ -359,7 +357,7 @@ def test_index_comments(
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
 def test_index_videos(
-    mocker, with_error, update_only
+    mocker, wrap_retry_mock, with_error, update_only
 ):  # pylint: disable=unused-argument
     """index_videos should call the api function of the same name"""
     index_videos_mock = mocker.patch("search.indexing_api.index_videos")
@@ -373,7 +371,7 @@ def test_index_videos(
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_staff_lists(mocker, with_error, update_only):
+def test_index_staff_lists(mocker, wrap_retry_mock, with_error, update_only):
     """index_staff_lists should call the api function of the same name"""
     index_staff_lists_mock = mocker.patch("search.indexing_api.index_staff_lists")
     if with_error:
@@ -385,17 +383,19 @@ def test_index_staff_lists(mocker, with_error, update_only):
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_bulk_delete_staff_lists(mocker, with_error):  # pylint: disable=unused-argument
-    """bulk_delete_staff_lists should call the api function of the same name"""
-    bulk_delete_staff_lists_mock = mocker.patch(
-        "search.indexing_api.delete_staff_lists"
+def test_bulk_deindex_staff_lists(
+    mocker, with_error
+):  # pylint: disable=unused-argument
+    """bulk_deindex_staff_lists should call the api function of the same name"""
+    bulk_deindex_staff_lists_mock = mocker.patch(
+        "search.indexing_api.deindex_staff_lists"
     )
     if with_error:
-        bulk_delete_staff_lists_mock.side_effect = TabError
-    result = bulk_delete_staff_lists.delay([1, 2, 3]).get()
-    assert result == ("bulk_delete_staff_lists threw an error" if with_error else None)
+        bulk_deindex_staff_lists_mock.side_effect = TabError
+    result = bulk_deindex_staff_lists.delay([1, 2, 3]).get()
+    assert result == ("bulk_deindex_staff_lists threw an error" if with_error else None)
 
-    bulk_delete_staff_lists_mock.assert_called_once_with([1, 2, 3])
+    bulk_deindex_staff_lists_mock.assert_called_once_with([1, 2, 3])
 
 
 @pytest.mark.parametrize(
@@ -543,6 +543,11 @@ def test_start_recreate_index(
                     for course in courses
                     if course.platform == PlatformType.xpro.value
                 ],
+                *[
+                    course.id
+                    for course in courses
+                    if course.platform == PlatformType.oll.value
+                ],
             ]
         )
 
@@ -602,7 +607,7 @@ def test_finish_recreate_index(mocker, with_error):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_courses(mocker, with_error, update_only):
+def test_index_courses(mocker, wrap_retry_mock, with_error, update_only):
     """index_courses should call the api function of the same name"""
     index_courses_mock = mocker.patch("search.indexing_api.index_courses")
     if with_error:
@@ -613,11 +618,11 @@ def test_index_courses(mocker, with_error, update_only):
     index_courses_mock.assert_called_once_with([1, 2, 3], update_only)
 
 
-def test_delete_document(mocker):
-    """delete_document should call the api function of the same name"""
-    delete_document_mock = mocker.patch("search.indexing_api.delete_document")
-    delete_document.delay(1, "course").get()
-    delete_document_mock.assert_called_once_with(1, "course")
+def test_deindex_document(mocker):
+    """deindex_document should call the api function of the same name"""
+    deindex_document_mock = mocker.patch("search.indexing_api.deindex_document")
+    deindex_document.delay(1, "course").get()
+    deindex_document_mock.assert_called_once_with(1, "course")
 
 
 @pytest.mark.parametrize("is_indexing_user", [True, False])
@@ -660,7 +665,7 @@ def test_upsert_content_file_task(mocked_api):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_course_content_files(mocker, with_error, update_only):
+def test_index_course_content_files(mocker, wrap_retry_mock, with_error, update_only):
     """index_course_content_files should call the api function of the same name"""
     index_content_files_mock = mocker.patch(
         "search.indexing_api.index_course_content_files"
@@ -677,13 +682,13 @@ def test_index_course_content_files(mocker, with_error, update_only):
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize("update_only", [True, False])
-def test_index_run_content_files(mocker, with_error, update_only):
+def test_index_run_content_files(mocker, wrap_retry_mock, with_error, update_only):
     """index_run_content_files should call the api function of the same name"""
     index_run_content_files_mock = mocker.patch(
         "search.indexing_api.index_run_content_files"
     )
-    delete_run_content_files_mock = mocker.patch(
-        "search.indexing_api.delete_run_content_files"
+    deindex_run_content_files_mock = mocker.patch(
+        "search.indexing_api.deindex_run_content_files"
     )
     if with_error:
         index_run_content_files_mock.side_effect = TabError
@@ -693,37 +698,41 @@ def test_index_run_content_files(mocker, with_error, update_only):
     index_run_content_files_mock.assert_called_once_with(1, update_only=update_only)
 
     if not with_error:
-        delete_run_content_files_mock.assert_called_once_with(1, unpublished_only=True)
+        deindex_run_content_files_mock.assert_called_once_with(1, unpublished_only=True)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
-def test_delete_run_content_files(mocker, with_error):
-    """delete_run_content_files should call the api function of the same name"""
-    delete_run_content_files_mock = mocker.patch(
-        "search.indexing_api.delete_run_content_files"
+def test_delete_run_content_files(mocker, wrap_retry_mock, with_error):
+    """deindex_run_content_files should call the api function of the same name"""
+    deindex_run_content_files_mock = mocker.patch(
+        "search.indexing_api.deindex_run_content_files"
     )
     if with_error:
-        delete_run_content_files_mock.side_effect = TabError
-    result = delete_run_content_files.delay(1).get()
-    assert result == ("delete_run_content_files threw an error" if with_error else None)
+        deindex_run_content_files_mock.side_effect = TabError
+    result = deindex_run_content_files.delay(1).get()
+    assert result == (
+        "deindex_run_content_files threw an error" if with_error else None
+    )
 
-    delete_run_content_files_mock.assert_called_once_with(1)
+    deindex_run_content_files_mock.assert_called_once_with(1)
 
 
 @pytest.mark.parametrize("with_error", [True, False])
 @pytest.mark.parametrize(
     "tasks_func_name, indexing_func_name",
     [
-        ("bulk_delete_profiles", "delete_profiles"),
-        ("bulk_delete_courses", "delete_courses"),
-        ("bulk_delete_programs", "delete_programs"),
-        ("bulk_delete_user_lists", "delete_user_lists"),
-        ("bulk_delete_videos", "delete_videos"),
-        ("bulk_delete_podcasts", "delete_podcasts"),
-        ("bulk_delete_podcast_episodes", "delete_podcast_episodes"),
+        ("bulk_deindex_profiles", "deindex_profiles"),
+        ("bulk_deindex_courses", "deindex_courses"),
+        ("bulk_deindex_programs", "deindex_programs"),
+        ("bulk_deindex_user_lists", "deindex_user_lists"),
+        ("bulk_deindex_videos", "deindex_videos"),
+        ("bulk_deindex_podcasts", "deindex_podcasts"),
+        ("bulk_deindex_podcast_episodes", "deindex_podcast_episodes"),
     ],
 )
-def test_bulk_deletion_tasks(mocker, with_error, tasks_func_name, indexing_func_name):
+def test_bulk_deletion_tasks(
+    mocker, wrap_retry_mock, with_error, tasks_func_name, indexing_func_name
+):
     """bulk deletion tasks should call corresponding indexing api function"""
     indexing_api_task_mock = mocker.patch(f"search.indexing_api.{indexing_func_name}")
 
@@ -811,28 +820,30 @@ def test_start_update_index(
     index_comments_mock = mocker.patch("search.tasks.index_comments", autospec=True)
 
     index_profiles_mock = mocker.patch("search.tasks.index_profiles", autospec=True)
-    delete_profiles_mock = mocker.patch(
-        "search.tasks.bulk_delete_profiles", autospec=True
+    deindex_profiles_mock = mocker.patch(
+        "search.tasks.bulk_deindex_profiles", autospec=True
     )
 
     index_courses_mock = mocker.patch("search.tasks.index_courses", autospec=True)
-    delete_courses_mock = mocker.patch(
-        "search.tasks.bulk_delete_courses", autospec=True
+    deindex_courses_mock = mocker.patch(
+        "search.tasks.bulk_deindex_courses", autospec=True
     )
 
     index_videos_mock = mocker.patch("search.tasks.index_videos", autospec=True)
-    delete_videos_mock = mocker.patch("search.tasks.bulk_delete_videos", autospec=True)
+    deindex_videos_mock = mocker.patch(
+        "search.tasks.bulk_deindex_videos", autospec=True
+    )
 
     index_podcasts_mock = mocker.patch("search.tasks.index_podcasts", autospec=True)
-    delete_podcasts_mock = mocker.patch(
-        "search.tasks.bulk_delete_podcasts", autospec=True
+    deindex_podcasts_mock = mocker.patch(
+        "search.tasks.bulk_deindex_podcasts", autospec=True
     )
 
     index_podcast_episodes_mock = mocker.patch(
         "search.tasks.index_podcast_episodes", autospec=True
     )
-    delete_podcast_episodes_mock = mocker.patch(
-        "search.tasks.bulk_delete_podcast_episodes", autospec=True
+    deindex_podcast_episodes_mock = mocker.patch(
+        "search.tasks.bulk_deindex_podcast_episodes", autospec=True
     )
 
     index_course_content_mock = mocker.patch(
@@ -865,9 +876,9 @@ def test_start_update_index(
                 [users[offset * 2].profile.id, users[offset * 2 + 1].profile.id], True
             )
 
-        assert delete_profiles_mock.si.call_count == 2
+        assert deindex_profiles_mock.si.call_count == 2
         for offset in range(2):
-            delete_profiles_mock.si.assert_any_call(
+            deindex_profiles_mock.si.assert_any_call(
                 [
                     inactive_users[offset * 2].profile.id,
                     inactive_users[offset * 2 + 1].profile.id,
@@ -882,30 +893,30 @@ def test_start_update_index(
             course = next(course for course in courses if course.platform == platform)
             index_courses_mock.si.assert_any_call([course.id], True)
 
-            assert delete_courses_mock.si.call_count == 1
+            assert deindex_courses_mock.si.call_count == 1
             unpublished_course = next(
                 course for course in unpublished_courses if course.platform == platform
             )
-            delete_courses_mock.si.assert_any_call([unpublished_course.id])
+            deindex_courses_mock.si.assert_any_call([unpublished_course.id])
         else:
             assert index_courses_mock.si.call_count == 3
             index_courses_mock.si.assert_any_call([courses[0].id, courses[1].id], True)
             index_courses_mock.si.assert_any_call([courses[2].id, courses[3].id], True)
             index_courses_mock.si.assert_any_call([courses[4].id, courses[5].id], True)
 
-            assert delete_courses_mock.si.call_count == 3
-            delete_courses_mock.si.assert_any_call(
+            assert deindex_courses_mock.si.call_count == 3
+            deindex_courses_mock.si.assert_any_call(
                 [unpublished_courses[0].id, unpublished_courses[1].id]
             )
-            delete_courses_mock.si.assert_any_call(
+            deindex_courses_mock.si.assert_any_call(
                 [unpublished_courses[2].id, unpublished_courses[3].id]
             )
-            delete_courses_mock.si.assert_any_call(
+            deindex_courses_mock.si.assert_any_call(
                 [unpublished_courses[4].id, unpublished_courses[5].id]
             )
 
     if RESOURCE_FILE_TYPE in indexes:
-        if platform in (PlatformType.ocw.value, PlatformType.xpro.value):
+        if platform in RESOURCE_FILE_PLATFORMS:
             assert index_course_content_mock.si.call_count == 1
             course = next(course for course in courses if course.platform == platform)
 
@@ -914,38 +925,23 @@ def test_start_update_index(
         elif platform:
             assert index_course_content_mock.si.call_count == 0
         else:
-            assert index_course_content_mock.si.call_count == 1
-            index_course_content_mock.si.assert_any_call(
-                [
-                    *[
-                        course.id
-                        for course in courses
-                        if course.platform == PlatformType.ocw.value
-                    ],
-                    *[
-                        course.id
-                        for course in courses
-                        if course.platform == PlatformType.xpro.value
-                    ],
-                ],
-                True,
-            )
+            assert index_course_content_mock.si.call_count == 2
 
     if VIDEO_TYPE in indexes:
         assert index_videos_mock.si.call_count == 2
         index_videos_mock.si.assert_any_call([videos[0].id, videos[1].id], True)
         index_videos_mock.si.assert_any_call([videos[2].id, videos[3].id], True)
 
-        assert delete_videos_mock.si.call_count == 1
-        delete_videos_mock.si.assert_any_call([unpublished_video.id])
+        assert deindex_videos_mock.si.call_count == 1
+        deindex_videos_mock.si.assert_any_call([unpublished_video.id])
 
     if PODCAST_TYPE in indexes:
         assert index_podcasts_mock.si.call_count == 5
         index_podcasts_mock.si.assert_any_call([podcasts[0].id, podcasts[1].id], True)
         index_podcasts_mock.si.assert_any_call([podcasts[2].id, podcasts[3].id], True)
 
-        assert delete_podcasts_mock.si.call_count == 1
-        delete_podcasts_mock.si.assert_any_call([unpublished_podcast.id])
+        assert deindex_podcasts_mock.si.call_count == 1
+        deindex_podcasts_mock.si.assert_any_call([unpublished_podcast.id])
 
     if PODCAST_EPISODE_TYPE in indexes:
         assert index_podcast_episodes_mock.si.call_count == 2
@@ -956,8 +952,8 @@ def test_start_update_index(
             [podcast_episodes[2].id, podcast_episodes[3].id], True
         )
 
-        assert delete_podcast_episodes_mock.si.call_count == 1
-        delete_podcast_episodes_mock.si.assert_any_call(
+        assert deindex_podcast_episodes_mock.si.call_count == 1
+        deindex_podcast_episodes_mock.si.assert_any_call(
             [unpublished_podcast_episode.id]
         )
 

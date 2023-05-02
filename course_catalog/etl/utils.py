@@ -9,6 +9,7 @@ import re
 import uuid
 from datetime import datetime
 from functools import wraps
+from hashlib import md5
 from itertools import chain
 from subprocess import check_call
 from tempfile import TemporaryDirectory
@@ -31,7 +32,7 @@ from course_catalog.constants import (
     VALID_TEXT_FILE_TYPES,
     PlatformType,
 )
-from course_catalog.models import get_max_length
+from course_catalog.models import get_max_length, LearningResourceRun, ContentFile
 
 log = logging.getLogger()
 
@@ -310,6 +311,7 @@ def get_xbundle_docs(olx_path: str) -> Generator[dict, None, None]:
                 "content_type": CONTENT_TYPE_VERTICAL,
                 "title": vertical.attrib.get("display_name") or "",
                 "mime_type": "application/xml",
+                "checksum": md5(content.encode("utf-8")).hexdigest(),
             },
         )
 
@@ -350,16 +352,20 @@ def documents_from_olx(
                         "key": f"document_{next(counter)}_{filename}",
                         "content_type": CONTENT_TYPE_FILE,
                         "mime_type": mimetype,
+                        "checksum": md5(filebytes).hexdigest(),
                     },
                 )
 
 
-def transform_content_files(course_tarpath: str) -> Generator[dict, None, None]:
+def transform_content_files(
+    course_tarpath: str, run: LearningResourceRun
+) -> Generator[dict, None, None]:
     """
     Pass content to tika, then return a JSON document with the transformed content inside it
 
     Args:
         course_tarpath (str): The path to the tarball which contains the OLX
+        run (LearningResourceRun): The run associated witb the content files
 
     Yields:
         dict: content from file
@@ -372,22 +378,24 @@ def transform_content_files(course_tarpath: str) -> Generator[dict, None, None]:
             key = metadata["key"]
             content_type = metadata["content_type"]
             mime_type = metadata.get("mime_type")
-            tika_output = extract_text_metadata(
-                document, other_headers={"Content-Type": mime_type} if mime_type else {}
-            )
 
-            if tika_output is None:
-                log.info("No tika response for %s", key)
-                continue
+            existing_content = ContentFile.objects.filter(key=key, run=run).first()
+            if not existing_content or existing_content.checksum != metadata.get(
+                "checksum"
+            ):
+                tika_output = extract_text_metadata(
+                    document,
+                    other_headers={"Content-Type": mime_type} if mime_type else {},
+                )
 
-            tika_content = tika_output.get("content") or ""
-            tika_metadata = tika_output.get("metadata") or {}
-            yield (
-                {
+                if tika_output is None:
+                    log.info("No tika response for %s", key)
+                    continue
+
+                tika_content = tika_output.get("content") or ""
+                tika_metadata = tika_output.get("metadata") or {}
+                content_dict = {
                     "content": tika_content.strip(),
-                    "published": True,
-                    "key": key,
-                    "published": True,
                     "content_title": (
                         metadata.get("title") or tika_metadata.get("title") or ""
                     )[: get_max_length("content_title")],
@@ -397,7 +405,21 @@ def transform_content_files(course_tarpath: str) -> Generator[dict, None, None]:
                     "content_language": (tika_metadata.get("language") or "")[
                         : get_max_length("content_language")
                     ],
+                }
+            else:
+                content_dict = {
+                    "content": existing_content.content,
+                    "content_title": existing_content.content_title,
+                    "content_author": existing_content.content_author,
+                    "content_language": existing_content.content_language,
+                }
+            yield (
+                {
+                    "key": key,
+                    "published": True,
                     "content_type": content_type,
+                    "checksum": metadata.get("checksum"),
+                    **content_dict,
                 }
             )
 
@@ -501,3 +523,12 @@ def extract_valid_department_from_id(course_string):
         dept_candidate = department_string.groups()[0]
         return [dept_candidate] if dept_candidate in OCW_DEPARTMENTS.keys() else None
     return None
+
+
+def calc_checksum(filename) -> str:
+    "Return the md5 checksum of the specified filepath"
+    hash_md5 = md5()
+    with open(filename, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()

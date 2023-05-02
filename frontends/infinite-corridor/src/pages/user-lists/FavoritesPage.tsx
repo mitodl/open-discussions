@@ -8,6 +8,8 @@ import UserListItems from "./ItemsListing"
 const FavoritesPage: React.FC = () => {
   const favoritesQuery = useFavoritesListing()
 
+  const items = favoritesQuery.data?.results
+
   return (
     <BannerPage
       src="/static/images/course_search_banner.png"
@@ -20,7 +22,7 @@ const FavoritesPage: React.FC = () => {
             <h1 className="ic-list-header">My Favorites</h1>
             <UserListItems
               isLoading={favoritesQuery.isLoading}
-              data={favoritesQuery.data}
+              items={items}
               emptyMessage="You don't have any favorites yet."
             />
           </GridColumn>

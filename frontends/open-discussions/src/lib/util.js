@@ -137,10 +137,13 @@ export const isValidUrl = (url: string): boolean =>
 export const toArray = (obj: any) =>
   Array.isArray(obj) ? obj : obj ? [obj] : undefined
 
-export const languageName = (langCode: ?string): string =>
-  LocaleCode.getLanguageName(
-    `${langCode ? langCode.split("-")[0].toLowerCase() : "en"}-US`
+export const languageName = (langCode: ?string): string | null => {
+  if (!langCode) return null
+  const lang = LocaleCode.getLanguageName(
+    `${langCode.split("-")[0].toLowerCase()}-US`
   )
+  return lang ? lang : null
+}
 
 export const flatZip = R.compose(R.flatten, R.zip)
 

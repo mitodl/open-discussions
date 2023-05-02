@@ -1,5 +1,9 @@
 import UrlAssembler from "url-assembler"
-import { LearningResourceType as LRT, TYPE_FAVORITES } from "ol-search-ui"
+import {
+  LearningResourceType as LRT,
+  TYPE_FAVORITES,
+  TYPE_POPULAR
+} from "ol-search-ui"
 import type { PaginationSearchParams } from "ol-util"
 import type { SearchQueryParams } from "@mitodl/course-search-utils"
 
@@ -8,10 +12,30 @@ const DEFAULT_PAGINATION_PARAMS: PaginationSearchParams = {
   limit:  50
 }
 
+interface CourseFilterParams {
+  offered_by?: string
+}
+
+const popularContentApi = UrlAssembler("/popular-content/")
+const popularContentUrls = {
+  listing: (options: PaginationSearchParams = {}) =>
+    popularContentApi
+      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
+      .toString()
+}
+
 const courseApi = UrlAssembler("/courses/")
 const courseDetailsApi = courseApi.segment(":id/")
 const courseUrls = {
-  details: (id: number) => courseDetailsApi.param({ id }).toString(),
+  details:  (id: number) => courseDetailsApi.param({ id }).toString(),
+  upcoming: (
+    options: PaginationSearchParams = {},
+    filterOptions: CourseFilterParams = {}
+  ) =>
+    courseApi
+      .segment("upcoming/")
+      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options, ...filterOptions })
+      .toString(),
   listing: (options: PaginationSearchParams = {}) =>
     courseApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
   favorite: (id: number) =>
@@ -41,7 +65,12 @@ const videoUrls = {
   favorite: (id: number) =>
     videoDetailsApi.segment("favorite/").param({ id }).toString(),
   unfavorite: (id: number) =>
-    videoDetailsApi.segment("unfavorite/").param({ id }).toString()
+    videoDetailsApi.segment("unfavorite/").param({ id }).toString(),
+  new: (options: PaginationSearchParams = {}) =>
+    videoApi
+      .segment("new/")
+      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
+      .toString()
 }
 
 const podcastApi = UrlAssembler("/podcasts/")
@@ -146,7 +175,8 @@ const urls = {
   userList:       userListUrls,
   resource:       resourceUrls,
   topics:         topicsUrls,
-  search:         "search/"
+  search:         "search/",
+  popularContent: popularContentUrls
 }
 
 const baseKey = "learning-resources"
@@ -180,34 +210,54 @@ const keys = {
   all:      [baseKey],
   resource: resourceKeys,
   userList: {
-    all: () => resourceKeys(LRT.Userlist).all,
-    id:  (id: number) => ({
-      ...resourceKeys(LRT.Userlist).id(id),
-      itemsListing: (options?: PaginationSearchParams) => [
-        ...keys.userList.id(id).all,
-        "items",
-        options
-      ]
-    }),
+    all: resourceKeys(LRT.Userlist).all,
+    id:  (id: number) => {
+      const forId = resourceKeys(LRT.Userlist).id(id)
+      return {
+        ...forId,
+        itemsListing: {
+          all:      [...forId.all, "items"],
+          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
+            opts?: T
+          ) => [...forId.all, "items", "infinite", opts]
+        }
+      }
+    },
     listing: {
       all:  resourceKeys(LRT.Userlist).listing.all,
       page: (opts?: UserListOptions) =>
         resourceKeys(LRT.Userlist).listing.page(opts)
     }
   },
-  topics:    [baseKey, "topics"],
+  topics: [baseKey, "topics"],
+
   favorites: {
     all:     resourceKeys(TYPE_FAVORITES).all,
     listing: resourceKeys(TYPE_FAVORITES).listing
   },
+
   search: {
     all:   [baseKey, "search"],
     pages: (params: Omit<SearchQueryParams, "from">) => [
       ...keys.search.all,
       params
     ]
+  },
+
+  courses: {
+    all:     resourceKeys(LRT.Course).all,
+    listing: resourceKeys(LRT.Course).listing
+  },
+
+  videos: {
+    all:     resourceKeys(LRT.Video).all,
+    listing: resourceKeys(LRT.Video).listing
+  },
+
+  popularContent: {
+    listing: resourceKeys(TYPE_POPULAR).listing
   }
 }
 
 export { urls, keys, DEFAULT_PAGINATION_PARAMS }
-export type { UserListOptions }
+export type { UserListOptions, CourseFilterParams }

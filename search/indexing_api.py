@@ -27,14 +27,16 @@ from search.constants import (
     COMMENT_TYPE,
     COURSE_TYPE,
     GLOBAL_DOC_TYPE,
+    MAPPING,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,
     POST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
+    SCRIPTING_LANG,
     STAFF_LIST_TYPE,
+    UPDATE_CONFLICT_SETTING,
     USER_LIST_TYPE,
-    USER_PATH_TYPE,
     VALID_OBJECT_TYPES,
     VIDEO_TYPE,
 )
@@ -65,235 +67,6 @@ from search.serializers import (
 
 log = logging.getLogger(__name__)
 User = get_user_model()
-
-SCRIPTING_LANG = "painless"
-UPDATE_CONFLICT_SETTING = "proceed"
-
-ENGLISH_TEXT_FIELD = {
-    "type": "text",
-    "fields": {"english": {"type": "text", "analyzer": "english"}},
-}
-
-ENGLISH_TEXT_FIELD_WITH_SUGGEST = {
-    "type": "text",
-    "fields": {
-        "english": {"type": "text", "analyzer": "english"},
-        "trigram": {"type": "text", "analyzer": "trigram"},
-    },
-}
-
-BASE_OBJECT_TYPE = {
-    "object_type": {"type": "keyword"},
-    "author_id": {"type": "keyword"},
-    "author_name": {
-        "type": "text",
-        "fields": {
-            "english": {"type": "text", "analyzer": "english"},
-            "trigram": {"type": "text", "analyzer": "trigram"},
-            "raw": {"type": "keyword"},
-        },
-    },
-    "author_avatar_small": {"type": "keyword"},
-    "author_headline": ENGLISH_TEXT_FIELD,
-}
-
-PROFILE_OBJECT_TYPE = {
-    **BASE_OBJECT_TYPE,
-    "author_bio": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "author_channel_membership": {"type": "keyword"},
-    "author_channel_join_data": {
-        "type": "nested",
-        "properties": {"name": {"type": "keyword"}, "joined": {"type": "date"}},
-    },
-    "author_avatar_medium": {"type": "keyword"},
-    "suggest_field1": {"type": "alias", "path": "author_name.trigram"},
-    "suggest_field2": {"type": "alias", "path": "author_bio.trigram"},
-}
-
-CONTENT_OBJECT_TYPE = {
-    **BASE_OBJECT_TYPE,
-    "channel_name": {"type": "keyword"},
-    "channel_title": ENGLISH_TEXT_FIELD,
-    "channel_type": {"type": "keyword"},
-    "text": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "score": {"type": "long"},
-    "post_id": {"type": "keyword"},
-    "post_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "post_slug": {"type": "keyword"},
-    "created": {"type": "date"},
-    "deleted": {"type": "boolean"},
-    "removed": {"type": "boolean"},
-    "suggest_field1": {"type": "alias", "path": "post_title.trigram"},
-    "suggest_field2": {"type": "alias", "path": "text.trigram"},
-}
-
-
-"""
-Each resource index needs this relation even if it won't be used,
-otherwise no results will be returned from indices without it.
-"""
-RESOURCE_RELATIONS = {
-    "resource_relations": {"type": "join", "relations": {"resource": "resourcefile"}}
-}
-
-LEARNING_RESOURCE_TYPE = {
-    **RESOURCE_RELATIONS,
-    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "image_src": {"type": "keyword"},
-    "topics": {"type": "keyword"},
-    "audience": {"type": "keyword"},
-    "certification": {"type": "keyword"},
-    "offered_by": {"type": "keyword"},
-    "created": {"type": "date"},
-    "default_search_priority": {"type": "integer"},
-    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
-    "runs": {
-        "type": "nested",
-        "properties": {
-            "id": {"type": "long"},
-            "course_id": {"type": "keyword"},
-            "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-            "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-            "full_description": ENGLISH_TEXT_FIELD,
-            "language": {"type": "keyword"},
-            "level": {"type": "keyword"},
-            "semester": {"type": "keyword"},
-            "year": {"type": "keyword"},
-            "start_date": {"type": "date"},
-            "end_date": {"type": "date"},
-            "enrollment_start": {"type": "date"},
-            "enrollment_end": {"type": "date"},
-            "topics": {"type": "keyword"},
-            "instructors": {"type": "text"},
-            "prices": {
-                "type": "nested",
-                "properties": {
-                    "mode": {"type": "text"},
-                    "price": {"type": "scaled_float", "scaling_factor": 100},
-                },
-            },
-            "image_src": {"type": "keyword"},
-            "published": {"type": "boolean"},
-            "availability": {"type": "keyword"},
-            "offered_by": {"type": "keyword"},
-            "created": {"type": "date"},
-            "slug": {"type": "keyword"},
-        },
-    },
-}
-
-COURSE_FILE_OBJECT_TYPE = {
-    "run_id": {"type": "keyword"},
-    "run_slug": {"type": "keyword"},
-    "run_title": ENGLISH_TEXT_FIELD,
-    "uid": {"type": "keyword"},
-    "key": {"type": "keyword"},
-    "url": {"type": "keyword"},
-    "short_url": {"type": "keyword"},
-    "section": {"type": "keyword"},
-    "section_slug": {"type": "keyword"},
-    "file_type": {"type": "keyword"},
-    "content_type": {"type": "keyword"},
-    "content": ENGLISH_TEXT_FIELD,
-    "location": {"type": "keyword"},
-    "resource_type": {"type": "keyword"},
-}
-
-COURSE_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    **COURSE_FILE_OBJECT_TYPE,
-    "id": {"type": "long"},
-    "course_id": {"type": "keyword"},
-    "full_description": ENGLISH_TEXT_FIELD,
-    "platform": {"type": "keyword"},
-    "published": {"type": "boolean"},
-    "department_name": {"type": "keyword"},
-    "course_feature_tags": {"type": "keyword"},
-    "coursenum": {"type": "keyword"},
-    "department_course_numbers": {
-        "type": "nested",
-        "properties": {
-            "coursenum": {"type": "keyword"},
-            "sort_coursenum": {"type": "keyword"},
-            "department": {"type": "keyword"},
-            "primary": {"type": "boolean"},
-        },
-    },
-}
-
-
-PROGRAM_OBJECT_TYPE = {**LEARNING_RESOURCE_TYPE, "id": {"type": "long"}}
-
-LIST_OBJECT_TYPE = {
-    **RESOURCE_RELATIONS,
-    "audience": {"type": "keyword"},
-    "certification": {"type": "keyword"},
-    "id": {"type": "long"},
-    "title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "short_description": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "image_src": {"type": "keyword"},
-    "topics": {"type": "keyword"},
-    "author": {"type": "keyword"},
-    "privacy_level": {"type": "keyword"},
-    "list_type": {"type": "keyword"},
-    "created": {"type": "date"},
-    "default_search_priority": {"type": "integer"},
-    "minimum_price": {"type": "scaled_float", "scaling_factor": 100},
-}
-
-VIDEO_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    "id": {"type": "long"},
-    "video_id": {"type": "keyword"},
-    "platform": {"type": "keyword"},
-    "full_description": ENGLISH_TEXT_FIELD,
-    "transcript": ENGLISH_TEXT_FIELD,
-    "published": {"type": "boolean"},
-}
-
-PODCAST_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    "id": {"type": "long"},
-    "full_description": ENGLISH_TEXT_FIELD,
-    "url": {"type": "keyword"},
-}
-
-PODCAST_EPISODE_OBJECT_TYPE = {
-    **LEARNING_RESOURCE_TYPE,
-    "id": {"type": "long"},
-    "podcast_id": {"type": "long"},
-    "series_title": ENGLISH_TEXT_FIELD_WITH_SUGGEST,
-    "full_description": ENGLISH_TEXT_FIELD,
-    "url": {"type": "keyword"},
-    "last_modified": {"type": "date"},
-}
-
-MAPPING = {
-    POST_TYPE: {
-        **CONTENT_OBJECT_TYPE,
-        "post_link_url": {"type": "keyword"},
-        "post_link_thumbnail": {"type": "keyword"},
-        "num_comments": {"type": "long"},
-        "plain_text": ENGLISH_TEXT_FIELD,
-        "post_type": {"type": "keyword"},
-    },
-    COMMENT_TYPE: {
-        **CONTENT_OBJECT_TYPE,
-        "comment_id": {"type": "keyword"},
-        "parent_comment_id": {"type": "keyword"},
-        "parent_post_removed": {"type": "boolean"},
-    },
-    PROFILE_TYPE: PROFILE_OBJECT_TYPE,
-    COURSE_TYPE: COURSE_OBJECT_TYPE,
-    PROGRAM_TYPE: PROGRAM_OBJECT_TYPE,
-    USER_LIST_TYPE: LIST_OBJECT_TYPE,
-    USER_PATH_TYPE: LIST_OBJECT_TYPE,
-    STAFF_LIST_TYPE: LIST_OBJECT_TYPE,
-    VIDEO_TYPE: VIDEO_OBJECT_TYPE,
-    PODCAST_TYPE: PODCAST_OBJECT_TYPE,
-    PODCAST_EPISODE_TYPE: PODCAST_EPISODE_OBJECT_TYPE,
-}
 
 
 def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=None):
@@ -364,7 +137,7 @@ def create_document(doc_id, data):
         conn.create(index=alias, doc_type=GLOBAL_DOC_TYPE, body=data, id=doc_id)
 
 
-def delete_document(doc_id, object_type, **kwargs):
+def deindex_document(doc_id, object_type, **kwargs):
     """
     Makes a request to ES to delete a document
 
@@ -530,7 +303,7 @@ def update_post(doc_id, post):
     )
 
 
-def delete_items(documents, object_type, update_only, **kwargs):
+def deindex_items(documents, object_type, update_only, **kwargs):
     """
     Calls index_items with error catching around not_found for objects that don't exist
     in the index
@@ -550,8 +323,8 @@ def delete_items(documents, object_type, update_only, **kwargs):
         for message in error_messages:
             message = list(message.values())[0]
             if message["result"] != "not_found":
-                log.error("Bulk deletion failed. Error: %s", str(message))
-                raise ReindexException(f"Bulk deletion failed: {message}")
+                log.error("Bulk deindex failed. Error: %s", str(message))
+                raise ReindexException(f"Bulk deindex failed: {message}")
 
 
 def index_items(documents, object_type, update_only, **kwargs):
@@ -570,7 +343,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     for chunk in chunks(
         documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
     ):
-        documents_size = len(json.dumps(chunk))
+        documents_size = len(json.dumps(chunk, default=str))
         # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
         if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
@@ -645,14 +418,14 @@ def index_profiles(ids, update_only=False):
     index_items(serialize_bulk_profiles(ids), PROFILE_TYPE, update_only)
 
 
-def delete_profiles(ids):
+def deindex_profiles(ids):
     """
-    Delete a list of profiles by id
+    Deindex a list of profiles by id
 
     Args:
         ids(list of int): List of Profile ids
     """
-    delete_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
+    deindex_items(serialize_bulk_profiles_for_deletion(ids), PROFILE_TYPE, True)
 
 
 def index_courses(ids, update_only=False):
@@ -667,20 +440,20 @@ def index_courses(ids, update_only=False):
     index_items(serialize_bulk_courses(ids), COURSE_TYPE, update_only)
 
 
-def delete_courses(ids):
+def deindex_courses(ids):
     """
-    Delete a list of courses by id
+    Deindex a list of courses by id
 
     Args:
         ids(list of int): List of Course id's
     """
-    delete_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
+    deindex_items(serialize_bulk_courses_for_deletion(ids), COURSE_TYPE, True)
 
     course_content_type = ContentType.objects.get_for_model(Course)
     for run_id in LearningResourceRun.objects.filter(
         object_id__in=ids, content_type=course_content_type
     ).values_list("id", flat=True):
-        delete_run_content_files(run_id)
+        deindex_run_content_files(run_id)
 
 
 def index_course_content_files(course_ids, update_only=False):
@@ -694,7 +467,7 @@ def index_course_content_files(course_ids, update_only=False):
     """
     course_content_type = ContentType.objects.get_for_model(Course)
     for run_id in LearningResourceRun.objects.filter(
-        object_id__in=course_ids, content_type=course_content_type
+        object_id__in=course_ids, content_type=course_content_type, published=True
     ).values_list("id", flat=True):
         index_run_content_files(run_id, update_only=update_only)
 
@@ -735,9 +508,9 @@ def index_run_content_files(run_id, update_only=False):
         )
 
 
-def delete_run_content_files(run_id, unpublished_only=False):
+def deindex_run_content_files(run_id, unpublished_only=False):
     """
-    Delete a list of content files by run from the index
+    Deindex and delete a list of content files by run from the index
 
     Args:
         run_id(int): Course run id
@@ -759,12 +532,14 @@ def delete_run_content_files(run_id, unpublished_only=False):
     )
 
     course = run.content_object
-    delete_items(
+    deindex_items(
         documents,
         COURSE_TYPE,
         True,
         routing=gen_course_id(course.platform, course.course_id),
     )
+    # Don't need them anymore
+    content_files.delete()
 
 
 def index_programs(ids, update_only=False):
@@ -779,14 +554,14 @@ def index_programs(ids, update_only=False):
     index_items(serialize_bulk_programs(ids), PROGRAM_TYPE, update_only)
 
 
-def delete_programs(ids):
+def deindex_programs(ids):
     """
     Delete a list of programs by id
 
     Args:
         ids(list of int): List of Program id's
     """
-    delete_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
+    deindex_items(serialize_bulk_programs_for_deletion(ids), PROGRAM_TYPE, True)
 
 
 def index_user_lists(ids, update_only=False):
@@ -801,15 +576,15 @@ def index_user_lists(ids, update_only=False):
     index_items(serialize_bulk_user_lists(ids), USER_LIST_TYPE, update_only)
 
 
-def delete_user_lists(ids):
+def deindex_user_lists(ids):
     """
-    Delete a list of user lists by id
+    Deindex a list of user lists by id
 
     Args:
         ids(list of int): List of UserList ids
 
     """
-    delete_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
+    deindex_items(serialize_bulk_user_lists_for_deletion(ids), USER_LIST_TYPE, True)
 
 
 def index_staff_lists(ids, update_only=False):
@@ -824,7 +599,7 @@ def index_staff_lists(ids, update_only=False):
     index_items(serialize_bulk_staff_lists(ids), STAFF_LIST_TYPE, update_only)
 
 
-def delete_staff_lists(ids):
+def deindex_staff_lists(ids):
     """
     Delete a list of staff lists by id
 
@@ -832,7 +607,7 @@ def delete_staff_lists(ids):
         ids(list of int): List of StaffList ids
 
     """
-    delete_items(serialize_bulk_staff_lists_for_deletion(ids), STAFF_LIST_TYPE, True)
+    deindex_items(serialize_bulk_staff_lists_for_deletion(ids), STAFF_LIST_TYPE, True)
 
 
 def index_videos(ids, update_only=False):
@@ -847,15 +622,15 @@ def index_videos(ids, update_only=False):
     index_items(serialize_bulk_videos(ids), VIDEO_TYPE, update_only)
 
 
-def delete_videos(ids):
+def deindex_videos(ids):
     """
-    Delete a list of videos by id
+    Deindex a list of videos by id
 
     Args:
         ids(list of int): List of video ids
 
     """
-    delete_items(serialize_bulk_videos_for_deletion(ids), VIDEO_TYPE, True)
+    deindex_items(serialize_bulk_videos_for_deletion(ids), VIDEO_TYPE, True)
 
 
 def index_podcasts(ids, update_only=False):
@@ -869,15 +644,15 @@ def index_podcasts(ids, update_only=False):
     index_items(serialize_bulk_podcasts(ids), PODCAST_TYPE, update_only)
 
 
-def delete_podcasts(ids):
+def deindex_podcasts(ids):
     """
-    Delete a list of podcasts by id
+    Deindex a list of podcasts by id
 
     Args:
         ids(list of int): List of podcast ids
 
     """
-    delete_items(serialize_bulk_podcasts_for_deletion(ids), PODCAST_TYPE, True)
+    deindex_items(serialize_bulk_podcasts_for_deletion(ids), PODCAST_TYPE, True)
 
 
 def index_podcast_episodes(ids, update_only=False):
@@ -891,14 +666,14 @@ def index_podcast_episodes(ids, update_only=False):
     index_items(serialize_bulk_podcast_episodes(ids), PODCAST_EPISODE_TYPE, update_only)
 
 
-def delete_podcast_episodes(ids):
+def deindex_podcast_episodes(ids):
     """
     Delete a list of podcast episodes by id
 
     Args:
         ids(list of int): List of PodcastEpisode ids
     """
-    delete_items(
+    deindex_items(
         serialize_bulk_podcast_episodes_for_deletion(ids), PODCAST_EPISODE_TYPE, True
     )
 

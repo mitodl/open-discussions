@@ -27,6 +27,14 @@ $small-font-size: 0.75em !default;
   flex-direction: row-reverse;
 }
 
+.ol-lrc-row-reverse .ol-lrc-image {
+  margin-left: 16px;
+}
+
+.ol-lrc-row .ol-lrc-image {
+  margin-right: 16px;
+}
+
 .ol-lrc-content .clickable-title {
   border: none;
   background-color: white;
@@ -41,7 +49,7 @@ $small-font-size: 0.75em !default;
   cursor: pointer;
 }
 
-.ol-lrc-content.MuiCardContent-root {
+.ol-lrc-details {
   /*
   Make content flexbox so that we can control which child fills remaining space.
   */
@@ -105,6 +113,20 @@ $small-font-size: 0.75em !default;
 .ol-lrc-title {
   font-weight: $bold-weight;
   margin:0;
+}
+
+.ol-lrc-drag-handle {
+  display: flex;
+  align-items: center;
+  font-size: 40px;
+  align-self: stretch;
+  color: $light-text;
+  border-right: 1px solid $light-text;
+  margin-right: 16px;
+}
+
+.MuiCardContent-root.ol-lrc-sortable {
+  padding-left: 4px;
 }
 
 .ol-lrc-footer-row {

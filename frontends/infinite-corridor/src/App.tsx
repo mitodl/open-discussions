@@ -17,6 +17,7 @@ import { QueryClientProvider, QueryClient } from "react-query"
 import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
+import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
 
 export const BASE_URL = "/infinite"
 
@@ -42,7 +43,9 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
     <MuiThemeProvider theme={muiTheme}>
       <QueryClientProvider client={queryClient}>
         <HelmetProvider>
-          <Router history={history}>{children}</Router>
+          <Router history={history}>
+            <NiceModalProvider>{children}</NiceModalProvider>
+          </Router>
         </HelmetProvider>
       </QueryClientProvider>
     </MuiThemeProvider>

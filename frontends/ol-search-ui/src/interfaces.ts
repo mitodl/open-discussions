@@ -12,15 +12,18 @@ export enum LearningResourceType {
 }
 
 /**
- * "favorites" is not a real learning resource type in the sense that none of
+ * "favorites" and "popular" are not real learning resource types in the sense that none of
  * the resource objects returned by the /catalogs API endpoints have
  * object_type === "favorites".
  *
  * We occasionally treat it somewhat like a LearningResourceType, though
  * (Example: LearningResourceCardTemplate can render a list of "Favorites"
  * similarly to a UserList.)
+
  */
 export const TYPE_FAVORITES = "favorites"
+
+export const TYPE_POPULAR = "popular"
 
 export enum PrivacyLevel {
   Public = "public",

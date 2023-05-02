@@ -218,6 +218,7 @@ class LearningResourceRun(AbstractCourse):
     )
     object_id = models.PositiveIntegerField(null=True)
     content_object = GenericForeignKey("content_type", "object_id")
+    checksum = models.CharField(max_length=32, null=True, blank=True)
 
     def __str__(self):
         return f"LearningResourceRun platform={self.platform} run_id={self.run_id}"
@@ -264,6 +265,7 @@ class ContentFile(TimestampedModel):
         models.CharField(max_length=256, null=False, blank=False), null=True, blank=True
     )
     published = models.BooleanField(default=True)
+    checksum = models.CharField(max_length=32, null=True, blank=True)
 
     class Meta:
         unique_together = (("key", "run"),)

@@ -24,8 +24,8 @@ def mock_user_list_index(mocker):
     return SimpleNamespace(
         upsert_user_list=mocker.patch("course_catalog.serializers.upsert_user_list"),
         upsert_user_list_view=mocker.patch("course_catalog.views.upsert_user_list"),
-        delete_empty_list=mocker.patch("course_catalog.serializers.delete_user_list"),
-        delete_user_list=mocker.patch("course_catalog.views.delete_user_list"),
+        delete_empty_list=mocker.patch("course_catalog.serializers.deindex_user_list"),
+        delete_user_list=mocker.patch("course_catalog.views.deindex_user_list"),
     )
 
 

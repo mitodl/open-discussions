@@ -4,7 +4,7 @@ import sys
 from django.core.management import BaseCommand
 
 from course_catalog.models import Course, Video
-from search.task_helpers import delete_course, delete_video
+from search.task_helpers import deindex_course, deindex_video
 
 
 class Command(BaseCommand):
@@ -24,7 +24,7 @@ class Command(BaseCommand):
         for platform in options["platform"]:
             idx = 0
             for course in Course.objects.filter(platform=platform):
-                delete_course(course)
+                deindex_course(course)
                 course.delete()
                 idx += 1
             sys.stdout.write(f"Removed {idx} courses from platform {platform}\n")

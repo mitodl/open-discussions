@@ -528,7 +528,7 @@ def test_sync_ocw_course_published(  # pylint:disable=too-many-arguments
     )
     mock_load_content = mocker.patch("course_catalog.api.load_content_files")
     mock_upsert = mocker.patch("course_catalog.api.upsert_course")
-    mock_delete = mocker.patch("course_catalog.api.delete_course")
+    mock_delete = mocker.patch("course_catalog.api.deindex_course")
     setup_s3(settings)
     bucket = boto3.resource("s3").Bucket(settings.OCW_CONTENT_BUCKET_NAME)
 

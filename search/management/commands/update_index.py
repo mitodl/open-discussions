@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from open_discussions.utils import now_in_utc
 from search.tasks import start_update_index
-from search.constants import VALID_OBJECT_TYPES, RESOURCE_FILE_TYPE
+from search.constants import VALID_OBJECT_TYPES, RESOURCE_FILE_TYPE, COURSE_TYPE
 from course_catalog.constants import PlatformType
 
 valid_object_types = list(VALID_OBJECT_TYPES)
@@ -62,7 +62,6 @@ class Command(BaseCommand):
                         platform=options["platform"]
                     )
                 )
-
         else:
             indexes_to_update = list(
                 filter(lambda object_type: options[object_type], valid_object_types)
@@ -74,7 +73,13 @@ class Command(BaseCommand):
                 for object_type in sorted(valid_object_types):
                     self.stdout.write(f"  --{object_type}s")
                 return
-
+            if (
+                COURSE_TYPE in indexes_to_update
+                and RESOURCE_FILE_TYPE not in indexes_to_update
+            ):
+                self.stderr.write(
+                    "WARNING: Courses will be updated but not course content files"
+                )
             task = start_update_index.delay(indexes_to_update, options["platform"])
             self.stdout.write(
                 "Started celery task {task} to update index content for the following indexes: {indexes}".format(

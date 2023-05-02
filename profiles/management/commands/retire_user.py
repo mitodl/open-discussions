@@ -44,7 +44,7 @@ class Command(BaseCommand):
         )
         user.received_invitations.all().delete()
 
-        task_helpers.delete_profile(user)
+        task_helpers.deindex_profile(user)
 
         self.stdout.write(
             "Deleting {} post/comment subscriptions".format(

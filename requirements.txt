@@ -10,6 +10,8 @@ amqp==5.1.1
     # via kombu
 appdirs==1.4.3
     # via zeep
+asttokens==2.2.1
+    # via stack-data
 async-timeout==4.0.2
     # via redis
 attrs==19.3.0
@@ -31,15 +33,14 @@ betamax-serializers==0.2.0
 billiard==3.6.4.0
     # via celery
 boto==2.39.0
+    # via smart-open
+boto3==1.26.110
     # via
     #   -r requirements.in
-    #   smart-open
-boto3==1.14.37
-    # via
     #   ocw-data-parser
     #   pyathena
     #   smart-open
-botocore==1.17.37
+botocore==1.29.110
     # via
     #   boto3
     #   pyathena
@@ -52,7 +53,7 @@ cachetools==3.1.1
     # via google-auth
 cairocffi==0.8.1
     # via cairosvg
-cairosvg==2.5.1
+cairosvg==2.7.0
     # via -r requirements.in
 celery==5.2.1
     # via
@@ -86,9 +87,7 @@ cryptography==3.4.8
 cssselect2==0.2.1
     # via cairosvg
 decorator==4.4.1
-    # via
-    #   ipython
-    #   traitlets
+    # via ipython
 defusedxml==0.6.0
     # via
     #   cairosvg
@@ -96,9 +95,7 @@ defusedxml==0.6.0
     #   social-auth-core
     #   zeep
 deprecated==1.2.7
-    # via
-    #   pygithub
-    #   redis
+    # via pygithub
 dj-database-url==0.3.0
     # via -r requirements.in
 dj-static==0.0.6
@@ -168,8 +165,6 @@ docopt==0.6.2
     # via
     #   webvtt-py
     #   xbundle
-docutils==0.14
-    # via botocore
 drf-extensions==0.5.0
     # via -r requirements.in
 drf-spectacular==0.26.1
@@ -181,6 +176,8 @@ elasticsearch==7.10.0
     #   elasticsearch-dsl
 elasticsearch-dsl==7.4.1
     # via -r requirements.in
+executing==1.2.0
+    # via stack-data
 factory-boy==2.12.0
     # via -r requirements.in
 faker==2.0.0
@@ -211,10 +208,8 @@ idna==2.5
     #   tldextract
 inflection==0.5.1
     # via drf-spectacular
-ipython==7.16.3
+ipython==8.10.0
     # via -r requirements.in
-ipython-genutils==0.2.0
-    # via traitlets
 isodate==0.6.1
     # via
     #   python3-saml
@@ -238,6 +233,8 @@ lxml==4.6.5
     #   zeep
 markdown2==2.4.0
     # via -r requirements.in
+matplotlib-inline==0.1.6
+    # via ipython
 mit-moira @ git+https://github.com/mitodl/mit-moira.git
     # via -r requirements.in
 nested-lookup==0.2.22
@@ -250,8 +247,6 @@ oauthlib==2.0.7
     #   social-auth-core
 ocw-data-parser==0.35.1
     # via -r requirements.in
-packaging==21.3
-    # via redis
 parso==0.6.1
     # via jedi
 pexpect==4.8.0
@@ -268,7 +263,7 @@ praw==4.5.1
     # via -r requirements.in
 prawcore==0.10.1
     # via praw
-prompt-toolkit==3.0.3
+prompt-toolkit==3.0.38
     # via
     #   click-repl
     #   ipython
@@ -278,6 +273,8 @@ psycopg2==2.8.3
     #   django-server-status
 ptyprocess==0.6.0
     # via pexpect
+pure-eval==0.2.2
+    # via stack-data
 pyasn1==0.4.7
     # via
     #   pyasn1-modules
@@ -302,7 +299,6 @@ pyopenssl==19.1.0
 pyparsing==2.4.7
     # via
     #   httplib2
-    #   packaging
 python-dateutil==2.8.1
     # via
     #   -r requirements.in
@@ -326,7 +322,7 @@ pyyaml==5.4
     # via
     #   -r requirements.in
     #   drf-spectacular
-redis==4.3.4
+redis==4.4.4
     # via
     #   -r requirements.in
     #   django-redis
@@ -357,7 +353,7 @@ requests-toolbelt==0.9.1
     # via zeep
 rsa==4.7
     # via google-auth
-s3transfer==0.3.3
+s3transfer==0.6.0
     # via boto3
 sentry-sdk==0.14.1
     # via -r requirements.in
@@ -365,6 +361,7 @@ sgmllib3k==1.0.0
     # via feedparser
 six==1.15.0
     # via
+    #   asttokens
     #   click-repl
     #   django-anymail
     #   django-appconf
@@ -387,7 +384,6 @@ six==1.15.0
     #   social-auth-app-django
     #   social-auth-core
     #   tenacity
-    #   traitlets
     #   zeep
 smart-open==1.8.0
     # via ocw-data-parser
@@ -397,8 +393,10 @@ social-auth-core==1.7.0
     # via social-auth-app-django
 soupsieve==2.0
     # via beautifulsoup4
-sqlparse==0.3.0
+sqlparse==0.4.4
     # via django
+stack-data==0.6.2
+    # via ipython
 static3==0.5.1
     # via
     #   -r requirements.in
@@ -417,8 +415,10 @@ tldextract==2.2.0
     # via -r requirements.in
 toolz==0.10.0
     # via -r requirements.in
-traitlets==4.3.3
-    # via ipython
+traitlets==5.9.0
+    # via
+    #   ipython
+    #   matplotlib-inline
 ulid-py==0.0.3
     # via -r requirements.in
 update-checker==0.16
