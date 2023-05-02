@@ -406,8 +406,10 @@ class ESContentFileSerializer(ESResourceFileSerializerMixin, ESModelSerializer):
             max_content_size = (
                 settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content
             )
-            truncated_content = (
-                json.dumps(content).strip('"')[:max_content_size].rstrip("\\")
+            truncated_content = re.sub(
+                r"\\([0-9A-Za-z]+)?$",
+                "",
+                json.dumps(content).strip('"')[:max_content_size],
             )
             data["content"] = json.loads(f'"{truncated_content}"')
         return data

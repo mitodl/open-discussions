@@ -1,7 +1,6 @@
 """Tests for elasticsearch serializers"""
 import json
 from datetime import datetime
-
 # pylint: disable=redefined-outer-name,unused-argument
 from functools import reduce
 
@@ -470,6 +469,43 @@ def test_es_content_file_serializer(  # pylint:disable=too-many-arguments
             "resource_type": resource_type,
         },
     )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "content_end,expected_end",
+    [
+        [b"\xe7\x9a\x84".decode("utf-8"), ""],
+        [b"\xc3\x8b".decode("utf-8"), ""],
+        ["bbbbbbb", "bbbbb"],
+    ],
+)
+def test_es_content_file_serializer_truncate(  # pylint:disable=too-many-arguments
+    settings, mocker, content_end, expected_end
+):
+    """Verify that the ESContentFileSerializer has the correct data"""
+    settings.ELASTICSEARCH_MAX_REQUEST_SIZE = 5000
+    content_kwargs = {
+        "content": "",
+        "content_author": "MIT",
+        "content_language": "en",
+        "content_title": "test title",
+        "section": "Resources",
+    }
+    content_file = factories.ContentFileFactory.create(**content_kwargs)
+    serialized = serializers.ESContentFileSerializer(content_file).data
+    serialized.pop("content")
+    len_minus_content = len(json.dumps(serialized))
+
+    content_file.content = f'{"a" * (settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content - 105)}{content_end} {"z" * 500}'
+    content_file.save()
+    serialized = serializers.ESContentFileSerializer(content_file).data
+    serialized_content = serialized.pop("content")
+    expected_length = settings.ELASTICSEARCH_MAX_REQUEST_SIZE - len_minus_content - 105
+    expected_content = content_file.content[:expected_length] + expected_end
+    assert serialized_content == expected_content
+    if expected_end == "":
+        assert content_end not in serialized_content
 
 
 @pytest.mark.django_db

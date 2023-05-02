@@ -8,7 +8,6 @@ betamax_serializers
 boto3==1.26.110
 cairosvg
 celery==5.2.1
-cryptography>=39.0.1
 dj-database-url==0.3.0
 dj-static==0.0.6
 django-anymail[mailgun]==3.*
@@ -50,6 +49,7 @@ python-dateutil
 python-rapidjson==1.8
 python3-saml==1.14.0
 pygithub==1.44.1
+pyopenssl==19.1.0
 pytube==9.5.2
 redis>=3.5.2.3
 requests==2.24.0
