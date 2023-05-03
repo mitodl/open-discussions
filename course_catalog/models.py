@@ -74,7 +74,7 @@ class LearningResourceQuerySet(TimestampedModelQuerySet):
                     queryset=StaffListItem.objects.prefetch_related("content_type"),
                 )
             )
-        # force list_items to be an empty query for anonymous users
+        # force stafflist_items to be an empty query for other users
         return self.prefetch_related(
             Prefetch("stafflist_items", queryset=StaffListItem.objects.none())
         )
