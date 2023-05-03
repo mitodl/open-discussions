@@ -12,6 +12,7 @@ from django.db.models import F, Max, prefetch_related_objects
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from course_catalog import utils
 from course_catalog.constants import (
     PlatformType,
     PrivacyLevel,
@@ -35,14 +36,6 @@ from course_catalog.models import (
     UserList,
     UserListItem,
     Video,
-)
-from course_catalog.utils import (
-    get_course_url,
-    get_ocw_department_list,
-    get_ocw_topics,
-    get_year_and_semester,
-    parse_instructors,
-    semester_year_to_date,
 )
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
@@ -275,7 +268,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         """
         Custom function to parse data out of the raw edx json
         """
-        year, semester = get_year_and_semester(data)
+        year, semester = utils.get_year_and_semester(data)
         course_fields = {
             "content_type": data.get("content_type"),
             "object_id": data.get("object_id"),
@@ -293,10 +286,10 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
             "enrollment_end": data.get("enrollment_end"),
             "best_start_date": data.get("enrollment_start")
             or data.get("start")
-            or semester_year_to_date(semester, year),
+            or utils.semester_year_to_date(semester, year),
             "best_end_date": data.get("enrollment_end")
             or data.get("end")
-            or semester_year_to_date(semester, year, ending=True),
+            or utils.semester_year_to_date(semester, year, ending=True),
             "image_src": (
                 (data.get("image") or {}).get("src")
                 or (data.get("course_image") or {}).get("src")
@@ -316,7 +309,7 @@ class LearningResourceRunSerializer(BaseCourseSerializer):
         if is_published is not None:
             course_fields["published"] = is_published
 
-        self.instructors = parse_instructors(data.get("staff"))
+        self.instructors = utils.parse_instructors(data.get("staff"))
 
         self.prices = [
             {
@@ -388,7 +381,7 @@ class OCWSerializer(CourseSerializer):
         """
         topics = [
             {"name": topic_name}
-            for topic_name in get_ocw_topics(data.get("course_collections"))
+            for topic_name in utils.get_ocw_topics(data.get("course_collections"))
         ]
 
         course_feature_tags = [
@@ -410,9 +403,9 @@ class OCWSerializer(CourseSerializer):
             "last_modified": data.get("last_modified"),
             "published": data.get("is_published"),
             "course_feature_tags": course_feature_tags,
-            "url": get_course_url(data.get("uid"), data, PlatformType.ocw.value),
+            "url": utils.get_course_url(data.get("uid"), data, PlatformType.ocw.value),
             "platform": PlatformType.ocw.value,
-            "department": get_ocw_department_list(data),
+            "department": utils.get_ocw_department_list(data),
             "extra_course_numbers": extra_course_numbers,
         }
         if "PROD/RES" in data.get("course_prefix"):

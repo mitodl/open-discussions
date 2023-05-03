@@ -23,10 +23,10 @@ from course_catalog.factories import (
     ProgramFactory,
     ProgramItemCourseFactory,
     StaffListFactory,
-    UserListFactory,
-    VideoFactory,
     StaffListItemFactory,
+    UserListFactory,
     UserListItemFactory,
+    VideoFactory,
 )
 from course_catalog.models import FavoriteItem, StaffListItem, UserListItem
 from course_catalog.serializers import (
@@ -34,6 +34,8 @@ from course_catalog.serializers import (
     CourseTopicSerializer,
     FavoriteItemSerializer,
     LearningResourceRunSerializer,
+    MicroStaffListItemSerializer,
+    MicroUserListItemSerializer,
     OCWNextSerializer,
     PodcastEpisodeSerializer,
     PodcastSerializer,
@@ -43,8 +45,6 @@ from course_catalog.serializers import (
     UserListItemSerializer,
     UserListSerializer,
     VideoSerializer,
-    MicroStaffListItemSerializer,
-    MicroUserListItemSerializer,
 )
 from open_discussions.factories import UserFactory
 
