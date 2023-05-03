@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.214.0
+---------------
+
+- Do not display "English" as default language on resources (#3961)
+- Use single modal for "Add to list..." -> fix premature close (#3951)
+- Show warning if updating courses but not resource files (#3967)
+
 Version 0.213.1 (Released April 27, 2023)
 ---------------
 
