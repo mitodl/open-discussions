@@ -8,9 +8,9 @@ import { allowConsoleErrors } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
 import { QueryClient, QueryClientProvider } from "react-query"
 import {
-  useAddToUserListItems,
+  useAddToListItems,
   useCreateUserList,
-  useDeleteFromUserListItems,
+  useDeleteFromListItems,
   useDeleteUserList,
   useResource,
   useUserListsListing,
@@ -23,6 +23,7 @@ import {
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
+import axios from "../../libs/axios"
 
 function* makeCounter() {
   let i = 0
@@ -137,10 +138,18 @@ test("useDeleteUserList invalidates all resource queries", async () => {
   expect(before.listing.data).not.toEqual(after.listing.data)
 })
 
-test("useAddToUserListItems invalidates userlist details and listing", async () => {
+test.each([
+  {
+    list: factories.makeUserList({ id: 123 }),
+    url:  urls.userList.itemAdd(123)
+  },
+  {
+    list: factories.makeStaffList({ id: 456 }),
+    url:  urls.staffList.itemAdd(456)
+  }
+])("useAddToListItems invalidates userlist details and listing", async ({ list, url }) => {
   const { wrapper, spies } = setup()
 
-  const list = factories.makeUserList()
   const resource = factories.makeCourse()
   const modifiedAddedResource = {
     ...resource,
@@ -151,31 +160,31 @@ test("useAddToUserListItems invalidates userlist details and listing", async () 
     () => useResource(resource.object_type, resource.id),
     { wrapper }
   )
-  const { result: addResult } = renderHook(() => useAddToUserListItems(), {
+  const { result: addResult } = renderHook(() => useAddToListItems(), {
     wrapper
   })
 
-  setMockResponse.post(urls.userList.itemAdd(list.id), {
-    content_data: modifiedAddedResource
-  })
+  setMockResponse.post(url, { content_data: modifiedAddedResource })
 
   await act(async () => {
     await addResult.current.mutateAsync({
-      userListId: list.id,
-      payload:    {
+      list,
+      item: {
         object_id:    resource.id,
         content_type: resource.object_type
       }
     })
   })
 
+  expect(axios.post).toHaveBeenCalledWith(url, expect.anything())
+
   // The list we modified was invalidated
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(list.id).all
+    queryKey: keys.resource(list.object_type).id(list.id).all
   })
   // The list listing was invalided.
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.listing.all
+    queryKey: keys.resource(list.object_type).listing.all
   })
   // Nothing else invalidated
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
@@ -184,7 +193,7 @@ test("useAddToUserListItems invalidates userlist details and listing", async () 
   expect(resourceResult.current.data).toEqual(modifiedAddedResource)
 })
 
-test("useAddToUserListItems patches search results", async () => {
+test("useAddToListItems patches search results", async () => {
   const { wrapper } = setup()
   const searchResults = factories.makeSearchResponse(4, 10)
   const i = faker.datatype.number({ min: 0, max: 3 })
@@ -201,7 +210,7 @@ test("useAddToUserListItems patches search results", async () => {
   }
 
   const useTestHook = () => {
-    const addItem = useAddToUserListItems()
+    const addItem = useAddToListItems()
     const search = useInfiniteSearch({})
     return { addItem, search }
   }
@@ -220,8 +229,8 @@ test("useAddToUserListItems patches search results", async () => {
     })
   })
   await result.current.addItem.mutateAsync({
-    userListId: newMember.list_id,
-    payload:    newMember
+    list: { id: newMember.list_id, object_type: LRT.Userlist },
+    item: newMember
   })
 
   await waitFor(() => {
@@ -229,7 +238,7 @@ test("useAddToUserListItems patches search results", async () => {
   })
 })
 
-test("useDeleteFromUserListItems patches search results", async () => {
+test("useDeleteFromListItems patches search results", async () => {
   const { wrapper } = setup()
   const searchResults = factories.makeSearchResponse(4, 10)
   const i = faker.datatype.number({ min: 0, max: 3 })
@@ -249,7 +258,7 @@ test("useDeleteFromUserListItems patches search results", async () => {
   }
 
   const useTestHook = () => {
-    const deleteItem = useDeleteFromUserListItems()
+    const deleteItem = useDeleteFromListItems()
     const search = useInfiniteSearch({})
     return { deleteItem, search }
   }
@@ -260,47 +269,61 @@ test("useDeleteFromUserListItems patches search results", async () => {
     expect(result.current.search.data?.pages).toEqual([searchResults])
   })
 
-  await result.current.deleteItem.mutateAsync(oldMembers[deleteIndex])
+  await result.current.deleteItem.mutateAsync({
+    list: { id: oldMembers[deleteIndex].list_id, object_type: LRT.Userlist },
+    item: oldMembers[deleteIndex]
+  })
 
   await waitFor(() => {
     expect(result.current.search.data?.pages).toEqual([expected])
   })
 })
 
-test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
+test.each([
+  {
+    list: factories.makeUserList({ id: 123 }),
+    item: factories.makeListItemMember({ item_id: 789 }),
+    url:  urls.userList.itemDetails(123, 789)
+  },
+  {
+    list: factories.makeStaffList({ id: 456 }),
+    item: factories.makeListItemMember({ item_id: 789 }),
+    url:  urls.staffList.itemDetails(456, 789)
+  }
+])("useDeleteFromListItems makes API call and invalidates appropriate queries", async ({ list, url, item }) => {
   const { wrapper, spies } = setup()
 
-  const userlist = factories.makeUserList()
-  const itemToDelete = factories.makeListItemMember({
-    content_type: LRT.Course, // should match affectedResourceData
-    list_id:      userlist.id
-  })
 
-  const resource = factories.makeCourse({
-    id:    itemToDelete.object_id,
-    lists: [itemToDelete]
+  const resource = factories.makeLearningResource({
+    id:          item.object_id,
+    object_type: item.content_type,
+    lists:       [item]
   })
   const resourceUrl = urls.resource.details(resource.object_type, resource.id)
   setMockResponse.get(resourceUrl, resource)
 
-  const { result } = renderHook(() => useDeleteFromUserListItems(), { wrapper })
+  const { result } = renderHook(() => useDeleteFromListItems(), { wrapper })
 
-  await act(async () => result.current.mutateAsync(itemToDelete))
+  await act(async () =>
+    result.current.mutateAsync({list, item})
+  )
+
+  expect(axios.delete).toHaveBeenCalledWith(url)
 
   // Check the invalidations
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(userlist.id).all
+    queryKey: keys.resource(list.object_type).id(list.id).all
   })
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.listing.all
+    queryKey: keys.resource(list.object_type).listing.all
   })
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
     queryKey: keys.resource(resource.object_type).id(resource.id).details
   })
 })
 
-test("useDeleteFromUserListItems optimistically updates resource data", async () => {
+test("useDeleteFromListItems optimistically updates resource data", async () => {
   const { wrapper } = setup()
 
   const userlist = factories.makeUserList()
@@ -321,14 +344,17 @@ test("useDeleteFromUserListItems optimistically updates resource data", async ()
     () => useResource(resource.object_type, resource.id),
     { wrapper }
   )
-  const { result, waitFor } = renderHook(() => useDeleteFromUserListItems(), {
+  const { result, waitFor } = renderHook(() => useDeleteFromListItems(), {
     wrapper
   })
 
   await waitFor(() => resourceQuery.current.isFetched)
 
   act(() => {
-    result.current.mutateAsync(itemToDelete)
+    result.current.mutateAsync({
+      list: userlist,
+      item: itemToDelete
+    })
   })
 
   // Check the optimistic update
