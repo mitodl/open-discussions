@@ -21,8 +21,8 @@ import { LearningResource, PrivacyLevel, UserList } from "ol-search-ui"
 import { LoadingSpinner } from "ol-util"
 
 import {
-  useAddToUserListItems,
-  useDeleteFromUserListItems,
+  useAddToListItems,
+  useDeleteFromListItems,
   useFavorite,
   useResource,
   useUnfavorite,
@@ -71,8 +71,8 @@ const useRequestRecord = () => {
 
 const useToggleItemInList = (resource?: LearningResource) => {
   const requestRecord = useRequestRecord()
-  const addTo = useAddToUserListItems()
-  const deleteFrom = useDeleteFromUserListItems()
+  const addTo = useAddToListItems()
+  const deleteFrom = useDeleteFromListItems()
   const favorite = useFavorite()
   const unfavorite = useUnfavorite()
   const handleAdd = async (list: UserListOrFavorites) => {
@@ -83,11 +83,8 @@ const useToggleItemInList = (resource?: LearningResource) => {
         await favorite.mutateAsync(resource)
       } else {
         await addTo.mutateAsync({
-          userListId: list.id,
-          payload:    {
-            object_id:    resource.id,
-            content_type: resource.object_type
-          }
+          list,
+          item: { object_id: resource.id, content_type: resource.object_type }
         })
       }
     } finally {
@@ -103,7 +100,7 @@ const useToggleItemInList = (resource?: LearningResource) => {
       } else {
         const listItem = resource.lists.find(l => l.list_id === list.id)
         if (!listItem) return // should not happen
-        await deleteFrom.mutateAsync(listItem)
+        await deleteFrom.mutateAsync({ list, item: listItem })
       }
     } finally {
       requestRecord.clear(resource, list)

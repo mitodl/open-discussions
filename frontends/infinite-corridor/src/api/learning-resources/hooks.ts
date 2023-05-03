@@ -7,7 +7,9 @@ import {
   LearningResourceType as LRT,
   ListItemMember,
   StaffList,
-  ListItem
+  ListItem,
+  LearningResourceRef,
+  isUserListOrPath
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
 import axios from "../../libs/axios"
@@ -236,39 +238,38 @@ const useDeleteUserList = () => {
   })
 }
 
-type AddToUserListPayload = {
-  object_id: number
-  content_type: LRT
-}
 const addToUserList = async ({
-  userListId,
-  payload
+  list,
+  item
 }: {
-  userListId: number
-  payload: AddToUserListPayload
+  list: Pick<UserList | StaffList, "id" | "object_type">
+  item: LearningResourceRef
 }): Promise<ListItemMember & { content_data: LearningResource }> => {
-  const { data: response } = await axios.post(
-    urls.userList.itemAdd(userListId),
-    payload
-  )
+  const url = isUserListOrPath(list) ?
+    urls.userList.itemAdd(list.id) :
+    urls.staffList.itemAdd(list.id)
+  const { data: response } = await axios.post(url, item)
   return response
 }
-const useAddToUserListItems = () => {
+const useAddToListItems = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: addToUserList,
     onSuccess:  (data, variables) => {
       const resource = data.content_data
+      const { list } = variables
       queryClient.setQueryData<LearningResource>(
         keys.resource(resource.object_type).id(resource.id).details,
         resource
       )
       // Skip optimistic updates for now. We do not know the list item id.
       queryClient.invalidateQueries({
-        queryKey: keys.userList.id(variables.userListId).all
+        queryKey: keys.resource(list.object_type).id(list.id).all
       })
       // The listing response includes item counts, which have changed
-      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(list.object_type).listing.all
+      })
 
       modifyCachedSearchResource(
         queryClient,
@@ -282,24 +283,34 @@ const useAddToUserListItems = () => {
   })
 }
 
-const deleteFromUserListItems = async (item: ListItemMember): Promise<void> => {
-  await axios.delete(urls.userList.itemDetails(item.list_id, item.item_id))
+const deleteFromUserListItems = async ({
+  list,
+  item
+}: {
+  list: Pick<UserList | StaffList, "id" | "object_type">
+  item: ListItemMember
+}) => {
+  const url = isUserListOrPath(list) ?
+    urls.userList.itemDetails(list.id, item.item_id) :
+    urls.staffList.itemDetails(list.id, item.item_id)
+  await axios.delete(url)
 }
-const useDeleteFromUserListItems = () => {
+const useDeleteFromListItems = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteFromUserListItems,
     onMutate:   vars => {
+      const { item } = vars
       const resourceKey = keys
-        .resource(vars.content_type)
-        .id(vars.object_id).details
+        .resource(item.content_type)
+        .id(item.object_id).details
       const previousResource =
         queryClient.getQueryData<LearningResource>(resourceKey)
       if (previousResource) {
         const newResource: LearningResource = {
           ...previousResource,
           lists: previousResource.lists.filter(
-            member => member.item_id !== vars.item_id
+            member => member.item_id !== item.item_id
           )
         }
         queryClient.setQueryData(resourceKey, newResource)
@@ -313,24 +324,28 @@ const useDeleteFromUserListItems = () => {
       context?.rollback()
     },
     onSettled: (_data, _error, vars) => {
+      const { item, list } = vars
       queryClient.invalidateQueries({
-        queryKey: keys.resource(vars.content_type).id(vars.object_id).details
+        queryKey: keys.resource(item.content_type).id(item.object_id).details
       })
       queryClient.invalidateQueries({
-        queryKey: keys.userList.id(vars.list_id).all
+        queryKey: keys.resource(list.object_type).id(list.id).all
       })
       // The listing response includes item counts, which have changed
-      queryClient.invalidateQueries({ queryKey: keys.userList.listing.all })
+      queryClient.invalidateQueries({
+        queryKey: keys.resource(list.object_type).listing.all
+      })
     },
     onSuccess(_data, vars) {
+      const { item } = vars
       modifyCachedSearchResource(
         queryClient,
         {
-          id:          vars.object_id,
-          object_type: vars.content_type
+          id:          item.object_id,
+          object_type: item.content_type
         },
         current => ({
-          lists: current.lists?.filter?.(r => r.item_id !== vars.item_id)
+          lists: current.lists?.filter?.(r => r.item_id !== item.item_id)
         })
       )
     }
@@ -524,8 +539,8 @@ export {
   useCreateUserList, // mutation
   useUpdateUserList, // mutation
   useDeleteUserList, // mutation
-  useAddToUserListItems, // mutation
-  useDeleteFromUserListItems, // mutation
+  useAddToListItems, // mutation
+  useDeleteFromListItems, // mutation
   useStaffListsListing, // listing
   useCreateStaffList, // mutation
   useUpdateStaffList, // mutation

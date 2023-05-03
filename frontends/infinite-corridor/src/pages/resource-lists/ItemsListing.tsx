@@ -18,7 +18,7 @@ type ResourceListItemsProps = {
   isRefetching?: boolean
   emptyMessage: string
   sortable?: boolean
-  mode: "userlist" | "stafflist"
+  mode?: "userlist" | "stafflist"
 }
 
 const ResourceListItemsViewOnly: React.FC<{
@@ -44,7 +44,7 @@ const ResourceListItemsSortable: React.FC<{
   listId: number
   items: ListItem[]
   isRefetching?: boolean
-  mode: ResourceListItemsProps["mode"]
+  mode: NonNullable<ResourceListItemsProps["mode"]>
 }> = ({ items, listId, isRefetching, mode }) => {
   const move = useMoveListItem(mode)
   const renderDragging: RenderActive = useCallback(active => {
@@ -147,13 +147,14 @@ const ResurceListItems: React.FC<ResourceListItemsProps> = ({
   mode
 }) => {
   if (sortable && !id) throw new Error("Sortable list must have an id")
+  if (sortable && !mode) throw new Error("Sortable list must have a mode")
   return (
     <>
       {isLoading && <LoadingSpinner loading />}
       {items &&
         (items.length === 0 ? (
           <p className="empty-message">{emptyMessage}</p>
-        ) : sortable && id ? (
+        ) : sortable && id && mode ? (
           <ResourceListItemsSortable
             listId={id}
             mode={mode}

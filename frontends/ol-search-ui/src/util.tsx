@@ -238,17 +238,23 @@ const formatPrice = (price: number | null | undefined): string => {
 export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()
 
-const isUserListOrPath = (
-  resource: UserList | StaffList
-): resource is UserList => {
+const isUserListOrPath = <
+  U extends Pick<UserList, "object_type">,
+  S extends Pick<StaffList, "object_type">
+>(
+    resource: U | S
+  ): resource is U => {
   return (
     resource.object_type === LR.Userlist ||
     resource.object_type === LR.LearningPath
   )
 }
-const isStaffListOrPath = (
-  resource: UserList | StaffList
-): resource is StaffList => {
+const isStaffListOrPath = <
+  U extends Pick<UserList, "object_type">,
+  S extends Pick<StaffList, "object_type">
+>(
+    resource: U | S
+  ): resource is S => {
   return (
     resource.object_type === LR.StaffList ||
     resource.object_type === LR.StaffPath
