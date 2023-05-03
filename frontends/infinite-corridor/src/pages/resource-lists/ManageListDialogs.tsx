@@ -8,7 +8,9 @@ import {
   UserList,
   StaffList,
   LearningResourceType as LRT,
-  PrivacyLevel
+  PrivacyLevel,
+  isStaffListOrPath,
+  isUserListOrPath
 } from "ol-search-ui"
 import * as Yup from "yup"
 import {
@@ -243,23 +245,6 @@ const UpsertListDialog = NiceModal.create(
     )
   }
 )
-
-const isUserListOrPath = (
-  resource: UserList | StaffList
-): resource is UserList => {
-  return (
-    resource.object_type === LRT.Userlist ||
-    resource.object_type === LRT.LearningPath
-  )
-}
-const isStaffListOrPath = (
-  resource: UserList | StaffList
-): resource is StaffList => {
-  return (
-    resource.object_type === LRT.StaffList ||
-    resource.object_type === LRT.StaffPath
-  )
-}
 
 type DeleteListDialogProps = {
   resource: UserList | StaffList
