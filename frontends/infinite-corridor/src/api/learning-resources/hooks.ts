@@ -62,12 +62,16 @@ const useStaffList = (
   return useResource(LRT.StaffList, id, options) as UseQueryResult<StaffList>
 }
 
-const useUserListsListing = (options?: UserListOptions) => {
-  const url = urls.userList.listing(options)
-  const queryKey = keys.userList.listing.page(options)
+const useUserListsListing = (
+  options: UserListOptions & Pick<UseQueryOptions, "enabled"> = {}
+) => {
+  const { enabled, ...others } = options
+  const url = urls.userList.listing(others)
+  const queryKey = keys.userList.listing.page(others)
   return useQuery<PaginatedResult<UserList>>({
     queryKey,
-    queryFn: () => axios.get(url).then(res => res.data)
+    queryFn: () => axios.get(url).then(res => res.data),
+    enabled
   })
 }
 
@@ -352,12 +356,17 @@ const useDeleteFromListItems = () => {
   })
 }
 
-const useStaffListsListing = (options?: StaffListOptions) => {
-  const url = urls.staffList.listing(options)
-  const key = keys.staffList.listing.page(options)
-  return useQuery<PaginatedResult<StaffList>>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
+const useStaffListsListing = (
+  options: StaffListOptions & Pick<UseQueryOptions, "enabled"> = {}
+) => {
+  const { enabled, ...others } = options
+  const url = urls.staffList.listing(others)
+  const queryKey = keys.staffList.listing.page(others)
+  return useQuery<PaginatedResult<StaffList>>({
+    queryKey,
+    queryFn: () => axios.get(url).then(res => res.data),
+    enabled
+  })
 }
 
 const updateStaffList = async (data: Partial<StaffList> & { id: number }) => {

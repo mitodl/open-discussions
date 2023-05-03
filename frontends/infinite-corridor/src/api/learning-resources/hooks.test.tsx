@@ -147,51 +147,54 @@ test.each([
     list: factories.makeStaffList({ id: 456 }),
     url:  urls.staffList.itemAdd(456)
   }
-])("useAddToListItems invalidates userlist details and listing", async ({ list, url }) => {
-  const { wrapper, spies } = setup()
+])(
+  "useAddToListItems invalidates userlist details and listing",
+  async ({ list, url }) => {
+    const { wrapper, spies } = setup()
 
-  const resource = factories.makeCourse()
-  const modifiedAddedResource = {
-    ...resource,
-    lists: resource.lists.concat({} as ListItemMember)
-  }
+    const resource = factories.makeCourse()
+    const modifiedAddedResource = {
+      ...resource,
+      lists: resource.lists.concat({} as ListItemMember)
+    }
 
-  const { result: resourceResult } = renderHook(
-    () => useResource(resource.object_type, resource.id),
-    { wrapper }
-  )
-  const { result: addResult } = renderHook(() => useAddToListItems(), {
-    wrapper
-  })
-
-  setMockResponse.post(url, { content_data: modifiedAddedResource })
-
-  await act(async () => {
-    await addResult.current.mutateAsync({
-      list,
-      item: {
-        object_id:    resource.id,
-        content_type: resource.object_type
-      }
+    const { result: resourceResult } = renderHook(
+      () => useResource(resource.object_type, resource.id),
+      { wrapper }
+    )
+    const { result: addResult } = renderHook(() => useAddToListItems(), {
+      wrapper
     })
-  })
 
-  expect(axios.post).toHaveBeenCalledWith(url, expect.anything())
+    setMockResponse.post(url, { content_data: modifiedAddedResource })
 
-  // The list we modified was invalidated
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(list.object_type).id(list.id).all
-  })
-  // The list listing was invalided.
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(list.object_type).listing.all
-  })
-  // Nothing else invalidated
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
+    await act(async () => {
+      await addResult.current.mutateAsync({
+        list,
+        item: {
+          object_id:    resource.id,
+          content_type: resource.object_type
+        }
+      })
+    })
 
-  // The POST response result updated resource data
-  expect(resourceResult.current.data).toEqual(modifiedAddedResource)
-})
+    expect(axios.post).toHaveBeenCalledWith(url, expect.anything())
+
+    // The list we modified was invalidated
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).id(list.id).all
+    })
+    // The list listing was invalided.
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).listing.all
+    })
+    // Nothing else invalidated
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
+
+    // The POST response result updated resource data
+    expect(resourceResult.current.data).toEqual(modifiedAddedResource)
+  }
+)
 
 test("useAddToListItems patches search results", async () => {
   const { wrapper } = setup()
@@ -290,38 +293,38 @@ test.each([
     item: factories.makeListItemMember({ item_id: 789 }),
     url:  urls.staffList.itemDetails(456, 789)
   }
-])("useDeleteFromListItems makes API call and invalidates appropriate queries", async ({ list, url, item }) => {
-  const { wrapper, spies } = setup()
+])(
+  "useDeleteFromListItems makes API call and invalidates appropriate queries",
+  async ({ list, url, item }) => {
+    const { wrapper, spies } = setup()
 
+    const resource = factories.makeLearningResource({
+      id:          item.object_id,
+      object_type: item.content_type,
+      lists:       [item]
+    })
+    const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+    setMockResponse.get(resourceUrl, resource)
 
-  const resource = factories.makeLearningResource({
-    id:          item.object_id,
-    object_type: item.content_type,
-    lists:       [item]
-  })
-  const resourceUrl = urls.resource.details(resource.object_type, resource.id)
-  setMockResponse.get(resourceUrl, resource)
+    const { result } = renderHook(() => useDeleteFromListItems(), { wrapper })
 
-  const { result } = renderHook(() => useDeleteFromListItems(), { wrapper })
+    await act(async () => result.current.mutateAsync({ list, item }))
 
-  await act(async () =>
-    result.current.mutateAsync({list, item})
-  )
+    expect(axios.delete).toHaveBeenCalledWith(url)
 
-  expect(axios.delete).toHaveBeenCalledWith(url)
-
-  // Check the invalidations
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(list.object_type).id(list.id).all
-  })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(list.object_type).listing.all
-  })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(resource.object_type).id(resource.id).details
-  })
-})
+    // Check the invalidations
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).id(list.id).all
+    })
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).listing.all
+    })
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(resource.object_type).id(resource.id).details
+    })
+  }
+)
 
 test("useDeleteFromListItems optimistically updates resource data", async () => {
   const { wrapper } = setup()

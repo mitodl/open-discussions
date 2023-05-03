@@ -17,7 +17,12 @@ import Chip from "@mui/material/Chip"
 import AddIcon from "@mui/icons-material/Add"
 import * as NiceModal from "@ebay/nice-modal-react"
 
-import { LearningResource, PrivacyLevel, UserList } from "ol-search-ui"
+import {
+  LearningResource,
+  PrivacyLevel,
+  StaffList,
+  UserList
+} from "ol-search-ui"
 import { LoadingSpinner } from "ol-util"
 
 import {
@@ -25,6 +30,7 @@ import {
   useDeleteFromListItems,
   useFavorite,
   useResource,
+  useStaffListsListing,
   useUnfavorite,
   useUserListsListing
 } from "../../api/learning-resources"
@@ -34,10 +40,12 @@ type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
 type AddToListDialogProps = {
   resourceKey: ResourceKey
+  mode: "userlist" | "stafflist"
 }
 
-type UserListOrFavorites =
+type ListOrFavorites =
   | UserList
+  | StaffList
   | {
       id: "favorites"
       title: string
@@ -48,18 +56,18 @@ const useRequestRecord = () => {
   const [pending, setPending] = useState<Map<string, "delete" | "add">>(
     new Map()
   )
-  const key = (resource: LearningResource, list: UserListOrFavorites) =>
+  const key = (resource: LearningResource, list: ListOrFavorites) =>
     `${resource.object_type}-${resource.id}-${list.id}`
-  const get = (resource: LearningResource, list: UserListOrFavorites) =>
+  const get = (resource: LearningResource, list: ListOrFavorites) =>
     pending.get(key(resource, list))
   const set = (
     resource: LearningResource,
-    list: UserListOrFavorites,
+    list: ListOrFavorites,
     value: "delete" | "add"
   ) => {
     setPending(current => new Map(current).set(key(resource, list), value))
   }
-  const clear = (resource: LearningResource, list: UserListOrFavorites) => {
+  const clear = (resource: LearningResource, list: ListOrFavorites) => {
     setPending(current => {
       const next = new Map(current)
       next.delete(key(resource, list))
@@ -69,13 +77,16 @@ const useRequestRecord = () => {
   return { get, set, clear }
 }
 
-const useToggleItemInList = (resource?: LearningResource) => {
+const useToggleItemInList = (
+  mode: "stafflist" | "userlist",
+  resource?: LearningResource
+) => {
   const requestRecord = useRequestRecord()
   const addTo = useAddToListItems()
   const deleteFrom = useDeleteFromListItems()
   const favorite = useFavorite()
   const unfavorite = useUnfavorite()
-  const handleAdd = async (list: UserListOrFavorites) => {
+  const handleAdd = async (list: ListOrFavorites) => {
     if (!resource) return
     try {
       requestRecord.set(resource, list, "add")
@@ -91,14 +102,15 @@ const useToggleItemInList = (resource?: LearningResource) => {
       requestRecord.clear(resource, list)
     }
   }
-  const handleRemove = async (list: UserListOrFavorites) => {
+  const handleRemove = async (list: ListOrFavorites) => {
     if (!resource) return
+    const lists = mode === "userlist" ? resource.lists : resource.stafflists
     try {
       requestRecord.set(resource, list, "delete")
       if (list.id === "favorites") {
         await unfavorite.mutateAsync(resource)
       } else {
-        const listItem = resource.lists.find(l => l.list_id === list.id)
+        const listItem = lists.find(l => l.list_id === list.id)
         if (!listItem) return // should not happen
         await deleteFrom.mutateAsync({ list, item: listItem })
       }
@@ -107,20 +119,21 @@ const useToggleItemInList = (resource?: LearningResource) => {
     }
   }
 
-  const isChecked = (list: UserListOrFavorites): boolean => {
+  const isChecked = (list: ListOrFavorites): boolean => {
     if (!resource) return false
     if (list.id === "favorites") {
       return !!resource.is_favorite
     }
-    return resource.lists.some(l => l.list_id === list.id)
+    const lists = mode === "userlist" ? resource.lists : resource.stafflists
+    return lists.some(l => l.list_id === list.id)
   }
 
-  const isAdding = (list: UserListOrFavorites) =>
+  const isAdding = (list: ListOrFavorites) =>
     !!resource && requestRecord.get(resource, list) === "add"
-  const isRemoving = (list: UserListOrFavorites) =>
+  const isRemoving = (list: ListOrFavorites) =>
     !!resource && requestRecord.get(resource, list) === "delete"
 
-  const handleToggle = (list: UserListOrFavorites) => async () => {
+  const handleToggle = (list: ListOrFavorites) => async () => {
     return isChecked(list) ? handleRemove(list) : handleAdd(list)
   }
   return { handleToggle, isChecked, isAdding, isRemoving }
@@ -134,31 +147,44 @@ const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
   return <Chip icon={icon} label={label} size="small" />
 }
 
+const FAVORITESS = [
+  {
+    id:            "favorites",
+    title:         "Favorites",
+    privacy_level: PrivacyLevel.Private
+  }
+] as const
 const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
-  resourceKey
+  resourceKey,
+  mode
 }) => {
   const modal = NiceModal.useModal()
   const resourceQuery = useResource(resourceKey.object_type, resourceKey.id)
   const resource = resourceQuery.data
-  const userListsQuery = useUserListsListing()
-  const userLists = userListsQuery.data?.results
-  const lists: UserListOrFavorites[] = [
-    {
-      id:            "favorites",
-      title:         "Favorites",
-      privacy_level: PrivacyLevel.Private
-    },
-    ...(userLists || [])
+  const userListsQuery = useUserListsListing({ enabled: mode === "userlist" })
+  const staffListsQuery = useStaffListsListing({
+    enabled: mode === "stafflist"
+  })
+  const listsQuery = mode === "userlist" ? userListsQuery : staffListsQuery
+  const lists: ListOrFavorites[] = [
+    ...(mode === "userlist" ? FAVORITESS : []),
+    ...(listsQuery.data?.results || [])
   ]
+  if (mode === "userlist") {
+    lists
+  }
 
-  const { handleToggle, isChecked, isAdding, isRemoving } =
-    useToggleItemInList(resource)
+  const { handleToggle, isChecked, isAdding, isRemoving } = useToggleItemInList(
+    mode,
+    resource
+  )
 
-  const isReady = resource && userLists
+  const isReady = resource && listsQuery.isSuccess
 
+  const title = mode === "userlist" ? "Add to My Lists" : "Add to Learning List"
   return (
     <Dialog className="add-to-list-dialog" {...NiceModal.muiDialogV5(modal)}>
-      <DialogTitle>Add to list</DialogTitle>
+      <DialogTitle>{title}</DialogTitle>
       <Box position="absolute" top={0} right={0}>
         <IconButton onClick={modal.hide} aria-label="Close">
           <CloseIcon />
@@ -203,7 +229,7 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
             })}
             <ListItem className="add-to-list-new">
               <ListItemButton
-                onClick={() => manageListDialogs.createList("userlist")}
+                onClick={() => manageListDialogs.createList(mode)}
               >
                 <AddIcon />
                 <ListItemText primary="Create a new list" />
