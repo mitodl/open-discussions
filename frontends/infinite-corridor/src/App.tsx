@@ -14,7 +14,7 @@ import {
 import {
   UserListDetailsPage,
   StaffListDetailsPage
-} from "./pages/resource-lists/UserListDetailsPage"
+} from "./pages/resource-lists/ResourceListDetailsPage"
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"

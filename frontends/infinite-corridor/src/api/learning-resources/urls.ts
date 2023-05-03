@@ -213,7 +213,12 @@ const urls = {
 
 const baseKey = "learning-resources"
 const resourceKeys = (type: string) => {
-  const normalized = type === LRT.LearningPath ? LRT.Userlist : type
+  let normalized = type
+  if (type === LRT.LearningPath) {
+    normalized = LRT.Userlist
+  } else if (type === LRT.StaffPath) {
+    normalized = LRT.StaffList
+  }
   return {
     all: [baseKey, normalized],
     id:  (id: number) => ({

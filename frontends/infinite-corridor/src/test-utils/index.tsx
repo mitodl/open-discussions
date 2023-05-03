@@ -53,7 +53,7 @@ const renderWithProviders = (
       {component}
     </AppProviders>
   )
-  return { history, view }
+  return { history, view, queryClient }
 }
 
 /**
