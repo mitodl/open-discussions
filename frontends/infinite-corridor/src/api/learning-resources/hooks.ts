@@ -17,7 +17,7 @@ import {
   useQueryClient,
   UseQueryResult,
   UseQueryOptions,
-  InfiniteData,
+  InfiniteData
 } from "react-query"
 import {
   urls,
@@ -57,7 +57,7 @@ const useStaffList = (
   id: number,
   options: Pick<UseQueryOptions, "enabled"> = {}
 ) => {
-  return useResource(LRT.StaffList, id, options) as UseQueryResult<UserList>
+  return useResource(LRT.StaffList, id, options) as UseQueryResult<StaffList>
 }
 
 const useUserListsListing = (options?: UserListOptions) => {
@@ -257,13 +257,13 @@ const useAddToUserListItems = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: addToUserList,
-    // Skip optimistic updates for now. We do not know the list item id.
     onSuccess:  (data, variables) => {
       const resource = data.content_data
-      queryClient.setQueryData(
+      queryClient.setQueryData<LearningResource>(
         keys.resource(resource.object_type).id(resource.id).details,
         resource
       )
+      // Skip optimistic updates for now. We do not know the list item id.
       queryClient.invalidateQueries({
         queryKey: keys.userList.id(variables.userListId).all
       })
