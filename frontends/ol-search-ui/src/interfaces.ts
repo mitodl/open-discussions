@@ -40,6 +40,7 @@ export type LearningResource = {
   full_description?: string | null
   object_type: LearningResourceType
   lists: ListItemMember[]
+  stafflists: ListItemMember[]
   image_src: string | null
   runs?: LearningResourceRun[]
   offered_by?: string[]

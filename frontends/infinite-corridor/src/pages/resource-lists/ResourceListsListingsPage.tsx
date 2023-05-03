@@ -87,6 +87,7 @@ const makeFavorites = (count: number): Favorites => {
     item_count:    count,
     topics:        [],
     lists:         [],
+    stafflists:    [],
     image_src:     null,
     certification: []
   }

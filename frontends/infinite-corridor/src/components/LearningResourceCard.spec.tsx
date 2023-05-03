@@ -127,7 +127,8 @@ describe("LearningResourceCard", () => {
     expect(showModal).not.toHaveBeenCalled()
     await user.click(button)
     expect(showModal).toHaveBeenCalledWith(AddToListDialog, {
-      resourceKey: resource
+      resourceKey: resource,
+      mode:        "userlist"
     })
   })
 
