@@ -25,6 +25,8 @@ from course_catalog.factories import (
     StaffListFactory,
     UserListFactory,
     VideoFactory,
+    StaffListItemFactory,
+    UserListItemFactory,
 )
 from course_catalog.models import FavoriteItem, StaffListItem, UserListItem
 from course_catalog.serializers import (
@@ -41,6 +43,8 @@ from course_catalog.serializers import (
     UserListItemSerializer,
     UserListSerializer,
     VideoSerializer,
+    MicroStaffListItemSerializer,
+    MicroUserListItemSerializer,
 )
 from open_discussions.factories import UserFactory
 
@@ -67,10 +71,18 @@ def test_serialize_course_related_models(offered_by):
     course = CourseFactory(
         offered_by=offered_by, topics=CourseTopicFactory.create_batch(3)
     )
+    staff_items = StaffListItemFactory.create_batch(3, content_object=course)
+    list_items = UserListItemFactory.create_batch(2, content_object=course)
     serializer = CourseSerializer(course)
     assert len(serializer.data["topics"]) == 3
     assert "name" in serializer.data["topics"][0].keys()
     assert len(serializer.data["runs"]) == 3
+    assert serializer.data["lists"] == [
+        MicroUserListItemSerializer(instance=item).data for item in list_items
+    ]
+    assert serializer.data["stafflists"] == [
+        MicroStaffListItemSerializer(instance=item).data for item in staff_items
+    ]
     assert (
         serializer.data["department_slug"]
         == OCW_DEPARTMENTS[
@@ -394,6 +406,7 @@ def test_podcast_serializer():
         "title": podcast.title,
         "id": podcast.id,
         "lists": [],
+        "stafflists": [],
         "object_type": "podcast",
         "published": True,
         "searchable": True,
@@ -429,6 +442,7 @@ def test_podcast_episode_serializer():
         "podcast_title": episode.podcast.title,
         "transcript": "",
         "lists": [],
+        "stafflists": [],
         "published": True,
         "searchable": True,
         "duration": None,

@@ -107,12 +107,30 @@ class MicroUserListItemSerializer(serializers.ModelSerializer):
         fields = ("item_id", "list_id", "object_id", "content_type")
 
 
+class MicroStaffListItemSerializer(serializers.ModelSerializer):
+    """
+    Serializer for UserListItem containing only the item id and userlist id.
+    """
+
+    item_id = serializers.IntegerField(source="id")
+    list_id = serializers.IntegerField(source="staff_list_id")
+    object_id = serializers.IntegerField()
+    content_type = serializers.CharField(source="content_type.name")
+
+    class Meta:
+        model = StaffListItem
+        fields = ("item_id", "list_id", "object_id", "content_type")
+
+
 class ListsSerializerMixin(serializers.Serializer):
     """
     Mixin to serialize lists for various models
     """
 
     lists = MicroUserListItemSerializer(source="list_items", read_only=True, many=True)
+    stafflists = MicroStaffListItemSerializer(
+        source="stafflist_items", read_only=True, many=True
+    )
 
 
 class CourseInstructorSerializer(serializers.ModelSerializer):

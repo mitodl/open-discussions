@@ -10,6 +10,7 @@ from django.db.models import Exists, ExpressionWrapper, OuterRef, Prefetch, Valu
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,
+    GROUP_STAFF_LISTS_EDITORS,
     OCW_DEPARTMENTS,
     VALID_COURSE_CONTENT_CHOICES,
     AvailabilityType,
@@ -55,6 +56,29 @@ class LearningResourceQuerySet(TimestampedModelQuerySet):
             Prefetch("list_items", queryset=UserListItem.objects.none())
         )
 
+    def prefetch_stafflist_items_for_user(self, user=None):
+        """Prefetch stafflist_items based on the current user"""
+        if (
+            user
+            and user.is_authenticated
+            and (
+                user.is_staff
+                or user.is_superuser
+                or user.groups.filter(name=GROUP_STAFF_LISTS_EDITORS).first()
+                is not None
+            )
+        ):
+            return self.prefetch_related(
+                Prefetch(
+                    "stafflist_items",
+                    queryset=StaffListItem.objects.prefetch_related("content_type"),
+                )
+            )
+        # force list_items to be an empty query for anonymous users
+        return self.prefetch_related(
+            Prefetch("stafflist_items", queryset=StaffListItem.objects.none())
+        )
+
     def annotate_is_favorite_for_user(self, user=None):
         """Annotate the query with a subquery for is_favorite"""
         return self.annotate(
@@ -82,6 +106,7 @@ class LearningResourceGenericRelationsMixin(models.Model):
 
     favorite_items = GenericRelation("course_catalog.FavoriteItem")
     list_items = GenericRelation("course_catalog.UserListItem")
+    stafflist_items = GenericRelation("course_catalog.StaffListItem")
 
     class Meta:
         abstract = True
