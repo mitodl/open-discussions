@@ -1,4 +1,9 @@
-import { UserList, LearningResourceType as LRT, StaffList } from "ol-search-ui"
+import {
+  UserList,
+  LearningResourceType as LRT,
+  StaffList,
+  isUserListOrPath
+} from "ol-search-ui"
 import {
   makeUserList,
   makeStaffList,
@@ -17,7 +22,6 @@ import {
   waitFor
 } from "../../test-utils"
 import { User } from "../../types/settings"
-import { isUserListOrPath } from "./util"
 
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
