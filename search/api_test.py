@@ -140,7 +140,6 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
-@pytest.fixture()
 def test_execute_search(user, elasticsearch):
     """execute_search should execute an Elasticsearch search"""
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
@@ -231,7 +230,6 @@ def test_execute_search(user, elasticsearch):
     )
 
 
-@pytest.fixture()
 def test_execute_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     user = AnonymousUser()
@@ -312,7 +310,6 @@ def test_execute_search_anonymous(elasticsearch):
     )
 
 
-@pytest.fixture()
 @pytest.mark.parametrize("max_suggestions", [1, 3])
 @pytest.mark.parametrize("suggest_min_hits", [2, 4])
 def test_execute_search_with_suggestion(
@@ -342,7 +339,6 @@ def test_execute_search_with_suggestion(
     }
 
 
-@pytest.fixture()
 @pytest.mark.parametrize("list_search_enabled", [True, False])
 def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
@@ -417,7 +413,6 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
     )
 
 
-@pytest.fixture()
 @pytest.mark.parametrize("list_search_enabled", [True, False])
 def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
@@ -490,7 +485,6 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
     )
 
 
-@pytest.fixture()
 def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     """execute_learn_search should execute an Elasticsearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
@@ -539,7 +533,6 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
 
 @pytest.mark.parametrize("is_anonymous", [True, False])
 @pytest.mark.django_db
-@pytest.fixture()
 def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5
@@ -1019,7 +1012,6 @@ def test_combine_type_buckets_in_aggregates(
     }
 
 
-@pytest.fixture()
 def test_get_similar_topics(settings, elasticsearch):
     """Test get_similar_topics makes a query for similar document topics"""
     input_doc = {"title": "title text", "description": "description text"}
