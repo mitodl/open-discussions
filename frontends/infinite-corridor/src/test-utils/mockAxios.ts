@@ -1,6 +1,8 @@
 import { when } from "jest-when"
 import type { AxiosResponse } from "axios"
 
+const AxiosError = jest.requireActual("axios").AxiosError
+
 type Method = "get" | "post" | "patch" | "delete"
 
 type PartialAxiosResponse = Pick<AxiosResponse, "data" | "status">
@@ -48,21 +50,22 @@ const mockRequest = (
   responseBody: unknown = undefined,
   code: number
 ) => {
-  if (code >= 400) {
-    when(makeRequest)
-      .calledWith(method, url, requestBody)
-      .mockRejectedValue({
-        response: {
-          data:   responseBody,
-          status: code
-        }
-      })
-  } else {
-    when(makeRequest).calledWith(method, url, requestBody).mockResolvedValue({
-      data:   responseBody,
-      status: code
+  when(makeRequest)
+    .calledWith(method, url, requestBody)
+    .mockImplementation(async () => {
+      const data = await responseBody
+      const response = { data, status: code }
+      if (code >= 400) {
+        throw new AxiosError(
+          "Mock Error",
+          String(code),
+          undefined,
+          undefined,
+          response as AxiosResponse
+        )
+      }
+      return response
     })
-  }
 }
 
 interface MockResponseOptions {
@@ -78,21 +81,45 @@ interface MockResponseOptions {
 }
 
 const setMockResponse = {
+  /**
+   * Set mock response for a GET request; default response status is 200.
+   *
+   * If `responseBody` is a Promise, the request will resolve to the value of
+   * `responseBody` when `responseBody` resolves.
+   */
   get: (
     url: string,
     responseBody: unknown,
     { code = 200, requestBody }: MockResponseOptions = {}
   ) => mockRequest("get", url, requestBody, responseBody, code),
+  /**
+   * Set mock response for a POST request; default response status is 201.
+   *
+   * If `responseBody` is a Promise, the request will resolve to the value of
+   * `responseBody` when `responseBody` resolves.
+   */
   post: (
     url: string,
     responseBody?: unknown,
     { code = 201, requestBody }: MockResponseOptions = {}
   ) => mockRequest("post", url, requestBody, responseBody, code),
+  /**
+   * Set mock response for a PATCH request; default response status is 200.
+   *
+   * If `responseBody` is a Promise, the request will resolve to the value of
+   * `responseBody` when `responseBody` resolves.
+   */
   patch: (
     url: string,
     responseBody?: unknown,
     { code = 200, requestBody }: MockResponseOptions = {}
   ) => mockRequest("patch", url, requestBody, responseBody, code),
+  /**
+   * Set mock response for a PATCH request; default response status is 204.
+   *
+   * If `responseBody` is a Promise, the request will resolve to the value of
+   * `responseBody` when `responseBody` resolves.
+   */
   delete: (
     url: string,
     responseBody?: unknown,
