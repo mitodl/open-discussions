@@ -10,6 +10,7 @@ from search.constants import COURSE_TYPE
 @pytest.mark.parametrize("include_reindexing", [True, False])
 @pytest.mark.parametrize("indexes_exist", [True, False])
 @pytest.mark.parametrize("object_types", [None, [COURSE_TYPE]])
+@pytest.fixture()
 def test_get_active_aliases(mocker, include_reindexing, indexes_exist, object_types):
     """Test for get_active_aliases"""
     conn = mocker.Mock()

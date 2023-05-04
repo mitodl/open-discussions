@@ -140,6 +140,7 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
+@pytest.fixture()
 def test_execute_search(user, elasticsearch):
     """execute_search should execute an Elasticsearch search"""
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
@@ -230,6 +231,7 @@ def test_execute_search(user, elasticsearch):
     )
 
 
+@pytest.fixture()
 def test_execute_search_anonymous(elasticsearch):
     """execute_search should execute an Elasticsearch search with an anonymous user"""
     user = AnonymousUser()
@@ -310,6 +312,7 @@ def test_execute_search_anonymous(elasticsearch):
     )
 
 
+@pytest.fixture()
 @pytest.mark.parametrize("max_suggestions", [1, 3])
 @pytest.mark.parametrize("suggest_min_hits", [2, 4])
 def test_execute_search_with_suggestion(
@@ -329,21 +332,24 @@ def test_execute_search_with_suggestion(
     )
 
     elasticsearch.conn.search.return_value = {
-        "hits": {"total": 3},
+        "hits": {"total": {"value": 3, "relation": "eq"}},
         "suggest": RAW_SUGGESTIONS,
     }
 
     assert execute_search(user=user, query=query) == {
-        "hits": {"total": 3},
+        "hits": {"total": {"value": 3, "relation": "eq"}},
         "suggest": expected_suggest,
     }
 
 
+@pytest.fixture()
 @pytest.mark.parametrize("list_search_enabled", [True, False])
 def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -411,11 +417,14 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
     )
 
 
+@pytest.fixture()
 @pytest.mark.parametrize("list_search_enabled", [True, False])
 def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
@@ -481,10 +490,13 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
     )
 
 
+@pytest.fixture()
 def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     """execute_learn_search should execute an Elasticsearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
@@ -500,6 +512,7 @@ def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     }
 
 
+@pytest.fixture()
 def test_find_related_documents(settings, elasticsearch, user, gen_query_filters_mock):
     """find_related_documents should execute a more-like-this query"""
     posts_to_return = 7
@@ -526,6 +539,7 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
 
 @pytest.mark.parametrize("is_anonymous", [True, False])
 @pytest.mark.django_db
+@pytest.fixture()
 def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5
@@ -712,7 +726,7 @@ def test_transform_results(
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": 3},
+        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
         "suggest": RAW_SUGGESTIONS,
         "aggregations": {
             "agg_filter_topics": {
@@ -739,7 +753,6 @@ def test_transform_results(
             },
         },
     }
-
     assert (
         transform_results(results, search_user, [])["aggregations"]
         == results["aggregations"]
@@ -770,7 +783,7 @@ def test_transform_department_filter(department_fitler):
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": 3},
+        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
         "aggregations": {
             "agg_filter_topics": {
                 "doc_count": 30,
@@ -804,7 +817,7 @@ def test_transform_department_name_aggregations():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_department_name": {
@@ -839,7 +852,7 @@ def test_transform_level_aggregation():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_level": {
@@ -891,7 +904,7 @@ def test_transform_topics_aggregations():
     Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_topics": {
@@ -925,7 +938,7 @@ def test_transform_resource_type_aggregations():
     transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_resource_type": {
@@ -987,7 +1000,7 @@ def test_combine_type_buckets_in_aggregates(
         type_buckets.append({"key": "learningpath", "doc_count": 3})
 
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {"type": {"buckets": type_buckets}},
     }
@@ -1006,6 +1019,7 @@ def test_combine_type_buckets_in_aggregates(
     }
 
 
+@pytest.fixture()
 def test_get_similar_topics(settings, elasticsearch):
     """Test get_similar_topics makes a query for similar document topics"""
     input_doc = {"title": "title text", "description": "description text"}
