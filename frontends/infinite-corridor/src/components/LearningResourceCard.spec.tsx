@@ -8,7 +8,7 @@ import {
 import { renderWithProviders, user, screen, within } from "../test-utils"
 import LearningResourceCard from "./LearningResourceCard"
 import type { LearningResourceCardProps } from "./LearningResourceCard"
-import AddToListDialog from "../pages/user-lists/AddToListDialog"
+import AddToListDialog from "../pages/resource-lists/AddToListDialog"
 
 jest.mock("@ebay/nice-modal-react", () => {
   const actual = jest.requireActual("@ebay/nice-modal-react")

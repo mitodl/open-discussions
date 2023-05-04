@@ -1,4 +1,3 @@
-import React from "react"
 import { faker } from "@faker-js/faker"
 import {
   makeCourse,
@@ -8,10 +7,9 @@ import {
 import { UserList, LearningResource } from "ol-search-ui"
 import { assertNotNil } from "ol-util"
 
-import NiceModal from "@ebay/nice-modal-react"
+import * as NiceModal from "@ebay/nice-modal-react"
 import AddToListDialog from "./AddToListDialog"
 import {
-  expectProps,
   renderWithProviders,
   screen,
   user,
@@ -23,18 +21,16 @@ import {
   mockAxiosInstance as axios
 } from "../../test-utils/mockAxios"
 import { urls } from "../../api/learning-resources"
-import { CreateListDialog } from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 import { waitForElementToBeRemoved } from "@testing-library/react"
 
-jest.mock("./ManageListDialogs", () => {
-  const actual = jest.requireActual("./ManageListDialogs")
+jest.mock("@ebay/nice-modal-react", () => {
+  const actual = jest.requireActual("@ebay/nice-modal-react")
   return {
     ...actual,
-    CreateListDialog: jest.fn(() => <div>Create new list</div>)
+    show: jest.fn(actual.show)
   }
 })
-
-const spyCreateListDialog = jest.mocked(CreateListDialog)
 
 type SetupOptions = {
   inLists: number[]
@@ -62,7 +58,6 @@ const setup = ({
   )
   setMockResponse.get(urls.userList.listing(), paginatedLists)
 
-  const onClose = jest.fn()
   const view = renderWithProviders(null)
 
   if (dialogOpen) {
@@ -73,7 +68,6 @@ const setup = ({
 
   return {
     view,
-    onClose,
     resource,
     lists
   }
@@ -211,14 +205,19 @@ describe("AddToListDialog", () => {
   })
 
   test("Clicking 'Create a new list' opens the create list dialog", async () => {
+    // Don't actually open the 'Create List' modal, or we'll need to mock API responses.
+    const createList = jest
+      .spyOn(manageListDialogs, "createList")
+      .mockImplementationOnce(jest.fn())
+
     setup()
     const button = await screen.findByRole("button", {
       name: "Create a new list"
     })
 
-    expectProps(spyCreateListDialog, { open: false }, -1)
+    expect(createList).not.toHaveBeenCalled()
     await user.click(button)
-    expectProps(spyCreateListDialog, { open: true }, -1)
+    expect(createList).toHaveBeenCalledWith("userlist")
   })
 
   test("Opens and closes via NiceModal", async () => {

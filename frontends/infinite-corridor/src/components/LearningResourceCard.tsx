@@ -12,7 +12,7 @@ import { imgConfigs } from "../util/constants"
 import IconButton from "@mui/material/IconButton"
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"
 import BookmarkIcon from "@mui/icons-material/Bookmark"
-import AddToListDialog from "../pages/user-lists/AddToListDialog"
+import AddToListDialog from "../pages/resource-lists/AddToListDialog"
 
 type TemplateProps = LearningResourceCardTemplateProps<
   LearningResource | LearningResourceSearchResult

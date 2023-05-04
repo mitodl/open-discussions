@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker"
 import { UserList, LearningResourceType as LRT } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
-import { EditListDialog } from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 import ItemsListing from "./ItemsListing"
 import {
   screen,
@@ -14,13 +14,6 @@ import {
 } from "../../test-utils"
 import { User } from "../../types/settings"
 
-jest.mock("./ManageListDialogs", () => {
-  const actual = jest.requireActual("./ManageListDialogs")
-  return {
-    ...actual,
-    EditListDialog: jest.fn(actual.EditListDialog)
-  }
-})
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
   return {
@@ -30,7 +23,6 @@ jest.mock("./ItemsListing", () => {
   }
 })
 
-const spyEditListDialog = jest.mocked(EditListDialog)
 const spyItemsListing = jest.mocked(ItemsListing)
 
 describe("UserListDetailsPage", () => {
@@ -43,7 +35,7 @@ describe("UserListDetailsPage", () => {
   }: { user?: Partial<User>; list?: Partial<UserList> } = {}) => {
     const userList = factories.makeUserList(list)
     const count = faker.datatype.number({ min: 2, max: 5 })
-    const paginatedItems = factories.makeUserListItemsPaginated({ count })
+    const paginatedItems = factories.makeListItemsPaginated({ count })
     const items = paginatedItems.results.map(r => r.content_data)
     const topics = [
       ...userList.topics,
@@ -160,9 +152,13 @@ describe("UserListDetailsPage", () => {
       list: { author: userId }
     })
     const editButton = await screen.findByRole("button", { name: "Edit" })
+
+    const editList = jest.spyOn(manageListDialogs, "editList")
+    editList.mockImplementationOnce(jest.fn())
+
+    expect(editList).not.toHaveBeenCalled()
     await user.click(editButton)
-    await screen.findByRole("dialog", { name: "Edit list" })
-    expectProps(spyEditListDialog, { resource: userList })
+    expect(editList).toHaveBeenCalledWith(userList)
   })
 
   test("Passes appropriate props to ItemsListing", async () => {

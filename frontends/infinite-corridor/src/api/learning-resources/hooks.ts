@@ -1,11 +1,12 @@
 import { chunk } from "lodash"
 import type {
   LearningResource,
-  PaginatedUserListItems,
+  PaginatedListItems,
   UserList,
   CourseTopic,
   LearningResourceType,
-  ListItemMember
+  ListItemMember,
+  StaffList
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
 import axios from "../../libs/axios"
@@ -18,7 +19,13 @@ import {
   useInfiniteQuery,
   InfiniteData
 } from "react-query"
-import { urls, keys, UserListOptions, CourseFilterParams } from "./urls"
+import {
+  urls,
+  keys,
+  UserListOptions,
+  CourseFilterParams,
+  StaffListOptions
+} from "./urls"
 import { modifyCachedSearchResource } from "./search"
 import invariant from "tiny-invariant"
 import { QueryFilters } from "react-query/types/core/utils"
@@ -52,7 +59,7 @@ const useUserListItems = (
 ) => {
   const { enabled, ...others } = options
   const queryKey = keys.userList.id(listId).itemsListing.infinite(options)
-  const queryFn = ({ pageParam = 0 }): Promise<PaginatedUserListItems> => {
+  const queryFn = ({ pageParam = 0 }): Promise<PaginatedListItems> => {
     const url = urls.userList.itemsListing(listId, {
       ...others,
       offset: pageParam
@@ -75,7 +82,7 @@ const useUserListItems = (
 const useFavoritesListing = (options?: PaginationSearchParams) => {
   const url = urls.favorite.listing(options)
   const key = keys.favorites.listing.page(options)
-  return useQuery<PaginatedUserListItems>(key, () =>
+  return useQuery<PaginatedListItems>(key, () =>
     axios.get(url).then(res => res.data)
   )
 }
@@ -300,6 +307,71 @@ const useDeleteFromUserListItems = () => {
   })
 }
 
+const useStaffListsListing = (options?: StaffListOptions) => {
+  const url = urls.staffList.listing(options)
+  const key = keys.staffList.listing.page(options)
+  return useQuery<PaginatedResult<StaffList>>(key, () =>
+    axios.get(url).then(res => res.data)
+  )
+}
+
+const updateStaffList = async (data: Partial<StaffList> & { id: number }) => {
+  const url = urls.staffList.details(data.id)
+  const { data: response } = await axios.patch(url, data)
+  return response
+}
+const useUpdateStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(updateStaffList, {
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.id(variables.id).details
+      })
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.listing.all
+      })
+    }
+  })
+}
+
+const createStaffList = async (data: Partial<StaffList>) => {
+  const url = urls.staffList.create
+  const { data: response } = await axios.post(url, data)
+  return response
+}
+const useCreateStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(createStaffList, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: keys.staffList.listing.all
+      })
+    }
+  })
+}
+
+const deleteStaffList = async (id: number) => {
+  const { data: response } = await axios.delete(urls.staffList.details(id))
+  return response
+}
+const useDeleteStaffList = () => {
+  const queryClient = useQueryClient()
+  return useMutation(deleteStaffList, {
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        /**
+         * Invalidate everything related to learning resources, since any resource
+         * could have belonged to this list.
+         *
+         * This is a little bit overzealous, e.g., we do not really need to
+         * invalidate topics and favorites.
+         */
+        queryKey: keys.all
+      })
+    }
+  })
+}
+
 const useUpcomingCourses = (
   options?: PaginationSearchParams,
   filters?: CourseFilterParams
@@ -363,7 +435,7 @@ const useMoveUserListItem = () => {
         queryKey:  keys.userList.id(vars.item.list_id).itemsListing.all,
         predicate: query => query.state.data !== undefined
       }
-      queryClient.setQueriesData<InfiniteData<PaginatedUserListItems>>(
+      queryClient.setQueriesData<InfiniteData<PaginatedListItems>>(
         queryFilter,
         old => {
           invariant(old, "old data should be defined")
@@ -418,6 +490,10 @@ export {
   useDeleteUserList, // mutation
   useAddToUserListItems, // mutation
   useDeleteFromUserListItems, // mutation
+  useStaffListsListing, // listing
+  useCreateStaffList, // mutation
+  useUpdateStaffList, // mutation
+  useDeleteStaffList, // mutation
   useFavorite, // mutation
   useUnfavorite, // mutation
   useUpcomingCourses, // listing

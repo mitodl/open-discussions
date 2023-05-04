@@ -71,3 +71,4 @@ const RadioChoiceField: React.FC<RadioChoiceFieldProps> = ({
 }
 
 export default RadioChoiceField
+export type { RadioChoiceFieldProps, RadioChoiceProps }

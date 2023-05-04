@@ -12,9 +12,10 @@ import {
   EmbedlyConfig,
   Course,
   UserList,
-  UserListItem,
+  ListItem,
   PrivacyLevel,
-  ListItemMember
+  ListItemMember,
+  StaffList
 } from "./interfaces"
 
 import { times } from "lodash"
@@ -165,6 +166,39 @@ export const makeUserList: Factory<UserList> = overrides => {
   return userList
 }
 
+export const makeStaffList: Factory<StaffList> = overrides => {
+  const type = faker.helpers.arrayElement([
+    LearningResourceType.StaffList,
+    LearningResourceType.StaffPath
+  ] as const)
+  const staffList: StaffList = {
+    id:                faker.unique(faker.datatype.number),
+    short_description: faker.lorem.paragraph(),
+    offered_by:        [],
+    title:             faker.lorem.words(),
+    topics:            times(2, () => makeTopic()),
+    is_favorite:       faker.datatype.boolean(),
+    image_src:         new URL(faker.internet.url()).toString(),
+    image_description: faker.helpers.arrayElement([
+      null,
+      faker.lorem.sentence()
+    ]),
+    item_count:    faker.datatype.number({ min: 2, max: 5 }),
+    object_type:   type,
+    list_type:     type,
+    privacy_level: faker.helpers.arrayElement([
+      PrivacyLevel.Public,
+      PrivacyLevel.Private
+    ]),
+    author:        faker.datatype.number({ min: 1, max: 1000 }),
+    lists:         [],
+    certification: [],
+    author_name:   faker.name.findName(),
+    ...overrides
+  }
+  return staffList
+}
+
 const resultMakers = {
   course:  makeCourse,
   program: makeProgram,
@@ -246,9 +280,9 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
   return resource
 }
 
-export const makeUserListItem: Factory<UserListItem> = overrides => {
+export const makeListItem: Factory<ListItem> = overrides => {
   const content = makeLearningResource()
-  const item: UserListItem = {
+  const item: ListItem = {
     id:           faker.unique(faker.datatype.number),
     object_id:    content.id,
     position:     faker.datatype.number(),
@@ -277,11 +311,13 @@ export const makeListItemMember: Factory<
   }
 }
 
-export const makeUserListItemsPaginated = makePaginatedFactory(makeUserListItem)
+export const makeListItemsPaginated = makePaginatedFactory(makeListItem)
 
-export const makeFavorites = makeUserListItemsPaginated
+export const makeFavorites = makeListItemsPaginated
 
 export const makeUserListsPaginated = makePaginatedFactory(makeUserList)
+
+export const makeStaffListsPaginated = makePaginatedFactory(makeStaffList)
 
 export const makeTopicsPaginated = makePaginatedFactory(makeTopic)
 

@@ -1,55 +1,49 @@
 import React, { useCallback } from "react"
+import Button from "@mui/material/Button"
+import Grid from "@mui/material/Grid"
 import Menu from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import EditIcon from "@mui/icons-material/Edit"
-import Button from "@mui/material/Button"
-import Grid from "@mui/material/Grid"
 import DeleteIcon from "@mui/icons-material/Delete"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import IconButton from "@mui/material/IconButton"
 
 import { BannerPage, useToggle } from "ol-util"
-import {
-  CreateListDialog,
-  EditListDialog,
-  DeleteListDialog,
-  useDeleteListDialog,
-  useEditingDialog,
-  useCreationDialog
-} from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 import { GridColumn, GridContainer } from "../../components/layout"
 import {
   useFavoritesListing,
+  useStaffListsListing,
   useUserListsListing
 } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
 import { LearningResourceCardTemplate, TYPE_FAVORITES } from "ol-search-ui"
-import type { UserList, Favorites } from "ol-search-ui"
+import type { UserList, StaffList, Favorites } from "ol-search-ui"
 import { imgConfigs } from "../../util/constants"
 import { useHistory } from "react-router"
-import { FAVORITES_VIEW, makeUserListViewPath } from "../urls"
+import {
+  FAVORITES_VIEW,
+  makeStaffListsViewPath,
+  makeUserListViewPath
+} from "../urls"
 
-type EditListMenuProps = {
-  resource: UserList
-  onEdit: (resource: UserList) => void
-  onDelete: (resource: UserList) => void
+type EditListMenuProps<L extends UserList | StaffList> = {
+  resource: L
 }
-const EditListMenu: React.FC<EditListMenuProps> = ({
-  resource,
-  onEdit,
-  onDelete
-}) => {
+const EditListMenu = <L extends UserList | StaffList>({
+  resource
+}: EditListMenuProps<L>) => {
   const [open, toggleOpen] = useToggle(false)
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const handleEdit = useCallback(() => {
-    onEdit(resource)
+    manageListDialogs.editList(resource)
     toggleOpen.off()
-  }, [resource, onEdit, toggleOpen])
+  }, [resource, toggleOpen])
   const handleDelete = useCallback(() => {
-    onDelete(resource)
+    manageListDialogs.deleteList(resource)
     toggleOpen.off()
-  }, [resource, onDelete, toggleOpen])
+  }, [resource, toggleOpen])
   return (
     <>
       <IconButton
@@ -98,11 +92,31 @@ const makeFavorites = (count: number): Favorites => {
   }
 }
 
-const UserListsListingPage: React.FC = () => {
-  const creation = useCreationDialog()
-  const editing = useEditingDialog()
-  const deletion = useDeleteListDialog()
+type ListCardProps<L extends UserList | StaffList | Favorites> = {
+  list: L
+  onActivate: (resource: L) => void
+}
+const ListCard = <L extends UserList | StaffList | Favorites>({
+  list,
+  onActivate
+}: ListCardProps<L>) => {
+  return (
+    <LearningResourceCardTemplate
+      variant="row-reverse"
+      className="ic-resource-card"
+      resource={list}
+      imgConfig={imgConfigs["row-reverse-small"]}
+      footerActionSlot={
+        list.object_type === TYPE_FAVORITES ? undefined : (
+          <EditListMenu resource={list} />
+        )
+      }
+      onActivate={onActivate}
+    />
+  )
+}
 
+const UserListsListingPage: React.FC = () => {
   const userListsQuery = useUserListsListing()
   const favoritesQuery = useFavoritesListing()
   const favorites = favoritesQuery.data ?
@@ -135,7 +149,10 @@ const UserListsListingPage: React.FC = () => {
                 <h1>My Lists</h1>
               </Grid>
               <Grid item xs={6} className="ic-centered-right">
-                <Button variant="contained" onClick={creation.handleStart}>
+                <Button
+                  variant="contained"
+                  onClick={() => manageListDialogs.createList("userlist")}
+                >
                   Create new list
                 </Button>
               </Grid>
@@ -146,33 +163,13 @@ const UserListsListingPage: React.FC = () => {
                 <ul className="ic-card-row-list">
                   {favorites && (
                     <li>
-                      <LearningResourceCardTemplate
-                        suppressImage
-                        variant="row-reverse"
-                        className="ic-resource-card"
-                        resource={favorites}
-                        imgConfig={imgConfigs["row-reverse-small"]}
-                        onActivate={handleActivate}
-                      />
+                      <ListCard list={favorites} onActivate={handleActivate} />
                     </li>
                   )}
                   {userListsQuery.data.results.map(list => {
                     return (
                       <li key={list.id}>
-                        <LearningResourceCardTemplate
-                          variant="row-reverse"
-                          className="ic-resource-card"
-                          resource={list}
-                          imgConfig={imgConfigs["row-reverse-small"]}
-                          footerActionSlot={
-                            <EditListMenu
-                              resource={list}
-                              onEdit={editing.handleStart}
-                              onDelete={deletion.handleStart}
-                            />
-                          }
-                          onActivate={handleActivate}
-                        />
+                        <ListCard list={list} onActivate={handleActivate} />
                       </li>
                     )
                   })}
@@ -182,20 +179,63 @@ const UserListsListingPage: React.FC = () => {
           </GridColumn>
         </GridContainer>
       </Container>
-      <CreateListDialog
-        open={creation.isOpen}
-        onClose={creation.handleFinish}
-      />
-      <EditListDialog
-        resource={editing.resource}
-        onClose={editing.handleFinish}
-      />
-      <DeleteListDialog
-        resource={deletion.resource}
-        onClose={deletion.handleFinish}
-      />
     </BannerPage>
   )
 }
 
-export default UserListsListingPage
+const StaffListsListingPage: React.FC = () => {
+  const staffListsQuery = useStaffListsListing()
+
+  const history = useHistory()
+  const handleActivate = useCallback(
+    (resource: StaffList) => {
+      const path = makeStaffListsViewPath(resource.id)
+      history.push(path)
+    },
+    [history]
+  )
+
+  return (
+    <BannerPage
+      src="/static/images/course_search_banner.png"
+      alt=""
+      compactOnMobile
+    >
+      <Container maxWidth="sm">
+        <GridContainer>
+          <GridColumn variant="single-full">
+            <Grid container className="ic-list-header">
+              <Grid item xs={6}>
+                <h1>Learning Lists</h1>
+              </Grid>
+              <Grid item xs={6} className="ic-centered-right">
+                <Button
+                  variant="contained"
+                  onClick={() => manageListDialogs.createList("stafflist")}
+                >
+                  Create new list
+                </Button>
+              </Grid>
+            </Grid>
+            <section>
+              {staffListsQuery.isLoading && <p>Loading...</p>}
+              {staffListsQuery.data && (
+                <ul className="ic-card-row-list">
+                  {staffListsQuery.data.results.map(list => {
+                    return (
+                      <li key={list.id}>
+                        <ListCard list={list} onActivate={handleActivate} />
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </section>
+          </GridColumn>
+        </GridContainer>
+      </Container>
+    </BannerPage>
+  )
+}
+
+export { StaffListsListingPage, UserListsListingPage }

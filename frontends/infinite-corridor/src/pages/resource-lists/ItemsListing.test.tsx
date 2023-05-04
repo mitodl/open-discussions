@@ -54,7 +54,7 @@ describe("ItemsListing", () => {
     "Shows empty message when there are no items",
     ({ count, hasEmptyMessage }) => {
       const emptyMessage = faker.lorem.sentence()
-      const items = factories.makeUserListItemsPaginated({ count }).results
+      const items = factories.makeListItemsPaginated({ count }).results
       setup({ isLoading: false, emptyMessage, items })
       const emptyMessageElement = screen.queryByText(emptyMessage)
       expect(!!emptyMessageElement).toBe(hasEmptyMessage)
@@ -62,7 +62,7 @@ describe("ItemsListing", () => {
   )
 
   test("Shows a list of LearningResourceCards", () => {
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     setup({ isLoading: false, items })
     const titles = items.map(item => item.content_data.title)
     const headings = screen.getAllByRole("heading", {
@@ -75,7 +75,7 @@ describe("ItemsListing", () => {
   })
 
   test("Shows a list of sortable LearningResourceCards when sortable=true", () => {
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     setup({ isLoading: false, items, id: 1, sortable: true })
     const titles = items.map(item => item.content_data.title)
     const headings = screen.getAllByRole("heading", {
@@ -92,7 +92,7 @@ describe("ItemsListing", () => {
 
   test("Throws error if passed 'sortable' without a list id", () => {
     allowConsoleErrors()
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     expect(() => {
       setup({ isLoading: false, items, sortable: true })
     }).toThrow("Sortable list must have an id")
@@ -101,7 +101,7 @@ describe("ItemsListing", () => {
 
 describe("Sorting ItemListing", () => {
   const setup = (props: Partial<UserListItemsProps> = {}) => {
-    const items = factories.makeUserListItemsPaginated({ count: 5 }).results
+    const items = factories.makeListItemsPaginated({ count: 5 }).results
     const listId = faker.datatype.number()
     const defaultProps: UserListItemsProps = {
       id:           listId,

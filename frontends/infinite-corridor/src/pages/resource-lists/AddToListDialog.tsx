@@ -28,7 +28,7 @@ import {
   useUnfavorite,
   useUserListsListing
 } from "../../api/learning-resources"
-import { CreateListDialog, useCreationDialog } from "./ManageListDialogs"
+import { manageListDialogs } from "./ManageListDialogs"
 
 type ResourceKey = Pick<LearningResource, "id" | "object_type">
 
@@ -141,7 +141,6 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
   resourceKey
 }) => {
   const modal = NiceModal.useModal()
-  const listCreation = useCreationDialog()
   const resourceQuery = useResource(resourceKey.object_type, resourceKey.id)
   const resource = resourceQuery.data
   const userListsQuery = useUserListsListing()
@@ -206,7 +205,9 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
               )
             })}
             <ListItem className="add-to-list-new">
-              <ListItemButton onClick={listCreation.handleStart}>
+              <ListItemButton
+                onClick={() => manageListDialogs.createList("userlist")}
+              >
                 <AddIcon />
                 <ListItemText primary="Create a new list" />
               </ListItemButton>
@@ -219,10 +220,6 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
           <LoadingSpinner loading={!isReady} />
         </DialogContent>
       )}
-      <CreateListDialog
-        open={listCreation.isOpen}
-        onClose={listCreation.handleFinish}
-      />
     </Dialog>
   )
 }

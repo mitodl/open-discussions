@@ -4,11 +4,13 @@ import { PaginatedResult } from "ol-util"
 export enum LearningResourceType {
   Course = "course",
   Program = "program",
-  Userlist = "userlist",
-  LearningPath = "learningpath",
   Video = "video",
   Podcast = "podcast",
-  PodcastEpisode = "podcastepisode"
+  PodcastEpisode = "podcastepisode",
+  Userlist = "userlist",
+  LearningPath = "learningpath",
+  StaffList = "list",
+  StaffPath = "path"
 }
 
 /**
@@ -65,14 +67,20 @@ export interface Course extends LearningResource {
   object_type: LearningResourceType.Course
 }
 
-export interface UserList extends LearningResource {
+interface LearningList extends LearningResource {
   image_description?: string | null
   list_type: string
   privacy_level: PrivacyLevel
   author: number
   author_name: string
   item_count: number
+}
+
+export interface UserList extends LearningList {
   object_type: LearningResourceType.Userlist | LearningResourceType.LearningPath
+}
+export interface StaffList extends LearningList {
+  object_type: LearningResourceType.StaffList | LearningResourceType.StaffPath
 }
 
 export interface Favorites
@@ -83,7 +91,10 @@ export interface Favorites
   object_type: typeof TYPE_FAVORITES
 }
 
-export type UserListItem = {
+/**
+ * items in userlists / stafflists
+ */
+export type ListItem = {
   id: number
   object_id: number
   position: number
@@ -172,6 +183,6 @@ export type EmbedlyConfig = {
   height: number
 }
 
-export type PaginatedUserListItems = PaginatedResult<UserListItem>
+export type PaginatedListItems = PaginatedResult<ListItem>
 
 export type PaginatedUserLists = PaginatedResult<UserList>

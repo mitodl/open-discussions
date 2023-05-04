@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 import classNames from "classnames"
-import type { UserListItem } from "ol-search-ui"
+import type { ListItem } from "ol-search-ui"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import {
   SortableItem,
@@ -13,7 +13,7 @@ import { useMoveUserListItem } from "../../api/learning-resources"
 
 type UserListItemsProps = {
   id?: number
-  items?: UserListItem[]
+  items?: ListItem[]
   isLoading?: boolean
   isRefetching?: boolean
   emptyMessage: string
@@ -21,7 +21,7 @@ type UserListItemsProps = {
 }
 
 const UserListItemsViewOnly: React.FC<{
-  items: UserListItem[]
+  items: ListItem[]
 }> = ({ items }) => {
   return (
     <ul className="ic-card-row-list">
@@ -41,12 +41,12 @@ const UserListItemsViewOnly: React.FC<{
 
 const UserListItemsSortable: React.FC<{
   listId: number
-  items: UserListItem[]
+  items: ListItem[]
   isRefetching?: boolean
 }> = ({ items, listId, isRefetching }) => {
   const move = useMoveUserListItem()
   const renderDragging: RenderActive = useCallback(active => {
-    const item = active.data.current as UserListItem
+    const item = active.data.current as ListItem
     return (
       <LearningResourceCard
         className="ic-dragging"
@@ -75,8 +75,8 @@ const UserListItemsSortable: React.FC<{
    */
   const moveItemsOnCancelDrop: CancelDrop<number> = useCallback(
     async e => {
-      const active = e.active.data.current as unknown as UserListItem
-      const over = e.over.data.current as unknown as UserListItem
+      const active = e.active.data.current as unknown as ListItem
+      const over = e.over.data.current as unknown as ListItem
       try {
         await move.mutateAsync({
           item: {
