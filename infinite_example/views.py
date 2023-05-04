@@ -24,7 +24,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "is_public_list_editor": user.is_authenticated
             and is_public_list_editor(user),
             "is_staff_list_editor": user.is_authenticated
-                and (is_admin_user(request) or is_staff_list_editor(request))
+            and (is_admin_user(request) or is_staff_list_editor(request)),
         },
     }
 
