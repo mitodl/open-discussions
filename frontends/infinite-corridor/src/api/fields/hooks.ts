@@ -10,11 +10,11 @@ import axios from "../../libs/axios"
 import { fieldDetails } from "./urls"
 
 const useFieldsList = () => {
-  return useQuery<FieldList>(urls.fieldsList)
+  return useQuery<FieldList>([urls.fieldsList])
 }
 
 const useFieldDetails = (name: string) => {
-  return useQuery<FieldChannel>(urls.fieldDetails(name))
+  return useQuery<FieldChannel>([urls.fieldDetails(name)])
 }
 
 const editFieldChannel = async (
@@ -33,7 +33,7 @@ const useMutateField = (field: FieldChannel) => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(fieldDetails(field.name))
+        queryClient.invalidateQueries([fieldDetails(field.name)])
       }
     }
   )
