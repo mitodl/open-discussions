@@ -506,7 +506,6 @@ def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     }
 
 
-@pytest.fixture()
 def test_find_related_documents(settings, elasticsearch, user, gen_query_filters_mock):
     """find_related_documents should execute a more-like-this query"""
     posts_to_return = 7
