@@ -6,7 +6,7 @@ import { faker } from "@faker-js/faker"
 import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
-import { QueryClient, QueryClientProvider } from "react-query"
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {
   useAddToListItems,
   useCreateUserList,

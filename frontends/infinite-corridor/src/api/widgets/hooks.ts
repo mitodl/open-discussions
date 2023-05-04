@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "react-query"
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { AnonymousWidget, WidgetListResponse } from "ol-widgets"
 import * as urls from "./urls"
 import axios from "../../libs/axios"

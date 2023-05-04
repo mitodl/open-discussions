@@ -19,7 +19,7 @@ import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"
 import { History } from "history"
-import { QueryClientProvider, QueryClient } from "react-query"
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"

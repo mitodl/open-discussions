@@ -19,8 +19,9 @@ import {
   useQueryClient,
   UseQueryResult,
   UseQueryOptions,
-  InfiniteData
-} from "react-query"
+  InfiniteData,
+  QueryFilters
+} from "@tanstack/react-query"
 import {
   urls,
   keys,
@@ -30,7 +31,6 @@ import {
 } from "./urls"
 import { modifyCachedSearchResource } from "./search"
 import invariant from "tiny-invariant"
-import { QueryFilters } from "react-query/types/core/utils"
 import { useInfiniteLimitOffsetQuery } from "./util"
 
 const useResource = (
