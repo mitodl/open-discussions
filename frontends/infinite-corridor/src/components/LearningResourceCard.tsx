@@ -53,11 +53,11 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
         imgConfig={imgConfigs[variant]}
         onActivate={activateResource}
         footerActionSlot={
-          <>
+          <div>
             {user.is_staff_list_editor && (
               <IconButton
                 size="small"
-                aria-label="Add to list"
+                aria-label="Add to MIT lists"
                 onClick={showAddToStaffListDialog}
               >
                 <PlaylistAddIcon />
@@ -66,13 +66,13 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
             {user.is_authenticated && (
               <IconButton
                 size="small"
-                aria-label="Add to list"
+                aria-label="Add to my lists"
                 onClick={showAddToListDialog}
               >
                 {isInList ? <BookmarkIcon /> : <BookmarkBorderIcon />}
               </IconButton>
             )}
-          </>
+          </div>
         }
       />
     </>

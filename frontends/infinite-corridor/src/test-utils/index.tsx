@@ -98,4 +98,4 @@ export {
 } from "@testing-library/react"
 export { default as user } from "@testing-library/user-event"
 
-export type { TestAppOptions }
+export type { TestAppOptions, User }
