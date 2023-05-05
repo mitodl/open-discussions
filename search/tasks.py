@@ -9,7 +9,7 @@ from celery.exceptions import Ignore
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from opensearchpy.exceptions import NotFoundError
+from opensearchpy.exceptions import NotFoundError, RequestError
 from prawcore.exceptions import NotFound
 
 from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
@@ -46,6 +46,7 @@ from search.constants import (
     VIDEO_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
+from search.indexing_api import delete_orphaned_indices
 from search.serializers import (
     OSContentFileSerializer,
     OSCourseSerializer,
@@ -1275,7 +1276,7 @@ def get_update_podcast_episodes_tasks():
     return index_tasks
 
 
-@app.task
+@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def finish_recreate_index(results, backing_indices):
     """
     Swap reindex backing index with default backing index
@@ -1286,11 +1287,18 @@ def finish_recreate_index(results, backing_indices):
     """
     errors = merge_strings(results)
     if errors:
+        try:
+            delete_orphaned_indices()
+        except RequestError as ex:
+            raise RetryException(str(ex))
         raise ReindexException(f"Errors occurred during recreate_index: {errors}")
 
     log.info(
         "Done with temporary index. Pointing default aliases to newly created backing indexes..."
     )
     for obj_type, backing_index in backing_indices.items():
-        api.switch_indices(backing_index, obj_type)
+        try:
+            api.switch_indices(backing_index, obj_type)
+        except RequestError as ex:
+            raise RetryException(str(ex))
     log.info("recreate_index has finished successfully!")

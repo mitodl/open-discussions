@@ -748,6 +748,25 @@ def switch_indices(backing_index, object_type):
     )
 
 
+def delete_orphaned_indices():
+    """
+    Delete any indices without aliases and any reindexing aliases
+    """
+    conn = get_conn()
+    indices = conn.indices.get_alias(index="*")
+    for index in indices:
+        aliases = indices[index]["aliases"]
+        keys = [alias for alias in aliases]
+        for alias in aliases:
+            if "reindexing" in alias:
+                log.info(f"Deleting alias {alias} for index {index}")
+                conn.indices.delete_alias(name=alias, index=index)
+                keys.remove(alias)
+        if not keys:
+            log.info(f"Deleting index {index}")
+            conn.indices.delete(index)
+
+
 def es_iterate_all_documents(index, query, pagesize=250):
     """
     Helper to iterate all values from an index
