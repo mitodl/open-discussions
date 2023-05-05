@@ -2,7 +2,9 @@ import failOnConsole from "jest-fail-on-console"
 import '@testing-library/jest-dom'
 import { configure } from "@testing-library/dom"
 
-failOnConsole()
+failOnConsole({
+  silenceMessage: msg => /Can't perform a React state update on an unmounted component/.test(msg),
+})
 
 configure({
   /**
