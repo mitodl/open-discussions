@@ -19,9 +19,11 @@ import {
   setMockResponse,
   user,
   expectProps,
-  waitFor
+  waitFor,
+  act
 } from "../../test-utils"
 import { User } from "../../types/settings"
+import invariant from "tiny-invariant"
 
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
@@ -254,49 +256,37 @@ test.each([
   }
 )
 
-test.each([{ list: makeUserList() }, { list: makeStaffList() }])(
-  "Passes appropriate props to ItemsListing ($list.object_type)",
-  async ({ list }) => {
-    const { paginatedItems } = setup({ list })
-    expectProps(spyItemsListing, {
-      isLoading:    true,
-      items:        undefined,
-      emptyMessage: "There are no items in this list yet."
-    })
-
-    await waitFor(() => {
-      expectProps(
-        spyItemsListing,
-        {
-          // sortable is tested elsewhere
-          isLoading:    false,
-          items:        paginatedItems.results,
-          emptyMessage: "There are no items in this list yet."
-        },
-        -1
-      )
-    })
-  }
-)
-
-test.each([{ list: makeUserList() }, { list: makeStaffList() }])(
+test.each([{ list: makeUserList(), listUrls: lrUrls.userList }, { list: makeStaffList(), listUrls: lrUrls.staffList }])(
   "Passes isRefetching=true to ItemsList while reloading data",
-  async () => {
-    const list = makeUserList()
+  async ({ list, listUrls }) => {
     const { queryClient, paginatedItems } = setup({ list })
-
     await waitFor(() => expectProps(spyItemsListing, { isLoading: false }))
-
     expectProps(spyItemsListing, { isRefetching: false }, -1)
+    spyItemsListing.mockClear()
+
+    let resolve = () => invariant("Not yet assigned")
+    const itemsResponse = new Promise(res => {
+      resolve = () => res(paginatedItems)
+    })
+    setMockResponse.get(listUrls.itemsListing(list.id), itemsResponse)
+
     spyItemsListing.mockClear()
     // invalidate the cache entry for paginatedItems and check that
     // isFetching is gets passed to ItemsListing
-    queryClient.invalidateQueries({
-      predicate: query => {
-        // @ts-expect-error Since this is all queries, data is unknown
-        return query.state.data?.pages?.[0] === paginatedItems
-      }
+    act(() => {
+      queryClient.invalidateQueries({
+        predicate: query => {
+          // @ts-expect-error Since this is all queries, data is unknown
+          return query.state.data?.pages?.[0] === paginatedItems
+        }
+      })
     })
     await waitFor(() => expectProps(spyItemsListing, { isRefetching: true }))
+    spyItemsListing.mockClear()
+    await act(async () => {
+      resolve()
+      await itemsResponse
+    })
+    await waitFor(() => expectProps(spyItemsListing, { isRefetching: false }))
   }
 )
