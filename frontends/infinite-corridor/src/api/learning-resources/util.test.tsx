@@ -1,6 +1,6 @@
 import React from "react"
 import { renderHook } from "@testing-library/react-hooks/dom"
-import { QueryClient, QueryClientProvider } from "react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useInfiniteLimitOffsetQuery } from "./util"
 import { setMockResponse, act } from "../../test-utils"
 import axios from "../../libs/axios"
