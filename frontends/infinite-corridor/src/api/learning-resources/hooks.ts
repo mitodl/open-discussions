@@ -264,7 +264,7 @@ const useAddToListItems = () => {
       const { list } = variables
       queryClient.setQueryData<LearningResource>(
         keys.resource(resource.object_type).id(resource.id).details,
-        resource
+        old => ({ ...old, ...resource }) // API response is missing is_favorite
       )
       // Skip optimistic updates for now. We do not know the list item id.
       queryClient.invalidateQueries({
