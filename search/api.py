@@ -4,8 +4,8 @@ from collections import Counter, defaultdict
 from operator import itemgetter
 
 from django.conf import settings
-from elasticsearch_dsl import Q, Search
-from elasticsearch_dsl.query import MoreLikeThis
+from opensearch_dsl import Q, Search
+from opensearch_dsl.query import MoreLikeThis
 from nested_lookup import nested_lookup
 
 from channels.constants import (
@@ -205,11 +205,11 @@ def _apply_general_query_filters(search, user):
     Applies a series of filters to a Search object so permissions are respected, deleted
     objects are ignored, etc.
 
-    search (elasticsearch_dsl.Search): Search object
+    search (opensearch_dsl.Search): Search object
     user (User): The user executing the search
 
     Returns:
-        elasticsearch_dsl.Search: Search object with filters applied
+        opensearch_dsl.Search: Search object with filters applied
     """
     # Get the list of channels a logged in user is a contributor/moderator of
     channel_names = (
@@ -249,11 +249,11 @@ def _apply_learning_query_filters(search, user):
     Applies a series of filters to a Search object so permissions are respected, deleted
     objects are ignored, etc.
 
-    search (elasticsearch_dsl.Search): Search object
+    search (opensearch_dsl.Search): Search object
     user (User): The user executing the search
 
     Returns:
-        elasticsearch_dsl.Search: Search object with filters applied
+        opensearch_dsl.Search: Search object with filters applied
     """
     # Search public user lists (and user's own lists if logged in)
     if features.is_enabled(features.USER_LIST_SEARCH):

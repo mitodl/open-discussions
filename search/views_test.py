@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
-from elasticsearch.exceptions import TransportError
+from opensearchpy.exceptions import TransportError
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 
 from course_catalog.factories import CourseFactory

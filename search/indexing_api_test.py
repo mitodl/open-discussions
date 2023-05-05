@@ -5,7 +5,7 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-from elasticsearch.exceptions import ConflictError, NotFoundError
+from opensearchpy.exceptions import ConflictError, NotFoundError
 
 from channels.api import add_user_role, sync_channel_subscription_model
 from channels.factories.models import ChannelFactory

@@ -5,7 +5,7 @@ import uuid
 from functools import partial
 
 from django.conf import settings
-from elasticsearch_dsl.connections import connections
+from opensearch_dsl.connections import connections
 
 from search.constants import VALID_OBJECT_TYPES
 
