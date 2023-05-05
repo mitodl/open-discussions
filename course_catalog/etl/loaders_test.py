@@ -111,7 +111,9 @@ def mock_upsert_tasks(mocker):
         delete_podcast_episode=mocker.patch(
             "search.task_helpers.deindex_podcast_episode"
         ),
-        index_run_content_files=mocker.patch("search.task_helpers.index_run_content_files"),
+        index_run_content_files=mocker.patch(
+            "search.task_helpers.index_run_content_files"
+        ),
     )
 
 
