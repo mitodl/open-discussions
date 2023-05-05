@@ -759,11 +759,11 @@ def delete_orphaned_indices():
         keys = [alias for alias in aliases]
         for alias in aliases:
             if "reindexing" in alias:
-                log.info(f"Deleting alias {alias} for index {index}")
+                log.info("Deleting alias %s for index %s", alias, index)
                 conn.indices.delete_alias(name=alias, index=index)
                 keys.remove(alias)
         if not keys:
-            log.info(f"Deleting index {index}")
+            log.info("Deleting index %s", index)
             conn.indices.delete(index)
 
 
