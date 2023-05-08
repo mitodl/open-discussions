@@ -29,7 +29,7 @@
     "@material/snackbar": "0.44.0",
     "@material/toolbar": "0.4.4",
     "@mitodl/ckeditor-custom-build": "0.0.4",
-    "@mitodl/course-search-utils": "2.1.0",
+    "@mitodl/course-search-utils": "^2.2.0",
     "@mitodl/mdl-react-components": "0.0.3",
     "@reduxjs/toolkit": "1.4.0",
     "@sentry/browser": "5.5.0",

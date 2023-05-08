@@ -297,8 +297,10 @@ describe("api", function() {
           .returns(body)
         const params = {
           text:   "text",
-          type:   "course",
-          facets: new Map([["offered_by", "OCW"]])
+          facets: new Map([
+            ["offered_by", "OCW"],
+            ["type", "course"]
+          ])
         }
         const standardizedParams = {
           text:         "text",

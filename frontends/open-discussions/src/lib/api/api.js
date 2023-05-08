@@ -23,6 +23,7 @@ import type {
 } from "../../flow/discussionTypes"
 import type { NotificationSetting } from "../../flow/settingsTypes"
 import type { SearchParams } from "../../flow/searchTypes"
+
 import _ from "lodash"
 
 export function search(params: SearchParams): Promise<*> {
@@ -31,15 +32,13 @@ export function search(params: SearchParams): Promise<*> {
     "from",
     "size",
     "sort",
-    "channelName"
+    "channelName",
+    "resourceTypes"
   ])
 
   if (params["facets"]) {
-    searchParams["activeFacets"] = {
-      // $FlowFixMe
-      ...Object.fromEntries(params["facets"]),
-      type: params["type"]
-    }
+    // $FlowFixMe
+    searchParams["activeFacets"] = Object.fromEntries(params["facets"])
   }
 
   const body = buildSearchQuery(searchParams)

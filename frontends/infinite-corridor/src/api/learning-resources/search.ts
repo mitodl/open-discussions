@@ -43,7 +43,8 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
   const normalized: SearchQueryParams = allowedTypes ?
     {
       ...params,
-      activeFacets: restrictFacetTypes(allowedTypes, params.activeFacets)
+      activeFacets:  restrictFacetTypes(allowedTypes, params.activeFacets),
+      resourceTypes: allowedTypes
     } :
     params
   return useInfiniteQuery<SearchResponse>({
