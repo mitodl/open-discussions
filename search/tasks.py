@@ -46,7 +46,6 @@ from search.constants import (
     VIDEO_TYPE,
 )
 from search.exceptions import ReindexException, RetryException
-from search.indexing_api import delete_orphaned_indices
 from search.serializers import (
     OSContentFileSerializer,
     OSCourseSerializer,
@@ -1288,7 +1287,7 @@ def finish_recreate_index(results, backing_indices):
     errors = merge_strings(results)
     if errors:
         try:
-            delete_orphaned_indices()
+            api.delete_orphaned_indices()
         except RequestError as ex:
             raise RetryException(str(ex))
         raise ReindexException(f"Errors occurred during recreate_index: {errors}")

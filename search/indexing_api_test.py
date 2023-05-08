@@ -37,6 +37,7 @@ from search.indexing_api import (
     deindex_courses,
     deindex_document,
     deindex_run_content_files,
+    delete_orphaned_indices,
     get_reindexing_alias_name,
     increment_document_integer_field,
     index_course_content_files,
@@ -676,3 +677,53 @@ def test_deindex_run_content_files_no_files(mocker, has_files):
         ContentFileFactory.create(run=run, published=False)
     deindex_run_content_files(run.id, unpublished_only=True)
     assert mock_deindex_items.call_count == (1 if has_files else 0)
+
+
+def test_delete_orphaned_indices(mocker, mocked_es):
+    """
+    Delete any indices without aliases and any reindexing aliases
+    """
+    mock_aliases = {
+        "discussions_local_program_d6884bba05484cbb8c9b1e61d15ff354": {
+            "aliases": {
+                "discussions_local_all_default": {},
+                "discussions_local_program_default": {},
+            }
+        },
+        "discussions_local_program_b8c9b1e61d15ff354f6884bba05484cb": {
+            "aliases": {"discussions_local_program_reindexing": {}}
+        },
+        "discussions_local_program_1e61d15ff35b8c9b4f6884bba05484cb": {
+            "aliases": {
+                "discussions_local_program_reindexing": {},
+                "some_other_alias": {},
+            }
+        },
+        "discussions_local_program_5484cbb8c9b1e61d15ff354f6884bba0": {"aliases": {}},
+        "discussions_local_course_15ff354d6884bba05484cbb8c9b1e61d": {
+            "aliases": {
+                "discussions_local_all_default": {},
+                "discussions_local_course_default": {},
+            }
+        },
+    }
+    mocked_es.conn.indices = mocker.Mock(
+        delete_alias=mocker.Mock(), get_alias=mocker.Mock(return_value=mock_aliases)
+    )
+    delete_orphaned_indices()
+    mocked_es.conn.indices.get_alias.assert_called_once_with(index="*")
+    mocked_es.conn.indices.delete_alias.assert_any_call(
+        name="discussions_local_program_reindexing",
+        index="discussions_local_program_b8c9b1e61d15ff354f6884bba05484cb",
+    )
+    mocked_es.conn.indices.delete_alias.assert_any_call(
+        name="discussions_local_program_reindexing",
+        index="discussions_local_program_1e61d15ff35b8c9b4f6884bba05484cb",
+    )
+    mocked_es.conn.indices.delete.assert_any_call(
+        "discussions_local_program_5484cbb8c9b1e61d15ff354f6884bba0"
+    )
+    mocked_es.conn.indices.delete.assert_any_call(
+        "discussions_local_program_b8c9b1e61d15ff354f6884bba05484cb"
+    )
+    assert mocked_es.conn.indices.delete.call_count == 2

@@ -2,9 +2,10 @@
 # pylint: disable=redefined-outer-name,unused-argument
 
 import pytest
+from celery.exceptions import Retry
 from django.conf import settings
 from opensearchpy.exceptions import ConnectionError as ESConnectionError
-from opensearchpy.exceptions import ConnectionTimeout
+from opensearchpy.exceptions import ConnectionTimeout, RequestError
 from prawcore.exceptions import NotFound
 
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
@@ -594,15 +595,45 @@ def test_finish_recreate_index(mocker, with_error):
     switch_indices_mock = mocker.patch(
         "search.indexing_api.switch_indices", autospec=True
     )
+    mock_delete_orphans = mocker.patch("search.indexing_api.delete_orphaned_indices")
 
     if with_error:
         with pytest.raises(ReindexException):
             finish_recreate_index.delay(results, backing_indices)
-        assert switch_indices_mock.call_count == 0
+        switch_indices_mock.assert_not_called()
+        mock_delete_orphans.assert_called_once()
     else:
         finish_recreate_index.delay(results, backing_indices)
         switch_indices_mock.assert_any_call("backing", POST_TYPE)
         switch_indices_mock.assert_any_call("backing", COMMENT_TYPE)
+        mock_delete_orphans.assert_not_called()
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_finish_recreate_index_retry_exceptions(mocker, with_error):
+    """
+    finish_recreate_index should be retried on RequestErrors
+    """
+    backing_indices = {"post": "backing", "comment": "backing", "profile": "backing"}
+    results = ["error"] if with_error else []
+    mock_error = RequestError(429, "oops", {})
+    switch_indices_mock = mocker.patch(
+        "search.indexing_api.switch_indices",
+        autospec=True,
+        side_effect=[mock_error, None],
+    )
+    mock_delete_orphans = mocker.patch(
+        "search.indexing_api.delete_orphaned_indices", side_effect=[mock_error, None]
+    )
+
+    with pytest.raises(Retry):
+        finish_recreate_index.delay(results, backing_indices)
+    if with_error:
+        switch_indices_mock.assert_not_called()
+        mock_delete_orphans.assert_called_once()
+    else:
+        mock_delete_orphans.assert_not_called()
+        switch_indices_mock.assert_called_once()
 
 
 @pytest.mark.parametrize("with_error", [True, False])
