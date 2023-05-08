@@ -11,7 +11,10 @@ import {
   UserListsListingPage,
   StaffListsListingPage
 } from "./pages/resource-lists/ResourceListsListingsPage"
-import UserListDetailsPage from "./pages/resource-lists/UserListDetailsPage"
+import {
+  UserListDetailsPage,
+  StaffListDetailsPage
+} from "./pages/resource-lists/ResourceListDetailsPage"
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"
@@ -87,6 +90,9 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
           </Route>
           <Route path={urls.STAFFLISTS_LISTING} exact>
             <StaffListsListingPage />
+          </Route>
+          <Route path={urls.STAFFLIST_VIEW} exact>
+            <StaffListDetailsPage />
           </Route>
         </Switch>
         <LearningResourceDrawer />

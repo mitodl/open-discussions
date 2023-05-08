@@ -79,6 +79,7 @@ export const makeCourse: Factory<Course> = overrides => ({
   runs:              times(3, () => makeRun()),
   is_favorite:       casual.coin_flip,
   lists:             times(faker.datatype.number(3), () => makeListItemMember()),
+  stafflists:        times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          casual.random_element([
     [],
     [OPEN_CONTENT],
@@ -101,6 +102,7 @@ export const makeProgram: Factory<LearningResource> = overrides => ({
   runs:              [makeRun()],
   is_favorite:       casual.coin_flip,
   lists:             times(faker.datatype.number(3), () => makeListItemMember()),
+  stafflists:        times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          casual.random_element([
     [],
     [OPEN_CONTENT],
@@ -126,6 +128,7 @@ export const makeVideo: Factory<LearningResource> = overrides => ({
   offered_by:        [casual.random_element(["mitc", "ocw"])],
   runs:              undefined,
   lists:             times(faker.datatype.number(3), () => makeListItemMember()),
+  stafflists:        times(faker.datatype.number(3), () => makeListItemMember()),
   audience:          [],
   certification:     [],
   topics:            [],
@@ -159,6 +162,7 @@ export const makeUserList: Factory<UserList> = overrides => {
     ]),
     author:        faker.datatype.number({ min: 1, max: 1000 }),
     lists:         [],
+    stafflists:    [],
     certification: [],
     author_name:   faker.name.findName(),
     ...overrides
@@ -192,6 +196,7 @@ export const makeStaffList: Factory<StaffList> = overrides => {
     ]),
     author:        faker.datatype.number({ min: 1, max: 1000 }),
     lists:         [],
+    stafflists:    [],
     certification: [],
     author_name:   faker.name.findName(),
     ...overrides
@@ -274,6 +279,7 @@ export const makeLearningResource: Factory<LearningResource> = overrides => {
     platform:      faker.lorem.word(),
     runs:          times(3, () => makeRun()),
     lists:         [],
+    stafflists:    [],
     certification: [],
     ...overrides
   }
@@ -297,11 +303,11 @@ export const makeListItemMember: Factory<
   ListItemMember,
   {
     resource?: LearningResource
-    userList?: UserList
+    list?: UserList | StaffList
   }
-> = (overrides, { resource, userList } = {}) => {
+> = (overrides, { resource, list } = {}) => {
   return {
-    list_id:      userList?.id ?? faker.unique(faker.datatype.number),
+    list_id:      list?.id ?? faker.unique(faker.datatype.number),
     item_id:      faker.unique(faker.datatype.number),
     object_id:    resource?.id ?? faker.unique(faker.datatype.number),
     content_type:

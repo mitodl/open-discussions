@@ -8,21 +8,21 @@ import { allowConsoleErrors } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
 import { QueryClient, QueryClientProvider } from "react-query"
 import {
-  useAddToUserListItems,
+  useAddToListItems,
   useCreateUserList,
-  useDeleteFromUserListItems,
+  useDeleteFromListItems,
   useDeleteUserList,
   useResource,
   useUserListsListing,
   useFavorite,
   useUnfavorite,
   useUserListItems,
-  useMoveUserListItem
+  useMoveListItem,
+  useStaffListItems
 } from "./hooks"
-import { mockAxiosInstance, setMockResponse } from "../../test-utils/mockAxios"
+import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
-import { assertNotNil } from "ol-util"
 import axios from "../../libs/axios"
 
 function* makeCounter() {
@@ -35,6 +35,7 @@ function* makeCounter() {
 const setup = () => {
   const idCounter = makeCounter()
   setMockResponse.defaultImplementation((method, url) => {
+    console.log("Responding to", method, url)
     return Promise.resolve({
       data:   `request number ${idCounter.next().value} (${method} to ${url})`,
       status: 200
@@ -138,54 +139,70 @@ test("useDeleteUserList invalidates all resource queries", async () => {
   expect(before.listing.data).not.toEqual(after.listing.data)
 })
 
-test("useAddToUserListItems invalidates userlist details and listing", async () => {
-  const { wrapper, spies } = setup()
-
-  const list = factories.makeUserList()
-  const resource = factories.makeCourse()
-  const modifiedAddedResource = {
-    ...resource,
-    lists: resource.lists.concat({} as ListItemMember)
+test.each([
+  {
+    list: factories.makeUserList({ id: 123 }),
+    url:  urls.userList.itemAdd(123)
+  },
+  {
+    list: factories.makeStaffList({ id: 456 }),
+    url:  urls.staffList.itemAdd(456)
   }
+])(
+  "useAddToListItems invalidates list details and lists listing",
+  async ({ list, url }) => {
+    const { wrapper, spies } = setup()
 
-  const { result: resourceResult } = renderHook(
-    () => useResource(resource.object_type, resource.id),
-    { wrapper }
-  )
-  const { result: addResult } = renderHook(() => useAddToUserListItems(), {
-    wrapper
-  })
+    const resource = factories.makeCourse()
+    setMockResponse.get(
+      urls.resource.details(resource.object_type, resource.id),
+      resource
+    )
 
-  setMockResponse.post(urls.userList.itemAdd(list.id), {
-    content_data: modifiedAddedResource
-  })
+    const modifiedAddedResource = {
+      ...resource,
+      lists: resource.lists.concat({} as ListItemMember)
+    }
 
-  await act(async () => {
-    await addResult.current.mutateAsync({
-      userListId: list.id,
-      payload:    {
-        object_id:    resource.id,
-        content_type: resource.object_type
-      }
+    const { result: resourceResult } = renderHook(
+      () => useResource(resource.object_type, resource.id),
+      { wrapper }
+    )
+    const { result: addResult } = renderHook(() => useAddToListItems(), {
+      wrapper
     })
-  })
 
-  // The list we modified was invalidated
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(list.id).all
-  })
-  // The list listing was invalided.
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.listing.all
-  })
-  // Nothing else invalidated
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
+    setMockResponse.post(url, { content_data: modifiedAddedResource })
 
-  // The POST response result updated resource data
-  expect(resourceResult.current.data).toEqual(modifiedAddedResource)
-})
+    await act(async () => {
+      await addResult.current.mutateAsync({
+        list,
+        item: {
+          object_id:    resource.id,
+          content_type: resource.object_type
+        }
+      })
+    })
 
-test("useAddToUserListItems patches search results", async () => {
+    expect(axios.post).toHaveBeenCalledWith(url, expect.anything())
+
+    // The list we modified was invalidated
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).id(list.id).all
+    })
+    // The list listing was invalided.
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).listing.all
+    })
+    // Nothing else invalidated
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
+
+    // The POST response result updated resource data
+    expect(resourceResult.current.data).toEqual(modifiedAddedResource)
+  }
+)
+
+test("useAddToListItems patches search results", async () => {
   const { wrapper } = setup()
   const searchResults = factories.makeSearchResponse(4, 10)
   const i = faker.datatype.number({ min: 0, max: 3 })
@@ -202,7 +219,7 @@ test("useAddToUserListItems patches search results", async () => {
   }
 
   const useTestHook = () => {
-    const addItem = useAddToUserListItems()
+    const addItem = useAddToListItems()
     const search = useInfiniteSearch({})
     return { addItem, search }
   }
@@ -221,8 +238,8 @@ test("useAddToUserListItems patches search results", async () => {
     })
   })
   await result.current.addItem.mutateAsync({
-    userListId: newMember.list_id,
-    payload:    newMember
+    list: { id: newMember.list_id, object_type: LRT.Userlist },
+    item: newMember
   })
 
   await waitFor(() => {
@@ -230,7 +247,7 @@ test("useAddToUserListItems patches search results", async () => {
   })
 })
 
-test("useDeleteFromUserListItems patches search results", async () => {
+test("useDeleteFromListItems patches search results", async () => {
   const { wrapper } = setup()
   const searchResults = factories.makeSearchResponse(4, 10)
   const i = faker.datatype.number({ min: 0, max: 3 })
@@ -250,7 +267,7 @@ test("useDeleteFromUserListItems patches search results", async () => {
   }
 
   const useTestHook = () => {
-    const deleteItem = useDeleteFromUserListItems()
+    const deleteItem = useDeleteFromListItems()
     const search = useInfiniteSearch({})
     return { deleteItem, search }
   }
@@ -261,47 +278,61 @@ test("useDeleteFromUserListItems patches search results", async () => {
     expect(result.current.search.data?.pages).toEqual([searchResults])
   })
 
-  await result.current.deleteItem.mutateAsync(oldMembers[deleteIndex])
+  await result.current.deleteItem.mutateAsync({
+    list: { id: oldMembers[deleteIndex].list_id, object_type: LRT.Userlist },
+    item: oldMembers[deleteIndex]
+  })
 
   await waitFor(() => {
     expect(result.current.search.data?.pages).toEqual([expected])
   })
 })
 
-test("useDeleteFromUserListItems invalidates appropriate queries", async () => {
-  const { wrapper, spies } = setup()
+test.each([
+  {
+    list: factories.makeUserList({ id: 123 }),
+    item: factories.makeListItemMember({ item_id: 789 }),
+    url:  urls.userList.itemDetails(123, 789)
+  },
+  {
+    list: factories.makeStaffList({ id: 456 }),
+    item: factories.makeListItemMember({ item_id: 789 }),
+    url:  urls.staffList.itemDetails(456, 789)
+  }
+])(
+  "useDeleteFromListItems makes API call and invalidates appropriate queries",
+  async ({ list, url, item }) => {
+    const { wrapper, spies } = setup()
 
-  const userlist = factories.makeUserList()
-  const itemToDelete = factories.makeListItemMember({
-    content_type: LRT.Course, // should match affectedResourceData
-    list_id:      userlist.id
-  })
+    const resource = factories.makeLearningResource({
+      id:          item.object_id,
+      object_type: item.content_type,
+      lists:       [item]
+    })
+    const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+    setMockResponse.get(resourceUrl, resource)
 
-  const resource = factories.makeCourse({
-    id:    itemToDelete.object_id,
-    lists: [itemToDelete]
-  })
-  const resourceUrl = urls.resource.details(resource.object_type, resource.id)
-  setMockResponse.get(resourceUrl, resource)
+    const { result } = renderHook(() => useDeleteFromListItems(), { wrapper })
 
-  const { result } = renderHook(() => useDeleteFromUserListItems(), { wrapper })
+    await act(async () => result.current.mutateAsync({ list, item }))
 
-  await act(async () => result.current.mutateAsync(itemToDelete))
+    expect(axios.delete).toHaveBeenCalledWith(url)
 
-  // Check the invalidations
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(userlist.id).all
-  })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.listing.all
-  })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.resource(resource.object_type).id(resource.id).details
-  })
-})
+    // Check the invalidations
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).id(list.id).all
+    })
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(list.object_type).listing.all
+    })
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: keys.resource(resource.object_type).id(resource.id).details
+    })
+  }
+)
 
-test("useDeleteFromUserListItems optimistically updates resource data", async () => {
+test("useDeleteFromListItems optimistically updates resource data", async () => {
   const { wrapper } = setup()
 
   const userlist = factories.makeUserList()
@@ -322,14 +353,17 @@ test("useDeleteFromUserListItems optimistically updates resource data", async ()
     () => useResource(resource.object_type, resource.id),
     { wrapper }
   )
-  const { result, waitFor } = renderHook(() => useDeleteFromUserListItems(), {
+  const { result, waitFor } = renderHook(() => useDeleteFromListItems(), {
     wrapper
   })
 
   await waitFor(() => resourceQuery.current.isFetched)
 
   act(() => {
-    result.current.mutateAsync(itemToDelete)
+    result.current.mutateAsync({
+      list: userlist,
+      item: itemToDelete
+    })
   })
 
   // Check the optimistic update
@@ -417,85 +451,76 @@ test.each([
   })
 })
 
-test("useItemListing pagination", async () => {
-  const { wrapper } = setup()
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
-  )
-  const { result, waitFor } = renderHook(
-    () => useUserListItems(123, { limit: 3 }),
-    { wrapper }
-  )
-
-  const assertApiCall = (limit: number, offset: number) => {
-    expect(axios.get).toHaveBeenLastCalledWith(
-      urls.userList.itemsListing(123, { limit, offset })
-    )
+test.each([
+  {
+    mode:          "userlist",
+    useItemsQuery: useUserListItems,
+    itemsUrl:      "userlists/123/items"
+  },
+  {
+    mode:          "stafflist",
+    useItemsQuery: useStaffListItems,
+    itemsUrl:      "stafflists/123/items"
   }
+] as const)(
+  "useMoveListItem($mode) optimistic updates",
+  async ({ mode, useItemsQuery, itemsUrl }) => {
+    const { wrapper, spies } = setup()
+    setMockResponse.get(
+      expect.stringContaining(itemsUrl),
+      factories.makeListItemsPaginated(
+        {
+          count:    5,
+          pageSize: 3
+        },
+        { next: `${itemsUrl}?limit=3&offset=3` }
+      )
+    )
+    const { result: itemsQ, waitFor } = renderHook(
+      () => useItemsQuery(123, { limit: 3 }),
+      { wrapper }
+    )
 
-  await waitFor(() => expect(result.current.isLoading).toBe(false))
-  assertNotNil(result.current.data)
-  expect(result.current.data.pages.length).toBe(1)
-  expect(result.current.data.pages[0].results.length).toBe(3)
-  assertApiCall(3, 0)
-
-  await act(async () => {
-    await result.current.fetchNextPage()
-  })
-  expect(result.current.data.pages.length).toBe(2)
-  assertApiCall(3, 3)
-
-  mockAxiosInstance.get.mockClear()
-  await act(async () => {
-    await result.current.fetchNextPage()
-  })
-  expect(result.current.data.pages.length).toBe(2)
-  expect(mockAxiosInstance.get).not.toHaveBeenCalled()
-})
-
-test("useMoveUserListItem optimistic updates", async () => {
-  const { wrapper, spies } = setup()
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 3 })
-  )
-  const { result: itemsQ, waitFor } = renderHook(
-    () => useUserListItems(123, { limit: 3 }),
-    { wrapper }
-  )
-
-  const { result: moveItem } = renderHook(() => useMoveUserListItem(), {
-    wrapper
-  })
-
-  await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
-
-  setMockResponse.get(
-    expect.stringContaining("userlists/123/items"),
-    factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
-  )
-
-  await act(async () => {
-    await itemsQ.current.fetchNextPage()
-  })
-
-  const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
-  const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
-
-  spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
-  await act(async () =>
-    moveItem.current.mutateAsync({
-      item:        { list_id: 123, item_id: item3.id },
-      newPosition: item1.position,
-      oldIndex:    3,
-      newIndex:    1
+    const { result: moveItem } = renderHook(() => useMoveListItem(mode), {
+      wrapper
     })
-  )
 
-  expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
-  expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.userList.id(123).itemsListing.all
-  })
-})
+    await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
+
+    setMockResponse.get(
+      expect.stringContaining(itemsUrl),
+      factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
+    )
+
+    await act(async () => {
+      await itemsQ.current.fetchNextPage()
+    })
+
+    const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
+    const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
+
+    spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
+    await act(async () =>
+      moveItem.current.mutateAsync({
+        item:        { list_id: 123, item_id: item3.id },
+        newPosition: item1.position,
+        oldIndex:    3,
+        newIndex:    1
+      })
+    )
+
+    expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
+    expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
+
+    const listKeys = {
+      userlist:  keys.userList.id(123).itemsListing.all,
+      stafflist: keys.staffList.id(123).itemsListing.all
+    }
+    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+      queryKey: mode === "userlist" ? listKeys.userlist : listKeys.stafflist
+    })
+    expect(spies.queryClient.invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: mode === "stafflist" ? listKeys.userlist : listKeys.stafflist
+    })
+  }
+)

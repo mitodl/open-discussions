@@ -3,7 +3,7 @@ import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../../components/layout"
 import { useFavoritesListing } from "../../api/learning-resources"
 import Container from "@mui/material/Container"
-import UserListItems from "./ItemsListing"
+import ResourceListItems from "./ItemsListing"
 
 const FavoritesPage: React.FC = () => {
   const favoritesQuery = useFavoritesListing()
@@ -20,7 +20,7 @@ const FavoritesPage: React.FC = () => {
         <GridContainer>
           <GridColumn variant="single-full">
             <h1 className="ic-list-header">My Favorites</h1>
-            <UserListItems
+            <ResourceListItems
               isLoading={favoritesQuery.isLoading}
               items={items}
               emptyMessage="You don't have any favorites yet."

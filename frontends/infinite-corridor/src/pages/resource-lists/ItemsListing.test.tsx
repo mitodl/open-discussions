@@ -11,7 +11,7 @@ import {
   waitFor,
   act
 } from "../../test-utils"
-import UserListItems, { UserListItemsProps } from "./ItemsListing"
+import UserListItems, { ResourceListItemsProps } from "./ItemsListing"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import axios from "../../libs/axios"
 import { urls } from "../../api/learning-resources"
@@ -32,10 +32,11 @@ const spySortableList = jest.mocked(SortableList)
 const spySortableItem = jest.mocked(SortableItem)
 
 describe("ItemsListing", () => {
-  const setup = (props: Partial<UserListItemsProps>) => {
-    const defaultProps: UserListItemsProps = {
+  const setup = (props: Partial<ResourceListItemsProps>) => {
+    const defaultProps: ResourceListItemsProps = {
       isLoading:    true,
-      emptyMessage: "Empty message"
+      emptyMessage: "Empty message",
+      mode:         "userlist"
     }
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
@@ -100,14 +101,15 @@ describe("ItemsListing", () => {
 })
 
 describe("Sorting ItemListing", () => {
-  const setup = (props: Partial<UserListItemsProps> = {}) => {
+  const setup = (props: Partial<ResourceListItemsProps> = {}) => {
     const items = factories.makeListItemsPaginated({ count: 5 }).results
     const listId = faker.datatype.number()
-    const defaultProps: UserListItemsProps = {
+    const defaultProps: ResourceListItemsProps = {
       id:           listId,
       items:        items,
       isLoading:    false,
       sortable:     true,
+      mode:         "userlist",
       emptyMessage: "Empty message"
     }
     const allProps = { ...defaultProps, ...props }
@@ -140,23 +142,34 @@ describe("Sorting ItemListing", () => {
     return { history, simulateDrag, items, listId }
   }
 
-  test("Dragging an item to a new position calls API correctly", async () => {
-    const { simulateDrag, items, listId } = setup()
-    const [from, to] = [1, 3]
-    const active = items[from]
-    const over = items[to]
-    const patchUrl = urls.userList.itemDetails(listId, active.id)
+  test.each([
+    {
+      mode:     "userlist",
+      patchUrl: urls.userList.itemDetails
+    },
+    {
+      mode:     "stafflist",
+      patchUrl: urls.staffList.itemDetails
+    }
+  ] as const)(
+    "Dragging an item to a new position calls API correctly",
+    async ({ mode, patchUrl }) => {
+      const { simulateDrag, items, listId } = setup({ mode })
+      const [from, to] = [1, 3]
+      const active = items[from]
+      const over = items[to]
 
-    setMockResponse.patch(patchUrl)
+      setMockResponse.patch(patchUrl(listId, active.id))
 
-    act(() => simulateDrag(from, to))
+      act(() => simulateDrag(from, to))
 
-    expect(axios.patch).toHaveBeenCalledTimes(0)
-    await waitFor(() => expect(axios.patch).toHaveBeenCalled())
-    expect(axios.patch).toHaveBeenCalledWith(patchUrl, {
-      position: over.position
-    })
-  })
+      expect(axios.patch).toHaveBeenCalledTimes(0)
+      await waitFor(() => expect(axios.patch).toHaveBeenCalled())
+      expect(axios.patch).toHaveBeenCalledWith(patchUrl(listId, active.id), {
+        position: over.position
+      })
+    }
+  )
 
   test("Dragging is disabled while API call is made", async () => {
     const { simulateDrag, items, listId } = setup()
