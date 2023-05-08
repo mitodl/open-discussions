@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.215.0
+---------------
+
+- improve setMockResponse manual response resolution (#3982)
+- Handle unicode chars when truncating file content (#3976)
+- UI for Staff Lists Listing page (#3973)
+- Stafflist items serializer (#3980)
+
 Version 0.214.0 (Released May 04, 2023)
 ---------------
 
