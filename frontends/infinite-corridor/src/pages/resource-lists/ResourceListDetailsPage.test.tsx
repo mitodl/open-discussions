@@ -131,7 +131,7 @@ test.each([
     canSort:      false
   }
 ])(
-  "Authenticated users can edit userlists & sort learning paths iff they are the author",
+  "Authenticated users can edit userlists & sort paths if and only if they are the author",
   async ({ list, userSettings, canEdit, canSort }) => {
     setup({ userSettings, list })
     await screen.findByRole("heading", { name: list.title })
@@ -170,7 +170,7 @@ test.each([
     canSort:      false
   }
 ])(
-  "Authenticated users can edit userlists & sort learning paths iff they are the author",
+  "Authenticated users can edit stafflists & sort learning paths if and only if they are the author",
   async ({ list, userSettings, canEdit, canSort }) => {
     setup({ userSettings, list })
     await screen.findByRole("heading", { name: list.title })

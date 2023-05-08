@@ -137,7 +137,7 @@ const ResourceListItemsSortable: React.FC<{
   )
 }
 
-const ResurceListItems: React.FC<ResourceListItemsProps> = ({
+const ResourceListItems: React.FC<ResourceListItemsProps> = ({
   id,
   items,
   isLoading,
@@ -168,5 +168,5 @@ const ResurceListItems: React.FC<ResourceListItemsProps> = ({
   )
 }
 
-export default ResurceListItems
+export default ResourceListItems
 export type { ResourceListItemsProps as ResourceListItemsProps }

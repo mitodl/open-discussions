@@ -13,7 +13,7 @@ import Grid from "@mui/material/Grid"
 import Button from "@mui/material/Button"
 
 import { useParams } from "react-router"
-import ResurceListItems from "./ItemsListing"
+import ResourceListItems from "./ItemsListing"
 import {
   LearningResourceType as LRT,
   PaginatedListItems,
@@ -102,7 +102,7 @@ const ResourceListDetailsPage: React.FC<{
                 </Grid>
               </Grid>
             )}
-            <ResurceListItems
+            <ResourceListItems
               id={id}
               mode={mode}
               items={items}

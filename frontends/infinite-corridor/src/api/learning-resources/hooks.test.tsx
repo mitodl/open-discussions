@@ -35,6 +35,7 @@ function* makeCounter() {
 const setup = () => {
   const idCounter = makeCounter()
   setMockResponse.defaultImplementation((method, url) => {
+    console.log("Responding to", method, url)
     return Promise.resolve({
       data:   `request number ${idCounter.next().value} (${method} to ${url})`,
       status: 200
@@ -148,12 +149,12 @@ test.each([
     url:  urls.staffList.itemAdd(456)
   }
 ])(
-  "useAddToListItems invalidates userlist details and listing",
+  "useAddToListItems invalidates list details and lists listing",
   async ({ list, url }) => {
     const { wrapper, spies } = setup()
 
     const resource = factories.makeCourse()
-    setMockResponse.post(
+    setMockResponse.get(
       urls.resource.details(resource.object_type, resource.id),
       resource
     )
@@ -197,8 +198,7 @@ test.each([
     expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
 
     // The POST response result updated resource data
-    console.log(resourceResult.current.data)
-    // expect(resourceResult.current.data).toEqual(modifiedAddedResource)
+    expect(resourceResult.current.data).toEqual(modifiedAddedResource)
   }
 )
 

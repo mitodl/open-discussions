@@ -147,7 +147,7 @@ const PrivacyChip: React.FC<PrivacyChipProps> = ({ privacyLevel }) => {
   return <Chip icon={icon} label={label} size="small" />
 }
 
-const FAVORITESS = [
+const FAVORITES = [
   {
     id:            "favorites",
     title:         "Favorites",
@@ -167,7 +167,7 @@ const AddToListDialogInner: React.FC<AddToListDialogProps> = ({
   })
   const listsQuery = mode === "userlist" ? userListsQuery : staffListsQuery
   const lists: ListOrFavorites[] = [
-    ...(mode === "userlist" ? FAVORITESS : []),
+    ...(mode === "userlist" ? FAVORITES : []),
     ...(listsQuery.data?.results || [])
   ]
   if (mode === "userlist") {
