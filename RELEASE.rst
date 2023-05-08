@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.215.1
+---------------
+
+- Elasticsearch 7.10 upgrade (#3974)
+- Details page + AddToListDialog for stafflists (#3983)
+
 Version 0.215.0 (Released May 08, 2023)
 ---------------
 
