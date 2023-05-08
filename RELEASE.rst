@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.215.0
+Version 0.215.0 (Released May 08, 2023)
 ---------------
 
 - improve setMockResponse manual response resolution (#3982)
