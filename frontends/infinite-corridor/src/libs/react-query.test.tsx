@@ -1,8 +1,8 @@
 import React from "react"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
-import { QueryClientProvider } from '@tanstack/react-query'
-import { useQuery } from '@tanstack/react-query'
+import { QueryClientProvider } from "@tanstack/react-query"
+import { useQuery } from "@tanstack/react-query"
 import { createQueryClient } from "./react-query"
 
 const queryClient = createQueryClient()
@@ -25,7 +25,7 @@ test.each([
     const queryFn = jest.fn().mockRejectedValue({ response: { status } })
     const { result, waitFor } = renderHook(
       () =>
-        useQuery(['test'], {
+        useQuery(["test"], {
           queryFn,
           retryDelay: 0
         }),

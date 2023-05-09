@@ -9,7 +9,8 @@ import {
   StaffList,
   ListItem,
   LearningResourceRef,
-  isUserListOrPath
+  isUserListOrPath,
+  isStaffListOrPath
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
 import axios from "../../libs/axios"
@@ -304,28 +305,27 @@ const useDeleteFromListItems = () => {
   return useMutation({
     mutationFn: deleteFromUserListItems,
     onMutate:   vars => {
-      const { item } = vars
+      const { item, list } = vars
       const resourceKey = keys
         .resource(item.content_type)
         .id(item.object_id).details
-      const previousResource =
-        queryClient.getQueryData<LearningResource>(resourceKey)
-      if (previousResource) {
-        const newResource: LearningResource = {
-          ...previousResource,
-          lists: previousResource.lists.filter(
-            member => member.item_id !== item.item_id
-          )
+      queryClient.setQueryData<LearningResource>(resourceKey, current => {
+        if (!current) return
+        const wasNotRemoved = (m: ListItemMember) => m.item_id !== item.item_id
+        if (isStaffListOrPath(list)) {
+          return {
+            ...current,
+            stafflists: current.stafflists.filter(wasNotRemoved)
+          }
         }
-        queryClient.setQueryData(resourceKey, newResource)
-      }
-      const rollback = () => {
-        queryClient.setQueryData(resourceKey, previousResource)
-      }
-      return { rollback }
-    },
-    onError: (_error, _var, context) => {
-      context?.rollback()
+        if (isUserListOrPath(list)) {
+          return {
+            ...current,
+            lists: current.lists.filter(wasNotRemoved)
+          }
+        }
+        return undefined
+      })
     },
     onSettled: (_data, _error, vars) => {
       const { item, list } = vars

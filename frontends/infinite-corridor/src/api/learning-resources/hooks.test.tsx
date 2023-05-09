@@ -6,14 +6,13 @@ import { faker } from "@faker-js/faker"
 import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
   useAddToListItems,
   useCreateUserList,
   useDeleteFromListItems,
   useDeleteUserList,
   useResource,
-  useUserListsListing,
   useFavorite,
   useUnfavorite,
   useUserListItems,
@@ -24,6 +23,7 @@ import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
 import axios from "../../libs/axios"
+import invariant from "tiny-invariant"
 
 function* makeCounter() {
   let i = 0
@@ -35,7 +35,6 @@ function* makeCounter() {
 const setup = () => {
   const idCounter = makeCounter()
   setMockResponse.defaultImplementation((method, url) => {
-    console.log("Responding to", method, url)
     return Promise.resolve({
       data:   `request number ${idCounter.next().value} (${method} to ${url})`,
       status: 200
@@ -75,68 +74,29 @@ test("useResource rejects with invalid resource type", async () => {
 })
 
 test("useCreateUserList invalidates userlist Listings", async () => {
-  const { wrapper } = setup()
+  const { wrapper, spies } = setup()
 
-  /**
-   * A test hoook wrapping some useQuery calls and a useMutation call. We'll
-   * check that the queries are refetched as expected after the mutation.
-   */
-  const existingListId = faker.datatype.number()
-  const useTestHook = () => {
-    const createList = useCreateUserList()
-    const existingList = useResource(LRT.Userlist, existingListId)
-    const listing = useUserListsListing()
-    return { createList, existingList, listing }
-  }
+  const { result } = renderHook(() => useCreateUserList(), { wrapper })
 
-  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(
-    () =>
-      result.current.existingList.isSuccess && result.current.listing.isSuccess
-  )
-  const before = result.current
-  await act(() =>
-    result.current.createList.mutateAsync({ title: "My new list" })
-  )
-  const after = result.current
+  await act(() => result.current.mutateAsync({ title: "My new list" }))
 
-  // specific list is still cached
-  expect(before.existingList.data).toEqual(after.existingList.data)
-  // listing has been re-fetched
-  expect(before.listing.data).not.toEqual(after.listing.data)
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.userList.listing.all
+  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(1)
 })
 
 test("useDeleteUserList invalidates all resource queries", async () => {
-  const { wrapper } = setup()
+  const { wrapper, spies } = setup()
 
-  const otherResourceId = faker.datatype.number()
+  const { result } = renderHook(() => useDeleteUserList(), { wrapper })
 
-  /**
-   * A test hoook wrapping some useQuery calls and a useMutation call. We'll
-   * check that the queries are refetched as expected after the mutation.
-   */
-  const useTestHook = () => {
-    const deleteList = useDeleteUserList()
-    const otherResource = useResource(LRT.Course, otherResourceId)
-    const listing = useUserListsListing()
-    return { deleteList, otherResource, listing }
-  }
+  await act(() => result.current.mutateAsync(faker.datatype.number()))
 
-  const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
-  await waitFor(
-    () =>
-      result.current.otherResource.isSuccess && result.current.listing.isSuccess
-  )
-  const before = result.current
-  await act(() =>
-    result.current.deleteList.mutateAsync(faker.datatype.number())
-  )
-  const after = result.current
-
-  // other resource is re-fetched. (It could have been in the deleted list.)
-  expect(before.otherResource.data).not.toEqual(after.otherResource.data)
-  // listing has been re-fetched.
-  expect(before.listing.data).not.toEqual(after.listing.data)
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: keys.all
+  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(1)
 })
 
 test.each([
@@ -366,9 +326,24 @@ test("useDeleteFromListItems optimistically updates resource data", async () => 
     })
   })
 
-  // Check the optimistic update
+  let resolve = () => invariant("Not yet assigned")
+  setMockResponse.get(
+    resourceUrl,
+    new Promise(res => {
+      resolve = () => res(modifiedResource)
+    })
+  )
+
+  // Optimistic update
   await waitFor(() => {
     expect(resourceQuery.current.data).toEqual(modifiedResource)
+  })
+  expect(resourceQuery.current.isFetching).toBe(true)
+
+  resolve()
+  // Server update
+  await waitFor(() => {
+    expect(resourceQuery.current.isFetching).toBe(false)
   })
 })
 
@@ -466,16 +441,18 @@ test.each([
   "useMoveListItem($mode) optimistic updates",
   async ({ mode, useItemsQuery, itemsUrl }) => {
     const { wrapper, spies } = setup()
-    setMockResponse.get(
-      expect.stringContaining(itemsUrl),
-      factories.makeListItemsPaginated(
-        {
-          count:    5,
-          pageSize: 3
-        },
-        { next: `${itemsUrl}?limit=3&offset=3` }
-      )
+    const page1 = factories.makeListItemsPaginated(
+      {
+        count:    5,
+        pageSize: 3
+      },
+      { next: `${itemsUrl}?limit=3&offset=3` }
     )
+    const page2 = factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
+    const url1 = expect.stringContaining("offset=0")
+    const url2 = expect.stringContaining("offset=3")
+    setMockResponse.get(url1, page1)
+    setMockResponse.get(url2, page2)
     const { result: itemsQ, waitFor } = renderHook(
       () => useItemsQuery(123, { limit: 3 }),
       { wrapper }
@@ -487,17 +464,20 @@ test.each([
 
     await waitFor(() => expect(itemsQ.current.isLoading).toBe(false))
 
-    setMockResponse.get(
-      expect.stringContaining(itemsUrl),
-      factories.makeListItemsPaginated({ count: 5, pageSize: 2 })
-    )
+    expect(itemsQ.current.hasNextPage).toBe(true)
+
+    expect(itemsQ.current.data?.pages).toEqual([page1])
 
     await act(async () => {
       await itemsQ.current.fetchNextPage()
     })
 
-    const [item0, item1, item2] = itemsQ.current.data?.pages[0].results ?? []
-    const [item3, item4] = itemsQ.current.data?.pages[1].results ?? []
+    await waitFor(() => expect(itemsQ.current.data?.pages.length).toBe(2))
+
+    expect(itemsQ.current.data?.pages).toEqual([page1, page2])
+
+    const [item0, item1, item2] = page1.results
+    const [item3, item4] = page2.results
 
     spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
     await act(async () =>
@@ -509,7 +489,17 @@ test.each([
       })
     )
 
-    expect(itemsQ.current.data?.pages[0].results).toEqual([item0, item3, item1])
+    // Block the API response
+    setMockResponse.get(url1, new Promise(() => null))
+    setMockResponse.get(url2, new Promise(() => null))
+
+    await waitFor(() => {
+      expect(itemsQ.current.data?.pages[0].results).toEqual([
+        item0,
+        item3,
+        item1
+      ])
+    })
     expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
 
     const listKeys = {

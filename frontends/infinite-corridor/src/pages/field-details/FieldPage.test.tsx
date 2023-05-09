@@ -5,7 +5,7 @@ import { urls as widgetUrls } from "../../api/widgets"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { LearningResource } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem } from "ol-search-ui"
+import type { UserList, ListItem } from "ol-search-ui"
 import type { FieldChannel } from "../../api/fields"
 import * as factory from "../../api/fields/factories"
 import * as lrFactory from "ol-search-ui/src/factories"
@@ -82,7 +82,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   const widgetsList = makeWidgetListResponse()
   setMockResponse.get(widgetUrls.widgetList(field.widget_list), widgetsList)
 
-  const toLearningResources = (items: UserListItem[]) =>
+  const toLearningResources = (items: ListItem[]) =>
     items.map(item => item.content_data)
   const featured: SubfieldData = {
     list:  list1,

@@ -52,15 +52,14 @@ describe("useInfiniteLimitOffsetQuery", () => {
       await result.current.fetchNextPage()
     })
 
+    expect(result.current.hasNextPage).toBe(true)
     setMockResponse.get(initialUrl, secondPage)
-    expect(result.current.data?.pages).toEqual([firstPage, secondPage])
+    await waitFor(() => {
+      expect(result.current.data?.pages).toEqual([firstPage, secondPage])
+    })
     expect(axios.get).toHaveBeenCalledWith(nextUrl)
     expect(axios.get).toHaveBeenCalledTimes(2)
 
-    jest.mocked(axios.get).mockClear()
-    await act(async () => {
-      await result.current.fetchNextPage()
-    })
-    expect(axios.get).not.toHaveBeenCalled()
+    expect(result.current.hasNextPage).toBe(false)
   })
 })

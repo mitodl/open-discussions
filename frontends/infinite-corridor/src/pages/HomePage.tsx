@@ -20,7 +20,7 @@ import Tab from "@mui/material/Tab"
 import TabPanel from "@mui/lab/TabPanel"
 import TabList from "@mui/lab/TabList"
 import type { PaginatedResult } from "ol-util"
-import { UseQueryResult } from '@tanstack/react-query'
+import { UseQueryResult } from "@tanstack/react-query"
 
 interface HomePageCarouselProps {
   query: UseQueryResult<PaginatedResult<LearningResource>>

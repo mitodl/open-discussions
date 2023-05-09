@@ -256,7 +256,10 @@ test.each([
   }
 )
 
-test.each([{ list: makeUserList(), listUrls: lrUrls.userList }, { list: makeStaffList(), listUrls: lrUrls.staffList }])(
+test.each([
+  { list: makeUserList(), listUrls: lrUrls.userList },
+  { list: makeStaffList(), listUrls: lrUrls.staffList }
+])(
   "Passes isRefetching=true to ItemsList while reloading data",
   async ({ list, listUrls }) => {
     const { queryClient, paginatedItems } = setup({ list })
