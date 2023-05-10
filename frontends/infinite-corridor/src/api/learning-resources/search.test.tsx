@@ -64,6 +64,7 @@ describe("useInfiniteSearch", () => {
     expect(result.current.data.pages.length).toBe(1)
     expect(result.current.data.pages[0].hits.hits.length).toBe(3)
     assertSearchLastCalledWith({ from: 0, size: 3 })
+    expect(result.current.hasNextPage).toBe(true)
 
     await act(async () => {
       await result.current.fetchNextPage()
@@ -73,18 +74,16 @@ describe("useInfiniteSearch", () => {
       expect(result.current.data?.pages.length).toBe(2)
     })
     assertSearchLastCalledWith({ from: 3, size: 3 })
+    expect(result.current.hasNextPage).toBe(true)
 
     await act(async () => {
       await result.current.fetchNextPage()
     })
 
-    expect(result.current.hasNextPage).toBe(true)
     await waitFor(() => {
       expect(result.current.data?.pages.length).toBe(3)
     })
     assertSearchLastCalledWith({ from: 6, size: 3 })
-
-    // No more pages left!
     expect(result.current.hasNextPage).toBe(false)
   })
 
