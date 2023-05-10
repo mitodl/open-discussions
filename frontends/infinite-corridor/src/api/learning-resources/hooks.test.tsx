@@ -484,10 +484,8 @@ test.each([
     spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
     await act(async () =>
       moveItem.current.mutateAsync({
-        item:        { list_id: 123, item_id: items[3].id },
-        newPosition: items[1].position,
-        oldIndex:    3,
-        newIndex:    1
+        item:     { list_id: 123, item_id: items[3].id },
+        position: items[1].position
       })
     )
 

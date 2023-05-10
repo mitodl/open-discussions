@@ -456,16 +456,16 @@ const useNewVideos = (options?: PaginationSearchParams) => {
 }
 type MoveItemPayload = {
   item: Pick<ListItemMember, "item_id" | "list_id">
-  newPosition: number
+  position: number
 }
-const moveUserListItem = async ({ item, newPosition }: MoveItemPayload) => {
+const moveUserListItem = async ({ item, position }: MoveItemPayload) => {
   const url = urls.userList.itemDetails(item.list_id, item.item_id)
-  const body = { position: newPosition }
+  const body = { position }
   await axios.patch(url, body)
 }
-const moveStaffListItem = async ({ item, newPosition }: MoveItemPayload) => {
+const moveStaffListItem = async ({ item, position }: MoveItemPayload) => {
   const url = urls.staffList.itemDetails(item.list_id, item.item_id)
-  const body = { position: newPosition }
+  const body = { position }
   await axios.patch(url, body)
 }
 

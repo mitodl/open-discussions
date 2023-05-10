@@ -85,9 +85,7 @@ const ResourceListItemsSortable: React.FC<{
           item_id: active.id,
           list_id: listId
         },
-        newPosition: over.position,
-        oldIndex:    e.activeIndex,
-        newIndex:    e.overIndex
+        position: over.position
       })
     },
     [move, listId]
