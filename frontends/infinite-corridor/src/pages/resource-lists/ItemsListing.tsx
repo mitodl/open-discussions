@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import classNames from "classnames"
 import type { ListItem } from "ol-search-ui"
 import LearningResourceCard from "../../components/LearningResourceCard"
@@ -7,7 +7,8 @@ import {
   SortableList,
   RenderActive,
   LoadingSpinner,
-  CancelDrop
+  arrayMove,
+  OnSortEnd
 } from "ol-util"
 import { useMoveListItem } from "../../api/learning-resources"
 
@@ -47,6 +48,17 @@ const ResourceListItemsSortable: React.FC<{
   mode: NonNullable<ResourceListItemsProps["mode"]>
 }> = ({ items, listId, isRefetching, mode }) => {
   const move = useMoveListItem(mode)
+
+  /**
+   * `sorted` is a local copy of `items`:
+   *  - `onSortEnd`, we'll update `sorted` copy immediately to prevent UI from
+   *  snapping back to its original position.
+   *  - `items` is the source of truth (most likely, this is coming from an API)
+   *    so sync `items` -> `sorted` when `items` changes.
+   */
+  const [sorted, setSorted] = React.useState<ListItem[]>([])
+  useEffect(() => setSorted(items), [items])
+
   const renderDragging: RenderActive = useCallback(active => {
     const item = active.data.current as ListItem
     return (
@@ -60,39 +72,23 @@ const ResourceListItemsSortable: React.FC<{
     )
   }, [])
 
-  /**
-   * Use the cancelDrop callback to move the item.
-   *
-   * Why?
-   *
-   * The `useMoveListItem` mutation function makes an API call and
-   * optimistically updates the UI for immediate feedback. Except optimistic
-   * updates in react-query aren't actually immediate, they're asynchronous (no
-   * server interaction, but on the JS event loop).
-   *
-   * Using the cancelDrop callback delays dnd-kit's drop event until our API
-   * call has finished, at which point the optimistic update is also done.
-   *
-   * See https://github.com/clauderic/dnd-kit/issues/921
-   */
-  const moveItemsOnCancelDrop: CancelDrop<number> = useCallback(
+  const onSortEnd: OnSortEnd<number> = useCallback(
     async e => {
       const active = e.active.data.current as unknown as ListItem
       const over = e.over.data.current as unknown as ListItem
-      try {
-        await move.mutateAsync({
-          item: {
-            item_id: active.id,
-            list_id: listId
-          },
-          newPosition: over.position,
-          oldIndex:    e.activeIndex,
-          newIndex:    e.overIndex
-        })
-        return false
-      } catch (e) {
-        return true
-      }
+      setSorted(current => {
+        const newOrder = arrayMove(current, e.activeIndex, e.overIndex)
+        return newOrder
+      })
+      move.mutate({
+        item: {
+          item_id: active.id,
+          list_id: listId
+        },
+        newPosition: over.position,
+        oldIndex:    e.activeIndex,
+        newIndex:    e.overIndex
+      })
     },
     [move, listId]
   )
@@ -104,11 +100,11 @@ const ResourceListItemsSortable: React.FC<{
       })}
     >
       <SortableList
-        itemIds={items.map(item => item.id)}
-        cancelDrop={moveItemsOnCancelDrop}
+        itemIds={sorted.map(item => item.id)}
+        onSortEnd={onSortEnd}
         renderActive={renderDragging}
       >
-        {items.map(item => {
+        {sorted.map(item => {
           return (
             <SortableItem
               Component="li"
