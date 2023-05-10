@@ -257,6 +257,31 @@ test.each([
   }
 )
 
+test.each([{ list: makeUserList() }, { list: makeStaffList() }])(
+  "Passes appropriate props to ItemsListing ($list.object_type)",
+  async ({ list }) => {
+    const { paginatedItems } = setup({ list })
+    expectProps(spyItemsListing, {
+      isLoading:    true,
+      items:        undefined,
+      emptyMessage: "There are no items in this list yet."
+    })
+
+    await waitFor(() => {
+      expectProps(
+        spyItemsListing,
+        {
+          // sortable is tested elsewhere
+          isLoading:    false,
+          items:        paginatedItems.results,
+          emptyMessage: "There are no items in this list yet."
+        },
+        -1
+      )
+    })
+  }
+)
+
 test.each([
   { list: makeUserList(), listUrls: lrUrls.userList },
   { list: makeStaffList(), listUrls: lrUrls.staffList }
