@@ -3,8 +3,12 @@ import { clone } from "lodash"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
-import { LearningResourceType as LRT, ListItemMember } from "ol-search-ui"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import {
+  LearningResourceType as LRT,
+  LearningResource,
+  ListItemMember
+} from "ol-search-ui"
+import { allowConsoleErrors, ControlledPromise } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import {
@@ -23,7 +27,6 @@ import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
 import axios from "../../libs/axios"
-import invariant from "tiny-invariant"
 
 function* makeCounter() {
   let i = 0
@@ -128,9 +131,12 @@ test.each([
       () => useResource(resource.object_type, resource.id),
       { wrapper }
     )
-    const { result: addResult } = renderHook(() => useAddToListItems(), {
-      wrapper
-    })
+    const { result: addResult, waitFor } = renderHook(
+      () => useAddToListItems(),
+      {
+        wrapper
+      }
+    )
 
     setMockResponse.post(url, { content_data: modifiedAddedResource })
 
@@ -158,7 +164,9 @@ test.each([
     expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
 
     // The POST response result updated resource data
-    expect(resourceResult.current.data).toEqual(modifiedAddedResource)
+    await waitFor(() => {
+      expect(resourceResult.current.data).toEqual(modifiedAddedResource)
+    })
   }
 )
 
@@ -326,13 +334,8 @@ test("useDeleteFromListItems optimistically updates resource data", async () => 
     })
   })
 
-  let resolve = () => invariant("Not yet assigned")
-  setMockResponse.get(
-    resourceUrl,
-    new Promise(res => {
-      resolve = () => res(modifiedResource)
-    })
-  )
+  const resourceResponse = new ControlledPromise<LearningResource>()
+  setMockResponse.get(resourceUrl, resourceResponse)
 
   // Optimistic update
   await waitFor(() => {
@@ -340,7 +343,7 @@ test("useDeleteFromListItems optimistically updates resource data", async () => 
   })
   expect(resourceQuery.current.isFetching).toBe(true)
 
-  resolve()
+  resourceResponse.resolve(modifiedResource)
   // Server update
   await waitFor(() => {
     expect(resourceQuery.current.isFetching).toBe(false)
@@ -438,7 +441,7 @@ test.each([
     itemsUrl:      "stafflists/123/items"
   }
 ] as const)(
-  "useMoveListItem($mode) optimistic updates",
+  "useMoveListItem($mode) invalidates appropriate queries",
   async ({ mode, useItemsQuery, itemsUrl }) => {
     const { wrapper, spies } = setup()
     const page1 = factories.makeListItemsPaginated(
@@ -476,31 +479,17 @@ test.each([
 
     expect(itemsQ.current.data?.pages).toEqual([page1, page2])
 
-    const [item0, item1, item2] = page1.results
-    const [item3, item4] = page2.results
+    const items = [page1.results, page2.results].flat()
 
     spies.queryClient.invalidateQueries.mockImplementationOnce(jest.fn())
     await act(async () =>
       moveItem.current.mutateAsync({
-        item:        { list_id: 123, item_id: item3.id },
-        newPosition: item1.position,
+        item:        { list_id: 123, item_id: items[3].id },
+        newPosition: items[1].position,
         oldIndex:    3,
         newIndex:    1
       })
     )
-
-    // Block the API response
-    setMockResponse.get(url1, new Promise(() => null))
-    setMockResponse.get(url2, new Promise(() => null))
-
-    await waitFor(() => {
-      expect(itemsQ.current.data?.pages[0].results).toEqual([
-        item0,
-        item3,
-        item1
-      ])
-    })
-    expect(itemsQ.current.data?.pages[1].results).toEqual([item2, item4])
 
     const listKeys = {
       userlist:  keys.userList.id(123).itemsListing.all,

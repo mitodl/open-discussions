@@ -2,7 +2,8 @@ import {
   UserList,
   LearningResourceType as LRT,
   StaffList,
-  isUserListOrPath
+  isUserListOrPath,
+  PaginatedListItems
 } from "ol-search-ui"
 import {
   makeUserList,
@@ -23,7 +24,7 @@ import {
   act
 } from "../../test-utils"
 import { User } from "../../types/settings"
-import invariant from "tiny-invariant"
+import { ControlledPromise } from "ol-util/src/test-utils"
 
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")
@@ -267,10 +268,7 @@ test.each([
     expectProps(spyItemsListing, { isRefetching: false }, -1)
     spyItemsListing.mockClear()
 
-    let resolve = () => invariant("Not yet assigned")
-    const itemsResponse = new Promise(res => {
-      resolve = () => res(paginatedItems)
-    })
+    const itemsResponse = new ControlledPromise<PaginatedListItems>()
     setMockResponse.get(listUrls.itemsListing(list.id), itemsResponse)
 
     spyItemsListing.mockClear()
@@ -287,7 +285,7 @@ test.each([
     await waitFor(() => expectProps(spyItemsListing, { isRefetching: true }))
     spyItemsListing.mockClear()
     await act(async () => {
-      resolve()
+      itemsResponse.resolve(paginatedItems)
       await itemsResponse
     })
     await waitFor(() => expectProps(spyItemsListing, { isRefetching: false }))
