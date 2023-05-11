@@ -176,12 +176,12 @@ describe("CourseSearchPage", () => {
     wrapper.update()
     await wrapper.find("InfiniteScroll").prop("loadMore")()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: null,
-      from:        SETTINGS.search_page_size,
-      size:        SETTINGS.search_page_size,
-      text:        "",
-      type:        LR_TYPE_ALL,
-      facets:      new Map(
+      channelName:   null,
+      from:          SETTINGS.search_page_size,
+      size:          SETTINGS.search_page_size,
+      text:          "",
+      resourceTypes: LR_TYPE_ALL,
+      facets:        new Map(
         Object.entries({
           audience:            [],
           certification:       [],
@@ -212,12 +212,12 @@ describe("CourseSearchPage", () => {
 
     await render()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: null,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        LR_TYPE_ALL,
-      facets:      new Map(
+      channelName:   null,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: LR_TYPE_ALL,
+      facets:        new Map(
         Object.entries({
           audience:            [],
           certification:       [],
@@ -248,12 +248,12 @@ describe("CourseSearchPage", () => {
 
     await render()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: null,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        ["podcast", "podcastepisode"],
-      facets:      new Map(
+      channelName:   null,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: LR_TYPE_ALL,
+      facets:        new Map(
         Object.entries({
           audience:            [],
           certification:       [],
@@ -285,12 +285,12 @@ describe("CourseSearchPage", () => {
     SETTINGS.search_page_size = 5
     await render()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: null,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        ["userlist", "learningpath"],
-      facets:      new Map(
+      channelName:   null,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: LR_TYPE_ALL,
+      facets:        new Map(
         Object.entries({
           audience:            [],
           certification:       [],

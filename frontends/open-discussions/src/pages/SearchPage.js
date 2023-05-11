@@ -149,10 +149,17 @@ export class SearchPage extends React.Component<Props, State> {
       from = 0
     }
     this.setState({ from, error })
+
+    let resourceTypes = undefined
+
+    if (!R.isNil(type)) {
+      resourceTypes = [type]
+    }
+
     await runSearch({
       channelName,
       text,
-      type,
+      resourceTypes,
       from,
       size: SETTINGS.search_page_size
     })
