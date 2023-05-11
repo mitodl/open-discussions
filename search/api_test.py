@@ -225,6 +225,7 @@ def test_execute_search(user, elasticsearch):
                 }
             },
         },
+        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -304,6 +305,7 @@ def test_execute_search_anonymous(elasticsearch):
                 }
             },
         },
+        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -327,12 +329,12 @@ def test_execute_search_with_suggestion(
     )
 
     elasticsearch.conn.search.return_value = {
-        "hits": {"total": {"value": 3, "relation": "eq"}},
+        "hits": {"total": 3},
         "suggest": RAW_SUGGESTIONS,
     }
 
     assert execute_search(user=user, query=query) == {
-        "hits": {"total": {"value": 3, "relation": "eq"}},
+        "hits": {"total": 3},
         "suggest": expected_suggest,
     }
 
@@ -341,9 +343,7 @@ def test_execute_search_with_suggestion(
 def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {
-        "hits": {"total": {"value": 10, "relation": "eq"}}
-    }
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -406,6 +406,7 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
 
     elasticsearch.conn.search.assert_called_once_with(
         body={**query, "query": subquery},
+        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -414,9 +415,7 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
 def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {
-        "hits": {"total": {"value": 10, "relation": "eq"}}
-    }
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
@@ -477,6 +476,7 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
             **query,
             "query": subquery,
         },
+        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -484,9 +484,7 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
 def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     """execute_learn_search should execute an Elasticsearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
-    elasticsearch.conn.search.return_value = {
-        "hits": {"total": {"value": 10, "relation": "eq"}}
-    }
+    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
@@ -714,7 +712,7 @@ def test_transform_results(
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
+        "hits": {"hits": raw_hits, "total": 3},
         "suggest": RAW_SUGGESTIONS,
         "aggregations": {
             "agg_filter_topics": {
@@ -741,6 +739,7 @@ def test_transform_results(
             },
         },
     }
+
     assert (
         transform_results(results, search_user, [])["aggregations"]
         == results["aggregations"]
@@ -771,7 +770,7 @@ def test_transform_department_filter(department_fitler):
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
+        "hits": {"hits": raw_hits, "total": 3},
         "aggregations": {
             "agg_filter_topics": {
                 "doc_count": 30,
@@ -805,7 +804,7 @@ def test_transform_department_name_aggregations():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
+        "hits": {"hits": {}, "total": 15},
         "suggest": {},
         "aggregations": {
             "agg_filter_department_name": {
@@ -840,7 +839,7 @@ def test_transform_level_aggregation():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
+        "hits": {"hits": {}, "total": 15},
         "suggest": {},
         "aggregations": {
             "agg_filter_level": {
@@ -892,7 +891,7 @@ def test_transform_topics_aggregations():
     Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
+        "hits": {"hits": {}, "total": 15},
         "suggest": {},
         "aggregations": {
             "agg_filter_topics": {
@@ -926,7 +925,7 @@ def test_transform_resource_type_aggregations():
     transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
+        "hits": {"hits": {}, "total": 15},
         "suggest": {},
         "aggregations": {
             "agg_filter_resource_type": {
@@ -988,7 +987,7 @@ def test_combine_type_buckets_in_aggregates(
         type_buckets.append({"key": "learningpath", "doc_count": 3})
 
     results = {
-        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
+        "hits": {"hits": {}, "total": 15},
         "suggest": {},
         "aggregations": {"type": {"buckets": type_buckets}},
     }
@@ -1056,5 +1055,6 @@ def test_get_similar_topics(settings, elasticsearch):
                 }
             },
         },
+        doc_type=[],
         index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
     )

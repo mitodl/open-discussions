@@ -341,9 +341,10 @@ def _transform_search_results_suggest(search_result):
     """
 
     es_suggest = search_result.pop("suggest", {})
-    total = search_result.get("hits", {}).get("total", {})
-    total_value = total if isinstance(total, int) else total.get("value", 0)
-    if total_value <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS:
+    if (
+        search_result.get("hits", {}).get("total", 0)
+        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
+    ):
         suggestion_dict = defaultdict(int)
         suggestions = [
             suggestion
@@ -363,6 +364,7 @@ def _transform_search_results_suggest(search_result):
         ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
     else:
         search_result["suggest"] = []
+
     return search_result
 
 
@@ -468,27 +470,11 @@ def transform_results(search_result, user, department_filters):
                 )
 
     search_result = _transform_search_results_suggest(search_result)
-    search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
 
     return search_result
-
-
-def _transform_search_result_total_es7(result):
-    """
-    Replace value depending on whether getting sent an int or dict per es6 or 7
-
-    Args:
-        result (dict): The single result from Elasticsearch results
-
-    """
-    total = result.get("hits", {}).get("total", {})
-    if isinstance(total, int):
-        return total
-    else:
-        return total.get("value", 0)
 
 
 def _transform_search_results_coursenum(search_result, department_filters):

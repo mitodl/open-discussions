@@ -119,7 +119,9 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
         }
     }
     if not skip_mapping:
-        index_create_data["mappings"] = {"properties": MAPPING[object_type]}
+        index_create_data["mappings"] = {
+            GLOBAL_DOC_TYPE: {"properties": MAPPING[object_type]}
+        }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
     conn.indices.create(index_name, body=index_create_data)
 
