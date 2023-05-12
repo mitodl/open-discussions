@@ -1,6 +1,6 @@
 import axios from "./libs/axios"
 import { setMockResponse } from "./test-utils"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import { ControlledPromise, allowConsoleErrors } from "ol-util/src/test-utils"
 
 describe("request mocking", () => {
   test("mocking specific responses and spying", async () => {
@@ -78,13 +78,7 @@ describe("request mocking", () => {
   })
 
   test("Manually resolving a response", async () => {
-    let resolve: (value: number) => void = () => {
-      throw new Error("Not yet assigned")
-    }
-    const responseBody = new Promise(resolver => {
-      resolve = resolver
-    })
-
+    const responseBody = new ControlledPromise<number>()
     setMockResponse.get("/respond-when-i-say", responseBody)
     const response = axios.get("/respond-when-i-say")
     let responseStatus = "pending"
@@ -94,7 +88,7 @@ describe("request mocking", () => {
 
     await Promise.resolve() // flush the event queue
     expect(responseStatus).toBe("pending") // response is still pending
-    resolve(37)
+    responseBody.resolve(37)
     expect(await response).toEqual(
       expect.objectContaining({
         data:   37,

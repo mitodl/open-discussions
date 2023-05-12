@@ -264,7 +264,7 @@ describe("Creating lists with manageListDialogs", () => {
 
   test("Displays overall error if form validates but API call fails", async () => {
     allowConsoleErrors()
-    const { topics } = await setup()
+    const { topics } = await setup("userlist")
     const userList = factories.makeUserList({
       short_description: faker.lorem.paragraph(),
       topics:            [faker.helpers.arrayElement(topics.results)]

@@ -56,7 +56,7 @@ describe("EditFieldBasicForm", () => {
     const featuredListSelector = (await screen.findByLabelText(
       "Featured learning resources"
     )) as HTMLInputElement
-    expect(featuredListSelector.value).toEqual(field.featured_list.title)
+    expect(featuredListSelector.value).toEqual(field.featured_list?.title)
     await user.click(featuredListSelector)
     await user.click(screen.getByText(publicLists.results[4].title))
     expect(featuredListSelector.value).toEqual(publicLists.results[4].title)
@@ -68,7 +68,7 @@ describe("EditFieldBasicForm", () => {
     expect(drags.length).toEqual(3)
     for (let x = 0; x < drags.length; x++) {
       // eslint-disable-next-line testing-library/no-node-access
-      expect(drags[x].closest("div").innerHTML).toContain(field.lists[x].title)
+      expect(drags[x].closest("div")?.innerHTML).toContain(field.lists[x].title)
     }
 
     // Add a list

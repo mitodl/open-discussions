@@ -1,4 +1,3 @@
-import { chunk } from "lodash"
 import {
   LearningResource,
   PaginatedListItems,
@@ -9,18 +8,18 @@ import {
   StaffList,
   ListItem,
   LearningResourceRef,
-  isUserListOrPath
+  isUserListOrPath,
+  isStaffListOrPath
 } from "ol-search-ui"
-import { PaginatedResult, PaginationSearchParams, arrayMove } from "ol-util"
+import { PaginatedResult, PaginationSearchParams } from "ol-util"
 import axios from "../../libs/axios"
 import {
   useMutation,
   useQuery,
   useQueryClient,
   UseQueryResult,
-  UseQueryOptions,
-  InfiniteData
-} from "react-query"
+  UseQueryOptions
+} from "@tanstack/react-query"
 import {
   urls,
   keys,
@@ -29,8 +28,6 @@ import {
   StaffListOptions
 } from "./urls"
 import { modifyCachedSearchResource } from "./search"
-import invariant from "tiny-invariant"
-import { QueryFilters } from "react-query/types/core/utils"
 import { useInfiniteLimitOffsetQuery } from "./util"
 
 const useResource = (
@@ -304,28 +301,27 @@ const useDeleteFromListItems = () => {
   return useMutation({
     mutationFn: deleteFromUserListItems,
     onMutate:   vars => {
-      const { item } = vars
+      const { item, list } = vars
       const resourceKey = keys
         .resource(item.content_type)
         .id(item.object_id).details
-      const previousResource =
-        queryClient.getQueryData<LearningResource>(resourceKey)
-      if (previousResource) {
-        const newResource: LearningResource = {
-          ...previousResource,
-          lists: previousResource.lists.filter(
-            member => member.item_id !== item.item_id
-          )
+      queryClient.setQueryData<LearningResource>(resourceKey, current => {
+        if (!current) return
+        const wasNotRemoved = (m: ListItemMember) => m.item_id !== item.item_id
+        if (isStaffListOrPath(list)) {
+          return {
+            ...current,
+            stafflists: current.stafflists.filter(wasNotRemoved)
+          }
         }
-        queryClient.setQueryData(resourceKey, newResource)
-      }
-      const rollback = () => {
-        queryClient.setQueryData(resourceKey, previousResource)
-      }
-      return { rollback }
-    },
-    onError: (_error, _var, context) => {
-      context?.rollback()
+        if (isUserListOrPath(list)) {
+          return {
+            ...current,
+            lists: current.lists.filter(wasNotRemoved)
+          }
+        }
+        return undefined
+      })
     },
     onSettled: (_data, _error, vars) => {
       const { item, list } = vars
@@ -460,30 +456,21 @@ const useNewVideos = (options?: PaginationSearchParams) => {
 }
 type MoveItemPayload = {
   item: Pick<ListItemMember, "item_id" | "list_id">
-  newPosition: number
-  oldIndex: number
-  newIndex: number
+  position: number
 }
-const moveUserListItem = async ({ item, newPosition }: MoveItemPayload) => {
+const moveUserListItem = async ({ item, position }: MoveItemPayload) => {
   const url = urls.userList.itemDetails(item.list_id, item.item_id)
-  const body = { position: newPosition }
+  const body = { position }
   await axios.patch(url, body)
 }
-const moveStaffListItem = async ({ item, newPosition }: MoveItemPayload) => {
+const moveStaffListItem = async ({ item, position }: MoveItemPayload) => {
   const url = urls.staffList.itemDetails(item.list_id, item.item_id)
-  const body = { position: newPosition }
+  const body = { position }
   await axios.patch(url, body)
 }
 
 /**
  * Mutation for moving a list item to a new position.
- *
- * The `mutationFn` requires both the old and new
- *   - the new item `position` (item positions come from the API)
- *   - both the old and new indices within UI array.
- *
- * We use the indices to update the UI immediately, and the positions to make
- * the API call.
  */
 const useMoveListItem = (mode: "userlist" | "stafflist") => {
   const queryClient = useQueryClient()
@@ -494,28 +481,6 @@ const useMoveListItem = (mode: "userlist" | "stafflist") => {
       keys.staffList.id(id).itemsListing.all
   return useMutation({
     mutationFn,
-    onMutate: vars => {
-      const queryFilter: QueryFilters = {
-        queryKey:  listingKey(vars.item.list_id),
-        predicate: query => query.state.data !== undefined
-      }
-      queryClient.setQueriesData<InfiniteData<PaginatedListItems>>(
-        queryFilter,
-        old => {
-          invariant(old, "old data should be defined")
-          const items = old.pages.flatMap(page => page.results)
-          const newItems = arrayMove(items, vars.oldIndex, vars.newIndex)
-          return {
-            ...old,
-            pages: chunk(newItems, old.pages[0].results.length).map((c, i) => ({
-              ...old.pages[i],
-              results: c
-            }))
-          }
-        }
-      )
-      return { queryFilter }
-    },
     onSettled: (_data, _error, vars) => {
       /**
        * We did an optimistic update that re-ordered the list for the UI.

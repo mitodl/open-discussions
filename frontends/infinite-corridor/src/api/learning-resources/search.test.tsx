@@ -6,7 +6,7 @@ import {
 import { act } from "@testing-library/react"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import * as factories from "ol-search-ui/src/factories"
-import { QueryClient, QueryClientProvider } from "react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls } from "./urls"
 import axios from "../../libs/axios"
@@ -27,12 +27,6 @@ const assertSearchLastCalledWith = (
 ) => {
   const body = exactly ? params : expect.objectContaining(params)
   expect(axios.post).toHaveBeenLastCalledWith(urls.search, body)
-}
-const assertSearchCalledTimes = (count: number) => {
-  const searchCalls = jest
-    .mocked(axios.post)
-    .mock.calls.filter(args => args[0] === urls.search)
-  expect(searchCalls).toHaveLength(count)
 }
 
 const setup = () => {
@@ -70,28 +64,27 @@ describe("useInfiniteSearch", () => {
     expect(result.current.data.pages.length).toBe(1)
     expect(result.current.data.pages[0].hits.hits.length).toBe(3)
     assertSearchLastCalledWith({ from: 0, size: 3 })
+    expect(result.current.hasNextPage).toBe(true)
 
     await act(async () => {
       await result.current.fetchNextPage()
     })
 
-    expect(result.current.data.pages.length).toBe(2)
+    await waitFor(() => {
+      expect(result.current.data?.pages.length).toBe(2)
+    })
     assertSearchLastCalledWith({ from: 3, size: 3 })
+    expect(result.current.hasNextPage).toBe(true)
 
     await act(async () => {
       await result.current.fetchNextPage()
     })
 
-    expect(result.current.data.pages.length).toBe(3)
+    await waitFor(() => {
+      expect(result.current.data?.pages.length).toBe(3)
+    })
     assertSearchLastCalledWith({ from: 6, size: 3 })
-
-    // No more pages left!
-    jest.mocked(axios.post).mockClear()
-    await act(async () => {
-      await result.current.fetchNextPage()
-    })
-    assertSearchCalledTimes(0) // no api call
-    expect(result.current.data.pages.length).toBe(3) // results unchanged
+    expect(result.current.hasNextPage).toBe(false)
   })
 
   it("uses correct searchparams when making calls", () => {

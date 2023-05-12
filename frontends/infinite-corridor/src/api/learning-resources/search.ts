@@ -1,5 +1,5 @@
 import { intersection } from "lodash"
-import { QueryClient, useInfiniteQuery } from "react-query"
+import { QueryClient, useInfiniteQuery } from "@tanstack/react-query"
 import type { LearningResourceSearchResult } from "ol-search-ui"
 import type {
   Aggregations,

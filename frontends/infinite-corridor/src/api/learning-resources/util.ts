@@ -1,6 +1,6 @@
 import { PaginatedResult } from "ol-util"
-import { useInfiniteQuery } from "react-query"
-import type { UseInfiniteQueryOptions } from "react-query"
+import { useInfiniteQuery } from "@tanstack/react-query"
+import type { UseInfiniteQueryOptions } from "@tanstack/react-query"
 import axios from "../../libs/axios"
 
 const useInfiniteLimitOffsetQuery = <T>(
