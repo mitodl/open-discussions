@@ -120,3 +120,4 @@ export {
   createMatchMediaForJsDom,
   allowConsoleErrors
 }
+export { default as ControlledPromise } from "./ControlledPromise"

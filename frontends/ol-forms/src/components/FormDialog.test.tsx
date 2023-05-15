@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker"
 import { render, screen, act, waitFor } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import FormDialog, { FormDialogProps } from "./FormDialog"
+import { ControlledPromise } from "ol-util/src/test-utils"
 
 const setup = (props?: Partial<FormDialogProps>) => {
   const onSubmit = jest.fn(e => {
@@ -80,14 +81,10 @@ test("It resets the form when opening/closing the dialog", async () => {
 })
 
 test("The submit button is disabled while submitting", async () => {
-  let resolvePromise: () => void = () => {
-    throw new Error("resolvePromise not set")
-  }
+  const submission = new ControlledPromise<void>()
   const onSubmit = jest.fn((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    return new Promise<void>(resolve => {
-      resolvePromise = resolve
-    })
+    return submission
   })
   setup({ onSubmit })
   const submitButton = screen.getByRole("button", { name: "Save" })
@@ -95,7 +92,7 @@ test("The submit button is disabled while submitting", async () => {
   await user.click(submitButton)
   expect(submitButton).toBeDisabled()
 
-  act(resolvePromise)
+  act(submission.resolve)
   await waitFor(() => expect(submitButton).not.toBeDisabled())
 })
 

@@ -22,7 +22,7 @@ import {
 } from "ol-search-ui"
 import SwapVertIcon from "@mui/icons-material/SwapVert"
 import { manageListDialogs } from "./ManageListDialogs"
-import { UseInfiniteQueryResult, UseQueryResult } from "react-query"
+import { UseInfiniteQueryResult, UseQueryResult } from "@tanstack/react-query"
 
 type RouteParams = {
   id: string

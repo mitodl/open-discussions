@@ -34,7 +34,7 @@ jobs:
           http.cors.enabled: "true"
           http.cors.allow-origin: "*"
           rest.action.multi.allow_explicit_index: "false"
-          ES_JAVA_OPTS: -Xms512m -Xmx512m"
+          ES_JAVA_OPTS: -Xms512m -Xmx512m
         ports:
           - 9200:9200
 

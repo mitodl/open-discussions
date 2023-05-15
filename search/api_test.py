@@ -340,7 +340,10 @@ def test_execute_search_with_suggestion(
 
 
 @pytest.mark.parametrize("list_search_enabled", [True, False])
-def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled):
+@pytest.mark.parametrize("has_resource_type_subquery", [True, False])
+def test_execute_learn_search(
+    settings, user, elasticsearch, list_search_enabled, has_resource_type_subquery
+):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
     elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
@@ -348,7 +351,11 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
 
-    query = {"a": "query"}
+    if has_resource_type_subquery:
+        query = {"a": {"bool": {"object_type": COURSE_TYPE}}}
+    else:
+        query = {"a": "query"}
+
     assert (
         execute_learn_search(user=user, query=query)
         == elasticsearch.conn.search.return_value
@@ -403,11 +410,11 @@ def test_execute_learn_search(settings, user, elasticsearch, list_search_enabled
                 ]
             }
         }
-
+    index_type = COURSE_TYPE if has_resource_type_subquery else ALIAS_ALL_INDICES
     elasticsearch.conn.search.assert_called_once_with(
         body={**query, "query": subquery},
         doc_type=[],
-        index=[get_default_alias_name(ALIAS_ALL_INDICES)],
+        index=[get_default_alias_name(index_type)],
     )
 
 

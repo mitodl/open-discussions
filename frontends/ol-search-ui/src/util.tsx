@@ -6,7 +6,8 @@ import {
   LearningResourceType as LR,
   UserList,
   StaffList,
-  TYPE_FAVORITES
+  TYPE_FAVORITES,
+  LearningResource
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
 import { capitalize, emptyOrNil } from "ol-util"
@@ -239,10 +240,10 @@ export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()
 
 const isUserListOrPath = <
-  U extends Pick<UserList, "object_type">,
-  S extends Pick<StaffList, "object_type">
+  R extends Pick<LearningResource, "object_type">,
+  U extends Pick<UserList, "object_type">
 >(
-    resource: U | S
+    resource: R | U
   ): resource is U => {
   return (
     resource.object_type === LR.Userlist ||
@@ -250,10 +251,10 @@ const isUserListOrPath = <
   )
 }
 const isStaffListOrPath = <
-  U extends Pick<UserList, "object_type">,
+  R extends Pick<LearningResource, "object_type">,
   S extends Pick<StaffList, "object_type">
 >(
-    resource: U | S
+    resource: R | S
   ): resource is S => {
   return (
     resource.object_type === LR.StaffList ||

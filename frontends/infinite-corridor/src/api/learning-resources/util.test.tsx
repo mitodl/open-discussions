@@ -1,6 +1,6 @@
 import React from "react"
 import { renderHook } from "@testing-library/react-hooks/dom"
-import { QueryClient, QueryClientProvider } from "react-query"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useInfiniteLimitOffsetQuery } from "./util"
 import { setMockResponse, act } from "../../test-utils"
 import axios from "../../libs/axios"
@@ -52,15 +52,14 @@ describe("useInfiniteLimitOffsetQuery", () => {
       await result.current.fetchNextPage()
     })
 
+    expect(result.current.hasNextPage).toBe(true)
     setMockResponse.get(initialUrl, secondPage)
-    expect(result.current.data?.pages).toEqual([firstPage, secondPage])
+    await waitFor(() => {
+      expect(result.current.data?.pages).toEqual([firstPage, secondPage])
+    })
     expect(axios.get).toHaveBeenCalledWith(nextUrl)
     expect(axios.get).toHaveBeenCalledTimes(2)
 
-    jest.mocked(axios.get).mockClear()
-    await act(async () => {
-      await result.current.fetchNextPage()
-    })
-    expect(axios.get).not.toHaveBeenCalled()
+    expect(result.current.hasNextPage).toBe(false)
   })
 })

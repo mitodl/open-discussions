@@ -12,7 +12,7 @@ import {
   act
 } from "../../test-utils"
 import UserListItems, { ResourceListItemsProps } from "./ItemsListing"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import { allowConsoleErrors, ControlledPromise } from "ol-util/src/test-utils"
 import axios from "../../libs/axios"
 import { urls } from "../../api/learning-resources"
 import invariant from "tiny-invariant"
@@ -115,13 +115,13 @@ describe("Sorting ItemListing", () => {
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
 
-    const { cancelDrop } = spySortableList.mock.lastCall[0]
-    invariant(cancelDrop)
+    const { onSortEnd } = spySortableList.mock.lastCall[0]
+    invariant(onSortEnd)
 
     const simulateDrag = (from: number, to: number) => {
       const active = items[from]
       const over = items[to]
-      cancelDrop({
+      onSortEnd({
         activeIndex: from,
         overIndex:   to,
         active:      {
@@ -176,22 +176,50 @@ describe("Sorting ItemListing", () => {
     const [from, to] = [1, 3]
 
     const patchUrl = urls.userList.itemDetails(listId, items[from].id)
-    let resolvePatch: () => void = jest.fn()
-    const patchResponse = new Promise<void>(resolve => {
-      resolvePatch = resolve
-    })
+    const patchResponse = new ControlledPromise<void>()
     setMockResponse.patch(patchUrl, patchResponse)
-    act(() => simulateDrag(from, to))
 
+    act(() => simulateDrag(from, to))
     await waitFor(() => expect(axios.patch).toHaveBeenCalled())
 
     expectProps(spySortableItem, { disabled: true })
+
     await act(async () => {
-      resolvePatch()
+      patchResponse.resolve()
       await patchResponse
     })
 
     expectProps(spySortableItem, { disabled: false })
+  })
+
+  test("UI order is correct while waiting for API response", async () => {
+    const { simulateDrag, items, listId } = setup()
+    const titles = items.map(items => items.content_data.title)
+    const [from, to] = [1, 3]
+
+    const patchUrl = urls.userList.itemDetails(listId, items[from].id)
+    const patchResponse = new ControlledPromise<void>()
+    setMockResponse.patch(patchUrl, patchResponse)
+
+    const titleEls1 = screen.getAllByRole("heading", {
+      name: value => titles.includes(value)
+    })
+    expect(titleEls1.map(el => el.textContent)).toEqual(titles)
+
+    act(() => simulateDrag(from, to))
+
+    await waitFor(() => {
+      const titleEls2 = screen.getAllByRole("heading", {
+        name: value => titles.includes(value)
+      })
+      expect(titleEls2).toEqual([
+        titleEls1[0],
+        titleEls1[2],
+        titleEls1[3],
+        titleEls1[1],
+        titleEls1[4]
+      ])
+    })
   })
 
   test("Sorting is disabled when isRefetching=true", async () => {
