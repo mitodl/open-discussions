@@ -3944,9 +3944,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mitodl/course-search-utils@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "@mitodl/course-search-utils@npm:2.2.0"
+"@mitodl/course-search-utils@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@mitodl/course-search-utils@npm:2.3.0"
   dependencies:
     bodybuilder: ^2.5.0
     history: ^4.9 || ^5.0.0
@@ -3954,7 +3954,7 @@ __metadata:
     ramda: ^0.27.1
   peerDependencies:
     react: ^16.13.1
-  checksum: aca74555fb31110cf6650e8130296c65d3b3e3a3ae031f744113682f704f232daf5ab666ffc067ad1a46c04a040651bdf415f99bef59e570b1cb18675e18154a
+  checksum: 9a4ec0c8cf27dfc10b83c131d0debb2e95a4f9ab8b179c19a0d5759f3777640336252ed692087fba0814331cf85f58334f2fa39562ff608cd76643aed4de4dc3
   languageName: node
   linkType: hard
 
@@ -12974,7 +12974,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
-    "@mitodl/course-search-utils": ^2.2.0
+    "@mitodl/course-search-utils": ^2.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/lab": ^5.0.0-alpha.91
     "@mui/material": ^5.9.0
@@ -16803,7 +16803,7 @@ __metadata:
     "@emotion/react": ^11.9.3
     "@emotion/styled": ^11.9.3
     "@faker-js/faker": ^7.3.0
-    "@mitodl/course-search-utils": ^2.2.0
+    "@mitodl/course-search-utils": ^2.3.0
     "@mui/icons-material": ^5.8.4
     "@mui/material": ^5.9.0
     lodash: ^4.17.21
@@ -17004,7 +17004,7 @@ __metadata:
     "@material/snackbar": 0.44.0
     "@material/toolbar": 0.4.4
     "@mitodl/ckeditor-custom-build": 0.0.4
-    "@mitodl/course-search-utils": ^2.2.0
+    "@mitodl/course-search-utils": ^2.3.0
     "@mitodl/mdl-react-components": 0.0.3
     "@reduxjs/toolkit": 1.4.0
     "@sentry/browser": 5.5.0
