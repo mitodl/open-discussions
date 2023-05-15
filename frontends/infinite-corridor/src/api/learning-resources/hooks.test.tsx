@@ -3,11 +3,7 @@ import { clone } from "lodash"
 import { renderHook } from "@testing-library/react-hooks/dom"
 import { act } from "@testing-library/react"
 import { faker } from "@faker-js/faker"
-import {
-  LearningResourceType as LRT,
-  LearningResource,
-  ListItemMember
-} from "ol-search-ui"
+import { LearningResourceType as LRT, LearningResource } from "ol-search-ui"
 import { allowConsoleErrors, ControlledPromise } from "ol-util/src/test-utils"
 import * as factories from "ol-search-ui/src/factories"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
@@ -27,6 +23,15 @@ import { setMockResponse } from "../../test-utils/mockAxios"
 import { urls, keys } from "./urls"
 import { useInfiniteSearch } from "./search"
 import axios from "../../libs/axios"
+import { invalidateResourceQueries } from "./util"
+
+jest.mock("./util", () => {
+  const actual = jest.requireActual("./util")
+  return {
+    ...actual,
+    invalidateResourceQueries: jest.fn(actual.invalidateResourceQueries)
+  }
+})
 
 function* makeCounter() {
   let i = 0
@@ -57,10 +62,11 @@ const setup = () => {
   const spies = {
     queryClient: {
       invalidateQueries: jest.spyOn(queryClient, "invalidateQueries")
-    }
+    },
+    invalidateResourceQueries: jest.mocked(invalidateResourceQueries)
   }
 
-  return { wrapper, spies }
+  return { wrapper, spies, queryClient }
 }
 
 test("useResource rejects with invalid resource type", async () => {
@@ -103,29 +109,36 @@ test("useDeleteUserList invalidates all resource queries", async () => {
 })
 
 test.each([
-  {
-    list: factories.makeUserList({ id: 123 }),
-    url:  urls.userList.itemAdd(123)
+  () => {
+    const list = factories.makeUserList()
+    const addItemUrl = urls.userList.itemAdd(list.id)
+    const item = factories.makeListItemMember()
+    const resource = factories.makeCourse()
+    const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+    const resourcePatch = { lists: resource.lists.concat(item) }
+    return { list, addItemUrl, resource, resourcePatch, resourceUrl }
   },
-  {
-    list: factories.makeStaffList({ id: 456 }),
-    url:  urls.staffList.itemAdd(456)
+  () => {
+    const list = factories.makeStaffList()
+    const addItemUrl = urls.staffList.itemAdd(list.id)
+    const item = factories.makeListItemMember()
+    const resource = factories.makeCourse()
+    const resourcePatch = { stafflists: resource.stafflists.concat(item) }
+    const resourceUrl = urls.resource.details(resource.object_type, resource.id)
+    return { list, addItemUrl, resource, resourcePatch, resourceUrl }
   }
 ])(
   "useAddToListItems invalidates list details and lists listing",
-  async ({ list, url }) => {
+  async getData => {
     const { wrapper, spies } = setup()
+    const { resource, list, addItemUrl, resourceUrl, resourcePatch } = getData()
 
-    const resource = factories.makeCourse()
     setMockResponse.get(
       urls.resource.details(resource.object_type, resource.id),
       resource
     )
 
-    const modifiedAddedResource = {
-      ...resource,
-      lists: resource.lists.concat({} as ListItemMember)
-    }
+    const modifiedAddedResource = { ...resource, ...resourcePatch }
 
     const { result: resourceResult } = renderHook(
       () => useResource(resource.object_type, resource.id),
@@ -133,12 +146,11 @@ test.each([
     )
     const { result: addResult, waitFor } = renderHook(
       () => useAddToListItems(),
-      {
-        wrapper
-      }
+      { wrapper }
     )
 
-    setMockResponse.post(url, { content_data: modifiedAddedResource })
+    setMockResponse.post(addItemUrl, { content_data: modifiedAddedResource })
+    setMockResponse.get(resourceUrl, new ControlledPromise())
 
     await act(async () => {
       await addResult.current.mutateAsync({
@@ -150,18 +162,16 @@ test.each([
       })
     })
 
-    expect(axios.post).toHaveBeenCalledWith(url, expect.anything())
+    expect(axios.post).toHaveBeenCalledWith(addItemUrl, expect.anything())
 
-    // The list we modified was invalidated
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: keys.resource(list.object_type).id(list.id).all
-    })
-    // The list listing was invalided.
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: keys.resource(list.object_type).listing.all
-    })
-    // Nothing else invalidated
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(2)
+    expect(spies.invalidateResourceQueries).toHaveBeenCalledWith(
+      expect.anything(),
+      modifiedAddedResource
+    )
+    expect(spies.invalidateResourceQueries).toHaveBeenCalledWith(
+      expect.anything(),
+      list
+    )
 
     // The POST response result updated resource data
     await waitFor(() => {
@@ -286,17 +296,14 @@ test.each([
 
     expect(axios.delete).toHaveBeenCalledWith(url)
 
-    // Check the invalidations
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledTimes(3)
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: keys.resource(list.object_type).id(list.id).all
-    })
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: keys.resource(list.object_type).listing.all
-    })
-    expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-      queryKey: keys.resource(resource.object_type).id(resource.id).details
-    })
+    expect(spies.invalidateResourceQueries).toHaveBeenCalledWith(
+      expect.anything(),
+      { object_type: item.content_type, id: item.object_id }
+    )
+    expect(spies.invalidateResourceQueries).toHaveBeenCalledWith(
+      expect.anything(),
+      list
+    )
   }
 )
 
@@ -490,8 +497,8 @@ test.each([
     )
 
     const listKeys = {
-      userlist:  keys.userList.id(123).itemsListing.all,
-      stafflist: keys.staffList.id(123).itemsListing.all
+      userlist:  keys.userList.itemsListing.for(123).all,
+      stafflist: keys.staffList.itemsListing.for(123).all
     }
     expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
       queryKey: mode === "userlist" ? listKeys.userlist : listKeys.stafflist

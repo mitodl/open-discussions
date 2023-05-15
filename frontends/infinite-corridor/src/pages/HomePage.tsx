@@ -90,10 +90,9 @@ const HomePage: React.FC = () => {
   }, [searchText, history])
 
   const upcomingCourseQuery = useUpcomingCourses()
-  const upcomingMicormastersCourseQuery = useUpcomingCourses(
-    {},
-    { offered_by: "Micromasters" }
-  )
+  const upcomingMicormastersCourseQuery = useUpcomingCourses({
+    offered_by: "Micromasters"
+  })
   const upcomingProfessionalCourseQuery = useUpcomingCourses()
   const upcomingCertificateCourseQuery = useUpcomingCourses()
   const popularContentQuery = usePopularContent()

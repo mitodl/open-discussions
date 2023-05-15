@@ -132,9 +132,14 @@ describe.each([
     const list = faker.helpers.arrayElement(lists as (StaffList | UserList)[])
 
     const addToListUrl = listUrls.itemAdd(list.id)
+    const modifiedResource = addToList(resource, list, mode)
     setMockResponse.post(addToListUrl, {
-      content_data: addToList(resource, list, mode)
+      content_data: modifiedResource
     })
+    setMockResponse.get(
+      urls.resource.details(resource.object_type, resource.id),
+      modifiedResource
+    )
 
     const listButton = await screen.findByRole("button", { name: list.title })
     const checkbox = within(listButton).getByRole<HTMLInputElement>("checkbox")

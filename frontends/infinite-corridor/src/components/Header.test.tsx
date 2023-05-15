@@ -1,5 +1,5 @@
 import { urls as fieldsUrls } from "../api/fields"
-import { urls as learningResourceUrls } from "../api/learning-resources"
+import { urls as lrUrls } from "../api/learning-resources"
 
 import * as factories from "../api/fields/factories"
 import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
@@ -9,9 +9,13 @@ describe("Header", () => {
     const fieldsList = factories.makeFieldsPaginated({ count: 0 })
 
     setMockResponse.get(fieldsUrls.fieldsList, fieldsList)
-    setMockResponse.get(learningResourceUrls.course.upcoming(), [])
-    setMockResponse.get(learningResourceUrls.video.new(), [])
-    setMockResponse.get(learningResourceUrls.popularContent.listing(), [])
+    setMockResponse.get(lrUrls.course.upcoming(), [])
+    setMockResponse.get(
+      lrUrls.course.upcoming({ offered_by: "Micromasters" }),
+      []
+    )
+    setMockResponse.get(lrUrls.video.new(), [])
+    setMockResponse.get(lrUrls.popularContent.listing(), [])
 
     renderTestApp()
     const header = screen.getByRole("banner")
