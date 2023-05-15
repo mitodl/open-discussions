@@ -344,7 +344,9 @@ def test_execute_learn_search(
 ):
     """execute_learn_search should execute an Elasticsearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": {"value": 10, "relation": "eq"}}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -419,7 +421,9 @@ def test_execute_learn_search(
 def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
     """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": {"value": 10, "relation": "eq"}}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
@@ -487,7 +491,9 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
 def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     """execute_learn_search should execute an Elasticsearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
-    elasticsearch.conn.search.return_value = {"hits": {"total": {"value": 10, "relation": "eq"}}}
+    elasticsearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
