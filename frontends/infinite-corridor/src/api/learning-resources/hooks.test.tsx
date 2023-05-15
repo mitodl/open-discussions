@@ -370,9 +370,11 @@ test("useFavorite invalidates appropriate queries", async () => {
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
     queryKey: keys.resource(resource.object_type).id(resource.id).details
   })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.favorites.all
-  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith(
+    expect.objectContaining({
+      queryKey: keys.favorites.all
+    })
+  )
 })
 
 test("useUnfavorite invalidates appropriate queries", async () => {
@@ -388,9 +390,11 @@ test("useUnfavorite invalidates appropriate queries", async () => {
   expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
     queryKey: keys.resource(resource.object_type).id(resource.id).details
   })
-  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith({
-    queryKey: keys.favorites.all
-  })
+  expect(spies.queryClient.invalidateQueries).toHaveBeenCalledWith(
+    expect.objectContaining({
+      queryKey: keys.favorites.all
+    })
+  )
 })
 
 test.each([

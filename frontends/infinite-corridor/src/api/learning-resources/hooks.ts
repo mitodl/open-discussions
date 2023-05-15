@@ -127,12 +127,8 @@ const useFavorite = () => {
       return axios.post(url).then(res => res.data)
     },
     onSuccess(_data, resource) {
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(resource.object_type).id(resource.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.favorites.all
-      })
+      queryClient.invalidateQueries({ queryKey: keys.favorites.all })
+      invalidateResourceQueries(queryClient, resource)
       modifyCachedSearchResource(
         queryClient,
         {
@@ -153,12 +149,7 @@ const useUnfavorite = () => {
       return axios.post(url).then(res => res.data)
     },
     onSuccess(_data, resource) {
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(resource.object_type).id(resource.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.favorites.all
-      })
+      invalidateResourceQueries(queryClient, resource)
       modifyCachedSearchResource(
         queryClient,
         {
@@ -190,12 +181,8 @@ const useUpdateUserList = () => {
   const queryClient = useQueryClient()
   return useMutation(updateUserList, {
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: keys.userList.id(variables.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.userList.listing.all
-      })
+      const resource = { object_type: LRT.Userlist, id: variables.id }
+      invalidateResourceQueries(queryClient, resource)
     }
   })
 }
@@ -348,12 +335,8 @@ const useUpdateStaffList = () => {
   const queryClient = useQueryClient()
   return useMutation(updateStaffList, {
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: keys.staffList.id(variables.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.staffList.listing.all
-      })
+      const resource = { object_type: LRT.StaffList, id: variables.id }
+      invalidateResourceQueries(queryClient, resource)
     }
   })
 }

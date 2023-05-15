@@ -79,6 +79,10 @@ const invalidateResourceQueries = (
     queryKey:  keys.videos.new.all,
     predicate: hasMatchingData
   })
+  queryClient.invalidateQueries({
+    queryKey:  keys.favorites.all,
+    predicate: hasMatchingData
+  })
 }
 
 export { useInfiniteLimitOffsetQuery, invalidateResourceQueries }
