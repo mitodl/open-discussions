@@ -225,7 +225,6 @@ def test_execute_search(user, elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -305,7 +304,6 @@ def test_execute_search_anonymous(elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -413,7 +411,6 @@ def test_execute_learn_search(
     index_type = COURSE_TYPE if has_resource_type_subquery else ALIAS_ALL_INDICES
     elasticsearch.conn.search.assert_called_once_with(
         body={**query, "query": subquery},
-        doc_type=[],
         index=[get_default_alias_name(index_type)],
     )
 
@@ -483,7 +480,6 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
             **query,
             "query": subquery,
         },
-        doc_type=[],
         index=[get_default_alias_name(ALIAS_ALL_INDICES)],
     )
 
@@ -1062,6 +1058,5 @@ def test_get_similar_topics(settings, elasticsearch):
                 }
             },
         },
-        doc_type=[],
         index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
     )
