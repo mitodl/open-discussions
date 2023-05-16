@@ -4,7 +4,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { useInfiniteLimitOffsetQuery } from "./util"
 import { setMockResponse, act } from "../../test-utils"
 import axios from "../../libs/axios"
-import { makeLearningResource } from "ol-search-ui/src/factories"
 
 const setup = () => {
   const queryClient = new QueryClient({
