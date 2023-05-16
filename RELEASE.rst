@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.216.0
+Version 0.216.0 (Released May 16, 2023)
 ---------------
 
 - Update react query (#3989)
