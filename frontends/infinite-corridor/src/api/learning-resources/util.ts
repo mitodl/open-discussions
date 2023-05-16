@@ -24,6 +24,9 @@ const useInfiniteLimitOffsetQuery = <T>(
   })
 }
 
+/**
+ * Invalidate queries that include the given resource in their response data.
+ */
 const invalidateResourceQueries = (
   queryClient: QueryClient,
   resource: Pick<LearningResource, "object_type" | "id">
@@ -59,13 +62,10 @@ const invalidateResourceQueries = (
     queryKey:  keys.userList.itemsListing.all,
     predicate: hasMatchingData
   })
-  queryClient.invalidateQueries(
-    {
-      queryKey:  keys.staffList.itemsListing.all,
-      predicate: hasMatchingData
-    },
-    { cancelRefetch: false }
-  )
+  queryClient.invalidateQueries({
+    queryKey:  keys.staffList.itemsListing.all,
+    predicate: hasMatchingData
+  })
 
   queryClient.invalidateQueries({
     queryKey:  keys.popularContent.listing.all,

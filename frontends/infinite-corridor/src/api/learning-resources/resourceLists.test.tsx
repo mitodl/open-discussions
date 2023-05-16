@@ -24,10 +24,8 @@ import {
   useDeleteStaffList,
   useDeleteUserList,
   useMoveListItem,
-  useStaffListItems,
   useUpdateStaffList,
-  useUpdateUserList,
-  useUserListItems
+  useUpdateUserList
 } from "./resourceLists"
 import { useResource } from "./resources"
 import { ControlledPromise } from "ol-util/src/test-utils"
@@ -85,7 +83,7 @@ describe.each([
     useDelete: useDeleteStaffList,
     makeList:  makeStaffList
   }
-])(
+] as const)(
   "$listType Mutations",
   ({ makeList, useCreate, listUrls, listKeys, useUpdate, useDelete }) => {
     test("$useCreate invalidates only $listType listsings", async () => {
@@ -123,9 +121,15 @@ describe.each([
 
       const { result } = renderHook(() => useUpdate(), { wrapper })
 
-      const list = makeList() as any
+      const list = makeList()
       setMockResponse.patch(listUrls.details(list.id), list)
-      await act(() => result.current.mutateAsync(list))
+      await act(() =>
+        result.current.mutateAsync(
+          // @ts-expect-error TS has trouble with the correlation between list & useUpdate:
+          // argument 'A | B' is not passable to function with type '(A) => ... | (B) => ...'
+          list
+        )
+      )
 
       expect(spies.invalidateResourceQueries).toHaveBeenCalledWith(
         expect.anything(),

@@ -317,15 +317,15 @@ const moveStaffListItem = async ({ item, position }: MoveItemPayload) => {
 const useMoveListItem = (mode: "userlist" | "stafflist") => {
   const queryClient = useQueryClient()
   const mutationFn = mode === "userlist" ? moveUserListItem : moveStaffListItem
-  const listingKey = (id: number) =>
+  const listingKey =
     mode === "userlist" ?
-      keys.userList.itemsListing.for(id).all :
-      keys.staffList.itemsListing.for(id).all
+      keys.userList.itemsListing :
+      keys.staffList.itemsListing
   return useMutation({
     mutationFn,
     onSettled: (_data, _error, vars) => {
       queryClient.invalidateQueries({
-        queryKey: listingKey(vars.item.list_id)
+        queryKey: listingKey.for(vars.item.list_id).all
       })
     }
   })
