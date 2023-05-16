@@ -123,7 +123,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
             GLOBAL_DOC_TYPE: {"properties": MAPPING[object_type]}
         }
     # from https://www.elastic.co/guide/en/elasticsearch/guide/current/asciifolding-token-filter.html
-    conn.indices.create(index_name, body=index_create_data)
+    conn.indices.create(index_name, body=index_create_data, include_type_name=True)
 
 
 def create_document(doc_id, data):
