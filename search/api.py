@@ -336,7 +336,7 @@ def execute_search(*, user, query):
     search = Search(index=indexes)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return _transform_search_results_suggest(search.execute().to_dict())
+    return _transform_search_results_suggest_with_compatability(search.execute().to_dict())
 
 
 def execute_learn_search(*, user, query):
@@ -359,7 +359,7 @@ def execute_learn_search(*, user, query):
     return transform_results(search.execute().to_dict(), user, department_filters)
 
 
-def _transform_search_results_suggest(search_result):
+def _transform_search_results_suggest_with_compatability(search_result):
     """
     Transform suggest results from elasticsearch
 
@@ -500,7 +500,7 @@ def transform_results(search_result, user, department_filters):
                     user, object_type, object_id
                 )
 
-    search_result = _transform_search_results_suggest(search_result)
+    search_result = _transform_search_results_suggest_with_compatability(search_result)
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
