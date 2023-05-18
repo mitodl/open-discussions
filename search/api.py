@@ -500,7 +500,6 @@ def transform_results(search_result, user, department_filters):
                     user, object_type, object_id
                 )
 
-    search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
     search_result = _transform_search_results_suggest(search_result)
 
     if len(department_filters) > 0:
