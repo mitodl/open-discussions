@@ -371,9 +371,7 @@ def _transform_search_results_suggest(search_result):
     """
 
     es_suggest = search_result.pop("suggest", {})
-    total = search_result.get("hits", {}).get("total", {})
-    total_value = total if isinstance(total, int) else total.get("value", 0)
-    if total_value <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS:
+    if search_result.get("hits", {}).get("total", {}) <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS:
         suggestion_dict = defaultdict(int)
         suggestions = [
             suggestion
@@ -498,8 +496,8 @@ def transform_results(search_result, user, department_filters):
                     user, object_type, object_id
                 )
 
-    search_result = _transform_search_results_suggest(search_result)
     search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
+    search_result = _transform_search_results_suggest(search_result)
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
