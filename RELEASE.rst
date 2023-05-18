@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+Version 0.216.0 (Released May 16, 2023)
+---------------
+
+- Update react query (#3989)
+- don't search all indexes (#3991)
+- Revert "Elasticsearch 7.10 upgrade (#3974)" (#3992)
+- fix resource type facet (#3987)
+- Elasticsearch 7.10 upgrade (#3974)
+- Details page + AddToListDialog for stafflists (#3983)
+
 Version 0.215.0 (Released May 08, 2023)
 ---------------
 
