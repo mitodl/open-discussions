@@ -31,6 +31,9 @@ const createQueryClient = (): QueryClient =>
            * times. Many things (e.g., 403, 404) are not worth retrying. Let's
            * just retry some explicit whitelist of status codes.
            */
+          if (status === 403) {
+          //   do the thing
+          }
           if (status !== undefined && RETRY_STATUS_CODES.includes(status)) {
             return failureCount < MAX_RETRIES
           }
