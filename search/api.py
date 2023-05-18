@@ -336,7 +336,9 @@ def execute_search(*, user, query):
     search = Search(index=indexes)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return _transform_search_results_suggest_with_compatability(search.execute().to_dict())
+    return _transform_search_results_suggest_with_compatability(
+        search.execute().to_dict()
+    )
 
 
 def execute_learn_search(*, user, query):
