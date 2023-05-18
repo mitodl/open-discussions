@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.216.1
+---------------
+
+- Change search conditional (#4000)
+- Elasticsearch 7.10 client only (PR 1 of 3) (#3993)
+
 Version 0.216.0 (Released May 16, 2023)
 ---------------
 
