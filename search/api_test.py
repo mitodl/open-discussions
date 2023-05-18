@@ -332,7 +332,7 @@ def test_execute_search_with_suggestion(
     }
 
     assert execute_search(user=user, query=query) == {
-        "hits": {"total": {"value": 3, "relation": "eq"}},
+        "hits": {"total":  3},
         "suggest": expected_suggest,
     }
 
