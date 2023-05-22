@@ -13,7 +13,7 @@ x-environment:
   OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
   OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
   OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-  OPENSEARCH_URL: opensearch:9200
+  OPENSEARCH_URL: elastic:9200
   CELERY_TASK_ALWAYS_EAGER: 'False'
   CELERY_BROKER_URL: redis://redis:6379/4
   CELERY_RESULT_BACKEND: redis://redis:6379/4
@@ -38,9 +38,9 @@ services:
     ports:
       - "6379"
 
-  opensearch:
-    image: docker.elastic.co/opensearch/opensearch:7.10.0
-    container_name: opensearch
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+    container_name: elastic
     environment:
       - network.host=0.0.0.0
       - http.cors.enabled=true
@@ -74,7 +74,7 @@ services:
       - "8061:8061"
     links:
       - db
-      - opensearch
+      - elastic
       - redis
       - watch
     extra_hosts: *default-extra-hosts
