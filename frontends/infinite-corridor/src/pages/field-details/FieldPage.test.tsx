@@ -5,7 +5,7 @@ import { urls as widgetUrls } from "../../api/widgets"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { LearningResource } from "ol-search-ui"
 import { TitledCarousel } from "ol-util"
-import type { UserList, UserListItem } from "ol-search-ui"
+import type { UserList, ListItem } from "ol-search-ui"
 import type { FieldChannel } from "../../api/fields"
 import * as factory from "../../api/fields/factories"
 import * as lrFactory from "ol-search-ui/src/factories"
@@ -64,9 +64,9 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   const list1 = factory.makeFieldUserList()
   const list2 = factory.makeFieldUserList()
   const list3 = factory.makeFieldUserList()
-  const items1 = lrFactory.makeUserListItemsPaginated({ count: 4 })
-  const items2 = lrFactory.makeUserListItemsPaginated({ count: 2 })
-  const items3 = lrFactory.makeUserListItemsPaginated({ count: 2 })
+  const items1 = lrFactory.makeListItemsPaginated({ count: 4 })
+  const items2 = lrFactory.makeListItemsPaginated({ count: 2 })
+  const items3 = lrFactory.makeListItemsPaginated({ count: 2 })
 
   const field = factory.makeField({
     featured_list: list1,
@@ -82,7 +82,7 @@ const setupApis = (fieldPatch?: Partial<FieldChannel>) => {
   const widgetsList = makeWidgetListResponse()
   setMockResponse.get(widgetUrls.widgetList(field.widget_list), widgetsList)
 
-  const toLearningResources = (items: UserListItem[]) =>
+  const toLearningResources = (items: ListItem[]) =>
     items.map(item => item.content_data)
   const featured: SubfieldData = {
     list:  list1,

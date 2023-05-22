@@ -32,6 +32,8 @@ from search.constants import (
     PODCAST_TYPE,
     USER_LIST_TYPE,
     USER_PATH_TYPE,
+    VALID_OBJECT_TYPES,
+    RESOURCE_FILE_TYPE,
 )
 
 RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
@@ -291,6 +293,34 @@ def is_learning_query(query):
     return len(object_types.intersection(set(LEARNING_RESOURCE_TYPES))) > 0
 
 
+def relevant_indexes(query):
+    """
+    Return True if the query includes learning resource types, False otherwise
+
+    Args:
+        query (dict): The query sent to ElasticSearch
+
+    Returns:
+        Array(string): array of index names
+
+    """
+    object_types = set(extract_values(query, "object_type"))
+
+    valid_index_types = set(VALID_OBJECT_TYPES)
+    valid_index_types.add(RESOURCE_FILE_TYPE)
+
+    object_types = object_types.intersection(valid_index_types)
+
+    if not object_types:
+        return [get_default_alias_name(ALIAS_ALL_INDICES)]
+
+    if RESOURCE_FILE_TYPE in object_types:
+        object_types.add(COURSE_TYPE)
+        object_types.remove(RESOURCE_FILE_TYPE)
+
+    return map(get_default_alias_name, object_types)
+
+
 def execute_search(*, user, query):
     """
     Execute a search based on the query
@@ -302,11 +332,13 @@ def execute_search(*, user, query):
     Returns:
         dict: The Elasticsearch response dict
     """
-    index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index)
+    indexes = ",".join(relevant_indexes(query))
+    search = Search(index=indexes)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return _transform_search_results_suggest(search.execute().to_dict())
+    return _transform_search_results_suggest_with_compatability(
+        search.execute().to_dict()
+    )
 
 
 def execute_learn_search(*, user, query):
@@ -321,15 +353,15 @@ def execute_learn_search(*, user, query):
     Returns:
         dict: The Elasticsearch response dict
     """
-    index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index)
+    indexes = ",".join(relevant_indexes(query))
+    search = Search(index=indexes)
     search.update_from_dict(query)
     department_filters = nested_lookup("department_name", query.get("post_filter", {}))
     search = _apply_learning_query_filters(search, user)
     return transform_results(search.execute().to_dict(), user, department_filters)
 
 
-def _transform_search_results_suggest(search_result):
+def _transform_search_results_suggest_with_compatability(search_result):
     """
     Transform suggest results from elasticsearch
 
@@ -341,9 +373,11 @@ def _transform_search_results_suggest(search_result):
     """
 
     es_suggest = search_result.pop("suggest", {})
-    total = search_result.get("hits", {}).get("total", {})
-    total_value = total if isinstance(total, int) else total.get("value", 0)
-    if total_value <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS:
+    search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
+    if (
+        search_result.get("hits", {}).get("total", 0)
+        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
+    ):
         suggestion_dict = defaultdict(int)
         suggestions = [
             suggestion
@@ -467,8 +501,7 @@ def transform_results(search_result, user, department_filters):
                     user, object_type, object_id
                 )
 
-    search_result = _transform_search_results_suggest(search_result)
-    search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
+    search_result = _transform_search_results_suggest_with_compatability(search_result)
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
@@ -479,10 +512,8 @@ def transform_results(search_result, user, department_filters):
 def _transform_search_result_total_es7(result):
     """
     Replace value depending on whether getting sent an int or dict per es6 or 7
-
     Args:
         result (dict): The single result from Elasticsearch results
-
     """
     total = result.get("hits", {}).get("total", {})
     if isinstance(total, int):

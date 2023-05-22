@@ -11,8 +11,8 @@ import {
   waitFor,
   act
 } from "../../test-utils"
-import UserListItems, { UserListItemsProps } from "./ItemsListing"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import UserListItems, { ResourceListItemsProps } from "./ItemsListing"
+import { allowConsoleErrors, ControlledPromise } from "ol-util/src/test-utils"
 import axios from "../../libs/axios"
 import { urls } from "../../api/learning-resources"
 import invariant from "tiny-invariant"
@@ -32,10 +32,11 @@ const spySortableList = jest.mocked(SortableList)
 const spySortableItem = jest.mocked(SortableItem)
 
 describe("ItemsListing", () => {
-  const setup = (props: Partial<UserListItemsProps>) => {
-    const defaultProps: UserListItemsProps = {
+  const setup = (props: Partial<ResourceListItemsProps>) => {
+    const defaultProps: ResourceListItemsProps = {
       isLoading:    true,
-      emptyMessage: "Empty message"
+      emptyMessage: "Empty message",
+      mode:         "userlist"
     }
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
@@ -54,7 +55,7 @@ describe("ItemsListing", () => {
     "Shows empty message when there are no items",
     ({ count, hasEmptyMessage }) => {
       const emptyMessage = faker.lorem.sentence()
-      const items = factories.makeUserListItemsPaginated({ count }).results
+      const items = factories.makeListItemsPaginated({ count }).results
       setup({ isLoading: false, emptyMessage, items })
       const emptyMessageElement = screen.queryByText(emptyMessage)
       expect(!!emptyMessageElement).toBe(hasEmptyMessage)
@@ -62,7 +63,7 @@ describe("ItemsListing", () => {
   )
 
   test("Shows a list of LearningResourceCards", () => {
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     setup({ isLoading: false, items })
     const titles = items.map(item => item.content_data.title)
     const headings = screen.getAllByRole("heading", {
@@ -75,7 +76,7 @@ describe("ItemsListing", () => {
   })
 
   test("Shows a list of sortable LearningResourceCards when sortable=true", () => {
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     setup({ isLoading: false, items, id: 1, sortable: true })
     const titles = items.map(item => item.content_data.title)
     const headings = screen.getAllByRole("heading", {
@@ -92,7 +93,7 @@ describe("ItemsListing", () => {
 
   test("Throws error if passed 'sortable' without a list id", () => {
     allowConsoleErrors()
-    const items = factories.makeUserListItemsPaginated({ count: 3 }).results
+    const items = factories.makeListItemsPaginated({ count: 3 }).results
     expect(() => {
       setup({ isLoading: false, items, sortable: true })
     }).toThrow("Sortable list must have an id")
@@ -100,26 +101,27 @@ describe("ItemsListing", () => {
 })
 
 describe("Sorting ItemListing", () => {
-  const setup = (props: Partial<UserListItemsProps> = {}) => {
-    const items = factories.makeUserListItemsPaginated({ count: 5 }).results
+  const setup = (props: Partial<ResourceListItemsProps> = {}) => {
+    const items = factories.makeListItemsPaginated({ count: 5 }).results
     const listId = faker.datatype.number()
-    const defaultProps: UserListItemsProps = {
+    const defaultProps: ResourceListItemsProps = {
       id:           listId,
       items:        items,
       isLoading:    false,
       sortable:     true,
+      mode:         "userlist",
       emptyMessage: "Empty message"
     }
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
 
-    const { cancelDrop } = spySortableList.mock.lastCall[0]
-    invariant(cancelDrop)
+    const { onSortEnd } = spySortableList.mock.lastCall[0]
+    invariant(onSortEnd)
 
     const simulateDrag = (from: number, to: number) => {
       const active = items[from]
       const over = items[to]
-      cancelDrop({
+      onSortEnd({
         activeIndex: from,
         overIndex:   to,
         active:      {
@@ -140,45 +142,84 @@ describe("Sorting ItemListing", () => {
     return { history, simulateDrag, items, listId }
   }
 
-  test("Dragging an item to a new position calls API correctly", async () => {
-    const { simulateDrag, items, listId } = setup()
-    const [from, to] = [1, 3]
-    const active = items[from]
-    const over = items[to]
-    const patchUrl = urls.userList.itemDetails(listId, active.id)
+  test.each([
+    {
+      mode:     "userlist",
+      patchUrl: urls.userList.itemDetails
+    },
+    {
+      mode:     "stafflist",
+      patchUrl: urls.staffList.itemDetails
+    }
+  ] as const)(
+    "Dragging an item to a new position calls API correctly",
+    async ({ mode, patchUrl }) => {
+      const { simulateDrag, items, listId } = setup({ mode })
+      const [from, to] = [1, 3]
+      const active = items[from]
+      const over = items[to]
 
-    setMockResponse.patch(patchUrl)
+      setMockResponse.patch(patchUrl(listId, active.id))
 
-    act(() => simulateDrag(from, to))
+      act(() => simulateDrag(from, to))
 
-    expect(axios.patch).toHaveBeenCalledTimes(0)
-    await waitFor(() => expect(axios.patch).toHaveBeenCalled())
-    expect(axios.patch).toHaveBeenCalledWith(patchUrl, {
-      position: over.position
-    })
-  })
+      expect(axios.patch).toHaveBeenCalledTimes(0)
+      await waitFor(() => expect(axios.patch).toHaveBeenCalled())
+      expect(axios.patch).toHaveBeenCalledWith(patchUrl(listId, active.id), {
+        position: over.position
+      })
+    }
+  )
 
   test("Dragging is disabled while API call is made", async () => {
     const { simulateDrag, items, listId } = setup()
     const [from, to] = [1, 3]
 
     const patchUrl = urls.userList.itemDetails(listId, items[from].id)
-    let resolvePatch: () => void = jest.fn()
-    const patchResponse = new Promise<void>(resolve => {
-      resolvePatch = resolve
-    })
+    const patchResponse = new ControlledPromise<void>()
     setMockResponse.patch(patchUrl, patchResponse)
-    act(() => simulateDrag(from, to))
 
+    act(() => simulateDrag(from, to))
     await waitFor(() => expect(axios.patch).toHaveBeenCalled())
 
     expectProps(spySortableItem, { disabled: true })
+
     await act(async () => {
-      resolvePatch()
+      patchResponse.resolve()
       await patchResponse
     })
 
     expectProps(spySortableItem, { disabled: false })
+  })
+
+  test("UI order is correct while waiting for API response", async () => {
+    const { simulateDrag, items, listId } = setup()
+    const titles = items.map(items => items.content_data.title)
+    const [from, to] = [1, 3]
+
+    const patchUrl = urls.userList.itemDetails(listId, items[from].id)
+    const patchResponse = new ControlledPromise<void>()
+    setMockResponse.patch(patchUrl, patchResponse)
+
+    const titleEls1 = screen.getAllByRole("heading", {
+      name: value => titles.includes(value)
+    })
+    expect(titleEls1.map(el => el.textContent)).toEqual(titles)
+
+    act(() => simulateDrag(from, to))
+
+    await waitFor(() => {
+      const titleEls2 = screen.getAllByRole("heading", {
+        name: value => titles.includes(value)
+      })
+      expect(titleEls2).toEqual([
+        titleEls1[0],
+        titleEls1[2],
+        titleEls1[3],
+        titleEls1[1],
+        titleEls1[4]
+      ])
+    })
   })
 
   test("Sorting is disabled when isRefetching=true", async () => {

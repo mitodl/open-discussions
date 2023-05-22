@@ -192,6 +192,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
             .defer("raw_json")
             .annotate_is_favorite_for_user(user)
             .prefetch_list_items_for_user(user)
+            .prefetch_stafflist_items_for_user(user)
             .distinct()
         )
 
@@ -257,6 +258,7 @@ class UserListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMix
             UserList.objects.prefetch_related("author", "topics", "offered_by")
             .annotate(item_count=Count("items"))
             .prefetch_list_items_for_user(user)
+            .prefetch_stafflist_items_for_user(user)
             .annotate_is_favorite_for_user(user)
         )
 
@@ -334,6 +336,7 @@ class StaffListViewSet(NestedViewSetMixin, viewsets.ModelViewSet, FavoriteViewMi
             .annotate(item_count=Count("items"))
             .annotate_is_favorite_for_user(user)
             .prefetch_list_items_for_user(user)
+            .prefetch_stafflist_items_for_user(user)
         )
 
     def list(self, request, *args, **kwargs):
@@ -407,6 +410,7 @@ class ProgramViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
             Program.objects.all()
             .prefetch_related("items")
             .prefetch_list_items_for_user(user)
+            .prefetch_stafflist_items_for_user(user)
             .annotate_is_favorite_for_user(user)
         )
 
@@ -427,6 +431,7 @@ class VideoViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
             Video.objects.all()
             .prefetch_related("topics", "offered_by")
             .prefetch_list_items_for_user(user)
+            .prefetch_stafflist_items_for_user(user)
             .annotate_is_favorite_for_user(user)
         )
 
@@ -594,6 +599,7 @@ def shared_podcast_episode_query(user):
         )
         .annotate_is_favorite_for_user(user)
         .prefetch_list_items_for_user(user)
+        .prefetch_stafflist_items_for_user(user)
         .select_related("podcast")
     )
 

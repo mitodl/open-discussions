@@ -79,11 +79,11 @@ describe("SearchPage", () => {
     const { inner } = await renderPage()
 
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: channel.name,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        undefined
+      channelName:   channel.name,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: undefined
     })
     assert.deepEqual(
       inner.props().upvotedPosts.get(upvotedPost.id),
@@ -129,11 +129,11 @@ describe("SearchPage", () => {
     helper.searchStub.reset()
     await inner.find("InfiniteScroll").prop("loadMore")()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: channel.name,
-      from:        SETTINGS.search_page_size,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        undefined
+      channelName:   channel.name,
+      from:          SETTINGS.search_page_size,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: undefined
     })
     // from is 5, plus 5 is 10 which is == numHits so no more results
     wrapper.update()
@@ -263,22 +263,22 @@ describe("SearchPage", () => {
       }
     )
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: channel.name,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type
+      channelName:   channel.name,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: ["post"]
     })
   })
 
   it("has a default value for type, which is undefined", async () => {
     await renderPage()
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: channel.name,
-      from:        0,
-      size:        SETTINGS.search_page_size,
-      text:        "text",
-      type:        undefined
+      channelName:   channel.name,
+      from:          0,
+      size:          SETTINGS.search_page_size,
+      text:          "text",
+      resourceTypes: undefined
     })
   })
 
@@ -292,11 +292,11 @@ describe("SearchPage", () => {
       preventDefault: helper.sandbox.stub()
     })
     sinon.assert.calledWith(helper.searchStub, {
-      channelName: channel.name,
-      from:        0,
-      size:        SETTINGS.search_page_size,
+      channelName:   channel.name,
+      from:          0,
+      size:          SETTINGS.search_page_size,
       text,
-      type
+      resourceTypes: ["comment"]
     })
     assert.deepEqual(qs.parse(helper.currentLocation.search), { type, q: text })
     assert.deepEqual(inner.state(), {

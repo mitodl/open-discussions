@@ -6,9 +6,10 @@ import {
   makeSearchResult
 } from "ol-search-ui/src/factories"
 import { renderWithProviders, user, screen, within } from "../test-utils"
+import type { User } from "../test-utils"
 import LearningResourceCard from "./LearningResourceCard"
 import type { LearningResourceCardProps } from "./LearningResourceCard"
-import AddToListDialog from "../pages/user-lists/AddToListDialog"
+import AddToListDialog from "../pages/resource-lists/AddToListDialog"
 
 jest.mock("@ebay/nice-modal-react", () => {
   const actual = jest.requireActual("@ebay/nice-modal-react")
@@ -20,18 +21,21 @@ jest.mock("@ebay/nice-modal-react", () => {
 })
 
 type SetupOptions = {
-  isAuthenticated?: boolean
+  userSettings?: Partial<User>
   props?: Partial<LearningResourceCardProps>
 }
-const setup = ({ isAuthenticated = false, props = {} }: SetupOptions = {}) => {
+const setup = ({ userSettings: user, props = {} }: SetupOptions = {}) => {
   const { resource = makeLearningResource(), variant = "column" } = props
   const { view, history } = renderWithProviders(
     <LearningResourceCard {...props} resource={resource} variant={variant} />,
-    {
-      user: { is_authenticated: isAuthenticated }
-    }
+    { user }
   )
   return { resource, view, history }
+}
+
+const labels = {
+  addToUserLists:  "Add to my lists",
+  addToStaffLists: "Add to MIT lists"
 }
 
 describe("LearningResourceCard", () => {
@@ -51,21 +55,21 @@ describe("LearningResourceCard", () => {
   })
 
   test.each([
-    { isAuthenticated: true, canAddToList: true },
-    { isAuthenticated: false, canAddToList: false },
+    { userSettings: { is_authenticated: true }, canAddToList: true },
+    { userSettings: { is_authenticated: false }, canAddToList: false },
     {
-      isAuthenticated: false,
-      canAddToList:    false,
-      resource:        {
-        ...makeSearchResult()._source,
-        lists: undefined
-      }
+      userSettings: { is_authenticated: false },
+      canAddToList: false,
+      // Unauthenticated users have search results with lists = undefined
+      resource:     { ...makeSearchResult()._source, lists: undefined }
     }
   ])(
-    "Shows 'add to list' button if and only if user is logged in",
-    ({ isAuthenticated, canAddToList, resource }) => {
-      setup({ isAuthenticated, props: { resource } })
-      const button = screen.queryByRole("button", { name: "Add to list" })
+    "Shows 'Add to my lists' button if and only if user is logged in",
+    ({ userSettings, canAddToList, resource }) => {
+      setup({ userSettings, props: { resource } })
+      const button = screen.queryByRole("button", {
+        name: labels.addToUserLists
+      })
       expect(!!button).toBe(canAddToList)
     }
   )
@@ -88,8 +92,8 @@ describe("LearningResourceCard", () => {
     "Bookmark icon is $style if resource $is in list",
     ({ testId, resource }) => {
       const props = { resource }
-      setup({ isAuthenticated: true, props })
-      const button = screen.getByRole("button", { name: "Add to list" })
+      setup({ props, userSettings: { is_authenticated: true } })
+      const button = screen.getByRole("button", { name: labels.addToUserLists })
       within(button).getByTestId(testId)
     }
   )
@@ -110,29 +114,72 @@ describe("LearningResourceCard", () => {
     "Bookmark icon is $style if resource.is_favorite=$resource.is_favorite",
     ({ testId, resource }) => {
       setup({
-        isAuthenticated: true,
-        props:           { resource }
+        userSettings: { is_authenticated: true },
+        props:        { resource }
       })
-      const button = screen.getByRole("button", { name: "Add to list" })
+      const button = screen.getByRole("button", { name: labels.addToUserLists })
       within(button).getByTestId(testId)
     }
   )
 
-  test("Clicking 'add to list' button opens AddToListDialog", async () => {
-    const showModal = jest.mocked(NiceModal.show)
+  test.each([
+    {
+      userSettings: { is_authenticated: true },
+      btnLabel:     labels.addToUserLists,
+      mode:         "userlist"
+    },
+    {
+      userSettings: { is_staff_list_editor: true },
+      btnLabel:     labels.addToStaffLists,
+      mode:         "stafflist"
+    }
+  ])(
+    "Clicking $btnLabel button opens AddToListDialog(mode=$mode)",
+    async ({ userSettings, mode, btnLabel }) => {
+      const showModal = jest.mocked(NiceModal.show)
 
-    const { resource } = setup({ isAuthenticated: true })
-    const button = screen.getByRole("button", { name: "Add to list" })
+      const { resource } = setup({ userSettings })
+      const button = screen.getByRole("button", { name: btnLabel })
 
-    expect(showModal).not.toHaveBeenCalled()
-    await user.click(button)
-    expect(showModal).toHaveBeenCalledWith(AddToListDialog, {
-      resourceKey: resource
-    })
-  })
+      expect(showModal).not.toHaveBeenCalled()
+      await user.click(button)
+      expect(showModal).toHaveBeenCalledWith(AddToListDialog, {
+        resourceKey: resource,
+        mode
+      })
+    }
+  )
 
   test("Applies className to the resource card", () => {
     const { view } = setup({ props: { className: "test-class" } })
     expect(view.container.firstChild).toHaveClass("test-class")
+  })
+
+  test.each([
+    { userSettings: { is_staff_list_editor: false }, shouldShow: false },
+    { userSettings: { is_staff_list_editor: true }, shouldShow: true }
+  ])(
+    "Shows 'Add to my lists' button if and only if user is logged in",
+    ({ userSettings, shouldShow }) => {
+      setup({ userSettings })
+      const button = screen.queryByRole("button", {
+        name: labels.addToStaffLists
+      })
+      expect(!!button).toBe(shouldShow)
+    }
+  )
+
+  test("Clicking 'Add to MIT lists' button opens AddToListDialog", async () => {
+    const showModal = jest.mocked(NiceModal.show)
+
+    const { resource } = setup({ userSettings: { is_staff_list_editor: true } })
+    const button = screen.getByRole("button", { name: labels.addToStaffLists })
+
+    expect(showModal).not.toHaveBeenCalled()
+    await user.click(button)
+    expect(showModal).toHaveBeenCalledWith(AddToListDialog, {
+      resourceKey: resource,
+      mode:        "stafflist"
+    })
   })
 })

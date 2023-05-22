@@ -6,7 +6,7 @@ import { renderTestApp, screen, setMockResponse, within } from "../test-utils"
 
 describe("Header", () => {
   it("Includes a link to MIT Homepage", async () => {
-    const fieldsList = factories.makeFieldsPaginated(0)
+    const fieldsList = factories.makeFieldsPaginated({ count: 0 })
 
     setMockResponse.get(fieldsUrls.fieldsList, fieldsList)
     setMockResponse.get(learningResourceUrls.course.upcoming(), [])

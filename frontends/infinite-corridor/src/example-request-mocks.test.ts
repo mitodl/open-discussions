@@ -1,6 +1,6 @@
 import axios from "./libs/axios"
 import { setMockResponse } from "./test-utils"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import { ControlledPromise, allowConsoleErrors } from "ol-util/src/test-utils"
 
 describe("request mocking", () => {
   test("mocking specific responses and spying", async () => {
@@ -55,9 +55,11 @@ describe("request mocking", () => {
 
   test("Error codes reject", async () => {
     setMockResponse.post("/some-example", "Bad request", { code: 400 })
-    await expect(axios.post("/some-example", { a: 5 })).rejects.toEqual({
-      response: { data: "Bad request", status: 400 }
-    })
+    await expect(axios.post("/some-example", { a: 5 })).rejects.toEqual(
+      expect.objectContaining({
+        response: { data: "Bad request", status: 400 }
+      })
+    )
   })
 
   test("Errors if mock value is not set.", async () => {
@@ -73,5 +75,26 @@ describe("request mocking", () => {
     expect(consoleError).toHaveBeenCalledWith(
       "No response specified for post /some-example"
     )
+  })
+
+  test("Manually resolving a response", async () => {
+    const responseBody = new ControlledPromise<number>()
+    setMockResponse.get("/respond-when-i-say", responseBody)
+    const response = axios.get("/respond-when-i-say")
+    let responseStatus = "pending"
+    response.then(() => {
+      responseStatus = "resolved"
+    })
+
+    await Promise.resolve() // flush the event queue
+    expect(responseStatus).toBe("pending") // response is still pending
+    responseBody.resolve(37)
+    expect(await response).toEqual(
+      expect.objectContaining({
+        data:   37,
+        status: 200
+      })
+    )
+    expect(responseStatus).toBe("resolved")
   })
 })

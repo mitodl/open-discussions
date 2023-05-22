@@ -7,13 +7,19 @@ import DemoPage from "./pages/DemoPage"
 import FieldPage from "./pages/field-details/FieldPage"
 import FieldAdminApp from "./pages/field-details/FieldAdminApp"
 import LearningResourceDrawer from "./components/LearningResourceDrawer"
-import UserListsListingPage from "./pages/user-lists/UserListsListingPage"
-import UserListDetailsPage from "./pages/user-lists/UserListDetailsPage"
-import FavoritesPage from "./pages/user-lists/FavoritesPage"
+import {
+  UserListsListingPage,
+  StaffListsListingPage
+} from "./pages/resource-lists/ResourceListsListingsPage"
+import {
+  UserListDetailsPage,
+  StaffListDetailsPage
+} from "./pages/resource-lists/ResourceListDetailsPage"
+import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"
 import { History } from "history"
-import { QueryClientProvider, QueryClient } from "react-query"
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
@@ -81,6 +87,12 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
           </Route>
           <Route path={urls.USERLIST_VIEW} exact>
             <UserListDetailsPage />
+          </Route>
+          <Route path={urls.STAFFLISTS_LISTING} exact>
+            <StaffListsListingPage />
+          </Route>
+          <Route path={urls.STAFFLIST_VIEW} exact>
+            <StaffListDetailsPage />
           </Route>
         </Switch>
         <LearningResourceDrawer />

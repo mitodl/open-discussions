@@ -4,7 +4,10 @@ import {
   CoursePrice,
   CourseInstructor,
   LearningResourceType as LR,
-  TYPE_FAVORITES
+  UserList,
+  StaffList,
+  TYPE_FAVORITES,
+  LearningResource
 } from "./interfaces"
 import React, { useState, useEffect } from "react"
 import { capitalize, emptyOrNil } from "ol-util"
@@ -104,6 +107,8 @@ const readableLearningResources: Record<LR | typeof TYPE_FAVORITES, string> = {
   [LR.Program]:        "Program",
   [LR.Userlist]:       "Learning List",
   [LR.LearningPath]:   "Learning Path",
+  [LR.StaffList]:      "MIT Learning List",
+  [LR.StaffPath]:      "MIT Learning Path",
   [LR.Video]:          "Video",
   [TYPE_FAVORITES]:    "Favorites",
   [LR.Podcast]:        "Podcast",
@@ -233,3 +238,28 @@ const formatPrice = (price: number | null | undefined): string => {
 
 export const absolutizeURL = (url: string) =>
   new URL(url, window.location.origin).toString()
+
+const isUserListOrPath = <
+  R extends Pick<LearningResource, "object_type">,
+  U extends Pick<UserList, "object_type">
+>(
+    resource: R | U
+  ): resource is U => {
+  return (
+    resource.object_type === LR.Userlist ||
+    resource.object_type === LR.LearningPath
+  )
+}
+const isStaffListOrPath = <
+  R extends Pick<LearningResource, "object_type">,
+  S extends Pick<StaffList, "object_type">
+>(
+    resource: R | S
+  ): resource is S => {
+  return (
+    resource.object_type === LR.StaffList ||
+    resource.object_type === LR.StaffPath
+  )
+}
+
+export { isUserListOrPath, isStaffListOrPath }

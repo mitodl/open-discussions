@@ -1,5 +1,5 @@
 import { intersection } from "lodash"
-import { QueryClient, useInfiniteQuery } from "react-query"
+import { QueryClient, useInfiniteQuery } from "@tanstack/react-query"
 import type { LearningResourceSearchResult } from "ol-search-ui"
 import type {
   Aggregations,
@@ -43,7 +43,8 @@ const useInfiniteSearch = (params: InfiniteSearchOptions) => {
   const normalized: SearchQueryParams = allowedTypes ?
     {
       ...params,
-      activeFacets: restrictFacetTypes(allowedTypes, params.activeFacets)
+      activeFacets:  restrictFacetTypes(allowedTypes, params.activeFacets),
+      resourceTypes: allowedTypes
     } :
     params
   return useInfiniteQuery<SearchResponse>({

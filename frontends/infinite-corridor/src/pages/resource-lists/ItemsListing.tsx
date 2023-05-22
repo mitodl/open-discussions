@@ -1,27 +1,29 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 import classNames from "classnames"
-import type { UserListItem } from "ol-search-ui"
+import type { ListItem } from "ol-search-ui"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import {
   SortableItem,
   SortableList,
   RenderActive,
   LoadingSpinner,
-  CancelDrop
+  arrayMove,
+  OnSortEnd
 } from "ol-util"
-import { useMoveUserListItem } from "../../api/learning-resources"
+import { useMoveListItem } from "../../api/learning-resources"
 
-type UserListItemsProps = {
+type ResourceListItemsProps = {
   id?: number
-  items?: UserListItem[]
+  items?: ListItem[]
   isLoading?: boolean
   isRefetching?: boolean
   emptyMessage: string
   sortable?: boolean
+  mode?: "userlist" | "stafflist"
 }
 
-const UserListItemsViewOnly: React.FC<{
-  items: UserListItem[]
+const ResourceListItemsViewOnly: React.FC<{
+  items: ListItem[]
 }> = ({ items }) => {
   return (
     <ul className="ic-card-row-list">
@@ -39,14 +41,26 @@ const UserListItemsViewOnly: React.FC<{
   )
 }
 
-const UserListItemsSortable: React.FC<{
+const ResourceListItemsSortable: React.FC<{
   listId: number
-  items: UserListItem[]
+  items: ListItem[]
   isRefetching?: boolean
-}> = ({ items, listId, isRefetching }) => {
-  const move = useMoveUserListItem()
+  mode: NonNullable<ResourceListItemsProps["mode"]>
+}> = ({ items, listId, isRefetching, mode }) => {
+  const move = useMoveListItem(mode)
+
+  /**
+   * `sorted` is a local copy of `items`:
+   *  - `onSortEnd`, we'll update `sorted` copy immediately to prevent UI from
+   *  snapping back to its original position.
+   *  - `items` is the source of truth (most likely, this is coming from an API)
+   *    so sync `items` -> `sorted` when `items` changes.
+   */
+  const [sorted, setSorted] = React.useState<ListItem[]>([])
+  useEffect(() => setSorted(items), [items])
+
   const renderDragging: RenderActive = useCallback(active => {
-    const item = active.data.current as UserListItem
+    const item = active.data.current as ListItem
     return (
       <LearningResourceCard
         className="ic-dragging"
@@ -58,39 +72,21 @@ const UserListItemsSortable: React.FC<{
     )
   }, [])
 
-  /**
-   * Use the cancelDrop callback to move the item.
-   *
-   * Why?
-   *
-   * The `useMoveUserListItem` mutation function makes an API call and
-   * optimistically updates the UI for immediate feedback. Except optimistic
-   * updates in react-query aren't actually immediate, they're asynchronous (no
-   * server interaction, but on the JS event loop).
-   *
-   * Using the cancelDrop callback delays dnd-kit's drop event until our API
-   * call has finished, at which point the optimistic update is also done.
-   *
-   * See https://github.com/clauderic/dnd-kit/issues/921
-   */
-  const moveItemsOnCancelDrop: CancelDrop<number> = useCallback(
+  const onSortEnd: OnSortEnd<number> = useCallback(
     async e => {
-      const active = e.active.data.current as unknown as UserListItem
-      const over = e.over.data.current as unknown as UserListItem
-      try {
-        await move.mutateAsync({
-          item: {
-            item_id: active.id,
-            list_id: listId
-          },
-          newPosition: over.position,
-          oldIndex:    e.activeIndex,
-          newIndex:    e.overIndex
-        })
-        return false
-      } catch (e) {
-        return true
-      }
+      const active = e.active.data.current as unknown as ListItem
+      const over = e.over.data.current as unknown as ListItem
+      setSorted(current => {
+        const newOrder = arrayMove(current, e.activeIndex, e.overIndex)
+        return newOrder
+      })
+      move.mutate({
+        item: {
+          item_id: active.id,
+          list_id: listId
+        },
+        position: over.position
+      })
     },
     [move, listId]
   )
@@ -102,11 +98,11 @@ const UserListItemsSortable: React.FC<{
       })}
     >
       <SortableList
-        itemIds={items.map(item => item.id)}
-        cancelDrop={moveItemsOnCancelDrop}
+        itemIds={sorted.map(item => item.id)}
+        onSortEnd={onSortEnd}
         renderActive={renderDragging}
       >
-        {items.map(item => {
+        {sorted.map(item => {
           return (
             <SortableItem
               Component="li"
@@ -135,33 +131,36 @@ const UserListItemsSortable: React.FC<{
   )
 }
 
-const UserListItems: React.FC<UserListItemsProps> = ({
+const ResourceListItems: React.FC<ResourceListItemsProps> = ({
   id,
   items,
   isLoading,
   isRefetching,
   emptyMessage,
-  sortable = false
+  sortable = false,
+  mode
 }) => {
   if (sortable && !id) throw new Error("Sortable list must have an id")
+  if (sortable && !mode) throw new Error("Sortable list must have a mode")
   return (
     <>
       {isLoading && <LoadingSpinner loading />}
       {items &&
         (items.length === 0 ? (
           <p className="empty-message">{emptyMessage}</p>
-        ) : sortable && id ? (
-          <UserListItemsSortable
+        ) : sortable && id && mode ? (
+          <ResourceListItemsSortable
             listId={id}
+            mode={mode}
             items={items}
             isRefetching={isRefetching}
           />
         ) : (
-          <UserListItemsViewOnly items={items} />
+          <ResourceListItemsViewOnly items={items} />
         ))}
     </>
   )
 }
 
-export default UserListItems
-export type { UserListItemsProps }
+export default ResourceListItems
+export type { ResourceListItemsProps as ResourceListItemsProps }

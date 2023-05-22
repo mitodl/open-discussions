@@ -12,7 +12,8 @@ import { imgConfigs } from "../util/constants"
 import IconButton from "@mui/material/IconButton"
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder"
 import BookmarkIcon from "@mui/icons-material/Bookmark"
-import AddToListDialog from "../pages/user-lists/AddToListDialog"
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd"
+import AddToListDialog from "../pages/resource-lists/AddToListDialog"
 
 type TemplateProps = LearningResourceCardTemplateProps<
   LearningResource | LearningResourceSearchResult
@@ -31,7 +32,13 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
 }) => {
   const activateResource = useActivateResourceDrawer()
   const showAddToListDialog = useCallback(() => {
-    NiceModal.show(AddToListDialog, { resourceKey: resource })
+    NiceModal.show(AddToListDialog, { resourceKey: resource, mode: "userlist" })
+  }, [resource])
+  const showAddToStaffListDialog = useCallback(() => {
+    NiceModal.show(AddToListDialog, {
+      resourceKey: resource,
+      mode:        "stafflist"
+    })
   }, [resource])
   const { user } = SETTINGS
   const isInList = (resource.lists?.length ?? 0) > 0 || resource.is_favorite
@@ -46,15 +53,26 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
         imgConfig={imgConfigs[variant]}
         onActivate={activateResource}
         footerActionSlot={
-          user.is_authenticated && (
-            <IconButton
-              size="small"
-              aria-label="Add to list"
-              onClick={showAddToListDialog}
-            >
-              {isInList ? <BookmarkIcon /> : <BookmarkBorderIcon />}
-            </IconButton>
-          )
+          <div>
+            {user.is_staff_list_editor && (
+              <IconButton
+                size="small"
+                aria-label="Add to MIT lists"
+                onClick={showAddToStaffListDialog}
+              >
+                <PlaylistAddIcon />
+              </IconButton>
+            )}
+            {user.is_authenticated && (
+              <IconButton
+                size="small"
+                aria-label="Add to my lists"
+                onClick={showAddToListDialog}
+              >
+                {isInList ? <BookmarkIcon /> : <BookmarkBorderIcon />}
+              </IconButton>
+            )}
+          </div>
         }
       />
     </>

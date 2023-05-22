@@ -1,6 +1,31 @@
 Release Notes
 =============
 
+Version 0.216.0 (Released May 16, 2023)
+---------------
+
+- Update react query (#3989)
+- don't search all indexes (#3991)
+- Revert "Elasticsearch 7.10 upgrade (#3974)" (#3992)
+- fix resource type facet (#3987)
+- Elasticsearch 7.10 upgrade (#3974)
+- Details page + AddToListDialog for stafflists (#3983)
+
+Version 0.215.0 (Released May 08, 2023)
+---------------
+
+- improve setMockResponse manual response resolution (#3982)
+- Handle unicode chars when truncating file content (#3976)
+- UI for Staff Lists Listing page (#3973)
+- Stafflist items serializer (#3980)
+
+Version 0.214.0 (Released May 04, 2023)
+---------------
+
+- Do not display "English" as default language on resources (#3961)
+- Use single modal for "Add to list..." -> fix premature close (#3951)
+- Show warning if updating courses but not resource files (#3967)
+
 Version 0.213.1 (Released April 27, 2023)
 ---------------
 
