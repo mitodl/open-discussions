@@ -1,8 +1,10 @@
 {
   "root": true,
   "extends": ["eslint-config-mitodl", "eslint-config-mitodl/flow", "eslint-config-mitodl/mocha"],
+  "plugins": ["import"],
   "rules": {
-      "operator-linebreak": "off"
+      "operator-linebreak": "off",
+      "import/no-extraneous-dependencies": "error"
   },
   "settings": {
     "react": {
