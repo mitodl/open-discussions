@@ -340,9 +340,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     conn = get_conn()
     # bulk will also break an iterable into chunks. However we should do this here so that
     # we can use the same documents when indexing to multiple aliases.
-    for chunk in chunks(
-        documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
-    ):
+    for chunk in chunks(documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE):
         documents_size = len(json.dumps(chunk, default=str))
         # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
         if documents_size > settings.OPENSEARCH_MAX_REQUEST_SIZE:

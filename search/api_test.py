@@ -149,9 +149,7 @@ def test_execute_search(user, opensearch):
     query = {"a": "query"}
     opensearch.conn.search.return_value = {"hits": {"total": 10}}
 
-    assert (
-        execute_search(user=user, query=query) == opensearch.conn.search.return_value
-    )
+    assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
         body={
             **query,
@@ -235,9 +233,7 @@ def test_execute_search_anonymous(opensearch):
     query = {"a": "query"}
     opensearch.conn.search.return_value = {"hits": {"total": 10}}
 
-    assert (
-        execute_search(user=user, query=query) == opensearch.conn.search.return_value
-    )
+    assert execute_search(user=user, query=query) == opensearch.conn.search.return_value
     opensearch.conn.search.assert_called_once_with(
         body={
             **query,

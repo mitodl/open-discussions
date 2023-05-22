@@ -403,9 +403,7 @@ class OSContentFileSerializer(OSResourceFileSerializerMixin, OSModelSerializer):
             content = data.pop("content")
             # Include a little extra buffer to be safe
             len_minus_content = len(json.dumps(data)) + 100
-            max_content_size = (
-                settings.OPENSEARCH_MAX_REQUEST_SIZE - len_minus_content
-            )
+            max_content_size = settings.OPENSEARCH_MAX_REQUEST_SIZE - len_minus_content
             truncated_content = re.sub(
                 r"\\([0-9A-Za-z]+)?$",
                 "",
