@@ -17,7 +17,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
     js_settings = {
         "embedlyKey": settings.EMBEDLY_KEY,
         "ocw_next_base_url": settings.OCW_NEXT_BASE_URL,
-        "search_page_size": settings.ELASTICSEARCH_DEFAULT_PAGE_SIZE,
+        "search_page_size": settings.OPENSEARCH_DEFAULT_PAGE_SIZE,
         "user": {
             "id": user.id,
             "is_authenticated": bool(user.is_authenticated),

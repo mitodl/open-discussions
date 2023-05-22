@@ -26,7 +26,7 @@ class Command(BaseCommand):
         """Run Populate prolearn courses"""
         if options["delete"]:
             self.stdout.write(
-                "Deleting all existing prolearn courses from database and ElasticSearch"
+                "Deleting all existing prolearn courses from database and opensearch"
             )
             for course in Course.objects.filter(
                 platform__in=PROLEARN_DEPARTMENT_MAPPING.keys()

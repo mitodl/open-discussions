@@ -38,7 +38,7 @@ active and so that they can be removed.
 
 ### Architecture Changes
 
-Currently, a separate aggregation request is made once to Elasticsearch to get the list of all unique subject and
+Currently, a separate aggregation request is made once to Opensearch to get the list of all unique subject and
 platform facet values, and stored in state.  This includes counts, which are not displayed.  The aggregation query
 can be appended to the standard search query so that both are returned in the same response, with facet counts based on the
 search results returned.  The subject facets are sorted alphabetically, this will be changed to sort by hits, which

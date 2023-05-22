@@ -45,11 +45,11 @@ from search.constants import (
     USER_PATH_TYPE,
 )
 from search.serializers import (
-    ESContentFileSerializer,
-    ESCourseSerializer,
-    ESProgramSerializer,
-    ESUserListSerializer,
-    ESVideoSerializer,
+    OSContentFileSerializer,
+    OSCourseSerializer,
+    OSProgramSerializer,
+    OSUserListSerializer,
+    OSVideoSerializer,
 )
 
 RAW_SUGGESTIONS = {
@@ -140,19 +140,19 @@ def test_is_reddit_object_removed(
     assert is_reddit_object_removed(reddit_obj) is expected_value
 
 
-def test_execute_search(user, elasticsearch):
-    """execute_search should execute an Elasticsearch search"""
+def test_execute_search(user, opensearch):
+    """execute_search should execute an OpenSearch search"""
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
 
     query = {"a": "query"}
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {"hits": {"total": 10}}
 
     assert (
-        execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
+        execute_search(user=user, query=query) == opensearch.conn.search.return_value
     )
-    elasticsearch.conn.search.assert_called_once_with(
+    opensearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -229,16 +229,16 @@ def test_execute_search(user, elasticsearch):
     )
 
 
-def test_execute_search_anonymous(elasticsearch):
-    """execute_search should execute an Elasticsearch search with an anonymous user"""
+def test_execute_search_anonymous(opensearch):
+    """execute_search should execute an OpenSearch search with an anonymous user"""
     user = AnonymousUser()
     query = {"a": "query"}
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {"hits": {"total": 10}}
 
     assert (
-        execute_search(user=user, query=query) == elasticsearch.conn.search.return_value
+        execute_search(user=user, query=query) == opensearch.conn.search.return_value
     )
-    elasticsearch.conn.search.assert_called_once_with(
+    opensearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": {
@@ -311,14 +311,14 @@ def test_execute_search_anonymous(elasticsearch):
 @pytest.mark.parametrize("max_suggestions", [1, 3])
 @pytest.mark.parametrize("suggest_min_hits", [2, 4])
 def test_execute_search_with_suggestion(
-    elasticsearch, suggest_min_hits, max_suggestions, settings
+    opensearch, suggest_min_hits, max_suggestions, settings
 ):
-    """execute_search should execute an Elasticsearch search suggestions"""
+    """execute_search should execute an OpenSearch search suggestions"""
     user = AnonymousUser()
     query = {"a": "query"}
 
-    settings.ELASTICSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
-    settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
+    settings.OPENSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
+    settings.OPENSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
 
     expected_suggest = (
         ["engineers", "engineer", "engines"][:max_suggestions]
@@ -326,7 +326,7 @@ def test_execute_search_with_suggestion(
         else []
     )
 
-    elasticsearch.conn.search.return_value = {
+    opensearch.conn.search.return_value = {
         "hits": {"total": 3},
         "suggest": RAW_SUGGESTIONS,
     }
@@ -340,11 +340,11 @@ def test_execute_search_with_suggestion(
 @pytest.mark.parametrize("list_search_enabled", [True, False])
 @pytest.mark.parametrize("has_resource_type_subquery", [True, False])
 def test_execute_learn_search(
-    settings, user, elasticsearch, list_search_enabled, has_resource_type_subquery
+    settings, user, opensearch, list_search_enabled, has_resource_type_subquery
 ):
-    """execute_learn_search should execute an Elasticsearch search for learning resources"""
+    """execute_learn_search should execute an opensearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {"hits": {"total": 10}}
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -356,7 +356,7 @@ def test_execute_learn_search(
 
     assert (
         execute_learn_search(user=user, query=query)
-        == elasticsearch.conn.search.return_value
+        == opensearch.conn.search.return_value
     )
     if list_search_enabled:
         subquery = {
@@ -409,22 +409,22 @@ def test_execute_learn_search(
             }
         }
     index_type = COURSE_TYPE if has_resource_type_subquery else ALIAS_ALL_INDICES
-    elasticsearch.conn.search.assert_called_once_with(
+    opensearch.conn.search.assert_called_once_with(
         body={**query, "query": subquery},
         index=[get_default_alias_name(index_type)],
     )
 
 
 @pytest.mark.parametrize("list_search_enabled", [True, False])
-def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_enabled):
-    """execute_learn_search should execute an Elasticsearch search with an anonymous user"""
+def test_execute_learn_search_anonymous(settings, opensearch, list_search_enabled):
+    """execute_learn_search should execute an opensearch search with an anonymous user"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {"hits": {"total": 10}}
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
-        == elasticsearch.conn.search.return_value
+        == opensearch.conn.search.return_value
     )
     if list_search_enabled:
         subquery = {
@@ -475,7 +475,7 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
                 ]
             }
         }
-    elasticsearch.conn.search.assert_called_once_with(
+    opensearch.conn.search.assert_called_once_with(
         body={
             **query,
             "query": subquery,
@@ -484,16 +484,16 @@ def test_execute_learn_search_anonymous(settings, elasticsearch, list_search_ena
     )
 
 
-def test_execute_learn_search_podcasts(settings, user, elasticsearch):
-    """execute_learn_search should execute an Elasticsearch search"""
+def test_execute_learn_search_podcasts(settings, user, opensearch):
+    """execute_learn_search should execute an OpenSearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
-    elasticsearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {"hits": {"total": 10}}
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
-        == elasticsearch.conn.search.return_value
+        == opensearch.conn.search.return_value
     )
-    first_call = elasticsearch.conn.search.call_args[1]
+    first_call = opensearch.conn.search.call_args[1]
     assert first_call["body"]["query"]["bool"]["filter"][1] == {
         "bool": {
             "must_not": [
@@ -503,7 +503,7 @@ def test_execute_learn_search_podcasts(settings, user, elasticsearch):
     }
 
 
-def test_find_related_documents(settings, elasticsearch, user, gen_query_filters_mock):
+def test_find_related_documents(settings, opensearch, user, gen_query_filters_mock):
     """find_related_documents should execute a more-like-this query"""
     posts_to_return = 7
     settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT = posts_to_return
@@ -511,10 +511,10 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
 
     assert (
         find_related_documents(user=user, post_id=post_id)
-        == elasticsearch.conn.search.return_value
+        == opensearch.conn.search.return_value
     )
     assert gen_query_filters_mock.call_count == 1
-    constructed_query = elasticsearch.conn.search.call_args[1]
+    constructed_query = opensearch.conn.search.call_args[1]
     assert constructed_query["body"]["query"] == {
         "more_like_this": {
             "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
@@ -529,7 +529,7 @@ def test_find_related_documents(settings, elasticsearch, user, gen_query_filters
 
 @pytest.mark.parametrize("is_anonymous", [True, False])
 @pytest.mark.django_db
-def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
+def test_find_similar_resources(settings, is_anonymous, opensearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5
     settings.OPEN_DISCUSSIONS_SIMILAR_RESOURCES_COUNT = resources_to_return
@@ -561,16 +561,16 @@ def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
         "id": course.id,
         "object_type": COURSE_TYPE,
     }
-    elasticsearch.conn.search.return_value = {
+    opensearch.conn.search.return_value = {
         "hits": {
             "hits": [
-                {"_source": ESCourseSerializer(course).data},
-                {"_source": ESCourseSerializer(favorited_course).data},
-                {"_source": ESCourseSerializer(saved_course).data},
-                {"_source": ESVideoSerializer(VideoFactory.create()).data},
-                {"_source": ESProgramSerializer(ProgramFactory.create()).data},
-                {"_source": ESUserListSerializer(UserListFactory.create()).data},
-                {"_source": ESContentFileSerializer(ContentFileFactory.create()).data},
+                {"_source": OSCourseSerializer(course).data},
+                {"_source": OSCourseSerializer(favorited_course).data},
+                {"_source": OSCourseSerializer(saved_course).data},
+                {"_source": OSVideoSerializer(VideoFactory.create()).data},
+                {"_source": OSProgramSerializer(ProgramFactory.create()).data},
+                {"_source": OSUserListSerializer(UserListFactory.create()).data},
+                {"_source": OSContentFileSerializer(ContentFileFactory.create()).data},
             ]
         }
     }
@@ -578,7 +578,7 @@ def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
 
     assert similar_resources == [
         hit["_source"]
-        for hit in elasticsearch.conn.search.return_value["hits"]["hits"][1:6]
+        for hit in opensearch.conn.search.return_value["hits"]["hits"][1:6]
     ]
 
     if is_anonymous:
@@ -595,7 +595,7 @@ def test_find_similar_resources(settings, is_anonymous, elasticsearch, user):
             }
         ]
 
-    constructed_query = elasticsearch.conn.search.call_args[1]
+    constructed_query = opensearch.conn.search.call_args[1]
     assert extract_values(constructed_query, "more_like_this") == [
         {
             "like": {"doc": value_doc, "fields": list(value_doc.keys())},
@@ -616,8 +616,8 @@ def test_transform_results(
     """
     transform_results should move scripted fields into the source result
     """
-    settings.ELASTICSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
-    settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
+    settings.OPENSEARCH_MAX_SUGGEST_HITS = suggest_min_hits
+    settings.OPENSEARCH_MAX_SUGGEST_RESULTS = max_suggestions
     favorited_course = CourseFactory.create()
     generic_course = CourseFactory.create()
     listed_learningpath = UserListFactory.create(
@@ -651,21 +651,21 @@ def test_transform_results(
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
-            "_source": ESCourseSerializer(generic_course).data,
+            "_source": OSCourseSerializer(generic_course).data,
         },
         {
             "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a1",
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeB",
             "_score": 1.0,
-            "_source": ESCourseSerializer(favorited_course).data,
+            "_source": OSCourseSerializer(favorited_course).data,
         },
         {
             "_index": "discussions_local_course_681a7db4cba9432c84c3723c2f81b1a2",
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeC",
             "_score": 1.0,
-            "_source": ESUserListSerializer(listed_learningpath).data,
+            "_source": OSUserListSerializer(listed_learningpath).data,
         },
     ]
 
@@ -676,7 +676,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
             "_source": {
-                **ESCourseSerializer(generic_course).data,
+                **OSCourseSerializer(generic_course).data,
                 "is_favorite": False,
                 "lists": [],
             },
@@ -687,7 +687,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeB",
             "_score": 1.0,
             "_source": {
-                **ESCourseSerializer(favorited_course).data,
+                **OSCourseSerializer(favorited_course).data,
                 "is_favorite": True,
                 "lists": [],
             },
@@ -698,7 +698,7 @@ def test_transform_results(
             "_id": "co_mitx_TUlUeCsyLjAxeC",
             "_score": 1.0,
             "_source": {
-                **ESUserListSerializer(listed_learningpath).data,
+                **OSUserListSerializer(listed_learningpath).data,
                 "is_favorite": False,
                 "lists": [
                     {
@@ -767,7 +767,7 @@ def test_transform_department_filter(department_fitler):
             "_type": "_doc",
             "_id": "co_mitx_TUlUeCsyLjAxeA",
             "_score": 1.0,
-            "_source": ESCourseSerializer(course).data,
+            "_source": OSCourseSerializer(course).data,
         }
     ]
 
@@ -1008,12 +1008,12 @@ def test_combine_type_buckets_in_aggregates(
     }
 
 
-def test_get_similar_topics(settings, elasticsearch):
+def test_get_similar_topics(settings, opensearch):
     """Test get_similar_topics makes a query for similar document topics"""
     input_doc = {"title": "title text", "description": "description text"}
 
     # topic d is least popular and should not show up, order does not matter
-    elasticsearch.conn.search.return_value = {
+    opensearch.conn.search.return_value = {
         "hits": {
             "hits": [
                 {"_source": {"topics": ["topic a", "topic b", "topic d"]}},
@@ -1028,7 +1028,7 @@ def test_get_similar_topics(settings, elasticsearch):
     # results should be top 3 in decreasing order of frequency
     assert get_similar_topics(input_doc, 3, 1, 15) == ["topic a", "topic c", "topic b"]
 
-    elasticsearch.conn.search.assert_called_once_with(
+    opensearch.conn.search.assert_called_once_with(
         body={
             "_source": {"includes": "topics"},
             "query": {
@@ -1057,5 +1057,5 @@ def test_get_similar_topics(settings, elasticsearch):
                 }
             },
         },
-        index=[f"{settings.ELASTICSEARCH_INDEX}_all_default"],
+        index=[f"{settings.OPENSEARCH_INDEX}_all_default"],
     )

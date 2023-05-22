@@ -26,7 +26,7 @@ class Command(BaseCommand):
         """Run Populate edx courses"""
         if options["delete"]:
             self.stdout.write(
-                "Deleting all existing MITx courses from database and ElasticSearch"
+                "Deleting all existing MITx courses from database and opensearch"
             )
             for course in Course.objects.filter(platform=PlatformType.mitx.value):
                 course.delete()

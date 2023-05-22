@@ -34,7 +34,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.serializers import ESCommentSerializer, ESPostSerializer
+from search.serializers import OSCommentSerializer, OSPostSerializer
 from search.tasks import (
     create_document,
     create_post_document,
@@ -81,7 +81,7 @@ def index_new_post(post_obj):
         post_obj (channels.proxies.PostProxy): A proxied post/submission
     """
     post = post_obj._self_post  # pylint: disable=protected-access
-    data = ESPostSerializer(instance=post).data
+    data = OSPostSerializer(instance=post).data
     create_post_document.delay(gen_post_id(post.post_id), data)
 
 
@@ -94,7 +94,7 @@ def index_new_comment(comment_obj):
         comment_obj (praw.models.reddit.comment.Comment): A PRAW comment object
     """
     comment = Comment.objects.get(comment_id=comment_obj.id)
-    data = ESCommentSerializer(instance=comment).data
+    data = OSCommentSerializer(instance=comment).data
     create_document.delay(gen_comment_id(comment_obj.id), data)
     increment_parent_post_comment_count(comment_obj)
 
@@ -339,7 +339,7 @@ def update_indexed_score(instance, instance_type, vote_action=None):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_course(course_id):
     """
-    Run a task to create or update a course's Elasticsearch document
+    Run a task to create or update a course's OpenSearch document
 
     Args:
         course_id (int): the primary key for the Course to update
@@ -364,7 +364,7 @@ def deindex_course(course_obj):
 
 def upsert_content_file(content_file_id):
     """
-    Run a task to create or update a content file's Elasticsearch document
+    Run a task to create or update a content file's OpenSearch document
 
     Args:
         content_file_id (int): the primary key for the ContentFile to update
@@ -397,7 +397,7 @@ def deindex_run_content_files(run_id):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_program(program_id):
     """
-    Run a task to create or update a program Elasticsearch document
+    Run a task to create or update a program OpenSearch document
 
     Args:
         program_id (int): the primary key for the Program to update in ES
@@ -419,7 +419,7 @@ def deindex_program(program_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_user_list(user_list_id):
     """
-    Run a task to update all fields of a UserList Elasticsearch document
+    Run a task to update all fields of a UserList OpenSearch document
 
     Args:
         user_list_id (int): the primary key for the UserList to update in ES
@@ -441,7 +441,7 @@ def deindex_user_list(user_list_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_staff_list(staff_list_id):
     """
-    Run a task to update all fields of a StaffList Elasticsearch document
+    Run a task to update all fields of a StaffList OpenSearch document
 
     Args:
         staff_list_id (int): the primary key for the StaffList to update in ES
@@ -463,7 +463,7 @@ def deindex_staff_list(staff_list_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_video(video_id):
     """
-    Run a task to create or update a video Elasticsearch document
+    Run a task to create or update a video OpenSearch document
 
     Args:
         video_id (int): the database primary key of the Video to update in ES
@@ -485,7 +485,7 @@ def deindex_video(video_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_podcast(podcast_id):
     """
-    Run a task to create or update a podcast Elasticsearch document
+    Run a task to create or update a podcast OpenSearch document
 
     Args:
         podcast_id (int): the database primary key of the Podcast to update in ES
@@ -507,7 +507,7 @@ def deindex_podcast(podcast_obj):
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_podcast_episode(podcast_episode_id):
     """
-    Run a task to create or update a podcast episode Elasticsearch document
+    Run a task to create or update a podcast episode OpenSearch document
 
     Args:
         podcast_episode_id (int): the database primary key of the PodcastEpisode to update in ES

@@ -42,53 +42,53 @@ SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
 
 def gen_post_id(reddit_obj_id):
     """
-    Generates the Elasticsearch document id for a post
+    Generates the OpenSearch document id for a post
 
     Args:
         reddit_obj_id (int|str): The id of a reddit object as reported by PRAW
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "p_{}".format(reddit_obj_id)
 
 
 def gen_comment_id(reddit_obj_id):
     """
-    Generates the Elasticsearch document id for a comment
+    Generates the OpenSearch document id for a comment
 
     Args:
         reddit_obj_id (int|str): The id of a reddit object as reported by PRAW
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "c_{}".format(reddit_obj_id)
 
 
 def gen_profile_id(profile_id):
     """
-    Generates the Elasticsearch document id for a profile
+    Generates the OpenSearch document id for a profile
 
     Args:
         profile_id (str): The username of a Profile object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "u_{}".format(profile_id)
 
 
 def gen_course_id(platform, course_id):
     """
-    Generates the Elasticsearch document id for a course
+    Generates the OpenSearch document id for a course
 
     Args:
         platform (str): The platform of a Course object
         course_id (str): The course_id of a Course object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     safe_id = urlsafe_b64encode(course_id.encode("utf-8")).decode("utf-8").rstrip("=")
     return "co_{}_{}".format(platform, safe_id)
@@ -96,14 +96,14 @@ def gen_course_id(platform, course_id):
 
 def gen_content_file_id(key):
     """
-    Generates the Elasticsearch document id for a ContentFile
+    Generates the OpenSearch document id for a ContentFile
 
     Args:
         run_id (str): The run id of a ContentFile object
         key (str): The key of a ContentFile object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     safe_key = urlsafe_b64encode(key.encode("utf-8")).decode("utf-8").rstrip("=")
     return "cf_{}".format(safe_key)
@@ -111,78 +111,78 @@ def gen_content_file_id(key):
 
 def gen_program_id(program_obj):
     """
-    Generates the Elasticsearch document id for a Program
+    Generates the OpenSearch document id for a Program
 
     Args:
         program_obj (Program): The Program object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "program_{}".format(program_obj.id)
 
 
 def gen_user_list_id(user_list_obj):
     """
-    Generates the Elasticsearch document id for a UserList
+    Generates the OpenSearch document id for a UserList
 
     Args:
         user_list_obj (UserList): The UserList object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "user_list_{}".format(user_list_obj.id)
 
 
 def gen_staff_list_id(staff_list_obj):
     """
-    Generates the Elasticsearch document id for a StaffList
+    Generates the OpenSearch document id for a StaffList
 
     Args:
         staff_list_obj (StaffList): The StaffList object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The OpenSearch document id for this object
     """
     return "staff_list_{}".format(staff_list_obj.id)
 
 
 def gen_video_id(video_obj):
     """
-    Generates the Elasticsearch document id for a Video
+    Generates the OpenSearch document id for a Video
 
     Args:
         video_obj (Video): The Video object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The opensearch document id for this object
     """
     return "video_{}_{}".format(video_obj.platform, video_obj.video_id)
 
 
 def gen_podcast_id(podcast_obj):
     """
-    Generates the Elasticsearch document id for a Podcast
+    Generates the opensearch document id for a Podcast
 
     Args:
         podcast_obj (Podcast): The Podcast object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The opensearch document id for this object
     """
     return "podcast_{}".format(podcast_obj.id)
 
 
 def gen_podcast_episode_id(podcast_episode_obj):
     """
-    Generates the Elasticsearch document id for a Podcast
+    Generates the opensearch document id for a Podcast
 
     Args:
         podcast_episode_obj (PodcastEpisode): The PodcastEpisode object
 
     Returns:
-        str: The Elasticsearch document id for this object
+        str: The opensearch document id for this object
     """
     return "podcast_ep_{}".format(podcast_episode_obj.id)
 
@@ -283,7 +283,7 @@ def is_learning_query(query):
     Return True if the query includes learning resource types, False otherwise
 
     Args:
-        query (dict): The query sent to ElasticSearch
+        query (dict): The query sent to opensearch
 
     Returns:
         bool: if the query includes learning resource types
@@ -298,7 +298,7 @@ def relevant_indexes(query):
     Return True if the query includes learning resource types, False otherwise
 
     Args:
-        query (dict): The query sent to ElasticSearch
+        query (dict): The query sent to opensearch
 
     Returns:
         Array(string): array of index names
@@ -327,10 +327,10 @@ def execute_search(*, user, query):
 
     Args:
         user (User): The user executing the search. Used to determine filters to enforce permissions.
-        query (dict): The Elasticsearch query constructed in the frontend
+        query (dict): The opensearch query constructed in the frontend
 
     Returns:
-        dict: The Elasticsearch response dict
+        dict: The opensearch response dict
     """
     indexes = ",".join(relevant_indexes(query))
     search = Search(index=indexes)
@@ -348,10 +348,10 @@ def execute_learn_search(*, user, query):
 
     Args:
         user (User): The user executing the search. Used to determine filters to enforce permissions.
-        query (dict): The Elasticsearch query constructed in the frontend
+        query (dict): The opensearch query constructed in the frontend
 
     Returns:
-        dict: The Elasticsearch response dict
+        dict: The opensearch response dict
     """
     indexes = ",".join(relevant_indexes(query))
     search = Search(index=indexes)
@@ -363,20 +363,20 @@ def execute_learn_search(*, user, query):
 
 def _transform_search_results_suggest_with_compatability(search_result):
     """
-    Transform suggest results from elasticsearch
+    Transform suggest results from opensearch
 
     Args:
-        search_result (dict): The results from ElasticSearch
+        search_result (dict): The results from opensearch
 
     Returns:
-        dict: The Elasticsearch response dict with transformed suggestions
+        dict: The opensearch response dict with transformed suggestions
     """
 
     es_suggest = search_result.pop("suggest", {})
     search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
     if (
         search_result.get("hits", {}).get("total", 0)
-        <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
+        <= settings.OPENSEARCH_MAX_SUGGEST_HITS
     ):
         suggestion_dict = defaultdict(int)
         suggestions = [
@@ -394,7 +394,7 @@ def _transform_search_results_suggest_with_compatability(search_result):
             for key, value in sorted(
                 suggestion_dict.items(), key=lambda item: item[1], reverse=True
             )
-        ][: settings.ELASTICSEARCH_MAX_SUGGEST_RESULTS]
+        ][: settings.OPENSEARCH_MAX_SUGGEST_RESULTS]
     else:
         search_result["suggest"] = []
     return search_result
@@ -407,11 +407,11 @@ def transform_results(search_result, user, department_filters):
     Add 'is_favorite' and 'lists' fields to the '_source' attributes for learning resources.
 
     Args:
-        search_result (dict): The results from ElasticSearch
+        search_result (dict): The results from OpenSearch
         user (User): the user who performed the search
 
     Returns:
-        dict: The Elasticsearch response dict with transformed aggregates and source values
+        dict: The OpenSearch response dict with transformed aggregates and source values
     """
 
     for aggregation_key in [
@@ -513,7 +513,7 @@ def _transform_search_result_total_es7(result):
     """
     Replace value depending on whether getting sent an int or dict per es6 or 7
     Args:
-        result (dict): The single result from Elasticsearch results
+        result (dict): The single result from OpenSearch results
     """
     total = result.get("hits", {}).get("total", {})
     if isinstance(total, int):
@@ -527,7 +527,7 @@ def _transform_search_results_coursenum(search_result, department_filters):
     Replace coursenum in search results with the smallest coursenum from a department in department_filters
 
     Args:
-        search_result (dict): The results from ElasticSearch
+        search_result (dict): The results from OpenSearch
         department_filters (list(string)): list of filtered departments
     """
 
@@ -561,7 +561,7 @@ def find_related_documents(*, user, post_id):
         post_id (str): The id of the post that you want to find related posts for
 
     Returns:
-        dict: The Elasticsearch response dict
+        dict: The OpenSearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)
@@ -589,7 +589,7 @@ def find_similar_resources(*, user, value_doc):
             a document representing the data fields we want to search with
 
     Returns:
-        dict: The Elasticsearch response dict
+        dict: The OpenSearch response dict
     """
     index = get_default_alias_name(ALIAS_ALL_INDICES)
     search = Search(index=index)

@@ -26,7 +26,7 @@ class Command(BaseCommand):
         """Run Populate micromasters courses"""
         if options["delete"]:
             self.stdout.write(
-                "Deleting all existing xPro programs from database and ElasticSearch"
+                "Deleting all existing xPro programs from database and opensearch"
             )
             # NOTE: we only delete programs, because courses are owned by the MITx integration
             for program in Program.objects.filter(

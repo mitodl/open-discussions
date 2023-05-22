@@ -1,4 +1,4 @@
-"""Elasticsearch fixtures"""
+"""opensearch fixtures"""
 from types import SimpleNamespace
 
 import pytest
@@ -7,9 +7,9 @@ from search.connection import configure_connections
 
 
 @pytest.fixture(autouse=True)
-def elasticsearch(mocker, settings):
-    """Fixture for mocking elasticsearch"""
-    settings.ELASTICSEARCH_URL = "test.elastic"
+def opensearch(mocker, settings):
+    """Fixture for mocking opensearch"""
+    settings.OPENSEARCH_URL = "test.opensearch"
     mock_get_connection = mocker.patch(
         "opensearch_dsl.search.get_connection", autospec=True
     )

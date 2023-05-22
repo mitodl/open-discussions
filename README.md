@@ -222,11 +222,11 @@ To enable channel widgets, run through these steps:
     ```
 1. Add `FEATURE_WIDGETS_UI=True` to your `.env`
 
-### Enabling searching the course catalog on elasticsearch
+### Enabling searching the course catalog on opensearch
 
-To enable searching the course catalog on elasticsearch, run through these steps:
+To enable searching the course catalog on opensearch, run through these steps:
 1. Start the services with `docker-compose up`
-2. With the above running, run this management command, which kicks off a celery task, to create an elasticsearch index:
+2. With the above running, run this management command, which kicks off a celery task, to create an opensearch index:
     ```
     docker-compose  run web python manage.py recreate_index --all
     ```

@@ -1,5 +1,5 @@
 """
-Elasticsearch connection functionality
+OpenSearch connection functionality
 """
 import uuid
 from functools import partial
@@ -17,16 +17,16 @@ def configure_connections():
     This should only be called once
     """
     # this is the default connection
-    http_auth = settings.ELASTICSEARCH_HTTP_AUTH
+    http_auth = settings.OPENSEARCH_HTTP_AUTH
     use_ssl = http_auth is not None
     # configure() lazily creates connections when get_connection() is called
     connections.configure(
         default={
-            "hosts": [settings.ELASTICSEARCH_URL],
+            "hosts": [settings.OPENSEARCH_URL],
             "http_auth": http_auth,
             "use_ssl": use_ssl,
-            "timeout": settings.ELASTICSEARCH_DEFAULT_TIMEOUT,
-            "connections_per_node": settings.ELASTICSEARCH_CONNECTIONS_PER_NODE,
+            "timeout": settings.OPENSEARCH_DEFAULT_TIMEOUT,
+            "connections_per_node": settings.OPENSEARCH_CONNECTIONS_PER_NODE,
             # make sure we verify SSL certificates (off by default)
             "verify_certs": use_ssl,
         }
@@ -38,7 +38,7 @@ def get_conn():
     Get the default connection
 
     Returns:
-        elasticsearch.client.Elasticsearch: An Elasticsearch client
+        opensearch.client.Opensearch: An OpenSearch client
     """
     return connections.get_connection()
 
@@ -54,7 +54,7 @@ def make_backing_index_name(object_type):
         str: A new name for a backing index
     """
     return "{prefix}_{object_type}_{hash}".format(
-        prefix=settings.ELASTICSEARCH_INDEX,
+        prefix=settings.OPENSEARCH_INDEX,
         object_type=object_type,
         hash=uuid.uuid4().hex,
     )
@@ -62,7 +62,7 @@ def make_backing_index_name(object_type):
 
 def make_alias_name(is_reindexing, object_type):
     """
-    Make the name used for the Elasticsearch alias
+    Make the name used for the Opensearch alias
 
     Args:
         object_type(str): The object type of the index (post, comment, etc)
@@ -72,7 +72,7 @@ def make_alias_name(is_reindexing, object_type):
         str: The name of the alias
     """
     return "{prefix}_{object_type}_{suffix}".format(
-        prefix=settings.ELASTICSEARCH_INDEX,
+        prefix=settings.OPENSEARCH_INDEX,
         object_type=object_type,
         suffix="reindexing" if is_reindexing else "default",
     )
@@ -87,7 +87,7 @@ def get_active_aliases(conn, *, object_types=None, include_reindexing=True):
     Returns aliases which exist for specified object types
 
     Args:
-        conn(elasticsearch.client.Elasticsearch): An Elasticsearch client
+        conn(opensearch.client.Opensearch): An Opensearch client
         object_types(list of str): list of object types (post, comment, etc)
         include_reindexing(boolean): include reindexing indexes if true
 
@@ -111,7 +111,7 @@ def active_aliases_with_reindexing(conn, object_types):
     Returns aliases which exist for specified object types including reindexing aliases
 
     Args:
-        conn(elasticsearch.client.Elasticsearch): An Elasticsearch client
+        conn(opensearch.client.Opensearch): An Opensearch client
         object_types(list of str): list of object types (post, comment, etc)
     """
 
@@ -128,10 +128,10 @@ def active_aliases_with_reindexing(conn, object_types):
 
 def refresh_index(index):
     """
-    Refresh the elasticsearch index
+    Refresh the opensearch index
 
     Args:
-        index (str): The elasticsearch index to refresh
+        index (str): The opensearch index to refresh
     """
     conn = get_conn()
     conn.indices.refresh(index)
