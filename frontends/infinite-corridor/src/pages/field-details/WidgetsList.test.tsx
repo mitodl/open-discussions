@@ -4,7 +4,8 @@ import {
   screen,
   waitFor,
   expectProps,
-  user
+  user,
+  expectLastProps
 } from "../../test-utils"
 import { Widget, WidgetsListEditable } from "ol-widgets"
 import { makeWidgetListResponse } from "ol-widgets/src/factories"
@@ -42,18 +43,20 @@ describe("Viewing widgets with WidgetsList", () => {
      * Check that widget components are still on-screen
      */
     const { widgets } = widgetsList
-    await waitFor(() => {
-      screen.getByRole("heading", { name: widgets[0].title })
-      screen.getByRole("heading", { name: widgets[1].title })
-      screen.getByRole("heading", { name: widgets[2].title })
-    })
+    const w1 = await screen.findByRole("heading", { name: widgets[0].title })
+    const w2 = await screen.findByRole("heading", { name: widgets[1].title })
+    const w3 = await screen.findByRole("heading", { name: widgets[2].title })
+
+    const { DOCUMENT_POSITION_FOLLOWING } = Node
+    expect(w1.compareDocumentPosition(w2)).toBe(DOCUMENT_POSITION_FOLLOWING)
+    expect(w2.compareDocumentPosition(w3)).toBe(DOCUMENT_POSITION_FOLLOWING)
 
     /**
      * Check that the Widget component was called with correct props
      */
-    expectProps(spyWidget, { widget: widgets.at(-1) }, -1)
-    expectProps(spyWidget, { widget: widgets.at(-2) }, -2)
-    expectProps(spyWidget, { widget: widgets.at(-3) }, -3)
+    expectProps(spyWidget, { widget: widgets.at(-1) })
+    expectProps(spyWidget, { widget: widgets.at(-2) })
+    expectProps(spyWidget, { widget: widgets.at(-3) })
   })
 })
 
@@ -73,7 +76,7 @@ describe("Editing widgets with WidgetsList", () => {
       screen.getByRole("heading", { name: widgets[1].title })
       screen.getByRole("heading", { name: widgets[2].title })
     })
-    expectProps(spyWidgetsListEditable, { widgetsList }, -1)
+    expectLastProps(spyWidgetsListEditable, { widgetsList })
   })
 
   it("makes the expected API call when WidgetsListEditable is edited+submitted", async () => {
