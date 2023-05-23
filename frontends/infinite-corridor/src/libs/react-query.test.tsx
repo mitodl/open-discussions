@@ -1,5 +1,5 @@
 import React from "react"
-import { renderHook } from "@testing-library/react-hooks/dom"
+import { renderHook, waitFor } from "@testing-library/react"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
@@ -23,7 +23,7 @@ test.each([
   async ({ status, retries }) => {
     allowConsoleErrors()
     const queryFn = jest.fn().mockRejectedValue({ response: { status } })
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useQuery(["test"], {
           queryFn,
@@ -32,7 +32,9 @@ test.each([
       { wrapper }
     )
 
-    await waitFor(() => result.current.isError)
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
     expect(queryFn).toHaveBeenCalledTimes(retries + 1)
   }
 )
