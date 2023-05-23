@@ -1,15 +1,12 @@
 import {
   LearningResource,
-  PaginatedListItems,
   UserList,
-  CourseTopic,
-  LearningResourceType as LRT,
+  LearningResourceType as LR,
   ListItemMember,
   StaffList,
   ListItem,
   LearningResourceRef,
-  isUserListOrPath,
-  isStaffListOrPath
+  isUserListOrPath
 } from "ol-search-ui"
 import { PaginatedResult, PaginationSearchParams } from "ol-util"
 import axios from "../../libs/axios"
@@ -20,31 +17,11 @@ import {
   UseQueryResult,
   UseQueryOptions
 } from "@tanstack/react-query"
-import {
-  urls,
-  keys,
-  UserListOptions,
-  CourseFilterParams,
-  StaffListOptions
-} from "./urls"
+import { urls, keys, UserListOptions, StaffListOptions } from "./urls"
 import { modifyCachedSearchResource } from "./search"
-import { useInfiniteLimitOffsetQuery } from "./util"
+import { invalidateResourceQueries, useInfiniteLimitOffsetQuery } from "./util"
+import { useResource } from "./resources"
 
-const useResource = (
-  type: string,
-  id: number,
-  options: Pick<UseQueryOptions, "enabled"> = {}
-) => {
-  const key = keys.resource(type).id(id).details
-  return useQuery<LearningResource>(
-    key,
-    async () => {
-      const url = urls.resource.details(type, id)
-      return axios.get(url).then(res => res.data)
-    },
-    options
-  )
-}
 const useUserList = (
   id: number,
   options: Pick<UseQueryOptions, "enabled"> = {}
@@ -56,7 +33,7 @@ const useStaffList = (
   id: number,
   options: Pick<UseQueryOptions, "enabled"> = {}
 ) => {
-  return useResource(LRT.StaffList, id, options) as UseQueryResult<StaffList>
+  return useResource(LR.StaffList, id, options) as UseQueryResult<StaffList>
 }
 
 const useUserListsListing = (
@@ -81,7 +58,7 @@ const useUserListItems = (
     Pick<UseQueryOptions, "enabled"> = {}
 ) => {
   const { enabled, ...others } = options
-  const queryKey = keys.userList.id(listId).itemsListing.infinite(options)
+  const queryKey = keys.userList.itemsListing.for(listId).infinite(options)
   const initialUrl = urls.userList.itemsListing(listId, {
     ...others,
     offset: 0
@@ -101,7 +78,7 @@ const useStaffListItems = (
     Pick<UseQueryOptions, "enabled"> = {}
 ) => {
   const { enabled, ...others } = options
-  const queryKey = keys.staffList.id(listId).itemsListing.infinite(options)
+  const queryKey = keys.staffList.itemsListing.for(listId).infinite(options)
   const initialUrl = urls.staffList.itemsListing(listId, {
     ...others,
     offset: 0
@@ -110,76 +87,6 @@ const useStaffListItems = (
     queryKey,
     enabled
   })
-}
-
-const useFavoritesListing = (options?: PaginationSearchParams) => {
-  const url = urls.favorite.listing(options)
-  const key = keys.favorites.listing.page(options)
-  return useQuery<PaginatedListItems>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
-}
-
-const useFavorite = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (resource: LearningResource) => {
-      const url = urls.resource.favorite(resource.object_type, resource.id)
-      return axios.post(url).then(res => res.data)
-    },
-    onSuccess(_data, resource) {
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(resource.object_type).id(resource.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.favorites.all
-      })
-      modifyCachedSearchResource(
-        queryClient,
-        {
-          id:          resource.id,
-          object_type: resource.object_type
-        },
-        () => ({ is_favorite: true })
-      )
-    }
-  })
-}
-
-const useUnfavorite = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (resource: LearningResource) => {
-      const url = urls.resource.unfavorite(resource.object_type, resource.id)
-      return axios.post(url).then(res => res.data)
-    },
-    onSuccess(_data, resource) {
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(resource.object_type).id(resource.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.favorites.all
-      })
-      modifyCachedSearchResource(
-        queryClient,
-        {
-          id:          resource.id,
-          object_type: resource.object_type
-        },
-        () => ({ is_favorite: false })
-      )
-    }
-  })
-}
-
-const useTopics = (opts?: Pick<UseQueryOptions, "enabled">) => {
-  const key = keys.topics
-  const url = urls.topics.listing
-  return useQuery<PaginatedResult<CourseTopic>>(
-    key,
-    () => axios.get(url).then(res => res.data),
-    opts
-  )
 }
 
 const updateUserList = async (data: Partial<UserList> & { id: number }) => {
@@ -191,12 +98,8 @@ const useUpdateUserList = () => {
   const queryClient = useQueryClient()
   return useMutation(updateUserList, {
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: keys.userList.id(variables.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.userList.listing.all
-      })
+      const resource = { object_type: LR.Userlist, id: variables.id }
+      invalidateResourceQueries(queryClient, resource)
     }
   })
 }
@@ -261,16 +164,13 @@ const useAddToListItems = () => {
       const { list } = variables
       queryClient.setQueryData<LearningResource>(
         keys.resource(resource.object_type).id(resource.id).details,
-        old => ({ ...old, ...resource }) // API response is missing is_favorite
+        old => {
+          if (!old) return undefined
+          return { ...old, ...data.content_data }
+        }
       )
-      // Skip optimistic updates for now. We do not know the list item id.
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(list.object_type).id(list.id).all
-      })
-      // The listing response includes item counts, which have changed
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(list.object_type).listing.all
-      })
+      invalidateResourceQueries(queryClient, resource),
+      invalidateResourceQueries(queryClient, list)
 
       modifyCachedSearchResource(
         queryClient,
@@ -300,44 +200,22 @@ const useDeleteFromListItems = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: deleteFromUserListItems,
-    onMutate:   vars => {
-      const { item, list } = vars
-      const resourceKey = keys
-        .resource(item.content_type)
-        .id(item.object_id).details
-      queryClient.setQueryData<LearningResource>(resourceKey, current => {
-        if (!current) return
-        const wasNotRemoved = (m: ListItemMember) => m.item_id !== item.item_id
-        if (isStaffListOrPath(list)) {
-          return {
-            ...current,
-            stafflists: current.stafflists.filter(wasNotRemoved)
-          }
-        }
-        if (isUserListOrPath(list)) {
-          return {
-            ...current,
-            lists: current.lists.filter(wasNotRemoved)
-          }
-        }
-        return undefined
-      })
-    },
-    onSettled: (_data, _error, vars) => {
-      const { item, list } = vars
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(item.content_type).id(item.object_id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(list.object_type).id(list.id).all
-      })
-      // The listing response includes item counts, which have changed
-      queryClient.invalidateQueries({
-        queryKey: keys.resource(list.object_type).listing.all
-      })
-    },
     onSuccess(_data, vars) {
-      const { item } = vars
+      const { item, list } = vars
+      const resource = { object_type: item.content_type, id: item.object_id }
+      invalidateResourceQueries(queryClient, resource),
+      invalidateResourceQueries(queryClient, list)
+      queryClient.setQueryData<LearningResource>(
+        keys.resource(resource.object_type).id(resource.id).details,
+        old => {
+          if (!old) return undefined
+          const listKey = isUserListOrPath(list) ? "lists" : "stafflists"
+          return {
+            ...old,
+            [listKey]: old[listKey].filter(x => x.item_id !== item.item_id)
+          }
+        }
+      )
       modifyCachedSearchResource(
         queryClient,
         {
@@ -374,12 +252,8 @@ const useUpdateStaffList = () => {
   const queryClient = useQueryClient()
   return useMutation(updateStaffList, {
     onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: keys.staffList.id(variables.id).details
-      })
-      queryClient.invalidateQueries({
-        queryKey: keys.staffList.listing.all
-      })
+      const resource = { object_type: LR.StaffList, id: variables.id }
+      invalidateResourceQueries(queryClient, resource)
     }
   })
 }
@@ -422,38 +296,6 @@ const useDeleteStaffList = () => {
   })
 }
 
-const useUpcomingCourses = (
-  options?: PaginationSearchParams,
-  filters?: CourseFilterParams
-) => {
-  const url = urls.course.upcoming(options, filters)
-
-  const key = keys.courses.listing.all
-
-  return useQuery<PaginatedResult<LearningResource>>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
-}
-
-const usePopularContent = (options?: PaginationSearchParams) => {
-  const url = urls.popularContent.listing(options)
-
-  const key = keys.popularContent.listing.all
-
-  return useQuery<PaginatedResult<LearningResource>>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
-}
-
-const useNewVideos = (options?: PaginationSearchParams) => {
-  const url = urls.video.new(options)
-
-  const key = keys.videos.listing.all
-
-  return useQuery<PaginatedResult<LearningResource>>(key, () =>
-    axios.get(url).then(res => res.data)
-  )
-}
 type MoveItemPayload = {
   item: Pick<ListItemMember, "item_id" | "list_id">
   position: number
@@ -475,54 +317,39 @@ const moveStaffListItem = async ({ item, position }: MoveItemPayload) => {
 const useMoveListItem = (mode: "userlist" | "stafflist") => {
   const queryClient = useQueryClient()
   const mutationFn = mode === "userlist" ? moveUserListItem : moveStaffListItem
-  const listingKey = (id: number) =>
+  const listingKey =
     mode === "userlist" ?
-      keys.userList.id(id).itemsListing.all :
-      keys.staffList.id(id).itemsListing.all
+      keys.userList.itemsListing :
+      keys.staffList.itemsListing
   return useMutation({
     mutationFn,
     onSettled: (_data, _error, vars) => {
-      /**
-       * We did an optimistic update that re-ordered the list for the UI.
-       * But the API calls are based on list items' `position` property, not
-       * their index within the list.
-       *
-       * The position properties are incorrect after our reordering, so re-fetch
-       * the list.
-       *
-       * Since the listing is an InfiniteQuery, this invalidates all pages,
-       * which could be slow if several pages are showing. In practice, usually
-       * only one page (max 50 items) is showing.
-       */
       queryClient.invalidateQueries({
-        queryKey: listingKey(vars.item.list_id)
+        queryKey: listingKey.for(vars.item.list_id).all
       })
     }
   })
 }
 
 export {
-  useResource, // details
-  useUserListItems, // items listing
-  useUserList, // details
-  useStaffList, // details
-  useStaffListItems, // items listing
-  useUserListsListing, // listing
-  useFavoritesListing, // items listing
-  useTopics,
-  useCreateUserList, // mutation
-  useUpdateUserList, // mutation
-  useDeleteUserList, // mutation
-  useAddToListItems, // mutation
-  useDeleteFromListItems, // mutation
-  useStaffListsListing, // listing
-  useCreateStaffList, // mutation
-  useUpdateStaffList, // mutation
-  useDeleteStaffList, // mutation
-  useFavorite, // mutation
-  useUnfavorite, // mutation
-  useUpcomingCourses, // listing
-  usePopularContent, // listing
-  useNewVideos, // listing
-  useMoveListItem // mutation
+  // userlist queries
+  useUserList,
+  useUserListsListing,
+  useUserListItems,
+  // stafflist queries
+  useStaffList,
+  useStaffListsListing,
+  useStaffListItems,
+  // userlist mutations
+  useCreateUserList,
+  useUpdateUserList,
+  useDeleteUserList,
+  // stafflist mutations
+  useCreateStaffList,
+  useUpdateStaffList,
+  useDeleteStaffList,
+  // items mutations
+  useAddToListItems,
+  useDeleteFromListItems,
+  useMoveListItem
 }

@@ -33,6 +33,10 @@ describe("HomePage", () => {
   test("Submitting search goes to search page", async () => {
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
     setMockResponse.get(urls.course.upcoming(), [])
+    setMockResponse.get(
+      urls.course.upcoming({ offered_by: "Micromasters" }),
+      []
+    )
     setMockResponse.get(urls.video.new(), [])
     setMockResponse.get(urls.popularContent.listing(), [])
 
@@ -54,6 +58,10 @@ describe("HomePage", () => {
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 
     setMockResponse.get(urls.course.upcoming(), coursesResult)
+    setMockResponse.get(
+      urls.course.upcoming({ offered_by: "Micromasters" }),
+      []
+    )
     setMockResponse.get(urls.video.new(), [])
     setMockResponse.get(urls.popularContent.listing(), [])
 
@@ -85,6 +93,10 @@ describe("HomePage", () => {
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 
     setMockResponse.get(urls.course.upcoming(), [])
+    setMockResponse.get(
+      urls.course.upcoming({ offered_by: "Micromasters" }),
+      []
+    )
     setMockResponse.get(urls.video.new(), videosResult)
     setMockResponse.get(urls.popularContent.listing(), [])
 
@@ -116,6 +128,10 @@ describe("HomePage", () => {
     setMockResponse.post("search/", { hits: { hits: [], total: 0 } })
 
     setMockResponse.get(urls.course.upcoming(), [])
+    setMockResponse.get(
+      urls.course.upcoming({ offered_by: "Micromasters" }),
+      []
+    )
     setMockResponse.get(urls.video.new(), [])
     setMockResponse.get(urls.popularContent.listing(), popularResult)
 
