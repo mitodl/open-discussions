@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.216.1
+Version 0.216.1 (Released May 23, 2023)
 ---------------
 
 - Move the transformation inside _transform_search_results_suggest (#4002)
