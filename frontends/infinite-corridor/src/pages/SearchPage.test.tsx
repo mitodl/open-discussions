@@ -102,7 +102,8 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        size:         4
+        size:         4,
+        aggregations: ["certification", "type", "offered_by"]
       })
     )
 
@@ -113,7 +114,8 @@ describe("SearchPage", () => {
         text:         "",
         from:         4,
         activeFacets: expectedFacets,
-        size:         4
+        size:         4,
+        aggregations: ["certification", "type", "offered_by"]
       })
     )
   })
@@ -149,7 +151,8 @@ describe("SearchPage", () => {
       {
         from:         0,
         size:         4,
-        activeFacets: expectedFacets
+        activeFacets: expectedFacets,
+        aggregations: ["certification", "type", "offered_by"]
       },
       1
     )
@@ -167,7 +170,8 @@ describe("SearchPage", () => {
         activeFacets: {
           ...expectedFacets,
           offered_by: ["MITx"]
-        }
+        },
+        aggregations: ["certification", "type", "offered_by"]
       },
       2
     )
@@ -184,7 +188,8 @@ describe("SearchPage", () => {
         activeFacets: {
           ...expectedFacets,
           offered_by: ["MITx"]
-        }
+        },
+        aggregations: ["certification", "type", "offered_by"]
       },
       1
     )
@@ -208,7 +213,8 @@ describe("SearchPage", () => {
         size:         4,
         activeFacets: {
           ...expectedFacets
-        }
+        },
+        aggregations: ["certification", "type", "offered_by"]
       },
       2
     )
@@ -230,7 +236,8 @@ describe("SearchPage", () => {
         text:         "",
         from:         0,
         activeFacets: expectedFacets,
-        size:         4
+        size:         4,
+        aggregations: ["certification", "type", "offered_by"]
       })
     )
 
@@ -241,7 +248,8 @@ describe("SearchPage", () => {
         text:         "New Search Text",
         from:         0,
         activeFacets: expectedFacets,
-        size:         4
+        size:         4,
+        aggregations: ["certification", "type", "offered_by"]
       })
     )
   })

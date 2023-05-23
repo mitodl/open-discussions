@@ -36,6 +36,7 @@ const restrictFacetTypes = (allowedTypes: string[], facets?: Facets) => {
 
 type InfiniteSearchOptions = Omit<SearchQueryParams, "from"> & {
   allowedTypes?: string[]
+  aggregations?: string[]
 }
 
 const useInfiniteSearch = (params: InfiniteSearchOptions) => {

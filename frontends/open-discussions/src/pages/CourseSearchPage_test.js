@@ -193,7 +193,14 @@ describe("CourseSearchPage", () => {
           course_feature_tags: [],
           resource_type:       []
         })
-      )
+      ),
+      aggregations: [
+        "audience",
+        "certification",
+        "type",
+        "topics",
+        "offered_by"
+      ]
     })
     wrapper.update()
     // from is 5, plus 5 is 10 which is == numHits so no more results
@@ -229,7 +236,14 @@ describe("CourseSearchPage", () => {
           course_feature_tags: [],
           resource_type:       []
         })
-      )
+      ),
+      aggregations: [
+        "audience",
+        "certification",
+        "type",
+        "topics",
+        "offered_by"
+      ]
     })
   })
 
@@ -265,7 +279,14 @@ describe("CourseSearchPage", () => {
           course_feature_tags: [],
           resource_type:       []
         })
-      )
+      ),
+      aggregations: [
+        "audience",
+        "certification",
+        "type",
+        "topics",
+        "offered_by"
+      ]
     })
   })
 
@@ -302,7 +323,14 @@ describe("CourseSearchPage", () => {
           course_feature_tags: [],
           resource_type:       []
         })
-      )
+      ),
+      aggregations: [
+        "audience",
+        "certification",
+        "type",
+        "topics",
+        "offered_by"
+      ]
     })
   })
 
