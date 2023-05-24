@@ -28,13 +28,15 @@ jobs:
           - 6379:6379
 
       elastic:
-        image: docker.elastic.co/elasticsearch/elasticsearch:6.8.2
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
         env:
           network.host: "0.0.0.0"
           http.cors.enabled: "true"
           http.cors.allow-origin: "*"
+          http.max_content_length: "10mb"
           rest.action.multi.allow_explicit_index: "false"
-          ES_JAVA_OPTS: -Xms512m -Xmx512m
+          ES_JAVA_OPTS: "-Xms1024m -Xmx1024m"
+          discovery.type: "single-node"
         ports:
           - 9200:9200
 

@@ -336,7 +336,9 @@ def execute_search(*, user, query):
     search = Search(index=indexes)
     search.update_from_dict(query)
     search = _apply_general_query_filters(search, user)
-    return _transform_search_results_suggest(search.execute().to_dict())
+    return _transform_search_results_suggest_with_compatability(
+        search.execute().to_dict()
+    )
 
 
 def execute_learn_search(*, user, query):
@@ -359,7 +361,7 @@ def execute_learn_search(*, user, query):
     return transform_results(search.execute().to_dict(), user, department_filters)
 
 
-def _transform_search_results_suggest(search_result):
+def _transform_search_results_suggest_with_compatability(search_result):
     """
     Transform suggest results from elasticsearch
 
@@ -371,6 +373,7 @@ def _transform_search_results_suggest(search_result):
     """
 
     es_suggest = search_result.pop("suggest", {})
+    search_result["hits"]["total"] = _transform_search_result_total_es7(search_result)
     if (
         search_result.get("hits", {}).get("total", 0)
         <= settings.ELASTICSEARCH_MAX_SUGGEST_HITS
@@ -499,12 +502,25 @@ def transform_results(search_result, user, department_filters):
                     user, object_type, object_id
                 )
 
-    search_result = _transform_search_results_suggest(search_result)
+    search_result = _transform_search_results_suggest_with_compatability(search_result)
 
     if len(department_filters) > 0:
         _transform_search_results_coursenum(search_result, department_filters)
 
     return search_result
+
+
+def _transform_search_result_total_es7(result):
+    """
+    Replace value depending on whether getting sent an int or dict per es6 or 7
+    Args:
+        result (dict): The single result from Elasticsearch results
+    """
+    total = result.get("hits", {}).get("total", {})
+    if isinstance(total, int):
+        return total
+    else:
+        return total.get("value", 0)
 
 
 def _transform_search_results_coursenum(search_result, department_filters):

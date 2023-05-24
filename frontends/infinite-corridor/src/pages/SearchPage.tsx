@@ -24,6 +24,8 @@ const facetMap: FacetManifest = [
   ["offered_by", "Offered By"]
 ]
 
+const searchAggregationKeys = ["certification", "type", "offered_by"]
+
 const SearchPage: React.FC = () => {
   const isMd = useMuiBreakpoint("md")
 
@@ -34,7 +36,8 @@ const SearchPage: React.FC = () => {
     text,
     activeFacets,
     size:         pageSize,
-    allowedTypes: ALLOWED_TYPES
+    allowedTypes: ALLOWED_TYPES,
+    aggregations: searchAggregationKeys
   })
   useSyncUrlAndSearch(history, search)
 

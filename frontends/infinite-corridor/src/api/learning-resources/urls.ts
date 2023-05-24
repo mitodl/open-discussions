@@ -12,10 +12,6 @@ const DEFAULT_PAGINATION_PARAMS: PaginationSearchParams = {
   limit:  50
 }
 
-interface CourseFilterParams {
-  offered_by?: string
-}
-
 const popularContentApi = UrlAssembler("/popular-content/")
 const popularContentUrls = {
   listing: (options: PaginationSearchParams = {}) =>
@@ -24,17 +20,15 @@ const popularContentUrls = {
       .toString()
 }
 
+type CourseOptions = PaginationSearchParams & { offered_by?: string }
 const courseApi = UrlAssembler("/courses/")
 const courseDetailsApi = courseApi.segment(":id/")
 const courseUrls = {
   details:  (id: number) => courseDetailsApi.param({ id }).toString(),
-  upcoming: (
-    options: PaginationSearchParams = {},
-    filterOptions: CourseFilterParams = {}
-  ) =>
+  upcoming: (options: CourseOptions = {}) =>
     courseApi
       .segment("upcoming/")
-      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options, ...filterOptions })
+      .param({ ...DEFAULT_PAGINATION_PARAMS, ...options })
       .toString(),
   listing: (options: PaginationSearchParams = {}) =>
     courseApi.param({ ...DEFAULT_PAGINATION_PARAMS, ...options }).toString(),
@@ -246,75 +240,80 @@ const resourceKeys = (type: string) => {
 const keys = {
   all:      [baseKey],
   resource: resourceKeys,
-  userList: {
-    all: resourceKeys(LRT.Userlist).all,
-    id:  (id: number) => {
-      const forId = resourceKeys(LRT.Userlist).id(id)
-      return {
-        ...forId,
-        itemsListing: {
-          all:      [...forId.all, "items"],
-          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
-            opts?: T
-          ) => [...forId.all, "items", "infinite", opts]
-        }
-      }
-    },
-    listing: {
-      all:  resourceKeys(LRT.Userlist).listing.all,
-      page: (opts?: UserListOptions) =>
-        resourceKeys(LRT.Userlist).listing.page(opts)
-    }
-  },
-  staffList: {
-    all: resourceKeys(LRT.StaffList).all,
-    id:  (id: number) => {
-      const forId = resourceKeys(LRT.StaffList).id(id)
-      return {
-        ...forId,
-        itemsListing: {
-          all:      [...forId.all, "items"],
-          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
-            opts?: T
-          ) => [...forId.all, "items", "infinite", opts]
-        }
-      }
-    },
-    listing: {
-      all:  resourceKeys(LRT.StaffList).listing.all,
-      page: (opts?: StaffListOptions) =>
-        resourceKeys(LRT.StaffList).listing.page(opts)
-    }
-  },
-  topics: [baseKey, "topics"],
-
-  favorites: {
-    all:     resourceKeys(TYPE_FAVORITES).all,
-    listing: resourceKeys(TYPE_FAVORITES).listing
-  },
-
-  search: {
+  topics:   [baseKey, "topics"],
+  search:   {
     all:   [baseKey, "search"],
     pages: (params: Omit<SearchQueryParams, "from">) => [
       ...keys.search.all,
       params
     ]
   },
-
+  userList: {
+    ...resourceKeys(LRT.Userlist),
+    /**
+     * Why not nest this under `userList.id(id: number)`?
+     *
+     * Because changing a resource can affect the itemsListing response for any
+     * userlist. Suppose resource X is mutated. By placing the itemsListing key
+     * here, we can more easily invalidate all itemsListings that depend on
+     * resource X.
+     */
+    itemsListing: {
+      all: [...resourceKeys(LRT.Userlist).all, "items"],
+      for: (listId: number) => {
+        const allForId = [...resourceKeys(LRT.Userlist).all, "items", listId]
+        return {
+          all:      allForId,
+          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
+            opts?: T
+          ) => [...allForId, "infinite", opts]
+        }
+      }
+    }
+  },
+  staffList: {
+    ...resourceKeys(LRT.StaffList),
+    itemsListing: {
+      all: [...resourceKeys(LRT.StaffList).all, "items"],
+      for: (listId: number) => {
+        const allForId = [...resourceKeys(LRT.StaffList).all, "items", listId]
+        return {
+          all:      allForId,
+          infinite: <T extends Omit<PaginationSearchParams, "offset">>(
+            opts?: T
+          ) => [...allForId, "infinite", opts]
+        }
+      }
+    }
+  },
+  favorites: {
+    all:     resourceKeys(TYPE_FAVORITES).all,
+    listing: resourceKeys(TYPE_FAVORITES).listing
+  },
   courses: {
-    all:     resourceKeys(LRT.Course).all,
-    listing: resourceKeys(LRT.Course).listing
+    upcoming: {
+      all:  [...resourceKeys(LRT.Course).all, "upcoming"],
+      page: (opts?: CourseOptions) => [
+        ...resourceKeys(LRT.Course).all,
+        "upcoming",
+        opts
+      ]
+    }
   },
-
   videos: {
-    all:     resourceKeys(LRT.Video).all,
-    listing: resourceKeys(LRT.Video).listing
+    new: {
+      all:  [...resourceKeys(LRT.Video).all, "new"],
+      page: (opts?: PaginationSearchParams) => [
+        ...resourceKeys(LRT.Video).all,
+        "new",
+        opts
+      ]
+    }
   },
-
   popularContent: {
     listing: resourceKeys(TYPE_POPULAR).listing
   }
 }
 
 export { urls, keys, DEFAULT_PAGINATION_PARAMS }
-export type { UserListOptions, StaffListOptions, CourseFilterParams }
+export type { UserListOptions, StaffListOptions, CourseOptions }
