@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.217.0
+Version 0.217.0 (Released May 24, 2023)
 ---------------
 
 - fix aggregations (#3998)
