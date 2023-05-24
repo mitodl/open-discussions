@@ -33,7 +33,8 @@ export function search(params: SearchParams): Promise<*> {
     "size",
     "sort",
     "channelName",
-    "resourceTypes"
+    "resourceTypes",
+    "aggregations"
   ])
 
   if (params["facets"]) {

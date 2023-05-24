@@ -323,7 +323,7 @@ def test_execute_search_with_suggestion(
     )
 
     opensearch.conn.search.return_value = {
-        "hits": {"total": 3},
+        "hits": {"total": {"value": 3, "relation": "eq"}},
         "suggest": RAW_SUGGESTIONS,
     }
 
@@ -340,7 +340,9 @@ def test_execute_learn_search(
 ):
     """execute_learn_search should execute an opensearch search for learning resources"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    opensearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     channels = sorted(ChannelFactory.create_batch(2), key=lambda channel: channel.name)
     add_user_role(channels[0], "moderators", user)
     add_user_role(channels[1], "contributors", user)
@@ -415,7 +417,9 @@ def test_execute_learn_search(
 def test_execute_learn_search_anonymous(settings, opensearch, list_search_enabled):
     """execute_learn_search should execute an opensearch search with an anonymous user"""
     settings.FEATURES[features.USER_LIST_SEARCH] = list_search_enabled
-    opensearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     user = AnonymousUser()
     query = {"a": "query"}
     assert (
@@ -483,7 +487,9 @@ def test_execute_learn_search_anonymous(settings, opensearch, list_search_enable
 def test_execute_learn_search_podcasts(settings, user, opensearch):
     """execute_learn_search should execute an OpenSearch search"""
     settings.FEATURES[features.PODCAST_SEARCH] = False
-    opensearch.conn.search.return_value = {"hits": {"total": 10}}
+    opensearch.conn.search.return_value = {
+        "hits": {"total": {"value": 10, "relation": "eq"}}
+    }
     query = {"a": "query"}
     assert (
         execute_learn_search(user=user, query=query)
@@ -711,7 +717,7 @@ def test_transform_results(
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": 3},
+        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
         "suggest": RAW_SUGGESTIONS,
         "aggregations": {
             "agg_filter_topics": {
@@ -768,7 +774,7 @@ def test_transform_department_filter(department_fitler):
     ]
 
     results = {
-        "hits": {"hits": raw_hits, "total": 3},
+        "hits": {"hits": raw_hits, "total": {"value": 3, "relation": "eq"}},
         "aggregations": {
             "agg_filter_topics": {
                 "doc_count": 30,
@@ -802,7 +808,7 @@ def test_transform_department_name_aggregations():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_department_name": {
@@ -837,7 +843,7 @@ def test_transform_level_aggregation():
     Aggregations with filters are nested under `agg_filter_<key>`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_level": {
@@ -889,7 +895,7 @@ def test_transform_topics_aggregations():
     Topics Aggregations with filters are nested under `agg_filter_topics`. transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_topics": {
@@ -923,7 +929,7 @@ def test_transform_resource_type_aggregations():
     transform_results should unnest them
     """
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {
             "agg_filter_resource_type": {
@@ -985,7 +991,7 @@ def test_combine_type_buckets_in_aggregates(
         type_buckets.append({"key": "learningpath", "doc_count": 3})
 
     results = {
-        "hits": {"hits": {}, "total": 15},
+        "hits": {"hits": {}, "total": {"value": 15, "relation": "eq"}},
         "suggest": {},
         "aggregations": {"type": {"buckets": type_buckets}},
     }

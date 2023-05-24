@@ -20,6 +20,7 @@ import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"
 import { History } from "history"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
@@ -53,6 +54,10 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
             <NiceModalProvider>{children}</NiceModalProvider>
           </Router>
         </HelmetProvider>
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          toggleButtonProps={{ style: { opacity: 0.5 } }}
+        />
       </QueryClientProvider>
     </MuiThemeProvider>
   )

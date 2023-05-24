@@ -37,6 +37,13 @@ import type { SortParam, LearningResourceResult } from "../flow/searchTypes"
 import type { Match } from "react-router"
 import type { CellWidth } from "../components/Grid"
 import { LR_TYPE_ALL } from "../lib/constants"
+const aggregations = [
+  "audience",
+  "certification",
+  "type",
+  "topics",
+  "offered_by"
+]
 
 export type CourseSearchParams = {
   type?: ?string | ?Array<string>,
@@ -158,7 +165,8 @@ export default function CourseSearchPage(props: Props) {
           facets:        new Map(Object.entries(searchFacets)),
           from,
           size:          SETTINGS.search_page_size,
-          resourceTypes: LR_TYPE_ALL
+          resourceTypes: LR_TYPE_ALL,
+          aggregations
         })
       )
     },
