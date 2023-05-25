@@ -128,7 +128,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
 
 def create_document(doc_id, data):
     """
-    Makes a request to ES to create a new document
+    Makes a request to OS to create a new document
 
     Args:
         doc_id (str): The ES document id
