@@ -3,7 +3,7 @@
 from django.db import migrations, models, transaction
 import django.db.models.deletion
 
-from search.task_helpers import deindex_course
+from search.search_index_helpers import deindex_course
 
 
 def delete_resources(apps, schema_editor):

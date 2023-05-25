@@ -5,7 +5,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.models import Program
 from course_catalog.tasks import get_micromasters_data
 from open_discussions.utils import now_in_utc
-from search.task_helpers import deindex_program
+from search.search_index_helpers import deindex_program
 
 
 class Command(BaseCommand):

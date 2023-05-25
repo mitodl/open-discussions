@@ -8,7 +8,7 @@ from course_catalog.models import Video
 from course_catalog.tasks import get_youtube_data, get_youtube_transcripts
 from open_discussions.utils import now_in_utc
 from open_discussions.constants import ISOFORMAT
-from search.task_helpers import deindex_video
+from search.search_index_helpers import deindex_video
 
 
 class Command(BaseCommand):

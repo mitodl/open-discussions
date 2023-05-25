@@ -95,7 +95,7 @@ def session_indexing_decorator():
         return dummy_decorator_inner
 
     patched_decorator = patch(
-        "search.task_helpers.reddit_object_persist", dummy_decorator
+        "search.search_index_helpers.reddit_object_persist", dummy_decorator
     )
     patched_decorator.start()
     # Reload the modules that import and use the channels API. All methods decorated with
@@ -156,7 +156,7 @@ def mocked_celery(mocker):
 @pytest.fixture
 def mock_search_tasks(mocker):
     """Patch search tasks so they no-op"""
-    return mocker.patch("search.task_helpers")
+    return mocker.patch("search.search_index_helpers")
 
 
 @pytest.fixture

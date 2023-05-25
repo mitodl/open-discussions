@@ -571,6 +571,7 @@ def test_update_spam(
     mock_askimet_client = mocker.patch(
         "channels.tasks.create_akismet_client"
     ).return_value
+    mocker.patch("search.search_index_helpers.deindex_profile", autospec=True)
     tasks.update_spam.delay(
         spam=spam,
         comment_ids=[comment.id],

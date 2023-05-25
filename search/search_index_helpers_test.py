@@ -34,7 +34,7 @@ from search.constants import (
     USER_LIST_TYPE,
     VIDEO_TYPE,
 )
-from search.task_helpers import (
+from search.search_index_helpers import (
     decrement_parent_post_comment_count,
     deindex_course,
     deindex_podcast,
@@ -127,10 +127,10 @@ def test_index_new_post(mocker):
     mock_post = mocker.Mock(post_id="abc")
     mock_post_proxy = mocker.Mock(_self_post=mock_post)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.OSPostSerializer.to_representation",
+        "search.search_index_helpers.OSPostSerializer.to_representation",
         return_value=fake_serialized_data,
     )
-    patched_task = mocker.patch("search.task_helpers.create_post_document")
+    patched_task = mocker.patch("search.search_index_helpers.create_post_document")
     index_new_post(mock_post_proxy)
     patched_serialize_func.assert_called_once_with(mock_post)
     assert patched_task.delay.called is True
@@ -150,12 +150,12 @@ def test_index_new_comment(mocker):
     mock_submission = mocker.Mock(id="123")
     mock_comment = mocker.Mock(id=comment.comment_id, submission=mock_submission)
     patched_serialize_func = mocker.patch(
-        "search.task_helpers.OSCommentSerializer.to_representation",
+        "search.search_index_helpers.OSCommentSerializer.to_representation",
         return_value=fake_serialized_data,
     )
-    patched_create_task = mocker.patch("search.task_helpers.create_document")
+    patched_create_task = mocker.patch("search.search_index_helpers.create_document")
     patched_increment_task = mocker.patch(
-        "search.task_helpers.increment_document_integer_field"
+        "search.search_index_helpers.increment_document_integer_field"
     )
     index_new_comment(mock_comment)
     patched_serialize_func.assert_called_once_with(comment)
@@ -179,7 +179,9 @@ def test_update_post_text(mocker, reddit_submission_obj):
     """
     Test that update_post_text calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_document_with_partial"
+    )
     update_post_text(reddit_submission_obj)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
@@ -196,7 +198,9 @@ def test_update_comment_text(mocker, reddit_comment_obj):
     """
     Test that update_post_text calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_document_with_partial"
+    )
     update_comment_text(reddit_comment_obj)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
@@ -216,12 +220,14 @@ def test_update_post_removal_status(
     Test that update_post_removal_status calls the indexing task with the right parameters and
     calls an additional task to update child comment removal status
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_document_with_partial"
+    )
     patched_comment_update_func = mocker.patch(
-        "search.task_helpers.update_field_for_all_post_comments"
+        "search.search_index_helpers.update_field_for_all_post_comments"
     )
     patched_reddit_object_removed = mocker.patch(
-        "search.task_helpers.is_reddit_object_removed"
+        "search.search_index_helpers.is_reddit_object_removed"
     )
     patched_reddit_object_removed.return_value = removal_status
     update_post_removal_status(reddit_submission_obj)
@@ -248,9 +254,11 @@ def test_update_comment_removal_status(
     """
     Test that update_comment_removal_status calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_document_with_partial")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_document_with_partial"
+    )
     patched_reddit_object_removed = mocker.patch(
-        "search.task_helpers.is_reddit_object_removed"
+        "search.search_index_helpers.is_reddit_object_removed"
     )
     patched_reddit_object_removed.return_value = removal_status
     update_comment_removal_status(reddit_comment_obj)
@@ -266,7 +274,9 @@ def test_update_post_removal_for_comments(mocker, reddit_submission_obj):
     """
     Test that update_post_removal_for_comments calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_field_values_by_query"
+    )
     field_name, field_value = ("field1", "value1")
     update_field_for_all_post_comments(
         reddit_submission_obj, field_name=field_name, field_value=field_value
@@ -301,7 +311,9 @@ def test_update_post_comment_count(
     """
     Test that update_post_removal_status calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.increment_document_integer_field")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.increment_document_integer_field"
+    )
     update_comment_count_func(reddit_comment_obj)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (
@@ -320,10 +332,10 @@ def test_set_comment_to_deleted(mocker, reddit_comment_obj):
     and calls another task to decrement the parent post's comment count
     """
     patched_partial_update_task = mocker.patch(
-        "search.task_helpers.update_document_with_partial"
+        "search.search_index_helpers.update_document_with_partial"
     )
     patched_increment_task = mocker.patch(
-        "search.task_helpers.increment_document_integer_field"
+        "search.search_index_helpers.increment_document_integer_field"
     )
     set_comment_to_deleted(reddit_comment_obj)
     assert patched_partial_update_task.delay.called is True
@@ -358,7 +370,9 @@ def test_update_indexed_score(
     """
     Test that update_indexed_score calls the indexing task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.increment_document_integer_field")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.increment_document_integer_field"
+    )
     update_indexed_score(reddit_submission_obj, POST_TYPE, vote_action=vote_action)
     assert patched_task.delay.called is True
     assert patched_task.delay.call_args[0] == (gen_post_id(reddit_submission_obj.id),)
@@ -373,9 +387,9 @@ def test_upsert_profile(mocker, mock_es_profile_serializer, user):
     """
     Tests that upsert_profile calls the task with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.tasks.upsert_profile")
+    patched_task = mocker.patch("search.search_index_helpers.tasks.upsert_profile")
     upsert_profile(user.profile.id)
-    patched_task.delay.assert_called_once_with(user.profile.id)
+    patched_task.assert_called_once_with(user.profile.id)
 
 
 def test_update_author_posts_comments(mocker, mock_es_profile_serializer, user):
@@ -400,7 +414,9 @@ def test_update_channel_index(mocker):
     """
     Tests that update_channel_index calls update_field_values_by_query with the right parameters
     """
-    patched_task = mocker.patch("search.task_helpers.update_field_values_by_query")
+    patched_task = mocker.patch(
+        "search.search_index_helpers.update_field_values_by_query"
+    )
     channel = mocker.Mock(
         display_name="name",
         title="title",
@@ -433,7 +449,7 @@ def test_upsert_course(mocker):
     patched_task = mocker.patch("search.tasks.upsert_course")
     course = CourseFactory.create()
     upsert_course(course.id)
-    patched_task.delay.assert_called_once_with(course.id)
+    patched_task.assert_called_once_with(course.id)
 
 
 @pytest.mark.django_db
@@ -441,13 +457,15 @@ def test_delete_course(mocker):
     """
     Tests that deindex_course calls the delete tasks for the course and its content files
     """
-    mock_del_document = mocker.patch("search.task_helpers.deindex_document")
-    mock_bulk_del = mocker.patch("search.task_helpers.deindex_run_content_files")
+    mock_del_document = mocker.patch("search.search_index_helpers.deindex_document")
+    mock_bulk_del = mocker.patch(
+        "search.search_index_helpers.deindex_run_content_files"
+    )
     course = CourseFactory.create()
     course_es_id = gen_course_id(course.platform, course.course_id)
 
     deindex_course(course)
-    mock_del_document.delay.assert_called_once_with(course_es_id, COURSE_TYPE)
+    mock_del_document.assert_called_once_with(course_es_id, COURSE_TYPE)
     for run in course.runs.iterator():
         mock_bulk_del.assert_any_call(run.id)
 
@@ -455,10 +473,10 @@ def test_delete_course(mocker):
 @pytest.mark.django_db
 def test_delete_profile(mocker, user):
     """Tests that deleting a user triggers a delete on a profile document"""
-    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    patched_delete_task = mocker.patch("search.search_index_helpers.deindex_document")
     deindex_profile(user)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (
+    assert patched_delete_task.called is True
+    assert patched_delete_task.call_args[0] == (
         gen_profile_id(user.username),
         PROFILE_TYPE,
     )
@@ -472,7 +490,7 @@ def test_upsert_program(mocker):
     patched_task = mocker.patch("search.tasks.upsert_program")
     program = ProgramFactory.create()
     upsert_program(program.id)
-    patched_task.delay.assert_called_once_with(program.id)
+    patched_task.assert_called_once_with(program.id)
 
 
 @pytest.mark.django_db
@@ -483,17 +501,17 @@ def test_upsert_video(mocker):
     patched_task = mocker.patch("search.tasks.upsert_video")
     video = VideoFactory.create()
     upsert_video(video.id)
-    patched_task.delay.assert_called_once_with(video.id)
+    patched_task.assert_called_once_with(video.id)
 
 
 @pytest.mark.django_db
 def test_delete_video(mocker):
     """Tests that deleting a video triggers a delete on a video document"""
-    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    patched_delete_task = mocker.patch("search.search_index_helpers.deindex_document")
     video = VideoFactory.create()
     deindex_video(video)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (gen_video_id(video), VIDEO_TYPE)
+    assert patched_delete_task.called is True
+    assert patched_delete_task.call_args[0] == (gen_video_id(video), VIDEO_TYPE)
 
 
 @pytest.mark.django_db
@@ -507,7 +525,7 @@ def test_upsert_user_list(mocker, list_type):
     patched_task = mocker.patch("search.tasks.upsert_user_list")
     user_list = UserListFactory.create(list_type=list_type)
     upsert_user_list(user_list.id)
-    patched_task.delay.assert_called_once_with(user_list.id)
+    patched_task.assert_called_once_with(user_list.id)
 
 
 @pytest.mark.django_db
@@ -516,11 +534,11 @@ def test_upsert_user_list(mocker, list_type):
 )
 def test_delete_user_list(mocker, list_type):
     """Tests that deleting a UserList triggers a delete on a UserList document"""
-    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    patched_delete_task = mocker.patch("search.search_index_helpers.deindex_document")
     user_list = UserListFactory.create(list_type=list_type)
     deindex_user_list(user_list)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (
+    assert patched_delete_task.called is True
+    assert patched_delete_task.call_args[0] == (
         gen_user_list_id(user_list),
         USER_LIST_TYPE,
     )
@@ -534,7 +552,7 @@ def test_upsert_content_file(mocker):
     patched_task = mocker.patch("search.tasks.upsert_content_file")
     content_file = ContentFileFactory.create()
     upsert_content_file(content_file.id)
-    patched_task.delay.assert_called_once_with(content_file.id)
+    patched_task.assert_called_once_with(content_file.id)
 
 
 @pytest.mark.django_db
@@ -545,7 +563,7 @@ def test_index_run_content_files(mocker):
     patched_task = mocker.patch("search.tasks.index_run_content_files")
     content_file = ContentFileFactory.create()
     index_run_content_files(content_file.id)
-    patched_task.delay.assert_called_once_with(content_file.id)
+    patched_task.assert_called_once_with(content_file.id)
 
 
 @pytest.mark.django_db
@@ -554,7 +572,7 @@ def test_delete_run_content_files(mocker):
     patched_task = mocker.patch("search.tasks.deindex_run_content_files")
     content_file = ContentFileFactory.create()
     deindex_run_content_files(content_file.id)
-    patched_task.delay.assert_called_once_with(content_file.id)
+    patched_task.assert_called_once_with(content_file.id)
 
 
 @pytest.mark.django_db
@@ -565,7 +583,7 @@ def test_upsert_podcast(mocker):
     patched_task = mocker.patch("search.tasks.upsert_podcast")
     podcast = PodcastFactory.create()
     upsert_podcast(podcast.id)
-    patched_task.delay.assert_called_once_with(podcast.id)
+    patched_task.assert_called_once_with(podcast.id)
 
 
 @pytest.mark.django_db
@@ -576,17 +594,17 @@ def test_upsert_podcast_episode(mocker):
     patched_task = mocker.patch("search.tasks.upsert_podcast_episode")
     episode = PodcastFactory.create()
     upsert_podcast_episode(episode.id)
-    patched_task.delay.assert_called_once_with(episode.id)
+    patched_task.assert_called_once_with(episode.id)
 
 
 @pytest.mark.django_db
 def test_delete_podcast(mocker):
     """Tests that deleting a podcast triggers the correct ES delete task"""
-    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    patched_delete_task = mocker.patch("search.search_index_helpers.deindex_document")
     podcast = PodcastFactory.create()
     deindex_podcast(podcast)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (
+    assert patched_delete_task.called is True
+    assert patched_delete_task.call_args[0] == (
         gen_podcast_id(podcast),
         PODCAST_TYPE,
     )
@@ -595,11 +613,11 @@ def test_delete_podcast(mocker):
 @pytest.mark.django_db
 def test_delete_podcast_episode(mocker):
     """Tests that deleting a podcast episode triggers the correct ES delete task"""
-    patched_delete_task = mocker.patch("search.task_helpers.deindex_document")
+    patched_delete_task = mocker.patch("search.search_index_helpers.deindex_document")
     episode = PodcastEpisodeFactory.create()
     deindex_podcast_episode(episode)
-    assert patched_delete_task.delay.called is True
-    assert patched_delete_task.delay.call_args[0] == (
+    assert patched_delete_task.called is True
+    assert patched_delete_task.call_args[0] == (
         gen_podcast_episode_id(episode),
         PODCAST_EPISODE_TYPE,
     )

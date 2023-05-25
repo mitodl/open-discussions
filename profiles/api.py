@@ -10,7 +10,7 @@ from profiles.models import (
     SITE_TYPE_OPTIONS,
     PERSONAL_SITE_TYPE,
 )
-from search import task_helpers as search_task_helpers
+from search import search_index_helpers
 
 
 def ensure_profile(user, profile_data=None):
@@ -45,8 +45,8 @@ def after_profile_created_or_updated(profile):
         """
         Operations that should be run after the profile create or update is committed
         """
-        search_task_helpers.upsert_profile(profile.id)
-        search_task_helpers.update_author_posts_comments(profile.id)
+        search_index_helpers.upsert_profile(profile.id)
+        search_index_helpers.update_author_posts_comments(profile.id)
 
     # this will either get called when the outermost transaction commits or otherwise immediately
     # this avoids race conditions where the async tasks may not see the record or the updated values

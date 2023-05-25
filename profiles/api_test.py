@@ -52,7 +52,7 @@ def test_after_profile_created_or_updated(mocker, user):
     # you can't test transactions in tests because the test is wrapped in the transaction
     # so we mock it to mimic/test the behavior
     mock_transaction = mocker.patch("profiles.api.transaction")
-    mock_search_tasks = mocker.patch("profiles.api.search_task_helpers")
+    mock_search_tasks = mocker.patch("profiles.api.search_index_helpers")
 
     after_profile_created_or_updated(user.profile)
 

@@ -46,7 +46,7 @@ from channels.models import (
 )
 from channels.utils import DEFAULT_LISTING_PARAMS, ListingParams
 from channels.test_utils import assert_properties_eq
-from search import task_helpers as search_task_helpers
+from search import search_index_helpers
 from open_discussions.factories import UserFactory
 from notifications.models import NotificationSettings, NOTIFICATION_TYPE_MODERATOR
 from notifications.factories import NotificationSettingsFactory
@@ -180,7 +180,7 @@ def mock_client(mock_get_client):
 @pytest.fixture()
 def mock_upsert_profile(mocker):
     """Mock of upsert_profile function"""
-    return mocker.patch("channels.api.search_task_helpers.upsert_profile")
+    return mocker.patch("channels.api.search_index_helpers.upsert_profile")
 
 
 @pytest.fixture()
@@ -214,7 +214,7 @@ def test_apply_vote(
     Tests that the functions to apply an upvote/downvote behave appropriately given
     the voting request and the current state of upvotes/downvotes for the user.
     """
-    mocker.patch("search.task_helpers.update_indexed_score")
+    mocker.patch("search.search_index_helpers.update_indexed_score")
     mock_instance = mocker.Mock(likes=likes_value)
     vote_result = vote_func(mock_instance, request_data, allow_downvote=True)
     expected_vote_success = expected_instance_vote_func is not None
@@ -237,7 +237,7 @@ def test_vote_indexing(
     """Test that an upvote/downvote calls a function to update the index"""
     post = PostFactory.create(is_text=True)
     patched_vote_indexer = mocker.patch(
-        "channels.api.search_task_helpers.update_indexed_score"
+        "channels.api.search_index_helpers.update_indexed_score"
     )
     # Test upvote
     mock_reddit_obj = Mock()
@@ -431,7 +431,7 @@ def test_update_channel_type(mock_client, channel_type, indexing_decorator):
     )
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_channel_index
+        search_index_helpers.update_channel_index
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -448,7 +448,7 @@ def test_update_channel_setting(mock_client, channel_setting, indexing_decorator
     mock_client.subreddit.return_value.mod.update.assert_called_once_with(**kwargs)
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_channel_index
+        search_index_helpers.update_channel_index
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -726,7 +726,7 @@ def test_update_post_text(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_post_text
+        search_index_helpers.update_post_text
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -750,7 +750,7 @@ def test_update_post_article(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_post_text
+        search_index_helpers.update_post_text
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -798,7 +798,7 @@ def test_approve_post(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_post_removal_status
+        search_index_helpers.update_post_removal_status
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -813,7 +813,7 @@ def test_remove_post(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_post_removal_status
+        search_index_helpers.update_post_removal_status
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -833,7 +833,7 @@ def test_create_comment_on_post(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.index_new_comment
+        search_index_helpers.index_new_comment
         in indexing_decorator.mock_persist_func.original
     )
     assert Comment.objects.filter(
@@ -858,7 +858,7 @@ def test_create_comment_on_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.index_new_comment
+        search_index_helpers.index_new_comment
         in indexing_decorator.mock_persist_func.original
     )
     assert Comment.objects.filter(
@@ -913,7 +913,7 @@ def test_delete_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.set_comment_to_deleted
+        search_index_helpers.set_comment_to_deleted
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -928,7 +928,7 @@ def test_update_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_comment_text
+        search_index_helpers.update_comment_text
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -943,7 +943,7 @@ def test_approve_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_comment_removal_status
+        search_index_helpers.update_comment_removal_status
         in indexing_decorator.mock_persist_func.original
     )
 
@@ -958,7 +958,7 @@ def test_remove_comment(mock_client, indexing_decorator):
     # This API function should be wrapped with the indexing decorator and pass in a specific indexer function
     assert indexing_decorator.mock_persist_func.call_count == 1
     assert (
-        search_task_helpers.update_comment_removal_status
+        search_index_helpers.update_comment_removal_status
         in indexing_decorator.mock_persist_func.original
     )
 
