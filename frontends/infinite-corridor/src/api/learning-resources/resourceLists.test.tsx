@@ -50,7 +50,7 @@ const setup = () => {
     }
   })
 
-  const wrapper = ({ children }) => (
+  const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 

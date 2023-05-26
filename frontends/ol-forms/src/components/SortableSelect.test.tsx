@@ -1,10 +1,11 @@
 import React from "react"
-import { zip } from "ramda"
+import { zip } from "lodash"
 import { faker } from "@faker-js/faker"
 import { render, screen } from "@testing-library/react"
 
 import SortableSelect, { SortableItem } from "./SortableSelect"
 import { Option } from "./SelectField"
+import invariant from "tiny-invariant"
 
 const createFakeOptions = (times: number): Option[] =>
   Array(times)
@@ -44,8 +45,11 @@ describe("SortableSelect", () => {
     }))
     const drags = await screen.findAllByText("drag_indicator")
     zip(values, drags).forEach(([value, draggable]) => {
+      invariant(draggable)
+      invariant(value)
       // eslint-disable-next-line testing-library/no-node-access
-      const titleDiv = draggable.closest("div").children[1]
+      const titleDiv = draggable.closest("div")?.children[1]
+      invariant(titleDiv)
       expect(titleDiv.innerHTML).toEqual(value.title)
     })
   })

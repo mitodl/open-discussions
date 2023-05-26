@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createQueryClient } from "./react-query"
 
 const queryClient = createQueryClient()
-const wrapper = ({ children }) => (
+const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 )
 
