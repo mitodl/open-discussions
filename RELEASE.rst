@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.217.1
+---------------
+
+- Opensearch Client (PR 3 of 3) (#3985)
+
 Version 0.217.0 (Released May 24, 2023)
 ---------------
 
