@@ -2,7 +2,7 @@
 import logging
 
 from django.utils.decorators import method_decorator
-from elasticsearch.exceptions import TransportError
+from opensearchpy.exceptions import TransportError
 from rest_framework.response import Response
 from rest_framework.status import HTTP_405_METHOD_NOT_ALLOWED
 from rest_framework.views import APIView
@@ -28,7 +28,7 @@ class ESView(APIView):
     def handle_exception(self, exc):
         if isinstance(exc, TransportError):
             if isinstance(exc.status_code, int) and 400 <= exc.status_code < 500:
-                log.exception("Received a 4xx error from Elasticsearch")
+                log.exception("Received a 4xx error from OpenSearch")
                 return Response(status=exc.status_code)
         raise exc
 

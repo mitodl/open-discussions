@@ -1,5 +1,5 @@
 """
-Functions and constants for Elasticsearch indexing
+Functions and constants for OpenSearch indexing
 """
 import json
 import logging
@@ -8,8 +8,8 @@ from math import ceil
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
-from elasticsearch.exceptions import ConflictError, NotFoundError
-from elasticsearch.helpers import BulkIndexError, bulk
+from opensearchpy.exceptions import ConflictError, NotFoundError
+from opensearchpy.helpers import BulkIndexError, bulk
 
 from course_catalog.models import ContentFile, Course, LearningResourceRun
 from open_discussions.utils import chunks
@@ -42,7 +42,7 @@ from search.constants import (
 )
 from search.exceptions import ReindexException
 from search.serializers import (
-    ESPostSerializer,
+    OSPostSerializer,
     serialize_bulk_comments,
     serialize_bulk_courses,
     serialize_bulk_courses_for_deletion,
@@ -88,8 +88,8 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
     index_create_data = {
         "settings": {
             "index": {
-                "number_of_shards": settings.ELASTICSEARCH_SHARD_COUNT,
-                "number_of_replicas": settings.ELASTICSEARCH_REPLICA_COUNT,
+                "number_of_shards": settings.OPENSEARCH_SHARD_COUNT,
+                "number_of_replicas": settings.OPENSEARCH_REPLICA_COUNT,
                 "refresh_interval": "60s",
             },
             "analysis": {
@@ -128,7 +128,7 @@ def clear_and_create_index(*, index_name=None, skip_mapping=False, object_type=N
 
 def create_document(doc_id, data):
     """
-    Makes a request to ES to create a new document
+    Makes a request to OS to create a new document
 
     Args:
         doc_id (str): The ES document id
@@ -212,7 +212,7 @@ def _update_document_by_id(doc_id, body, object_type, *, retry_on_conflict=0, **
         body (dict): ES update operation body
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
-        kwargs (dict): Optional kwargs to be passed to ElasticSearch
+        kwargs (dict): Optional kwargs to be passed to opensearch
     """
     conn = get_conn()
     for alias in get_active_aliases(conn, object_types=[object_type]):
@@ -258,7 +258,7 @@ def upsert_document(doc_id, doc, object_type, *, retry_on_conflict=0, **kwargs):
         doc (dict): Full ES document
         object_type (str): The object type to update (post, comment, etc)
         retry_on_conflict (int): Number of times to retry if there's a conflict (default=0)
-        kwargs (dict): Optional kwargs to be passed to ElasticSearch
+        kwargs (dict): Optional kwargs to be passed to opensearch
     """
     _update_document_by_id(
         doc_id,
@@ -301,7 +301,7 @@ def update_post(doc_id, post):
         post (channels.models.Post): A Post object
     """
     return update_document_with_partial(
-        doc_id, ESPostSerializer(instance=post).data, POST_TYPE
+        doc_id, OSPostSerializer(instance=post).data, POST_TYPE
     )
 
 
@@ -311,7 +311,7 @@ def deindex_items(documents, object_type, update_only, **kwargs):
     in the index
 
     Args:
-        documents (iterable of dict): An iterable with ElasticSearch documents to index
+        documents (iterable of dict): An iterable with opensearch documents to index
         object_type (str): the ES object type
         update_only (bool): Update existing index only
 
@@ -334,7 +334,7 @@ def index_items(documents, object_type, update_only, **kwargs):
     Index items based on list of item ids
 
     Args:
-        documents (iterable of dict): An iterable with ElasticSearch documents to index
+        documents (iterable of dict): An iterable with opensearch documents to index
         object_type (str): the ES object type
         update_only (bool): Update existing index only
 
@@ -342,25 +342,23 @@ def index_items(documents, object_type, update_only, **kwargs):
     conn = get_conn()
     # bulk will also break an iterable into chunks. However we should do this here so that
     # we can use the same documents when indexing to multiple aliases.
-    for chunk in chunks(
-        documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
-    ):
+    for chunk in chunks(documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE):
         documents_size = len(json.dumps(chunk, default=str))
         # Keep chunking the chunks until either the size is acceptable or there's nothing left to chunk
-        if documents_size > settings.ELASTICSEARCH_MAX_REQUEST_SIZE:
+        if documents_size > settings.OPENSEARCH_MAX_REQUEST_SIZE:
             if len(chunk) == 1:
                 log.error(
                     "Document id %s for object_type %s exceeds max size %d: %d",
                     chunk[0]["_id"],
                     object_type,
-                    settings.ELASTICSEARCH_MAX_REQUEST_SIZE,
+                    settings.OPENSEARCH_MAX_REQUEST_SIZE,
                     documents_size,
                 )
                 continue
             num_chunks = min(
                 ceil(
                     len(chunk)
-                    / ceil(documents_size / settings.ELASTICSEARCH_MAX_REQUEST_SIZE)
+                    / ceil(documents_size / settings.OPENSEARCH_MAX_REQUEST_SIZE)
                 ),
                 len(chunk) - 1,
             )
@@ -375,7 +373,7 @@ def index_items(documents, object_type, update_only, **kwargs):
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                     **kwargs,
                 )
                 if len(errors) > 0:
@@ -489,7 +487,7 @@ def index_run_content_files(run_id, update_only=False):
     )
 
     for ids_chunk in chunks(
-        content_file_ids, chunk_size=settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE
+        content_file_ids, chunk_size=settings.OPENSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE
     ):
 
         documents = (
@@ -755,7 +753,7 @@ def es_iterate_all_documents(index, query, pagesize=250):
     Helper to iterate all values from an index
 
     index (str): The index
-    query (dict): Elasticsearch query filter
+    query (dict): opensearch query filter
     pagesize (int): integer
 
     """

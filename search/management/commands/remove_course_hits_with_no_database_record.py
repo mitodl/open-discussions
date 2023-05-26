@@ -11,7 +11,7 @@ from search.tasks import deindex_document
 class Command(BaseCommand):
     """Delete es course records that don't have a database object"""
 
-    help = "Remove courses with no database record from the elasticsearch index"
+    help = "Remove courses with no database record from the opensearch index"
 
     def handle(self, *args, **options):
         """Delete es course records that don't have a database object"""

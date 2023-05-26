@@ -167,7 +167,7 @@ const mapStateToProps = (state, ownProps) => {
   const { profiles } = ownProps
   const suggestions = state.search.data.results.map(searchResultToProfile)
 
-  // NOTE: ideally we should do this filtering in Elasticsearch, so that hits already filtered out don't occupy
+  // NOTE: ideally we should do this filtering in Opensearch, so that hits already filtered out don't occupy
   // space in the first set of hits. However this seems like an edge case and can be worked around by the user
   // by typing in more of the phrase to get the user they're looking for.
   const usernames = new Set(profiles.map(profile => profile.username))

@@ -5,7 +5,7 @@ Tests for the indexing API
 from types import SimpleNamespace
 
 import pytest
-from elasticsearch.exceptions import ConflictError, NotFoundError
+from opensearchpy.exceptions import ConflictError, NotFoundError
 
 from channels.api import add_user_role, sync_channel_subscription_model
 from channels.factories.models import ChannelFactory
@@ -56,7 +56,7 @@ pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("mocked_es")]
 def mocked_es(mocker, settings):
     """Mocked ES client objects/functions"""
     index_name = "test"
-    settings.ELASTICSEARCH_INDEX = index_name
+    settings.OPENSEARCH_INDEX = index_name
     conn = mocker.Mock()
     get_conn_patch = mocker.patch(
         "search.indexing_api.get_conn", autospec=True, return_value=conn
@@ -77,7 +77,7 @@ def mocked_es(mocker, settings):
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 def test_create_document(mocked_es, mocker, object_type):
     """
-    Test that create_document gets a connection and calls the correct elasticsearch-dsl function
+    Test that create_document gets a connection and calls the correct opensearch-dsl function
     """
     doc_id, data = ("doc_id", {"object_type": object_type})
     mock_get_aliases = mocker.patch(
@@ -98,7 +98,7 @@ def test_update_field_values_by_query(
     mocker, mocked_es, version_conflicts, expected_error_logged
 ):
     """
-    Tests that update_field_values_by_query gets a connection, calls the correct elasticsearch-dsl function,
+    Tests that update_field_values_by_query gets a connection, calls the correct opensearch-dsl function,
     and logs an error if the results indicate version conflicts
     """
     patched_logger = mocker.patch("search.indexing_api.log")
@@ -132,7 +132,7 @@ def test_update_field_values_by_query(
 @pytest.mark.parametrize("object_type", [POST_TYPE, COMMENT_TYPE])
 def test_update_document_with_partial(mocked_es, mocker, object_type):
     """
-    Test that update_document_with_partial gets a connection and calls the correct elasticsearch-dsl function
+    Test that update_document_with_partial gets a connection and calls the correct opensearch-dsl function
     """
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", return_value=[object_type]
@@ -169,7 +169,7 @@ def test_update_post(mocker):
         "search.indexing_api.update_document_with_partial"
     )
     mocker.patch(
-        "search.indexing_api.ESPostSerializer", return_value=fake_serialized_post
+        "search.indexing_api.OSPostSerializer", return_value=fake_serialized_post
     )
 
     update_post("abc", fake_post)
@@ -184,7 +184,7 @@ def test_update_post(mocker):
 def test_increment_document_integer_field(mocked_es):
     """
     Test that increment_document_integer_field gets a connection and calls the
-    correct elasticsearch-dsl function
+    correct opensearch-dsl function
     """
     doc_id, field_name, incr_amount = ("doc_id", "some_field_name", 1)
     increment_document_integer_field(doc_id, field_name, incr_amount, POST_TYPE)
@@ -364,7 +364,7 @@ def test_index_functions(
     """
     index functions should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 3
     documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
@@ -392,14 +392,14 @@ def test_index_functions(
 
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
-                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+                documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
                     mocked_es.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
 
@@ -433,7 +433,7 @@ def test_bulk_deindex_functions(
     """
     Deindex functions should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 3
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 3
     documents = ["doc1", "doc2", "doc3", "doc4", "doc5"]
     mock_get_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=["a", "b"]
@@ -459,14 +459,14 @@ def test_bulk_deindex_functions(
 
         for alias in mock_get_aliases.return_value:
             for chunk in chunks(
-                documents, chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE
+                documents, chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE
             ):
                 bulk_mock.assert_any_call(
                     mocked_es.conn,
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                 )
 
 
@@ -545,8 +545,8 @@ def test_index_items_size_limits(settings, mocker, max_size, chunks, exceeds_siz
     """
     Chunks should get split into smaller chunks if necessary, log error if single-file chunks too big
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 5
-    settings.ELASTICSEARCH_MAX_REQUEST_SIZE = max_size
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 5
+    settings.OPENSEARCH_MAX_REQUEST_SIZE = max_size
     mock_aliases = mocker.patch(
         "search.indexing_api.get_active_aliases", autospec=True, return_value=[]
     )
@@ -611,8 +611,8 @@ def test_bulk_index_content_files(
     """
     index functions for content files should call bulk with correct arguments
     """
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = indexing_chunk_size
-    settings.ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = indexing_chunk_size
+    settings.OPENSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE = document_indexing_chunk_size
     course = CourseFactory.create()
     run = LearningResourceRunFactory.create(content_object=course)
     content_files = ContentFileFactory.create_batch(5, run=run, published=True)
@@ -662,7 +662,7 @@ def test_bulk_index_content_files(
                     chunk,
                     index=alias,
                     doc_type=GLOBAL_DOC_TYPE,
-                    chunk_size=settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE,
+                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
                     routing=gen_course_id(course.platform, course.course_id),
                 )
 
