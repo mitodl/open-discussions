@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.218.0
+---------------
+
+- Remove pyopenssl (#3830)
+- Delete orphaned indices after a failed reindex (#3984)
+
 Version 0.217.1 (Released May 30, 2023)
 ---------------
 
