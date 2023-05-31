@@ -58,34 +58,39 @@ const renderWithProviders = (
 
 /**
  * Assert that a functional component was called at some point with the given
- * props. Optionally, specify a call index.
- * Optionally, specify that a particular function number occured with given props.
+ * props.
  * @param fc the mock or spied upon functional component
  * @param partialProps an object of props
- * @param nthCall Optional index. If specified, then asserts that particular
- *  call occurred with given props.
  */
 const expectProps = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fc: jest.Mock<any, any>,
-  partialProps: unknown,
-  nthCall?: number
+  partialProps: unknown
 ) => {
-  if (nthCall !== undefined) {
-    const callArgs = fc.mock.calls.at(nthCall)
-    expect(callArgs).toEqual([
-      expect.objectContaining(partialProps),
-      expect.anything()
-    ])
-  } else {
-    expect(fc).toHaveBeenCalledWith(
-      expect.objectContaining(partialProps),
-      expect.anything()
-    )
-  }
+  expect(fc).toHaveBeenCalledWith(
+    expect.objectContaining(partialProps),
+    expect.anything()
+  )
 }
 
-export { renderTestApp, renderWithProviders, expectProps }
+/**
+ * Assert that a functional component was last called with the given
+ * props.
+ * @param fc the mock or spied upon functional component
+ * @param partialProps an object of props
+ */
+const expectLastProps = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fc: jest.Mock<any, any>,
+  partialProps: unknown
+) => {
+  expect(fc).toHaveBeenLastCalledWith(
+    expect.objectContaining(partialProps),
+    expect.anything()
+  )
+}
+
+export { renderTestApp, renderWithProviders, expectProps, expectLastProps }
 // Conveniences
 export { setMockResponse }
 export {

@@ -21,7 +21,8 @@ import {
   user,
   expectProps,
   waitFor,
-  act
+  act,
+  expectLastProps
 } from "../../test-utils"
 import { User } from "../../types/settings"
 import { ControlledPromise } from "ol-util/src/test-utils"
@@ -200,15 +201,15 @@ test.each([
   async ({ list, userSettings }) => {
     setup({ userSettings, list })
     const reorderButton = await screen.findByRole("button", { name: "Reorder" })
-    expectProps(spyItemsListing, { sortable: false }, -1)
+    expectLastProps(spyItemsListing, { sortable: false })
     await user.click(reorderButton)
-    expectProps(spyItemsListing, { sortable: true }, -1)
+    expectLastProps(spyItemsListing, { sortable: true })
 
     const doneButton = await screen.findByRole("button", {
       name: "Done ordering"
     })
     await user.click(doneButton)
-    expectProps(spyItemsListing, { sortable: false }, -1)
+    expectLastProps(spyItemsListing, { sortable: false })
   }
 )
 
@@ -261,23 +262,19 @@ test.each([{ list: makeUserList() }, { list: makeStaffList() }])(
   "Passes appropriate props to ItemsListing ($list.object_type)",
   async ({ list }) => {
     const { paginatedItems } = setup({ list })
-    expectProps(spyItemsListing, {
+    expectLastProps(spyItemsListing, {
       isLoading:    true,
       items:        undefined,
       emptyMessage: "There are no items in this list yet."
     })
 
     await waitFor(() => {
-      expectProps(
-        spyItemsListing,
-        {
-          // sortable is tested elsewhere
-          isLoading:    false,
-          items:        paginatedItems.results,
-          emptyMessage: "There are no items in this list yet."
-        },
-        -1
-      )
+      expectLastProps(spyItemsListing, {
+        // sortable is tested elsewhere
+        isLoading:    false,
+        items:        paginatedItems.results,
+        emptyMessage: "There are no items in this list yet."
+      })
     })
   }
 )
@@ -290,7 +287,7 @@ test.each([
   async ({ list, listUrls }) => {
     const { queryClient, paginatedItems } = setup({ list })
     await waitFor(() => expectProps(spyItemsListing, { isLoading: false }))
-    expectProps(spyItemsListing, { isRefetching: false }, -1)
+    expectLastProps(spyItemsListing, { isRefetching: false })
     spyItemsListing.mockClear()
 
     const itemsResponse = new ControlledPromise<PaginatedListItems>()

@@ -1,5 +1,5 @@
 import React from "react"
-import { renderHook } from "@testing-library/react-hooks/dom"
+import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { invalidateResourceQueries, useInfiniteLimitOffsetQuery } from "./util"
 import { setMockResponse, act } from "../../test-utils"
@@ -51,13 +51,15 @@ describe("useInfiniteLimitOffsetQuery", () => {
     }
     setMockResponse.get(initialUrl, firstPage)
     setMockResponse.get(nextUrl, secondPage)
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useInfiniteLimitOffsetQuery(initialUrl, { queryKey: ["some-list"] }),
       { wrapper }
     )
 
-    await waitFor(() => result.current.isSuccess)
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true)
+    })
 
     expect(result.current.data?.pages).toEqual([firstPage])
     expect(axios.get).toHaveBeenCalledWith(initialUrl)
@@ -91,7 +93,7 @@ describe("invalidateResourceQueries", () => {
 
     setMockResponse.get(url1, resource1)
     setMockResponse.get(url2, resource2)
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () => {
         return {
           r1: useResource(resource1.object_type, resource1.id),
@@ -101,8 +103,12 @@ describe("invalidateResourceQueries", () => {
       { wrapper }
     )
 
-    await waitFor(() => result.current.r1.isSuccess)
-    await waitFor(() => result.current.r2.isSuccess)
+    await waitFor(() => {
+      expect(result.current.r1.isSuccess).toBe(true)
+    })
+    await waitFor(() => {
+      expect(result.current.r2.isSuccess).toBe(true)
+    })
 
     setMockResponse.get(url1, modified1)
     setMockResponse.get(url2, modified2)
@@ -129,9 +135,11 @@ describe("invalidateResourceQueries", () => {
       const resource = faker.helpers.arrayElement(resources.results)
 
       const { wrapper, queryClient } = setup()
-      const { result, waitFor } = renderHook(() => hook(), { wrapper })
+      const { result } = renderHook(() => hook(), { wrapper })
 
-      await waitFor(() => result.current.isSuccess)
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
       expect(result.current.data).toEqual(resources)
 
       const changed = makeLearningResourcesPaginated({ count: 3 })
@@ -155,9 +163,11 @@ describe("invalidateResourceQueries", () => {
       setMockResponse.get(url, resources)
 
       const { wrapper, queryClient } = setup()
-      const { result, waitFor } = renderHook(() => hook(), { wrapper })
+      const { result } = renderHook(() => hook(), { wrapper })
 
-      await waitFor(() => result.current.isSuccess)
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
       expect(result.current.data).toEqual(resources)
       expect(axios.get).toHaveBeenCalledTimes(1)
       jest.mocked(axios.get).mockClear()
@@ -188,9 +198,11 @@ describe("invalidateResourceQueries", () => {
       const resource = faker.helpers.arrayElement(items.results).content_data
 
       const { wrapper, queryClient } = setup()
-      const { result, waitFor } = renderHook(() => hook(listId), { wrapper })
+      const { result } = renderHook(() => hook(listId), { wrapper })
 
-      await waitFor(() => result.current.isSuccess)
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
 
       const changed = makeListItemsPaginated({ count: 3 })
       setMockResponse.get(url(listId), changed)
@@ -223,9 +235,11 @@ describe("invalidateResourceQueries", () => {
       setMockResponse.get(url(listId), items)
 
       const { wrapper, queryClient } = setup()
-      const { result, waitFor } = renderHook(() => hook(listId), { wrapper })
+      const { result } = renderHook(() => hook(listId), { wrapper })
 
-      await waitFor(() => result.current.isSuccess)
+      await waitFor(() => {
+        expect(result.current.isSuccess).toBe(true)
+      })
 
       expect(axios.get).toHaveBeenCalledTimes(1)
       jest.mocked(axios.get).mockClear()

@@ -1,5 +1,5 @@
 import React from "react"
-import { renderHook } from "@testing-library/react-hooks/dom"
+import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { faker } from "@faker-js/faker"
 import { setMockResponse, act } from "../../test-utils"
@@ -240,7 +240,7 @@ describe("useAddToListItems", () => {
 
     const modifiedAddedResource = { ...resource, ...resourcePatch }
 
-    const { result: resourceResult, waitFor } = renderHook(
+    const { result: resourceResult } = renderHook(
       () => useResource(resource.object_type, resource.id),
       { wrapper }
     )
@@ -288,7 +288,7 @@ describe("useAddToListItems", () => {
       return { addItem, search }
     }
     setMockResponse.post(urls.search, searchResults)
-    const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+    const { result } = renderHook(() => useTestHook(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.search.data?.pages).toEqual([searchResults])
@@ -364,13 +364,15 @@ describe("useDeleteFromListItems", () => {
     setMockResponse.get(resourceUrl, resource)
     const modifiedResource = { ...resource, lists: [] }
 
-    const { result: resourceQuery, waitFor } = renderHook(
+    const { result: resourceQuery } = renderHook(
       () => useResource(resource.object_type, resource.id),
       { wrapper }
     )
     const { result } = renderHook(useDeleteFromListItems, { wrapper })
 
-    await waitFor(() => resourceQuery.current.isFetched)
+    await waitFor(() => {
+      expect(resourceQuery.current.isFetched).toBe(true)
+    })
 
     const itemUrl = urls.userList.itemDetails(list.id, item.item_id)
     setMockResponse.delete(itemUrl, null)
@@ -424,7 +426,7 @@ describe("useDeleteFromListItems", () => {
       return { deleteItem, search }
     }
     setMockResponse.post(urls.search, initialResponse)
-    const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+    const { result } = renderHook(() => useTestHook(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.search.data?.pages).toEqual([initialResponse])

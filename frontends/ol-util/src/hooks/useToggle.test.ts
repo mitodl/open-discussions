@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react-hooks/dom"
+import { renderHook, act } from "@testing-library/react"
 import useToggle from "./useToggle"
 
 test.each([{ initialValue: true }, { initialValue: false }])(
