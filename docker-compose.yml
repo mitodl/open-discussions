@@ -13,7 +13,7 @@ x-environment:
   OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
   OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret
   OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-  OPENSEARCH_URL: elastic:9200
+  OPENSEARCH_URL: opensearch-node1:9200
   CELERY_TASK_ALWAYS_EAGER: 'False'
   CELERY_BROKER_URL: redis://redis:6379/4
   CELERY_RESULT_BACKEND: redis://redis:6379/4
@@ -38,16 +38,29 @@ services:
     ports:
       - "6379"
 
-  elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.0
+  opensearch-node1:
+    image: opensearchproject/opensearch:1.0.0
+    container_name: opensearch-node1
     environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
       - network.host=0.0.0.0
       - http.cors.enabled=true
       - http.cors.allow-origin=*
       - http.max_content_length=10mb
       - rest.action.multi.allow_explicit_index=false
+      - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
       - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536 # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
     ports:
       - 9101:9200
 
@@ -73,7 +86,7 @@ services:
       - "8061:8061"
     links:
       - db
-      - elastic
+      - opensearch-node1
       - redis
       - watch
     extra_hosts: *default-extra-hosts
@@ -116,3 +129,6 @@ services:
     entrypoint: java -jar tika-server-1.23.jar -h 0.0.0.0 -spawnChild
     ports:
       - "9998:9998"
+
+volumes:
+  opensearch-data1:
