@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.218.1
+---------------
+
+- Update Typescript (#4015)
+- Use React 18 in New Pages (#4007)
+
 Version 0.218.0 (Released June 01, 2023)
 ---------------
 
