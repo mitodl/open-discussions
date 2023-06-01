@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 import boto3
 import pytest
-from mock.mock import ANY
+from unittest.mock import ANY
 from moto import mock_s3
 
 from course_catalog.conftest import (

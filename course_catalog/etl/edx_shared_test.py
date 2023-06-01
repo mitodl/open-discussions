@@ -55,11 +55,12 @@ def test_sync_edx_course_files(
     )
     keys = [f"20220101/{s3_prefix}/{run_id}.tar.gz" for run_id in run_ids]
     for idx, run_id in enumerate(run_ids):
-        bucket.put_object(
-            Key=keys[idx],
-            Body=open(f"test_json/{run_id}.tar.gz", "rb").read(),
-            ACL="public-read",
-        )
+        with open(f"test_json/{run_id}.tar.gz", "rb") as infile:
+            bucket.put_object(
+                Key=keys[idx],
+                Body=infile.read(),
+                ACL="public-read",
+            )
         run = LearningResourceRunFactory.create(
             platform=platform,
             run_id=run_id,
@@ -141,11 +142,12 @@ def test_sync_edx_course_files_empty_bucket(
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
-    bucket.put_object(
-        Key=key,
-        Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
+    with open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb") as infile:
+        bucket.put_object(
+            Key=key,
+            Body=infile.read(),
+            ACL="public-read",
+        )
     mock_load_content_files = mocker.patch(
         "course_catalog.etl.edx_shared.load_content_files",
         autospec=True,
@@ -175,11 +177,12 @@ def test_sync_edx_course_files_error(
         if platform == PlatformType.mitxonline.value
         else mock_xpro_learning_bucket
     ).bucket
-    bucket.put_object(
-        Key=key,
-        Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
-        ACL="public-read",
-    )
+    with open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb") as infile:
+        bucket.put_object(
+            Key=key,
+            Body=infile.read(),
+            ACL="public-read",
+        )
     mocker.patch(
         "course_catalog.etl.edx_shared.get_learning_course_bucket", return_value=bucket
     )
@@ -207,10 +210,12 @@ def test_get_most_recent_course_archives(
     """get_most_recent_course_archives should return expected keys"""
     bucket = mock_mitxonline_learning_bucket.bucket
     base_key = "0101/courses/my-course.tar.gz"
+    with open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb") as infile:
+        body = infile.read()
     for year in [2021, 2022, 2023]:
         bucket.put_object(
             Key=f"{year}{base_key}",
-            Body=open("test_json/course-v1:MITxT+8.01.3x+3T2022.tar.gz", "rb").read(),
+            Body=body,
             ACL="public-read",
         )
     mock_get_bucket = mocker.patch(

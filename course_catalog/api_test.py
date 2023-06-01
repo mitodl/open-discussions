@@ -8,7 +8,7 @@ import boto3
 import pytest
 import pytz
 from django.utils import timezone
-from mock import ANY
+from unittest.mock import ANY
 from moto import mock_s3
 
 from course_catalog.api import (

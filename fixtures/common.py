@@ -10,8 +10,8 @@ from unittest.mock import Mock, patch
 import factory
 import pytest
 import responses
-from _pytest.deprecated import RemovedInPytest4Warning
 from django.utils.deprecation import RemovedInDjango30Warning
+from pytest_mock import PytestMockWarning
 from urllib3.exceptions import InsecureRequestWarning
 
 import channels.api
@@ -38,6 +38,7 @@ def warnings_as_errors():
         # For celery
         warnings.simplefilter("ignore", category=ImportWarning)
         warnings.filterwarnings("ignore", category=InsecureRequestWarning)
+        warnings.filterwarnings("ignore", category=PytestMockWarning)
         warnings.filterwarnings(
             "ignore",
             message="'async' and 'await' will become reserved keywords in Python 3.7",
@@ -46,7 +47,7 @@ def warnings_as_errors():
         # Ignore deprecation warnings in third party libraries
         warnings.filterwarnings(
             "ignore",
-            module=".*(api_jwt|api_jws|rest_framework_jwt|betamax|astroid).*",
+            module=".*(api_jwt|api_jws|rest_framework_jwt|betamax|astroid|).*",
             category=DeprecationWarning,
         )
         # Ignore warnings for social_django compatibility code
@@ -55,8 +56,6 @@ def warnings_as_errors():
             message=r".*(JSONField\.from_db_value).*",
             category=RemovedInDjango30Warning,
         )
-        warnings.filterwarnings("ignore", category=RemovedInPytest4Warning)
-
         yield
     finally:
         warnings.resetwarnings()
