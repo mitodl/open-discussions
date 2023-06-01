@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.218.1
+Version 0.218.1 (Released June 01, 2023)
 ---------------
 
 - Update Typescript (#4015)
