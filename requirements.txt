@@ -439,7 +439,7 @@ urllib3==1.26.11
     #   opensearch-py
     #   requests
     #   sentry-sdk
-uwsgi==2.0.20
+uwsgi==2.0.21
     # via -r requirements.in
 vine==5.0.0
     # via
