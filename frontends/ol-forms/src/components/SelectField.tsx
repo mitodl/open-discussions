@@ -14,7 +14,7 @@ export interface Option {
 
 interface Props {
   name: string
-  value: null | undefined | string | string[]
+  value?: null | string | string[]
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void
   multiple?: boolean
   options: Array<string | Option>

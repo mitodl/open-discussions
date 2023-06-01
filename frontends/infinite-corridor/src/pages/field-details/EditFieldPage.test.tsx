@@ -1,25 +1,25 @@
 import { renderTestApp, screen, setMockResponse } from "../../test-utils"
 import * as factory from "../../api/fields/factories"
-import { urls } from "../../api/fields"
+import { FieldChannel, urls } from "../../api/fields"
 import { urls as lrUrls } from "../../api/learning-resources"
 
 describe("EditFieldPage", () => {
-  let field
-  ;``
-  beforeEach(() => {
-    field = factory.makeField({ is_moderator: true })
+  const setup = (overrides?: Partial<FieldChannel>) => {
+    const field = factory.makeField({ is_moderator: true, ...overrides })
     setMockResponse.get(urls.fieldDetails(field.name), field)
     setMockResponse.get(lrUrls.userList.listing({ public: true }), [field])
-  })
+    return field
+  }
 
   it("Displays 3 tabs for moderators", async () => {
+    const field = setup()
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/` })
     const tabs = await screen.findAllByRole("tab")
     expect(tabs.length).toEqual(3)
   })
 
   it("Displays message and no tabs for non-moderators", async () => {
-    field = factory.makeField({ is_moderator: false })
+    const field = setup({ is_moderator: false })
     setMockResponse.get(urls.fieldDetails(field.name), field)
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/` })
     await screen.findByText("You do not have permission to access this page.")
@@ -28,6 +28,7 @@ describe("EditFieldPage", () => {
   })
 
   it("Displays the correct tab and form for the #appearance hash", async () => {
+    const field = setup()
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#appearance` })
     const activeTab = await screen.findByRole("tab", { selected: true })
     expect(activeTab?.textContent).toEqual("Appearance")
@@ -35,6 +36,7 @@ describe("EditFieldPage", () => {
   })
 
   it("Displays the correct tab and form for the #basic hash", async () => {
+    const field = setup()
     renderTestApp({ url: `${urls.fieldDetails(field.name)}manage/#basic` })
     const activeTab = await screen.findByRole("tab", { selected: true })
     expect(activeTab?.textContent).toEqual("Basic")

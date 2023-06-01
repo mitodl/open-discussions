@@ -1,5 +1,9 @@
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
-import { buildSearchQuery } from "@mitodl/course-search-utils"
+import {
+  Facets,
+  SearchQueryParams,
+  buildSearchQuery
+} from "@mitodl/course-search-utils"
 import { assertInstanceOf } from "ol-util"
 import axios from "../libs/axios"
 
@@ -9,7 +13,10 @@ const getSearchTextInput = (): HTMLInputElement => {
   return textInput
 }
 
-const buildSearchQueryWithCollapse = params => {
+type FacetsWithType = Facets & Pick<Required<Facets>, "type">
+const buildSearchQueryWithCollapse = (
+  params: SearchQueryParams & { activeFacets: FacetsWithType }
+) => {
   const query = buildSearchQuery(params)
   if (params.activeFacets.type[0] === "course") {
     query["collapse"] = {

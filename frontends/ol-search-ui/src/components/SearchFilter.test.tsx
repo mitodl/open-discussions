@@ -6,7 +6,7 @@ import { fireEvent, waitFor } from "@testing-library/react"
 describe("SearchFilter", () => {
   const onClickStub = jest.fn()
 
-  const upperCase = text => {
+  const upperCase = (text: string) => {
     return text.toUpperCase()
   }
 

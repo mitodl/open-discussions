@@ -9,7 +9,8 @@ import { makeWidgetListResponse, makeWidget } from "../../factories"
 import WidgetsListEditable from "./WidgetsListEditable"
 import { btnLabel } from "../Widget"
 import { WidgetTypes } from "../../interfaces"
-import { assertInstanceOf, SortableList } from "ol-util"
+import { assertInstanceOf, SortableList, SortEndEvent } from "ol-util"
+import invariant from "tiny-invariant"
 
 jest.mock("ol-util", () => {
   const actual = jest.requireActual("ol-util")
@@ -231,10 +232,13 @@ describe("WidgetsListEditable", () => {
     const [w1, w2, w3] = widgets
 
     const { onSortEnd, itemIds } = spySortableList.mock.lastCall[0]
+    invariant(onSortEnd, "onSortEnd should be defined")
     // Note that these are the wrapper ids not the widget ids
     const [id1, id2, id3] = itemIds
     const newOrder = [id2, id1, id3]
-    act(() => onSortEnd({ itemIds: newOrder }))
+    // @ts-expect-error Event object is not fully mocked
+    const sortEnd: SortEndEvent = { itemIds: newOrder }
+    act(() => onSortEnd(sortEnd))
 
     await user.click(await findBtn("Done", getHeader()))
     expect(spies.onSubmit).toHaveBeenCalledWith({
