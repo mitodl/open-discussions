@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.218.0
+Version 0.218.0 (Released June 01, 2023)
 ---------------
 
 - Remove pyopenssl (#3830)
