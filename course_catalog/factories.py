@@ -39,7 +39,6 @@ from course_catalog.models import (
     Video,
     VideoChannel,
 )
-
 # pylint: disable=unused-argument
 from open_discussions.factories import UserFactory
 from search.constants import (

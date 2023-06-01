@@ -3,10 +3,10 @@ Test tasks
 """
 import json
 from contextlib import contextmanager
+from unittest.mock import ANY
 
 import boto3
 import pytest
-from unittest.mock import ANY
 from moto import mock_s3
 
 from course_catalog.conftest import (

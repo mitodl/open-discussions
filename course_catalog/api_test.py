@@ -3,12 +3,12 @@ Test course_catalog.api
 """
 import json
 from datetime import datetime, timedelta
+from unittest.mock import ANY
 
 import boto3
 import pytest
 import pytz
 from django.utils import timezone
-from unittest.mock import ANY
 from moto import mock_s3
 
 from course_catalog.api import (
