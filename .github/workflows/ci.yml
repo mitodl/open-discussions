@@ -57,8 +57,8 @@ jobs:
             **/requirements.txt
             **/test_requirements.txt
 
-  #     - name: Install dependencies
-  #       run: pip install -r requirements.txt -r test_requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r test_requirements.txt
 
   #     - name: Code formatting
   #       run: black --check .
