@@ -2,5 +2,16 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "local>mitodl/.github:renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchFields": [
+        "frontends/open-discussions/package.json"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "enabled": false
+    }
   ]
 }
