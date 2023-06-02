@@ -914,7 +914,6 @@ def test_load_content_files(mocker, is_published):
     )
     mock_bulk_index = mocker.patch(
         "course_catalog.etl.loaders.search_index_helpers.index_run_content_files",
-        autospec=True,
     )
     mock_bulk_delete = mocker.patch(
         "course_catalog.etl.loaders.search_index_helpers.deindex_run_content_files",

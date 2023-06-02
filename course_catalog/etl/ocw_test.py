@@ -184,7 +184,9 @@ def test_transform_content_files_generic_s3_error(mocker):
 
 
 @pytest.mark.django_db
-def test_transform_content_files_generic_no_s3_key(mocker, mock_ocw_learning_bucket):
+def test_transform_content_files_generic_no_s3_key(
+    mocker, mock_tika_functions, mock_ocw_learning_bucket
+):
     """Verify that transform_content_files calls tika and returns expected output"""
     mock_warn_log = mocker.patch("course_catalog.etl.ocw.log.warning")
     bad_key = "4-105-geometric-disciplines-fall-2012/e07fcb22fbcf24329fc81b8194329699_MIT4_105F12_ex3-explosion.pdf"
