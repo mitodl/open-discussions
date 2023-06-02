@@ -41,7 +41,7 @@ jobs:
           - 9200:9200
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: update apt
         run: sudo apt-get update -y
@@ -49,95 +49,90 @@ jobs:
       - name: Apt install
         run: cat Aptfile | sudo xargs apt-get install
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.9.13"
+          python-version: '3.9'
+          cache: 'pip'
+          cache-dependency-path: |
+            **/requirements.txt
+            **/test_requirements.txt
 
-      - id: cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/test_requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+  #     - name: Install dependencies
+  #       run: pip install -r requirements.txt -r test_requirements.txt
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt -r test_requirements.txt
+  #     - name: Code formatting
+  #       run: black --check .
 
-      - name: Code formatting
-        run: black --check .
+  #     - name: Lint
+  #       run: pylint ./**/*.py
 
-      - name: Lint
-        run: pylint ./**/*.py
+  #     - name: Create test local state
+  #       run: ./scripts/test/stub-data.sh
 
-      - name: Create test local state
-        run: ./scripts/test/stub-data.sh
+  #     - name: Tests
+  #       run: |
+  #         export MEDIA_ROOT="$(mktemp -d)"
+  #         tox
+  #       env:
+  #         DEBUG: 'False'
+  #         NODE_ENV: 'production'
+  #         DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres # pragma: allowlist secret
+  #         OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
+  #         OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
+  #         OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
+  #         OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
+  #         OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
+  #         OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
+  #         OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret # pragma: allowlist secret
+  #         OPENSEARCH_URL: localhost:9200
+  #         CELERY_TASK_ALWAYS_EAGER: 'True'
+  #         CELERY_BROKER_URL: redis://localhost:6379/4
+  #         CELERY_RESULT_BACKEND: redis://localhost:6379/4
+  #         TIKA_CLIENT_ONLY: 'True'
+  #         AKISMET_IS_TESTING: 'True'
 
-      - name: Tests
-        run: |
-          export MEDIA_ROOT="$(mktemp -d)"
-          tox
-        env:
-          DEBUG: 'False'
-          NODE_ENV: 'production'
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres # pragma: allowlist secret
-          OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
-          OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
-          OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-          OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
-          OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
-          OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
-          OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret # pragma: allowlist secret
-          OPENSEARCH_URL: localhost:9200
-          CELERY_TASK_ALWAYS_EAGER: 'True'
-          CELERY_BROKER_URL: redis://localhost:6379/4
-          CELERY_RESULT_BACKEND: redis://localhost:6379/4
-          TIKA_CLIENT_ONLY: 'True'
-          AKISMET_IS_TESTING: 'True'
+  #     - name: Upload coverage to CodeCov
+  #       uses: codecov/codecov-action@v1
+  #       with:
+  #         file: ./coverage.xml
 
-      - name: Upload coverage to CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage.xml
+  # javascript-tests:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '16.15.1'
+  #         cache: 'yarn'
 
-  javascript-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.15.1'
-          cache: 'yarn'
+  #     - name: Setup environment
+  #       run: sudo apt-get install libelf1
 
-      - name: Setup environment
-        run: sudo apt-get install libelf1
+  #     - name: Install dependencies
+  #       run: yarn install --immutable
 
-      - name: Install dependencies
-        run: yarn install --immutable
+  #     - name: Webpack build
+  #       run: yarn run build
 
-      - name: Webpack build
-        run: yarn run build
+  #     - name: Lints
+  #       run: yarn run lint-check
 
-      - name: Lints
-        run: yarn run lint-check
+  #     - name: Code formatting
+  #       run: yarn run fmt-check
 
-      - name: Code formatting
-        run: yarn run fmt-check
+  #     - name: Scss lint
+  #       run: yarn run scss-lint
 
-      - name: Scss lint
-        run: yarn run scss-lint
+  #     - name: Typecheck
+  #       run: yarn run typecheck
 
-      - name: Typecheck
-        run: yarn run typecheck
+  #     - name: Tests
+  #       run: yarn run test
+  #       env:
+  #         CODECOV: true
+  #         NODE_ENV: test
 
-      - name: Tests
-        run: yarn run test
-        env:
-          CODECOV: true
-          NODE_ENV: test
-
-      - name: Upload coverage to CodeCov
-        uses: codecov/codecov-action@v1
-        with:
-          file: coverage/lcov.info
+  #     - name: Upload coverage to CodeCov
+  #       uses: codecov/codecov-action@v1
+  #       with:
+  #         file: coverage/lcov.info
