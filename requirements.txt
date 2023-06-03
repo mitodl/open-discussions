@@ -8,7 +8,7 @@ akismet==1.1
     # via -r requirements.in
 amqp==5.1.1
     # via kombu
-appdirs==1.4.3
+appdirs==1.4.4
     # via zeep
 asttokens==2.2.1
     # via stack-data
