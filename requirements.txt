@@ -329,7 +329,7 @@ redis==4.4.4
     #   -r requirements.in
     #   django-redis
     #   django-server-status
-requests==2.24.0
+requests==2.31.0
     # via
     #   -r requirements.in
     #   akismet
