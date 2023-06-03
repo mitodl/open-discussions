@@ -6805,10 +6805,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"array-move@npm:2.2.0":
-  version: 2.2.0
-  resolution: "array-move@npm:2.2.0"
-  checksum: 79f09e0d84baee149510fd56b6961f6e90c9cf0ed293251fa011910b2b40129dcd29cbd526ddb04348205a7eed958d12c7eaa93a0795111f6570e410cdacb0f0
+"array-move@npm:2.2.2":
+  version: 2.2.2
+  resolution: "array-move@npm:2.2.2"
+  checksum: b809a07bfbe2dedc54d409ac964de6ff6c3da4635359238f9bf9cc28b4042479fd34e2ad66ac9472a2691def666e52cd3bfdf8307de770a1cbd1c7b3ff4d076d
   languageName: node
   linkType: hard
 
@@ -16359,7 +16359,7 @@ __metadata:
     "@testing-library/user-event": ^14.2.1
     "@trust/webcrypto": 0.9.2
     amplitudejs: 5.0.3
-    array-move: 2.2.0
+    array-move: 2.2.2
     assert: 2.0.0
     autoprefixer: 9.7.4
     babel-eslint: 10.1.0
