@@ -53,7 +53,7 @@
     "array-move": "2.2.2",
     "assert": "2.0.0",
     "autoprefixer": "9.7.4",
-    "babel-eslint": "10.1.0",
+    "@babel/eslint-parser": "7.11.0",
     "babel-loader": "8.1.0",
     "babel-plugin-istanbul": "4.1.6",
     "blueimp-canvas-to-blob": "3.14.0",

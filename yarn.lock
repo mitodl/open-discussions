@@ -61,6 +61,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/eslint-parser@npm:7.11.0":
+  version: 7.11.0
+  resolution: "@babel/eslint-parser@npm:7.11.0"
+  dependencies:
+    eslint-scope: 5.1.0
+    eslint-visitor-keys: ^1.3.0
+    semver: ^6.3.0
+  peerDependencies:
+    "@babel/core": ">=7.11.0"
+    eslint: ">=7.5.0"
+  checksum: a169cf198cd806e50dabb0a5dd9e8a5872e84e88b1b80517054ea6df597a466ba8677cabb01e34948e6d738cf0aec95cde23df3f34acde61712f23e1eb0a1297
+  languageName: node
+  linkType: hard
+
 "@babel/generator@npm:^7.18.13, @babel/generator@npm:^7.18.2, @babel/generator@npm:^7.7.2":
   version: 7.18.13
   resolution: "@babel/generator@npm:7.18.13"
@@ -7027,7 +7041,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"babel-eslint@npm:10.1.0, babel-eslint@npm:^10.1.0":
+"babel-eslint@npm:^10.1.0":
   version: 10.1.0
   resolution: "babel-eslint@npm:10.1.0"
   dependencies:
@@ -10210,6 +10224,16 @@ __metadata:
   version: 0.3.0
   resolution: "eslint-rule-composer@npm:0.3.0"
   checksum: c2f57cded8d1c8f82483e0ce28861214347e24fd79fd4144667974cd334d718f4ba05080aaef2399e3bbe36f7d6632865110227e6b176ed6daa2d676df9281b1
+  languageName: node
+  linkType: hard
+
+"eslint-scope@npm:5.1.0":
+  version: 5.1.0
+  resolution: "eslint-scope@npm:5.1.0"
+  dependencies:
+    esrecurse: ^4.1.0
+    estraverse: ^4.1.1
+  checksum: 701c850429cc26105c8d2324c65b269aed45f33a6ad2f43c3d0d47c8d51ec242800e448a7a591cc6162b75cfcb456f0a63f20dd76887bac332617d4847194057
   languageName: node
   linkType: hard
 
@@ -16320,6 +16344,7 @@ __metadata:
   resolution: "open-discussions@workspace:frontends/open-discussions"
   dependencies:
     "@babel/core": 7.18.5
+    "@babel/eslint-parser": 7.11.0
     "@babel/plugin-proposal-class-properties": 7.17.12
     "@babel/plugin-transform-react-constant-elements": 7.17.12
     "@babel/plugin-transform-react-inline-elements": 7.16.7
@@ -16362,7 +16387,6 @@ __metadata:
     array-move: 2.2.2
     assert: 2.0.0
     autoprefixer: 9.7.4
-    babel-eslint: 10.1.0
     babel-loader: 8.1.0
     babel-plugin-istanbul: 4.1.6
     blueimp-canvas-to-blob: 3.14.0
