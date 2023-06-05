@@ -12287,10 +12287,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:7.0.5":
-  version: 7.0.5
-  resolution: "immer@npm:7.0.5"
-  checksum: 9af9f0e8dc467ec8c3bc1007305e399f4e9773354bb2002e62b9b26d41cec81bcdd9be1e73687c3eec02aa4002e2f5f2b46ce87c706c02862206e572342a1ed8
+"immer@npm:9.0.6":
+  version: 9.0.6
+  resolution: "immer@npm:9.0.6"
+  checksum: 75da22f3b32f3f14604eb389b4f50e84a14f2e42f306f0cbe4d2969aed54ec7fda9a7e9ca42ebae2ba73ec9bb6ec1001fafbac535accaf03860054ab0f7e8388
   languageName: node
   linkType: hard
 
@@ -16397,7 +16397,7 @@ __metadata:
     fuse.js: 6.0.0
     history: ^4.10
     html-entities: 1.2.1
-    immer: 7.0.5
+    immer: 9.0.6
     isomorphic-fetch: 2.2.1
     jsdom: 16.6.0
     jsdom-global: 3.0.2
