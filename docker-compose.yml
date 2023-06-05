@@ -45,7 +45,7 @@ services:
       - cluster.name=opensearch-cluster
       - node.name=opensearch-node1
       - bootstrap.memory_lock=true # along with the memlock settings below, disables swapping
-      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      - "OPENSEARCH_JAVA_OPTS=-Xms1024m -Xmx1024m" # Set min and max JVM heap sizes to at least 50% of system RAM
       - "DISABLE_INSTALL_DEMO_CONFIG=true" # disables execution of install_demo_configuration.sh bundled with security plugin, which installs demo certificates and security configurations to OpenSearch
       - "DISABLE_SECURITY_PLUGIN=true" # disables security plugin entirely in OpenSearch by setting plugins.security.disabled: true in opensearch.yml
       - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
@@ -60,7 +60,6 @@ services:
       - opensearch-data1:/usr/share/opensearch/data
     ports:
       - 9100:9200
-      - 9600:9600 # required for Performance Analyzer
 
   nginx:
     image: nginx:1.9.5
