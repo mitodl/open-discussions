@@ -88,8 +88,11 @@ def contributor_api(user):
 
 
 @pytest.fixture()
-def private_channel_and_contributor(private_channel, staff_api, user):
+def private_channel_and_contributor(private_channel, staff_api, user, mocker):
     """Fixture for a channel and a user who is a contributor"""
+
+    mocker.patch("search.search_index_helpers.upsert_profile", autospec=True)
+
     staff_api.add_contributor(user.username, private_channel.name)
     staff_api.add_subscriber(user.username, private_channel.name)
     return private_channel, user

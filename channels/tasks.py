@@ -39,7 +39,7 @@ from mail import api as mail_api
 from open_discussions.celery import app
 from open_discussions.utils import chunks
 from search.exceptions import PopulateUserRolesException, RetryException
-from search import task_helpers
+from search import search_index_helpers
 from notifications.tasks import notify_moderators
 
 User = get_user_model()
@@ -623,5 +623,5 @@ def retire_user(user):
         user.save()
         user.social_auth.all().delete()
         user.received_invitations.all().delete()
-        task_helpers.deindex_profile(user)
+        search_index_helpers.deindex_profile(user)
         user.content_subscriptions.all().delete()

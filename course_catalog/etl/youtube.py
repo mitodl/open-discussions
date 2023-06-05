@@ -20,7 +20,7 @@ from course_catalog.etl.exceptions import (
 )
 from course_catalog.models import Video
 from open_discussions.utils import now_in_utc
-from search.task_helpers import upsert_video
+from search.search_index_helpers import upsert_video
 
 
 CONFIG_FILE_REPO = "mitodl/open-video-data"

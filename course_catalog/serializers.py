@@ -40,7 +40,7 @@ from course_catalog.models import (
 from moira_lists.moira_api import is_public_list_editor
 from open_discussions.serializers import WriteableSerializerMethodField
 from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
-from search.task_helpers import (
+from search.search_index_helpers import (
     deindex_staff_list,
     deindex_user_list,
     upsert_staff_list,

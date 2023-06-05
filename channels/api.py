@@ -84,8 +84,8 @@ from notifications.models import (
     FREQUENCY_IMMEDIATE,
 )
 from open_discussions.utils import now_in_utc
-from search import task_helpers as search_task_helpers
-from search.task_helpers import reddit_object_persist
+from search import search_index_helpers
+from search.search_index_helpers import reddit_object_persist
 from widgets.models import WidgetList
 
 USER_AGENT = "MIT-Open: {version}"
@@ -689,7 +689,7 @@ class Api:
 
         return ChannelProxy(subreddit, channel)
 
-    @reddit_object_persist(search_task_helpers.update_channel_index)
+    @reddit_object_persist(search_index_helpers.update_channel_index)
     def update_channel(self, name, title=None, channel_type=None, **other_settings):
         """
         Updates a channel
@@ -870,7 +870,7 @@ class Api:
                 instance.clear_vote()
 
         try:
-            search_task_helpers.update_indexed_score(
+            search_index_helpers.update_indexed_score(
                 instance, instance_type, vote_action
             )
         except Exception:  # pylint: disable=broad-except
@@ -887,7 +887,7 @@ class Api:
     )
 
     @reddit_object_persist(
-        search_task_helpers.index_new_post,
+        search_index_helpers.index_new_post,
         channel_task_helpers.maybe_repair_post_in_host_listing,
     )  # pylint: disable=too-many-arguments, too-many-locals
     def create_post(
@@ -1093,7 +1093,7 @@ class Api:
         """
         return proxy_post(self.get_submission(post_id))
 
-    @reddit_object_persist(search_task_helpers.update_post_text)
+    @reddit_object_persist(search_index_helpers.update_post_text)
     def update_post(
         self, post_id, *, text=None, article_content=None, cover_image=None
     ):
@@ -1175,7 +1175,7 @@ class Api:
         post = self.get_post(post_id)
         post.mod.sticky(pinned)
 
-    @reddit_object_persist(search_task_helpers.update_post_removal_status)
+    @reddit_object_persist(search_index_helpers.update_post_removal_status)
     def remove_post(self, post_id):
         """
         Removes the post, opposite of approve_post
@@ -1189,7 +1189,7 @@ class Api:
             post.mod.remove()
         return post
 
-    @reddit_object_persist(search_task_helpers.update_post_removal_status)
+    @reddit_object_persist(search_index_helpers.update_post_removal_status)
     def approve_post(self, post_id):
         """
         Approves the post, opposite of remove_post
@@ -1203,7 +1203,7 @@ class Api:
             post.mod.approve()
         return post
 
-    @reddit_object_persist(search_task_helpers.set_post_to_deleted)
+    @reddit_object_persist(search_index_helpers.set_post_to_deleted)
     def delete_post(self, post_id):
         """
         Deletes the post
@@ -1220,7 +1220,7 @@ class Api:
             post.delete()
         return post
 
-    @reddit_object_persist(search_task_helpers.index_new_comment)
+    @reddit_object_persist(search_index_helpers.index_new_comment)
     def create_comment(self, text, post_id=None, comment_id=None):
         """
         Create a new comment in reply to a post or comment
@@ -1259,7 +1259,7 @@ class Api:
 
         return comment
 
-    @reddit_object_persist(search_task_helpers.update_comment_text)
+    @reddit_object_persist(search_index_helpers.update_comment_text)
     def update_comment(self, comment_id, text):
         """
         Updates a existing comment
@@ -1278,7 +1278,7 @@ class Api:
             comment = comment.edit(text)
         return comment
 
-    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
+    @reddit_object_persist(search_index_helpers.update_comment_removal_status)
     def remove_comment(self, comment_id):
         """
         Removes a comment
@@ -1292,7 +1292,7 @@ class Api:
             comment.mod.remove()
         return comment
 
-    @reddit_object_persist(search_task_helpers.update_comment_removal_status)
+    @reddit_object_persist(search_index_helpers.update_comment_removal_status)
     def approve_comment(self, comment_id):
         """
         Approves a comment
@@ -1306,7 +1306,7 @@ class Api:
             comment.mod.approve()
         return comment
 
-    @reddit_object_persist(search_task_helpers.set_comment_to_deleted)
+    @reddit_object_persist(search_index_helpers.set_comment_to_deleted)
     def delete_comment(self, comment_id):
         """
         Deletes the comment
@@ -1462,7 +1462,7 @@ class Api:
         with transaction.atomic():
             add_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
             proxied_channel.contributor.add(user)
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
         return Redditor(self.reddit, name=contributor_name)
 
     def remove_contributor(self, contributor_name, channel_name):
@@ -1484,7 +1484,7 @@ class Api:
         with transaction.atomic():
             remove_user_role(proxied_channel.channel, ROLE_CONTRIBUTORS, user)
             proxied_channel.contributor.remove(user)
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
 
     def list_contributors(self, channel_name):
         """
@@ -1528,7 +1528,7 @@ class Api:
                 if ex.error_type != "ALREADY_MODERATOR":
                     raise
 
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
 
     def accept_invite(self, channel_name):
         """
@@ -1563,7 +1563,7 @@ class Api:
                 notification_type=NOTIFICATION_TYPE_MODERATOR,
             ).delete()
 
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
 
     def _list_moderators(self, *, channel_name, moderator_name):
         """
@@ -1639,7 +1639,7 @@ class Api:
                 channel.subscribe()
             except PrawForbidden as ex:
                 raise PermissionDenied() from ex
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
         return Redditor(self.reddit, name=subscriber_name)
 
     def remove_subscriber(self, subscriber_name, channel_name):
@@ -1667,7 +1667,7 @@ class Api:
                 # or maybe there's another unrelated 403 error from reddit, but we can't tell the difference,
                 # and the double removal case is probably more common.
                 pass
-        search_task_helpers.upsert_profile(user.profile.id)
+        search_index_helpers.upsert_profile(user.profile.id)
 
     def is_subscriber(self, subscriber_name, channel_name):
         """

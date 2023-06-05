@@ -4,6 +4,7 @@ from django.core.management import BaseCommand
 from course_catalog.models import Podcast, PodcastEpisode
 from course_catalog.tasks import get_podcast_data
 from open_discussions.utils import now_in_utc
+from search.search_index_helpers import deindex_podcast, deindex_podcast_episode
 
 
 class Command(BaseCommand):
@@ -24,8 +25,12 @@ class Command(BaseCommand):
         """Run Populate Sloan courses"""
         if options["delete"]:
             self.stdout.write("Deleting all existing Podcasts courses from database")
-            PodcastEpisode.objects.all().delete()
-            Podcast.objects.all().delete()
+            for podcast_episode in PodcastEpisode.objects.all():
+                deindex_podcast_episode(podcast_episode)
+                podcast_episode.delete()
+            for podcast in Podcast.objects.all():
+                deindex_podcast(podcast)
+                podcast.delete()
 
         else:
             task = get_podcast_data.delay()

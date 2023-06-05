@@ -40,7 +40,7 @@ from course_catalog.models import (
     VideoChannel,
 )
 from course_catalog.utils import load_course_blocklist, load_course_duplicates
-from search import task_helpers as search_task_helpers
+from search import search_index_helpers
 from search.constants import COURSE_TYPE
 
 log = logging.getLogger()
@@ -228,7 +228,7 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
                 if duplicate_course:
                     duplicate_course.published = False
                     duplicate_course.save()
-                    search_task_helpers.deindex_course(duplicate_course)
+                    search_index_helpers.deindex_course(duplicate_course)
         else:
             course, created = Course.objects.select_for_update().update_or_create(
                 platform=platform, course_id=course_id, defaults=course_data
@@ -261,11 +261,11 @@ def load_course(course_data, blocklist, duplicates, *, config=CourseLoaderConfig
         load_offered_bys(course, offered_bys_data, config=config.offered_by)
 
     if not created and not course.published:
-        search_task_helpers.deindex_course(course)
+        search_index_helpers.deindex_course(course)
     elif course.published:
-        search_task_helpers.upsert_course(course.id)
+        search_index_helpers.upsert_course(course.id)
         for run_id in unpublished_runs:
-            search_task_helpers.deindex_run_content_files(run_id)
+            search_index_helpers.deindex_run_content_files(run_id)
 
     return course
 
@@ -296,7 +296,7 @@ def load_courses(platform, courses_data, *, config=CourseLoaderConfig()):
         ):
             course.published = False
             course.save()
-            search_task_helpers.deindex_course(course)
+            search_index_helpers.deindex_course(course)
 
     return courses
 
@@ -366,9 +366,9 @@ def load_program(program_data, blocklist, duplicates, *, config=ProgramLoaderCon
         ).delete()
 
     if not created and not program.published:
-        search_task_helpers.deindex_program(program)
+        search_index_helpers.deindex_program(program)
     elif program.published:
-        search_task_helpers.upsert_program(program.id)
+        search_index_helpers.upsert_program(program.id)
 
     return program
 
@@ -403,9 +403,9 @@ def load_video(video_data, *, config=VideoLoaderConfig()):
     if not created and not video.published:
         # NOTE: if we didn't see a video in a playlist, it is likely NOT being removed here
         #       this gets addressed in load_channels after everything has been synced
-        search_task_helpers.deindex_video(video)
+        search_index_helpers.deindex_video(video)
     elif video.published:
-        search_task_helpers.upsert_video(video.id)
+        search_index_helpers.upsert_video(video.id)
 
     return video
 
@@ -452,7 +452,7 @@ def load_playlist_user_list(playlist, user_list_title):
         # if the playlist shouldn't have a user list, but it does, delete it
         if playlist.user_list:
             user_list = playlist.user_list
-            search_task_helpers.deindex_user_list(user_list)
+            search_index_helpers.deindex_user_list(user_list)
             user_list.delete()
         return None
 
@@ -488,7 +488,7 @@ def load_playlist_user_list(playlist, user_list_title):
         id__in=[item.id for item in items]
     ).delete()
 
-    search_task_helpers.upsert_user_list(user_list.id)
+    search_index_helpers.upsert_user_list(user_list.id)
 
     return user_list
 
@@ -569,7 +569,7 @@ def load_playlists(video_channel, playlists_data):
     for playlist in playlists_to_unpublish.filter(has_user_list=True):
         user_list = playlist.user_list
         if user_list:
-            search_task_helpers.deindex_user_list(user_list)
+            search_index_helpers.deindex_user_list(user_list)
             user_list.delete()
 
     playlists_to_unpublish.update(published=False, has_user_list=False)
@@ -653,7 +653,7 @@ def load_video_channels(video_channels_data):
     ):
         video.published = False
         video.save()
-        search_task_helpers.deindex_video(video)
+        search_index_helpers.deindex_video(video)
 
     return video_channels
 
@@ -706,9 +706,9 @@ def load_content_files(course_run, content_files_data):
         deleted_files.update(published=False)
 
         if course_run.published:
-            search_task_helpers.index_run_content_files(course_run.id)
+            search_index_helpers.index_run_content_files(course_run.id)
         else:
-            search_task_helpers.deindex_run_content_files(course_run.id)
+            search_index_helpers.deindex_run_content_files(course_run.id)
 
         return content_files_ids
 
@@ -737,9 +737,9 @@ def load_podcast_episode(episode_data, podcast, *, config=PodcastEpisodeLoaderCo
     load_offered_bys(episode, offered_bys_data, config=config.offered_by)
 
     if not created and not episode.published:
-        search_task_helpers.deindex_podcast_episode(episode)
+        search_index_helpers.deindex_podcast_episode(episode)
     elif episode.published:
-        search_task_helpers.upsert_podcast_episode(episode.id)
+        search_index_helpers.upsert_podcast_episode(episode.id)
 
     return episode
 
@@ -780,14 +780,14 @@ def load_podcast(podcast_data, *, config=PodcastLoaderConfig()):
     )
 
     for episode in unpublished_episodes:
-        search_task_helpers.deindex_podcast_episode(episode)
+        search_index_helpers.deindex_podcast_episode(episode)
 
     unpublished_episodes.update(published=False)
 
     if not created and not podcast.published:
-        search_task_helpers.deindex_podcast(podcast)
+        search_index_helpers.deindex_podcast(podcast)
     elif podcast.published:
-        search_task_helpers.upsert_podcast(podcast.id)
+        search_index_helpers.upsert_podcast(podcast.id)
 
     return podcast
 
