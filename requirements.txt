@@ -28,7 +28,7 @@ betamax==0.8.0
     # via
     #   -r requirements.in
     #   betamax-serializers
-betamax-serializers==0.2.0
+betamax-serializers==0.2.1
     # via -r requirements.in
 billiard==3.6.4.0
     # via celery
