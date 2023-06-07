@@ -1,0 +1,12 @@
+{
+  "name": "ol-template",
+  "description": "Templates for the frontend.",
+  "type": "module",
+  "packageManager": "yarn@3.2.0",
+  "dependencies": {
+    "plop": "^3.1.2"
+  },
+  "scripts": {
+    "plop": "plop"
+  }
+}
