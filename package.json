@@ -21,10 +21,10 @@
         "global:coverage": "cd $INIT_CWD && yarn test --coverage",
         "global:fmt-check": "cd $INIT_CWD && prettier-eslint --no-semi --list-different --with-node-modules src/**/*.{ts,tsx}",
         "global:fmt-fix": "cd $INIT_CWD && prettier-eslint --no-semi --with-node-modules --write src/**/*.{ts,tsx}",
-        "global:lint-check": "cd $INIT_CWD && eslint src/ --ext .js,.jsx,.ts,.tsx",
+        "global:lint-check": "cd $INIT_CWD && eslint . --ext .js,.jsx,.ts,.tsx",
         "global:scss-lint": "cd $INIT_CWD && stylelint '**/*.scss' --allow-empty-input",
         "global:scss-lint-fix": "cd $INIT_CWD && stylelint '**/*.scss' --allow-empty-input --fix",
-        "global:lint-fix": "cd $INIT_CWD && eslint --fix src/ --ext .js,.jsx,.ts,.tsx",
+        "global:lint-fix": "cd $INIT_CWD && eslint --fix . --ext .js,.jsx,.ts,.tsx",
         "global:test": "cd $INIT_CWD && NODE_ENV=test jest",
         "global:typecheck": "cd $INIT_CWD && tsc --noEmit",
         "global:test-watch": "cd $INIT_CWD && NODE_ENV=test jest --watch"
