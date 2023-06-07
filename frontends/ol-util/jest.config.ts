@@ -9,7 +9,6 @@ const _createSettings = () => ({
 
 const config: Config.InitialOptions = {
   ...baseConfig,
-  rootDir: "./src",
   globals: {
     SETTINGS: _createSettings(),
   },

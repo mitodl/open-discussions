@@ -7,7 +7,6 @@ const config: Config.InitialOptions = {
     ...baseConfig.setupFilesAfterEnv,
     "./test-utils/setupJest.ts",
   ],
-  rootDir: "./src",
 }
 
 export default config

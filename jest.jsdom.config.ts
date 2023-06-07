@@ -8,6 +8,7 @@ const config: Config.InitialOptions & Pick<Required<Config.InitialOptions>, "set
     "^.+\\.(t|j)sx?$": "@swc/jest",
   },
   verbose: true,
+  rootDir: "./src",
 }
 
 export default config
