@@ -94,7 +94,8 @@ class RegisterEmailView(SocialAuthAPIView):
                 "https://www.google.com/recaptcha/api/siteverify?secret={key}&response={captcha}".format(
                     key=quote(settings.RECAPTCHA_SECRET_KEY),
                     captcha=quote(request.data["recaptcha"]),
-                )
+                ),
+                timeout=settings.REQUEST_TIMEOUT,
             )
             response = r.json()
             if not response["success"]:

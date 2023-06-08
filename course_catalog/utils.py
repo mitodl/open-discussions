@@ -219,7 +219,7 @@ def load_course_blocklist():
     """
     blocklist_url = settings.BLOCKLISTED_COURSES_URL
     if blocklist_url is not None:
-        response = requests.get(blocklist_url)
+        response = requests.get(blocklist_url, timeout=settings.REQUEST_TIMEOUT)
         response.raise_for_status()
         return [str(line, "utf-8") for line in response.iter_lines()]
     return []
@@ -235,7 +235,7 @@ def load_course_duplicates(platform):
     """
     duplicates_url = settings.DUPLICATE_COURSES_URL
     if duplicates_url is not None:
-        response = requests.get(duplicates_url)
+        response = requests.get(duplicates_url, timeout=settings.REQUEST_TIMEOUT)
         response.raise_for_status()
         duplicates_for_all_platforms = yaml.safe_load(response.text)
         if platform in duplicates_for_all_platforms:

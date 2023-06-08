@@ -533,6 +533,10 @@
       "description": "Google Recaptcha secret key",
       "required": false
     },
+    "REQUESTS_TIMEOUT": {
+      "description": "Default timeout for requests",
+      "required": false
+    },
     "RSS_FEED_EPISODE_LIMIT":{
       "description": "Number of episodes included in aggregated rss feed",
       "required": false

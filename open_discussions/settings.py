@@ -789,6 +789,8 @@ ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
 
 ENABLE_INFINITE_CORRIDOR = get_bool("ENABLE_INFINITE_CORRIDOR", False)
 
+REQUESTS_TIMEOUT = get_int("REQUEST_TIMEOUT", 30)
+
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing
     IPWARE_PRIVATE_IP_PREFIX = ()
