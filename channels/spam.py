@@ -5,7 +5,6 @@ from types import SimpleNamespace
 
 import akismet
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import SimpleLazyObject
 from ipware import get_client_ip
 

@@ -20,7 +20,9 @@ router.register(
 )
 
 urlpatterns = [
-    re_path(r"^api/v0/channels/$", channels.ChannelListView.as_view(), name="channel-list"),
+    re_path(
+        r"^api/v0/channels/$", channels.ChannelListView.as_view(), name="channel-list"
+    ),
     re_path(
         r"^api/v0/channels/(?P<channel_name>[A-Za-z0-9_]+)/$",
         channels.ChannelDetailView.as_view(),

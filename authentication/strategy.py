@@ -1,5 +1,4 @@
 """Custom strategy"""
-from rest_framework.request import Request
 from social_django.strategy import DjangoStrategy
 
 from authentication import api as auth_api
@@ -26,7 +25,6 @@ class DjangoRestFrameworkStrategy(OpenDiscussionsStrategy):
         # pass the original django request to DjangoStrategy
         request = drf_request._request  # pylint: disable=protected-access
         super().__init__(storage, request=request, tpl=tpl)
-
 
     def request_data(self, merge=True):
         """Returns the request data"""

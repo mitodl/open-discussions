@@ -141,7 +141,7 @@ MIDDLEWARE = (
     "authentication.middleware.BlockedIPMiddleware",
     "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
-    "hijack.middleware.HijackUserMiddleware"
+    "hijack.middleware.HijackUserMiddleware",
 )
 
 # CORS

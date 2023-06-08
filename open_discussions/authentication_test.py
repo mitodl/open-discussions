@@ -79,7 +79,7 @@ def test_ignore_expired_jwt_authentication_valid(rf, user):
         "api/v0/notification_settings", HTTP_AUTHORIZATION="Bearer {}".format(token)
     )
     authentication = IgnoreExpiredJwtAuthentication()
-    assert authentication.authenticate(request)== (user, token)
+    assert authentication.authenticate(request) == (user, token)
 
 
 def test_ignore_expired_jwt_authentication_expired(rf, user):

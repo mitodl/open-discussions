@@ -42,9 +42,12 @@ def mm_user(user):
     )
     return user
 
+
 @pytest.fixture(autouse=True)
 def admin_profile(admin_user):
+    """Create a profile for the admin user"""
     Profile.objects.get_or_create(user=admin_user)
+
 
 @pytest.fixture
 def enrollment_job_mock(mocker):
@@ -657,7 +660,9 @@ def test_login_email_hijacked(client, user, admin_user):
     admin_user = UserFactory.create(is_superuser=True)
     user = UserFactory.create()
     client.force_login(admin_user)
-    client.post(reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart")
+    client.post(
+        reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart"
+    )
     response = client.post(
         reverse("psa-login-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
@@ -668,7 +673,9 @@ def test_login_email_hijacked(client, user, admin_user):
 def test_register_email_hijacked(client, user, admin_user):
     """Test that a 403 response is returned for email register view if user is hijacked"""
     client.force_login(admin_user)
-    client.post(reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart")
+    client.post(
+        reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart"
+    )
     response = client.post(
         reverse("psa-register-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},

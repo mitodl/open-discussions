@@ -18,7 +18,8 @@ logger = logging.getLogger()
 class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
     """Version of JSONWebTokenAuthentication that ignores JWT values if they're expired"""
 
-    def get_token_from_request(self, request):
+    @classmethod
+    def get_token_from_request(cls, request):
         """Returns the JWT values as long as it's not expired"""
         value = super().get_token_from_request(request)
 

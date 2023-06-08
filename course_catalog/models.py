@@ -6,7 +6,14 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Exists, ExpressionWrapper, OuterRef, Prefetch, Value, JSONField
+from django.db.models import (
+    Exists,
+    ExpressionWrapper,
+    OuterRef,
+    Prefetch,
+    Value,
+    JSONField,
+)
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,

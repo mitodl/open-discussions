@@ -10,5 +10,7 @@ urlpatterns = [
         RelatedPostsView.as_view(),
         name="related-posts",
     ),
-    re_path(r"api/v0/similar/$", SimilarResourcesView.as_view(), name="similar-resources"),
+    re_path(
+        r"api/v0/similar/$", SimilarResourcesView.as_view(), name="similar-resources"
+    ),
 ]
