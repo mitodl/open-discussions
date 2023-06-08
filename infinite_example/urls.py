@@ -1,11 +1,11 @@
 """URL configuration for infinite_example"""
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import re_path
 
 from infinite_example.views import index
 
 urlpatterns = (
-    [url(r"^infinite", index)]
+    [re_path(r"^infinite", index)]
     if settings.ENABLE_INFINITE_CORRIDOR
-    else [url(r"^infinite/demo", index)]
+    else [re_path(r"^infinite/demo", index)]
 )

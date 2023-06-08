@@ -105,9 +105,8 @@ INSTALLED_APPS = (
     "corsheaders",
     "webpack_loader",
     "anymail",
-    "compat",
     "hijack",
-    "hijack_admin",
+    "hijack.contrib.admin",
     "guardian",
     "imagekit",
     "django_json_widget",
@@ -142,6 +141,7 @@ MIDDLEWARE = (
     "authentication.middleware.BlockedIPMiddleware",
     "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
+    "hijack.middleware.HijackUserMiddleware"
 )
 
 # CORS

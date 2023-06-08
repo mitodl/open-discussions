@@ -4,9 +4,9 @@ course_catalog models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.fields import ArrayField, JSONField
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.db.models import Exists, ExpressionWrapper, OuterRef, Prefetch, Value
+from django.db.models import Exists, ExpressionWrapper, OuterRef, Prefetch, Value, JSONField
 
 from course_catalog.constants import (
     CONTENT_TYPE_FILE,

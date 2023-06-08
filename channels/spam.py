@@ -27,7 +27,7 @@ def save_spam_result(*, user_ip, user_agent, object_type, object_id, is_spam):
         is_spam(bool): if the object was flagged as spam
     """
     result, created = SpamCheckResult.objects.get_or_create(
-        content_type=ContentType.objects.get(model=object_type),
+        content_type=object_type,
         object_id=object_id,
         defaults={
             "checks": 1,

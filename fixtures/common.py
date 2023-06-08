@@ -10,7 +10,6 @@ from unittest.mock import Mock, patch
 import factory
 import pytest
 import responses
-from django.utils.deprecation import RemovedInDjango30Warning
 from pytest_mock import PytestMockWarning
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -49,12 +48,6 @@ def warnings_as_errors():
             "ignore",
             module=".*(api_jwt|api_jws|rest_framework_jwt|betamax|astroid|).*",
             category=DeprecationWarning,
-        )
-        # Ignore warnings for social_django compatibility code
-        warnings.filterwarnings(
-            "ignore",
-            message=r".*(JSONField\.from_db_value).*",
-            category=RemovedInDjango30Warning,
         )
         yield
     finally:

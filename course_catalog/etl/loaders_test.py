@@ -134,7 +134,7 @@ def test_load_program(
     program = (
         ProgramFactory.create(published=is_published, runs=[])
         if program_exists
-        else ProgramFactory.build(published=is_published, runs=[])
+        else ProgramFactory.build(published=is_published, runs=[], id=1)
     )
     courses = (
         CourseFactory.create_batch(2, platform="fake-platform")

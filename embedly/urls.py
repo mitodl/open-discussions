@@ -1,8 +1,8 @@
 """URL configurations for embedly"""
-from django.conf.urls import url
+from django.urls import re_path
 
 from embedly.views import embedly_view
 
 urlpatterns = [
-    url(r"^api/v0/embedly/(?P<url>.+)/$", embedly_view, name="embedly-detail")
+    re_path(r"^api/v0/embedly/(?P<url>.+)/$", embedly_view, name="embedly-detail")
 ]

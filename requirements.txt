@@ -8,10 +8,10 @@ akismet==1.1
     # via -r requirements.in
 amqp==5.1.1
     # via kombu
+asgiref==3.7.2
+    # via django
 asttokens==2.2.1
     # via stack-data
-async-timeout==4.0.2
-    # via redis
 attrs==19.3.0
     # via
     #   jsonschema
@@ -83,6 +83,8 @@ cryptography==39.0.1
     # via
     #   -r requirements.in
     #   django-anymail
+    #   pyjwt
+    #   social-auth-core
 cssselect2==0.2.1
     # via cairosvg
 decorator==4.4.1
@@ -98,7 +100,7 @@ dj-database-url==0.3.0
     # via -r requirements.in
 dj-static==0.0.6
     # via -r requirements.in
-django==2.2.28
+django==4.1.9
     # via
     #   -r requirements.in
     #   django-anymail
@@ -106,41 +108,38 @@ django==2.2.28
     #   django-bitfield
     #   django-cors-headers
     #   django-filter
+    #   django-guardian
+    #   django-hijack
     #   django-redis
     #   djangorestframework
+    #   djangorestframework-simplejwt
+    #   djoser
+    #   drf-jwt
     #   drf-spectacular
+    #   social-auth-app-django
 django-anymail[mailgun]==10.0
     # via -r requirements.in
 django-appconf==1.0.3
     # via django-imagekit
-django-bitfield==2.0.1
+django-bitfield==2.2.0
     # via -r requirements.in
-django-cache-memoize==0.1.6
+django-cache-memoize==0.1.10
     # via -r requirements.in
-django-compat==1.0.15
-    # via
-    #   -r requirements.in
-    #   django-hijack
-    #   django-hijack-admin
 django-cors-headers==3.6.0
     # via -r requirements.in
 django-filter==2.4.0
     # via -r requirements.in
-django-guardian==1.4.9
+django-guardian==2.4.0
     # via -r requirements.in
-django-hijack==2.1.10
-    # via
-    #   -r requirements.in
-    #   django-hijack-admin
-django-hijack-admin==2.1.10
+django-hijack==3.4.1
     # via -r requirements.in
-django-imagekit==4.0.2
+django-imagekit==4.1.0
     # via -r requirements.in
 django-ipware==3.0.0
     # via -r requirements.in
 django-json-widget==1.0.0
     # via -r requirements.in
-django-redis==4.10.0
+django-redis==5.2.0
     # via -r requirements.in
 django-server-status==0.5.0
     # via -r requirements.in
@@ -150,20 +149,24 @@ django-templated-mail==1.1.1
     # via djoser
 django-webpack-loader==1.4.1
     # via -r requirements.in
-djangorestframework==3.11.2
+djangorestframework==3.14.0
     # via
     #   -r requirements.in
+    #   djangorestframework-simplejwt
     #   drf-extensions
+    #   drf-jwt
     #   drf-spectacular
-djangorestframework-jwt==1.11.0
-    # via -r requirements.in
-djoser==2.0.3
+djangorestframework-simplejwt==5.2.2
+    # via djoser
+djoser==2.2.0
     # via -r requirements.in
 docopt==0.6.2
     # via
     #   webvtt-py
     #   xbundle
-drf-extensions==0.5.0
+drf-extensions==0.7.1
+    # via -r requirements.in
+drf-jwt==1.19.2
     # via -r requirements.in
 drf-spectacular==0.26.1
     # via -r requirements.in
@@ -221,7 +224,7 @@ kombu==5.2.4
     # via
     #   celery
     #   django-server-status
-lxml==4.6.5
+lxml==4.9.2
     # via
     #   -r requirements.in
     #   python3-saml
@@ -272,7 +275,7 @@ prompt-toolkit==3.0.38
     # via
     #   click-repl
     #   ipython
-psycopg2==2.8.3
+psycopg2==2.9.6
     # via
     #   -r requirements.in
     #   django-server-status
@@ -294,9 +297,10 @@ pygithub==1.44.1
     # via -r requirements.in
 pygments==2.7.4
     # via ipython
-pyjwt==1.7.1
+pyjwt[crypto]==2.7.0
     # via
-    #   djangorestframework-jwt
+    #   djangorestframework-simplejwt
+    #   drf-jwt
     #   pygithub
     #   social-auth-core
 pyparsing==2.4.7
@@ -313,20 +317,20 @@ python-rapidjson==1.8
     # via -r requirements.in
 python3-openid==3.1.0
     # via social-auth-core
-python3-saml==1.14.0
+python3-saml==1.15.0
     # via -r requirements.in
 pytube==9.5.2
     # via -r requirements.in
 pytz==2022.1
     # via
     #   celery
-    #   django
+    #   djangorestframework
     #   zeep
 pyyaml==5.4
     # via
     #   -r requirements.in
     #   drf-spectacular
-redis==4.4.4
+redis==4.5.5
     # via
     #   -r requirements.in
     #   django-redis
@@ -371,8 +375,6 @@ six==1.15.0
     #   click-repl
     #   django-appconf
     #   django-bitfield
-    #   django-compat
-    #   django-guardian
     #   django-imagekit
     #   django-server-status
     #   faker
@@ -385,14 +387,14 @@ six==1.15.0
     #   pygithub
     #   python-dateutil
     #   requests-file
-    #   social-auth-app-django
-    #   social-auth-core
     #   tenacity
 smart-open==1.8.0
     # via ocw-data-parser
-social-auth-app-django==2.1.0
-    # via -r requirements.in
-social-auth-core==1.7.0
+social-auth-app-django==5.2.0
+    # via
+    #   -r requirements.in
+    #   djoser
+social-auth-core==4.4.2
     # via social-auth-app-django
 soupsieve==2.0
     # via beautifulsoup4

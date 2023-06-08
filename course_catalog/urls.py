@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.urls import re_path
 from django.urls import include
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -51,34 +51,34 @@ router.register(
 
 
 urlpatterns = [
-    url(
+    re_path(
         r"^api/v0/podcasts/recent/$",
         views.RecentPodcastEpisodesViewSet.as_view({"get": "list"}),
         name="recent-podcast-episodes",
     ),
-    url(
+    re_path(
         r"^api/v0/podcasts/(?P<pk>[^/.]+)/episodes/$",
         views.EpisodesInPodcast.as_view({"get": "list"}),
         name="episodes-in-podcast",
     ),
-    url(r"^api/v0/", include(router.urls)),
-    url(r"^api/v0/ocw_webhook/$", WebhookOCWView.as_view(), name="ocw-webhook"),
-    url(
+    re_path(r"^api/v0/", include(router.urls)),
+    re_path(r"^api/v0/ocw_webhook/$", WebhookOCWView.as_view(), name="ocw-webhook"),
+    re_path(
         r"^api/v0/ocw_next_webhook/$",
         WebhookOCWNextView.as_view(),
         name="ocw-next-webhook",
     ),
-    url(
+    re_path(
         r"^api/v0/ocw-course-report", views.ocw_course_report, name="ocw-course-report"
     ),
-    url(r"^podcasts/rss_feed", views.podcast_rss_feed, name="podcast-rss-feed"),
-    url(r"api/v0/schema/$", SpectacularAPIView.as_view(), name="schema"),
-    url(
+    re_path(r"^podcasts/rss_feed", views.podcast_rss_feed, name="podcast-rss-feed"),
+    re_path(r"api/v0/schema/$", SpectacularAPIView.as_view(), name="schema"),
+    re_path(
         "api/v0/schema/swagger-ui/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
     ),
-    url(
+    re_path(
         "api/v0/schema/redoc/",
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",

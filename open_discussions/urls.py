@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from rest_framework_jwt.views import refresh_jwt_token
@@ -32,29 +32,28 @@ handler403 = "open_discussions.views.handle_403"
 handler404 = "open_discussions.views.handle_404"
 
 urlpatterns = [
-    url(r"^admin/", admin.site.urls),
-    url(r"^status/", include("server_status.urls")),
-    url(r"", include("authentication.urls")),
-    url(r"", include("social_django.urls", namespace="social")),
-    url(r"", include("channels.urls")),
-    url(r"", include("channels_fields.urls")),
-    url(r"", include("infinite_example.urls"), name="infinite_example"),
-    url(r"", include("profiles.urls")),
-    url(r"", include("mail.urls")),
-    url(r"", include("notifications.urls")),
-    url(r"", include("embedly.urls")),
-    url(r"", include("search.urls")),
-    url(r"", include("ckeditor.urls")),
-    url(r"", include("widgets.urls")),
-    url(r"", include("course_catalog.urls")),
-    url(r"", include("livestream.urls")),
-    url(r"", include("interactions.urls")),
-    url(r"^api/token/refresh/", refresh_jwt_token),
+    re_path(r"^admin/", admin.site.urls),
+    re_path(r"", include("authentication.urls")),
+    re_path(r"", include("social_django.urls", namespace="social")),
+    re_path(r"", include("channels.urls")),
+    re_path(r"", include("channels_fields.urls")),
+    re_path(r"", include("infinite_example.urls"), name="infinite_example"),
+    re_path(r"", include("profiles.urls")),
+    re_path(r"", include("mail.urls")),
+    re_path(r"", include("notifications.urls")),
+    re_path(r"", include("embedly.urls")),
+    re_path(r"", include("search.urls")),
+    re_path(r"", include("ckeditor.urls")),
+    re_path(r"", include("widgets.urls")),
+    re_path(r"", include("course_catalog.urls")),
+    re_path(r"", include("livestream.urls")),
+    re_path(r"", include("interactions.urls")),
+    re_path(r"^api/token/refresh/", refresh_jwt_token),
     # React App
-    url(r"^$", index, name="open_discussions-index"),
-    url(r"^auth_required/$", index),
-    url(r"^content_policy/$", index),
-    url(
+    re_path(r"^$", index, name="open_discussions-index"),
+    re_path(r"^auth_required/$", index),
+    re_path(r"^content_policy/$", index),
+    re_path(
         r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/"
         r"(?P<post_slug>{post_slug_pattern})/comment/(?P<comment_id>[A-Za-z0-9_]+)/?$".format(
             post_slug_pattern=POST_SLUG_PATTERN
@@ -62,49 +61,49 @@ urlpatterns = [
         channel_post,
         name="channel-post-comment",
     ),
-    url(
+    re_path(
         r"^c/(?P<channel_name>[A-Za-z0-9_]+)/(?P<post_id>[A-Za-z0-9_]+)/(?P<post_slug>{post_slug_pattern})/?$".format(
             post_slug_pattern=POST_SLUG_PATTERN
         ),
         channel_post,
         name="channel-post",
     ),
-    url(r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"),
-    url(
+    re_path(r"^c/(?P<channel_name>[A-Za-z0-9_]+)/$", index, name="channel"),
+    re_path(
         r"^manage/c/edit/(?P<channel_name>[A-Za-z0-9_]+)/basic/$",
         index,
         name="manage-channel",
     ),
-    url(r"^settings/(?P<token>[^/]+)/$", index, name="settings-anon"),
-    url(r"^c/", index),
-    url(r"^channel/", channel_redirect),
-    url(r"^manage/", index),
-    url(r"^create_post/", index),
-    url(r"^settings/", index),
-    url(r"^saml/metadata/", saml_metadata, name="saml-metadata"),
-    url(r"^profile/(?P<username>[A-Za-z0-9_]+)/", index, name="profile"),
-    url(r"^login/", index, name="login"),
-    url(r"^signup/", index, name="signup"),
-    url(r"^signup/confirm/$", index, name="register-confirm"),
-    url(r"^account/inactive/$", index, name="account-inactive"),
-    url(r"^password_reset/", index, name="password-reset"),
-    url(
+    re_path(r"^settings/(?P<token>[^/]+)/$", index, name="settings-anon"),
+    re_path(r"^c/", index),
+    re_path(r"^channel/", channel_redirect),
+    re_path(r"^manage/", index),
+    re_path(r"^create_post/", index),
+    re_path(r"^settings/", index),
+    re_path(r"^saml/metadata/", saml_metadata, name="saml-metadata"),
+    re_path(r"^profile/(?P<username>[A-Za-z0-9_]+)/", index, name="profile"),
+    re_path(r"^login/", index, name="login"),
+    re_path(r"^signup/", index, name="signup"),
+    re_path(r"^signup/confirm/$", index, name="register-confirm"),
+    re_path(r"^account/inactive/$", index, name="account-inactive"),
+    re_path(r"^password_reset/", index, name="password-reset"),
+    re_path(
         r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
         index,
         name="password-reset-confirm",
     ),
-    url(r"^privacy-statement/", index, name="privacy-statement"),
-    url(r"^search/", index, name="site-search"),
-    url(r"^courses/", index, name="courses"),
-    url(r"^learn/", index, name="learn"),
-    url(r"^fields/", index, name="fields"),
-    url(r"^podcasts/", index, name="podcasts"),
-    url(r"^terms-and-conditions/", index, name="terms-and-conditions"),
+    re_path(r"^privacy-statement/", index, name="privacy-statement"),
+    re_path(r"^search/", index, name="site-search"),
+    re_path(r"^courses/", index, name="courses"),
+    re_path(r"^learn/", index, name="learn"),
+    re_path(r"^fields/", index, name="fields"),
+    re_path(r"^podcasts/", index, name="podcasts"),
+    re_path(r"^terms-and-conditions/", index, name="terms-and-conditions"),
     # Hijack
-    url(r"^hijack/", include("hijack.urls", namespace="hijack")),
+    re_path(r"^hijack/", include("hijack.urls", namespace="hijack")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     import debug_toolbar  # pylint: disable=wrong-import-position, wrong-import-order
 
-    urlpatterns += [url(r"^__debug__/", include(debug_toolbar.urls))]
+    urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]

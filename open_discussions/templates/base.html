@@ -1,4 +1,4 @@
-{% load i18n static hijack_tags %}
+{% load i18n static hijack %}
 {% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <html lang="en">
@@ -15,12 +15,11 @@
     <title>{% block title %}{% trans "Open Discussions" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% endblock %}">
     <meta name="keywords" content="{% block keywords %}{% endblock %}">
-    {% block extrahead %}
+    {% block extrahead %}Ï
     {% endblock %}
     {% endspaceless %}
   </head>
   <body class="{% block bodyclass %}{% endblock %}">
-    {% hijack_notification %}
     {% block content %}
     {% endblock %}
   </body>
