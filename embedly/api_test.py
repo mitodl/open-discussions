@@ -10,6 +10,7 @@ def test_get_embedly_summary(settings, mocker):
     requests_patch.assert_called_once_with(
         settings.EMBEDLY_EMBED_URL,
         {"key": "a great key :)", "url": "http://en.wikipedia.org/wiki/Giant_panda/"},
+        timeout=settings.REQUESTS_TIMEOUT,
     )
 
 
@@ -21,4 +22,5 @@ def test_get_embedly_content(settings, mocker):
     requests_patch.assert_called_once_with(
         settings.EMBEDLY_EXTRACT_URL,
         {"key": "a great key :)", "url": "http://en.wikipedia.org/wiki/Giant_panda/"},
+        timeout=settings.REQUESTS_TIMEOUT,
     )

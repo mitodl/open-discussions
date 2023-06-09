@@ -95,7 +95,7 @@ class RegisterEmailView(SocialAuthAPIView):
                     key=quote(settings.RECAPTCHA_SECRET_KEY),
                     captcha=quote(request.data["recaptcha"]),
                 ),
-                timeout=settings.REQUEST_TIMEOUT,
+                timeout=settings.REQUESTS_TIMEOUT,
             )
             response = r.json()
             if not response["success"]:

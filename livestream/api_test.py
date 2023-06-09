@@ -11,5 +11,6 @@ def test_get_upcoming_events(settings, mocker):
     requests_patch.assert_called_once_with(
         f"https://livestreamapis.com/v3/accounts/{settings.LIVESTREAM_ACCOUNT_ID}/upcoming_events",
         auth=(settings.LIVESTREAM_SECRET_KEY, ""),
+        timeout=settings.REQUESTS_TIMEOUT,
     )
     assert resp == requests_patch.return_value

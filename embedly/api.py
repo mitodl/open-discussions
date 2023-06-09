@@ -11,7 +11,7 @@ def get_embedly_summary(url):
     return requests.get(
         settings.EMBEDLY_EMBED_URL,
         params={"key": settings.EMBEDLY_KEY, "url": url},
-        timeout=settings.REQUEST_TIMEOUT,
+        timeout=settings.REQUESTS_TIMEOUT,
     )
 
 
@@ -20,5 +20,5 @@ def get_embedly_content(url):
     return requests.get(
         settings.EMBEDLY_EXTRACT_URL,
         params={"key": settings.EMBEDLY_KEY, "url": url},
-        timeout=settings.REQUEST_TIMEOUT,
+        timeout=settings.REQUESTS_TIMEOUT,
     )
