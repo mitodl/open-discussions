@@ -88,7 +88,7 @@ urlpatterns = [
     re_path(r"^account/inactive/$", index, name="account-inactive"),
     re_path(r"^password_reset/", index, name="password-reset"),
     re_path(
-        r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$",
+        r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,36})/$",
         index,
         name="password-reset-confirm",
     ),

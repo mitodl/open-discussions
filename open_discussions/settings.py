@@ -37,6 +37,7 @@ VERSION = "0.218.1"
 log = logging.getLogger()
 
 ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # initialize Sentry before doing anything else so we capture any config errors
 SENTRY_DSN = get_string("SENTRY_DSN", "")
