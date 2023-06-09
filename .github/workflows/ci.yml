@@ -41,7 +41,7 @@ jobs:
           - 9200:9200
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: update apt
         run: sudo apt-get update -y
@@ -49,18 +49,13 @@ jobs:
       - name: Apt install
         run: cat Aptfile | sudo xargs apt-get install
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
-          python-version: "3.9.13"
-
-      - id: cache
-        uses: actions/cache@v1
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/test_requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: '3.9'
+          cache: 'pip'
+          cache-dependency-path: |
+            **/requirements.txt
+            **/test_requirements.txt
 
       - name: Install dependencies
         run: pip install -r requirements.txt -r test_requirements.txt
@@ -104,27 +99,14 @@ jobs:
   javascript-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Set up NodeJS
-        uses: actions/setup-node@v2-beta
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: 16.15.1
+          node-version: '16.15.1'
+          cache: 'yarn'
 
       - name: Setup environment
         run: sudo apt-get install libelf1
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
-
-      - uses: actions/cache@v1
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn install --immutable
