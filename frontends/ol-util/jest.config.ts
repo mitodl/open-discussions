@@ -1,4 +1,4 @@
-import type { Config } from '@jest/types'
+import type { Config } from "@jest/types"
 import baseConfig from "../../jest.jsdom.config"
 
 const _createSettings = () => ({
@@ -9,10 +9,9 @@ const _createSettings = () => ({
 
 const config: Config.InitialOptions = {
   ...baseConfig,
-  rootDir: "./src",
   globals: {
-    SETTINGS: _createSettings(),
-  },
+    SETTINGS: _createSettings()
+  }
 }
 
 export default config
