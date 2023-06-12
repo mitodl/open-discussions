@@ -3,10 +3,8 @@ const path = require("path")
 const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const CKEditorWebpackPlugin = require("@ckeditor/ckeditor5-dev-webpack-plugin")
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
-
-const { styles } = require("@ckeditor/ckeditor5-dev-utils")
+const { withCKEditor } = require("ol-ckeditor/webpack-utils")
 
 const STATS_FILEPATH = path.resolve(
   __dirname,
@@ -28,49 +26,10 @@ const getPublicPath = isProduction => {
   return `http://${hostname}:${port}/`
 }
 
-/**
- * CKEditor (which we are including via ol-widgets) distributes its npm packages
- * as pre-bundled, ready-to-use modules, or as un-built modules for greater
- * customization. This takes care of building CKEditor. See for more:
- * https://ckeditor.com/docs/ckeditor5/latest/installation/advanced/alternative-setups/integrating-from-source.html
- */
-const ckeditorRules = [
-  {
-    test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
-    use:  ["raw-loader"]
-  },
-  {
-    test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-    use:  [
-      {
-        loader:  "style-loader",
-        options: {
-          injectType: "singletonStyleTag",
-          attributes: {
-            "data-cke": true
-          }
-        }
-      },
-      "css-loader",
-      {
-        loader:  "postcss-loader",
-        options: {
-          postcssOptions: styles.getPostCssConfig({
-            themeImporter: {
-              themePath: require.resolve("@ckeditor/ckeditor5-theme-lark")
-            },
-            minify: true
-          })
-        }
-      }
-    ]
-  }
-]
-
 const getWebpackConfig = ({ mode, analyzeBundle }) => {
   const isProduction = mode === "production"
   const publicPath = getPublicPath(isProduction)
-  return {
+  const config = {
     mode,
     context: __dirname,
     devtool: "source-map",
@@ -104,7 +63,6 @@ const getWebpackConfig = ({ mode, analyzeBundle }) => {
           use:     "swc-loader",
           exclude: /node_modules/
         },
-        ...ckeditorRules,
         {
           test:    /\.css$|\.scss$/,
           exclude: /@ckeditor/,
@@ -137,10 +95,6 @@ const getWebpackConfig = ({ mode, analyzeBundle }) => {
             new MiniCssExtractPlugin({
               filename: "[name]-[contenthash].css"
             }),
-            new CKEditorWebpackPlugin({
-              language:                               "en",
-              addMainLanguageTranslationsToAllAssets: true
-            })
           ] :
           []
       )
@@ -187,6 +141,7 @@ const getWebpackConfig = ({ mode, analyzeBundle }) => {
       host: "::"
     }
   }
+  return withCKEditor(config)
 }
 
 module.exports = (_env, argv) => {

@@ -1,0 +1,23 @@
+{
+  "name": "ol-ckeditor",
+  "packageManager": "yarn@3.2.0",
+  "exports": {
+    ".": "./src/index.ts",
+    "./test_utils": "./src/test_utils.tsx",
+    "./webpack-utils": "./src/webpack-utils.js"
+  },
+  "dependencies": {
+    "@ckeditor/ckeditor5-basic-styles": "^38.0.1",
+    "@ckeditor/ckeditor5-core": "^38.0.1",
+    "@ckeditor/ckeditor5-dev-translations": "^38.0.1",
+    "@ckeditor/ckeditor5-dev-utils": "^38.0.1",
+    "@ckeditor/ckeditor5-editor-classic": "^38.0.1",
+    "@ckeditor/ckeditor5-essentials": "^38.0.1",
+    "@ckeditor/ckeditor5-link": "^38.0.1",
+    "@ckeditor/ckeditor5-list": "^38.0.1",
+    "@ckeditor/ckeditor5-markdown-gfm": "^38.0.1",
+    "@ckeditor/ckeditor5-paragraph": "^38.0.1",
+    "@ckeditor/ckeditor5-react": "^6.0.0",
+    "@ckeditor/ckeditor5-theme-lark": "^38.0.1"
+  }
+}
