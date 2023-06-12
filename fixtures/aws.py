@@ -38,7 +38,7 @@ def ocw_aws_settings(aws_settings):
     return aws_settings
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_ocw_learning_bucket(
     ocw_aws_settings, mock_s3_fixture
 ):  # pylint: disable=unused-argument
@@ -79,7 +79,7 @@ def mitxonline_aws_settings(aws_settings):
     return aws_settings
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_xpro_learning_bucket(
     xpro_aws_settings, mock_s3_fixture
 ):  # pylint: disable=unused-argument
@@ -93,7 +93,7 @@ def mock_xpro_learning_bucket(
     yield SimpleNamespace(s3=s3, bucket=bucket)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_mitxonline_learning_bucket(
     mitxonline_aws_settings, mock_s3_fixture
 ):  # pylint: disable=unused-argument
@@ -109,7 +109,7 @@ def mock_mitxonline_learning_bucket(
     yield SimpleNamespace(s3=s3, bucket=bucket)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def mock_mitx_learning_bucket(
     mitx_aws_settings, mock_s3_fixture
 ):  # pylint: disable=unused-argument
