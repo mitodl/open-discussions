@@ -94,7 +94,7 @@ const getWebpackConfig = ({ mode, analyzeBundle }) => {
             new webpack.optimize.AggressiveMergingPlugin(),
             new MiniCssExtractPlugin({
               filename: "[name]-[contenthash].css"
-            }),
+            })
           ] :
           []
       )

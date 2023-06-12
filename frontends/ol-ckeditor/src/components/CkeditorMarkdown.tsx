@@ -27,19 +27,19 @@ const editorConfig = {
 }
 
 interface CkeditorMarkdownProps {
-  id?: string
-  className?: string
   value: string
   onChange: (value: string) => void
   onBlur: () => void
+  id?: string
+  className?: string
 }
 
 const CkeditorMarkdown: React.FC<CkeditorMarkdownProps> = ({
-  id,
-  className,
   value,
   onChange,
-  onBlur
+  onBlur,
+  id,
+  className
 }) => {
   return (
     <div id={id} className={className}>
@@ -50,6 +50,9 @@ const CkeditorMarkdown: React.FC<CkeditorMarkdownProps> = ({
         onChange={(_event, editor) => {
           const data = editor.getData()
           onChange(data)
+        }}
+        onReady={editor => {
+          editor.ui.element
         }}
         onBlur={onBlur}
       />

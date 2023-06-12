@@ -1,5 +1,7 @@
 const { styles } = require("@ckeditor/ckeditor5-dev-utils")
-const { CKEditorTranslationsPlugin } = require('@ckeditor/ckeditor5-dev-translations')
+const {
+  CKEditorTranslationsPlugin
+} = require("@ckeditor/ckeditor5-dev-translations")
 
 const ckeditorRules = [
   {
@@ -34,7 +36,6 @@ const ckeditorRules = [
   }
 ]
 
-
 /**
  * CKEditor distributes its npm packages as pre-bundled, ready-to-use modules,
  * or as un-built modules for greater customization. This takes care of building
@@ -53,7 +54,7 @@ const ckeditorRules = [
  */
 const withCKEditor = config => {
   const modified = {
-    ...config,
+    ...config
   }
   modified.module.rules = [...modified.module.rules, ...ckeditorRules]
   modified.plugins = [

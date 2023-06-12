@@ -9,5 +9,5 @@
  */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./types/ckeditor.d.ts" />
-export { default as CkeditorMarkdown } from "./components/CkeditorMarkdown"
-export type { CkeditorMarkdownProps } from "./components/CkeditorMarkdown"
+export { default as CkeditorMarkdownLazy } from "./components/CkeditorMarkdownLazy"
+export type { CkeditorMarkdownLazyProps } from "./components/CkeditorMarkdownLazy"
