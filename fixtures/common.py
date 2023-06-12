@@ -38,6 +38,7 @@ def warnings_as_errors():
         warnings.simplefilter("ignore", category=ImportWarning)
         warnings.filterwarnings("ignore", category=InsecureRequestWarning)
         warnings.filterwarnings("ignore", category=PytestMockWarning)
+        warnings.filterwarnings("ignore", category=ResourceWarning)
         warnings.filterwarnings(
             "ignore",
             message="'async' and 'await' will become reserved keywords in Python 3.7",
