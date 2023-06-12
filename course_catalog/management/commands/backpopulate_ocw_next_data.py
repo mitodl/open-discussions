@@ -28,25 +28,24 @@ class Command(BaseCommand):
             help="Delete all existing records first",
         )
         parser.add_argument(
-            "--course-url-substring",
-            dest="course_url_substring",
+            "--course-name",
+            dest="course_name",
             required=False,
-            help="If set, backpopulate only courses whose urls match with this substring",
+            help="If set, backpopulate only the course with this name",
         )
         super().add_arguments(parser)
 
     def handle(self, *args, **options):
         """Run Populate ocw courses"""
-        course_url_substring = options.get("course_url_substring")
+        course_name = options.get("course_name")
         if options["delete"]:
-            if course_url_substring:
+            if course_name:
                 self.stdout.write(
-                    "Deleting course={course_url_substring}".format(
-                        course_url_substring=course_url_substring
-                    )
+                    "Deleting course={course_name}".format(course_name=course_name)
                 )
                 runs = LearningResourceRun.objects.filter(
-                    slug=course_url_substring, platform=PlatformType.ocw.value
+                    slug="courses/{}".format(course_name),
+                    platform=PlatformType.ocw.value,
                 )
 
                 for run in runs:
@@ -55,25 +54,23 @@ class Command(BaseCommand):
                     course.save()
                     deindex_course(course)
             else:
-                self.stdout.write(
-                    "You must specify a course_url_substring with --delete"
-                )
+                self.stdout.write("You must specify a course_name with --delete")
 
         else:
             start = now_in_utc()
 
             task = get_ocw_next_data.delay(
                 force_overwrite=options["force_overwrite"],
-                course_url_substring=course_url_substring,
+                course_url_substring=course_name,
                 utc_start_timestamp=start.strftime(ISOFORMAT),
             )
 
             self.stdout.write(
                 "Started task {task} to get ocw next course data "
-                "w/force_overwrite={overwrite}, course_url_substring={course_url_substring}".format(
+                "w/force_overwrite={overwrite}, course_name={course_name}".format(
                     task=task,
                     overwrite=options["force_overwrite"],
-                    course_url_substring=course_url_substring,
+                    course_name=course_name,
                 )
             )
             self.stdout.write("Waiting on task...")
