@@ -1,6 +1,24 @@
 Release Notes
 =============
 
+Version 0.219.0 (Released June 13, 2023)
+---------------
+
+- Update dependency betamax-serializers to v0.2.1 (#4045)
+- dont start extra tasks for index updates (#4009)
+- limit notifications to one worker (#4018)
+- Update dependency array-move to v2.2.2 (#4043)
+- Update dependency appdirs to v1.4.4 (#4042)
+- Update dependency @types/react-router to v5.1.20 (#4041)
+- Update dependency @types/lodash to v4.14.195 (#4040)
+- Update dependency @testing-library/jest-dom to v5.16.5 (#4039)
+- Update dependency urllib3 to v1.26.5 [SECURITY] (#4027)
+- Update dependency requests to v2.31.0 [SECURITY] (#4026)
+- Update dependency celery to v5.2.2 [SECURITY] (#4023)
+- Update dependency webpack to v5.76.0 [SECURITY] (#4028)
+- Update dependency lodash to v4.17.21 [SECURITY] (#4024)
+- Add renovate.json (#4021)
+
 Version 0.218.1 (Released June 01, 2023)
 ---------------
 
