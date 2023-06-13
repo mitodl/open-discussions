@@ -1,7 +1,7 @@
 import { QueryCache, QueryClient } from "@tanstack/react-query"
 import axios from "./axios"
-import { generateLoginRedirectUrl } from "../../../open-discussions/src/lib/auth.js"
-import { useHistory } from "react-router-dom"
+import { generateLoginRedirectUrl } from "ol-util"
+import { History } from "history"
 
 type MaybeHasStatus = {
   response?: {
@@ -12,7 +12,7 @@ const AUTH_STATUS_CODES = [401, 403]
 const RETRY_STATUS_CODES = [408, 429, 502, 503, 504]
 const MAX_RETRIES = 3
 
-const createQueryClient = (): QueryClient => {
+const createQueryClient = (history: History): QueryClient => {
   return new QueryClient({
     defaultOptions: {
       queries: {
@@ -43,15 +43,14 @@ const createQueryClient = (): QueryClient => {
     },
     queryCache: new QueryCache({
       onError: async error => {
-        const history = useHistory()
         const status = (error as MaybeHasStatus)?.response?.status
         const {user} = SETTINGS
 
         if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
           if (user.is_authenticated) {
-            return history.replace("/forbidden")
+            history.replace("/forbidden")
           } else {
-            return history.replace(generateLoginRedirectUrl())
+            history.replace(generateLoginRedirectUrl())
           }
         }
       }

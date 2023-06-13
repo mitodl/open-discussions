@@ -7,7 +7,7 @@ import App from "../App"
 const container = document.getElementById("container")
 
 const browserHistory = createBrowserHistory()
-const queryClient = createQueryClient()
+const queryClient = createQueryClient(browserHistory)
 ReactDOM.render(
   <App queryClient={queryClient} history={browserHistory} />,
   container
