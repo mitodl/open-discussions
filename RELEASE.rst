@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.219.1
+---------------
+
+- fix ocw course delete (#4047)
+- add CODEOWNERS (#4046)
+- OpenSeach Local Service (#4014)
+- Resolve Github Action Deprecation Warnings (#4022)
+- Local node package templates (#4049)
+- fix renovate configuration typo (#4051)
+- Replace dependency babel-eslint with @babel/eslint-parser 7.11.0 (#4037)
+- disable major version updates in frontends/open-discussions (#4034)
+
 Version 0.219.0 (Released June 13, 2023)
 ---------------
 
