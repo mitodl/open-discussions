@@ -5,6 +5,7 @@ import isEmpty from "lodash/isEmpty"
 import isNil from "lodash/isNil"
 import padStart from "lodash/padStart"
 import moment from "moment"
+import { useLocation } from "react-router-dom"
 
 export const initials = (title: string): string => {
   return title
@@ -73,4 +74,9 @@ export const pluralize = (singular: string, count: number, plural?: string) => {
     return singular
   }
   return plural ?? `${singular}s`
+}
+
+export const generateLoginRedirectUrl = () => {
+  const pathname = window.location.pathname
+  return `/login/?next=${pathname}`
 }
