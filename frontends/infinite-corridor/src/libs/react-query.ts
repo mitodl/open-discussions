@@ -49,9 +49,9 @@ const createQueryClient = (): QueryClient => {
 
         if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
           if (user.is_authenticated) {
-            return history.push("/forbidden")
+            return history.replace("/forbidden")
           } else {
-            return history.push(generateLoginRedirectUrl())
+            return history.replace(generateLoginRedirectUrl())
           }
         }
       }
