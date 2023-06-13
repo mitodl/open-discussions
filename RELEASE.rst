@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.219.0
+Version 0.219.0 (Released June 13, 2023)
 ---------------
 
 - Update dependency betamax-serializers to v0.2.1 (#4045)
