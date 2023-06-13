@@ -3,9 +3,11 @@ import { renderHook } from "@testing-library/react-hooks/dom"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
+import { createBrowserHistory } from "history"
 import { createQueryClient } from "./react-query"
 
-const queryClient = createQueryClient()
+const browserHistory = createBrowserHistory()
+const queryClient = createQueryClient(browserHistory)
 const wrapper = ({ children }) => (
   <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 )
