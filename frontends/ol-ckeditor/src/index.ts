@@ -11,3 +11,6 @@
 /// <reference path="./types/ckeditor.d.ts" />
 export { default as CkeditorMarkdownLazy } from "./components/CkeditorMarkdownLazy"
 export type { CkeditorMarkdownLazyProps } from "./components/CkeditorMarkdownLazy"
+
+export { default as CkeditorArticle } from "./components/CkeditorArticle"
+export type { CkeditorArticleProps } from "./components/CkeditorArticle"

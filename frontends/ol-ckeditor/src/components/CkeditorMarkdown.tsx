@@ -51,9 +51,6 @@ const CkeditorMarkdown: React.FC<CkeditorMarkdownProps> = ({
           const data = editor.getData()
           onChange(data)
         }}
-        onReady={editor => {
-          editor.ui.element
-        }}
         onBlur={onBlur}
       />
     </div>

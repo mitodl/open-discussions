@@ -1497,12 +1497,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ckeditor/ckeditor5-autoformat@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-autoformat@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: 665ff1ee71a1ea80aff3f1f74c41f2e7a5908bb483167e13a5a4f3bf5c3c5c211c7201b96c23f301e9693ec6f54835bf584b3e38098b91233298c79a73f16928
+  languageName: node
+  linkType: hard
+
 "@ckeditor/ckeditor5-basic-styles@npm:^38.0.1":
   version: 38.0.1
   resolution: "@ckeditor/ckeditor5-basic-styles@npm:38.0.1"
   dependencies:
     ckeditor5: ^38.0.1
   checksum: 117ef7db1bc4b14435b8ea7037b60427bf3b38e948a9e2d17c70731c408d057c49fd37a2d2d416c10c974cbe8932962504c8ff892147e5188f469591bac46a41
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-block-quote@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-block-quote@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: 9bcf286e0f0ffd5791697198ba222d097e8222e0d9ec48c193a81f77af29c8e12fe0735cb058ff405479b7860790f1f6997de8f477ab000d81976d243d5700c9
   languageName: node
   linkType: hard
 
@@ -1575,6 +1593,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ckeditor/ckeditor5-easy-image@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-easy-image@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: f78bca1c50deb7e256e90100eaa5966237f21337dd69811849e1d8febb19b028b32d5b67ac51ebb55c3c93b5161d2a80fefa393d000758bd36759a901be0a624
+  languageName: node
+  linkType: hard
+
 "@ckeditor/ckeditor5-editor-classic@npm:^38.0.1":
   version: 38.0.1
   resolution: "@ckeditor/ckeditor5-editor-classic@npm:38.0.1"
@@ -1615,6 +1642,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ckeditor/ckeditor5-heading@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-heading@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: d1236c6f8c5da05ef068bb1921e9a9fc89b26a1d8e39090438a9329727a163315218c235a66df7418b745c0cf98d31d8a71e9e26a7b106e3f9df932ad400a797
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-image@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-image@npm:38.0.1"
+  dependencies:
+    "@ckeditor/ckeditor5-ui": ^38.0.1
+    ckeditor5: ^38.0.1
+    lodash-es: ^4.17.15
+  checksum: 54f582796d2d3279acea2ab1f4cdaaf8eb910f57d5c0cb32a9c7d25213938ad8b79108aa57bd0373134eba57501fd754f33b5da1d9931c20aafa943ebfaa87f2
+  languageName: node
+  linkType: hard
+
 "@ckeditor/ckeditor5-link@npm:^38.0.1":
   version: 38.0.1
   resolution: "@ckeditor/ckeditor5-link@npm:38.0.1"
@@ -1645,6 +1692,16 @@ __metadata:
     turndown: ^6.0.0
     turndown-plugin-gfm: ^1.0.2
   checksum: 001194768be22ca0f9d3004e02874d7c1677510ece04fe88367bdd0a63f6e81db5198f26aadd04d8d5d0675ae9c5ae926ed71d2a4d4b75b7504c05d2a8d8a7f3
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-media-embed@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-media-embed@npm:38.0.1"
+  dependencies:
+    "@ckeditor/ckeditor5-ui": ^38.0.1
+    ckeditor5: ^38.0.1
+  checksum: 68cdcc02e2159ed7308b24c5cdadba5417cdeaa5cd0f6fd4ac89453f419477bbe2324a0c25638fec90bff0002ea4d3a9ef7aa5f30f1d3b8187c322c210477b1b
   languageName: node
   linkType: hard
 
@@ -16715,15 +16772,21 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ol-ckeditor@workspace:frontends/ol-ckeditor"
   dependencies:
+    "@ckeditor/ckeditor5-autoformat": ^38.0.1
     "@ckeditor/ckeditor5-basic-styles": ^38.0.1
+    "@ckeditor/ckeditor5-block-quote": ^38.0.1
     "@ckeditor/ckeditor5-core": ^38.0.1
     "@ckeditor/ckeditor5-dev-translations": ^38.0.1
     "@ckeditor/ckeditor5-dev-utils": ^38.0.1
+    "@ckeditor/ckeditor5-easy-image": ^38.0.1
     "@ckeditor/ckeditor5-editor-classic": ^38.0.1
     "@ckeditor/ckeditor5-essentials": ^38.0.1
+    "@ckeditor/ckeditor5-heading": ^38.0.1
+    "@ckeditor/ckeditor5-image": ^38.0.1
     "@ckeditor/ckeditor5-link": ^38.0.1
     "@ckeditor/ckeditor5-list": ^38.0.1
     "@ckeditor/ckeditor5-markdown-gfm": ^38.0.1
+    "@ckeditor/ckeditor5-media-embed": ^38.0.1
     "@ckeditor/ckeditor5-paragraph": ^38.0.1
     "@ckeditor/ckeditor5-react": ^6.0.0
     "@ckeditor/ckeditor5-theme-lark": ^38.0.1
