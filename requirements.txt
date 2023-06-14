@@ -184,14 +184,19 @@ feedparser==6.0.10
     # via -r requirements.in
 future==0.18.3
     # via django-json-widget
-google-api-python-client==1.7.11
+google-api-core==2.11.1
+    # via google-api-python-client
+google-api-python-client==2.89.0
     # via -r requirements.in
-google-auth==1.6.3
+google-auth==2.20.0
     # via
+    #   google-api-core
     #   google-api-python-client
     #   google-auth-httplib2
-google-auth-httplib2==0.0.3
+google-auth-httplib2==0.1.0
     # via google-api-python-client
+googleapis-common-protos==1.59.1
+    # via google-api-core
 html5lib==1.1
     # via -r requirements.in
 httplib2==0.19.0
@@ -275,6 +280,10 @@ prompt-toolkit==3.0.38
     # via
     #   click-repl
     #   ipython
+protobuf==4.23.2
+    # via
+    #   google-api-core
+    #   googleapis-common-protos
 psycopg2==2.9.6
     # via
     #   -r requirements.in
@@ -341,6 +350,7 @@ requests==2.31.0
     #   akismet
     #   betamax
     #   django-anymail
+    #   google-api-core
     #   ocw-data-parser
     #   prawcore
     #   pygithub
@@ -378,8 +388,8 @@ six==1.15.0
     #   django-imagekit
     #   django-server-status
     #   faker
-    #   google-api-python-client
     #   google-auth
+    #   google-auth-httplib2
     #   html5lib
     #   isodate
     #   nested-lookup
@@ -428,7 +438,7 @@ ulid-py==0.0.3
     # via -r requirements.in
 update-checker==0.16
     # via praw
-uritemplate==3.0.0
+uritemplate==4.1.1
     # via
     #   drf-spectacular
     #   google-api-python-client
@@ -438,6 +448,7 @@ urllib3==1.26.11
     #   botocore
     #   django-anymail
     #   elasticsearch
+    #   google-auth
     #   opensearch-py
     #   requests
     #   sentry-sdk

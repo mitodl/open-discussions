@@ -31,7 +31,7 @@ djoser==2.2.0
 factory_boy
 faker
 feedparser>=6.0.10
-google-api-python-client==1.7.11
+google-api-python-client==2.89.0
 html5lib>=1.1
 importlib_metadata>=6.6.0
 ipython
