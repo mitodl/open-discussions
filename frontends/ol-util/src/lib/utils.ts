@@ -5,7 +5,6 @@ import isEmpty from "lodash/isEmpty"
 import isNil from "lodash/isNil"
 import padStart from "lodash/padStart"
 import moment from "moment"
-import { useLocation } from "react-router-dom"
 
 export const initials = (title: string): string => {
   return title

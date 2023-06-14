@@ -36,5 +36,30 @@ test.each([
 
     await waitFor(() => result.current.isError)
     expect(queryFn).toHaveBeenCalledTimes(retries + 1)
-  }
-)
+  })
+
+test.each([
+  {userIsAuthenticated: true, startingLocation: "", destination: "/forbidden"},
+  {userIsAuthenticated: true, startingLocation: "/place/to/go", destination: "/forbidden"},
+  {userIsAuthenticated: false, startingLocation: "", destination: ""},
+  {userIsAuthenticated: false, startingLocation: "/place/to/go", destination: "/place/to/go/"},
+])(
+  "Should redirect to $destination if user.is_authenticated is $userIsAuthenticated",
+  async ({userIsAuthenticated, startingLocation,  destination}) => {
+    window.SETTINGS.user.is_authenticated = userIsAuthenticated
+    const queryFn = jest.fn().mockRejectedValue({response: 403})
+    const baseUrl = "http://test.com"
+    delete (window as any).location
+    window.location.href = baseUrl
+    window.location.pathname = startingLocation
+
+    const { result, waitFor } = renderHook(
+      () =>
+        useQuery(["test"], {queryFn}),
+      { wrapper }
+    )
+
+    await waitFor(() => result.current.isError)
+    expect(window.location.href).toBe(baseUrl)
+    expect(window.location.pathname).toBe(destination)
+  })
