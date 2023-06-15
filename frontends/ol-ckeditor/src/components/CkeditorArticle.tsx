@@ -1,51 +1,56 @@
 import React, { useMemo } from "react"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 
-import ClassicEditor from "@ckeditor/ckeditor5-editor-classic/src/classiceditor"
-import type { EditorConfig } from '@ckeditor/ckeditor5-core'
+import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic"
+import type { EditorConfig } from "@ckeditor/ckeditor5-core"
 
-import Essentials from "@ckeditor/ckeditor5-essentials/src/essentials"
-// import UploadAdapter from "@ckeditor/ckeditor5-adapter-ckfinder/src/uploadadapter"
-import Autoformat from "@ckeditor/ckeditor5-autoformat/src/autoformat"
-import Bold from "@ckeditor/ckeditor5-basic-styles/src/bold"
-import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic"
-import BlockQuote from "@ckeditor/ckeditor5-block-quote/src/blockquote"
-import EasyImage from "@ckeditor/ckeditor5-easy-image/src/easyimage"
-import Heading from "@ckeditor/ckeditor5-heading/src/heading"
-import Image from "@ckeditor/ckeditor5-image/src/image"
-import ImageStyle from "@ckeditor/ckeditor5-image/src/imagestyle"
-import ImageToolbar from "@ckeditor/ckeditor5-image/src/imagetoolbar"
-import ImageUpload from "@ckeditor/ckeditor5-image/src/imageupload"
-import Link from "@ckeditor/ckeditor5-link/src/link"
-import List from "@ckeditor/ckeditor5-list/src/list"
-import MediaEmbed from "@ckeditor/ckeditor5-media-embed/src/mediaembed"
-import Paragraph from "@ckeditor/ckeditor5-paragraph/src/paragraph"
+import { Essentials } from "@ckeditor/ckeditor5-essentials"
+import { UploadAdapter } from "@ckeditor/ckeditor5-adapter-ckfinder"
+import { Autoformat } from "@ckeditor/ckeditor5-autoformat"
+import { Bold, Italic } from "@ckeditor/ckeditor5-basic-styles"
+import { BlockQuote } from "@ckeditor/ckeditor5-block-quote"
+import { EasyImage } from "@ckeditor/ckeditor5-easy-image"
+import { Heading } from "@ckeditor/ckeditor5-heading"
+import {
+  Image,
+  ImageStyle,
+  ImageToolbar,
+  ImageUpload
+} from "@ckeditor/ckeditor5-image"
+import { Link } from "@ckeditor/ckeditor5-link"
+import { List } from "@ckeditor/ckeditor5-list"
+import { MediaEmbed } from "@ckeditor/ckeditor5-media-embed"
+import { Paragraph } from "@ckeditor/ckeditor5-paragraph"
+import { CloudServices } from "@ckeditor/ckeditor5-cloud-services"
 
 // block toolbar setup
-import BlockToolbar from "@ckeditor/ckeditor5-ui/src/toolbar/block/blocktoolbar"
-import ParagraphButtonUI from "@ckeditor/ckeditor5-paragraph/src/paragraphbuttonui"
+import { BlockToolbar } from "@ckeditor/ckeditor5-ui"
+import { ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph"
+import cloudServicesConfig from "./cloudServices"
 
-const baseEditorConfig: EditorConfig = ({
+const baseEditorConfig: EditorConfig = {
   plugins: [
     Essentials,
-    // UploadAdapter,
     Autoformat,
     Bold,
     Italic,
     BlockQuote,
-    // EasyImage,
     Heading,
-    Image,
-    ImageStyle,
-    ImageToolbar,
-    // ImageUpload,
     Link,
     List,
     MediaEmbed,
     Paragraph,
     BlockToolbar,
-    ParagraphButtonUI,
+    UploadAdapter,
+    CloudServices,
+    EasyImage,
+    Image,
+    ImageStyle,
+    ImageToolbar,
+    ImageUpload,
+    ParagraphButtonUI
   ],
+  blockToolbar: ["mediaEmbed", "imageUpload"],
   toolbar:      {
     items: [
       "heading",
@@ -54,13 +59,15 @@ const baseEditorConfig: EditorConfig = ({
       "link",
       "bulletedList",
       "numberedList",
-      "blockQuote",
-      "mediaEmbed",
-      "imageUpload"
+      "blockQuote"
     ]
   },
   placeholder: "Type here...",
-})
+  image:       {
+    toolbar: ["imageStyle:full", "imageStyle:side", "|", "imageTextAlternative"]
+  },
+  cloudServices: cloudServicesConfig
+}
 
 type CkeditorArticleProps = {
   value: string

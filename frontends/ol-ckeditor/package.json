@@ -7,9 +7,11 @@
     "./webpack-utils": "./src/webpack-utils.js"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-adapter-ckfinder": "^38.0.1",
     "@ckeditor/ckeditor5-autoformat": "^38.0.1",
     "@ckeditor/ckeditor5-basic-styles": "^38.0.1",
     "@ckeditor/ckeditor5-block-quote": "^38.0.1",
+    "@ckeditor/ckeditor5-cloud-services": "^38.0.1",
     "@ckeditor/ckeditor5-core": "^38.0.1",
     "@ckeditor/ckeditor5-dev-translations": "^38.0.1",
     "@ckeditor/ckeditor5-dev-utils": "^38.0.1",
@@ -24,6 +26,7 @@
     "@ckeditor/ckeditor5-media-embed": "^38.0.1",
     "@ckeditor/ckeditor5-paragraph": "^38.0.1",
     "@ckeditor/ckeditor5-react": "^6.0.0",
-    "@ckeditor/ckeditor5-theme-lark": "^38.0.1"
+    "@ckeditor/ckeditor5-theme-lark": "^38.0.1",
+    "axios": "^1.4.0"
   }
 }

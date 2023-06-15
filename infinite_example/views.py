@@ -26,6 +26,7 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             "is_staff_list_editor": user.is_authenticated
             and (is_admin_user(request) or is_staff_list_editor(request)),
         },
+        "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
     }
 
     return render(request, "example.html", context=dict(js_settings=js_settings))

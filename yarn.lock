@@ -1497,6 +1497,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ckeditor/ckeditor5-adapter-ckfinder@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-adapter-ckfinder@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: 4a49364bacd27a61fc5306f2d67acaaed6842bacba20e4ab3d0b27077572ab2401fb80603c6496afc8dddb22876f807d2c4f053336e1bf384a57af29fa1e533f
+  languageName: node
+  linkType: hard
+
 "@ckeditor/ckeditor5-autoformat@npm:^38.0.1":
   version: 38.0.1
   resolution: "@ckeditor/ckeditor5-autoformat@npm:38.0.1"
@@ -1535,6 +1544,15 @@ __metadata:
     "@ckeditor/ckeditor5-widget": ^38.0.1
     lodash-es: ^4.17.15
   checksum: 7661fbee6933674e60b456fd65d7a5f8d190a998c6e0e39cf65b6330945b3ec8dd00548b54908f306df93c89afc0cd6ef49322254744007c5a95c9621e9c6af1
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-cloud-services@npm:^38.0.1":
+  version: 38.0.1
+  resolution: "@ckeditor/ckeditor5-cloud-services@npm:38.0.1"
+  dependencies:
+    ckeditor5: ^38.0.1
+  checksum: b2372af26555acbbbefe4546d8477c704339ad6e73c7f628af4ad12157051c1011f68679a47841240e7fe615b38dd99d955cd2aee5c0e99507fead6f7415d894
   languageName: node
   linkType: hard
 
@@ -6861,6 +6879,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "axios@npm:1.4.0"
+  dependencies:
+    follow-redirects: ^1.15.0
+    form-data: ^4.0.0
+    proxy-from-env: ^1.1.0
+  checksum: 7fb6a4313bae7f45e89d62c70a800913c303df653f19eafec88e56cea2e3821066b8409bc68be1930ecca80e861c52aa787659df0ffec6ad4d451c7816b9386b
+  languageName: node
+  linkType: hard
+
 "babel-code-frame@npm:^6.26.0":
   version: 6.26.0
   resolution: "babel-code-frame@npm:6.26.0"
@@ -11402,6 +11431,16 @@ __metadata:
     debug:
       optional: true
   checksum: 6aa4e3e3cdfa3b9314801a1cd192ba756a53479d9d8cca65bf4db3a3e8834e62139245cd2f9566147c8dfe2efff1700d3e6aefd103de4004a7b99985e71dd533
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.0":
+  version: 1.15.2
+  resolution: "follow-redirects@npm:1.15.2"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: faa66059b66358ba65c234c2f2a37fcec029dc22775f35d9ad6abac56003268baf41e55f9ee645957b32c7d9f62baf1f0b906e68267276f54ec4b4c597c2b190
   languageName: node
   linkType: hard
 
@@ -16772,9 +16811,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ol-ckeditor@workspace:frontends/ol-ckeditor"
   dependencies:
+    "@ckeditor/ckeditor5-adapter-ckfinder": ^38.0.1
     "@ckeditor/ckeditor5-autoformat": ^38.0.1
     "@ckeditor/ckeditor5-basic-styles": ^38.0.1
     "@ckeditor/ckeditor5-block-quote": ^38.0.1
+    "@ckeditor/ckeditor5-cloud-services": ^38.0.1
     "@ckeditor/ckeditor5-core": ^38.0.1
     "@ckeditor/ckeditor5-dev-translations": ^38.0.1
     "@ckeditor/ckeditor5-dev-utils": ^38.0.1
@@ -16790,6 +16831,7 @@ __metadata:
     "@ckeditor/ckeditor5-paragraph": ^38.0.1
     "@ckeditor/ckeditor5-react": ^6.0.0
     "@ckeditor/ckeditor5-theme-lark": ^38.0.1
+    axios: ^1.4.0
   languageName: unknown
   linkType: soft
 
@@ -18855,6 +18897,13 @@ __metadata:
     forwarded: 0.2.0
     ipaddr.js: 1.9.1
   checksum: 29c6990ce9364648255454842f06f8c46fcd124d3e6d7c5066df44662de63cdc0bad032e9bf5a3d653ff72141cc7b6019873d685708ac8210c30458ad99f2b74
+  languageName: node
+  linkType: hard
+
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: ed7fcc2ba0a33404958e34d95d18638249a68c430e30fcb6c478497d72739ba64ce9810a24f53a7d921d0c065e5b78e3822759800698167256b04659366ca4d4
   languageName: node
   linkType: hard
 

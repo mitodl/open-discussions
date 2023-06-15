@@ -9,4 +9,6 @@ const instance = axios.create({
   xsrfHeaderName: "X-CSRFToken"
 })
 
+window.axios1 = instance
+
 export default instance
