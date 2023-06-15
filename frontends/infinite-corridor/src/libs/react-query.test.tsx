@@ -51,7 +51,6 @@ test.each([
     window.SETTINGS.user.is_authenticated = userIsAuthenticated
     const queryFn = jest.fn().mockRejectedValue({response: 403})
     const baseUrl = "http://test.com"
-    delete (window as any).location
     window.location.href = baseUrl
     window.location.pathname = startingLocation
 

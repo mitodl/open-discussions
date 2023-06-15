@@ -78,7 +78,6 @@ describe("pluralize", () => {
 
 describe("generateLoginRedirectUrl", () => {
   const baseUrl = "http://test.com"
-  delete (window as any).location
   test("If location is empty, should still return you to /", () => {
     expect(u.generateLoginRedirectUrl()).toBe("/login/?next=")
   })
