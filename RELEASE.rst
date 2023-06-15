@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.219.1
+Version 0.219.1 (Released June 15, 2023)
 ---------------
 
 - fix ocw course delete (#4047)
