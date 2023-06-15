@@ -292,7 +292,7 @@ pygithub==1.44.1
     # via -r requirements.in
 pygments==2.7.4
     # via ipython
-pyjwt==1.5.2
+pyjwt==2.4.0
     # via
     #   djangorestframework-jwt
     #   pygithub
