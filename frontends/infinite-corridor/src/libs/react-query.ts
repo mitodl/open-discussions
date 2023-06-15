@@ -50,7 +50,7 @@ const createQueryClient = (history: History): QueryClient => {
           if (user.is_authenticated) {
             history.replace("/forbidden/")
           } else {
-            history.replace(`/login/?next=${currentLocation.pathname}`)
+            window.location.href = `/login/?next=${currentLocation.pathname}`
           }
         }
       }

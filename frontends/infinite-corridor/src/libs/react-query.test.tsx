@@ -84,6 +84,8 @@ test.each([
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
-    expect(history.location.pathname).toBe(destination)
+    await waitFor(() => {
+      expect(history.location.pathname).toBe(destination)
+    })
   }
 )
