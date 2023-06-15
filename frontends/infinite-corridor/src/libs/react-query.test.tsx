@@ -3,14 +3,19 @@ import { renderHook, waitFor } from "@testing-library/react"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
-import { createBrowserHistory } from "history"
+import { createMemoryHistory, MemoryHistory } from "history"
 import { createQueryClient } from "./react-query"
+import { Router } from "react-router"
 
-const browserHistory = createBrowserHistory()
-const queryClient = createQueryClient(browserHistory)
-const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-)
+const getWrapper = (history: MemoryHistory) => {
+  const queryClient = createQueryClient(history)
+  const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <QueryClientProvider client={queryClient}>
+      <Router history={history}>{children}</Router>
+    </QueryClientProvider>
+  )
+  return wrapper
+}
 
 test.each([
   { status: 408, retries: 3 },
@@ -24,6 +29,7 @@ test.each([
   "should retry $status failures $retries times",
   async ({ status, retries }) => {
     allowConsoleErrors()
+    const wrapper = getWrapper(createMemoryHistory())
     const queryFn = jest.fn().mockRejectedValue({ response: { status } })
     const { result } = renderHook(
       () =>
@@ -66,8 +72,10 @@ test.each([
   "Should redirect to $destination if user.is_authenticated is $userIsAuthenticated",
   async ({ userIsAuthenticated, startingLocation, destination }) => {
     window.SETTINGS.user.is_authenticated = userIsAuthenticated
+    const history = createMemoryHistory()
+    history.replace(startingLocation)
+    const wrapper = getWrapper(history)
     const queryFn = jest.fn().mockRejectedValue({ response: 403 })
-    browserHistory.replace(startingLocation)
 
     const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
       wrapper
@@ -76,6 +84,6 @@ test.each([
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
-    expect(browserHistory.location.pathname).toBe(destination)
+    expect(history.location.pathname).toBe(destination)
   }
 )
