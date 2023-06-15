@@ -5,7 +5,6 @@ import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
 import { createBrowserHistory } from "history"
 import { createQueryClient } from "./react-query"
-import { history } from "react-router-dom"
 
 const browserHistory = createBrowserHistory()
 const queryClient = createQueryClient(browserHistory)
@@ -68,9 +67,7 @@ test.each([
   async ({ userIsAuthenticated, startingLocation, destination }) => {
     window.SETTINGS.user.is_authenticated = userIsAuthenticated
     const queryFn = jest.fn().mockRejectedValue({ response: 403 })
-    jest
-      .spyOn(history, "location")
-      .mockReturnValue({ pathname: startingLocation })
+    browserHistory.replace(startingLocation)
 
     const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
       wrapper
@@ -79,6 +76,6 @@ test.each([
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
-    expect(window.location.pathname).toBe(destination)
+    expect(browserHistory.location.pathname).toBe(destination)
   }
 )
