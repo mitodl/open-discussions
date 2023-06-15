@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.219.2
+Version 0.219.2 (Released June 15, 2023)
 ---------------
 
 - Update akhileshns/heroku-deploy digest to 9fd0f9f (#4038)
