@@ -1,6 +1,5 @@
 import { QueryCache, QueryClient } from "@tanstack/react-query"
 import axios from "./axios"
-import { generateLoginRedirectUrl } from "ol-util"
 import { History } from "history"
 
 type MaybeHasStatus = {
