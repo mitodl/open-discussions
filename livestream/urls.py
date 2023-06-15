@@ -1,6 +1,6 @@
 """livestream URL"""
-from django.conf.urls import url
+from django.urls import re_path
 
 from livestream.views import livestream_view
 
-urlpatterns = [url(r"^api/v0/livestream/$", livestream_view, name="livestream")]
+urlpatterns = [re_path(r"^api/v0/livestream/$", livestream_view, name="livestream")]

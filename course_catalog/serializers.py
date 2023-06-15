@@ -73,7 +73,9 @@ class GenericForeignKeyFieldSerializer(serializers.Serializer):
         elif isinstance(instance, PodcastEpisode):
             serializer = PodcastEpisodeSerializer(instance, context=context)
         else:
-            raise Exception("Unexpected type of tagged object")
+            raise Exception(  # pylint:disable=broad-exception-raised
+                "Unexpected type of tagged object"
+            )
         return serializer.data
 
 

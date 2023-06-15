@@ -37,6 +37,7 @@ VERSION = "0.219.2"
 log = logging.getLogger()
 
 ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # initialize Sentry before doing anything else so we capture any config errors
 SENTRY_DSN = get_string("SENTRY_DSN", "")
@@ -105,9 +106,8 @@ INSTALLED_APPS = (
     "corsheaders",
     "webpack_loader",
     "anymail",
-    "compat",
     "hijack",
-    "hijack_admin",
+    "hijack.contrib.admin",
     "guardian",
     "imagekit",
     "django_json_widget",
@@ -142,6 +142,7 @@ MIDDLEWARE = (
     "authentication.middleware.BlockedIPMiddleware",
     "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
 )
 
 # CORS
@@ -788,6 +789,8 @@ ATHENA_REGION_NAME = get_string("ATHENA_REGION_NAME", "us-east-1")
 ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
 
 ENABLE_INFINITE_CORRIDOR = get_bool("ENABLE_INFINITE_CORRIDOR", False)
+
+REQUESTS_TIMEOUT = get_int("REQUESTS_TIMEOUT", 30)
 
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing

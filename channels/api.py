@@ -1063,7 +1063,7 @@ class Api:
         elif sort == POSTS_SORT_TOP:
             return listing.top(**kwargs)
         else:
-            raise Exception(
+            raise Exception(  # pylint:disable=broad-exception-raised
                 "Sort method '{}' is in VALID_POST_SORT_TYPES but not actually supported".format(
                     sort
                 )

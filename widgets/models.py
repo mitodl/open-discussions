@@ -1,6 +1,6 @@
 """WidgetApp models"""
 from django.db import models
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 
 
 class WidgetList(models.Model):

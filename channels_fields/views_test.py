@@ -12,6 +12,8 @@ from channels_fields.models import FieldChannel
 from channels_fields.serializers import FieldChannelSerializer
 from open_discussions.factories import UserFactory
 
+pytestmark = pytest.mark.django_db
+
 
 def test_list_field_channels(user_client):
     """Test that all field channels are returned"""

@@ -2,6 +2,7 @@
 # pylint: disable=redefined-outer-name
 
 from django.contrib.auth import get_user, get_user_model
+from django.test import Client
 from django.urls import reverse
 import factory
 import pytest
@@ -13,8 +14,9 @@ from authentication.backends.micromasters import MicroMastersAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
 from open_discussions import features
-from open_discussions.factories import UserSocialAuthFactory
+from open_discussions.factories import UserSocialAuthFactory, UserFactory
 from open_discussions.test_utils import any_instance_of, MockResponse
+from profiles.models import Profile
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
 lazy = pytest.lazy_fixture
@@ -39,6 +41,12 @@ def mm_user(user):
         user=user, provider=MicroMastersAuth.name, uid=user.email
     )
     return user
+
+
+@pytest.fixture(autouse=True)
+def admin_profile(admin_user):
+    """Create a profile for the admin user"""
+    Profile.objects.get_or_create(user=admin_user)
 
 
 @pytest.fixture
@@ -649,8 +657,12 @@ def test_login_email_error(client, mocker):
 
 def test_login_email_hijacked(client, user, admin_user):
     """Test that a 403 response is returned for email login view if user is hijacked"""
+    admin_user = UserFactory.create(is_superuser=True)
+    user = UserFactory.create()
     client.force_login(admin_user)
-    client.post("/hijack/{}/".format(user.id))
+    client.post(
+        reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart"
+    )
     response = client.post(
         reverse("psa-login-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
@@ -661,7 +673,9 @@ def test_login_email_hijacked(client, user, admin_user):
 def test_register_email_hijacked(client, user, admin_user):
     """Test that a 403 response is returned for email register view if user is hijacked"""
     client.force_login(admin_user)
-    client.post("/hijack/{}/".format(user.id))
+    client.post(
+        reverse("hijack:acquire"), data={"user_pk": user.pk}, format="multipart"
+    )
     response = client.post(
         reverse("psa-register-email"),
         {"flow": SocialAuthState.FLOW_LOGIN, "email": "anything@example.com"},
@@ -675,9 +689,12 @@ def test_login_complete(
     settings, client, logged_in_user, admin_user, test_jwt_token, hijacked
 ):  # pylint: disable=unused-argument
     """Verify that the jwt-complete view invalidates the JWT auth cookie"""
+    client = Client()
+    if test_jwt_token:
+        client.cookies[settings.OPEN_DISCUSSIONS_COOKIE_NAME] = test_jwt_token
     if hijacked:
         client.force_login(admin_user)
-        client.post("/hijack/{}/".format(logged_in_user.id))
+        client.post(reverse("hijack:acquire"), {"user_pk": logged_in_user.pk})
 
     response = client.get(reverse("login-complete"))
 

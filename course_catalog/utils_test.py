@@ -125,7 +125,7 @@ def test_load_blocklist(url, settings, mocker):
         mock_request.assert_not_called()
         assert blocklist == []
     else:
-        mock_request.assert_called_once_with(url)
+        mock_request.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
         assert blocklist == [str(id, "utf-8") for id in file_content]
 
 
@@ -152,10 +152,10 @@ mitx:
         mock_request.assert_not_called()
         assert duplicates == []
     elif platform == "other":
-        mock_request.assert_called_once_with(url)
+        mock_request.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
         assert duplicates == []
     else:
-        mock_request.assert_called_once_with(url)
+        mock_request.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
         assert duplicates == [
             {
                 "duplicate_course_ids": ["MITx+1", "MITx+2", "MITx+3"],

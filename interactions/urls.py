@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.urls import re_path
 from django.urls import include
 from rest_framework.routers import DefaultRouter
 
@@ -27,4 +27,4 @@ router.register(
     r"popular-content", views.PopularContentViewSet, basename="popular_content"
 )
 
-urlpatterns = [url(r"^api/v0/", include(router.urls))]
+urlpatterns = [re_path(r"^api/v0/", include(router.urls))]

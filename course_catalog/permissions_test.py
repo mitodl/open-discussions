@@ -267,7 +267,7 @@ def test_stafflist_favorite_permissions(mocker, user, is_public, is_editor, acti
         else PrivacyLevel.private.value,
     )
     update_editor_group(user, is_editor)
-    request = mocker.MagicMock(method="POST", user=(user))
+    request = mocker.MagicMock(method="POST", user=user)
     assert HasStaffListPermission().has_object_permission(
         request, mocker.MagicMock(action=action), stafflist
     ) is ((is_public and "favorite" in action) or is_editor)

@@ -4,6 +4,7 @@ from datetime import datetime
 import boto3
 import pytest
 import pytz
+from moto import mock_s3
 
 from course_catalog.conftest import OCW_NEXT_TEST_PREFIX, setup_s3_ocw_next
 from course_catalog.etl.ocw_next import (
@@ -18,6 +19,7 @@ pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
 
 
+@mock_s3
 def test_transform_ocw_next_content_files(settings, mocker):
     """
     Test transform_ocw_next_content_files
@@ -87,6 +89,7 @@ def test_transform_ocw_next_content_files(settings, mocker):
     }
 
 
+@mock_s3
 @pytest.mark.parametrize("overwrite", [True, False])
 @pytest.mark.parametrize("modified_after_last_import", [True, False])
 def test_transform_resource_needs_text_update(

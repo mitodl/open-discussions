@@ -1,7 +1,7 @@
 """Profile models"""
 from uuid import uuid4
 
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.db import models, transaction
 from django.conf import settings
 
@@ -76,8 +76,8 @@ class Profile(models.Model):
         null=True, max_length=2083, upload_to=profile_image_upload_uri_medium
     )
 
-    email_optin = models.NullBooleanField()
-    toc_optin = models.NullBooleanField()
+    email_optin = models.BooleanField(null=True)
+    toc_optin = models.BooleanField(null=True)
 
     headline = models.CharField(blank=True, null=True, max_length=60)
     bio = models.TextField(blank=True, null=True)
