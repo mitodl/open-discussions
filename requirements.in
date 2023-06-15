@@ -9,6 +9,7 @@ betamax_serializers
 boto3==1.26.143
 cairosvg
 celery==5.3.0
+cffi==1.15.1
 cryptography>=39.0.1
 dj-database-url==0.3.0
 dj-static==0.0.6
