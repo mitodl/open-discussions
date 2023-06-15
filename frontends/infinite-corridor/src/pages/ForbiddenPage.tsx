@@ -8,7 +8,9 @@ const ForbiddenPage: React.FC = () => {
     <BannerPage>
       <Container>
         <span>Uh oh.</span>
-        <Link to="/infinite"><button >Take me to safety</button></Link>
+        <Link to="/infinite">
+          <button>Take me to safety</button>
+        </Link>
       </Container>
     </BannerPage>
   )

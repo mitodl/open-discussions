@@ -38,28 +38,44 @@ test.each([
       expect(result.current.isError).toBe(true)
     })
     expect(queryFn).toHaveBeenCalledTimes(retries + 1)
-  })
+  }
+)
 
 test.each([
-  {userIsAuthenticated: true, startingLocation: "", destination: "/forbidden"},
-  {userIsAuthenticated: true, startingLocation: "/place/to/go", destination: "/forbidden"},
-  {userIsAuthenticated: false, startingLocation: "", destination: "/login/?next=/"},
-  {userIsAuthenticated: false, startingLocation: "/place/to/go", destination: "/login/?next=/place/to/go/"},
+  {
+    userIsAuthenticated: true,
+    startingLocation:    "",
+    destination:         "/forbidden"
+  },
+  {
+    userIsAuthenticated: true,
+    startingLocation:    "/place/to/go",
+    destination:         "/forbidden"
+  },
+  {
+    userIsAuthenticated: false,
+    startingLocation:    "",
+    destination:         "/login/?next=/"
+  },
+  {
+    userIsAuthenticated: false,
+    startingLocation:    "/place/to/go",
+    destination:         "/login/?next=/place/to/go/"
+  }
 ])(
   "Should redirect to $destination if user.is_authenticated is $userIsAuthenticated",
-  async ({userIsAuthenticated, startingLocation,  destination}) => {
+  async ({ userIsAuthenticated, startingLocation, destination }) => {
     window.SETTINGS.user.is_authenticated = userIsAuthenticated
-    const queryFn = jest.fn().mockRejectedValue({response: 403})
+    const queryFn = jest.fn().mockRejectedValue({ response: 403 })
     window.location.pathname = startingLocation
 
-    const { result } = renderHook(
-      () =>
-        useQuery(["test"], {queryFn}),
-      { wrapper }
-    )
+    const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
+      wrapper
+    })
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
     expect(window.location.pathname).toBe(destination)
-  })
+  }
+)
