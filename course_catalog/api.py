@@ -32,7 +32,7 @@ from course_catalog.serializers import (
     OCWSerializer,
 )
 from course_catalog.utils import get_course_url, get_s3_object_and_read, safe_load_json
-from search.task_helpers import deindex_course, upsert_course
+from search.search_index_helpers import deindex_course, upsert_course
 
 log = logging.getLogger(__name__)
 

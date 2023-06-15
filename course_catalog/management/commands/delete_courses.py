@@ -4,7 +4,7 @@ import sys
 from django.core.management import BaseCommand
 
 from course_catalog.models import Course, Video
-from search.task_helpers import deindex_course, deindex_video
+from search.search_index_helpers import deindex_course, deindex_video
 
 
 class Command(BaseCommand):

@@ -5,7 +5,7 @@ from course_catalog.constants import PlatformType
 from course_catalog.models import Course
 from course_catalog.tasks import get_mitxonline_data
 from open_discussions.utils import now_in_utc
-from search.task_helpers import deindex_course
+from search.search_index_helpers import deindex_course
 
 
 class Command(BaseCommand):

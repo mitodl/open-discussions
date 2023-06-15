@@ -47,6 +47,16 @@ from search.tasks import (
 log = logging.getLogger()
 
 
+def try_with_retry_as_task(function, *args):
+    """
+    Try running the task, if it errors, run it as a celery task.
+    """
+    try:
+        function(*args)
+    except Exception:  # pylint:disable=broad-except
+        function.delay(*args)
+
+
 def reddit_object_persist(*persistence_funcs):
     """
     Decorator that passes a PRAW object to any number of functions that persist the object to a new data store.
@@ -130,6 +140,7 @@ def update_comment_text(comment_obj):
     )
 
 
+@if_feature_enabled(INDEX_UPDATES)
 def update_field_for_all_post_comments(post_obj, field_name, field_value):
     """
     Runs a task to update a field value for all comments associated with a given post.
@@ -185,7 +196,7 @@ def upsert_profile(user_id):
     Args:
         user_id (int): the primary key for the User whose profile to query by and update
     """
-    tasks.upsert_profile.delay(user_id)
+    try_with_retry_as_task(tasks.upsert_profile, user_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -197,7 +208,9 @@ def deindex_profile(user_obj):
         user_obj(django.contrib.auth.models.User): the User whose profile to query by and update
     """
     if user_obj.username != settings.INDEXING_API_USERNAME:
-        deindex_document.delay(gen_profile_id(user_obj.username), PROFILE_TYPE)
+        try_with_retry_as_task(
+            deindex_document, gen_profile_id(user_obj.username), PROFILE_TYPE
+        )
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -344,7 +357,7 @@ def upsert_course(course_id):
     Args:
         course_id (int): the primary key for the Course to update
     """
-    tasks.upsert_course.delay(course_id)
+    try_with_retry_as_task(tasks.upsert_course, course_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -355,13 +368,17 @@ def deindex_course(course_obj):
     Args:
         course_obj (course_catalog.models.Course): A Course object
     """
-    deindex_document.delay(
-        gen_course_id(course_obj.platform, course_obj.course_id), COURSE_TYPE
+    try_with_retry_as_task(
+        deindex_document,
+        gen_course_id(course_obj.platform, course_obj.course_id),
+        COURSE_TYPE,
     )
+
     for run_id in course_obj.runs.values_list("id", flat=True):
-        deindex_run_content_files(run_id)
+        try_with_retry_as_task(deindex_run_content_files, run_id)
 
 
+@if_feature_enabled(INDEX_UPDATES)
 def upsert_content_file(content_file_id):
     """
     Run a task to create or update a content file's OpenSearch document
@@ -369,9 +386,10 @@ def upsert_content_file(content_file_id):
     Args:
         content_file_id (int): the primary key for the ContentFile to update
     """
-    tasks.upsert_content_file.delay(content_file_id)
+    try_with_retry_as_task(tasks.upsert_content_file, content_file_id)
 
 
+@if_feature_enabled(INDEX_UPDATES)
 def index_run_content_files(run_id):
     """
     Runs a task to index content files for a LearningResourceRun
@@ -380,9 +398,10 @@ def index_run_content_files(run_id):
         run_id(int): LearningResourceRun id
 
     """
-    tasks.index_run_content_files.delay(run_id)
+    try_with_retry_as_task(tasks.index_run_content_files, run_id)
 
 
+@if_feature_enabled(INDEX_UPDATES)
 def deindex_run_content_files(run_id):
     """
     Runs a task to delete content files for a LearningResourceRun from the index
@@ -391,7 +410,7 @@ def deindex_run_content_files(run_id):
         run_id(int): LearningResourceRun id
 
     """
-    tasks.deindex_run_content_files.delay(run_id)
+    try_with_retry_as_task(tasks.deindex_run_content_files, run_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -402,7 +421,7 @@ def upsert_program(program_id):
     Args:
         program_id (int): the primary key for the Program to update in ES
     """
-    tasks.upsert_program.delay(program_id)
+    try_with_retry_as_task(tasks.upsert_program, program_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -413,7 +432,7 @@ def deindex_program(program_obj):
     Args:
         program_obj (course_catalog.models.Program): A Program object
     """
-    deindex_document.delay(gen_program_id(program_obj), PROGRAM_TYPE)
+    try_with_retry_as_task(deindex_document, gen_program_id(program_obj), PROGRAM_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -424,7 +443,7 @@ def upsert_user_list(user_list_id):
     Args:
         user_list_id (int): the primary key for the UserList to update in ES
     """
-    tasks.upsert_user_list.delay(user_list_id)
+    try_with_retry_as_task(tasks.upsert_user_list, user_list_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -435,7 +454,9 @@ def deindex_user_list(user_list_obj):
     Args:
         user_list_obj (course_catalog.models.UserList): A UserList object
     """
-    deindex_document.delay(gen_user_list_id(user_list_obj), USER_LIST_TYPE)
+    try_with_retry_as_task(
+        deindex_document, gen_user_list_id(user_list_obj), USER_LIST_TYPE
+    )
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -446,7 +467,7 @@ def upsert_staff_list(staff_list_id):
     Args:
         staff_list_id (int): the primary key for the StaffList to update in ES
     """
-    tasks.upsert_staff_list.delay(staff_list_id)
+    try_with_retry_as_task(tasks.upsert_staff_list, staff_list_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -457,7 +478,9 @@ def deindex_staff_list(staff_list_obj):
     Args:
         staff_list_obj (course_catalog.models.StaffList): A StaffList object
     """
-    deindex_document.delay(gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE)
+    try_with_retry_as_task(
+        deindex_document, gen_staff_list_id(staff_list_obj), STAFF_LIST_TYPE
+    )
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -468,7 +491,7 @@ def upsert_video(video_id):
     Args:
         video_id (int): the database primary key of the Video to update in ES
     """
-    tasks.upsert_video.delay(video_id)
+    try_with_retry_as_task(tasks.upsert_video, video_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -479,7 +502,7 @@ def deindex_video(video_obj):
     Args:
         video_obj (course_catalog.models.Video): A Video object
     """
-    deindex_document.delay(gen_video_id(video_obj), VIDEO_TYPE)
+    try_with_retry_as_task(deindex_document, gen_video_id(video_obj), VIDEO_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -490,7 +513,7 @@ def upsert_podcast(podcast_id):
     Args:
         podcast_id (int): the database primary key of the Podcast to update in ES
     """
-    tasks.upsert_podcast.delay(podcast_id)
+    try_with_retry_as_task(tasks.upsert_podcast, podcast_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -501,7 +524,7 @@ def deindex_podcast(podcast_obj):
     Args:
         podcast_obj (course_catalog.models.Podcast): A Podcast object
     """
-    deindex_document.delay(gen_podcast_id(podcast_obj), PODCAST_TYPE)
+    try_with_retry_as_task(deindex_document, gen_podcast_id(podcast_obj), PODCAST_TYPE)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -512,7 +535,7 @@ def upsert_podcast_episode(podcast_episode_id):
     Args:
         podcast_episode_id (int): the database primary key of the PodcastEpisode to update in ES
     """
-    tasks.upsert_podcast_episode.delay(podcast_episode_id)
+    try_with_retry_as_task(tasks.upsert_podcast_episode, podcast_episode_id)
 
 
 @if_feature_enabled(INDEX_UPDATES)
@@ -523,6 +546,8 @@ def deindex_podcast_episode(podcast_episode_obj):
     Args:
         podcast_episode_obj (course_catalog.models.PodcastEpisode): A PodcastEpisode object
     """
-    deindex_document.delay(
-        gen_podcast_episode_id(podcast_episode_obj), PODCAST_EPISODE_TYPE
+    try_with_retry_as_task(
+        deindex_document,
+        gen_podcast_episode_id(podcast_episode_obj),
+        PODCAST_EPISODE_TYPE,
     )

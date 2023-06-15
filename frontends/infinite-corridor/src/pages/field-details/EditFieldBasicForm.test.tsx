@@ -117,11 +117,9 @@ describe("EditFieldBasicForm", () => {
       featured_list: publicLists.results[4],
       lists:         [...field.lists.slice(0, 3), publicLists.results[4]]
     }
-    setMockResponse.patch(
-      urls.fieldDetails(field.name),
-      { requestBody: updatedValues },
-      updatedField
-    )
+    setMockResponse.patch(urls.fieldDetails(field.name), updatedField, {
+      requestBody: updatedValues
+    })
     setMockResponse.get(urls.fieldDetails(field.name), updatedField)
     const submitBtn = screen.getByText("Save")
     await user.click(submitBtn)

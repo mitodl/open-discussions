@@ -13,15 +13,11 @@
     "declaration": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "preserveWatchOutput": true,
   },
-  "exclude": [
-    "frontends/*/**/*.test.ts",
-    "frontends/*/**/*.test.tsx"
-  ]
 }

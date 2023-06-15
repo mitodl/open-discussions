@@ -5,7 +5,7 @@ from django.db.models import Q
 
 from course_catalog.models import Course, CourseTopic
 from course_catalog.utils import get_ocw_topics
-from search.task_helpers import upsert_course
+from search.search_index_helpers import upsert_course
 
 
 class Command(BaseCommand):

@@ -6,7 +6,7 @@ import {
   renderTestApp,
   setMockResponse,
   waitFor,
-  expectProps
+  expectLastProps
 } from "../../test-utils"
 import ItemsListing from "./ItemsListing"
 
@@ -41,22 +41,18 @@ describe("FavoritesPage", () => {
 
   test("Passes appropriate props to ItemsListing", async () => {
     const { favorites } = setup()
-    expectProps(spyItemsListing, {
+    expectLastProps(spyItemsListing, {
       isLoading:    true,
       items:        undefined,
       emptyMessage: "You don't have any favorites yet."
     })
 
     await waitFor(() => {
-      expectProps(
-        spyItemsListing,
-        {
-          isLoading:    false,
-          items:        favorites.results,
-          emptyMessage: "You don't have any favorites yet."
-        },
-        -1
-      )
+      expectLastProps(spyItemsListing, {
+        isLoading:    false,
+        items:        favorites.results,
+        emptyMessage: "You don't have any favorites yet."
+      })
     })
   })
 })

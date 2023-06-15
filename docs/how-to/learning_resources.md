@@ -31,7 +31,7 @@ and in tests for that code:
    - Add a new ES serializer
    - Create functions for bulk indexing of the new type
 
-- search.task_helpers
+- search.search_index_helpers
   - Add upsert and delete functions for the type
 
 - search.tasks

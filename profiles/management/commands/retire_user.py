@@ -2,7 +2,7 @@
 from django.core.management import BaseCommand
 from django.contrib.auth import get_user_model
 
-from search import task_helpers
+from search import search_index_helpers
 
 
 User = get_user_model()
@@ -44,7 +44,7 @@ class Command(BaseCommand):
         )
         user.received_invitations.all().delete()
 
-        task_helpers.deindex_profile(user)
+        search_index_helpers.deindex_profile(user)
 
         self.stdout.write(
             "Deleting {} post/comment subscriptions".format(

@@ -3,19 +3,27 @@ const path = require("path")
 const webpack = require("webpack")
 const BundleTracker = require("webpack-bundle-tracker")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const CKEditorWebpackPlugin = require('@ckeditor/ckeditor5-dev-webpack-plugin')
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const CKEditorWebpackPlugin = require("@ckeditor/ckeditor5-dev-webpack-plugin")
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer")
 
-const { styles } = require('@ckeditor/ckeditor5-dev-utils')
+const { styles } = require("@ckeditor/ckeditor5-dev-utils")
 
-const STATS_FILEPATH = path.resolve(__dirname, "../../webpack-stats/infinite-corridor.json")
+const STATS_FILEPATH = path.resolve(
+  __dirname,
+  "../../webpack-stats/infinite-corridor.json"
+)
 
 const getPublicPath = isProduction => {
-  const { OPEN_DISCUSSIONS_HOSTNAME: hostname, WEBPACK_PORT_INFINITE_CORRIDOR: port } = process.env
+  const {
+    OPEN_DISCUSSIONS_HOSTNAME: hostname,
+    WEBPACK_PORT_INFINITE_CORRIDOR: port
+  } = process.env
   const buildPath = "/static/infinite-corridor/"
   if (isProduction) return buildPath
   if (!hostname || !port) {
-    throw new Error(`hostname (${hostname}) and port (${port}) should both be defined.`)
+    throw new Error(
+      `hostname (${hostname}) and port (${port}) should both be defined.`
+    )
   }
   return `http://${hostname}:${port}/`
 }
@@ -43,15 +51,13 @@ const ckeditorRules = [
           }
         }
       },
-      'css-loader',
+      "css-loader",
       {
         loader:  "postcss-loader",
         options: {
           postcssOptions: styles.getPostCssConfig({
             themeImporter: {
-              themePath: require.resolve(
-                "@ckeditor/ckeditor5-theme-lark"
-              )
+              themePath: require.resolve("@ckeditor/ckeditor5-theme-lark")
             },
             minify: true
           })
@@ -61,8 +67,7 @@ const ckeditorRules = [
   }
 ]
 
-
-const getWebpackConfig = ({mode, analyzeBundle}) => {
+const getWebpackConfig = ({ mode, analyzeBundle }) => {
   const isProduction = mode === "production"
   const publicPath = getPublicPath(isProduction)
   return {
@@ -70,19 +75,21 @@ const getWebpackConfig = ({mode, analyzeBundle}) => {
     context: __dirname,
     devtool: "source-map",
     entry:   {
-      root:         "./src/entry/root",
-      style:        "./src/entry/style",
+      root:  "./src/entry/root",
+      style: "./src/entry/style"
     },
-    output:  {
+    output: {
       path: path.resolve(__dirname, "build"),
-      ...(isProduction ? {
-        filename:           "[name]-[chunkhash].js",
-        chunkFilename:      "[id]-[chunkhash].js",
-        crossOriginLoading: "anonymous",
-        hashFunction:       "xxhash64"
-      } : {
-        filename: "[name].js",
-      }),
+      ...(isProduction ?
+        {
+          filename:           "[name]-[chunkhash].js",
+          chunkFilename:      "[id]-[chunkhash].js",
+          crossOriginLoading: "anonymous",
+          hashFunction:       "xxhash64"
+        } :
+        {
+          filename: "[name].js"
+        }),
       publicPath
     },
     module: {
@@ -102,7 +109,11 @@ const getWebpackConfig = ({mode, analyzeBundle}) => {
           test:    /\.css$|\.scss$/,
           exclude: /@ckeditor/,
           use:     [
-            { loader: isProduction ? MiniCssExtractPlugin.loader : "style-loader" },
+            {
+              loader: isProduction ?
+                MiniCssExtractPlugin.loader :
+                "style-loader"
+            },
             "css-loader",
             "postcss-loader",
             "sass-loader"
@@ -114,22 +125,34 @@ const getWebpackConfig = ({mode, analyzeBundle}) => {
       new BundleTracker({ filename: STATS_FILEPATH }),
       new webpack.DefinePlugin({
         "process.env": {
-          env: { NODE_ENV: JSON.stringify(mode) },
+          env: { NODE_ENV: JSON.stringify(mode) }
         }
-      }),
-    ].concat(isProduction ? [
-      new webpack.LoaderOptionsPlugin({ minimize: true }),
-      new webpack.optimize.AggressiveMergingPlugin(),
-      new MiniCssExtractPlugin({ filename: "[name]-[contenthash].css" }),
-      new CKEditorWebpackPlugin({
-        language:                               "en",
-        addMainLanguageTranslationsToAllAssets: true
       })
-    ] : []).concat(
-      analyzeBundle ? [new BundleAnalyzerPlugin({
-        analyzerMode: "static",
-      })] : []
-    ),
+    ]
+      .concat(
+        isProduction ?
+          [
+            new webpack.LoaderOptionsPlugin({ minimize: true }),
+            new webpack.optimize.AggressiveMergingPlugin(),
+            new MiniCssExtractPlugin({
+              filename: "[name]-[contenthash].css"
+            }),
+            new CKEditorWebpackPlugin({
+              language:                               "en",
+              addMainLanguageTranslationsToAllAssets: true
+            })
+          ] :
+          []
+      )
+      .concat(
+        analyzeBundle ?
+          [
+            new BundleAnalyzerPlugin({
+              analyzerMode: "static"
+            })
+          ] :
+          []
+      ),
     resolve: {
       extensions: [".js", ".jsx", ".ts", ".tsx"]
     },
@@ -138,18 +161,20 @@ const getWebpackConfig = ({mode, analyzeBundle}) => {
     },
     optimization: {
       moduleIds:   "named",
-      splitChunks:  {
+      splitChunks: {
         name:      "common",
         minChunks: 2,
-        ...(isProduction ? {
-          cacheGroups: {
-            common: {
-              test:   /[\\/]node_modules[\\/]/,
-              name:   'common',
-              chunks: 'all',
+        ...(isProduction ?
+          {
+            cacheGroups: {
+              common: {
+                test:   /[\\/]node_modules[\\/]/,
+                name:   "common",
+                chunks: "all"
+              }
             }
-          }
-        } : {})
+          } :
+          {})
       },
       minimize:     isProduction,
       emitOnErrors: false
@@ -157,9 +182,9 @@ const getWebpackConfig = ({mode, analyzeBundle}) => {
     devServer: {
       allowedHosts: "all",
       headers:      {
-        'Access-Control-Allow-Origin': '*'
+        "Access-Control-Allow-Origin": "*"
       },
-      host: "::",
+      host: "::"
     }
   }
 }

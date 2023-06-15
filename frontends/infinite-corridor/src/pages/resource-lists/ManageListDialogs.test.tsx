@@ -100,7 +100,12 @@ describe("Creating lists with manageListDialogs", () => {
   }
 
   const fillInForm = async (userList: UserList | StaffList) => {
-    await user.click(inputs.list_type[userList.list_type]())
+    const listType = userList.list_type as
+      | LRT.StaffList
+      | LRT.Userlist
+      | LRT.StaffPath
+      | LRT.LearningPath
+    await user.click(inputs.list_type[listType]())
 
     await user.click(inputs.privacy_level[userList.privacy_level]())
 

@@ -95,24 +95,24 @@ def mock_tasks(mocker):
 def mock_upsert_tasks(mocker):
     """Mock out the upsert task helpers"""
     return SimpleNamespace(
-        upsert_course=mocker.patch("search.task_helpers.upsert_course"),
-        delete_course=mocker.patch("search.task_helpers.deindex_course"),
-        upsert_program=mocker.patch("search.task_helpers.upsert_program"),
-        delete_program=mocker.patch("search.task_helpers.deindex_program"),
-        upsert_video=mocker.patch("search.task_helpers.upsert_video"),
-        delete_video=mocker.patch("search.task_helpers.deindex_video"),
-        delete_user_list=mocker.patch("search.task_helpers.deindex_user_list"),
-        upsert_user_list=mocker.patch("search.task_helpers.upsert_user_list"),
-        upsert_podcast=mocker.patch("search.task_helpers.upsert_podcast"),
+        upsert_course=mocker.patch("search.search_index_helpers.upsert_course"),
+        delete_course=mocker.patch("search.search_index_helpers.deindex_course"),
+        upsert_program=mocker.patch("search.search_index_helpers.upsert_program"),
+        delete_program=mocker.patch("search.search_index_helpers.deindex_program"),
+        upsert_video=mocker.patch("search.search_index_helpers.upsert_video"),
+        delete_video=mocker.patch("search.search_index_helpers.deindex_video"),
+        delete_user_list=mocker.patch("search.search_index_helpers.deindex_user_list"),
+        upsert_user_list=mocker.patch("search.search_index_helpers.upsert_user_list"),
+        upsert_podcast=mocker.patch("search.search_index_helpers.upsert_podcast"),
         upsert_podcast_episode=mocker.patch(
-            "search.task_helpers.upsert_podcast_episode"
+            "search.search_index_helpers.upsert_podcast_episode"
         ),
-        delete_podcast=mocker.patch("search.task_helpers.deindex_podcast"),
+        delete_podcast=mocker.patch("search.search_index_helpers.deindex_podcast"),
         delete_podcast_episode=mocker.patch(
-            "search.task_helpers.deindex_podcast_episode"
+            "search.search_index_helpers.deindex_podcast_episode"
         ),
         index_run_content_files=mocker.patch(
-            "search.task_helpers.index_run_content_files"
+            "search.search_index_helpers.index_run_content_files"
         ),
     )
 
@@ -248,7 +248,7 @@ def test_load_course(  # pylint:disable=too-many-arguments
 ):
     """Test that load_course loads the course"""
     mock_delete_files = mocker.patch(
-        "course_catalog.etl.loaders.search_task_helpers.deindex_run_content_files"
+        "course_catalog.etl.loaders.search_index_helpers.deindex_run_content_files"
     )
     course = (
         CourseFactory.create(runs=None, published=is_published)
@@ -913,11 +913,11 @@ def test_load_content_files(mocker, is_published):
         autospec=True,
     )
     mock_bulk_index = mocker.patch(
-        "course_catalog.etl.loaders.search_task_helpers.index_run_content_files",
+        "course_catalog.etl.loaders.search_index_helpers.index_run_content_files",
         autospec=True,
     )
     mock_bulk_delete = mocker.patch(
-        "course_catalog.etl.loaders.search_task_helpers.deindex_run_content_files",
+        "course_catalog.etl.loaders.search_index_helpers.deindex_run_content_files",
         autospec=True,
     )
     load_content_files(course_run, content_data)

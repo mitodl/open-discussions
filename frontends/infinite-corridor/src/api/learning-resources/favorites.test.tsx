@@ -1,5 +1,5 @@
 import React from "react"
-import { renderHook } from "@testing-library/react-hooks/dom"
+import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { faker } from "@faker-js/faker"
 import { setMockResponse, act } from "../../test-utils"
@@ -27,7 +27,7 @@ const setup = () => {
     }
   })
 
-  const wrapper = ({ children }) => (
+  const wrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 
@@ -89,7 +89,7 @@ describe.each([
       return { mutation, search }
     }
     setMockResponse.post(urls.search, searchResults)
-    const { result, waitFor } = renderHook(() => useTestHook(), { wrapper })
+    const { result } = renderHook(() => useTestHook(), { wrapper })
     await waitFor(() => {
       expect(result.current.search.data?.pages).toEqual([searchResults])
     })

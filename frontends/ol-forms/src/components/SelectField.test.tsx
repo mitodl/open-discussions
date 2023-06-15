@@ -5,12 +5,10 @@ import user from "@testing-library/user-event"
 import SelectField, { Option } from "./SelectField"
 
 describe("SelectField", () => {
-  let name: string, options: Array<string | Option>, min: number, max: number
+  let name: string, options: Array<string | Option>
 
   beforeEach(() => {
     options = ["one", "two", { label: "Three", value: "3" }]
-    min = 1
-    max = 3
   })
 
   const renderField = (props: object = {}) =>
@@ -18,8 +16,6 @@ describe("SelectField", () => {
       <SelectField
         onChange={jest.fn()}
         name={name}
-        min={min}
-        max={max}
         options={options}
         {...props}
       />

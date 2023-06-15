@@ -9,7 +9,7 @@ import { dispatchCardCreated } from "./util"
 const emulateEmbedly = (parent: HTMLElement) => {
   const anchors = parent.querySelectorAll("a.embedly-card")
   if (anchors.length !== 1) throw new Error("Expected 1 .embedly-card anchor")
-  const [a] = anchors
+  const a = anchors[0]
   const iframe = document.createElement("iframe")
   a.remove()
   parent.appendChild(iframe)

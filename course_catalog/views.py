@@ -71,7 +71,7 @@ from open_discussions.permissions import (
     is_admin_user,
 )
 from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
-from search.task_helpers import (
+from search.search_index_helpers import (
     deindex_course,
     deindex_staff_list,
     deindex_user_list,

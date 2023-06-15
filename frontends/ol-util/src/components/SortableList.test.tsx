@@ -21,7 +21,9 @@ jest.mock("@dnd-kit/core", () => {
      * DragOverlay's children are normally only visible while dragging.
      * Since dnd-kit is non-functional in JSDom, let's always render the children.
      */
-    DragOverlay: ({ children }) => <div>{children}</div>
+    DragOverlay: ({ children }: { children: React.ReactNode }) => (
+      <div>{children}</div>
+    )
   }
 })
 

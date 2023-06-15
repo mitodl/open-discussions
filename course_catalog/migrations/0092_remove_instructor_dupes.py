@@ -2,7 +2,7 @@
 from django.db import migrations, models, transaction
 from django.db.models import Count, Q
 
-from search.task_helpers import upsert_course
+from search.search_index_helpers import upsert_course
 
 
 def remove_dupes(apps, schema_editor):

@@ -261,7 +261,7 @@ describe("SearchPage", () => {
     const list = await screen.findByRole("list", { name: "Search Results" })
     const items = await within(list).findAllByRole("listitem")
     expect(items).toHaveLength(2)
-    expect(spyLearningResourceCard).toHaveBeenCalledTimes(2)
+
     expect(spyLearningResourceCard).toHaveBeenCalledWith(
       expect.objectContaining({ resource: results.hits.hits[0]._source }),
       expect.anything()

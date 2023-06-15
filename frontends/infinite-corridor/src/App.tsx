@@ -1,4 +1,4 @@
-import React from "react"
+import React, { StrictMode } from "react"
 import { HelmetProvider } from "react-helmet-async"
 
 import HomePage from "./pages/HomePage"
@@ -48,19 +48,21 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
   children
 }) => {
   return (
-    <MuiThemeProvider theme={muiTheme}>
-      <QueryClientProvider client={queryClient}>
-        <HelmetProvider>
-          <Router history={history}>
-            <NiceModalProvider>{children}</NiceModalProvider>
-          </Router>
-        </HelmetProvider>
-        <ReactQueryDevtools
-          initialIsOpen={false}
-          toggleButtonProps={{ style: { opacity: 0.5 } }}
-        />
-      </QueryClientProvider>
-    </MuiThemeProvider>
+    <StrictMode>
+      <MuiThemeProvider theme={muiTheme}>
+        <QueryClientProvider client={queryClient}>
+          <HelmetProvider>
+            <Router history={history}>
+              <NiceModalProvider>{children}</NiceModalProvider>
+            </Router>
+          </HelmetProvider>
+          <ReactQueryDevtools
+            initialIsOpen={false}
+            toggleButtonProps={{ style: { opacity: 0.5 } }}
+          />
+        </QueryClientProvider>
+      </MuiThemeProvider>
+    </StrictMode>
   )
 }
 
