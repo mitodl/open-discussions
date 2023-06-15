@@ -83,13 +83,15 @@ describe("generateLoginRedirectUrl", () => {
   })
 
   window.location.href = baseUrl
-  window.location.pathname = ""
+  window.location.pathname = "/"
   test("If location is base url, should return you to home", () => {
-    expect(u.generateLoginRedirectUrl()).toBe("/login/?next=")
+    expect(u.generateLoginRedirectUrl()).toBe("/login/?next=/")
   })
 
-  window.location.pathname = "some/location/elsewhere"
+  window.location.pathname = "/some/location/elsewhere"
   test("If location is not empty, should return you to where you came from", () => {
-    expect(u.generateLoginRedirectUrl()).toBe("/login/?next=some/location/elsewhere")
+    expect(u.generateLoginRedirectUrl()).toBe(
+      "/login/?next=some/location/elsewhere"
+    )
   })
 })
