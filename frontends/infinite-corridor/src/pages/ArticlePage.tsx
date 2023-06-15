@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { BannerPage } from "ol-util"
 import { GridColumn, GridContainer } from "../components/layout"
 import Container from "@mui/material/Container"
-import { CkeditorArticle } from "ol-ckeditor"
+import { CkeditorArticleLazy } from "ol-ckeditor"
 
 const ArticlePage: React.FC = () => {
   const [value, setValue] = useState("")
@@ -16,7 +16,7 @@ const ArticlePage: React.FC = () => {
         <GridContainer>
           <GridColumn variant="single-full">
             <h1>Article Editor Test Page</h1>
-            <CkeditorArticle value={value} onChange={setValue} />
+            <CkeditorArticleLazy value={value} onChange={setValue} />
           </GridColumn>
         </GridContainer>
       </Container>
