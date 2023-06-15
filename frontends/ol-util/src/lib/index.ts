@@ -4,6 +4,5 @@ export {
   emptyOrNil,
   formatDurationClockTime,
   useMuiBreakpoint,
-  pluralize,
-  generateLoginRedirectUrl
+  pluralize
 } from "./utils"
