@@ -54,7 +54,7 @@ _https://opensource.appbase.io/reactivesearch/v2_
   - Seems to be gaining [popularity over Searchkit](https://www.npmtrends.com/@appbaseio/reactivesearch-vs-searchkit)
   - Possible in theory to customize queries via the `customQuery` property of components.
 - Cons:
-  - Although designed to connect directly to an Elasticsearch URL, using a proxy view is possible. However, it does not seem
+  - Although designed to connect directly to an OpenSearch URL, using a proxy view is possible. However, it does not seem
   to play nice with Django Rest Framework; sends data as `application/x-ndjson` instead of `application/json` resulting
   in an `UnsupportedMediaType` error.
   - Difficult to take individual components and integrate them to our workflow, since every component needs to be wrapped by `<ReactiveBase />`

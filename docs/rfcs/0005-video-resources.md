@@ -23,7 +23,7 @@ If found, add the video as a resource, including the thumbnail image and transcr
 
 - [ ] Each Youtube video found for an OCW will be saved as a `ContentFile` resource in the database
 - [ ] The resource will include a thumbnail image and transcript text if found.
-- [ ] The Elasticsearch index will include the resource along with the thumbnail and text.
+- [ ] The OpenSearch index will include the resource along with the thumbnail and text.
 
 
 ### Architecture Changes
@@ -45,4 +45,4 @@ None
 
 ### Testing & Rollout
 After running the `get_ocw_files` function, there should be new `ContentFile` objects for each Youtube video found.
-These new resources should also be in the Elasticsearch index with populated `image_src` and `content` fields.
+These new resources should also be in the OpenSearch index with populated `image_src` and `content` fields.

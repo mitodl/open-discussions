@@ -89,7 +89,7 @@ jobs:
           OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
           OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
           OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret # pragma: allowlist secret
-          ELASTICSEARCH_URL: localhost:9200
+          OPENSEARCH_URL: localhost:9200
           CELERY_TASK_ALWAYS_EAGER: 'True'
           CELERY_BROKER_URL: redis://localhost:6379/4
           CELERY_RESULT_BACKEND: redis://localhost:6379/4

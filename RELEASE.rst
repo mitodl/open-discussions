@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+Version 0.217.1 (Released May 30, 2023)
+---------------
+
+- Opensearch Client (PR 3 of 3) (#3985)
+
+Version 0.217.0 (Released May 24, 2023)
+---------------
+
+- fix aggregations (#3998)
+- Upgrade local elasticsearch service to 7.10  (PR 2 of 3) (#3994)
+- Better react-query query invalidation (#3997)
+
 Version 0.216.1 (Released May 23, 2023)
 ---------------
 

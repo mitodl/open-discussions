@@ -9,7 +9,7 @@ from search.constants import VALID_OBJECT_TYPES
 class Command(BaseCommand):
     """Indexes reddit content"""
 
-    help = "Recreate elasticsearch index"
+    help = "Recreate opensearch index"
 
     def add_arguments(self, parser):
         parser.add_argument(

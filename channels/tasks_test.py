@@ -113,7 +113,7 @@ def test_populate_subscriptions_and_roles(
     channels, users = channels_and_users
     users = sorted(users, key=lambda user: user.id)
     channels = sorted(channels, key=lambda channel: channel.id)
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_populate_user_subscriptions = mocker.patch(
         "channels.tasks.populate_user_subscriptions"
     )
@@ -210,7 +210,7 @@ def test_populate_post_and_comment_fields(mocker, mocked_celery, settings):
     populate_post_and_comment_fields should call sub-tasks with correct ids
     """
     posts = PostFactory.create_batch(4)
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_populate_post_and_comment_fields_batch = mocker.patch(
         "channels.tasks.populate_post_and_comment_fields_batch"
     )
@@ -370,7 +370,7 @@ def test_populate_all_posts_and_comments(mocker, settings, mocked_celery):
     # ensure group consumers the generator passed to it so the other assertions work
     mocked_celery.group.side_effect = list
 
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 10
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 10
 
     with pytest.raises(mocked_celery.replace_exception_class):
         tasks.populate_all_posts_and_comments.delay()

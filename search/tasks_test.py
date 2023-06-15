@@ -2,9 +2,10 @@
 # pylint: disable=redefined-outer-name,unused-argument
 
 import pytest
+from celery.exceptions import Retry
 from django.conf import settings
-from elasticsearch.exceptions import ConnectionError as ESConnectionError
-from elasticsearch.exceptions import ConnectionTimeout
+from opensearchpy.exceptions import ConnectionError as ESConnectionError
+from opensearchpy.exceptions import ConnectionTimeout, RequestError
 from prawcore.exceptions import NotFound
 
 from channels.constants import LINK_TYPE_LINK, LINK_TYPE_SELF
@@ -54,15 +55,15 @@ from search.constants import (
 )
 from search.exceptions import ReindexException, RetryException
 from search.serializers import (
-    ESContentFileSerializer,
-    ESCourseSerializer,
-    ESPodcastEpisodeSerializer,
-    ESPodcastSerializer,
-    ESProfileSerializer,
-    ESProgramSerializer,
-    ESStaffListSerializer,
-    ESUserListSerializer,
-    ESVideoSerializer,
+    OSContentFileSerializer,
+    OSCourseSerializer,
+    OSPodcastEpisodeSerializer,
+    OSPodcastSerializer,
+    OSProfileSerializer,
+    OSProgramSerializer,
+    OSStaffListSerializer,
+    OSUserListSerializer,
+    OSVideoSerializer,
 )
 from search.tasks import (
     bulk_deindex_staff_lists,
@@ -136,7 +137,7 @@ def test_upsert_course_task(mocked_api):
     """Test that upsert_course will serialize the course data and upsert it to the ES index"""
     course = CourseFactory.create()
     upsert_course(course.id)
-    data = ESCourseSerializer(course).data
+    data = OSCourseSerializer(course).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_course_id(course.platform, course.course_id),
         data,
@@ -149,7 +150,7 @@ def test_upsert_program_task(mocked_api):
     """Test that upsert_program will serialize the video data and upsert it to the ES index"""
     program = ProgramFactory.create()
     upsert_program(program.id)
-    data = ESProgramSerializer(program).data
+    data = OSProgramSerializer(program).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_program_id(program),
         data,
@@ -162,7 +163,7 @@ def test_upsert_video_task(mocked_api):
     """Test that upsert_video will serialize the video data and upsert it to the ES index"""
     video = VideoFactory.create()
     upsert_video(video.id)
-    video_data = ESVideoSerializer(video).data
+    video_data = OSVideoSerializer(video).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_video_id(video),
         video_data,
@@ -175,7 +176,7 @@ def test_upsert_user_list_task(mocked_api):
     """Test that upsert_user_list will serialize the UserList data and upsert it to the ES index"""
     user_list = UserListFactory.create()
     upsert_user_list(user_list.id)
-    data = ESUserListSerializer(user_list).data
+    data = OSUserListSerializer(user_list).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_user_list_id(user_list),
         data,
@@ -188,7 +189,7 @@ def test_upsert_staff_list_task(mocked_api):
     """Test that upsert_staff_list will serialize the StaffList data and upsert it to the ES index"""
     staff_list = StaffListFactory.create()
     upsert_staff_list(staff_list.id)
-    data = ESStaffListSerializer(staff_list).data
+    data = OSStaffListSerializer(staff_list).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_staff_list_id(staff_list),
         data,
@@ -201,7 +202,7 @@ def test_upsert_podcast_task(mocked_api):
     """Test that upsert_podcast will serialize the podcast data and upsert it to the ES index"""
     podcast = PodcastFactory.create()
     upsert_podcast(podcast.id)
-    podcast_data = ESPodcastSerializer(podcast).data
+    podcast_data = OSPodcastSerializer(podcast).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_podcast_id(podcast),
         podcast_data,
@@ -214,7 +215,7 @@ def test_upsert_podcast_episode_task(mocked_api):
     """Test that upsert_podcast_episode will serialize the podcast episode data and upsert it to the ES index"""
     podcast_episode = PodcastEpisodeFactory.create()
     upsert_podcast_episode(podcast_episode.id)
-    podcast_episode_data = ESPodcastEpisodeSerializer(podcast_episode).data
+    podcast_episode_data = OSPodcastEpisodeSerializer(podcast_episode).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_podcast_episode_id(podcast_episode),
         podcast_episode_data,
@@ -412,10 +413,10 @@ def test_start_recreate_index(
     mocker, mocked_celery, user, indexes
 ):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
     """
-    recreate_index should recreate the elasticsearch index and reindex all data with it
+    recreate_index should recreate the OpenSearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_blocklist = mocker.patch("search.tasks.load_course_blocklist", return_value=[])
     UserFactory.create_batch(
         4, is_active=False
@@ -594,15 +595,45 @@ def test_finish_recreate_index(mocker, with_error):
     switch_indices_mock = mocker.patch(
         "search.indexing_api.switch_indices", autospec=True
     )
+    mock_delete_orphans = mocker.patch("search.indexing_api.delete_orphaned_indices")
 
     if with_error:
         with pytest.raises(ReindexException):
             finish_recreate_index.delay(results, backing_indices)
-        assert switch_indices_mock.call_count == 0
+        switch_indices_mock.assert_not_called()
+        mock_delete_orphans.assert_called_once()
     else:
         finish_recreate_index.delay(results, backing_indices)
         switch_indices_mock.assert_any_call("backing", POST_TYPE)
         switch_indices_mock.assert_any_call("backing", COMMENT_TYPE)
+        mock_delete_orphans.assert_not_called()
+
+
+@pytest.mark.parametrize("with_error", [True, False])
+def test_finish_recreate_index_retry_exceptions(mocker, with_error):
+    """
+    finish_recreate_index should be retried on RequestErrors
+    """
+    backing_indices = {"post": "backing", "comment": "backing", "profile": "backing"}
+    results = ["error"] if with_error else []
+    mock_error = RequestError(429, "oops", {})
+    switch_indices_mock = mocker.patch(
+        "search.indexing_api.switch_indices",
+        autospec=True,
+        side_effect=[mock_error, None],
+    )
+    mock_delete_orphans = mocker.patch(
+        "search.indexing_api.delete_orphaned_indices", side_effect=[mock_error, None]
+    )
+
+    with pytest.raises(Retry):
+        finish_recreate_index.delay(results, backing_indices)
+    if with_error:
+        switch_indices_mock.assert_not_called()
+        mock_delete_orphans.assert_called_once()
+    else:
+        mock_delete_orphans.assert_not_called()
+        switch_indices_mock.assert_called_once()
 
 
 @pytest.mark.parametrize("with_error", [True, False])
@@ -637,7 +668,7 @@ def test_upsert_profile_task(mocked_api, user, settings, is_indexing_user):
     if is_indexing_user:
         mocked_api.upsert_document.assert_not_called()
     else:
-        data = ESProfileSerializer().serialize(user.profile)
+        data = OSProfileSerializer().serialize(user.profile)
         mocked_api.upsert_document.assert_called_once_with(
             gen_profile_id(user.username),
             data,
@@ -653,7 +684,7 @@ def test_upsert_content_file_task(mocked_api):
     )
     course = content_file.run.content_object
     upsert_content_file(content_file.id)
-    data = ESContentFileSerializer(content_file).data
+    data = OSContentFileSerializer(content_file).data
     mocked_api.upsert_document.assert_called_once_with(
         gen_content_file_id(content_file.key),
         data,
@@ -771,10 +802,10 @@ def test_start_update_index(
     mocker, mocked_celery, user, indexes, platform
 ):  # pylint:disable=too-many-locals,too-many-statements,too-many-branches
     """
-    recreate_index should recreate the elasticsearch index and reindex all data with it
+    recreate_index should recreate the OpenSearch index and reindex all data with it
     """
     settings.INDEXING_API_USERNAME = user.username
-    settings.ELASTICSEARCH_INDEXING_CHUNK_SIZE = 2
+    settings.OPENSEARCH_INDEXING_CHUNK_SIZE = 2
     mock_blocklist = mocker.patch("search.tasks.load_course_blocklist", return_value=[])
     inactive_users = UserFactory.create_batch(4, is_active=False)
     comments = sorted(CommentFactory.create_batch(4), key=lambda comment: comment.id)

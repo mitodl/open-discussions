@@ -119,55 +119,55 @@
       "description": "S3 prefix for MITx bucket keys",
       "required": false
     },
-    "ELASTICSEARCH_HTTP_AUTH": {
-      "description": "Basic auth settings for connecting to Elasticsearch"
+    "OPENSEARCH_HTTP_AUTH": {
+      "description": "Basic auth settings for connecting to OpenSearch"
     },
-    "ELASTICSEARCH_CONNECTIONS_PER_NODE": {
-      "description": "The size of the connection pool created for each node detected within an ElasticSearch cluster.",
+    "OPENSEARCH_CONNECTIONS_PER_NODE": {
+      "description": "The size of the connection pool created for each node detected within an OpenSearch cluster.",
       "required": false
     },
-    "ELASTICSEARCH_DEFAULT_TIMEOUT": {
-      "description": "The default timeout in seconds for Elasticsearch requests",
+    "OPENSEARCH_DEFAULT_TIMEOUT": {
+      "description": "The default timeout in seconds for OpenSearch requests",
       "required": false
     },
-    "ELASTICSEARCH_INDEX": {
-      "description": "Index to use on Elasticsearch",
+    "OPENSEARCH_INDEX": {
+      "description": "Index to use on OpenSearch",
       "required": true
     },
-    "ELASTICSEARCH_MAX_REQUEST_SIZE": {
-      "description": "Maximum size of JSON data requests sent to Elasticsearch",
+    "OPENSEARCH_MAX_REQUEST_SIZE": {
+      "description": "Maximum size of JSON data requests sent to OpenSearch",
       "required": false
     },
-    "ELASTICSEARCH_SHARD_COUNT": {
-      "description": "Number of shards to allocate when creating an Elasticsearch index. Generally set to the CPU count of an individual node in the cluster.",
+    "OPENSEARCH_SHARD_COUNT": {
+      "description": "Number of shards to allocate when creating an OpenSearch index. Generally set to the CPU count of an individual node in the cluster.",
       "required": false
     },
-    "ELASTICSEARCH_REPLICA_COUNT": {
-      "description": "Number of index replicas to create when initializing a new Elasticsearch index. Generally set to the number of search nodes available in the cluster.",
+    "OPENSEARCH_REPLICA_COUNT": {
+      "description": "Number of index replicas to create when initializing a new OpenSearch index. Generally set to the number of search nodes available in the cluster.",
       "required": false
     },
-    "ELASTICSEARCH_INDEXING_CHUNK_SIZE": {
-      "description": "Chunk size to use for Elasticsearch indexing tasks",
+    "OPENSEARCH_INDEXING_CHUNK_SIZE": {
+      "description": "Chunk size to use for OpenSearch indexing tasks",
       "required": false
     },
-    "ELASTICSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE": {
-      "description": "Chunk size to use for Elasticsearch course document indexing",
+    "OPENSEARCH_DOCUMENT_INDEXING_CHUNK_SIZE": {
+      "description": "Chunk size to use for OpenSearch course document indexing",
       "required": false
     },
-    "ELASTICSEARCH_MAX_SUGGEST_HITS": {
+    "OPENSEARCH_MAX_SUGGEST_HITS": {
       "description": "Return suggested search terms only if the number of hits is equal to or below this value",
       "required": false
     },
-    "ELASTICSEARCH_MAX_SUGGEST_RESULTS": {
+    "OPENSEARCH_MAX_SUGGEST_RESULTS": {
       "description": "The maximum number of search term suggestions to return",
       "required": false
     },
-    "ELASTICSEARCH_MIN_QUERY_SIZE": {
+    "OPENSEARCH_MIN_QUERY_SIZE": {
       "description": "Minimimum number of characters in a query string to search for",
       "required": false
     },
-    "ELASTICSEARCH_URL": {
-      "description": "URL for connecting to Elasticsearch cluster"
+    "OPENSEARCH_URL": {
+      "description": "URL for connecting to OpenSearch cluster"
     },
     "ENABLE_INFINITE_CORRIDOR": {
       "description": "Boolean indicating whether infinite corridor is enabled",
@@ -469,11 +469,11 @@
       "required": false
     },
     "OPEN_RESOURCES_MIN_DOC_FREQ": {
-      "description": "Elasticsearch min_doc_freq value for determining similar resources",
+      "description": "OpenSearch min_doc_freq value for determining similar resources",
       "required": false
     },
     "OPEN_RESOURCES_MIN_TERM_FREQ": {
-      "description": "Elasticsearch min_term_freq value for determining similar resources",
+      "description": "OpenSearch min_term_freq value for determining similar resources",
       "required": false
     },
     "OPEN_VIDEO_DATA_BRANCH": {
@@ -485,11 +485,11 @@
       "required": false
     },
     "OPEN_VIDEO_MIN_DOC_FREQ": {
-      "description": "Elasticsearch min_doc_freq value for determing video topics",
+      "description": "OpenSearch min_doc_freq value for determing video topics",
       "required": false
     },
     "OPEN_VIDEO_MIN_TERM_FREQ": {
-      "description": "Elasticsearch min_term_freq value for determing video topics",
+      "description": "OpenSearch min_term_freq value for determing video topics",
       "required": false
     },
     "OPEN_VIDEO_USER_LIST_OWNER": {

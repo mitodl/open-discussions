@@ -1,4 +1,4 @@
-"""Tests for elasticsearch bulk serializers"""
+"""Tests for opensearch bulk serializers"""
 
 import pytest
 
@@ -18,7 +18,7 @@ def test_serialize_post_for_bulk(mocker):
     post_id = "post1"
     base_serialized_post = {"serialized": "post"}
     mocker.patch(
-        "search.serializers.ESPostSerializer.to_representation",
+        "search.serializers.OSPostSerializer.to_representation",
         return_value=base_serialized_post,
     )
     serialized = serializers.serialize_post_for_bulk(mocker.Mock(post_id=post_id))
@@ -32,7 +32,7 @@ def test_serialize_comment_for_bulk(mocker):
     comment_id = "456"
     base_serialized_comment = {"serialized": "comment"}
     mocker.patch(
-        "search.serializers.ESCommentSerializer.to_representation",
+        "search.serializers.OSCommentSerializer.to_representation",
         return_value=base_serialized_comment,
     )
     serialized = serializers.serialize_comment_for_bulk(
@@ -61,11 +61,11 @@ def test_serialize_bulk_profiles(mocker):
 
 def test_serialize_profile_for_bulk(user):
     """
-    Test that serialize_profile_for_bulk yields a valid ESProfileSerializer
+    Test that serialize_profile_for_bulk yields a valid OSProfileSerializer
     """
     assert serializers.serialize_profile_for_bulk(user.profile) == {
         "_id": "u_{}".format(user.username),
-        **serializers.ESProfileSerializer().serialize(user.profile),
+        **serializers.OSProfileSerializer().serialize(user.profile),
     }
 
 
@@ -88,14 +88,14 @@ def test_serialize_bulk_courses(mocker):
 @pytest.mark.django_db
 def test_serialize_course_for_bulk():
     """
-    Test that serialize_course_for_bulk yields a valid ESCourseSerializer
+    Test that serialize_course_for_bulk yields a valid OSCourseSerializer
     """
     course = factories.CourseFactory.create()
     assert_json_equal(
         serializers.serialize_course_for_bulk(course),
         {
             "_id": api.gen_course_id(course.platform, course.course_id),
-            **serializers.ESCourseSerializer(course).data,
+            **serializers.OSCourseSerializer(course).data,
         },
     )
 
@@ -125,7 +125,7 @@ def test_serialize_bulk_staff_lists(mocker):
 @pytest.mark.django_db
 def test_serialize_staff_list_for_bulk():
     """
-    Test that serialize_staff_list_for_bulk yields a valid ESStaffListSerializer
+    Test that serialize_staff_list_for_bulk yields a valid OSStaffListSerializer
     """
     staff_list = factories.StaffListFactory.create()
     factories.StaffListItemFactory.create(staff_list=staff_list)
@@ -133,7 +133,7 @@ def test_serialize_staff_list_for_bulk():
         serializers.serialize_staff_list_for_bulk(staff_list),
         {
             "_id": api.gen_staff_list_id(staff_list),
-            **serializers.ESStaffListSerializer(staff_list).data,
+            **serializers.OSStaffListSerializer(staff_list).data,
         },
     )
 
@@ -153,31 +153,31 @@ def test_serialize_bulk_video(mocker):
 @pytest.mark.django_db
 def test_serialize_video_for_bulk():
     """
-    Test that serialize_video_for_bulk yields a valid ESVideoSerializer
+    Test that serialize_video_for_bulk yields a valid OSVideoSerializer
     """
     video = factories.VideoFactory.create()
     assert serializers.serialize_video_for_bulk(video) == {
         "_id": api.gen_video_id(video),
-        **serializers.ESVideoSerializer(video).data,
+        **serializers.OSVideoSerializer(video).data,
     }
 
 
 @pytest.mark.django_db
 def test_serialize_content_file_for_bulk():
     """
-    Test that serialize_content_file_for_bulk yields a valid ESContentFileSerializer
+    Test that serialize_content_file_for_bulk yields a valid OSContentFileSerializer
     """
     content_file = factories.ContentFileFactory.create()
     assert serializers.serialize_content_file_for_bulk(content_file) == {
         "_id": api.gen_content_file_id(content_file.key),
-        **serializers.ESContentFileSerializer(content_file).data,
+        **serializers.OSContentFileSerializer(content_file).data,
     }
 
 
 @pytest.mark.django_db
 def test_serialize_content_file_for_bulk_deletion():
     """
-    Test that serialize_content_file_for_bulk_deletion yields a valid ESContentFileSerializer
+    Test that serialize_content_file_for_bulk_deletion yields a valid OSContentFileSerializer
     """
     content_file = factories.ContentFileFactory.create()
     assert serializers.serialize_content_file_for_bulk_deletion(content_file) == {
@@ -203,12 +203,12 @@ def test_serialize_bulk_podcasts(mocker):
 @pytest.mark.django_db
 def test_serialize_podcast_for_bulk():
     """
-    Test that serialize_podcast_for_bulk yields a valid ESPodcastSerializer
+    Test that serialize_podcast_for_bulk yields a valid OSPodcastSerializer
     """
     podcast = factories.PodcastFactory.create()
     assert serializers.serialize_podcast_for_bulk(podcast) == {
         "_id": api.gen_podcast_id(podcast),
-        **serializers.ESPodcastSerializer(podcast).data,
+        **serializers.OSPodcastSerializer(podcast).data,
     }
 
 
@@ -234,12 +234,12 @@ def test_serialize_bulk_podcast_episodes(mocker):
 @pytest.mark.django_db
 def test_serialize_podcast_episode_for_bulk():
     """
-    Test that serialize_podcast_episode_for_bulk yields a valid ESPodcastEpisodeSerializer
+    Test that serialize_podcast_episode_for_bulk yields a valid OSPodcastEpisodeSerializer
     """
     podcast_episode = factories.PodcastEpisodeFactory.create()
     assert serializers.serialize_podcast_episode_for_bulk(podcast_episode) == {
         "_id": api.gen_podcast_episode_id(podcast_episode),
-        **serializers.ESPodcastEpisodeSerializer(podcast_episode).data,
+        **serializers.OSPodcastEpisodeSerializer(podcast_episode).data,
     }
 
 
