@@ -75,23 +75,3 @@ describe("pluralize", () => {
     expect(u.pluralize("pup", 500, "puppies")).toBe("puppies")
   })
 })
-
-describe("generateLoginRedirectUrl", () => {
-  const baseUrl = "http://test.com"
-  test("If location is empty, should still return you to /", () => {
-    expect(u.generateLoginRedirectUrl()).toBe("/login/?next=")
-  })
-
-  window.location.href = baseUrl
-  window.location.pathname = "/"
-  test("If location is base url, should return you to home", () => {
-    expect(u.generateLoginRedirectUrl()).toBe("/login/?next=/")
-  })
-
-  window.location.pathname = "/some/location/elsewhere"
-  test("If location is not empty, should return you to where you came from", () => {
-    expect(u.generateLoginRedirectUrl()).toBe(
-      "/login/?next=some/location/elsewhere"
-    )
-  })
-})

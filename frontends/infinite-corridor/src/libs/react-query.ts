@@ -45,12 +45,13 @@ const createQueryClient = (history: History): QueryClient => {
       onError: async error => {
         const status = (error as MaybeHasStatus)?.response?.status
         const { user } = SETTINGS
+        const currentLocation = history.location
 
         if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
           if (user.is_authenticated) {
-            history.replace("/forbidden")
+            history.replace("/forbidden/")
           } else {
-            history.replace(generateLoginRedirectUrl())
+            history.replace(`/login/?next=${currentLocation.pathname}`)
           }
         }
       }

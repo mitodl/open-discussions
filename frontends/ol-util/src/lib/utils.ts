@@ -74,8 +74,3 @@ export const pluralize = (singular: string, count: number, plural?: string) => {
   }
   return plural ?? `${singular}s`
 }
-
-export const generateLoginRedirectUrl = () => {
-  const pathname = window.location.pathname
-  return `/login/?next=${pathname}`
-}
