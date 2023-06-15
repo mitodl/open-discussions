@@ -61,7 +61,9 @@ test.each([
       { wrapper }
     )
 
-    await waitFor(() => {expect(result.current.isError).toBe(true)})
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
     expect(window.location.href).toBe(baseUrl)
     expect(window.location.pathname).toBe(destination)
   })
