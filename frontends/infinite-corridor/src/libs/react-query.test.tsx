@@ -50,32 +50,30 @@ test.each([
 
 test.each([
   {
-    startingLocation:    "",
+    startingLocation:    "/",
     destination:      "/login/?next=/",
   },
   {
-    startingLocation:    "/place/to/go",
+    startingLocation:    "/place/to/go/",
     destination:      "/login/?next=/place/to/go/",
   }
 ])(
-  "Should redirect window to $destination if user is logged in",
+  "Should redirect window to $destination if user is not logged in",
   async ({ startingLocation, destination }) => {
     allowConsoleErrors()
-    window.SETTINGS.user.is_authenticated = true
+    window.SETTINGS.user.is_authenticated = false
     const history = createMemoryHistory({initialEntries: [startingLocation]})
     const wrapper = getWrapper(history)
-    const queryFn = jest.fn().mockRejectedValue({ response: 403 })
+    const queryFn = jest.fn().mockRejectedValue({ response: {status: 403 }})
 
     await withFakeLocation(async () => {
       const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
         wrapper
       })
       await waitFor(() => {
-        expect(result.current.isError).toBe(true)
+        expect(window.location.href).toBe(destination)
       })
-      await waitFor(() => {
-        expect(window.location.pathname).toBe(destination)
-      })
+      expect(result.current.isError).toBe(true)
     })
   }
 )
@@ -90,14 +88,14 @@ test.each([
     destination:      "/forbidden/",
   }
 ])(
-  "Should redirect history to $destination if user is not logged in",
+  "Should redirect history to $destination if user is logged in",
   async ({ startingLocation, destination }) => {
     allowConsoleErrors()
-    window.SETTINGS.user.is_authenticated = false
+    window.SETTINGS.user.is_authenticated = true
     const history = createMemoryHistory()
     history.replace(startingLocation)
     const wrapper = getWrapper(history)
-    const queryFn = jest.fn().mockRejectedValue({ response: 403 })
+    const queryFn = jest.fn().mockRejectedValue({ response: {status: 403}})
 
     const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
       wrapper
@@ -105,8 +103,6 @@ test.each([
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
-    await waitFor(() => {
-      expect(history.location.pathname).toBe(destination)
-    })
+    expect(history.location.pathname).toBe(destination)
   }
 )
