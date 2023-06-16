@@ -3,10 +3,11 @@
 /**
  * Settings injected by Django
  */
-interface SETTINGS {
-  ckeditor_upload_url?: string
-}
 
 export declare global {
-  declare var SETTINGS: SETTINGS
+  declare var SETTINGS
+
+  interface SETTINGS {
+    ckeditor_upload_url?: string
+  }
 }

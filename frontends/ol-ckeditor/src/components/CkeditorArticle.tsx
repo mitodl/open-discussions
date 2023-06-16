@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useMemo, useEffect } from "react"
 import { CKEditor } from "@ckeditor/ckeditor5-react"
 
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic"
@@ -26,7 +26,8 @@ import { CloudServices } from "@ckeditor/ckeditor5-cloud-services"
 // block toolbar setup
 import { BlockToolbar } from "@ckeditor/ckeditor5-ui"
 import { ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph"
-import cloudServicesConfig from "./cloudServices"
+import getCloudServicesConfig from "./cloudServices"
+import { ensureEmbedlyPlatform, embedlyCardHtml } from "ol-util"
 
 const baseEditorConfig: EditorConfig = {
   plugins: [
@@ -64,9 +65,23 @@ const baseEditorConfig: EditorConfig = {
   },
   placeholder: "Type here...",
   image:       {
-    toolbar: ["imageStyle:full", "imageStyle:side", "|", "imageTextAlternative"]
+    toolbar: ["imageStyle:block", "imageStyle:side", "|", "imageTextAlternative"]
   },
-  cloudServices: cloudServicesConfig
+  cloudServices: getCloudServicesConfig(),
+  mediaEmbed:    {
+    previewsInData: true,
+    providers:      [
+      {
+        name: "embedly",
+        url:  /.+/,
+        html: match => {
+          const url = match[0]
+
+          return embedlyCardHtml(url)
+        }
+      }
+    ]
+  }
 }
 
 type CkeditorArticleProps = {
@@ -76,6 +91,7 @@ type CkeditorArticleProps = {
   id?: string
   className?: string
   placeholder?: string
+  editableClassName?: string
 }
 
 const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
@@ -92,6 +108,11 @@ const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
       placeholder
     }
   }, [placeholder])
+
+  useEffect(() => {
+    ensureEmbedlyPlatform()
+  }, [])
+
   return (
     <div id={id} className={className}>
       <CKEditor

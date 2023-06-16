@@ -5,6 +5,7 @@ import LoadingText from "./LoadingText"
 
 type OptionalFallback = {
   fallback?: React.ReactNode
+  fallbackLines?: number
 }
 
 const RawCKEditorMarkdownLazy = lazy(() => import("./CkeditorMarkdown"))
@@ -13,10 +14,11 @@ type CkeditorMarkdownLazyProps = CkeditorMarkdownProps & OptionalFallback
 
 const CkeditorMarkdownLazy: React.FC<CkeditorMarkdownLazyProps> = ({
   fallback,
+  fallbackLines,
   ...others
 }) => {
   return (
-    <Suspense fallback={fallback ?? <LoadingText />}>
+    <Suspense fallback={fallback ?? <LoadingText lines={fallbackLines} />}>
       <RawCKEditorMarkdownLazy {...others} />
     </Suspense>
   )
@@ -28,10 +30,11 @@ type CkeditorArticleLazyProps = CkeditorArticleProps & OptionalFallback
 
 const CkeditorArticleLazy: React.FC<CkeditorArticleLazyProps> = ({
   fallback,
+  fallbackLines,
   ...others
 }) => {
   return (
-    <Suspense fallback={fallback ?? <LoadingText />}>
+    <Suspense fallback={fallback ?? <LoadingText lines={fallbackLines} />}>
       <RawCKEditorArticleLazy {...others} />
     </Suspense>
   )

@@ -16,7 +16,14 @@ const ArticlePage: React.FC = () => {
         <GridContainer>
           <GridColumn variant="single-full">
             <h1>Article Editor Test Page</h1>
-            <CkeditorArticleLazy value={value} onChange={setValue} />
+            <CkeditorArticleLazy
+              fallbackLines={6}
+              className="article-editor"
+              value={value}
+              onChange={setValue}
+            />
+            <h2>Preview</h2>
+            <div dangerouslySetInnerHTML={{ __html: value }} />
           </GridColumn>
         </GridContainer>
       </Container>
