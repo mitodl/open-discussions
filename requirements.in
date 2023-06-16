@@ -39,7 +39,7 @@ importlib_metadata>=6.6.0
 ipython
 lxml==4.9.2
 markdown2==2.4.0
-newrelic>=7.14.0.177
+newrelic>=8.8.0
 ocw-data-parser==0.35.1
 opensearch-py==1.0.0
 opensearch-dsl==1.0.0
