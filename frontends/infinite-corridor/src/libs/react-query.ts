@@ -43,6 +43,7 @@ const createQueryClient = (history: History): QueryClient => {
     queryCache: new QueryCache({
       onError: async error => {
         const status = (error as MaybeHasStatus)?.response?.status
+        console.log(status)
         const { user } = SETTINGS
         const currentLocation = history.location
 
@@ -50,6 +51,8 @@ const createQueryClient = (history: History): QueryClient => {
           if (user.is_authenticated) {
             history.replace("/forbidden/")
           } else {
+            // Once there is an auth flow within this app, this can be moved
+            // off of window.location and use history as well
             window.location.href = `/login/?next=${currentLocation.pathname}`
           }
         }
