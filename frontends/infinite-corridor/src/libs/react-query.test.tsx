@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 import { createMemoryHistory, MemoryHistory } from "history"
 import { createQueryClient } from "./react-query"
 import { Router } from "react-router"
+import { withFakeLocation } from "../test-utils/withLocation"
 
 const getWrapper = (history: MemoryHistory) => {
   const queryClient = createQueryClient(history)
@@ -49,38 +50,58 @@ test.each([
 
 test.each([
   {
-    userIsAuthenticated: true,
     startingLocation:    "",
-    destination:         "/forbidden"
+    destination:      "/login/?next=/",
   },
   {
-    userIsAuthenticated: true,
     startingLocation:    "/place/to/go",
-    destination:         "/forbidden"
-  },
-  {
-    userIsAuthenticated: false,
-    startingLocation:    "",
-    destination:         "/login/?next=/"
-  },
-  {
-    userIsAuthenticated: false,
-    startingLocation:    "/place/to/go",
-    destination:         "/login/?next=/place/to/go/"
+    destination:      "/login/?next=/place/to/go/",
   }
 ])(
-  "Should redirect to $destination if user.is_authenticated is $userIsAuthenticated",
-  async ({ userIsAuthenticated, startingLocation, destination }) => {
-    window.SETTINGS.user.is_authenticated = userIsAuthenticated
+  "Should redirect window to $destination if user is logged in",
+  async ({ startingLocation, destination }) => {
+    allowConsoleErrors()
+    window.SETTINGS.user.is_authenticated = true
+    const history = createMemoryHistory({initialEntries: [startingLocation]})
+    const wrapper = getWrapper(history)
+    const queryFn = jest.fn().mockRejectedValue({ response: 403 })
+
+    await withFakeLocation(async () => {
+      const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
+        wrapper
+      })
+      await waitFor(() => {
+        expect(result.current.isError).toBe(true)
+      })
+      await waitFor(() => {
+        expect(window.location.pathname).toBe(destination)
+      })
+    })
+  }
+)
+
+test.each([
+  {
+    startingLocation: "",
+    destination:      "/forbidden/",
+  },
+  {
+    startingLocation: "/place/to/go",
+    destination:      "/forbidden/",
+  }
+])(
+  "Should redirect history to $destination if user is not logged in",
+  async ({ startingLocation, destination }) => {
+    allowConsoleErrors()
+    window.SETTINGS.user.is_authenticated = false
     const history = createMemoryHistory()
     history.replace(startingLocation)
     const wrapper = getWrapper(history)
     const queryFn = jest.fn().mockRejectedValue({ response: 403 })
 
-    const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
+    const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
       wrapper
     })
-
     await waitFor(() => {
       expect(result.current.isError).toBe(true)
     })
