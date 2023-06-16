@@ -43,7 +43,6 @@ const createQueryClient = (history: History): QueryClient => {
     queryCache: new QueryCache({
       onError: async error => {
         const status = (error as MaybeHasStatus)?.response?.status
-        console.log(status)
         const { user } = SETTINGS
         const currentLocation = history.location
 
