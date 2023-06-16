@@ -113,6 +113,7 @@ django==4.1.9
     #   django-guardian
     #   django-hijack
     #   django-redis
+    #   django-storages
     #   djangorestframework
     #   djangorestframework-simplejwt
     #   djoser
@@ -145,7 +146,7 @@ django-redis==5.2.0
     # via -r requirements.in
 django-server-status==0.5.0
     # via -r requirements.in
-django-storages==1.6.6
+django-storages==1.13.2
     # via -r requirements.in
 django-templated-mail==1.1.1
     # via djoser
