@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.220.0
+---------------
+
+- Update django-storages (#4062)
+- Update newrelic (#4060)
+- Update cffi version, hopefully heroku will like this one better? (#4058)
+- Upgrade python and django (#4019)
+
 Version 0.219.2 (Released June 15, 2023)
 ---------------
 
