@@ -7,7 +7,9 @@ const ForbiddenPage: React.FC = () => {
   return (
     <BannerPage>
       <Container>
-        <span>403 forbidden error: you don't have permission to access this resource</span>
+        <span>
+          403 forbidden error: you don't have permission to access this resource
+        </span>
         <Link to="/infinite">
           <button>Take me to safety</button>
         </Link>

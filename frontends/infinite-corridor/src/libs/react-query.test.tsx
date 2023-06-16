@@ -50,24 +50,24 @@ test.each([
 
 test.each([
   {
-    startingLocation:    "/",
-    destination:      "/login/?next=/",
+    startingLocation: "/",
+    destination:      "/login/?next=/"
   },
   {
-    startingLocation:    "/place/to/go/",
-    destination:      "/login/?next=/place/to/go/",
+    startingLocation: "/place/to/go/",
+    destination:      "/login/?next=/place/to/go/"
   }
 ])(
   "Should redirect window to $destination if user is not logged in",
   async ({ startingLocation, destination }) => {
     allowConsoleErrors()
     window.SETTINGS.user.is_authenticated = false
-    const history = createMemoryHistory({initialEntries: [startingLocation]})
+    const history = createMemoryHistory({ initialEntries: [startingLocation] })
     const wrapper = getWrapper(history)
-    const queryFn = jest.fn().mockRejectedValue({ response: {status: 403 }})
+    const queryFn = jest.fn().mockRejectedValue({ response: { status: 403 } })
 
     await withFakeLocation(async () => {
-      const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
+      const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
         wrapper
       })
       await waitFor(() => {
@@ -81,11 +81,11 @@ test.each([
 test.each([
   {
     startingLocation: "",
-    destination:      "/forbidden/",
+    destination:      "/forbidden/"
   },
   {
     startingLocation: "/place/to/go",
-    destination:      "/forbidden/",
+    destination:      "/forbidden/"
   }
 ])(
   "Should redirect history to $destination if user is logged in",
@@ -95,9 +95,9 @@ test.each([
     const history = createMemoryHistory()
     history.replace(startingLocation)
     const wrapper = getWrapper(history)
-    const queryFn = jest.fn().mockRejectedValue({ response: {status: 403}})
+    const queryFn = jest.fn().mockRejectedValue({ response: { status: 403 } })
 
-    const {result} = renderHook(() => useQuery(["test"], {queryFn}), {
+    const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
       wrapper
     })
     await waitFor(() => {
