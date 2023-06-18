@@ -138,7 +138,7 @@ django-hijack==3.4.1
     # via -r requirements.in
 django-imagekit==4.1.0
     # via -r requirements.in
-django-ipware==3.0.0
+django-ipware==3.0.7
     # via -r requirements.in
 django-json-widget==1.0.0
     # via -r requirements.in
