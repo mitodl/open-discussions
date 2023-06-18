@@ -89,7 +89,7 @@ cryptography==39.0.1
     #   social-auth-core
 cssselect2==0.2.1
     # via cairosvg
-decorator==4.4.1
+decorator==4.4.2
     # via ipython
 defusedxml==0.6.0
     # via
