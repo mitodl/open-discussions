@@ -10359,14 +10359,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-babel@npm:5.3.0":
-  version: 5.3.0
-  resolution: "eslint-plugin-babel@npm:5.3.0"
+"eslint-plugin-babel@npm:5.3.1":
+  version: 5.3.1
+  resolution: "eslint-plugin-babel@npm:5.3.1"
   dependencies:
     eslint-rule-composer: ^0.3.0
   peerDependencies:
     eslint: ">=4.0.0"
-  checksum: 345c0e6645502b7e5596f101a0f1d887bbf0fcfd89e2aa1c16b6c2acacd0ac1a5f7aabeacbfcc025c0e06e1125fe753512d1b4e6068f535aa3fa4f9f5970c755
+  checksum: 18b0bfda53deab4056160a4f3a89a4649b6ae17e4970cc836f7d586c8abab5ebb492440e2acf4770a463138a44a4ee7f9b22b4ed1fdbe69c652f714c1d973e38
   languageName: node
   linkType: hard
 
@@ -17071,7 +17071,7 @@ __metadata:
     enzyme-adapter-react-16: 1.15.7
     eslint: 7.5.0
     eslint-config-mitodl: ^1.0.0
-    eslint-plugin-babel: 5.3.0
+    eslint-plugin-babel: 5.3.1
     eslint-plugin-flow-vars: 0.5.0
     eslint-plugin-flowtype: 4.2.0
     eslint-plugin-mocha: 6.0.0
