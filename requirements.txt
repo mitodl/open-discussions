@@ -171,7 +171,7 @@ drf-extensions==0.7.1
     # via -r requirements.in
 drf-jwt==1.19.2
     # via -r requirements.in
-drf-spectacular==0.26.1
+drf-spectacular==0.26.2
     # via -r requirements.in
 elasticsearch==7.10.0
     # via django-server-status
