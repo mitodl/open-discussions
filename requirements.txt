@@ -122,7 +122,7 @@ django==4.1.9
     #   social-auth-app-django
 django-anymail[mailgun]==10.0
     # via -r requirements.in
-django-appconf==1.0.3
+django-appconf==1.0.5
     # via django-imagekit
 django-bitfield==2.2.0
     # via -r requirements.in
