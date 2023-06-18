@@ -96,7 +96,7 @@ defusedxml==0.6.0
     #   cairosvg
     #   python3-openid
     #   social-auth-core
-deprecated==1.2.7
+deprecated==1.2.14
     # via pygithub
 dj-database-url==0.3.0
     # via -r requirements.in
