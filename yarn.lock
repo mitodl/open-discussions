@@ -14952,17 +14952,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"locale-code@npm:2.0.1":
-  version: 2.0.1
-  resolution: "locale-code@npm:2.0.1"
-  dependencies:
-    iso-3166-1-alpha-2: ~1.0.0
-    iso-639-1-zh: ^2.0.4
-  checksum: 355f3837c7db96ee1a51018a617a882e4d99175f7e91e6dfe0e8f0c3b417f9ab65592822a4b9b8ef2903e3cbfbc644fc6feab415184c1c6725aff52b6fadcf43
-  languageName: node
-  linkType: hard
-
-"locale-code@npm:^2.0.2":
+"locale-code@npm:2.0.2, locale-code@npm:^2.0.2":
   version: 2.0.2
   resolution: "locale-code@npm:2.0.2"
   dependencies:
@@ -17104,7 +17094,7 @@ __metadata:
     isomorphic-fetch: 2.2.1
     jsdom: 16.6.0
     jsdom-global: 3.0.2
-    locale-code: 2.0.1
+    locale-code: 2.0.2
     lodash: 4.17.21
     material-components-web: 3.2.0
     mini-css-extract-plugin: 0.5.0
