@@ -5,7 +5,7 @@ ddt
 django-debug-toolbar
 ipdb
 isort==4.3.21
-moto==4.1.10
+moto==4.1.11
 nplusone>=0.8.1
 pdbpp
 pip-tools
