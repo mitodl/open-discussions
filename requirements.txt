@@ -245,7 +245,7 @@ matplotlib-inline==0.1.6
     # via ipython
 mit-moira @ git+https://github.com/mitodl/mit-moira.git
     # via -r requirements.in
-nested-lookup==0.2.22
+nested-lookup==0.2.25
     # via -r requirements.in
 newrelic==8.8.0
     # via -r requirements.in
