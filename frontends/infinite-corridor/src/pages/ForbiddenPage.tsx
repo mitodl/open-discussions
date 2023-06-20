@@ -1,20 +1,21 @@
 import React from "react"
 import Container from "@mui/material/Container"
-import { BannerPage } from "ol-util"
 import { Link } from "react-router-dom"
+import Button from "@mui/material/Button"
 
 const ForbiddenPage: React.FC = () => {
   return (
-    <BannerPage>
-      <Container>
-        <span>
-          403 forbidden error: you don't have permission to access this resource
-        </span>
-        <Link to="/infinite">
-          <button>Take me to safety</button>
-        </Link>
+    <Container className="error-page">
+      <Container className="error-container">
+        <div className="page-title">
+          403 Forbidden Error: You do not have permission to access this resource
+        </div>
+        <div className="button-container">
+          <Button className="return-button" variant="outlined" href="/infinite">
+            Home</Button>
+        </div>
       </Container>
-    </BannerPage>
+    </Container>
   )
 }
 
