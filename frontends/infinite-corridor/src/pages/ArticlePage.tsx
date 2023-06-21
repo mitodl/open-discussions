@@ -21,6 +21,7 @@ const ArticlePage: React.FC = () => {
               className="article-editor"
               value={value}
               onChange={setValue}
+              placeholder="Write your article here..."
             />
             <h2>Preview</h2>
             <div dangerouslySetInnerHTML={{ __html: value }} />

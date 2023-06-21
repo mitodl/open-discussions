@@ -63,7 +63,7 @@ const baseEditorConfig: EditorConfig = {
       "blockQuote"
     ]
   },
-  placeholder: "Type here...",
+  placeholder: "Write here...",
   image:       {
     toolbar: [
       "imageStyle:block",
@@ -110,7 +110,7 @@ const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
   const config = useMemo(() => {
     return {
       ...baseEditorConfig,
-      placeholder
+      ...(placeholder ? { placeholder } : {})
     }
   }, [placeholder])
 
