@@ -1,10 +1,15 @@
-import { QueryCache, QueryClient } from "@tanstack/react-query"
+import {QueryCache, QueryClient} from "@tanstack/react-query"
 import axios from "./axios"
-import { History } from "history"
+import {History} from "history"
 
 type MaybeHasStatus = {
   response?: {
     status?: number
+  }
+}
+type MaybeHasUseCustom404Handler = {
+  meta?: {
+    useCustom404Handler?: string
   }
 }
 const AUTH_STATUS_CODES = [401, 403]
@@ -41,18 +46,24 @@ const createQueryClient = (history: History): QueryClient => {
       }
     },
     queryCache: new QueryCache({
-      onError: async error => {
+      onError: async (error, query) => {
         const status = (error as MaybeHasStatus)?.response?.status
         const { user } = SETTINGS
         const currentLocation = history.location
+        const useCustom404Handler = (query as MaybeHasUseCustom404Handler)?.meta?.useCustom404Handler
 
-        if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
-          if (user.is_authenticated) {
+        if (useCustom404Handler === undefined || !useCustom404Handler) {
+          if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
+            if (user.is_authenticated) {
+              history.replace("/forbidden/")
+            } else {
+              // Once there is an auth flow within this app, this can be moved
+              // off of window.location and use history as well
+              window.location.href = `/login/?next=${currentLocation.pathname}`
+            }
+          }
+          if (status === 404) {
             history.replace("/forbidden/")
-          } else {
-            // Once there is an auth flow within this app, this can be moved
-            // off of window.location and use history as well
-            window.location.href = `/login/?next=${currentLocation.pathname}`
           }
         }
       }
