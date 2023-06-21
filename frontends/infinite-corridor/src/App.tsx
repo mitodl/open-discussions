@@ -17,6 +17,7 @@ import {
 } from "./pages/resource-lists/ResourceListDetailsPage"
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import ForbiddenPage from "./pages/ForbiddenPage"
+import NotFoundPage from "./pages/NotFoundPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch } from "react-router"
 import { History } from "history"
@@ -103,7 +104,10 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
             <StaffListDetailsPage />
           </Route>
           <Route path={urls.FORBIDDEN_VIEW} exact>
-            <ForbiddenPage />
+            <NotFoundPage />
+          </Route>
+          <Route path={urls.NOTFOUND_VIEW} exact>
+            <NotFoundPage />
           </Route>
         </Switch>
         <LearningResourceDrawer />

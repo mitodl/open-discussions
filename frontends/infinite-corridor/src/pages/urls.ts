@@ -30,3 +30,4 @@ export const makeStaffListsViewPath = (id: number) =>
   generatePath(STAFFLIST_VIEW, { id })
 
 export const FORBIDDEN_VIEW = `${BASE}/forbidden`
+export const NOTFOUND_VIEW = `${BASE}/not-found`
