@@ -65,7 +65,12 @@ const baseEditorConfig: EditorConfig = {
   },
   placeholder: "Type here...",
   image:       {
-    toolbar: ["imageStyle:block", "imageStyle:side", "|", "imageTextAlternative"]
+    toolbar: [
+      "imageStyle:block",
+      "imageStyle:side",
+      "|",
+      "imageTextAlternative"
+    ]
   },
   cloudServices: getCloudServicesConfig(),
   mediaEmbed:    {
