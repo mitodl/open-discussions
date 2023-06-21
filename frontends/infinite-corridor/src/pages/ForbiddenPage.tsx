@@ -7,11 +7,13 @@ const ForbiddenPage: React.FC = () => {
     <Container className="error-page">
       <Container className="error-container">
         <div className="page-title">
-          403 Forbidden Error: You do not have permission to access this resource
+          403 Forbidden Error: You do not have permission to access this
+          resource
         </div>
         <div className="button-container">
           <Button className="return-button" variant="outlined" href="/infinite">
-            Home</Button>
+            Home
+          </Button>
         </div>
       </Container>
     </Container>
