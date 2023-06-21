@@ -1,6 +1,6 @@
-import {QueryCache, QueryClient} from "@tanstack/react-query"
+import { QueryCache, QueryClient } from "@tanstack/react-query"
 import axios from "./axios"
-import {History} from "history"
+import { History } from "history"
 
 type MaybeHasStatus = {
   response?: {
@@ -50,7 +50,8 @@ const createQueryClient = (history: History): QueryClient => {
         const status = (error as MaybeHasStatus)?.response?.status
         const { user } = SETTINGS
         const currentLocation = history.location
-        const useCustom404Handler = (query as MaybeHasUseCustom404Handler)?.meta?.useCustom404Handler
+        const useCustom404Handler = (query as MaybeHasUseCustom404Handler)?.meta
+          ?.useCustom404Handler
 
         if (useCustom404Handler === undefined || !useCustom404Handler) {
           if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {

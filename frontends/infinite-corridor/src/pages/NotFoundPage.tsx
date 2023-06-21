@@ -11,7 +11,8 @@ const NotFoundPage: React.FC = () => {
         </div>
         <div className="button-container">
           <Button className="return-button" variant="outlined" href="/infinite">
-            Home</Button>
+            Home
+          </Button>
         </div>
       </Container>
     </Container>
