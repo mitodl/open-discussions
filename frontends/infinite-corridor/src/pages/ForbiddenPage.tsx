@@ -1,6 +1,5 @@
 import React from "react"
 import Container from "@mui/material/Container"
-import { Link } from "react-router-dom"
 import Button from "@mui/material/Button"
 
 const ForbiddenPage: React.FC = () => {
