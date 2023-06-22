@@ -1,4 +1,4 @@
-import React, { StrictMode } from "react"
+import React, { StrictMode, useEffect } from "react"
 import { HelmetProvider } from "react-helmet-async"
 
 import HomePage from "./pages/HomePage"
@@ -18,7 +18,7 @@ import {
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import ForbiddenPage from "./pages/ForbiddenPage"
 import * as urls from "./pages/urls"
-import { Route, Router, Switch } from "react-router"
+import { Route, Router, Switch, useHistory, useLocation } from "react-router"
 import { History } from "history"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
@@ -26,6 +26,12 @@ import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
+
+type MaybeHasForbiddenState = {
+  state?: {
+    forbidden?: boolean
+  }
+}
 
 export const BASE_URL = "/infinite"
 
@@ -66,46 +72,61 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
   )
 }
 
+const AppRoutes: React.FC = () => {
+  const location = useLocation()
+  const history = useHistory()
+
+  const forbidden = (location as MaybeHasForbiddenState)?.state?.forbidden
+
+  useEffect(() => {
+    history.replace({ state: {} })
+  }, [history])
+  if (forbidden) return <ForbiddenPage />
+  return (
+    <Switch>
+      <Route path={urls.HOME} exact>
+        <HomePage />
+      </Route>
+      <Route path={urls.SEARCH}>
+        <SearchPage />
+      </Route>
+      <Route path={urls.DEMO}>
+        <DemoPage />
+      </Route>
+      <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
+        <FieldPage />
+      </Route>
+      <Route path={urls.FIELD_EDIT} exact>
+        <FieldAdminApp />
+      </Route>
+      <Route path={urls.USERLISTS_LISTING} exact>
+        <UserListsListingPage />
+      </Route>
+      <Route path={urls.FAVORITES_VIEW} exact>
+        <FavoritesPage />
+      </Route>
+      <Route path={urls.USERLIST_VIEW} exact>
+        <UserListDetailsPage />
+      </Route>
+      <Route path={urls.STAFFLISTS_LISTING} exact>
+        <StaffListsListingPage />
+      </Route>
+      <Route path={urls.STAFFLIST_VIEW} exact>
+        <StaffListDetailsPage />
+      </Route>
+      <Route path={urls.FORBIDDEN_VIEW} exact>
+        <ForbiddenPage />
+      </Route>
+    </Switch>
+  )
+}
+
 const App: React.FC<AppProps> = ({ history, queryClient }) => {
   return (
     <div className="app-container">
       <AppProviders history={history} queryClient={queryClient}>
         <Header />
-        <Switch>
-          <Route path={urls.HOME} exact>
-            <HomePage />
-          </Route>
-          <Route path={urls.SEARCH}>
-            <SearchPage />
-          </Route>
-          <Route path={urls.DEMO}>
-            <DemoPage />
-          </Route>
-          <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
-            <FieldPage />
-          </Route>
-          <Route path={urls.FIELD_EDIT} exact>
-            <FieldAdminApp />
-          </Route>
-          <Route path={urls.USERLISTS_LISTING} exact>
-            <UserListsListingPage />
-          </Route>
-          <Route path={urls.FAVORITES_VIEW} exact>
-            <FavoritesPage />
-          </Route>
-          <Route path={urls.USERLIST_VIEW} exact>
-            <UserListDetailsPage />
-          </Route>
-          <Route path={urls.STAFFLISTS_LISTING} exact>
-            <StaffListsListingPage />
-          </Route>
-          <Route path={urls.STAFFLIST_VIEW} exact>
-            <StaffListDetailsPage />
-          </Route>
-          <Route path={urls.FORBIDDEN_VIEW} exact>
-            <ForbiddenPage />
-          </Route>
-        </Switch>
+        <AppRoutes />
         <LearningResourceDrawer />
       </AppProviders>
     </div>
