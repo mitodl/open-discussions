@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.220.0
+Version 0.220.0 (Released June 22, 2023)
 ---------------
 
 - Update django-storages (#4062)
