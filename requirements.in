@@ -36,7 +36,8 @@ feedparser>=6.0.10
 google-api-python-client==2.89.0
 html5lib>=1.1
 importlib_metadata>=6.6.0
-ipython
+ipython>=8.14.0
+jedi>=0.18.2
 lxml==4.9.2
 markdown2==2.4.0
 newrelic>=8.8.0
