@@ -1,5 +1,5 @@
 import React from "react"
-import {renderHook, waitFor} from "@testing-library/react"
+import { renderHook, waitFor } from "@testing-library/react"
 import { allowConsoleErrors } from "ol-util/src/test-utils"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
@@ -91,13 +91,15 @@ test.each([
   }
 ])(
   "Should maintain $startingLocation but set history.location.state.forbidden to true if user is logged in & gets 403",
-  async ({ status, startingLocation, forbidden}) => {
+  async ({ status, startingLocation, forbidden }) => {
     allowConsoleErrors()
     window.SETTINGS.user.is_authenticated = true
     const history = createMemoryHistory()
     history.replace(startingLocation)
     const wrapper = getWrapper(history)
-    const queryFn = jest.fn().mockRejectedValue({ response: { status: status } })
+    const queryFn = jest
+      .fn()
+      .mockRejectedValue({ response: { status: status } })
 
     const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
       wrapper
@@ -107,9 +109,13 @@ test.each([
     })
     expect(history.location.pathname).toBe(startingLocation)
     if (forbidden) {
-      expect(history.location).toEqual(expect.objectContaining({state: {forbidden: true}}))
+      expect(history.location).toEqual(
+        expect.objectContaining({ state: { forbidden: true } })
+      )
     } else {
-      expect(history.location).toEqual(expect.not.objectContaining({state: {forbidden: true}}))
+      expect(history.location).toEqual(
+        expect.not.objectContaining({ state: { forbidden: true } })
+      )
     }
   }
 )
