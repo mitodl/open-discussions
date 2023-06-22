@@ -33,7 +33,7 @@ billiard==4.1.0
     # via celery
 boto==2.39.0
     # via smart-open
-boto3==1.26.143
+boto3==1.26.155
     # via
     #   -r requirements.in
     #   ocw-data-parser
@@ -52,7 +52,7 @@ cairocffi==0.8.1
     # via cairosvg
 cairosvg==2.7.0
     # via -r requirements.in
-celery==5.3.0
+celery==5.3.1
     # via
     #   -r requirements.in
     #   django-server-status
@@ -138,7 +138,7 @@ django-hijack==3.4.1
     # via -r requirements.in
 django-imagekit==4.1.0
     # via -r requirements.in
-django-ipware==3.0.0
+django-ipware==3.0.7
     # via -r requirements.in
 django-json-widget==1.0.0
     # via -r requirements.in
@@ -171,7 +171,7 @@ drf-extensions==0.7.1
     # via -r requirements.in
 drf-jwt==1.19.2
     # via -r requirements.in
-drf-spectacular==0.26.1
+drf-spectacular==0.26.2
     # via -r requirements.in
 elasticsearch==7.10.0
     # via django-server-status
@@ -241,13 +241,13 @@ lxml==4.9.2
     #   xbundle
     #   xmlsec
     #   zeep
-markdown2==2.4.0
+markdown2==2.4.8
     # via -r requirements.in
 matplotlib-inline==0.1.6
     # via ipython
 mit-moira @ git+https://github.com/mitodl/mit-moira.git
     # via -r requirements.in
-nested-lookup==0.2.22
+nested-lookup==0.2.25
     # via -r requirements.in
 newrelic==8.8.0
     # via -r requirements.in
