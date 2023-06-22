@@ -32,7 +32,7 @@ from open_discussions.settings_celery import *
 from open_discussions.settings_course_etl import *
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.219.2"
+VERSION = "0.220.0"
 
 log = logging.getLogger()
 
