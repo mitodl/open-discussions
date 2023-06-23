@@ -71,7 +71,6 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
 const AppRoutes: React.FC = () => {
   const history = useHistory<AppLocationState>()
   const location = useLocation<AppLocationState>()
-  console.log(location)
 
   useEffect(() => {
     const state = history.location.state
