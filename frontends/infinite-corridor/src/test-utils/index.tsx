@@ -27,7 +27,7 @@ const renderTestApp = (options: Partial<TestAppOptions> = {}) => {
   window.SETTINGS.user = makeUserSettings(options.user)
 
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
-  const queryClient = createQueryClient()
+  const queryClient = createQueryClient(history)
   render(<App queryClient={queryClient} history={history} />)
   return { history, queryClient }
 }
@@ -47,7 +47,7 @@ const renderWithProviders = (
   window.SETTINGS.user = makeUserSettings(options.user)
 
   const history = createMemoryHistory({ initialEntries: [`${BASE_URL}${url}`] })
-  const queryClient = createQueryClient()
+  const queryClient = createQueryClient(history)
   const view = render(
     <AppProviders queryClient={queryClient} history={history}>
       {component}

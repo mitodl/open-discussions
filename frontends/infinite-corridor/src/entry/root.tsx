@@ -10,5 +10,5 @@ invariant(container, "Could not find container element")
 const root = createRoot(container)
 
 const browserHistory = createBrowserHistory()
-const queryClient = createQueryClient()
+const queryClient = createQueryClient(browserHistory)
 root.render(<App queryClient={queryClient} history={browserHistory} />)

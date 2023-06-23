@@ -1,16 +1,18 @@
-import { QueryClient } from "@tanstack/react-query"
+import { QueryCache, QueryClient } from "@tanstack/react-query"
 import axios from "./axios"
+import { History } from "history"
 
 type MaybeHasStatus = {
   response?: {
     status?: number
   }
 }
+const AUTH_STATUS_CODES = [401, 403]
 const RETRY_STATUS_CODES = [408, 429, 502, 503, 504]
 const MAX_RETRIES = 3
 
-const createQueryClient = (): QueryClient =>
-  new QueryClient({
+const createQueryClient = (history: History): QueryClient => {
+  return new QueryClient({
     defaultOptions: {
       queries: {
         staleTime: 30 * 1000,
@@ -37,7 +39,26 @@ const createQueryClient = (): QueryClient =>
           return false
         }
       }
-    }
+    },
+    queryCache: new QueryCache({
+      onError: async error => {
+        const status = (error as MaybeHasStatus)?.response?.status
+        const { user } = SETTINGS
+        const currentLocation = history.location
+
+        if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
+          if (user.is_authenticated) {
+            const newState = { forbidden: true }
+            history.replace({ ...currentLocation, state: newState })
+          } else {
+            // Once there is an auth flow within this app, this can be moved
+            // off of window.location and use history as well
+            window.location.href = `/login/?next=${currentLocation.pathname}`
+          }
+        }
+      }
+    })
   })
+}
 
 export { createQueryClient }
