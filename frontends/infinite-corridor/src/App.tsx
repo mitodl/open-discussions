@@ -39,7 +39,7 @@ interface AppProps {
   queryClient: QueryClient
 }
 
-type AppLocationState = { forbidden?: boolean }
+type AppLocationState = undefined | { forbidden?: boolean }
 
 /**
  * Renders child with Router, QueryClientProvider, and other such context provides.
