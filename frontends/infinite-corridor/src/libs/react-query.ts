@@ -48,8 +48,8 @@ const createQueryClient = (history: History): QueryClient => {
 
         if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
           if (user.is_authenticated) {
-            const newState = {forbidden: true}
-            history.replace({...currentLocation, state: newState})
+            const newState = { forbidden: true }
+            history.replace({ ...currentLocation, state: newState })
           } else {
             // Once there is an auth flow within this app, this can be moved
             // off of window.location and use history as well

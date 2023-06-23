@@ -78,10 +78,10 @@ const AppRoutes: React.FC = () => {
       delete state.forbidden
     }
 
-    history.replace({...history.location, state: state})
+    history.replace({ ...history.location, state: state })
   }, [history])
-  if (location.state.forbidden) {
-    return <ForbiddenPage/>
+  if (location.state.forbidden !== undefined && location.state.forbidden) {
+    return <ForbiddenPage />
   }
   return (
     <Switch>
