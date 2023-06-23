@@ -80,7 +80,11 @@ const AppRoutes: React.FC = () => {
 
     history.replace({ ...history.location, state: state })
   }, [history])
-  if (location.state !== undefined && "forbidden" in location.state && location.state.forbidden) {
+  if (
+    location.state !== undefined &&
+    "forbidden" in location.state &&
+    location.state.forbidden
+  ) {
     return <ForbiddenPage />
   }
   return (
