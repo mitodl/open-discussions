@@ -74,7 +74,7 @@ const AppRoutes: React.FC = () => {
 
   useEffect(() => {
     const state = history.location.state
-    if (state !== undefined && "forbidden" in state && state.forbidden) {
+    if (state?.forbidden) {
       delete state.forbidden
     }
 
