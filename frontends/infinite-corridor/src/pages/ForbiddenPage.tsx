@@ -8,7 +8,7 @@ import Button from "@mui/material/Button"
 const ForbiddenPage: React.FC = () => {
   return (
     <Container maxWidth="sm">
-      <Card style={{ marginTop: "1em" }}>
+      <Card sx={{ marginTop: "1rem" }}>
         <CardContent>
           <h1>403 Forbidden Error</h1>
           You do not have permission to access this resource.

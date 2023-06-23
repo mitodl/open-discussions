@@ -27,12 +27,6 @@ import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
 
-type MaybeHasForbiddenState = {
-  state?: {
-    forbidden?: boolean
-  }
-}
-
 export const BASE_URL = "/infinite"
 
 interface AppProps {
@@ -44,6 +38,8 @@ interface AppProps {
   history: History
   queryClient: QueryClient
 }
+
+type AppLocationState = { forbidden?: boolean }
 
 /**
  * Renders child with Router, QueryClientProvider, and other such context provides.
@@ -73,15 +69,20 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
 }
 
 const AppRoutes: React.FC = () => {
-  const location = useLocation()
-  const history = useHistory()
-
-  const forbidden = (location as MaybeHasForbiddenState)?.state?.forbidden
+  const history = useHistory<AppLocationState>()
+  const location = useLocation<AppLocationState>()
 
   useEffect(() => {
-    history.replace({ state: {} })
+    const state = history.location.state
+    if (history.location.state.forbidden) {
+      delete state.forbidden
+    }
+
+    history.replace({...history.location, state: state})
   }, [history])
-  if (forbidden) return <ForbiddenPage />
+  if (location.state.forbidden) {
+    return <ForbiddenPage/>
+  }
   return (
     <Switch>
       <Route path={urls.HOME} exact>
