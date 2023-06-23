@@ -71,16 +71,17 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
 const AppRoutes: React.FC = () => {
   const history = useHistory<AppLocationState>()
   const location = useLocation<AppLocationState>()
+  console.log(location)
 
   useEffect(() => {
     const state = history.location.state
-    if (history.location.state.forbidden) {
+    if (state !== undefined && "forbidden" in state && state.forbidden) {
       delete state.forbidden
     }
 
     history.replace({ ...history.location, state: state })
   }, [history])
-  if ("forbidden" in location.state && location.state.forbidden) {
+  if (location.state !== undefined && "forbidden" in location.state && location.state.forbidden) {
     return <ForbiddenPage />
   }
   return (
