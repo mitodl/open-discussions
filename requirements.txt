@@ -241,7 +241,7 @@ lxml==4.9.2
     #   xbundle
     #   xmlsec
     #   zeep
-markdown2==2.4.8
+markdown2==2.4.9
     # via -r requirements.in
 matplotlib-inline==0.1.6
     # via ipython
