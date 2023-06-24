@@ -285,7 +285,7 @@ prompt-toolkit==3.0.38
     # via
     #   click-repl
     #   ipython
-protobuf==4.23.2
+protobuf==4.23.3
     # via
     #   google-api-core
     #   googleapis-common-protos
