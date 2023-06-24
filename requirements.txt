@@ -39,7 +39,7 @@ boto3==1.26.155
     #   ocw-data-parser
     #   pyathena
     #   smart-open
-botocore==1.29.155
+botocore==1.29.160
     # via
     #   boto3
     #   pyathena
