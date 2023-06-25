@@ -17205,7 +17205,7 @@ __metadata:
     redux-actions: 2.6.5
     redux-asserts: 0.0.12
     redux-debounced: 0.5.0
-    redux-hammock: 0.3.2
+    redux-hammock: 0.3.3
     redux-localstorage: 0.4.1
     redux-logger: 3.0.6
     redux-mock-store: 1.5.3
@@ -20064,9 +20064,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-hammock@npm:0.3.2":
-  version: 0.3.2
-  resolution: "redux-hammock@npm:0.3.2"
+"redux-hammock@npm:0.3.3":
+  version: 0.3.3
+  resolution: "redux-hammock@npm:0.3.3"
   dependencies:
     babel-polyfill: ^6.23.0
     babel-runtime: ^6.26.0
@@ -20078,7 +20078,7 @@ __metadata:
     redux-actions: ^2.6.5
   peerDependencies:
     redux-thunk: 2.x
-  checksum: e9b9abe714a8eb887d4f34d4b435ea23166978e0965770f482e811991e1fed8b4dd28a997a555d1abd906989aa0a45cc126ae38931948db79c6f8494d0ba82fa
+  checksum: d18ee912fb0ba549d9b47cbff0dbcf8c8c8c788c04904245dc95628bb5674bcafe803a1e52b40aa37a6d4ec13c0de7ab8967a05d899b9c51659d90e2cca20bfe
   languageName: node
   linkType: hard
 
