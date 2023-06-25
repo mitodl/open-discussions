@@ -17196,7 +17196,7 @@ __metadata:
     react-redux: 7.1.0
     react-router: ^5.3.3
     react-router-dom: ^5.1.2
-    react-scrollbar: 0.5.4
+    react-scrollbar: 0.5.6
     react-select: 3.0.8
     react-share: 2.2.0
     react-sortable-hoc: 1.11.0
@@ -19684,9 +19684,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-scrollbar@npm:0.5.4":
-  version: 0.5.4
-  resolution: "react-scrollbar@npm:0.5.4"
+"react-scrollbar@npm:0.5.6":
+  version: 0.5.6
+  resolution: "react-scrollbar@npm:0.5.6"
   dependencies:
     config: ^1.24.0
     line-height: ^0.1.1
@@ -19694,7 +19694,7 @@ __metadata:
   peerDependencies:
     prop-types: ^15.6.0
     react: ^15.3.0 || ^16.0.0-rc || ^16.0
-  checksum: 8ab011e7dbe8dd4f982612f5c57f06d7c2f9c763dd8afe345a9463900b7a38cb516c2e82085ec6e157bdfd30e5c1931156bb2a20cd0793751d10b11e352c840a
+  checksum: aeed6c421f37363d60a12af7caf76dbe410ad3cb8cdf3f1197f94df96e4861860b5fb637689877d6354c62cba63dff2dc061cdafe914df435fae22b7927dc542
   languageName: node
   linkType: hard
 
