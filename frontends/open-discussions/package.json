@@ -145,7 +145,7 @@
     "redux-actions": "2.6.5",
     "redux-asserts": "0.0.12",
     "redux-debounced": "0.5.0",
-    "redux-hammock": "0.3.2",
+    "redux-hammock": "0.3.3",
     "redux-localstorage": "0.4.1",
     "redux-logger": "3.0.6",
     "redux-mock-store": "1.5.3",
