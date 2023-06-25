@@ -17174,7 +17174,7 @@ __metadata:
     prosemirror-state: ^1.2.1 <=1.3.4
     prosemirror-view: ^1.3.7 <=1.18.7
     query-string: 5.0.1
-    raf: 3.4.0
+    raf: 3.4.1
     ramda: 0.24.1
     ramda-adjunct: 2.23.0
     rc-tooltip: 3.7.3
@@ -19037,16 +19037,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"raf@npm:3.4.0":
-  version: 3.4.0
-  resolution: "raf@npm:3.4.0"
-  dependencies:
-    performance-now: ^2.1.0
-  checksum: d664bf025e022ec11eb6418702156b27bfc85f3beef7ceb03767b0f5064cd63ab7ce0524eb5e0796da0ff2db0576dff0567325603fb8ab18a135f9bf2697ac85
-  languageName: node
-  linkType: hard
-
-"raf@npm:^3.1.0, raf@npm:^3.4.0, raf@npm:^3.4.1":
+"raf@npm:3.4.1, raf@npm:^3.1.0, raf@npm:^3.4.0, raf@npm:^3.4.1":
   version: 3.4.1
   resolution: "raf@npm:3.4.1"
   dependencies:
