@@ -17213,7 +17213,7 @@ __metadata:
     redux-query-interface-superagent: 3.3.0
     redux-query-react: 3.3.0
     redux-thunk: 2.3.0
-    regenerator-runtime: 0.13.3
+    regenerator-runtime: 0.13.11
     reselect: 4.0.0
     sanctuary: 0.13.2
     sass: 1.34.0
@@ -20203,10 +20203,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"regenerator-runtime@npm:0.13.3":
-  version: 0.13.3
-  resolution: "regenerator-runtime@npm:0.13.3"
-  checksum: 3d3dd091db39e9d7d1eedec811d8272f1a9b0d52ca047a800ffe9b90e289b002ca3d84bcb09fa849f41c4e8e8178ec246b0fb5f9f999a64cd7247986ea02d3bd
+"regenerator-runtime@npm:0.13.11":
+  version: 0.13.11
+  resolution: "regenerator-runtime@npm:0.13.11"
+  checksum: 27481628d22a1c4e3ff551096a683b424242a216fee44685467307f14d58020af1e19660bf2e26064de946bad7eff28950eae9f8209d55723e2d9351e632bbb4
   languageName: node
   linkType: hard
 
