@@ -40,7 +40,10 @@ interface AppProps {
   queryClient: QueryClient
 }
 
-type AppLocationState = undefined | { forbidden?: boolean }
+type AppLocationState = undefined | {
+  forbidden?: boolean
+  notFound?: boolean
+}
 
 /**
  * Renders child with Router, QueryClientProvider, and other such context provides.
@@ -83,6 +86,9 @@ const AppRoutes: React.FC = () => {
   }, [history])
   if (location.state?.forbidden) {
     return <ForbiddenPage />
+  }
+  if (location.state?.notFound) {
+    return <NotFoundPage />
   }
   return (
     <Switch>

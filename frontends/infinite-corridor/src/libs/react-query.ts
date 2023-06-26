@@ -8,6 +8,7 @@ type MaybeHasStatus = {
   }
 }
 const AUTH_STATUS_CODES = [401, 403]
+const NOT_FOUND_STATUS_CODES = [404]
 const RETRY_STATUS_CODES = [408, 429, 502, 503, 504]
 const MAX_RETRIES = 3
 
@@ -46,17 +47,20 @@ const createQueryClient = (history: History): QueryClient => {
         const { user } = SETTINGS
         const currentLocation = history.location
 
-        if (status !== undefined && AUTH_STATUS_CODES.includes(status)) {
-          if (user.is_authenticated) {
-            const newState = { forbidden: true }
-            history.replace({ ...currentLocation, state: newState })
-          } else {
-            // Once there is an auth flow within this app, this can be moved
-            // off of window.location and use history as well
-            window.location.href = `/login/?next=${currentLocation.pathname}`
+        if (status !== undefined) {
+          if (AUTH_STATUS_CODES.includes(status)) {
+            if (user.is_authenticated) {
+              const newState = { forbidden: true }
+              history.replace({ ...currentLocation, state: newState })
+            } else {
+              // Once there is an auth flow within this app, this can be moved
+              // off of window.location and use history as well
+              window.location.href = `/login/?next=${currentLocation.pathname}`
+            }
           }
-          if (status === 404) {
-            history.replace("/forbidden/")
+          if (NOT_FOUND_STATUS_CODES.includes(status)) {
+            const newState = { notFound: true }
+            history.replace({...currentLocation, state: newState})
           }
         }
       }
