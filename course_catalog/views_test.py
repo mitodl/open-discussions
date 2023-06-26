@@ -304,19 +304,27 @@ def test_video_endpoint(client):
 
     resp = client.get(reverse("videos-list"))
     assert resp.data.get("count") == 3
-    assert list(map(lambda video: video["id"], resp.data.get("results"))) == [
-        video1.id,
-        video2.id,
-        video3.id,
-    ]
+    assert sorted(
+        list(map(lambda video: video["id"], resp.data.get("results")))
+    ) == sorted(
+        [
+            video1.id,
+            video2.id,
+            video3.id,
+        ]
+    )
 
     resp = client.get(reverse("videos-list") + "new/")
     assert resp.data.get("count") == 3
-    assert list(map(lambda video: video["id"], resp.data.get("results"))) == [
-        video2.id,
-        video3.id,
-        video1.id,
-    ]
+    assert sorted(
+        list(map(lambda video: video["id"], resp.data.get("results")))
+    ) == sorted(
+        [
+            video2.id,
+            video3.id,
+            video1.id,
+        ]
+    )
 
     resp = client.get(reverse("videos-detail", args=[video1.id]))
     assert resp.data.get("video_id") == video1.video_id

@@ -45,10 +45,16 @@ def test_auth_complete(user, auth, mock_strategy):
     jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
     jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
     jwt_payload = jwt_payload_handler(user)
+    jwt_payload_resp = {
+        **jwt_payload,
+        "exp": int(jwt_payload["exp"].timestamp()),
+        "user_profile_id": list(jwt_payload["user_profile_id"]),
+        "jti": str(jwt_payload["jti"]),
+    }
     jwt_value = jwt_encode_handler(jwt_payload)
     mock_strategy.request.COOKIES[api_settings.JWT_AUTH_COOKIE] = jwt_value
 
     assert auth.auth_complete(1, arg2=2) == mock_strategy.authenticate.return_value
     mock_strategy.authenticate.assert_called_once_with(
-        1, arg2=2, response=jwt_payload, backend=auth
+        1, arg2=2, response=jwt_payload_resp, backend=auth
     )

@@ -11,6 +11,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name="profile", name="email_optin", field=models.NullBooleanField()
+            model_name="profile",
+            name="email_optin",
+            field=models.BooleanField(null=True),
         )
     ]

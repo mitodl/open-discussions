@@ -17,7 +17,9 @@ def test_get_ckeditor(client, user, settings):
     client.force_login(user)
     resp = client.get(reverse("ckeditor-token"))
     assert resp.status_code == status.HTTP_200_OK
-    jwt_body = jwt.decode(resp.content, settings.CKEDITOR_SECRET_KEY)
+    jwt_body = jwt.decode(
+        resp.content, settings.CKEDITOR_SECRET_KEY, algorithms=["HS256"]
+    )
     assert jwt_body["iss"] == settings.CKEDITOR_ENVIRONMENT_ID
     assert jwt_body["iat"] <= math.floor(time())
 

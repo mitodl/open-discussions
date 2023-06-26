@@ -134,7 +134,7 @@ def test_load_program(
     program = (
         ProgramFactory.create(published=is_published, runs=[])
         if program_exists
-        else ProgramFactory.build(published=is_published, runs=[])
+        else ProgramFactory.build(published=is_published, runs=[], id=1)
     )
     courses = (
         CourseFactory.create_batch(2, platform="fake-platform")
@@ -914,7 +914,6 @@ def test_load_content_files(mocker, is_published):
     )
     mock_bulk_index = mocker.patch(
         "course_catalog.etl.loaders.search_index_helpers.index_run_content_files",
-        autospec=True,
     )
     mock_bulk_delete = mocker.patch(
         "course_catalog.etl.loaders.search_index_helpers.deindex_run_content_files",

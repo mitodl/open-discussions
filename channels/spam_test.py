@@ -212,13 +212,13 @@ def test_save_spam_result(*, model, is_spam, ip_address):
         "is_spam": is_spam,
     }
     save_spam_result(**kwargs)
-    result = SpamCheckResult.objects.get(content_type__model=object_type, object_id=1)
+    result = SpamCheckResult.objects.get(content_type=object_type, object_id=1)
     assert result.is_spam is is_spam
     assert result.checks == 1
     assert result.user_ip == ip_address
     kwargs["is_spam"] = not is_spam
     save_spam_result(**kwargs)
-    result = SpamCheckResult.objects.get(content_type__model=object_type, object_id=1)
+    result = SpamCheckResult.objects.get(content_type=object_type, object_id=1)
     assert result.is_spam is not is_spam
     assert result.checks == 2
 

@@ -9,4 +9,5 @@ def get_upcoming_events():
     return requests.get(
         f"https://livestreamapis.com/v3/accounts/{settings.LIVESTREAM_ACCOUNT_ID}/upcoming_events",
         auth=(settings.LIVESTREAM_SECRET_KEY, ""),
+        timeout=settings.REQUESTS_TIMEOUT,
     )

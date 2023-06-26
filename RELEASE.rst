@@ -1,6 +1,31 @@
 Release Notes
 =============
 
+Version 0.220.0 (Released June 22, 2023)
+---------------
+
+- Update django-storages (#4062)
+- Update newrelic (#4060)
+- Update cffi version, hopefully heroku will like this one better? (#4058)
+- Upgrade python and django (#4019)
+
+Version 0.219.2 (Released June 15, 2023)
+---------------
+
+- Update akhileshns/heroku-deploy digest to 9fd0f9f (#4038)
+
+Version 0.219.1 (Released June 15, 2023)
+---------------
+
+- fix ocw course delete (#4047)
+- add CODEOWNERS (#4046)
+- OpenSeach Local Service (#4014)
+- Resolve Github Action Deprecation Warnings (#4022)
+- Local node package templates (#4049)
+- fix renovate configuration typo (#4051)
+- Replace dependency babel-eslint with @babel/eslint-parser 7.11.0 (#4037)
+- disable major version updates in frontends/open-discussions (#4034)
+
 Version 0.219.0 (Released June 13, 2023)
 ---------------
 

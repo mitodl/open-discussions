@@ -1,5 +1,5 @@
 """URL configurations for notifications"""
-from django.conf.urls import url, include
+from django.urls import re_path, include
 
 from rest_framework.routers import DefaultRouter
 
@@ -12,4 +12,4 @@ router.register(
     basename="notification_settings",
 )
 
-urlpatterns = [url(r"^api/v0/", include(router.urls))]
+urlpatterns = [re_path(r"^api/v0/", include(router.urls))]

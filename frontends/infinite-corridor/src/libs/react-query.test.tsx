@@ -30,7 +30,6 @@ test.each([
   "should retry $status failures $retries times",
   async ({ status, retries }) => {
     allowConsoleErrors()
-    const wrapper = getWrapper(createMemoryHistory())
     const queryFn = jest.fn().mockRejectedValue({ response: { status } })
     const { result } = renderHook(
       () =>

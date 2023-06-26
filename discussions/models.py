@@ -1,7 +1,7 @@
 """Discussions models"""
 from bitfield import BitField
 from django.contrib.auth.models import Group
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.core.validators import RegexValidator
 from django.db import models
 from imagekit.models import ImageSpecField, ProcessedImageField

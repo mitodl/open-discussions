@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name="profile", name="toc_optin", field=models.NullBooleanField()
+            model_name="profile", name="toc_optin", field=models.BooleanField(null=True)
         ),
     ]

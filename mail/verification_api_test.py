@@ -36,7 +36,7 @@ def test_send_verification_email(mocker, rf, email, match, blocked):
     send_messages_mock = mocker.patch("mail.api.send_messages")
     request = rf.post(reverse("social:complete", args=("email",)), {"email": email})
     # social_django depends on request.sesssion, so use the middleware to set that
-    SessionMiddleware().process_request(request)
+    SessionMiddleware(mocker.Mock()).process_request(request)
     strategy = load_strategy(request)
     backend = load_backend(strategy, EmailAuth.name, None)
     code = mocker.Mock(code="abc", email=email)

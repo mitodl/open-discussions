@@ -1,8 +1,7 @@
 """
 WidgetApp urls
 """
-from django.conf.urls import url
-from django.urls import include
+from django.urls import include, re_path
 from rest_framework import routers
 
 from widgets.views import WidgetListViewSet
@@ -10,4 +9,4 @@ from widgets.views import WidgetListViewSet
 router = routers.DefaultRouter()
 router.register(r"widget_lists", WidgetListViewSet, basename="widget_list")
 
-urlpatterns = [url(r"^api/v0/", include(router.urls))]
+urlpatterns = [re_path(r"^api/v0/", include(router.urls))]

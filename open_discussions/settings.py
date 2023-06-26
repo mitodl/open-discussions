@@ -32,11 +32,12 @@ from open_discussions.settings_celery import *
 from open_discussions.settings_course_etl import *
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.219.0"
+VERSION = "0.220.0"
 
 log = logging.getLogger()
 
 ENVIRONMENT = get_string("OPEN_DISCUSSIONS_ENVIRONMENT", "dev")
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # initialize Sentry before doing anything else so we capture any config errors
 SENTRY_DSN = get_string("SENTRY_DSN", "")
@@ -105,9 +106,8 @@ INSTALLED_APPS = (
     "corsheaders",
     "webpack_loader",
     "anymail",
-    "compat",
     "hijack",
-    "hijack_admin",
+    "hijack.contrib.admin",
     "guardian",
     "imagekit",
     "django_json_widget",
@@ -142,6 +142,7 @@ MIDDLEWARE = (
     "authentication.middleware.BlockedIPMiddleware",
     "open_discussions.middleware.channel_api.ChannelApiMiddleware",
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
+    "hijack.middleware.HijackUserMiddleware",
 )
 
 # CORS
@@ -550,7 +551,8 @@ if OPEN_DISCUSSIONS_USE_S3:
     # Configure Django Storages to use Cloudfront distribution for S3 assets
     if CLOUDFRONT_DIST:
         AWS_S3_CUSTOM_DOMAIN = "{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST)
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto.S3BotoStorage"
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    AWS_DEFAULT_ACL = "public-read"
 
 IMAGEKIT_SPEC_CACHEFILE_NAMER = "imagekit.cachefiles.namers.source_name_dot_hash"
 IMAGEKIT_CACHEFILE_DIR = get_string("IMAGEKIT_CACHEFILE_DIR", "")
@@ -788,6 +790,8 @@ ATHENA_REGION_NAME = get_string("ATHENA_REGION_NAME", "us-east-1")
 ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
 
 ENABLE_INFINITE_CORRIDOR = get_bool("ENABLE_INFINITE_CORRIDOR", False)
+
+REQUESTS_TIMEOUT = get_int("REQUESTS_TIMEOUT", 30)
 
 if DEBUG:
     # allow for all IPs to be routable, including localhost, for testing

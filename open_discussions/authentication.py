@@ -18,9 +18,10 @@ logger = logging.getLogger()
 class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
     """Version of JSONWebTokenAuthentication that ignores JWT values if they're expired"""
 
-    def get_jwt_value(self, request):
+    @classmethod
+    def get_token_from_request(cls, request):
         """Returns the JWT values as long as it's not expired"""
-        value = super().get_jwt_value(request)
+        value = super().get_token_from_request(request)
 
         try:
             # try to decode the value just to see if it's expired
@@ -28,7 +29,7 @@ class IgnoreExpiredJwtAuthentication(JSONWebTokenAuthentication):
 
             jwt_decode_handler = api_settings.JWT_DECODE_HANDLER
             jwt_decode_handler(value)
-        except jwt.ExpiredSignature:
+        except jwt.ExpiredSignatureError:
             # if it is expired, treat it as if the user never passed a token
             logger.debug("Ignoring expired JWT")
             return None

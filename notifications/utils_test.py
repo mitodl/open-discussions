@@ -55,7 +55,7 @@ def test_mark_as_sent_or_canceled_misc_error():
 
     with utils.mark_as_sent_or_canceled(notification) as will_send:
         assert will_send is True
-        raise Exception("some random error")
+        raise Exception("some random error")  # pylint:disable=broad-exception-raised)
 
     notification.refresh_from_db()
     assert notification.state == EmailNotification.STATE_PENDING

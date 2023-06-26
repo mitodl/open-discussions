@@ -3,12 +3,11 @@ Test course_catalog.api
 """
 import json
 from datetime import datetime, timedelta
+from unittest.mock import ANY
 
 import boto3
 import pytest
 import pytz
-from django.utils import timezone
-from mock import ANY
 from moto import mock_s3
 
 from course_catalog.api import (
@@ -44,6 +43,7 @@ from course_catalog.models import (
     LearningResourceRun,
 )
 from course_catalog.utils import get_ocw_topics
+from open_discussions.utils import now_in_utc
 
 pytestmark = pytest.mark.django_db
 # pylint:disable=redefined-outer-name,unused-argument
@@ -214,13 +214,13 @@ def test_deserializing_a_valid_ocw_course(
     """
     Verify that OCWSerializer successfully de-serialize a JSON object and create Course model instance
     """
-    digest_ocw_course(ocw_valid_data, timezone.now(), published)
+    digest_ocw_course(ocw_valid_data, now_in_utc(), published)
     assert Course.objects.count() == 1
-    digest_ocw_course(ocw_valid_data, timezone.now() - timedelta(hours=1), published)
+    digest_ocw_course(ocw_valid_data, now_in_utc() - timedelta(hours=1), published)
     assert Course.objects.count() == 1
 
     digest_ocw_course(
-        ocw_valid_data, timezone.now() + timedelta(hours=1), published, "PROD/RES"
+        ocw_valid_data, now_in_utc() + timedelta(hours=1), published, "PROD/RES"
     )
     assert Course.objects.count() == 1
     course = Course.objects.last()
@@ -284,10 +284,10 @@ def test_deserializing_a_valid_ocw_course_with_existing_newer_run(
 
     assert course.runs.count() == 3
     existing_run = course.runs.first()
-    existing_run.best_start_date = datetime.now(timezone.utc)
+    existing_run.best_start_date = now_in_utc()
     existing_run.save()
 
-    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    digest_ocw_course(ocw_valid_data, now_in_utc(), True)
     assert Course.objects.count() == 1
     course = Course.objects.last()
     assert course.title == "Undergraduate Thesis Tutorial"
@@ -308,7 +308,7 @@ def test_deserializing_a_valid_ocw_course_with_keep_existing_image_src(
 
     assert Course.objects.last().image_src == "existing"
 
-    digest_ocw_course(ocw_valid_data, timezone.now(), True, "PROD/RES", True)
+    digest_ocw_course(ocw_valid_data, now_in_utc(), True, "PROD/RES", True)
     assert Course.objects.count() == 1
     course = Course.objects.last()
     assert course.image_src == "existing"
@@ -319,7 +319,7 @@ def test_deserialzing_an_invalid_ocw_course(ocw_valid_data):
     Verifies that OCWSerializer validation works correctly if the OCW course has invalid values
     """
     ocw_valid_data.pop("course_id")
-    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    digest_ocw_course(ocw_valid_data, now_in_utc(), True)
     assert not Course.objects.count()
 
 
@@ -329,7 +329,7 @@ def test_deserialzing_an_invalid_ocw_course_run(ocw_valid_data, mocker):
     """
     mock_log = mocker.patch("course_catalog.api.log.error")
     ocw_valid_data["enrollment_start"] = "This is not a date"
-    digest_ocw_course(ocw_valid_data, timezone.now(), True)
+    digest_ocw_course(ocw_valid_data, now_in_utc(), True)
     assert LearningResourceRun.objects.count() == 0
     mock_log.assert_called_once_with(
         "OCW LearningResourceRun %s is not valid: %s", ocw_valid_data.get("uid"), ANY
@@ -345,10 +345,10 @@ def test_deserializing_a_valid_ocw_next_course(
     settings.OCW_NEXT_BASE_URL = "https://ocw-test.mit.edu"
     uid = "e9387c256bae4ca99cce88fd8b7f8272"
     url_path = "courses/my-course"
-    digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, url_path)
+    digest_ocw_next_course(ocw_next_valid_data, now_in_utc(), uid, url_path)
     assert Course.objects.count() == 1
     digest_ocw_next_course(
-        ocw_next_valid_data, timezone.now() - timedelta(hours=1), uid, url_path
+        ocw_next_valid_data, now_in_utc() - timedelta(hours=1), uid, url_path
     )
     assert Course.objects.count() == 1
 
@@ -400,7 +400,7 @@ def test_deserialzing_an_invalid_ocw_next_course(ocw_next_valid_data):
     course_prefix = "courses/my-course"
 
     ocw_next_valid_data.pop("primary_course_number")
-    digest_ocw_next_course(ocw_next_valid_data, timezone.now(), uid, course_prefix)
+    digest_ocw_next_course(ocw_next_valid_data, now_in_utc(), uid, course_prefix)
     assert not Course.objects.count()
 
 

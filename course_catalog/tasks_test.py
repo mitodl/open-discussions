@@ -3,10 +3,10 @@ Test tasks
 """
 import json
 from contextlib import contextmanager
+from unittest.mock import ANY
 
 import boto3
 import pytest
-from mock.mock import ANY
 from moto import mock_s3
 
 from course_catalog.conftest import (
@@ -160,7 +160,9 @@ def test_get_ocw_next_courses(settings, mocker, mocked_celery):
     Test get_ocw_next_courses
     """
     setup_s3_ocw_next(settings)
-
+    mocker.patch("course_catalog.api.upsert_course")
+    mocker.patch("course_catalog.api.load_content_files")
+    mocker.patch("course_catalog.api.transform_ocw_next_content_files")
     get_ocw_next_courses.delay(url_paths=[OCW_NEXT_TEST_PREFIX], force_overwrite=False)
 
     assert Course.objects.count() == 1
@@ -239,6 +241,11 @@ def test_get_ocw_overwrite(
 ):
     """Test that courses are overridden if force_overwrite=True"""
     setup_s3(settings)
+
+    mocker.patch("course_catalog.api.upsert_course")
+    mocker.patch("course_catalog.api.deindex_course")
+    mocker.patch("course_catalog.api.load_content_files")
+    mocker.patch("course_catalog.api.transform_content_files")
 
     # run ocw sync
     get_ocw_courses.delay(
