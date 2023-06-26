@@ -1,5 +1,5 @@
 import React from "react"
-import { screen, render } from "@testing-library/react"
+import { screen, render, waitFor } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import { faker } from "@faker-js/faker"
 import { assertNotNil, PartialBy } from "ol-util"
@@ -12,10 +12,10 @@ type TestProps = PartialBy<
   ManageWidgetDialogProps,
   "specs" | "onSubmit" | "onCancel" | "isOpen"
 >
-const setupEditingDialog = (props?: TestProps) => {
+const setupEditingDialog = async (props?: TestProps) => {
   const { available_widgets: specs } = makeWidgetListResponse()
   const spies = { onSubmit: jest.fn(), onCancel: jest.fn() }
-  const widget = makeWidget(WidgetTypes.RichText)
+  const widget = props?.widget ?? makeWidget(WidgetTypes.RichText)
   render(
     <ManageWidgetDialog
       isOpen={true}
@@ -26,6 +26,9 @@ const setupEditingDialog = (props?: TestProps) => {
       {...props}
     />
   )
+  await waitFor(() => {
+    expect(screen.queryByLabelText("Loading")).toBe(null)
+  })
   return { spies, widget, specs }
 }
 
@@ -38,13 +41,13 @@ describe("ManageWidgetDialog (Editing)", () => {
     }
   )
 
-  it("Displays 'Edit Widget' as dialog title", () => {
-    setupEditingDialog()
+  it("Displays 'Edit Widget' as dialog title", async () => {
+    await setupEditingDialog()
     screen.getByRole("heading", { name: "Edit widget" })
   })
 
   it("Allows editing the widget title", async () => {
-    const { widget, spies } = setupEditingDialog()
+    const { widget, spies } = await setupEditingDialog()
     const title = screen.getByLabelText("Title")
     await user.clear(title)
     await user.click(title)
@@ -62,7 +65,7 @@ describe("ManageWidgetDialog (Editing)", () => {
 
   it("Displays an error with supplied class if title is empty", async () => {
     const classes = { error: faker.lorem.word() }
-    const { spies } = setupEditingDialog({ classes })
+    const { spies } = await setupEditingDialog({ classes })
     const title = screen.getByLabelText("Title")
     await user.clear(title)
     await user.click(screen.getByRole("button", { name: "Submit" }))
@@ -71,7 +74,7 @@ describe("ManageWidgetDialog (Editing)", () => {
     expect(errMsg).toHaveClass(classes.error)
   })
 
-  it("passes classes to relevant elements", () => {
+  it("passes classes to relevant elements", async () => {
     const fakerClassName = () => faker.unique(faker.lorem.slug)
     const classes = {
       label:      fakerClassName(),
@@ -79,7 +82,7 @@ describe("ManageWidgetDialog (Editing)", () => {
       fieldGroup: fakerClassName(),
       dialog:     fakerClassName()
     }
-    setupEditingDialog({ classes })
+    await setupEditingDialog({ classes })
     // eslint-disable-next-line testing-library/no-node-access
     const dialog = document.querySelector(`.${classes.dialog}`) as HTMLElement
     // eslint-disable-next-line testing-library/no-node-access
@@ -104,9 +107,9 @@ describe("ManageWidgetDialog (Editing)", () => {
 
   test.each(Object.values(WidgetTypes))(
     "It renders all the fields for widget %s",
-    widgetType => {
+    async widgetType => {
       const widget = makeWidget(widgetType)
-      const { specs } = setupEditingDialog({ widget })
+      const { specs } = await setupEditingDialog({ widget })
       const spec = specs.find(spec => spec.widget_type === widgetType)
       assertNotNil(spec)
       const fields = spec.form_spec
@@ -122,8 +125,8 @@ const setupAddingWidget: typeof setupEditingDialog = props =>
   setupEditingDialog({ ...props, widget: null })
 
 describe("Adding new widgets", () => {
-  test("Dialog shows all widget types on first page", () => {
-    const { specs } = setupAddingWidget()
+  test("Dialog shows all widget types on first page", async () => {
+    const { specs } = await setupAddingWidget()
     // The dialog has radio buttons for each available widget
     const radios = screen.getAllByRole("radio")
     // eslint-disable-next-line testing-library/no-node-access
@@ -133,19 +136,19 @@ describe("Adding new widgets", () => {
     })
   })
 
-  test("First widget type is initially chosen", () => {
-    setupAddingWidget()
+  test("First widget type is initially chosen", async () => {
+    await setupAddingWidget()
     const radios = screen.getAllByRole("radio")
     expect(radios[0]).toBeChecked()
   })
 
-  it("Displays 'New widget' as dialog title", () => {
-    setupAddingWidget()
+  it("Displays 'New widget' as dialog title", async () => {
+    await setupAddingWidget()
     screen.getByRole("heading", { name: "New widget" })
   })
 
   it("Displays description of new widget as title for dialog second page", async () => {
-    const { specs } = setupAddingWidget()
+    const { specs } = await setupAddingWidget()
     await user.click(screen.getByRole("button", { name: "Next" }))
     const heading = screen.getByRole("heading")
 
