@@ -17208,7 +17208,7 @@ __metadata:
     redux-hammock: 0.3.3
     redux-localstorage: 0.4.1
     redux-logger: 3.0.6
-    redux-mock-store: 1.5.3
+    redux-mock-store: 1.5.4
     redux-query: 3.3.0
     redux-query-interface-superagent: 3.3.0
     redux-query-react: 3.3.0
@@ -20098,12 +20098,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redux-mock-store@npm:1.5.3":
-  version: 1.5.3
-  resolution: "redux-mock-store@npm:1.5.3"
+"redux-mock-store@npm:1.5.4":
+  version: 1.5.4
+  resolution: "redux-mock-store@npm:1.5.4"
   dependencies:
     lodash.isplainobject: ^4.0.6
-  checksum: 9c786169c5c0c6889451e1d170c90e02817ee7e9f219c2eb0aa7a103903e599bb8b8e7f255075e3d80b5c9f56388dbc5293a475a8c8a444c6ba0ca739766176c
+  checksum: 571eab2cca3e46321969025af865ddd780804c811be9db277fddf772d86e3ea67b4ef1b19ea3866417d41eb1b73605103020321f68cf68f379a52679a6823d12
   languageName: node
   linkType: hard
 
