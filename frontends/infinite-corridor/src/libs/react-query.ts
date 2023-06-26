@@ -8,9 +8,11 @@ type MaybeHasStatus = {
   }
 }
 
-type global404Flag = undefined | {
-  hasCustomNotFoundHandler?: boolean
-}
+type global404Flag =
+  | undefined
+  | {
+      hasCustomNotFoundHandler?: boolean
+    }
 const AUTH_STATUS_CODES = [401, 403]
 const NOT_FOUND_STATUS_CODES = [404]
 const RETRY_STATUS_CODES = [408, 429, 502, 503, 504]
@@ -65,8 +67,8 @@ const createQueryClient = (history: History): QueryClient => {
           }
           if (NOT_FOUND_STATUS_CODES.includes(status)) {
             if (!hasCustomNotFoundHandler) {
-              const newState = {notFound: true}
-              history.replace({...currentLocation, state: newState})
+              const newState = { notFound: true }
+              history.replace({ ...currentLocation, state: newState })
             }
           }
         }

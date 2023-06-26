@@ -119,3 +119,44 @@ test.each([
     }
   }
 )
+
+test.each([
+  {
+    status:           200,
+    startingLocation: "/",
+    notFound:         false
+  },
+  {
+    status:           404,
+    startingLocation: "/does/not/exist/",
+    notFound:         true
+  }
+])(
+  "Should maintain $startingLocation but set history.location.state.notFound to true if user gets a 404",
+  async ({ status, startingLocation, notFound }) => {
+    allowConsoleErrors()
+    const history = createMemoryHistory()
+    history.replace(startingLocation)
+    const wrapper = getWrapper(history)
+    const queryFn = jest
+      .fn()
+      .mockRejectedValue({ response: { status: status } })
+
+    const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
+      wrapper
+    })
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
+    expect(history.location.pathname).toBe(startingLocation)
+    if (notFound) {
+      expect(history.location).toEqual(
+        expect.objectContaining({ state: { notFound: true } })
+      )
+    } else {
+      expect(history.location).toEqual(
+        expect.not.objectContaining({ state: { notFound: true } })
+      )
+    }
+  }
+)
