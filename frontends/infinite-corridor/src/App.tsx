@@ -125,9 +125,7 @@ const AppRoutes: React.FC = () => {
       <Route path={urls.FORBIDDEN_VIEW} exact>
         <ForbiddenPage />
       </Route>
-      <Route path={urls.NOTFOUND_VIEW} exact>
-        <NotFoundPage />
-      </Route>
+      <Route component={NotFoundPage} />
     </Switch>
   )
 }
