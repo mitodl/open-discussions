@@ -88,10 +88,22 @@ const getEmbedlyKey = (): string | null => {
   return null
 }
 
+const embedlyCardHtml = (url: string) => {
+  const embedlyKey = getEmbedlyKey()
+  return `<a
+  data-card-chrome="0"
+  data-card-controls="0"
+  data-card-key=${embedlyKey}
+  class="embedly-card"
+  href="${url}">
+</a>`
+}
+
 export {
   createStylesheet,
   ensureEmbedlyPlatform,
   getEmbedlyKey,
   EmbedlyEventTypes,
-  dispatchCardCreated
+  dispatchCardCreated,
+  embedlyCardHtml
 }

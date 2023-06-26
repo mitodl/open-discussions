@@ -26,7 +26,7 @@ export type {
   SortableListProps
 } from "./SortableList"
 
-export { EmbedlyCard } from "./embedly"
+export { EmbedlyCard, ensureEmbedlyPlatform, embedlyCardHtml } from "./embedly"
 
 export { default as MetaTags } from "./MetaTags"
 

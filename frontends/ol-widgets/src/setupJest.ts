@@ -1,6 +1,6 @@
-import { setupMockMarkdownEditor } from "./test-utils"
+import { setupMockEditors } from "ol-ckeditor/test_utils"
 
-setupMockMarkdownEditor()
+setupMockEditors()
 
 afterEach(() => {
   /**

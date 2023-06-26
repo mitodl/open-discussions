@@ -27,6 +27,7 @@ import Header from "./components/Header"
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles"
 import { muiTheme } from "./libs/mui"
 import { Provider as NiceModalProvider } from "@ebay/nice-modal-react"
+import ArticlePage from "./pages/ArticlePage"
 
 export const BASE_URL = "/infinite"
 
@@ -126,6 +127,9 @@ const AppRoutes: React.FC = () => {
       </Route>
       <Route path={urls.FORBIDDEN_VIEW} exact>
         <ForbiddenPage />
+      </Route>
+      <Route path="/infinite/article" exact>
+        <ArticlePage />
       </Route>
       <Route component={NotFoundPage} />
     </Switch>

@@ -1,5 +1,5 @@
 extends: stylelint-config-standard-scss
 rules:
   selector-class-pattern:
-  - ((^Mui[A-Z-])|^([a-z][a-z0-9]*)(-[a-z0-9]+)*$) # kebab-case or Mui class
+  - (^ck.*)|((^Mui[A-Z-])|^([a-z][a-z0-9]*)(-[a-z0-9]+)*$) # CKEditor, MUI or kebab-case
   - message: "Expected class selector to be kebab-case"

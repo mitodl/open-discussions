@@ -1,5 +1,5 @@
 import React from "react"
-import type { CkeditorMarkdownProps } from "../components/editing/CkeditorMarkdown"
+import type { CkeditorMarkdownProps } from "./components/CkeditorMarkdown"
 /**
  * Replace the CkeditorMarkdown input with a textarea.
  *
@@ -9,8 +9,8 @@ import type { CkeditorMarkdownProps } from "../components/editing/CkeditorMarkdo
  *  2. Even if we make the imports work, CKEditor can't function in jest's jsdom
  *     environment. So.... let's just use a textarea.
  */
-const setupMockMarkdownEditor = () => {
-  jest.mock("../components/editing/CkeditorMarkdown", () => ({
+const setupMockEditors = () => {
+  jest.mock("./components/CkeditorMarkdown", () => ({
     __esModule: true,
     default:    ({ onChange, ...others }: CkeditorMarkdownProps) => (
       <textarea onChange={e => onChange(e.target.value)} {...others} />
@@ -18,4 +18,4 @@ const setupMockMarkdownEditor = () => {
   }))
 }
 
-export { setupMockMarkdownEditor }
+export { setupMockEditors }

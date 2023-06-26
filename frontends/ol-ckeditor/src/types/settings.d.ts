@@ -8,8 +8,6 @@ export declare global {
   declare var SETTINGS
 
   interface SETTINGS {
-    search_page_size: number
-    embedlyKey: string
-    ocw_next_base_url: string
+    ckeditor_upload_url?: string
   }
 }

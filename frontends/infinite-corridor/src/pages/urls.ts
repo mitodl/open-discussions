@@ -29,5 +29,7 @@ export const STAFFLIST_VIEW = `${BASE}/stafflists/:id` as const
 export const makeStaffListsViewPath = (id: number) =>
   generatePath(STAFFLIST_VIEW, { id })
 
+export const TEMPORARY_ARTICLE_VIEW = `${BASE}/article/` as const
+
 export const FORBIDDEN_VIEW = `${BASE}/forbidden`
 export const NOTFOUND_VIEW = `${BASE}/not-found`
