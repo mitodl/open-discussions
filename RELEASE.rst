@@ -1,6 +1,52 @@
 Release Notes
 =============
 
+Version 0.221.0
+---------------
+
+- Update dependency style-loader to v3.3.3 (#4110)
+- Update dependency sass-loader to v13.3.2 (#4109)
+- Update dependency s3transfer to v0.6.1 (#4108)
+- Update dependency regenerator-runtime to v0.13.11 (#4107)
+- Update dependency redux-mock-store to v1.5.4 (#4106)
+- Update dependency redux-hammock to v0.3.3 (#4104)
+- Update dependency react-share to v4.4.1 (#4103)
+- Update dependency react-scrollbar to v0.5.6 (#4102)
+- Update dependency raf to v3.4.1 (#4101)
+- Update dependency query-string to v7.1.3 (#4100)
+- Update dependency qs to v6.11.2 (#4099)
+- Update dependency moto to v4.1.12 (#4105)
+- Update dependency pyyaml to v5.4.1 (#4098)
+- Update dependency protobuf to v4.23.3 (#4097)
+- Update dependency markdown2 to v2.4.9 (#4096)
+- Update dependency drf-spectacular to v0.26.3 (#4095)
+- Update dependency boto3 to v1.26.160 (#4093)
+- Update dependency botocore to v1.29.160 (#4094)
+- New Open 403 handling (#4054)
+- Fix ipython auto-complete error msg (#4091)
+- Update dependency postcss-loader to v2.1.6 (#4086)
+- Update dependency prettier to v2.8.8 (#4087)
+- Update dependency nested-lookup to v0.2.25 (#4085)
+- Update dependency moto to v4.1.11 (#4084)
+- Update dependency markdown2 to v2.4.8 (#4082)
+- Update dependency locale-code to v2.0.2 (#4081)
+- Update dependency js-beautify to v1.14.8 (#4080)
+- Update dependency jest-when to v3.5.2 (#4079)
+- Update dependency html-entities to v2.3.6 (#4078)
+- Update dependency eslint-plugin-babel to v5.3.1 (#4076)
+- Update dependency celery to v5.3.1 (#4083)
+- Update dependency enzyme-adapter-react-16 to v1.15.7 (#4075)
+- Update dependency drf-spectacular to v0.26.2 (#4074)
+- Update dependency django-ipware to v3.0.7 (#4073)
+- Update dependency django-appconf to v1.0.5 (#4072)
+- Update dependency deprecated to v1.2.14 (#4071)
+- Update dependency decorator to v4.4.2 (#4070)
+- Update dependency decimal.js-light to v2.5.1 (#4069)
+- Update dependency classnames to v2.3.2 (#4068)
+- Update dependency cheerio to v1.0.0-rc.12 (#4067)
+- Update dependency boto3 to v1.26.155 (#4065)
+- Update dependency botocore to v1.29.155 (#4066)
+
 Version 0.220.0 (Released June 22, 2023)
 ---------------
 
