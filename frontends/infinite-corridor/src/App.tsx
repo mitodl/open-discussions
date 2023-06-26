@@ -1,4 +1,4 @@
-import React, { StrictMode } from "react"
+import React, { StrictMode, useEffect } from "react"
 import { HelmetProvider } from "react-helmet-async"
 
 import HomePage from "./pages/HomePage"
@@ -19,7 +19,7 @@ import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import ForbiddenPage from "./pages/ForbiddenPage"
 import NotFoundPage from "./pages/NotFoundPage"
 import * as urls from "./pages/urls"
-import { Route, Router, Switch } from "react-router"
+import { Route, Router, Switch, useHistory, useLocation } from "react-router"
 import { History } from "history"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
@@ -39,6 +39,8 @@ interface AppProps {
   history: History
   queryClient: QueryClient
 }
+
+type AppLocationState = undefined | { forbidden?: boolean }
 
 /**
  * Renders child with Router, QueryClientProvider, and other such context provides.
@@ -67,49 +69,69 @@ const AppProviders: React.FC<AppProps & { children: React.ReactNode }> = ({
   )
 }
 
+const AppRoutes: React.FC = () => {
+  const history = useHistory<AppLocationState>()
+  const location = useLocation<AppLocationState>()
+
+  useEffect(() => {
+    const state = history.location.state
+    if (state?.forbidden) {
+      delete state.forbidden
+    }
+
+    history.replace({ ...history.location, state: state })
+  }, [history])
+  if (location.state?.forbidden) {
+    return <ForbiddenPage />
+  }
+  return (
+    <Switch>
+      <Route path={urls.HOME} exact>
+        <HomePage />
+      </Route>
+      <Route path={urls.SEARCH}>
+        <SearchPage />
+      </Route>
+      <Route path={urls.DEMO}>
+        <DemoPage />
+      </Route>
+      <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
+        <FieldPage />
+      </Route>
+      <Route path={urls.FIELD_EDIT} exact>
+        <FieldAdminApp />
+      </Route>
+      <Route path={urls.USERLISTS_LISTING} exact>
+        <UserListsListingPage />
+      </Route>
+      <Route path={urls.FAVORITES_VIEW} exact>
+        <FavoritesPage />
+      </Route>
+      <Route path={urls.USERLIST_VIEW} exact>
+        <UserListDetailsPage />
+      </Route>
+      <Route path={urls.STAFFLISTS_LISTING} exact>
+        <StaffListsListingPage />
+      </Route>
+      <Route path={urls.STAFFLIST_VIEW} exact>
+        <StaffListDetailsPage />
+      </Route>
+      <Route path={urls.FORBIDDEN_VIEW} exact>
+        <ForbiddenPage />
+      </Route>
+      <Route path={urls.NOTFOUND_VIEW} exact>
+        <NotFoundPage />
+      </Route>
+    </Switch>
+  )
+}
+
 const App: React.FC<AppProps> = ({ history, queryClient }) => {
   return (
     <div className="app-container">
       <AppProviders history={history} queryClient={queryClient}>
         <Header />
-        <Switch>
-          <Route path={urls.HOME} exact>
-            <HomePage />
-          </Route>
-          <Route path={urls.SEARCH}>
-            <SearchPage />
-          </Route>
-          <Route path={urls.DEMO}>
-            <DemoPage />
-          </Route>
-          <Route path={[urls.FIELD_VIEW, urls.FIELD_EDIT_WIDGETS]} exact>
-            <FieldPage />
-          </Route>
-          <Route path={urls.FIELD_EDIT} exact>
-            <FieldAdminApp />
-          </Route>
-          <Route path={urls.USERLISTS_LISTING} exact>
-            <UserListsListingPage />
-          </Route>
-          <Route path={urls.FAVORITES_VIEW} exact>
-            <FavoritesPage />
-          </Route>
-          <Route path={urls.USERLIST_VIEW} exact>
-            <UserListDetailsPage />
-          </Route>
-          <Route path={urls.STAFFLISTS_LISTING} exact>
-            <StaffListsListingPage />
-          </Route>
-          <Route path={urls.STAFFLIST_VIEW} exact>
-            <StaffListDetailsPage />
-          </Route>
-          <Route path={urls.FORBIDDEN_VIEW} exact>
-            <NotFoundPage />
-          </Route>
-          <Route path={urls.NOTFOUND_VIEW} exact>
-            <NotFoundPage />
-          </Route>
-        </Switch>
+        <AppRoutes />
         <LearningResourceDrawer />
       </AppProviders>
     </div>
