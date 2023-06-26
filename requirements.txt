@@ -23,7 +23,7 @@ base36==0.1.1
     # via -r requirements.in
 beautifulsoup4==4.8.2
     # via -r requirements.in
-betamax==0.8.0
+betamax==0.8.1
     # via
     #   -r requirements.in
     #   betamax-serializers
