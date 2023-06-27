@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.221.0
+Version 0.221.0 (Released June 27, 2023)
 ---------------
 
 - Update dependency style-loader to v3.3.3 (#4110)
