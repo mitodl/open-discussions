@@ -1,12 +1,12 @@
 import "jest-extended"
 import "jest-extended/all"
 
-import { setupMockMarkdownEditor } from "ol-widgets/src/test-utils"
+import { setupMockEditors } from "ol-ckeditor/test_utils"
 import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
 import { mockAxiosInstance, resetApi } from "./mockAxios"
 import { makeUserSettings } from "./factories"
 
-setupMockMarkdownEditor()
+setupMockEditors()
 
 jest.mock("axios", () => {
   return {

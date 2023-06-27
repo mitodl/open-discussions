@@ -7,9 +7,6 @@
     "url": "https://github.com/mitodl/mit-open.git"
   },
   "dependencies": {
-    "@ckeditor/ckeditor5-dev-utils": "^30.4.0",
-    "@ckeditor/ckeditor5-dev-webpack-plugin": "^30.4.0",
-    "@ckeditor/ckeditor5-theme-lark": "^35.0.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@faker-js/faker": "^7.3.0",
@@ -31,6 +28,7 @@
     "css-loader": "^6.7.1",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.6.1",
+    "ol-ckeditor": "workspace:^",
     "ol-forms": "workspace:*",
     "ol-search-ui": "workspace:*",
     "ol-util": "workspace:*",

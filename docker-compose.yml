@@ -5,7 +5,7 @@ x-environment:
   DEBUG: 'False'
   DEV_ENV: 'True'  # necessary to have nginx connect to web container
   NODE_ENV: 'production'
-  DATABASE_URL: postgres://postgres@db:5432/postgres
+  DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
   OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
   OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
   OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
@@ -29,9 +29,11 @@ x-extra-hosts:
 
 services:
   db:
-    image: postgres:11.6
+    image: postgres:12.11
     ports:
       - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=postgres
 
   redis:
     image: redis:5.0.8
