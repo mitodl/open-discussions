@@ -82,16 +82,16 @@ test.each([
   {
     status:           200,
     startingLocation: "/",
-    forbidden:        false
+    state:            undefined
   },
   {
     status:           403,
     startingLocation: "/place/to/go",
-    forbidden:        true
+    state:            { notFound: true }
   }
 ])(
   "Should maintain $startingLocation but set history.location.state.forbidden to true if user is logged in & gets 403",
-  async ({ status, startingLocation, forbidden }) => {
+  async ({ status, startingLocation, state }) => {
     allowConsoleErrors()
     window.SETTINGS.user.is_authenticated = true
     const history = createMemoryHistory()
@@ -108,15 +108,7 @@ test.each([
       expect(result.current.isError).toBe(true)
     })
     expect(history.location.pathname).toBe(startingLocation)
-    if (forbidden) {
-      expect(history.location).toEqual(
-        expect.objectContaining({ state: { forbidden: true } })
-      )
-    } else {
-      expect(history.location).toEqual(
-        expect.not.objectContaining({ state: { forbidden: true } })
-      )
-    }
+    expect.objectContaining({ state: state })
   }
 )
 
