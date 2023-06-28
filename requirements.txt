@@ -179,7 +179,7 @@ executing==1.2.0
     # via stack-data
 factory-boy==2.12.0
     # via -r requirements.in
-faker==2.0.0
+faker==2.0.5
     # via
     #   -r requirements.in
     #   factory-boy
@@ -422,7 +422,7 @@ static3==0.5.1
     #   dj-static
 tenacity==6.3.1
     # via pyathena
-text-unidecode==1.2
+text-unidecode==1.3
     # via faker
 tika==1.23.1
     # via -r requirements.in
