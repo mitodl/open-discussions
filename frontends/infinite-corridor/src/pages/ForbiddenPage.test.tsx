@@ -1,19 +1,22 @@
 import React from "react"
 import { renderWithProviders, screen } from "../test-utils"
 import ForbiddenPage from "./ForbiddenPage"
+import { waitFor } from "@testing-library/react"
 
 test("The ForbiddenPage loads with meta", async () => {
   renderWithProviders(<ForbiddenPage />, {})
-  const meta = document.querySelector('[name="robots"]')
-  expect(meta).toBeInTheDocument()
+  await waitFor(() => {
+    const meta = document.querySelector('[name="robots"]')
+    expect(meta).toBeInTheDocument()
+  })
 })
 
-test("The ForbiddenPage loads with Correct Title", async () => {
+test("The ForbiddenPage loads with Correct Title", () => {
   renderWithProviders(<ForbiddenPage />, {})
   screen.getByRole("heading", { name: "403 Forbidden Error" })
 })
 
-test("The ForbiddenPage loads with a link that directs to HomePage", async () => {
+test("The ForbiddenPage loads with a link that directs to HomePage", () => {
   renderWithProviders(<ForbiddenPage />, {})
   screen.getByRole("link", { name: "Return Home" })
 })
