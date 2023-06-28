@@ -179,7 +179,7 @@ executing==1.2.0
     # via stack-data
 factory-boy==2.12.0
     # via -r requirements.in
-faker==2.0.0
+faker==2.0.5
     # via
     #   -r requirements.in
     #   factory-boy
