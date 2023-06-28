@@ -6,6 +6,7 @@ import { waitFor } from "@testing-library/react"
 test("The ForbiddenPage loads with meta", async () => {
   renderWithProviders(<ForbiddenPage />, {})
   await waitFor(() => {
+    // eslint-disable-next-line testing-library/no-node-access
     const meta = document.querySelector('[name="robots"]')
     expect(meta).toBeInTheDocument()
   })
