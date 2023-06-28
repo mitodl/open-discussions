@@ -20,7 +20,7 @@ const NotFoundPage: React.FC = () => {
           Resource Not Found
         </CardContent>
         <CardActions>
-          <Button aria-label="Return Home" variant="outlined" href={HOME}>
+          <Button variant="outlined" href={HOME}>
             Home
           </Button>
         </CardActions>
