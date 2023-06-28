@@ -21,4 +21,3 @@ pytest-lazy-fixture>=0.6.3
 responses==0.14.0
 safety
 semantic-version
-tox

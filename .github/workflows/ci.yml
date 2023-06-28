@@ -68,28 +68,22 @@ jobs:
 
       - name: Create test local state
         run: ./scripts/test/stub-data.sh
-
       - name: Tests
         run: |
           export MEDIA_ROOT="$(mktemp -d)"
-          tox
+          ./scripts/test/python_tests.sh
         env:
-          DEBUG: 'False'
-          NODE_ENV: 'production'
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres # pragma: allowlist secret
-          OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
-          OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
-          OPEN_DISCUSSIONS_FEATURES_DEFAULT: 'True'
-          OPEN_DISCUSSIONS_REDDIT_URL: https://reddit.local
-          OPEN_DISCUSSIONS_REDDIT_VALIDATE_SSL: 'False'
-          OPEN_DISCUSSIONS_REDDIT_CLIENT_ID: od_client_id
-          OPEN_DISCUSSIONS_REDDIT_SECRET: od_client_secret # pragma: allowlist secret
-          OPENSEARCH_URL: localhost:9200
-          CELERY_TASK_ALWAYS_EAGER: 'True'
+          OPEN_DISCUSSIONS_BASE_URL: http://localhost:8063/
+          MAILGUN_KEY: fake_mailgun_key
+          MAILGUN_SENDER_DOMAIN: other.fake.site
+          OPENSEARCH_INDEX: testindex
+          INDEXING_API_USERNAME: mitodl
+          OPEN_DISCUSSIONS_COOKIE_DOMAIN: localhost
+          OPEN_DISCUSSIONS_COOKIE_NAME: cookie_monster
           CELERY_BROKER_URL: redis://localhost:6379/4
           CELERY_RESULT_BACKEND: redis://localhost:6379/4
-          TIKA_CLIENT_ONLY: 'True'
-          AKISMET_IS_TESTING: 'True'
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres # pragma: allowlist secret
+          OPENSEARCH_URL: http://localhost:9300/
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1
