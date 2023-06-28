@@ -1,5 +1,5 @@
 import React from "react"
-import { renderWithProviders, screen, user } from "../test-utils"
+import { renderWithProviders, screen } from "../test-utils"
 import ForbiddenPage from "./ForbiddenPage"
 
 test("The ForbiddenPage loads with meta", async () => {
