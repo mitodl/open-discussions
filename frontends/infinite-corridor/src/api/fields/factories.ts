@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { makePaginatedFactory, Factory } from "ol-util/src/factories"
 import { makeUserList } from "ol-search-ui/src/factories"
 import type { UserList } from "ol-search-ui"

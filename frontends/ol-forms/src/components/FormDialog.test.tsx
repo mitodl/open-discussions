@@ -1,5 +1,5 @@
 import React from "react"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { render, screen, act, waitFor } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import FormDialog, { FormDialogProps } from "./FormDialog"

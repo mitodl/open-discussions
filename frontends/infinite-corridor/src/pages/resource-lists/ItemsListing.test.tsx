@@ -1,5 +1,5 @@
 import React from "react"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { SortableList, SortableItem } from "ol-util"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import * as factories from "ol-search-ui/src/factories"

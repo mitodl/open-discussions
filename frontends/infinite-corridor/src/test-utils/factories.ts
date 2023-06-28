@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import type { Factory } from "ol-util/src/factories"
 import type { User } from "../types/settings"
 

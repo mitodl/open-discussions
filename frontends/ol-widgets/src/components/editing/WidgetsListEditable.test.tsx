@@ -4,7 +4,7 @@
 import React from "react"
 import { screen, render, within, act } from "@testing-library/react"
 import user from "@testing-library/user-event"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { makeWidgetListResponse, makeWidget } from "../../factories"
 import WidgetsListEditable from "./WidgetsListEditable"
 import { btnLabel } from "../Widget"
