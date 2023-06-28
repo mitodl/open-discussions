@@ -1,7 +1,8 @@
 import React from "react"
-import { renderWithProviders, screen } from "../test-utils"
-import NotFoundPage from "./NotFoundPage"
 import { waitFor } from "@testing-library/react"
+import { renderWithProviders, screen } from "../test-utils"
+import { HOME } from "./urls"
+import NotFoundPage from "./NotFoundPage"
 
 test("The NotFoundPage loads with meta", async () => {
   renderWithProviders(<NotFoundPage />, {})
@@ -19,5 +20,6 @@ test("The NotFoundPage loads with Correct Title", () => {
 
 test("The NotFoundPage loads with a link that directs to HomePage", () => {
   renderWithProviders(<NotFoundPage />, {})
-  screen.getByRole("link", { name: "Return Home" })
+  const homeLink = screen.getByRole("link", { name: "Return Home" })
+  expect(homeLink).toHaveAttribute("href", HOME)
 })

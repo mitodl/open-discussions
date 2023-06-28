@@ -1,7 +1,8 @@
 import React from "react"
-import { renderWithProviders, screen } from "../test-utils"
-import ForbiddenPage from "./ForbiddenPage"
 import { waitFor } from "@testing-library/react"
+import { renderWithProviders, screen } from "../test-utils"
+import { HOME } from "./urls"
+import ForbiddenPage from "./ForbiddenPage"
 
 test("The ForbiddenPage loads with meta", async () => {
   renderWithProviders(<ForbiddenPage />, {})
@@ -19,5 +20,6 @@ test("The ForbiddenPage loads with Correct Title", () => {
 
 test("The ForbiddenPage loads with a link that directs to HomePage", () => {
   renderWithProviders(<ForbiddenPage />, {})
-  screen.getByRole("link", { name: "Return Home" })
+  const homeLink = screen.getByRole("link", { name: "Return Home" })
+  expect(homeLink).toHaveAttribute("href", HOME)
 })
