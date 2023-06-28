@@ -17,6 +17,7 @@ import {
 } from "./pages/resource-lists/ResourceListDetailsPage"
 import FavoritesPage from "./pages/resource-lists/FavoritesPage"
 import ForbiddenPage from "./pages/ForbiddenPage"
+import NotFoundPage from "./pages/NotFoundPage"
 import * as urls from "./pages/urls"
 import { Route, Router, Switch, useHistory, useLocation } from "react-router"
 import { History } from "history"
@@ -40,7 +41,12 @@ interface AppProps {
   queryClient: QueryClient
 }
 
-type AppLocationState = undefined | { forbidden?: boolean }
+type AppLocationState =
+  | undefined
+  | {
+      forbidden?: boolean
+      notFound?: boolean
+    }
 
 /**
  * Renders child with Router, QueryClientProvider, and other such context provides.
@@ -84,6 +90,9 @@ const AppRoutes: React.FC = () => {
   if (location.state?.forbidden) {
     return <ForbiddenPage />
   }
+  if (location.state?.notFound) {
+    return <NotFoundPage />
+  }
   return (
     <Switch>
       <Route path={urls.HOME} exact>
@@ -122,6 +131,7 @@ const AppRoutes: React.FC = () => {
       <Route path="/infinite/article" exact>
         <ArticlePage />
       </Route>
+      <Route component={NotFoundPage} />
     </Switch>
   )
 }

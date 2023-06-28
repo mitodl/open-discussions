@@ -32,3 +32,4 @@ export const makeStaffListsViewPath = (id: number) =>
 export const TEMPORARY_ARTICLE_VIEW = `${BASE}/article/` as const
 
 export const FORBIDDEN_VIEW = `${BASE}/forbidden`
+export const NOTFOUND_VIEW = `${BASE}/not-found`

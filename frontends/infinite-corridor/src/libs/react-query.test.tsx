@@ -82,16 +82,16 @@ test.each([
   {
     status:           200,
     startingLocation: "/",
-    forbidden:        false
+    state:            undefined
   },
   {
     status:           403,
     startingLocation: "/place/to/go",
-    forbidden:        true
+    state:            { notFound: true }
   }
 ])(
   "Should maintain $startingLocation but set history.location.state.forbidden to true if user is logged in & gets 403",
-  async ({ status, startingLocation, forbidden }) => {
+  async ({ status, startingLocation, state }) => {
     allowConsoleErrors()
     window.SETTINGS.user.is_authenticated = true
     const history = createMemoryHistory()
@@ -108,13 +108,46 @@ test.each([
       expect(result.current.isError).toBe(true)
     })
     expect(history.location.pathname).toBe(startingLocation)
-    if (forbidden) {
+    expect.objectContaining({ state: state })
+  }
+)
+
+test.each([
+  {
+    status:           200,
+    startingLocation: "/",
+    notFound:         false
+  },
+  {
+    status:           404,
+    startingLocation: "/does/not/exist/",
+    notFound:         true
+  }
+])(
+  "Should maintain $startingLocation but set history.location.state.notFound to true if user gets a 404",
+  async ({ status, startingLocation, notFound }) => {
+    allowConsoleErrors()
+    const history = createMemoryHistory()
+    history.replace(startingLocation)
+    const wrapper = getWrapper(history)
+    const queryFn = jest
+      .fn()
+      .mockRejectedValue({ response: { status: status } })
+
+    const { result } = renderHook(() => useQuery(["test"], { queryFn }), {
+      wrapper
+    })
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true)
+    })
+    expect(history.location.pathname).toBe(startingLocation)
+    if (notFound) {
       expect(history.location).toEqual(
-        expect.objectContaining({ state: { forbidden: true } })
+        expect.objectContaining({ state: { notFound: true } })
       )
     } else {
       expect(history.location).toEqual(
-        expect.not.objectContaining({ state: { forbidden: true } })
+        expect.not.objectContaining({ state: { notFound: true } })
       )
     }
   }

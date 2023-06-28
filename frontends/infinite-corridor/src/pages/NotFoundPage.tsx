@@ -8,7 +8,7 @@ import Button from "@mui/material/Button"
 import { HOME } from "./urls"
 import { MetaTags } from "ol-util"
 
-const ForbiddenPage: React.FC = () => {
+const NotFoundPage: React.FC = () => {
   return (
     <Container maxWidth="sm">
       <Card sx={{ marginTop: "1rem" }}>
@@ -16,8 +16,8 @@ const ForbiddenPage: React.FC = () => {
           <meta name="robots" content="noindex,noarchive" />
         </MetaTags>
         <CardContent>
-          <h1>403 Forbidden Error</h1>
-          You do not have permission to access this resource.
+          <h1>404 Not Found Error</h1>
+          Resource Not Found
         </CardContent>
         <CardActions>
           <Button variant="outlined" href={HOME}>
@@ -29,4 +29,4 @@ const ForbiddenPage: React.FC = () => {
   )
 }
 
-export default ForbiddenPage
+export default NotFoundPage
