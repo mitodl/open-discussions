@@ -20,6 +20,6 @@ test("The ForbiddenPage loads with Correct Title", () => {
 
 test("The ForbiddenPage loads with a link that directs to HomePage", () => {
   renderWithProviders(<ForbiddenPage />, {})
-  const homeLink = screen.getByRole("link", { name: "Return Home" })
+  const homeLink = screen.getByRole("link", { name: "Home" })
   expect(homeLink).toHaveAttribute("href", HOME)
 })
