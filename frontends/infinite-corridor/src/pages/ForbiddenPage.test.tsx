@@ -3,6 +3,8 @@ import { renderWithProviders, screen, user } from "../test-utils"
 import ForbiddenPage from "./ForbiddenPage"
 import HomePage from "./HomePage"
 
+const returnHome = jest.mocked(HomePage)
+
 test("The ForbiddenPage loads with meta", async () => {
   renderWithProviders(<ForbiddenPage />, {})
   const meta = document.querySelector('[name="robots"]')
@@ -18,5 +20,5 @@ test("The ForbiddenPage loads with a link that directs to HomePage", async () =>
   renderWithProviders(<ForbiddenPage />, {})
   const homeButton = screen.getByRole("link", { name: "Return Home" })
   await user.click(homeButton)
-  expect(HomePage).toHaveBeenCalled()
+  expect(returnHome).toHaveBeenCalled()
 })

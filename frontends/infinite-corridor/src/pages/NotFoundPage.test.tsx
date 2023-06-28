@@ -3,6 +3,8 @@ import { renderWithProviders, screen, user } from "../test-utils"
 import NotFoundPage from "./NotFoundPage"
 import HomePage from "./HomePage"
 
+const returnHome = jest.mocked(HomePage)
+
 test("The NotFoundPage loads with meta", () => {
   renderWithProviders(<NotFoundPage />, {})
   const meta = document.querySelector('[name="robots"]')
@@ -18,5 +20,5 @@ test("The NotFoundPage loads with a link that directs to HomePage", async () => 
   renderWithProviders(<NotFoundPage />, {})
   const homeButton = await screen.findByRole("link", { name: "Return Home" })
   await user.click(homeButton)
-  expect(HomePage).toHaveBeenCalled()
+  expect(returnHome).toHaveBeenCalled()
 })
