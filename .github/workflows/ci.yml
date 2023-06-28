@@ -126,8 +126,17 @@ jobs:
       - name: Typecheck
         run: yarn run typecheck
 
+      - name: Tests (old; mocha)
+        run:  yarn workspace open-discussions run test
+        env:
+          NODE_ENV: test
+
+      - name: Get number of CPU cores
+        id: cpu-cores
+        uses: SimenB/github-actions-cpu-cores@v1
+
       - name: Tests
-        run: yarn run test
+        run: yarn test --max-workers ${{ steps.cpu-cores.outputs.count }}
         env:
           CODECOV: true
           NODE_ENV: test
