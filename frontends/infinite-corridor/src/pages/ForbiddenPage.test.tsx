@@ -5,7 +5,7 @@ import HomePage from "./HomePage"
 
 test("The ForbiddenPage loads with meta", async () => {
   renderWithProviders(<ForbiddenPage />, {})
-  const meta = document.querySelector('meta[name="robots"]')
+  const meta = document.querySelector('[name="robots"]')
   expect(meta).toBeInTheDocument()
 })
 
@@ -14,9 +14,9 @@ test("The ForbiddenPage loads with Correct Title", async () => {
   screen.getByRole("heading", { name: "403 Forbidden Error" })
 })
 
-test("The ForbiddenPage loads with a button that directs to HomePage", async () => {
+test("The ForbiddenPage loads with a link that directs to HomePage", async () => {
   renderWithProviders(<ForbiddenPage />, {})
-  const homeButton = screen.getByRole("button", { name: "Return Home" })
+  const homeButton = screen.getByRole("link", { name: "Return Home" })
   await user.click(homeButton)
   expect(HomePage).toHaveBeenCalled()
 })

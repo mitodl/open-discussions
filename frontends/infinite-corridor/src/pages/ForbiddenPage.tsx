@@ -20,7 +20,7 @@ const ForbiddenPage: React.FC = () => {
           You do not have permission to access this resource.
         </CardContent>
         <CardActions>
-          <Button variant="outlined" href={HOME}>
+          <Button aria-label="Return Home" variant="outlined" href={HOME}>
             Home
           </Button>
         </CardActions>
