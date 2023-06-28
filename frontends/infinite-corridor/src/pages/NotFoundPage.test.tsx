@@ -7,8 +7,8 @@ test("The NotFoundPage loads with meta", async () => {
   renderWithProviders(<NotFoundPage />, {})
   await waitFor(() => {
     // eslint-disable-next-line testing-library/no-node-access
-    const meta = document.querySelector('[name="robots"]')
-    expect(meta).toBeInTheDocument()
+    const meta = document.head.querySelector('meta[name="robots"]')
+    expect(meta).toHaveProperty("content", "noindex,noarchive")
   })
 })
 
