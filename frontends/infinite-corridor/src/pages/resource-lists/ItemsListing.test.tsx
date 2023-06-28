@@ -115,7 +115,7 @@ describe("Sorting ItemListing", () => {
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
 
-    const { onSortEnd } = spySortableList.mock.lastCall[0]
+    const onSortEnd = spySortableList.mock.lastCall?.[0]?.onSortEnd
     invariant(onSortEnd)
 
     const simulateDrag = (from: number, to: number) => {

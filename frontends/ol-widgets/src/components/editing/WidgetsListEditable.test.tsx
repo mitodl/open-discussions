@@ -231,7 +231,9 @@ describe("WidgetsListEditable", () => {
     const { widgets, getHeader, spies } = renderWidgetsList()
     const [w1, w2, w3] = widgets
 
-    const { onSortEnd, itemIds } = spySortableList.mock.lastCall[0]
+    const lastProps = spySortableList.mock.lastCall?.[0]
+    invariant(lastProps)
+    const { onSortEnd, itemIds } = lastProps
     invariant(onSortEnd, "onSortEnd should be defined")
     // Note that these are the wrapper ids not the widget ids
     const [id1, id2, id3] = itemIds

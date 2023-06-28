@@ -9,6 +9,7 @@ import type {
 } from "@dnd-kit/core"
 import type { SortableData } from "@dnd-kit/sortable"
 import SortableList, { SortableItem } from "./SortableList"
+import invariant from "tiny-invariant"
 
 jest.mock("@dnd-kit/core", () => {
   const actual = jest.requireActual("@dnd-kit/core")
@@ -75,14 +76,16 @@ const setupTest = (itemIds: string[]) => {
   )
   const dnd = {
     onDragStart: (e: DragStartEvent) => {
-      const props = spyDndContext.mock.lastCall[0]
+      const props = spyDndContext.mock.lastCall?.[0]
+      invariant(props, "DndContext props should be defined")
       if (!props.onDragStart) {
         throw new Error("props.onDragStart should be defined")
       }
       props.onDragStart(e)
     },
     onDragEnd: (e: DragEndEvent) => {
-      const props = spyDndContext.mock.lastCall[0]
+      const props = spyDndContext.mock.lastCall?.[0]
+      invariant(props, "DndContext props should be defined")
       if (!props.onDragEnd) throw new Error("props.onDragEnd should be defined")
       if (!props.cancelDrop) {
         throw new Error("props.cancelDrop should be defined")
