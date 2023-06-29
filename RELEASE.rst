@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.221.1
+Version 0.221.1 (Released June 29, 2023)
 ---------------
 
 - New Open 404 Handling (#4089)
