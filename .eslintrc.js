@@ -6,7 +6,9 @@ module.exports = {
     "@typescript-eslint/no-restricted-imports": ["error", {
       paths: [
         /**
-         * See:
+         * No direct imports from "barrel files". They make Jest slow.
+         *
+         * For more, see:
          *  - https://github.com/jestjs/jest/issues/11234
          *  - https://github.com/faker-js/faker/issues/1114#issuecomment-1169532948
          */
