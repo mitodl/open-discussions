@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.221.1
+---------------
+
+- New Open 404 Handling (#4089)
+- Update dependency cryptography to v41 [SECURITY] (#4036)
+- Update dependency faker to v2.0.5 (#4077)
+- Update dependency betamax to v0.8.1 (#4044)
+- alphabetize (#4118)
+- Update dependency tldextract to v2.2.3 (#4113)
+- Update dependency styled-components to v5.3.11 (#4112)
+- Article editor in new open (frontend only) (#4064)
+- Update dependency style-loader to v3.3.3 (#4111)
+- update local postgres to 12.11 (#4092)
+
 Version 0.221.0 (Released June 27, 2023)
 ---------------
 
