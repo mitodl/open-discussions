@@ -1,4 +1,4 @@
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import * as factories from "ol-search-ui/src/factories"
 import { urls as lrUrls } from "../../api/learning-resources"
 import {

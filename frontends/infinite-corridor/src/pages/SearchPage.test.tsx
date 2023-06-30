@@ -71,6 +71,11 @@ const enableInfiniteScrollerScrolling = async () => {
 
 describe("SearchPage", () => {
   test("should support InfiniteScroll-ing", async () => {
+    const DEFAULT_DEVICE_WIDTH = "1200px"
+    window.matchMedia = createMatchMediaForJsDom({
+      width: DEFAULT_DEVICE_WIDTH
+    })
+
     const firstResponse = makeSearchResponse()
     const secondResponse = makeSearchResponse()
 

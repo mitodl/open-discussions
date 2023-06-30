@@ -16,7 +16,7 @@ import {
   useResource,
   useUpcomingCourses
 } from "./resources"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { useFavoritesListing } from "./favorites"
 import { useStaffListItems } from "./resourceLists"
 

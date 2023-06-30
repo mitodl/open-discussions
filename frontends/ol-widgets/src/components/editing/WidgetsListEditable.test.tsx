@@ -4,7 +4,7 @@
 import React from "react"
 import { screen, render, within, act } from "@testing-library/react"
 import user from "@testing-library/user-event"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { makeWidgetListResponse, makeWidget } from "../../factories"
 import WidgetsListEditable from "./WidgetsListEditable"
 import { btnLabel } from "../Widget"
@@ -231,7 +231,9 @@ describe("WidgetsListEditable", () => {
     const { widgets, getHeader, spies } = renderWidgetsList()
     const [w1, w2, w3] = widgets
 
-    const { onSortEnd, itemIds } = spySortableList.mock.lastCall[0]
+    const lastProps = spySortableList.mock.lastCall?.[0]
+    invariant(lastProps)
+    const { onSortEnd, itemIds } = lastProps
     invariant(onSortEnd, "onSortEnd should be defined")
     // Note that these are the wrapper ids not the widget ids
     const [id1, id2, id3] = itemIds

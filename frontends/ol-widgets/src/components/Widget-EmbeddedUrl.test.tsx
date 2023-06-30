@@ -1,5 +1,5 @@
 import React from "react"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { render } from "@testing-library/react"
 import Widget from "./Widget"
 import { makeEmbeddedUrlWidget } from "../factories"

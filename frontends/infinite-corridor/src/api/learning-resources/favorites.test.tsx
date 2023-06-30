@@ -1,7 +1,7 @@
 import React from "react"
 import { renderHook, waitFor } from "@testing-library/react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { setMockResponse, act } from "../../test-utils"
 import { invalidateResourceQueries } from "./util"
 import { urls } from "./urls"

@@ -1,7 +1,7 @@
 import React from "react"
 import { screen, render, waitFor } from "@testing-library/react"
 import user from "@testing-library/user-event"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { assertNotNil, PartialBy } from "ol-util"
 import { makeWidgetListResponse, makeWidget } from "../../factories"
 import ManageWidgetDialog from "./ManageWidgetDialog"

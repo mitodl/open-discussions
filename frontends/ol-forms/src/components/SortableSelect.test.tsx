@@ -1,6 +1,6 @@
 import React from "react"
 import { zip } from "lodash"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { render, screen } from "@testing-library/react"
 
 import SortableSelect, { SortableItem } from "./SortableSelect"

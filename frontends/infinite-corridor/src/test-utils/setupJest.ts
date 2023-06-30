@@ -2,7 +2,6 @@ import "jest-extended"
 import "jest-extended/all"
 
 import { setupMockEditors } from "ol-ckeditor/test_utils"
-import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
 import { mockAxiosInstance, resetApi } from "./mockAxios"
 import { makeUserSettings } from "./factories"
 
@@ -35,11 +34,6 @@ afterEach(() => {
   jest.clearAllMocks()
   resetApi()
   global.SETTINGS = _createSettings()
-})
-
-const DEFAULT_DEVICE_WIDTH = "1200px"
-beforeAll(() => {
-  window.matchMedia = createMatchMediaForJsDom({ width: DEFAULT_DEVICE_WIDTH })
 })
 
 /**

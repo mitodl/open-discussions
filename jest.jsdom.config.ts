@@ -13,8 +13,7 @@ const config: Config.InitialOptions & Pick<Required<Config.InitialOptions>, "set
   moduleNameMapper:  {
     '\\.scss$': 'identity-obj-proxy'
   },
-  verbose:          true,
-  rootDir:          "./src",
+  rootDir: "./src",
 }
 
 export default config

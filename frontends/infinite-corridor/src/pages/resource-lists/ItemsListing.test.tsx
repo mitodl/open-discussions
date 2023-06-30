@@ -1,5 +1,5 @@
 import React from "react"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { SortableList, SortableItem } from "ol-util"
 import LearningResourceCard from "../../components/LearningResourceCard"
 import * as factories from "ol-search-ui/src/factories"
@@ -115,7 +115,7 @@ describe("Sorting ItemListing", () => {
     const allProps = { ...defaultProps, ...props }
     const { history } = renderWithProviders(<UserListItems {...allProps} />)
 
-    const { onSortEnd } = spySortableList.mock.lastCall[0]
+    const onSortEnd = spySortableList.mock.lastCall?.[0]?.onSortEnd
     invariant(onSortEnd)
 
     const simulateDrag = (from: number, to: number) => {

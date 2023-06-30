@@ -1,7 +1,7 @@
 import React from "react"
 import { render, screen, fireEvent, within } from "@testing-library/react"
 import user from "@testing-library/user-event"
-import { faker } from "@faker-js/faker"
+import { faker } from "@faker-js/faker/locale/en"
 import { assertInstanceOf, assertNotNil } from "ol-util"
 import { getByTerm, queryByTerm } from "ol-util/src/test-utils"
 import { makeUrl } from "ol-util/src/factories"
