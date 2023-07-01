@@ -33,7 +33,7 @@ billiard==4.1.0
     # via celery
 boto==2.39.0
     # via smart-open
-boto3==1.26.160
+boto3==1.26.165
     # via
     #   -r requirements.in
     #   ocw-data-parser
