@@ -17352,7 +17352,7 @@ __metadata:
     webpack-cli: 4.10.0
     webpack-dev-middleware: 5.3.3
     webpack-dev-server: ^4.9.2
-    webpack-hot-middleware: 2.25.1
+    webpack-hot-middleware: 2.25.4
     whatwg-url: 7.0.0
   languageName: unknown
   linkType: soft
@@ -19160,13 +19160,6 @@ __metadata:
     split-on-first: ^1.0.0
     strict-uri-encode: ^2.0.0
   checksum: 91af02dcd9cc9227a052841d5c2eecb80a0d6489d05625df506a097ef1c59037cfb5e907f39b84643cbfd535c955abec3e553d0130a7b510120c37d06e0f4346
-  languageName: node
-  linkType: hard
-
-"querystring@npm:^0.2.0":
-  version: 0.2.1
-  resolution: "querystring@npm:0.2.1"
-  checksum: 7b83b45d641e75fd39cd6625ddfd44e7618e741c61e95281b57bbae8fde0afcc12cf851924559e5cc1ef9baa3b1e06e22b164ea1397d65dd94b801f678d9c8ce
   languageName: node
   linkType: hard
 
@@ -23976,19 +23969,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-hot-middleware@npm:2.25.1":
-  version: 2.25.1
-  resolution: "webpack-hot-middleware@npm:2.25.1"
-  dependencies:
-    ansi-html-community: 0.0.8
-    html-entities: ^2.1.0
-    querystring: ^0.2.0
-    strip-ansi: ^6.0.0
-  checksum: 49f05023a1e95fab2703a885c3321dfd2ff832bcece9cbfafe9dbe68bcf16a25cd5c3c455b0534e93b7448f2dd05de2ef9009394c95dfae9bbbcc740189416f7
-  languageName: node
-  linkType: hard
-
-"webpack-hot-middleware@npm:^2.25.1":
+"webpack-hot-middleware@npm:2.25.4, webpack-hot-middleware@npm:^2.25.1":
   version: 2.25.4
   resolution: "webpack-hot-middleware@npm:2.25.4"
   dependencies:

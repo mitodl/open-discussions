@@ -174,7 +174,7 @@
     "webpack-cli": "4.10.0",
     "webpack-dev-middleware": "5.3.3",
     "webpack-dev-server": "^4.9.2",
-    "webpack-hot-middleware": "2.25.1",
+    "webpack-hot-middleware": "2.25.4",
     "whatwg-url": "7.0.0"
   },
   "resolutions": {
