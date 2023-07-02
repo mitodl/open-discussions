@@ -249,7 +249,7 @@ mit-moira @ git+https://github.com/mitodl/mit-moira.git
     # via -r requirements.in
 nested-lookup==0.2.25
     # via -r requirements.in
-newrelic==8.8.0
+newrelic==8.8.1
     # via -r requirements.in
 oauthlib==2.0.7
     # via
