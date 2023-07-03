@@ -1,6 +1,6 @@
 {
   "name": "ol-forms",
-  "packageManager": "yarn@3.2.0",
+  "packageManager": "yarn@3.6.1",
   "main": "./src/index.ts",
   "peerDependencies": {
     "react": "^16.10 || 17 || 18",

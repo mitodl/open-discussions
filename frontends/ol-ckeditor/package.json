@@ -1,6 +1,6 @@
 {
   "name": "ol-ckeditor",
-  "packageManager": "yarn@3.2.0",
+  "packageManager": "yarn@3.6.1",
   "exports": {
     ".": "./src/index.ts",
     "./test_utils": "./src/test_utils.tsx",
