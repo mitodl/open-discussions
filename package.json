@@ -32,7 +32,7 @@
         "create-package": "yarn workspace ol-template plop package"
     },
     "version": "0.0.0",
-    "packageManager": "yarn@3.2.0",
+    "packageManager": "yarn@3.6.1",
     "dependencies": {
         "@ebay/nice-modal-react": "^1.2.10",
         "@swc/core": "^1.3.32",

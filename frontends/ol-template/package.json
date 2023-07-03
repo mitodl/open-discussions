@@ -2,7 +2,7 @@
   "name": "ol-template",
   "description": "Templates for the frontend.",
   "type": "module",
-  "packageManager": "yarn@3.2.0",
+  "packageManager": "yarn@3.6.1",
   "dependencies": {
     "plop": "^3.1.2"
   },
