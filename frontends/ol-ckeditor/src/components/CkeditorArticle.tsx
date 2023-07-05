@@ -3,7 +3,6 @@ import { CKEditor } from "@ckeditor/ckeditor5-react"
 
 import { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic"
 import type { EditorConfig } from "@ckeditor/ckeditor5-core"
-import { icons } from "@ckeditor/ckeditor5-core"
 
 import { Essentials } from "@ckeditor/ckeditor5-essentials"
 import { UploadAdapter } from "@ckeditor/ckeditor5-adapter-ckfinder"
