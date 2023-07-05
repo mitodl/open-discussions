@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euf -o pipefail
 
-docker-compose run web tox
-docker-compose run watch npm run-script lint
-docker-compose run watch npm run-script flow
-docker-compose run watch npm run-script coverage
+docker-compose run --rm web ./scripts/test/python_tests.sh
+docker-compose run --rm watch yarn lint-check
+docker-compose run --rm watch yarn typecheck

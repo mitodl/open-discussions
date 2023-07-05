@@ -68,14 +68,11 @@ jobs:
 
       - name: Create test local state
         run: ./scripts/test/stub-data.sh
-
       - name: Tests
         run: |
           export MEDIA_ROOT="$(mktemp -d)"
-          tox
+          ./scripts/test/python_tests.sh
         env:
-          DEBUG: 'False'
-          NODE_ENV: 'production'
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres # pragma: allowlist secret
           OPEN_DISCUSSIONS_SECURE_SSL_REDIRECT: 'False'
           OPEN_DISCUSSIONS_DB_DISABLE_SSL: 'True'
@@ -90,6 +87,13 @@ jobs:
           CELERY_RESULT_BACKEND: redis://localhost:6379/4
           TIKA_CLIENT_ONLY: 'True'
           AKISMET_IS_TESTING: 'True'
+          OPEN_DISCUSSIONS_BASE_URL: http://localhost:8063/
+          MAILGUN_KEY: fake_mailgun_key
+          MAILGUN_SENDER_DOMAIN: other.fake.site
+          OPENSEARCH_INDEX: testindex
+          INDEXING_API_USERNAME: mitodl
+          OPEN_DISCUSSIONS_COOKIE_DOMAIN: localhost
+          OPEN_DISCUSSIONS_COOKIE_NAME: cookie_monster
 
       - name: Upload coverage to CodeCov
         uses: codecov/codecov-action@v1
