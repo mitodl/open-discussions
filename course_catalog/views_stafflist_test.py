@@ -15,7 +15,7 @@ from course_catalog.models import StaffList
 from course_catalog.utils import update_editor_group
 from open_discussions.factories import UserFactory
 
-# pylint:disable=redefined-outer-name
+# pylint:disable=redefined-outer-name,unused-argument
 
 
 @pytest.fixture()
