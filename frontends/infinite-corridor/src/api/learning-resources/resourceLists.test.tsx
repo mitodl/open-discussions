@@ -28,7 +28,7 @@ import {
   useUpdateUserList
 } from "./resourceLists"
 import { useResource } from "./resources"
-import { ControlledPromise } from "ol-util/src/test-utils"
+import { ControlledPromise } from "ol-util/test-utils"
 import axios from "../../libs/axios"
 import { clone } from "lodash"
 import { useInfiniteSearch } from "./search"

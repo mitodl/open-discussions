@@ -3,7 +3,7 @@ import { faker } from "@faker-js/faker/locale/en"
 import { render, screen, act, waitFor } from "@testing-library/react"
 import user from "@testing-library/user-event"
 import FormDialog, { FormDialogProps } from "./FormDialog"
-import { ControlledPromise } from "ol-util/src/test-utils"
+import { ControlledPromise } from "ol-util/test-utils"
 
 const setup = (props?: Partial<FormDialogProps>) => {
   const onSubmit = jest.fn(e => {

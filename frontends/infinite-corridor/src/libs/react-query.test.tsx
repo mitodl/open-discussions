@@ -1,6 +1,6 @@
 import React from "react"
 import { renderHook, waitFor } from "@testing-library/react"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import { allowConsoleErrors } from "ol-util/test-utils"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { useQuery } from "@tanstack/react-query"
 import { createMemoryHistory, MemoryHistory } from "history"

@@ -4,6 +4,8 @@ import { GridColumn, GridContainer } from "../components/layout"
 import Container from "@mui/material/Container"
 import { CkeditorArticleLazy } from "ol-ckeditor"
 
+const configOverrides = { placeholder: "Write your article here..." }
+
 const ArticlePage: React.FC = () => {
   const [value, setValue] = useState("")
   return (
@@ -21,7 +23,7 @@ const ArticlePage: React.FC = () => {
               className="article-editor"
               value={value}
               onChange={setValue}
-              placeholder="Write your article here..."
+              config={configOverrides}
             />
             <h2>Preview</h2>
             <div dangerouslySetInnerHTML={{ __html: value }} />
