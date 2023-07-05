@@ -8,6 +8,8 @@ akismet==1.1
     # via -r requirements.in
 amqp==5.1.1
     # via kombu
+appnope==0.1.3
+    # via ipython
 asgiref==3.7.2
     # via django
 asttokens==2.2.1
@@ -33,16 +35,14 @@ billiard==4.1.0
     # via celery
 boto==2.39.0
     # via smart-open
-boto3==1.26.165
+boto3==1.26.155
     # via
     #   -r requirements.in
     #   ocw-data-parser
-    #   pyathena
     #   smart-open
 botocore==1.29.165
     # via
     #   boto3
-    #   pyathena
     #   s3transfer
 bz2file==0.98
     # via smart-open
@@ -171,7 +171,7 @@ drf-extensions==0.7.1
     # via -r requirements.in
 drf-jwt==1.19.2
     # via -r requirements.in
-drf-spectacular==0.26.3
+drf-spectacular==0.26.2
     # via -r requirements.in
 elasticsearch==7.10.0
     # via django-server-status
@@ -303,8 +303,6 @@ pyasn1==0.4.7
     #   rsa
 pyasn1-modules==0.2.7
     # via google-auth
-pyathena==2.1.1
-    # via -r requirements.in
 pycparser==2.18
     # via cffi
 pygithub==1.44.1
@@ -340,7 +338,7 @@ pytz==2022.1
     # via
     #   djangorestframework
     #   zeep
-pyyaml==5.4.1
+pyyaml==5.4
     # via
     #   -r requirements.in
     #   drf-spectacular
@@ -401,7 +399,6 @@ six==1.15.0
     #   pygithub
     #   python-dateutil
     #   requests-file
-    #   tenacity
 smart-open==1.8.0
     # via ocw-data-parser
 social-auth-app-django==5.2.0
@@ -420,8 +417,6 @@ static3==0.5.1
     # via
     #   -r requirements.in
     #   dj-static
-tenacity==6.3.1
-    # via pyathena
 text-unidecode==1.3
     # via faker
 tika==1.23.1

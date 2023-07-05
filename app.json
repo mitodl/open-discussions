@@ -31,22 +31,6 @@
       "description": "Blog urlfor Akismet",
       "required": false
     },
-    "ATHENA_MITX_DATABASE_NAME": {
-      "description": "Database name for Athena queries",
-      "required": true
-    },
-    "ATHENA_MITX_ENROLLMENTS_TABLE": {
-      "description": "Table name for Athena mitx enrollments",
-      "required": false
-    },
-    "ATHENA_REGION_NAME": {
-      "description": "Region name for Athena queries",
-      "required": false
-    },
-    "ATHENA_WORK_GROUP": {
-      "description": "Work group for Athena queries",
-      "required": false
-    },
     "AWS_ACCESS_KEY_ID": {
       "description": "AWS Access Key for S3 storage.",
       "required": false
