@@ -571,7 +571,7 @@ def test_get_youtube_transcripts_with_multiple_consecutive_failures(mocker):
     mock_caption_call = mocker.patch(
         "course_catalog.etl.youtube.get_captions_for_video"
     )
-    mock_caption_call.side_effect = pytube.exceptions.VideoUnavailable
+    mock_caption_call.side_effect = pytube.exceptions.VideoUnavailable(1)
 
     mock_parse_call = mocker.patch("course_catalog.etl.youtube.parse_video_captions")
     mock_upsert_video = mocker.patch("course_catalog.etl.youtube.upsert_video")
