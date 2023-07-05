@@ -29,8 +29,7 @@ import { ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph"
 import getCloudServicesConfig from "./cloudServices"
 import { ensureEmbedlyPlatform, embedlyCardHtml } from "ol-util"
 import BlockEditorIcon from "./BlockEditorIcon"
-
-import plusIcon from "@ckeditor/ckeditor5-core/theme/icons/plus.svg"
+import { icons } from "@ckeditor/ckeditor5-core"
 
 const baseEditorConfig: EditorConfig = {
   plugins: [
@@ -92,7 +91,7 @@ const baseEditorConfig: EditorConfig = {
     ]
   },
   blockEditorIcon: {
-    icon: plusIcon
+    icon: icons.plus
   }
 }
 
