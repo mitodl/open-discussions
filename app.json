@@ -19,6 +19,9 @@
     },
     {
       "url": "https://github.com/heroku/heroku-buildpack-nginx"
+    },
+    {
+      "url": "https://github.com/moneymeets/python-poetry-buildpack"
     }
   ],
   "description": "open-discussions",
