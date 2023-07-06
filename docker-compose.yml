@@ -126,7 +126,6 @@ services:
 
   tika:
     image: apache/tika:1.28
-    entrypoint: java -jar tika-server-1.28.jar -h 0.0.0.0 -spawnChild
     ports:
       - "9998:9998"
 
