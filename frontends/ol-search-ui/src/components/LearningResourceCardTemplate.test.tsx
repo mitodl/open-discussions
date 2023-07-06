@@ -9,7 +9,7 @@ import {
   makeUserList
 } from "../factories"
 import { resourceThumbnailSrc } from "../util"
-import { allowConsoleErrors } from "ol-util/src/test-utils"
+import { allowConsoleErrors } from "ol-util/test-utils"
 
 describe("LearningResourceCard", () => {
   it("renders title and cover image", () => {

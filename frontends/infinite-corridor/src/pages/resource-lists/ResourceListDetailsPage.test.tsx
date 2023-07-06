@@ -25,7 +25,7 @@ import {
   expectLastProps
 } from "../../test-utils"
 import { User } from "../../types/settings"
-import { ControlledPromise } from "ol-util/src/test-utils"
+import { ControlledPromise } from "ol-util/test-utils"
 
 jest.mock("./ItemsListing", () => {
   const actual = jest.requireActual("./ItemsListing")

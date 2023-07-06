@@ -7,7 +7,7 @@ import {
   UserList
 } from "ol-search-ui"
 import * as factories from "ol-search-ui/src/factories"
-import { allowConsoleErrors, getDescriptionFor } from "ol-util/src/test-utils"
+import { allowConsoleErrors, getDescriptionFor } from "ol-util/test-utils"
 import { urls as lrUrls } from "../../api/learning-resources"
 import { manageListDialogs } from "./ManageListDialogs"
 import {

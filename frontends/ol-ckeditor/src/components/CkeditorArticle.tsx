@@ -28,6 +28,8 @@ import { BlockToolbar } from "@ckeditor/ckeditor5-ui"
 import { ParagraphButtonUI } from "@ckeditor/ckeditor5-paragraph"
 import getCloudServicesConfig from "./cloudServices"
 import { ensureEmbedlyPlatform, embedlyCardHtml } from "ol-util"
+import BlockEditorIcon from "./BlockEditorIcon"
+import { icons } from "@ckeditor/ckeditor5-core"
 
 const baseEditorConfig: EditorConfig = {
   plugins: [
@@ -49,7 +51,8 @@ const baseEditorConfig: EditorConfig = {
     ImageStyle,
     ImageToolbar,
     ImageUpload,
-    ParagraphButtonUI
+    ParagraphButtonUI,
+    BlockEditorIcon
   ],
   blockToolbar: ["mediaEmbed", "imageUpload"],
   toolbar:      {
@@ -86,6 +89,9 @@ const baseEditorConfig: EditorConfig = {
         }
       }
     ]
+  },
+  blockEditorIcon: {
+    icon: icons.plus
   }
 }
 
@@ -95,8 +101,7 @@ type CkeditorArticleProps = {
   onBlur?: () => void
   id?: string
   className?: string
-  placeholder?: string
-  editableClassName?: string
+  config?: Partial<EditorConfig>
 }
 
 const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
@@ -105,14 +110,14 @@ const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
   onBlur,
   id,
   className,
-  placeholder
+  config
 }) => {
-  const config = useMemo(() => {
+  const fullConfig = useMemo(() => {
     return {
       ...baseEditorConfig,
-      ...(placeholder ? { placeholder } : {})
+      ...config
     }
-  }, [placeholder])
+  }, [config])
 
   useEffect(() => {
     ensureEmbedlyPlatform()
@@ -123,7 +128,7 @@ const CkeditorArticle: React.FC<CkeditorArticleProps> = ({
       <CKEditor
         editor={ClassicEditor}
         data={value}
-        config={config}
+        config={fullConfig}
         onChange={(_event, editor) => {
           const data = editor.getData()
           onChange(data)
