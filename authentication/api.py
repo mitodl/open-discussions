@@ -9,7 +9,6 @@ from authentication.backends.micromasters import MicroMastersAuth
 from channels import api as channels_api
 from notifications import api as notifications_api
 from profiles import api as profile_api
-from course_catalog.tasks import update_enrollments_for_email
 
 User = get_user_model()
 
@@ -46,8 +45,6 @@ def create_user(username, email, profile_data=None, user_extra=None):
         # this could fail if the reddit backend is down
         # so if it fails we want to rollback this entire transaction
         channels_api.get_or_create_auth_tokens(user)
-
-    update_enrollments_for_email.delay(user.email)
 
     return user
 

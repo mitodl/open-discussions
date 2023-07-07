@@ -68,14 +68,10 @@ def test_serialize_create_user(db, mocker):
     get_or_create_auth_tokens_stub = mocker.patch(
         "channels.api.get_or_create_auth_tokens"
     )
-    enrollment_job_mock = mocker.patch(
-        "authentication.api.update_enrollments_for_email.delay"
-    )
     serializer = UserSerializer(data={"email": "test@localhost", "profile": profile})
     serializer.is_valid(raise_exception=True)
     user = serializer.save()
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
-    enrollment_job_mock.assert_called_once_with(user.email)
 
     del profile["email_optin"]  # is write-only
     del profile["toc_optin"]  # is write-only
