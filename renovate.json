@@ -12,6 +12,9 @@
         "major"
       ],
       "enabled": false
+    },
+    {
+      "matchSourceUrls": ["https://github.com/ckeditor/ckeditor5"] 
     }
   ]
 }
