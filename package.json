@@ -75,7 +75,7 @@
         "react-appzi": "^1.0.4",
         "react-share": "^4.4.0",
         "rimraf": "^3.0.2",
-        "stylelint": "^15.2.0",
+        "stylelint": "^15.10.1",
         "stylelint-config-standard-scss": "^7.0.1",
         "swc-loader": "^0.2.3",
         "tiny-invariant": "^1.3.1",
