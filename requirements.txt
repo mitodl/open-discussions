@@ -281,7 +281,7 @@ praw==4.5.1
     # via -r requirements.in
 prawcore==0.10.1
     # via praw
-prompt-toolkit==3.0.38
+prompt-toolkit==3.0.39
     # via
     #   click-repl
     #   ipython
