@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.222.0
+Version 0.222.0 (Released July 10, 2023)
 ---------------
 
 - Use "+" not "¶" for ckeditor block toolbar (#4153)
