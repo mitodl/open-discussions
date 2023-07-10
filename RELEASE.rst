@@ -1,6 +1,34 @@
 Release Notes
 =============
 
+Version 0.222.0 (Released July 10, 2023)
+---------------
+
+- Use "+" not "¶" for ckeditor block toolbar (#4153)
+- Use pytest directly without tox (#4119)
+- Update apache/tika Docker tag to v1.28 (#4148)
+- Update Yarn to v3.6.1 (#4147)
+- Update Node.js to v16.20.1 (#4146)
+- Update tanstack-query monorepo to v4.29.19 (#4145)
+- Update redis Docker tag to v5.0.14 (#4144)
+- Update react-router monorepo to v5.3.4 (#4143)
+- Update react monorepo (#4142)
+- Update opensearchproject/opensearch Docker tag to v1.3.11 (#4141)
+- Update dependency webpack-hot-middleware to v2.25.4 (#4140)
+- Update dependency webpack-hot-middleware to v2.25.4 (#4139)
+- Update dependency urllib3 to v1.26.16 (#4138)
+- Update dependency url to v0.11.1 (#4137)
+- Update dependency url to v0.11.1 (#4136)
+- Update dependency tzinfo to v1.2.11 (#4135)
+- Update dependency newrelic to v8.8.1 (#4134)
+- Update dependency cryptography to v41.0.1 (#4133)
+- Update dependency boto3 to v1.26.165 (#4131)
+- Update dependency botocore to v1.29.165 (#4132)
+- Update dependency @swc/core to v1.3.67 (#4130)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.0.4 (#4129)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.0.4 (#4128)
+- Make jest faster (#4121)
+
 Version 0.221.1 (Released June 29, 2023)
 ---------------
 
