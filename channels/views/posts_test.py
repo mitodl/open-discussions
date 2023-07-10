@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.request import Request
 
 from profiles.utils import image_uri
-from channels.factories.models import LinkMetaFactory
+from channels.factories.models import LinkMetaFactory, PostFactory
 from channels.constants import (
     EXTENDED_POST_TYPE_ARTICLE,
     VALID_POST_SORT_TYPES,
@@ -437,6 +437,7 @@ def test_get_post_no_profile(
 def test_get_post_forbidden(client, logged_in_profile):
     """Get a post the user doesn't have permission to"""
     post_id = "adc"
+    PostFactory.create(post_id=post_id)
     url = reverse("post-detail", kwargs={"post_id": post_id})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_403_FORBIDDEN
@@ -445,6 +446,7 @@ def test_get_post_forbidden(client, logged_in_profile):
 def test_get_post_not_found(client, logged_in_profile):
     """Get a post the user doesn't have permission to"""
     post_id = "missing"
+    PostFactory.create(post_id=post_id)
     url = reverse("post-detail", kwargs={"post_id": post_id})
     resp = client.get(url)
     assert resp.status_code == status.HTTP_404_NOT_FOUND

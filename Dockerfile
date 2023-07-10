@@ -18,10 +18,21 @@ RUN mkdir /src
 RUN adduser --disabled-password --gecos "" mitodl
 RUN mkdir /var/media && chown -R mitodl:mitodl /var/media
 
+# Poetry env configuration
+ENV  \
+  # poetry:
+  POETRY_VERSION=1.5.1 \
+  POETRY_VIRTUALENVS_CREATE=false \
+  POETRY_CACHE_DIR='/tmp/cache/poetry'
+
+# Install poetry
+RUN pip install "poetry==$POETRY_VERSION"
+
 # Install project packages
-COPY requirements.txt /tmp/requirements.txt
-COPY test_requirements.txt /tmp/test_requirements.txt
-RUN pip install -r requirements.txt -r test_requirements.txt
+COPY pyproject.toml /src
+COPY poetry.lock /src
+WORKDIR /src
+RUN poetry install
 
 # Add project
 COPY . /src
@@ -30,9 +41,6 @@ RUN chown -R mitodl:mitodl /src
 
 RUN apt-get clean && apt-get purge
 USER mitodl
-
-# Set pip cache folder, as it is breaking pip when it is on a shared volume
-ENV XDG_CACHE_HOME /tmp/.cache
 
 EXPOSE 8063
 ENV PORT 8063
