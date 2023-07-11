@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+Version 0.223.0 (Released July 11, 2023)
+---------------
+
+- Exact version of python to satisfy heroku (#4179)
+- Fix heroku poetry build (#4178)
+- Update dependency Django to v4.1.10 [SECURITY] (#4176)
+- Use poetry instead of requirements files (#4151)
+- Update dependency protobuf to v4.23.4 (#4169)
+- Update dependency prompt-toolkit to v3.0.39 (#4168)
+- Update dependency click to v8.1.4 (#4165)
+- Update dependency lxml to v4.9.3 (#4167)
+- Update dependency @swc/core to v1.3.68 (#4164)
+- Update dependency stylelint to v15.10.1 [SECURITY] (#4162)
+- group ckeditor5 in renovate (#4152)
+- remove enrollment models (#4157)
+- Update docker-compose entrypoint for tika to point to the correct version (#4156)
+
 Version 0.222.0 (Released July 10, 2023)
 ---------------
 
