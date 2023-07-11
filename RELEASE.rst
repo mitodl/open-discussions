@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.223.0
+Version 0.223.0 (Released July 11, 2023)
 ---------------
 
 - Exact version of python to satisfy heroku (#4179)
