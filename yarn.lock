@@ -3857,16 +3857,22 @@ __metadata:
   linkType: hard
 
 "@mitodl/course-search-utils@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "@mitodl/course-search-utils@npm:2.3.0"
+  version: 2.3.2
+  resolution: "@mitodl/course-search-utils@npm:2.3.2"
   dependencies:
     bodybuilder: ^2.5.0
-    history: ^4.9 || ^5.0.0
     query-string: ^6.13.1
     ramda: ^0.27.1
   peerDependencies:
+    "@types/history": ^4.9
+    history: ^4.9 || ^5.0.0
     react: ^16.13.1
-  checksum: 9a4ec0c8cf27dfc10b83c131d0debb2e95a4f9ab8b179c19a0d5759f3777640336252ed692087fba0814331cf85f58334f2fa39562ff608cd76643aed4de4dc3
+  peerDependenciesMeta:
+    "@types/history":
+      optional: true
+    history:
+      optional: true
+  checksum: 9d6947520e501b31dd40f4674bec2be08d97423956e105b6334e602dd4e1eea0b075aedd43ebb1e341e6a155d761c8ca15d46722bdcfb581b948fc05b2571ba1
   languageName: node
   linkType: hard
 
@@ -12509,7 +12515,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"history@npm:^4.10, history@npm:^4.9 || ^5.0.0, history@npm:^4.9.0":
+"history@npm:^4.10, history@npm:^4.9.0":
   version: 4.10.1
   resolution: "history@npm:4.10.1"
   dependencies:
