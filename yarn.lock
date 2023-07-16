@@ -1575,13 +1575,13 @@ __metadata:
   linkType: hard
 
 "@ckeditor/ckeditor5-core@npm:^38.0.1":
-  version: 38.0.1
-  resolution: "@ckeditor/ckeditor5-core@npm:38.0.1"
+  version: 38.1.1
+  resolution: "@ckeditor/ckeditor5-core@npm:38.1.1"
   dependencies:
-    "@ckeditor/ckeditor5-engine": ^38.0.1
-    "@ckeditor/ckeditor5-utils": ^38.0.1
+    "@ckeditor/ckeditor5-engine": 38.1.1
+    "@ckeditor/ckeditor5-utils": 38.1.1
     lodash-es: ^4.17.15
-  checksum: 271fda8e1ed23eaa61a5a0a6e23bc24c4ffecd35f2a2ea48da5853dc9c2e8ed0f0038ed6a695e50b0c94c6a5916bad4f07ca0ea27aa5f14350cef010c04c918d
+  checksum: 749013c2a55030470a5b79f8795c327f57f5ef672cc1f15ff0405d34b32588483cbbecf5e071195a16fa5f22e18570f22fdc253fd6d7b4474dbca86c7eaf7964
   languageName: node
   linkType: hard
 
@@ -1645,6 +1645,16 @@ __metadata:
     ckeditor5: ^38.0.1
     lodash-es: ^4.17.15
   checksum: 5342f4b40338dde73036bb2baa18af5859aed22e49c0200afc7b137e2b87c9dc3e841afad92fc312aadc11863eb56134ab2beeab01d116e91c0bbecc0a4b4046
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-engine@npm:38.1.1":
+  version: 38.1.1
+  resolution: "@ckeditor/ckeditor5-engine@npm:38.1.1"
+  dependencies:
+    "@ckeditor/ckeditor5-utils": 38.1.1
+    lodash-es: ^4.17.15
+  checksum: 299d1506bfff9fd84f486738432af7e5e649e6a7a9186b62f6847275929aa2e956620fdda8f60204fa62bada9c8285eae0aeb10f289e0fe33e612ae8bd9674da
   languageName: node
   linkType: hard
 
@@ -1832,6 +1842,15 @@ __metadata:
     "@ckeditor/ckeditor5-ui": ^38.0.1
     "@ckeditor/ckeditor5-utils": ^38.0.1
   checksum: c2eea78a50a46d789987df57e51ec397c82bb3047a15ea0c6f00602eeba6d85b123edd9097cd3e961d8221b93f7251ee7bae04050d1f83c7beffa0ebca93b035
+  languageName: node
+  linkType: hard
+
+"@ckeditor/ckeditor5-utils@npm:38.1.1":
+  version: 38.1.1
+  resolution: "@ckeditor/ckeditor5-utils@npm:38.1.1"
+  dependencies:
+    lodash-es: ^4.17.15
+  checksum: ca3f0b75a04242acdbf16a954b2863480944ab095a16cdd014927376698cf6916f0e5bb079a4ca3cc2a3f15f264494ee427e829070e05685ce6f3c629fc9fbd7
   languageName: node
   linkType: hard
 
