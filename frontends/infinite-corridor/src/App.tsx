@@ -151,6 +151,7 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
 
 export default withLDProvider({
   clientSideID: '64b03585d079d81391a9616b',
+  // Pass data here, just strings for demo
   context: {
     "kind": "user",
     "key": "example_user",
