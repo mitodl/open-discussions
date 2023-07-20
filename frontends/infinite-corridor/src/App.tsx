@@ -1,5 +1,6 @@
 import React, { StrictMode, useEffect } from "react"
 import { HelmetProvider } from "react-helmet-async"
+import { withLDProvider } from 'launchdarkly-react-client-sdk'
 
 import HomePage from "./pages/HomePage"
 import SearchPage from "./pages/SearchPage"
@@ -148,5 +149,13 @@ const App: React.FC<AppProps> = ({ history, queryClient }) => {
   )
 }
 
-export default App
+export default withLDProvider({
+  clientSideID: '64b03585d079d81391a9616b',
+  context: {
+    "kind": "user",
+    "key": "example_user",
+    "name": "Example user",
+    "email": "User@example.com"
+  }
+})(App)
 export { AppProviders }

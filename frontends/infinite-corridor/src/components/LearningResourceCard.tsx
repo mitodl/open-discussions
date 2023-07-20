@@ -1,6 +1,7 @@
 import React, { useCallback } from "react"
 import classNames from "classnames"
 import * as NiceModal from "@ebay/nice-modal-react"
+import { withLDConsumer } from 'launchdarkly-react-client-sdk'
 import { LearningResourceCardTemplate } from "ol-search-ui"
 import type {
   LearningResourceCardTemplateProps,
@@ -28,7 +29,8 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   variant,
   className,
   sortable,
-  suppressImage
+  suppressImage,
+  flags
 }) => {
   const activateResource = useActivateResourceDrawer()
   const showAddToListDialog = useCallback(() => {
@@ -54,7 +56,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
         onActivate={activateResource}
         footerActionSlot={
           <div>
-            {user.is_staff_list_editor && (
+            {flags.newOpenStaffList && (
               <IconButton
                 size="small"
                 aria-label="Add to MIT lists"
@@ -63,7 +65,7 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
                 <PlaylistAddIcon />
               </IconButton>
             )}
-            {user.is_authenticated && (
+            {flags.newOpenUserList && (
               <IconButton
                 size="small"
                 aria-label="Add to my lists"
@@ -79,5 +81,5 @@ const LearningResourceCard: React.FC<LearningResourceCardProps> = ({
   )
 }
 
-export default LearningResourceCard
+export default withLDConsumer()(LearningResourceCard)
 export type { LearningResourceCardProps }
