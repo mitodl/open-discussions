@@ -25,14 +25,6 @@ export const LoginTooltipContent = () => (
         >
           Log In
         </Link>
-        <Link
-          className="link-button red"
-          to={(location: Location) =>
-            `${REGISTER_URL}?next=${encodeURIComponent(location.pathname)}`
-          }
-        >
-          Sign Up
-        </Link>
       </div>
     </div>
   </div>

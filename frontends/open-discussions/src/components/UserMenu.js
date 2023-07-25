@@ -62,9 +62,6 @@ export const LoggedOutMenu = (props: DropdownMenuProps) => (
     <li>
       <Link to={LOGIN_URL}>Log In</Link>
     </li>
-    <li>
-      <Link to={REGISTER_URL}>Sign Up</Link>
-    </li>
   </DropdownMenu>
 )
 

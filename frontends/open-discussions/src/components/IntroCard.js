@@ -22,12 +22,14 @@ export default function IntroCard() {
           </p>
         </div>
         <div className="action-col">
-          <Link
-            className="link-button"
-            to={userIsAnonymous() ? REGISTER_URL : newPostURL()}
-          >
-            {userIsAnonymous() ? "Become a member" : "Create a post"}
-          </Link>
+          {userIsAnonymous() ? null :
+            (<Link
+              className="link-button"
+              to={newPostURL()}
+            >
+              "Create a post"
+            </Link>)
+          }
         </div>
       </div>
     </Card>
