@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import Tooltip from "rc-tooltip"
 
 import { userIsAnonymous } from "../lib/util"
-import { LOGIN_URL, REGISTER_URL } from "../lib/url"
+import { LOGIN_URL } from "../lib/url"
 
 import type { Location } from "react-router-dom"
 

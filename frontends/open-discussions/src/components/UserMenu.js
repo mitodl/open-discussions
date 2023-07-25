@@ -13,8 +13,7 @@ import {
   profileURL,
   userListIndexURL,
   SETTINGS_URL,
-  LOGIN_URL,
-  REGISTER_URL
+  LOGIN_URL
 } from "../lib/url"
 import { PHONE } from "../lib/constants"
 

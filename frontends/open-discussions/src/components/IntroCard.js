@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 
 import { userIsAnonymous } from "../lib/util"
-import { REGISTER_URL, newPostURL, MIT_LOGO_URL } from "../lib/url"
+import { newPostURL, MIT_LOGO_URL } from "../lib/url"
 
 export default function IntroCard() {
   return (
