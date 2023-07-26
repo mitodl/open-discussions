@@ -9,7 +9,7 @@ import { Link } from "react-router-dom"
 import UserMenu, { LoggedInMenu, LoggedOutMenu } from "./UserMenu"
 import { DropDownArrow, DropUpArrow } from "./Arrow"
 
-import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
+import { profileURL, SETTINGS_URL, LOGIN_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import { defaultProfileImageUrl } from "../lib/util"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
