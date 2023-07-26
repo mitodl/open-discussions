@@ -102,22 +102,21 @@ describe("UserMenu", () => {
     assert.isTrue(wrapper.find(LoggedInMenu).exists())
   })
 
-  it("should not contain logged-out user links when profile is null", () => {
+  it("should contain logged-out user links when profile is null", () => {
     const wrapper = renderUserMenu({ showUserMenu: true, profile: null })
-    assert.isFalse(wrapper.find(REGISTER_URL).exists())
+    assert.isTrue(wrapper.find(LoggedOutMenu).exists())
   })
 
   describe("menu items", () => {
     const menuProps = { closeMenu: () => {} }
 
-    it("should include login and sign up links for logged-out users", () => {
+    it("should include login links only for logged-out users", () => {
       const wrapper = shallow(<LoggedOutMenu {...menuProps} />)
       const links = wrapper.find(Link)
+      assert.equal(links.length, 1)
       const firstLinkProps = links.at(0).props()
       assert.equal(firstLinkProps.to, LOGIN_URL)
       assert.equal(firstLinkProps.children, "Log In")
-      assert.isFalse(wrapper.find(REGISTER_URL).exists())
-      assert.isFalse(wrapper.find("Sign Up").exists())
     })
 
     it("should include settings link if non-null profile is provided", () => {

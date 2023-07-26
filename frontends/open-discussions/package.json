@@ -195,7 +195,7 @@
     "test": "./scripts/js_test.sh",
     "coverage": "COVERAGE=1 ./scripts/js_test.sh",
     "codecov": "CODECOV=1 ./scripts/js_test.sh",
-    "watch": "WATCH=1 ./scripts/js_test.sh",
+    "test-watch": "WATCH=1 ./scripts/js_test.sh",
     "typecheck": "flow check ./src",
     "fmt-fix": "LOG_LEVEL= prettier-eslint --eslint-path $INIT_CWD/node_modules/eslint --write --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
     "fmt-check": "prettier-eslint --eslint-path $INIT_CWD/node_modules/eslint --list-different --no-semi --ignore $PROJECT_CWD/'frontends/open-discussions/src/flow/**/*.js' $PROJECT_CWD/'frontends/open-discussions/src/**/*.js' $PROJECT_CWD/'frontends/open-discussions/scss/**/*.scss'",
