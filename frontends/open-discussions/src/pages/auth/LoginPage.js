@@ -3,8 +3,6 @@
 import React from "react"
 import { connect } from "react-redux"
 import R from "ramda"
-import { Link } from "react-router-dom"
-import qs from "query-string"
 
 import Card from "../../components/Card"
 import MetaTags from "../../components/MetaTags"
@@ -17,7 +15,7 @@ import { setAuthUserDetail } from "../../actions/ui"
 import { processAuthResponse } from "../../lib/auth"
 import { configureForm, getAuthResponseFieldErrors } from "../../lib/forms"
 import { formatTitle } from "../../lib/title"
-import { REGISTER_URL, getNextParam } from "../../lib/url"
+import { getNextParam } from "../../lib/url"
 import { validateEmailForm as validateForm } from "../../lib/validation"
 import { mergeAndInjectProps } from "../../lib/redux_props"
 import { FLOW_LOGIN, isProcessing } from "../../reducers/auth"
@@ -49,12 +47,6 @@ export class LoginPage extends React.Component<LoginPageProps> {
 
             {renderForm()}
             <ExternalLogins next={next} />
-            <div className="alternate-auth-link">
-              Not a member?{" "}
-              <Link to={`${REGISTER_URL}?${qs.stringify({ next })}`}>
-                Sign up
-              </Link>
-            </div>
           </Card>
         </div>
       </div>
