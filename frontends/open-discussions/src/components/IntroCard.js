@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import Card from "./Card"
 
 import { userIsAnonymous } from "../lib/util"
-import { REGISTER_URL, newPostURL, MIT_LOGO_URL } from "../lib/url"
+import { newPostURL, MIT_LOGO_URL } from "../lib/url"
 
 export default function IntroCard() {
   return (
@@ -22,12 +22,11 @@ export default function IntroCard() {
           </p>
         </div>
         <div className="action-col">
-          <Link
-            className="link-button"
-            to={userIsAnonymous() ? REGISTER_URL : newPostURL()}
-          >
-            {userIsAnonymous() ? "Become a member" : "Create a post"}
-          </Link>
+          {userIsAnonymous() ? null : (
+            <Link className="link-button" to={newPostURL()}>
+              "Create a post"
+            </Link>
+          )}
         </div>
       </div>
     </Card>

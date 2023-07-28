@@ -6,7 +6,7 @@ import { shallow } from "enzyme"
 
 import IntroCard from "./IntroCard"
 
-import { REGISTER_URL, newPostURL } from "../lib/url"
+import { newPostURL } from "../lib/url"
 import * as utilLib from "../lib/util"
 
 describe("IntroCard", () => {
@@ -23,15 +23,19 @@ describe("IntroCard", () => {
   })
 
   //
-  ;[
-    [true, REGISTER_URL, "Become a member"],
-    [false, newPostURL(), "Create a post"]
-  ].forEach(([isAnon, url, text]) => {
-    it(`should return the right stuff when anon == ${String(isAnon)}`, () => {
-      isAnonStub.returns(isAnon)
-      const link = render().find(".link-button")
-      assert.equal(link.prop("to"), url)
-      assert.equal(link.text(), text)
-    })
+  it(`should return the the create a post link when anon == false`, () => {
+    const url = newPostURL()
+    const text = '"Create a post"'
+    isAnonStub.returns(false)
+    const link = render().find(".link-button")
+    assert.equal(link.prop("to"), url)
+    assert.equal(link.text(), text)
+  })
+  it(`should not return a link when anon == true`, () => {
+    isAnonStub.returns(true)
+    const link = render().find(".link-button")
+    assert.equal(link.length, 0)
+    const text = render().find("Become a member")
+    assert.equal(text.length, 0)
   })
 })

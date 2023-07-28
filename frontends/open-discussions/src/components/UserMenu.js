@@ -13,8 +13,7 @@ import {
   profileURL,
   userListIndexURL,
   SETTINGS_URL,
-  LOGIN_URL,
-  REGISTER_URL
+  LOGIN_URL
 } from "../lib/url"
 import { PHONE } from "../lib/constants"
 
@@ -61,9 +60,6 @@ export const LoggedOutMenu = (props: DropdownMenuProps) => (
   <DropdownMenu {...props}>
     <li>
       <Link to={LOGIN_URL}>Log In</Link>
-    </li>
-    <li>
-      <Link to={REGISTER_URL}>Sign Up</Link>
     </li>
   </DropdownMenu>
 )
