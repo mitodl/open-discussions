@@ -1,6 +1,38 @@
 Release Notes
 =============
 
+Version 0.223.1
+---------------
+
+- remove signup link from login page (#4200)
+- Update swc monorepo (#4213)
+- Update jest monorepo to v29.6.2 (#4212)
+- Update dependency uwsgi to v2.0.22 (#4211)
+- Update dependency stylelint to v15.10.2 (#4210)
+- Update dependency pylint to v2.17.5 (#4209)
+- Update dependency markdown2 to v2.4.10 (#4208)
+- Update dependency js-beautify to v1.14.9 (#4207)
+- Update dependency drf-spectacular to v0.26.4 (#4206)
+- Update dependency boto3 to v1.28.15 (#4205)
+- Update dependency @types/react to v18.2.17 (#4204)
+- Update dependency @types/lodash to v4.14.196 (#4203)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.1.3 (#4202)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.1.3 (#4201)
+- Remove signup options from the UI (#4196)
+- Update dependency pyyaml to v6 (#4198)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.1.2 (#4192)
+- Update tanstack-query monorepo to v4.29.25 (#4189)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.1.2 (#4191)
+- Update dependency moto to v4.1.13 (#4190)
+- Update react monorepo (#4188)
+- Update jest monorepo (#4187)
+- Update dependency sentry-sdk to v1.28.1 (#4186)
+- Update dependency boto3 to v1.28.3 (#4185)
+- Update dependency @swc/core to v1.3.69 (#4184)
+- Update dependency @mitodl/course-search-utils to v2.3.2 (#4183)
+- expose sentry env vars (#4181)
+- add sentry to infinite frontend (#4160)
+
 Version 0.223.0 (Released July 11, 2023)
 ---------------
 
