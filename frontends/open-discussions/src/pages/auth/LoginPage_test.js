@@ -95,12 +95,12 @@ describe("LoginPage", () => {
     assert.ok(link.exists())
   })
 
-  it("should contain a link to the signup page", async () => {
+  it("should not contain a link to the signup page", async () => {
     const { inner } = await renderPage()
     const link = inner
       .find("Link")
       .findWhere(c => c.prop("to") === `${REGISTER_URL}?next=%2F`)
-    assert.ok(link.exists())
+    assert.ok(!link.exists())
   })
 
   it("form onSubmit prop calls api correctly", async () => {
