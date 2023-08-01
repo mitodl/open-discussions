@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.223.1
+Version 0.223.1 (Released August 01, 2023)
 ---------------
 
 - remove signup link from login page (#4200)
