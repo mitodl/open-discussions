@@ -381,11 +381,11 @@ SOCIAL_AUTH_PIPELINE = (
     # Update the user record with any changed info from the auth service.
     "social_core.pipeline.user.user_details",
     # Resolve outstanding channel invitations
-    # "authentication.pipeline.invite.resolve_outstanding_channel_invites",
+    "authentication.pipeline.invite.resolve_outstanding_channel_invites",
     # Create the moira list associations for the user if any.
     "authentication.pipeline.user.update_moira_lists",
     # update the user's managed channels
-    # "authentication.pipeline.user.update_managed_channel_memberships",
+    "authentication.pipeline.user.update_managed_channel_memberships",
 )
 SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT = get_string(
     name="SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT",
