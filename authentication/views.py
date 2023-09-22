@@ -245,8 +245,25 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
 @permission_classes([IsAuthenticated])
 @authentication_classes([BearerAuthentication])
 def get_user_details_for_keycloak(request, email):
+    """
+    Endpoint for the Keycloak plug-in: https://github.com/daniel-frak/keycloak-user-migration.
+
+    Args:
+        email (string): The email of a user record in Open Discussions.
+
+    Returns:
+        Response: GET requests will respond with the user's first and last name,
+            and email address, along with some additional flags specific for
+            Keycloak.
+            POST requests will respond with a 200 status if the password,
+            contained in the body, matches the user's record.  If the
+            password does not match the user's record, a 403 response is
+            provided.
+            Both requests will respond with a 404 if no Open Discussion's user
+            has an email matching the email argument.
+    """
     user = User.objects.filter(email=email).all()
-    if user.exists:
+    if user:
         if request.method == "POST":
             body = json.loads(request.body)
             password = body["password"]
