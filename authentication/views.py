@@ -266,8 +266,7 @@ def get_user_details_for_keycloak(request, email):
     if user:
         if request.method == "POST":
             body = json.loads(request.body)
-            password = body["password"]
-            if password and user[0].check_password(password):
+            if "password" in body and user[0].check_password(body["password"]):
                 return Response({}, status=status.HTTP_200_OK)
             else:
                 return Response({}, status=status.HTTP_403_FORBIDDEN)
@@ -278,6 +277,10 @@ def get_user_details_for_keycloak(request, email):
                 "lastName": user[0].last_name,
                 "enabled": True,
                 "emailVerified": True,
+                "attributes": {},
+                "roles": ["default-roles-olapps"],
+                "groups": [],
+                "requiredActions": [],
             }
             return Response(response, status=status.HTTP_200_OK)
     else:

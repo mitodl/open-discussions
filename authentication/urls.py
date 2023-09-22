@@ -58,6 +58,6 @@ urlpatterns = [
     path(
         "api/v0/auth/<email>/",
         get_user_details_for_keycloak,
-        name="get_user_details_for_keycloak",
+        name="get-user-details-for-keycloak",
     ),
 ]
