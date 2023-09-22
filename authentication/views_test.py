@@ -772,10 +772,10 @@ def test_get_social_auth_types(client, user):
     assert resp.json() == [{"provider": provider} for provider in social_auth_providers]
 
 
-def test_get_user_details_for_keycloak(client, user):
+def test_get_user_details_for_keycloak(client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a list expected attributes for the Keycloak plug-in."""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     resp = client.get(url)
     assert resp.json() == {
@@ -792,40 +792,51 @@ def test_get_user_details_for_keycloak(client, user):
 
 
 def test_get_user_details_for_keycloak_requires_bearer_token(client, user):
-    """Verify that get-user-details-for-keycloak returns a list expected attributes for the Keycloak plug-in."""
+    """Verify that get-user-details-for-keycloak returns a 401 if the request is made without a bearer token header."""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
     response = client.get(url)
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-def test_get_user_details_for_keycloak_user_not_found(client, user):
+def test_get_user_details_for_keycloak_requires_staff_user(client, user):
+    """Verify that get-user-details-for-keycloak returns a 403 if the request is made with a bearer token header NOT belonging to a staff user."""
+    url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
+    bearer_token = Token.objects.create(user=user)
+    client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
+    response = client.get(url)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+def test_get_user_details_for_keycloak_user_not_found(client, admin_user):
     """Verify that get-user-details-for-keycloak returns a 404 if the user does not exist"""
     url = reverse(
         "get-user-details-for-keycloak",
         kwargs={"email": "incorrect_user_email@email.com"},
     )
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.get(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_post_user_details_for_keycloak_user_not_found(client, user):
+def test_post_user_details_for_keycloak_user_not_found(client, admin_user):
     """Verify that get-user-details-for-keycloak returns a 404 if the user does not exist"""
     url = reverse(
         "get-user-details-for-keycloak",
         kwargs={"email": "incorrect_user_email@email.com"},
     )
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.post(url)
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_post_user_details_for_keycloak_password_incorrect(mocker, client, user):
+def test_post_user_details_for_keycloak_password_incorrect(
+    mocker, client, user, admin_user
+):
     """Verify that get-user-details-for-keycloak returns a 403 if the POST contains an incorrect password"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     # Mock that the password provided in the request does not match the Django user's.
     mocker.patch("django.contrib.auth.models.User.check_password", return_value=False)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
@@ -833,19 +844,19 @@ def test_post_user_details_for_keycloak_password_incorrect(mocker, client, user)
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_post_user_details_for_keycloak_password_missing(client, user):
+def test_post_user_details_for_keycloak_password_missing(client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a 403 if the POST is missing the password json object"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.post(url, data={"pass": "incorrect_password"})
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_post_user_details_for_keycloak_(mocker, client, user):
+def test_post_user_details_for_keycloak_(mocker, client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a 200 if the POST contains the correct password"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
-    bearer_token = Token.objects.create(user=user)
+    bearer_token = Token.objects.create(user=admin_user)
     # Mock that the password provided in the request matches the Django user's.
     mocker.patch("django.contrib.auth.models.User.check_password", return_value=True)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)

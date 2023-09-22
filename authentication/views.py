@@ -36,6 +36,7 @@ from authentication.serializers import (
 from authentication.utils import load_drf_strategy
 from mail.api import render_email_templates, send_messages
 from open_discussions.authentication import BearerAuthentication
+from open_discussions.permissions import IsStaffPermission
 
 User = get_user_model()
 
@@ -242,7 +243,7 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
 
 
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated, IsStaffPermission])
 @authentication_classes([BearerAuthentication])
 def get_user_details_for_keycloak(request, email):
     """
