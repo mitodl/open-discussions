@@ -9,16 +9,23 @@ from django.shortcuts import render, redirect
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend
+from profiles.models import Profile
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.decorators import (
+    api_view,
+    permission_classes,
+    action,
+    authentication_classes,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_jwt.settings import api_settings
 from anymail.message import AnymailMessage
 from djoser.views import UserViewSet
 from djoser.utils import ActionViewMixin
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
+import json
 
 from authentication.serializers import (
     LoginEmailSerializer,
@@ -29,6 +36,7 @@ from authentication.serializers import (
 )
 from authentication.utils import load_drf_strategy
 from mail.api import render_email_templates, send_messages
+from open_discussions.authentication import BearerAuthentication
 
 User = get_user_model()
 
@@ -232,3 +240,29 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
             update_session_auth_hash(self.request, self.request.user)
             return Response({}, status=status.HTTP_200_OK)
         return response
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([BearerAuthentication])
+def get_user_details_for_keycloak(request, email):
+    user = User.objects.filter(email=email).all()
+    if user.exists:
+        if request.method == "POST":
+            body = json.loads(request.body)
+            password = body["password"]
+            if password and user[0].check_password(password):
+                return Response({}, status=status.HTTP_200_OK)
+            else:
+                return Response({}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            response = {
+                "email": user[0].email,
+                "firstName": user[0].first_name,
+                "lastName": user[0].last_name,
+                "enabled": True,
+                "emailVerified": True,
+            }
+            return Response(response, status=status.HTTP_200_OK)
+    else:
+        return Response({}, status=status.HTTP_404_NOT_FOUND)

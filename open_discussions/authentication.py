@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 import jwt
 from rest_framework.authentication import BaseAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from rest_framework.authentication import TokenAuthentication
 
 
 User = get_user_model()
@@ -76,3 +77,14 @@ class StatelessTokenAuthentication(BaseAuthentication):
             return (user, None)
 
         return None
+
+class BearerAuthentication(TokenAuthentication):
+    '''
+    Simple token based authentication using utvsapitoken.
+
+    Clients should authenticate by passing the token key in the 'Authorization'
+    HTTP header, prepended with the string 'Bearer '.  For example:
+
+    Authorization: Bearer 956e252a-513c-48c5-92dd-bfddc364e812
+    '''
+    keyword = 'Bearer'
