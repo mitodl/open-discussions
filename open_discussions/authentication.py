@@ -1,12 +1,10 @@
 """Custom authentication for DRF"""
 import logging
 
-from django.contrib.auth import get_user_model
 import jwt
-from rest_framework.authentication import BaseAuthentication
+from django.contrib.auth import get_user_model
+from rest_framework.authentication import BaseAuthentication, TokenAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-from rest_framework.authentication import TokenAuthentication
-
 
 User = get_user_model()
 

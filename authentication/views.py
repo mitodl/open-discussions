@@ -1,38 +1,37 @@
 """Authentication views"""
+import json
 from urllib.parse import quote
 
 import requests
+from anymail.message import AnymailMessage
 from django.conf import settings
-from django.core import mail as django_mail
 from django.contrib.auth import get_user_model, update_session_auth_hash
-from django.shortcuts import render, redirect
+from django.core import mail as django_mail
+from django.shortcuts import redirect, render
+from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
+from djoser.utils import ActionViewMixin
+from djoser.views import UserViewSet
+from rest_framework import status
+from rest_framework.decorators import (
+    action,
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend
-from profiles.models import Profile
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.decorators import (
-    api_view,
-    permission_classes,
-    action,
-    authentication_classes,
-)
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.settings import api_settings
-from anymail.message import AnymailMessage
-from djoser.views import UserViewSet
-from djoser.utils import ActionViewMixin
-from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
-import json
 
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
-    RegisterEmailSerializer,
     RegisterConfirmSerializer,
     RegisterDetailsSerializer,
+    RegisterEmailSerializer,
 )
 from authentication.utils import load_drf_strategy
 from mail.api import render_email_templates, send_messages
