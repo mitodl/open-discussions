@@ -103,7 +103,7 @@ INSTALLED_APPS = (
     "social_django",
     "server_status",
     "rest_framework",
-    'rest_framework.authtoken',
+    "rest_framework.authtoken",
     "corsheaders",
     "webpack_loader",
     "anymail",
@@ -725,7 +725,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "open_discussions.authentication.IgnoreExpiredJwtAuthentication",
-        'open_discussions.authentication.BearerAuthentication',
+        "open_discussions.authentication.BearerAuthentication",
     ),
     "EXCEPTION_HANDLER": "open_discussions.exceptions.api_exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
