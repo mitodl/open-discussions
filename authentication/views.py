@@ -274,6 +274,7 @@ def get_user_details_for_keycloak(request, email):
         else:
             response = {
                 "email": user[0].email,
+                "username": user[0].email,
                 "firstName": user[0].first_name,
                 "lastName": user[0].last_name,
                 "enabled": True,

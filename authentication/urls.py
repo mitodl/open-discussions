@@ -56,7 +56,7 @@ urlpatterns = [
     re_path(r"^login/complete$", login_complete, name="login-complete"),
     re_path(r"^logout/$", auth_views.LogoutView.as_view(), name="logout"),
     path(
-        "api/v0/auth/<email>/",
+        "api/v0/auth/<email>",
         get_user_details_for_keycloak,
         name="get-user-details-for-keycloak",
     ),
