@@ -100,6 +100,7 @@ urllib3 = "^1.25.10"
 uwsgi = "^2.0.21"
 wrapt = "^1.14.1"
 xbundle = "^0.3.1"
+social-auth-core = {extras = ["openidconnect"], version = "^4.4.2"}
 
 [tool.poetry.group.dev.dependencies]
 astroid = "^2.15.4"
