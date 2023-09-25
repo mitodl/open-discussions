@@ -788,6 +788,7 @@ def test_get_user_details_for_keycloak(client, user, admin_user):
         "roles": ["default-roles-olapps"],
         "groups": [],
         "requiredActions": [],
+        "username": user.username,
     }
 
 
