@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.224.0
+Version 0.224.0 (Released September 26, 2023)
 ---------------
 
 - 4225: Keycloak OIDC integration (#4230)
