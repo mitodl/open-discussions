@@ -1,11 +1,10 @@
 """Custom authentication for DRF"""
 import logging
 
-from django.contrib.auth import get_user_model
 import jwt
-from rest_framework.authentication import BaseAuthentication
+from django.contrib.auth import get_user_model
+from rest_framework.authentication import BaseAuthentication, TokenAuthentication
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-
 
 User = get_user_model()
 
@@ -76,3 +75,16 @@ class StatelessTokenAuthentication(BaseAuthentication):
             return (user, None)
 
         return None
+
+
+class BearerAuthentication(TokenAuthentication):
+    """
+    Token based authentication overriding the OOTB keyword.
+
+    Clients should authenticate by passing the token key in the 'Authorization'
+    HTTP header, prepended with the string 'Bearer '.  For example:
+
+    Authorization: Bearer 956e252a-513c-48c5-92dd-bfddc364e812
+    """
+
+    keyword = "Bearer"

@@ -1,5 +1,5 @@
 """URL configurations for authentication"""
-from django.urls import re_path
+from django.urls import re_path, path
 from django.contrib.auth import views as auth_views
 
 from authentication.views import (
@@ -11,6 +11,7 @@ from authentication.views import (
     get_social_auth_types,
     login_complete,
     CustomDjoserAPIView,
+    get_user_details_for_keycloak,
 )
 
 
@@ -54,4 +55,9 @@ urlpatterns = [
     re_path(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
     re_path(r"^login/complete$", login_complete, name="login-complete"),
     re_path(r"^logout/$", auth_views.LogoutView.as_view(), name="logout"),
+    path(
+        "api/v0/auth/<email>",
+        get_user_details_for_keycloak,
+        name="get-user-details-for-keycloak",
+    ),
 ]

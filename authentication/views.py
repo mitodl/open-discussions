@@ -1,34 +1,43 @@
 """Authentication views"""
+import json
 from urllib.parse import quote
 
 import requests
+from anymail.message import AnymailMessage
 from django.conf import settings
-from django.core import mail as django_mail
 from django.contrib.auth import get_user_model, update_session_auth_hash
-from django.shortcuts import render, redirect
+from django.core import mail as django_mail
+from django.http import Http404
+from django.shortcuts import redirect, render
+from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
+from djoser.utils import ActionViewMixin
+from djoser.views import UserViewSet
+from rest_framework import status
+from rest_framework.decorators import (
+    action,
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend
-from rest_framework import status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_jwt.settings import api_settings
-from anymail.message import AnymailMessage
-from djoser.views import UserViewSet
-from djoser.utils import ActionViewMixin
-from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
-    RegisterEmailSerializer,
     RegisterConfirmSerializer,
     RegisterDetailsSerializer,
+    RegisterEmailSerializer,
 )
 from authentication.utils import load_drf_strategy
 from mail.api import render_email_templates, send_messages
+from open_discussions.authentication import BearerAuthentication
+from open_discussions.permissions import IsStaffPermission
 
 User = get_user_model()
 
@@ -232,3 +241,50 @@ class CustomDjoserAPIView(UserViewSet, ActionViewMixin):
             update_session_auth_hash(self.request, self.request.user)
             return Response({}, status=status.HTTP_200_OK)
         return response
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated, IsStaffPermission])
+@authentication_classes([BearerAuthentication])
+def get_user_details_for_keycloak(request, email):
+    """
+    Endpoint for the Keycloak plug-in: https://github.com/daniel-frak/keycloak-user-migration.
+
+    Args:
+        email (string): The email of a user record in Open Discussions.
+
+    Returns:
+        Response: GET requests will respond with the user's first and last name,
+            and email address, along with some additional flags specific for
+            Keycloak.
+            POST requests will respond with a 200 status if the password,
+            contained in the body, matches the user's record.  If the
+            password does not match the user's record, a 403 response is
+            provided.
+            Both requests will respond with a 404 if no Open Discussion's user
+            has an email matching the email argument.
+    """
+    user = User.objects.filter(email=email).first()
+    if user:
+        if request.method == "POST":
+            body = json.loads(request.body)
+            if "password" in body and user.check_password(body["password"]):
+                return Response({}, status=status.HTTP_200_OK)
+            else:
+                return Response({}, status=status.HTTP_403_FORBIDDEN)
+        else:
+            response = {
+                "email": user.email,
+                "username": user.email,
+                "firstName": user.first_name,
+                "lastName": user.last_name,
+                "enabled": True,
+                "emailVerified": True,
+                "attributes": {},
+                "roles": ["default-roles-olapps"],
+                "groups": [],
+                "requiredActions": [],
+            }
+            return Response(response, status=status.HTTP_200_OK)
+    else:
+        raise Http404("User not found")
