@@ -1,6 +1,7 @@
 """Authentication views"""
 import json
 from urllib.parse import quote
+from django.http import Http404
 
 import requests
 from anymail.message import AnymailMessage
@@ -263,20 +264,20 @@ def get_user_details_for_keycloak(request, email):
             Both requests will respond with a 404 if no Open Discussion's user
             has an email matching the email argument.
     """
-    user = User.objects.filter(email=email).all()
+    user = User.objects.filter(email=email).first()
     if user:
         if request.method == "POST":
             body = json.loads(request.body)
-            if "password" in body and user[0].check_password(body["password"]):
+            if "password" in body and user.check_password(body["password"]):
                 return Response({}, status=status.HTTP_200_OK)
             else:
                 return Response({}, status=status.HTTP_403_FORBIDDEN)
         else:
             response = {
-                "email": user[0].email,
-                "username": user[0].email,
-                "firstName": user[0].first_name,
-                "lastName": user[0].last_name,
+                "email": user.email,
+                "username": user.email,
+                "firstName": user.first_name,
+                "lastName": user.last_name,
                 "enabled": True,
                 "emailVerified": True,
                 "attributes": {},
@@ -286,4 +287,4 @@ def get_user_details_for_keycloak(request, email):
             }
             return Response(response, status=status.HTTP_200_OK)
     else:
-        return Response({}, status=status.HTTP_404_NOT_FOUND)
+        raise Http404("User not found")
