@@ -1,13 +1,13 @@
 """Authentication views"""
 import json
 from urllib.parse import quote
-from django.http import Http404
 
 import requests
 from anymail.message import AnymailMessage
 from django.conf import settings
 from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.core import mail as django_mail
+from django.http import Http404
 from django.shortcuts import redirect, render
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 from djoser.utils import ActionViewMixin
