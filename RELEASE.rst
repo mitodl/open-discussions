@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.224.1
+Version 0.224.1 (Released September 28, 2023)
 ---------------
 
 - 4227: configure keycloak user migration plug in - REST API (#4231)
