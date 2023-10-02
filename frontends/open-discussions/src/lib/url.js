@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import R from "ramda"
 import qs from "query-string"
 import UrlAssembler from "url-assembler"
@@ -101,17 +102,17 @@ export const PASSWORD_RESET_URL = "/password_reset/"
 export const PASSWORD_CHANGE_URL = "/settings/password"
 
 // auth urls
-export const LOGIN_URL = "/login/"
-export const LOGIN_PASSWORD_URL = "/login/password/"
-export const LOGIN_PROVIDER_URL = "/login/external/"
+export const LOGIN_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/")
+export const LOGIN_PASSWORD_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/password/")
+export const LOGIN_PROVIDER_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/external/")
 
-export const REGISTER_URL = "/signup/"
-export const REGISTER_CONFIRM_URL = "/signup/confirm/"
-export const REGISTER_DETAILS_URL = "/signup/details/"
+export const REGISTER_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/")
+export const REGISTER_CONFIRM_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/confirm/")
+export const REGISTER_DETAILS_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/details/")
 
 export const INACTIVE_USER_URL = "/account/inactive/"
 
-export const TOUCHSTONE_URL = "/login/saml/?idp=default"
+export const TOUCHSTONE_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/saml/?idp=default")
 export const MICROMASTERS_URL = "/login/micromasters/"
 
 export const TERMS_OF_SERVICE_URL = "/terms-and-conditions"
