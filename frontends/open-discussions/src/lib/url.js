@@ -185,8 +185,7 @@ export const programDetailApiURL = programApiURL.segment(":programId/")
 export const userListApiURL = api.segment("userlists/")
 export const userListDetailApiURL = userListApiURL.segment(":userListId/")
 export const userListItemsApiURL = userListDetailApiURL.segment("items/")
-export const userListItemsDetailApiURL =
-  userListItemsApiURL.segment(":itemId/")
+export const userListItemsDetailApiURL = userListItemsApiURL.segment(":itemId/")
 
 export const videoApiURL = api.segment("videos/")
 export const videoDetailApiURL = videoApiURL.segment(":videoId/")
@@ -220,6 +219,6 @@ export const learningResourcePermalink = (object: Object) =>
         : COURSE_URL
     }${toQueryString({
       lr_id: object.id,
-      type:  object.object_type,
+      type:  object.object_type
     })}`
   )

@@ -38,7 +38,7 @@ export const LoginTooltipContent = () => (
 )
 
 type Props = {
-  children: Array<React$Element<any>> | React$Element<any>,
+  children: Array<React$Element<any>> | React$Element<any>
 }
 
 const LoginTooltip = ({ children }: Props) =>
