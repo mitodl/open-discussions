@@ -18,25 +18,27 @@ export const LoginTooltipContent = () => (
     </div>
     <div className="bottom-row">
       <div className="tooltip-buttons">
-        {SETTINGS.FEATURES.KEYCLOAK_ENABLED ?
-          <a className="link-button" href={LOGIN_URL}>Log In</a>
-          :
+        {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+          <a className="link-button" href={LOGIN_URL}>
+            Log In
+          </a>
+        ) : (
           <Link
             className="link-button"
             to={(location: Location) =>
               `${LOGIN_URL}?next=${encodeURIComponent(location.pathname)}`
             }
           >
-          Log In
+            Log In
           </Link>
-        }
+        )}
       </div>
     </div>
   </div>
 )
 
 type Props = {
-  children: Array<React$Element<any>> | React$Element<any>
+  children: Array<React$Element<any>> | React$Element<any>,
 }
 
 const LoginTooltip = ({ children }: Props) =>

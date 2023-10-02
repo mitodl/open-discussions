@@ -102,17 +102,31 @@ export const PASSWORD_RESET_URL = "/password_reset/"
 export const PASSWORD_CHANGE_URL = "/settings/password"
 
 // auth urls
-export const LOGIN_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/")
-export const LOGIN_PASSWORD_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/password/")
-export const LOGIN_PROVIDER_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/external/")
+export const LOGIN_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/login/"
+export const LOGIN_PASSWORD_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/login/password/"
+export const LOGIN_PROVIDER_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/login/external/"
 
-export const REGISTER_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/")
-export const REGISTER_CONFIRM_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/confirm/")
-export const REGISTER_DETAILS_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/signup/details/")
+export const REGISTER_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/signup/"
+export const REGISTER_CONFIRM_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/signup/confirm/"
+export const REGISTER_DETAILS_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/signup/details/"
 
 export const INACTIVE_USER_URL = "/account/inactive/"
 
-export const TOUCHSTONE_URL = (SETTINGS.FEATURES.KEYCLOAK_ENABLED ? "/login/ol-oidc/" : "/login/saml/?idp=default")
+export const TOUCHSTONE_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/login/saml/?idp=default"
 export const MICROMASTERS_URL = "/login/micromasters/"
 
 export const TERMS_OF_SERVICE_URL = "/terms-and-conditions"
@@ -171,7 +185,8 @@ export const programDetailApiURL = programApiURL.segment(":programId/")
 export const userListApiURL = api.segment("userlists/")
 export const userListDetailApiURL = userListApiURL.segment(":userListId/")
 export const userListItemsApiURL = userListDetailApiURL.segment("items/")
-export const userListItemsDetailApiURL = userListItemsApiURL.segment(":itemId/")
+export const userListItemsDetailApiURL =
+  userListItemsApiURL.segment(":itemId/")
 
 export const videoApiURL = api.segment("videos/")
 export const videoDetailApiURL = videoApiURL.segment(":videoId/")
@@ -205,6 +220,6 @@ export const learningResourcePermalink = (object: Object) =>
         : COURSE_URL
     }${toQueryString({
       lr_id: object.id,
-      type:  object.object_type
+      type:  object.object_type,
     })}`
   )

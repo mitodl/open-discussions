@@ -13,7 +13,7 @@ import {
   profileURL,
   userListIndexURL,
   SETTINGS_URL,
-  LOGIN_URL
+  LOGIN_URL,
 } from "../lib/url"
 import { PHONE } from "../lib/constants"
 
@@ -22,12 +22,12 @@ import type { Profile } from "../flow/discussionTypes"
 type Props = {
   profile: ?Profile,
   toggleShowUserMenu: Function,
-  showUserMenu: boolean
+  showUserMenu: boolean,
 }
 
 type DropdownMenuProps = {
   closeMenu: Function,
-  className?: string
+  className?: string,
 }
 
 export const LoggedInMenu = (props: DropdownMenuProps) => (
@@ -59,10 +59,11 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
 export const LoggedOutMenu = (props: DropdownMenuProps) => (
   <DropdownMenu {...props}>
     <li>
-      {SETTINGS.FEATURES.KEYCLOAK_ENABLED ?
+      {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
         <a href={LOGIN_URL}>Log In</a>
-        : <Link to={LOGIN_URL}>Log In</Link>
-      }
+      ) : (
+        <Link to={LOGIN_URL}>Log In</Link>
+      )}
     </li>
   </DropdownMenu>
 )
