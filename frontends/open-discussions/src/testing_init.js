@@ -46,7 +46,8 @@ const _createSettings = () => ({
   search_min_length:      2,
   accepted_social_sites:  [],
   livestream_ui_enabled:  true,
-  ckeditor_upload_url:    "/upload/token"
+  ckeditor_upload_url:    "/upload/token",
+  FEATURES:               { ["KEYCLOAK_ENABLED"]: false }
 })
 
 global.SETTINGS = _createSettings()
