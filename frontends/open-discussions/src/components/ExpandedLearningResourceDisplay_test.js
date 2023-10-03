@@ -2,6 +2,8 @@
 import { assert } from "chai"
 import R from "ramda"
 
+import moment from "moment"
+
 import ExpandedLearningResourceDisplay from "../components/ExpandedLearningResourceDisplay"
 import * as UserListItemsMod from "../components/UserListItems"
 import * as PaginatedPodcastEpisodesMod from "./PaginatedPodcastEpisodes"
@@ -24,7 +26,6 @@ import {
   LR_TYPE_PODCAST_EPISODE,
   readableLearningResources
 } from "../lib/constants"
-import { mockHTMLElHeight } from "../lib/test_utils"
 import {
   bestRun,
   getInstructorName,
@@ -50,12 +51,12 @@ describe("ExpandedLearningResourceDisplay", () => {
     setShowResourceDrawerStub = helper.sandbox.stub()
     course = makeCourse()
     embedly = makeYoutubeVideo()
+    moment.locale("en")
     similarResources = [
       makeLearningResourceResult(LR_TYPE_COURSE),
       makeLearningResourceResult(LR_TYPE_PROGRAM),
       makeLearningResourceResult(LR_TYPE_COURSE)
     ]
-    mockHTMLElHeight(50, 100)
     helper.stubComponent(
       UserListItemsMod,
       "PaginatedUserListItems",
