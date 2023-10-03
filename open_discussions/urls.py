@@ -117,7 +117,7 @@ if settings.DEBUG:
 
     urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]
 
-if settings.FEATURES["KEYCLOAK_ENABLED"]:
+if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABLED"]:
     urlpatterns += [
         re_path(
             r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,36})/$",
