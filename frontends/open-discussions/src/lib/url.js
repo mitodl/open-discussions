@@ -98,8 +98,12 @@ export const CONTENT_POLICY_URL = "/content_policy/"
 export const SETTINGS_URL = "/settings/"
 export const NOTIFICATION_SETTINGS_URL = "/settings/notifications"
 export const ACCOUNT_SETTINGS_URL = "/settings/account"
-export const PASSWORD_RESET_URL = "/password_reset/"
-export const PASSWORD_CHANGE_URL = "/settings/password"
+export const PASSWORD_RESET_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/password_reset/"
+export const PASSWORD_CHANGE_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
+  ? "/login/ol-oidc/"
+  : "/settings/password"
 
 // auth urls
 export const LOGIN_URL = SETTINGS.FEATURES.KEYCLOAK_ENABLED
