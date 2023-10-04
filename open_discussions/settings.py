@@ -309,7 +309,7 @@ AUTHENTICATION_BACKENDS = (
     "guardian.backends.ObjectPermissionBackend",
 )
 
-FEATURE_KEYCLOAK_ENABLED = get_bool("FEATURE_KEYCLOAK_ENABLED", True)
+FEATURE_KEYCLOAK_ENABLED = get_bool("FEATURE_KEYCLOAK_ENABLED", False)
 
 SOCIAL_AUTH_STRATEGY = "authentication.strategy.OpenDiscussionsStrategy"
 
