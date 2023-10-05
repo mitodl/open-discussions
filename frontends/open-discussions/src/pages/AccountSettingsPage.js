@@ -15,6 +15,7 @@ import { formatTitle } from "../lib/title"
 import type { Match } from "react-router"
 import type { SocialAuth } from "../flow/discussionTypes"
 import type { Dispatch } from "redux"
+import { PASSWORD_CHANGE_URL } from "../lib/url"
 
 type OwnProps = {|
   match: Match
@@ -49,7 +50,7 @@ class AccountSettingsPage extends React.Component<Props> {
       return (
         <div key={index} className="account-settings-row">
           <h5>MIT Open</h5>
-          <Link to="/settings/password">Change Password</Link>
+          <Link to={PASSWORD_CHANGE_URL}>Change Password</Link>
         </div>
       )
     case "micromasters":

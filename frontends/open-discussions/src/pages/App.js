@@ -19,6 +19,7 @@ import CreatePostPage from "./CreatePostPage"
 import SettingsPage from "./SettingsPage"
 import AccountSettingsPage from "./AccountSettingsPage"
 import PasswordChangePage from "./PasswordChangePage"
+import PasswordChangeRequestPage from "./PasswordChangeRequestPage"
 import ProfilePage from "./ProfilePage"
 import ProfileEditPage from "./ProfileEditPage"
 import LoginPage from "./auth/LoginPage"
@@ -258,11 +259,19 @@ class App extends React.Component<Props> {
               path={`${match.url}settings/account`}
               component={AccountSettingsPage}
             />
-            <Route
-              exact
-              path={`${match.url}settings/password`}
-              component={PasswordChangePage}
-            />
+            {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+              <Route
+                exact
+                path={`${match.url}settings/password`}
+                component={PasswordChangeRequestPage}
+              />
+            ) : (
+              <Route
+                exact
+                path={`${match.url}settings/password`}
+                component={PasswordChangePage}
+              />
+            )}
             <Route
               exact
               path={`${match.url}settings/:token?`}

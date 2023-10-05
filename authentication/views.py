@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model, update_session_auth_hash
 from django.core import mail as django_mail
 from django.http import Http404
 from django.shortcuts import redirect, render
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 from djoser.utils import ActionViewMixin
 from djoser.views import UserViewSet
@@ -26,6 +27,8 @@ from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend
+from social_core.utils import get_strategy
+from social_django.utils import STORAGE, STRATEGY
 
 from authentication.serializers import (
     LoginEmailSerializer,
@@ -286,5 +289,46 @@ def get_user_details_for_keycloak(request, email):
                 "requiredActions": [],
             }
             return Response(response, status=status.HTTP_200_OK)
+    else:
+        raise Http404("User not found")
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def post_request_password_update(request, user_id):
+    """
+    <COLLIN>
+
+    Args:
+        uid (string): The uid of a user record in Open Discussions.
+
+    Returns:
+        Response: <COLLIN>
+    """
+    user = User.objects.filter(id=user_id).first()
+    if user:
+        strategy = get_strategy(STRATEGY, STORAGE)
+        storage = strategy.storage
+        user_social_auth_record = (
+            storage.user.get_social_auth_for_user(
+                user, provider=OlOpenIdConnectAuth.name
+            )
+            .filter(user=user)
+            .first()
+        )
+        if user_social_auth_record:
+            payload = json.dumps(["UPDATE_PASSWORD"])
+            client_id = "ol-open-discussions-local"
+            redirect_uri = "google.com"
+            realm_name = "olapps"
+            keycloak_base_url = "https://sso-qa.odl.mit.edu"
+            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}&redirect_uri={redirect_uri}"
+            access_token = user_social_auth_record.get_access_token(strategy)
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {access_token}",
+            }
+            response = requests.request("PUT", url, headers=headers, data=payload)
+        return Response({response}, status=status.HTTP_200_OK)
     else:
         raise Http404("User not found")

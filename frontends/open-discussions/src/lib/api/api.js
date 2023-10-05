@@ -1,7 +1,7 @@
 // @flow
 /* global SETTINGS:false */
 // For mocking purposes we need to use "fetch" defined as a global instead of importing as a local.
-import { PATCH, POST, DELETE } from "redux-hammock/constants"
+import { PATCH, POST, DELETE, PUT } from "redux-hammock/constants"
 import { fetchJSONWithCSRF } from "redux-hammock/django_csrf_fetch"
 
 import { buildSearchQuery } from "@mitodl/course-search-utils/dist/search"
@@ -314,3 +314,10 @@ export const postSetPassword = (
 export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
   return fetchJSONWithAuthFailure("/api/v0/auths/")
 }
+
+export const postPasswordChangeRequest = (
+  userId: string,
+): Promise<*> =>
+  fetchJSONWithCSRF(`/api/v0/update_password_request/${userId}`, {
+    method: POST,
+  })
