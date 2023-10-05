@@ -6,7 +6,6 @@ import { formatTitle } from "../lib/title"
 import { actions } from "../actions"
 import type { Dispatch } from "redux"
 import { connect } from "react-redux"
-import { Redirect } from "react-router"
 import { LOGIN_URL } from "../lib/url"
 
 type Props = {|
