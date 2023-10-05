@@ -31,14 +31,17 @@ class PasswordChangeRequestPage extends React.Component<Props> {
 
   render() {
     const { match } = this.props
-    console.log(SETTINGS)
 
-    return SETTINGS.isAuthenticated && SETTINGS.user_id ? (
+    return SETTINGS.is_authenticated && SETTINGS.user_id ? (
       <React.Fragment>
         <MetaTags canonicalLink={match?.url}>
           <title>{formatTitle(`Request password change`)}</title>
         </MetaTags>
         <h1>Password change email sent.</h1>
+        <p>
+          You will soon receive an email with instructions for changing your
+          password.
+        </p>
       </React.Fragment>
     ) : (
       <React.Fragment>

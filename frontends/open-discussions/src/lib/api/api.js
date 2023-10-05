@@ -315,9 +315,7 @@ export function getSocialAuthTypes(): Promise<Array<SocialAuth>> {
   return fetchJSONWithAuthFailure("/api/v0/auths/")
 }
 
-export const postPasswordChangeRequest = (
-  userId: string,
-): Promise<*> =>
+export const postPasswordChangeRequest = (userId: string): Promise<*> =>
   fetchJSONWithCSRF(`/api/v0/update_password_request/${userId}`, {
-    method: POST,
+    method: POST
   })

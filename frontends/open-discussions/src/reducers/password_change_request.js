@@ -6,5 +6,5 @@ export const passwordChangeRequestEndpoint = {
   name:         "passwordChangeRequest",
   verbs:        [POST],
   initialState: { ...INITIAL_STATE },
-  postFunc:      (userId: string) => api.postPasswordChangeRequest(userId)
+  postFunc:     (userId: string) => api.postPasswordChangeRequest(userId)
 }
