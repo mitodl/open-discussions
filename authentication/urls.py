@@ -1,7 +1,6 @@
 """URL configurations for authentication"""
 from django.conf import settings
 from django.urls import re_path, path
-from django.contrib.auth import views as auth_views
 
 from authentication.views import (
     LoginEmailView,
@@ -14,12 +13,13 @@ from authentication.views import (
     CustomDjoserAPIView,
     get_user_details_for_keycloak,
     post_request_password_update,
+    CustomLogoutView,
 )
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     re_path(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
     re_path(r"^login/complete$", login_complete, name="login-complete"),
-    re_path(r"^logout/$", auth_views.LogoutView.as_view(), name="logout"),
 ]
 if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABLED"]:
     urlpatterns += [
@@ -33,9 +33,11 @@ if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABL
             post_request_password_update,
             name="update-password-request-api",
         ),
+        re_path(r"^logout/$", CustomLogoutView.as_view(), name="logout"),
     ]
 else:
     urlpatterns += [
+        re_path(r"^logout/$", auth_views.LogoutView.as_view(), name="logout"),
         re_path(
             r"^api/v0/login/email/$", LoginEmailView.as_view(), name="psa-login-email"
         ),

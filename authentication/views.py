@@ -5,7 +5,7 @@ from urllib.parse import quote
 import requests
 from anymail.message import AnymailMessage
 from django.conf import settings
-from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth import get_user_model, update_session_auth_hash, views
 from django.core import mail as django_mail
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -26,9 +26,7 @@ from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
-from social_django.utils import load_backend
-from social_core.utils import get_strategy
-from social_django.utils import STORAGE, STRATEGY
+from social_django.utils import load_backend, load_strategy
 
 from authentication.serializers import (
     LoginEmailSerializer,
@@ -38,6 +36,9 @@ from authentication.serializers import (
     RegisterEmailSerializer,
 )
 from authentication.utils import load_drf_strategy
+from authentication.api import (
+    logout_of_keycloak,
+)
 from mail.api import render_email_templates, send_messages
 from open_discussions.authentication import BearerAuthentication
 from open_discussions.permissions import IsStaffPermission
@@ -295,7 +296,7 @@ def get_user_details_for_keycloak(request, email):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def post_request_password_update(request, user_id):
+def post_request_password_update(request):
     """
     <COLLIN>
 
@@ -305,9 +306,9 @@ def post_request_password_update(request, user_id):
     Returns:
         Response: <COLLIN>
     """
-    user = User.objects.filter(id=user_id).first()
+    user = getattr(request, "user", None)
     if user:
-        strategy = get_strategy(STRATEGY, STORAGE)
+        strategy = load_strategy(request)
         storage = strategy.storage
         user_social_auth_record = (
             storage.user.get_social_auth_for_user(
@@ -319,10 +320,9 @@ def post_request_password_update(request, user_id):
         if user_social_auth_record:
             payload = json.dumps(["UPDATE_PASSWORD"])
             client_id = "ol-open-discussions-local"
-            redirect_uri = "google.com"
             realm_name = "olapps"
             keycloak_base_url = "https://sso-qa.odl.mit.edu"
-            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}&redirect_uri={redirect_uri}"
+            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
             access_token = user_social_auth_record.get_access_token(strategy)
             headers = {
                 "Content-Type": "application/json",
@@ -332,3 +332,25 @@ def post_request_password_update(request, user_id):
         return Response({response}, status=status.HTTP_200_OK)
     else:
         raise Http404("User not found")
+
+
+class CustomLogoutView(views.LogoutView):
+    """COLLIN"""
+
+    def post(self, request):
+        """COLLIN"""
+        user = getattr(request, "user", None)
+        if user:
+            logout_of_keycloak(user)
+            return super().post(request)
+        else:
+            raise Http404("User not found")
+
+    def get(self, request):
+        """COLLIN"""
+        user = getattr(request, "user", None)
+        if user:
+            logout_of_keycloak(user)
+            return super().get(request)
+        else:
+            raise Http404("User not found")
