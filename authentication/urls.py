@@ -1,21 +1,21 @@
 """URL configurations for authentication"""
 from django.conf import settings
-from django.urls import re_path, path
+from django.contrib.auth import views as auth_views
+from django.urls import path, re_path
 
 from authentication.views import (
+    CustomDjoserAPIView,
+    CustomLogoutView,
     LoginEmailView,
     LoginPasswordView,
-    RegisterEmailView,
     RegisterConfirmView,
     RegisterDetailsView,
+    RegisterEmailView,
     get_social_auth_types,
-    login_complete,
-    CustomDjoserAPIView,
     get_user_details_for_keycloak,
+    login_complete,
     post_request_password_update,
-    CustomLogoutView,
 )
-from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     re_path(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
@@ -29,7 +29,7 @@ if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABL
             name="get-user-details-for-keycloak",
         ),
         path(
-            "api/v0/update_password_request/<user_id>",
+            "api/v0/update_password_request/",
             post_request_password_update,
             name="update-password-request-api",
         ),

@@ -9,7 +9,6 @@ from django.contrib.auth import get_user_model, update_session_auth_hash, views
 from django.core import mail as django_mail
 from django.http import Http404
 from django.shortcuts import redirect, render
-from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from djoser.email import PasswordResetEmail as DjoserPasswordResetEmail
 from djoser.utils import ActionViewMixin
 from djoser.views import UserViewSet
@@ -22,12 +21,15 @@ from rest_framework.decorators import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend, load_strategy
 
+from authentication.api import logout_of_keycloak
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
@@ -36,9 +38,6 @@ from authentication.serializers import (
     RegisterEmailSerializer,
 )
 from authentication.utils import load_drf_strategy
-from authentication.api import (
-    logout_of_keycloak,
-)
 from mail.api import render_email_templates, send_messages
 from open_discussions.authentication import BearerAuthentication
 from open_discussions.permissions import IsStaffPermission
@@ -298,13 +297,13 @@ def get_user_details_for_keycloak(request, email):
 @permission_classes([IsAuthenticated])
 def post_request_password_update(request):
     """
-    <COLLIN>
-
-    Args:
-        uid (string): The uid of a user record in Open Discussions.
+    Endpoint for initiating the Keycloak password reset workflow via email.
 
     Returns:
-        Response: <COLLIN>
+        Response: HTTP_200_OK if the user and user's social auth record is found.
+
+    Raises:
+        Http404 if the user is not found.
     """
     user = getattr(request, "user", None)
     if user:
@@ -319,26 +318,31 @@ def post_request_password_update(request):
         )
         if user_social_auth_record:
             payload = json.dumps(["UPDATE_PASSWORD"])
-            client_id = "ol-open-discussions-local"
-            realm_name = "olapps"
-            keycloak_base_url = "https://sso-qa.odl.mit.edu"
-            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
+            client_id = settings.SOCIAL_AUTH_OL_OIDC_KEY
+            keycloak_base_url = settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT
+            url = f"{keycloak_base_url}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
             access_token = user_social_auth_record.get_access_token(strategy)
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {access_token}",
             }
             response = requests.request("PUT", url, headers=headers, data=payload)
-        return Response({response}, status=status.HTTP_200_OK)
-    else:
-        raise Http404("User not found")
+            if response.status_code == HTTP_204_NO_CONTENT:
+                return Response({response}, status=status.HTTP_200_OK)
+
+    raise Http404("User not found")
 
 
 class CustomLogoutView(views.LogoutView):
-    """COLLIN"""
+    """
+    Ends the user's Keycloak session in additional to the built in Django logout.
+    """
 
     def post(self, request):
-        """COLLIN"""
+        """
+        POST endpoint for logging a user out.
+        Raises 404 if the user is not included in the request.
+        """
         user = getattr(request, "user", None)
         if user:
             logout_of_keycloak(user)
@@ -347,7 +351,10 @@ class CustomLogoutView(views.LogoutView):
             raise Http404("User not found")
 
     def get(self, request):
-        """COLLIN"""
+        """
+        GET endpoint for loggin a user out.
+        Raises 404 if the user is not included in the request.
+        """
         user = getattr(request, "user", None)
         if user:
             logout_of_keycloak(user)
