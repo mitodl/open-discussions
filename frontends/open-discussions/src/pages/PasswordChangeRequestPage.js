@@ -9,8 +9,6 @@ import { connect } from "react-redux"
 import { LOGIN_URL } from "../lib/url"
 
 type Props = {|
-  ...OwnProps,
-  ...StateProps,
   dispatch: Dispatch<*>
 |}
 
