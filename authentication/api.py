@@ -1,8 +1,8 @@
 """Authentication api"""
 import logging
-from django.conf import settings
 
 import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
 from rest_framework.status import HTTP_204_NO_CONTENT
@@ -118,5 +118,7 @@ def logout_of_keycloak(user):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {access_token}",
             }
-            response = requests.request("POST", url, headers=headers, data={})
+            response = requests.request(
+                "POST", url, headers=headers, data={}, timeout=settings.REQUESTS_TIMEOUT
+            )
             return response.status_code == HTTP_204_NO_CONTENT

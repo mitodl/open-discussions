@@ -326,7 +326,13 @@ def post_request_password_update(request):
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {access_token}",
             }
-            response = requests.request("PUT", url, headers=headers, data=payload)
+            response = requests.request(
+                "PUT",
+                url,
+                headers=headers,
+                data=payload,
+                timeout=settings.REQUESTS_TIMEOUT,
+            )
             if response.status_code == HTTP_204_NO_CONTENT:
                 return Response({response}, status=status.HTTP_200_OK)
 
@@ -338,7 +344,7 @@ class CustomLogoutView(views.LogoutView):
     Ends the user's Keycloak session in additional to the built in Django logout.
     """
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         """
         POST endpoint for logging a user out.
         Raises 404 if the user is not included in the request.
@@ -350,7 +356,7 @@ class CustomLogoutView(views.LogoutView):
         else:
             raise Http404("User not found")
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         """
         GET endpoint for loggin a user out.
         Raises 404 if the user is not included in the request.
