@@ -9,6 +9,7 @@ import { connect } from "react-redux"
 import { LOGIN_URL } from "../lib/url"
 
 type Props = {|
+  match: Match,
   dispatch: Dispatch<*>
 |}
 
