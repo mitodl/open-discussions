@@ -14,8 +14,7 @@ from social_core.backends.saml import SAMLAuth
 from authentication.backends.micromasters import MicroMastersAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
-from authentication.views import get_user_details_for_keycloak
-from open_discussions import features, settings
+from open_discussions import features
 from open_discussions.factories import UserSocialAuthFactory, UserFactory
 from open_discussions.test_utils import any_instance_of, MockResponse
 from profiles.models import Profile
