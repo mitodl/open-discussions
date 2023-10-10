@@ -309,13 +309,9 @@ def post_request_password_update(request):
     if user:
         strategy = load_strategy(request)
         storage = strategy.storage
-        user_social_auth_record = (
-            storage.user.get_social_auth_for_user(
-                user, provider=OlOpenIdConnectAuth.name
-            )
-            .filter(user=user)
-            .first()
-        )
+        user_social_auth_record = storage.user.get_social_auth_for_user(
+            user, provider=OlOpenIdConnectAuth.name
+        ).first()
         if user_social_auth_record:
             payload = json.dumps(["UPDATE_PASSWORD"])
             client_id = settings.SOCIAL_AUTH_OL_OIDC_KEY

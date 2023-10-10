@@ -1,9 +1,11 @@
 """API tests"""
+from typing import Literal
 from django.contrib.auth import get_user_model
 import pytest
 from social_django.models import UserSocialAuth
 
 from authentication import api
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from notifications.models import NotificationSettings
 from profiles.models import Profile
 from open_discussions.test_utils import any_instance_of
@@ -21,7 +23,7 @@ pytestmark = pytest.mark.django_db
         # None,
     ],
 )
-def test_create_user(mocker, profile_data):
+def test_create_user(mocker, profile_data: dict[str, str]):
     """Tests that a user and associated objects are created"""
     auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
 
@@ -47,7 +49,12 @@ def test_create_user(mocker, profile_data):
     "mock_method",
     ["profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"],
 )
-def test_create_user_errors(mocker, mock_method):
+def test_create_user_errors(
+    mocker,
+    mock_method: Literal[
+        "profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"
+    ],
+):
     """Test that we don't end up in a partial state if there are errors"""
     mocker.patch(mock_method, side_effect=Exception("error"))
     auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
@@ -126,3 +133,70 @@ def test_create_or_update_micromasters_social_auth(user):
     }
 
     assert UserSocialAuth.objects.count() == 1
+
+
+@pytest.fixture
+def keycloak_user(user):
+    """Fixture for a user that has an 'OlOpenIdConnectAuth' type UserSocialAuth record"""
+    return UserSocialAuth.objects.create(
+        provider=OlOpenIdConnectAuth.name, user=user, uid="123"
+    )
+
+
+def _mock_keycloak_logout_post(
+    status, user_social_auth_uid, settings, mocked_responses
+):
+    """Mock the Keycloak password reset API response"""
+    url = f"{settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT}/users/{user_social_auth_uid}/logout"
+    mocked_responses.add(
+        mocked_responses.POST,
+        url,
+        json={},
+        status=status,
+    )
+
+
+def test_logout_of_keycloak_successful_response(
+    user: User, mocker, settings, mocked_responses, keycloak_user
+):
+    """Test that the UserSocialAuth exists for the user and the Keycloak POST returns 204."""
+    fake_access_token = "123ABC"
+    mocker.patch(
+        "social_django.models.UserSocialAuth.get_access_token",
+        return_value=fake_access_token,
+    )
+
+    _mock_keycloak_logout_post(204, keycloak_user.uid, settings, mocked_responses)
+
+    assert api.logout_of_keycloak(user) is True
+
+    for call in mocked_responses.calls[1:]:
+        assert ({("Authorization", f"Bearer {fake_access_token}")}).issubset(
+            set(call.request.headers.items())
+        )
+
+
+def test_logout_of_keycloak_no_social_auth_record_for_user(user):
+    """Test that False is returned if there is no UserSocialAuth for the user."""
+
+    assert api.logout_of_keycloak(user) is False
+
+
+def test_logout_of_keycloak_unexpected_response_from_keycloak(
+    user, mocker, settings, mocked_responses, keycloak_user
+):
+    """Test that False is returned if the POST request to Keycloak returns a non-204 status."""
+
+    fake_access_token = "123ABC"
+    mocker.patch(
+        "social_django.models.UserSocialAuth.get_access_token",
+        return_value=fake_access_token,
+    )
+
+    _mock_keycloak_logout_post(401, keycloak_user.uid, settings, mocked_responses)
+    assert api.logout_of_keycloak(user) is False
+
+    for call in mocked_responses.calls[1:]:
+        assert ({("Authorization", f"Bearer {fake_access_token}")}).issubset(
+            set(call.request.headers.items())
+        )

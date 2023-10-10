@@ -106,9 +106,7 @@ def logout_of_keycloak(user):
         user_social_auth_record = (
             storage.user.get_social_auth_for_user(
                 user, provider=OlOpenIdConnectAuth.name
-            )
-            .filter(user=user)
-            .first()
+            ).first()
         )
         if user_social_auth_record:
             keycloak_base_url = settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT
@@ -121,4 +119,7 @@ def logout_of_keycloak(user):
             response = requests.request(
                 "POST", url, headers=headers, data={}, timeout=settings.REQUESTS_TIMEOUT
             )
+            print("CP")
+            print(response)
             return response.status_code == HTTP_204_NO_CONTENT
+        return False

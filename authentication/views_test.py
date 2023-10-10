@@ -1,17 +1,21 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
 
+from urllib.parse import urlencode
 from django.contrib.auth import get_user, get_user_model
 from django.test import Client
 from django.urls import reverse
 import factory
 import pytest
+import json
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from social_core.backends.email import EmailAuth
 from social_core.backends.saml import SAMLAuth
+from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
 from open_discussions import features
@@ -866,7 +870,7 @@ def test_post_user_details_for_keycloak_password_missing(client, user, admin_use
 
 
 @pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
-def test_post_user_details_for_keycloak_(mocker, client, user, admin_user):
+def test_post_user_details_for_keycloak(mocker, client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a 200 if the POST contains the correct password"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
     bearer_token = Token.objects.create(user=admin_user)
@@ -875,3 +879,84 @@ def test_post_user_details_for_keycloak_(mocker, client, user, admin_user):
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
     response = client.post(url, data={"password": "correct_password"})
     assert response.status_code == status.HTTP_200_OK
+
+
+def _mock_keycloak_password_update_post(
+    status, user_social_auth_uid, settings, mocked_responses
+):
+    """Mock the Keycloak password reset API response"""
+    url = f"{settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT}/users/{user_social_auth_uid}/execute-actions-email?client_id={settings.SOCIAL_AUTH_OL_OIDC_KEY}"
+    mocked_responses.add(mocked_responses.PUT, url, json={}, status=status)
+
+
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_post_request_password_update_successful(
+    mocker, client, user, settings, mocked_responses
+):
+    """Verify that update-password-request-api returns a 200 if the user and user's social auth record exists"""
+    url = reverse("update-password-request-api")
+    keycloak_user = UserSocialAuth.objects.create(
+        provider=OlOpenIdConnectAuth.name, user=user, uid="123"
+    )
+    fake_access_token = "ABC123"
+    mocker.patch(
+        "social_django.models.UserSocialAuth.get_access_token",
+        return_value=fake_access_token,
+    )
+    _mock_keycloak_password_update_post(
+        204, keycloak_user.uid, settings, mocked_responses
+    )
+    client.force_login(user)
+    response = client.post(url)
+    assert response.status_code == status.HTTP_200_OK
+
+    for call in mocked_responses.calls[1:]:
+        assert ({("Authorization", f"Bearer {fake_access_token}")}).issubset(
+            set(call.request.headers.items())
+        )
+    assert mocked_responses.calls[0].request.body == '["UPDATE_PASSWORD"]'
+
+
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_post_request_password_update_unauthorized_user(client):
+    """Verify that update-password-request-api returns a 403 if the user is not authenticated."""
+    url = reverse("update-password-request-api")
+    response = client.post(url)
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_post_request_password_update_no_auth_record_found(client, user):
+    """Verify that update-password-request-api returns a 404 if the user's social auth record does not exist"""
+    url = reverse("update-password-request-api")
+    client.force_login(user)
+    response = client.post(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_post_request_password_update_unexpected_keycloak_response(
+    mocker, client, user, settings, mocked_responses
+):
+    """Verify that update-password-request-api returns a 404 if the response from Keycloak is not a 204"""
+    url = reverse("update-password-request-api")
+    keycloak_user = UserSocialAuth.objects.create(
+        provider=OlOpenIdConnectAuth.name, user=user, uid="123"
+    )
+    fake_access_token = "ABC123"
+    mocker.patch(
+        "social_django.models.UserSocialAuth.get_access_token",
+        return_value=fake_access_token,
+    )
+    _mock_keycloak_password_update_post(
+        403, keycloak_user.uid, settings, mocked_responses
+    )
+    client.force_login(user)
+    response = client.post(url)
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    for call in mocked_responses.calls[1:]:
+        assert ({("Authorization", f"Bearer {fake_access_token}")}).issubset(
+            set(call.request.headers.items())
+        )
+    assert mocked_responses.calls[0].request.body == '["UPDATE_PASSWORD"]'
