@@ -102,21 +102,6 @@ if settings.DEBUG:
 
 if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABLED"]:
     urlpatterns += [
-        re_path(
-            r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,36})/$",
-            RedirectView.as_view(url="/login/ol-oidc/"),
-            name="password-reset-confirm",
-        ),
-        re_path(
-            r"^password_reset/",
-            RedirectView.as_view(url="/login/ol-oidc/"),
-            name="password-reset",
-        ),
-        re_path(
-            r"^signup/confirm/$",
-            RedirectView.as_view(url="/login/ol-oidc/"),
-            name="register-confirm",
-        ),
         re_path(r"^login/", RedirectView.as_view(url="/login/ol-oidc/"), name="login"),
         re_path(
             r"^signup/", RedirectView.as_view(url="/login/ol-oidc/"), name="signup"

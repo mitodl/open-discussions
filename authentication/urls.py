@@ -16,12 +16,13 @@ from authentication.views import (
     login_complete,
     post_request_password_update,
 )
+from open_discussions.features import KEYCLOAK_ENABLED
 
 urlpatterns = [
     re_path(r"^api/v0/auths/$", get_social_auth_types, name="get-auth-types-api"),
     re_path(r"^login/complete$", login_complete, name="login-complete"),
 ]
-if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABLED"]:
+if KEYCLOAK_ENABLED in settings.FEATURES and settings.FEATURES[KEYCLOAK_ENABLED]:
     urlpatterns += [
         path(
             "api/v0/auth/<email>",

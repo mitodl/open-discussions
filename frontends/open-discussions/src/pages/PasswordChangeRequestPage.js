@@ -7,6 +7,7 @@ import { actions } from "../actions"
 import type { Dispatch } from "redux"
 import { connect } from "react-redux"
 import { LOGIN_URL } from "../lib/url"
+import type { Match } from "react-router"
 
 type Props = {|
   match: Match,
