@@ -103,11 +103,9 @@ def logout_of_keycloak(user):
     if user:
         strategy = load_strategy()
         storage = strategy.storage
-        user_social_auth_record = (
-            storage.user.get_social_auth_for_user(
-                user, provider=OlOpenIdConnectAuth.name
-            ).first()
-        )
+        user_social_auth_record = storage.user.get_social_auth_for_user(
+            user, provider=OlOpenIdConnectAuth.name
+        ).first()
         if user_social_auth_record:
             keycloak_base_url = settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT
             url = f"{keycloak_base_url}/users/{user_social_auth_record.uid}/logout"
