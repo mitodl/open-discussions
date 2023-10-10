@@ -1,13 +1,11 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
 
-from urllib.parse import urlencode
+import factory
+import pytest
 from django.contrib.auth import get_user, get_user_model
 from django.test import Client
 from django.urls import reverse
-import factory
-import pytest
-import json
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from social_core.backends.email import EmailAuth
@@ -19,8 +17,8 @@ from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
 from open_discussions import features
-from open_discussions.factories import UserSocialAuthFactory, UserFactory
-from open_discussions.test_utils import any_instance_of, MockResponse
+from open_discussions.factories import UserFactory, UserSocialAuthFactory
+from open_discussions.test_utils import MockResponse, any_instance_of
 from profiles.models import Profile
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]

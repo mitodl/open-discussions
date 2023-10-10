@@ -135,8 +135,8 @@ def test_create_or_update_micromasters_social_auth(user):
     assert UserSocialAuth.objects.count() == 1
 
 
-@pytest.fixture
-def keycloak_user(user):
+@pytest.fixture(name="keycloak_user")
+def fixture_keycloak_user(user):
     """Fixture for a user that has an 'OlOpenIdConnectAuth' type UserSocialAuth record"""
     return UserSocialAuth.objects.create(
         provider=OlOpenIdConnectAuth.name, user=user, uid="123"
