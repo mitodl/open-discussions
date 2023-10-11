@@ -586,27 +586,27 @@
     },
     "SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT": {
       "description": "The base URI for OpenID Connect discovery, https://<OIDC_ENDPOINT>/ without .well-known/openid-configuration.",
-      "required": false
+      "required": true
     },
     "SOCIAL_AUTH_OL_OIDC_KEY": {
       "description": "The client ID provided by the OpenID Connect provider.",
-      "required": false
+      "required": true
     },
     "SOCIAL_AUTH_OL_OIDC_SECRET": {
       "description": "The client secret provided by the OpenID Connect provider.",
-      "required": false
+      "required": true
     },
     "USERINFO_URL": {
       "description": "Provder endpoint where client sends requests for identity claims.",
-      "required": false
+      "required": true
     },
     "ACCESS_TOKEN_URL": {
       "description": "Provider endpoint where client exchanges the authorization code for tokens.",
-      "required": false
+      "required": true
     },
     "AUTHORIZATION_URL": {
       "description": "Provider endpoint where the user is asked to authenticate.",
-      "required": false
+      "required": true
     },
     "SECRET_KEY": {
       "description": "Django secret key.",
