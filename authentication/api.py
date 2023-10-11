@@ -87,36 +87,3 @@ def create_or_update_micromasters_social_auth(user, uid, details):
     extra_data = backend.extra_data(user, uid, {"username": uid}, details)
     social.set_extra_data(extra_data)
     return social
-
-
-def logout_of_keycloak(user):
-    """
-    Ends the user's Keycloak session if the user has a social_auth record for the Keycloak OIDC backend.
-
-    Args:
-        user (User): User model record.
-
-    Returns:
-        boolean: True if the API request to Keycloak was successful, otherwise False.
-    """
-
-    if user:
-        strategy = load_strategy()
-        storage = strategy.storage
-        user_social_auth_record = storage.user.get_social_auth_for_user(
-            user, provider=OlOpenIdConnectAuth.name
-        ).first()
-        if user_social_auth_record:
-            keycloak_base_url = settings.KEYCLOAK_BASE_URL
-            realm_name = settings.KEYCLOAK_REALM_NAME
-            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/logout"
-            access_token = user_social_auth_record.get_access_token(strategy)
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            }
-            response = requests.request(
-                "POST", url, headers=headers, data={}, timeout=settings.REQUESTS_TIMEOUT
-            )
-            return response.status_code == HTTP_204_NO_CONTENT
-        return False

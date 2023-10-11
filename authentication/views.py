@@ -28,7 +28,6 @@ from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
 from social_django.utils import load_backend, load_strategy
 
-from authentication.api import logout_of_keycloak
 from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import (
     LoginEmailSerializer,
@@ -347,8 +346,10 @@ class CustomLogoutView(views.LogoutView):
         """
         user = getattr(request, "user", None)
         if user:
-            logout_of_keycloak(user)
-            return super().post(request)
+            super().post(request)
+            return redirect(
+                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
+            )
         else:
             raise Http404("User not found")
 
@@ -359,7 +360,9 @@ class CustomLogoutView(views.LogoutView):
         """
         user = getattr(request, "user", None)
         if user:
-            logout_of_keycloak(user)
-            return super().get(request)
+            super().get(request)
+            return redirect(
+                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
+            )
         else:
             raise Http404("User not found")

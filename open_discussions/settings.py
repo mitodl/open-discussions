@@ -400,7 +400,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT = get_string(
     name="SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT",
-    default=f"{KEYCLOAK_BASE_URL}/realms/realm_name"
+    default=f"{KEYCLOAK_BASE_URL}/realms/realm_name",
 )
 
 SOCIAL_AUTH_OL_OIDC_KEY = get_string(
