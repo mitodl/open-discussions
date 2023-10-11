@@ -107,8 +107,9 @@ def logout_of_keycloak(user):
             user, provider=OlOpenIdConnectAuth.name
         ).first()
         if user_social_auth_record:
-            keycloak_base_url = settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT
-            url = f"{keycloak_base_url}/users/{user_social_auth_record.uid}/logout"
+            keycloak_base_url = settings.KEYCLOAK_BASE_URL
+            realm_name = settings.KEYCLOAK_REALM_NAME
+            url = f"{keycloak_base_url}/admin/realms/{realm_name}/users/{user_social_auth_record.uid}/logout"
             access_token = user_social_auth_record.get_access_token(strategy)
             headers = {
                 "Content-Type": "application/json",
