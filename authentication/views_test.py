@@ -883,7 +883,7 @@ def _mock_keycloak_password_update_post(
     status, user_social_auth_uid, settings, mocked_responses
 ):
     """Mock the Keycloak password reset API response"""
-    url = f"{settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT}/users/{user_social_auth_uid}/execute-actions-email?client_id={settings.SOCIAL_AUTH_OL_OIDC_KEY}"
+    url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/${settings.KEYCLOAK_REALM_NAME}/users/{user_social_auth_uid}/execute-actions-email?client_id={settings.SOCIAL_AUTH_OL_OIDC_KEY}"
     mocked_responses.add(mocked_responses.PUT, url, json={}, status=status)
 
 
