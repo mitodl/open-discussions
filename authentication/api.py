@@ -117,7 +117,5 @@ def logout_of_keycloak(user):
             response = requests.request(
                 "POST", url, headers=headers, data={}, timeout=settings.REQUESTS_TIMEOUT
             )
-            print("CP")
-            print(response)
             return response.status_code == HTTP_204_NO_CONTENT
         return False
