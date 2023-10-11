@@ -1,16 +1,11 @@
 """Authentication api"""
 import logging
 
-import requests
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import IntegrityError, transaction
-from rest_framework.status import HTTP_204_NO_CONTENT
 from social_core.utils import get_strategy
-from social_django.utils import load_strategy
 
 from authentication.backends.micromasters import MicroMastersAuth
-from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from channels import api as channels_api
 from notifications import api as notifications_api
 from profiles import api as profile_api
