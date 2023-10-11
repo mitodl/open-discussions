@@ -310,6 +310,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 FEATURE_KEYCLOAK_ENABLED = get_bool("FEATURE_KEYCLOAK_ENABLED", False)
+KEYCLOAK_BASE_URL = get_string("KEYCLOAK_BASE_URL", "http://mit-keycloak-base-url.edu")
+KEYCLOAK_REALM_NAME = get_string("KEYCLOAK_REALM_NAME", "olapps")
 
 SOCIAL_AUTH_STRATEGY = "authentication.strategy.OpenDiscussionsStrategy"
 

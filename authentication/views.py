@@ -315,8 +315,9 @@ def post_request_password_update(request):
         if user_social_auth_record:
             payload = json.dumps(["UPDATE_PASSWORD"])
             client_id = settings.SOCIAL_AUTH_OL_OIDC_KEY
-            keycloak_base_url = settings.SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT
-            url = f"{keycloak_base_url}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
+            keycloak_realm_name = settings.KEYCLOAK_REALM_NAME
+            keycloak_base_url = settings.KEYCLOAK_BASE_URL
+            url = f"{keycloak_base_url}/admin/realms/${keycloak_realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
             access_token = user_social_auth_record.get_access_token(strategy)
             headers = {
                 "Content-Type": "application/json",
@@ -331,7 +332,6 @@ def post_request_password_update(request):
             )
             if response.status_code == HTTP_204_NO_CONTENT:
                 return Response({response}, status=status.HTTP_200_OK)
-
     raise Http404("User not found")
 
 

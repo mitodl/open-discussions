@@ -30,7 +30,7 @@ if KEYCLOAK_ENABLED in settings.FEATURES and settings.FEATURES[KEYCLOAK_ENABLED]
             name="get-user-details-for-keycloak",
         ),
         path(
-            "api/v0/update_password_request/",
+            "api/v0/update_password_request",
             post_request_password_update,
             name="update-password-request-api",
         ),

@@ -696,7 +696,15 @@
     },
     "FEATURE_KEYCLOAK_ENABLED": {
       "description": "Authentication functionality is managed by Keycloak.",
-      "required": false
+      "required": true
+    },
+    "KEYCLOAK_REALM_NAME": {
+      "description": "The Keycloak realm name in which Open Discussions has a client configuration.",
+      "required": true
+    },
+    "KEYCLOAK_BASE_URL": {
+      "description": "The base URL for a Keycloak configuration.",
+      "required": true
     }
   },
   "keywords": [
