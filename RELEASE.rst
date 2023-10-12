@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.224.2
+---------------
+
+- 4228: keycloak integration login register password reset ux (#4234)
+
 Version 0.224.1 (Released September 28, 2023)
 ---------------
 
