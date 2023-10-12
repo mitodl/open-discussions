@@ -2,6 +2,7 @@
 from django.conf import settings
 from django.contrib.auth import views as auth_views
 from django.urls import path, re_path
+from django.views.generic import RedirectView
 
 from authentication.views import (
     CustomDjoserAPIView,
@@ -14,7 +15,6 @@ from authentication.views import (
     get_social_auth_types,
     get_user_details_for_keycloak,
     login_complete,
-    post_request_password_update,
 )
 from open_discussions.features import KEYCLOAK_ENABLED
 
@@ -30,8 +30,10 @@ if KEYCLOAK_ENABLED in settings.FEATURES and settings.FEATURES[KEYCLOAK_ENABLED]
             name="get-user-details-for-keycloak",
         ),
         path(
-            "api/v0/update_password_request",
-            post_request_password_update,
+            "settings/password",
+            RedirectView.as_view(
+                url=f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/account/?referrer={settings.OPEN_DISCUSSIONS_TITLE}&referrer_uri={settings.SITE_BASE_URL}#/account-security/signing-in/"
+            ),
             name="update-password-request-api",
         ),
         re_path(r"^logout/$", CustomLogoutView.as_view(), name="logout"),

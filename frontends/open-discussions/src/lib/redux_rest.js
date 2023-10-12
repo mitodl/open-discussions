@@ -21,7 +21,6 @@ import { userContributionsEndpoint } from "../reducers/user_contributions"
 import { authEndpoint } from "../reducers/auth"
 import { passwordResetEndpoint } from "../reducers/password_reset"
 import { passwordChangeEndpoint } from "../reducers/password_change"
-import { passwordChangeRequestEndpoint } from "../reducers/password_change_request"
 import { profileImageEndpoint } from "../reducers/profile_image"
 import { channelAvatarEndpoint } from "../reducers/channel_avatar"
 import { channelBannerEndpoint } from "../reducers/channel_banner"
@@ -56,7 +55,6 @@ export const endpoints = [
   authEndpoint,
   passwordResetEndpoint,
   passwordChangeEndpoint,
-  passwordChangeRequestEndpoint,
   profileImageEndpoint,
   channelAvatarEndpoint,
   channelBannerEndpoint,

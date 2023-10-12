@@ -21,14 +21,12 @@ from rest_framework.decorators import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
-from social_django.utils import load_backend, load_strategy
+from social_django.utils import load_backend
 
-from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
@@ -290,48 +288,6 @@ def get_user_details_for_keycloak(request, email):
             return Response(response, status=status.HTTP_200_OK)
     else:
         raise Http404("User not found")
-
-
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def post_request_password_update(request):
-    """
-    Endpoint for initiating the Keycloak password reset workflow via email.
-
-    Returns:
-        Response: HTTP_200_OK if the user and user's social auth record is found.
-
-    Raises:
-        Http404 if the user is not found.
-    """
-    user = getattr(request, "user", None)
-    if user:
-        strategy = load_strategy(request)
-        storage = strategy.storage
-        user_social_auth_record = storage.user.get_social_auth_for_user(
-            user, provider=OlOpenIdConnectAuth.name
-        ).first()
-        if user_social_auth_record:
-            payload = json.dumps(["UPDATE_PASSWORD"])
-            client_id = settings.SOCIAL_AUTH_OL_OIDC_KEY
-            keycloak_realm_name = settings.KEYCLOAK_REALM_NAME
-            keycloak_base_url = settings.KEYCLOAK_BASE_URL
-            url = f"{keycloak_base_url}/admin/realms/${keycloak_realm_name}/users/{user_social_auth_record.uid}/execute-actions-email?client_id={client_id}"
-            access_token = user_social_auth_record.get_access_token(strategy)
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            }
-            response = requests.request(
-                "PUT",
-                url,
-                headers=headers,
-                data=payload,
-                timeout=settings.REQUESTS_TIMEOUT,
-            )
-            if response.status_code == HTTP_204_NO_CONTENT:
-                return Response({response}, status=status.HTTP_200_OK)
-    raise Http404("User not found")
 
 
 class CustomLogoutView(views.LogoutView):
