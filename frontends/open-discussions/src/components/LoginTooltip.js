@@ -1,4 +1,5 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { Link } from "react-router-dom"
 import Tooltip from "rc-tooltip"
@@ -17,14 +18,20 @@ export const LoginTooltipContent = () => (
     </div>
     <div className="bottom-row">
       <div className="tooltip-buttons">
-        <Link
-          className="link-button"
-          to={(location: Location) =>
-            `${LOGIN_URL}?next=${encodeURIComponent(location.pathname)}`
-          }
-        >
-          Log In
-        </Link>
+        {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+          <a className="link-button" href={LOGIN_URL}>
+            Log In
+          </a>
+        ) : (
+          <Link
+            className="link-button"
+            to={(location: Location) =>
+              `${LOGIN_URL}?next=${encodeURIComponent(location.pathname)}`
+            }
+          >
+            Log In
+          </Link>
+        )}
       </div>
     </div>
   </div>

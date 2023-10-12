@@ -2,7 +2,7 @@
 import logging
 
 from django.contrib.auth import get_user_model
-from django.db import transaction, IntegrityError
+from django.db import IntegrityError, transaction
 from social_core.utils import get_strategy
 
 from authentication.backends.micromasters import MicroMastersAuth

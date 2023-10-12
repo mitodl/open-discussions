@@ -309,6 +309,16 @@ AUTHENTICATION_BACKENDS = (
     "guardian.backends.ObjectPermissionBackend",
 )
 
+FEATURE_KEYCLOAK_ENABLED = get_bool("FEATURE_KEYCLOAK_ENABLED", False)
+KEYCLOAK_BASE_URL = get_string(
+    name="KEYCLOAK_BASE_URL",
+    default="http://mit-keycloak-base-url.edu",
+)
+KEYCLOAK_REALM_NAME = get_string(
+    name="KEYCLOAK_REALM_NAME",
+    default="olapps",
+)
+
 SOCIAL_AUTH_STRATEGY = "authentication.strategy.OpenDiscussionsStrategy"
 
 SOCIAL_AUTH_LOGIN_REDIRECT_URL = "login-complete"
@@ -390,7 +400,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT = get_string(
     name="SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT",
-    default=None,
+    default=f"{KEYCLOAK_BASE_URL}/realms/realm_name",
 )
 
 SOCIAL_AUTH_OL_OIDC_KEY = get_string(

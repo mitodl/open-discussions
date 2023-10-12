@@ -13,7 +13,7 @@
     },
     {
       "url": "https://github.com/moneymeets/python-poetry-buildpack"
-    },    
+    },
     {
       "url": "https://github.com/heroku/heroku-buildpack-python"
     },
@@ -60,7 +60,7 @@
     },
     "CELERY_WORKER_MAX_MEMORY_PER_CHILD": {
       "description": "Max memory to be used by celery worker child",
-      "required": false      
+      "required": false
     },
     "CLOUDFRONT_DIST": {
       "description": "Cloudfront distribution",
@@ -68,7 +68,7 @@
     },
     "CORS_ALLOWED_ORIGINS": {
       "description": "A list of origins that are authorized to make cross-site HTTP requests",
-      "required": false      
+      "required": false
     },
     "DRF_NESTED_PARENT_LOOKUP_PREFIX": {
       "description": "DRF extensions parent lookup kwarg name prefix",
@@ -76,7 +76,7 @@
     },
     "CORS_ALLOWED_ORIGIN_REGEXES": {
       "description": "A list of regexes that match origins that are authorized to make cross-site HTTP requests",
-      "required": false      
+      "required": false
     },
     "CSAIL_BASE_URL": {
       "description": "CSAIL courses base URL",
@@ -490,11 +490,11 @@
       "description": "If false, disables the node_modules cache to fix yarn install",
       "value": "false"
     },
-    "OCW_NEXT_LIVE_BUCKET":{
+    "OCW_NEXT_LIVE_BUCKET": {
       "description": "bucket for ocw-next courses data",
       "required": false
     },
-    "OCW_NEXT_AWS_STORAGE_BUCKET_NAME":{
+    "OCW_NEXT_AWS_STORAGE_BUCKET_NAME": {
       "description": "bucket for ocw-next storage data",
       "required": false
     },
@@ -524,11 +524,11 @@
       "description": "Default timeout for requests",
       "required": false
     },
-    "RSS_FEED_EPISODE_LIMIT":{
+    "RSS_FEED_EPISODE_LIMIT": {
       "description": "Number of episodes included in aggregated rss feed",
       "required": false
     },
-    "RSS_FEED_CACHE_MINUTES":{
+    "RSS_FEED_CACHE_MINUTES": {
       "description": "Minutes that /podcasts/rss_feed will be cached",
       "required": false
     },
@@ -536,7 +536,7 @@
       "description": "Custom login url for SAML",
       "required": false
     },
-    "SOCIAL_AUTH_SAML_SP_ENTITY_ID" : {
+    "SOCIAL_AUTH_SAML_SP_ENTITY_ID": {
       "description": "SAML Service Provider Entity ID",
       "required": false
     },
@@ -586,27 +586,27 @@
     },
     "SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT": {
       "description": "The base URI for OpenID Connect discovery, https://<OIDC_ENDPOINT>/ without .well-known/openid-configuration.",
-      "required": false
+      "required": true
     },
     "SOCIAL_AUTH_OL_OIDC_KEY": {
       "description": "The client ID provided by the OpenID Connect provider.",
-      "required": false
+      "required": true
     },
     "SOCIAL_AUTH_OL_OIDC_SECRET": {
       "description": "The client secret provided by the OpenID Connect provider.",
-      "required": false
+      "required": true
     },
     "USERINFO_URL": {
       "description": "Provder endpoint where client sends requests for identity claims.",
-      "required": false
+      "required": true
     },
     "ACCESS_TOKEN_URL": {
       "description": "Provider endpoint where client exchanges the authorization code for tokens.",
-      "required": false
+      "required": true
     },
     "AUTHORIZATION_URL": {
       "description": "Provider endpoint where the user is asked to authenticate.",
-      "required": false
+      "required": true
     },
     "SECRET_KEY": {
       "description": "Django secret key.",
@@ -693,6 +693,18 @@
     "YOUTUBE_FETCH_TRANSCRIPT_SLEEP_SECONDS": {
       "description": "Sleep time between requests to the youtube transcripts api",
       "required": false
+    },
+    "FEATURE_KEYCLOAK_ENABLED": {
+      "description": "Authentication functionality is managed by Keycloak.",
+      "required": true
+    },
+    "KEYCLOAK_REALM_NAME": {
+      "description": "The Keycloak realm name in which Open Discussions has a client configuration.",
+      "required": true
+    },
+    "KEYCLOAK_BASE_URL": {
+      "description": "The base URL for a Keycloak configuration.",
+      "required": true
     }
   },
   "keywords": [

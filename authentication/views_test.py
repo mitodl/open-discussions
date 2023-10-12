@@ -1,11 +1,11 @@
 """Tests for authentication views"""
 # pylint: disable=redefined-outer-name
 
+import factory
+import pytest
 from django.contrib.auth import get_user, get_user_model
 from django.test import Client
 from django.urls import reverse
-import factory
-import pytest
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from social_core.backends.email import EmailAuth
@@ -15,8 +15,8 @@ from authentication.backends.micromasters import MicroMastersAuth
 from authentication.serializers import PARTIAL_PIPELINE_TOKEN_KEY
 from authentication.utils import SocialAuthState
 from open_discussions import features
-from open_discussions.factories import UserSocialAuthFactory, UserFactory
-from open_discussions.test_utils import any_instance_of, MockResponse
+from open_discussions.factories import UserFactory, UserSocialAuthFactory
+from open_discussions.test_utils import MockResponse, any_instance_of
 from profiles.models import Profile
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("indexing_user")]
@@ -772,11 +772,16 @@ def test_get_social_auth_types(client, user):
     assert resp.json() == [{"provider": provider} for provider in social_auth_providers]
 
 
-def test_get_user_details_for_keycloak(client, user, admin_user):
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_get_user_details_for_keycloak(
+    client,
+    user,
+    admin_user,
+):
     """Verify that get-user-details-for-keycloak returns a list expected attributes for the Keycloak plug-in."""
-    url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
     bearer_token = Token.objects.create(user=admin_user)
     client.credentials(HTTP_AUTHORIZATION="Bearer " + bearer_token.key)
+    url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
     resp = client.get(url)
     assert resp.json() == {
         "email": user.email,
@@ -792,6 +797,7 @@ def test_get_user_details_for_keycloak(client, user, admin_user):
     }
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_get_user_details_for_keycloak_requires_bearer_token(client, user):
     """Verify that get-user-details-for-keycloak returns a 401 if the request is made without a bearer token header."""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
@@ -799,6 +805,7 @@ def test_get_user_details_for_keycloak_requires_bearer_token(client, user):
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_get_user_details_for_keycloak_requires_staff_user(client, user):
     """Verify that get-user-details-for-keycloak returns a 403 if the request is made with a bearer token header NOT belonging to a staff user."""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
@@ -808,6 +815,7 @@ def test_get_user_details_for_keycloak_requires_staff_user(client, user):
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_get_user_details_for_keycloak_user_not_found(client, admin_user):
     """Verify that get-user-details-for-keycloak returns a 404 if the user does not exist"""
     url = reverse(
@@ -820,6 +828,7 @@ def test_get_user_details_for_keycloak_user_not_found(client, admin_user):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_post_user_details_for_keycloak_user_not_found(client, admin_user):
     """Verify that get-user-details-for-keycloak returns a 404 if the user does not exist"""
     url = reverse(
@@ -832,6 +841,7 @@ def test_post_user_details_for_keycloak_user_not_found(client, admin_user):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_post_user_details_for_keycloak_password_incorrect(
     mocker, client, user, admin_user
 ):
@@ -845,6 +855,7 @@ def test_post_user_details_for_keycloak_password_incorrect(
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
 def test_post_user_details_for_keycloak_password_missing(client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a 403 if the POST is missing the password json object"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
@@ -854,7 +865,8 @@ def test_post_user_details_for_keycloak_password_missing(client, user, admin_use
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-def test_post_user_details_for_keycloak_(mocker, client, user, admin_user):
+@pytest.mark.urls("authentication.test_resources.test_keycloak_urls")
+def test_post_user_details_for_keycloak(mocker, client, user, admin_user):
     """Verify that get-user-details-for-keycloak returns a 200 if the POST contains the correct password"""
     url = reverse("get-user-details-for-keycloak", kwargs={"email": user.email})
     bearer_token = Token.objects.create(user=admin_user)

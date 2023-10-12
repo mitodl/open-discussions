@@ -5,7 +5,7 @@ from urllib.parse import quote
 import requests
 from anymail.message import AnymailMessage
 from django.conf import settings
-from django.contrib.auth import get_user_model, update_session_auth_hash
+from django.contrib.auth import get_user_model, update_session_auth_hash, views
 from django.core import mail as django_mail
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -288,3 +288,37 @@ def get_user_details_for_keycloak(request, email):
             return Response(response, status=status.HTTP_200_OK)
     else:
         raise Http404("User not found")
+
+
+class CustomLogoutView(views.LogoutView):
+    """
+    Ends the user's Keycloak session in additional to the built in Django logout.
+    """
+
+    def post(self, request, *args, **kwargs):
+        """
+        POST endpoint for logging a user out.
+        Raises 404 if the user is not included in the request.
+        """
+        user = getattr(request, "user", None)
+        if user:
+            super().post(request)
+            return redirect(
+                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
+            )
+        else:
+            raise Http404("User not found")
+
+    def get(self, request, *args, **kwargs):
+        """
+        GET endpoint for loggin a user out.
+        Raises 404 if the user is not included in the request.
+        """
+        user = getattr(request, "user", None)
+        if user:
+            super().get(request)
+            return redirect(
+                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
+            )
+        else:
+            raise Http404("User not found")

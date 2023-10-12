@@ -46,7 +46,8 @@ const _createSettings = () => ({
   search_min_length:      2,
   accepted_social_sites:  [],
   livestream_ui_enabled:  true,
-  ckeditor_upload_url:    "/upload/token"
+  ckeditor_upload_url:    "/upload/token",
+  FEATURES:               { ["KEYCLOAK_ENABLED"]: false }
 })
 
 global.SETTINGS = _createSettings()
@@ -87,5 +88,23 @@ import chai from "chai"
 import chaiAsPromised from "chai-as-promised"
 chai.use(chaiAsPromised)
 
-import { mockHTMLElHeight } from "./lib/test_utils"
+// This method is purposefully defined here in order to
+// avoid importing test_utils which will cause issues.
+const mockHTMLElHeight = (scrollHeight: number, offsetHeight: number) => {
+  // $FlowFixMe
+  Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
+    configurable: true,
+    get:          function() {
+      return scrollHeight || 0
+    }
+  })
+
+  // $FlowFixMe
+  Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
+    configurable: true,
+    get:          function() {
+      return offsetHeight || 0
+    }
+  })
+}
 mockHTMLElHeight(100, 100)
