@@ -51,9 +51,9 @@ class AccountSettingsPage extends React.Component<Props> {
         <div key={index} className="account-settings-row">
           <h5>MIT Open</h5>
           {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
-            <a href={PASSWORD_CHANGE_URL}>Log In</a>
+            <a href={PASSWORD_CHANGE_URL}>Change Password</a>
           ) : (
-            <Link to={PASSWORD_CHANGE_URL}>Log In</Link>
+            <Link to={PASSWORD_CHANGE_URL}>Change Password</Link>
           )}
         </div>
       )
