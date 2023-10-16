@@ -55,4 +55,16 @@ describe("AccountSettingsPage", () => {
     assert.equal(rows.length, 2)
     assert.equal(rows.at(0).find("h5").text(), "MIT Open")
   })
+
+  it("renders change password when keycloak is active.", async () => {
+    SETTINGS.FEATURES.KEYCLOAK_ENABLED = true
+    helper.getSocialAuthTypesStub.returns(
+      Promise.resolve([{ provider: "ol-oidc" }, { provider: "email" }])
+    )
+    const wrapper = await renderPage()
+
+    const rows = wrapper.find(".account-settings-row")
+    assert.equal(rows.length, 2)
+    assert.equal(rows.at(0).find("h5").text(), "MIT Open")
+  })
 })
