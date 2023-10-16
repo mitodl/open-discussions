@@ -50,11 +50,7 @@ class AccountSettingsPage extends React.Component<Props> {
       return (
         <div key={index} className="account-settings-row">
           <h5>MIT Open</h5>
-          {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
-            <a href={PASSWORD_CHANGE_URL}>Change Password</a>
-          ) : (
-            <Link to={PASSWORD_CHANGE_URL}>Change Password</Link>
-          )}
+          <Link to={PASSWORD_CHANGE_URL}>Change Password</Link>
         </div>
       )
     case "micromasters":
@@ -92,11 +88,18 @@ class AccountSettingsPage extends React.Component<Props> {
               <span className="highlight"> {SETTINGS.user_full_name} </span>
               using:
             </label>
-            {R.compose(
-              R.addIndex(R.map)(this.renderSocialAuthLine),
-              // Show email auth before any other social auths
-              R.sortBy(auth => (auth.provider === "email" ? 0 : 1))
-            )(socialAuths)}
+            {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+              <div className="account-settings-row">
+                <h5>MIT Open</h5>
+                <a href={PASSWORD_CHANGE_URL}>Change Password</a>
+              </div>
+            ) : (
+              R.compose(
+                R.addIndex(R.map)(this.renderSocialAuthLine),
+                // Show email auth before any other social auths
+                R.sortBy(auth => (auth.provider === "email" ? 0 : 1))
+              )(socialAuths)
+            )}
           </Card>
         </div>
       </React.Fragment>
