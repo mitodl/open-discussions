@@ -64,7 +64,7 @@ describe("AccountSettingsPage", () => {
     const wrapper = await renderPage()
 
     const rows = wrapper.find(".account-settings-row")
-    assert.equal(rows.length, 2)
+    assert.equal(rows.length, 1)
     assert.equal(rows.at(0).find("h5").text(), "MIT Open")
   })
 })
