@@ -25,8 +25,9 @@ from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 from social_core.backends.email import EmailAuth
 from social_django.models import UserSocialAuth
-from social_django.utils import load_backend
+from social_django.utils import load_backend, load_strategy
 
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from authentication.serializers import (
     LoginEmailSerializer,
     LoginPasswordSerializer,
@@ -295,19 +296,36 @@ class CustomLogoutView(views.LogoutView):
     Ends the user's Keycloak session in additional to the built in Django logout.
     """
 
+    def _keycloak_logout_url(self, user):
+        """
+        Returns the OpenID Connect logout URL for a user based on their SocialAuth record's id_token
+        and the currently configured Keycloak environment variables.
+
+        Args:
+            user (User): User model record associated with the SocialAuth record.
+
+        Returns:
+            string: The URL to redirect the user to in order to logout.
+        """
+        strategy = load_strategy()
+        storage = strategy.storage
+        user_social_auth_record = storage.user.get_social_auth_for_user(
+            user, provider=OlOpenIdConnectAuth.name
+        ).first()
+        id_token = user_social_auth_record.extra_data.get("id_token")
+        return f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout?id_token_hint={id_token}"
+
     def post(self, request, *args, **kwargs):
         """
         POST endpoint for logging a user out.
         Raises 404 if the user is not included in the request.
         """
         user = getattr(request, "user", None)
-        if user:
+        if user and user.is_authenticated:
             super().post(request)
-            return redirect(
-                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
-            )
+            return redirect(self._keycloak_logout_url(user))
         else:
-            raise Http404("User not found")
+            raise Http404("Not currently logged in.")
 
     def get(self, request, *args, **kwargs):
         """
@@ -315,10 +333,8 @@ class CustomLogoutView(views.LogoutView):
         Raises 404 if the user is not included in the request.
         """
         user = getattr(request, "user", None)
-        if user:
+        if user and user.is_authenticated:
             super().get(request)
-            return redirect(
-                f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/logout"
-            )
+            return redirect(self._keycloak_logout_url(user))
         else:
-            raise Http404("User not found")
+            raise Http404("Not currently logged in.")
