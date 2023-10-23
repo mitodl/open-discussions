@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.224.3
+Version 0.224.3 (Released October 23, 2023)
 ---------------
 
 - 4236: Account settings page should always display forgot password option (Keycloak enabled) (#4239)
