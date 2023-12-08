@@ -129,6 +129,7 @@ INSTALLED_APPS = (
     "interactions",
     "moira_lists",
     "discussions",
+    "keycloak_user_export",
 )
 
 MIDDLEWARE = (
