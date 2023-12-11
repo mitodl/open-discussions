@@ -6,7 +6,7 @@ from django.utils.http import urlencode
 import base64
 import calendar
 
-from django.core.management import BaseCommand
+from django.core.management import BaseCommand, CommandError
 from keycloak_user_export.models import UserExportToKeycloak
 
 User = get_user_model()
@@ -14,7 +14,7 @@ User = get_user_model()
 
 class Command(BaseCommand):
     """
-    Creates a Keycloak user record for all Django user records which have a password set
+    Creates Keycloak user records for all Django user records which have a password set
     and no associated social-auth record for the "ol-oidc" provider.  The Keycloak user
     record is populated with the Django user's first_name, last_name, email, and password.
 
@@ -24,7 +24,7 @@ class Command(BaseCommand):
     The `KEYCLOAK_BASE_URL` environment variable must be defined and equal to the
     base URL of the Keycloak instance.
 
-    This command assumes the use of the default Django User model (first_name, last_name, email, password).
+    This command assumes Django users are defined with the default Django User model (first_name, last_name, email, password).
 
     A UserExportToKeycloak record is created for each successfully exported user.  If a UserExportToKeycloak
     already exists for a user, no duplicate UserExportToKeycloak record will be created.
@@ -34,7 +34,7 @@ class Command(BaseCommand):
     """
 
     help = """
-    Creates a Keycloak user record for all user records which have a password set
+    Creates Keycloak user records for all Django user records which have a password set
     and no associated social-auth record for the "ol-oidc" provider.
     Keycloak users are created in the realm defined by the `KEYCLOAK_REALM_NAME`
     environment variable.
@@ -93,6 +93,22 @@ class Command(BaseCommand):
         return response.json()["access_token"]
 
     def handle(self, *args, **kwargs):
+        if (
+            not hasattr(settings, "KEYCLOAK_BASE_URL")
+            or settings.KEYCLOAK_BASE_URL is None
+        ):
+            raise CommandError(
+                "KEYCLOAK_BASE_URL must be defined as an environment variable."
+            )
+
+        if (
+            not hasattr(settings, "KEYCLOAK_REALM_NAME")
+            or settings.KEYCLOAK_REALM_NAME is None
+        ):
+            raise CommandError(
+                "KEYCLOAK_REALM_NAME must be defined as an environment variable."
+            )
+
         unsynced_users = (
             User.objects.only("email", "password")
             .exclude(social_auth__provider="ol-oidc")
