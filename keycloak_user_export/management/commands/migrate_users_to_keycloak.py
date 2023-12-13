@@ -70,7 +70,7 @@ class Command(BaseCommand):
             help="(Optional) How many users to export to Keycloak at a time.",
         )
 
-    def get_access_token(
+    def _get_access_token(
         self, client_id: str, email: str, password: str, client_secret: str
     ):
         """
@@ -92,97 +92,122 @@ class Command(BaseCommand):
         response = requests.request("POST", url, headers=headers, data=payload)
         return response.json()["access_token"]
 
-    def handle(self, *args, **kwargs):
-        if (
-            not hasattr(settings, "KEYCLOAK_BASE_URL")
-            or settings.KEYCLOAK_BASE_URL is None
-        ):
+    def _generate_keycloak_user_payload(self, user):
+        """
+        Returns a dictionary formatted as the expected user representation for the
+        Keycloak partialImport Admin REST API endpoint.
+        The dictionary will include credential data if the user has a password
+        defined.
+
+        Args:
+            user (models.User): A Django User model record.
+
+        Returns:
+            dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
+        """
+        user_keycloak_payload = {
+            "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
+            "username": user.email,
+            "firstName": user.first_name,
+            "lastName": user.last_name,
+            "enabled": True,
+            "totp": False,
+            "emailVerified": True,
+            "email": user.email,
+            "credentials": [],
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "realmRoles": ["default-roles-master"],
+            "notBefore": 0,
+            "groups": [],
+        }
+        # If the user has a password defined, we will create a credential for them in Keycloak.
+        # This allows the user to
+        if user.password and user.has_usable_password():
+            _, iterations, salt, hash = user.password.split("$", 3)
+            base64_salt = base64.b64encode(salt.encode())
+            user_keycloak_payload["credentials"].append(
+                {
+                    "secretData": json.dumps(
+                        {"value": hash, "salt": base64_salt.decode()}
+                    ),
+                    "type": "password",
+                    "credentialData": json.dumps(
+                        {
+                            "hashIterations": iterations,
+                            "algorithm": "pbkdf2-sha256",
+                        }
+                    ),
+                }
+            )
+        return user_keycloak_payload
+
+    def _verify_environment_variables_configured(self):
+        """
+        Verify that KEYCLOAK_BASE_URL and KEYCLOAK_REALM_NAME are configured as environment
+        variables.
+
+        Raises:
+            CommandError: KEYCLOAK_BASE_URL must be defined as an environment variable.
+            CommandError: KEYCLOAK_REALM_NAME must be defined as an environment variable.
+        """
+        if getattr(settings, "KEYCLOAK_BASE_URL", None) is None:
             raise CommandError(
                 "KEYCLOAK_BASE_URL must be defined as an environment variable."
             )
 
-        if (
-            not hasattr(settings, "KEYCLOAK_REALM_NAME")
-            or settings.KEYCLOAK_REALM_NAME is None
-        ):
+        if getattr(settings, "KEYCLOAK_REALM_NAME", None) is None:
             raise CommandError(
                 "KEYCLOAK_REALM_NAME must be defined as an environment variable."
             )
 
+    def handle(self, *args, **kwargs):
+        self._verify_environment_variables_configured()
+
+        keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
+
         unsynced_users = (
             User.objects.only("email", "password")
             .exclude(social_auth__provider="ol-oidc")
-            .exclude(userexporttokeycloak__user__isnull=False)
+            .exclude(userexporttokeycloak__isnull=False)
             .select_related("userexporttokeycloak")
             .prefetch_related("social_auth")
         )
 
-        access_token = self.get_access_token(
+        access_token = self._get_access_token(
             kwargs["client_id"],
             kwargs["email"],
             kwargs["password"],
             kwargs["client_secret"],
         )
 
-        url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
-        unsynced_users_array = []
+        unsynced_users_keycloak_payload_array = []
 
         # Process batches of the users who must be exported.
         batch_size = kwargs["batchsize"]
         for i in range(0, len(unsynced_users), batch_size):
             batch = unsynced_users[i : i + batch_size]
             for user in batch:
-                user_keycloak_payload = {
-                    "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
-                    "username": user.email,
-                    "firstName": user.first_name,
-                    "lastName": user.last_name,
-                    "enabled": True,
-                    "totp": False,
-                    "emailVerified": True,
-                    "email": user.email,
-                    "credentials": [],
-                    "disableableCredentialTypes": [],
-                    "requiredActions": [],
-                    "realmRoles": ["default-roles-master"],
-                    "notBefore": 0,
-                    "groups": [],
-                }
-                # If the user has a password defined, we will create a credential for them in Keycloak.
-                # This allows the user to
-                if user.password and user.has_usable_password():
-                    _, iterations, salt, hash = user.password.split("$", 3)
-                    base64_salt = base64.b64encode(salt.encode())
-                    user_keycloak_payload["credentials"].append(
-                        {
-                            "secretData": json.dumps(
-                                {"value": hash, "salt": base64_salt.decode()}
-                            ),
-                            "type": "password",
-                            "credentialData": json.dumps(
-                                {
-                                    "hashIterations": iterations,
-                                    "algorithm": "pbkdf2-sha256",
-                                }
-                            ),
-                        }
-                    )
-                unsynced_users_array.append(user_keycloak_payload)
+                unsynced_users_keycloak_payload_array.append(
+                    self._generate_keycloak_user_payload(user)
+                )
             headers = {
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {access_token}",
             }
-            test_payload = json.dumps(
+            payload = json.dumps(
                 {
                     "ifResourceExists": "SKIP",
-                    "realm": "master",
-                    "users": unsynced_users_array,
+                    "realm": settings.KEYCLOAK_REALM_NAME,
+                    "users": unsynced_users_keycloak_payload_array,
                 }
             )
-            response = requests.request("POST", url, headers=headers, data=test_payload)
+            response = requests.request(
+                "POST", keycloak_partial_import_url, headers=headers, data=payload
+            )
             # If Keycloak responds with a 401, refresh the access_token and retry once.
             if response.status_code == 401:
-                access_token = self.get_access_token(
+                access_token = self._get_access_token(
                     kwargs["client_id"],
                     kwargs["email"],
                     kwargs["password"],
@@ -193,15 +218,13 @@ class Command(BaseCommand):
                     "Authorization": f"Bearer {access_token}",
                 }
                 response = requests.request(
-                    "POST", url, headers=headers, data=test_payload
+                    "POST", keycloak_partial_import_url, headers=headers, data=payload
                 )
 
             # If the response from Keycloak is not 200, print out an error and move on to
             # the next batch of users to export.
             if response.status_code != 200:
-                print(
-                    f"Error calling Keycloak REST API, returned {response.status_code}"
-                )
+                print(f"Error calling Keycloak REST API, returned {response.content}")
             else:
                 user_synced_with_keycloak_records = []
                 keycloak_response_body = json.loads(response.content)
@@ -209,13 +232,12 @@ class Command(BaseCommand):
                 # Expect the response below from Keycloak.
                 # {"overwritten":0,"added":0,"skipped":1,"results":[{"action":"ADDED","resourceType":"USER","resourceName":"collinp@mit.edu","id":"b2fb40bc-5c68-4f4b-b3ab-d178cd593454"}]}
                 keycloak_results = keycloak_response_body["results"]
+                # Convert the keycloak_results to a dictionary using the user email as the key.
+                keycloak_results_email_key_dict = {
+                    item["resourceName"]: item for item in keycloak_results
+                }
                 for user in batch:
-                    keycloak_response_for_user = next(
-                        keycloak_result
-                        for keycloak_result in keycloak_results
-                        if keycloak_result["resourceName"] == user.email
-                    )
-                    if keycloak_response_for_user["action"] == "ADDED":
+                    if keycloak_results_email_key_dict[user.email]["action"] == "ADDED":
                         user_synced_with_keycloak_records.append(
                             UserExportToKeycloak(user=user)
                         )
