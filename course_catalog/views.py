@@ -544,7 +544,7 @@ class WebhookOCWNextView(APIView):
         prefixes = content.get("prefixes", [prefix] if prefix else None)
         site_uid = content.get("site_uid")
         unpublished = content.get("unpublished", False)
-        status = 200
+        response_status = 200
 
         if version == "live":
             if prefixes is not None:
@@ -581,11 +581,11 @@ class WebhookOCWNextView(APIView):
                 message = (
                     f"Could not determine appropriate action from request: {content}"
                 )
-                status = 400
+                response_status = 400
 
         else:
             message = "Not a live version, ignoring"
-        return Response(data={"message": message}, status=status)
+        return Response(data={"message": message}, status=response_status)
 
 
 class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
