@@ -71,6 +71,7 @@ from open_discussions.permissions import (
     is_admin_user,
 )
 from open_discussions.settings import DRF_NESTED_PARENT_LOOKUP_PREFIX
+from open_discussions.utils import chunks
 from search.search_index_helpers import (
     deindex_course,
     deindex_staff_list,
@@ -540,13 +541,27 @@ class WebhookOCWNextView(APIView):
 
         version = content.get("version")
         prefix = content.get("prefix")
+        prefixes = content.get("prefixes", [prefix] if prefix else None)
         site_uid = content.get("site_uid")
         unpublished = content.get("unpublished", False)
+        response_status = 200
 
         if version == "live":
-            if prefix is not None:
-                # Index the course
-                get_ocw_next_courses.delay(url_paths=[prefix], force_overwrite=False)
+            if prefixes is not None:
+                # Index the course(s)
+                prefixes = (
+                    prefixes
+                    if isinstance(prefixes, list)
+                    else [prefix.strip() for prefix in prefixes.split(",")]
+                )
+                for url_paths in chunks(
+                    prefixes, chunk_size=settings.OCW_ITERATOR_CHUNK_SIZE
+                ):
+                    get_ocw_next_courses.delay(
+                        url_paths=url_paths,
+                        force_overwrite=False,
+                    )
+                message = f"OCW courses queued for indexing: {prefixes}"
             elif site_uid is not None and unpublished is True:
                 # Remove the course from the search index
                 course_run = LearningResourceRun.objects.filter(
@@ -557,8 +572,20 @@ class WebhookOCWNextView(APIView):
                     course.published = False
                     course.save()
                     deindex_course(course)
+                    message = f"OCW course {site_uid} queued for unpublishing"
+                else:
+                    message = (
+                        f"OCW course {site_uid} not found, so nothing to unpublish"
+                    )
+            else:
+                message = (
+                    f"Could not determine appropriate action from request: {content}"
+                )
+                response_status = 400
 
-        return Response({})
+        else:
+            message = "Not a live version, ignoring"
+        return Response(data={"message": message}, status=response_status)
 
 
 class PodcastViewSet(viewsets.ReadOnlyModelViewSet, FavoriteViewMixin):
