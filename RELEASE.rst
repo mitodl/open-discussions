@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.225.0
+---------------
+
+- Handle multiple prefixes in ocw webhook endpoint (#4251)
+- 4247: Migrate Django users to Keycloak (#4248)
+- fix(deps): update dependency axios to v1 [security] (#4245)
+- fix(deps): update dependency django to v4.1.13 [security] (#4242)
+
 Version 0.224.3 (Released October 23, 2023)
 ---------------
 
