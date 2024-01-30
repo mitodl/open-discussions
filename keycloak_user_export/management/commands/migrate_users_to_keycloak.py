@@ -18,10 +18,10 @@ class Command(BaseCommand):
     social-auth record for the "ol-oidc" provider.  The Keycloak user
     record is populated with the Django user's first_name, last_name, and email.
 
-    Optionally, the "--filter_provider_name" argument can be defined (string) when running this script
-    which will only create Keycloak user records for Django user records which have no associated
-    social-auth record for the "ol-oidc" provider and must have a social-auth record
-    for a provider matching the value of the supplied argument.
+    Optionally, the "--filter_provider_name" argument can be defined (string) when running this script.
+    If defined, Keycoak user records will be created only for Django user records which have no associated
+    social-auth record for the "ol-oidc" provider, and have a social-auth record with a provider
+    equal to the argument value.
 
     Optionally, the "--keycloak_group_path" argument can be defined (string) when running this script
     which will add all created Keycloak users to the Keycloak group path defined as the
@@ -88,14 +88,14 @@ class Command(BaseCommand):
             nargs="?",
             default="",
             type=str,
-            help="(Optional) The Keycloak group's path users should be added to.",
+            help="(Optional) The Keycloak group's path users should will added to.",
         )
         parser.add_argument(
             "--filter_provider_name",
             nargs="?",
             default=None,
             type=str,
-            help="(Optional) Only import users with a specified social auth provider.",
+            help="(Optional) Only create Keycloak users for Django user records associated with a specific social-auth provider.",
         )
 
     def _get_access_token(
@@ -111,7 +111,7 @@ class Command(BaseCommand):
             client_secret (str): The client secret associated with Keycloak's admin-cli client.
 
         Returns:
-            A new access_token for the administrator user for use with the Keycloak admin-cli client.
+            A new access_token (string) for the administrator user for use with the Keycloak admin-cli client.
         """
         url = f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/token"
         payload = f"{urlencode({'client_id': client_id})}&{urlencode({'username': username})}&{urlencode({'password': password})}&grant_type=password&{urlencode({'client_secret': client_secret})}&{urlencode({'scope': 'email openid'})}"
@@ -127,6 +127,7 @@ class Command(BaseCommand):
 
         Args:
             user (models.User): A Django User model record.
+            keycloak_group_path (str): The Keycloak group path which newly created users should be added to.
 
         Returns:
             dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
