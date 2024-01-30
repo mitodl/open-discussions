@@ -3,8 +3,8 @@ import requests
 import json
 from django.conf import settings
 from django.utils.http import urlencode
-import base64
 import calendar
+from django.db.models import Q
 
 from django.core.management import BaseCommand, CommandError
 from keycloak_user_export.models import UserExportToKeycloak
@@ -14,9 +14,23 @@ User = get_user_model()
 
 class Command(BaseCommand):
     """
-    Creates Keycloak user records for all Django user records which have a password set
-    and no associated social-auth record for the "ol-oidc" provider.  The Keycloak user
-    record is populated with the Django user's first_name, last_name, email, and password.
+    Creates Keycloak user records for all Django user records which have no associated
+    social-auth record for the "ol-oidc" provider.  The Keycloak user
+    record is populated with the Django user's first_name, last_name, and email.
+
+    Optionally, the "--filter_provider_name" argument can be defined (string) when running this script
+    which will only create Keycloak user records for Django user records which have no associated
+    social-auth record for the "ol-oidc" provider and must have a social-auth record
+    for a provider matching the value of the supplied argument.
+
+    Optionally, the "--keycloak_group_path" argument can be defined (string) when running this script
+    which will add all created Keycloak users to the Keycloak group path defined as the
+    argument value.  For example, "--keycloak_group_path=/imported/open-discussions/touchstone".
+    If the argument is defined, the Keycloak group path must exist prior to executing this script.
+
+    Optionally, the "--batch_size" argument can be defined (int) when running this script.
+    The value of this argument controls how many Keycloak user records should be created
+    with each API request made to Keycloak.  The default is 25.
 
     Keycloak users are created in the realm defined by the `KEYCLOAK_REALM_NAME`
     environment variable.
@@ -24,7 +38,7 @@ class Command(BaseCommand):
     The `KEYCLOAK_BASE_URL` environment variable must be defined and equal to the
     base URL of the Keycloak instance.
 
-    This command assumes Django users are defined with the default Django User model (first_name, last_name, email, password).
+    This command assumes Django users are defined with the default Django User model (first_name, last_name, email).
 
     A UserExportToKeycloak record is created for each successfully exported user.  If a UserExportToKeycloak
     already exists for a user, no duplicate UserExportToKeycloak record will be created.
@@ -34,8 +48,8 @@ class Command(BaseCommand):
     """
 
     help = """
-    Creates Keycloak user records for all Django user records which have a password set
-    and no associated social-auth record for the "ol-oidc" provider.
+    Creates Keycloak user records for all Django user records which have
+    no associated social-auth record for the "ol-oidc" provider.
     Keycloak users are created in the realm defined by the `KEYCLOAK_REALM_NAME`
     environment variable.
     The `KEYCLOAK_BASE_URL` environment variable must be defined and equal to the
@@ -47,8 +61,8 @@ class Command(BaseCommand):
 
         # pylint: disable=expression-not-assigned
         parser.add_argument(
-            "email",
-            help="Email address of a Keycloak realm admin user.",
+            "username",
+            help="Username of a Keycloak realm admin user.",
         )
         parser.add_argument(
             "password",
@@ -63,41 +77,53 @@ class Command(BaseCommand):
             help="Client secret for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
-            "--batchsize",
+            "--batch_size",
             nargs="?",
             default=25,
             type=int,
             help="(Optional) How many users to export to Keycloak at a time.",
         )
+        parser.add_argument(
+            "--keycloak_group_path",
+            nargs="?",
+            default="",
+            type=str,
+            help="(Optional) The Keycloak group's path users should be added to.",
+        )
+        parser.add_argument(
+            "--filter_provider_name",
+            nargs="?",
+            default=None,
+            type=str,
+            help="(Optional) Only import users with a specified social auth provider.",
+        )
 
     def _get_access_token(
-        self, client_id: str, email: str, password: str, client_secret: str
+        self, client_id: str, username: str, password: str, client_secret: str
     ):
         """
         Creates a new access token for a Keycloak realm administrator for use with the admin-cli client.
 
         Args:
             client_id (str): The client_ID associated with Keycloak's admin-cli client.
-            email (str): The email address of a Keycloak realm administrator user.
-            password (str): The password associated with the email address for a Keycloak realm administrator user.
+            username (str): The username of a Keycloak realm administrator user.
+            password (str): The password associated with the username for a Keycloak realm administrator user.
             client_secret (str): The client secret associated with Keycloak's admin-cli client.
 
         Returns:
             A new access_token for the administrator user for use with the Keycloak admin-cli client.
         """
         url = f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/token"
-        payload = f"{urlencode({'client_id': client_id})}&{urlencode({'username': email})}&{urlencode({'password': password})}&grant_type=password&{urlencode({'client_secret': client_secret})}&{urlencode({'scope': 'email openid'})}"
+        payload = f"{urlencode({'client_id': client_id})}&{urlencode({'username': username})}&{urlencode({'password': password})}&grant_type=password&{urlencode({'client_secret': client_secret})}&{urlencode({'scope': 'email openid'})}"
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         response = requests.request("POST", url, headers=headers, data=payload)
         return response.json()["access_token"]
 
-    def _generate_keycloak_user_payload(self, user):
+    def _generate_keycloak_user_payload(self, user, keycloak_group_path):
         """
         Returns a dictionary formatted as the expected user representation for the
         Keycloak partialImport Admin REST API endpoint.
-        The dictionary will include credential data if the user has a password
-        defined.
 
         Args:
             user (models.User): A Django User model record.
@@ -119,27 +145,8 @@ class Command(BaseCommand):
             "requiredActions": [],
             "realmRoles": ["default-roles-master"],
             "notBefore": 0,
-            "groups": [],
+            "groups": [keycloak_group_path],
         }
-        # If the user has a password defined, we will create a credential for them in Keycloak.
-        # This allows the user to
-        if user.password and user.has_usable_password():
-            _, iterations, salt, hash = user.password.split("$", 3)
-            base64_salt = base64.b64encode(salt.encode())
-            user_keycloak_payload["credentials"].append(
-                {
-                    "secretData": json.dumps(
-                        {"value": hash, "salt": base64_salt.decode()}
-                    ),
-                    "type": "password",
-                    "credentialData": json.dumps(
-                        {
-                            "hashIterations": iterations,
-                            "algorithm": "pbkdf2-sha256",
-                        }
-                    ),
-                }
-            )
         return user_keycloak_payload
 
     def _verify_environment_variables_configured(self):
@@ -165,18 +172,26 @@ class Command(BaseCommand):
         self._verify_environment_variables_configured()
 
         keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
-
+        unsynced_users_social_auth_query = Q()
+        if kwargs["filter_provider_name"] is not None:
+            unsynced_users_social_auth_query &= Q(
+                social_auth__provider=kwargs["filter_provider_name"]
+            )
         unsynced_users = (
-            User.objects.only("email", "password")
+            User.objects.only("email")
             .exclude(social_auth__provider="ol-oidc")
             .exclude(userexporttokeycloak__isnull=False)
+            .filter(unsynced_users_social_auth_query)
             .select_related("userexporttokeycloak")
             .prefetch_related("social_auth")
         )
-
+        if kwargs["filter_provider_name"] is not None:
+            unsynced_users = unsynced_users.filter(
+                social_auth__provider=kwargs["filter_provider_name"]
+            )
         access_token = self._get_access_token(
             kwargs["client_id"],
-            kwargs["email"],
+            kwargs["username"],
             kwargs["password"],
             kwargs["client_secret"],
         )
@@ -184,12 +199,14 @@ class Command(BaseCommand):
         unsynced_users_keycloak_payload_array = []
 
         # Process batches of the users who must be exported.
-        batch_size = kwargs["batchsize"]
+        batch_size = kwargs["batch_size"]
         for i in range(0, len(unsynced_users), batch_size):
             batch = unsynced_users[i : i + batch_size]
             for user in batch:
                 unsynced_users_keycloak_payload_array.append(
-                    self._generate_keycloak_user_payload(user)
+                    self._generate_keycloak_user_payload(
+                        user, kwargs["keycloak_group_path"]
+                    )
                 )
             headers = {
                 "Content-Type": "application/json",
@@ -209,7 +226,7 @@ class Command(BaseCommand):
             if response.status_code == 401:
                 access_token = self._get_access_token(
                     kwargs["client_id"],
-                    kwargs["email"],
+                    kwargs["username"],
                     kwargs["password"],
                     kwargs["client_secret"],
                 )
