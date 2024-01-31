@@ -18,17 +18,17 @@ class Command(BaseCommand):
     social-auth record for the "ol-oidc" provider.  The Keycloak user
     record is populated with the Django user's first_name, last_name, and email.
 
-    Optionally, the "--filter_provider_name" argument can be defined (string) when running this script.
+    Optionally, the "--filter-provider-name" argument can be defined (string) when running this script.
     If defined, Keycoak user records will be created only for Django user records which have no associated
     social-auth record for the "ol-oidc" provider, and have a social-auth record with a provider
     equal to the argument value.
 
-    Optionally, the "--keycloak_group_path" argument can be defined (string) when running this script
+    Optionally, the "--keycloak-group-path" argument can be defined (string) when running this script
     which will add all created Keycloak users to the Keycloak group path defined as the
-    argument value.  For example, "--keycloak_group_path=/imported/open-discussions/touchstone".
+    argument value.  For example, "--keycloak-group-path=/imported/open-discussions/touchstone".
     If the argument is defined, the Keycloak group path must exist prior to executing this script.
 
-    Optionally, the "--batch_size" argument can be defined (int) when running this script.
+    Optionally, the "--batch-size" argument can be defined (int) when running this script.
     The value of this argument controls how many Keycloak user records should be created
     with each API request made to Keycloak.  The default is 25.
 
@@ -69,29 +69,29 @@ class Command(BaseCommand):
             help="Password of a Keycloak realm admin user.",
         )
         parser.add_argument(
-            "client_id",
+            "client-id",
             help="Client ID for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
-            "client_secret",
+            "client-secret",
             help="Client secret for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
-            "--batch_size",
+            "--batch-size",
             nargs="?",
             default=25,
             type=int,
             help="(Optional) How many users to export to Keycloak at a time.",
         )
         parser.add_argument(
-            "--keycloak_group_path",
+            "--keycloak-group-path",
             nargs="?",
             default="",
             type=str,
             help="(Optional) The Keycloak group's path users should will added to.",
         )
         parser.add_argument(
-            "--filter_provider_name",
+            "--filter-provider-name",
             nargs="?",
             default=None,
             type=str,
@@ -174,9 +174,9 @@ class Command(BaseCommand):
 
         keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
         unsynced_users_social_auth_query = Q()
-        if kwargs["filter_provider_name"] is not None:
+        if kwargs["filter-provider-name"] is not None:
             unsynced_users_social_auth_query &= Q(
-                social_auth__provider=kwargs["filter_provider_name"]
+                social_auth__provider=kwargs["filter-provider-name"]
             )
         unsynced_users = (
             User.objects.only("email")
@@ -186,10 +186,6 @@ class Command(BaseCommand):
             .select_related("userexporttokeycloak")
             .prefetch_related("social_auth")
         )
-        if kwargs["filter_provider_name"] is not None:
-            unsynced_users = unsynced_users.filter(
-                social_auth__provider=kwargs["filter_provider_name"]
-            )
         access_token = self._get_access_token(
             kwargs["client_id"],
             kwargs["username"],
@@ -200,7 +196,7 @@ class Command(BaseCommand):
         unsynced_users_keycloak_payload_array = []
 
         # Process batches of the users who must be exported.
-        batch_size = kwargs["batch_size"]
+        batch_size = kwargs["batch-size"]
         for i in range(0, len(unsynced_users), batch_size):
             batch = unsynced_users[i : i + batch_size]
             for user in batch:
@@ -226,10 +222,10 @@ class Command(BaseCommand):
             # If Keycloak responds with a 401, refresh the access_token and retry once.
             if response.status_code == 401:
                 access_token = self._get_access_token(
-                    kwargs["client_id"],
+                    kwargs["client-id"],
                     kwargs["username"],
                     kwargs["password"],
-                    kwargs["client_secret"],
+                    kwargs["client-secret"],
                 )
                 headers = {
                     "Content-Type": "application/json",
