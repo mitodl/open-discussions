@@ -174,9 +174,9 @@ class Command(BaseCommand):
 
         keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
         unsynced_users_social_auth_query = Q()
-        if kwargs["filter-provider-name"] is not None:
+        if kwargs["filter_provider_name"] is not None:
             unsynced_users_social_auth_query &= Q(
-                social_auth__provider=kwargs["filter-provider-name"]
+                social_auth__provider=kwargs["filter_provider_name"]
             )
         unsynced_users = (
             User.objects.only("email")
@@ -187,16 +187,16 @@ class Command(BaseCommand):
             .prefetch_related("social_auth")
         )
         access_token = self._get_access_token(
-            kwargs["client_id"],
+            kwargs["client-id"],
             kwargs["username"],
             kwargs["password"],
-            kwargs["client_secret"],
+            kwargs["client-secret"],
         )
 
         unsynced_users_keycloak_payload_array = []
 
         # Process batches of the users who must be exported.
-        batch_size = kwargs["batch-size"]
+        batch_size = kwargs["batch_size"]
         for i in range(0, len(unsynced_users), batch_size):
             batch = unsynced_users[i : i + batch_size]
             for user in batch:
