@@ -114,7 +114,7 @@ class Command(BaseCommand):
             A new access_token (string) for the administrator user for use with the Keycloak admin-cli client.
         """
         url = f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/token"
-        payload = f"{urlencode({'client_id': client_id})}&{urlencode({'username': username})}&{urlencode({'password': password})}&grant_type=password&{urlencode({'client_secret': client_secret})}&{urlencode({'scope': 'email openid'})}"
+        payload = f"{urlencode(dict(client_id=client_id, username=username, password=password, grant_type='password', client_secret=client_secret, scope='email openid'))}"
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         response = requests.request("POST", url, headers=headers, data=payload)
