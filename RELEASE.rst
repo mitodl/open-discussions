@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.225.0
+Version 0.225.0 (Released February 06, 2024)
 ---------------
 
 - Handle multiple prefixes in ocw webhook endpoint (#4251)
