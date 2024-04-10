@@ -257,6 +257,7 @@ OCW_DEPARTMENTS = {
         "name": "Athletics, Physical Education and Recreation",
     },
     "RES": {"slug": "supplemental-resources", "name": "Supplemental Resources"},
+    "SP": {"slug": "special-programs", "name": "Special Programs"},
     "STS": {
         "slug": "science-technology-and-society",
         "name": "Science, Technology, and Society",
