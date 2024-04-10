@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+Version 0.225.1
+---------------
+
+- Add OCW SP department (#4260)
+- chore(config): migrate config renovate.json (#4259)
+- fix(deps): update dependency express to v4.19.2 [security] (#4257)
+- fix(deps): update dependency webpack-dev-middleware to v5.3.4 [security] (#4256)
+- 4249: remove code from user migration script for importing credentials (#4253)
+
 Version 0.225.0 (Released February 06, 2024)
 ---------------
 
