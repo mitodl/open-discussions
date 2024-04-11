@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.225.1
+Version 0.225.1 (Released April 11, 2024)
 ---------------
 
 - Add OCW SP department (#4260)
