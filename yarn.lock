@@ -5223,9 +5223,9 @@ __metadata:
   linkType: hard
 
 "@types/css-mediaquery@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@types/css-mediaquery@npm:0.1.1"
-  checksum: b8beb960238fd32b44396fd0871fc8626d9e0136217f168effccd3cc33a0673f1a94e8a982e385a46c34b5ab4b19c9220be7ec628818837a3c47dcaa973954c4
+  version: 0.1.4
+  resolution: "@types/css-mediaquery@npm:0.1.4"
+  checksum: d5b23a093d5dde31729b392e19e98b1060273c2d4a36bfb8e5b679f1c3c7b62e45a99d1be0e57b7ed375e4f313e9acecbe51f875d742e3283cc876adb9f333c9
   languageName: node
   linkType: hard
 
