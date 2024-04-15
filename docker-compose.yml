@@ -91,7 +91,7 @@ services:
     extra_hosts: *default-extra-hosts
 
   watch:
-    image: node:16.20.1
+    image: node:16.20.2
     working_dir: /src
     command: ./scripts/run-watch-dev.sh
     ports:
