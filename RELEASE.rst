@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+Version 0.226.0
+---------------
+
+- Fix: Add nubbins for celery monitoring. (#4273)
+- fix(deps): update dependency @types/react-infinite-scroller to v1.2.5 (#4272)
+- fix(deps): update dependency @types/css-mediaquery to v0.1.4 (#4271)
+- fix(deps): update dependency @ebay/nice-modal-react to v1.2.13 (#4270)
+- chore(deps): update opensearchproject/opensearch docker tag to v1.3.15 (#4269)
+- chore(deps): update node.js to v16.20.2 (#4268)
+- chore(deps): update dependency pytest to v7.4.4 (#4267)
+- chore(deps): update dependency pylint-django to v2.5.5 (#4266)
+- chore(deps): update dependency pylint to v2.17.7 (#4265)
+- chore(deps): update dependency astroid to v2.15.8 (#4264)
+
 Version 0.225.1 (Released April 11, 2024)
 ---------------
 
