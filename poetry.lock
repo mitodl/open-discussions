@@ -2425,13 +2425,13 @@ infinite-tracing = ["grpcio", "protobuf"]
 
 [[package]]
 name = "nplusone"
-version = "0.8.2"
+version = "0.9.0"
 description = "Detecting the n+1 queries problem in Python"
 optional = false
 python-versions = "*"
 files = [
-    {file = "nplusone-0.8.2-py2.py3-none-any.whl", hash = "sha256:9a641cf17230fe6fbb7b06f77b0d259d10c12dc840884385d36c83b59d44012f"},
-    {file = "nplusone-0.8.2.tar.gz", hash = "sha256:c9052082e47cf4a524c5085c52111e20351ccc7e7c0c89f1cbe547f54f528e03"},
+    {file = "nplusone-0.9.0-py2.py3-none-any.whl", hash = "sha256:334542aa5760e13fd546060d188850660eade7bc0b447618035e488fb3e1380b"},
+    {file = "nplusone-0.9.0.tar.gz", hash = "sha256:7386feb6a7bdf38e365bbb0fec917a75e0e642bf62bb8eaede8fba60d3cb5fea"},
 ]
 
 [package.dependencies]
@@ -4430,4 +4430,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "e2cc1c5fbeeb6ac54699f8b768538a68428f6d0b941811c28398c5570104002f"
+content-hash = "04c66becf9c204a5b8b2564e66eb675a96105224078c7da74c5fdab15d51e2fa"
