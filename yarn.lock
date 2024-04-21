@@ -4577,15 +4577,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/browser@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/browser@npm:5.5.0"
+"@sentry/browser@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/browser@npm:5.30.0"
   dependencies:
-    "@sentry/core": 5.5.0
-    "@sentry/types": 5.5.0
-    "@sentry/utils": 5.5.0
+    "@sentry/core": 5.30.0
+    "@sentry/types": 5.30.0
+    "@sentry/utils": 5.30.0
     tslib: ^1.9.3
-  checksum: abe084cfe5f74712a673d30131e6f1eaf3938f442d2248d610816e950f8d046245e7da53a900a5a45481623b6bf0fd03153b67b8399b533f0551f40859734c7e
+  checksum: 7fc154075c8f7da2ec54970cc0033555e4aa9ef88d2fc7fcfb2a0c206be5dca778914d5a25ddf06c5f8da8acffa9158a3ee2216b2efb848b75a3f11d281784db
   languageName: node
   linkType: hard
 
@@ -4603,16 +4603,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/core@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/core@npm:5.5.0"
+"@sentry/core@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/core@npm:5.30.0"
   dependencies:
-    "@sentry/hub": 5.5.0
-    "@sentry/minimal": 5.5.0
-    "@sentry/types": 5.5.0
-    "@sentry/utils": 5.5.0
+    "@sentry/hub": 5.30.0
+    "@sentry/minimal": 5.30.0
+    "@sentry/types": 5.30.0
+    "@sentry/utils": 5.30.0
     tslib: ^1.9.3
-  checksum: ebf7191afae5cfc7b010826f2b9848655155cbf66c9d35c9ab315b85459835d718315216ba14110513c9eeb8555e5b5e25a72d292a5c51a6d4f6730256eb2ad1
+  checksum: 8a2b22687e70d76fa4381bce215d770b6c08561c5ff5d6afe39c8c3c509c18ee7384ad0be3aee18d3a858a3c88e1d2821cf10eb5e05646376a33200903b56da2
   languageName: node
   linkType: hard
 
@@ -4627,25 +4627,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/hub@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/hub@npm:5.5.0"
+"@sentry/hub@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/hub@npm:5.30.0"
   dependencies:
-    "@sentry/types": 5.5.0
-    "@sentry/utils": 5.5.0
+    "@sentry/types": 5.30.0
+    "@sentry/utils": 5.30.0
     tslib: ^1.9.3
-  checksum: 075a016039b7a948eb868935b5116fa56f5990eaa99d1e9c00ba2edff3b2129ae071f289eb9a45c886828e764fa6cab58ebdc0cab3337d5681ace8ebb5b6cd5b
+  checksum: 09f778cc78765213f1e35a3ee6da3a8e02a706e8a7e5b7f84614707f4b665c7297b700a1849ab2ca1f02ede5884fd9ae893e58dc65f04f35ccdfee17e99ee93d
   languageName: node
   linkType: hard
 
-"@sentry/minimal@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/minimal@npm:5.5.0"
+"@sentry/minimal@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/minimal@npm:5.30.0"
   dependencies:
-    "@sentry/hub": 5.5.0
-    "@sentry/types": 5.5.0
+    "@sentry/hub": 5.30.0
+    "@sentry/types": 5.30.0
     tslib: ^1.9.3
-  checksum: 5bbd97eb7b5244510c2957ceb4141dcd3aaf6b9fca038ca76a343fe3e8fa774b3e480a452a5802b0171cf0c5440ac9eb83051837ca17d87bc0eb1515bb81a2b5
+  checksum: 934650f6989ce51f425c7c4b4d4d9bfecface8162a36d21df8a241f780ab1716dd47b81e2170e4cc624797ed1eebe10f71e4876c1e25b787860daaef75ca7a0c
   languageName: node
   linkType: hard
 
@@ -4675,10 +4675,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/types@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/types@npm:5.5.0"
-  checksum: c75cf8983cefb73013d41063b31bcce534d2f886b0a77cb8fd32e6a2bdcfc5386ca97a585ca075956bb61877ab46c3cdbe1ec5029ee7003958eb336a31e064d9
+"@sentry/types@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/types@npm:5.30.0"
+  checksum: de7df777824c8e311f143c6fd7de220b24f25b5018312fe8f67d93bebf0f3cdd32bbca9f155846f5c31441d940eebe27c8338000321559a743264c7e41dda560
   languageName: node
   linkType: hard
 
@@ -4689,13 +4689,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sentry/utils@npm:5.5.0":
-  version: 5.5.0
-  resolution: "@sentry/utils@npm:5.5.0"
+"@sentry/utils@npm:5.30.0":
+  version: 5.30.0
+  resolution: "@sentry/utils@npm:5.30.0"
   dependencies:
-    "@sentry/types": 5.5.0
+    "@sentry/types": 5.30.0
     tslib: ^1.9.3
-  checksum: 177ec613d9b6d2dbeb6bd1c8c8a3c11e54105e9e6d8c25faa055b479a49052b96c9e4fcde2452becdea261992442a932ca2298176205c479cd109621ba2fb1ff
+  checksum: 27b259a136c664427641dd32ee3dc490553f3b5e92986accfa829d14063ebc69b191e92209ac9c40fbc367f74cfa17dc93b4c40981d666711fd57b4d51a82062
   languageName: node
   linkType: hard
 
@@ -17793,7 +17793,7 @@ __metadata:
     "@rmwc/menu": ^5.7.2
     "@rmwc/snackbar": ^5.7.2
     "@rmwc/theme": ^5.7.2
-    "@sentry/browser": 5.5.0
+    "@sentry/browser": 5.30.0
     "@testing-library/react": 12
     "@testing-library/user-event": ^14.2.1
     "@trust/webcrypto": 0.9.2
