@@ -16615,8 +16615,6 @@ __metadata:
     webpack-sources: ^1.1.0
   peerDependencies:
     webpack: ^4.4.0
-  bin:
-    mini-css-extract-plugin: ""
   checksum: deec20ae4000639e4678cd28eda4694ec81ea9697dc0e62d958ee8209f404a0ce94caa234613e0f7c88c0266b72afe838252f78f2b9b35b645276544909d7504
   languageName: node
   linkType: hard

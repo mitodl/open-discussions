@@ -1,6 +1,6 @@
 {
   "name": "ol-search-ui",
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@3.8.1",
   "main": "./src/index.ts",
   "dependencies": {
     "@emotion/react": "^11.9.3",
