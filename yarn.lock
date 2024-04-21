@@ -6619,10 +6619,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"amplitudejs@npm:5.0.3":
-  version: 5.0.3
-  resolution: "amplitudejs@npm:5.0.3"
-  checksum: 8f87c6f03de580505ed6e3ce534fd53845990310c124b7fffaa39e565c310d01fd018a2e6a172367a930db6e7a32d0f45c93160d49b920dfa2f204373a3003ee
+"amplitudejs@npm:5.3.2":
+  version: 5.3.2
+  resolution: "amplitudejs@npm:5.3.2"
+  checksum: eec1afb9d35628c753164b825d21d4312afaee384818655afcf1afe479d59fc2f58c92c2229bd24a4ecc0bc0bc7b3b7de422154d815ec6eb617d5423f72b44ff
   languageName: node
   linkType: hard
 
@@ -17797,7 +17797,7 @@ __metadata:
     "@testing-library/react": 12
     "@testing-library/user-event": ^14.2.1
     "@trust/webcrypto": 0.9.2
-    amplitudejs: 5.0.3
+    amplitudejs: 5.3.2
     array-move: 2.2.2
     assert: 2.0.0
     autoprefixer: 9.7.4
