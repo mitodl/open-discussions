@@ -46,7 +46,7 @@
     "@rmwc/menu": "^5.7.2",
     "@rmwc/snackbar": "^5.7.2",
     "@rmwc/theme": "^5.7.2",
-    "@sentry/browser": "5.5.0",
+    "@sentry/browser": "5.30.0",
     "@testing-library/react": "12",
     "@testing-library/user-event": "^14.2.1",
     "@trust/webcrypto": "0.9.2",
