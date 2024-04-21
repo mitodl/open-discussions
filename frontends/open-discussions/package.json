@@ -52,7 +52,7 @@
     "@trust/webcrypto": "0.9.2",
     "amplitudejs": "5.3.2",
     "array-move": "2.2.2",
-    "assert": "2.0.0",
+    "assert": "2.1.0",
     "autoprefixer": "9.7.4",
     "babel-loader": "8.1.0",
     "babel-plugin-istanbul": "4.1.6",
