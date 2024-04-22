@@ -7658,12 +7658,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bodybuilder@npm:2.2.15":
-  version: 2.2.15
-  resolution: "bodybuilder@npm:2.2.15"
+"bodybuilder@npm:2.5.1":
+  version: 2.5.1
+  resolution: "bodybuilder@npm:2.5.1"
   dependencies:
-    lodash: ^4.9.0
-  checksum: fb122c4c607e5f27496cb28fb7a3ff2ce3cc380ca43dcd34f9116b7d6e0908327a756aa68b7c39f5551be3fc2f6ebe1aa1e0e1fe2c248d7692343fe2b06a594e
+    lodash.clonedeep: 4.5.0
+    lodash.isobject: 3.0.2
+    lodash.isplainobject: 4.0.6
+    lodash.merge: 4.6.2
+    lodash.unset: 4.5.2
+  checksum: c5d401f5e8c032f42ed27502e3cfafdf75c41c8dfadfd8cb574deca5650afecccbecc2417f4299a18533a6bbe094f9be3613e5d70391ddcd2f4a5a3ffc69a408
   languageName: node
   linkType: hard
 
@@ -15866,7 +15870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4.0.0, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.3.0, lodash@npm:^4.7.0, lodash@npm:^4.9.0, lodash@npm:~4.17.10":
+"lodash@npm:4.17.21, lodash@npm:^4.0.0, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.3.0, lodash@npm:^4.7.0, lodash@npm:~4.17.10":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -17832,7 +17836,7 @@ __metadata:
     babel-loader: 8.3.0
     babel-plugin-istanbul: 4.1.6
     blueimp-canvas-to-blob: 3.29.0
-    bodybuilder: 2.2.15
+    bodybuilder: 2.5.1
     bootstrap: ^5.1.3
     casual-browserify: 1.5.12
     chai: 4.2.0
