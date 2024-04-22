@@ -7604,10 +7604,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"blueimp-canvas-to-blob@npm:3.14.0":
-  version: 3.14.0
-  resolution: "blueimp-canvas-to-blob@npm:3.14.0"
-  checksum: da4070d11a140ba53f97d4a610af089c3f6108db9422e067fc59fc5142421fa973963e2b007c907f375a9e6c315be7cbcf78064e68db685c7bfd0a2eeaea5bac
+"blueimp-canvas-to-blob@npm:3.29.0":
+  version: 3.29.0
+  resolution: "blueimp-canvas-to-blob@npm:3.29.0"
+  checksum: 6a55b90fbe958b75f7c78ff9e7617c01254d29cc8567ea6c853cd26a52518b3dfce28635f6964130ac738ee8ff9fb9c0ca094db2ceeaa021ff0432c1985416eb
   languageName: node
   linkType: hard
 
@@ -17831,7 +17831,7 @@ __metadata:
     autoprefixer: 9.8.8
     babel-loader: 8.3.0
     babel-plugin-istanbul: 4.1.6
-    blueimp-canvas-to-blob: 3.14.0
+    blueimp-canvas-to-blob: 3.29.0
     bodybuilder: 2.2.15
     bootstrap: ^5.1.3
     casual-browserify: 1.5.12
