@@ -83,7 +83,22 @@
 
   .podcast-footer {
     width: 100%;
-    border-top: 10px solid $course-blue;
+
+    .podcast-disclaimer-box {
+      background-color: $course-blue;
+      padding-top: 10px;
+      padding-bottom: 20px;
+    }
+
+    .podcast-disclaimer {
+      max-width: 900px;
+      color: white;
+      margin: auto;
+      padding: 16px;
+      @include breakpoint(mobile) {
+        font-size: 12px;
+      }
+    }
 
     .cells {
       display: flex;
