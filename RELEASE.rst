@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.227.0
+Version 0.227.0 (Released April 24, 2024)
 ---------------
 
 - add podcast disclaimer (#4294)
