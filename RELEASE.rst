@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+Version 0.227.0
+---------------
+
+- add podcast disclaimer (#4294)
+- fix(deps): update dependency chai to v4.4.1 (#4293)
+- fix(deps): update dependency bodybuilder to v2.5.1 (#4292)
+- fix(deps): update dependency blueimp-canvas-to-blob to v3.29.0 (#4291)
+- fix(deps): update dependency babel-loader to v8.3.0 (#4290)
+- fix(deps): update dependency autoprefixer to v9.8.8 (#4289)
+- fix(deps): update dependency assert to v2.1.0 (#4288)
+- fix(deps): update dependency amplitudejs to v5.3.2 (#4287)
+- fix(deps): update dependency @sentry/browser to v5.30.0 (#4286)
+- chore(deps): update yarn to v3.8.1 (#4284)
+- chore(deps): update postgres docker tag to v12.18 (#4283)
+- chore(deps): update nginx docker tag to v1.25.5 (#4282)
+- chore(deps): update docker.elastic.co/elasticsearch/elasticsearch docker tag to v7.17.20 (#4281)
+- chore(deps): update dependency responses to ^0.25.0 (#4280)
+- chore(deps): update dependency nplusone to ^0.9.0 (#4279)
+- fix(deps): update dependency url to v0.11.3 (#4277)
+- fix(deps): update dependency style-loader to v3.3.4 (#4276)
+- fix(deps): update dependency enzyme-adapter-react-16 to v1.15.8 (#4275)
+
 Version 0.226.0 (Released April 18, 2024)
 ---------------
 
