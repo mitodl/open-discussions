@@ -965,13 +965,13 @@ graph = ["objgraph (>=1.7.2)"]
 
 [[package]]
 name = "dj-database-url"
-version = "0.3.0"
+version = "0.5.0"
 description = "Use Database URLs in your Django Application."
 optional = false
 python-versions = "*"
 files = [
-    {file = "dj-database-url-0.3.0.tar.gz", hash = "sha256:f2e273ed34acbb560962d5cf12917936d8df02297df09bd3089b8546d4584138"},
-    {file = "dj_database_url-0.3.0-py2.py3-none-any.whl", hash = "sha256:ca01768fdecde134301f3170743226f60edff5c3935f12437378ebd911506353"},
+    {file = "dj-database-url-0.5.0.tar.gz", hash = "sha256:4aeaeb1f573c74835b0686a2b46b85990571159ffc21aa57ecd4d1e1cb334163"},
+    {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
 ]
 
 [[package]]
@@ -4430,4 +4430,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "148a187c352eb6792c0dbb684608a5dd1d17fac050bf39cf813329f9e8235f2d"
+content-hash = "6696a076eb780c8a72b26ba54a7fbc0086d1e93cb6d3e07b3e7b9efea3956a52"
