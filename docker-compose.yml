@@ -64,7 +64,7 @@ services:
       - 9100:9200
 
   nginx:
-    image: nginx:1.25.5
+    image: nginx:1.26.0
     ports:
       - "8063:8063"
     links:
