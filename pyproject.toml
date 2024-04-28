@@ -43,7 +43,7 @@ cairosvg = "^2.7.0"
 celery = "^5.3.1"
 cffi = "^1.15.1"
 cryptography = "^39.0.1"
-dj-database-url = "^0.3.0"
+dj-database-url = "^0.5.0"
 dj-static = "^0.0.6"
 Django = "4.1.13"
 django-anymail = {extras = ["mailgun"], version = "^10.0"}
