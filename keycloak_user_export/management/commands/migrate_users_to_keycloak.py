@@ -132,11 +132,12 @@ class Command(BaseCommand):
         Returns:
             dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
         """
+        first_name, last_name = self._get_user_names(user)
         user_keycloak_payload = {
             "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
             "username": user.email,
-            "firstName": user.first_name,
-            "lastName": user.last_name,
+            "firstName": first_name,
+            "lastName": last_name,
             "enabled": True,
             "totp": False,
             "emailVerified": True,
@@ -149,6 +150,27 @@ class Command(BaseCommand):
             "groups": [keycloak_group_path],
         }
         return user_keycloak_payload
+
+    def _get_user_names(self, user):
+        """
+        Return the first and last name of a user.
+
+        If there is only one name in the user's profile this returns empty strings.
+
+        Args:
+            user (models.User): A Django User model record.
+
+        Returns:
+            (str, str): the first and last names of the user
+        """
+        profile = getattr(user, "profile", None)
+        name = profile.name if profile is not None else ""
+        names = name.split(maxsplit=1)
+
+        if len(names) == 2:
+            return tuple(names)
+
+        return "", ""
 
     def _verify_environment_variables_configured(self):
         """
