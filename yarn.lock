@@ -8948,10 +8948,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:3.2.0":
-  version: 3.2.0
-  resolution: "core-js@npm:3.2.0"
-  checksum: 32ebab04b7ac4bc4d0c32c1f75e9cf51c5cd893be16dabcd2280c81ff3b491ad869135383322231ca69e6d9526d31f96f6f9726400e1b7eb5bd03b416abe7797
+"core-js@npm:3.37.0":
+  version: 3.37.0
+  resolution: "core-js@npm:3.37.0"
+  checksum: 212c3e9b3fc277dbb63739ef58a61c5709ccd0b36f09c3ce6946aa91fa180c60f57f976d4a5fdb9cda0c6cb55417379ba5a008fc3a1384ec94ec8ec61826469d
   languageName: node
   linkType: hard
 
@@ -17851,7 +17851,7 @@ __metadata:
     chai-as-promised: 7.1.1
     cheerio: 1.0.0-rc.12
     codecov: 3.8.3
-    core-js: 3.2.0
+    core-js: 3.37.0
     css-loader: 3.6.0
     decimal.js-light: 2.5.1
     detect-browser: 2.5.1
