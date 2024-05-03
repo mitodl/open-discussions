@@ -1,9 +1,12 @@
 # Core requirements
-git
 curl
+git
+libffi-dev
 libjpeg-dev
-zlib1g-dev
+libpq-dev
+libxmlsec1-dev
 net-tools
 pkg-config
-libffi-dev
-libxmlsec1-dev
+postgresql-client
+pipx
+zlib1g-dev

@@ -74,6 +74,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: django-server
     environment:
       << : *py-environment
       PORT: 8061
@@ -83,6 +84,8 @@ services:
     tty: true
     ports:
       - "8061:8061"
+    volumes:
+      - .:/app
     links:
       - db
       - opensearch-node1
@@ -111,6 +114,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: django
     environment: *py-environment
     env_file: .env
     command: >
@@ -122,6 +126,8 @@ services:
       - db
       - opensearch-node1
       - redis
+    volumes:
+      - .:/app
     extra_hosts: *default-extra-hosts
 
   tika:
