@@ -1060,13 +1060,13 @@ tests = ["flake8", "mysqlclient", "psycopg2 (>=2.3)", "pytest-django"]
 
 [[package]]
 name = "django-cache-memoize"
-version = "0.1.10"
+version = "0.2.0"
 description = "Django utility for a memoization decorator that uses the Django cache framework."
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.8"
 files = [
-    {file = "django-cache-memoize-0.1.10.tar.gz", hash = "sha256:63e8faa245a41c0dbad843807e9f21a6e59eba8e6e50df310fdf6485a6749843"},
-    {file = "django_cache_memoize-0.1.10-py3-none-any.whl", hash = "sha256:676299313079cde9242ae84db0160e80b1d44e8dd6bc9b1f4f1247e11b30c9e0"},
+    {file = "django-cache-memoize-0.2.0.tar.gz", hash = "sha256:79950a027ba40e4aff4efed587b76036bf5ba1f59329d7b158797b832be72ca6"},
+    {file = "django_cache_memoize-0.2.0-py3-none-any.whl", hash = "sha256:a6bfd112da699d1fa85955a1e15b7c48ee25e58044398958e269678db10736f3"},
 ]
 
 [package.extras]
@@ -4430,4 +4430,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "d9b91db1967db69609d621255f711f0d3801c04c156d2411b22d55819744339d"
+content-hash = "faea9d4e1ed52f05b3962cec0cfa211a49de0eab11da1ca8957e83a6ec8864ff"
