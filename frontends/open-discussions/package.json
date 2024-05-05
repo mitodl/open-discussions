@@ -82,7 +82,7 @@
     "fetch-mock": "6.5.2",
     "flow-bin": "0.94.0",
     "flow-typed": "2.6.2",
-    "focus-visible": "5.1.0",
+    "focus-visible": "5.2.0",
     "formik": "2.0.3",
     "fuse.js": "6.0.0",
     "history": "^4.10",
