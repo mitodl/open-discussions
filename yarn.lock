@@ -11743,14 +11743,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fetch-mock@npm:6.4.4":
-  version: 6.4.4
-  resolution: "fetch-mock@npm:6.4.4"
+"fetch-mock@npm:6.5.2":
+  version: 6.5.2
+  resolution: "fetch-mock@npm:6.5.2"
   dependencies:
     babel-polyfill: ^6.26.0
     glob-to-regexp: ^0.4.0
     path-to-regexp: ^2.2.1
-  checksum: 119f21553cdee964b6d9248630b9b6883e50b2049f07504ec64e4cf9ec2877b3f598bb29910f2dbb99a421bc3ff38baf131660edd208134e36750569a7879c45
+  checksum: 62c4a2a5bdc2ee355f1a21488ed902d33b58874e11b7386494f297896e2d21284a80b6852dbd8f15ea974b6c688266d875898a52f5ebf8473a7200ced4f2cade
   languageName: node
   linkType: hard
 
@@ -18082,7 +18082,7 @@ __metadata:
     eslint-plugin-react-hooks: 4.6.2
     esm: ^3.2.25
     express: 4.19.2
-    fetch-mock: 6.4.4
+    fetch-mock: 6.5.2
     flow-bin: 0.94.0
     flow-typed: 2.4.0
     focus-visible: 5.1.0
