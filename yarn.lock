@@ -10837,14 +10837,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-flowtype@npm:4.2.0":
-  version: 4.2.0
-  resolution: "eslint-plugin-flowtype@npm:4.2.0"
+"eslint-plugin-flowtype@npm:4.7.0":
+  version: 4.7.0
+  resolution: "eslint-plugin-flowtype@npm:4.7.0"
   dependencies:
     lodash: ^4.17.15
   peerDependencies:
     eslint: ">=6.1.0"
-  checksum: ec8230df454e8fd18742cbb86dce8339fb4a2cbcdd2e9b5698bbec388c5f85a309c76a35279e3393f1d8ab01517767848052c13fe8b645bdd761315442bbcebe
+  checksum: 5ac601bae7f104bbc4c013ac3a41b4b61850e8ab6dcda48ecbf44cd30ba192bd0b1c11c9af32dc20e9a1ce33b53cc36a05b84f961d62f563733fef0835bb98a6
   languageName: node
   linkType: hard
 
@@ -17888,7 +17888,7 @@ __metadata:
     eslint-config-mitodl: ^1.0.0
     eslint-plugin-babel: 5.3.1
     eslint-plugin-flow-vars: 0.5.0
-    eslint-plugin-flowtype: 4.2.0
+    eslint-plugin-flowtype: 4.7.0
     eslint-plugin-mocha: 6.3.0
     eslint-plugin-react: 7.14.3
     eslint-plugin-react-hooks: 4.6.2
