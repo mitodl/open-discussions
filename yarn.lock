@@ -15663,47 +15663,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:16.6.0":
-  version: 16.6.0
-  resolution: "jsdom@npm:16.6.0"
-  dependencies:
-    abab: ^2.0.5
-    acorn: ^8.2.4
-    acorn-globals: ^6.0.0
-    cssom: ^0.4.4
-    cssstyle: ^2.3.0
-    data-urls: ^2.0.0
-    decimal.js: ^10.2.1
-    domexception: ^2.0.1
-    escodegen: ^2.0.0
-    form-data: ^3.0.0
-    html-encoding-sniffer: ^2.0.1
-    http-proxy-agent: ^4.0.1
-    https-proxy-agent: ^5.0.0
-    is-potential-custom-element-name: ^1.0.1
-    nwsapi: ^2.2.0
-    parse5: 6.0.1
-    saxes: ^5.0.1
-    symbol-tree: ^3.2.4
-    tough-cookie: ^4.0.0
-    w3c-hr-time: ^1.0.2
-    w3c-xmlserializer: ^2.0.0
-    webidl-conversions: ^6.1.0
-    whatwg-encoding: ^1.0.5
-    whatwg-mimetype: ^2.3.0
-    whatwg-url: ^8.5.0
-    ws: ^7.4.5
-    xml-name-validator: ^3.0.0
-  peerDependencies:
-    canvas: ^2.5.0
-  peerDependenciesMeta:
-    canvas:
-      optional: true
-  checksum: 4abf126bba167f1cf123601232ceb3be0696a4370c8fa484a1a99d93926f251c372d84233b74aeede55909c3f30c350c646d27409f41353ea733c52e0243f49c
-  languageName: node
-  linkType: hard
-
-"jsdom@npm:^16.2.0":
+"jsdom@npm:16.7.0, jsdom@npm:^16.2.0":
   version: 16.7.0
   resolution: "jsdom@npm:16.7.0"
   dependencies:
@@ -18498,7 +18458,7 @@ __metadata:
     html-entities: 1.4.0
     immer: 7.0.5
     isomorphic-fetch: 2.2.1
-    jsdom: 16.6.0
+    jsdom: 16.7.0
     jsdom-global: 3.0.2
     locale-code: 2.0.2
     lodash: 4.17.21
@@ -26069,7 +26029,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.3.1, ws@npm:^7.4.5, ws@npm:^7.4.6":
+"ws@npm:^7.3.1, ws@npm:^7.4.6":
   version: 7.5.9
   resolution: "ws@npm:7.5.9"
   peerDependencies:
