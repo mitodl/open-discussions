@@ -8,7 +8,7 @@ jobs:
       # Label used to access the service container
       db:
         # Docker Hub image
-        image: postgres:12.18
+        image: postgres:12.19
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
