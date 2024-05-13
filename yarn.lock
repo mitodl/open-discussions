@@ -18481,7 +18481,7 @@ __metadata:
     path-browserify: 1.0.1
     postcss-loader: 2.1.6
     process: ^0.11.10
-    prop-types: 15.6.2
+    prop-types: 15.8.1
     prosemirror-commands: ^1.0.7 <=1.1.7
     prosemirror-example-setup: ^1.0.1 <= 1.1.2
     prosemirror-markdown: ^1.2.2 <=1.5.1
@@ -20130,17 +20130,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:15.6.2":
-  version: 15.6.2
-  resolution: "prop-types@npm:15.6.2"
-  dependencies:
-    loose-envify: ^1.3.1
-    object-assign: ^4.1.1
-  checksum: 79e478b2684449295bc8c60af1cfba4f3d414a5d832e9d23f720bce7f07df9dc52105a626134d9a3f84bb5551c9da5ec6d77d10f906b5cef26fe464959b96646
-  languageName: node
-  linkType: hard
-
-"prop-types@npm:15.x, prop-types@npm:^15.5.0, prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.5.8, prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
+"prop-types@npm:15.8.1, prop-types@npm:15.x, prop-types@npm:^15.5.0, prop-types@npm:^15.5.10, prop-types@npm:^15.5.7, prop-types@npm:^15.5.8, prop-types@npm:^15.6.0, prop-types@npm:^15.6.1, prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
