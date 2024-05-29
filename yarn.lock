@@ -18483,7 +18483,7 @@ __metadata:
     process: ^0.11.10
     prop-types: 15.8.1
     prosemirror-commands: ^1.0.7 <=1.1.7
-    prosemirror-example-setup: ^1.0.1 <= 1.1.2
+    prosemirror-example-setup: <= 1.2.2
     prosemirror-markdown: ^1.2.2 <=1.5.1
     prosemirror-model: ^1.6.6 <=1.14.1
     prosemirror-schema-basic: ^1.0.0 <=1.1.2
@@ -20179,9 +20179,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-example-setup@npm:^1.0.1 <= 1.1.2":
-  version: 1.1.2
-  resolution: "prosemirror-example-setup@npm:1.1.2"
+"prosemirror-example-setup@npm:<= 1.2.2":
+  version: 1.2.2
+  resolution: "prosemirror-example-setup@npm:1.2.2"
   dependencies:
     prosemirror-commands: ^1.0.0
     prosemirror-dropcursor: ^1.0.0
@@ -20192,7 +20192,7 @@ __metadata:
     prosemirror-menu: ^1.0.0
     prosemirror-schema-list: ^1.0.0
     prosemirror-state: ^1.0.0
-  checksum: 1b642119cce5fae45a694448db73e5bcf9ac036760803525d561b30f9edbf127fcd6ebc3e4492b4faa846246b518f92625550117a64eb78f090ce46e06e612eb
+  checksum: a72a11158c08857696b5c941713ec3be78d9738ed314f66a6f27c351f4cb270a0af0d394369c7ea9997a12c5b3b4647813eb11ed308eaa16d031d8cadbdcf85a
   languageName: node
   linkType: hard
 
