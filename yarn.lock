@@ -18482,7 +18482,7 @@ __metadata:
     postcss-loader: 2.1.6
     process: ^0.11.10
     prop-types: 15.8.1
-    prosemirror-commands: ^1.0.7 <=1.1.7
+    prosemirror-commands: <=1.5.2
     prosemirror-example-setup: ^1.0.1 <= 1.1.2
     prosemirror-markdown: ^1.2.2 <=1.5.1
     prosemirror-model: ^1.6.6 <=1.14.1
@@ -20157,7 +20157,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-commands@npm:^1.0.0, prosemirror-commands@npm:^1.0.7 <=1.1.7":
+"prosemirror-commands@npm:<=1.5.2":
+  version: 1.5.2
+  resolution: "prosemirror-commands@npm:1.5.2"
+  dependencies:
+    prosemirror-model: ^1.0.0
+    prosemirror-state: ^1.0.0
+    prosemirror-transform: ^1.0.0
+  checksum: ff65063a8c7ba1044eb193f31ddaf75a6a9ae656c5e2ccb9e546263b85f016419bcb1a1b6eae7a5004c377775acd3ac3c97d291adb11b71e3ddf26dcb211008d
+  languageName: node
+  linkType: hard
+
+"prosemirror-commands@npm:^1.0.0":
   version: 1.1.7
   resolution: "prosemirror-commands@npm:1.1.7"
   dependencies:
