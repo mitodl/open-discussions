@@ -156,13 +156,13 @@ lxml = ["lxml"]
 
 [[package]]
 name = "betamax"
-version = "0.8.1"
+version = "0.9.0"
 description = "A VCR imitation for python-requests"
 optional = false
-python-versions = "*"
+python-versions = ">=3.8.1"
 files = [
-    {file = "betamax-0.8.1-py2.py3-none-any.whl", hash = "sha256:aa5ad34cc8d018b35814fb0557d15c78ced9ac56fdc43ccacdb882aa7a5217c1"},
-    {file = "betamax-0.8.1.tar.gz", hash = "sha256:5bf004ceffccae881213fb722f34517166b84a34919b92ffc14d1dbd050b71c2"},
+    {file = "betamax-0.9.0-py2.py3-none-any.whl", hash = "sha256:880d6da87eaf7e61c42bdc4240f0ac04ab5365bd7f2798784c18d37d8cf747bc"},
+    {file = "betamax-0.9.0.tar.gz", hash = "sha256:82316e1679bc6879e3c83318d016b54b7c9225ff08c4462de4813e22038d5f94"},
 ]
 
 [package.dependencies]
@@ -4386,4 +4386,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "4538c870228c2bebb177c857b16beb818fb1f18b96c091668fcf9980aaf6e9ca"
+content-hash = "33606c4233dd35192e92cc716b5ee724c75c4a2396f9ad35b6ee07992d422c51"

@@ -104,7 +104,7 @@ social-auth-core = {extras = ["openidconnect"], version = "^4.4.2"}
 
 [tool.poetry.group.dev.dependencies]
 astroid = "^2.15.4"
-betamax = "^0.8.0"
+betamax = "^0.9.0"
 betamax_serializers = "^0.2.1"
 black = "22.6.0"
 bpython = "^0.24"
