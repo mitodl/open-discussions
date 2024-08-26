@@ -1,6 +1,53 @@
 Release Notes
 =============
 
+Version 0.228.0
+---------------
+
+- Remove RES constant from OCW departments (#4339)
+- fix(deps): update dependency django to v4.2.15 [security] (#4345)
+- fix(deps): update dependency social-auth-app-django to v5.4.1 [security] (#4342)
+- fix(deps): update dependency djangorestframework to v3.15.2 [security] (#4341)
+- fix(deps): update dependency urllib3 to v1.26.19 [security] (#4340)
+- fix(deps): update dependency django to v4.2.14 [security] (#4338)
+- Bump tough-cookie from 4.0.0 to 4.1.4 (#4304)
+- fix(deps): update dependency core-js to v3.37.1 (#4335)
+- fix(deps): update dependency prop-types to v15.8.1 (#4332)
+- fix(deps): update dependency object.entries to v1.1.8 (#4331)
+- fix(deps): update dependency moment to v2.30.1 (#4328)
+- fix(deps): update dependency chai-as-promised to v7.1.2 (#4330)
+- fix(deps): update dependency mini-css-extract-plugin to v0.12.0 (#4327)
+- chore(deps): update postgres docker tag to v12.19 (#4326)
+- fix(deps): update dependency django to v4.2.13 (#4325)
+- Update migrate_users_to_keycloak to use profile (#4324)
+- chore(deps): pin dependencies (#4262)
+- Switch poetry over to using virtualenvs (#4303)
+- fix(deps): update dependency jsdom to v16.7.0 (#4322)
+- fix(deps): update dependency jedi to ^0.19.0 (#4321)
+- fix(deps): update dependency html-entities to v1.4.0 (#4320)
+- fix(deps): update dependency fuse.js to v6.6.2 (#4319)
+- fix(deps): update dependency formik to v2.4.6 (#4318)
+- fix(deps): update dependency focus-visible to v5.2.0 (#4317)
+- fix(deps): update dependency flow-typed to v2.6.2 (#4316)
+- fix(deps): update dependency fetch-mock to v6.5.2 (#4314)
+- fix(deps): update dependency eslint-plugin-react to v7.34.1 (#4313)
+- fix(deps): update dependency eslint-plugin-flowtype to v4.7.0 (#4311)
+- fix(deps): update dependency eslint-plugin-mocha to v6.3.0 (#4312)
+- fix(deps): update dependency eslint to v7.32.0 (#4310)
+- fix(deps): update dependency drf-spectacular to ^0.27.0 (#4309)
+- fix(deps): update dependency django-server-status to ^0.7.0 (#4308)
+- fix(deps): update dependency django-cache-memoize to ^0.2.0 (#4307)
+- chore(deps): update yarn to v3.8.2 (#4306)
+- chore(deps): update docker.elastic.co/elasticsearch/elasticsearch docker tag to v7.17.21 (#4305)
+- fix(deps): update dependency django to v4.2.11 (#4302)
+- fix(deps): update dependency core-js to v3.37.0 (#4300)
+- chore(deps): update akhileshns/heroku-deploy digest to 581dd28 (#4263)
+- fix(deps): update dependency dj-database-url to ^0.5.0 (#4301)
+- fix(deps): update dependency codecov to v3.8.3 (#4299)
+- fix(deps): update dependency eslint-plugin-react-hooks to v4.6.2 (#4297)
+- chore(deps): update nginx docker tag to v1.26.0 (#4298)
+- chore(deps): update opensearchproject/opensearch docker tag to v1.3.16 (#4296)
+
 Version 0.227.0 (Released April 24, 2024)
 ---------------
 
