@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.228.0
+Version 0.228.0 (Released August 27, 2024)
 ---------------
 
 - Remove RES constant from OCW departments (#4339)
