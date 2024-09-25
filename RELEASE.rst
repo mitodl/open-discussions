@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.229.0
+Version 0.229.0 (Released September 25, 2024)
 ---------------
 
 - Updated retire_user script to handle spammer users (#4356)
