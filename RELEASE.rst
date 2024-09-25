@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.229.0
+---------------
+
+- Updated retire_user script to handle spammer users (#4356)
+- fix(deps): update dependency express to v4.20.0 [security] (#4355)
+- fix(deps): update dependency webpack to v5.94.0 [security] (#4347)
+
 Version 0.228.0 (Released August 27, 2024)
 ---------------
 
