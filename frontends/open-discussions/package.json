@@ -39,7 +39,7 @@
     "@mitodl/mdl-react-components": "0.0.3",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.9.0",
-    "@reduxjs/toolkit": "1.4.0",
+    "@reduxjs/toolkit": "1.9.7",
     "@rmwc/checkbox": "^5.7.2",
     "@rmwc/dialog": "^5.7.2",
     "@rmwc/drawer": "^5.7.2",
