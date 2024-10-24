@@ -1,12 +1,13 @@
-from django.contrib.auth import get_user_model
-import requests
-import json
-from django.conf import settings
-from django.utils.http import urlencode
 import calendar
-from django.db.models import Q
+import json
+import urlparse
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management import BaseCommand, CommandError
+from django.db.models import Q
+import httpx
+
 from keycloak_user_export.models import UserExportToKeycloak
 
 User = get_user_model()
@@ -61,19 +62,19 @@ class Command(BaseCommand):
 
         # pylint: disable=expression-not-assigned
         parser.add_argument(
-            "username",
+            "--username",
             help="Username of a Keycloak realm admin user.",
         )
         parser.add_argument(
-            "password",
+            "--password",
             help="Password of a Keycloak realm admin user.",
         )
         parser.add_argument(
-            "client-id",
+            "--client-id",
             help="Client ID for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
-            "client-secret",
+            "--client-secret",
             help="Client secret for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
@@ -99,7 +100,7 @@ class Command(BaseCommand):
         )
 
     def _get_access_token(
-        self, client_id: str, username: str, password: str, client_secret: str
+        self, client: Client, client_id: str, username: str, password: str, client_secret: str
     ):
         """
         Creates a new access token for a Keycloak realm administrator for use with the admin-cli client.
@@ -119,59 +120,6 @@ class Command(BaseCommand):
 
         response = requests.request("POST", url, headers=headers, data=payload)
         return response.json()["access_token"]
-
-    def _generate_keycloak_user_payload(self, user, keycloak_group_path):
-        """
-        Returns a dictionary formatted as the expected user representation for the
-        Keycloak partialImport Admin REST API endpoint.
-
-        Args:
-            user (models.User): A Django User model record.
-            keycloak_group_path (str): The Keycloak group path which newly created users should be added to.
-
-        Returns:
-            dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
-        """
-        first_name, last_name = self._get_user_names(user)
-        user_keycloak_payload = {
-            "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
-            "username": user.email,
-            "firstName": first_name,
-            "lastName": last_name,
-            "enabled": True,
-            "totp": False,
-            "emailVerified": True,
-            "email": user.email,
-            "credentials": [],
-            "disableableCredentialTypes": [],
-            "requiredActions": [],
-            "realmRoles": ["default-roles-master"],
-            "notBefore": 0,
-            "groups": [keycloak_group_path],
-        }
-        return user_keycloak_payload
-
-    def _get_user_names(self, user):
-        """
-        Return the first and last name of a user.
-
-        If there is only one name in the user's profile this returns empty strings.
-
-        Args:
-            user (models.User): A Django User model record.
-
-        Returns:
-            (str, str): the first and last names of the user
-        """
-        profile = getattr(user, "profile", None)
-        name = profile.name if profile is not None else ""
-        names = name.split(maxsplit=1)
-
-        if len(names) == 2:
-            return tuple(names)
-
-        return "", ""
-
     def _verify_environment_variables_configured(self):
         """
         Verify that KEYCLOAK_BASE_URL and KEYCLOAK_REALM_NAME are configured as environment
@@ -194,89 +142,131 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         self._verify_environment_variables_configured()
 
-        keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
         unsynced_users_social_auth_query = Q()
+
+        client_id = kwargs["client_id"]
+        client_secret = kwargs["client_secret"]
+        keycloak_group_path = kwargs["keycloak_group_path"]
+
         if kwargs["filter_provider_name"] is not None:
             unsynced_users_social_auth_query &= Q(
                 social_auth__provider=kwargs["filter_provider_name"]
             )
+
         unsynced_users = (
             User.objects.only("email")
             .exclude(social_auth__provider="ol-oidc")
             .exclude(userexporttokeycloak__isnull=False)
+            .exclude(profile__isnull=True)
             .filter(unsynced_users_social_auth_query)
             .select_related("userexporttokeycloak")
             .prefetch_related("social_auth")
         )
-        access_token = self._get_access_token(
-            kwargs["client-id"],
-            kwargs["username"],
-            kwargs["password"],
-            kwargs["client-secret"],
-        )
-
-        unsynced_users_keycloak_payload_array = []
 
         # Process batches of the users who must be exported.
         batch_size = kwargs["batch_size"]
-        for i in range(0, len(unsynced_users), batch_size):
-            batch = unsynced_users[i : i + batch_size]
-            for user in batch:
-                unsynced_users_keycloak_payload_array.append(
-                    self._generate_keycloak_user_payload(
-                        user, kwargs["keycloak_group_path"]
-                    )
-                )
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            }
-            payload = json.dumps(
-                {
-                    "ifResourceExists": "SKIP",
-                    "realm": settings.KEYCLOAK_REALM_NAME,
-                    "users": unsynced_users_keycloak_payload_array,
-                }
-            )
-            response = requests.request(
-                "POST", keycloak_partial_import_url, headers=headers, data=payload
-            )
-            # If Keycloak responds with a 401, refresh the access_token and retry once.
-            if response.status_code == 401:
-                access_token = self._get_access_token(
-                    kwargs["client-id"],
-                    kwargs["username"],
-                    kwargs["password"],
-                    kwargs["client-secret"],
-                )
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {access_token}",
-                }
-                response = requests.request(
-                    "POST", keycloak_partial_import_url, headers=headers, data=payload
-                )
 
-            # If the response from Keycloak is not 200, print out an error and move on to
-            # the next batch of users to export.
-            if response.status_code != 200:
-                print(f"Error calling Keycloak REST API, returned {response.content}")
-            else:
-                user_synced_with_keycloak_records = []
-                keycloak_response_body = json.loads(response.content)
+        with httpx.Client(
+            # httpx kwargs
+            base_url=urlparse.urljoin(
+                settings.KEYCLOAK_BASE_URL,
+                "/realms/",
+                settings.KEYCLOAK_REALM_NAME,
+            ),
+            headers={
+                "Content-Type": "application/json+scim",
+            },
+        ) as client:
+            group_location = None
 
-                # Expect the response below from Keycloak.
-                # {"overwritten":0,"added":0,"skipped":1,"results":[{"action":"ADDED","resourceType":"USER","resourceName":"collinp@mit.edu","id":"b2fb40bc-5c68-4f4b-b3ab-d178cd593454"}]}
-                keycloak_results = keycloak_response_body["results"]
-                # Convert the keycloak_results to a dictionary using the user email as the key.
-                keycloak_results_email_key_dict = {
-                    item["resourceName"]: item for item in keycloak_results
-                }
+            client.fetch_token()
+
+            response = client.get("/scim/v2/Groups")
+            self.stdout.write(json.dumps(response.json(), indent=2))
+            import sys
+            sys.exit(1)
+            for i in range(0, len(unsynced_users), batch_size):
+                batch = unsynced_users[i : i + batch_size]
+                operations = []
+
                 for user in batch:
-                    if keycloak_results_email_key_dict[user.email]["action"] == "ADDED":
-                        user_synced_with_keycloak_records.append(
-                            UserExportToKeycloak(user=user)
+                    operations.append(
+                        {
+                            "method": "POST",
+                            "path": "/Users",
+                            "bulkId": user.email,
+                            "data": {
+                                "schemas": [
+                                    "urn:ietf:params:scim:schemas:core:2.0:User"
+                                ],
+                                "userName": user.email,
+                                "displayName": user.profile.name,
+                                "emailOptIn": user.profile.email_optin,
+                                "emails": [
+                                    {
+                                        "value": user.email,
+                                        "primary": True,
+                                    }
+                                ],
+                            },
+                        }
+                    )
+                    if group_location:
+                        operations.append(
+                            {
+                                "method": "PATCH",
+                                "path": group_location,
+                                "data": {
+                                    "op": "add",
+                                    "path": "members",
+                                    "value": [
+                                        {
+                                            "value": f"bulkId:{user.email}",
+                                            "type": "User",
+                                        }
+                                    ],
+                                },
+                            }
                         )
-                UserExportToKeycloak.objects.bulk_create(
-                    user_synced_with_keycloak_records, ignore_conflicts=True
-                )
+
+                payload = {
+                    "schemas": ["urn:ietf:params:scim:api:messages:2.0:BulkRequest"],
+                    "Operations": operations,
+                }
+
+                response = client.post("/scim/v2/Bulk", json=payload)
+
+                # If the response from Keycloak is not 200, print out an error and move on to
+                # the next batch of users to export.
+                if response.status_code != 200:
+                    self.stderr.write(
+                        self.style.ERROR(
+                            f"Error calling Keycloak /Bulk API, returned: {response.content}"
+                        )
+                    )
+
+                else:
+                    user_synced_with_keycloak_records = []
+
+                    operations = response.json()["Operations"]
+
+                    # Convert the keycloak_results to a dictionary using the user email as the key.
+                    keycloak_results_email_key_dict = {
+                        item["bulkId"]: item for item in operations
+                    }
+                    for user in batch:
+                        result = keycloak_results_email_key_dict[user.email]
+                        status_code = int(result["status"])
+                        if status_code == 201:
+                            user_synced_with_keycloak_records.append(
+                                UserExportToKeycloak(
+                                    user=user, location=result["location"]
+                                )
+                            )
+                        else:
+                            detail = result["response"]["detail"]
+                            self.stdout.write(f"Server error creating user: {detail}")
+
+                    UserExportToKeycloak.objects.bulk_create(
+                        user_synced_with_keycloak_records, ignore_conflicts=True
+                    )

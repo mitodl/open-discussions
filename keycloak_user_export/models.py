@@ -11,3 +11,4 @@ class UserExportToKeycloak(models.Model):
     """
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    scim_location = models.CharField(default=None, max_length=1024)
