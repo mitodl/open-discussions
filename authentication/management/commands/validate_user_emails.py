@@ -34,6 +34,7 @@ class Command(BaseCommand):
             "--upload-catch-size",
             dest="upload_batch_size",
             default=5000,
+            type=int,
             help="The batch size of the CSVs to upload",
         )
         subparsers.add_parser("check")
