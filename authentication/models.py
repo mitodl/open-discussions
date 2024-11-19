@@ -1,6 +1,8 @@
-""" Models for mail app """
+"""Models for mail app"""
+
 from ipaddress import ip_address
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.safestring import mark_safe
@@ -45,3 +47,21 @@ class BlockedIPRange(TimestampedModel):
             raise ValidationError(
                 f"IP {self.ip_end} < IP {self.ip_start}", code="invalid"
             )
+
+
+class EmailValidation(TimestampedModel):
+    """Status of an email validation"""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="email_validations",
+    )
+    email = models.CharField(max_length=512)
+    list_name = models.CharField(max_length=100)
+    result = models.CharField(max_length=30, null=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["list_name", "email"]),
+        ]

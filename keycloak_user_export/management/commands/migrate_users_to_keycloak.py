@@ -1,12 +1,14 @@
-from django.contrib.auth import get_user_model
-import requests
-import json
-from django.conf import settings
-from django.utils.http import urlencode
 import calendar
-from django.db.models import Q
+import json
+import sys
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
+from django.utils.http import urlencode
+import requests
+
 from keycloak_user_export.models import UserExportToKeycloak
 
 User = get_user_model()
@@ -118,6 +120,15 @@ class Command(BaseCommand):
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
 
         response = requests.request("POST", url, headers=headers, data=payload)
+
+        if response.status_code != 200:
+            self.stderr.write(
+                self.style.ERROR(
+                    f"Got error requesting access token: {response.json()}"
+                )
+            )
+            sys.exit(1)
+
         return response.json()["access_token"]
 
     def _generate_keycloak_user_payload(self, user, keycloak_group_path):
@@ -132,12 +143,9 @@ class Command(BaseCommand):
         Returns:
             dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
         """
-        first_name, last_name = self._get_user_names(user)
         user_keycloak_payload = {
             "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
             "username": user.email,
-            "firstName": first_name,
-            "lastName": last_name,
             "enabled": True,
             "totp": False,
             "emailVerified": True,
@@ -147,30 +155,15 @@ class Command(BaseCommand):
             "requiredActions": [],
             "realmRoles": ["default-roles-master"],
             "notBefore": 0,
-            "groups": [keycloak_group_path],
+            "groups": [keycloak_group_path] if keycloak_group_path else [],
+            "attributes": {
+                "fullName": user.profile.name,
+                "emailOptIn": 1 if user.profile.email_optin else 0,
+            }
+            if hasattr(user, "profile")
+            else {},
         }
         return user_keycloak_payload
-
-    def _get_user_names(self, user):
-        """
-        Return the first and last name of a user.
-
-        If there is only one name in the user's profile this returns empty strings.
-
-        Args:
-            user (models.User): A Django User model record.
-
-        Returns:
-            (str, str): the first and last names of the user
-        """
-        profile = getattr(user, "profile", None)
-        name = profile.name if profile is not None else ""
-        names = name.split(maxsplit=1)
-
-        if len(names) == 2:
-            return tuple(names)
-
-        return "", ""
 
     def _verify_environment_variables_configured(self):
         """
