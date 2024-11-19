@@ -31,12 +31,6 @@ class Command(BaseCommand):
         subparsers = parser.add_subparsers(dest="subcommand", required=True)
         start_parser = subparsers.add_parser("start")
         start_parser.add_argument(
-            "--db-chunk-size",
-            dest="db_chunk_size",
-            default=1000,
-            help="The number of record to fetch frmo the db at a time",
-        )
-        start_parser.add_argument(
             "--upload-catch-size",
             dest="upload_batch_size",
             default=5000,
@@ -59,7 +53,6 @@ class Command(BaseCommand):
         """Run verify user emails"""
         timestamp = int(datetime.utcnow().timestamp())
         list_name_prefix = f"email-validation-{timestamp}"
-        db_chunk_size = options["db_chunk_size"]
         upload_batch_size = options["upload_batch_size"]
 
         users = User.objects.annotate(
@@ -74,7 +67,6 @@ class Command(BaseCommand):
             email_validation_api.start_user_email_validation(
                 users,
                 list_name_prefix,
-                db_chunk_size=db_chunk_size,
                 upload_batch_size=upload_batch_size,
             )
         except requests.exceptions.HTTPError as exc:

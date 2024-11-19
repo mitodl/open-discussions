@@ -95,7 +95,6 @@ def batch_validation_csv_files(
     users,
     list_name_base: str,
     *,
-    db_chunk_size: int = 1000,
     upload_batch_size: int = 5000,
 ):
     """
@@ -103,7 +102,7 @@ def batch_validation_csv_files(
     """
 
     # create the iterator here so it can be reused across while loop steps
-    user_chunks_iter = chunks(users.only("email"), chunk_size=db_chunk_size)
+    user_chunks_iter = chunks(users.only("email"), chunk_size=1000)
 
     batch_idx = 1
     while True:
@@ -145,20 +144,14 @@ def start_user_email_validation(
     users,
     list_name_base: str,
     *,
-    db_chunk_size: int = 1000,
     upload_batch_size: int = 20000,
 ):
     """
     Start the bulk verification of users' email addresses.
-
-    Args:
-        users: QuerySet of users to verify
-        chunk_size(int): chunk size to write to the temporary CSV file
     """
     for csv_batch in batch_validation_csv_files(
         users,
         list_name_base,
-        db_chunk_size=db_chunk_size,
         upload_batch_size=upload_batch_size,
     ):
         send_to_mailgun(csv_batch)
