@@ -15,8 +15,6 @@ pytestmark = [pytest.mark.usefixtures("mocked_responses")]
 class _ContextManagerEntered(Exception):
     """Dummy exception for testing"""
 
-    pass
-
 
 def test_csv_batch_file():
     """Test that csv_batch_file creates a temporary csv file with a header"""

@@ -1,4 +1,5 @@
 """Email validation APIs"""
+
 from contextlib import contextmanager
 from csv import DictWriter
 from dataclasses import dataclass, field
@@ -178,7 +179,7 @@ def fetch_result_zip_file(url: str, temp_dir: str) -> str:
     """Fetch the result file and write it out locally"""
     filename = os.path.join(temp_dir, "results.json.zip")
 
-    with requests.get(url, stream=True) as resp:
+    with requests.get(url, stream=True, timeout=60 * 5) as resp:
         resp.raise_for_status()
         with open(filename, mode="wb") as zip_file:
             for chunk in resp.iter_content(chunk_size=8192):
