@@ -31,7 +31,7 @@ class Command(BaseCommand):
         subparsers = parser.add_subparsers(dest="subcommand", required=True)
         start_parser = subparsers.add_parser("start")
         start_parser.add_argument(
-            "--upload-catch-size",
+            "--upload-batch-size",
             dest="upload_batch_size",
             default=5000,
             type=int,
