@@ -30,6 +30,7 @@ VALIDATION_API_URL = "https://api.mailgun.net/v4/address/validate/bulk/"
 @dataclass
 class CsvBatchFile:
     """Dataclass for a CSV batch"""
+
     name: str
     file: typing.TextIO
     writer: DictWriter
@@ -84,7 +85,7 @@ def send_to_mailgun(csv_batch):
             urljoin(VALIDATION_API_URL, csv_batch.name),
             auth=("api", get_api_key()),
             files={"file": ("file", csv_file.read())},
-            timeout=60*5,
+            timeout=60 * 5,
         )
         resp.raise_for_status()
 
@@ -167,7 +168,7 @@ def get_validation_result(list_name: str) -> dict:
     resp = requests.get(
         urljoin(VALIDATION_API_URL, list_name),
         auth=("api", get_api_key()),
-        timeout=60*5,
+        timeout=60 * 5,
     )
     resp.raise_for_status()
     return resp.json()

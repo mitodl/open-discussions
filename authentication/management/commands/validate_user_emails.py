@@ -15,7 +15,11 @@ User = get_user_model()
 
 def get_unprocessed_validation_lists():
     """Return a QuerySet for unprocess"""
-    return EmailValidation.objects.filter(result__isnull=True).values_list("list_name", flat=True).distinct()
+    return (
+        EmailValidation.objects.filter(result__isnull=True)
+        .values_list("list_name", flat=True)
+        .distinct()
+    )
 
 
 class Command(BaseCommand):

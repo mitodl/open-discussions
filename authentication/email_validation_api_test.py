@@ -14,6 +14,7 @@ pytestmark = [pytest.mark.usefixtures("mocked_responses")]
 
 class _ContextManagerEntered(Exception):
     """Dummy exception for testing"""
+
     pass
 
 
