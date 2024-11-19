@@ -95,7 +95,7 @@ def batch_validation_csv_files(
     users,
     list_name_base: str,
     *,
-    upload_batch_size: int = 5000,
+    upload_batch_size: int,
 ):
     """
     Yields CSV files to upload to mailgun
@@ -144,7 +144,7 @@ def start_user_email_validation(
     users,
     list_name_base: str,
     *,
-    upload_batch_size: int = 20000,
+    upload_batch_size: int,
 ):
     """
     Start the bulk verification of users' email addresses.
