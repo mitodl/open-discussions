@@ -80,7 +80,7 @@
     "eslint-plugin-react-hooks": "4.6.2",
     "express": "4.20.0",
     "fetch-mock": "6.5.2",
-    "flow-bin": "0.94.0",
+    "flow-bin": "0.256.0",
     "flow-typed": "2.6.2",
     "focus-visible": "5.2.0",
     "formik": "2.4.6",
