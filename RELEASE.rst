@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.230.0
+Version 0.230.0 (Released December 12, 2024)
 ---------------
 
 - Fix the error printing for failed requests (#4364)
