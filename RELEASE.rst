@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.230.0
+---------------
+
+- Fix the error printing for failed requests (#4364)
+- Validate users' email address against mailgun (#4362)
+- Added fields to keycloak export (#4360)
+- fix(deps): update dependency requests to v2.32.2 [security] (#4358)
+
 Version 0.229.0 (Released September 25, 2024)
 ---------------
 
