@@ -72,7 +72,7 @@ class Command(BaseCommand):
             )
         except requests.exceptions.HTTPError as exc:
             self.stderr.write(str(exc))
-            self.stderr.write(exc.response.json())
+            self.stderr.write(exc.response.text)
         except Exception as exc:
             self.stderr.write(str(exc))
 
