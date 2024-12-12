@@ -62,7 +62,7 @@ class Command(BaseCommand):
                     user=OuterRef("pk"), email=OuterRef("email")
                 )
             )
-        ).filter(has_email_validations=False)
+        ).filter(is_active=True, has_email_validations=False)
 
         try:
             email_validation_api.start_user_email_validation(
