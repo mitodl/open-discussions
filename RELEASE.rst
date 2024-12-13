@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.230.1
+---------------
+
+- Only validate active user emails (#4366)
+
 Version 0.230.0 (Released December 12, 2024)
 ---------------
 
