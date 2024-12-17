@@ -1,4 +1,4 @@
-FROM python:3.11.4 as base
+FROM python:3.11.4 AS base
 LABEL maintainer "ODL DevOps <mitx-devops@mit.edu>"
 
 # Add package files, install updated node and pip
@@ -11,6 +11,10 @@ RUN apt-get install -y $(grep -vE "^\s*#" apt.txt  | tr "\n" " ")
 
 # pip
 RUN curl --silent --location https://bootstrap.pypa.io/get-pip.py | python3 -
+
+# copy in trusted certs
+COPY --chmod=644 certs/*.crt /usr/local/share/ca-certificates/
+RUN update-ca-certificates 
 
 # Poetry env configuration
 ENV  \
@@ -50,13 +54,13 @@ ENV XDG_CACHE_HOME /tmp/.cache
 # Add project
 COPY . /app
 
-FROM base as django
+FROM base AS django
 
 USER mitodl
 
 # django-server target
 # =======================================
-FROM django as django-server
+FROM django AS django-server
 
 EXPOSE 8063
 ENV PORT 8063

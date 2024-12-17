@@ -1,15 +1,15 @@
 import calendar
-import json
+from urllib.parse import urljoin
 import sys
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.core.management import BaseCommand, CommandError
-from django.utils.http import urlencode
 import requests
 
 from keycloak_user_export.models import UserExportToKeycloak
+from open_discussions.utils import chunks
 
 User = get_user_model()
 
@@ -63,19 +63,13 @@ class Command(BaseCommand):
 
         # pylint: disable=expression-not-assigned
         parser.add_argument(
-            "username",
-            help="Username of a Keycloak realm admin user.",
-        )
-        parser.add_argument(
-            "password",
-            help="Password of a Keycloak realm admin user.",
-        )
-        parser.add_argument(
-            "client-id",
+            "--client-id",
+            required=True,
             help="Client ID for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
-            "client-secret",
+            "--client-secret",
+            required=True,
             help="Client secret for the Keycloak Admin-CLI client.",
         )
         parser.add_argument(
@@ -100,26 +94,33 @@ class Command(BaseCommand):
             help="(Optional) Only create Keycloak users for Django user records associated with a specific social-auth provider.",
         )
 
-    def _get_access_token(
-        self, client_id: str, username: str, password: str, client_secret: str
+    def _refresh_auth(
+        self,
+        session: requests.Session,
+        client_id: str,
+        client_secret: str,
     ):
         """
         Creates a new access token for a Keycloak realm administrator for use with the admin-cli client.
 
         Args:
+            session (requests.Session): The requests session to use and update
             client_id (str): The client_ID associated with Keycloak's admin-cli client.
-            username (str): The username of a Keycloak realm administrator user.
-            password (str): The password associated with the username for a Keycloak realm administrator user.
             client_secret (str): The client secret associated with Keycloak's admin-cli client.
 
-        Returns:
-            A new access_token (string) for the administrator user for use with the Keycloak admin-cli client.
         """
-        url = f"{settings.KEYCLOAK_BASE_URL}/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/token"
-        payload = f"{urlencode(dict(client_id=client_id, username=username, password=password, grant_type='password', client_secret=client_secret, scope='email openid'))}"
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        url = urljoin(
+            settings.KEYCLOAK_BASE_URL,
+            f"/realms/{settings.KEYCLOAK_REALM_NAME}/protocol/openid-connect/token",
+        )
+        payload = {
+            "grant_type": "client_credentials",
+            "client_id": client_id,
+            "client_secret": client_secret,
+            "scope": "email openid",
+        }
 
-        response = requests.request("POST", url, headers=headers, data=payload)
+        response = requests.post(url, data=payload)
 
         if response.status_code != 200:
             self.stderr.write(
@@ -129,7 +130,12 @@ class Command(BaseCommand):
             )
             sys.exit(1)
 
-        return response.json()["access_token"]
+        access_token = response.json()["access_token"]
+        session.headers.update(
+            {
+                "Authorization": f"Bearer {access_token}",
+            }
+        )
 
     def _generate_keycloak_user_payload(self, user, keycloak_group_path):
         """
@@ -195,81 +201,70 @@ class Command(BaseCommand):
             )
         unsynced_users = (
             User.objects.only("email")
+            .filter(is_active=True)
             .exclude(social_auth__provider="ol-oidc")
             .exclude(userexporttokeycloak__isnull=False)
             .filter(unsynced_users_social_auth_query)
             .select_related("userexporttokeycloak")
             .prefetch_related("social_auth")
         )
-        access_token = self._get_access_token(
-            kwargs["client-id"],
-            kwargs["username"],
-            kwargs["password"],
-            kwargs["client-secret"],
-        )
 
-        unsynced_users_keycloak_payload_array = []
+        with requests.Session() as session:
+            self._refresh_auth(
+                session,
+                kwargs["client_id"],
+                kwargs["client_secret"],
+            )
 
-        # Process batches of the users who must be exported.
-        batch_size = kwargs["batch_size"]
-        for i in range(0, len(unsynced_users), batch_size):
-            batch = unsynced_users[i : i + batch_size]
-            for user in batch:
-                unsynced_users_keycloak_payload_array.append(
-                    self._generate_keycloak_user_payload(
-                        user, kwargs["keycloak_group_path"]
-                    )
-                )
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            }
-            payload = json.dumps(
-                {
+            # Process batches of the users who must be exported.
+            batch_size = kwargs["batch_size"]
+            for batch in chunks(unsynced_users, chunk_size=batch_size):
+                payload = {
                     "ifResourceExists": "SKIP",
                     "realm": settings.KEYCLOAK_REALM_NAME,
-                    "users": unsynced_users_keycloak_payload_array,
-                }
-            )
-            response = requests.request(
-                "POST", keycloak_partial_import_url, headers=headers, data=payload
-            )
-            # If Keycloak responds with a 401, refresh the access_token and retry once.
-            if response.status_code == 401:
-                access_token = self._get_access_token(
-                    kwargs["client-id"],
-                    kwargs["username"],
-                    kwargs["password"],
-                    kwargs["client-secret"],
-                )
-                headers = {
-                    "Content-Type": "application/json",
-                    "Authorization": f"Bearer {access_token}",
-                }
-                response = requests.request(
-                    "POST", keycloak_partial_import_url, headers=headers, data=payload
-                )
-
-            # If the response from Keycloak is not 200, print out an error and move on to
-            # the next batch of users to export.
-            if response.status_code != 200:
-                print(f"Error calling Keycloak REST API, returned {response.content}")
-            else:
-                user_synced_with_keycloak_records = []
-                keycloak_response_body = json.loads(response.content)
-
-                # Expect the response below from Keycloak.
-                # {"overwritten":0,"added":0,"skipped":1,"results":[{"action":"ADDED","resourceType":"USER","resourceName":"collinp@mit.edu","id":"b2fb40bc-5c68-4f4b-b3ab-d178cd593454"}]}
-                keycloak_results = keycloak_response_body["results"]
-                # Convert the keycloak_results to a dictionary using the user email as the key.
-                keycloak_results_email_key_dict = {
-                    item["resourceName"]: item for item in keycloak_results
-                }
-                for user in batch:
-                    if keycloak_results_email_key_dict[user.email]["action"] == "ADDED":
-                        user_synced_with_keycloak_records.append(
-                            UserExportToKeycloak(user=user)
+                    "users": [
+                        self._generate_keycloak_user_payload(
+                            user, kwargs["keycloak_group_path"]
                         )
-                UserExportToKeycloak.objects.bulk_create(
-                    user_synced_with_keycloak_records, ignore_conflicts=True
-                )
+                        for user in batch
+                    ],
+                }
+                response = session.post(keycloak_partial_import_url, json=payload)
+                # If Keycloak responds with a 401, refresh the access_token and retry once.
+                if response.status_code == 401:
+                    self._refresh_auth(
+                        session,
+                        kwargs["client_id"],
+                        kwargs["client_secret"],
+                    )
+                    response = session.post(keycloak_partial_import_url, json=payload)
+
+                # If the response from Keycloak is not 200, print out an error and move on to
+                # the next batch of users to export.
+                if response.status_code != 200:
+                    self.stderr.write("Error calling Keycloak REST API, returned:")
+                    self.stderr.write(f"Status code: {response.status_code}")
+                    self.stderr.write("Content:")
+                    self.stderr.write(response.text)
+                else:
+                    user_synced_with_keycloak_records = []
+                    keycloak_response_body = response.json()
+
+                    # Expect the response below from Keycloak.
+                    # {"overwritten":0,"added":0,"skipped":1,"results":[{"action":"ADDED","resourceType":"USER","resourceName":"collinp@mit.edu","id":"b2fb40bc-5c68-4f4b-b3ab-d178cd593454"}]}
+                    keycloak_results = keycloak_response_body["results"]
+                    # Convert the keycloak_results to a dictionary using the user email as the key.
+                    keycloak_results_email_key_dict = {
+                        item["resourceName"]: item for item in keycloak_results
+                    }
+                    for user in batch:
+                        if (
+                            keycloak_results_email_key_dict[user.email]["action"]
+                            == "ADDED"
+                        ):
+                            user_synced_with_keycloak_records.append(
+                                UserExportToKeycloak(user=user)
+                            )
+                    UserExportToKeycloak.objects.bulk_create(
+                        user_synced_with_keycloak_records, ignore_conflicts=True
+                    )
