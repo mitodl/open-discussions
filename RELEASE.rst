@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.231.0
+---------------
+
+- Fix some attributes and state for KC export (#4370)
+- Bug fix + switch kc migration to client creds (#4368)
+
 Version 0.230.1 (Released December 16, 2024)
 ---------------
 
