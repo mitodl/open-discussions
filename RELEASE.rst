@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.231.0
+Version 0.231.0 (Released December 18, 2024)
 ---------------
 
 - Fix some attributes and state for KC export (#4370)
