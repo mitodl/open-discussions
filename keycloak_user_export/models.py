@@ -11,3 +11,4 @@ class UserExportToKeycloak(models.Model):
     """
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    action = models.CharField(max_length=20, null=False, default="ADDED")
