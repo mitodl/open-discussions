@@ -1,4 +1,3 @@
-import calendar
 from urllib.parse import urljoin
 import sys
 
@@ -62,6 +61,12 @@ class Command(BaseCommand):
         """parse arguments"""
 
         # pylint: disable=expression-not-assigned
+        parser.add_argument(
+            "--verbose",
+            help="Enable verbose logging",
+            action="store_true",
+            default=False,
+        )
         parser.add_argument(
             "--client-id",
             required=True,
@@ -150,17 +155,12 @@ class Command(BaseCommand):
             dict: user representation for use with the Keycloak partialImport Admin REST API endpoint.
         """
         user_keycloak_payload = {
-            "createdTimestamp": calendar.timegm(user.date_joined.timetuple()),
+            "createdTimestamp": user.date_joined.timestamp() * 1000,
             "username": user.email,
             "enabled": True,
-            "totp": False,
             "emailVerified": True,
             "email": user.email,
-            "credentials": [],
-            "disableableCredentialTypes": [],
-            "requiredActions": [],
-            "realmRoles": ["default-roles-master"],
-            "notBefore": 0,
+            "realmRoles": [f"default-roles-{settings.KEYCLOAK_REALM_NAME}"],
             "groups": [keycloak_group_path] if keycloak_group_path else [],
             "attributes": {
                 "fullName": user.profile.name,
@@ -190,7 +190,23 @@ class Command(BaseCommand):
                 "KEYCLOAK_REALM_NAME must be defined as an environment variable."
             )
 
+    def _log_api_call(self, response):
+        """Log the API call to keycloak"""
+        status_code = response.status_code
+
+        if not self.verbose and status_code == 200:
+            return
+
+        log_out = self.stdout if status_code == 200 else self.stderr
+
+        log_out.write(f"{response.request.method} {response.request.url}")
+        log_out.write(f"Status code: {status_code}")
+        log_out.write(f"Request:\t{response.request.body.decode('utf-8')}")
+        log_out.write(f"Response:\t{response.text}")
+
     def handle(self, *args, **kwargs):
+        self.verbose = kwargs["verbose"]
+
         self._verify_environment_variables_configured()
 
         keycloak_partial_import_url = f"{settings.KEYCLOAK_BASE_URL}/admin/realms/{settings.KEYCLOAK_REALM_NAME}/partialImport"
@@ -239,14 +255,9 @@ class Command(BaseCommand):
                     )
                     response = session.post(keycloak_partial_import_url, json=payload)
 
-                # If the response from Keycloak is not 200, print out an error and move on to
-                # the next batch of users to export.
-                if response.status_code != 200:
-                    self.stderr.write("Error calling Keycloak REST API, returned:")
-                    self.stderr.write(f"Status code: {response.status_code}")
-                    self.stderr.write("Content:")
-                    self.stderr.write(response.text)
-                else:
+                self._log_api_call(response)
+
+                if response.status_code == 200:
                     user_synced_with_keycloak_records = []
                     keycloak_response_body = response.json()
 
@@ -258,12 +269,14 @@ class Command(BaseCommand):
                         item["resourceName"]: item for item in keycloak_results
                     }
                     for user in batch:
-                        if (
-                            keycloak_results_email_key_dict[user.email]["action"]
-                            == "ADDED"
-                        ):
+                        action = keycloak_results_email_key_dict[user.email]["action"]
+                        if action in ("ADDED", "SKIPPED"):
                             user_synced_with_keycloak_records.append(
-                                UserExportToKeycloak(user=user)
+                                UserExportToKeycloak(user=user, action=action)
+                            )
+                        else:
+                            self.stderr.write(
+                                f"Unexpected action '{action} for user '{user.email}"
                             )
                     UserExportToKeycloak.objects.bulk_create(
                         user_synced_with_keycloak_records, ignore_conflicts=True
