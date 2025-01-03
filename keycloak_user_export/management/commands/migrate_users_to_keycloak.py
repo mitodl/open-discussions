@@ -160,6 +160,11 @@ class Command(BaseCommand):
             "enabled": True,
             "emailVerified": True,
             "email": user.email,
+            "totp": False,
+            "credentials": [],
+            "disableableCredentialTypes": [],
+            "requiredActions": [],
+            "notBefore": 0,
             "realmRoles": [f"default-roles-{settings.KEYCLOAK_REALM_NAME}"],
             "groups": [keycloak_group_path] if keycloak_group_path else [],
             "attributes": {
