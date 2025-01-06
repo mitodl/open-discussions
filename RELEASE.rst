@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.232.0
+Version 0.232.0 (Released January 06, 2025)
 ---------------
 
 - Add back in keycloak user attributes (#4372)
