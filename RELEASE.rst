@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.233.0
+---------------
+
+- Fix error with xmlsec library (#4374)
+
 Version 0.232.0 (Released January 06, 2025)
 ---------------
 
