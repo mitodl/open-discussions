@@ -1,4 +1,5 @@
 import json
+from math import ceil
 
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -20,11 +21,25 @@ def kc_settings(settings):
     settings.KEYCLOAK_REALM_NAME = "pytest-realm"
 
 
-def test_migrate_users_to_keycloak(mocked_responses):
+@pytest.mark.parametrize(
+    "num_users, num_already_synced, batch_size",
+    [
+        (100, 0, 10),
+        (100, 20, 10),
+        (100, 99, 10),
+    ],
+)
+def test_migrate_users_to_keycloak(
+    mocked_responses,
+    django_assert_num_queries,
+    num_users,
+    num_already_synced,
+    batch_size,
+):
     """Test that the migrate_users_to_keycloak command functions as expected"""
-    users = UserFactory.create_batch(100)
+    users = UserFactory.create_batch(num_users)
     inactive_users = UserFactory.create_batch(10, is_active=False)
-    already_synced = users[:20]
+    already_synced = users[:num_already_synced]
 
     UserExportToKeycloak.objects.bulk_create(
         [UserExportToKeycloak(user=user) for user in already_synced]
@@ -68,11 +83,16 @@ def test_migrate_users_to_keycloak(mocked_responses):
         content_type="application/json",
     )
 
-    call_command(
-        "migrate_users_to_keycloak",
-        "--client-id=test-client-id",
-        "--client-secret=test-client-secret",
-    )
+    # 3 queries per batch plus 1 for the last empty query to terminate the loop
+    num_batches = ceil((num_users - num_already_synced) / batch_size)
+    num_queries = num_batches * 3 + 1
+    with django_assert_num_queries(num_queries):
+        call_command(
+            "migrate_users_to_keycloak",
+            "--client-id=test-client-id",
+            "--client-secret=test-client-secret",
+            f"--batch-size={batch_size}",
+        )
 
     assert (
         list(User.objects.filter(userexporttokeycloak__isnull=False).order_by("id"))
