@@ -8,7 +8,6 @@ from django.core.management import BaseCommand, CommandError
 import requests
 
 from keycloak_user_export.models import UserExportToKeycloak
-from open_discussions.utils import chunks
 
 User = get_user_model()
 
@@ -221,13 +220,12 @@ class Command(BaseCommand):
                 social_auth__provider=kwargs["filter_provider_name"]
             )
         unsynced_users = (
-            User.objects.only("email")
+            User.objects.only("email", "date_joined")
             .filter(is_active=True)
             .exclude(social_auth__provider="ol-oidc")
             .exclude(userexporttokeycloak__isnull=False)
             .filter(unsynced_users_social_auth_query)
-            .select_related("userexporttokeycloak")
-            .prefetch_related("social_auth")
+            .prefetch_related("profile")
         )
 
         with requests.Session() as session:
@@ -239,7 +237,9 @@ class Command(BaseCommand):
 
             # Process batches of the users who must be exported.
             batch_size = kwargs["batch_size"]
-            for batch in chunks(unsynced_users, chunk_size=batch_size):
+            # the users are updated in such a way that they're excluded from this query the next time
+            # so we just keep grabbing a slice from the beginning of the query until it returns empty
+            while batch := unsynced_users[:batch_size]:
                 payload = {
                     "ifResourceExists": "SKIP",
                     "realm": settings.KEYCLOAK_REALM_NAME,
