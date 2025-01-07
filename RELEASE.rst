@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+Version 0.233.1
+---------------
+
+- Fix chunk iteration for user migration script (#4378)
+
 Version 0.233.0 (Released January 06, 2025)
 ---------------
 
