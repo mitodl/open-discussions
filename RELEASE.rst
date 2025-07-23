@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+Version 0.234.0
+---------------
+
+- config: Disable scheduled tasks that are no longer needed (#4381)
+- Update dependency sentry-sdk to v2 [SECURITY] (#4344)
+- Update dependency Django to v4.2.16 [SECURITY] (#4380)
+
 Version 0.233.1 (Released January 07, 2025)
 ---------------
 
