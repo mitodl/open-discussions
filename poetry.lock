@@ -1180,16 +1180,13 @@ files = [
 
 [[package]]
 name = "django-json-widget"
-version = "1.1.1"
+version = "2.0.1"
 description = "Django json widget is an alternative widget that makes it easy to edit the jsonfield field of django."
 optional = false
 python-versions = "*"
 files = [
-    {file = "django-json-widget-1.1.1.tar.gz", hash = "sha256:ec948a4c379687f9c854748ba540fdbeb1b1730846ca953f186818521de7e696"},
+    {file = "django-json-widget-2.0.1.tar.gz", hash = "sha256:adb4cab17fe5a04139037d7d84725369530ef35b912c3790d3a7b13f99351358"},
 ]
-
-[package.dependencies]
-future = "*"
 
 [[package]]
 name = "django-redis"
@@ -1517,16 +1514,6 @@ files = [
 
 [package.dependencies]
 python-dateutil = ">=2.7"
-
-[[package]]
-name = "future"
-version = "0.18.3"
-description = "Clean single-source support for Python 3 and 2"
-optional = false
-python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-files = [
-    {file = "future-0.18.3.tar.gz", hash = "sha256:34a17436ed1e96697a86f9de3d15a3b0be01d8bc8de9c1dffd59fb8234ed5307"},
-]
 
 [[package]]
 name = "google-api-core"
@@ -4414,4 +4401,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "f0591ad2f4bf7622d038e3fa74137612400f7358b715ac70faef8ebc750c6e72"
+content-hash = "aa8a92d1d9fa6e887e7c482a01a4d0bad282af6fd00606e77bfeef436272dcc3"
