@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.234.0
+Version 0.234.0 (Released July 23, 2025)
 ---------------
 
 - config: Disable scheduled tasks that are no longer needed (#4381)
