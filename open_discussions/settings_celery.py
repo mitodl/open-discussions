@@ -21,18 +21,6 @@ CELERY_BEAT_SCHEDULE = {
         "task": "channels.tasks.evict_expired_access_tokens",
         "schedule": crontab(minute=0, hour="*"),
     },
-    "send-unsent-emails-four-times-daily": {
-        "task": "notifications.tasks.send_unsent_email_notifications",
-        "schedule": crontab(minute=0, hour="*/6"),
-    },
-    "send-frontpage-digests-every-1-days": {
-        "task": "notifications.tasks.send_daily_frontpage_digests",
-        "schedule": crontab(minute=0, hour=14),  # 10am EST
-    },
-    "send-frontpage-digests-every-1-weeks": {
-        "task": "notifications.tasks.send_weekly_frontpage_digests",
-        "schedule": crontab(minute=0, hour=14, day_of_week=2),  # 10am EST on tuesdays
-    },
     "update-podcasts": {
         "task": "course_catalog.tasks.get_podcast_data",
         "schedule": get_int(
