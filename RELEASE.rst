@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.234.1
+Version 0.234.1 (Released August 06, 2025)
 ---------------
 
 - config: Remove all email related schedules from Celery (#4383)
