@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@ee0669bd1cc54295c223e0bb666b733df41de1c5 # v2
         with:
           ref: release-candidate
-      - uses: akhileshns/heroku-deploy@581dd286c962b6972d427fcf8980f60755c15520
+      - uses: akhileshns/heroku-deploy@e3eb99d45a8e2ec5dca08735e089607befa4bf28
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: "odl-open-discussions-rc"
