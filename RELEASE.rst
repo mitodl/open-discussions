@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-Version 0.234.2
+Version 0.234.2 (Released August 08, 2025)
 ---------------
 
 - config: Add event signals to Celery for better task tracking
