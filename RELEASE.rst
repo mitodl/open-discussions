@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+Version 0.234.2
+---------------
+
+- config: Add event signals to Celery for better task tracking
+- chore(deps): update akhileshns/heroku-deploy digest to e3eb99d (#4387)
+
 Version 0.234.1 (Released August 06, 2025)
 ---------------
 
