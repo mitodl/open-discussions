@@ -21,7 +21,7 @@
     "@babel/preset-flow": "7.17.12",
     "@babel/preset-react": "7.17.12",
     "@babel/register": "7.17.7",
-    "@babel/runtime": "7.18.3",
+    "@babel/runtime": "7.26.10",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@material/base": "0.2.3",
