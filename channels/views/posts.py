@@ -47,7 +47,7 @@ class PostListView(APIView):
             )
             users = lookup_users_for_posts(posts)
             posts = proxy_posts(
-                [post for post in posts if post.author and post.author.name in users]
+                [post for post in posts if post.author and post.author.username in users]
             )
             subscriptions = lookup_subscriptions_for_posts(posts, request.user)
 

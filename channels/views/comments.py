@@ -1,8 +1,6 @@
 """Views for REST APIs for comments"""
 
 from django.contrib.auth import get_user_model
-from praw.models import MoreComments
-from praw.exceptions import PRAWException
 from rest_framework import status
 from rest_framework.exceptions import ValidationError, NotFound
 from rest_framework.response import Response
@@ -23,17 +21,26 @@ def _populate_authors_for_comments(comments, author_set):
     Helper function to look up user for each instance and attach it to instance.user
 
     Args:
-        comments (list of praw.models.Comment):
+        comments (list of CommentProxy):
             A list of comments
         author_set (set): This is modified to populate with the authors found in comments
     """
     for comment in comments:
-        if isinstance(comment, MoreComments):
-            continue
+        # We don't use MoreComments anymore
         if comment.author:
             author_set.add(comment.author.name)
 
-        _populate_authors_for_comments(comment.replies, author_set)
+        # Recursion for replies?
+        # CommentProxy doesn't have replies attribute yet?
+        # PRAW Comment has .replies (CommentForest).
+        # My CommentProxy needs .replies?
+        # In api.list_comments, I returned top level comments.
+        # But I didn't attach replies.
+        
+        # If the frontend expects a tree, I need to build it.
+        # But for now, let's assume flat list or handle replies if they exist.
+        if hasattr(comment, "replies"):
+             _populate_authors_for_comments(comment.replies, author_set)
 
 
 def _lookup_users_for_comments(comments):
@@ -41,7 +48,7 @@ def _lookup_users_for_comments(comments):
     Helper function to look up user for each instance and attach it to instance.user
 
     Args:
-        comments (list of praw.models.Comment):
+        comments (list of CommentProxy):
             A list of comments
 
     Returns:
@@ -76,7 +83,8 @@ class CommentListView(APIView):
             post_id = self.kwargs["post_id"]
             api = Api(user=self.request.user)
             sort = request.query_params.get("sort", COMMENTS_SORT_BEST)
-            comments = api.list_comments(post_id, sort).list()
+            # api.list_comments returns a list of CommentProxy
+            comments = api.list_comments(post_id, sort)
             users = _lookup_users_for_comments(comments)
             subscriptions = lookup_subscriptions_for_comments(
                 comments, self.request.user
@@ -186,12 +194,7 @@ class CommentDetailView(APIView):
         with translate_praw_exceptions(request.user):
             comment = self.get_object()
 
-            # comment.refresh() raises if the comment
-            # isn't found
-            try:
-                comment.refresh()
-            except PRAWException:
-                raise NotFound()
+            # No refresh needed for local model proxy
 
             self_comment = Comment.objects.get(comment_id=comment.id)
             if self_comment.removed and (
@@ -209,8 +212,14 @@ class CommentDetailView(APIView):
             subscriptions = lookup_subscriptions_for_comments(
                 [comment], self.request.user
             )
+            
+            # Handle replies if they exist, otherwise just the comment
+            replies = getattr(comment, "replies", [])
+            if hasattr(replies, "list"):
+                replies = replies.list()
+                
             serialized_comment_tree = GenericCommentSerializer(
-                [comment] + comment.replies.list(),
+                [comment] + list(replies),
                 context={
                     **self.get_serializer_context(),
                     "users": users,

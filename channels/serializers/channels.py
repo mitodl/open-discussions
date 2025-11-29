@@ -4,8 +4,13 @@ Serializers for channel REST APIs
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from channels.constants import VALID_CHANNEL_TYPES, VALID_LINK_TYPES
-from channels.models import Channel
+from channels.constants import (
+    VALID_CHANNEL_TYPES, 
+    VALID_LINK_TYPES,
+    ROLE_CONTRIBUTORS,
+    ROLE_MODERATORS,
+)
+from channels.models import Channel, ChannelGroupRole, ChannelSubscription
 from open_discussions.utils import filter_dict_with_renamed_keys
 from open_discussions.serializers import WriteableSerializerMethodField
 
@@ -79,24 +84,41 @@ class ChannelSerializer(ChannelAppearanceMixin, serializers.Serializer):
 
     def get_user_is_contributor(self, channel):
         """
-        Get is_contributor from reddit object.
-        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        Get is_contributor from local DB
         """
-        return bool(channel.user_is_contributor)
+        user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
+        return ChannelGroupRole.objects.filter(
+            channel=channel._self_channel, 
+            group__user=user, 
+            role=ROLE_CONTRIBUTORS
+        ).exists()
 
     def get_user_is_moderator(self, channel):
         """
-        Get is_moderator from reddit object.
-        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        Get is_moderator from local DB
         """
-        return bool(channel.user_is_moderator)
+        user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
+        return ChannelGroupRole.objects.filter(
+            channel=channel._self_channel, 
+            group__user=user, 
+            role=ROLE_MODERATORS
+        ).exists()
 
     def get_user_is_subscriber(self, channel):
         """
-        Get user_is_subscriber from reddit object.
-        For some reason reddit returns None instead of False so an explicit conversion is done here.
+        Get user_is_subscriber from local DB
         """
-        return bool(channel.user_is_subscriber)
+        user = self.context.get("request").user
+        if user.is_anonymous:
+            return False
+        return ChannelSubscription.objects.filter(
+            channel=channel._self_channel, 
+            user=user
+        ).exists()
 
     def get_moderator_notifications(self, channel):
         """Get moderator notifications"""

@@ -1,157 +1,161 @@
 """Object proxies"""
+from types import SimpleNamespace
 from django.utils.functional import SimpleLazyObject
 from wrapt import ObjectProxy
 
-from channels.models import Channel, Post
+from channels.models import Channel, Post, Comment
+
+
+class AuthorProxy:
+    """Proxies a User object to look like a PRAW Redditor"""
+    def __init__(self, user):
+        self.user = user
+
+    @property
+    def name(self):
+        return self.user.username if self.user else "[deleted]"
+
+    def __str__(self):
+        return self.name
 
 
 class PostProxy(ObjectProxy):
-    # pylint: disable=protected-access
     """
-    Proxies properties to a Submission or a Post
-
-    This allows properties to be proxied to the Submission unless otherwise overridden
+    Proxies properties to a Post model to look like a PRAW Submission
     """
 
-    def __init__(self, submission, post):
+    def __init__(self, post):
         """
         Args:
-            submission (praw.models.reddit.submission.Submission): a PRAW submission object
-            post (channels.models.Post): the post associated with the submission
+            post (channels.models.Post): the post
         """
-        # treat submission as the primary proxy target
-        super().__init__(submission)
-        # store the post so @property overrides can reference it
-        self._self_submission = submission
+        super().__init__(post)
         self._self_post = post
 
     def __eq__(self, other):
-        """PostProxy equality delegates to submission and post equality checks"""
-        # isinstance doesn't work here because ObjectProxy spoofs that
-        if hasattr(other, "_self_submission") and hasattr(other, "_self_post"):
-            # check the submission first because post may be lazy
-            return (
-                other._self_submission == self._self_submission
-                and other._self_post == self._self_post
-            )
+        """PostProxy equality"""
+        if hasattr(other, "_self_post"):
+            return other._self_post == self._self_post
         return False
 
     def __str__(self):
         """String representation"""
-        return f"PostProxy for submission: {self._self_submission.id}"
+        return f"PostProxy for post: {self._self_post.post_id}"
 
     @property
+    def id(self):
+        return self._self_post.post_id
+
+    @property
+    def ups(self):
+        return self._self_post.score
+
+    @property
+    def author(self):
+        return AuthorProxy(self._self_post.author)
+
+    @property
+    def created(self):
+        return self._self_post.created_on.timestamp()
+
+    @property
+    def selftext(self):
+        return self._self_post.text
+
+    @property
+    def permalink(self):
+        # Construct a fake permalink or use the URL if available
+        # Reddit permalink format: /r/subreddit/comments/id/title/
+        return f"/r/{self._self_post.channel.name}/comments/{self._self_post.post_id}/{self._self_post.slug}/"
+
+    @property
+    def subreddit(self):
+        return ChannelProxy(self._self_post.channel)
+
+    @property
+    def likes(self):
+        return None  # Read-only, no user specific vote status
+
+    @property
+    def banned_by(self):
+        return True if self._self_post.removed else None
+
+    @property
+    def approved_by(self):
+        return None
+
+    @property
+    def is_self(self):
+        return self._self_post.url is None
+
+    # Existing properties that were proxying to _self_post
+    @property
     def channel(self):
-        """Return the post channel"""
         return self._self_post.channel
 
     @property
     def link_meta(self):
-        """Return the LinkMeta for this post"""
         return self._self_post.link_meta
 
     @property
     def post_type(self):
-        """Return the post_type"""
         return self._self_post.post_type
 
     @property
     def article(self):
-        """Return the Article for this post"""
         return self._self_post.article if hasattr(self._self_post, "article") else None
 
     @property
     def article_content(self):
-        """Return the article content for this post"""
         return self.article.content if self.article is not None else None
 
     @property
     def preview_text(self):
-        """Return preview_text for this post"""
         return self._self_post.preview_text
 
     @property
     def removed(self):
-        """Return removed flag for this post"""
         return self._self_post.removed
-
-
-def proxy_post(submission):
-    """
-    Helper function to proxy a submission
-
-    Args:
-        submission (praw.models.Submission): submission to proxy
-
-    Returns:
-        ProxyPost: proxied post
-    """
-    return PostProxy(
-        submission, SimpleLazyObject(lambda: Post.objects.get(post_id=submission.id))
-    )
-
-
-def proxy_posts(submissions):
-    """
-    Helper function to proxy submissions and posts.
-
-    Args:
-        submissions (list of praw.models.Submission):
-            A list of submissions
-
-    Returns:
-        list of ProxyPost: list of proxied posts
-    """
-    posts = {
-        post.post_id: post
-        for post in Post.objects.filter(
-            post_id__in=[submission.id for submission in submissions]
-        ).select_related("article", "link_meta", "channel")
-    }
-    return [
-        PostProxy(submission, posts[submission.id])
-        for submission in submissions
-        if submission.id in posts
-    ]
 
 
 class ChannelProxy(ObjectProxy):
     """
-    Proxies properties to a Subreddit or a Channel
-
-    This allows properties to be proxied to the Subreddit unless otherwise overridden
+    Proxies properties to a Channel model to look like a PRAW Subreddit
     """
 
-    def __init__(self, subreddit, channel):
+    def __init__(self, channel):
         """
         Args:
-            subreddit (praw.models.reddit.subreddit.Subreddit): a PRAW subreddit object
-            channel (channels.models.Channel): the channel associated with the subreddit
+            channel (channels.models.Channel): the channel
         """
-        # treat subreddit as the primary proxy target
-        super().__init__(subreddit)
-        # store the channel so @property overrides can reference it
-        self._self_subreddit = subreddit
+        super().__init__(channel)
         self._self_channel = channel
 
-    def __getattr__(self, name):
-        """
-        Avoid proxying __getattr__ but "proxy" to the wrapped object on any non-local fields
-        """
-        if name in (
-            "allowed_post_types",
-            "membership_is_managed",
-            "avatar",
-            "avatar_small",
-            "avatar_medium",
-            "ga_tracking_id",
-            "banner",
-            "widget_list_id",
-            "about",
-        ):
-            return getattr(self._self_channel, name)
-        else:
-            return getattr(self.__wrapped__, name)
+    @property
+    def display_name(self):
+        return self._self_channel.name
+
+    @property
+    def subreddit_type(self):
+        return self._self_channel.channel_type
+
+    @property
+    def public_description(self):
+        return "" # Placeholder
+
+    @property
+    def submit_text(self):
+        return "" # Placeholder
+
+    @property
+    def submit_text_label(self):
+        return "" # Placeholder
+
+    @property
+    def submission_type(self):
+        # Derive from allowed_post_types
+        # This is an approximation as we don't store the original string
+        return "any"
 
     @property
     def channel(self):
@@ -159,41 +163,83 @@ class ChannelProxy(ObjectProxy):
         return self._self_channel
 
 
-def proxy_channel(subreddit):
+class CommentProxy(ObjectProxy):
     """
-    Helper function to proxy a submission
-
-    Args:
-        subreddit (praw.models.Subreddit): subreddit to proxy
-
-    Returns:
-        ChannelProxy: proxied channel
+    Proxies properties to a Comment model to look like a PRAW Comment
     """
-    return ChannelProxy(
-        subreddit,
-        SimpleLazyObject(lambda: Channel.objects.get(name=subreddit.display_name)),
-    )
+    def __init__(self, comment):
+        super().__init__(comment)
+        self._self_comment = comment
+
+    @property
+    def id(self):
+        return self._self_comment.comment_id
+
+    @property
+    def body(self):
+        return self._self_comment.text
+
+    @property
+    def author(self):
+        return AuthorProxy(self._self_comment.author)
+
+    @property
+    def created(self):
+        return self._self_comment.created_on.timestamp()
+
+    @property
+    def banned_by(self):
+        return True if self._self_comment.removed else None
+
+    @property
+    def approved_by(self):
+        return None
+
+    @property
+    def likes(self):
+        return None
+
+    @property
+    def submission(self):
+        return PostProxy(self._self_comment.post)
+
+    @property
+    def subreddit(self):
+        return ChannelProxy(self._self_comment.post.channel)
+
+    @property
+    def parent_id(self):
+        # PRAW parent_id is prefixed with type (t1_, t3_)
+        if self._self_comment.parent_id:
+            return f"t1_{self._self_comment.parent_id}"
+        else:
+            return f"t3_{self._self_comment.post.post_id}"
+
+    def parent(self):
+        # Used by serializer get_parent_id
+        if self._self_comment.parent_id:
+            # Return a fake object with id
+            return SimpleNamespace(id=self._self_comment.parent_id)
+        else:
+            # Return submission
+            return self.submission
 
 
-def proxy_channels(subreddits):
-    """
-    Helper function to proxy submissions and posts.
+def proxy_post(post):
+    """Helper to proxy a post"""
+    return PostProxy(post)
 
-    Args:
-        subreddits (list of praw.models.Subreddit):
-            A list of subreddits
 
-    Returns:
-        list of ChannelProxy: list of proxied channels
-    """
-    channels = {
-        channel.name: channel
-        for channel in Channel.objects.filter(
-            name__in=[subreddit.display_name for subreddit in subreddits]
-        )
-    }
-    return [
-        ChannelProxy(subreddit, channels[subreddit.display_name])
-        for subreddit in subreddits
-        if subreddit.display_name in channels
-    ]
+def proxy_posts(posts):
+    """Helper to proxy posts"""
+    return [PostProxy(post) for post in posts]
+
+
+def proxy_channel(channel):
+    """Helper to proxy a channel"""
+    return ChannelProxy(channel)
+
+
+def proxy_channels(channels):
+    """Helper to proxy channels"""
+    return [ChannelProxy(channel) for channel in channels]
