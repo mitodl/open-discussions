@@ -7,10 +7,14 @@ import ProfileImage from "../components/ProfileImage"
 
 import IntegrationTestHelper from "../util/integration_test_helper"
 import { profileURL } from "../lib/url"
-import { makeProfile } from "../factories/profiles"
+import { makeProfile, makeUserWebsite } from "../factories/profiles"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
-import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
+import {
+  POSTS_OBJECT_TYPE,
+  COMMENTS_OBJECT_TYPE,
+  PERSONAL_SITE_TYPE
+} from "../lib/constants"
 
 describe("ProfilePage", function() {
   let helper, renderComponent, profile
@@ -118,5 +122,28 @@ describe("ProfilePage", function() {
       const wrapper = await renderPage()
       assert.isNotOk(wrapper.find("ProfileImage").at(1).props().editable)
     })
+  })
+
+  it("should not render personal website (www) link on profile page", async () => {
+    // Add a personal website to the profile
+    profile.user_websites = [
+      makeUserWebsite(1, "https://example.com", PERSONAL_SITE_TYPE)
+    ]
+    const wrapper = await renderPage()
+    // Verify that the personal website link is not rendered
+    assert.isFalse(wrapper.find(".external-site-logo").exists())
+  })
+
+  it("should render social site links but not personal website link", async () => {
+    // Add both social and personal websites to the profile
+    profile.user_websites = [
+      makeUserWebsite(1, "https://twitter.com/user", "twitter"),
+      makeUserWebsite(2, "https://example.com", PERSONAL_SITE_TYPE)
+    ]
+    const wrapper = await renderPage()
+    // Verify that social site links exist
+    assert.isTrue(wrapper.find(".card-site-links").exists())
+    // Verify that the personal website link (www) is not rendered
+    assert.isFalse(wrapper.find(".external-site-logo").exists())
   })
 })
