@@ -170,6 +170,7 @@ class CommentProxy(ObjectProxy):
     def __init__(self, comment):
         super().__init__(comment)
         self._self_comment = comment
+        self._replies = []
 
     @property
     def id(self):
@@ -214,6 +215,10 @@ class CommentProxy(ObjectProxy):
             return f"t1_{self._self_comment.parent_id}"
         else:
             return f"t3_{self._self_comment.post.post_id}"
+
+    @property
+    def replies(self):
+        return self._replies
 
     def parent(self):
         # Used by serializer get_parent_id

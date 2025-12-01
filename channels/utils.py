@@ -58,20 +58,30 @@ def get_pagination_and_reddit_obj_list(queryset, listing_params):
     """
     before, after, count, sort = listing_params
     limit = settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT
+    count = count or 0
     
     # Apply sort
     if sort == POSTS_SORT_NEW:
         queryset = queryset.order_by("-created_on")
     elif sort == POSTS_SORT_TOP:
         queryset = queryset.order_by("-score")
-    else: # HOT or default
-        # Fallback to score for hot
+    else:  # HOT or default
         queryset = queryset.order_by("-score")
 
-    # Simple pagination: just return the first page for now as we are removing Reddit integration
-    # and full cursor pagination implementation is out of scope for "minimal changes"
-    objects = list(queryset[:limit])
+    # Simple offset-based pagination
+    start = count
+    end = start + limit
+    objects = list(queryset[start:end])
+    total_count = queryset.count()
+    
     pagination = {"sort": sort}
+    
+    # Add pagination info if there are more results
+    if end < total_count:
+        pagination["after_count"] = end
+    
+    if start > 0:
+        pagination["before_count"] = max(0, start - limit)
     
     return pagination, objects
 
@@ -124,18 +134,6 @@ def _lookup_subscriptions_for_posts(posts, user):
 
     if not posts or user.is_anonymous:
         return []
-
-    # posts are Post models, so use post.post_id (Base36 encoded int, but stored as int in DB? No, Base36IntegerField)
-    # Base36IntegerField stores as int in DB, but access as string?
-    # channels/models.py: Base36IntegerField(models.BigIntegerField)
-    # It converts to/from base36 string in python.
-    # So post.post_id is a string (base36).
-    # Subscription.post_id is also Base36IntegerField.
-    
-    # We need to pass the integer values to the filter if we are filtering on the DB column directly?
-    # Or does Django handle it?
-    # Base36IntegerField.get_prep_value converts to int.
-    # So filtering with base36 strings should work.
     
     return Subscription.objects.filter(
         user=user, post_id__in=[post.post_id for post in posts], comment_id__isnull=True
@@ -158,10 +156,14 @@ def _lookup_subscriptions_for_comments(comments, user):
     if not comments or user.is_anonymous:
         return []
 
-    # comments are Comment models (or proxies?)
-    # If they are Comment models:
-    post_id = comments[0].post.post_id
-    comment_ids = [comment.comment_id for comment in comments]
+    # Handle both Comment models and CommentProxy objects
+    first_comment = comments[0]
+    if hasattr(first_comment, '_self_comment'):
+        post_id = first_comment._self_comment.post.post_id
+        comment_ids = [c._self_comment.comment_id for c in comments]
+    else:
+        post_id = first_comment.post.post_id
+        comment_ids = [comment.comment_id for comment in comments]
 
     return Subscription.objects.filter(
         user=user, post_id=post_id, comment_id__in=comment_ids

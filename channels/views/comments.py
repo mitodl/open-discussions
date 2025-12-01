@@ -26,21 +26,11 @@ def _populate_authors_for_comments(comments, author_set):
         author_set (set): This is modified to populate with the authors found in comments
     """
     for comment in comments:
-        # We don't use MoreComments anymore
         if comment.author:
             author_set.add(comment.author.name)
 
-        # Recursion for replies?
-        # CommentProxy doesn't have replies attribute yet?
-        # PRAW Comment has .replies (CommentForest).
-        # My CommentProxy needs .replies?
-        # In api.list_comments, I returned top level comments.
-        # But I didn't attach replies.
-        
-        # If the frontend expects a tree, I need to build it.
-        # But for now, let's assume flat list or handle replies if they exist.
-        if hasattr(comment, "replies"):
-             _populate_authors_for_comments(comment.replies, author_set)
+        if hasattr(comment, "replies") and comment.replies:
+            _populate_authors_for_comments(comment.replies, author_set)
 
 
 def _lookup_users_for_comments(comments):
@@ -83,7 +73,6 @@ class CommentListView(APIView):
             post_id = self.kwargs["post_id"]
             api = Api(user=self.request.user)
             sort = request.query_params.get("sort", COMMENTS_SORT_BEST)
-            # api.list_comments returns a list of CommentProxy
             comments = api.list_comments(post_id, sort)
             users = _lookup_users_for_comments(comments)
             subscriptions = lookup_subscriptions_for_comments(
@@ -213,13 +202,19 @@ class CommentDetailView(APIView):
                 [comment], self.request.user
             )
             
-            # Handle replies if they exist, otherwise just the comment
-            replies = getattr(comment, "replies", [])
-            if hasattr(replies, "list"):
-                replies = replies.list()
+            # Flatten comment tree for serialization
+            def flatten_comments(comment_list):
+                result = []
+                for c in comment_list:
+                    result.append(c)
+                    if hasattr(c, "replies") and c.replies:
+                        result.extend(flatten_comments(c.replies))
+                return result
+            
+            all_comments = flatten_comments([comment])
                 
             serialized_comment_tree = GenericCommentSerializer(
-                [comment] + list(replies),
+                all_comments,
                 context={
                     **self.get_serializer_context(),
                     "users": users,

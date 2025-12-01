@@ -1,12 +1,10 @@
 """Channels APIs"""
 import logging
-from datetime import datetime, timezone
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
-from django.http.response import Http404
 from rest_framework.exceptions import PermissionDenied, NotFound
 
 from channels.constants import (
@@ -14,31 +12,98 @@ from channels.constants import (
     POSTS_SORT_HOT,
     POSTS_SORT_NEW,
     POSTS_SORT_TOP,
-    VALID_POST_SORT_TYPES,
     VALID_COMMENT_SORT_TYPES,
     LINK_TYPE_LINK,
     LINK_TYPE_SELF,
     EXTENDED_POST_TYPE_ARTICLE,
+    ROLE_CONTRIBUTORS,
+    ROLE_MODERATORS,
 )
 from channels.models import (
     Channel,
     Comment,
     Post,
-    Subscription,
     ChannelSubscription,
+    ChannelGroupRole,
 )
 from channels.proxies import (
-    PostProxy,
-    ChannelProxy,
     CommentProxy,
     proxy_post,
     proxy_channel,
     proxy_channels,
-    proxy_posts,
 )
+from channels.utils import num_items_not_none
 
 User = get_user_model()
 log = logging.getLogger()
+
+
+def sync_channel_subscription_model(channel_name, user):
+    """
+    Create or update channel subscription for a user
+
+    Args:
+        channel_name (str): The name of the channel
+        user (django.contrib.models.auth.User): The user
+
+    Returns:
+        ChannelSubscription: the channel user role object
+    """
+    from django.db import transaction
+
+    with transaction.atomic():
+        channel = Channel.objects.get(name=channel_name)
+        return ChannelSubscription.objects.update_or_create(channel=channel, user=user)[0]
+
+
+def get_role_model(channel, role):
+    """
+    Get a ChannelGroupRole object
+
+    Args:
+        channel(channels.models.Channel): The channel
+        role(str): The role name (moderators, contributors)
+
+    Returns:
+        ChannelGroupRole: the ChannelGroupRole object
+    """
+    return ChannelGroupRole.objects.get(channel=channel, role=role)
+
+
+def add_user_role(channel, role, user):
+    """
+    Add a user to a channel role's group
+
+    Args:
+        channel(channels.models.Channel): The channel
+        role(str): The role name (moderators, contributors)
+        user(django.contrib.auth.models.User): The user
+    """
+    get_role_model(channel, role).group.user_set.add(user)
+
+
+def allowed_post_types_bitmask(allowed_post_types):
+    """
+    Returns a bitmask for the post types
+
+    Args:
+        allowed_post_types (list of str): list of allowed post types
+
+    Returns:
+        int: bit mask for the allowed post types
+    """
+    import operator
+    from functools import reduce
+
+    return reduce(
+        operator.or_,
+        [
+            bit
+            for post_type, bit in Channel.allowed_post_types.items()
+            if post_type in allowed_post_types
+        ],
+        0,
+    )
 
 
 def get_allowed_post_types_from_link_type(link_type):
@@ -83,8 +148,6 @@ def get_post_type(*, text, url, article_content):
         ValueError: If incompatible pieces of content are being submitted (e.g.: a URL is
             being submitted for a text post)
     """
-    from channels.utils import num_items_not_none
-
     if not any([text, url, article_content]):
         # title-only text post
         return LINK_TYPE_SELF
@@ -114,24 +177,14 @@ class Api:
         """
         List the channels
         """
-        # In the original code:
-        # if self.user.is_anonymous:
-        #     subreddits = self.reddit.subreddits.default()
-        # else:
-        #     subreddits = self.reddit.user.subreddits(limit=None)
-        
-        # For read-only archive, maybe just list all public channels?
-        # Or list channels the user is subscribed to if logged in?
-        
         if self.user.is_anonymous:
-             channels = Channel.objects.filter(channel_type=CHANNEL_TYPE_PUBLIC)
+            channels = Channel.objects.filter(channel_type=CHANNEL_TYPE_PUBLIC)
         else:
-            # List subscribed channels + public ones? 
-            # Original behavior for logged in user was "subreddits the user is subscribed to"
             channels = Channel.objects.filter(
-                id__in=ChannelSubscription.objects.filter(user=self.user).values("channel_id")
-            )
-            
+                Q(id__in=ChannelSubscription.objects.filter(user=self.user).values("channel_id")) |
+                Q(channel_type=CHANNEL_TYPE_PUBLIC)
+            ).distinct()
+
         return proxy_channels(channels)
 
     def get_channel(self, name):
@@ -145,18 +198,23 @@ class Api:
             raise NotFound(f"Channel {name} does not exist")
 
     def create_channel(self, *args, **kwargs):
+        """Create a channel - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def update_channel(self, *args, **kwargs):
+        """Update a channel - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def create_post(self, *args, **kwargs):
+        """Create a post - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def update_post(self, *args, **kwargs):
+        """Update a post - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
-        
+
     def delete_post(self, *args, **kwargs):
+        """Delete a post - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def front_page(self, listing_params):
@@ -165,14 +223,14 @@ class Api:
         """
         # Original: self.reddit.front
         # This usually means posts from subscribed subreddits.
-        
+
         queryset = Post.objects.filter(removed=False, deleted=False)
-        
+
         if not self.user.is_anonymous:
             # Filter by subscribed channels
             subscribed_channels = ChannelSubscription.objects.filter(user=self.user).values("channel_id")
             queryset = queryset.filter(channel__in=subscribed_channels)
-            
+
         return self._get_listing(queryset, listing_params)
 
     def list_posts(self, channel_name, listing_params):
@@ -183,7 +241,7 @@ class Api:
             channel = Channel.objects.get(name=channel_name)
         except Channel.DoesNotExist:
             raise NotFound(f"Channel {channel_name} does not exist")
-            
+
         queryset = Post.objects.filter(channel=channel, removed=False, deleted=False)
         return self._get_listing(queryset, listing_params)
 
@@ -192,41 +250,15 @@ class Api:
         queryset = Post.objects.filter(author__username=username, removed=False, deleted=False)
         return self._get_listing(queryset, listing_params)
 
-    def list_user_comments(self, username, listing_params):
+    def list_user_comments(self, username, _listing_params):
         """List comments submitted by a given user"""
-        # This returns a listing of comments
         queryset = Comment.objects.filter(author__username=username, removed=False, deleted=False)
-        # We need a _get_comment_listing?
-        # _get_listing returns PostProxies usually.
-        # Let's adapt _get_listing to handle comments too or make a new one.
-        return self._get_listing(queryset, listing_params, is_posts=False)
+        return queryset
 
-    def _get_listing(self, queryset, listing_params, is_posts=True):
+    def _get_listing(self, queryset, _listing_params):
         """
-        List posts/comments using the 'hot' algorithm (or others)
+        Returns a queryset for posts - sorting and pagination handled by utils
         """
-        before, after, count, sort = listing_params
-        
-        # Sorting is handled in utils.get_pagination_and_reddit_obj_list usually?
-        # No, that function takes a generator.
-        # Here we are returning a generator or list?
-        # The original API returned a ListingGenerator.
-        # Our views expect something that can be passed to get_pagination_and_reddit_obj_list.
-        # In our new utils.py, get_pagination_and_reddit_obj_list takes a queryset.
-        # So we should just return the queryset here, but with sort applied?
-        # utils.get_pagination_and_reddit_obj_list applies sort and limit.
-        
-        # However, the view calls:
-        # paginated_posts = api.list_posts(...)
-        # pagination, posts = get_pagination_and_reddit_obj_list(paginated_posts, listing_params)
-        
-        # So list_posts should return a queryset.
-        
-        if sort not in VALID_POST_SORT_TYPES and is_posts:
-             raise ValueError("Sort method '{}' is not supported".format(sort))
-             
-        # We defer sorting/slicing to get_pagination_and_reddit_obj_list in utils
-        # But we can apply some default ordering here to ensure consistency
         return queryset
 
     def get_post(self, post_id):
@@ -251,46 +283,104 @@ class Api:
 
     def list_comments(self, post_id, sort):
         """
-        Lists the comments of a post_id
+        Lists the comments of a post_id with full tree structure
         """
         if sort not in VALID_COMMENT_SORT_TYPES:
             raise ValueError(
                 "Sort method '{}' is not supported for comments".format(sort)
             )
 
-        # This is expected to return a CommentForest-like object or a list of comments.
-        # The serializer (CommentSerializer) doesn't seem to iterate over it?
-        # Wait, Post.comments in PRAW returns a CommentForest.
-        # In views/comments.py (not checked yet, but likely exists), it probably iterates.
-        
-        # Let's check how it's used.
-        # In the original code: return post.comments
-        
-        # We need to return top-level comments for the post.
-        comments = Comment.objects.filter(post__post_id=post_id, parent_id__isnull=True).order_by("-score")
-        return [CommentProxy(c) for c in comments]
+        # Fetch all comments for the post
+        all_comments = Comment.objects.filter(post__post_id=post_id).select_related('author', 'post')
 
-    def more_comments(self, parent_id, post_id, children, sort):
+        # Build a map of comment_id -> CommentProxy
+        comment_map = {}
+        for comment in all_comments:
+            proxy = CommentProxy(comment)
+            comment_map[comment.comment_id] = proxy
+
+        # Build the tree structure by attaching replies to their parents
+        top_level = []
+        for comment in all_comments:
+            proxy = comment_map[comment.comment_id]
+            if comment.parent_id is None:
+                # Top-level comment
+                top_level.append(proxy)
+            else:
+                # Reply to another comment
+                if comment.parent_id in comment_map:
+                    parent_proxy = comment_map[comment.parent_id]
+                    parent_proxy._replies.append(proxy)
+
+        # Sort top-level comments
+        if sort == "top":
+            top_level.sort(key=lambda c: c._self_comment.score, reverse=True)
+        elif sort == "new":
+            top_level.sort(key=lambda c: c._self_comment.created_on, reverse=True)
+        else:
+            top_level.sort(key=lambda c: c._self_comment.score, reverse=True)
+
+        return top_level
+
+    def more_comments(self, _parent_id, _post_id, children, sort):
         """
         Fetches data for a comment and its children
         """
-        # This is used to expand "more comments" links.
-        # children is a list of comment IDs.
-        
-        comments = Comment.objects.filter(comment_id__in=children)
-        return [CommentProxy(c) for c in comments]
+        if not children:
+            return []
 
-    # Read-only stubs for other methods
-    def add_contributor(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def remove_contributor(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def add_moderator(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def remove_moderator(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def add_subscriber(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def remove_subscriber(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def report_post(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    def report_comment(self, *args, **kwargs): raise PermissionDenied("Read-only mode")
-    
+        if sort not in VALID_COMMENT_SORT_TYPES:
+            raise ValueError(
+                "Sort method '{}' is not supported for comments".format(sort)
+            )
+
+        comments = Comment.objects.filter(comment_id__in=children).select_related('author', 'post')
+        proxies = [CommentProxy(c) for c in comments]
+
+        # Sort based on sort parameter
+        if sort == "top":
+            proxies.sort(key=lambda c: c._self_comment.score, reverse=True)
+        elif sort == "new":
+            proxies.sort(key=lambda c: c._self_comment.created_on, reverse=True)
+        else:
+            proxies.sort(key=lambda c: c._self_comment.score, reverse=True)
+
+        return proxies
+
+    def add_contributor(self, *args, **kwargs):
+        """Add a contributor - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def remove_contributor(self, *args, **kwargs):
+        """Remove a contributor - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def add_moderator(self, *args, **kwargs):
+        """Add a moderator - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def remove_moderator(self, *args, **kwargs):
+        """Remove a moderator - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def add_subscriber(self, *args, **kwargs):
+        """Add a subscriber - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def remove_subscriber(self, *args, **kwargs):
+        """Remove a subscriber - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def report_post(self, *args, **kwargs):
+        """Report a post - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
+    def report_comment(self, *args, **kwargs):
+        """Report a comment - disabled in read-only mode"""
+        raise PermissionDenied("Read-only mode")
+
     def is_subscriber(self, subscriber_name, channel_name):
+        """Check if a user is subscribed to a channel"""
         try:
             user = User.objects.get(username=subscriber_name)
             return ChannelSubscription.objects.filter(user=user, channel__name=channel_name).exists()
@@ -298,54 +388,60 @@ class Api:
             return False
 
     def is_moderator(self, channel_name, moderator_name):
-        # Check local DB roles
-        # We have ChannelGroupRole
-        from channels.models import ChannelGroupRole
-        from channels.constants import ROLE_MODERATORS
-        
+        """Check if a user is a moderator of a channel"""
         try:
             user = User.objects.get(username=moderator_name)
             channel = Channel.objects.get(name=channel_name)
             return ChannelGroupRole.objects.filter(
-                channel=channel, 
-                role=ROLE_MODERATORS, 
+                channel=channel,
+                role=ROLE_MODERATORS,
                 group__user=user
             ).exists()
         except (User.DoesNotExist, Channel.DoesNotExist):
             return False
 
     def list_contributors(self, channel_name):
-        # Return empty list or implement if needed
-        return []
+        """List contributors for a channel"""
+        try:
+            channel = Channel.objects.get(name=channel_name)
+            role = ChannelGroupRole.objects.get(channel=channel, role=ROLE_CONTRIBUTORS)
+            return list(role.group.user_set.all())
+        except (Channel.DoesNotExist, ChannelGroupRole.DoesNotExist):
+            return []
 
     def list_moderators(self, channel_name):
-        # Return empty list or implement if needed
-        return []
-        
-    def list_reports(self, channel_name):
+        """List moderators for a channel"""
+        try:
+            channel = Channel.objects.get(name=channel_name)
+            role = ChannelGroupRole.objects.get(channel=channel, role=ROLE_MODERATORS)
+            return list(role.group.user_set.all())
+        except (Channel.DoesNotExist, ChannelGroupRole.DoesNotExist):
+            return []
+
+    def list_reports(self, _channel_name):
+        """List reports for a channel - always returns empty in read-only mode"""
         return []
 
     def add_post_subscription(self, post_id):
-        # Allow subscriptions locally? Or read-only?
-        # Plan says "remove all integration with Reddit".
-        # Local subscriptions are fine if they don't sync to Reddit.
-        # But for now, let's make it read-only to be safe/simple.
+        """Add a post subscription - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def remove_post_subscription(self, post_id):
+        """Remove a post subscription - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def add_comment_subscription(self, post_id, comment_id):
+        """Add a comment subscription - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
 
     def remove_comment_subscription(self, post_id, comment_id):
+        """Remove a comment subscription - disabled in read-only mode"""
         raise PermissionDenied("Read-only mode")
-        
+
     def apply_post_vote(self, *args, **kwargs):
-        # No voting
-        return False
-        
-    def apply_comment_vote(self, *args, **kwargs):
-        # No voting
+        """Apply a vote to a post - disabled in read-only mode"""
         return False
 
+    def apply_comment_vote(self, *args, **kwargs):
+        """Apply a vote to a comment - disabled in read-only mode"""
+        return False
