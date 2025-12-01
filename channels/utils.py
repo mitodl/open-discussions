@@ -59,7 +59,7 @@ def get_pagination_and_reddit_obj_list(queryset, listing_params):
     before, after, count, sort = listing_params
     limit = settings.OPEN_DISCUSSIONS_CHANNEL_POST_LIMIT
     count = count or 0
-    
+
     # Apply sort
     if sort == POSTS_SORT_NEW:
         queryset = queryset.order_by("-created_on")
@@ -73,16 +73,16 @@ def get_pagination_and_reddit_obj_list(queryset, listing_params):
     end = start + limit
     objects = list(queryset[start:end])
     total_count = queryset.count()
-    
+
     pagination = {"sort": sort}
-    
+
     # Add pagination info if there are more results
     if end < total_count:
         pagination["after_count"] = end
-    
+
     if start > 0:
         pagination["before_count"] = max(0, start - limit)
-    
+
     return pagination, objects
 
 
@@ -110,10 +110,8 @@ def lookup_users_for_posts(posts):
     for post in posts:
         if post.author:
             usernames.append(post.author.username)
-            
-    users = User.objects.filter(
-        username__in=usernames
-    ).select_related("profile")
+
+    users = User.objects.filter(username__in=usernames).select_related("profile")
     return {user.username: user for user in users}
 
 
@@ -134,7 +132,7 @@ def _lookup_subscriptions_for_posts(posts, user):
 
     if not posts or user.is_anonymous:
         return []
-    
+
     return Subscription.objects.filter(
         user=user, post_id__in=[post.post_id for post in posts], comment_id__isnull=True
     ).values_list("post_id", flat=True)
@@ -158,7 +156,7 @@ def _lookup_subscriptions_for_comments(comments, user):
 
     # Handle both Comment models and CommentProxy objects
     first_comment = comments[0]
-    if hasattr(first_comment, '_self_comment'):
+    if hasattr(first_comment, "_self_comment"):
         post_id = first_comment._self_comment.post.post_id
         comment_ids = [c._self_comment.comment_id for c in comments]
     else:

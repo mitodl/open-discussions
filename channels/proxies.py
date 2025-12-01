@@ -8,6 +8,7 @@ from channels.models import Channel, Post, Comment
 
 class AuthorProxy:
     """Proxies a User object to look like a PRAW Redditor"""
+
     def __init__(self, user):
         self.user = user
 
@@ -141,15 +142,15 @@ class ChannelProxy(ObjectProxy):
 
     @property
     def public_description(self):
-        return "" # Placeholder
+        return ""  # Placeholder
 
     @property
     def submit_text(self):
-        return "" # Placeholder
+        return ""  # Placeholder
 
     @property
     def submit_text_label(self):
-        return "" # Placeholder
+        return ""  # Placeholder
 
     @property
     def submission_type(self):
@@ -167,6 +168,7 @@ class CommentProxy(ObjectProxy):
     """
     Proxies properties to a Comment model to look like a PRAW Comment
     """
+
     def __init__(self, comment):
         super().__init__(comment)
         self._self_comment = comment

@@ -201,7 +201,7 @@ class CommentDetailView(APIView):
             subscriptions = lookup_subscriptions_for_comments(
                 [comment], self.request.user
             )
-            
+
             # Flatten comment tree for serialization
             def flatten_comments(comment_list):
                 result = []
@@ -210,9 +210,9 @@ class CommentDetailView(APIView):
                     if hasattr(c, "replies") and c.replies:
                         result.extend(flatten_comments(c.replies))
                 return result
-            
+
             all_comments = flatten_comments([comment])
-                
+
             serialized_comment_tree = GenericCommentSerializer(
                 all_comments,
                 context={

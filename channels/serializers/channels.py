@@ -5,7 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from channels.constants import (
-    VALID_CHANNEL_TYPES, 
+    VALID_CHANNEL_TYPES,
     VALID_LINK_TYPES,
     ROLE_CONTRIBUTORS,
     ROLE_MODERATORS,
@@ -90,9 +90,7 @@ class ChannelSerializer(ChannelAppearanceMixin, serializers.Serializer):
         if user.is_anonymous:
             return False
         return ChannelGroupRole.objects.filter(
-            channel=channel._self_channel, 
-            group__user=user, 
-            role=ROLE_CONTRIBUTORS
+            channel=channel._self_channel, group__user=user, role=ROLE_CONTRIBUTORS
         ).exists()
 
     def get_user_is_moderator(self, channel):
@@ -103,9 +101,7 @@ class ChannelSerializer(ChannelAppearanceMixin, serializers.Serializer):
         if user.is_anonymous:
             return False
         return ChannelGroupRole.objects.filter(
-            channel=channel._self_channel, 
-            group__user=user, 
-            role=ROLE_MODERATORS
+            channel=channel._self_channel, group__user=user, role=ROLE_MODERATORS
         ).exists()
 
     def get_user_is_subscriber(self, channel):
@@ -116,8 +112,7 @@ class ChannelSerializer(ChannelAppearanceMixin, serializers.Serializer):
         if user.is_anonymous:
             return False
         return ChannelSubscription.objects.filter(
-            channel=channel._self_channel, 
-            user=user
+            channel=channel._self_channel, user=user
         ).exists()
 
     def get_moderator_notifications(self, channel):

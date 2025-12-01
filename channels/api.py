@@ -53,7 +53,9 @@ def sync_channel_subscription_model(channel_name, user):
 
     with transaction.atomic():
         channel = Channel.objects.get(name=channel_name)
-        return ChannelSubscription.objects.update_or_create(channel=channel, user=user)[0]
+        return ChannelSubscription.objects.update_or_create(channel=channel, user=user)[
+            0
+        ]
 
 
 def get_role_model(channel, role):
@@ -181,8 +183,12 @@ class Api:
             channels = Channel.objects.filter(channel_type=CHANNEL_TYPE_PUBLIC)
         else:
             channels = Channel.objects.filter(
-                Q(id__in=ChannelSubscription.objects.filter(user=self.user).values("channel_id")) |
-                Q(channel_type=CHANNEL_TYPE_PUBLIC)
+                Q(
+                    id__in=ChannelSubscription.objects.filter(user=self.user).values(
+                        "channel_id"
+                    )
+                )
+                | Q(channel_type=CHANNEL_TYPE_PUBLIC)
             ).distinct()
 
         return proxy_channels(channels)
@@ -228,7 +234,9 @@ class Api:
 
         if not self.user.is_anonymous:
             # Filter by subscribed channels
-            subscribed_channels = ChannelSubscription.objects.filter(user=self.user).values("channel_id")
+            subscribed_channels = ChannelSubscription.objects.filter(
+                user=self.user
+            ).values("channel_id")
             queryset = queryset.filter(channel__in=subscribed_channels)
 
         return self._get_listing(queryset, listing_params)
@@ -247,12 +255,16 @@ class Api:
 
     def list_user_posts(self, username, listing_params):
         """List posts submitted by a given user"""
-        queryset = Post.objects.filter(author__username=username, removed=False, deleted=False)
+        queryset = Post.objects.filter(
+            author__username=username, removed=False, deleted=False
+        )
         return self._get_listing(queryset, listing_params)
 
     def list_user_comments(self, username, _listing_params):
         """List comments submitted by a given user"""
-        queryset = Comment.objects.filter(author__username=username, removed=False, deleted=False)
+        queryset = Comment.objects.filter(
+            author__username=username, removed=False, deleted=False
+        )
         return queryset
 
     def _get_listing(self, queryset, _listing_params):
@@ -291,7 +303,9 @@ class Api:
             )
 
         # Fetch all comments for the post
-        all_comments = Comment.objects.filter(post__post_id=post_id).select_related('author', 'post')
+        all_comments = Comment.objects.filter(post__post_id=post_id).select_related(
+            "author", "post"
+        )
 
         # Build a map of comment_id -> CommentProxy
         comment_map = {}
@@ -334,7 +348,9 @@ class Api:
                 "Sort method '{}' is not supported for comments".format(sort)
             )
 
-        comments = Comment.objects.filter(comment_id__in=children).select_related('author', 'post')
+        comments = Comment.objects.filter(comment_id__in=children).select_related(
+            "author", "post"
+        )
         proxies = [CommentProxy(c) for c in comments]
 
         # Sort based on sort parameter
@@ -383,7 +399,9 @@ class Api:
         """Check if a user is subscribed to a channel"""
         try:
             user = User.objects.get(username=subscriber_name)
-            return ChannelSubscription.objects.filter(user=user, channel__name=channel_name).exists()
+            return ChannelSubscription.objects.filter(
+                user=user, channel__name=channel_name
+            ).exists()
         except User.DoesNotExist:
             return False
 
@@ -393,9 +411,7 @@ class Api:
             user = User.objects.get(username=moderator_name)
             channel = Channel.objects.get(name=channel_name)
             return ChannelGroupRole.objects.filter(
-                channel=channel,
-                role=ROLE_MODERATORS,
-                group__user=user
+                channel=channel, role=ROLE_MODERATORS, group__user=user
             ).exists()
         except (User.DoesNotExist, Channel.DoesNotExist):
             return False
