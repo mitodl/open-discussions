@@ -27,6 +27,9 @@ def index(request, **kwargs):  # pylint: disable=unused-argument
             and (is_admin_user(request) or is_staff_list_editor(request)),
         },
         "ckeditor_upload_url": settings.CKEDITOR_UPLOAD_URL,
+        "environment": settings.ENVIRONMENT,
+        "sentry_dsn": settings.SENTRY_DSN,
+        "release_version": settings.VERSION,
     }
 
     return render(request, "example.html", context=dict(js_settings=js_settings))

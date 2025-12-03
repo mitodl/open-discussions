@@ -5,13 +5,18 @@
   ],
   "packageRules": [
     {
-      "matchFiles": [
+      "matchFileNames": [
         "frontends/open-discussions/package.json"
       ],
       "matchUpdateTypes": [
         "major"
       ],
       "enabled": false
+    },
+    {
+      "matchSourceUrls": [
+        "https://github.com/ckeditor/ckeditor5"
+      ]
     }
   ]
 }

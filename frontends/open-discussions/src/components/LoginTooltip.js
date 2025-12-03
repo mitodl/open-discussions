@@ -1,10 +1,11 @@
 // @flow
+/* global SETTINGS: false */
 import React from "react"
 import { Link } from "react-router-dom"
 import Tooltip from "rc-tooltip"
 
 import { userIsAnonymous } from "../lib/util"
-import { LOGIN_URL, REGISTER_URL } from "../lib/url"
+import { LOGIN_URL } from "../lib/url"
 
 import type { Location } from "react-router-dom"
 
@@ -17,22 +18,20 @@ export const LoginTooltipContent = () => (
     </div>
     <div className="bottom-row">
       <div className="tooltip-buttons">
-        <Link
-          className="link-button"
-          to={(location: Location) =>
-            `${LOGIN_URL}?next=${encodeURIComponent(location.pathname)}`
-          }
-        >
-          Log In
-        </Link>
-        <Link
-          className="link-button red"
-          to={(location: Location) =>
-            `${REGISTER_URL}?next=${encodeURIComponent(location.pathname)}`
-          }
-        >
-          Sign Up
-        </Link>
+        {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+          <a className="link-button" href={LOGIN_URL}>
+            Log In
+          </a>
+        ) : (
+          <Link
+            className="link-button"
+            to={(location: Location) =>
+              `${LOGIN_URL}?next=${encodeURIComponent(location.pathname)}`
+            }
+          >
+            Log In
+          </Link>
+        )}
       </div>
     </div>
   </div>

@@ -2,7 +2,7 @@
 import casual from "casual-browserify"
 import { faker } from "@faker-js/faker/locale/en"
 import { DATE_FORMAT } from "./util"
-import { Factory, makePaginatedFactory } from "ol-util/src/factories"
+import { Factory, makePaginatedFactory } from "ol-util/factories"
 import {
   CourseTopic,
   LearningResourceSearchResult,

@@ -9,7 +9,7 @@ import { Link } from "react-router-dom"
 import UserMenu, { LoggedInMenu, LoggedOutMenu } from "./UserMenu"
 import { DropDownArrow, DropUpArrow } from "./Arrow"
 
-import { profileURL, SETTINGS_URL, LOGIN_URL, REGISTER_URL } from "../lib/url"
+import { profileURL, SETTINGS_URL, LOGIN_URL } from "../lib/url"
 import * as utilFuncs from "../lib/util"
 import { defaultProfileImageUrl } from "../lib/util"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
@@ -110,15 +110,13 @@ describe("UserMenu", () => {
   describe("menu items", () => {
     const menuProps = { closeMenu: () => {} }
 
-    it("should include login and sign up links for logged-out users", () => {
+    it("should include login links only for logged-out users", () => {
       const wrapper = shallow(<LoggedOutMenu {...menuProps} />)
       const links = wrapper.find(Link)
+      assert.equal(links.length, 1)
       const firstLinkProps = links.at(0).props()
       assert.equal(firstLinkProps.to, LOGIN_URL)
       assert.equal(firstLinkProps.children, "Log In")
-      const secondLinkProps = links.at(1).props()
-      assert.equal(secondLinkProps.to, REGISTER_URL)
-      assert.equal(secondLinkProps.children, "Sign Up")
     })
 
     it("should include settings link if non-null profile is provided", () => {

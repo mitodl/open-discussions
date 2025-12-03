@@ -13,8 +13,7 @@ import {
   profileURL,
   userListIndexURL,
   SETTINGS_URL,
-  LOGIN_URL,
-  REGISTER_URL
+  LOGIN_URL
 } from "../lib/url"
 import { PHONE } from "../lib/constants"
 
@@ -60,17 +59,17 @@ export const LoggedInMenu = (props: DropdownMenuProps) => (
 export const LoggedOutMenu = (props: DropdownMenuProps) => (
   <DropdownMenu {...props}>
     <li>
-      <Link to={LOGIN_URL}>Log In</Link>
-    </li>
-    <li>
-      <Link to={REGISTER_URL}>Sign Up</Link>
+      {SETTINGS.FEATURES.KEYCLOAK_ENABLED ? (
+        <a href={LOGIN_URL}>Log In</a>
+      ) : (
+        <Link to={LOGIN_URL}>Log In</Link>
+      )}
     </li>
   </DropdownMenu>
 )
 
 const UserMenu = ({ toggleShowUserMenu, showUserMenu, profile }: Props) => {
   const ListComponent = profile ? LoggedInMenu : LoggedOutMenu
-
   return (
     <div className="user-menu">
       <div

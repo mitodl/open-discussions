@@ -1,7 +1,14 @@
 {
   "name": "ol-util",
-  "packageManager": "yarn@3.6.1",
-  "main": "./src/index.ts",
+  "packageManager": "yarn@3.8.2",
+  "exports": {
+    ".": "./src/index.ts",
+    "./assets/*": "./assets/*",
+    "./test-utils": "./src/test-utils/index.ts",
+    "./factories": "./src/factories.ts",
+    "./test-utils/filemock": "./src/test-utils/filemock.js",
+    "./test-utils/svgmock": "./src/test-utils/svgmock.js"
+  },
   "peerDependencies": {
     "react": "^16.10 || 17 || 18",
     "react-router": "^5.3.3",

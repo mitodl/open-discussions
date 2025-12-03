@@ -32,7 +32,7 @@ from open_discussions.settings_celery import *
 from open_discussions.settings_course_etl import *
 from open_discussions.settings_spectacular import open_spectacular_settings
 
-VERSION = "0.221.1"
+VERSION = "0.234.2"
 
 log = logging.getLogger()
 
@@ -103,6 +103,7 @@ INSTALLED_APPS = (
     "social_django",
     "server_status",
     "rest_framework",
+    "rest_framework.authtoken",
     "corsheaders",
     "webpack_loader",
     "anymail",
@@ -128,6 +129,7 @@ INSTALLED_APPS = (
     "interactions",
     "moira_lists",
     "discussions",
+    "keycloak_user_export",
 )
 
 MIDDLEWARE = (
@@ -220,14 +222,102 @@ USE_L10N = True
 
 USE_TZ = True
 
-# social auth
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.8/howto/static-files/
+
+# Serve static files with dj-static
+STATIC_URL = "/static/"
+CLOUDFRONT_DIST = get_string("CLOUDFRONT_DIST", None)
+if CLOUDFRONT_DIST:
+    STATIC_URL = urljoin(
+        "https://{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST), STATIC_URL
+    )
+
+STATIC_ROOT = "staticfiles"
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+for name, path in [
+    ("open-discussions", os.path.join(BASE_DIR, "frontends/open-discussions/build")),
+    ("infinite-corridor", os.path.join(BASE_DIR, "frontends/infinite-corridor/build")),
+]:
+    if os.path.exists(path):
+        STATICFILES_DIRS.append((name, path))
+    else:
+        log.warning("Static file directory was missing: %s", path)
+
+# Important to define this so DEBUG works properly
+INTERNAL_IPS = (get_string("HOST_IP", "127.0.0.1"),)
+
+# Configure e-mail settings
+EMAIL_BACKEND = get_string(
+    "OPEN_DISCUSSIONS_EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = get_string("OPEN_DISCUSSIONS_EMAIL_HOST", "localhost")
+EMAIL_PORT = get_int("OPEN_DISCUSSIONS_EMAIL_PORT", 25)
+EMAIL_HOST_USER = get_string("OPEN_DISCUSSIONS_EMAIL_USER", "")
+EMAIL_HOST_PASSWORD = get_string("OPEN_DISCUSSIONS_EMAIL_PASSWORD", "")
+EMAIL_USE_TLS = get_bool("OPEN_DISCUSSIONS_EMAIL_TLS", False)
+EMAIL_SUPPORT = get_string("OPEN_DISCUSSIONS_SUPPORT_EMAIL", "support@example.com")
+DEFAULT_FROM_EMAIL = get_string("OPEN_DISCUSSIONS_FROM_EMAIL", "webmaster@localhost")
+
+MAILGUN_SENDER_DOMAIN = get_string("MAILGUN_SENDER_DOMAIN", None)
+if not MAILGUN_SENDER_DOMAIN:
+    raise ImproperlyConfigured("MAILGUN_SENDER_DOMAIN not set")
+MAILGUN_KEY = get_string("MAILGUN_KEY", None)
+if not MAILGUN_KEY:
+    raise ImproperlyConfigured("MAILGUN_KEY not set")
+MAILGUN_RECIPIENT_OVERRIDE = get_string("MAILGUN_RECIPIENT_OVERRIDE", None)
+MAILGUN_FROM_EMAIL = get_string("MAILGUN_FROM_EMAIL", "no-reply@example.com")
+MAILGUN_BCC_TO_EMAIL = get_string("MAILGUN_BCC_TO_EMAIL", None)
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": MAILGUN_KEY,
+    "MAILGUN_SENDER_DOMAIN": MAILGUN_SENDER_DOMAIN,
+}
+
+# e-mail configurable admins
+ADMIN_EMAIL = get_string("OPEN_DISCUSSIONS_ADMIN_EMAIL", "")
+if ADMIN_EMAIL != "":
+    ADMINS = (("Admins", ADMIN_EMAIL),)
+else:
+    ADMINS = ()
+
+# Email Notifications config
+
+NOTIFICATION_EMAIL_BACKEND = get_string(
+    "OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND",
+    "anymail.backends.mailgun.EmailBackend",
+)
+# See https://docs.celeryproject.org/en/latest/reference/celery.app.task.html#celery.app.task.Task.rate_limit
+NOTIFICATION_ATTEMPT_RATE_LIMIT = get_string(
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_RATE_LIMIT", None  # default is no rate limit
+)
+
+NOTIFICATION_ATTEMPT_CHUNK_SIZE = get_int(
+    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_CHUNK_SIZE", 100
+)
+NOTIFICATION_SEND_CHUNK_SIZE = get_int(
+    "OPEN_DISCUSSIONS_NOTIFICATION_SEND_CHUNK_SIZE", 100
+)
+
+# Social Auth configurations - [START]
 AUTHENTICATION_BACKENDS = (
+    "authentication.backends.ol_open_id_connect.OlOpenIdConnectAuth",
     "authentication.backends.micromasters.MicroMastersAuth",
     "social_core.backends.email.EmailAuth",
     "social_core.backends.saml.SAMLAuth",
     # the following needs to stay here to allow login of local users
     "django.contrib.auth.backends.ModelBackend",
     "guardian.backends.ObjectPermissionBackend",
+)
+
+FEATURE_KEYCLOAK_ENABLED = get_bool("FEATURE_KEYCLOAK_ENABLED", False)
+KEYCLOAK_BASE_URL = get_string(
+    name="KEYCLOAK_BASE_URL",
+    default="http://mit-keycloak-base-url.edu",
+)
+KEYCLOAK_REALM_NAME = get_string(
+    name="KEYCLOAK_REALM_NAME",
+    default="olapps",
 )
 
 SOCIAL_AUTH_STRATEGY = "authentication.strategy.OpenDiscussionsStrategy"
@@ -309,84 +399,35 @@ SOCIAL_AUTH_PIPELINE = (
     # update the user's managed channels
     "authentication.pipeline.user.update_managed_channel_memberships",
 )
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-# Serve static files with dj-static
-STATIC_URL = "/static/"
-CLOUDFRONT_DIST = get_string("CLOUDFRONT_DIST", None)
-if CLOUDFRONT_DIST:
-    STATIC_URL = urljoin(
-        "https://{dist}.cloudfront.net".format(dist=CLOUDFRONT_DIST), STATIC_URL
-    )
-
-STATIC_ROOT = "staticfiles"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-for name, path in [
-    ("open-discussions", os.path.join(BASE_DIR, "frontends/open-discussions/build")),
-    ("infinite-corridor", os.path.join(BASE_DIR, "frontends/infinite-corridor/build")),
-]:
-    if os.path.exists(path):
-        STATICFILES_DIRS.append((name, path))
-    else:
-        log.warning("Static file directory was missing: %s", path)
-
-# Important to define this so DEBUG works properly
-INTERNAL_IPS = (get_string("HOST_IP", "127.0.0.1"),)
-
-# Configure e-mail settings
-EMAIL_BACKEND = get_string(
-    "OPEN_DISCUSSIONS_EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
-)
-EMAIL_HOST = get_string("OPEN_DISCUSSIONS_EMAIL_HOST", "localhost")
-EMAIL_PORT = get_int("OPEN_DISCUSSIONS_EMAIL_PORT", 25)
-EMAIL_HOST_USER = get_string("OPEN_DISCUSSIONS_EMAIL_USER", "")
-EMAIL_HOST_PASSWORD = get_string("OPEN_DISCUSSIONS_EMAIL_PASSWORD", "")
-EMAIL_USE_TLS = get_bool("OPEN_DISCUSSIONS_EMAIL_TLS", False)
-EMAIL_SUPPORT = get_string("OPEN_DISCUSSIONS_SUPPORT_EMAIL", "support@example.com")
-DEFAULT_FROM_EMAIL = get_string("OPEN_DISCUSSIONS_FROM_EMAIL", "webmaster@localhost")
-
-MAILGUN_SENDER_DOMAIN = get_string("MAILGUN_SENDER_DOMAIN", None)
-if not MAILGUN_SENDER_DOMAIN:
-    raise ImproperlyConfigured("MAILGUN_SENDER_DOMAIN not set")
-MAILGUN_KEY = get_string("MAILGUN_KEY", None)
-if not MAILGUN_KEY:
-    raise ImproperlyConfigured("MAILGUN_KEY not set")
-MAILGUN_RECIPIENT_OVERRIDE = get_string("MAILGUN_RECIPIENT_OVERRIDE", None)
-MAILGUN_FROM_EMAIL = get_string("MAILGUN_FROM_EMAIL", "no-reply@example.com")
-MAILGUN_BCC_TO_EMAIL = get_string("MAILGUN_BCC_TO_EMAIL", None)
-
-ANYMAIL = {
-    "MAILGUN_API_KEY": MAILGUN_KEY,
-    "MAILGUN_SENDER_DOMAIN": MAILGUN_SENDER_DOMAIN,
-}
-
-# e-mail configurable admins
-ADMIN_EMAIL = get_string("OPEN_DISCUSSIONS_ADMIN_EMAIL", "")
-if ADMIN_EMAIL != "":
-    ADMINS = (("Admins", ADMIN_EMAIL),)
-else:
-    ADMINS = ()
-
-# Email Notifications config
-
-NOTIFICATION_EMAIL_BACKEND = get_string(
-    "OPEN_DISCUSSIONS_NOTIFICATION_EMAIL_BACKEND",
-    "anymail.backends.mailgun.EmailBackend",
-)
-# See https://docs.celeryproject.org/en/latest/reference/celery.app.task.html#celery.app.task.Task.rate_limit
-NOTIFICATION_ATTEMPT_RATE_LIMIT = get_string(
-    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_RATE_LIMIT", None  # default is no rate limit
+SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT = get_string(
+    name="SOCIAL_AUTH_OL_OIDC_OIDC_ENDPOINT",
+    default=f"{KEYCLOAK_BASE_URL}/realms/realm_name",
 )
 
-NOTIFICATION_ATTEMPT_CHUNK_SIZE = get_int(
-    "OPEN_DISCUSSIONS_NOTIFICATION_ATTEMPT_CHUNK_SIZE", 100
-)
-NOTIFICATION_SEND_CHUNK_SIZE = get_int(
-    "OPEN_DISCUSSIONS_NOTIFICATION_SEND_CHUNK_SIZE", 100
+SOCIAL_AUTH_OL_OIDC_KEY = get_string(
+    name="SOCIAL_AUTH_OL_OIDC_KEY",
+    default="some available client id",
 )
 
+SOCIAL_AUTH_OL_OIDC_SECRET = get_string(
+    name="SOCIAL_AUTH_OL_OIDC_SECRET",
+    default="some super secret key",
+)
+
+USERINFO_URL = get_string(
+    name="USERINFO_URL",
+    default=None,
+)
+
+ACCESS_TOKEN_URL = get_string(
+    name="ACCESS_TOKEN_URL",
+    default=None,
+)
+
+AUTHORIZATION_URL = get_string(
+    name="AUTHORIZATION_URL",
+    default=None,
+)
 # SAML settings
 SOCIAL_AUTH_SAML_SP_ENTITY_ID = get_string(
     "SOCIAL_AUTH_SAML_SP_ENTITY_ID", SITE_BASE_URL
@@ -443,6 +484,8 @@ SOCIAL_AUTH_SAML_SECURITY_CONFIG = {
     "wantAssertionsEncrypted": SOCIAL_AUTH_SAML_SECURITY_ENCRYPTED,
     "requestedAuthnContext": False,
 }
+
+# Social Auth configurations - [END]
 
 # embed.ly configuration
 EMBEDLY_KEY = get_string("EMBEDLY_KEY", None)
@@ -724,6 +767,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
         "open_discussions.authentication.IgnoreExpiredJwtAuthentication",
+        "open_discussions.authentication.BearerAuthentication",
     ),
     "EXCEPTION_HANDLER": "open_discussions.exceptions.api_exception_handler",
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
@@ -783,11 +827,6 @@ SPAM_EXEMPT_EMAILS = get_list_of_str("SPAM_EXEMPT_EMAILS", ["[@\\.]mit\\.edu"])
 
 RSS_FEED_EPISODE_LIMIT = get_int("RSS_FEED_EPISODE_LIMIT", 100)
 RSS_FEED_CACHE_MINUTES = get_int("RSS_FEED_CACHE_MINUTES", 15)
-
-ATHENA_MITX_DATABASE_NAME = get_string("ATHENA_MITX_DATABASE_NAME", None)
-ATHENA_MITX_ENROLLMENTS_TABLE = get_string("ATHENA_MITX_ENROLLMENTS_TABLE", None)
-ATHENA_REGION_NAME = get_string("ATHENA_REGION_NAME", "us-east-1")
-ATHENA_WORK_GROUP = get_string("ATHENA_WORK_GROUP", "primary")
 
 ENABLE_INFINITE_CORRIDOR = get_bool("ENABLE_INFINITE_CORRIDOR", False)
 

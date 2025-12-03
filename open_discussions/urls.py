@@ -14,12 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from django.conf import settings
-from django.urls import include, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import include, re_path
+from django.views.generic import RedirectView
 from rest_framework_jwt.views import refresh_jwt_token
 
-from open_discussions.views import index, saml_metadata, channel_redirect, channel_post
+from open_discussions.views import channel_post, channel_redirect, index, saml_metadata
 
 # Post slugs can contain unicode characters, so a letter-matching pattern like [A-Za-z] doesn't work.
 # "[^\W]" Matches any character that is NOT a non-alphanumeric character, including underscores.
@@ -82,16 +83,7 @@ urlpatterns = [
     re_path(r"^settings/", index),
     re_path(r"^saml/metadata/", saml_metadata, name="saml-metadata"),
     re_path(r"^profile/(?P<username>[A-Za-z0-9_]+)/", index, name="profile"),
-    re_path(r"^login/", index, name="login"),
-    re_path(r"^signup/", index, name="signup"),
-    re_path(r"^signup/confirm/$", index, name="register-confirm"),
     re_path(r"^account/inactive/$", index, name="account-inactive"),
-    re_path(r"^password_reset/", index, name="password-reset"),
-    re_path(
-        r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,36})/$",
-        index,
-        name="password-reset-confirm",
-    ),
     re_path(r"^privacy-statement/", index, name="privacy-statement"),
     re_path(r"^search/", index, name="site-search"),
     re_path(r"^courses/", index, name="courses"),
@@ -107,3 +99,23 @@ if settings.DEBUG:
     import debug_toolbar  # pylint: disable=wrong-import-position, wrong-import-order
 
     urlpatterns += [re_path(r"^__debug__/", include(debug_toolbar.urls))]
+
+if "KEYCLOAK_ENABLED" in settings.FEATURES and settings.FEATURES["KEYCLOAK_ENABLED"]:
+    urlpatterns += [
+        re_path(r"^login/", RedirectView.as_view(url="/login/ol-oidc/"), name="login"),
+        re_path(
+            r"^signup/", RedirectView.as_view(url="/login/ol-oidc/"), name="signup"
+        ),
+    ]
+else:
+    urlpatterns += [
+        re_path(
+            r"^password_reset/confirm/(?P<uid>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,36})/$",
+            index,
+            name="password-reset-confirm",
+        ),
+        re_path(r"^password_reset/", index, name="password-reset"),
+        re_path(r"^signup/confirm/$", index, name="register-confirm"),
+        re_path(r"^login/", index, name="login"),
+        re_path(r"^signup/", index, name="signup"),
+    ]

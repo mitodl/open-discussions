@@ -112,9 +112,7 @@ def test_create_user(
     ensure_notifications_stub = mocker.patch(
         "notifications.api.ensure_notification_settings"
     )
-    enrollment_job_stub = mocker.patch(
-        "authentication.api.update_enrollments_for_email.delay"
-    )
+
     resp = staff_client.post(url, data=payload)
     user = User.objects.get(username=resp.json()["username"])
     assert resp.status_code == 201
@@ -134,7 +132,6 @@ def test_create_user(
     assert resp.json()["profile"] == payload["profile"]
     get_or_create_auth_tokens_stub.assert_called_once_with(user)
     ensure_notifications_stub.assert_called_once_with(user, skip_moderator_setting=True)
-    enrollment_job_stub.assert_called_once_with(user.email)
     assert user.email == email
     assert user.profile.email_optin is email_optin
     assert user.profile.toc_optin is toc_optin

@@ -19,7 +19,6 @@ import boto3
 import pytz
 import rapidjson
 import requests
-from boto.s3.bucket import Bucket
 from django.conf import settings
 from django.utils.functional import SimpleLazyObject
 from tika import parser as tika_parser
@@ -442,7 +441,7 @@ def get_learning_course_bucket_name(platform: str) -> str:
     return bucket_names.get(platform)
 
 
-def get_learning_course_bucket(platform: str) -> Bucket:
+def get_learning_course_bucket(platform: str) -> object:
     """
     Get the platform's learning course S3 Bucket holding content file data
 

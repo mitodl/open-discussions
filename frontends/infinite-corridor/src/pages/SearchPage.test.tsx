@@ -7,7 +7,7 @@ import {
 } from "@mitodl/course-search-utils"
 
 import { assertInstanceOf } from "ol-util"
-import { createMatchMediaForJsDom } from "ol-util/src/test-utils"
+import { createMatchMediaForJsDom } from "ol-util/test-utils"
 import { screen, renderTestApp, setMockResponse, user } from "../test-utils"
 
 import { fireEvent, waitFor, within } from "@testing-library/react"

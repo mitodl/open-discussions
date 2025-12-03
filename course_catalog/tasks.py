@@ -11,7 +11,6 @@ import pytz
 import rapidjson
 from celery import Task
 from django.conf import settings
-from django.contrib.auth.models import User
 
 from course_catalog.api import (
     generate_course_prefix_list,
@@ -20,7 +19,7 @@ from course_catalog.api import (
     sync_ocw_next_courses,
 )
 from course_catalog.constants import PlatformType
-from course_catalog.etl import enrollments, pipelines, youtube
+from course_catalog.etl import pipelines, youtube
 from course_catalog.etl.edx_shared import (
     get_most_recent_course_archives,
     sync_edx_course_files,
@@ -448,18 +447,3 @@ def get_podcast_data():
     results = pipelines.podcast_etl()
 
     return len(list(results))
-
-
-@app.task
-def update_enrollments_for_email(email):
-    """
-    Update enrollment data for a single email
-
-    Args:
-        email (string): user email
-    """
-    user = User.objects.filter(email=email).last()
-    if not user:
-        return
-
-    enrollments.update_enrollments_for_user(user)

@@ -1,9 +1,11 @@
 """API tests"""
+from typing import Literal
 from django.contrib.auth import get_user_model
 import pytest
 from social_django.models import UserSocialAuth
 
 from authentication import api
+from authentication.backends.ol_open_id_connect import OlOpenIdConnectAuth
 from notifications.models import NotificationSettings
 from profiles.models import Profile
 from open_discussions.test_utils import any_instance_of
@@ -21,12 +23,9 @@ pytestmark = pytest.mark.django_db
         # None,
     ],
 )
-def test_create_user(mocker, profile_data):
+def test_create_user(mocker, profile_data: dict[str, str]):
     """Tests that a user and associated objects are created"""
     auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
-    enrollment_job_mock = mocker.patch(
-        "authentication.api.update_enrollments_for_email.delay"
-    )
 
     email = "email@localhost"
     username = "username"
@@ -39,7 +38,6 @@ def test_create_user(mocker, profile_data):
     assert NotificationSettings.objects.count() == 2
 
     auth_token_mock.assert_called_once()
-    enrollment_job_mock.assert_called_once_with(user.email)
 
     if "name" in profile_data:
         assert user.profile.name == profile_data["name"]
@@ -51,7 +49,12 @@ def test_create_user(mocker, profile_data):
     "mock_method",
     ["profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"],
 )
-def test_create_user_errors(mocker, mock_method):
+def test_create_user_errors(
+    mocker,
+    mock_method: Literal[
+        "profiles.api.ensure_profile", "notifications.api.ensure_notification_settings"
+    ],
+):
     """Test that we don't end up in a partial state if there are errors"""
     mocker.patch(mock_method, side_effect=Exception("error"))
     auth_token_mock = mocker.patch("channels.api.get_or_create_auth_tokens")
@@ -130,3 +133,11 @@ def test_create_or_update_micromasters_social_auth(user):
     }
 
     assert UserSocialAuth.objects.count() == 1
+
+
+@pytest.fixture(name="keycloak_user")
+def fixture_keycloak_user(user):
+    """Fixture for a user that has an 'OlOpenIdConnectAuth' type UserSocialAuth record"""
+    return UserSocialAuth.objects.create(
+        provider=OlOpenIdConnectAuth.name, user=user, uid="123"
+    )

@@ -1,6 +1,6 @@
 {
   "name": "ol-widgets",
-  "packageManager": "yarn@3.6.1",
+  "packageManager": "yarn@3.8.2",
   "main": "./src/index.ts",
   "dependencies": {
     "@emotion/react": "^11.9.3",

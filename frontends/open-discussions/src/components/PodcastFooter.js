@@ -9,6 +9,15 @@ import { PODCAST_URL } from "../lib/url"
 export default function PodcastFooter() {
   return (
     <div className="podcast-footer">
+      <div className="podcast-disclaimer-box">
+        <div className="podcast-disclaimer">
+          <strong>Disclaimer</strong> - The views, thoughts, and opinions
+          expressed in the programs listed above are the speaker’s own and do
+          not necessarily represent the views, thoughts, and opinions of the
+          Massachusetts Institute of Technology. The material and information
+          presented here is for general information purposes only.
+        </div>
+      </div>
       <div className="cells">
         <div className="cell logo-legal">
           <a

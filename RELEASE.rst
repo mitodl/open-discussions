@@ -1,6 +1,263 @@
 Release Notes
 =============
 
+Version 0.234.2 (Released August 08, 2025)
+---------------
+
+- config: Add event signals to Celery for better task tracking
+- chore(deps): update akhileshns/heroku-deploy digest to e3eb99d (#4387)
+
+Version 0.234.1 (Released August 06, 2025)
+---------------
+
+- config: Remove all email related schedules from Celery (#4383)
+
+Version 0.234.0 (Released July 23, 2025)
+---------------
+
+- config: Disable scheduled tasks that are no longer needed (#4381)
+- Update dependency sentry-sdk to v2 [SECURITY] (#4344)
+- Update dependency Django to v4.2.16 [SECURITY] (#4380)
+
+Version 0.233.1 (Released January 07, 2025)
+---------------
+
+- Fix chunk iteration for user migration script (#4378)
+
+Version 0.233.0 (Released January 06, 2025)
+---------------
+
+- Fix error with xmlsec library (#4374)
+
+Version 0.232.0 (Released January 06, 2025)
+---------------
+
+- Add back in keycloak user attributes (#4372)
+
+Version 0.231.0 (Released December 18, 2024)
+---------------
+
+- Fix some attributes and state for KC export (#4370)
+- Bug fix + switch kc migration to client creds (#4368)
+
+Version 0.230.1 (Released December 16, 2024)
+---------------
+
+- Only validate active user emails (#4366)
+
+Version 0.230.0 (Released December 12, 2024)
+---------------
+
+- Fix the error printing for failed requests (#4364)
+- Validate users' email address against mailgun (#4362)
+- Added fields to keycloak export (#4360)
+- fix(deps): update dependency requests to v2.32.2 [security] (#4358)
+
+Version 0.229.0 (Released September 25, 2024)
+---------------
+
+- Updated retire_user script to handle spammer users (#4356)
+- fix(deps): update dependency express to v4.20.0 [security] (#4355)
+- fix(deps): update dependency webpack to v5.94.0 [security] (#4347)
+
+Version 0.228.0 (Released August 27, 2024)
+---------------
+
+- Remove RES constant from OCW departments (#4339)
+- fix(deps): update dependency django to v4.2.15 [security] (#4345)
+- fix(deps): update dependency social-auth-app-django to v5.4.1 [security] (#4342)
+- fix(deps): update dependency djangorestframework to v3.15.2 [security] (#4341)
+- fix(deps): update dependency urllib3 to v1.26.19 [security] (#4340)
+- fix(deps): update dependency django to v4.2.14 [security] (#4338)
+- Bump tough-cookie from 4.0.0 to 4.1.4 (#4304)
+- fix(deps): update dependency core-js to v3.37.1 (#4335)
+- fix(deps): update dependency prop-types to v15.8.1 (#4332)
+- fix(deps): update dependency object.entries to v1.1.8 (#4331)
+- fix(deps): update dependency moment to v2.30.1 (#4328)
+- fix(deps): update dependency chai-as-promised to v7.1.2 (#4330)
+- fix(deps): update dependency mini-css-extract-plugin to v0.12.0 (#4327)
+- chore(deps): update postgres docker tag to v12.19 (#4326)
+- fix(deps): update dependency django to v4.2.13 (#4325)
+- Update migrate_users_to_keycloak to use profile (#4324)
+- chore(deps): pin dependencies (#4262)
+- Switch poetry over to using virtualenvs (#4303)
+- fix(deps): update dependency jsdom to v16.7.0 (#4322)
+- fix(deps): update dependency jedi to ^0.19.0 (#4321)
+- fix(deps): update dependency html-entities to v1.4.0 (#4320)
+- fix(deps): update dependency fuse.js to v6.6.2 (#4319)
+- fix(deps): update dependency formik to v2.4.6 (#4318)
+- fix(deps): update dependency focus-visible to v5.2.0 (#4317)
+- fix(deps): update dependency flow-typed to v2.6.2 (#4316)
+- fix(deps): update dependency fetch-mock to v6.5.2 (#4314)
+- fix(deps): update dependency eslint-plugin-react to v7.34.1 (#4313)
+- fix(deps): update dependency eslint-plugin-flowtype to v4.7.0 (#4311)
+- fix(deps): update dependency eslint-plugin-mocha to v6.3.0 (#4312)
+- fix(deps): update dependency eslint to v7.32.0 (#4310)
+- fix(deps): update dependency drf-spectacular to ^0.27.0 (#4309)
+- fix(deps): update dependency django-server-status to ^0.7.0 (#4308)
+- fix(deps): update dependency django-cache-memoize to ^0.2.0 (#4307)
+- chore(deps): update yarn to v3.8.2 (#4306)
+- chore(deps): update docker.elastic.co/elasticsearch/elasticsearch docker tag to v7.17.21 (#4305)
+- fix(deps): update dependency django to v4.2.11 (#4302)
+- fix(deps): update dependency core-js to v3.37.0 (#4300)
+- chore(deps): update akhileshns/heroku-deploy digest to 581dd28 (#4263)
+- fix(deps): update dependency dj-database-url to ^0.5.0 (#4301)
+- fix(deps): update dependency codecov to v3.8.3 (#4299)
+- fix(deps): update dependency eslint-plugin-react-hooks to v4.6.2 (#4297)
+- chore(deps): update nginx docker tag to v1.26.0 (#4298)
+- chore(deps): update opensearchproject/opensearch docker tag to v1.3.16 (#4296)
+
+Version 0.227.0 (Released April 24, 2024)
+---------------
+
+- add podcast disclaimer (#4294)
+- fix(deps): update dependency chai to v4.4.1 (#4293)
+- fix(deps): update dependency bodybuilder to v2.5.1 (#4292)
+- fix(deps): update dependency blueimp-canvas-to-blob to v3.29.0 (#4291)
+- fix(deps): update dependency babel-loader to v8.3.0 (#4290)
+- fix(deps): update dependency autoprefixer to v9.8.8 (#4289)
+- fix(deps): update dependency assert to v2.1.0 (#4288)
+- fix(deps): update dependency amplitudejs to v5.3.2 (#4287)
+- fix(deps): update dependency @sentry/browser to v5.30.0 (#4286)
+- chore(deps): update yarn to v3.8.1 (#4284)
+- chore(deps): update postgres docker tag to v12.18 (#4283)
+- chore(deps): update nginx docker tag to v1.25.5 (#4282)
+- chore(deps): update docker.elastic.co/elasticsearch/elasticsearch docker tag to v7.17.20 (#4281)
+- chore(deps): update dependency responses to ^0.25.0 (#4280)
+- chore(deps): update dependency nplusone to ^0.9.0 (#4279)
+- fix(deps): update dependency url to v0.11.3 (#4277)
+- fix(deps): update dependency style-loader to v3.3.4 (#4276)
+- fix(deps): update dependency enzyme-adapter-react-16 to v1.15.8 (#4275)
+
+Version 0.226.0 (Released April 18, 2024)
+---------------
+
+- Fix: Add nubbins for celery monitoring. (#4273)
+- fix(deps): update dependency @types/react-infinite-scroller to v1.2.5 (#4272)
+- fix(deps): update dependency @types/css-mediaquery to v0.1.4 (#4271)
+- fix(deps): update dependency @ebay/nice-modal-react to v1.2.13 (#4270)
+- chore(deps): update opensearchproject/opensearch docker tag to v1.3.15 (#4269)
+- chore(deps): update node.js to v16.20.2 (#4268)
+- chore(deps): update dependency pytest to v7.4.4 (#4267)
+- chore(deps): update dependency pylint-django to v2.5.5 (#4266)
+- chore(deps): update dependency pylint to v2.17.7 (#4265)
+- chore(deps): update dependency astroid to v2.15.8 (#4264)
+
+Version 0.225.1 (Released April 11, 2024)
+---------------
+
+- Add OCW SP department (#4260)
+- chore(config): migrate config renovate.json (#4259)
+- fix(deps): update dependency express to v4.19.2 [security] (#4257)
+- fix(deps): update dependency webpack-dev-middleware to v5.3.4 [security] (#4256)
+- 4249: remove code from user migration script for importing credentials (#4253)
+
+Version 0.225.0 (Released February 06, 2024)
+---------------
+
+- Handle multiple prefixes in ocw webhook endpoint (#4251)
+- 4247: Migrate Django users to Keycloak (#4248)
+- fix(deps): update dependency axios to v1 [security] (#4245)
+- fix(deps): update dependency django to v4.1.13 [security] (#4242)
+
+Version 0.224.3 (Released October 23, 2023)
+---------------
+
+- 4236: Account settings page should always display forgot password option (Keycloak enabled) (#4239)
+- 1825: logout user from Keycloak without confirm (#4238)
+
+Version 0.224.2 (Released October 12, 2023)
+---------------
+
+- 4228: keycloak integration login register password reset ux (#4234)
+
+Version 0.224.1 (Released September 28, 2023)
+---------------
+
+- 4227: configure keycloak user migration plug in - REST API (#4231)
+
+Version 0.224.0 (Released September 26, 2023)
+---------------
+
+- 4225: Keycloak OIDC integration (#4230)
+
+Version 0.223.1 (Released August 01, 2023)
+---------------
+
+- remove signup link from login page (#4200)
+- Update swc monorepo (#4213)
+- Update jest monorepo to v29.6.2 (#4212)
+- Update dependency uwsgi to v2.0.22 (#4211)
+- Update dependency stylelint to v15.10.2 (#4210)
+- Update dependency pylint to v2.17.5 (#4209)
+- Update dependency markdown2 to v2.4.10 (#4208)
+- Update dependency js-beautify to v1.14.9 (#4207)
+- Update dependency drf-spectacular to v0.26.4 (#4206)
+- Update dependency boto3 to v1.28.15 (#4205)
+- Update dependency @types/react to v18.2.17 (#4204)
+- Update dependency @types/lodash to v4.14.196 (#4203)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.1.3 (#4202)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.1.3 (#4201)
+- Remove signup options from the UI (#4196)
+- Update dependency pyyaml to v6 (#4198)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.1.2 (#4192)
+- Update tanstack-query monorepo to v4.29.25 (#4189)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.1.2 (#4191)
+- Update dependency moto to v4.1.13 (#4190)
+- Update react monorepo (#4188)
+- Update jest monorepo (#4187)
+- Update dependency sentry-sdk to v1.28.1 (#4186)
+- Update dependency boto3 to v1.28.3 (#4185)
+- Update dependency @swc/core to v1.3.69 (#4184)
+- Update dependency @mitodl/course-search-utils to v2.3.2 (#4183)
+- expose sentry env vars (#4181)
+- add sentry to infinite frontend (#4160)
+
+Version 0.223.0 (Released July 11, 2023)
+---------------
+
+- Exact version of python to satisfy heroku (#4179)
+- Fix heroku poetry build (#4178)
+- Update dependency Django to v4.1.10 [SECURITY] (#4176)
+- Use poetry instead of requirements files (#4151)
+- Update dependency protobuf to v4.23.4 (#4169)
+- Update dependency prompt-toolkit to v3.0.39 (#4168)
+- Update dependency click to v8.1.4 (#4165)
+- Update dependency lxml to v4.9.3 (#4167)
+- Update dependency @swc/core to v1.3.68 (#4164)
+- Update dependency stylelint to v15.10.1 [SECURITY] (#4162)
+- group ckeditor5 in renovate (#4152)
+- remove enrollment models (#4157)
+- Update docker-compose entrypoint for tika to point to the correct version (#4156)
+
+Version 0.222.0 (Released July 10, 2023)
+---------------
+
+- Use "+" not "¶" for ckeditor block toolbar (#4153)
+- Use pytest directly without tox (#4119)
+- Update apache/tika Docker tag to v1.28 (#4148)
+- Update Yarn to v3.6.1 (#4147)
+- Update Node.js to v16.20.1 (#4146)
+- Update tanstack-query monorepo to v4.29.19 (#4145)
+- Update redis Docker tag to v5.0.14 (#4144)
+- Update react-router monorepo to v5.3.4 (#4143)
+- Update react monorepo (#4142)
+- Update opensearchproject/opensearch Docker tag to v1.3.11 (#4141)
+- Update dependency webpack-hot-middleware to v2.25.4 (#4140)
+- Update dependency webpack-hot-middleware to v2.25.4 (#4139)
+- Update dependency urllib3 to v1.26.16 (#4138)
+- Update dependency url to v0.11.1 (#4137)
+- Update dependency url to v0.11.1 (#4136)
+- Update dependency tzinfo to v1.2.11 (#4135)
+- Update dependency newrelic to v8.8.1 (#4134)
+- Update dependency cryptography to v41.0.1 (#4133)
+- Update dependency boto3 to v1.26.165 (#4131)
+- Update dependency botocore to v1.29.165 (#4132)
+- Update dependency @swc/core to v1.3.67 (#4130)
+- Update dependency @ckeditor/ckeditor5-dev-utils to v38.0.4 (#4129)
+- Update dependency @ckeditor/ckeditor5-dev-translations to v38.0.4 (#4128)
+- Make jest faster (#4121)
+
 Version 0.221.1 (Released June 29, 2023)
 ---------------
 

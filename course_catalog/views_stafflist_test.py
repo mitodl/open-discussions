@@ -15,7 +15,7 @@ from course_catalog.models import StaffList
 from course_catalog.utils import update_editor_group
 from open_discussions.factories import UserFactory
 
-# pylint:disable=redefined-outer-name
+# pylint:disable=redefined-outer-name,unused-argument
 
 
 @pytest.fixture()
@@ -118,7 +118,9 @@ def test_staff_list_endpoint_create(  # pylint: disable=too-many-arguments
 @pytest.mark.parametrize("is_public", [True, False])
 @pytest.mark.parametrize("is_editor", [True, False])
 @pytest.mark.parametrize("update_topics", [True, False])
-def test_staff_list_endpoint_patch(client, update_topics, is_public, is_editor):
+def test_staff_list_endpoint_patch(
+    client, mock_staff_list_index, update_topics, is_public, is_editor
+):
     """Test stafflist endpoint for updating a StaffList"""
     [original_topic, new_topic] = CourseTopicFactory.create_batch(2)
     user = UserFactory.create()

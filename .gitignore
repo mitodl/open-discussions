@@ -125,3 +125,7 @@ tsconfig.tsbuildinfo
 
 # VS-Code
 .vscode
+
+# certs
+certs/
+!certs/.keep

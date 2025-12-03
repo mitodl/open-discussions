@@ -29,7 +29,7 @@ x-extra-hosts:
 
 services:
   db:
-    image: postgres:12.11
+    image: postgres:12.19
     ports:
       - 5432:5432
     environment:
@@ -41,7 +41,7 @@ services:
       - "6379"
 
   opensearch-node1:
-    image: opensearchproject/opensearch:1.3.11
+    image: opensearchproject/opensearch:1.3.16
     container_name: opensearch-node1
     environment:
       - cluster.name=opensearch-cluster
@@ -64,7 +64,7 @@ services:
       - 9100:9200
 
   nginx:
-    image: nginx:1.9.5
+    image: nginx:1.26.0
     ports:
       - "8063:8063"
     links:
@@ -74,6 +74,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: django-server
     environment:
       << : *py-environment
       PORT: 8061
@@ -83,6 +84,8 @@ services:
     tty: true
     ports:
       - "8061:8061"
+    volumes:
+      - .:/app
     links:
       - db
       - opensearch-node1
@@ -91,7 +94,7 @@ services:
     extra_hosts: *default-extra-hosts
 
   watch:
-    image: node:16.20.1
+    image: node:16.20.2
     working_dir: /src
     command: ./scripts/run-watch-dev.sh
     ports:
@@ -111,6 +114,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: django
     environment: *py-environment
     env_file: .env
     command: >
@@ -122,11 +126,12 @@ services:
       - db
       - opensearch-node1
       - redis
+    volumes:
+      - .:/app
     extra_hosts: *default-extra-hosts
 
   tika:
     image: apache/tika:1.28
-    entrypoint: java -jar tika-server-1.23.jar -h 0.0.0.0 -spawnChild
     ports:
       - "9998:9998"
 

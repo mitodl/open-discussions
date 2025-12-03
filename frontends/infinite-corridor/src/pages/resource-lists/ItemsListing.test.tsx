@@ -12,7 +12,7 @@ import {
   act
 } from "../../test-utils"
 import UserListItems, { ResourceListItemsProps } from "./ItemsListing"
-import { allowConsoleErrors, ControlledPromise } from "ol-util/src/test-utils"
+import { allowConsoleErrors, ControlledPromise } from "ol-util/test-utils"
 import axios from "../../libs/axios"
 import { urls } from "../../api/learning-resources"
 import invariant from "tiny-invariant"
