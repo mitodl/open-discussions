@@ -114,6 +114,7 @@ INSTALLED_APPS = (
     "django_json_widget",
     "django_filters",
     "drf_spectacular",
+    "treebeard",
     # Put our apps after this point
     "open_discussions",
     "authentication",

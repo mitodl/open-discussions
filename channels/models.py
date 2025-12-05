@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import JSONField
 from django.db import models
+from treebeard.mp_tree import MP_Node
 
 from widgets.models import WidgetList
 
@@ -160,6 +161,20 @@ class Channel(TimestampedModel):
         max_length=20, choices=VALID_CHANNEL_CHOICES, null=True
     )
     moderator_notifications = models.BooleanField(default=False, null=False)
+    
+    reddit_id = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+        help_text="Original Reddit subreddit ID (base36)"
+    )
+    archived_on = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this channel was archived from Reddit"
+    )
 
     def save(
         self, *args, update_image=False, **kwargs
@@ -262,10 +277,29 @@ class Post(TimestampedModel):
     removed = models.BooleanField(null=True)
     deleted = models.BooleanField(null=True)
     exclude_from_frontpage_emails = models.BooleanField(null=True)
+    
+    reddit_id = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+        help_text="Original Reddit post ID (base36)"
+    )
+    archived_on = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this post was archived from Reddit"
+    )
+    plain_text = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Cached plain text version for search/display"
+    )
 
     @property
-    def plain_text(self):
-        """Returns a plaintext represention of the post"""
+    def plain_text_computed(self):
+        """Returns a plaintext represention of the post (legacy property for migration)"""
         if getattr(self, "article", None) is not None:
             return render_article_text(self.article.content)
         elif self.post_type == LINK_TYPE_SELF:
@@ -316,6 +350,27 @@ class Comment(TimestampedModel):
     edited = models.BooleanField(null=True)
     removed = models.BooleanField(null=True)
     deleted = models.BooleanField(null=True)
+    
+    reddit_id = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        unique=True,
+        db_index=True,
+        help_text="Original Reddit comment ID (base36)"
+    )
+    parent_reddit_id = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Parent comment reddit_id (CharField)"
+    )
+    archived_on = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when this comment was archived from Reddit"
+    )
 
     def __str__(self):
         return f"{self.comment_id} on post {self.post}"
@@ -388,3 +443,54 @@ class SpamCheckResult(TimestampedModel):
     class Meta:
         unique_together = (("content_type", "object_id"),)
         index_together = (("content_type", "object_id"),)
+
+
+class CommentTreeNode(MP_Node):
+    """
+    Materialized path tree for comments sorted by score.
+    One tree per post for efficient traversal.
+    
+    Uses django-treebeard for tree operations.
+    Each post has one root node (comment=None) with all comments as descendants.
+    """
+    alphabet = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name='tree_nodes',
+        db_index=True,
+        help_text="Post this tree belongs to"
+    )
+    
+    comment = models.OneToOneField(
+        Comment,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='tree_node',
+        help_text="Comment this node represents (null for root)"
+    )
+    
+    score = models.IntegerField(
+        default=0,
+        help_text="Denormalized score for sorting"
+    )
+    created = models.DateTimeField(
+        help_text="Denormalized created timestamp for sorting"
+    )
+    
+    node_order_by = ['score', 'created']
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['post', 'path'], name='tree_post_path_idx'),
+            models.Index(fields=['post', 'depth'], name='tree_post_depth_idx'),
+        ]
+        verbose_name = 'Comment Tree Node'
+        verbose_name_plural = 'Comment Tree Nodes'
+    
+    def __str__(self):
+        if self.comment:
+            return f"TreeNode for Comment {self.comment.reddit_id or self.comment.comment_id}"
+        return f"Root TreeNode for Post {self.post.reddit_id or self.post.post_id}"
