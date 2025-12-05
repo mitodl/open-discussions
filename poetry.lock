@@ -1246,6 +1246,23 @@ libcloud = ["apache-libcloud"]
 sftp = ["paramiko (>=1.10.0)"]
 
 [[package]]
+name = "django-treebeard"
+version = "4.8.0"
+description = "Efficient tree implementations for Django"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "django_treebeard-4.8.0-py3-none-any.whl", hash = "sha256:ecaa7a0bbfa86a48fc91ff335513e83c841cdfe1add6229d04ac7096198d5d51"},
+    {file = "django_treebeard-4.8.0.tar.gz", hash = "sha256:61b8076b576107da21f6f6040774c0d17025200c2efdb70dd1f14b18c9206c3a"},
+]
+
+[package.dependencies]
+django = ">=4.2"
+
+[package.extras]
+test = ["pytest-django (>=4.0,<5.0)", "pytest-pythonpath (>=0.7,<1.0)"]
+
+[[package]]
 name = "django-webpack-loader"
 version = "1.8.1"
 description = "Transparently use webpack with django"
@@ -4406,4 +4423,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "3.11.4"
-content-hash = "dccc99fb338ca35929d5ea020e66e1eeca219a5109ec6210a86d07468258aafe"
+content-hash = "21fcb677cdfd2e8d1d777eacfad17617432651071a979ca254ea766bbefb07b1"
