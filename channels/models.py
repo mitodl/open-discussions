@@ -291,15 +291,20 @@ class Post(TimestampedModel):
         blank=True,
         help_text="Timestamp when this post was archived from Reddit"
     )
-    plain_text = models.TextField(
+    cached_plain_text = models.TextField(
         null=True,
         blank=True,
         help_text="Cached plain text version for search/display"
     )
 
     @property
-    def plain_text_computed(self):
-        """Returns a plaintext represention of the post (legacy property for migration)"""
+    def plain_text(self):
+        """Returns a plaintext representation of the post"""
+        # Return cached value if available
+        if self.cached_plain_text is not None:
+            return self.cached_plain_text
+        
+        # Otherwise compute it
         if getattr(self, "article", None) is not None:
             return render_article_text(self.article.content)
         elif self.post_type == LINK_TYPE_SELF:
@@ -364,7 +369,7 @@ class Comment(TimestampedModel):
         null=True,
         blank=True,
         db_index=True,
-        help_text="Parent comment reddit_id (CharField)"
+        help_text="Parent comment's Reddit ID (base36)"
     )
     archived_on = models.DateTimeField(
         null=True,
@@ -459,7 +464,6 @@ class CommentTreeNode(MP_Node):
         Post,
         on_delete=models.CASCADE,
         related_name='tree_nodes',
-        db_index=True,
         help_text="Post this tree belongs to"
     )
     
@@ -477,10 +481,11 @@ class CommentTreeNode(MP_Node):
         help_text="Denormalized score for sorting"
     )
     created = models.DateTimeField(
+        null=True,
         help_text="Denormalized created timestamp for sorting"
     )
     
-    node_order_by = ['score', 'created']
+    node_order_by = ['-score', 'created']
     
     class Meta:
         indexes = [
