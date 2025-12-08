@@ -7,7 +7,6 @@ import R from "ramda"
 import Card from "../components/Card"
 import MetaTags from "../components/MetaTags"
 import ProfileImage, { PROFILE_IMAGE_MEDIUM } from "../components/ProfileImage"
-import ProfileContributionFeed from "../components/ProfileContributionFeed"
 import { withSpinnerLoading } from "../components/Loading"
 import withSingleColumn from "../hoc/withSingleColumn"
 import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
@@ -15,9 +14,8 @@ import { SocialSiteLogoLink, SiteLogoLink } from "../components/SiteLogoLink"
 import { actions } from "../actions"
 import { formatTitle } from "../lib/title"
 import { getUserName } from "../lib/util"
-import { PERSONAL_SITE_TYPE, POSTS_OBJECT_TYPE } from "../lib/constants"
+import { PERSONAL_SITE_TYPE } from "../lib/constants"
 import { any404Error, anyErrorExcept404 } from "../util/rest"
-import { clearPostError } from "../actions/post"
 
 import type { Match } from "react-router"
 import type { Profile } from "../flow/discussionTypes"
@@ -33,21 +31,11 @@ type Props = {
   errored: boolean
 }
 
-const defaultTab = POSTS_OBJECT_TYPE
-
 class ProfilePage extends React.Component<Props> {
   componentDidMount() {
     const { profile } = this.props
     if (!profile) {
       this.loadData()
-    }
-  }
-
-  componentWillUnmount() {
-    const { dispatch, errored, notFound } = this.props
-
-    if (errored || notFound) {
-      dispatch(clearPostError())
     }
   }
 
@@ -86,7 +74,7 @@ class ProfilePage extends React.Component<Props> {
   }
 
   render() {
-    const { profile, userName, match } = this.props
+    const { profile, userName } = this.props
     if (!profile) {
       return null
     }
@@ -130,10 +118,6 @@ class ProfilePage extends React.Component<Props> {
             </div>
           ) : null}
         </Card>
-        <ProfileContributionFeed
-          userName={userName}
-          selectedTab={match.params.objectType || defaultTab}
-        />
       </React.Fragment>
     )
   }
