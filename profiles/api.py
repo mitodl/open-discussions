@@ -3,7 +3,6 @@ import tldextract
 
 from django.db import transaction
 
-from channels.models import ChannelGroupRole
 from profiles.models import (
     Profile,
     filter_profile_props,
@@ -46,56 +45,10 @@ def after_profile_created_or_updated(profile):
         Operations that should be run after the profile create or update is committed
         """
         search_index_helpers.upsert_profile(profile.id)
-        search_index_helpers.update_author_posts_comments(profile.id)
 
     # this will either get called when the outermost transaction commits or otherwise immediately
     # this avoids race conditions where the async tasks may not see the record or the updated values
     transaction.on_commit(_after_profile_created_or_updated)
-
-
-def get_channels(user):
-    """
-    Get the list of channel names for which the user is a moderator, contributor, or subscriber
-
-    Args:
-        user(django.contrib.auth.models.User): the user to retrieve channel names for
-
-    Returns:
-        set of str: Channel names
-    """
-    return set(
-        list(user.channelsubscription_set.values_list("channel__name", flat=True))
-        + list(
-            ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
-                "channel__name", flat=True
-            )
-        )
-    )
-
-
-def get_channel_join_dates(user):
-    """
-    Get the list of channels and the dates that the user joined them
-
-    Args:
-        user(django.contrib.auth.models.User): the user to retrieve channel names for
-
-    Returns:
-        set of (str: Channel names, datetime: when they joined)
-    """
-    names_and_dates = list(
-        user.channelsubscription_set.values_list("channel__name", "created_on")
-    ) + list(
-        ChannelGroupRole.objects.filter(group__in=user.groups.all()).values_list(
-            "channel__name", "created_on"
-        )
-    )
-
-    output = {}
-    for name, joined in names_and_dates:
-        if name not in output or joined < output[name]:
-            output[name] = joined
-    return [(k, v) for k, v in output.items()]
 
 
 def get_site_type_from_url(url):
