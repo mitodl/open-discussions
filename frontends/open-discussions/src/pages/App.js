@@ -15,7 +15,6 @@ import PrivacyPolicyPage from "./policies/PrivacyPolicyPage"
 import TermsOfServicePage from "./policies/TermsOfServicePage"
 import AdminPage from "./admin/AdminPage"
 import AuthRequiredPage from "./auth/AuthRequiredPage"
-import CreatePostPage from "./CreatePostPage"
 import SettingsPage from "./SettingsPage"
 import AccountSettingsPage from "./AccountSettingsPage"
 import PasswordChangePage from "./PasswordChangePage"
@@ -30,7 +29,6 @@ import RegisterDetailsPage from "./auth/RegisterDetailsPage"
 import InactiveUserPage from "./auth/InactiveUserPage"
 import PasswordResetPage from "./auth/PasswordResetPage"
 import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
-import ChannelRouter from "./ChannelRouter"
 import LearnRouter from "./LearnRouter"
 import PodcastFrontpage from "./PodcastFrontpage"
 
@@ -52,7 +50,6 @@ import {
   setBannerMessage,
   hideBanner
 } from "../actions/ui"
-import { setChannelData } from "../actions/channel"
 import { SETTINGS_URL } from "../lib/url"
 import { isAnonAccessiblePath } from "../lib/auth"
 import { isMobileWidth, preventDefaultAndInvoke } from "../lib/util"
@@ -61,7 +58,6 @@ import {
   isAudioPlayerLoadedSelector
 } from "../lib/redux_selectors"
 import { POSTS_OBJECT_TYPE, COMMENTS_OBJECT_TYPE } from "../lib/constants"
-import { channelIndexRoute } from "../lib/routing"
 
 import type { Location, Match } from "react-router"
 import type { Dispatch } from "redux"
@@ -155,8 +151,6 @@ class App extends React.Component<Props> {
   loadData = async () => {
     const { dispatch } = this.props
 
-    const channels = await dispatch(actions.subscribedChannels.get())
-    dispatch(setChannelData(channels))
     if (SETTINGS.username) {
       await dispatch(actions.profiles.get(SETTINGS.username))
     }
@@ -229,15 +223,7 @@ class App extends React.Component<Props> {
         <div className={`content${audioPlayerPadding}`}>
           <AudioPlayer />
           <Route exact path={match.url} component={HomePage} />
-          <Route
-            path={channelIndexRoute(match.url)}
-            component={ChannelRouter}
-          />
           <Route path={`${match.url}manage/`} component={AdminPage} />
-          <PrivateRoute
-            path={`${match.url}create_post/:channelName?`}
-            component={CreatePostPage}
-          />
           <Route
             path={`${match.url}auth_required/`}
             component={AuthRequiredPage}
