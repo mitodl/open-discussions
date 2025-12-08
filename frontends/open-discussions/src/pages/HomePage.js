@@ -31,7 +31,10 @@ export class HomePage extends React.Component<Props> {
         <MetaTags canonicalLink={match?.url} />
         <IntroCard />
         <div className="home-content">
-          <p>Welcome to MIT Open Learning. Use the search feature to find courses, podcasts, and learning resources.</p>
+          <p>
+            Welcome to MIT Open Learning. Use the search feature to find
+            courses, podcasts, and learning resources.
+          </p>
         </div>
       </React.Fragment>
     )

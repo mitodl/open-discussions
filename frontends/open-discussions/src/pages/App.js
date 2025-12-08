@@ -32,7 +32,6 @@ import PasswordResetConfirmPage from "./auth/PasswordResetConfirmPage"
 import LearnRouter from "./LearnRouter"
 import PodcastFrontpage from "./PodcastFrontpage"
 
-import PrivateRoute from "../components/auth/PrivateRoute"
 import Snackbar from "../components/material/Snackbar"
 import Banner from "../components/material/Banner"
 import Drawer from "../components/Drawer"

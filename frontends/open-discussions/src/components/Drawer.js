@@ -20,11 +20,7 @@ import {
   setShowDrawerDesktop
 } from "../actions/ui"
 import { isAudioPlayerLoadedSelector } from "../lib/redux_selectors"
-import {
-  getViewportWidth,
-  isMobileWidth,
-  DRAWER_BREAKPOINT
-} from "../lib/util"
+import { getViewportWidth, isMobileWidth, DRAWER_BREAKPOINT } from "../lib/util"
 
 import type { Dispatch } from "redux"
 import type { Location } from "react-router"
