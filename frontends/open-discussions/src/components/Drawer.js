@@ -1,7 +1,6 @@
 // @flow
 
 import React from "react"
-import R from "ramda"
 import { connect } from "react-redux"
 import { withRouter } from "react-router"
 import { Drawer, DrawerContent } from "@rmwc/drawer"
@@ -20,30 +19,21 @@ import {
   setShowDrawerHover,
   setShowDrawerDesktop
 } from "../actions/ui"
-import {
-  getSubscribedChannels,
-  isAudioPlayerLoadedSelector
-} from "../lib/redux_selectors"
+import { isAudioPlayerLoadedSelector } from "../lib/redux_selectors"
 import {
   getViewportWidth,
   isMobileWidth,
-  DRAWER_BREAKPOINT,
-  userIsAnonymous
+  DRAWER_BREAKPOINT
 } from "../lib/util"
-import { getChannelNameFromPathname, newPostURL } from "../lib/url"
-import { userCanPost } from "../lib/channels"
 
 import type { Dispatch } from "redux"
-import type { Channel } from "../flow/discussionTypes"
 import type { Location } from "react-router"
 
 type DrawerPropsFromState = {
   showDrawerDesktop: boolean,
   showDrawerMobile: boolean,
   showDrawerHover: boolean,
-  audioPlayerLoaded: boolean,
-  subscribedChannels: Array<Channel>,
-  channels: Map<string, Channel>
+  audioPlayerLoaded: boolean
 }
 
 type DrawerProps = DrawerPropsFromState & {
@@ -123,29 +113,13 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
 
   render() {
     const {
-      channels,
       showDrawerDesktop,
       showDrawerHover,
       showDrawerMobile,
       audioPlayerLoaded,
-      subscribedChannels,
       location: { pathname }
     } = this.props
     const isMobile = isMobileWidth()
-
-    const channelName = getChannelNameFromPathname(pathname)
-    const currentChannel = channels.get(channelName)
-
-    const composeHref = userIsAnonymous() ? null : newPostURL(channelName)
-
-    let showComposeLink
-    if (userIsAnonymous()) {
-      showComposeLink = true
-    } else {
-      showComposeLink = currentChannel
-        ? userCanPost(currentChannel)
-        : R.any(userCanPost, [...channels.values()])
-    }
 
     const expanded = isMobile ? true : showDrawerDesktop || showDrawerHover
     const audioPlayerPadding = audioPlayerLoaded
@@ -174,12 +148,7 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
                         />
                       </div>
                     ) : null}
-                    <Navigation
-                      subscribedChannels={subscribedChannels}
-                      pathname={pathname}
-                      showComposeLink={showComposeLink}
-                      composeHref={composeHref}
-                    />
+                    <Navigation pathname={pathname} />
                   </div>
                   <NavigationItem fading whenExpanded={() => <Footer />} />
                 </NavigationExpansion.Provider>
@@ -193,12 +162,10 @@ export class ResponsiveDrawer extends React.Component<DrawerProps> {
 }
 
 export const mapStateToProps = (state: Object): DrawerPropsFromState => ({
-  subscribedChannels: getSubscribedChannels(state),
-  showDrawerDesktop:  state.ui.showDrawerDesktop,
-  showDrawerHover:    state.ui.showDrawerHover,
-  showDrawerMobile:   state.ui.showDrawerMobile,
-  audioPlayerLoaded:  isAudioPlayerLoadedSelector(state),
-  channels:           state.channels.data
+  showDrawerDesktop: state.ui.showDrawerDesktop,
+  showDrawerHover:   state.ui.showDrawerHover,
+  showDrawerMobile:  state.ui.showDrawerMobile,
+  audioPlayerLoaded: isAudioPlayerLoadedSelector(state)
 })
 
-export default R.compose(connect(mapStateToProps), withRouter)(ResponsiveDrawer)
+export default connect(mapStateToProps)(withRouter(ResponsiveDrawer))
