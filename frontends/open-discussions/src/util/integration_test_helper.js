@@ -14,13 +14,10 @@ import _ from "lodash"
 import Router, { routes } from "../Router"
 
 import * as api from "../lib/api/api"
-import * as channelAPI from "../lib/api/channels"
 import * as ckeditorAPI from "../lib/api/ckeditor"
 import * as moderationAPI from "../lib/api/moderation"
 import * as embedlyAPI from "../lib/api/embedly"
 import * as frontpageAPI from "../lib/api/frontpage"
-import * as postAPI from "../lib/api/posts"
-import * as commentAPI from "../lib/api/comments"
 import * as livestreamAPI from "../lib/api/livestream"
 import * as widgetAPI from "../lib/api/widgets"
 import rootReducer from "../reducers"
@@ -56,13 +53,10 @@ export default class IntegrationTestHelper {
     //       call `resetBehavior()` on the stub first or the error still raises
     ;[
       api,
-      channelAPI,
       ckeditorAPI,
       moderationAPI,
       embedlyAPI,
       frontpageAPI,
-      postAPI,
-      commentAPI,
       livestreamAPI,
       widgetAPI
     ].forEach(apiModule => {
