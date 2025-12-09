@@ -10,10 +10,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from opensearchpy.exceptions import NotFoundError, RequestError
-from prawcore.exceptions import NotFound
 
-from channels.constants import COMMENT_TYPE, LINK_TYPE_LINK, POST_TYPE
-from channels.models import Comment, Post
 from course_catalog.constants import RESOURCE_FILE_PLATFORMS, PrivacyLevel
 from course_catalog.models import (
     ContentFile,
@@ -26,7 +23,6 @@ from course_catalog.models import (
     Video,
 )
 from course_catalog.utils import load_course_blocklist
-from embedly.api import get_embedly_content
 from open_discussions.celery import app
 from open_discussions.utils import chunks, html_to_plain_text, merge_strings
 from profiles.models import Profile
@@ -38,7 +34,6 @@ from search.constants import (
     PODCAST_TYPE,
     PROFILE_TYPE,
     PROGRAM_TYPE,
-    REDDIT_EXCEPTIONS,
     RESOURCE_FILE_TYPE,
     SEARCH_CONN_EXCEPTIONS,
     STAFF_LIST_TYPE,
@@ -84,12 +79,6 @@ def wrap_retry_exception(*exception_classes):
     try:
         yield
     except Exception as ex:  # pylint:disable=bare-except
-        if isinstance(ex, NotFound):
-            # No corresponding reddit post/comment found for django model object.  Log error and continue indexing.
-            log.exception(
-                "No corresponding reddit post/comment found for django model object"
-            )
-            return
         # Celery is confused by exceptions which don't take a string as an argument, so we need to wrap before raising
         if isinstance(ex, exception_classes):
             raise RetryException(str(ex)) from ex
@@ -148,45 +137,6 @@ def update_author_posts_comments(profile_id):
     _update_fields_by_username(
         profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
     )
-
-
-@app.task
-def update_link_post_with_preview(doc_id, data):
-    """
-    Task that fetches Embedly preview data for a link post and updates the corresponding
-    database and OpenSearch objects
-
-    Args:
-        doc_id (str): ES document ID
-        data (dict): Dict of serialized post data produced by OSPostSerializer
-    """
-    if not data["post_link_url"]:
-        return None
-    response = get_embedly_content(data["post_link_url"]).json()
-    # Parse the embedly response to produce the link preview text
-    preview_text = (
-        html_to_plain_text(response["content"]).strip()
-        if response.get("content")
-        else response["description"]
-    )
-    # Update the post in the database
-    post = Post.objects.get(post_id=data["post_id"])
-    post.preview_text = preview_text
-    post.save()
-    # Update the post in ES
-    return api.update_post(doc_id, post)
-
-
-@app.task
-def create_post_document(doc_id, data):
-    """
-    Task that makes a request to create an ES document for a post, and if it's a link-type
-    post, updates the newly-created post with preview text
-    """
-    tasks = [create_document.si(doc_id, data)]
-    if data.get("post_type") == LINK_TYPE_LINK and data.get("post_link_url"):
-        tasks.append(update_link_post_with_preview.si(doc_id, data))
-    return celery.chain(tasks)()
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -370,7 +320,7 @@ def bulk_deindex_profiles(ids):
 
     """
     try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
+        with wrap_retry_exception(*SEARCH_CONN_EXCEPTIONS):
             api.deindex_profiles(ids)
     except (RetryException, Ignore):
         raise
@@ -379,47 +329,6 @@ def bulk_deindex_profiles(ids):
         log.exception(error)
         return error
 
-
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_posts(post_ids, update_only=False):
-    """
-    Index a list of posts by a list of Post.id
-
-    Args:
-        post_ids (list of int): list of Post.id to index
-        update_only (bool): update existing index only
-
-    """
-    try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
-            api.index_posts(post_ids, update_only)
-    except (RetryException, Ignore):
-        raise
-    except:  # pylint: disable=bare-except
-        error = "index_posts threw an error"
-        log.exception(error)
-        return error
-
-
-@app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
-def index_comments(comment_ids, update_only=False):
-    """
-    Index a list of comments by a list of Comment.id
-
-    Args:
-        comment_ids (list of int): list of Comment.id to index
-        update_only (bool): update existing index only
-
-    """
-    try:
-        with wrap_retry_exception(*REDDIT_EXCEPTIONS, *SEARCH_CONN_EXCEPTIONS):
-            api.index_comments(comment_ids, update_only)
-    except (RetryException, Ignore):
-        raise
-    except:  # pylint: disable=bare-except
-        error = "index_comments threw an error"
-        log.exception(error)
-        return error
 
 
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
