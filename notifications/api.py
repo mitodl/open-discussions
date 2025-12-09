@@ -5,17 +5,12 @@ from django.conf import settings
 from django.db.models import Q
 from django.contrib.auth.models import User
 
-from channels.models import Subscription, ChannelGroupRole, Channel
-from channels.api import get_admin_api
-from channels.constants import ROLE_MODERATORS
-
 from notifications.notifiers.exceptions import (
     UnsupportedNotificationTypeError,
     CancelNotificationError,
 )
 from notifications.models import (
     EmailNotification,
-    PostEvent,
     NotificationSettings,
     NOTIFICATION_TYPE_FRONTPAGE,
     NOTIFICATION_TYPE_COMMENTS,
@@ -25,7 +20,7 @@ from notifications.models import (
     FREQUENCY_WEEKLY,
     FREQUENCY_NEVER,
 )
-from notifications.notifiers import frontpage, moderator_posts
+from notifications.notifiers import frontpage
 from notifications import tasks
 from open_discussions.utils import chunks
 
@@ -38,7 +33,7 @@ def ensure_notification_settings(user, skip_moderator_setting=False):
 
     Args:
         user (User): user to create settings for
-        skip_moderator_setting (boolean): Skip moderator notifaction creation
+        skip_moderator_setting (boolean): Skip moderator notification creation (deprecated)
     """
     existing_notification_types = NotificationSettings.objects.filter(
         user=user
@@ -57,17 +52,6 @@ def ensure_notification_settings(user, skip_moderator_setting=False):
             notification_type=NOTIFICATION_TYPE_COMMENTS,
             defaults={"trigger_frequency": FREQUENCY_IMMEDIATE},
         )
-
-    if not skip_moderator_setting:
-        for channel_group_role in ChannelGroupRole.objects.filter(
-            group__user=user, role=ROLE_MODERATORS
-        ):
-            NotificationSettings.objects.get_or_create(
-                user=user,
-                notification_type=NOTIFICATION_TYPE_MODERATOR,
-                channel=channel_group_role.channel,
-                defaults={"trigger_frequency": FREQUENCY_IMMEDIATE},
-            )
 
 
 def attempt_send_notification_batch(notification_settings_ids):
@@ -124,25 +108,15 @@ def _get_notifier_for_notification(notification):
     Returns:
         Notifier: instance of the notifier to use
     """
-    if notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
-        channel_api = get_admin_api()
-        event = PostEvent.objects.get(email_notification=notification)
-        channel_name = channel_api.get_post(event.post_id).subreddit.display_name
-
-        notification_settings = NotificationSettings.objects.get(
-            user=notification.user,
-            notification_type=notification.notification_type,
-            channel__name=channel_name,
-        )
-    else:
-        notification_settings = NotificationSettings.objects.get(
-            user=notification.user, notification_type=notification.notification_type
-        )
+    notification_settings = NotificationSettings.objects.get(
+        user=notification.user, notification_type=notification.notification_type
+    )
 
     if notification.notification_type == NOTIFICATION_TYPE_FRONTPAGE:
         return frontpage.FrontpageDigestNotifier(notification_settings)
     elif notification.notification_type == NOTIFICATION_TYPE_MODERATOR:
-        return moderator_posts.ModeratorPostsNotifier(notification_settings)
+        # Moderator notifications no longer supported - discussions removed
+        return None
     elif notification.notification_type == NOTIFICATION_TYPE_COMMENTS:
         # Comment notifications no longer supported - discussions removed
         return None
@@ -212,30 +186,10 @@ def send_comment_notifications(post_id, comment_id, new_comment_id):
 
 def send_moderator_notifications(post_id, channel_name):
     """
-    Sends post notifications to channel moderators
+    Sends post notifications to channel moderators (deprecated - no-op)
 
     Args:
         post_id (str): base36 post id
         channel_name (str): channel_name
     """
-
-    channel_api = get_admin_api()
-    for moderator in channel_api.list_moderators(channel_name):
-        self_user = User.objects.get(username=moderator.name)
-        try:
-            notification_setting = NotificationSettings.objects.get(
-                user=self_user,
-                notification_type=NOTIFICATION_TYPE_MODERATOR,
-                channel__name=channel_name,
-            )
-        except NotificationSettings.DoesNotExist:
-            channel = Channel.objects.get(name=channel_name)
-            notification_setting = NotificationSettings.objects.create(
-                user=self_user,
-                notification_type=NOTIFICATION_TYPE_MODERATOR,
-                channel=channel,
-                trigger_frequency=FREQUENCY_NEVER,
-            )
-
-        notifier = moderator_posts.ModeratorPostsNotifier(notification_setting)
-        notifier.create_moderator_post_event(self_user, post_id)
+    pass
