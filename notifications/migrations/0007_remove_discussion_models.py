@@ -26,7 +26,7 @@ class Migration(migrations.Migration):
         ),
         # Drop the channel_id column
         migrations.RunSQL(
-            sql='ALTER TABLE notifications_notificationsettings DROP COLUMN IF EXISTS channel_id CASCADE;',
+            sql="ALTER TABLE notifications_notificationsettings DROP COLUMN IF EXISTS channel_id CASCADE;",
             reverse_sql=migrations.RunSQL.noop,
         ),
         # Re-add the unique constraint without channel
