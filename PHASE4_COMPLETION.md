@@ -54,6 +54,32 @@ This migration performs the following database operations:
   - Removed `unique_without_channel` conditional constraint
   - Added simpler `unique_user_notification_type` constraint on `["user", "notification_type"]`
 
+### 4. Created Final Cleanup Migration: 0008_drop_channels_tables.py
+
+This migration drops all remaining channels and channels_fields tables from the database:
+
+**Channels app tables dropped:**
+- `channels_spamcheckresult`
+- `channels_article`
+- `channels_comment`
+- `channels_channelmembershipconfig_channels`
+- `channels_channelmembershipconfig`
+- `channels_channelgrouprole`
+- `channels_channelsubscription`
+- `channels_post`
+- `channels_linkmeta`
+- `channels_channelinvitation`
+- `channels_channel`
+- `channels_subscription`
+- `channels_redditaccesstoken`
+- `channels_redditrefreshtoken`
+
+**Channels_fields app tables dropped:**
+- `channels_fields_subfield`
+- `channels_fields_fieldlist`
+- `channels_fields_fieldchannelgrouprole`
+- `channels_fields_fieldchannel`
+
 ## Database State
 
 ### Before Phase 4
@@ -79,6 +105,8 @@ notifications_notificationsettings:
 Deleted tables:
   - notifications_commentevent (deleted)
   - notifications_postevent (deleted)
+  - All 14 channels_* tables (deleted)
+  - All 4 channels_fields_* tables (deleted)
 ```
 
 ## Verification
@@ -101,6 +129,9 @@ docker-compose exec db psql -U postgres -d postgres -c "\dt notifications_*"
 # Result: Only 2 tables remain:
 #   - notifications_emailnotification
 #   - notifications_notificationsettings
+
+docker-compose exec db psql -U postgres -d postgres -c "SELECT tablename FROM pg_tables WHERE tablename LIKE 'channels_%';"
+# Result: 0 rows (all channels tables deleted)
 ```
 
 ## Files Modified
@@ -111,6 +142,7 @@ docker-compose exec db psql -U postgres -d postgres -c "\dt notifications_*"
 4. `notifications/migrations/0006_moderator_post_notifiacation_channel.py` - Changed FK to IntegerField
 5. `notifications/models.py` - Updated constraints
 6. `notifications/migrations/0007_remove_discussion_models.py` - **NEW** cleanup migration
+7. `notifications/migrations/0008_drop_channels_tables.py` - **NEW** drop all channels tables
 
 ## Key Technical Decisions
 
@@ -154,4 +186,6 @@ According to the AI Agent Guide, Phase 5 is next:
 
 ## Commit
 
-Committed as: `feat: Phase 4 - Remove discussion database references and models`
+Two commits were made:
+1. `feat: Phase 4 - Remove discussion database references and models`
+2. `feat: Drop all channels database tables`
