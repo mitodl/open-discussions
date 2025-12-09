@@ -118,6 +118,8 @@ INSTALLED_APPS = (
     "open_discussions",
     "authentication",
     "infinite_example",
+    "channels",  # TODO: Remove in Phase 3
+    "channels_fields",  # TODO: Remove in Phase 3
     "profiles",
     "mail",
     "notifications",
@@ -140,6 +142,7 @@ MIDDLEWARE = (
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "authentication.middleware.BlockedIPMiddleware",
+    "open_discussions.middleware.channel_api.ChannelApiMiddleware",  # TODO: Remove in Phase 3
     "authentication.middleware.SocialAuthExceptionRedirectMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 )

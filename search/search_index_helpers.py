@@ -45,6 +45,66 @@ def try_with_retry_as_task(function, *args):
         function.delay(*args)
 
 
+def reddit_object_persist(*persistence_funcs):
+    """
+    Deprecated decorator - no longer used. Kept as stub for Phase 3 cleanup.
+    """
+    def decorator(func):
+        return func
+    return decorator
+
+
+# Stub functions for removed discussion features - will be deleted in Phase 3
+def index_new_post(post_obj):
+    """Deprecated - no longer indexing posts"""
+    pass
+
+
+def index_new_comment(comment_obj):
+    """Deprecated - no longer indexing comments"""
+    pass
+
+
+def update_post_text(post_obj):
+    """Deprecated - no longer indexing posts"""
+    pass
+
+
+def update_comment_text(comment_obj):
+    """Deprecated - no longer indexing comments"""
+    pass
+
+
+def update_channel_index(channel_obj):
+    """Deprecated - no longer indexing channels"""
+    pass
+
+
+def update_post_removal_status(post_obj):
+    """Deprecated - no longer indexing posts"""
+    pass
+
+
+def update_comment_removal_status(comment_obj):
+    """Deprecated - no longer indexing comments"""
+    pass
+
+
+def set_post_to_deleted(post_obj):
+    """Deprecated - no longer indexing posts"""
+    pass
+
+
+def set_comment_to_deleted(comment_obj):
+    """Deprecated - no longer indexing comments"""
+    pass
+
+
+def update_indexed_score(instance, instance_type, vote_action=None):
+    """Deprecated - no longer indexing post/comment scores"""
+    pass
+
+
 @if_feature_enabled(INDEX_UPDATES)
 def upsert_profile(user_id):
     """
