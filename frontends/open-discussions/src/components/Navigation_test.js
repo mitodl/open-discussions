@@ -7,12 +7,10 @@ import { mount } from "enzyme"
 import { Provider } from "react-redux"
 
 import Navigation from "./Navigation"
-import SubscriptionsList from "./SubscriptionsList"
 import LoginTooltip from "./LoginTooltip"
 
 import * as channels from "../lib/channels"
 import * as util from "../lib/util"
-import { channelURL } from "../lib/url"
 import { configureShallowRenderer, shouldIf } from "../lib/test_utils"
 import { makeChannelList } from "../factories/channels"
 import IntegrationTestHelper from "../util/integration_test_helper"
@@ -104,26 +102,5 @@ describe("Navigation", () => {
         expHighlighted
       )
     })
-  })
-
-  it("should show a SubscriptionsList", () => {
-    const channels = makeChannelList(10)
-    const wrapper = renderComponent({
-      subscribedChannels: channels
-    })
-    assert.equal(
-      wrapper.find(SubscriptionsList).props().subscribedChannels,
-      channels
-    )
-  })
-
-  it("should pass the current channel down to the SubscriptionsList", () => {
-    const wrapper = renderComponent({
-      pathname: channelURL("foobar")
-    })
-    assert.equal(
-      wrapper.find(SubscriptionsList).props().currentChannel,
-      "foobar"
-    )
   })
 })
