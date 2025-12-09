@@ -1,28 +1,21 @@
 """Custom permissions"""
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden
-from prawcore.exceptions import Redirect as PrawRedirect
 from rest_framework import permissions
 
-from channels.models import Channel
 from open_discussions import features
 
 
 def channel_exists(view):
     """
-    Return True if a Channel object exists for a channel_name in the view, or there is no channel name.
-    Raises 404 if the Channel does not exist.
+    Return True (deprecated - channels removed)
 
     Args:
         view (rest_framework.views.APIView): django DRF view
 
     Returns:
-        bool: True if Channel exists (or there is no channel name)
+        bool: True
     """
-    channel_name = view.kwargs.get("channel_name", None)
-    if not channel_name or Channel.objects.filter(name=channel_name).exists():
-        return True
-    raise Http404()
+    return True
 
 
 def is_admin_user(request):
@@ -40,52 +33,29 @@ def is_admin_user(request):
 
 def is_moderator(request, view):
     """
-    Helper function to check if a user is a moderator
+    Helper function to check if a user is a moderator (deprecated - always False)
 
     Args:
         request (HTTPRequest): django request object
         view (APIView): a DRF view object
 
     Returns:
-        bool: True if user is moderator on the channel
+        bool: False (channels removed)
     """
-    user_api = request.channel_api
-    channel_name = view.kwargs.get("channel_name", None)
-    try:
-        return (
-            channel_name
-            and not request.user.is_anonymous
-            and user_api.is_moderator(channel_name, request.user.username)
-        )
-    except PrawForbidden:
-        # User was forbidden to list moderators so they are most certainly not one
-        return False
-    except PrawRedirect:
-        # if a redirect occurred, that means the user doesn't have any permissions
-        # for the subreddit and most definitely is not a moderator
-        return False
+    return False
 
 
 def channel_is_mod_editable(view):
     """
-    Helper function to check that a channel can be edited by a moderator on discussions.
+    Helper function to check that a channel can be edited (deprecated - always False)
 
     Args:
         view (APIView): a DRF view object
 
     Returns:
-        bool:
-            True if the channel can be edited by a moderator. False if the channel does not exist or can only
-            be edited by a staff user from another server.
+        bool: False (channels removed)
     """
-    channel_name = view.kwargs.get("channel_name")
-    managed = (
-        Channel.objects.filter(name=channel_name)
-        .values_list("membership_is_managed", flat=True)
-        .first()
-    )
-    # None means the channel does not exist, True means it does but we shouldn't edit it via REST API
-    return managed is False
+    return False
 
 
 def is_readonly(request):
