@@ -84,13 +84,8 @@ class NotificationSettings(TimestampedModel):
     class Meta:
         constraints = [
             UniqueConstraint(
-                fields=["user", "notification_type", "channel"],
-                name="unique_with_channel",
-            ),
-            UniqueConstraint(
                 fields=["user", "notification_type"],
-                condition=Q(channel=None),
-                name="unique_without_channel",
+                name="unique_user_notification_type",
             ),
         ]
 
