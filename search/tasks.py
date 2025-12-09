@@ -330,7 +330,6 @@ def bulk_deindex_profiles(ids):
         return error
 
 
-
 @app.task(autoretry_for=(RetryException,), retry_backoff=True, rate_limit="600/m")
 def index_courses(ids, update_only=False):
     """

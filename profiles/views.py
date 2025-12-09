@@ -94,7 +94,7 @@ class UserContributionListView(APIView):
         Returns empty list as posts/comments no longer exist
         """
         object_type = self.kwargs["object_type"]
-        
+
         return Response(
             {
                 object_type: [],
