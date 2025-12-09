@@ -27,34 +27,7 @@ from search.constants import (
     RESOURCE_FILE_TYPE,
 )
 
-RELATED_POST_RELEVANT_FIELDS = ["plain_text", "post_title", "author_id", "channel_name"]
 SIMILAR_RESOURCE_RELEVANT_FIELDS = ["title", "short_description"]
-
-
-def gen_post_id(reddit_obj_id):
-    """
-    Generates the OpenSearch document id for a post
-
-    Args:
-        reddit_obj_id (int|str): The id of a reddit object as reported by PRAW
-
-    Returns:
-        str: The OpenSearch document id for this object
-    """
-    return "p_{}".format(reddit_obj_id)
-
-
-def gen_comment_id(reddit_obj_id):
-    """
-    Generates the OpenSearch document id for a comment
-
-    Args:
-        reddit_obj_id (int|str): The id of a reddit object as reported by PRAW
-
-    Returns:
-        str: The OpenSearch document id for this object
-    """
-    return "c_{}".format(reddit_obj_id)
 
 
 def gen_profile_id(profile_id):
@@ -176,20 +149,6 @@ def gen_podcast_episode_id(podcast_episode_obj):
         str: The opensearch document id for this object
     """
     return "podcast_ep_{}".format(podcast_episode_obj.id)
-
-
-def is_reddit_object_removed(reddit_obj):
-    """
-    Indicates whether or not a given reddit object is considered to be removed by moderators
-
-    Args:
-        reddit_obj (praw.models.reddit.submission.Submission, praw.models.reddit.comment.Comment):
-            A PRAW post/'submission' or comment object
-
-    Returns:
-        bool: True if the object is considered removed, False otherwise
-    """
-    return bool(reddit_obj.banned_by) and not reddit_obj.approved_by
 
 
 # pylint: disable=invalid-unary-operand-type
@@ -513,33 +472,6 @@ def _transform_search_results_coursenum(search_result, department_filters):
                 hit["_source"]["coursenum"] = filtered_department_course_numbers[0][
                     "coursenum"
                 ]
-
-
-def find_related_documents(*, user, post_id):
-    """
-    Execute a "more like this" query to find posts that are related to a specific post
-
-     Args:
-        user (User): The user executing the search
-        post_id (str): The id of the post that you want to find related posts for
-
-    Returns:
-        dict: The OpenSearch response dict
-    """
-    index = get_default_alias_name(ALIAS_ALL_INDICES)
-    search = Search(index=index)
-    search = _apply_general_query_filters(search, user)
-    search = search.query(
-        MoreLikeThis(
-            like={"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
-            fields=RELATED_POST_RELEVANT_FIELDS,
-            min_term_freq=1,
-            min_doc_freq=1,
-        )
-    )
-    # Limit results to the number indicated in settings
-    search = search[0 : settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT]
-    return search.execute().to_dict()
 
 
 def find_similar_resources(*, user, value_doc):
