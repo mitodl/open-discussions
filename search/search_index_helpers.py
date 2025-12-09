@@ -49,8 +49,10 @@ def reddit_object_persist(*persistence_funcs):
     """
     Deprecated decorator - no longer used. Kept as stub for Phase 3 cleanup.
     """
+
     def decorator(func):
         return func
+
     return decorator
 
 
