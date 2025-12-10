@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 import pytest
 import pytz
 
-from channels.models import SpamCheckResult
 from open_discussions.factories import UserFactory
 from open_discussions.utils import (
     now_in_utc,
@@ -201,14 +200,9 @@ def test_get_field_names():
     """
     Assert that get_field_names returns expected fields
     """
-    assert set(get_field_names(SpamCheckResult)) == {
-        "user_ip",
-        "user_agent",
-        "checks",
-        "is_spam",
-        "content_type",
-        "content_object",
-        "object_id",
-        "created_on",
-        "updated_on",
-    }
+    # Test with User model instead of removed SpamCheckResult
+    user_fields = get_field_names(User)
+    assert "username" in user_fields
+    assert "email" in user_fields
+    assert "id" in user_fields
+

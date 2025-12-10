@@ -10,27 +10,9 @@ import pytest
 from social_django.models import UserSocialAuth
 
 from authentication.backends.micromasters import MicroMastersAuth
-from channels.serializers.posts import BasePostSerializer
-from channels.serializers.comments import BaseCommentSerializer
-from channels.constants import LINK_TYPE_SELF
-from channels.proxies import PostProxy
-from channels.factories.models import CommentFactory
 from profiles.utils import make_temp_image_file, DEFAULT_PROFILE_IMAGE
-from fixtures.reddit import PostFactory
 
 pytestmark = [pytest.mark.django_db]
-
-
-@pytest.fixture()
-def removed_post_proxy(reddit_submission_obj):
-    """A dummy removed PostProxy object"""
-    post = PostFactory.create(
-        post_id="removed",
-        channel__name="channel",
-        post_type=LINK_TYPE_SELF,
-        removed=True,
-    )
-    return PostProxy(reddit_submission_obj, post)
 
 
 def test_list_users(staff_client, staff_user):

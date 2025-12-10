@@ -5,9 +5,6 @@ import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.contenttypes.models import ContentType
 
-from channels.api import add_user_role
-from channels.constants import CHANNEL_TYPE_PUBLIC, CHANNEL_TYPE_RESTRICTED
-from channels.factories.models import ChannelFactory
 from course_catalog.constants import PlatformType, PrivacyLevel
 from course_catalog.factories import (
     ContentFileFactory,
@@ -25,13 +22,9 @@ from search.api import (
     SIMILAR_RESOURCE_RELEVANT_FIELDS,
     execute_learn_search,
     execute_search,
-    find_related_documents,
     find_similar_resources,
-    gen_comment_id,
-    gen_post_id,
     gen_video_id,
     get_similar_topics,
-    is_reddit_object_removed,
     transform_results,
 )
 from search.connection import get_default_alias_name
@@ -101,14 +94,6 @@ def gen_query_filters_mock(mocker):
     )
 
 
-def test_gen_post_id():
-    """Test that gen_post_id returns an expected id"""
-    assert gen_post_id("1") == "p_1"
-
-
-def test_gen_comment_id():
-    """Test that gen_comment_id returns an expected id"""
-    assert gen_comment_id("1") == "c_1"
 
 
 def test_gen_video_id(mocker):
@@ -505,32 +490,7 @@ def test_execute_learn_search_podcasts(settings, user, opensearch):
     }
 
 
-def test_find_related_documents(settings, opensearch, user, gen_query_filters_mock):
-    """find_related_documents should execute a more-like-this query"""
-    posts_to_return = 7
-    settings.OPEN_DISCUSSIONS_RELATED_POST_COUNT = posts_to_return
-    post_id = "abc"
 
-    assert (
-        find_related_documents(user=user, post_id=post_id)
-        == opensearch.conn.search.return_value
-    )
-    assert gen_query_filters_mock.call_count == 1
-    constructed_query = opensearch.conn.search.call_args[1]
-    assert constructed_query["body"]["query"] == {
-        "more_like_this": {
-            "like": {"_id": gen_post_id(post_id), "_type": GLOBAL_DOC_TYPE},
-            "fields": ["plain_text", "post_title", "author_id", "channel_name"],
-            "min_term_freq": 1,
-            "min_doc_freq": 1,
-        }
-    }
-    assert constructed_query["body"]["from"] == 0
-    assert constructed_query["body"]["size"] == posts_to_return
-
-
-@pytest.mark.parametrize("is_anonymous", [True, False])
-@pytest.mark.django_db
 def test_find_similar_resources(settings, is_anonymous, opensearch, user):
     """find_similar_resources should execute a more-like-this query and not include input resource"""
     resources_to_return = 5

@@ -5,7 +5,6 @@ from django.http import Http404
 from prawcore.exceptions import Forbidden as PrawForbidden
 from prawcore.exceptions import Redirect as PrawRedirect
 
-from channels.models import Channel
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
     ContributorPermissions,
