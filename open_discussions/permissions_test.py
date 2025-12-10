@@ -2,8 +2,6 @@
 import pytest
 from django.contrib.auth.models import AnonymousUser
 from django.http import Http404
-from prawcore.exceptions import Forbidden as PrawForbidden
-from prawcore.exceptions import Redirect as PrawRedirect
 
 from open_discussions.permissions import (
     AnonymousAccessReadonlyPermission,
@@ -137,19 +135,6 @@ def test_is_staff_or_moderator_permission(mocker, is_staff, moderator, expected)
     is_staff_user_mock.assert_called_once_with(request)
 
 
-@pytest.mark.parametrize("exception_cls", [PrawRedirect, PrawForbidden])
-def test_is_staff_or_moderator_exceptions(mocker, user, exception_cls):
-    """Test that user is deemed not a moderator if praw raises a forbidden or redirect error"""
-    perm = IsStaffOrModeratorPermission()
-    request = mocker.Mock(user=user)
-    request.channel_api = mocker.patch("channels.api.Api").return_value
-    request.channel_api.is_moderator.side_effect = exception_cls(
-        mocker.MagicMock(headers={"location": "/"})
-    )
-    view = mocker.Mock(kwargs=dict(channel_name="abc"))
-    assert perm.has_permission(request, view) is False
-
-
 @pytest.mark.parametrize(
     "is_staff,moderator,readonly,expected",
     [
@@ -189,19 +174,6 @@ def test_is_staff_moderator_or_readonly_permission(
         is_staff_user_mock.assert_called_once_with(request)
     if is_moderator_mock.called:
         is_moderator_mock.assert_called_once_with(request, view)
-
-
-@pytest.mark.parametrize("exception_cls", [PrawRedirect, PrawForbidden])
-def test_is_staff_moderator_or_readonly_exceptions(mocker, user, exception_cls):
-    """Test that user is deemed not a moderator if praw raises a forbidden or redirect error"""
-    perm = IsStaffModeratorOrReadonlyPermission()
-    request = mocker.Mock(user=user)
-    request.channel_api = mocker.patch("channels.api.Api").return_value
-    request.channel_api.is_moderator.side_effect = exception_cls(
-        mocker.MagicMock(headers={"location": "/"})
-    )
-    view = mocker.Mock(kwargs=dict(channel_name="abc"))
-    assert perm.has_permission(request, view) is False
 
 
 @pytest.mark.parametrize(
