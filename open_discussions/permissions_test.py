@@ -71,9 +71,6 @@ def test_is_staff_user(
     assert is_admin_user(request) is expected
 
 
-@pytest.mark.parametrize(
-    "membership_is_managed,expected", [[True, False], [False, True], [None, False]]
-)
 def test_is_staff_permission(mocker, is_staff):
     """Test that IsStaffPermission checks that the user is a staff user"""
     request, view = mocker.Mock(), mocker.Mock()
@@ -377,9 +374,8 @@ def test_not_anonymous(method, mocker):
     assert perm.has_permission(request, mocker.Mock()) is True
 
 
-@pytest.mark.parametrize(
-    "name,raises_404", [["real", False], ["fake", True], [None, False]]
-)
+
+
 @pytest.mark.django_db
 def test_object_only_permissions(mocker):
     """Checks that ObjectOnlyPermissions.has_permission() returns True"""

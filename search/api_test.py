@@ -101,16 +101,6 @@ def test_gen_video_id(mocker):
     )
 
 
-@pytest.mark.parametrize(
-    "banned_by_val,approved_by_val,expected_value",
-    [
-        ("admin_username", "", True),
-        ("admin_username", None, True),
-        ("admin_username", "admin_username", False),
-        ("", None, False),
-        (None, None, False),
-    ],
-)
 def test_execute_search(user, opensearch):
     """execute_search should execute an OpenSearch search"""
 
