@@ -125,7 +125,7 @@ def _update_fields_by_username(username, field_dict, object_types):
 
 
 @app.task
-def update_author_posts_comments(profile_id):
+def update_author_posts_comments(profile_id):  # pylint: disable=unused-argument
     """
     Deprecated - Update author name and avatar in all associated post and comment docs.
     Posts and comments removed - this is now a no-op.
@@ -133,7 +133,7 @@ def update_author_posts_comments(profile_id):
     Args:
         profile_id: Profile ID (deprecated)
     """
-    pass
+
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
