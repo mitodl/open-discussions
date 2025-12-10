@@ -1,8 +1,6 @@
 """
 Django settings for celery.
 """
-from celery.schedules import crontab
-
 from open_discussions.envs import get_bool, get_int, get_string
 
 USE_CELERY = True

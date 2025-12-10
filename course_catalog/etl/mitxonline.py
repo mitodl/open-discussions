@@ -2,7 +2,6 @@
 import copy
 import logging
 import re
-from datetime import datetime
 from dateutil.parser import parse
 from urllib.parse import urljoin
 

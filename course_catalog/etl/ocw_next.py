@@ -125,7 +125,7 @@ def transform_resource(
 
     title = resource_data.get("title")
 
-    if title == "3play caption file" or title == "3play pdf file":
+    if title in {"3play caption file", "3play pdf file"}:
         return
 
     if not file_s3_path.startswith("courses"):

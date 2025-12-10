@@ -330,7 +330,7 @@ def documents_from_olx(
     try:
         for vertical in get_xbundle_docs(olx_path):
             yield vertical
-    except Exception as err:
+    except Exception:
         log.exception("Could not read verticals from path %s", olx_path)
 
     counter = _infinite_counter()

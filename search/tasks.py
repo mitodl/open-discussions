@@ -24,7 +24,7 @@ from course_catalog.models import (
 )
 from course_catalog.utils import load_course_blocklist
 from open_discussions.celery import app
-from open_discussions.utils import chunks, html_to_plain_text, merge_strings
+from open_discussions.utils import chunks, merge_strings
 from profiles.models import Profile
 from search import indexing_api as api
 from search.api import gen_content_file_id, gen_course_id
@@ -126,17 +126,14 @@ def _update_fields_by_username(username, field_dict, object_types):
 
 @app.task
 def update_author_posts_comments(profile_id):
-    """Update author name and avatar in all associated post and comment docs"""
-    profile_obj = Profile.objects.get(id=profile_id)
-    profile_data = OSProfileSerializer().serialize(profile_obj)
-    update_keys = {
-        key: value
-        for key, value in profile_data.items()
-        if key in ["author_name", "author_headline", "author_avatar_small"]
-    }
-    _update_fields_by_username(
-        profile_obj.user.username, update_keys, [POST_TYPE, COMMENT_TYPE]
-    )
+    """
+    Deprecated - Update author name and avatar in all associated post and comment docs.
+    Posts and comments removed - this is now a no-op.
+    
+    Args:
+        profile_id: Profile ID (deprecated)
+    """
+    pass
 
 
 @app.task(**PARTIAL_UPDATE_TASK_SETTINGS)
@@ -695,24 +692,6 @@ def start_recreate_index(self, indexes):
 
         index_tasks = []
 
-        if POST_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_posts.si(post_ids)
-                for post_ids in chunks(
-                    Post.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-
-        if COMMENT_TYPE in indexes:
-            index_tasks = index_tasks + [
-                index_comments.si(comment_ids)
-                for comment_ids in chunks(
-                    Comment.objects.order_by("id").values_list("id", flat=True),
-                    chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-                )
-            ]
-
         if PROFILE_TYPE in indexes:
             index_tasks = index_tasks + [
                 index_profiles.si(ids)
@@ -847,12 +826,6 @@ def start_update_index(self, indexes, platform):
         if COURSE_TYPE in indexes or RESOURCE_FILE_TYPE in indexes:
             blocklisted_ids = load_course_blocklist()
 
-        if POST_TYPE in indexes:
-            index_tasks = index_tasks + get_update_posts_tasks()
-
-        if COMMENT_TYPE in indexes:
-            index_tasks = index_tasks + get_update_comments_tasks()
-
         if PROFILE_TYPE in indexes:
             index_tasks = index_tasks + get_update_profiles_tasks()
 
@@ -891,28 +864,6 @@ def start_update_index(self, indexes, platform):
         return [error]
 
     raise self.replace(index_tasks)
-
-
-def get_update_posts_tasks():
-    """Get list of tasks to update posts"""
-    return [
-        index_posts.si(post_ids, True)
-        for post_ids in chunks(
-            Post.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-        )
-    ]
-
-
-def get_update_comments_tasks():
-    """Get list of tasks to update comments"""
-    return [
-        index_comments.si(comment_ids, True)
-        for comment_ids in chunks(
-            Comment.objects.order_by("id").values_list("id", flat=True),
-            chunk_size=settings.OPENSEARCH_INDEXING_CHUNK_SIZE,
-        )
-    ]
 
 
 def get_update_profiles_tasks():

@@ -1,6 +1,4 @@
-import django.contrib.postgres.fields.jsonb
-from django.db import migrations, models
-import django.db.models.deletion
+from django.db import migrations
 
 
 def remove_text_widgets(apps, schema_editor):

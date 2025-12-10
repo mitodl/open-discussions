@@ -17,7 +17,6 @@ from search.connection import get_default_alias_name
 from search.constants import (
     ALIAS_ALL_INDICES,
     COURSE_TYPE,
-    GLOBAL_DOC_TYPE,
     LEARNING_RESOURCE_TYPES,
     PODCAST_EPISODE_TYPE,
     PODCAST_TYPE,

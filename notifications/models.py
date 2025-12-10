@@ -1,7 +1,6 @@
 """Notification models"""
 from django.conf import settings
 from django.db import models
-from django.db.models import Q
 from django.db.models.constraints import UniqueConstraint
 
 from open_discussions.models import TimestampedModel

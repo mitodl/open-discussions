@@ -112,12 +112,11 @@ def notify_subscribed_users(post_id, comment_id, new_comment_id):
 @app.task
 def notify_moderators(post_id, channel_name):
     """
-    Notifies channel moderators of a new post.
+    Deprecated - channel moderator notifications no longer supported.
+    Kept as stub for backward compatibility.
 
     Args:
         post_id (str): base36 id of the post
         channel_name (str): channel name
     """
-    channel = Channel.objects.get(name=channel_name)
-    if channel.moderator_notifications:
-        api.send_moderator_notifications(post_id, channel_name)
+    pass

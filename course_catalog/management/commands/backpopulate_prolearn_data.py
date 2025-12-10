@@ -2,10 +2,10 @@
 from django.core.management import BaseCommand
 
 from course_catalog.etl.prolearn import PROLEARN_DEPARTMENT_MAPPING
-from course_catalog.models import Course, Program
+from course_catalog.models import Course
 from course_catalog.tasks import get_prolearn_data
 from open_discussions.utils import now_in_utc
-from search.search_index_helpers import deindex_course, deindex_program
+from search.search_index_helpers import deindex_course
 
 
 class Command(BaseCommand):

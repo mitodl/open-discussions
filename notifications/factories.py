@@ -4,13 +4,11 @@ from factory import Faker, SubFactory
 from factory.django import DjangoModelFactory
 from factory.fuzzy import FuzzyChoice
 import pytz
-import base36
 
 from open_discussions.factories import UserFactory
 from notifications.models import (
     NotificationSettings,
     EmailNotification,
-    PostEvent,
     FREQUENCIES,
     FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
@@ -69,13 +67,3 @@ class EmailNotificationFactory(DjangoModelFactory):
         )
         sending = factory.Trait(state=EmailNotification.STATE_SENDING)
 
-
-class PostEventFactory(DjangoModelFactory):
-    """Factory for PostEvent"""
-
-    user = SubFactory(UserFactory)
-    post_id = factory.Sequence(base36.dumps)
-    email_notification = SubFactory(EmailNotificationFactory)
-
-    class Meta:
-        model = PostEvent

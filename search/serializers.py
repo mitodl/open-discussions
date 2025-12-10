@@ -7,7 +7,6 @@ from functools import reduce
 
 from django.conf import settings
 from django.db.models import Prefetch
-from prawcore import NotFound
 from rest_framework import serializers
 
 from course_catalog.constants import OCW_DEPARTMENTS, PlatformType
@@ -25,7 +24,6 @@ from course_catalog.models import (
 )
 from open_discussions.utils import filter_dict_keys, filter_dict_with_renamed_keys
 from profiles.models import Profile
-from profiles.utils import image_uri
 from search.api import (
     gen_content_file_id,
     gen_course_id,

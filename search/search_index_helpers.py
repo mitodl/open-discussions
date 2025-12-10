@@ -2,7 +2,6 @@
 Functions that execute search-related asynchronous tasks
 """
 import logging
-from functools import partial, wraps
 
 from django.conf import settings
 

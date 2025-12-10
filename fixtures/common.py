@@ -3,7 +3,6 @@
 import logging
 import warnings
 from types import SimpleNamespace
-from unittest.mock import Mock
 
 import factory
 import pytest

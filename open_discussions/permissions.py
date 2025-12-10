@@ -1,5 +1,4 @@
 """Custom permissions"""
-from django.http import Http404
 from rest_framework import permissions
 
 from open_discussions import features

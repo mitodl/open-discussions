@@ -2,8 +2,6 @@
 import logging
 
 from django.conf import settings
-from django.db.models import Q
-from django.contrib.auth.models import User
 
 from notifications.notifiers.exceptions import (
     UnsupportedNotificationTypeError,
@@ -15,10 +13,8 @@ from notifications.models import (
     NOTIFICATION_TYPE_FRONTPAGE,
     NOTIFICATION_TYPE_COMMENTS,
     NOTIFICATION_TYPE_MODERATOR,
-    FREQUENCY_IMMEDIATE,
     FREQUENCY_DAILY,
     FREQUENCY_WEEKLY,
-    FREQUENCY_NEVER,
 )
 from notifications.notifiers import frontpage
 from notifications import tasks

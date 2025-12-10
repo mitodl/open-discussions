@@ -4,7 +4,6 @@ from django.conf import settings
 from django.db import migrations, models
 import django.db.models.deletion
 
-from course_catalog.constants import PlatformType
 
 
 class Migration(migrations.Migration):

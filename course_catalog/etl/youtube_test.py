@@ -632,10 +632,9 @@ def test_get_youtube_videos_for_transcripts_job(
                 video5,
                 video6,
             ]
+    elif created_after:
+        assert list(result.order_by("id")) == [video2, video6]
+    elif created_minutes:
+        assert list(result.order_by("id")) == [video2]
     else:
-        if created_after:
-            assert list(result.order_by("id")) == [video2, video6]
-        elif created_minutes:
-            assert list(result.order_by("id")) == [video2]
-        else:
-            assert list(result.order_by("id")) == [video2, video4, video6]
+        assert list(result.order_by("id")) == [video2, video4, video6]

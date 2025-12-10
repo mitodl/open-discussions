@@ -7,6 +7,15 @@ class FrontpageDigestNotifier(EmailNotifier):
     Notifier for frontpage digest emails (deprecated - discussions removed)
     """
 
+    def __init__(self, notification_settings):
+        """
+        Initialize the notifier with notification settings
+        
+        Args:
+            notification_settings: NotificationSettings instance
+        """
+        super().__init__("frontpage_email", notification_settings)
+
     def should_send_notification(self):
         """
         Returns False - frontpage notifications disabled

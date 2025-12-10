@@ -1,7 +1,6 @@
 """xPro course catalog ETL"""
 import copy
 import logging
-from datetime import datetime
 from dateutil.parser import parse
 
 import pytz
